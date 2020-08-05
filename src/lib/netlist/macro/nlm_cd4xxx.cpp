@@ -3,8 +3,8 @@
 
 #include "netlist/devices/net_lib.h"
 
-//- Identifier: CD4001BM/CD4001BC
-//- Title: Quad 2-Input NOR Buffered B Series Gate
+//- Identifier: CD4001_DIP
+//- Title: CD4001BM/CD4001BC Quad 2-Input NOR Buffered B Series Gate
 //- Description: These quad gates are monolithic complementary MOS (CMOS) integrated circuits constructed with N- and P-channel enhancement mode transistors.
 //-   They have equal source and sink current capabilities and conform to standard B series output drive.
 //-   The devices also have buffered outputs which improve transfer characteristics by providing very high gain.
@@ -44,8 +44,8 @@ static NETLIST_START(CD4001_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4006BM/CD4006BC
-//- Title: 18-Stage Static Shift Register
+//- Identifier: CD4006_DIP
+//- Title: CD4006BM/CD4006BC 18-Stage Static Shift Register
 //- Description: The CD4006BM/CD4006BC 18-stage static shift register is comprised of four separate shift register sections, two sections of four stages and two sections of five stages.
 //-   Each section has an independent data input.
 //-   Outputs are available at the fourth stage and the fifth stage of each section.
@@ -74,8 +74,8 @@ static NETLIST_START(CD4006_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4011BM/CD4011BC
-//- Title: Quad 2-Input NAND Buffered B Series Gate
+//- Identifier: CD4011_DIP
+//- Title: CD4011BM/CD4011BC Quad 2-Input NAND Buffered B Series Gate
 //- Description: These quad gates are monolithic complementary MOS (CMOS) integrated circuits constructed with N- and P-channel enhancement mode transistors.
 //-   They have equal source and sink current capabilities and conform to standard B series output drive.
 //-   The devices also have buffered outputs which improve transfer characteristics by providing very high gain.
@@ -115,8 +115,8 @@ static NETLIST_START(CD4011_DIP)
 	   )
 NETLIST_END()
 
-//- Identifier: CD4013BM/CD4013BC
-//- Title: Dual D Flip-Flop
+//- Identifier: CD4013_DIP
+//- Title: CD4013BM/CD4013BC Dual D Flip-Flop
 //- Description: The CD4013B dual D flip-flop is a monolithic complementary MOS (CMOS) integrated circuit constructed with N- and P-channel enhancement mode transistors.
 //-   Each flip-flop has independent data, set, reset, and clock inputs and Q and QQ outputs.
 //-   These devices can be used for shift register applications, and by connecting Q output to the data input, for counter and toggle applications.
@@ -158,8 +158,8 @@ static NETLIST_START(CD4013_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4016BM/CD4016BC
-//- Title: Quad Bilateral Switch
+//- Identifier: CD4016_DIP
+//- Title: CD4016BM/CD4016BC Quad Bilateral Switch
 //- Description: The CD4016BM/CD4016BC is a quad bilateral switch intended for the transmission or multiplexing of analog or digital signals.
 //-   It is pin-for-pin compatible with CD4066BM/CD4066BC.
 //- Pinalias: INOUTA,OUTINA,OUTINB,INOUTB,CONTROLB,CONTROLC,VSS,INOUTC,OUTINC,OUTIND,INOUTD,CONTROLD,CONTROLA,VDD
@@ -194,8 +194,8 @@ static NETLIST_START(CD4016_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4017BM/CD4017BC
-//- Title: Decade Counter/Divider with 10 Decoded Outputs
+//- Identifier: CD4017_DIP
+//- Title: CD4017BM/CD4017BC Decade Counter/Divider with 10 Decoded Outputs
 //- Description: The CD4017BM/CD4017BC is a 5-stage divide-by-10 Johnson counter with 10 decoded outputs and a carry out bit.
 //-   These counters are cleared to their zero count by a logical 1 on their reset line.
 //-   These counters are advanced on the positive edge of the clock signal when the clock enable signal is in the logical 0 state.
@@ -225,8 +225,8 @@ static NETLIST_START(CD4017_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4020BC
-//- Title: 14-Stage Ripple Carry Binary Counters
+//- Identifier: CD4020_DIP
+//- Title: CD4020BC 14-Stage Ripple Carry Binary Counters
 //- Description: The CD4020BC is a 14-stage ripple carry binary counter.
 //-   The counters are advanced one count on the negative transition of each clock pulse.
 //-   The counters are reset to the zero state by a logical 1 at the reset input independent of clock.
@@ -248,11 +248,11 @@ static NETLIST_START(CD4020_DIP)
 		 A.Q7, /*  Q7 |6           11| RESET */ A.RESET,
 		 A.Q4, /*  Q4 |7           10| PHI1  */ A.IP,
 		A.VSS, /* VSS |8            9| Q1    */ A.Q1
-			   /*     +--------------+       */
+			   /*     +--------------+       */)
 NETLIST_END()
 
-//- Identifier: CD4022BM/CD4022BC
-//- Title: Divide-by-8 Counter/Divider with 8 Decoded Outputs
+//- Identifier: CD4022_DIP
+//- Title: CD4022BM/CD4022BC Divide-by-8 Counter/Divider with 8 Decoded Outputs
 //- Description: The CD4022BM/CD4022BC is a 4-stage divide-by-8 Johnson counter with 8 decoded outputs and a carry-out bit.
 //-   These counters are cleared to their zero count by a logical 1 on their reset line.
 //-   These counters are advanced on the positive edge of the clock signal when the clock enable signal is in the logical 0 state.
@@ -283,8 +283,8 @@ static NETLIST_START(CD4022_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4024BM/CD4024BC
-//- Title: 7-Stage Ripple Carry Binary Counter
+//- Identifier: CD4024_DIP
+//- Title: CD4024BM/CD4024BC 7-Stage Ripple Carry Binary Counter
 //- Description: The CD4024BM/CD4024BC is a 7-stage ripple-carry binary counter.
 //-   Buffered outputs are externally available from stages 1 through 7.
 //-   The counter is reset to its logical 0 stage by a logical 1 on the reset input.
@@ -307,11 +307,11 @@ static NETLIST_START(CD4024_DIP)
 		   A.Q5, /*    Q5 |5           10| NC  */ NC.I,
 		   A.Q4, /*    Q4 |6            9| Q3  */ A.Q3,
 		  A.VSS, /*   VSS |7            8| NC  */ NC.I
-				 /*       +--------------+     */
+				 /*       +--------------+     */)
 NETLIST_END()
 
-//- Identifier: CD4053BM/CD4053BC
-//- Title: Triple 2-Channel AnalogMultiplexer/Demultiplexer
+//- Identifier: CD4053_DIP
+//- Title: CD4053BM/CD4053BC Triple 2-Channel AnalogMultiplexer/Demultiplexer
 //- Description: These analog multiplexers/demultiplexers are digitally controlled analog switches having low ON impedance andvery low OFF leakage currents.
 //-   Control of analog signalsup to 15V(p-p) can be achieved by digital signal amplitudes of 3–15V.
 //-   For example, if VDD=5V, VSS=0V and VEE=-5V, analog signals from -5V to +5V can be controlled by digital inputs of 0–5V.
@@ -352,8 +352,8 @@ static NETLIST_START(CD4053_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4066BM/CD4066BC
-//- Title: Quad Bilateral Switch
+//- Identifier: CD4066_DIP
+//- Title: CD4066BM/CD4066BC Quad Bilateral Switch
 //- Description: The CD4066BM/CD4066BC is a quad bilateral switch intended for the transmission or multiplexing of analog or digital signals.
 //-   It is pin-for-pin compatible with CD4016BM/CD4016BC, but has a much lower ON resistance, and ON resistance is relatively constant over the input-signal range.
 //- Pinalias: INOUTA,OUTINA,OUTINB,INOUTB,CONTROLB,CONTROLC,VSS,INOUTC,OUTINC,OUTIND,INOUTD,CONTROLD,CONTROLA,VDD
@@ -388,8 +388,8 @@ static NETLIST_START(CD4066_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4069UBM/CD4069UBC
-//- Title: Inverter Circuits
+//- Identifier: CD4069_DIP
+//- Title: CD4069UBM/CD4069UBC Inverter Circuits
 //- Description: The CD4069UB consists of six inverter circuits and is manufactured using complementary MOS (CMOS) to achieve wide power supply operating range, low power consumption, high noise immunity, and symmetric controlled rise and fall times.
 //-   This device is intended for all general purpose inverter applications where the special characteristics of the MM74C901, MM74C903, MM74C907, and CD4049A Hex Inverter/Buffers are not required.
 //-   In those applications requiring larger noise immunity the MM74C14 or MM74C914 Hex Schmitt Trigger is suggested.
@@ -423,8 +423,8 @@ static NETLIST_START(CD4069_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: CD4070BM/CD4070BC
-//- Title: Quad 2-Input EXCLUSIVE-OR Gate
+//- Identifier: CD4070_DIP
+//- Title: CD4070BM/CD4070BC Quad 2-Input EXCLUSIVE-OR Gate
 //- Description: Employing complementary MOS (CMOS) transistors to achieve wide power supply operating range, low power consumption, and high noise margin, the CD4070BM/BC provides basic functions used in the implementation of digital integrated circuit systems.
 //-   The N- and P-channel enhancement mode transistors provide a symmetrical circuit with output swing essentially equal to the supply voltage.
 //-   No DC power other than that caused by leakage current is consumed during static condition.
@@ -456,8 +456,8 @@ static NETLIST_START(CD4070_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 74HC/HCT4316
-//- Title: Quad bilateral switches
+//- Identifier: CD4316_DIP
+//- Title: 74HC/HCT4316 Quad bilateral switches
 //- Description: The 74HC/HCT4316 are high-speed Si-gate CMOS devices.
 //-   They are specified in compliance with JEDEC standard no. 7A.
 //-   The 74HC/HCT4316 have four independent analog switches.

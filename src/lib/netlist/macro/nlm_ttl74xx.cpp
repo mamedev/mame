@@ -17,8 +17,8 @@
 //
 #endif
 
-//- Identifier: 5400/DM5400/DM7400
-//- Title: Quad 2-Input NAND Gates
+//- Identifier: TTL_7400_DIP
+//- Title: 5400/DM5400/DM7400 Quad 2-Input NAND Gates
 //- Description: This device contains four independent gates each of which performs the logic NAND function.
 //- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
 //- Package: DIP
@@ -56,8 +56,8 @@ static NETLIST_START(TTL_7400_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5402/DM5402/DM7402
-//- Title: Quad 2-Input NOR Gates
+//- Identifier: TTL_7402_DIP
+//- Title: 5402/DM5402/DM7402 Quad 2-Input NOR Gates
 //- Description: This device contains four independent gates each of which performs the logic NOR function.
 //- Pinalias: Y1,A1,B1,Y2,A2,B2,GND,A3,B3,Y3,A4,B4,Y4,VCC
 //- Package: DIP
@@ -95,8 +95,8 @@ static NETLIST_START(TTL_7402_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5404/DM5404/DM7404
-//- Title: Hex Inverting Gates
+//- Identifier: TTL_7404_DIP
+//- Title: 5404/DM5404/DM7404 Hex Inverting Gates
 //- Description: This device contains six independent gates each of which performs the logic INVERT function.
 //- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
 //- Package: DIP
@@ -134,8 +134,8 @@ static NETLIST_START(TTL_7404_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5406/DM7406
-//- Title: Hex Inverting Buffers with High Voltage Open-Collector Outputs
+//- Identifier: TTL_7406_DIP
+//- Title: DM5406/DM7406 Hex Inverting Buffers with High Voltage Open-Collector Outputs
 //- Description: This device contains six independent buffers each of which performs the logic INVERT function.
 //-   The open-collector outputs require external pull-up resistors for proper logical operation.
 //- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
@@ -175,8 +175,8 @@ static NETLIST_START(TTL_7406_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5407/DM7407
-//- Title: Hex Buffers with High Voltage Open-Collector Outputs
+//- Identifier: TTL_7407_DIP
+//- Title: DM5407/DM7407 Hex Buffers with High Voltage Open-Collector Outputs
 //- Description: This device contains six independent gates each of which performs a buffer function.
 //-   The open-collector outputs re-quire external pull-up resistors for proper logical operation.
 //- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
@@ -216,8 +216,8 @@ static NETLIST_START(TTL_7407_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5408/DM5408/DM7408
-//- Title: Quad 2-Input AND Gates
+//- Identifier: TTL_7408_DIP
+//- Title: 5408/DM5408/DM7408 Quad 2-Input AND Gates
 //- Description: This device contains four independent gates each of which performs the logic AND function.
 //- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
 //- Package: DIP
@@ -255,8 +255,8 @@ static NETLIST_START(TTL_7408_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5410/DM5410/DM7410
-//- Title: Triple 3-Input NAND Gates
+//- Identifier: TTL_7410_DIP
+//- Title: 5410/DM5410/DM7410 Triple 3-Input NAND Gates
 //- Description: This device contains three independent gates each of which performs the logic NAND function.
 //- Pinalias: A1,B1,A2,B2,C2,Y2,GND,Y3,A3,B3,C3,Y1,C1,VCC
 //- Package: DIP
@@ -293,8 +293,8 @@ static NETLIST_START(TTL_7410_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM7411
-//- Title: Triple 3-Input AND Gate
+//- Identifier: TTL_7411_DIP
+//- Title: DM7411 Triple 3-Input AND Gate
 //- Description: This device contains three independent gates with three data inputs each which perform the logic AND function.
 //- Pinalias: A1,B1,A2,B2,C2,Y2,GND,Y3,A3,B3,C3,Y1,C1,VCC
 //- Package: DIP
@@ -331,8 +331,8 @@ static NETLIST_START(TTL_7411_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5414/DM7414
-//- Title: Hex Inverter withSchmitt Trigger Inputs
+//- Identifier: TTL_7414_DIP
+//- Title: DM5414/DM7414 Hex Inverter withSchmitt Trigger Inputs
 //- Description: This device contains six independent gates each of whichperforms the logic INVERT function.
 //-   Each input has hysteresis which increases the noise immunity and transforms a slowly changing input
 //-   signal to a fast changing, jitter free output.
@@ -411,8 +411,8 @@ static NETLIST_START(TTL_74LS14_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5416/DM7416
-//- Title: Hex Inverting Buffers with High Voltage Open-Collector Outputs
+//- Identifier: TTL_7416_DIP
+//- Title: DM5416/DM7416 Hex Inverting Buffers with High Voltage Open-Collector Outputs
 //- Description: This device contains six independent gates each of which performs the logic INVERT function.
 //-   The open-collector outputs require external pull-up resistors for proper logical operation.
 //- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
@@ -451,8 +451,8 @@ static NETLIST_START(TTL_7416_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5420/DM5420/DM7420
-//- Title: Dual 4-Input NAND Gates
+//- Identifier: TTL_7420_DIP
+//- Title: 5420/DM5420/DM7420 Dual 4-Input NAND Gates
 //- Description: This device contains two independent gates each of which performs the logic NAND function.
 //- Pinalias: A1,B1,NC,C1,D1,Y1,GND,Y2,A2,B2,NC,C2,D2,VCC
 //- Package: DIP
@@ -490,8 +490,8 @@ static NETLIST_START(TTL_7420_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54LS21/DM54LS21/DM74LS21
-//- Title: Dual 4-Input AND Gates
+//- Identifier: TTL_7421_DIP
+//- Title: 54LS21/DM54LS21/DM74LS21 Dual 4-Input AND Gates
 //- Description: This device contains two independent 4-input gates each of which performs the logic AND function.
 //- Pinalias: A1,B1,NC,C1,D1,Y1,GND,Y2,A2,B2,NC,C2,D2,VCC
 //- Package: DIP
@@ -529,8 +529,8 @@ static NETLIST_START(TTL_7421_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5425/DM7425
-//- Title: Dual 4-Input NOR Gate (with Strobe)
+//- Identifier: TTL_7425_DIP
+//- Title: 5425/DM7425 Dual 4-Input NOR Gate (with Strobe)
 //- Description: This device contains 2, 4-input gates that perform the logical NOR function.
 //-   The output of each NOR gate is gated (strobed) by pin 3 and 11 by positive true logic, i.e., logic "1" equals output on.
 //- Pinalias: A1,B1,X1,C1,D1,Y1,GND,Y2,A2,B2,X2,C2,D2
@@ -572,8 +572,8 @@ static NETLIST_START(TTL_7425_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM7427
-//- Title: Triple 3-Input NOR Gates
+//- Identifier: TTL_7427_DIP
+//- Title: DM7427 Triple 3-Input NOR Gates
 //- Description: This device contains three independent gates each of which performs the logic NOR function.
 //- Pinalias: A1,B1,A2,B2,C2,Y2,GND,Y3,A3,B3,C3,Y1,C1,VCC
 //- Package: DIP
@@ -610,8 +610,8 @@ static NETLIST_START(TTL_7427_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5430/DM5430/DM7430
-//- Title: 8-Input NAND Gate
+//- Identifier: TTL_7430_DIP
+//- Title: 5430/DM5430/DM7430 8-Input NAND Gate
 //- Description: This device contains a single gate which performs the logic NAND function.
 //- Pinalias: A,B,C,D,E,F,GND,Y,NC,NC,G,H,NC,VCC
 //- Package: DIP
@@ -648,8 +648,8 @@ static NETLIST_START(TTL_7430_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5432/DM5432/DM7432
-//- Title: Quad 2-Input OR Gates
+//- Identifier: TTL_7432_DIP
+//- Title: 5432/DM5432/DM7432 Quad 2-Input OR Gates
 //- Description: This device contains four independent gates each of whichperforms the logic OR function.
 //- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
 //- Package: DIP
@@ -687,8 +687,8 @@ static NETLIST_START(TTL_7432_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5437/DM5437/DM7437
-//- Title: Quad 2-Input NAND Buffers
+//- Identifier: TTL_7437_DIP
+//- Title: 5437/DM5437/DM7437 Quad 2-Input NAND Buffers
 //- Description: This device contains four independent gates each of whichperforms the logic OR function.
 //- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
 //- Package: DIP
@@ -727,8 +727,8 @@ static NETLIST_START(TTL_7437_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5442A/DM5442A/DM7442A
-//- Title: BCD to Decimal Decoders
+//- Identifier: TTL_7442_DIP
+//- Title: 5442A/DM5442A/DM7442A BCD to Decimal Decoders
 //- Description: These BCD-to-decimal decoders consist of eight inverters
 //-   and ten, four-input NAND gates. The inverters are
 //-   connected in pairs to make BCD input data available for
@@ -778,8 +778,8 @@ static NETLIST_START(TTL_7442_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5448/DM48LS48/DM7448/DM74LS48
-//- Title: BCD to 7-Segment Decoder
+//- Identifier: TTL_7448_DIP
+//- Title: DM5448/DM48LS48/DM7448/DM74LS48 BCD to 7-Segment Decoder
 //- Description: The 48 and LS48 feature active-high outputs for
 //-   driving lamp buffers or common-cathode LED's.
 //-   These circuits have full ripple-blanking input/output controls
@@ -845,8 +845,8 @@ static NETLIST_START(TTL_7448_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM7450
-//- Title: Expandable Dual 2-Wide 2-Input AND-OR-INVERT Gate
+//- Identifier: TTL_7450_DIP
+//- Title: DM7450 Expandable Dual 2-Wide 2-Input AND-OR-INVERT Gate
 //- Description: This device contains two independent combinations of gates, each of which perform the logic AND-OR-INVERT function.
 //-   One set of gates has an expander node.
 //- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
@@ -885,8 +885,8 @@ static NETLIST_START(TTL_7450_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5473/DM5473/DM7473
-//- Title: Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+//- Identifier: TTL_7473_DIP
+//- Title: 5473/DM5473/DM7473 Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
 //- Description: This device contains two independent positive pulse triggered J-K flip-flops with complementary outputs.
 //-   The J and K data is processed by the flip-flops after a complete clock pulse.
 //-   While the clock is low the slave is isolated from the master.
@@ -931,11 +931,11 @@ static NETLIST_START(TTL_7473_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54LS73A/DM74LS73A
-//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+//- Identifier: TTL_7473A_DIP
+//- Title: DM54LS73A/DM74LS73A Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
 //- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
 //-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
-//    The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
+//-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
 //-   The data on the J and K inputs is allowed to change while the clock is high or low without affecting the outputs as long as setup and hold times are not violated.
 //-   A low logic level on the clear input will reset the outputs regardless of the levels of the other inputs.
 //- Pinalias: CLK1,CLR1,K1,VCC,CLK2,CLR2,J2,QQ2,Q2,K2,GND,Q1,QQ1,J1
@@ -974,8 +974,8 @@ static NETLIST_START(TTL_7473A_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5474/DM5474/DM7474
-//- Title: Dual Positive-Edge-Triggered D Flip-Flops with Preset, Clear and Complementary Outputs
+//- Identifier: TTL_7474_DIP
+//- Title: 5474/DM5474/DM7474 Dual Positive-Edge-Triggered D Flip-Flops with Preset, Clear and Complementary Outputs
 //- Description: This device contains two independent positive-edge-triggered D flip-flops with complementary outputs.
 //-   The information on the D input is accepted by the flip-flops on the positive going edge of the clock pulse.
 //-   The triggering occurs at a voltage level and is not directly related to the transition time of the rising edge of the clock.
@@ -1017,8 +1017,8 @@ static NETLIST_START(TTL_7474_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5475/DM7475/DM7475A/DM74LS75
-//- Title: 4-bit D Latch
+//- Identifier: TTL_7475_DIP
+//- Title: DM5475/DM7475/DM7475A/DM74LS75 4-bit D Latch
 //- Description: These latches are ideally suited for use as temporary
 //-    storage for binary information between processing units
 //-    and input/output or indicator units. Information present
@@ -1073,8 +1073,8 @@ static NETLIST_START(TTL_7475_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74LS77
-//- Title: 4-bit D Latch
+//- Identifier: TTL_7477_DIP
+//- Title: DM74LS77 4-bit D Latch
 //- Description: These latches are ideally suited for use as temporary
 //-    storage for binary information between processing units
 //-    and input/output or indicator units. Information present
@@ -1125,8 +1125,8 @@ static NETLIST_START(TTL_7477_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5483/DM7483/DM74LS83A
-//- Title: 4-bit Binary Adders With Fast Carry
+//- Identifier: TTL_7483_DIP
+//- Title: DM5483/DM7483/DM74LS83A 4-bit Binary Adders With Fast Carry
 //- Description: These full adders perform the addition of two 4-bit
 //-   binary numbers. The sum (S) outputs are provided for
 //-   each bit and the resultant carry (C4) is obtained from
@@ -1161,8 +1161,8 @@ static NETLIST_START(TTL_7483_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5485/DM7485/DM74L85/DM74LS85
-//- Title: 4-Bit Magnitude Comparators
+//- Identifier: TTL_7485_DIP
+//- Title: DM5485/DM7485/DM74L85/DM74LS85 4-Bit Magnitude Comparators
 //- Description: These four-bit magnitude comparators perform comparison
 //-   of straight binary or BCD codes. Three
 //-   fully-decoded decisions about two, 4-bit words (A, B)
@@ -1201,8 +1201,8 @@ static NETLIST_START(TTL_7485_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 5486/DM5486/DM7486
-//- Title: Quad 2-Input Exclusive-OR Gates
+//- Identifier: TTL_7486_DIP
+//- Title: 5486/DM5486/DM7486 Quad 2-Input Exclusive-OR Gates
 //- Description: This device contains four independent gates each of which performs the logic exclusive-OR function.
 //- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
 //- Package: DIP
@@ -1240,8 +1240,8 @@ static NETLIST_START(TTL_7486_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM5490/DM7490A
-//- Title: Decade Counter
+//- Identifier: TTL_7490_DIP
+//- Title: DM5490/DM7490A Decade Counter
 //- Description: These monolithic counters contain four
 //-   master-slave flip-flops and additional gating to provide
 //-   a divide-by-two counter and a three-stage binary counter
@@ -1309,8 +1309,8 @@ static NETLIST_START(TTL_7490_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: SN5492A, SN54LS92, SN7492A, SN74LS92
-//- Title: Divide-By-Twelve Counter
+//- Identifier: TTL_7492_DIP
+//- Title: SN5492A, SN54LS92, SN7492A, SN74LS92 Divide-By-Twelve Counter
 //- Description: These monolithic counters contains four
 //-   master-slave flip-flops and additional gating to provide
 //-   a divide-by-two counter and a three-stage binary counter
@@ -1372,8 +1372,8 @@ NETLIST_END()
 	)
 NETLIST_END()
 
-//- Identifier: DM7493A
-//- Title: Binary Counter
+//- Identifier: TTL_7493_DIP
+//- Title: DM7493A Binary Counter
 //- Description: These monolithic counters contains four
 //-   master-slave flip-flops and additional gating to provide
 //-   a divide-by-two counter and a three-stage binary counter
@@ -1438,8 +1438,8 @@ NETLIST_END()
 	)
 NETLIST_END()
 
-//- Identifier: 5497/DM7497
-//- Title: Synchronous Modulo-64 Bit Rate Multiplier
+//- Identifier: TTL_7497_DIP
+//- Title: 5497/DM7497 Synchronous Modulo-64 Bit Rate Multiplier
 //- Description: The ’97 contains a synchronous 6-stage binary counter and six decoding gates that serve to gate the clock through to the output at a sub-multiple of the input frequency.
 //-   The output pulse rate, relative to the clock frequency, is determined by signals applied to the Select (S0–S5) inputs.
 //-   Both true and complement outputs are available, along with an enable input for each.
@@ -1467,8 +1467,8 @@ static NETLIST_START(TTL_7497_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: SN54107, SN74107
-//- Title: Dual J-K Flip-Flops With Clear
+//- Identifier: TTL_74107_DIP
+//- Title: SN54107, SN74107 Dual J-K Flip-Flops With Clear
 //- Description: The '107 contains two independent J-K flip-flops with individual J-K, clock, and direct clear inputs.
 //-   The '107 is a positive pulse-triggered flip-flop.
 //-   The J-K input data is loaded into the master while the clock is high and transferred to teh slave and the outputs on the high-to-low clock transition.
@@ -1513,8 +1513,8 @@ static NETLIST_START(TTL_74107_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54LS107A/DM74LS107A
-//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops withClear and Complementary Outputs
+//- Identifier: TTL_74107A_DIP
+//- Title: DM54LS107A/DM74LS107A Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops withClear and Complementary Outputs
 //- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
 //-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
 //-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
@@ -1556,8 +1556,8 @@ static NETLIST_START(TTL_74107A_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54S113/DM74S113
-//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Preset and Complementary Outputs
+//- Identifier: TTL_74113_DIP
+//- Title: DM54S113/DM74S113 Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Preset and Complementary Outputs
 //- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
 //-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
 //-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
@@ -1599,8 +1599,8 @@ static NETLIST_START(TTL_74113_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54S113/DM74S113
-//- Title: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Preset and Complementary Outputs
+//- Identifier: TTL_74113A_DIP
+//- Title: DM54S113/DM74S113 Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Preset and Complementary Outputs
 //- Description: This device contains two independent negative-edge-triggered J-K flip-flops with complementary outputs.
 //-   The J and K data is processed by the flip-flops on the falling edge of the clock pulse.
 //-   The clock triggering occurs at a voltage level and is not directly related to the transition time of the negative going edge of the clock pulse.
@@ -1796,8 +1796,8 @@ static NETLIST_START(TTL_74125_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74LS126A
-//- Title: Quad 3-STATE Buffer
+//- Identifier: TTL_74126_DIP
+//- Title: DM74LS126A Quad 3-STATE Buffer
 //- Description: This device contains four independent gates each of which performs a non-inverting buffer function.
 //-   The outputs have the 3-STATE feature.
 //-   When enabled, the outputs exhibit the low impedance characteristics of a standard LS output with additional drive capability to permit the driving of buslines without external resistors.
@@ -1845,8 +1845,8 @@ static NETLIST_START(TTL_74126_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54153/DM54153/DM74153
-//- Title: Dual 4-Line to 1-LineData Selectors/Multiplexers
+//- Identifier: TTL_74153_DIP
+//- Title: 54153/DM54153/DM74153 Dual 4-Line to 1-LineData Selectors/Multiplexers
 //- Description: Each of these data selectors/multiplexers contains inverters and drivers to supply fully complementary, on-chip, binary decoding data selection to the AND-OR-invert gates.
 //-   Separate strobe inputs are provided for each of the two four-line sections.
 //- Pinalias: G1,B,1C3,1C2,1C1,1C0,Y1,GND,Y2,2C0,2C1,2C2,2C3,A,G2,VCC
@@ -1892,8 +1892,8 @@ static NETLIST_START(TTL_74153_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54LS155/DM54LS155/DM74LS155
-//- Title: Dual 2-Line to 4-Line Decoders/Demultiplexers
+//- Identifier: TTL_74155_DIP
+//- Title: 54LS155/DM54LS155/DM74LS155 Dual 2-Line to 4-Line Decoders/Demultiplexers
 //- Description: These TTL circuits feature dual 1-line-to-4-line demultiplexers with individual strobes and common binary-address inputs in a single 16-pin package.
 //-   When both sections are enabled by the strobes, the common address inputs sequentially select and route associated input data to the appropriate output of each section.
 //-   The individual strobes permit activating or inhibiting each of the 4-bit sections as desired.
@@ -1956,8 +1956,8 @@ static NETLIST_START(TTL_74155_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54LS156/DM54LS156/DM74LS156
-//- Title: Dual 2-Line to 4-Line Decoders/Demultiplexers with Open-Collector Outputs
+//- Identifier: TTL_74156_DIP
+//- Title: 54LS156/DM54LS156/DM74LS156 Dual 2-Line to 4-Line Decoders/Demultiplexers with Open-Collector Outputs
 //- Description: These TTL circuits feature dual 1-line-to-4-line demultiplexers with individual strobes and common binary-address inputs in a single 16-pin package.
 //-   When both sections are enabled by the strobes, the common address inputs sequentially select and route associated input data to the appropriate output of each section.
 //-   The individual strobes permit activating or inhibiting each of the 4-bit sections as desired.
@@ -2020,8 +2020,8 @@ static NETLIST_START(TTL_74156_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54157/DM54157/DM74157
-//- Title: Quad 2-Line to 1-Line Data Selectors/Multiplexers
+//- Identifier: TTL_74157_DIP
+//- Title: 54157/DM54157/DM74157 Quad 2-Line to 1-Line Data Selectors/Multiplexers
 //- Description: These data selectors/multiplexers contain inverters and drivers to supply full on-chip data selection to the four output gates.
 //-   A separate strobe input is provided.
 //-   A 4-bit word is selected from one of two sources and is routed to the four outputs.
@@ -2066,8 +2066,8 @@ static NETLIST_START(TTL_74157_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54161/DM74161
-//- Title: Synchronous 4-Bit Counter
+//- Identifier: TTL_74161_DIP
+//- Title: DM54161/DM74161 Synchronous 4-Bit Counter
 //- Description: These synchronous, presettable counters feature an internal carry look-ahead for application in high-speed counting designs.
 //-   The 161 is a 4-bit binary counter.
 //-   The carry output is decoded by means of a NOR gate, thus preventing spikes during the normal counting mode of operation.
@@ -2105,8 +2105,8 @@ static NETLIST_START(TTL_74161_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74163
-//- Title: Synchronous 4-Bit Counter
+//- Identifier: TTL_74163_DIP
+//- Title: DM74163 Synchronous 4-Bit Counter
 //- Description: These synchronous, presettable counters feature an internal carry look-ahead for application in high-speed counting designs.
 //-   The 163 is a 4-bit binary counter.
 //-   The carry output is decoded by means of a NOR gate, thus preventing spikes during the normal counting mode of operation.
@@ -2147,8 +2147,8 @@ static NETLIST_START(TTL_74163_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74164
-//- Title: 8-Bit Serial In/Parallel Out Shift Registers
+//- Identifier: TTL_74164_DIP
+//- Title: DM74164 8-Bit Serial In/Parallel Out Shift Registers
 //- Description: These 8-bit shift registers feature gated serial inputs and an asynchronous clear.
 //-   A LOW logic level at either serial input inhibits entry of the new data, and resets the first flip-flop to the LOW level at the next clock pulse, thus providing complete control over incoming data.
 //-   A HIGH logic level on either input enables the other input, which will then determine the state of the first flip-flop.
@@ -2186,8 +2186,8 @@ static NETLIST_START(TTL_74164_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54165/DM74165
-//- Title: 8-Bit Parallel-to-Serial Converter
+//- Identifier: TTL_74165_DIP
+//- Title: 54165/DM74165 8-Bit Parallel-to-Serial Converter
 //- Description: The ’165 is an 8-bit parallel load or serial-in register with complementary outputs available from the last stage.
 //-   Parallel inputting occurs asynchronously when the Parallel Load (PL) input is LOW.
 //-   With PL HIGH, serial shifting occurs on the rising edge of the clock; new data enters via the Serial Data (DS) input.
@@ -2224,8 +2224,8 @@ static NETLIST_START(TTL_74165_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74LS166
-//- Title: 8-Bit Parallel-In/Serial-Out Shift Registers
+//- Identifier: TTL_74166_DIP
+//- Title: DM74LS166 8-Bit Parallel-In/Serial-Out Shift Registers
 //- Description: These parallel-in or serial-in, serial-out shift registers feature gated clock inputs and an overriding clear input.
 //-   All inputs are buffered to lower the drive requirements to one normalized load, and input clamping diodes minimize switching transients to simplify system design.
 //-   The load mode is established by the shift/load input.
@@ -2270,8 +2270,8 @@ static NETLIST_START(TTL_74166_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74174
-//- Title: Hex/Quad D-Type Flip-Flop with Clear
+//- Identifier: TTL_74174_DIP
+//- Title: DM74174 Hex/Quad D-Type Flip-Flop with Clear
 //- Description: These positive-edge triggered flip-flops utilize TTL circuitry to implement D-type flip-flop logic.
 //-   All have a direct clear input.
 //-   Information at the D inputs meeting the setup and hold time requirements is transferred to the Q outputs on the positive-going edge of the clock pulse.
@@ -2313,8 +2313,8 @@ static NETLIST_START(TTL_74174_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54LS260/DM74LS260
-//- Title: Dual 5-Input NOR Gate
+//- Identifier: TTL_74260_DIP
+//- Title: DM54LS260/DM74LS260 Dual 5-Input NOR Gate
 //- Description: This device contains two individual five input gates, each of which perform the logic NOR function.
 //- Pinalias: A1,B1,C1,A2,Q1,Q2,GND,B2,C2,D2,E2,D1,E1,VCC
 //- Package: DIP
@@ -2352,8 +2352,8 @@ static NETLIST_START(TTL_74260_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54279/DM74279
-//- Title: Quad Set-Reset Latch
+//- Identifier: TTL_74279_DIP
+//- Title: 54279/DM74279 Quad Set-Reset Latch
 //- Description: These latches are ideaily suited ·for use as temporary
 //-   storage of bfnary information between processing units
 //-   and I/O units. When either one of the data inputs is at
@@ -2410,8 +2410,8 @@ static NETLIST_START(TTL_74279_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54LS377/DM74LS377
-//- Title: Octal D Flip-Flop with Common Enable and Clock
+//- Identifier: TTL_74377_DIP
+//- Title: DM54LS377/DM74LS377 Octal D Flip-Flop with Common Enable and Clock
 //- Description: The ’LS377 is an 8-bit register built using advanced low power Schottky technology.
 //-   This register consists of eight D-type flip-flops with a buffered common clock and a buffered common input enable.
 //-   The device is packaged in the space-saving (0.3 inch row spacing) 20-pin package.
@@ -2468,8 +2468,8 @@ static NETLIST_START(TTL_74377_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM54LS378/DM74LS378
-//- Title: Parallel D Register with Enable
+//- Identifier: TTL_74378_DIP
+//- Title: DM54LS378/DM74LS378 Parallel D Register with Enable
 //- Description: The ’LS378 is a 6-bit register with a buffered common enable.
 //-   This device is similar to the ’LS174, but with common Enable rather than common Master Reset.
 //- Pinalias: EQ,Q0,D0,D1,Q1,D2,Q2,GND,CP,Q3,D3,Q4,D4,D5,Q6,VCC
@@ -2512,8 +2512,8 @@ static NETLIST_START(TTL_74378_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54LS379/DM74LS379
-//- Title: Quad Parallel Register with Enable
+//- Identifier: TTL_74379_DIP
+//- Title: 54LS379/DM74LS379 Quad Parallel Register with Enable
 //- Description: The LS379 is a 4-bit register with buffered common Enable.
 //-   This device is similar to the LS175 but features the common Enable rather than common Master Reset.
 //- Pinalias: EEQ,Q0,QQ0,D0,QQ1,Q1,GND,CP,Q2,QQ2,D2,D3,QQ3,Q3,VCC
@@ -2554,9 +2554,9 @@ static NETLIST_START(TTL_74379_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74LS393
+//- Identifier: TTL_74393_DIP
 //- Title: Dual 4-Bit Binary Counter
-//- Description: Each of these monolithic circuits contains eight master-slave flip-flops and additional gating to implement two individual four-bit counters in a single package.
+//- Description: DM74LS393 Each of these monolithic circuits contains eight master-slave flip-flops and additional gating to implement two individual four-bit counters in a single package.
 //-   The ’LS393 comprises two independent four-bit binary counters each having a clear and a clock input.
 //-   N-bit binary counters can be implemented with each package providing the capability of divide-by-256.
 //-   The LS393 has parallel outputs from each counter stage so that any submultiple of the input count freqency is available for system-timing signals.
@@ -2632,8 +2632,8 @@ static NETLIST_START(SN74LS629_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM9310/DM8310
-//- Title: Synchronous 4-Bit Decade Counter
+//- Identifier: TTL_9310_DIP
+//- Title: DM9310/DM8310 Synchronous 4-Bit Decade Counter
 //- Description: These synchronous, presettable counters feature an
 //-   internal carry look-ahead for application in high-speed
 //-   counting designs. The DM9310/DM8310 are decade
@@ -2697,8 +2697,8 @@ static NETLIST_START(TTL_9310_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM9312/DM8312
-//- Title: One of Eight Line Data Selectors/Multiplexers
+//- Identifier: TTL_9312_DIP
+//- Title: DM9312/DM8312 One of Eight Line Data Selectors/Multiplexers
 //- Description: These data selectors/multiplexers contain inverter/
 //-   drivers to supply full complementary, on-chip, binary
 //-   decoded data selection to the AND-OR-INVERT gates.
@@ -2743,8 +2743,8 @@ static NETLIST_START(TTL_9312_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM9316/DM8316
-//- Title: Synchronous 4-Bit Counters
+//- Identifier: TTL_9316_DIP
+//- Title: DM9316/DM8316 Synchronous 4-Bit Counters
 //- Description: These synchronous, presettable counters feature an
 //-   internal carry look-ahead for application in high-speed
 //-   counting designs. The DM9316/DM8316 are 4-bit binary
@@ -2808,8 +2808,8 @@ static NETLIST_START(TTL_9316_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM9322/DM8322
-//- Title: Quad 2-Line to 1-Line Data Selectors/Multiplexers
+//- Identifier: TTL_9322_DIP
+//- Title: DM9322/DM8322 Quad 2-Line to 1-Line Data Selectors/Multiplexers
 //- Description: These data selectors/multiplexers contain inverters and
 //-   drivers to supply full on-chip data selection to the four
 //-   output gates. A separate strobe input is provided. A
@@ -2846,8 +2846,8 @@ static NETLIST_START(TTL_9322_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM9602/DM6802
-//- Title: DM9602 Dual Retriggerable, Resettable One Shots
+//- Identifier: TTL_9602_DIP
+//- Title: DM9602/DM6802 Dual Retriggerable, Resettable One Shots
 //- Description: These dual resettable, retriggerable one shots have two
 //-   inputs per function; one which is active high, and one
 //-   which is active low. This allows the designer to employ

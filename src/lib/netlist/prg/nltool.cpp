@@ -1030,15 +1030,19 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "");
 			poutprefix("///", "  @snippet devsyn.dox.h {} csynopsis", d.id);
 			poutprefix("///", "");
-#if 1
+
 			poutprefix("///", "  @section {}_2 Parameters", d.id);
 			poutprefix("///", "");
-			poutprefix("///", "  <table>");
-			poutprefix("///", "  <tr><th>Name</th><th>Description</th></tr>");
-			for (auto &e : d.params)
-				poutprefix("///", "  <tr><td>{1}</td><td>{2}</td></tr>", e.first, e.second);
-			poutprefix("///", "  </table>");
-#endif
+			if (!d.params.empty())
+			{
+				poutprefix("///", "  <table>");
+				poutprefix("///", "  <tr><th>Name</th><th>Description</th></tr>");
+				for (auto &e : d.params)
+					poutprefix("///", "  <tr><td>{1}</td><td>{2}</td></tr>", e.first, e.second);
+				poutprefix("///", "  </table>");
+			}
+			else
+				poutprefix("///", "  This device has no parameters.");
 			poutprefix("///", "");
 			poutprefix("///", "  @section {}_3 Connection Diagram", d.id);
 			poutprefix("///", "");
