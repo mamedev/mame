@@ -49,10 +49,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void _60in1(machine_config &config);
 	void _39in1(machine_config &config);
 
 	void driver_init() override;
+	void init_39in1();
+	void init_60in1();
+	void init_rodent();
+
 private:
 	uint32_t m_seed;
 	uint32_t m_magic;
@@ -68,8 +71,6 @@ private:
 	uint32_t cpld_r(offs_t offset);
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t prot_cheater_r();
-	DECLARE_MACHINE_START(60in1);
-	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	void _39in1_map(address_map &map);
 
@@ -267,17 +268,30 @@ static INPUT_PORTS_START( 39in1 )
 */
 INPUT_PORTS_END
 
-void _39in1_state::machine_start()
+void _39in1_state::init_39in1()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	driver_init();
+
+	uint8_t *rom = memregion("maincpu")->base();
+
 	for (int i = 0; i < 0x80000; i += 2)
 	{
-		ROM[i] = bitswap<8>(ROM[i],7,2,5,6,0,3,1,4) ^ bitswap<8>((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
+		if (i & 0x08)
+			rom[i] ^= 0x02;
+		if (i & 0x10)
+			rom[i] ^= 0x40;
+		if (i & 0x20)
+			rom[i] ^= 0x04;
+		if (i & 0x40)
+			rom[i] ^= 0x80;
+
+		rom[i] = bitswap<8>(rom[i] ^ 0xc0, 7, 2, 5, 6, 0, 3, 1, 4);
 	}
 }
 
-MACHINE_START_MEMBER(_39in1_state,60in1)
+void _39in1_state::init_60in1()
 {
+	driver_init();
 	// TODO: Machine is marked as MNW; is this decrypt correct?
 	uint8_t *ROM = memregion("maincpu")->base();
 	for (int i = 0; i < 0x80000; i += 2)
@@ -286,6 +300,28 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 		{
 			ROM[i] = bitswap<8>(ROM[i],5,1,4,2,0,7,6,3)^bitswap<8>(i, 6,0,4,13,0,5,3,11);
 		}
+	}
+}
+
+void _39in1_state::init_rodent()
+{
+	driver_init();
+	// TODO: verify decryption. Game needs appropriate cpld_r() and cpld_w() and possibly protection_cheater_r() methods anyway
+	// what's below gives extremely similar code to the decrypted one for 39in1 up to 0x069C, where the code base seems to start differing
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x80000; i += 2)
+	{
+		if (i & 0x08)
+			rom[i] ^= 0x80;
+		if (i & 0x10)
+			rom[i] ^= 0x04;
+		if (i & 0x20)
+			rom[i] ^= 0x40;
+		if (i & 0x40)
+			rom[i] ^= 0x08;
+
+		rom[i] = bitswap<8>(rom[i] ^ 0x43, 2, 4, 0, 6, 7, 3, 1, 5);
 	}
 }
 
@@ -299,12 +335,6 @@ void _39in1_state::_39in1(machine_config &config)
 	PXA255_PERIPHERALS(config, m_pxa_periphs, 200000000, m_maincpu);
 	m_pxa_periphs->gpio0_write().set(FUNC(_39in1_state::eeprom_w));
 	m_pxa_periphs->gpio0_read().set(FUNC(_39in1_state::eeprom_r));
-}
-
-void _39in1_state::_60in1(machine_config &config)
-{
-	_39in1(config);
-	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
 }
 
 ROM_START( 39in1 )
@@ -436,12 +466,12 @@ ROM_START( rodent )
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, CRC(c311c7bc) SHA1(8328002b7f6a8b7a3ffca079b7960bc990211d7b) )
 ROM_END
 
-GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,  39in1, _60in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, driver_init, ROT270, "The Game Room", "Rodent Exterminator",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, init_39in1,  ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,  39in1, _39in1, 39in1, _39in1_state, init_60in1,  ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, init_rodent, ROT270, "The Game Room", "Rodent Exterminator",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
