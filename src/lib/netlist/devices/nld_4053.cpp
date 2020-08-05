@@ -30,19 +30,14 @@ namespace netlist
 		, m_supply(*this)
 		{
 			connect(m_RX.N(), m_RY.N());
-
 			register_subalias("X", m_RX.P());
 			register_subalias("Y", m_RY.P());
-
 			register_subalias("XY", m_RX.N());
 		}
 
 		NETLIB_RESETI()
 		{
-			// Start in off condition
-			// FIXME: is ROFF correct?
-			m_RX.set_R(plib::reciprocal(exec().gmin()));
-			m_RY.set_R(plib::reciprocal(exec().gmin()));
+			update_state(true, false);
 		}
 
 	private:
@@ -62,40 +57,16 @@ namespace netlist
 			}
 
 			if (newx != m_lastx || newy != m_lasty)
-			{
-				const nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
-				const nl_fptype Ron = m_base_r() * nlconst::magic(5.0) / sup;
-				const nl_fptype Roff = plib::reciprocal(exec().gmin());
-				const nl_fptype RX = (newx != 0) ? Ron : Roff;
-				const nl_fptype RY = (newy != 0) ? Ron : Roff;
-				if (m_RX.solver() == m_RY.solver())
-				{
-					m_RX.change_state([this, &RX, &RY]()
-					{
-						m_RX.set_R(RX);
-						m_RY.set_R(RY);
-					});
-				}
-				else
-				{
-					m_RX.change_state([this, &RX]()
-					{
-						m_RX.set_R(RX);
-					});
-					m_RY.change_state([this, &RY]()
-					{
-						m_RY.set_R(RY);
-					});
-				}
-			}
+				update_state(newx, newy);
 		}
 
 		bool on(analog_input_t &input, bool &state)
 		{
+			// digital inputs are based on VDD
 			nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
 			nl_fptype in = input() - m_supply.GND().Q_Analog();
-			nl_fptype low = nlconst::magic(0.45) * sup;
-			nl_fptype high = nlconst::magic(0.55) * sup;
+			nl_fptype low = nlconst::magic(0.3) * sup;
+			nl_fptype high = nlconst::magic(0.7) * sup;
 			if (in < low)
 			{
 				state = false;
@@ -105,6 +76,37 @@ namespace netlist
 				state = true;
 			}
 			return state;
+		}
+
+		void update_state(bool newx, bool newy)
+		{
+			// analog output is based on VEE
+			const nl_fptype sup = (m_VEE() - m_supply.GND().Q_Analog());
+			const nl_fptype Ron = m_base_r() * nlconst::magic(5.0) / sup;
+			const nl_fptype Roff = plib::reciprocal(exec().gmin());
+			const nl_fptype RX = newx ? Ron : Roff;
+			const nl_fptype RY = newy ? Ron : Roff;
+			if (m_RX.solver() == m_RY.solver())
+			{
+				m_RX.change_state([this, &RX, &RY]()
+				{
+					m_RX.set_R(RX);
+					m_RY.set_R(RY);
+				});
+			}
+			else
+			{
+				m_RX.change_state([this, &RX]()
+				{
+					m_RX.set_R(RX);
+				});
+				m_RY.change_state([this, &RY]()
+				{
+					m_RY.set_R(RY);
+				});
+			}
+			m_lastx = newx;
+			m_lasty = newy;
 		}
 
 		analog::NETLIB_SUB(R_base) m_RX;
