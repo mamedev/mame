@@ -33,6 +33,8 @@
 #define HLE_BACKGROUND_VCO (1)
 #define HLE_TORPEDO1_VCO (1)
 #define HLE_TORPEDO2_VCO (1)
+#define HLE_SKITTER_VCO (1)
+#define USE_AFUNC_MIXING (1)
 #define ENABLE_FRONTIERS (0)
 
 
@@ -699,6 +701,21 @@ NETLIST_START(zektor)
 	NET_C(Q3.E, R23.1)
 	NET_C(R23.2, R22.2)
 	NET_C(R22.1, Q2.E)
+
+#if (HLE_SKITTER_VCO)
+	//
+	// U1 is basically a standalone oscillator. Simulation at high
+	// frequency puts it at around 45Hz. Samples from real machines
+	// show it to be about 35Hz.
+	//
+	CLOCK(SKITTERCLK, 45)
+	NET_C(SKITTERCLK.GND, GND)
+	NET_C(SKITTERCLK.VCC, I_V12)
+	AFUNC(SKITTERENV, 1, "if(A0<6,2,18)")
+	NET_C(SKITTERENV.A0, SKITTERCLK.Q)
+	NET_C(SKITTERENV.Q, Q2.B)
+	NET_C(GND, C5.1, C5.2, C47.1, C47.2, R14.1, R14.2, R15.1, R15.2, R16.1, R16.2, R19.1, R19.2, U1.2, U1.3)
+#else
 	NET_C(Q2.B, R19.1)
 	NET_C(R19.2, C5.1)
 	NET_C(C5.2, C47.2, U1.2, R16.1)
@@ -706,6 +723,8 @@ NETLIST_START(zektor)
 	NET_C(U1.3, R15.1, R14.2)
 	NET_C(R14.1, GND)
 	NET_C(R15.2, U1.6, R16.2)
+#endif
+
 	NET_C(C9.2, R21.1)
 	NET_C(C9.1, GND)
 	NET_C(R21.2, R18.1)
@@ -1171,8 +1190,20 @@ NETLIST_START(zektor)
 	NET_C(SKITTER, R6.1)
 	NET_C(BUFFER, R8.1)
 	NET_C(C44.2, R9.1)
+#if (USE_AFUNC_MIXING)
+	// This prevents the individual sound nets from combining
+	// at the mixing resistors.
+	AFUNC(MIXFUNC, 5, "(A0/10+A1/220+A2/220+A3/10+A4/33)*4")
+	NET_C(MIXFUNC.A0, R10.2)
+	NET_C(MIXFUNC.A1, R7.2)
+	NET_C(MIXFUNC.A2, R6.2)
+	NET_C(MIXFUNC.A3, R8.2)
+	NET_C(MIXFUNC.A4, R9.2)
+	ALIAS(OUTPUT, MIXFUNC.Q)
+#else
 	NET_C(R10.2, R7.2, R6.2, R8.2, R9.2)
 	ALIAS(OUTPUT, R8.2)
+#endif
 
 	//
 	// Unconnected inputs
