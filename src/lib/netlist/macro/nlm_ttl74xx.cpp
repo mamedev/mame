@@ -729,9 +729,12 @@ NETLIST_END()
 
 //- Identifier: 5442A/DM5442A/DM7442A
 //- Title: BCD to Decimal Decoders
-//- Description: These BCD-to-decimal decoders consist of eight inverters and ten, four-input NAND gates.
-//-   The inverters are connected in pairs to make BCD input data available for decoding by the NAND gates.
-//-   Full decoding of input logic ensures that all outputs remain off for all invalid (10–15) input conditions.
+//- Description: These BCD-to-decimal decoders consist of eight inverters
+//-   and ten, four-input NAND gates. The inverters are
+//-   connected in pairs to make BCD input data available for
+//-   decoding by the NAND gates. Full decoding of input
+//-   logic ensures that all outputs remain off for all invalid
+//-   (10-15) input conditions.
 //- Pinalias: 0,1,2,3,4,5,6,GND,7,8,9,D,C,B,A,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -775,12 +778,22 @@ static NETLIST_START(TTL_7442_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: DM74LS48
+//- Identifier: DM5448/DM48LS48/DM7448/DM74LS48
 //- Title: BCD to 7-Segment Decoder
-//- Description: The ’LS48 translates four lines of BCD (8421) input data into the 7-segment numeral code and provides seven corresponding outputs having pull-up resistors, as opposed to totem pole pull-ups.
-//-   These outputs can serve as logic signals, with a HIGH output corresponding to a lighted lamp segment, or can provide a 1.3 mA base current to npn lamp driver transistors.
-//-   Auxiliary inputs provide lamp test, blanking and cascadable zero-suppression functions.
-//-   The ’LS48 decodes the input data in the pattern indicated in the Truth Table and the segment identification illustration.
+//- Description: The 48 and LS48 feature active-high outputs for
+//-   driving lamp buffers or common-cathode LED's.
+//-   These circuits have full ripple-blanking input/output controls
+//-   and a lamp test input. Display patterns
+//-   for BCD input counts above nine are unique symbols
+//-   to authenticate input conditions.
+//-   These circuits incorporate automatic
+//-   leading and/or trailing-edge, zero-blanking control
+//-   (RBI and RBO). Lamp test (LT) of these devices may
+//-   be performed at any time when the BI/RBO node is at
+//-   a high logic level. They contain
+//-   an overriding blanking input (BI) which can be used
+//-   to control the lamp intensity (by pulsing), or to inhibit
+//-   the outputs.
 //- Pinalias: A1,A2,LTQ,BIQ,RBIQ,A3,A0,GND,e,d,c,b,a,g,f,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -1004,17 +1017,28 @@ static NETLIST_START(TTL_7474_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: SN54/74LS75
+//- Identifier: DM5475/DM7475/DM7475A/DM74LS75
 //- Title: 4-bit D Latch
-//- Description: The TTL/MSI SN54/74LS75 latch is used as temporary storage for binary information between processing units and input/output or indicator units.
-//-   Information present at a data (D) input is transferred to the Q output when the Enable is HIGH and the Q output will follow the data input as long as the Enable remains HIGH.
-//-   When the Enable goes LOW, the information (that was present at the data input at the time the transition occurred) is retained at the Q output until the Enable is permitted to go HIGH.
-//-   The SN54/74LS75 features complementary Q and QQ output from a 4-bit latch and is available in the 16-pin packages.
-//- Pinalias: QQ0,D0,D1,E23,VCC,D2,D3,QQ3,Q3,Q2,QQ2,GND,E01,QQ1,Q1,Q0
+//- Description: These latches are ideally suited for use as temporary
+//-    storage for binary information between processing units
+//-    and input/output or indicator units. Information present
+//-    at a data (D) input is transferred to the Q output when
+//-    the enable (G) is high, and the Q output will follow
+//-    the data input as long as the enable remains high. When
+//-    the enable goes low, the information (that was present
+//-    at the data input at the time the transition occurred) is
+//-    retained at the Q output until the enable is permitted
+//-    to go high.
+//-
+//-    The DM5475/DM7475, DM54L75A/DM74L75A, and
+//-    DM54LS75/DM74LS75 feature complementary Q and
+//-    QQ outputs from a 4-bit latch, and are available in 16-pin
+//-    packages.
+//- Pinalias: QQ1,D1,D2,E34,VCC,D3,D4,QQ4,Q4,Q3,QQ3,GND,E12,QQ2,Q2,Q1
 //- Package: DIP
-//- NamingConvention: Naming conventions follow Motorola datasheet
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/motorola/SN74LS77.pdf
+//-   https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 //-         +---+---++---+----+
 //-         | D | G || Q | QQ |
@@ -1037,29 +1061,35 @@ static NETLIST_START(TTL_7475_DIP)
 	NET_C(C.CLK, D.CLK)
 
 	DIPPINS(   /*       +--------------+       */
-		 A.QQ, /*   QQ0 |1     ++    16| Q0    */ A.Q,
-		  A.D, /*    D0 |2           15| Q1    */ B.Q,
-		  B.D, /*    D1 |3           14| QQ1   */ B.QQ,
-		C.CLK, /*   E23 |4    7475   13| E01   */ A.CLK,
+		 A.QQ, /*   QQ1 |1     ++    16| Q1    */ A.Q,
+		  A.D, /*    D1 |2           15| Q2    */ B.Q,
+		  B.D, /*    D2 |3           14| QQ2   */ B.QQ,
+		C.CLK, /*   E34 |4    7475   13| E12   */ A.CLK,
 		A.VCC, /*   VCC |5           12| GND   */ A.GND,
-		  C.D, /*    D2 |6           11| QQ2   */ C.QQ,
-		  D.D, /*    D3 |7           10| Q2    */ C.Q,
-		 D.QQ, /*   QQ3 |8            9| Q3    */ D.Q
+		  C.D, /*    D3 |6           11| QQ3   */ C.QQ,
+		  D.D, /*    D4 |7           10| Q3    */ C.Q,
+		 D.QQ, /*   QQ4 |8            9| Q4    */ D.Q
 			   /*       +--------------+       */
 	)
 NETLIST_END()
 
-//- Identifier: SN54/74LS77
+//- Identifier: DM74LS77
 //- Title: 4-bit D Latch
-//- Description: The TTL/MSI SN54/74LS77 latch is used as temporary storage for binary information between processing units and input/output or indicator units.
-//-   Information present at a data (D) input is transferred to the Q output when the Enable is HIGH and the Q output will follow the data input as long as the Enable remains HIGH.
-//-   When the Enable goes LOW, the information (that was present at the data input at the time the transition occurred) is retained at the Q output until the Enable is permitted to go HIGH.
-//-   For higher component density applications the SN54/74LS77 4-bit latch is available in the 14-pin package with QQ outputs omitted.
-//- Pinalias: D0,D1,E23,VCC,D2,D3,NC,Q3,Q2,NC,GND,E01,Q1,Q0
+//- Description: These latches are ideally suited for use as temporary
+//-    storage for binary information between processing units
+//-    and input/output or indicator units. Information present
+//-    at a data (D) input is transferred to the Q output when
+//-    the enable (G) is high, and the Q output will follow
+//-    the data input as long as the enable remains high. When
+//-    the enable goes low, the information (that was present
+//-    at the data input at the time the transition occurred) is
+//-    retained at the Q output until the enable is permitted
+//-    to go high.
+//- Pinalias: D1,D2,E34,VCC,D3,D4,NC,Q4,Q3,NC,GND,E12,Q2,Q1
 //- Package: DIP
-//- NamingConvention: Naming conventions follow Motorola datasheet
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://pdf.datasheetcatalog.com/datasheet/motorola/SN74LS77.pdf
+//-   https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 //-         +---+---++---+----+
 //-         | D | G || Q | QQ |
@@ -1084,24 +1114,31 @@ static NETLIST_START(TTL_7477_DIP)
 	NC_PIN(NC)
 
 	DIPPINS(   /*       +--------------+       */
-		  A.D, /*    D0 |1     ++    14| Q0    */ A.Q,
-		  B.D, /*    D1 |2           13| Q1    */ B.Q,
-		C.CLK, /*   E23 |3           12| E01   */ A.CLK,
+		  A.D, /*    D1 |1     ++    14| Q1    */ A.Q,
+		  B.D, /*    D2 |2           13| Q2    */ B.Q,
+		C.CLK, /*   E34 |3           12| E12   */ A.CLK,
 		A.VCC, /*   VCC |4    7477   11| GND   */ A.GND,
-		  C.D, /*    D2 |5           10| NC    */ NC.I,
-		  D.D, /*    D3 |6            9| Q2    */ C.Q,
-		 NC.I, /*    NC |7            8| Q3    */ D.Q
+		  C.D, /*    D3 |5           10| NC    */ NC.I,
+		  D.D, /*    D4 |6            9| Q3    */ C.Q,
+		 NC.I, /*    NC |7            8| Q4    */ D.Q
 			   /*       +--------------+       */
 	)
 NETLIST_END()
 
-//- Identifier: 54LS83A/DM54LS83A/DM74LS83A
+//- Identifier: DM5483/DM7483/DM74LS83A
 //- Title: 4-bit Binary Adders With Fast Carry
-//- Description: These full adders perform the addition of two 4-bit binary numbers.
-//-   The sum (S) outputs are provided for each bit and the resultant carry (C4) is obtained from the fourth bit.
-//-   These adders feature full internal look ahead across all four bits.
-//-   This provides the system designer with partial look-ahead performance at the economy and reduced package count of a ripple-carry implementation.
-//-   The adder logic, including the carry, is implemented in its true form meaning that the end-around carry can be accomplished without the need for logic or level inversion.
+//- Description: These full adders perform the addition of two 4-bit
+//-   binary numbers. The sum (S) outputs are provided for
+//-   each bit and the resultant carry (C4) is obtained from
+//-   the fourth bit. These adders feature full internal look
+//-   ahead across all four bits. This provides the system
+//-   designer with partial look-ahead performance at the
+//-   economy and reduced package count of a ripple-carry
+//-   implementation.
+//-
+//-   The adder logic, including the carry, is implemented in
+//-   its true form meaning that the end-around carry can be
+//-   accomplished without the need for logic or level inversion.
 //- Pinalias: A4,S3,A3,B3,VCC,S2,B2,A2,S1,A1,B1,GND,C0,C4,S4,B4
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -1124,15 +1161,24 @@ static NETLIST_START(TTL_7483_DIP)
 	)
 NETLIST_END()
 
-//- Identifier: 54LS85/DM54LS85/DM74LS85
+//- Identifier: DM5485/DM7485/DM74L85/DM74LS85
 //- Title: 4-Bit Magnitude Comparators
-//- Description: These 4-bit magnitude comparators perform comparison of straight binary or BCD codes.
-//-   Three fully-decoded decisions about two 4-bit words (A, B) are made and are externally available at three outputs.
-//-   These devices are fully expandable to any number of bits without external gates.
-//-   Words ofgreater length may be compared by connecting comparators in cascade.
-//-   The A>B, A<B, and A=B outputs of a stage handling less-significant bits are connected to the corresponding inputs of the next stage handling more-significant bits.
-//-   The stage handling the least-significant bits must have a high-level voltage applied to the A=B input.
-//-   The cascading paths are implemented with only a two-gate-level delay to reduce overall comparison times for long words.
+//- Description: These four-bit magnitude comparators perform comparison
+//-   of straight binary or BCD codes. Three
+//-   fully-decoded decisions about two, 4-bit words (A, B)
+//-   are made and are externally available at three outputs.
+//-   These devices are fully expandable to any number of
+//-   bits without external gates. Words of greater length may
+//-   be compared by connecting comparators in cascade. The
+//-   A > B, A < B, and A = B outputs of a stage handling
+//-   less-significant bits are connected to the corresponding
+//-   inputs of the next stage handling more-significant bits.
+//-   The stage handling the least-significant bits must have a
+//-   high-level voltage applied to the A = B input and in
+//-   addition for the L85, low-level voltages applied to the
+//-   A> B and A < B inputs. The cascading paths of the 85,
+//-   and LS85 are implemented with only a two-gate-Ievel
+//-   delay to reduce overall comparison times for long words.
 //- Pinalias: B3,LTIN,EQIN,GTIN,GTOUT,EQOUT,LTOUT,GND,B0,A0,B1,A1,A2,B2,A3,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -1196,11 +1242,22 @@ NETLIST_END()
 
 //- Identifier: DM5490/DM7490A
 //- Title: Decade Counter
-//- Description: These monolithic counters contain four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-five.
-//-   These counters have a gated zero reset and also gated set-to-nine inputs for use in BCD nine’s complement applications.
-//-   To use their maximum count length, the B input is connected to the QA output.
-//-   The input count pulses are applied to input A and the outputs are as described in the truth table.
-//-   A symmetrical divide-by-ten count can be obtained by connecting the QD output to the A input and applying the input count to the B input which gives a divide-by-ten squarewave at output QA.
+//- Description: These monolithic counters contain four
+//-   master-slave flip-flops and additional gating to provide
+//-   a divide-by-two counter and a three-stage binary counter
+//-   for which the count cycle length is divide-by-five.
+//-
+//-   These counters have a gated zero reset and
+//-   also have gated set-to-nine inputs
+//-   for use in BCD nine's complement applications.
+//-
+//-   To use their maximum count length (decade), the B input is connected
+//-   to the QA output. The input count pulses are applied to
+//-   input A and the outputs are as described in the appropriate
+//-   truth table. A symmetrical divide-by-ten count can be
+//-   obtained from the by connecting the QD output to
+//-   the A input and applying the input count to the B input
+//-   which gives a divide-by-ten square wave at output QA.
 //- Pinalias: B,R01,R02,NC,VCC,R91,R92,QC,QB,GND,QD,QA,NC,A
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -1254,10 +1311,18 @@ NETLIST_END()
 
 //- Identifier: SN5492A, SN54LS92, SN7492A, SN74LS92
 //- Title: Divide-By-Twelve Counter
-//- Description: These monolithic counters contain four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-six.
+//- Description: These monolithic counters contains four
+//-   master-slave flip-flops and additional gating to provide
+//-   a divide-by-two counter and a three-stage binary counter
+//-   for which the count cycle length is divide-by-six.
+//-
 //-   These counters have a gated zero reset.
-//-   To use their maximum count length, the CKB input is connected to the QA output.
-//-   The input count pulses are applied to input CKA and the outputs are as described in the truth table.
+//-
+//-   To use their maximum count length (divide-by-
+//-   twelve), the B input is connected
+//-   to the QA output. The input count pulses are applied to
+//-   input A and the outputs are as described in the appropriate
+//-   truth table.
 //- Pinalias: CKB,NC,NC,NC,VCC,R01,R02,QD,QC,GND,QB,QA,NC,CLKA
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Texas Instruments datasheet
@@ -1309,10 +1374,17 @@ NETLIST_END()
 
 //- Identifier: DM7493A
 //- Title: Binary Counter
-//- Description: These monolithic counters contain four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-eight.
+//- Description: These monolithic counters contains four
+//-   master-slave flip-flops and additional gating to provide
+//-   a divide-by-two counter and a three-stage binary counter
+//-   for which the count cycle length is divide-by-eight.
+//-
 //-   These counters have a gated zero reset.
-//-   To use their maximum count length, the B input is connected to the QA output.
-//-   The input count pulses are applied to input A and the outputs are as described in the truth table.
+//-
+//-   To use their maximum count length (four-bit binary), the B input is connected
+//-   to the QA output. The input count pulses are applied to
+//-   input A and the outputs are as described in the appropriate
+//-   truth table.
 //- Pinalias: B,R01,R02,NC,VCC,NC,NC,QC,QB,GND,QD,QA,NC,A
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -2282,7 +2354,15 @@ NETLIST_END()
 
 //- Identifier: 54279/DM74279
 //- Title: Quad Set-Reset Latch
-//- Description: This device contains four independent set-reset type flip-flops with one Q output each.
+//- Description: These latches are ideaily suited ·for use as temporary
+//-   storage of bfnary information between processing units
+//-   and I/O units. When either one of the data inputs is at
+//-   a low logic level, the output will follow the level of the
+//-   R input. When both data inputs are high, the output will
+//-   remain latched in its previous state. When both inputs
+//-   are low, the output will .go high. However, this high
+//-   level may not persist when either one of the data inputs
+//-   returns to the high state.
 //- Pinalias: 1RQ,1S1Q,1S2Q,1Q,2RQ,2SQ,2Q,GND,3Q,3RQ,3S1Q,3S2Q,4Q,4RQ,4SQ,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -2552,69 +2632,55 @@ static NETLIST_START(SN74LS629_DIP)
 	)
 NETLIST_END()
 
-/*
- *  DM9312: One of Eight Line Data Selectors/Multiplexers
- *
- *          +--------------+
- *       D0 |1     ++    16| VCC
- *       D1 |2           15| Y
- *       D2 |3           14| YQ
- *       D3 |4    9312   13| C
- *       D4 |5           12| B
- *       D5 |6           11| A
- *       D6 |7           10| G   Strobe
- *      GND |8            9| D7
- *          +--------------+
- *                  __
- *          +---+---+---+---++---+---+
- *          | C | B | A | G || Y | YQ|
- *          +===+===+===+===++===+===+
- *          | X | X | X | 1 ||  0| 1 |
- *          | 0 | 0 | 0 | 0 || D0|D0Q|
- *          | 0 | 0 | 1 | 0 || D1|D1Q|
- *          | 0 | 1 | 0 | 0 || D2|D2Q|
- *          | 0 | 1 | 1 | 0 || D3|D3Q|
- *          | 1 | 0 | 0 | 0 || D4|D4Q|
- *          | 1 | 0 | 1 | 0 || D5|D5Q|
- *          | 1 | 1 | 0 | 0 || D6|D6Q|
- *          | 1 | 1 | 1 | 0 || D7|D7Q|
- *          +---+---+---+---++---+---+
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
-
-static NETLIST_START(DM9312_DIP)
-	DM9312(s)
-
-	DIPPINS(    /*     +--------------+     */
-		s.D0,   /*  D0 |1     ++    16| VCC */ s.VCC,
-		s.D1,   /*  D1 |2           15| Y   */ s.Y,
-		s.D2,   /*  D2 |3           14| YQ  */ s.YQ,
-		s.D3,   /*  D3 |4    9312   13| C   */ s.C,
-		s.D4,   /*  D4 |5           12| B   */ s.B,
-		s.D5,   /*  D5 |6           11| A   */ s.A,
-		s.D6,   /*  D6 |7           10| G   */ s.G, //Strobe
-		s.GND,  /* GND |8            9| D7  */ s.D7
-				/*     +--------------+     */
-	)
-NETLIST_END()
-
-/*
- *  DM9310/9316: Synchronous 4-Bit Counters
- *
- *          +--------------+
- *    CLEAR |1     ++    16| VCC
- *    CLOCK |2           15| RC (Ripple Carry)
- *        A |3           14| QA
- *        B |4    9310   13| QB
- *        C |5    9316   12| QC
- *        D |6           11| QD
- * Enable P |7           10| Enable T
- *      GND |8            9| LOAD
- *          +--------------+
- */
-
+//- Identifier: DM9310/DM8310
+//- Title: Synchronous 4-Bit Decade Counter
+//- Description: These synchronous, presettable counters feature an
+//-   internal carry look-ahead for application in high-speed
+//-   counting designs. The DM9310/DM8310 are decade
+//-   counters. The carry output is decoded by means of a
+//-   NOR gate, thus preventing spikes during the normal
+//-   counting mode of operation. Synchronous operation
+//-   is provided by having all flip-flops clocked simultaneously
+//-   so that the outputs change coincident with each
+//-   other when so instructed by the count-enable inputs
+//-   and internal gating. This mode of operation eliminates
+//-   the output counting spikes which are normally
+//-   associated with asynchronous (ripple clock) counters.
+//-   A buffered clock input triggers the four flip-flops on
+//-   the rising (positive-going) edge of the clock input
+//-   waveform.
+//-
+//-   These counters are fully programmable; that is, the
+//-   outputs may be preset to either level. As presetting is
+//-   synchronous, setting up a low level at the load input
+//-   disables the counter and causes the outputs to agree
+//-   with the setup data after the next clock pulse regardless
+//-   of the levels of the enable input. Low-to-high transitions
+//-   at the· load input are perfectly acceptable regardless of
+//-   the logic levels on the clock or enable inputs. The clear
+//-   function is asynchronous and a low level at the clear
+//-   input sets all four of the flip-flop outputs low regardless
+//-   of the levels of clock, load, or enable inputs.
+//-
+//-   The carry look-ahead circuitry provides for cascading
+//-   counters for n-bit synchronous applications without
+//-   additional gating. Instrumental in accomplishing this
+//-   function are two count-enable inputs and a ripple carry
+//-   output. Both count-enable inputs (P and T) must be
+//-   high to count, and input T is fed-forward to enable the
+//-   ripple carry output. The ripple carry output thus
+//-   enabled will produce a high-level output pulse with a
+//-   duration approximately equal to the high-level portion
+//-   of the QA output. This high-level overflow ripply carry
+//-   pulse can be used to enable successive cascaded stages.
+//-   High-to-Low level transitions at the enable P or T inputs
+//-   may occur regardless of the logic level in the clock.
+//- Pinalias: CLEARQ,CLOCK,A,B,C,D,ENABLEP,GND,LOADQ,ENABLET,QD,QC,QB,QA,RC,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-
 static NETLIST_START(TTL_9310_DIP)
 	TTL_9310(A)
 
@@ -2631,37 +2697,131 @@ static NETLIST_START(TTL_9310_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: DM9312/DM8312
+//- Title: One of Eight Line Data Selectors/Multiplexers
+//- Description: These data selectors/multiplexers contain inverter/
+//-   drivers to supply full complementary, on-chip, binary
+//-   decoded data selection to the AND-OR-INVERT gates.
+//-
+//-   The DM9312/8312 is a single 8-bit multiplexer with
+//-   complementary outputs and a strobe control. When the
+//-   strobe is low, the function is enabled. When a high logic
+//-   level is applied to the strobe, the outputs are latched.
+//- Pinalias: D0,D1,D2,D3,D4,D5,D6,GND,D7,G,A,B,C,YQ,Y,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DM9312.pdf
+//-
+//-     +---+---+---+---++----+-----+
+//-     | C | B | A | G ||  Y |  YQ |
+//-     +===+===+===+===++====+=====+
+//-     | X | X | X | 1 ||  0 |  1  |
+//-     | 0 | 0 | 0 | 0 || D0 | D0Q |
+//-     | 0 | 0 | 1 | 0 || D1 | D1Q |
+//-     | 0 | 1 | 0 | 0 || D2 | D2Q |
+//-     | 0 | 1 | 1 | 0 || D3 | D3Q |
+//-     | 1 | 0 | 0 | 0 || D4 | D4Q |
+//-     | 1 | 0 | 1 | 0 || D5 | D5Q |
+//-     | 1 | 1 | 0 | 0 || D6 | D6Q |
+//-     | 1 | 1 | 1 | 0 || D7 | D7Q |
+//-     +---+---+---+---++----+-----+
+//-
+static NETLIST_START(DM9312_DIP)
+	DM9312(A)
+
+	DIPPINS(   /*     +--------------+     */
+		 A.D0, /*  D0 |1     ++    16| VCC */ A.VCC,
+		 A.D1, /*  D1 |2           15| Y   */ A.Y,
+		 A.D2, /*  D2 |3           14| YQ  */ A.YQ,
+		 A.D3, /*  D3 |4    9312   13| C   */ A.C,
+		 A.D4, /*  D4 |5           12| B   */ A.B,
+		 A.D5, /*  D5 |6           11| A   */ A.A,
+		 A.D6, /*  D6 |7           10| G   */ A.G, //Strobe
+		A.GND, /* GND |8            9| D7  */ A.D7
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
+//- Identifier: DM9316/DM8316
+//- Title: Synchronous 4-Bit Counters
+//- Description: These synchronous, presettable counters feature an
+//-   internal carry look-ahead for application in high-speed
+//-   counting designs. The DM9316/DM8316 are 4-bit binary
+//-   counters. The carry output is decoded by means of a
+//-   NOR gate, thus preventing spikes during the normal
+//-   counting mode of operation. Synchronous operation
+//-   is provided by having all flip-flops clocked simultaneously
+//-   so that the outputs change coincident with each
+//-   other when so instructed by the count-enable inputs
+//-   and internal gating. This mode of operation eliminates
+//-   the output counting spikes which are normally
+//-   associated with asynchronous (ripple clock) counters.
+//-   A buffered clock input triggers the four flip-flops on
+//-   the rising (positive-going) edge of the clock input
+//-   waveform.
+//-
+//-   These counters are fully programmable; that is, the
+//-   outputs may be preset to either level. As presetting is
+//-   synchronous, setting up a low level at the load input
+//-   disables the counter and causes the outputs to agree
+//-   with the setup data after the next clock pulse regardless
+//-   of the levels of the enable input. Low-to-high transitions
+//-   at the· load input are perfectly acceptable regardless of
+//-   the logic levels on the clock or enable inputs. The clear
+//-   function is asynchronous and a low level at the clear
+//-   input sets all four of the flip-flop outputs low regardless
+//-   of the levels of clock, load, or enable inputs.
+//-
+//-   The carry look-ahead circuitry provides for cascading
+//-   counters for n-bit synchronous applications without
+//-   additional gating. Instrumental in accomplishing this
+//-   function are two count-enable inputs and a ripple carry
+//-   output. Both count-enable inputs (P and T) must be
+//-   high to count, and input T is fed-forward to enable the
+//-   ripple carry output. The ripple carry output thus
+//-   enabled will produce a high-level output pulse with a
+//-   duration approximately equal to the high-level portion
+//-   of the QA output. This high-level overflow ripply carry
+//-   pulse can be used to enable successive cascaded stages.
+//-   High-to-Low level transitions at the enable P or T inputs
+//-   may occur regardless of the logic level in the clock.
+//- Pinalias: CLEARQ,CLOCK,A,B,C,D,ENABLEP,GND,LOADQ,ENABLET,QD,QC,QB,QA,RC,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006606.PDF
+//-
 static NETLIST_START(TTL_9316_DIP)
 	TTL_9316(A)
 
 	DIPPINS(    /*          +--------------+          */
-		A.CLRQ, /*   /CLEAR |1     ++    16| VCC      */ A.VCC,
+		A.CLRQ, /*   CLEARQ |1     ++    16| VCC      */ A.VCC,
 		 A.CLK, /*    CLOCK |2           15| RC       */ A.RC,
 		   A.A, /*        A |3           14| QA       */ A.QA,
 		   A.B, /*        B |4    9316   13| QB       */ A.QB,
 		   A.C, /*        C |5           12| QC       */ A.QC,
 		   A.D, /*        D |6           11| QD       */ A.QD,
 		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
-		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
+		 A.GND, /*      GND |8            9| LOADQ    */ A.LOADQ
 			    /*          +--------------+          */
 	)
 NETLIST_END()
 
-/*
- *  9322: Quad 2-Line to 1-Line Data Selectors/Multiplexers
- *
- *          +------------+
- *   SELECT |1    ++   16| VCC
- *       A1 |2         15| STROBE
- *       B1 |3         14| A4
- *       Y1 |4   9322  13| B4
- *       A2 |5         12| Y4
- *       B2 |6         11| A3
- *       Y2 |7         10| B3
- *      GND |8          9| Y3
- *          +------------+
- */
-
+//- Identifier: DM9322/DM8322
+//- Title: Quad 2-Line to 1-Line Data Selectors/Multiplexers
+//- Description: These data selectors/multiplexers contain inverters and
+//-   drivers to supply full on-chip data selection to the four
+//-   output gates. A separate strobe input is provided. A
+//-   4-bit word is selected from one of two sources and is
+//-   routed to the four outputs. True data is presented
+//-   at the outputs.
+//- Pinalias: SELECT,A1,B1,Y1,A2,B2,Y2,GND,Y3,B3,A3,Y4,B4,A4,STROBE,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006606.PDF
+//-
 static NETLIST_START(TTL_9322_DIP)
 	TTL_9322_GATE(A)
 	TTL_9322_GATE(B)
@@ -2686,23 +2846,24 @@ static NETLIST_START(TTL_9322_DIP)
 	)
 NETLIST_END()
 
-//- Identifier:  TTL_9602_DIP
+//- Identifier: DM9602/DM6802
 //- Title: DM9602 Dual Retriggerable, Resettable One Shots
 //- Description: These dual resettable, retriggerable one shots have two
-//-   inputs per function; one which is active HIGH, and one
-//-   which is active LOW. This allows the designer to employ
+//-   inputs per function; one which is active high, and one
+//-   which is active low. This allows the designer to employ
 //-   either leading-edge or trailing-edge triggering, which is
-//-   independent of input transition times. When input conditions for triggering are met, a new cycle starts and the
-//-   external capacitor is allowed to rapidly discharge and then
-//-   charge again. The retriggerable feature permits output
-//-   pulse widths to be extended. In fact a continuous true output can be maintained by having an input cycle time whih
-//-   is shorter than the output cycle time. The output pulse may
-//-   then be terminated at any time by applying a LOW logic
-//-   level to the RESET pin. Retriggering may be inhibited by
-//-   either connecting the Q output to an active HIGH input, or
-//-   the Q output to an active LOW input.
-//-   The DM74123 is a dual retriggerable monostable multivibrator
-//-
+//-   independent of input transition times. When input con·
+//-   ditions for triggering are met, a new cycle starts and the
+//-   external capacitor is allowed to rapidly discharge and
+//-   then charge again. The retriggerable feature permits
+//-   output pulse widths to be extended. In fact a continuous
+//-   true output can be maintained by having an input cycle
+//-   time which is shorter than the output cycle time. The
+//-   output pulse may then be terminated at any time by
+//-   applying a low logic level to the RESET pin. Retriggering
+//-   may be inhibited by either connecting the Q output to
+//-   an active high input, or the Q output to an active
+//-   low input.
 //- Pinalias: C1,RC1,CLRQ1,B1,A1,Q1,QQ1,GND,QQ2,Q2,A2,B2,CLRQ2,RC2,C2,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
