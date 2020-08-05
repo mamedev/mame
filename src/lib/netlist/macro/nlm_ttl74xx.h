@@ -406,11 +406,11 @@
 #define TTL_74393_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74393_DIP, name)
 
-#define DM9312(...)                                                            \
-		NET_REGISTER_DEVEXT(DM9312, __VA_ARGS__)
+#define TTL_9312(...)                                                          \
+		NET_REGISTER_DEVEXT(TTL_9312, __VA_ARGS__)
 
-#define DM9312_DIP(name)                                                       \
-		NET_REGISTER_DEV(DM9312_DIP, name)
+#define TTL_9312_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_9312_DIP, name)
 
 #define TTL_9310_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_9310_DIP, name)
