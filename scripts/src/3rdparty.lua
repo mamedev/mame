@@ -723,6 +723,11 @@ if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_ver
 		}
 end
 
+	configuration { "asmjs" }
+		buildoptions {
+			"-Wno-misleading-indentation",
+		}
+
 	configuration { "mingw*" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",

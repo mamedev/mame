@@ -25,10 +25,6 @@
 #include <malloc.h>
 #endif
 
-#if defined(PAGESIZE)
-#undef PAGESIZE
-#endif
-
 namespace plib {
 
 	//============================================================
@@ -627,8 +623,8 @@ namespace plib {
 	struct align_traits : public align_traits_base<T, has_align<T>::value>
 	{};
 
-	template <typename BASEARENA = aligned_arena, std::size_t PAGESIZE = 1024>
-	class paged_arena : public arena_base<paged_arena<BASEARENA, PAGESIZE>, true, true>
+	template <typename BASEARENA = aligned_arena, std::size_t PG_SIZE = 1024>
+	class paged_arena : public arena_base<paged_arena<BASEARENA, PG_SIZE>, true, true>
 	{
 	public:
 		paged_arena() = default;
@@ -640,13 +636,13 @@ namespace plib {
 		static void *allocate(size_t align, size_t size)
 		{
 			plib::unused_var(align);
-			//size = ((size + PAGESIZE - 1) / PAGESIZE) * PAGESIZE;
-			return arena().allocate(PAGESIZE, size);
+			//size = ((size + PG_SIZE - 1) / PG_SIZE) * PG_SIZE;
+			return arena().allocate(PG_SIZE, size);
 		}
 
 		static void deallocate(void *ptr, size_t size) noexcept
 		{
-			//size = ((size + PAGESIZE - 1) / PAGESIZE) * PAGESIZE;
+			//size = ((size + PG_SIZE - 1) / PG_SIZE) * PG_SIZE;
 			arena().deallocate(ptr, size);
 		}
 
