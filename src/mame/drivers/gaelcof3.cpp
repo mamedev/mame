@@ -9,15 +9,34 @@
   OKI M6295 for sound
   1 bank of 6 dips
 
+  Gaelco FUTBOL-3 PCB
+  _____________________________________________________
+  |JP1  JP2         __________                        |
+  | __   ___        |ULN2803A_|                       |
+  || |  |  |        ___________                       |
+  || |  |  |        |MC74HCT273A                      |
+  ||_|  |  |        _________   _________             |
+  |JP3  |  |        |TLP504A_| |TLP504A_|             |
+  | __  |  |        __________                        |
+  || |  |  |        |PIC16C55|                        |
+  ||_|  |  |                                          |
+  | ___ |__|   ___ <-SN74LS365AN                      |
+  | VOL        |  |   ______    ___________________   |
+  |  _______   |  |  | OKI |   |ROM U1             |  |
+  | |DIPSx6|   |  |  |_____|   |___________________|  |
+  |            |__|                                   |
+  |___________________________________________________|
+
+  JP1 = 10 pin [+5V, GND, DAT, CLK, ENA, PU1, PU2, PU3, PU4, GND]
+  JP2 = 14 pin [12VA, 12VA, +5V, ALT, CON, BOM, MOT, N/U, BOM, POT, ALT, 12V, GND, GND]
+  JP3 =  5 pin [PU5, PU6, PU7, PU8, GND]
 
   The PCBs were inside two "Coche de Bomberos" kiddie rides from CMC Cresmatic (https://www.recreativas.org/coche-de-bomberos-6022-cresmatic).
   Anyway, the hardware is generic enough to serve any basic kiddie ride.
 
-  The only dumpable ROM on the PCB is the Oki sound samples. There are two different versions dumped (from two different machines):
-
-  "Susanita tiene un ratón" - Based on the song composed by Emilio Alberto Aragón 'Miliki'.
-
-  "El auto de papá" - Based on the song composed by Enrique Fischer 'Pipo Pescador'.
+  The only dumped ROM on the PCB is the Oki sound samples. There are two different versions dumped (from two different machines):
+     -"Susanita tiene un ratón" - Based on the song composed by Emilio Alberto Aragón 'Miliki'.
+     -"El auto de papá" - Based on the song composed by Enrique Fischer 'Pipo Pescador'.
 */
 
 #include "emu.h"
