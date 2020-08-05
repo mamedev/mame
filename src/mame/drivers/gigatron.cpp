@@ -243,4 +243,4 @@ ROM_START( gigatron )
 	ROMX_LOAD( "gigrom1.rom",  0x0000, 0x20000, CRC(8ea5a2af) SHA1(e5758d5cc467c3476bd8f992fd45dfcdf06d0430),ROM_BIOS(4))
 ROM_END
 
-COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
