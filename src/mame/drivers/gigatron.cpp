@@ -20,6 +20,17 @@
 #define VSYNC      0x80
 #define HSYNC      0x40
 
+/***************************************************************************
+
+	TODO
+	
+	Hook up a quikload for loading .gt1 files
+	HLE the keyboard and Pluggy McPlugface
+	Fix the video being shifted down.
+
+***************************************************************************/
+
+
 //**************************************************************************
 //  Driver Definition
 //**************************************************************************
@@ -128,6 +139,7 @@ void gigatron_state::port_out(uint8_t data)
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
     copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
+	video_reset();
     return 0;
 }
 
