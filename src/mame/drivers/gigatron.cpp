@@ -16,6 +16,8 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
+#include "gigatron.lh"
+
 #define MAIN_CLOCK 6250000
 #define VSYNC      0x80
 #define HSYNC      0x40
@@ -43,6 +45,10 @@ public:
 		, m_dac(*this, "dac")
 		, m_screen(*this, "screen")
 		, m_io_inputs(*this, "GAMEPAD")
+		, m_blinken1(*this, "blinken1")
+		, m_blinken2(*this, "blinken2")
+		, m_blinken3(*this, "blinken3")
+		, m_blinken4(*this, "blinken4")
 	{
 	}
 
@@ -60,7 +66,7 @@ private:
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
 
-	uint8_t m_lc; //Lights Changed
+	uint8_t m_lights; //blinkenlights
 
 	//Video Generation stuff
 	uint8_t m_out;
@@ -79,6 +85,11 @@ private:
 	required_device<dac_byte_interface> m_dac;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_inputs;
+	
+	output_finder<> m_blinken1;
+	output_finder<> m_blinken2;
+	output_finder<> m_blinken3;
+	output_finder<> m_blinken4;
 };
 
 //**************************************************************************
@@ -174,7 +185,14 @@ INPUT_PORTS_END
 
 void gigatron_state::machine_start()
 {
-	save_item(NAME(m_lc));
+	//blinkenlights
+	m_blinken1.resolve();
+	m_blinken2.resolve();
+	m_blinken3.resolve();
+	m_blinken4.resolve();
+	
+	//Savestate stuff
+	save_item(NAME(m_lights));
 	save_item(NAME(m_out));
 	save_item(NAME(m_row));
 	save_item(NAME(m_col));
@@ -186,7 +204,7 @@ void gigatron_state::machine_reset()
 {
 	m_dacoutput = 0;
 	m_dac->write(0);
-	m_lc = 0;
+	m_lights = 0;
 	m_out = 0;
 	m_row = 0;
 	m_col = 0;
@@ -200,12 +218,13 @@ void gigatron_state::port_outx(uint8_t data)
 	m_dac->write(m_dacoutput);
 	
 	//Blinkenlights
-	uint16_t light = data & 0xF;
-	m_lc ^= light;
+	m_lights = data & 0xF;
 }
 
 void gigatron_state::gigatron(machine_config &config)
 {
+	config.set_default_layout(layout_gigatron);
+	
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
@@ -230,15 +249,15 @@ void gigatron_state::gigatron(machine_config &config)
 
 ROM_START( gigatron )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "v5a", "Gigatron ROM V5a")
+	ROM_SYSTEM_BIOS(0, "v5a", "Gigatron ROM v5a")
 	ROMX_LOAD( "gigrom5a.rom",  0x0000, 0x20000, CRC(DCC071A6) SHA1(F82059BA0227FF48E4C687B90C8445DA30213EE2),ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v4", "Gigatron ROM V4")
+	ROM_SYSTEM_BIOS(1, "v4", "Gigatron ROM v4")
 	ROMX_LOAD( "gigrom4.rom",  0x0000, 0x20000, CRC(78995109) SHA1(2395fc48e64099836111f5aeca39ddbf4650ea4e),ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "v3", "Gigatron ROM V3")
+	ROM_SYSTEM_BIOS(2, "v3", "Gigatron ROM v3")
 	ROMX_LOAD( "gigrom3.rom",  0x0000, 0x20000, CRC(1536efbe) SHA1(959268069e761a01d620396eedb9abc1ee63c421),ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "v2", "Gigatron ROM V2")
+	ROM_SYSTEM_BIOS(3, "v2", "Gigatron ROM v2")
 	ROMX_LOAD( "gigrom2.rom",  0x0000, 0x20000, CRC(b4a3d936) SHA1(c93f417d589144b912c79f85b9e942d66242c2c3),ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "v1", "Gigatron ROM V1")
+	ROM_SYSTEM_BIOS(4, "v1", "Gigatron ROM v1")
 	ROMX_LOAD( "gigrom1.rom",  0x0000, 0x20000, CRC(8ea5a2af) SHA1(e5758d5cc467c3476bd8f992fd45dfcdf06d0430),ROM_BIOS(4))
 ROM_END
 
