@@ -365,7 +365,7 @@ void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_tim
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
-	nl_owner().log_value_double(m_param_name, *((double *) ptr));
+	nl_owner().log_add(m_param_name, *((double *) ptr), true);
 #endif
 	m_param->set(*((double *) ptr));
 }
@@ -394,7 +394,7 @@ void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
-	nl_owner().log_value_int(m_param_name, param);
+	nl_owner().log_add(m_param_name, param, false);
 #endif
 	m_param->set(param);
 }
@@ -403,7 +403,7 @@ void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_time
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
-	nl_owner().log_value_int(m_param_name, param);
+	nl_owner().log_add(m_param_name, param, false);
 #endif
 	m_param->set(param);
 }
@@ -443,21 +443,52 @@ void netlist_mame_sub_interface::set_mult_offset(const double mult, const double
 }
 
 #if NETLIST_CREATE_CSV
-void netlist_mame_device::log_value_int(char const* param, int value)
+void netlist_mame_device::log_add(char const* param, double value, bool isfloat)
 {
-	if (m_csv_file != nullptr)
+	// skip if no file
+	if (m_csv_file == nullptr)
+		return;
+
+	// make a new entry
+	buffer_entry entry = { machine().scheduler().time(), isfloat, value, param };
+
+	// flush out half of the old entries if we hit the buffer limit
+	if (m_buffer.size() >= MAX_BUFFER_ENTRIES)
+		log_flush(MAX_BUFFER_ENTRIES / 2);
+
+	// fast common case: if we go at the end, just push_back
+	if (m_buffer.size() == 0 || entry.time >= m_buffer.back().time)
 	{
-		attotime time = machine().scheduler().time();
-		fprintf(m_csv_file, "%s,%s,%d\n", time.as_string(), param, value);
+		m_buffer.push_back(entry);
+		return;
 	}
+
+	// find our place in the queue
+	for (auto cur = m_buffer.rbegin(); cur != m_buffer.rend(); cur++)
+		if (entry.time >= cur->time)
+		{
+			m_buffer.insert(cur.base(), entry);
+			return;
+		}
+
+	// if we're too early, drop this entry rather than risk putting an out-of-order
+	// entry after the last one we flushed
 }
 
-void netlist_mame_device::log_value_double(char const* param, double value)
+void netlist_mame_device::log_flush(int count)
 {
-	if (m_csv_file != nullptr)
+	if (m_csv_file == nullptr)
+		return;
+	if (count > m_buffer.size())
+		count = m_buffer.size();
+	while (count--)
 	{
-		attotime time = machine().scheduler().time();
-		fprintf(m_csv_file, "%s,%s,%f\n", time.as_string(), param, value);
+		auto &entry = m_buffer.front();
+		if (entry.isfloat)
+			fprintf(m_csv_file, "%s,%s,%f\n", entry.time.as_string(), entry.string, entry.value);
+		else
+			fprintf(m_csv_file, "%s,%s,%d\n", entry.time.as_string(), entry.string, int(entry.value));
+		m_buffer.pop_front();
 	}
 }
 #endif
@@ -1129,7 +1160,10 @@ void netlist_mame_device::device_stop()
 		netlist().exec().stop();
 #if NETLIST_CREATE_CSV
 	if (m_csv_file != nullptr)
+	{
+		log_flush();
 		fclose(m_csv_file);
+	}
 #endif
 }
 
