@@ -68,6 +68,8 @@ public:
 	putf8_reader(std::unique_ptr<std::istream> &&rhs) noexcept
 	: m_strm(std::move(rhs))
 	{
+		// no bad surprises
+		m_strm->imbue(std::locale::classic());
 	}
 
 	bool eof() const { return m_strm->eof(); }

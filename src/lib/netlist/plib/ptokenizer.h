@@ -22,17 +22,13 @@ namespace plib {
 	class ptokenizer
 	{
 	public:
-		template <typename T>
-		explicit ptokenizer(T &&strm) // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
-		: m_strm(std::forward<T>(strm))
-		, m_cur_line("")
-		, m_px(m_cur_line.begin())
-		, m_unget(0)
+		explicit ptokenizer() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+		: m_strm(nullptr)
 		, m_string('"')
 		, m_support_line_markers(true) // FIXME
+		, m_token_queue(nullptr)
 		{
-			// add a first entry to the stack
-			m_source_location.emplace_back(plib::source_location("Unknown", 0));
+			clear();
 		}
 
 		PCOPYASSIGNMOVE(ptokenizer, delete)
@@ -46,6 +42,7 @@ namespace plib {
 			STRING,
 			COMMENT,
 			LINEMARKER,
+			SOURCELINE,
 			UNKNOWN,
 			ENDOFFILE
 		)
@@ -57,28 +54,33 @@ namespace plib {
 			static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
 			token_id_t() : m_id(npos) {}
-			explicit token_id_t(const std::size_t id) : m_id(id) {}
+			explicit token_id_t(std::size_t id, const pstring &name)
+			: m_id(id)
+			, m_name(name)
+			{}
 			std::size_t id() const { return m_id; }
+			pstring name() const { return m_name; }
 		private:
 			std::size_t m_id;
+			pstring     m_name;
 		};
 
 		struct token_t
 		{
 			explicit token_t(token_type type)
-			: m_type(type), m_token("")
+			: m_type(type), m_id(token_id_t::npos), m_token("")
 			{
 			}
 			token_t(token_type type, const pstring &str)
-			: m_type(type), m_token(str)
+			: m_type(type), m_id(token_id_t::npos), m_token(str)
 			{
 			}
 			token_t(const token_id_t &id, const pstring &str)
-			: m_type(token_type::TOKEN), m_id(id), m_token(str)
+			: m_type(token_type::TOKEN), m_id(id.id()), m_token(str)
 			{
 			}
 
-			bool is(const token_id_t &tok_id) const noexcept { return m_id.id() == tok_id.id(); }
+			bool is(const token_id_t &tok_id) const noexcept { return m_id == tok_id.id(); }
 			bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }
 
 			bool is_type(const token_type type) const noexcept { return m_type == type; }
@@ -89,28 +91,17 @@ namespace plib {
 
 		private:
 			token_type m_type;
-			token_id_t m_id;
+			std::size_t m_id;
 			pstring m_token;
 		};
 
-		pstring currentline_str() const;
+		using token_store = std::vector<token_t>;
 
 		// tokenizer stuff follows ...
 
-		token_t get_token();
-		pstring get_string();
-		pstring get_identifier();
-		pstring get_identifier_or_number();
-
-		double get_number_double();
-		long get_number_long();
-
-		void require_token(const token_id_t &token_num);
-		void require_token(const token_t &tok, const token_id_t &token_num);
-
 		token_id_t register_token(const pstring &token)
 		{
-			token_id_t ret(m_tokens.size());
+			token_id_t ret(m_tokens.size(), token);
 			m_tokens.emplace(token, ret);
 			return ret;
 		}
@@ -127,22 +118,42 @@ namespace plib {
 			return *this;
 		}
 
-		token_t get_token_internal();
-		void error(const perrmsg &errs);
-
-		putf8_reader &stream() { return m_strm; }
-	protected:
-		virtual void verror(const pstring &msg) = 0;
+		void append_to_store(putf8_reader *reader, token_store &tokstor)
+		{
+			clear();
+			m_strm = reader;
+			// Process tokens into queue
+			token_t ret(token_type::UNKNOWN);
+			m_token_queue = &tokstor;
+			do {
+				ret = get_token_comment();
+				tokstor.push_back(ret);
+			} while (!ret.is_type(token_type::token_type::ENDOFFILE));
+			m_token_queue = nullptr;
+		}
 
 	private:
+
+		void clear()
+		{
+			m_cur_line = "";
+			m_px = m_cur_line.begin();
+			m_unget = 0;
+		}
+
+		token_t get_token_internal();
+
+		// get internal token with comment processing
+		token_t get_token_comment();
+
 		void skipeol();
 
 		pstring::value_type getc();
 		void ungetc(pstring::value_type c);
 
-		bool eof() const { return m_strm.eof(); }
+		bool eof() const { return m_strm->eof(); }
 
-		putf8_reader m_strm;
+		putf8_reader *m_strm;
 
 		pstring m_cur_line;
 		pstring::const_iterator m_px;
@@ -161,10 +172,71 @@ namespace plib {
 		token_id_t m_tok_comment_end;
 		token_id_t m_tok_line_comment;
 
+	protected:
+		bool m_support_line_markers;
+		token_store *m_token_queue;
+	};
+
+	class ptoken_reader
+	{
+	public:
+
+		using token_t = ptokenizer::token_t;
+		using token_type = ptokenizer::token_type;
+		using token_id_t = ptokenizer::token_id_t;
+		using token_store = ptokenizer::token_store;
+
+		explicit ptoken_reader()
+		: m_idx(0)
+		, m_token_store(nullptr)
+		{
+			// add a first entry to the stack
+			m_source_location.emplace_back(plib::source_location("Unknown", 0));
+		}
+
+		PCOPYASSIGNMOVE(ptoken_reader, delete)
+
+		virtual ~ptoken_reader() = default;
+
+		void set_token_source(const token_store *tokstor)
+		{
+			m_token_store = tokstor;
+		}
+
+		pstring currentline_str() const;
+
+		// tokenizer stuff follows ...
+
+		token_t get_token();
+		pstring get_string();
+		pstring get_identifier();
+		pstring get_identifier_or_number();
+
+		double get_number_double();
+		long get_number_long();
+
+		void require_token(const token_id_t &token_num);
+		void require_token(const token_t &tok, const token_id_t &token_num);
+
+		void error(const perrmsg &errs);
+
+	protected:
+		virtual void verror(const pstring &msg) = 0;
+
+	private:
+		token_t get_token_queue()
+		{
+			if (m_idx < m_token_store->size())
+				return (*m_token_store)[m_idx++];
+			return token_t(token_type::ENDOFFILE);
+		}
+
 		// source locations, vector used as stack because we need to loop through stack
 
-		bool m_support_line_markers;
 		std::vector<plib::source_location> m_source_location;
+		pstring m_line;
+		std::size_t m_idx;
+		const token_store * m_token_store;
 	};
 
 } // namespace plib

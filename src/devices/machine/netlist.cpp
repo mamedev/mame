@@ -978,8 +978,8 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 {
 	try
 	{
-		//plib::chrono::timer<plib::chrono::system_ticks> t;
-		//t.start();
+		plib::chrono::timer<plib::chrono::system_ticks> t;
+		t.start();
 		auto lnetlist = std::make_unique<netlist::netlist_state_t>("netlist",
 			plib::make_unique<netlist_validate_callbacks_t, netlist::host_arena>());
 		// enable validation mode
@@ -997,7 +997,7 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 			}
 		}
 
-		//t.stop();
+		t.stop();
 		//printf("time %s %f\n", this->mconfig().gamedrv().name, t.as_seconds<double>());
 		return lnetlist;
 	}

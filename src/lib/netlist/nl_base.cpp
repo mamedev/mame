@@ -115,7 +115,6 @@ namespace netlist
 	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
-
 		m_lib = m_callbacks->static_solver_lib();
 
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);
@@ -130,7 +129,6 @@ namespace netlist
 		devices::initialize_factory(m_setup->parser().factory());
 
 		// Add default include file
-		using a = plib::psource_str_t;
 		const pstring content =
 		"#define RES_R(res) (res)            \n"
 		"#define RES_K(res) ((res) * 1e3)    \n"
@@ -141,12 +139,16 @@ namespace netlist
 		"#define IND_U(ind) ((ind) * 1e-6)   \n"
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
-		m_setup->parser().add_include<a>("netlist/devices/net_lib.h", content);
+		m_setup->parser().add_include<plib::psource_str_t>("netlist/devices/net_lib.h", content);
 #if 1
 		NETLIST_NAME(base)(m_setup->parser());
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
+#if 0
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
+#else
 		pstring dir = "src/lib/netlist/macro/";
+		//m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_base.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_opamp.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_roms.cpp");
@@ -154,6 +156,7 @@ namespace netlist
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_other.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_ttl74xx.cpp");
 		m_setup->parser().include("base");
+#endif
 #endif
 	}
 

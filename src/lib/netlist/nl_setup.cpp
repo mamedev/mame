@@ -16,6 +16,8 @@
 
 #include "solver/nld_solver.h"
 
+#include <sstream>
+
 namespace netlist
 {
 	// ----------------------------------------------------------------------------------------
@@ -352,10 +354,26 @@ namespace netlist
 
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
-		auto y = std::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
-		y->process(std::move(istrm), "<stream>");
-		return parser_t(std::move(y), *this).parse(name);
-		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
+		auto key = istrm.filename();
+
+		if (m_source_cache.find(key) != m_source_cache.end())
+		{
+			return parser_t(*this).parse(m_source_cache[key], name);
+		}
+		else
+		{
+			//printf("searching %s\n", name.c_str());
+			plib::ppreprocessor y(m_includes, &m_defines);
+			y.process(std::move(istrm), istrm.filename());
+
+			auto abc = std::make_unique<std::stringstream>();
+			plib::copystream(*abc, y);
+
+			parser_t::token_store &st = m_source_cache[key];
+			parser_t parser(*this);
+			parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), key), st);
+			return parser.parse(st, name);
+		}
 	}
 
 	void nlparse_t::add_define(const pstring &defstr)
@@ -1689,6 +1707,19 @@ source_file_t::stream_ptr source_file_t::stream(const pstring &name)
 	else
 		return stream_ptr();
 }
+
+source_file_t::stream_ptr source_pattern_t::stream(const pstring &name)
+{
+	pstring filename = plib::pfmt(m_pattern)(name);
+	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
+	if (f->is_open())
+	{
+		return stream_ptr(std::move(f), filename);
+	}
+	else
+		return stream_ptr();
+}
+
 
 bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 {

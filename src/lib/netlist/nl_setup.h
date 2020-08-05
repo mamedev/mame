@@ -17,6 +17,7 @@
 
 #include "nl_config.h"
 #include "nltypes.h"
+#include "nl_parser.h"
 // FIXME: avoid including factory
 //#include "nl_factory.h"
 
@@ -270,6 +271,7 @@ namespace netlist
 		plib::psource_collection_t<>                m_sources;
 		detail::abstract_t &                        m_abstract;
 
+		std::unordered_map<pstring, parser_t::token_store>    m_source_cache;
 		log_type &m_log;
 		unsigned m_frontier_cnt;
 	};

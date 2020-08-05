@@ -8,22 +8,24 @@
 #ifndef NL_PARSER_H_
 #define NL_PARSER_H_
 
-#include "nl_setup.h"
+#include "nltypes.h" // for setup_t
 #include "plib/ptokenizer.h"
 
 namespace netlist
 {
-	class parser_t : public plib::ptokenizer
+	class parser_t : public plib::ptoken_reader
 	{
 	public:
-		template <typename T>
-		parser_t(T &&strm, nlparse_t &setup)
-			: plib::ptokenizer(std::forward<T>(strm))
-			, m_setup(setup)
-		{
-		}
+		using token_t = plib::ptokenizer::token_t;
+		using token_type = plib::ptokenizer::token_type;
+		using token_id_t = plib::ptokenizer::token_id_t;
+		using token_store = plib::ptokenizer::token_store;
 
-		bool parse(const pstring &nlname);
+		parser_t(nlparse_t &setup);
+
+		bool parse(plib::psource_t::stream_ptr &&strm, const pstring &nlname);
+		bool parse(token_store &tokstor, const pstring &nlname);
+		void parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tokstor);
 
 	protected:
 		void parse_netlist(const pstring &nlname);
@@ -49,6 +51,7 @@ namespace netlist
 		token_id_t m_tok_paren_left;
 		token_id_t m_tok_paren_right;
 		token_id_t m_tok_comma;
+		token_id_t m_tok_static;
 		token_id_t m_tok_ALIAS;
 		token_id_t m_tok_NET_C;
 		token_id_t m_tok_DIPPINS;
@@ -70,6 +73,7 @@ namespace netlist
 		token_id_t m_tok_TT_LINE;
 		token_id_t m_tok_TT_FAMILY;
 
+		plib::ptokenizer m_tokenizer;
 		nlparse_t &m_setup;
 };
 
