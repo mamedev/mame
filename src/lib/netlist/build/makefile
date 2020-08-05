@@ -251,7 +251,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend runtests
+.PHONY: all gcc9 clang clang-5 mingw doc man native maketree $(DEPEND) depend runtests
 
 #-------------------------------------------------
 # all
@@ -361,8 +361,13 @@ mingw:
 #     LDEXTRAFLAGS = -municode
 #
 
+man: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
+	@mkdir -p man
+	@mkdir -p html
+	help2man --include=nltool.help2man --no-info ./nltool$(EXESUFFIX) > man/nltool.1
+	groff -mandoc -Thtml man/nltool.1 > html/nltool.html
 
-doc: nltool$(EXESUFFIX)
+doc: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
