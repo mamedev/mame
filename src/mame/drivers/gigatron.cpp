@@ -26,7 +26,7 @@
 	
 	Hook up a quikload for loading .gt1 files
 	HLE the keyboard and Pluggy McPlugface
-	Fix the video being shifted down.
+	Fix the video being shifted down and to the left.
 
 ***************************************************************************/
 
