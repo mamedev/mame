@@ -4,6 +4,12 @@
 // the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
 // https://www.youtube.com/watch?v=NacY2WHd-CY
 
+// BIOS calls are made very frequently to the undumped firmware.
+// The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from Flash and executing it from RAM.
+// A variant of this call ($60d2 in bbl380, $60e3 in ragc153 & dphh8630) is invoked with jsr.
+// For these calls, a 24-bit starting address is specified in $82:$81:$80, and the length in bytes is twice the number specified in $84:$83.
+// ST2205U cannot execute code directly from Flash, but has a built-in DMA-compatible NAND interface on Port F ($05).
+
 #include "emu.h"
 
 #include "cpu/m6502/st2205u.h"
