@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese,cam900
 /***************************************************************************
 
     v3021.h

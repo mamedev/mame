@@ -1977,7 +1977,6 @@ void debugger_commands::execute_saveregion(int ref, const std::vector<std::strin
 {
 	u64 offset, length;
 	memory_region *region;
-	FILE *f;
 
 	/* validate parameters */
 	if (!validate_number_parameter(params[1], offset))
@@ -1987,20 +1986,20 @@ void debugger_commands::execute_saveregion(int ref, const std::vector<std::strin
 	if (!validate_memory_region_parameter(params[3], region))
 		return;
 
+	if (offset >= region->bytes())
+	{
+		m_console.printf("Invalid offset\n");
+		return;
+	}
+	if ((length <= 0) || ((length + offset) >= region->bytes()))
+		length = region->bytes() - offset;
+
 	/* open the file */
-	f = fopen(params[0].c_str(), "wb");
-	if (!f) {
+	FILE *f = fopen(params[0].c_str(), "wb");
+	if (!f)
+	{
 		m_console.printf("Error opening file '%s'\n", params[0].c_str());
 		return;
-	}
-
-	if(offset >= region->bytes()) {
-		m_console.printf("Invalide offset\n");
-		return;
-	}
-	// get full length
-	if(length <= 0 || length + offset >= region->bytes()) {
-		length = region->bytes() - offset;
 	}
 	fwrite(region->base() + offset, 1, length, f);
 
@@ -2118,14 +2117,13 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 
 
 /*-------------------------------------------------
-    execute_saveregion - execute the save command on region memory
+    execute_loadregion - execute the load command on region memory
 -------------------------------------------------*/
 
 void debugger_commands::execute_loadregion(int ref, const std::vector<std::string> &params)
 {
 	u64 offset, length;
 	memory_region *region;
-	FILE *f;
 
 	/* validate parameters */
 	if (!validate_number_parameter(params[1], offset))
@@ -2135,9 +2133,18 @@ void debugger_commands::execute_loadregion(int ref, const std::vector<std::strin
 	if (!validate_memory_region_parameter(params[3], region))
 		return;
 
+	if (offset >= region->bytes())
+	{
+		m_console.printf("Invalid offset\n");
+		return;
+	}
+	if ((length <= 0) || ((length + offset) >= region->bytes()))
+		length = region->bytes() - offset;
+
 	/* open the file */
-	f = fopen(params[0].c_str(), "rb");
-	if (!f) {
+	FILE *f = fopen(params[0].c_str(), "rb");
+	if (!f)
+	{
 		m_console.printf("Error opening file '%s'\n", params[0].c_str());
 		return;
 	}
@@ -2146,18 +2153,9 @@ void debugger_commands::execute_loadregion(int ref, const std::vector<std::strin
 	u64 size = ftell(f);
 	rewind(f);
 
-	if(offset >= region->bytes()) {
-		m_console.printf("Invalide offset\n");
-		return;
-	}
-	// get full length
-	if(length <= 0 || length + offset >= region->bytes()) {
-		length = region->bytes() - offset;
-	}
 	// check file size
-	if(length >= size) {
+	if (length >= size)
 		length = size;
-	}
 
 	fread(region->base() + offset, 1, length, f);
 

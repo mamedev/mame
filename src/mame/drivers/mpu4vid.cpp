@@ -8293,7 +8293,7 @@ GAME(  199?, v4sixxc,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwb
 GAME(  199?, v4sixxg,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxh,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxi,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sixxj,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, % Key) (MPU4 Video) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sixxj,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxk,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxl,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, All - Cash) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxm,    v4sixx,   bwbvid,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","6-X (BWB) (Release 3, 20p Switchable to 10p, All - Cash, Datapak) (MPU4 Video)",GAME_FLAGS )
@@ -8378,7 +8378,7 @@ GAME(  1996, v4renob,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_pri
 GAME(  1996, v4renos,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Switchable 20p/10p/5p, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4renou,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Switchable 20p/10p/5p, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4renor,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Switchable 20p/10p/5p, Cash+Token) (Showcase) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4renot,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Switchable 20p/10p/5p, Cash+Token) (Showcase) (set 2)(MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renot,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Switchable 20p/10p/5p, Cash+Token) (Showcase) (set 2) (MPU4 Video)",GAME_FLAGS )
 // older 68k version
 GAME(  1996, v4reno8,    v4reno,   bwbvid5,    bwbvid,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 8, 20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
 // 68k ROMs below have no matching base roms
