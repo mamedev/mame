@@ -92,6 +92,9 @@ void gigatron_cpu_device::reset_cpu()
 	
 	m_out_cb(0, 0);
 	m_outx_cb(0, 0);
+	
+	for(uint16_t i = 0; i < m_ramMask; i++)
+		gigatron_writemem8(i, floor(machine().rand() & 0xff));
 }
 
 /* Execute cycles */
@@ -231,7 +234,7 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 		break;
 	case 6:
 	case 7:
-		uint8_t rising = (~m_out) & b;
+		uint16_t rising = ~m_out & b;
 		m_out = b;
 		m_out_cb(0, m_out);
 
