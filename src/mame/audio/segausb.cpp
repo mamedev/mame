@@ -259,19 +259,16 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x01:  // 8253 U41
 		case 0x02:  // 8253 U41
 		case 0x03:  // 8253 U41
-			printf("U41_w(%d)=%02X\n", offset & 3, data);
 			m_pit[0]->write(offset & 3, data);
 			break;
 
 		case 0x04:  // ENV0 U26
 		case 0x05:  // ENV0 U25
 		case 0x06:  // ENV0 U24
-			printf("dac0(%d)=%02X\n", offset & 3, data);
 			m_nl_dac0[offset & 3]->write(double(data) / 255.0);
 			break;
 
 		case 0x07:  // ENV0 U38B
-			printf("sel0 = %d\n", data & 1);
 			m_nl_sel0->write(data & 1);
 			break;
 
@@ -279,19 +276,16 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x09:  // 8253 U42
 		case 0x0a:  // 8253 U42
 		case 0x0b:  // 8253 U42
-			printf("U42_w(%d)=%02X\n", offset & 3, data);
 			m_pit[1]->write(offset & 3, data);
 			break;
 
 		case 0x0c:  // ENV1 U12
 		case 0x0d:  // ENV1 U13
 		case 0x0e:  // ENV1 U14
-			printf("dac1(%d)=%02X\n", offset & 3, data);
 			m_nl_dac1[offset & 3]->write(double(data) / 255.0);
 			break;
 
 		case 0x0f:  // ENV0 U2B
-			printf("sel1 = %d\n", data & 1);
 			m_nl_sel1->write(data & 1);
 			break;
 
@@ -299,22 +293,18 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x11:  // 8253 U43
 		case 0x12:  // 8253 U43
 		case 0x13:  // 8253 U43
-			printf("U43_w(%d)=%02X\n", offset & 3, data);
 			m_pit[2]->write(offset & 3, data);
 			break;
 
 		case 0x14:  // ENV2 U27
 		case 0x15:  // ENV2 U28
 		case 0x16:  // ENV2 U29
-			printf("dac2(%d)=%02X\n", offset & 3, data);
 			m_nl_dac2[offset & 3]->write(double(data) / 255.0);
 			break;
 
 		case 0x17:  // ENV0 U38B
-			printf("sel2 = %d\n", data & 1);
 			m_nl_sel2->write(data & 1);
 			break;
-
 	}
 }
 
