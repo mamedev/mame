@@ -1045,10 +1045,10 @@
 #define TTL_74279B(...)                                                \
 	NET_REGISTER_DEVEXT(TTL_74279B, __VA_ARGS__)
 
-// usage       : DM9312(name, pA, pB, pC, pG, pD0, pD1, pD2, pD3, pD4, pD5, pD6, pD7)
+// usage       : TTL_9312(name, pA, pB, pC, pG, pD0, pD1, pD2, pD3, pD4, pD5, pD6, pD7)
 // auto connect: VCC, GND
-#define DM9312(...)                                                    \
-	NET_REGISTER_DEVEXT(DM9312, __VA_ARGS__)
+#define TTL_9312(...)                                                  \
+	NET_REGISTER_DEVEXT(TTL_9312, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: parser: TTL74XX_lib
@@ -1209,9 +1209,9 @@
 #define SN74LS629_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(SN74LS629_DIP, __VA_ARGS__)
 
-// usage       : DM9312_DIP(name)
-#define DM9312_DIP(...)                                                \
-	NET_REGISTER_DEVEXT(DM9312_DIP, __VA_ARGS__)
+// usage       : TTL_9312_DIP(name)
+#define TTL_9312_DIP(...)                                                \
+	NET_REGISTER_DEVEXT(TTL_9312_DIP, __VA_ARGS__)
 
 // usage       : TTL_9310_DIP(name)
 #define TTL_9310_DIP(...)                                              \
