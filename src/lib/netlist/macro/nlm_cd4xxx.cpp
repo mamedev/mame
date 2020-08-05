@@ -95,24 +95,24 @@ NETLIST_END()
 //-     +---+---++---+
 //-
 static NETLIST_START(CD4011_DIP)
-       CD4011_GATE(A)
-       CD4011_GATE(B)
-       CD4011_GATE(C)
-       CD4011_GATE(D)
+	CD4011_GATE(A)
+	CD4011_GATE(B)
+	CD4011_GATE(C)
+	CD4011_GATE(D)
 
-       NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
-       NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
 
-       DIPPINS(    /*     +--------------+     */
-			  A.A, /*   A |1     ++    14| VDD */ A.VDD,
-			  A.B, /*   B |2           13| H   */ D.B,
-			  A.Q, /*   J |3           12| G   */ D.A,
-			  B.Q, /*   K |4    4011   11| M   */ D.Q,
-			  B.A, /*   C |5           10| L   */ C.Q,
-			  B.B, /*   D |6            9| F   */ C.B,
-			A.VSS, /* VSS |7            8| E   */ C.A
-				   /*     +--------------+     */
-	   )
+	DIPPINS(    /*     +--------------+     */
+			A.A, /*   A |1     ++    14| VDD */ A.VDD,
+			A.B, /*   B |2           13| H   */ D.B,
+			A.Q, /*   J |3           12| G   */ D.A,
+			B.Q, /*   K |4    4011   11| M   */ D.Q,
+			B.A, /*   C |5           10| L   */ C.Q,
+			B.B, /*   D |6            9| F   */ C.B,
+		A.VSS, /* VSS |7            8| E   */ C.A
+				/*     +--------------+     */
+	)
 NETLIST_END()
 
 //- Identifier: CD4013BM/CD4013BC
@@ -249,6 +249,7 @@ static NETLIST_START(CD4020_DIP)
 		 A.Q4, /*  Q4 |7           10| PHI1  */ A.IP,
 		A.VSS, /* VSS |8            9| Q1    */ A.Q1
 			   /*     +--------------+       */
+	)
 NETLIST_END()
 
 //- Identifier: CD4022BM/CD4022BC
@@ -308,6 +309,7 @@ static NETLIST_START(CD4024_DIP)
 		   A.Q4, /*    Q4 |6            9| Q3  */ A.Q3,
 		  A.VSS, /*   VSS |7            8| NC  */ NC.I
 				 /*       +--------------+     */
+	)
 NETLIST_END()
 
 //- Identifier: CD4053BM/CD4053BC
