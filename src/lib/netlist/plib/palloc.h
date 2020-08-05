@@ -25,6 +25,10 @@
 #include <malloc.h>
 #endif
 
+#if defined(PAGESIZE)
+#undef PAGESIZE
+#endif
+
 namespace plib {
 
 	//============================================================

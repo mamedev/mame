@@ -35,6 +35,10 @@
 	name(name &&) /*noexcept*/ = def; \
 	name &operator=(name &&) /*noexcept*/ = def;
 
+#if defined(EMSCRIPTEN)
+#undef EMSCRIPTEN
+#endif
+
 namespace plib
 {
 	//============================================================

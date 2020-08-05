@@ -31,6 +31,11 @@ project "netlist"
 		"NL_USE_ACADEMIC_SOLVERS=0",
 	}
 
+	configuration { "asmjs" }
+		defines {
+			"PUSE_ALIGNED_OPTIMIZATIONS=0",
+		}
+
 	includedirs {
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/netlist",
