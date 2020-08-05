@@ -26,7 +26,6 @@
 	
 	Hook up a quikload for loading .gt1 files
 	HLE the keyboard and Pluggy McPlugface
-	Fix the video being shifted down.
 
 ***************************************************************************/
 
@@ -106,13 +105,13 @@ void gigatron_state::port_out(uint8_t data)
 
     if (falling & VSYNC)
     {
-        m_row = 0;
+        m_row = -36;
         m_pixel = 0;
     }
 
     if (falling & HSYNC)
     {
-        m_col = 0;
+        m_col = -4;
         m_row++;
     }
 
@@ -243,4 +242,4 @@ ROM_START( gigatron )
 	ROMX_LOAD( "gigrom1.rom",  0x0000, 0x20000, CRC(8ea5a2af) SHA1(e5758d5cc467c3476bd8f992fd45dfcdf06d0430),ROM_BIOS(4))
 ROM_END
 
-COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck / Walter Belgers", "Gigatron TTL Microcomputer", MACHINE_SUPPORTS_SAVE)
