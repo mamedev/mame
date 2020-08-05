@@ -150,6 +150,11 @@ uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
     copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
 	video_reset();
+	
+	m_blinken1 = (m_lights >> 3) & 1;
+	m_blinken2 = (m_lights >> 2) & 1;
+	m_blinken3 = (m_lights >> 1) & 1;
+	m_blinken4 = (m_lights >> 0) & 1;
     return 0;
 }
 
