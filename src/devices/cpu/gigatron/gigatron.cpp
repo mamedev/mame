@@ -86,7 +86,7 @@ void gigatron_cpu_device::reset_cpu()
 	m_pc = 0;
 	m_npc = (m_pc + 1) & m_romMask;
 	m_ppc = 0;
-	m_inReg = 0xFF;
+	m_inReg = 0xff;
 	m_outx = 0;
 	m_out = 0;
 	
@@ -341,8 +341,8 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 
 gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
-	, m_ramMask(0xFFFF)
-	, m_romMask(0xFFFF)
+	, m_ramMask(0xffff)
+	, m_romMask(0xffff)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
 	, m_outx_cb(*this)

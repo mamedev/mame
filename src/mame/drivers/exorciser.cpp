@@ -178,10 +178,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
 	DECLARE_WRITE_LINE_MEMBER(abort_key_w);
 
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
+private:
 	void dbg_map(address_map &map);
 	void mem_map(address_map &map);
 
