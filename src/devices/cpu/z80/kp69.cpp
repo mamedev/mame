@@ -32,11 +32,11 @@ DEFINE_DEVICE_TYPE(KP69, kp69_device, "kp69", "Kawasaki Steel KP69 Interrupt Con
 
 
 //-------------------------------------------------
-//  kp69_device - device type constructor
+//  kp69_base_device - constructor
 //-------------------------------------------------
 
-kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, KP69, tag, owner, clock)
+kp69_base_device::kp69_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_int_callback(*this)
 	, m_input_levels(0)
@@ -44,11 +44,21 @@ kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_
 	, m_isr(0)
 	, m_illegal_state(false)
 	, m_ivr(0)
-	, m_ivr_written(false)
 	, m_imr(0xffff)
 	, m_ler(0)
 	, m_pgr(0)
 	, m_int_active(false)
+{
+}
+
+
+//-------------------------------------------------
+//  kp69_device - constructor
+//-------------------------------------------------
+
+kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: kp69_base_device(mconfig, KP69, tag, owner, clock)
+	, m_ivr_written(false)
 {
 }
 
@@ -59,7 +69,7 @@ kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_
 //  initial conditions at start time
 //-------------------------------------------------
 
-void kp69_device::device_resolve_objects()
+void kp69_base_device::device_resolve_objects()
 {
 	// Resolve output callback
 	m_int_callback.resolve_safe();
@@ -70,7 +80,7 @@ void kp69_device::device_resolve_objects()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void kp69_device::device_start()
+void kp69_base_device::device_start()
 {
 	// Register state for saving
 	save_item(NAME(m_input_levels));
@@ -78,11 +88,16 @@ void kp69_device::device_start()
 	save_item(NAME(m_isr));
 	save_item(NAME(m_illegal_state));
 	save_item(NAME(m_ivr));
-	save_item(NAME(m_ivr_written));
 	save_item(NAME(m_imr));
 	save_item(NAME(m_ler));
 	save_item(NAME(m_pgr));
 	save_item(NAME(m_int_active));
+}
+
+void kp69_device::device_start()
+{
+	kp69_base_device::device_start();
+	save_item(NAME(m_ivr_written));
 }
 
 
@@ -90,7 +105,7 @@ void kp69_device::device_start()
 //  add_to_state - debug state interface for MCU
 //-------------------------------------------------
 
-void kp69_device::add_to_state(device_state_interface &state, int index)
+void kp69_base_device::add_to_state(device_state_interface &state, int index)
 {
 	state.state_add<u16>(index, "IRR", [this]() { return m_irr; }, [this](u16 data) { set_irr(data); });
 	state.state_add<u16>(index + 1, "ISR", [this]() { return m_isr; }, [this](u16 data) { set_isr(data); });
@@ -105,25 +120,30 @@ void kp69_device::add_to_state(device_state_interface &state, int index)
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void kp69_device::device_reset()
+void kp69_base_device::device_reset()
 {
 	// Reset inputs to level mode
-	m_irr = m_input_levels;
 	m_ler = 0;
 
-	// Mask all interrupts and end service
-	m_isr = 0;
+	// Mask all interrupts, cancel requests and end service
 	m_imr = 0xffff;
+	m_irr = 0;
+	m_isr = 0;
 	m_illegal_state = false;
 
 	// Reset priority groups
 	m_pgr = 0;
 
-	// Allow LER and IVR to be written first
-	m_ivr_written = false;
-
 	// Deassert interrupt output
 	set_int(false);
+}
+
+void kp69_device::device_reset()
+{
+	kp69_base_device::device_reset();
+
+	// Allow LER and IVR to be written first
+	m_ivr_written = false;
 }
 
 
@@ -131,7 +151,7 @@ void kp69_device::device_reset()
 //  isrl_r - read lower 8 bits of ISR
 //-------------------------------------------------
 
-u8 kp69_device::isrl_r()
+u8 kp69_base_device::isrl_r()
 {
 	return m_isr & 0x00ff;
 }
@@ -141,7 +161,7 @@ u8 kp69_device::isrl_r()
 //  isrh_r - read upper 8 bits of ISR
 //-------------------------------------------------
 
-u8 kp69_device::isrh_r()
+u8 kp69_base_device::isrh_r()
 {
 	return (m_isr & 0xff00) >> 8;
 }
@@ -151,7 +171,7 @@ u8 kp69_device::isrh_r()
 //  imrl_r - read lower 8 bits of IMR
 //-------------------------------------------------
 
-u8 kp69_device::imrl_r()
+u8 kp69_base_device::imrl_r()
 {
 	return m_imr & 0x00ff;
 }
@@ -161,7 +181,7 @@ u8 kp69_device::imrl_r()
 //  imrh_r - read upper 8 bits of IMR
 //-------------------------------------------------
 
-u8 kp69_device::imrh_r()
+u8 kp69_base_device::imrh_r()
 {
 	return (m_imr & 0xff00) >> 8;
 }
@@ -227,19 +247,16 @@ void kp69_device::ivr_imrh_w(u8 data)
 //  output is currently active
 //-------------------------------------------------
 
-bool kp69_device::int_active() const
+bool kp69_base_device::int_active() const
 {
 	if (m_illegal_state)
 		return false;
 
 	// Compare priority of pending interrupt request with any being serviced
-	u16 requested = m_irr & ~m_imr;
-	if ((requested & m_pgr) != 0 || (m_isr & m_pgr) != 0)
-		return count_leading_zeros(u32(requested & m_pgr)) < count_leading_zeros(u32(m_isr & m_pgr));
-	else if (requested != 0)
-		return count_leading_zeros(u32(requested)) < count_leading_zeros(u32(m_isr));
+	if ((m_irr & m_pgr) != 0 || (m_isr & m_pgr) != 0)
+		return (m_irr & ~m_isr & m_pgr) > (m_isr & m_pgr);
 	else
-		return false;
+		return (m_irr & ~m_isr) > m_isr;
 }
 
 
@@ -247,7 +264,7 @@ bool kp69_device::int_active() const
 //  set_int - update the INT output state
 //-------------------------------------------------
 
-void kp69_device::set_int(bool active)
+void kp69_base_device::set_int(bool active)
 {
 	if (m_int_active != active)
 	{
@@ -262,28 +279,32 @@ void kp69_device::set_int(bool active)
 //  out of 16 interrupt inputs
 //-------------------------------------------------
 
-void kp69_device::set_input_level(int level, bool state)
+void kp69_base_device::set_input_level(int level, bool state)
 {
 	if (!BIT(m_input_levels, level) && state)
 	{
 		m_input_levels |= 1 << level;
-		if (!BIT(m_irr, level))
+
+		// Masked-out interrupts cannot be requested
+		if (!BIT(m_irr, level) && !BIT(m_imr, level))
 		{
 			u16 old_ints = m_irr | m_isr;
 			m_irr |= 1 << level;
 			LOG("IRR[%d] asserted\n", level);
-			if (!m_illegal_state && !BIT(m_imr, level) && (1 << level) > (BIT(m_pgr, level) ? old_ints & m_pgr : old_ints))
+			if (!m_illegal_state && (1 << level) > (BIT(m_pgr, level) ? old_ints & m_pgr : old_ints))
 				set_int(true);
 		}
 	}
 	else if (BIT(m_input_levels, level) && !state)
 	{
 		m_input_levels &= ~(1 << level);
+
+		// Level-triggered interrupts may be deasserted
 		if (!BIT(m_ler, level) && BIT(m_irr, level))
 		{
 			m_irr &= ~(1 << level);
 			LOG("IRR[%d] cleared\n", level);
-			if (!m_illegal_state && !BIT(m_imr, level))
+			if (!m_illegal_state)
 				set_int(int_active());
 		}
 	}
@@ -295,12 +316,10 @@ void kp69_device::set_input_level(int level, bool state)
 //  Request Register (not accessible by software)
 //-------------------------------------------------
 
-void kp69_device::set_irr(u16 data)
+void kp69_base_device::set_irr(u16 data)
 {
-	bool update = !m_illegal_state && ((m_irr ^ data) & m_ler & ~m_imr) != 0;
-	m_irr = (data & m_ler) | (m_input_levels & ~m_ler);
-	if (update)
-		set_int(int_active());
+	m_irr = (data & ~m_imr & m_ler) | (m_irr & ~m_ler);
+	set_int(int_active());
 }
 
 
@@ -309,7 +328,7 @@ void kp69_device::set_irr(u16 data)
 //  Register (not writable by software)
 //-------------------------------------------------
 
-void kp69_device::set_isr(u16 data)
+void kp69_base_device::set_isr(u16 data)
 {
 	m_isr = data;
 	set_int(int_active());
@@ -321,12 +340,18 @@ void kp69_device::set_isr(u16 data)
 //  Mask Register
 //-------------------------------------------------
 
-void kp69_device::set_imr(u16 data)
+void kp69_base_device::set_imr(u16 data)
 {
-	bool update = !m_illegal_state && (m_irr & ~(m_imr ^ data)) != 0;
+	u16 old_irr = m_irr;
 	m_imr = data;
-	if (update)
-		set_int(int_active());
+	m_irr = (m_irr & ~data & m_ler) | (m_input_levels & ~data & ~m_ler);
+	if (m_irr != old_irr)
+	{
+		bool active = int_active();
+		if (active != m_int_active)
+			LOG("%s: INT %s (IRR = %04X, was %04X)\n", machine().describe_context(), active ? "unmasked" : "masked out", m_irr, old_irr);
+		set_int(active);
+	}
 }
 
 
@@ -335,12 +360,12 @@ void kp69_device::set_imr(u16 data)
 //  Register
 //-------------------------------------------------
 
-void kp69_device::set_ler(u16 data)
+void kp69_base_device::set_ler(u16 data)
 {
-	u16 requested = m_irr & ~m_imr;
+	u16 old_irr = m_irr;
 	m_irr = (m_input_levels & ~data) | (m_irr & m_ler & data);
 	m_ler = data;
-	if (requested != (m_irr & ~m_imr))
+	if (m_irr != old_irr)
 		set_int(int_active());
 }
 
@@ -350,7 +375,7 @@ void kp69_device::set_ler(u16 data)
 //  Group Register
 //-------------------------------------------------
 
-void kp69_device::set_pgr(u16 data)
+void kp69_base_device::set_pgr(u16 data)
 {
 	if (m_pgr != data)
 	{
@@ -366,7 +391,7 @@ void kp69_device::set_pgr(u16 data)
 //  state for this device
 //-------------------------------------------------
 
-int kp69_device::z80daisy_irq_state()
+int kp69_base_device::z80daisy_irq_state()
 {
 	return m_int_active ? (Z80_DAISY_INT | Z80_DAISY_IEO) : Z80_DAISY_IEO;
 }
@@ -377,22 +402,21 @@ int kp69_device::z80daisy_irq_state()
 //  return the appropriate vector
 //-------------------------------------------------
 
-int kp69_device::z80daisy_irq_ack()
+int kp69_base_device::z80daisy_irq_ack()
 {
-	u16 requested = m_irr & ~m_imr;
 	int level = -1;
 
 	// Restrict to high-priority interrupts if any of those are pending
-	if ((requested & m_pgr) != 0)
+	if ((m_irr & m_pgr) != 0)
 	{
-		level = 31 - count_leading_zeros(u32(requested & m_pgr));
+		level = 31 - count_leading_zeros(u32(m_irr & m_pgr));
 		assert(level >= 0 && level < 16);
 		if ((1 << level) < (m_isr & m_pgr))
 			level = -1;
 	}
-	else if (requested != 0 && (m_isr & m_pgr) == 0)
+	else if (m_irr != 0 && (m_isr & m_pgr) == 0)
 	{
-		level = 31 - count_leading_zeros(u32(requested));
+		level = 31 - count_leading_zeros(u32(m_irr));
 		assert(level >= 0 && level < 16);
 		if ((1 << level) < m_isr)
 			level = -1;
@@ -428,7 +452,7 @@ int kp69_device::z80daisy_irq_ack()
 //  pending state to allow other interrupts through
 //-------------------------------------------------
 
-void kp69_device::z80daisy_irq_reti()
+void kp69_base_device::z80daisy_irq_reti()
 {
 	if (m_illegal_state)
 	{
