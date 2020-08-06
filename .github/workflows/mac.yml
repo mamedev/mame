@@ -13,9 +13,10 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v2
-    - mame: Build libretro mame core
-      run: make -f Makefile.libretro -j8
-      run: zip -9 mame_libretro.zip mame_libretro.dylib
+    - name: Build libretro mame core
+      run: |
+        make -f Makefile.libretro -j8
+        zip -9 mame_libretro.zip mame_libretro.dylib
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -26,7 +27,7 @@ jobs:
         files: |
           mame_libretro.zip
     - name: Save core for upload job
-    - uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2
       with:
         name: mame_libretro.zip
         path: mame_libretro.zip
