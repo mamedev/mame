@@ -285,6 +285,8 @@ INPUT_PORTS_END
 
 void _39in1_state::decrypt(uint8_t xor00, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0)
 {
+	uint8_t *rom = memregion("maincpu")->base();
+
 	for (int i = 0; i < 0x80000; i += 2)
 	{
 		if (i & 0x08)
