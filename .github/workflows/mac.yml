@@ -6,15 +6,17 @@ on:
       - master
 
 jobs:
-  MacOS:
+  macOS:
     name: Build for macOS
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v2
-    - run: make -f Makefile.libretro -j8
-    - run: zip -9 mame_libretro.zip mame_libretro.dylib
-    - name: Upload MAME core
+    - name: Checkout source
+      uses: actions/checkout@v2
+    - mame: Build libretro mame core
+      run: make -f Makefile.libretro -j8
+      run: zip -9 mame_libretro.zip mame_libretro.dylib
+    - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -23,3 +25,29 @@ jobs:
         title: macOS x86_64
         files: |
           mame_libretro.zip
+    - name: Save core for upload job
+    - uses: actions/upload-artifact@v2
+      with:
+        name: mame_libretro.zip
+        path: mame_libretro.zip
+
+  uploadToBB:
+    name: Upload core to buildbot
+    runs-on: ubuntu-latest
+    needs: macOS
+    
+    steps:
+    - name: Recover core from artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: mame_libretro.zip
+        path: .
+    - name: Upload to buildbot
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        port: ${{ secrets.PORT }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        source: mame_libretro.zip
+        target: ${{ secrets.MACOS_X86_64_PATH }}

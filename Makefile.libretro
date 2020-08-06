@@ -135,7 +135,7 @@ ifeq ($(platform),android)
 	PLATFLAGS +=  ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
 	PLATFLAGS +=  ANDROID_NDK_ARM="$(ANDROID_NDK_ARM)"
 	PLATFLAGS +=  ANDROID_NDK_ROOT="$(ANDROID_NDK_ROOT)"
- 	LIBRETRO_CPU :=
+	LIBRETRO_CPU :=
 	ARCH :=
 	LIBRETRO_OS :=
 endif
@@ -191,7 +191,7 @@ download_github_%:
 	@curl -s -S -L -O -z mame_libretro* '$(GITHUB_REPO)/releases/download/$*/mame_libretro.zip'
 	@if [ -f mame_libretro.zip ]; then \
 		echo "Extracting"; \
-    	unzip -qqo mame_libretro.zip; \
+		unzip -qqo mame_libretro.zip; \
 		rm -f mame_libretro.zip; \
 		touch mame_libretro*; \
 	else \
