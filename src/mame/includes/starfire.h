@@ -116,8 +116,13 @@ public:
 	fireone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: starfire_base_state(mconfig, type, tag)
 		, m_controls(*this, "P%u", 1U)
+		, m_sound_left_partial_hit(*this, "sound_nl:lshpht")
+		, m_sound_right_partial_hit(*this, "sound_nl:rshpht")
+		, m_sound_left_torpedo(*this, "sound_nl:ltorp")
+		, m_sound_right_torpedo(*this, "sound_nl:rtorp")
 		, m_sound_left_boom(*this, "sound_nl:lboom")
 		, m_sound_right_boom(*this, "sound_nl:rboom")
+		, m_sound_torpedo_collision(*this, "sound_nl:torpcoll")
 		, m_sound_submarine_engine(*this, "sound_nl:subeng")
 		, m_sound_sonar_enable(*this, "sound_nl:sonar_enable")
 		, m_sound_sonar_sync(*this, "sound_nl:sonar_sync")
@@ -138,8 +143,13 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 
+	required_device<netlist_mame_logic_input_device> m_sound_left_partial_hit;
+	required_device<netlist_mame_logic_input_device> m_sound_right_partial_hit;
+	required_device<netlist_mame_logic_input_device> m_sound_left_torpedo;
+	required_device<netlist_mame_logic_input_device> m_sound_right_torpedo;
 	required_device<netlist_mame_logic_input_device> m_sound_left_boom;
 	required_device<netlist_mame_logic_input_device> m_sound_right_boom;
+	required_device<netlist_mame_logic_input_device> m_sound_torpedo_collision;
 	required_device<netlist_mame_logic_input_device> m_sound_submarine_engine;
 	required_device<netlist_mame_logic_input_device> m_sound_sonar_enable;
 	required_device<netlist_mame_logic_input_device> m_sound_sonar_sync;

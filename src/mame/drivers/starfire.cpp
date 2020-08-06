@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Dan Boris, Olivier Galibert, Aaron Giles
+// copyright-holders:Dan Boris, Olivier Galibert, Aaron Giles, Ryan Holtz
 /***************************************************************************
 
     Star Fire/Fire One system
 
     driver by Daniel Boris, Olivier Galibert, Aaron Giles
+
+    netlist audio by Ryan Holtz
 
 ****************************************************************************
 
@@ -43,6 +45,9 @@ Notes:
 
 starfira has one less rom in total than starfire but everything passes as
  ok in the rom test so its probably just an earlier revision or something
+
+fireone currently lacks the "alert" sound effect due to missing netlist
+support for the 8038 function generator IC.
 
 ***************************************************************************/
 
@@ -132,12 +137,17 @@ void fireone_state::sound_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
+		m_sound_left_torpedo->write(BIT(data, 0));
+		m_sound_left_partial_hit->write(BIT(data, 1));
 		m_sound_left_boom->write(BIT(data, 2));
 		m_player_select = BIT(~data, 3);
 	}
 	else
 	{
+		m_sound_right_torpedo->write(BIT(data, 0));
+		m_sound_right_partial_hit->write(BIT(data, 1));
 		m_sound_right_boom->write(BIT(data, 2));
+		m_sound_torpedo_collision->write(BIT(data, 3));
 		m_sound_submarine_engine->write(BIT(data, 4));
 		m_sound_sonar_sync->write(BIT(data, 6));
 		m_sound_sonar_enable->write(BIT(~data, 7));
@@ -397,7 +407,7 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(fireone))
 		.add_route(0, "lspeaker", 1.0)
-		.add_route(0, "rspeaker", 1.0);
+		.add_route(1, "rspeaker", 1.0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ltorp", "LTORP.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:lshpht", "LSHPHT.IN", 0);
@@ -406,6 +416,7 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:rtorp", "RTORP.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:rshpht", "RSHPHT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:rboom", "RBOOM.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:torpcoll", "TORPCOLL.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:subeng", "SUBENG.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:alert", "ALERT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_enable", "SONAR_ENABLE.POS", 0);
@@ -413,8 +424,8 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_l", "R64.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_r", "R65.DIAL");
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(500000.0, 0.0);
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(500000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(100000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(100000.0, 0.0);
 }
 
 void starfire_state::starfire(machine_config &config)
@@ -526,5 +537,5 @@ ROM_END
 
 GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
