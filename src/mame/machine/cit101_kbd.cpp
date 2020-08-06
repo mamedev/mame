@@ -46,8 +46,8 @@
         9F       (Invalid key)
 
     Two types of host commands are processed. Commands with bit 0
-    set affect the LEDs (TODO: identify which LEDs are which), and
-    commands with bit 0 clear are needed to initiate a new scan.
+    set affect the LEDs, and commands with bit 0 clear affect the
+    beeper. Sending a command is necessary to initiate a new scan.
 
 **********************************************************************/
 
@@ -68,7 +68,7 @@ cit101_keyboard_device::cit101_keyboard_device(const machine_config &mconfig, de
 	, m_beeper(*this, "beeper")
 	, m_keys(*this, "KEYS%d", 0U)
 	, m_kbid(*this, "KBID")
-	, m_leds(*this, "led%d", 1U)
+	, m_leds(*this, "led%d", 0U)
 	, m_txd_callback(*this)
 	, m_kbid_enabled(false)
 {
@@ -110,8 +110,16 @@ void cit101_keyboard_device::p2_w(u8 data)
 void cit101_keyboard_device::leds_w(u8 data)
 {
 	m_kbid_enabled = !BIT(data, 0);
+
+	// Bit 7 = ON LINE
+	// Bit 6 = OFF LINE
+	// Bit 5 = KBD LOCKED
+	// Bit 4 = L1
+	// Bit 3 = L2
+	// Bit 2 = L3
+	// Bit 1 = L4
 	for (int i = 0; i < 7; i++)
-		m_leds[i] = !BIT(data, i + 1);
+		m_leds[i] = !BIT(data, 7 - i);
 }
 
 u8 cit101_keyboard_device::keys_r()
@@ -147,8 +155,8 @@ INPUT_PORTS_START(cit101_keyboard)
 	PORT_BIT(0xe7, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("MODIFIERS")
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat") PORT_CODE(KEYCODE_RCONTROL)
-	PORT_BIT(2, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_SHIFT_2) PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rept") PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CHAR(UCHAR_SHIFT_2) PORT_CODE(KEYCODE_LCONTROL)
 
 	PORT_START("KEYS0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF3") PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CODE(KEYCODE_F3)
@@ -263,9 +271,21 @@ INPUT_PORTS_START(cit101_keyboard)
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+INPUT_PORTS_START(cit101e_keyboard)
+	PORT_INCLUDE(cit101_keyboard)
+
+	PORT_MODIFY("KEYS0")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Enter (Print)") PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_CODE(KEYCODE_ENTER_PAD)
+INPUT_PORTS_END
+
 ioport_constructor cit101_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(cit101_keyboard);
+}
+
+ioport_constructor cit101e_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(cit101e_keyboard);
 }
 
 void cit101_keyboard_device::device_add_mconfig(machine_config &config)
@@ -280,7 +300,7 @@ void cit101_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->t1_in_cb().set_ioport("MODIFIERS").bit(1);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 786).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown frequency
+	BEEP(config, m_beeper, 786).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown frequency (original keyboard has a NE555)
 }
 
 

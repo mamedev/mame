@@ -27,6 +27,8 @@ public:
 	// device type constructor
 	cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	static constexpr feature_type unemulated_features() { return feature::SOUND; }
+
 	// callback configuration
 	auto txd_callback() { return m_txd_callback.bind(); }
 
@@ -77,6 +79,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

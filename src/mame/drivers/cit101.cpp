@@ -30,6 +30,8 @@ CIT-101e (released 1983)
     Ergonomic redesign of CIT-101.
     Competitive with DEC VT220 (which was released several months later).
     14-inch monochrome screen with tilt/swivel, 24 lines of 80 or 132 characters.
+    10 x 12 (80 columns)/9 x 12 (132 columns) display cell.
+    19,610 Hz (80 columns)/18,870 Hz (132 columns) horizontal frequency.
     85-key low-profile keyboard.
 CIG-201
     Plug-in graphics card for CIT-101 and CIT-101e.
@@ -47,7 +49,9 @@ Special SET-UP control codes:
 * CTRL+D: Restore default NVR settings
 * CTRL+A: Set answerback message
 * CTRL+X: Enable/disable Bidirectional Auxiliary I/O Channel and SET-UP D Mode
-          (undocumented; SET-UP B Mode only)
+          (SET-UP B Mode only; documented only for CIT-101e but also valid on original)
+
+The NVR checksum error reported when the terminal is first used is nonfatal. Default settings will be used and can be saved.
 
 ************************************************************************************************************************************/
 
@@ -301,6 +305,7 @@ void cit101_state::screen_control_101e_w(u8 data)
 {
 	if ((m_extraram[0] & 0x06) != (data & 0x06))
 	{
+		// TODO: interlace mode
 		const int height = 300;
 		if (BIT(data, 1))
 			screen_reconfigure(19.6608_MHz_XTAL, 800, 1000, 288, height);
