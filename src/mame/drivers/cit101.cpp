@@ -190,8 +190,8 @@ void cit101_state::draw_line(uint32_t *pixptr, int minx, int maxx, int line, boo
 				char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 				if (last_line && BIT(attr, 0))
 					char_data ^= 0xff;
-				on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t(m_brightness, m_brightness, m_brightness);
-				off_color = BIT(attr, 1) ? rgb_t(m_brightness, m_brightness, m_brightness) : rgb_t::black();
+				on_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::black() : rgb_t(m_brightness, m_brightness, m_brightness);
+				off_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t(m_brightness, m_brightness, m_brightness) : rgb_t::black();
 				if (BIT(attr, 3) && m_blink)
 					on_color = rgb_t(m_brightness * 0.75, m_brightness * 0.75, m_brightness * 0.75);
 				last_bit = false;
