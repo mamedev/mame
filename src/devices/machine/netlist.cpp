@@ -381,7 +381,7 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	const uint32_t v = (val >> m_shift) & 1;
 	if (v != (*m_param)())
 	{
-		LGODEBUG("write %s\n", this->tag());
+		LOGDEBUG("write %s\n", this->tag());
 		synchronize(0, v);
 	}
 }
