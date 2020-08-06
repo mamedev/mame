@@ -140,7 +140,7 @@ void fireone_state::sound_w(offs_t offset, uint8_t data)
 		m_sound_right_boom->write(BIT(data, 2));
 		m_sound_submarine_engine->write(BIT(data, 4));
 		m_sound_sonar_sync->write(BIT(data, 6));
-		m_sound_sonar_enable->write(BIT(data, 7));
+		m_sound_sonar_enable->write(BIT(~data, 7));
 	}
 }
 
