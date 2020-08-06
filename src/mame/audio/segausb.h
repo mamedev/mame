@@ -11,10 +11,14 @@
 #pragma once
 
 #include "cpu/mcs48/mcs48.h"
-#include "machine/pit8253.h"
 #include "machine/netlist.h"
 #include "machine/timer.h"
 #include "netlist/nl_setup.h"
+#include "nl_segausb.h"
+
+#if (!SEGAUSB_FAKE_8253)
+#include "machine/pit8253.h"
+#endif
 
 class usb_sound_device : public device_t, public device_mixer_interface
 {
@@ -43,6 +47,19 @@ public:
 	void usb_portmap(address_map &map);
 
 protected:
+
+#if (SEGAUSB_FAKE_8253)
+	struct pit_state
+	{
+		pit_state() : mode{0}, latch{0}, cvalue{0} { }
+		void write(u8 offset, u8 data, netlist_mame_analog_input_device &hp0, netlist_mame_analog_input_device &hp1, netlist_mame_analog_input_device &hp2_on, netlist_mame_analog_input_device &hp2_off);
+		u8 mode[3];
+		u8 latch[3];
+		u16 cvalue[3];
+	};
+	pit_state m_pit_state[3];
+#endif
+
 	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
@@ -52,35 +69,45 @@ protected:
 
 	required_device<i8035_device> m_ourcpu;
 	required_device<cpu_device> m_maincpu;
+#if (!SEGAUSB_FAKE_8253)
 	required_device_array<pit8253_device, 3> m_pit;
+#endif
 
 	// channel 0
 	required_device_array<netlist_mame_analog_input_device, 3> m_nl_dac0;
 	required_device<netlist_mame_logic_input_device> m_nl_sel0;
+#if (SEGAUSB_FAKE_8253)
+	required_device<netlist_mame_analog_input_device> m_nl_pit0_hp0;
+	required_device<netlist_mame_analog_input_device> m_nl_pit0_hp1;
+	required_device<netlist_mame_analog_input_device> m_nl_pit0_hp2_on;
+	required_device<netlist_mame_analog_input_device> m_nl_pit0_hp2_off;
+#else
 	required_device_array<netlist_mame_logic_input_device, 3> m_nl_pit0_out;
+#endif
 
 	// channel 1
 	required_device_array<netlist_mame_analog_input_device, 3> m_nl_dac1;
 	required_device<netlist_mame_logic_input_device> m_nl_sel1;
+#if (SEGAUSB_FAKE_8253)
+	required_device<netlist_mame_analog_input_device> m_nl_pit1_hp0;
+	required_device<netlist_mame_analog_input_device> m_nl_pit1_hp1;
+	required_device<netlist_mame_analog_input_device> m_nl_pit1_hp2_on;
+	required_device<netlist_mame_analog_input_device> m_nl_pit1_hp2_off;
+#else
 	required_device_array<netlist_mame_logic_input_device, 3> m_nl_pit1_out;
+#endif
 
 	// channel 2
 	required_device_array<netlist_mame_analog_input_device, 3> m_nl_dac2;
 	required_device<netlist_mame_logic_input_device> m_nl_sel2;
+#if (SEGAUSB_FAKE_8253)
+	required_device<netlist_mame_analog_input_device> m_nl_pit2_hp0;
+	required_device<netlist_mame_analog_input_device> m_nl_pit2_hp1;
+	required_device<netlist_mame_analog_input_device> m_nl_pit2_hp2_on;
+	required_device<netlist_mame_analog_input_device> m_nl_pit2_hp2_off;
+#else
 	required_device_array<netlist_mame_logic_input_device, 3> m_nl_pit2_out;
-
-// temporary for debugging
-	template<int _PIT, int _CH>
-	DECLARE_WRITE_LINE_MEMBER(pit_write_line)
-	{
-//		attotime time = machine().scheduler().time();
-		if (_PIT == 0)
-			m_nl_pit0_out[_CH]->write_line(state);
-		else if (_PIT == 1)
-			m_nl_pit1_out[_CH]->write_line(state);
-		else if (_PIT == 2)
-			m_nl_pit2_out[_CH]->write_line(state);
-	}
+#endif
 
 private:
 	// internal state

@@ -44,16 +44,39 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 		device_mixer_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
 		m_maincpu(*this, finder_base::DUMMY_TAG),
+#if (!SEGAUSB_FAKE_8253)
 		m_pit(*this, "pit_%u", 0),
+#endif
 		m_nl_dac0(*this, "sound_nl:dac0_%u", 0),
 		m_nl_sel0(*this, "sound_nl:sel0"),
+#if (SEGAUSB_FAKE_8253)
+		m_nl_pit0_hp0(*this, "sound_nl:pit0_hp0"),
+		m_nl_pit0_hp1(*this, "sound_nl:pit0_hp1"),
+		m_nl_pit0_hp2_on(*this, "sound_nl:pit0_hp2_on"),
+		m_nl_pit0_hp2_off(*this, "sound_nl:pit0_hp2_off"),
+#else
 		m_nl_pit0_out(*this, "sound_nl:pit0_out%u", 0),
+#endif
 		m_nl_dac1(*this, "sound_nl:dac1_%u", 0),
 		m_nl_sel1(*this, "sound_nl:sel1"),
+#if (SEGAUSB_FAKE_8253)
+		m_nl_pit1_hp0(*this, "sound_nl:pit1_hp0"),
+		m_nl_pit1_hp1(*this, "sound_nl:pit1_hp1"),
+		m_nl_pit1_hp2_on(*this, "sound_nl:pit1_hp2_on"),
+		m_nl_pit1_hp2_off(*this, "sound_nl:pit1_hp2_off"),
+#else
 		m_nl_pit1_out(*this, "sound_nl:pit1_out%u", 0),
+#endif
 		m_nl_dac2(*this, "sound_nl:dac2_%u", 0),
 		m_nl_sel2(*this, "sound_nl:sel2"),
+#if (SEGAUSB_FAKE_8253)
+		m_nl_pit2_hp0(*this, "sound_nl:pit2_hp0"),
+		m_nl_pit2_hp1(*this, "sound_nl:pit2_hp1"),
+		m_nl_pit2_hp2_on(*this, "sound_nl:pit2_hp2_on"),
+		m_nl_pit2_hp2_off(*this, "sound_nl:pit2_hp2_off"),
+#else
 		m_nl_pit2_out(*this, "sound_nl:pit2_out%u", 0),
+#endif
 		m_in_latch(0),
 		m_out_latch(0),
 		m_last_p2_value(0),
@@ -77,12 +100,14 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 
 void usb_sound_device::device_start()
 {
+#if (!SEGAUSB_FAKE_8253)
 	for (int index = 0; index < 3; index++)
 	{
 		m_pit[index]->write_gate0(1);
 		m_pit[index]->write_gate1(1);
 		m_pit[index]->write_gate2(1);
 	}
+#endif
 
 	// register for save states
 	save_item(NAME(m_in_latch));
@@ -259,7 +284,11 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x01:  // 8253 U41
 		case 0x02:  // 8253 U41
 		case 0x03:  // 8253 U41
+#if (SEGAUSB_FAKE_8253)
+			m_pit_state[0].write(offset & 3, data, *m_nl_pit0_hp0, *m_nl_pit0_hp1, *m_nl_pit0_hp2_on, *m_nl_pit0_hp2_off);
+#else
 			m_pit[0]->write(offset & 3, data);
+#endif
 			break;
 
 		case 0x04:  // ENV0 U26
@@ -276,7 +305,11 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x09:  // 8253 U42
 		case 0x0a:  // 8253 U42
 		case 0x0b:  // 8253 U42
+#if (SEGAUSB_FAKE_8253)
+			m_pit_state[1].write(offset & 3, data, *m_nl_pit1_hp0, *m_nl_pit1_hp1, *m_nl_pit1_hp2_on, *m_nl_pit1_hp2_off);
+#else
 			m_pit[1]->write(offset & 3, data);
+#endif
 			break;
 
 		case 0x0c:  // ENV1 U12
@@ -293,7 +326,11 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x11:  // 8253 U43
 		case 0x12:  // 8253 U43
 		case 0x13:  // 8253 U43
+#if (SEGAUSB_FAKE_8253)
+			m_pit_state[2].write(offset & 3, data, *m_nl_pit2_hp0, *m_nl_pit2_hp1, *m_nl_pit2_hp2_on, *m_nl_pit2_hp2_off);
+#else
 			m_pit[2]->write(offset & 3, data);
+#endif
 			break;
 
 		case 0x14:  // ENV2 U27
@@ -330,6 +367,77 @@ void usb_sound_device::usb_portmap(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
+#if (SEGAUSB_FAKE_8253)
+
+void usb_sound_device::pit_state::write(u8 offset, u8 data, netlist_mame_analog_input_device &hp0, netlist_mame_analog_input_device &hp1, netlist_mame_analog_input_device &hp2on, netlist_mame_analog_input_device &hp2off)
+{
+	u8 which;
+	if (offset == 3)
+	{
+		which = data >> 6;
+		if (which < 3)
+		{
+			mode[which] = data;
+			latch[which] = 0;
+		}
+	}
+	else
+	{
+		which = offset;
+		u8 ctrmode = (mode[which] >> 4) & 3;
+		if (ctrmode == 1)
+			cvalue[which] = data;
+		else if (ctrmode == 2)
+			cvalue[which] = data << 8;
+		else if (ctrmode == 3)
+		{
+			if (latch[which] == 0)
+			{
+				cvalue[which] = data;
+				latch[which] = 1;
+				return;
+			}
+			else
+			{
+				cvalue[which] |= data << 8;
+				latch[which] = 0;
+			}
+		}
+	}
+
+	u8 thismode = (mode[which] >> 1) & 7;
+	u32 cval = cvalue[which];
+	if (cval == 0)
+		cval = 65536;
+	if (thismode == 3 && which < 2)
+	{
+		double hp = double(cval) / (USB_PCS_CLOCK.dvalue() * 2);
+		if (hp == 0) hp = 0.1;
+		if (which == 0)
+			hp0.write(hp);
+		else
+			hp1.write(hp);
+		printf("HP[%d] = %f\n", which, hp);
+	}
+	else if (thismode == 1 && which == 2)
+	{
+		double period = 1.0 / USB_GOS_CLOCK.dvalue();
+		double hpon = double(cval) / (USB_2MHZ_CLOCK.dvalue() * 2);
+		double hpoff = period - hpon;
+		if (hpoff <= 0)
+			hpon = 0.1, hpoff = 0.000001;
+		hp2on.write(hpon);
+		hp2off.write(hpoff);
+		printf("HP[2] = %f/%f\n", hpon, hpoff);
+	}
+	else
+	{
+		printf("WARNING: which=%d mode=%d\n", which, thismode);
+	}
+}
+
+#else
+
 TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::gos_timer )
 {
 	m_gos_clock ^= 1;
@@ -337,6 +445,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::gos_timer )
 	m_pit[1]->write_gate2(m_gos_clock);
 	m_pit[2]->write_gate2(m_gos_clock);
 }
+
+#endif
+
 
 void usb_sound_device::device_add_mconfig(machine_config &config)
 {
@@ -353,8 +464,10 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 			FUNC(usb_sound_device::increment_t1_clock_timer_cb),
 			attotime::from_hz(USB_2MHZ_CLOCK / 256));
 
+#if (!SEGAUSB_FAKE_8253)
 	TIMER(config, "gos_timer", 0).configure_periodic(
 			FUNC(usb_sound_device::gos_timer), attotime::from_hz(USB_GOS_CLOCK*2));
+#endif
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(segausb))
@@ -365,31 +478,53 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, m_nl_dac0[1], "I_U25_DAC.IN");
 	NETLIST_ANALOG_INPUT(config, m_nl_dac0[2], "I_U24_DAC.IN");
 	NETLIST_LOGIC_INPUT(config, m_nl_sel0, "I_U38B_SEL.IN", 0);
+#if (SEGAUSB_FAKE_8253)
+	NETLIST_ANALOG_INPUT(config, m_nl_pit0_hp0, "I_U41_HP0.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit0_hp1, "I_U41_HP1.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit0_hp2_on, "I_U41_HP2_ON.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit0_hp2_off, "I_U41_HP2_OFF.IN");
+#else
 	NETLIST_LOGIC_INPUT(config, m_nl_pit0_out[0], "I_U41_OUT0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_nl_pit0_out[1], "I_U41_OUT1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_nl_pit0_out[2], "I_U41_OUT2.IN", 0);
+#endif
 
 	// channel 1 inputs
 	NETLIST_ANALOG_INPUT(config, m_nl_dac1[0], "I_U12_DAC.IN");
 	NETLIST_ANALOG_INPUT(config, m_nl_dac1[1], "I_U13_DAC.IN");
 	NETLIST_ANALOG_INPUT(config, m_nl_dac1[2], "I_U14_DAC.IN");
 	NETLIST_LOGIC_INPUT(config, m_nl_sel1, "I_U2B_SEL.IN", 0);
+#if (SEGAUSB_FAKE_8253)
+	NETLIST_ANALOG_INPUT(config, m_nl_pit1_hp0, "I_U42_HP0.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit1_hp1, "I_U42_HP1.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit1_hp2_on, "I_U42_HP2_ON.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit1_hp2_off, "I_U42_HP2_OFF.IN");
+#else
 	NETLIST_LOGIC_INPUT(config, m_nl_pit1_out[0], "I_U42_OUT0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_nl_pit1_out[1], "I_U42_OUT1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_nl_pit1_out[2], "I_U42_OUT2.IN", 0);
+#endif
 
 	// channel 2 inputs
 	NETLIST_ANALOG_INPUT(config, m_nl_dac2[0], "I_U27_DAC.IN");
 	NETLIST_ANALOG_INPUT(config, m_nl_dac2[1], "I_U28_DAC.IN");
 	NETLIST_ANALOG_INPUT(config, m_nl_dac2[2], "I_U29_DAC.IN");
 	NETLIST_LOGIC_INPUT(config, m_nl_sel2, "I_U2A_SEL.IN", 0);
+#if (SEGAUSB_FAKE_8253)
+	NETLIST_ANALOG_INPUT(config, m_nl_pit2_hp0, "I_U43_HP0.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit2_hp1, "I_U43_HP1.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit2_hp2_on, "I_U43_HP2_ON.IN");
+	NETLIST_ANALOG_INPUT(config, m_nl_pit2_hp2_off, "I_U43_HP2_OFF.IN");
+#else
 	NETLIST_LOGIC_INPUT(config, m_nl_pit2_out[0], "I_U43_OUT0.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_nl_pit2_out[1], "I_U43_OUT1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_nl_pit2_out[2], "I_U43_OUT2.IN", 0);
+#endif
 
 	// final output
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(5000.0, 0.0);
 
+#if (!SEGAUSB_FAKE_8253)
 	// configure the PIT clocks and gates
 	for (int index = 0; index < 3; index++)
 	{
@@ -400,7 +535,6 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	}
 
 	// connect the PIT outputs to the netlist
-#if 0
 	m_pit[0]->out_handler<0>().set(m_nl_pit0_out[0], FUNC(netlist_mame_logic_input_device::write_line));
 	m_pit[0]->out_handler<1>().set(m_nl_pit0_out[1], FUNC(netlist_mame_logic_input_device::write_line));
 	m_pit[0]->out_handler<2>().set(m_nl_pit0_out[2], FUNC(netlist_mame_logic_input_device::write_line));
@@ -410,16 +544,6 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	m_pit[2]->out_handler<0>().set(m_nl_pit2_out[0], FUNC(netlist_mame_logic_input_device::write_line));
 	m_pit[2]->out_handler<1>().set(m_nl_pit2_out[1], FUNC(netlist_mame_logic_input_device::write_line));
 	m_pit[2]->out_handler<2>().set(m_nl_pit2_out[2], FUNC(netlist_mame_logic_input_device::write_line));
-#else
-	m_pit[0]->out_handler<0>().set(&usb_sound_device::pit_write_line<0,0>, "pit0,0_w");
-	m_pit[0]->out_handler<1>().set(&usb_sound_device::pit_write_line<0,1>, "pit0,1_w");
-	m_pit[0]->out_handler<2>().set(&usb_sound_device::pit_write_line<0,2>, "pit0,2_w");
-	m_pit[1]->out_handler<0>().set(&usb_sound_device::pit_write_line<1,0>, "pit1,0_w");
-	m_pit[1]->out_handler<1>().set(&usb_sound_device::pit_write_line<1,1>, "pit1,1_w");
-	m_pit[1]->out_handler<2>().set(&usb_sound_device::pit_write_line<1,2>, "pit1,2_w");
-	m_pit[2]->out_handler<0>().set(&usb_sound_device::pit_write_line<2,0>, "pit2,0_w");
-	m_pit[2]->out_handler<1>().set(&usb_sound_device::pit_write_line<2,1>, "pit2,1_w");
-	m_pit[2]->out_handler<2>().set(&usb_sound_device::pit_write_line<2,2>, "pit2,2_w");
 #endif
 }
 
