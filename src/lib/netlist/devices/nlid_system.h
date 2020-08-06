@@ -88,7 +88,7 @@ namespace devices
 	{
 		NETLIB_CONSTRUCTOR(varclock)
 		, m_N(*this, "N", 1)
-		, m_func(*this,"FUNC", "T")
+		, m_func(*this, "FUNC", "T")
 		, m_feedback(*this, "FB", NETLIB_DELEGATE(fb))
 		, m_Q(*this, "Q")
 		, m_compiled(*this, "m_compiled")
@@ -98,6 +98,8 @@ namespace devices
 			{
 				std::vector<pstring> inps;
 				inps.push_back(pstring("T"));
+				m_vals.push_back(nlconst::zero());
+				inps.push_back(pstring("Q"));
 				m_vals.push_back(nlconst::zero());
 				for (int i=0; i < m_N(); i++)
 				{
@@ -117,12 +119,13 @@ namespace devices
 		NETLIB_HANDLERI(fb)
 		{
 			m_vals[0] = exec().time().as_fp<nl_fptype>();
+			m_vals[1] = (m_feedback() ^ 1) ? nlconst::one() : nlconst::zero();
 			for (std::size_t i = 0; i < static_cast<unsigned>(m_N()); i++)
 			{
-				m_vals[i+1] = (*m_I[i])();
+				m_vals[i+2] = (*m_I[i])();
 			}
 			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_vals));
-			m_Q.push(m_feedback() ^ 1, m_inc);
+			m_Q.push(m_vals[1], m_inc);
 		}
 
 		using pf_type = plib::pfunction<nl_fptype>;
