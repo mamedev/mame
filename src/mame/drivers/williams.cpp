@@ -2657,82 +2657,130 @@ ROM_START( splat )
 ROM_END
 
 
-ROM_START( sinistar )
-	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "sinistar.10",  0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) )
-	ROM_LOAD( "sinistar.11",  0x0f000, 0x1000, CRC(3162bc50) SHA1(2f38e572ab9c731e38dfe9bad3cc8222a775c5ea) )
-	ROM_LOAD( "sinistar.01",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) )
-	ROM_LOAD( "sinistar.02",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) )
-	ROM_LOAD( "sinistar.03",  0x12000, 0x1000, CRC(1ce1b3cc) SHA1(5bc03d7249529d827dc60c087e074ab3e4ea7361) )
-	ROM_LOAD( "sinistar.04",  0x13000, 0x1000, CRC(6da632ba) SHA1(72c0c3d5a5ca87ca4d95fcedaf834206e4633950) )
-	ROM_LOAD( "sinistar.05",  0x14000, 0x1000, CRC(b662e8fc) SHA1(828a89d2ea13d8a362dae708f86bff54cb231887) )
-	ROM_LOAD( "sinistar.06",  0x15000, 0x1000, CRC(2306183d) SHA1(703e29e6446856615760a4897c0f5d79cc7bdfb2) )
-	ROM_LOAD( "sinistar.07",  0x16000, 0x1000, CRC(e5dd918e) SHA1(bf4e2ada6a59d246218544d822ba5355da925924) )
-	ROM_LOAD( "sinistar.08",  0x17000, 0x1000, CRC(4785a787) SHA1(8c7eca656b2c23b0da41a8c7ce51a2735cab85a4) )
-	ROM_LOAD( "sinistar.09",  0x18000, 0x1000, CRC(50cb63ad) SHA1(96e28e4fef98fff2649741a266fa590e0313e3b0) )
+/*
+Sinistar
+
+Multiple different ROM boards are known to exist:
+
+Rev.3:
+ ROM board known to come with final production rev. 2 labels with corresponding part numbers and two rev. 3
+ upgrade ROMs: white labels and orange stripe:
+
+    SINISTAR          SINISTAR
+    ROM 8-B    and    ROM 11-B
+    REV. 3            REV. 3
+
+ ROM board known to come with all rev. 2 upgrade ROMs (as described below): white labels and red stripe plus the
+ two rev. 3 upgrade ROMs as described above
+
+Rev.2:
+ Earlier ROM boards known to have all upgrade styled labels, white with red stripe, in the format:
+
+  SINISTAR
+  ROM  1-B
+  REV. 2
+
+Although not currently dumped, "true" rev.1 Sinistar ROMs are believed to be numbered 16-3004-23 through 16-3004-33,
+  with speech ROMs 16-3004-34 through 16-3004-37  (labels believed to be solid brown)
+There is known to be a "perfect" version of Sinistar, that being the original version presented to Williams by the
+  dev team. The dev team thought this version had the best game play while Williams decided it was too easy (IE: it
+  could be played too long on one quarter)
+
+*/
+ROM_START( sinistar ) // rev. 3
+	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
+	ROM_LOAD( "sinistar_rom_10-b_16-3004-62.4c", 0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) ) 
+	ROM_LOAD( "sinistar_rom_11-b_16-3004-64.4a", 0x0f000, 0x1000, CRC(3162bc50) SHA1(2f38e572ab9c731e38dfe9bad3cc8222a775c5ea) )
+	ROM_LOAD( "sinistar_rom_1-b_16-3004-53.1d",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) )
+	ROM_LOAD( "sinistar_rom_2-b_16-3004-54.1c",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) )
+	ROM_LOAD( "sinistar_rom_3-b_16-3004-55.1a",  0x12000, 0x1000, CRC(1ce1b3cc) SHA1(5bc03d7249529d827dc60c087e074ab3e4ea7361) )
+	ROM_LOAD( "sinistar_rom_4-b_16-3004-56.2d",  0x13000, 0x1000, CRC(6da632ba) SHA1(72c0c3d5a5ca87ca4d95fcedaf834206e4633950) )
+	ROM_LOAD( "sinistar_rom_5-b_16-3004-57.2c",  0x14000, 0x1000, CRC(b662e8fc) SHA1(828a89d2ea13d8a362dae708f86bff54cb231887) )
+	ROM_LOAD( "sinistar_rom_6-b_16-3004-58.2a",  0x15000, 0x1000, CRC(2306183d) SHA1(703e29e6446856615760a4897c0f5d79cc7bdfb2) )
+	ROM_LOAD( "sinistar_rom_7-b_16-3004-59.3d",  0x16000, 0x1000, CRC(e5dd918e) SHA1(bf4e2ada6a59d246218544d822ba5355da925924) )
+	ROM_LOAD( "sinistar_rom_8-b_16-3004-60.3c",  0x17000, 0x1000, CRC(4785a787) SHA1(8c7eca656b2c23b0da41a8c7ce51a2735cab85a4) )
+	ROM_LOAD( "sinistar_rom_9-b_16-3004-61.3a",  0x18000, 0x1000, CRC(50cb63ad) SHA1(96e28e4fef98fff2649741a266fa590e0313e3b0) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "speech.ic7",   0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-	ROM_LOAD( "speech.ic5",   0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-	ROM_LOAD( "speech.ic6",   0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-	ROM_LOAD( "speech.ic4",   0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "sinistar.snd", 0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "video_sound_rom_9_std.808",         0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+
+/*
+	ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
+	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
+*/
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder ROM 4 - Horizontal - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder ROM 6 - Vertical - 7641-5 BPROM
 ROM_END
 
-ROM_START( sinistar1 )
-	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "sinrev1.10",   0x0e000, 0x1000, CRC(ea87a53f) SHA1(4e4bad5315a8f5740c926ee5681879919a5be37f) )
-	ROM_LOAD( "sinrev1.11",   0x0f000, 0x1000, CRC(88d36e80) SHA1(bb9adaf5b73f9874e52dc2f5fd35e22f8b4fc258) )
-	ROM_LOAD( "sinrev1.01",   0x10000, 0x1000, CRC(3810d7b8) SHA1(dcd690cbc958a2f97f022765315d77fb7c7d8e8b) )
-	ROM_LOAD( "sinistar.02",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) )
-	ROM_LOAD( "sinrev1.03",   0x12000, 0x1000, CRC(7c984ca9) SHA1(b32b7d15194051db5d29acf95b049e2eccf6d393) )
-	ROM_LOAD( "sinrev1.04",   0x13000, 0x1000, CRC(cc6c4f24) SHA1(b4375544e02a19458c6fcc85edb31025c0b8eb71) )
-	ROM_LOAD( "sinrev1.05",   0x14000, 0x1000, CRC(12285bfe) SHA1(6d433103332ddda2f2af23febc0b15aa93db1f31) )
-	ROM_LOAD( "sinrev1.06",   0x15000, 0x1000, CRC(7a675f35) SHA1(3a7e9fdb2aef52dc29d33799694737038802b6e0) )
-	ROM_LOAD( "sinrev1.07",   0x16000, 0x1000, CRC(b0463243) SHA1(95d597856a1942bd176f5f62db0d691f8f2f2932) )
-	ROM_LOAD( "sinrev1.08",   0x17000, 0x1000, CRC(909040d4) SHA1(5361cc378bdace0799227e901341747dce9bb029) )
-	ROM_LOAD( "sinrev1.09",   0x18000, 0x1000, CRC(cc949810) SHA1(2d2d1cccd7e43b63e424c34ab5215a412e2b9809) )
+ROM_START( sinistar2 ) // rev. 2
+	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
+	ROM_LOAD( "sinistar_rom_10-b_16-3004-47.4c", 0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) ) //  == rev. 3 PN 16-3004-62
+	ROM_LOAD( "sinistar_rom_11-b_16-3004-48.4a", 0x0f000, 0x1000, CRC(792c8b00) SHA1(1f847ca8a67595927c36d69cead02813c2431c7b) ) //  unique to rev. 2
+	ROM_LOAD( "sinistar_rom_1-b_16-3004-38.1d",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) ) //  == rev. 3 PN 16-3004-53
+	ROM_LOAD( "sinistar_rom_2-b_16-3004-39.1c",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) ) //  == rev. 3 PN 16-3004-54
+	ROM_LOAD( "sinistar_rom_3-b_16-3004-40.1a",  0x12000, 0x1000, CRC(1ce1b3cc) SHA1(5bc03d7249529d827dc60c087e074ab3e4ea7361) ) //  == rev. 3 PN 16-3004-55
+	ROM_LOAD( "sinistar_rom_4-b_16-3004-41.2d",  0x13000, 0x1000, CRC(6da632ba) SHA1(72c0c3d5a5ca87ca4d95fcedaf834206e4633950) ) //  == rev. 3 PN 16-3004-56
+	ROM_LOAD( "sinistar_rom_5-b_16-3004-42.2c",  0x14000, 0x1000, CRC(b662e8fc) SHA1(828a89d2ea13d8a362dae708f86bff54cb231887) ) //  == rev. 3 PN 16-3004-57
+	ROM_LOAD( "sinistar_rom_6-b_16-3004-43.2a",  0x15000, 0x1000, CRC(2306183d) SHA1(703e29e6446856615760a4897c0f5d79cc7bdfb2) ) //  == rev. 3 PN 16-3004-57
+	ROM_LOAD( "sinistar_rom_7-b_16-3004-44.3d",  0x16000, 0x1000, CRC(e5dd918e) SHA1(bf4e2ada6a59d246218544d822ba5355da925924) ) //  == rev. 3 PN 16-3004-59
+	ROM_LOAD( "sinistar_rom_8-b_16-3004-45.3c",  0x17000, 0x1000, CRC(d7ecee45) SHA1(f9552035409bce0a36ed93a677b28f8cd361f8f1) ) //  unique to rev. 2
+	ROM_LOAD( "sinistar_rom_9-b_16-3004-46.3a",  0x18000, 0x1000, CRC(50cb63ad) SHA1(96e28e4fef98fff2649741a266fa590e0313e3b0) ) //  == rev. 3 PN 16-3004-61
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "speech.ic7",   0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-	ROM_LOAD( "speech.ic5",   0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-	ROM_LOAD( "speech.ic6",   0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-	ROM_LOAD( "speech.ic4",   0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "sinistar.snd", 0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "video_sound_rom_9_std.808",         0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+
+/*
+	ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
+	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
+*/
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder ROM 4 - Horizontal - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder ROM 6 - Vertical - 7641-5 BPROM
 ROM_END
 
-ROM_START( sinistar2 )
+ROM_START( sinistarp ) // solid pink labels - 1982 AMOA prototype
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "sinistar.10",  0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) )
-	ROM_LOAD( "sinrev2.11",   0x0f000, 0x1000, CRC(792c8b00) SHA1(1f847ca8a67595927c36d69cead02813c2431c7b) )
-	ROM_LOAD( "sinistar.01",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) )
-	ROM_LOAD( "sinistar.02",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) )
-	ROM_LOAD( "sinistar.03",  0x12000, 0x1000, CRC(1ce1b3cc) SHA1(5bc03d7249529d827dc60c087e074ab3e4ea7361) )
-	ROM_LOAD( "sinistar.04",  0x13000, 0x1000, CRC(6da632ba) SHA1(72c0c3d5a5ca87ca4d95fcedaf834206e4633950) )
-	ROM_LOAD( "sinistar.05",  0x14000, 0x1000, CRC(b662e8fc) SHA1(828a89d2ea13d8a362dae708f86bff54cb231887) )
-	ROM_LOAD( "sinistar.06",  0x15000, 0x1000, CRC(2306183d) SHA1(703e29e6446856615760a4897c0f5d79cc7bdfb2) )
-	ROM_LOAD( "sinistar.07",  0x16000, 0x1000, CRC(e5dd918e) SHA1(bf4e2ada6a59d246218544d822ba5355da925924) )
-	ROM_LOAD( "sinrev2.08",   0x17000, 0x1000, CRC(d7ecee45) SHA1(f9552035409bce0a36ed93a677b28f8cd361f8f1) )
-	ROM_LOAD( "sinistar.09",  0x18000, 0x1000, CRC(50cb63ad) SHA1(96e28e4fef98fff2649741a266fa590e0313e3b0) )
+	ROM_LOAD( "sinistar_rom_10-b_16-3004-21.4c", 0x0e000, 0x1000, CRC(ea87a53f) SHA1(4e4bad5315a8f5740c926ee5681879919a5be37f) )
+	ROM_LOAD( "sinistar_rom_11-b_16-3004-22.4a", 0x0f000, 0x1000, CRC(88d36e80) SHA1(bb9adaf5b73f9874e52dc2f5fd35e22f8b4fc258) )
+	ROM_LOAD( "sinistar_rom_1-b_16-3004-12.1d",  0x10000, 0x1000, CRC(3810d7b8) SHA1(dcd690cbc958a2f97f022765315d77fb7c7d8e8b) )
+	ROM_LOAD( "sinistar_rom_2-b_16-3004-13.1c",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) ) // only this one ROM remains the same through to rev. 3
+	ROM_LOAD( "sinistar_rom_3-b_16-3004-14.1a",  0x12000, 0x1000, CRC(7c984ca9) SHA1(b32b7d15194051db5d29acf95b049e2eccf6d393) )
+	ROM_LOAD( "sinistar_rom_4-b_16-3004-15.2d",  0x13000, 0x1000, CRC(cc6c4f24) SHA1(b4375544e02a19458c6fcc85edb31025c0b8eb71) )
+	ROM_LOAD( "sinistar_rom_5-b_16-3004-16.2c",  0x14000, 0x1000, CRC(12285bfe) SHA1(6d433103332ddda2f2af23febc0b15aa93db1f31) )
+	ROM_LOAD( "sinistar_rom_6-b_16-3004-17.2a",  0x15000, 0x1000, CRC(7a675f35) SHA1(3a7e9fdb2aef52dc29d33799694737038802b6e0) )
+	ROM_LOAD( "sinistar_rom_7-b_16-3004-18.3d",  0x16000, 0x1000, CRC(b0463243) SHA1(95d597856a1942bd176f5f62db0d691f8f2f2932) )
+	ROM_LOAD( "sinistar_rom_8-b_16-3004-19.3c",  0x17000, 0x1000, CRC(909040d4) SHA1(5361cc378bdace0799227e901341747dce9bb029) )
+	ROM_LOAD( "sinistar_rom_9-b_16-3004-20.3a",  0x18000, 0x1000, CRC(cc949810) SHA1(2d2d1cccd7e43b63e424c34ab5215a412e2b9809) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "speech.ic7",   0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-	ROM_LOAD( "speech.ic5",   0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-	ROM_LOAD( "speech.ic6",   0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-	ROM_LOAD( "speech.ic4",   0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "sinistar.snd", 0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+	ROM_LOAD( "3004_speech_ic7_r1.ic7",    0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) ) // same data as later sets, but no official part number assigned yet
+	ROM_LOAD( "3004_speech_ic5_r1.ic5",    0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+	ROM_LOAD( "3004_speech_ic6_r1.ic6",    0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+	ROM_LOAD( "3004_speech_ic4_r1.ic4",    0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+	ROM_LOAD( "video_sound_rom_9_std.808", 0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder ROM 4 - Horizontal - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder ROM 6 - Vertical - 7641-5 BPROM
 ROM_END
 
 
@@ -3427,8 +3475,8 @@ GAME( 1982, bubblesp,   bubbles,  bubbles,        bubbles,  bubbles_state,      
 GAME( 1982, splat,      0,        williams_muxed, splat,    williams_muxed_state, init_splat,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, sinistar,   0,        sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (revision 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sinistar1,  sinistar, sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (prototype version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (revision 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sinistarp,  sinistar, sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (AMOA-82 prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, playball,   0,        playball,       playball, playball_state,       empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 
