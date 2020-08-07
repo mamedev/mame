@@ -189,6 +189,8 @@ void Input_Binding(running_machine &machine)
    Buttons_mapping[5]=RETROPAD_R;
 
    if (
+         !core_stricmp(machine.system().name, "rabbit")    ||
+         !core_stricmp(machine.system().parent, "rabbit")  ||
          !core_stricmp(machine.system().name, "tekken")    ||
          !core_stricmp(machine.system().parent, "tekken")  ||
          !core_stricmp(machine.system().name, "tekken2")   ||
@@ -197,7 +199,7 @@ void Input_Binding(running_machine &machine)
          !core_stricmp(machine.system().parent, "vf")
       )
    {
-      /* Tekken 1/2/Virtua Fighter*/
+      /* Tekken 1/2/Virtua Fighter/Rabbit*/
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
@@ -208,13 +210,19 @@ void Input_Binding(running_machine &machine)
 
    }
    else if (
+              !core_stricmp(machine.system().name, "jojo")    ||
+              !core_stricmp(machine.system().parent, "jojo")  ||
+              !core_stricmp(machine.system().name, "jojoba")    ||
+              !core_stricmp(machine.system().parent, "jojoba")  ||
               !core_stricmp(machine.system().name, "souledge")    ||
               !core_stricmp(machine.system().parent, "souledge")  ||
               !core_stricmp(machine.system().name, "soulclbr")    ||
-              !core_stricmp(machine.system().parent, "soulclbr")
+              !core_stricmp(machine.system().parent, "soulclbr")    ||
+              !core_stricmp(machine.system().name, "svg")    ||
+              !core_stricmp(machine.system().parent, "svg")
            )
    {
-      /* Soul Edge/Soul Calibur */
+      /* Soul Edge/Soul Calibur/JoJo/SVG */
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
