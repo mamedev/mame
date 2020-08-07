@@ -12,6 +12,7 @@
 #define MAME_MACHINE_NETLIST_H
 
 #include <functional>
+#include <deque>
 
 #include "../../lib/netlist/nltypes.h"
 
