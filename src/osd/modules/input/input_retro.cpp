@@ -282,8 +282,8 @@ void Input_Binding(running_machine &machine)
 
    }
    else if (
-              (!core_stricmp(machine.system().name, "dstlk")) ||
-              (!core_stricmp(machine.system().parent, "dstlk")) ||
+              !core_stricmp(machine.system().name, "dstlk") ||
+              !core_stricmp(machine.system().parent, "dstlk") ||
               !core_stricmp(machine.system().name, "hsf2") ||
               !core_stricmp(machine.system().parent, "hsf2") ||
               !core_stricmp(machine.system().name, "msh") ||
@@ -294,6 +294,8 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "mvsc") ||
               !core_stricmp(machine.system().name, "nwarr") ||
               !core_stricmp(machine.system().parent, "nwarr") ||
+	      !core_stricmp(machine.system().name, "redearth") ||
+              !core_stricmp(machine.system().parent, "redearth") ||
               !core_stricmp(machine.system().name, "rvschool") ||
               !core_stricmp(machine.system().parent, "rvschool") ||
               !core_stricmp(machine.system().name, "sf2") ||
@@ -324,12 +326,14 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "sfiii3") ||
               !core_stricmp(machine.system().name, "sftm") ||
               !core_stricmp(machine.system().parent, "sftm") ||
+              !core_stricmp(machine.system().name, "sfz2al") ||
+              !core_stricmp(machine.system().parent, "sfz2al") ||
               !core_stricmp(machine.system().name, "ssf2") ||
               !core_stricmp(machine.system().parent, "ssf2") ||
               !core_stricmp(machine.system().name, "ssf2t") ||
               !core_stricmp(machine.system().parent, "ssf2t") ||
-              !core_stricmp(machine.system().name, "starglad") ||
-              !core_stricmp(machine.system().parent, "starglad") ||
+	      !core_stricmp(machine.system().name, "vhunt2") ||
+              !core_stricmp(machine.system().parent, "vhunt2") ||
               !core_stricmp(machine.system().name, "vsav") ||
               !core_stricmp(machine.system().parent, "vsav") ||
               !core_stricmp(machine.system().name, "vsav2") ||
@@ -338,9 +342,26 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "xmcota") ||
               !core_stricmp(machine.system().name, "xmvsf") ||
               !core_stricmp(machine.system().parent, "xmvsf")
+	   
+	      !core_stricmp(machine.system().name, "astrass") ||
+              !core_stricmp(machine.system().parent, "astrass") ||
+	      !core_stricmp(machine.system().name, "brival") ||
+              !core_stricmp(machine.system().parent, "brival") ||
+	      !core_stricmp(machine.system().name, "btlkroad") ||
+              !core_stricmp(machine.system().parent, "btlkroad") ||
+	      !core_stricmp(machine.system().name, "dragoona") ||
+              !core_stricmp(machine.system().parent, "dragoona") ||
+	      !core_stricmp(machine.system().name, "fghthist") ||
+              !core_stricmp(machine.system().parent, "fghthist") ||
+	      !core_stricmp(machine.system().name, "fgtlayer") ||
+              !core_stricmp(machine.system().parent, "fgtlayer") ||
+	      !core_stricmp(machine.system().name, "groovef") ||
+              !core_stricmp(machine.system().parent, "groovef") ||
+	      !core_stricmp(machine.system().name, "kaiserkn") ||
+              !core_stricmp(machine.system().parent, "kaiserkn") ||
            )
    {
-      /* Capcom CPS-1 and CPS-2 6-button fighting games */
+      /* 6-button fighting games (Mainly Capcom (CPS-1, CPS-2, CPS-3, ZN-1, ZN-2) + Others)*/
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
