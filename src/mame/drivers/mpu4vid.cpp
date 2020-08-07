@@ -2698,6 +2698,12 @@ void mpu4vid_state::init_cybcas()
 	m_current_chr_table = cybcas_data;
 
 	hack_bwb_startup_protection();
+
+	// hack out half the startup checks for now until we work out what they're checking!
+	uint16_t *rom = (uint16_t*)memregion("video")->base();
+
+	for (int i = 0x1e42; i < 0x1e74; i += 2)
+		rom[i / 2] = 0x4e71;
 }
 
 
@@ -9353,7 +9359,7 @@ GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4f
 /* All contain BWB video in the BIOS rom tho */
 /* These seem to use the other palette chip (BT471). and use the German BWB bank setup, so may need more work */
 
-GAME(  199?, v4cybcas,   0,        bwbvid_oki,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
 
