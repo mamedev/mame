@@ -2718,8 +2718,8 @@ ROM_START( sinistar ) // rev. 3
 */
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder ROM 4 - Horizontal - 7641-5 BPROM
-	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder ROM 6 - Vertical - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder PROM 4 - Horizontal - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder PROM 6 - Vertical - 7641-5 BPROM
 ROM_END
 
 ROM_START( sinistar2 ) // rev. 2
@@ -2753,8 +2753,8 @@ ROM_START( sinistar2 ) // rev. 2
 */
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder ROM 4 - Horizontal - 7641-5 BPROM
-	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder ROM 6 - Vertical - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder PROM 4 - Horizontal - 7641-5 BPROM
+	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder PROM 6 - Vertical - 7641-5 BPROM
 ROM_END
 
 ROM_START( sinistarp ) // solid pink labels - 1982 AMOA prototype
