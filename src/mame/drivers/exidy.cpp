@@ -1010,11 +1010,11 @@ ROM_START( targ )
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "hrl_5c-1.5c",   0x0000, 0x0100, CRC(a24290d0) SHA1(5f2888d168de874021b51c5d19a62fb8165e4454) ) // IM5623CJE (N82S129 compatible) BPROM - address decoder
-	ROM_LOAD( "stl_6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // IM5610CPE (N82S123 compatible) BPROM - unknown
-	ROM_LOAD( "hrl_14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // IM5610CPE (N82S123 compatible) BPROM - unknown
+	ROM_LOAD( "stl_6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // IM5610CPE (N82S123 compatible) BPROM - video RAM control
+	ROM_LOAD( "hrl_14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // IM5610CPE (N82S123 compatible) BPROM - sprite control
 
 	ROM_REGION( 0x0020, "targ", 0 )
-	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    /* unknown */
+	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    // sound "program" (tone frequencies)
 ROM_END
 
 
@@ -1031,11 +1031,11 @@ ROM_START( targc )
 
 	ROM_REGION( 0x0140, "proms", 0 )
 	ROM_LOAD( "hrl_5c-1.5c",   0x0000, 0x0100, CRC(a24290d0) SHA1(5f2888d168de874021b51c5d19a62fb8165e4454) ) // IM5623CJE (N82S129 compatible) BPROM - address decoder
-	ROM_LOAD( "stl_6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // IM5610CPE (N82S123 compatible) BPROM - unknown
-	ROM_LOAD( "hrl_14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // IM5610CPE (N82S123 compatible) BPROM - unknown
+	ROM_LOAD( "stl_6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // IM5610CPE (N82S123 compatible) BPROM - video RAM control
+	ROM_LOAD( "hrl_14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // IM5610CPE (N82S123 compatible) BPROM - sprite control
 
 	ROM_REGION( 0x0020, "targ", 0 )
-	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    /* unknown */
+	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    // sound "program" (tone frequencies)
 ROM_END
 
 
