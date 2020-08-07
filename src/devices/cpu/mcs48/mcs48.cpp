@@ -1,36 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-/*
-    TODO:
-    - EA pin - defined by architecture, must implement:
-      1 means external access, bypassing internal ROM
-      reimplement as a push, not a pull
-    - add CMOS devices, 1 new opcode (01 IDL)
-    - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
-    - make timer update cleaner:
-      timer is updated on S4 while I/O happens on S5
-      due to very bad coding, Kaypro 10 keyboard depends on being able to see T=0 before interrupt is taken
-      right now this is implemented with a hack in the mov_a_t handler
-      in theory it should also be possible to see the timer flag before the interrupt is taken
-      mov_t_a should also update the T register after it's incremented
-    - IRQ timing is similarly hacked due to WY-100 needing to take JNI branch before servicing interrupt
-*/
-
 /***************************************************************************
-
-    mcs48.c
 
     Intel MCS-48/UPI-41 Portable Emulator
 
     Copyright Mirko Buffoni
     Based on the original work Copyright Dan Boris, an 8048 emulator
 
+    TODO:
+    - EA pin - defined by architecture, must implement:
+      1 means external access, bypassing internal ROM
+      reimplement as a push, not a pull
+    - add CMOS devices, 1 new opcode (01 IDL)
+    - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
+    - IRQ timing is hacked due to WY-100 needing to take JNI branch before servicing interrupt
+
 ****************************************************************************
 
     Note that the default internal divisor for this chip is by 3 and
     then again by 5, or by 15 total.
-
-****************************************************************************
 
     Chip   RAM  ROM  I/O
     ----   ---  ---  ---
@@ -595,71 +583,71 @@ void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 OPHANDLER( illegal )
 {
 	logerror("MCS-48 PC:%04X - Illegal opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
-	return 1;
+	return 0;
 }
 
-OPHANDLER( add_a_r0 )       { execute_add(R0); return 1; }
-OPHANDLER( add_a_r1 )       { execute_add(R1); return 1; }
-OPHANDLER( add_a_r2 )       { execute_add(R2); return 1; }
-OPHANDLER( add_a_r3 )       { execute_add(R3); return 1; }
-OPHANDLER( add_a_r4 )       { execute_add(R4); return 1; }
-OPHANDLER( add_a_r5 )       { execute_add(R5); return 1; }
-OPHANDLER( add_a_r6 )       { execute_add(R6); return 1; }
-OPHANDLER( add_a_r7 )       { execute_add(R7); return 1; }
-OPHANDLER( add_a_xr0 )      { execute_add(ram_r(R0)); return 1; }
-OPHANDLER( add_a_xr1 )      { execute_add(ram_r(R1)); return 1; }
-OPHANDLER( add_a_n )        { execute_add(argument_fetch()); return 2; }
+OPHANDLER( add_a_r0 )       { execute_add(R0); return 0; }
+OPHANDLER( add_a_r1 )       { execute_add(R1); return 0; }
+OPHANDLER( add_a_r2 )       { execute_add(R2); return 0; }
+OPHANDLER( add_a_r3 )       { execute_add(R3); return 0; }
+OPHANDLER( add_a_r4 )       { execute_add(R4); return 0; }
+OPHANDLER( add_a_r5 )       { execute_add(R5); return 0; }
+OPHANDLER( add_a_r6 )       { execute_add(R6); return 0; }
+OPHANDLER( add_a_r7 )       { execute_add(R7); return 0; }
+OPHANDLER( add_a_xr0 )      { execute_add(ram_r(R0)); return 0; }
+OPHANDLER( add_a_xr1 )      { execute_add(ram_r(R1)); return 0; }
+OPHANDLER( add_a_n )        { execute_add(argument_fetch()); return 1; }
 
-OPHANDLER( adc_a_r0 )       { execute_addc(R0); return 1; }
-OPHANDLER( adc_a_r1 )       { execute_addc(R1); return 1; }
-OPHANDLER( adc_a_r2 )       { execute_addc(R2); return 1; }
-OPHANDLER( adc_a_r3 )       { execute_addc(R3); return 1; }
-OPHANDLER( adc_a_r4 )       { execute_addc(R4); return 1; }
-OPHANDLER( adc_a_r5 )       { execute_addc(R5); return 1; }
-OPHANDLER( adc_a_r6 )       { execute_addc(R6); return 1; }
-OPHANDLER( adc_a_r7 )       { execute_addc(R7); return 1; }
-OPHANDLER( adc_a_xr0 )      { execute_addc(ram_r(R0)); return 1; }
-OPHANDLER( adc_a_xr1 )      { execute_addc(ram_r(R1)); return 1; }
-OPHANDLER( adc_a_n )        { execute_addc(argument_fetch()); return 2; }
+OPHANDLER( adc_a_r0 )       { execute_addc(R0); return 0; }
+OPHANDLER( adc_a_r1 )       { execute_addc(R1); return 0; }
+OPHANDLER( adc_a_r2 )       { execute_addc(R2); return 0; }
+OPHANDLER( adc_a_r3 )       { execute_addc(R3); return 0; }
+OPHANDLER( adc_a_r4 )       { execute_addc(R4); return 0; }
+OPHANDLER( adc_a_r5 )       { execute_addc(R5); return 0; }
+OPHANDLER( adc_a_r6 )       { execute_addc(R6); return 0; }
+OPHANDLER( adc_a_r7 )       { execute_addc(R7); return 0; }
+OPHANDLER( adc_a_xr0 )      { execute_addc(ram_r(R0)); return 0; }
+OPHANDLER( adc_a_xr1 )      { execute_addc(ram_r(R1)); return 0; }
+OPHANDLER( adc_a_n )        { execute_addc(argument_fetch()); return 1; }
 
-OPHANDLER( anl_a_r0 )       { m_a &= R0; return 1; }
-OPHANDLER( anl_a_r1 )       { m_a &= R1; return 1; }
-OPHANDLER( anl_a_r2 )       { m_a &= R2; return 1; }
-OPHANDLER( anl_a_r3 )       { m_a &= R3; return 1; }
-OPHANDLER( anl_a_r4 )       { m_a &= R4; return 1; }
-OPHANDLER( anl_a_r5 )       { m_a &= R5; return 1; }
-OPHANDLER( anl_a_r6 )       { m_a &= R6; return 1; }
-OPHANDLER( anl_a_r7 )       { m_a &= R7; return 1; }
-OPHANDLER( anl_a_xr0 )      { m_a &= ram_r(R0); return 1; }
-OPHANDLER( anl_a_xr1 )      { m_a &= ram_r(R1); return 1; }
-OPHANDLER( anl_a_n )        { m_a &= argument_fetch(); return 2; }
+OPHANDLER( anl_a_r0 )       { m_a &= R0; return 0; }
+OPHANDLER( anl_a_r1 )       { m_a &= R1; return 0; }
+OPHANDLER( anl_a_r2 )       { m_a &= R2; return 0; }
+OPHANDLER( anl_a_r3 )       { m_a &= R3; return 0; }
+OPHANDLER( anl_a_r4 )       { m_a &= R4; return 0; }
+OPHANDLER( anl_a_r5 )       { m_a &= R5; return 0; }
+OPHANDLER( anl_a_r6 )       { m_a &= R6; return 0; }
+OPHANDLER( anl_a_r7 )       { m_a &= R7; return 0; }
+OPHANDLER( anl_a_xr0 )      { m_a &= ram_r(R0); return 0; }
+OPHANDLER( anl_a_xr1 )      { m_a &= ram_r(R1); return 0; }
+OPHANDLER( anl_a_n )        { m_a &= argument_fetch(); return 1; }
 
-OPHANDLER( anl_bus_n )      { bus_w(bus_r() & argument_fetch()); return 2; }
-OPHANDLER( anl_p1_n )       { port_w(1, m_p1 &= argument_fetch()); return 2; }
-OPHANDLER( anl_p2_n )       { port_w(2, m_p2 &= argument_fetch() | ~p2_mask()); return 2; }
-OPHANDLER( anld_p4_a )      { expander_operation(EXPANDER_OP_AND, 4); return 2; }
-OPHANDLER( anld_p5_a )      { expander_operation(EXPANDER_OP_AND, 5); return 2; }
-OPHANDLER( anld_p6_a )      { expander_operation(EXPANDER_OP_AND, 6); return 2; }
-OPHANDLER( anld_p7_a )      { expander_operation(EXPANDER_OP_AND, 7); return 2; }
+OPHANDLER( anl_bus_n )      { bus_w(bus_r() & argument_fetch()); return 1; }
+OPHANDLER( anl_p1_n )       { port_w(1, m_p1 &= argument_fetch()); return 1; }
+OPHANDLER( anl_p2_n )       { port_w(2, m_p2 &= argument_fetch() | ~p2_mask()); return 1; }
+OPHANDLER( anld_p4_a )      { expander_operation(EXPANDER_OP_AND, 4); return 1; }
+OPHANDLER( anld_p5_a )      { expander_operation(EXPANDER_OP_AND, 5); return 1; }
+OPHANDLER( anld_p6_a )      { expander_operation(EXPANDER_OP_AND, 6); return 1; }
+OPHANDLER( anld_p7_a )      { expander_operation(EXPANDER_OP_AND, 7); return 1; }
 
-OPHANDLER( call_0 )         { execute_call(argument_fetch() | 0x000); return 2; }
-OPHANDLER( call_1 )         { execute_call(argument_fetch() | 0x100); return 2; }
-OPHANDLER( call_2 )         { execute_call(argument_fetch() | 0x200); return 2; }
-OPHANDLER( call_3 )         { execute_call(argument_fetch() | 0x300); return 2; }
-OPHANDLER( call_4 )         { execute_call(argument_fetch() | 0x400); return 2; }
-OPHANDLER( call_5 )         { execute_call(argument_fetch() | 0x500); return 2; }
-OPHANDLER( call_6 )         { execute_call(argument_fetch() | 0x600); return 2; }
-OPHANDLER( call_7 )         { execute_call(argument_fetch() | 0x700); return 2; }
+OPHANDLER( call_0 )         { execute_call(argument_fetch() | 0x000); return 1; }
+OPHANDLER( call_1 )         { execute_call(argument_fetch() | 0x100); return 1; }
+OPHANDLER( call_2 )         { execute_call(argument_fetch() | 0x200); return 1; }
+OPHANDLER( call_3 )         { execute_call(argument_fetch() | 0x300); return 1; }
+OPHANDLER( call_4 )         { execute_call(argument_fetch() | 0x400); return 1; }
+OPHANDLER( call_5 )         { execute_call(argument_fetch() | 0x500); return 1; }
+OPHANDLER( call_6 )         { execute_call(argument_fetch() | 0x600); return 1; }
+OPHANDLER( call_7 )         { execute_call(argument_fetch() | 0x700); return 1; }
 
-OPHANDLER( clr_a )          { m_a = 0; return 1; }
-OPHANDLER( clr_c )          { m_psw &= ~C_FLAG; return 1; }
-OPHANDLER( clr_f0 )         { m_psw &= ~F_FLAG; m_sts &= ~STS_F0; return 1; }
-OPHANDLER( clr_f1 )         { m_sts &= ~STS_F1; return 1; }
+OPHANDLER( clr_a )          { m_a = 0; return 0; }
+OPHANDLER( clr_c )          { m_psw &= ~C_FLAG; return 0; }
+OPHANDLER( clr_f0 )         { m_psw &= ~F_FLAG; m_sts &= ~STS_F0; return 0; }
+OPHANDLER( clr_f1 )         { m_sts &= ~STS_F1; return 0; }
 
-OPHANDLER( cpl_a )          { m_a ^= 0xff; return 1; }
-OPHANDLER( cpl_c )          { m_psw ^= C_FLAG; return 1; }
-OPHANDLER( cpl_f0 )         { m_psw ^= F_FLAG; m_sts ^= STS_F0; return 1; }
-OPHANDLER( cpl_f1 )         { m_sts ^= STS_F1; return 1; }
+OPHANDLER( cpl_a )          { m_a ^= 0xff; return 0; }
+OPHANDLER( cpl_c )          { m_psw ^= C_FLAG; return 0; }
+OPHANDLER( cpl_f0 )         { m_psw ^= F_FLAG; m_sts ^= STS_F0; return 0; }
+OPHANDLER( cpl_f1 )         { m_sts ^= STS_F1; return 0; }
 
 OPHANDLER( da_a )
 {
@@ -676,48 +664,48 @@ OPHANDLER( da_a )
 	}
 	else
 		m_psw &= ~C_FLAG;
-	return 1;
+	return 0;
 }
 
-OPHANDLER( dec_a )          { m_a--; return 1; }
-OPHANDLER( dec_r0 )         { R0--; return 1; }
-OPHANDLER( dec_r1 )         { R1--; return 1; }
-OPHANDLER( dec_r2 )         { R2--; return 1; }
-OPHANDLER( dec_r3 )         { R3--; return 1; }
-OPHANDLER( dec_r4 )         { R4--; return 1; }
-OPHANDLER( dec_r5 )         { R5--; return 1; }
-OPHANDLER( dec_r6 )         { R6--; return 1; }
-OPHANDLER( dec_r7 )         { R7--; return 1; }
+OPHANDLER( dec_a )          { m_a--; return 0; }
+OPHANDLER( dec_r0 )         { R0--; return 0; }
+OPHANDLER( dec_r1 )         { R1--; return 0; }
+OPHANDLER( dec_r2 )         { R2--; return 0; }
+OPHANDLER( dec_r3 )         { R3--; return 0; }
+OPHANDLER( dec_r4 )         { R4--; return 0; }
+OPHANDLER( dec_r5 )         { R5--; return 0; }
+OPHANDLER( dec_r6 )         { R6--; return 0; }
+OPHANDLER( dec_r7 )         { R7--; return 0; }
 
-OPHANDLER( dis_i )          { m_xirq_enabled = false; return 1; }
-OPHANDLER( dis_tcnti )      { m_tirq_enabled = false; m_timer_overflow = false; return 1; }
+OPHANDLER( dis_i )          { m_xirq_enabled = false; return 0; }
+OPHANDLER( dis_tcnti )      { m_tirq_enabled = false; m_timer_overflow = false; return 0; }
 
-OPHANDLER( djnz_r0 )        { execute_jcc(--R0 != 0); return 2; }
-OPHANDLER( djnz_r1 )        { execute_jcc(--R1 != 0); return 2; }
-OPHANDLER( djnz_r2 )        { execute_jcc(--R2 != 0); return 2; }
-OPHANDLER( djnz_r3 )        { execute_jcc(--R3 != 0); return 2; }
-OPHANDLER( djnz_r4 )        { execute_jcc(--R4 != 0); return 2; }
-OPHANDLER( djnz_r5 )        { execute_jcc(--R5 != 0); return 2; }
-OPHANDLER( djnz_r6 )        { execute_jcc(--R6 != 0); return 2; }
-OPHANDLER( djnz_r7 )        { execute_jcc(--R7 != 0); return 2; }
+OPHANDLER( djnz_r0 )        { execute_jcc(--R0 != 0); return 1; }
+OPHANDLER( djnz_r1 )        { execute_jcc(--R1 != 0); return 1; }
+OPHANDLER( djnz_r2 )        { execute_jcc(--R2 != 0); return 1; }
+OPHANDLER( djnz_r3 )        { execute_jcc(--R3 != 0); return 1; }
+OPHANDLER( djnz_r4 )        { execute_jcc(--R4 != 0); return 1; }
+OPHANDLER( djnz_r5 )        { execute_jcc(--R5 != 0); return 1; }
+OPHANDLER( djnz_r6 )        { execute_jcc(--R6 != 0); return 1; }
+OPHANDLER( djnz_r7 )        { execute_jcc(--R7 != 0); return 1; }
 
-OPHANDLER( en_i )           { m_xirq_enabled = true; return 1 + check_irqs(); }
-OPHANDLER( en_tcnti )       { m_tirq_enabled = true; return 1 + check_irqs(); }
-OPHANDLER( en_dma )         { m_dma_enabled = true; port_w(2, m_p2); return 1; }
-OPHANDLER( en_flags )       { m_flags_enabled = true; port_w(2, m_p2); return 1; }
+OPHANDLER( en_i )           { m_xirq_enabled = true; return 0; }
+OPHANDLER( en_tcnti )       { m_tirq_enabled = true; return 0; }
+OPHANDLER( en_dma )         { m_dma_enabled = true; port_w(2, m_p2); return 0; }
+OPHANDLER( en_flags )       { m_flags_enabled = true; port_w(2, m_p2); return 0; }
 OPHANDLER( ent0_clk )
 {
 	if (!m_t0_clk_func.isnull())
 		m_t0_clk_func(clock() / 3);
 	else
 		logerror("T0 clock enabled\n");
-	return 1;
+	return 0;
 }
 
-OPHANDLER( in_a_p0 )        { m_a = bus_r() & m_dbbo; return 2; }
-OPHANDLER( in_a_p1 )        { m_a = port_r(1) & m_p1; return 2; }
-OPHANDLER( in_a_p2 )        { m_a = port_r(2) & m_p2; return 2; }
-OPHANDLER( ins_a_bus )      { m_a = bus_r(); return 2; }
+OPHANDLER( in_a_p0 )        { m_a = bus_r() & m_dbbo; return 1; }
+OPHANDLER( in_a_p1 )        { m_a = port_r(1) & m_p1; return 1; }
+OPHANDLER( in_a_p2 )        { m_a = port_r(2) & m_p2; return 1; }
+OPHANDLER( ins_a_bus )      { m_a = bus_r(); return 1; }
 OPHANDLER( in_a_dbb )
 {
 	/* acknowledge the IBF IRQ and clear the bit in STS */
@@ -729,135 +717,135 @@ OPHANDLER( in_a_dbb )
 	if (m_flags_enabled && (m_p2 & P2_NIBF) == 0)
 		port_w(2, m_p2 |= P2_NIBF);
 	m_a = m_dbbi;
-	return 2;
+	return 1;
 }
 
-OPHANDLER( inc_a )          { m_a++; return 1; }
-OPHANDLER( inc_r0 )         { R0++; return 1; }
-OPHANDLER( inc_r1 )         { R1++; return 1; }
-OPHANDLER( inc_r2 )         { R2++; return 1; }
-OPHANDLER( inc_r3 )         { R3++; return 1; }
-OPHANDLER( inc_r4 )         { R4++; return 1; }
-OPHANDLER( inc_r5 )         { R5++; return 1; }
-OPHANDLER( inc_r6 )         { R6++; return 1; }
-OPHANDLER( inc_r7 )         { R7++; return 1; }
-OPHANDLER( inc_xr0 )        { ram_w(R0, ram_r(R0) + 1); return 1; }
-OPHANDLER( inc_xr1 )        { ram_w(R1, ram_r(R1) + 1); return 1; }
+OPHANDLER( inc_a )          { m_a++; return 0; }
+OPHANDLER( inc_r0 )         { R0++; return 0; }
+OPHANDLER( inc_r1 )         { R1++; return 0; }
+OPHANDLER( inc_r2 )         { R2++; return 0; }
+OPHANDLER( inc_r3 )         { R3++; return 0; }
+OPHANDLER( inc_r4 )         { R4++; return 0; }
+OPHANDLER( inc_r5 )         { R5++; return 0; }
+OPHANDLER( inc_r6 )         { R6++; return 0; }
+OPHANDLER( inc_r7 )         { R7++; return 0; }
+OPHANDLER( inc_xr0 )        { ram_w(R0, ram_r(R0) + 1); return 0; }
+OPHANDLER( inc_xr1 )        { ram_w(R1, ram_r(R1) + 1); return 0; }
 
-OPHANDLER( jb_0 )           { execute_jcc((m_a & 0x01) != 0); return 2; }
-OPHANDLER( jb_1 )           { execute_jcc((m_a & 0x02) != 0); return 2; }
-OPHANDLER( jb_2 )           { execute_jcc((m_a & 0x04) != 0); return 2; }
-OPHANDLER( jb_3 )           { execute_jcc((m_a & 0x08) != 0); return 2; }
-OPHANDLER( jb_4 )           { execute_jcc((m_a & 0x10) != 0); return 2; }
-OPHANDLER( jb_5 )           { execute_jcc((m_a & 0x20) != 0); return 2; }
-OPHANDLER( jb_6 )           { execute_jcc((m_a & 0x40) != 0); return 2; }
-OPHANDLER( jb_7 )           { execute_jcc((m_a & 0x80) != 0); return 2; }
-OPHANDLER( jc )             { execute_jcc((m_psw & C_FLAG) != 0); return 2; }
-OPHANDLER( jf0 )            { execute_jcc((m_psw & F_FLAG) != 0); return 2; }
-OPHANDLER( jf1 )            { execute_jcc((m_sts & STS_F1) != 0); return 2; }
-OPHANDLER( jnc )            { execute_jcc((m_psw & C_FLAG) == 0); return 2; }
-OPHANDLER( jni )            { m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); return 2; }
-OPHANDLER( jnibf )          { m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); return 2; }
-OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 2; }
-OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 2; }
-OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 2; }
-OPHANDLER( jobf )           { execute_jcc((m_sts & STS_OBF) != 0); return 2; }
-OPHANDLER( jtf )            { execute_jcc(m_timer_flag); m_timer_flag = false; return 2; }
-OPHANDLER( jt_0 )           { execute_jcc(test_r(0) != 0); return 2; }
-OPHANDLER( jt_1 )           { execute_jcc(test_r(1) != 0); return 2; }
-OPHANDLER( jz )             { execute_jcc(m_a == 0); return 2; }
+OPHANDLER( jb_0 )           { execute_jcc((m_a & 0x01) != 0); return 1; }
+OPHANDLER( jb_1 )           { execute_jcc((m_a & 0x02) != 0); return 1; }
+OPHANDLER( jb_2 )           { execute_jcc((m_a & 0x04) != 0); return 1; }
+OPHANDLER( jb_3 )           { execute_jcc((m_a & 0x08) != 0); return 1; }
+OPHANDLER( jb_4 )           { execute_jcc((m_a & 0x10) != 0); return 1; }
+OPHANDLER( jb_5 )           { execute_jcc((m_a & 0x20) != 0); return 1; }
+OPHANDLER( jb_6 )           { execute_jcc((m_a & 0x40) != 0); return 1; }
+OPHANDLER( jb_7 )           { execute_jcc((m_a & 0x80) != 0); return 1; }
+OPHANDLER( jc )             { execute_jcc((m_psw & C_FLAG) != 0); return 1; }
+OPHANDLER( jf0 )            { execute_jcc((m_psw & F_FLAG) != 0); return 1; }
+OPHANDLER( jf1 )            { execute_jcc((m_sts & STS_F1) != 0); return 1; }
+OPHANDLER( jnc )            { execute_jcc((m_psw & C_FLAG) == 0); return 1; }
+OPHANDLER( jni )            { m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); return 1; }
+OPHANDLER( jnibf )          { m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); return 1; }
+OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 1; }
+OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 1; }
+OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 1; }
+OPHANDLER( jobf )           { execute_jcc((m_sts & STS_OBF) != 0); return 1; }
+OPHANDLER( jtf )            { execute_jcc(m_timer_flag); m_timer_flag = false; return 1; }
+OPHANDLER( jt_0 )           { execute_jcc(test_r(0) != 0); return 1; }
+OPHANDLER( jt_1 )           { execute_jcc(test_r(1) != 0); return 1; }
+OPHANDLER( jz )             { execute_jcc(m_a == 0); return 1; }
 
-OPHANDLER( jmp_0 )          { execute_jmp(argument_fetch() | 0x000); return 2; }
-OPHANDLER( jmp_1 )          { execute_jmp(argument_fetch() | 0x100); return 2; }
-OPHANDLER( jmp_2 )          { execute_jmp(argument_fetch() | 0x200); return 2; }
-OPHANDLER( jmp_3 )          { execute_jmp(argument_fetch() | 0x300); return 2; }
-OPHANDLER( jmp_4 )          { execute_jmp(argument_fetch() | 0x400); return 2; }
-OPHANDLER( jmp_5 )          { execute_jmp(argument_fetch() | 0x500); return 2; }
-OPHANDLER( jmp_6 )          { execute_jmp(argument_fetch() | 0x600); return 2; }
-OPHANDLER( jmp_7 )          { execute_jmp(argument_fetch() | 0x700); return 2; }
-OPHANDLER( jmpp_xa )        { m_pc &= 0xf00; m_pc |= program_r(m_pc | m_a); return 2; }
+OPHANDLER( jmp_0 )          { execute_jmp(argument_fetch() | 0x000); return 1; }
+OPHANDLER( jmp_1 )          { execute_jmp(argument_fetch() | 0x100); return 1; }
+OPHANDLER( jmp_2 )          { execute_jmp(argument_fetch() | 0x200); return 1; }
+OPHANDLER( jmp_3 )          { execute_jmp(argument_fetch() | 0x300); return 1; }
+OPHANDLER( jmp_4 )          { execute_jmp(argument_fetch() | 0x400); return 1; }
+OPHANDLER( jmp_5 )          { execute_jmp(argument_fetch() | 0x500); return 1; }
+OPHANDLER( jmp_6 )          { execute_jmp(argument_fetch() | 0x600); return 1; }
+OPHANDLER( jmp_7 )          { execute_jmp(argument_fetch() | 0x700); return 1; }
+OPHANDLER( jmpp_xa )        { m_pc &= 0xf00; m_pc |= program_r(m_pc | m_a); return 1; }
 
-OPHANDLER( mov_a_n )        { m_a = argument_fetch(); return 2; }
-OPHANDLER( mov_a_psw )      { m_a = m_psw; return 1; }
-OPHANDLER( mov_a_r0 )       { m_a = R0; return 1; }
-OPHANDLER( mov_a_r1 )       { m_a = R1; return 1; }
-OPHANDLER( mov_a_r2 )       { m_a = R2; return 1; }
-OPHANDLER( mov_a_r3 )       { m_a = R3; return 1; }
-OPHANDLER( mov_a_r4 )       { m_a = R4; return 1; }
-OPHANDLER( mov_a_r5 )       { m_a = R5; return 1; }
-OPHANDLER( mov_a_r6 )       { m_a = R6; return 1; }
-OPHANDLER( mov_a_r7 )       { m_a = R7; return 1; }
-OPHANDLER( mov_a_xr0 )      { m_a = ram_r(R0); return 1; }
-OPHANDLER( mov_a_xr1 )      { m_a = ram_r(R1); return 1; }
-OPHANDLER( mov_a_t )        { m_a = m_timer + ((m_timecount_enabled & TIMER_ENABLED) ? 1 : 0); return 1; }
+OPHANDLER( mov_a_n )        { m_a = argument_fetch(); return 1; }
+OPHANDLER( mov_a_psw )      { m_a = m_psw; return 0; }
+OPHANDLER( mov_a_r0 )       { m_a = R0; return 0; }
+OPHANDLER( mov_a_r1 )       { m_a = R1; return 0; }
+OPHANDLER( mov_a_r2 )       { m_a = R2; return 0; }
+OPHANDLER( mov_a_r3 )       { m_a = R3; return 0; }
+OPHANDLER( mov_a_r4 )       { m_a = R4; return 0; }
+OPHANDLER( mov_a_r5 )       { m_a = R5; return 0; }
+OPHANDLER( mov_a_r6 )       { m_a = R6; return 0; }
+OPHANDLER( mov_a_r7 )       { m_a = R7; return 0; }
+OPHANDLER( mov_a_xr0 )      { m_a = ram_r(R0); return 0; }
+OPHANDLER( mov_a_xr1 )      { m_a = ram_r(R1); return 0; }
+OPHANDLER( mov_a_t )        { m_a = m_timer; return 0; }
 
-OPHANDLER( mov_psw_a )      { m_psw = m_a; update_regptr(); return 1; }
-OPHANDLER( mov_sts_a )      { m_sts = (m_sts & 0x0f) | (m_a & 0xf0); return 1; }
-OPHANDLER( mov_r0_a )       { R0 = m_a; return 1; }
-OPHANDLER( mov_r1_a )       { R1 = m_a; return 1; }
-OPHANDLER( mov_r2_a )       { R2 = m_a; return 1; }
-OPHANDLER( mov_r3_a )       { R3 = m_a; return 1; }
-OPHANDLER( mov_r4_a )       { R4 = m_a; return 1; }
-OPHANDLER( mov_r5_a )       { R5 = m_a; return 1; }
-OPHANDLER( mov_r6_a )       { R6 = m_a; return 1; }
-OPHANDLER( mov_r7_a )       { R7 = m_a; return 1; }
-OPHANDLER( mov_r0_n )       { R0 = argument_fetch(); return 2; }
-OPHANDLER( mov_r1_n )       { R1 = argument_fetch(); return 2; }
-OPHANDLER( mov_r2_n )       { R2 = argument_fetch(); return 2; }
-OPHANDLER( mov_r3_n )       { R3 = argument_fetch(); return 2; }
-OPHANDLER( mov_r4_n )       { R4 = argument_fetch(); return 2; }
-OPHANDLER( mov_r5_n )       { R5 = argument_fetch(); return 2; }
-OPHANDLER( mov_r6_n )       { R6 = argument_fetch(); return 2; }
-OPHANDLER( mov_r7_n )       { R7 = argument_fetch(); return 2; }
-OPHANDLER( mov_t_a )        { m_timer = m_a; return 1; }
-OPHANDLER( mov_xr0_a )      { ram_w(R0, m_a); return 1; }
-OPHANDLER( mov_xr1_a )      { ram_w(R1, m_a); return 1; }
-OPHANDLER( mov_xr0_n )      { ram_w(R0, argument_fetch()); return 2; }
-OPHANDLER( mov_xr1_n )      { ram_w(R1, argument_fetch()); return 2; }
+OPHANDLER( mov_psw_a )      { m_psw = m_a; update_regptr(); return 0; }
+OPHANDLER( mov_sts_a )      { m_sts = (m_sts & 0x0f) | (m_a & 0xf0); return 0; }
+OPHANDLER( mov_r0_a )       { R0 = m_a; return 0; }
+OPHANDLER( mov_r1_a )       { R1 = m_a; return 0; }
+OPHANDLER( mov_r2_a )       { R2 = m_a; return 0; }
+OPHANDLER( mov_r3_a )       { R3 = m_a; return 0; }
+OPHANDLER( mov_r4_a )       { R4 = m_a; return 0; }
+OPHANDLER( mov_r5_a )       { R5 = m_a; return 0; }
+OPHANDLER( mov_r6_a )       { R6 = m_a; return 0; }
+OPHANDLER( mov_r7_a )       { R7 = m_a; return 0; }
+OPHANDLER( mov_r0_n )       { R0 = argument_fetch(); return 1; }
+OPHANDLER( mov_r1_n )       { R1 = argument_fetch(); return 1; }
+OPHANDLER( mov_r2_n )       { R2 = argument_fetch(); return 1; }
+OPHANDLER( mov_r3_n )       { R3 = argument_fetch(); return 1; }
+OPHANDLER( mov_r4_n )       { R4 = argument_fetch(); return 1; }
+OPHANDLER( mov_r5_n )       { R5 = argument_fetch(); return 1; }
+OPHANDLER( mov_r6_n )       { R6 = argument_fetch(); return 1; }
+OPHANDLER( mov_r7_n )       { R7 = argument_fetch(); return 1; }
+OPHANDLER( mov_t_a )        { m_timer = m_a; return 0; }
+OPHANDLER( mov_xr0_a )      { ram_w(R0, m_a); return 0; }
+OPHANDLER( mov_xr1_a )      { ram_w(R1, m_a); return 0; }
+OPHANDLER( mov_xr0_n )      { ram_w(R0, argument_fetch()); return 1; }
+OPHANDLER( mov_xr1_n )      { ram_w(R1, argument_fetch()); return 1; }
 
-OPHANDLER( movd_a_p4 )      { expander_operation(EXPANDER_OP_READ, 4); return 2; }
-OPHANDLER( movd_a_p5 )      { expander_operation(EXPANDER_OP_READ, 5); return 2; }
-OPHANDLER( movd_a_p6 )      { expander_operation(EXPANDER_OP_READ, 6); return 2; }
-OPHANDLER( movd_a_p7 )      { expander_operation(EXPANDER_OP_READ, 7); return 2; }
-OPHANDLER( movd_p4_a )      { expander_operation(EXPANDER_OP_WRITE, 4); return 2; }
-OPHANDLER( movd_p5_a )      { expander_operation(EXPANDER_OP_WRITE, 5); return 2; }
-OPHANDLER( movd_p6_a )      { expander_operation(EXPANDER_OP_WRITE, 6); return 2; }
-OPHANDLER( movd_p7_a )      { expander_operation(EXPANDER_OP_WRITE, 7); return 2; }
+OPHANDLER( movd_a_p4 )      { expander_operation(EXPANDER_OP_READ, 4); return 1; }
+OPHANDLER( movd_a_p5 )      { expander_operation(EXPANDER_OP_READ, 5); return 1; }
+OPHANDLER( movd_a_p6 )      { expander_operation(EXPANDER_OP_READ, 6); return 1; }
+OPHANDLER( movd_a_p7 )      { expander_operation(EXPANDER_OP_READ, 7); return 1; }
+OPHANDLER( movd_p4_a )      { expander_operation(EXPANDER_OP_WRITE, 4); return 1; }
+OPHANDLER( movd_p5_a )      { expander_operation(EXPANDER_OP_WRITE, 5); return 1; }
+OPHANDLER( movd_p6_a )      { expander_operation(EXPANDER_OP_WRITE, 6); return 1; }
+OPHANDLER( movd_p7_a )      { expander_operation(EXPANDER_OP_WRITE, 7); return 1; }
 
-OPHANDLER( movp_a_xa )      { m_a = program_r((m_pc & 0xf00) | m_a); return 2; }
-OPHANDLER( movp3_a_xa )     { m_a = program_r(0x300 | m_a); return 2; }
+OPHANDLER( movp_a_xa )      { m_a = program_r((m_pc & 0xf00) | m_a); return 1; }
+OPHANDLER( movp3_a_xa )     { m_a = program_r(0x300 | m_a); return 1; }
 
-OPHANDLER( movx_a_xr0 )     { m_a = ext_r(R0); return 2; }
-OPHANDLER( movx_a_xr1 )     { m_a = ext_r(R1); return 2; }
-OPHANDLER( movx_xr0_a )     { ext_w(R0, m_a); return 2; }
-OPHANDLER( movx_xr1_a )     { ext_w(R1, m_a); return 2; }
+OPHANDLER( movx_a_xr0 )     { m_a = ext_r(R0); return 1; }
+OPHANDLER( movx_a_xr1 )     { m_a = ext_r(R1); return 1; }
+OPHANDLER( movx_xr0_a )     { ext_w(R0, m_a); return 1; }
+OPHANDLER( movx_xr1_a )     { ext_w(R1, m_a); return 1; }
 
-OPHANDLER( nop )            { return 1; }
+OPHANDLER( nop )            { return 0; }
 
-OPHANDLER( orl_a_r0 )       { m_a |= R0; return 1; }
-OPHANDLER( orl_a_r1 )       { m_a |= R1; return 1; }
-OPHANDLER( orl_a_r2 )       { m_a |= R2; return 1; }
-OPHANDLER( orl_a_r3 )       { m_a |= R3; return 1; }
-OPHANDLER( orl_a_r4 )       { m_a |= R4; return 1; }
-OPHANDLER( orl_a_r5 )       { m_a |= R5; return 1; }
-OPHANDLER( orl_a_r6 )       { m_a |= R6; return 1; }
-OPHANDLER( orl_a_r7 )       { m_a |= R7; return 1; }
-OPHANDLER( orl_a_xr0 )      { m_a |= ram_r(R0); return 1; }
-OPHANDLER( orl_a_xr1 )      { m_a |= ram_r(R1); return 1; }
-OPHANDLER( orl_a_n )        { m_a |= argument_fetch(); return 2; }
+OPHANDLER( orl_a_r0 )       { m_a |= R0; return 0; }
+OPHANDLER( orl_a_r1 )       { m_a |= R1; return 0; }
+OPHANDLER( orl_a_r2 )       { m_a |= R2; return 0; }
+OPHANDLER( orl_a_r3 )       { m_a |= R3; return 0; }
+OPHANDLER( orl_a_r4 )       { m_a |= R4; return 0; }
+OPHANDLER( orl_a_r5 )       { m_a |= R5; return 0; }
+OPHANDLER( orl_a_r6 )       { m_a |= R6; return 0; }
+OPHANDLER( orl_a_r7 )       { m_a |= R7; return 0; }
+OPHANDLER( orl_a_xr0 )      { m_a |= ram_r(R0); return 0; }
+OPHANDLER( orl_a_xr1 )      { m_a |= ram_r(R1); return 0; }
+OPHANDLER( orl_a_n )        { m_a |= argument_fetch(); return 1; }
 
-OPHANDLER( orl_bus_n )      { bus_w(bus_r() | argument_fetch()); return 2; }
-OPHANDLER( orl_p1_n )       { port_w(1, m_p1 |= argument_fetch()); return 2; }
-OPHANDLER( orl_p2_n )       { port_w(2, m_p2 |= argument_fetch() & p2_mask()); return 2; }
-OPHANDLER( orld_p4_a )      { expander_operation(EXPANDER_OP_OR, 4); return 2; }
-OPHANDLER( orld_p5_a )      { expander_operation(EXPANDER_OP_OR, 5); return 2; }
-OPHANDLER( orld_p6_a )      { expander_operation(EXPANDER_OP_OR, 6); return 2; }
-OPHANDLER( orld_p7_a )      { expander_operation(EXPANDER_OP_OR, 7); return 2; }
+OPHANDLER( orl_bus_n )      { bus_w(bus_r() | argument_fetch()); return 1; }
+OPHANDLER( orl_p1_n )       { port_w(1, m_p1 |= argument_fetch()); return 1; }
+OPHANDLER( orl_p2_n )       { port_w(2, m_p2 |= argument_fetch() & p2_mask()); return 1; }
+OPHANDLER( orld_p4_a )      { expander_operation(EXPANDER_OP_OR, 4); return 1; }
+OPHANDLER( orld_p5_a )      { expander_operation(EXPANDER_OP_OR, 5); return 1; }
+OPHANDLER( orld_p6_a )      { expander_operation(EXPANDER_OP_OR, 6); return 1; }
+OPHANDLER( orld_p7_a )      { expander_operation(EXPANDER_OP_OR, 7); return 1; }
 
-OPHANDLER( outl_bus_a )     { bus_w(m_a); return 2; }
-OPHANDLER( outl_p0_a )      { bus_w(m_dbbo = m_a); return 2; }
-OPHANDLER( outl_p1_a )      { port_w(1, m_p1 = m_a); return 2; }
-OPHANDLER( outl_p2_a )      { uint8_t mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); return 2; }
+OPHANDLER( outl_bus_a )     { bus_w(m_a); return 1; }
+OPHANDLER( outl_p0_a )      { bus_w(m_dbbo = m_a); return 1; }
+OPHANDLER( outl_p1_a )      { port_w(1, m_p1 = m_a); return 1; }
+OPHANDLER( outl_p2_a )      { uint8_t mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); return 1; }
 OPHANDLER( out_dbb_a )
 {
 	/* copy to the DBBO and update the bit in STS */
@@ -867,64 +855,64 @@ OPHANDLER( out_dbb_a )
 	/* if P2 flags are enabled, update the state of P2 */
 	if (m_flags_enabled && (m_p2 & P2_OBF) == 0)
 		port_w(2, m_p2 |= P2_OBF);
-	return 2;
+	return 1;
 }
 
 
-OPHANDLER( ret )            { pull_pc(); return 2; }
+OPHANDLER( ret )            { pull_pc(); return 1; }
 OPHANDLER( retr )
 {
 	pull_pc_psw();
 
-	/* implicitly clear the IRQ in progress flip flop and re-check interrupts */
+	/* implicitly clear the IRQ in progress flip flop */
 	m_irq_in_progress = false;
-	return 2 + check_irqs();
+	return 1;
 }
 
-OPHANDLER( rl_a )           { m_a = (m_a << 1) | (m_a >> 7); return 1; }
-OPHANDLER( rlc_a )          { uint8_t newc = m_a & C_FLAG; m_a = (m_a << 1) | (m_psw >> 7); m_psw = (m_psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rl_a )           { m_a = (m_a << 1) | (m_a >> 7); return 0; }
+OPHANDLER( rlc_a )          { uint8_t newc = m_a & C_FLAG; m_a = (m_a << 1) | (m_psw >> 7); m_psw = (m_psw & ~C_FLAG) | newc; return 0; }
 
-OPHANDLER( rr_a )           { m_a = (m_a >> 1) | (m_a << 7); return 1; }
-OPHANDLER( rrc_a )          { uint8_t newc = (m_a << 7) & C_FLAG; m_a = (m_a >> 1) | (m_psw & C_FLAG); m_psw = (m_psw & ~C_FLAG) | newc; return 1; }
+OPHANDLER( rr_a )           { m_a = (m_a >> 1) | (m_a << 7); return 0; }
+OPHANDLER( rrc_a )          { uint8_t newc = (m_a << 7) & C_FLAG; m_a = (m_a >> 1) | (m_psw & C_FLAG); m_psw = (m_psw & ~C_FLAG) | newc; return 0; }
 
-OPHANDLER( sel_mb0 )        { m_a11 = 0x000; return 1; }
-OPHANDLER( sel_mb1 )        { m_a11 = 0x800; return 1; }
+OPHANDLER( sel_mb0 )        { m_a11 = 0x000; return 0; }
+OPHANDLER( sel_mb1 )        { m_a11 = 0x800; return 0; }
 
-OPHANDLER( sel_rb0 )        { m_psw &= ~B_FLAG; update_regptr(); return 1; }
-OPHANDLER( sel_rb1 )        { m_psw |=  B_FLAG; update_regptr(); return 1; }
+OPHANDLER( sel_rb0 )        { m_psw &= ~B_FLAG; update_regptr(); return 0; }
+OPHANDLER( sel_rb1 )        { m_psw |=  B_FLAG; update_regptr(); return 0; }
 
-OPHANDLER( stop_tcnt )      { m_timecount_enabled = 0; return 1; }
+OPHANDLER( stop_tcnt )      { m_timecount_enabled = 0; return 0; }
 
-OPHANDLER( strt_cnt )       { m_timecount_enabled = COUNTER_ENABLED; m_t1_history = test_r(1); return 1; }
-OPHANDLER( strt_t )         { m_timecount_enabled = TIMER_ENABLED; m_prescaler = 0; return 1; }
+OPHANDLER( strt_cnt )       { m_timecount_enabled = COUNTER_ENABLED; m_t1_history = test_r(1); return 0; }
+OPHANDLER( strt_t )         { m_timecount_enabled = TIMER_ENABLED; m_prescaler = 0; return 0; }
 
-OPHANDLER( swap_a )         { m_a = (m_a << 4) | (m_a >> 4); return 1; }
+OPHANDLER( swap_a )         { m_a = (m_a << 4) | (m_a >> 4); return 0; }
 
-OPHANDLER( xch_a_r0 )       { uint8_t tmp = m_a; m_a = R0; R0 = tmp; return 1; }
-OPHANDLER( xch_a_r1 )       { uint8_t tmp = m_a; m_a = R1; R1 = tmp; return 1; }
-OPHANDLER( xch_a_r2 )       { uint8_t tmp = m_a; m_a = R2; R2 = tmp; return 1; }
-OPHANDLER( xch_a_r3 )       { uint8_t tmp = m_a; m_a = R3; R3 = tmp; return 1; }
-OPHANDLER( xch_a_r4 )       { uint8_t tmp = m_a; m_a = R4; R4 = tmp; return 1; }
-OPHANDLER( xch_a_r5 )       { uint8_t tmp = m_a; m_a = R5; R5 = tmp; return 1; }
-OPHANDLER( xch_a_r6 )       { uint8_t tmp = m_a; m_a = R6; R6 = tmp; return 1; }
-OPHANDLER( xch_a_r7 )       { uint8_t tmp = m_a; m_a = R7; R7 = tmp; return 1; }
-OPHANDLER( xch_a_xr0 )      { uint8_t tmp = m_a; m_a = ram_r(R0); ram_w(R0, tmp); return 1; }
-OPHANDLER( xch_a_xr1 )      { uint8_t tmp = m_a; m_a = ram_r(R1); ram_w(R1, tmp); return 1; }
+OPHANDLER( xch_a_r0 )       { uint8_t tmp = m_a; m_a = R0; R0 = tmp; return 0; }
+OPHANDLER( xch_a_r1 )       { uint8_t tmp = m_a; m_a = R1; R1 = tmp; return 0; }
+OPHANDLER( xch_a_r2 )       { uint8_t tmp = m_a; m_a = R2; R2 = tmp; return 0; }
+OPHANDLER( xch_a_r3 )       { uint8_t tmp = m_a; m_a = R3; R3 = tmp; return 0; }
+OPHANDLER( xch_a_r4 )       { uint8_t tmp = m_a; m_a = R4; R4 = tmp; return 0; }
+OPHANDLER( xch_a_r5 )       { uint8_t tmp = m_a; m_a = R5; R5 = tmp; return 0; }
+OPHANDLER( xch_a_r6 )       { uint8_t tmp = m_a; m_a = R6; R6 = tmp; return 0; }
+OPHANDLER( xch_a_r7 )       { uint8_t tmp = m_a; m_a = R7; R7 = tmp; return 0; }
+OPHANDLER( xch_a_xr0 )      { uint8_t tmp = m_a; m_a = ram_r(R0); ram_w(R0, tmp); return 0; }
+OPHANDLER( xch_a_xr1 )      { uint8_t tmp = m_a; m_a = ram_r(R1); ram_w(R1, tmp); return 0; }
 
-OPHANDLER( xchd_a_xr0 )     { uint8_t oldram = ram_r(R0); ram_w(R0, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 1; }
-OPHANDLER( xchd_a_xr1 )     { uint8_t oldram = ram_r(R1); ram_w(R1, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 1; }
+OPHANDLER( xchd_a_xr0 )     { uint8_t oldram = ram_r(R0); ram_w(R0, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 0; }
+OPHANDLER( xchd_a_xr1 )     { uint8_t oldram = ram_r(R1); ram_w(R1, (oldram & 0xf0) | (m_a & 0x0f)); m_a = (m_a & 0xf0) | (oldram & 0x0f); return 0; }
 
-OPHANDLER( xrl_a_r0 )       { m_a ^= R0; return 1; }
-OPHANDLER( xrl_a_r1 )       { m_a ^= R1; return 1; }
-OPHANDLER( xrl_a_r2 )       { m_a ^= R2; return 1; }
-OPHANDLER( xrl_a_r3 )       { m_a ^= R3; return 1; }
-OPHANDLER( xrl_a_r4 )       { m_a ^= R4; return 1; }
-OPHANDLER( xrl_a_r5 )       { m_a ^= R5; return 1; }
-OPHANDLER( xrl_a_r6 )       { m_a ^= R6; return 1; }
-OPHANDLER( xrl_a_r7 )       { m_a ^= R7; return 1; }
-OPHANDLER( xrl_a_xr0 )      { m_a ^= ram_r(R0); return 1; }
-OPHANDLER( xrl_a_xr1 )      { m_a ^= ram_r(R1); return 1; }
-OPHANDLER( xrl_a_n )        { m_a ^= argument_fetch(); return 2; }
+OPHANDLER( xrl_a_r0 )       { m_a ^= R0; return 0; }
+OPHANDLER( xrl_a_r1 )       { m_a ^= R1; return 0; }
+OPHANDLER( xrl_a_r2 )       { m_a ^= R2; return 0; }
+OPHANDLER( xrl_a_r3 )       { m_a ^= R3; return 0; }
+OPHANDLER( xrl_a_r4 )       { m_a ^= R4; return 0; }
+OPHANDLER( xrl_a_r5 )       { m_a ^= R5; return 0; }
+OPHANDLER( xrl_a_r6 )       { m_a ^= R6; return 0; }
+OPHANDLER( xrl_a_r7 )       { m_a ^= R7; return 0; }
+OPHANDLER( xrl_a_xr0 )      { m_a ^= ram_r(R0); return 0; }
+OPHANDLER( xrl_a_xr1 )      { m_a ^= ram_r(R1); return 0; }
+OPHANDLER( xrl_a_n )        { m_a ^= argument_fetch(); return 1; }
 
 
 
@@ -1278,6 +1266,9 @@ int mcs48_cpu_device::check_irqs()
 
 void mcs48_cpu_device::burn_cycles(int count)
 {
+	if (count == 0)
+		return;
+
 	int timerover = false;
 
 	/* if the timer is enabled, accumulate prescaler cycles */
@@ -1292,12 +1283,15 @@ void mcs48_cpu_device::burn_cycles(int count)
 
 	/* if the counter is enabled, poll the T1 test input once for each cycle */
 	else if (m_timecount_enabled & COUNTER_ENABLED)
-		for ( ; count > 0; count--)
+		for ( ; count > 0; count--, m_icount--)
 		{
 			m_t1_history = (m_t1_history << 1) | (test_r(1) & 1);
 			if ((m_t1_history & 3) == 2)
 				timerover = (++m_timer == 0);
 		}
+
+	/* if timer counter was disabled, adjust icount here (otherwise count is 0) */
+	m_icount -= count;
 
 	/* if either source caused a timer overflow, set the flags and check IRQs */
 	if (timerover)
@@ -1306,10 +1300,7 @@ void mcs48_cpu_device::burn_cycles(int count)
 
 		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
 		if (m_tirq_enabled)
-		{
 			m_timer_overflow = true;
-			check_irqs();
-		}
 	}
 }
 
@@ -1321,34 +1312,22 @@ void mcs48_cpu_device::burn_cycles(int count)
 
 void mcs48_cpu_device::execute_run()
 {
-	int curcycles;
-
 	update_regptr();
 
-	/* external interrupts may have been set since we last checked */
-	curcycles = check_irqs();
-	m_icount -= curcycles;
-	if (m_timecount_enabled != 0)
-		burn_cycles(curcycles);
-
-	/* iterate over remaining cycles, guaranteeing at least one instruction */
+	// iterate over remaining cycles, guaranteeing at least one instruction
 	do
 	{
-		unsigned opcode;
+		// check interrupts - also burn the 1st opcode cycle:
+		// timer is updated on S4 while I/O(for single cycle opcodes) happens on S5
+		burn_cycles(check_irqs() + 1);
 
-		/* fetch next opcode */
 		m_prevpc = m_pc;
 		m_irq_polled = false;
 		debugger_instruction_hook(m_pc);
-		opcode = opcode_fetch();
 
-		/* process opcode and count cycles */
-		curcycles = (this->*m_opcode_table[opcode])();
-
-		/* burn the cycles */
-		m_icount -= curcycles;
-		if (m_timecount_enabled != 0)
-			burn_cycles(curcycles);
+		// fetch and process opcode
+		unsigned opcode = opcode_fetch();
+		burn_cycles((this->*m_opcode_table[opcode])());
 
 	} while (m_icount > 0);
 }

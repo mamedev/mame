@@ -2,8 +2,6 @@
 // copyright-holders:Mirko Buffoni
 /***************************************************************************
 
-    mcs48.c
-
     Intel MCS-48/UPI-41 Portable Emulator
 
     Copyright Mirko Buffoni
@@ -154,7 +152,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 15 - 1) / 15; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 15); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2+2; } // opcode+irq
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -213,7 +211,7 @@ protected:
 
 	uint16_t      m_a11;                /* A11 value, either 0x000 or 0x800 */
 
-	int         m_icount;
+	int           m_icount;
 
 	/* Memory spaces */
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
