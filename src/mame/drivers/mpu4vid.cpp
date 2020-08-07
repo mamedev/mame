@@ -211,17 +211,9 @@ TODO:
 class mpu4vid_state : public mpu4_state
 {
 public:
-	struct bt471_t
-	{
-		uint8_t address;
-		uint8_t addr_cnt;
-		uint8_t pixmask;
-		uint8_t command;
-		rgb_t color;
-	};
 
-	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mpu4_state(mconfig, type, tag),
+	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
 		m_scn2674(*this, "scn2674_vid"),
 		m_vid_vidram(*this, "vid_vidram"),
@@ -232,6 +224,7 @@ public:
 		m_trackx_port(*this, "TRACKX"),
 		m_tracky_port(*this, "TRACKY"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_ef9369(*this, "ef9369"),
 		m_4krow(0),
 		m_4ktable(nullptr)
 	{
@@ -283,7 +276,7 @@ private:
 	optional_ioport m_tracky_port;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	struct bt471_t m_bt471;
+	optional_device<ef9369_device> m_ef9369;
 
 	//Video
 	uint8_t m_m6840_irq_state;
@@ -307,8 +300,7 @@ private:
 	uint16_t mpu4_vid_vidram_r(offs_t offset);
 	void mpu4_vid_vidram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	EF9369_COLOR_UPDATE(ef9369_color_update);
-	void bt471_w(offs_t offset, uint8_t data);
-	uint8_t bt471_r(offs_t offset);
+
 	void vidcharacteriser_w(offs_t offset, uint8_t data);
 	uint8_t vidcharacteriser_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
@@ -332,6 +324,14 @@ private:
 	uint8_t *m_4ktable;
 	void hack_bwb_startup_protection();
 
+	uint8_t mpu4_vid_bt_a00004_r(offs_t offset);
+	void mpu4_vid_bt_a00002_w(offs_t offset, uint8_t data);
+	void mpu4_vid_bt_a00008_w(offs_t offset, uint8_t data);
+	uint8_t m_bt_palbase;
+	uint8_t m_bt_which;
+	uint8_t m_btpal_r[0x100];
+	uint8_t m_btpal_g[0x100];
+	uint8_t m_btpal_b[0x100];
 };
 
 /*************************************
@@ -440,29 +440,42 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 		uint16_t tile = m_vid_mainram[address & 0x7fff];
 		const uint8_t *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
 		int offset = m_gfxdecode->gfx(m_gfx_index+0)->rowbytes() * linecount;
+		
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t pen = line[offset + i];
 			int extra = tile >> 12;
 
-			// the test modes in many cases require the more complex logic here
-			// otherwise text is invisible, rgb patterns are not shown etc.
-			// this logic could still be incorrect
-			if (pen == 0)
+			if (m_ef9369)
 			{
-				bitmap.pix32(y, x + i) = m_palette->pen(pen);
-			}
-			else
-			{
-				int newpen = pen ^ (15 - extra);
-				if (newpen == 15)
+
+
+				int extra = tile >> 12;
+
+				// the test modes in many cases require the more complex logic here
+				// otherwise text is invisible, rgb patterns are not shown etc.
+				// this logic could still be incorrect
+				if (pen == 0)
 				{
-					bitmap.pix32(y, x + i) = m_palette->pen(extra);
+					bitmap.pix32(y, x + i) = m_palette->pen(pen);
 				}
 				else
 				{
-					bitmap.pix32(y, x + i) = m_palette->pen(newpen);
+					int newpen = pen ^ (15 - extra);
+					if (newpen == 15)
+					{
+						bitmap.pix32(y, x + i) = m_palette->pen(extra);
+					}
+					else
+					{
+						bitmap.pix32(y, x + i) = m_palette->pen(newpen);
+					}
 				}
+			}
+			else
+			{
+				bitmap.pix32(y, x + i) = m_palette->pen((extra<<4) | (pen & 0xf));
+
 			}
 		}
 	}
@@ -504,72 +517,6 @@ EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )
 {
 	m_palette->set_pen_color(entry, pal4bit(cc), pal4bit(cb), pal4bit(ca));
 }
-
-/******************************************
- *
- *  Brooktree Bt471 RAMDAC
- *  Implementation stolen from JPM
- *  Impact, may not be 100% (that has a 477)
- ******************************************/
-
-/*
- *  0 0 0    Address register (RAM write mode)
- *  0 0 1    Color palette RAMs
- *  0 1 0    Pixel read mask register
- *  0 1 1    Address register (RAM read mode)
- *  1 0 0    Address register (overlay write mode)
- *  1 1 1    Address register (overlay read mode)
- *  1 0 1    Overlay register
- */
-
-void mpu4vid_state::bt471_w(offs_t offset, uint8_t data)
-{
-	struct bt471_t &bt471 = m_bt471;
-
-	switch (offset)
-	{
-		case 0x0:
-		{
-			bt471.address = data;
-			bt471.addr_cnt = 0;
-			break;
-		}
-		case 0x1:
-		{
-			uint8_t *addr_cnt = &bt471.addr_cnt;
-			rgb_t *color = &bt471.color;
-
-			color[*addr_cnt] = data;
-
-			if (++*addr_cnt == 3)
-			{
-				m_palette->set_pen_color(bt471.address, rgb_t(color[0], color[1], color[2]));
-				*addr_cnt = 0;
-
-				/* Address register increments */
-				bt471.address++;
-			}
-			break;
-		}
-		case 0x2:
-		{
-			bt471.pixmask = data;
-			break;
-		}
-
-		default:
-		{
-			popmessage("Bt471: Unhandled write access (offset:%x, data:%x)", offset, data);
-		}
-	}
-}
-
-uint8_t mpu4vid_state::bt471_r(offs_t offset)
-{
-	popmessage("Bt471: Unhandled read access (offset:%x)", offset);
-	return 0;
-}
-
 
 /*************************************
  *
@@ -1838,9 +1785,9 @@ void mpu4vid_state::mpu4_68k_map_base(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 //  map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw(m_ef9369, FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
 	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w(m_ef9369, FUNC(ef9369_device::address_w)).umask16(0x00ff);
 //  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
@@ -1868,9 +1815,9 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 //  map(0x640000, 0x7fffff).noprw(); /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw(m_ef9369, FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
 	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w(m_ef9369, FUNC(ef9369_device::address_w)).umask16(0x00ff);
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1888,11 +1835,9 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw(m_ef9369, FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
 	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
-//  map(0xa00000, 0xa0000f).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)); //Some games use this
-//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
+	map(0xa00003, 0xa00003).w(m_ef9369, FUNC(ef9369_device::address_w)).umask16(0x00ff);
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1920,17 +1865,51 @@ void mpu4vid_state::bwbvidoki_68k_map(address_map& map)
 {
 	bwbvidoki_68k_base_map(map);
 
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff); //BT RAMDAC on some games?
+	map(0xa00001, 0xa00001).rw(m_ef9369, FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff);
 	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
+	map(0xa00003, 0xa00003).w(m_ef9369, FUNC(ef9369_device::address_w)).umask16(0x00ff);
+}
+
+// TODO: use actual BT471 device, currently seems to not work when hooked up tho? fails detection?
+
+uint8_t mpu4vid_state::mpu4_vid_bt_a00004_r(offs_t offset)
+{
+	// used by software to detect alt palette type? (same value is written prior to this)
+	return 0xaf;
+}
+
+void mpu4vid_state::mpu4_vid_bt_a00008_w(offs_t offset, uint8_t data)
+{
+	m_bt_palbase = data;
+	m_bt_which = 0;
+}
+
+void mpu4vid_state::mpu4_vid_bt_a00002_w(offs_t offset, uint8_t data)
+{
+	switch (m_bt_which)
+	{
+	case 0:	m_btpal_r[m_bt_palbase] = data;
+	case 1:	m_btpal_g[m_bt_palbase] = data;
+	case 2:	m_btpal_b[m_bt_palbase] = data;
+	}
+
+	m_bt_which++;
+
+	if (m_bt_which == 3)
+	{
+		m_bt_which = 0;
+		m_palette->set_pen_color(m_bt_palbase, pal6bit(m_btpal_r[m_bt_palbase]), pal6bit(m_btpal_g[m_bt_palbase]), pal6bit(m_btpal_b[m_bt_palbase]));
+		m_bt_palbase++;
+	}
 }
 
 void mpu4vid_state::bwbvidoki_68k_bt471_map(address_map& map)
 {
 	bwbvidoki_68k_base_map(map);
 
-//  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
-//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
+	map(0xa00002, 0xa00003).w(FUNC(mpu4vid_state::mpu4_vid_bt_a00002_w)).umask16(0xffff);
+	map(0xa00004, 0xa00005).r(FUNC(mpu4vid_state::mpu4_vid_bt_a00004_r)).umask16(0xffff);
+	map(0xa00008, 0xa00009).w(FUNC(mpu4vid_state::mpu4_vid_bt_a00008_w)).umask16(0xffff);
 }
 
 /* TODO: Fix up MPU4 map*/
@@ -2037,7 +2016,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 
-	EF9369(config, "ef9369").set_color_update_callback(FUNC(mpu4vid_state::ef9369_color_update));
+	EF9369(config, m_ef9369).set_color_update_callback(FUNC(mpu4vid_state::ef9369_color_update));
 
 	PTM6840(config, m_ptm, VIDEO_MASTER_CLOCK / 10); /* 68k E clock */
 	m_ptm->set_external_clocks(0, 0, 0);
@@ -2128,17 +2107,22 @@ void mpu4vid_state::bwbvid_oki_bt471(machine_config &config)
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::bwbvidoki_68k_bt471_map);
 	vid_oki(config);
+
+	config.device_remove("ef9369");
+
+	PALETTE(config.replace(), m_palette).set_entries(256);
+
 }
 
 /*
 Characteriser (CHR)
- The question data on the quiz games gets passed through the characterizer, the tables tested at startup are just a
+ The question data on the quiz games gets passed through the characteriser, the tables tested at startup are just a
  very specific test with known responses to make sure the device functions properly.  Unless there is extra encryption
  applied to just the question ROMs then the assumptions made here are wrong, because the questions don't decode.
 
  Perhaps the address lines for the question ROMS are scrambled somehow to make things decode, but how?
 
- It seems more likely that the Characterizer (PAL) acts as a challenge / response system, but various writes cause
+ It seems more likely that the Characteriser (PAL) acts as a challenge / response system, but various writes cause
  'latching' behavior because if you study the sequence written at startup you can see that the same write value should
  generate different responses.
 
@@ -2202,7 +2186,7 @@ uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 
 void mpu4vid_state::vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data)
 {
-	logerror("%04x write to characterizer %02x - %02x\n", m_videocpu->pcbase(), offset, data);
+	logerror("%04x write to characteriser %02x - %02x\n", m_videocpu->pcbase(), offset, data);
 
 	if (data == 0x00) // reset?
 	{
@@ -2222,7 +2206,7 @@ uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
 
 	// hack for v4strike, otherwise it reports questions as invalid, even if they decode properly
 	// is this a secondary security check, or are they mismatched for the version?
-	// it writes '03' to the characterizer, (the question revision or coincidence?)
+	// it writes '03' to the characteriser, (the question revision or coincidence?)
 	// but expects 00 back for that check
 
 	if (m_videocpu->pcbase() == 0x32c4)
@@ -2231,7 +2215,7 @@ uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
 			ret = 0x00;
 	}
 
-	logerror("%04x read from characterizer %02x - %02x\n", m_videocpu->pcbase(), offset, ret);
+	logerror("%04x read from characteriser %02x - %02x\n", m_videocpu->pcbase(), offset, ret);
 
 	return ret << 2; // 6-bit reads (lower 2 bits unused)
 }
@@ -9221,7 +9205,7 @@ GAME(  199?, v4rencasi,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 
 /* Uncertain BIOS */
-// has a Barcrest style Characterizer check, not a BWB one?
+// has a Barcrest style Characteriser check, not a BWB one?
 GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
 GAME(  199?, v4frfacta,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
 GAME(  199?, v4frfactb,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
