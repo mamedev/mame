@@ -24,7 +24,7 @@
 #include "machine/74153.h"
 #include "machine/6821pia.h"
 #include "screen.h"
-
+#include "speaker.h"
 
 
 /*************************************
@@ -292,6 +292,8 @@ void carpolo_state::carpolo(machine_config &config)
 	PALETTE(config, m_palette, FUNC(carpolo_state::carpolo_palette), 12*2+2*16+4*2);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(NETLIST_NAME(carpolo))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -301,7 +303,8 @@ void carpolo_state::carpolo(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash3", "PL3_CRASH.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash4", "PL4_CRASH.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "").set_mult_offset(10000.0, 0.0);
+	// Temporarily just tied to an arbitrary value to preserve lack of audio.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "PL1_CRASH.GND").set_mult_offset(10000.0, 0.0);
 }
 
 
