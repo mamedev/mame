@@ -18,14 +18,9 @@
         * Treasure Trail?
 
     Known issues:
-        * Neither game registers coins and I can't find where the credit
-          count gets updated in the code. Each game requires a unique
-          security PAL - maybe this is related? I'm poking the coin values
-          directly into RAM for now.
-        * Game hangs when nothing is connected to the first ACIA when
-          you try to 'collect' cash
+        * Coin data has to go through the datalogger to be counted
         * Verify WD FDC type
-        * Hook up ACIA properly
+        * Hook up ACIA properly, clocks etc.
         * Hook up watchdog NMI
         * Verify clocks
         * Use real video timings
@@ -35,22 +30,18 @@
         * Toggle both 'Back door' and 'Key switch' to enter test mode
         * Video hardware seems to match JPM System 5
         * IRQ 1 inits the PPIs, IRQ 2 does nothing
-        * Values send to the first ACIA serial port:
-          - Game ID: "JPMNA305v.." (guab) or "..JPMNN101}" (tenup)
-          - Coin 1-4: 1-4
-          - Game start: /
-          - Collect: D
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "bus/rs232/rs232.h"
 #include "formats/guab_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/bacta_datalogger.h"
+
 #include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
@@ -86,8 +77,6 @@ public:
 	{ }
 
 	void guab(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
 	virtual void machine_start() override;
@@ -161,8 +150,8 @@ void guab_state::guab_map(address_map &map)
 
 static INPUT_PORTS_START( guab )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 50)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 100)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
@@ -187,14 +176,14 @@ static INPUT_PORTS_START( guab )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("D")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tenup )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 50)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 100)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
@@ -219,8 +208,8 @@ static INPUT_PORTS_START( tenup )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, 20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")
 INPUT_PORTS_END
 
 
@@ -349,20 +338,6 @@ void guab_state::system_w(uint8_t data)
 //**************************************************************************
 //  INPUTS/OUTPUTS
 //**************************************************************************
-
-INPUT_CHANGED_MEMBER( guab_state::coin_inserted )
-{
-	if (newval == 0)
-	{
-		uint32_t credit;
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
-		/* Get the current credit value and add the new coin value */
-		credit = space.read_dword(0x8002c) + param;
-		space.write_dword(0x8002c, credit);
-	}
-}
-
 void guab_state::output1_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0); // cash in (ten up: cash in)
@@ -435,15 +410,6 @@ void guab_state::output6_w(uint8_t data)
 	m_leds[47] = BIT(data, 7);
 }
 
-static DEVICE_INPUT_DEFAULTS_START( acia_1_rs232_defaults )
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
-	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
-	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_ODD)
-	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
-DEVICE_INPUT_DEFAULTS_END
-
 
 //**************************************************************************
 //  AUDIO
@@ -494,6 +460,7 @@ void guab_state::guab(machine_config &config)
 	screen.set_screen_update(FUNC(guab_state::screen_update_guab));
 	screen.set_palette(m_palette);
 
+
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 
 	EF9369(config, "ef9369").set_color_update_callback(FUNC(guab_state::ef9369_color_update));
@@ -537,14 +504,11 @@ void guab_state::guab(machine_config &config)
 	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
 	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
-	acia1.txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
-	acia1.rts_handler().set("rs232_1", FUNC(rs232_port_device::write_rts));
+	acia1.txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
-	rs232.cts_handler().set("acia6850_1", FUNC(acia6850_device::write_cts));
-	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(acia_1_rs232_defaults));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta.rxd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source? the ptm doesn't seem to output any common baud values
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
