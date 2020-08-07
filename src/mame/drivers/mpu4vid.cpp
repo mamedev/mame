@@ -2529,9 +2529,80 @@ void mpu4vid_state::init_prizeinv()
 	hack_bwb_startup_protection();
 }
 
+/*
+TODO: use official Barcrest / BWB letters here, some show them, eg D = protocol / datapak, Y = % Key needed
+this is based on header info in a few games, could differ, check!
+
+offset 0 : Option Byte
+
+YtSi safD
+
+D = Protocol / Datapak
+f = fixed %
+a = arcade
+s = switchable (or use offset 1 value)
+i = 'irish'
+S = special (use offset 2)
+t = token
+Y = % key needed
+
+offset 1: price of pay (per-game, used depending on above)
+
+offset 2: special game type (per-game>)
+
+---- --rg
+
+g = Bingo Gala A
+r = Bingo Rank R
+*/
+
+
 void mpu4vid_state::init_bwbhack()
 {
 	hack_bwb_startup_protection();
+
+
+	uint8_t* rom = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	if (len != 0x10000)
+	{
+		logerror("main CPU size is not 0x10000!\n");
+		return;
+	}
+
+	for (int i = 0; i < 0x4000; i++)
+	{
+		if ((rom[i] != rom[i + 0x4000]) ||
+			(rom[i] != rom[i + 0x8000]) ||
+			(rom[i] != rom[i + 0xc000]))
+			logerror("main CPU ROM data not mirroring as expected at %04x!\n", i);
+	}
+
+	// helper for sorting out sets
+	uint8_t option = rom[0xc000];
+	uint8_t price = rom[0xc001];
+	uint8_t special = rom[0xc002];
+
+	logerror("option byte is %02x\n", option);
+	logerror("bit 0: Datapak     = %d\n", (option >> 0) & 1);
+	logerror("bit 1: Fixed %     = %d\n", (option >> 1) & 1);
+	logerror("bit 2: Arcade      = %d\n", (option >> 2) & 1);
+	logerror("bit 3: Switchable  = %d\n", (option >> 3) & 1);
+	logerror("bit 4: Irish       = %d\n", (option >> 4) & 1);
+	logerror("bit 5: Special     = %d\n", (option >> 5) & 1);
+	logerror("bit 6: Token       = %d\n", (option >> 6) & 1);
+	logerror("bit 7: Percent Key = %d\n", (option >> 7) & 1);
+
+	if (!((option >> 3) & 1))
+	{
+		logerror("Switchable was not set, so use coinage setting %02x\n", price);
+	}
+
+	if ((option >> 5) & 1)
+	{
+		logerror("Special was set, so use special setting %02x\n", special);
+	}
 }
 
 
