@@ -99,7 +99,6 @@ private:
 	uint8_t watchdog_r();
 	void watchdog_w(uint8_t data);
 
-
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void guab_map(address_map &map);
@@ -503,11 +502,12 @@ void guab_state::guab(machine_config &config)
 	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
 	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	
 	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
 	acia1.txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
 	bacta.rxd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source? the ptm doesn't seem to output any common baud values
