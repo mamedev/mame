@@ -237,6 +237,9 @@ public:
 	void crmaze(machine_config &config);
 	void bwbvid_oki(machine_config &config);
 	void bwbvid_oki_bt471(machine_config &config);
+
+	void bwbvid_oki_bt471_german(machine_config &config);
+
 	void mating(machine_config &config);
 	void vid_oki(machine_config &config);
 
@@ -316,6 +319,8 @@ private:
 	void mpu4_68k_map_strike(address_map &map);
 	void mpu4_vram(address_map &map);
 	void mpu4oki_68k_map(address_map &map);
+
+	void mpu4_6809_german_map(address_map &map);
 
 	void vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data);
 	uint8_t vidcharacteriser_4k_lookup_r(offs_t offset);
@@ -1979,6 +1984,12 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("maincpu",0);  /* 64k EPROM on board, only this region read */
 }
 
+void mpu4vid_state::mpu4_6809_german_map(address_map &map)
+{
+	mpu4_6809_map(map);
+
+	map(0x4000, 0xbfff).ram();
+}
 
 //Sampled sound timer
 /*
@@ -2162,6 +2173,13 @@ void mpu4vid_state::bwbvid_oki_bt471(machine_config &config)
 	PALETTE(config.replace(), m_palette).set_entries(256);
 
 }
+
+void mpu4vid_state::bwbvid_oki_bt471_german(machine_config &config)
+{
+	bwbvid_oki_bt471(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_6809_german_map);
+}
+
 
 /*
 Characteriser (CHR)
@@ -9337,7 +9355,7 @@ GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4f
 
 GAME(  199?, v4cybcas,   0,        bwbvid_oki,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4missis,   0,        bwbvid_oki,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
+GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
 
-GAME(  199?, v4picdil,   0,        bwbvid_oki,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Piccadilly Nights (Nova, German) (MPU4 Video)",GAME_FLAGS )  // different hardware type? extra ram on mpu4 side?
+GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Piccadilly Nights (Nova, German) (MPU4 Video)",GAME_FLAGS )  // different hardware type? extra ram on mpu4 side?
 
