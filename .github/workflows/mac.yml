@@ -52,4 +52,4 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         source: mame_libretro.zip
         target: ${{ secrets.MACOS_X86_64_PATH }}
-        debug: true
+        overwrite: true
