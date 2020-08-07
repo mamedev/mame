@@ -244,7 +244,7 @@ void midwunit_state::init_nbahangt()
 
 /********************** WWF Wrestlemania **********************/
 
-// note: other game's PCBs probably shuffle I/O addresses too, but only WWF game code usue/require this.
+// note: other game's PCBs probably shuffle I/O addresses too, but only WWF game code use/require this.
 void midwunit_state::wwfmania_io_0_w(uint16_t data)
 {
 	/* start with the originals */
