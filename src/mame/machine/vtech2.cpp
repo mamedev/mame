@@ -68,6 +68,29 @@ void vtech2_state::machine_reset()
 	m_language = m_io_keyboard[5]->read() & 0x30;
 }
 
+void vtech2_state::machine_start()
+{
+	save_item(NAME(m_laser_frame_message));
+	save_item(NAME(m_laser_frame_time));
+	save_item(NAME(m_laser_latch));
+	save_item(NAME(m_laser_track_x2));
+	save_item(NAME(m_laser_fdc_status));
+	save_item(NAME(m_laser_fdc_data));
+	save_item(NAME(m_laser_data));
+	save_item(NAME(m_laser_fdc_edge));
+	save_item(NAME(m_laser_fdc_bits));
+	save_item(NAME(m_laser_drive));
+	save_item(NAME(m_laser_fdc_start));
+	save_item(NAME(m_laser_fdc_write));
+	save_item(NAME(m_laser_fdc_offs));
+	save_item(NAME(m_laser_fdc_latch));
+	save_item(NAME(m_level_old));
+	save_item(NAME(m_cassette_bit));
+	save_item(NAME(m_laser_bg_mode));
+	save_item(NAME(m_laser_two_color));
+	save_item(NAME(m_language));
+	save_item(NAME(m_cart_size));
+}
 
 uint8_t vtech2_state::cart_r(offs_t offset)
 {
