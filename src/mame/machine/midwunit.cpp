@@ -64,6 +64,9 @@ uint16_t midwunit_state::midwunit_cmos_r(offs_t offset)
 
 void midwunit_state::midwunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// apply I/O shuffling
+	offset = m_ioshuffle[offset % 16];
+
 	offset %= 8;
 	int oldword = m_iodata[offset];
 	int newword = oldword;
@@ -241,6 +244,7 @@ void midwunit_state::init_nbahangt()
 
 /********************** WWF Wrestlemania **********************/
 
+// note: other game's PCBs probably shuffle I/O addresses too, but only WWF game code usue/require this.
 void midwunit_state::wwfmania_io_0_w(uint16_t data)
 {
 	/* start with the originals */
