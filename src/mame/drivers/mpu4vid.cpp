@@ -243,6 +243,7 @@ public:
 	void bwbvid(machine_config &config);
 	void crmaze(machine_config &config);
 	void bwbvid_oki(machine_config &config);
+	void bwbvid_oki_bt471(machine_config &config);
 	void mating(machine_config &config);
 	void vid_oki(machine_config &config);
 
@@ -315,7 +316,9 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void ic3ss_vid_w(offs_t offset, uint8_t data);
 
+	void bwbvidoki_68k_base_map(address_map &map);
 	void bwbvidoki_68k_map(address_map &map);
+	void bwbvidoki_68k_bt471_map(address_map &map);
 	void bwbvid_68k_map(address_map &map);
 	void mpu4_68k_map_base(address_map &map);
 	void mpu4_68k_map(address_map &map);
@@ -1896,17 +1899,13 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 }
 
-void mpu4vid_state::bwbvidoki_68k_map(address_map &map)
+void mpu4vid_state::bwbvidoki_68k_base_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).mirror(0x000004);
-	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff); //BT RAMDAC on some games?
-	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
-	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
-//  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
-//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
+
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1915,6 +1914,23 @@ void mpu4vid_state::bwbvidoki_68k_map(address_map &map)
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_vid_w)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe05000, 0xe05001).noprw();
+}
+
+void mpu4vid_state::bwbvidoki_68k_map(address_map& map)
+{
+	bwbvidoki_68k_base_map(map);
+
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w)).umask16(0x00ff); //BT RAMDAC on some games?
+	map(0xa00002, 0xa00003).nopr(); // uses a clr instruction on address which generates a dummy read
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w)).umask16(0x00ff);
+}
+
+void mpu4vid_state::bwbvidoki_68k_bt471_map(address_map& map)
+{
+	bwbvidoki_68k_base_map(map);
+
+//  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 }
 
 /* TODO: Fix up MPU4 map*/
@@ -2104,6 +2120,13 @@ void mpu4vid_state::bwbvid_oki(machine_config &config)
 {
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::bwbvidoki_68k_map);
+	vid_oki(config);
+}
+
+void mpu4vid_state::bwbvid_oki_bt471(machine_config &config)
+{
+	mpu4_vid(config);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::bwbvidoki_68k_bt471_map);
 	vid_oki(config);
 }
 
@@ -2530,7 +2553,7 @@ void mpu4vid_state::init_v4big40()
 	
 	// the games write 00 data to palette after startup from an area of RAM that is faded down after the boot screens then never populated again, why?
 	// this crudely unmaps the palette so we can see something
-	m_videocpu->space().unmap_readwrite(0xa00000, 0xafffff);
+	//m_videocpu->space().unmap_readwrite(0xa00000, 0xafffff);
 }
 
 static const bwb_chr_table cybcas_data1[5] = {
@@ -9025,24 +9048,24 @@ GAME(  1996, v4reno5,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_
 
 
 // v4big40 sets  black screen after the initial boot, are they complete?
-GAME(  199?, v4big40,    0,        bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40a,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40b,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40c,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40d,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40e,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40g,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40h,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40k,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40i,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40j,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4big40f,   v4big40,  bwbvid_oki,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key + OCDM) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40,    0,        bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40a,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40b,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40c,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40d,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40e,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40g,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40h,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40k,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40i,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40j,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4big40f,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_v4big40,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key + OCDM) (MPU4 Video)",GAME_FLAGS )
 
 
 // v4dbltak sets  black screen after the initial boot, are they complete?
-GAME(  199?, v4dbltak,   0,        bwbvid_oki, v4dbltak,mpu4vid_state, init_v4big40,     ROT0, "BWB","Double Take (BWB) (Release 4, Arcade Standard) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltaka,  v4dbltak, bwbvid_oki, v4dbltak,mpu4vid_state, init_v4big40,     ROT0, "BWB","Double Take (BWB) (Release 4, Arcade Data) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4dbltakb,  v4dbltak, bwbvid_oki, v4dbltak,mpu4vid_state, init_v4big40,     ROT0, "BWB","Double Take (BWB) (Release 4, S_Site Data + %-Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltak,   0,        bwbvid_oki_bt471, v4dbltak,mpu4vid_state, init_v4big40,     ROT0, "BWB","Double Take (BWB) (Release 4, Arcade Standard) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltaka,  v4dbltak, bwbvid_oki_bt471, v4dbltak,mpu4vid_state, init_v4big40,     ROT0, "BWB","Double Take (BWB) (Release 4, Arcade Data) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4dbltakb,  v4dbltak, bwbvid_oki_bt471, v4dbltak,mpu4vid_state, init_v4big40,     ROT0, "BWB","Double Take (BWB) (Release 4, S_Site Data + %-Key) (MPU4 Video)",GAME_FLAGS )
 
 
 GAME(  199?, v4gldrsh,   0,        bwbvid,     v4reno,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Gold Rush (BWB) (Release 8, 20p Fixed, All - Cash) (set 1) (MPU4 Video)",GAME_FLAGS )
