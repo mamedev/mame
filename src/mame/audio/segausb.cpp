@@ -285,6 +285,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x02:  // 8253 U41
 		case 0x03:  // 8253 U41
 #if (SEGAUSB_FAKE_8253)
+			if ((offset & 3) == 2) printf("%s: 0.2 count=%d\n", machine().scheduler().time().as_string(), data);
 			m_pit_state[0].write(offset & 3, data, *m_nl_pit0_hp0, *m_nl_pit0_hp1, *m_nl_pit0_hp2_on, *m_nl_pit0_hp2_off);
 #else
 			m_pit[0]->write(offset & 3, data);
@@ -306,6 +307,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x0a:  // 8253 U42
 		case 0x0b:  // 8253 U42
 #if (SEGAUSB_FAKE_8253)
+			if ((offset & 3) == 2) printf("%s: 1.2 count=%d\n", machine().scheduler().time().as_string(), data);
 			m_pit_state[1].write(offset & 3, data, *m_nl_pit1_hp0, *m_nl_pit1_hp1, *m_nl_pit1_hp2_on, *m_nl_pit1_hp2_off);
 #else
 			m_pit[1]->write(offset & 3, data);
@@ -327,8 +329,11 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x12:  // 8253 U43
 		case 0x13:  // 8253 U43
 #if (SEGAUSB_FAKE_8253)
+			if ((offset & 3) == 2) printf("%s: 2.2 count=%d\n", machine().scheduler().time().as_string(), data);
 			m_pit_state[2].write(offset & 3, data, *m_nl_pit2_hp0, *m_nl_pit2_hp1, *m_nl_pit2_hp2_on, *m_nl_pit2_hp2_off);
 #else
+			if ((offset & 3) == 2)
+				printf("%s: 2.2 count=%d\n", machine().scheduler().time().as_string(), data);
 			m_pit[2]->write(offset & 3, data);
 #endif
 			break;
@@ -344,6 +349,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 			break;
 	}
 }
+
 
 
 /*************************************
@@ -417,7 +423,7 @@ void usb_sound_device::pit_state::write(u8 offset, u8 data, netlist_mame_analog_
 			hp0.write(hp);
 		else
 			hp1.write(hp);
-		printf("HP[%d] = %f\n", which, hp);
+//		printf("HP[%d] = %f\n", which, hp);
 	}
 	else if (thismode == 1 && which == 2)
 	{
@@ -440,10 +446,12 @@ void usb_sound_device::pit_state::write(u8 offset, u8 data, netlist_mame_analog_
 
 TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::gos_timer )
 {
-	m_gos_clock ^= 1;
-	m_pit[0]->write_gate2(m_gos_clock);
-	m_pit[1]->write_gate2(m_gos_clock);
-	m_pit[2]->write_gate2(m_gos_clock);
+	m_pit[0]->write_gate2(0);
+	m_pit[1]->write_gate2(0);
+	m_pit[2]->write_gate2(0);
+	m_pit[0]->write_gate2(1);
+	m_pit[1]->write_gate2(1);
+	m_pit[2]->write_gate2(1);
 }
 
 #endif
@@ -466,7 +474,7 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 
 #if (!SEGAUSB_FAKE_8253)
 	TIMER(config, "gos_timer", 0).configure_periodic(
-			FUNC(usb_sound_device::gos_timer), attotime::from_hz(USB_GOS_CLOCK*2));
+			FUNC(usb_sound_device::gos_timer), attotime::from_hz(USB_GOS_CLOCK));
 #endif
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
