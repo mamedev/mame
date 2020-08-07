@@ -261,8 +261,8 @@ public:
 	void init_skiltrek();
 	void init_crmaze3();
 	void init_cybcas();
+	void init_v4frfact();
 	void init_bwbhack();
-
 private:
 	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
@@ -2482,6 +2482,11 @@ void mpu4vid_state::init_quidgrid()
 	m_current_chr_table = quidgrid_data;
 }
 
+void mpu4vid_state::init_v4frfact()
+{
+	mpu4vid_char_cheat(0x4f6);
+}
+
 void mpu4vid_state::hack_bwb_startup_protection()
 {
 	// there's no checksum that we need to fix after this
@@ -2513,6 +2518,7 @@ void mpu4vid_state::hack_bwb_startup_protection()
 		}
 	}
 }
+
 
 
 void mpu4vid_state::init_prizeinv()
@@ -8822,29 +8828,29 @@ GAME(  199?, v4vgpok,    0,        bwbvid,     v4vgpok,    mpu4vid_state, init_b
 
 GAME(  199?, v4redhtp,   0,        bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpk,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpl,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpm,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpo,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpp,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpq,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpl,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpp,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpm,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpo,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpq,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpn,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, % Key) (set 1)  (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpr,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Fixed, Cash+Token, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtps,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpx,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpt,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpu,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpw,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpy,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpz,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpt,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpy,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpu,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpw,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpz,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpv,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpaa, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 20p Switchable to 10p, Cash+Token, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpb,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpg,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpc,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpd,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpf,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtpi,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4redhtph,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpc,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 1, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtph,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 2, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpd,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpf,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4redhtpi,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpe,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpj,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fixed, Cash+Token, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4redhtpab, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 3, 10p Fxed, All-Cash) (MPU4 Video)",GAME_FLAGS )
@@ -8854,10 +8860,10 @@ GAME(  199?, v4redhtparc,v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwb
 // release 2 68k ROMs
 GAME(  1993, v4redhtp2,  v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copyright, 5p Fixed, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  1993, v4redhtp2a, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1993, v4redhtp2b, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1993, v4redhtp2c, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1993, v4redhtp2e, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  1993, v4redhtp2f, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  1993, v4redhtp2b, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1993, v4redhtp2e, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1993, v4redhtp2c, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1993, v4redhtp2f, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  1993, v4redhtp2d, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  1993, v4redhtp2g, v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Poker (Release 2, 1993 copryight, 5p Fixed, Cash+Token, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )
 // this is older despite still being 'release 2'
@@ -8867,33 +8873,33 @@ GAME(  199?, v4redhtpunk,v4redhtp, bwbvid,     v4redhtp, mpu4vid_state, init_bwb
 
 
 GAME(  199?, v4bubbnk,   0,        bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bubbnkb,  v4bubbnk, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bubbnkc,  v4bubbnk, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bubbnkb,  v4bubbnk, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bubbnkc,  v4bubbnk, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, Cash+Token, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bubbnkd,  v4bubbnk, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bubbnka,  v4bubbnk, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Bubbly Bonk (v4.0?) (20p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
 
 
 GAME(  199?, v4ovrmn3,   0,        bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, Cash+Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3a,  v4ovrmn3, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4ovrmn3b,  v4ovrmn3, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3a,  v4ovrmn3, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4ovrmn3b,  v4ovrmn3, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, Cash+Token, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4ovrmn3c,  v4ovrmn3, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4ovrmn3d,  v4ovrmn3, bwbvid,     v4bubbnk, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Over Moon Pt3 (BWB) (20p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
 
 
-GAME(  199?, v4mazbel,   0,        bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v2.5 DY, S/Site, Cash+Token, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4mazbel15, v4mazbel, bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4mazbel15a,v4mazbel, bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbel,   0,        bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v2.5 DY, S/Site, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbel15, v4mazbel, bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5, Arcade, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4mazbel15a,v4mazbel, bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Mazooma Belle (v1.5 DY, Arcade, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 
 
 GAME(  199?, v4rhmaz,    0,        bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4rhmaza,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 10p Fixed, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmaza,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 10p Fixed, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4rhmazb,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 10p Fixed, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4rhmazc,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Fixed) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4rhmazd,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS ) // B
-GAME(  199?, v4rhmaze,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS ) // BL
+GAME(  199?, v4rhmazd,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed, Datapak, % Key) (set 1) (MPU4 Video)",GAME_FLAGS ) // B   (Data Port failure on first boot?)
+GAME(  199?, v4rhmaze,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed, Datapak, % Key) (set 2) (MPU4 Video)",GAME_FLAGS ) // BL  (Data Port failure on first boot?)
 GAME(  199?, v4rhmazf,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4rhmazg,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4rhmazh,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Switchable to 10p, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4rhmazh,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Switchable to 10p, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4rhmazi,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Switchable to 10p, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4rhmazj,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 20p Switchable to 10p, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4rhmazk,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Red Hot Mazooma Belle (BWB) (Version 1.4 C, Cash+Token, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS )
@@ -8901,17 +8907,17 @@ GAME(  199?, v4rhmazk,   v4rhmaz,  bwbvid,     v4mazbel, mpu4vid_state, init_bwb
 
 GAME(  199?, v4shpwnd,   0,        bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4shpwndi,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwnde,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwndf,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwndh,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwnde,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwndf,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwndh,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4shpwndg,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Fixed, Cash + Special BWB Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4shpwnda,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 10p Fixed, Cash + Special BWB Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwndb,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 10p Fixed, Cash + Special BWB Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwndc,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 10p Fixed, Cash + Special BWB Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwndb,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 10p Fixed, Cash + Special BWB Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwndc,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 10p Fixed, Cash + Special BWB Token, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4shpwndd,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 10p Fixed, Cash + Special BWB Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4shpwndj,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Switchable to 10p, Cash + Special BWB Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwndk,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Switchable to 10p, Cash + Special BWB Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4shpwndl,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Switchable to 10p, Cash + Special BWB Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwndk,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Switchable to 10p, Cash + Special BWB Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4shpwndl,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Switchable to 10p, Cash + Special BWB Token, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4shpwndm,  v4shpwnd, bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB","Shop Window (v2.0) (Release 2, 20p Switchable to 10p, Cash + Special BWB Token, % Key) (MPU4 Video)",GAME_FLAGS )
 
 
@@ -8920,11 +8926,11 @@ GAME(  199?, v4sixxa,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwb
 GAME(  199?, v4sixxe,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, Cash+Token) (set 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxb,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxd,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sixxf,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sixxf,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxc,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxg,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sixxh,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sixxi,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sixxh,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sixxi,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxj,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxk,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Fixed, All - Cash) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sixxl,    v4sixx,   bwbvid,     v4shpwnd, mpu4vid_state, init_bwbhack,     ROT0, "BWB",u8"£6-X (BWB) (Release 3, 20p Switchable to 10p, All - Cash) (MPU4 Video)",GAME_FLAGS )
@@ -8935,17 +8941,17 @@ GAME(  199?, v4cshinf,   0,        bwbvid,     v4cshinf,  mpu4vid_state, init_bw
 GAME(  199?, v4cshinfd,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfg,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token) (set 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfe,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfi,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfk,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfk,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfi,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfh,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinff,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfj,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinff,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfj,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, Showcase, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfl,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Fixed, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfm,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfr,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfo,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfp,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4cshinfs,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfp,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfs,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cshinfo,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Datapak, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfn,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, Showcase) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfq,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, Cash+Token, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4cshinfu,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 4, 20p Switchable 20p/10p/5p, All - Cash) (MPU4 Video)",GAME_FLAGS )
@@ -8957,24 +8963,25 @@ GAME(  199?, v4cshinf3,  v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bw
 GAME(  199?, v4cshinf3a, v4cshinf, bwbvid,     v4cshinf,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Cash Inferno (BWB) (Release 3) (set 2) (MPU4 Video)",GAME_FLAGS )
 
 
+
 // the onscreen 'version' display doesn't quite align with the labels, 'DY' seems to be represented as 'B' on the labels, rather than the individual flags?
 // the labels seem closer to the Barcrest standard used on MPU4 fruit machines
 // gfx look wrong in test mode, uses BT chip?
 GAME(  199?, v4sunbst,   0,        bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4sunbsta,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sunbsta,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 10p Fixed, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstb,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash + Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstc,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 10p Fixed) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstd,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstk,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Fixed) (set 2) (MPU4 Video)",GAME_FLAGS ) // BT
-GAME(  199?, v4sunbste,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed) (set 1) (MPU4 Video)",GAME_FLAGS )  // B
-GAME(  199?, v4sunbstf,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed) (set 2) (MPU4 Video)",GAME_FLAGS )  // BL
+GAME(  199?, v4sunbste,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed, % Key) (set 1) (MPU4 Video)",GAME_FLAGS )  // B
+GAME(  199?, v4sunbstf,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Fixed, % Key) (set 2) (MPU4 Video)",GAME_FLAGS )  // BL
 GAME(  199?, v4sunbstg,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed) (set 1) (MPU4 Video)",GAME_FLAGS ) // D
 GAME(  199?, v4sunbsth,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed) (set 2) (MPU4 Video)",GAME_FLAGS ) // DL
 GAME(  199?, v4sunbsti,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 20p Fixed, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstj,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Fixed) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstl,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Switchable to 10p) (set 1) (MPU4 Video)",GAME_FLAGS ) // XC
 GAME(  199?, v4sunbstm,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4, Cash+Token, 1993 Awards, 20p Switchable to 10p) (set 2) (MPU4 Video)",GAME_FLAGS ) // XC L
-GAME(  199?, v4sunbstn,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4sunbstn,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 DY, Cash+Token, 1993 Awards, 20p Switchable to 10p, % Key) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbsto,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Switchable to 10p (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstp,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 D, Cash+Token, 1993 Awards, 20p Switchable to 10p) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4sunbstq,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Sunburst (BWB) (Version 1.4 Y, Cash+Token, 1993 Awards, 20p Switchable to 10p, % Key) (MPU4 Video)",GAME_FLAGS )
@@ -8987,7 +8994,7 @@ GAME(  199?, v4sunbstu,  v4sunbst, bwbvid,     v4cshinf,   mpu4vid_state, init_b
 GAME(  199?, v4bigfrt,   0,        bwbvid,     v4bigfrt,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bigfrta,  v4bigfrt, bwbvid,     v4bigfrt,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bigfrtb,  v4bigfrt, bwbvid,     v4bigfrt,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4bigfrtc,  v4bigfrt, bwbvid,     v4bigfrt,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4bigfrtc,  v4bigfrt, bwbvid,     v4bigfrt,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big Fruits (v2.0?) (% Key) (MPU4 Video)",GAME_FLAGS )
 
 
 //gfx look wrong in test mode, uses BT chip?
@@ -8999,7 +9006,7 @@ GAME(  1996, v4renoi,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_
 GAME(  1996, v4renol,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (set 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4renoc,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Datapak) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4renog,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Datapak) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4renok,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Datapak) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4renok,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Datapak) (set 3) (MPU4 Video)",GAME_FLAGS ) // gives a Data Port error first itme?
 GAME(  1996, v4renod,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Showcase) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4renoh,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Showcase) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4renof,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release A, 20p Fixed, Cash+Token) (Showcase) (set 1) (Datapak) (MPU4 Video)",GAME_FLAGS )
@@ -9193,13 +9200,13 @@ GAME(  199?, v4rencasi,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 /* Uncertain BIOS */
 // has a Barcrest style Characteriser check, not a BWB one?
-GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacta,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactb,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactc,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactd,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacte,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_bwbhack,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacta,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactb,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactc,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactd,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacte,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BWB video in the BIOS rom tho */
