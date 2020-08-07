@@ -982,6 +982,8 @@ function createProjects_mame_arcade(_target, _subtarget)
 
 createMAMEProjects(_target, _subtarget, "shared")
 files {
+	MAME_DIR .. "src/mame/machine/bacta_datalogger.h",
+	MAME_DIR .. "src/mame/machine/bacta_datalogger.cpp",
 	MAME_DIR .. "src/mame/machine/nmk112.cpp",
 	MAME_DIR .. "src/mame/machine/nmk112.h",
 	MAME_DIR .. "src/mame/machine/pcshare.cpp",
@@ -1408,8 +1410,6 @@ files {
 
 createMAMEProjects(_target, _subtarget, "barcrest")
 files {
-	MAME_DIR .. "src/mame/machine/bacta_datalogger.h",
-	MAME_DIR .. "src/mame/machine/bacta_datalogger.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu2.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu3.cpp",
 	MAME_DIR .. "src/mame/machine/mpu4.cpp",

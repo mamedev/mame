@@ -35,7 +35,6 @@ private:
 	void queue();
 
 	devcb_write_line m_rxd_handler;
-
 	uint8_t m_output_char;
 	emu_timer *m_timer_poll;
 };

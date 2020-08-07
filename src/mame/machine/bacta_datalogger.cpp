@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER(bacta_datalogger_device::update_serial)
 
 	set_rcv_rate(1200);
 
-	output_rxd(1);
+//	output_rxd(1);
 }
 
 void bacta_datalogger_device::device_reset()
@@ -114,26 +114,108 @@ void bacta_datalogger_device::rcv_complete()
 	data = get_received_char();
 	if (!is_receive_parity_error())
 	{
-		if (data == 0x00)//clean up logging
+		if (data != 0x00)
 		{
 			if (LOG_DATA) 
 			{
-				logerror("Received: %02x () \n",data);
+				switch (data)
+				{
+					case 0x01:
+						logerror("(%c) Prize 1 vend or 0x01\n",data);
+						break;
+					case 0x02:
+						logerror("(%c) Prize 2 vend or 0x02\n",data);
+						break;
+					case 0x03:
+						logerror("(%c) Prize 3 vend or 0x03\n",data);
+						break;
+					case 0x04:
+						logerror("(%c) Prize 4 vend or 0x04\n",data);
+						break;
+					case 0x05:
+						logerror("(%c) Remote Credit or 0x05\n",data);
+						break;
+					case 0x07:
+						logerror("(%c) Idle or 0x07\n",data);
+						break;
+					case 0x08:
+						logerror("(%c) Change or 0x08\n",data);
+						break;
+					case 0x09:
+					case 0x0a:
+					case 0x0b:
+					case 0x0c:
+					case 0x0d:
+					case 0x0e:
+					case 0x0f:
+						logerror("(%c) User defined message or 0x%x\n",data,data);
+						break;
+					case 0x2b:
+						logerror("(%c) Cashbox door open 0x2b\n",data);
+					case 0x2c:
+						logerror("(%c) Cashbox door closed 0x2c\n",data);
+					case 0x2d:
+						logerror("(%c) Service door open 0x2d\n",data);
+					case 0x2e:
+						logerror("(%c) Service door closed 0x2e\n",data);
+					case 0x61:
+						logerror("(%c) Coin Tube / Hopper Levels 0x61 \n",data);
+						break;
+					case 0x62:
+						logerror("(%c) Secondary message (0x%x), next byte is message length\n",data,data);
+						break;
+					case 0x63:
+						logerror("(%c) Critical Fault 0x63\n",data);
+						break;
+					case 0x64:
+						logerror("(%c) Non Critical Fault 0x64\n",data);
+						break;
+					case 0x65:
+						logerror("(%c) Manufacturer Message Header 0x65, next byte is message length\n",data);
+						break;
+					case 0x66:
+						logerror("(%c) Potential Parameter Data request 0x66, not currently supported\n",data);
+						break;
+					case 0x67:
+						logerror("(%c) Potential Parameter Report request 0x67, not currently supported\n",data);
+						break;
+					case 0x68:
+						logerror("(%c) Multi-Stake Multi-Game message 0x68\n",data);
+						break;
+					case 0x69:
+						logerror("(%c) Cashless source 0x69\n",data);
+						break;
+					case 0x70:
+					case 0x71:
+					case 0x72:
+					case 0x73:
+					case 0x74:
+					case 0x75:
+					case 0x76:
+					case 0x77:
+					case 0x78:
+					case 0x79:
+					case 0x7a:
+					case 0x7b:
+					case 0x7c:
+					case 0x7d:
+					case 0x7e:
+					case 0x7f:
+						logerror("(%c) User defined message (0x%x), next byte is message length\n",data,data);
+						break;
+					
+					default:
+						logerror("(%c) Received: %02x\n",data, data);
+						break;
+				}
+				m_output_char = 0x06;//ACK
+				queue();
 			}
-		
 		}
-		else 
-		{
-			if (LOG_DATA) 
-			{
-				logerror("Received: %02x (%c) \n",data, data);
-			}
-		}
-		m_output_char = 0x06;//ACK
 	}
 	else
 	{
 		m_output_char = 0x15;//NAK
+		queue();
 	}
-	queue();
 }
