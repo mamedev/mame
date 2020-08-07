@@ -16,7 +16,9 @@ Note: To start a game, certain switches need to be activated.  You must first pr
       hold one of the trough switches (usually the left) and the ball shooter switch for
       about 1 second.  Then you are able to start a game.
       For Pinbot, you must hold L and V for a second, then press start.
-      For Millionaire, you must hold [ and ] for a second, then start.
+      For Millionaire, you must hold [ and ] for a second, then press start.
+      For Fire!, you must hold U, I, O for a second, then press start.
+      For F-14, unknown. It seems likely it would be D, F, G, H, or D, F, G but this doesn't seem to work. The machine may be EXTREMELY picky about seeing all 4 balls pass the 4 trough sensors in the expected order before it thinks they are present
 
 *****************************************************************************************/
 

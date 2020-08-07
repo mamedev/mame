@@ -13,6 +13,11 @@
       or a code bug which is hit if the motor drawbridge limit sensors are not working/emulated, as in MAME.
       Proximate cause is smashing the stack, after which the RTS at 61DE (in bk2k_l4)
       transfers to 0000 (where no valid code exists).
+      This may or may not be an original game bug if the game is started if the
+      coin door is left open (hence the memory protect switch is left disengaged.
+      We do not currently emulate the memory protect function to write protect
+      the ram at 0x780-0x7ff, so it is possible that the protection being
+      active prevents the real machine from crashing)
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
     - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567) which has to be emulated
     - Taxi and Police Force both have issues with the display showing garbage overlaid by the alphanumerics.

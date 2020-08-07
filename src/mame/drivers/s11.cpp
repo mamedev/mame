@@ -9,10 +9,14 @@
 
 
 ToDo:
-- Can coin up but not start
+- tic-tac-strike belongs in s11a.cpp
+- gold mine belongs in s11b.cpp
+- top dawg belongs in s11b.cpp
+- shuffle inn belongs in s11b.cpp
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
-    - Road Kings: press 'Up' (the direction key) and Q, and press "1" after inserting 1 or more credits.
+    - Grand Lizard: Press S, D, F, and press "1" after inserting 1 or more credits.
+    - Road Kings: press 'Up' (the direction key) and 'Delete', and press "1" after inserting 1 or more credits.
     - High Speed: press D (ball trough center), F (ball trough lower right) and Enter (Ball Shooter) after inserting 1 or more credits.
 
 *****************************************************************************************/
