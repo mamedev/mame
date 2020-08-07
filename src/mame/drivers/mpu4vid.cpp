@@ -9355,7 +9355,7 @@ GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4f
 
 GAME(  199?, v4cybcas,   0,        bwbvid_oki,    mpu4,     mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
+GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
 
-GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    mpu4,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Piccadilly Nights (Nova, German) (MPU4 Video)",GAME_FLAGS )  // different hardware type? extra ram on mpu4 side?
+GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "Nova","Piccadilly Nights (Nova, German) (MPU4 Video)",GAME_FLAGS )  // different hardware type? extra ram on mpu4 side?
 
