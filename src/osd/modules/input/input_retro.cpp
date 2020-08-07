@@ -294,7 +294,7 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "mvsc") ||
               !core_stricmp(machine.system().name, "nwarr") ||
               !core_stricmp(machine.system().parent, "nwarr") ||
-	      !core_stricmp(machine.system().name, "redearth") ||
+              !core_stricmp(machine.system().name, "redearth") ||
               !core_stricmp(machine.system().parent, "redearth") ||
               !core_stricmp(machine.system().name, "rvschool") ||
               !core_stricmp(machine.system().parent, "rvschool") ||
@@ -332,7 +332,7 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "ssf2") ||
               !core_stricmp(machine.system().name, "ssf2t") ||
               !core_stricmp(machine.system().parent, "ssf2t") ||
-	      !core_stricmp(machine.system().name, "vhunt2") ||
+              !core_stricmp(machine.system().name, "vhunt2") ||
               !core_stricmp(machine.system().parent, "vhunt2") ||
               !core_stricmp(machine.system().name, "vsav") ||
               !core_stricmp(machine.system().parent, "vsav") ||
@@ -342,22 +342,22 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "xmcota") ||
               !core_stricmp(machine.system().name, "xmvsf") ||
               !core_stricmp(machine.system().parent, "xmvsf")
-	   
-	      !core_stricmp(machine.system().name, "astrass") ||
+              
+              !core_stricmp(machine.system().name, "astrass") ||
               !core_stricmp(machine.system().parent, "astrass") ||
-	      !core_stricmp(machine.system().name, "brival") ||
+              !core_stricmp(machine.system().name, "brival") ||
               !core_stricmp(machine.system().parent, "brival") ||
-	      !core_stricmp(machine.system().name, "btlkroad") ||
+              !core_stricmp(machine.system().name, "btlkroad") ||
               !core_stricmp(machine.system().parent, "btlkroad") ||
-	      !core_stricmp(machine.system().name, "dragoona") ||
+              !core_stricmp(machine.system().name, "dragoona") ||
               !core_stricmp(machine.system().parent, "dragoona") ||
-	      !core_stricmp(machine.system().name, "fghthist") ||
+              !core_stricmp(machine.system().name, "fghthist") ||
               !core_stricmp(machine.system().parent, "fghthist") ||
-	      !core_stricmp(machine.system().name, "fgtlayer") ||
+              !core_stricmp(machine.system().name, "fgtlayer") ||
               !core_stricmp(machine.system().parent, "fgtlayer") ||
-	      !core_stricmp(machine.system().name, "groovef") ||
+              !core_stricmp(machine.system().name, "groovef") ||
               !core_stricmp(machine.system().parent, "groovef") ||
-	      !core_stricmp(machine.system().name, "kaiserkn") ||
+              !core_stricmp(machine.system().name, "kaiserkn") ||
               !core_stricmp(machine.system().parent, "kaiserkn") ||
            )
    {
