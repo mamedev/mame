@@ -406,8 +406,11 @@ uint16_t spg2xx_io_device::io_r(offs_t offset)
 	switch (offset)
 	{
 	case REG_IOA_DATA: case REG_IOB_DATA: case REG_IOC_DATA:
-		do_gpio(offset, false);
-		LOGMASKED(LOG_GPIO, "%s: io_r: %s %c = %04x\n", machine().describe_context(), gpioregs[(offset - REG_IOA_DATA) % 5], gpioports[(offset - REG_IOA_DATA) / 5], m_io_regs[offset]);
+		if (!machine().side_effects_disabled())
+		{
+			do_gpio(offset, false);
+			LOGMASKED(LOG_GPIO, "%s: io_r: %s %c = %04x\n", machine().describe_context(), gpioregs[(offset - REG_IOA_DATA) % 5], gpioports[(offset - REG_IOA_DATA) / 5], m_io_regs[offset]);
+		}
 		val = m_io_regs[offset];
 		break;
 
@@ -455,15 +458,16 @@ uint16_t spg2xx_io_device::io_r(offs_t offset)
 		break;
 
 	case REG_ADC_DATA:
-	{
-		const uint16_t old = IO_IRQ_STATUS;
-		IO_IRQ_STATUS &= ~0x2000;
-		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-		if (changed)
-			check_irqs(changed);
-		LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
+		if (!machine().side_effects_disabled())
+		{
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS &= ~0x2000;
+			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+			if (changed)
+				check_irqs(changed);
+			LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
+		}
 		break;
-	}
 
 	case REG_WAKEUP_SOURCE:
 		LOGMASKED(LOG_IO_READS, "%s: io_r: Wakeup Source = %04x\n", machine().describe_context(), val);
@@ -475,10 +479,14 @@ uint16_t spg2xx_io_device::io_r(offs_t offset)
 		break;
 
 	case REG_PRNG1:
-		return clock_rng(0);
+		if (!machine().side_effects_disabled())
+			return clock_rng(0);
+		return m_io_regs[REG_PRNG1];
 
 	case REG_PRNG2:
-		return clock_rng(1);
+		if (!machine().side_effects_disabled())
+			return clock_rng(1);
+		return m_io_regs[REG_PRNG2];
 
 	case REG_FIQ_SEL:
 		LOGMASKED(LOG_FIQ, "%s: io_r: FIQ Source Select = %04x\n", machine().describe_context(), val);
@@ -516,40 +524,43 @@ uint16_t spg2xx_io_device::io_extended_r(offs_t offset)
 		break;
 
 	case REG_UART_RXBUF:
-		if (m_uart_rx_available)
+		if (!machine().side_effects_disabled())
 		{
-			m_io_regs[REG_UART_STATUS] &= ~0x0081;
-			LOGMASKED(LOG_UART, "UART Rx data is available, clearing bits\n");
-			if (m_uart_rx_fifo_count)
+			if (m_uart_rx_available)
 			{
-				LOGMASKED(LOG_UART, "%s: Remaining count %d, value %02x\n", machine().describe_context(), m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
-				m_io_regs[REG_UART_RXBUF] = m_uart_rx_fifo[m_uart_rx_fifo_start];
-				val = m_io_regs[REG_UART_RXBUF];
-				m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
-				m_uart_rx_fifo_count--;
-
-				if (m_uart_rx_fifo_count == 0)
+				m_io_regs[REG_UART_STATUS] &= ~0x0081;
+				LOGMASKED(LOG_UART, "UART Rx data is available, clearing bits\n");
+				if (m_uart_rx_fifo_count)
 				{
-					m_uart_rx_available = false;
+					LOGMASKED(LOG_UART, "%s: Remaining count %d, value %02x\n", machine().describe_context(), m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
+					m_io_regs[REG_UART_RXBUF] = m_uart_rx_fifo[m_uart_rx_fifo_start];
+					val = m_io_regs[REG_UART_RXBUF];
+					m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+					m_uart_rx_fifo_count--;
+
+					if (m_uart_rx_fifo_count == 0)
+					{
+						m_uart_rx_available = false;
+					}
+					else
+					{
+						LOGMASKED(LOG_UART, "Remaining count %d, setting up timer\n", m_uart_rx_fifo_count);
+						//uart_receive_tick();
+						if (m_uart_rx_timer->remaining() == attotime::never)
+							m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[REG_UART_CTRL], 5) ? 11 : 10, m_uart_baud_rate));
+					}
 				}
 				else
 				{
-					LOGMASKED(LOG_UART, "Remaining count %d, setting up timer\n", m_uart_rx_fifo_count);
-					//uart_receive_tick();
-					if (m_uart_rx_timer->remaining() == attotime::never)
-						m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[REG_UART_CTRL], 5) ? 11 : 10, m_uart_baud_rate));
+					m_uart_rx_available = false;
 				}
 			}
 			else
 			{
-				m_uart_rx_available = false;
+				m_io_regs[REG_UART_RXFIFO] |= 0x2000;
 			}
+			LOGMASKED(LOG_UART, "%s: io_r: UART Rx Data = %04x\n", machine().describe_context(), val);
 		}
-		else
-		{
-			m_io_regs[REG_UART_RXFIFO] |= 0x2000;
-		}
-		LOGMASKED(LOG_UART, "%s: io_r: UART Rx Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_UART_RXFIFO:
@@ -576,7 +587,7 @@ uint16_t spg2xx_io_device::io_extended_r(offs_t offset)
 
 	case REG_SPI_RXDATA:
 		LOGMASKED(LOG_SPI, "%s: io_r: SPI Rx Data = %04x, FIFO count %d\n", machine().describe_context(), val, m_spi_rx_fifo_count);
-		if (m_spi_rx_fifo_count > 0)
+		if (m_spi_rx_fifo_count > 0 && !machine().side_effects_disabled())
 		{
 			m_spi_rx_fifo_count--;
 			if (m_spi_rx_fifo_count > 0)
@@ -608,7 +619,7 @@ uint16_t spg2xx_io_device::io_extended_r(offs_t offset)
 
 	case REG_SIO_DATA:
 		LOGMASKED(LOG_SIO, "%s: io_r: SIO Data = %04x\n", machine().describe_context(), val);
-		if ((m_io_regs[REG_SIO_STATUS] & 0x8000) && !m_sio_writing)
+		if ((m_io_regs[REG_SIO_STATUS] & 0x8000) && !m_sio_writing && !machine().side_effects_disabled())
 		{
 			m_sio_bits_remaining--;
 			if (m_sio_bits_remaining == 0)
