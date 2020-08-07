@@ -36,6 +36,10 @@ public:
 
 	auto gpio0_write() { return m_gpio0_w.bind(); }
 	auto gpio0_read() { return m_gpio0_r.bind(); }
+	auto gpio1_write() { return m_gpio1_w.bind(); }
+	auto gpio1_read() { return m_gpio1_r.bind(); }
+	auto gpio2_write() { return m_gpio2_w.bind(); }
+	auto gpio2_read() { return m_gpio2_r.bind(); }
 
 	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
