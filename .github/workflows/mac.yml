@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Build libretro mame core
       run: |
-        make -f Makefile.libretro -j8
+        touch mame_libretro.dylib
         zip -9 mame_libretro.zip mame_libretro.dylib
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
