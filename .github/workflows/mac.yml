@@ -53,4 +53,4 @@ jobs:
         source: mame_libretro.zip
         target: ${{ secrets.MACOS_X86_64_PATH }}
         overwrite: true
-        tar_tmp_path: /tmp
+        tar_tmp_path: .
