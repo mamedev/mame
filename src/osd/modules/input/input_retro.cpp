@@ -192,10 +192,12 @@ void Input_Binding(running_machine &machine)
          !core_stricmp(machine.system().name, "tekken")    ||
          !core_stricmp(machine.system().parent, "tekken")  ||
          !core_stricmp(machine.system().name, "tekken2")   ||
-         !core_stricmp(machine.system().parent, "tekken2")
+         !core_stricmp(machine.system().parent, "tekken2")   ||
+         !core_stricmp(machine.system().name, "vf")   ||
+         !core_stricmp(machine.system().parent, "vf")
       )
    {
-      /* Tekken 1/2 */
+      /* Tekken 1/2/Virtua Fighter*/
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
@@ -231,21 +233,6 @@ void Input_Binding(running_machine &machine)
       Buttons_mapping[0]=RETROPAD_B;
       Buttons_mapping[1]=RETROPAD_Y;
       Buttons_mapping[2]=RETROPAD_X;
-      Buttons_mapping[3]=RETROPAD_A;
-      Buttons_mapping[4]=RETROPAD_L;
-      Buttons_mapping[5]=RETROPAD_R;
-
-   }
-   else if (
-              !core_stricmp(machine.system().name, "vf") ||
-              !core_stricmp(machine.system().parent, "vf")
-           )
-   {
-      /* Virtua Fighter */
-
-      Buttons_mapping[0]=RETROPAD_Y;
-      Buttons_mapping[1]=RETROPAD_X;
-      Buttons_mapping[2]=RETROPAD_B;
       Buttons_mapping[3]=RETROPAD_A;
       Buttons_mapping[4]=RETROPAD_L;
       Buttons_mapping[5]=RETROPAD_R;
