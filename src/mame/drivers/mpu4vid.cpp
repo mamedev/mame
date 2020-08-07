@@ -1502,6 +1502,7 @@ static INPUT_PORTS_START( v4dbltak )
 	PORT_CONFSETTING(    0x0d, "Invalid (70 GBP)"  )
 	PORT_CONFSETTING(    0x0e, "Invalid (Reserved 0e)"  )
 	PORT_CONFSETTING(    0x0f, "Invalid (Reserved 0f)"  )
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED) // % Key not used
 
 	PORT_MODIFY("BLACK1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Swop")
