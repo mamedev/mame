@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
+
 #ifndef MAME_INCLUDES_TRUCO_H
 #define MAME_INCLUDES_TRUCO_H
 

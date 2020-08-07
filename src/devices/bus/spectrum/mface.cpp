@@ -381,11 +381,6 @@ uint8_t spectrum_mprint_device::iorq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_mface_base_device::iorq_w(offs_t offset, uint8_t data)
-{
-	m_exp->iorq_w(offset, data);
-}
-
 void spectrum_mface1_device::iorq_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0xff)

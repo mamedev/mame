@@ -3606,8 +3606,10 @@ void metro_state::vmetal(machine_config &config)
 
 	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
-	m_vdp2->set_tmap_xoffsets(-16,-16,-16);
-	m_vdp2->set_tmap_yoffsets(-16,-16,-16);
+	m_vdp2->set_tmap_xoffsets(0,0,0);
+	m_vdp2->set_tmap_yoffsets(0,0,0);
+	m_vdp2->set_tmap_flip_xoffsets(16,16,16);
+	m_vdp2->set_tmap_flip_yoffsets(16,16,16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

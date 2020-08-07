@@ -396,7 +396,7 @@ ROM_START( tkmag220 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "u1g-2a.u2", 0x0000000, 0x8000000, BAD_DUMP CRC(0fd769a1) SHA1(df19402bcd20075483d63fb98fb3fa42bd33ccfd) ) // several sections of ROM appear to be erased, and fails ROM test, some games have missing graphics pulling from those areas, others crash due to missing code
+	ROM_LOAD16_WORD_SWAP( "taikee220.bin", 0x0000000, 0x8000000, CRC(02881534) SHA1(a0e0c9cfa3a6b1c6107f06abd3268b82bd663d06) )
 ROM_END
 
 
@@ -405,7 +405,7 @@ ROM_START( myac220 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // again several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
+	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
 ROM_END
 
 void tkmag220_game_state::tkmag220(machine_config &config)
@@ -468,10 +468,8 @@ void gormiti_game_state::machine_reset()
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-// This is a port of the 'Family Sport' games to GPL16250 type hardware, but it doesn't seem to use any unSP 2.0 instructions.
+// These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
-// do "go A1595" then "r1 = 0" in debugger to show menu, controls not yet working (which might be why it drops to test mode by default) will need banking hookup later.
-// This could be useful for figuring out how the sound registers have been remapped when compared to spg2xx
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
 CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -40,8 +40,8 @@ retf_imp
 	prefetch();
 
 brk_xav_imp
-	// there is code in soem games to indicate this doesn't always push the far bank to the stack..
-	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	// there is code in some games to indicate this doesn't always push the far bank to the stack..
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
 		read_pc_noinc();
 	} else {
@@ -56,7 +56,7 @@ brk_xav_imp
 	dec_SP();
 	write_stack(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
-	if(nmi_state) {
+	if(nmi_pending) {
 		if (m_vector_callback.isnull())
 		{
 			PC = read_arg(0xfffa);
@@ -76,7 +76,7 @@ brk_xav_imp
 			}
 		}
 
-		nmi_state = false;
+		nmi_pending = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
 		if (m_vector_callback.isnull())

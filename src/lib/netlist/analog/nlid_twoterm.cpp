@@ -31,22 +31,12 @@ namespace analog
 			solv->solve_now();
 	}
 
-	NETLIB_UPDATE(twoterm)
+	NETLIB_HANDLER(twoterm, termhandler)
 	{
 		// only called if connected to a rail net ==> notify the solver to recalculate
+		//printf("%s update\n", this->name().c_str());
 		solve_now();
 	}
-
-	// ----------------------------------------------------------------------------------------
-	// nld_R_base
-	// ----------------------------------------------------------------------------------------
-
-	NETLIB_RESET(R_base)
-	{
-		NETLIB_NAME(twoterm)::reset();
-		set_R(plib::reciprocal(exec().gmin()));
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// nld_POT
 	// ----------------------------------------------------------------------------------------
@@ -132,11 +122,21 @@ namespace analog
 
 	NETLIB_TIMESTEP(L)
 	{
-		// Gpar should support convergence
-		m_I += m_G * deltaV();
-		m_G = step / m_L() + m_gmin;
-		set_mat( m_G, -m_G, -m_I,
-				-m_G,  m_G,  m_I);
+		if (ts_type == timestep_type::FORWARD)
+		{
+			m_last_I = m_I;
+			m_last_G = m_G;
+			// Gpar should support convergence
+			m_I += m_G * deltaV();
+			m_G = step / m_L() + m_gmin;
+			set_mat( m_G, -m_G, -m_I,
+					-m_G,  m_G,  m_I);
+		}
+		else
+		{
+			m_I = m_last_I;
+			m_G = m_last_G;
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------

@@ -81,9 +81,20 @@ private:
 	u16 *                    m_bg_videoram;
 	u16 *                    m_tx_videoram;
 	u16 *                    m_rowscrollram;
-	std::unique_ptr<u16[]>   m_spritebufferram; // buffered spriteram
 
 	/* video-related */
+	struct sprite_t
+	{
+		int x,y;
+		bool xgrow, ygrow;
+		u32 xzoom, yzoom;
+		u32 color, offs;
+		u32 width, height;
+		u8 flip, pri;
+	};
+
+	std::unique_ptr<sprite_t[]> m_spritelist;
+	struct sprite_t *m_sprite_ptr_pre;
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_tx_tilemap;
 
@@ -128,7 +139,8 @@ private:
 	void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, int pri);
 	void draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
 	void draw_sprite_new_basic(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri);
-	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, u16 *sprite_source, bitmap_ind8& priority_bitmap);
+	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap);
+	void get_sprites();
 	void pgm_basic_mem(address_map &map);
 	void pgm_z80_io(address_map &map);
 	void pgm_z80_mem(address_map &map);

@@ -23,33 +23,35 @@ void pp01_state::video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part
 	uint16_t addroffset = part ? 0x1000  : 0x0000;
 	uint8_t *ram = m_ram->pointer();
 
-	if (BIT(m_video_write_mode,3)) {
+	if (BIT(m_video_write_mode,3))
+	{
 		// Copy mode
-		if(BIT(m_video_write_mode,0)) {
+		if(BIT(m_video_write_mode,0))
 			ram[0x6000+offset+addroffset] = data;
-		} else {
+		else
 			ram[0x6000+offset+addroffset] = 0;
-		}
-		if(BIT(m_video_write_mode,1)) {
+
+		if(BIT(m_video_write_mode,1))
 			ram[0xa000+offset+addroffset] = data;
-		} else {
+		else
 			ram[0xa000+offset+addroffset] = 0;
-		}
-		if(BIT(m_video_write_mode,2)) {
+
+		if(BIT(m_video_write_mode,2))
 			ram[0xe000+offset+addroffset] = data;
-		} else {
+		else
 			ram[0xe000+offset+addroffset] = 0;
-		}
-	} else {
-		if (block==0) {
+
+	}
+	else
+	{
+		if (block==0)
 			ram[0x6000+offset+addroffset] = data;
-		}
-		if (block==1) {
+		else
+		if (block==1)
 			ram[0xa000+offset+addroffset] = data;
-		}
-		if (block==2) {
+		else
+		if (block==2)
 			ram[0xe000+offset+addroffset] = data;
-		}
 	}
 }
 
@@ -85,14 +87,14 @@ void pp01_state::set_memory(uint8_t block, uint8_t data)
 	uint8_t *mem = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t startaddr = block*0x1000;
-	uint16_t endaddr   = ((block+1)*0x1000)-1;
-	uint8_t  blocknum  = block + 1;
-	char bank[10];
-	sprintf(bank,"bank%d",blocknum);
-	if (data>=0xE0 && data<=0xEF) {
+	uint16_t endaddr   = startaddr+0xfff;
+
+	if (data>=0xE0 && data<=0xEF)
+	{
 		// This is RAM
-		space.install_read_bank (startaddr, endaddr, bank);
-		switch(data) {
+		space.install_read_bank (startaddr, endaddr, m_bank[block]);
+		switch(data)
+		{
 		case 0xe6 :
 			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_r_1_w)));
 			break;
@@ -112,16 +114,21 @@ void pp01_state::set_memory(uint8_t block, uint8_t data)
 			space.install_write_handler(startaddr, endaddr, write8sm_delegate(*this, FUNC(pp01_state::video_b_2_w)));
 			break;
 		default:
-			space.install_write_bank(startaddr, endaddr, bank);
+			space.install_write_bank(startaddr, endaddr, m_bank[block]);
 			break;
 		}
 
-		membank(bank)->set_base(m_ram->pointer() + (data & 0x0F)* 0x1000);
-	} else if (data>=0xF8) {
-		space.install_read_bank (startaddr, endaddr, bank);
+		m_bank[block]->set_base(m_ram->pointer() + (data & 0x0F)* 0x1000);
+	}
+	else
+	if (data>=0xFC)
+	{
+		space.install_read_bank (startaddr, endaddr, m_bank[block]);
 		space.unmap_write(startaddr, endaddr);
-		membank(bank)->set_base(mem + ((data & 0x0F)-8)* 0x1000+0x10000);
-	} else {
+		m_bank[block]->set_base(mem + (data & 0x03)* 0x1000);
+	}
+	else
+	{
 		logerror("%02x %02x\n",block,data);
 		space.unmap_readwrite (startaddr, endaddr);
 	}
@@ -131,7 +138,8 @@ void pp01_state::machine_reset()
 {
 	int i;
 	memset(m_memory_block,0xff,16);
-	for(i=0;i<16;i++) {
+	for(i=0;i<16;i++)
+	{
 		m_memory_block[i] = 0xff;
 		set_memory(i, 0xff);
 	}
@@ -151,6 +159,15 @@ uint8_t pp01_state::mem_block_r(offs_t offset)
 
 void pp01_state::machine_start()
 {
+	save_item(NAME(m_video_scroll));
+	save_item(NAME(m_memory_block));
+	save_item(NAME(m_video_write_mode));
+	save_item(NAME(m_key_line));
+	save_item(NAME(m_txe));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_casspol));
+	save_item(NAME(m_cass_data));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( pp01_state::kansas_r )
@@ -202,12 +219,7 @@ void pp01_state::ppi1_porta_w(uint8_t data)
 
 uint8_t pp01_state::ppi1_portb_r()
 {
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
-	};
-
-	return (ioport(keynames[m_key_line])->read() & 0x3F) | (ioport("LINEALL")->read() & 0xC0);
+	return m_io_keyboard[m_key_line]->read() | m_io_keyboard[16]->read();
 }
 void pp01_state::ppi1_portb_w(uint8_t data)
 {

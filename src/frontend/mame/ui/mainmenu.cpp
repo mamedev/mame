@@ -75,6 +75,9 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 	item_append(_("Machine Information"), "", 0, (void *)GAME_INFO);
 
+	if (ui().found_machine_warnings())
+		item_append(_("Warning Information"), "", 0, (void *)WARN_INFO);
+
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
 		if (image.user_loadable())
@@ -182,6 +185,10 @@ void menu_main::handle()
 
 		case GAME_INFO:
 			menu::stack_push<menu_game_info>(ui(), container());
+			break;
+
+		case WARN_INFO:
+			menu::stack_push<menu_warn_info>(ui(), container());
 			break;
 
 		case IMAGE_MENU_IMAGE_INFO:

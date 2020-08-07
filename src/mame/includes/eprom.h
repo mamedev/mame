@@ -45,7 +45,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_int_ack_w(uint16_t data);
-	void video_int_ack_extra_w(uint16_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	uint8_t adc_r(offs_t offset);
 	void eprom_latch_w(uint8_t data);

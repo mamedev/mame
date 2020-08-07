@@ -40,6 +40,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_dart(*this, "dart")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
@@ -67,11 +68,11 @@ private:
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	bool m_rom_in_map;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
@@ -92,7 +93,7 @@ d7     FDC master clock 0=8MHz 1=16MHz (for 20cm disks, not emulated)
 */
 void ampro_state::port00_w(uint8_t data)
 {
-	m_rom_in_map = BIT(~data, 6);
+	m_bank1->set_entry(BIT(~data, 6));
 	m_fdc->dden_w(BIT(data, 5));
 	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
@@ -137,7 +138,7 @@ void ampro_state::dart_w(offs_t offset, uint8_t data)
 void ampro_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x0fff).lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0x0000, 0x0fff).bankr("bank1");
 }
 
 void ampro_state::io_map(address_map &map)
@@ -190,12 +191,13 @@ INPUT_PORTS_END
 
 void ampro_state::machine_start()
 {
-	save_item(NAME(m_rom_in_map));
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
 void ampro_state::machine_reset()
 {
-	m_rom_in_map = 1;
+	m_bank1->set_entry(1);
 
 	port00_w(0);
 	clear_strobe(0);

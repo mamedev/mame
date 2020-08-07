@@ -178,6 +178,16 @@ WRITE_LINE_MEMBER(poly88_state::cassette_clock_w)
 void poly88_state::machine_start()
 {
 	m_onboard_ram = make_unique_clear<u8[]>(0x200);
+	save_pointer(NAME(m_onboard_ram), 0x200);
+	save_item(NAME(m_int_vector));
+	save_item(NAME(m_dtr));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_casspol));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_onboard_disable));
 }
 
 void poly88_state::machine_reset()

@@ -28,14 +28,9 @@ NETLIST_EXTERNAL(loc_lib)
 
 NETLIST_START(ex2N6027)
 
-	/* This is a circuit pushing the solvers to the limits
-	 * 50,000 maximum NR loops.
-	 */
 	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-5)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-9)
-	PARAM(Solver.NR_LOOPS, 50000)
 	PARAM(Solver.METHOD, "MAT_CR")
 
 	LOCAL_SOURCE(loc_lib)

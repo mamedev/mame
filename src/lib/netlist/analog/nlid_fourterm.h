@@ -39,12 +39,12 @@ namespace analog {
 		NETLIB_CONSTRUCTOR_EX(VCCS, nl_fptype ri = nlconst::magic(1e9))
 		, m_G(*this, "G", nlconst::one())
 		, m_RI(*this, "RI", ri)
-		, m_OP(*this, "OP", &m_IP)
-		, m_ON(*this, "ON", &m_IP)
-		, m_IP(*this, "IP", &m_IN)   // <= this should be NULL and terminal be filtered out prior to solving...
-		, m_IN(*this, "IN", &m_IP)   // <= this should be NULL and terminal be filtered out prior to solving...
-		, m_OP1(*this, "_OP1", &m_IN)
-		, m_ON1(*this, "_ON1", &m_IN)
+		, m_OP(*this, "OP", &m_IP, NETLIB_DELEGATE(termhandler))
+		, m_ON(*this, "ON", &m_IP, NETLIB_DELEGATE(termhandler))
+		, m_IP(*this, "IP", &m_IN, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
+		, m_IN(*this, "IN", &m_IP, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
+		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(termhandler))
+		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(termhandler))
 		, m_gfac(nlconst::one())
 		{
 			connect(m_OP, m_OP1);
@@ -57,7 +57,7 @@ namespace analog {
 		param_fp_t m_RI;
 
 	protected:
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler);
 		NETLIB_UPDATE_PARAMI()
 		{
 			NETLIB_NAME(VCCS)::reset();
@@ -181,8 +181,8 @@ namespace analog {
 	public:
 		NETLIB_CONSTRUCTOR(VCVS)
 		, m_RO(*this, "RO", nlconst::one())
-		, m_OP2(*this, "_OP2", &m_ON2)
-		, m_ON2(*this, "_ON2", &m_OP2)
+		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(termhandler))
+		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(termhandler))
 		{
 			connect(m_OP2, m_OP1);
 			connect(m_ON2, m_ON1);
@@ -193,8 +193,11 @@ namespace analog {
 		param_fp_t m_RO;
 
 	private:
-		//NETLIB_UPDATEI();
 		//NETLIB_UPDATE_PARAMI();
+		NETLIB_HANDLERI(termhandler)
+		{
+			NETLIB_NAME(VCCS) :: termhandler();
+		}
 
 		terminal_t m_OP2;
 		terminal_t m_ON2;
@@ -233,8 +236,8 @@ namespace analog {
 	public:
 		NETLIB_CONSTRUCTOR_PASS(CCVS, nlconst::one())
 		, m_RO(*this, "RO", nlconst::one())
-		, m_OP2(*this, "_OP2", &m_ON2)
-		, m_ON2(*this, "_ON2", &m_OP2)
+		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(termhandler))
+		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(termhandler))
 		{
 			connect(m_OP2, m_OP1);
 			connect(m_ON2, m_ON1);
@@ -245,8 +248,12 @@ namespace analog {
 		param_fp_t m_RO;
 
 	private:
-		//NETLIB_UPDATEI();
 		//NETLIB_UPDATE_PARAMI();
+
+		NETLIB_HANDLERI(termhandler)
+		{
+			NETLIB_NAME(VCCS) :: termhandler();
+		}
 
 		terminal_t m_OP2;
 		terminal_t m_ON2;

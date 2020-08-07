@@ -1625,12 +1625,8 @@ void spg2xx_io_device::uart_receive_tick()
 void spg2xx_io_device::extint_w(int channel, bool state)
 {
 	LOGMASKED(LOG_EXTINT, "Setting extint channel %d to %s\n", channel, state ? "true" : "false");
-	bool old = m_extint[channel];
 	m_extint[channel] = state;
-	if (old != state)
-	{
-		check_extint_irq(channel);
-	}
+	check_extint_irq(channel);
 }
 
 void spg2xx_io_device::check_extint_irq(int channel)
@@ -1673,7 +1669,7 @@ void spg2xx_io_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x1200) // External IRQ
 	{
-		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
+		LOGMASKED(LOG_EXTINT, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
 		if (m_external_irq_cb)
 			m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 		else

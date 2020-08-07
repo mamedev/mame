@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "device.h"
-
 
 class r10788_device : public device_t
 {

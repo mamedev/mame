@@ -127,6 +127,10 @@ public:
 
 	void init_supertnk();
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(bankswitch_0_w);
 	DECLARE_WRITE_LINE_MEMBER(bankswitch_1_w);
@@ -139,9 +143,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
 
@@ -159,6 +160,10 @@ private:
 void supertnk_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
+
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_bitplane_select));
+	save_item(NAME(m_interrupt_enable));
 }
 
 
@@ -228,9 +233,11 @@ void supertnk_state::video_start()
 		m_pens[i] = rgb_t(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 
-	m_videoram[0] = std::make_unique<uint8_t[]>(0x2000);
-	m_videoram[1] = std::make_unique<uint8_t[]>(0x2000);
-	m_videoram[2] = std::make_unique<uint8_t[]>(0x2000);
+	for (int i = 0; i < 3; i++)
+	{
+		m_videoram[i] = std::make_unique<uint8_t[]>(0x2000);
+		save_pointer(NAME(m_videoram[i]), 0x2000, i);
+	}
 }
 
 
@@ -301,18 +308,6 @@ uint32_t supertnk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 
 	return 0;
-}
-
-
-
-/*************************************
- *
- *  Machine reset
- *
- *************************************/
-
-void supertnk_state::machine_reset()
-{
 }
 
 
@@ -515,4 +510,4 @@ void supertnk_state::init_supertnk()
 }
 
 
-GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )
+GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", MACHINE_SUPPORTS_SAVE )

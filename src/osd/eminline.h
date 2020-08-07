@@ -370,7 +370,7 @@ inline unsigned population_count_32(uint32_t val)
 	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
 	return unsigned(__builtin_popcount(static_cast<unsigned>(val)));
 #else
-	// optimal Hamming weight assuing fast 32*32->32
+	// optimal Hamming weight assuming fast 32*32->32
 	constexpr uint32_t m1(0x55555555);
 	constexpr uint32_t m2(0x33333333);
 	constexpr uint32_t m4(0x0f0f0f0f);

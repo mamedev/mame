@@ -30,9 +30,9 @@ public:
 	sm1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "i8251")
-		, m_ppi(*this, "i8255")
-		, m_crtc(*this, "i8275")
+		, m_uart(*this, "uart")
+		, m_ppi(*this, "ppi")
+		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -44,29 +44,29 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
-	void sm1800_8255_portb_w(uint8_t data);
-	void sm1800_8255_portc_w(uint8_t data);
-	uint8_t sm1800_8255_porta_r();
-	uint8_t sm1800_8255_portc_r();
+	void portb_w(uint8_t data);
+	void portc_w(uint8_t data);
+	uint8_t porta_r();
+	uint8_t portc_r();
 	uint8_t m_irq_state;
-	virtual void machine_reset() override;
+	void machine_start() override;
 	void sm1800_palette(palette_device &palette) const;
-	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
-	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void sm1800_io(address_map &map);
-	void sm1800_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
-void sm1800_state::sm1800_mem(address_map &map)
+void sm1800_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-	//map(0x0fb0, 0x0fff).w("i8275", FUNC(i8275_device::dack_w));
+	//map(0x0fb0, 0x0fff).w("crtc", FUNC(i8275_device::dack_w));
 	map(0x1000, 0x17ff).ram(); // videoram looks like 1080-17FF, normal ascii
 }
 
-void sm1800_state::sm1800_io(address_map &map)
+void sm1800_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -81,16 +81,17 @@ void sm1800_state::sm1800_io(address_map &map)
 static INPUT_PORTS_START( sm1800 )
 INPUT_PORTS_END
 
-IRQ_CALLBACK_MEMBER(sm1800_state::sm1800_irq_callback)
+IRQ_CALLBACK_MEMBER(sm1800_state::irq_callback)
 {
 	return 0xff;
 }
 
-void sm1800_state::machine_reset()
+void sm1800_state::machine_start()
 {
+	save_item(NAME(m_irq_state));
 }
 
-INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)
+INTERRUPT_GEN_MEMBER(sm1800_state::vblank_interrupt)
 {
 	m_maincpu->set_input_line(0, m_irq_state ?  HOLD_LINE : CLEAR_LINE);
 	m_irq_state ^= 1;
@@ -115,20 +116,20 @@ I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
-void sm1800_state::sm1800_8255_portb_w(uint8_t data)
+void sm1800_state::portb_w(uint8_t data)
 {
 }
 
-void sm1800_state::sm1800_8255_portc_w(uint8_t data)
+void sm1800_state::portc_w(uint8_t data)
 {
 }
 
-uint8_t sm1800_state::sm1800_8255_porta_r()
+uint8_t sm1800_state::porta_r()
 {
 	return 0xff;
 }
 
-uint8_t sm1800_state::sm1800_8255_portc_r()
+uint8_t sm1800_state::portc_r()
 {
 	return 0;
 }
@@ -142,7 +143,7 @@ void sm1800_state::sm1800_palette(palette_device &palette) const
 
 
 /* F4 Character Displayer */
-static const gfx_layout sm1800_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -156,7 +157,7 @@ static const gfx_layout sm1800_charlayout =
 };
 
 static GFXDECODE_START( gfx_sm1800 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, sm1800_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -164,14 +165,14 @@ void sm1800_state::sm1800(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(2'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &sm1800_state::sm1800_mem);
-	m_maincpu->set_addrmap(AS_IO, &sm1800_state::sm1800_io);
-	m_maincpu->set_vblank_int("screen", FUNC(sm1800_state::sm1800_vblank_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(sm1800_state::sm1800_irq_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sm1800_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sm1800_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sm1800_state::vblank_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sm1800_state::irq_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -182,10 +183,10 @@ void sm1800_state::sm1800(machine_config &config)
 
 	/* Devices */
 	I8255(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(sm1800_state::sm1800_8255_porta_r));
-	m_ppi->out_pb_callback().set(FUNC(sm1800_state::sm1800_8255_portb_w));
-	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
-	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
+	m_ppi->in_pa_callback().set(FUNC(sm1800_state::porta_r));
+	m_ppi->out_pb_callback().set(FUNC(sm1800_state::portb_w));
+	m_ppi->in_pc_callback().set(FUNC(sm1800_state::portc_r));
+	m_ppi->out_pc_callback().set(FUNC(sm1800_state::portc_w));
 
 	I8275(config, m_crtc, 2000000);
 	m_crtc->set_character_width(8);
@@ -196,14 +197,14 @@ void sm1800_state::sm1800(machine_config &config)
 
 /* ROM definition */
 ROM_START( sm1800 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "prog.bin", 0x0000, 0x0800, CRC(55736ad5) SHA1(b77f720f1b64b208dd6a5d4f9c9521d1284028e9))
 
-	ROM_REGION(0x0800, "chargen", 0)
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.bin", 0x0000, 0x0800, CRC(28ed9ebc) SHA1(f561136962a06a5dcb5a0436931d29e940155d24))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY      FULLNAME   FLAGS */
-COMP( ????, sm1800, 0,      0,      sm1800,  sm1800, sm1800_state, empty_init, "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, sm1800, 0,      0,      sm1800,  sm1800, sm1800_state, empty_init, "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

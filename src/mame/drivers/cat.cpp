@@ -1077,7 +1077,7 @@ void cat_state::cat(machine_config &config)
 	m_duart->irq_cb().set(FUNC(cat_state::cat_duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(cat_state::cat_duart_txa));
 	m_duart->b_tx_cb().set(FUNC(cat_state::cat_duart_txb));
-	m_duart->outport_cb().set(FUNC(cat_state::cat_duart_output));;
+	m_duart->outport_cb().set(FUNC(cat_state::cat_duart_output));
 
 	CENTRONICS(config, m_ctx, centronics_devices, "printer");
 	m_ctx->ack_handler().set(FUNC(cat_state::prn_ack_ff));

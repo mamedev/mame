@@ -24,12 +24,12 @@ namespace devices
 	NETLIB_OBJECT(7490)
 	{
 		NETLIB_CONSTRUCTOR(7490)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_R1(*this, "R1")
-		, m_R2(*this, "R2")
-		, m_R91(*this, "R91")
-		, m_R92(*this, "R92")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
+		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
+		, m_R91(*this, "R91", NETLIB_DELEGATE(inputs))
+		, m_R92(*this, "R92", NETLIB_DELEGATE(inputs))
 		, m_cnt(*this, "m_cnt", 0)
 		, m_last_A(*this, "m_last_A", 0)
 		, m_last_B(*this, "m_last_B", 0)
@@ -39,7 +39,7 @@ namespace devices
 		}
 
 	private:
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			const netlist_sig_t new_A = m_A();
 			const netlist_sig_t new_B = m_B();
@@ -117,8 +117,7 @@ namespace devices
 			// register_subalias("13", ); --> NC
 			register_subalias("14", "A.A");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(7490) A;
 	};

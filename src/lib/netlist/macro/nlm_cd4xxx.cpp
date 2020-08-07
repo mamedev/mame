@@ -252,6 +252,62 @@ static NETLIST_START(CD4316_DIP)
 
 NETLIST_END()
 
+//- Identifier:  CD4538_DIP
+//- Title: CD4538BC Dual Precision Monostable
+//- Description: The CD4538BC is a dual, precision monostable multivibrator with
+//-   independent trigger and reset controls. The device
+//-   is retriggerable and resettable, and the control inputs are
+//-   internally latched. Two trigger inputs are provided to allow
+//-   either rising or falling edge triggering. The reset inputs are
+//-   active LOW and prevent triggering while active. Precise
+//-   control of output pulse-width has been achieved using linear
+//-   CMOS techniques. The pulse duration and accuracy
+//-   are determined by external components RX and CX. The
+//-   device does not allow the timing capacitor to discharge
+//-   through the timing pin on power-down condition. For this
+//-   reason, no external protection resistor is required in series
+//-   with the timing pin. Input protection from static discharge is
+//-   provided on all pins.
+//-
+//- Pinalias: C1,RC1,CLRQ1,B1,A1,Q1,QQ1,GND,QQ2,Q2,A2,B2,CLRQ2,RC2,C2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Fairchild Semiconductor datasheet
+//- Limitations:
+//-    Timing inaccuracies may occur for capacitances < 1nF. Please consult datasheet
+//-
+//- Example: 74123.cpp,74123_example
+//-
+//- FunctionTable:
+//-    https://pdf1.alldatasheet.com/datasheet-pdf/view/50871/FAIRCHILD/CD4538.html
+//-
+static NETLIST_START(CD4538_DIP)
+
+	CD4538(A)
+	CD4538(B)
+
+	ALIAS(1, A.C) // C1
+	ALIAS(2, A.RC) // RC1
+	ALIAS(3, A.CLRQ)
+	ALIAS(4, A.A)
+	ALIAS(5, A.B)
+	ALIAS(6, A.Q)
+	ALIAS(7, A.QQ)
+	ALIAS(8, A.VSS)
+
+	ALIAS(9, B.QQ)
+	ALIAS(10, B.Q)
+	ALIAS(11, B.B)
+	ALIAS(12, B.A)
+	ALIAS(13, B.CLRQ)
+	ALIAS(14, B.RC) // RC2
+	ALIAS(15, B.C) // C2
+	ALIAS(16, A.VDD)
+
+	NET_C(A.VDD, B.VDD)
+	NET_C(A.VSS, B.VSS)
+NETLIST_END()
+
+
 NETLIST_START(CD4XXX_lib)
 
 	TRUTHTABLE_START(CD4001_GATE, 2, 1, "")
@@ -287,5 +343,6 @@ NETLIST_START(CD4XXX_lib)
 	LOCAL_LIB_ENTRY(CD4016_DIP)
 	LOCAL_LIB_ENTRY(CD4066_DIP)
 	LOCAL_LIB_ENTRY(CD4316_DIP)
+	LOCAL_LIB_ENTRY(CD4538_DIP)
 
 NETLIST_END()

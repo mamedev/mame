@@ -66,7 +66,9 @@ DEFINE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device,      "arm920t",      "ARM92
 DEFINE_DEVICE_TYPE(ARM946ES,     arm946es_cpu_device,     "arm946es",     "ARM946ES")
 DEFINE_DEVICE_TYPE(ARM11,        arm11_cpu_device,        "arm11",        "ARM11")
 DEFINE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device, "arm1176jzf_s", "ARM1176JZF-S")
+DEFINE_DEVICE_TYPE(PXA250,       pxa250_cpu_device,       "pxa250",       "Intel XScale PXA250")
 DEFINE_DEVICE_TYPE(PXA255,       pxa255_cpu_device,       "pxa255",       "Intel XScale PXA255")
+DEFINE_DEVICE_TYPE(PXA270,       pxa270_cpu_device,       "pxa270",       "Intel XScale PXA270")
 DEFINE_DEVICE_TYPE(SA1110,       sa1110_cpu_device,       "sa1110",       "Intel StrongARM SA-1110")
 DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
 
@@ -236,13 +238,30 @@ igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
+pxa250_cpu_device::pxa250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, PXA250, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_XSCALE, ENDIANNESS_LITTLE)
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
+			   | ARM9_COPRO_ID_ARCH_V5TE
+			   | ARM9_COPRO_ID_PART_PXA250
+			   | ARM9_COPRO_ID_STEP_PXA255_A0;
+}
+
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, PXA255, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_XSCALE, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
 			   | ARM9_COPRO_ID_ARCH_V5TE
-			   | ARM9_COPRO_ID_PXA255_CORE_GEN_XSCALE
-			   | (3 << ARM9_COPRO_ID_PXA255_CORE_REV_SHIFT)
+			   | ARM9_COPRO_ID_PART_PXA255
+			   | ARM9_COPRO_ID_STEP_PXA255_A0;
+}
+
+pxa270_cpu_device::pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, PXA270, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_XSCALE, ENDIANNESS_LITTLE)
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_INTEL
+			   | ARM9_COPRO_ID_ARCH_V5TE
+			   | ARM9_COPRO_ID_PART_PXA270
 			   | ARM9_COPRO_ID_STEP_PXA255_A0;
 }
 

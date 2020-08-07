@@ -81,8 +81,8 @@ namespace netlist
 	NETLIB_OBJECT(7493)
 	{
 		NETLIB_CONSTRUCTOR(7493)
-		, m_R1(*this, "R1")
-		, m_R2(*this, "R2")
+		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
+		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
 		, m_a(*this, "_m_a", 0)
 		, m_bcd(*this, "_m_b", 0)
 		, m_r(*this, "_m_r", 0)
@@ -102,7 +102,7 @@ namespace netlist
 			m_CLKB.set_state(logic_t::STATE_INP_HL);
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			if (!(m_R1() && m_R2()))
 			{
@@ -171,8 +171,7 @@ namespace netlist
 			// register_subalias("13", ); -. NC
 			register_subalias("14", "A.CLKA");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(7493) A;
 	};

@@ -18,7 +18,7 @@ TODO:
   Is cpu cycle timing wrong? I suspect conditional branch timing due to cache miss
   (pipeline has to refill). The delay loop between writing to the speaker is simply:
   SUBS R2, R2, #$1, BNE $2000cd8
-- does it have an LCDC? if so, what chip?
+- use SED1520 device for the LCD
 
 ******************************************************************************/
 

@@ -125,7 +125,7 @@
   | |-D7--- Audit/Test.
   '-'
 
-  Whilest in Audit/Test mode, pressing the ADVANCE button, you can enter into
+  Whilst in Audit/Test mode, pressing the ADVANCE button, you can enter into
   screen and inputs test mode.
 
   This ADVANCE button, is routed into a latch with D0, sharing with BET button.
@@ -213,12 +213,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_pl1(*this, "PL1"),
-		m_pl2(*this, "PL2"),
-		m_pl3(*this, "PL3"),
-		m_pl4(*this, "PL4"),
-		m_pl5(*this, "PL5"),
-		m_pl6(*this, "PL6"),
+		m_pl(*this, "PL%u", 1),
 		m_svc(*this, "SVC"),
 		m_dsw(*this, "DSW"),
 		m_unk(*this, "UNK"),
@@ -229,6 +224,10 @@ public:
 
 	void init_kas89();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void mux_w(uint8_t data);
 	uint8_t mux_r();
@@ -237,32 +236,24 @@ private:
 	void int_ack_w(uint8_t data);
 	void led_mux_data_w(uint8_t data);
 	void led_mux_select_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi_cb);
 	void audio_io(address_map &map);
 	void audio_map(address_map &map);
 	void kas89_io(address_map &map);
 	void kas89_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	uint8_t m_mux_data;
 	uint8_t m_main_nmi_enable;
 
 	uint8_t m_leds_mux_selector;
 	uint8_t m_leds_mux_data;
-	uint8_t m_outdata;            /* Muxed with the sound latch. Output to a sign? */
+	uint8_t m_outdata;            // Muxed with the sound latch. Output to a sign?
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_ioport m_pl1;
-	required_ioport m_pl2;
-	required_ioport m_pl3;
-	required_ioport m_pl4;
-	required_ioport m_pl5;
-	required_ioport m_pl6;
+	required_ioport_array<6> m_pl;
 	required_ioport m_svc;
 	required_ioport m_dsw;
 	required_ioport m_unk;
@@ -277,7 +268,13 @@ private:
 void kas89_state::machine_start()
 {
 	m_lamps.resolve();
-	m_lamps[37] = 0;   /* turning off the operator led */
+	m_lamps[37] = 0;   // turning off the operator led
+
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_main_nmi_enable));
+	save_item(NAME(m_leds_mux_selector));
+	save_item(NAME(m_leds_mux_data));
+	save_item(NAME(m_outdata));
 }
 
 void kas89_state::machine_reset()
@@ -306,18 +303,18 @@ uint8_t kas89_state::mux_r()
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return m_pl1->read();
-		case 0x02: return m_pl2->read();
-		case 0x04: return m_pl3->read();
-		case 0x08: return m_pl4->read();
-		case 0x10: return m_pl5->read();
-		case 0x20: return m_pl6->read();
+		case 0x01: return m_pl[0]->read();
+		case 0x02: return m_pl[1]->read();
+		case 0x04: return m_pl[2]->read();
+		case 0x08: return m_pl[3]->read();
+		case 0x10: return m_pl[4]->read();
+		case 0x20: return m_pl[5]->read();
 		case 0x40:
 		{
-			m_lamps[37] = BIT(~m_svc->read(), 5);  /* Operator Key LAMP */
+			m_lamps[37] = BIT(~m_svc->read(), 5);  // Operator Key LAMP
 			return m_svc->read();
 		}
-		case 0x80: return m_dsw->read();    /* Polled at $162a through NMI routine */
+		case 0x80: return m_dsw->read();    // Polled at $162a through NMI routine
 		case 0x3f: return m_unk->read();
 	}
 
@@ -325,13 +322,13 @@ uint8_t kas89_state::mux_r()
 	return m_mux_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_nmi_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::nmi_cb)
 {
 	if (m_main_nmi_enable)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_sound_nmi_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::sound_nmi_cb)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
@@ -350,8 +347,8 @@ void kas89_state::control_w(uint8_t data)
 
 	m_main_nmi_enable = data & 0x40;
 
-	machine().bookkeeping().coin_counter_w(0, (data ^ 0xff) & 0x01); /* Credits In counter */
-	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); /* Credits Out counter */
+	machine().bookkeeping().coin_counter_w(0, (data ^ 0xff) & 0x01); // Credits In counter
+	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); // Credits Out counter
 }
 
 void kas89_state::sound_comm_w(uint8_t data)
@@ -373,14 +370,14 @@ void kas89_state::sound_comm_w(uint8_t data)
 
 	if (data & 0x40)
 	{
-		m_outdata = (data ^ 0x40);  /* Pure data. Without the activator bit */
+		m_outdata = (data ^ 0x40);  // Pure data. Without the activator bit
 
 		if (m_outdata == 0x3f)
 		{
 			uint8_t i;
 			for ( i = 0; i < 37; i++ )
 			{
-				m_lamps[i] = 0;    /* All roulette LEDs OFF */
+				m_lamps[i] = 0;    // All roulette LEDs OFF
 			}
 		}
 
@@ -424,9 +421,9 @@ void kas89_state::led_mux_select_w(uint8_t data)
 	m_leds_mux_selector = data;
 
 	uint8_t i;
-	for ( i = 0; i < 37; i++ )
+	for ( uint8_t i = 0; i < 37; i++ )
 	{
-		m_lamps[i] = 0;    /* All LEDs OFF */
+		m_lamps[i] = 0;    // All LEDs OFF
 	}
 
 	switch(data)
@@ -435,69 +432,69 @@ void kas89_state::led_mux_select_w(uint8_t data)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				m_lamps[i] = 0;    /* All LEDs OFF */
+				m_lamps[i] = 0;    // All LEDs OFF
 			}
 		}
 
 		case 0x01:
 		{
-			m_lamps[11] = BIT(m_leds_mux_data, 0);  /* Number 11 LED */
-			m_lamps[36] = BIT(m_leds_mux_data, 1);  /* Number 36 LED */
-			m_lamps[13] = BIT(m_leds_mux_data, 2);  /* Number 13 LED */
-			m_lamps[27] = BIT(m_leds_mux_data, 3);  /* Number 27 LED */
-			m_lamps[06] = BIT(m_leds_mux_data, 4);  /* Number  6 LED */
-			m_lamps[34] = BIT(m_leds_mux_data, 5);  /* Number 34 LED */
-			m_lamps[17] = BIT(m_leds_mux_data, 6);  /* Number 17 LED */
-			m_lamps[25] = BIT(m_leds_mux_data, 7);  /* Number 25 LED */
+			m_lamps[11] = BIT(m_leds_mux_data, 0);  // Number 11 LED
+			m_lamps[36] = BIT(m_leds_mux_data, 1);  // Number 36 LED
+			m_lamps[13] = BIT(m_leds_mux_data, 2);  // Number 13 LED
+			m_lamps[27] = BIT(m_leds_mux_data, 3);  // Number 27 LED
+			m_lamps[06] = BIT(m_leds_mux_data, 4);  // Number  6 LED
+			m_lamps[34] = BIT(m_leds_mux_data, 5);  // Number 34 LED
+			m_lamps[17] = BIT(m_leds_mux_data, 6);  // Number 17 LED
+			m_lamps[25] = BIT(m_leds_mux_data, 7);  // Number 25 LED
 			break;
 		}
 
 		case 0x02:
 		{
-			m_lamps[ 2] = BIT(m_leds_mux_data, 0);  /* Number  2 LED */
-			m_lamps[21] = BIT(m_leds_mux_data, 1);  /* Number 21 LED */
-			m_lamps[ 4] = BIT(m_leds_mux_data, 2);  /* Number  4 LED */
-			m_lamps[19] = BIT(m_leds_mux_data, 3);  /* Number 19 LED */
-			m_lamps[15] = BIT(m_leds_mux_data, 4);  /* Number 15 LED */
-			m_lamps[32] = BIT(m_leds_mux_data, 5);  /* Number 32 LED */
-			m_lamps[ 0] = BIT(m_leds_mux_data, 6);  /* Number  0 LED */
-			m_lamps[26] = BIT(m_leds_mux_data, 7);  /* Number 26 LED */
+			m_lamps[ 2] = BIT(m_leds_mux_data, 0);  // Number  2 LED
+			m_lamps[21] = BIT(m_leds_mux_data, 1);  // Number 21 LED
+			m_lamps[ 4] = BIT(m_leds_mux_data, 2);  // Number  4 LED
+			m_lamps[19] = BIT(m_leds_mux_data, 3);  // Number 19 LED
+			m_lamps[15] = BIT(m_leds_mux_data, 4);  // Number 15 LED
+			m_lamps[32] = BIT(m_leds_mux_data, 5);  // Number 32 LED
+			m_lamps[ 0] = BIT(m_leds_mux_data, 6);  // Number  0 LED
+			m_lamps[26] = BIT(m_leds_mux_data, 7);  // Number 26 LED
 			break;
 		}
 
 		case 0x04:
 		{
-			m_lamps[ 3] = BIT(m_leds_mux_data, 0);  /* Number  3 LED */
-			m_lamps[35] = BIT(m_leds_mux_data, 1);  /* Number 35 LED */
-			m_lamps[12] = BIT(m_leds_mux_data, 2);  /* Number 12 LED */
-			m_lamps[28] = BIT(m_leds_mux_data, 3);  /* Number 28 LED */
-			m_lamps[ 7] = BIT(m_leds_mux_data, 4);  /* Number  7 LED */
-			m_lamps[29] = BIT(m_leds_mux_data, 5);  /* Number 29 LED */
-			m_lamps[18] = BIT(m_leds_mux_data, 6);  /* Number 18 LED */
+			m_lamps[ 3] = BIT(m_leds_mux_data, 0);  // Number  3 LED
+			m_lamps[35] = BIT(m_leds_mux_data, 1);  // Number 35 LED
+			m_lamps[12] = BIT(m_leds_mux_data, 2);  // Number 12 LED
+			m_lamps[28] = BIT(m_leds_mux_data, 3);  // Number 28 LED
+			m_lamps[ 7] = BIT(m_leds_mux_data, 4);  // Number  7 LED
+			m_lamps[29] = BIT(m_leds_mux_data, 5);  // Number 29 LED
+			m_lamps[18] = BIT(m_leds_mux_data, 6);  // Number 18 LED
 			break;
 		}
 
 		case 0x08:
 		{
-			m_lamps[22] = BIT(m_leds_mux_data, 0);  /* Number 22 LED */
-			m_lamps[ 9] = BIT(m_leds_mux_data, 1);  /* Number  9 LED */
-			m_lamps[31] = BIT(m_leds_mux_data, 2);  /* Number 31 LED */
-			m_lamps[14] = BIT(m_leds_mux_data, 3);  /* Number 14 LED */
-			m_lamps[20] = BIT(m_leds_mux_data, 4);  /* Number 20 LED */
-			m_lamps[ 1] = BIT(m_leds_mux_data, 5);  /* Number  1 LED */
-			m_lamps[33] = BIT(m_leds_mux_data, 6);  /* Number 33 LED */
+			m_lamps[22] = BIT(m_leds_mux_data, 0);  // Number 22 LED
+			m_lamps[ 9] = BIT(m_leds_mux_data, 1);  // Number  9 LED
+			m_lamps[31] = BIT(m_leds_mux_data, 2);  // Number 31 LED
+			m_lamps[14] = BIT(m_leds_mux_data, 3);  // Number 14 LED
+			m_lamps[20] = BIT(m_leds_mux_data, 4);  // Number 20 LED
+			m_lamps[ 1] = BIT(m_leds_mux_data, 5);  // Number  1 LED
+			m_lamps[33] = BIT(m_leds_mux_data, 6);  // Number 33 LED
 			break;
 		}
 
 		case 0x10:
 		{
-			m_lamps[16] = BIT(m_leds_mux_data, 0);  /* Number 16 LED */
-			m_lamps[24] = BIT(m_leds_mux_data, 1);  /* Number 24 LED */
-			m_lamps[ 5] = BIT(m_leds_mux_data, 2);  /* Number  5 LED */
-			m_lamps[10] = BIT(m_leds_mux_data, 3);  /* Number 10 LED */
-			m_lamps[23] = BIT(m_leds_mux_data, 4);  /* Number 23 LED */
-			m_lamps[ 8] = BIT(m_leds_mux_data, 5);  /* Number  8 LED */
-			m_lamps[30] = BIT(m_leds_mux_data, 6);  /* Number 30 LED */
+			m_lamps[16] = BIT(m_leds_mux_data, 0);  // Number 16 LED
+			m_lamps[24] = BIT(m_leds_mux_data, 1);  // Number 24 LED
+			m_lamps[ 5] = BIT(m_leds_mux_data, 2);  // Number  5 LED
+			m_lamps[10] = BIT(m_leds_mux_data, 3);  // Number 10 LED
+			m_lamps[23] = BIT(m_leds_mux_data, 4);  // Number 23 LED
+			m_lamps[ 8] = BIT(m_leds_mux_data, 5);  // Number  8 LED
+			m_lamps[30] = BIT(m_leds_mux_data, 6);  // Number 30 LED
 			break;
 		}
 
@@ -505,7 +502,7 @@ void kas89_state::led_mux_select_w(uint8_t data)
 		{
 			for ( i = 0; i < 37; i++ )
 			{
-				m_lamps[i] = 1;    /* All LEDs ON */
+				m_lamps[i] = 1;    // All LEDs ON
 			}
 		}
 	}
@@ -519,15 +516,15 @@ void kas89_state::led_mux_select_w(uint8_t data)
 void kas89_state::kas89_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x0037, 0x0037).nopw();    /* WTF? */
-	map(0x8000, 0x81ff).ram();     /* empty */
-	map(0x8200, 0x83ff).ram();     /* 8200-83ff (PL1) */
-	map(0x8400, 0x85ff).ram();     /* 8400-85ff (PL2) */
-	map(0x8600, 0x87ff).ram();     /* 8600-87ff (PL3) */
-	map(0x8800, 0x89ff).ram();     /* 8800-89ff (PL4) */
-	map(0x8a00, 0x8bff).ram();     /* 8a00-8bff (PL5) */
-	map(0x8c00, 0x8dff).ram();     /* 8c00-8dff (PL6) */
-	map(0x8e00, 0x8fff).ram();     /* empty */
+	map(0x0037, 0x0037).nopw();    // WTF?
+	map(0x8000, 0x81ff).ram();     // empty
+	map(0x8200, 0x83ff).ram();     // 8200-83ff (PL1)
+	map(0x8400, 0x85ff).ram();     // 8400-85ff (PL2)
+	map(0x8600, 0x87ff).ram();     // 8600-87ff (PL3)
+	map(0x8800, 0x89ff).ram();     // 8800-89ff (PL4)
+	map(0x8a00, 0x8bff).ram();     // 8a00-8bff (PL5)
+	map(0x8c00, 0x8dff).ram();     // 8c00-8dff (PL6)
+	map(0x8e00, 0x8fff).ram();     // empty
 	map(0x9000, 0x97ff).ram();
 	map(0x9800, 0x9fff).ram().share("nvram");
 }
@@ -538,7 +535,7 @@ void kas89_state::kas89_io(address_map &map)
 	map(0x40, 0x43).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0x80, 0x80).w(FUNC(kas89_state::mux_w));
 	map(0x81, 0x81).r(FUNC(kas89_state::mux_r));
-	map(0x82, 0x82).w(FUNC(kas89_state::control_w));    /* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
+	map(0x82, 0x82).w(FUNC(kas89_state::control_w));    // Bit6 trigger the 138Hz osc. tied to main Z80's NMI.
 	map(0x83, 0x83).w(FUNC(kas89_state::led_mux_data_w));
 	map(0x84, 0x84).w(FUNC(kas89_state::led_mux_select_w));
 	map(0x85, 0x85).w(FUNC(kas89_state::sound_comm_w));
@@ -668,8 +665,8 @@ static INPUT_PORTS_START( kas89 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Avance Pantalla (Advance)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Blank the screen. Disclaimer isn't shown.*/
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Otherwise hang the game when insert credits.*/
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Blank the screen. Disclaimer isn't shown.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // Otherwise hang the game when insert credits.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8)  PORT_TOGGLE PORT_NAME("Operator/Habilitation Key")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)  PORT_TOGGLE PORT_NAME("Audit/Test Mode Switch")
@@ -685,7 +682,7 @@ static INPUT_PORTS_START( kas89 )
   |                    Normal     | ON  | OFF |                                   |    Normal
   |                    Dura       | OFF | ON  |                                   |    Hard
   |                    Muy Dura   | ON  | ON  |                                   |    Very Hard
-  +-------------------------------+-----+-----+-----+-----+-----------------------+  [Heart Appeareance]
+  +-------------------------------+-----+-----+-----+-----+-----------------------+  [Heart Appearance]
   | Aparicion          No         |           | OFF | OFF |                       |    No
   |    del             Poco       |           | ON  | OFF |                       |    Few
   |  Corazon           (n/c)      |           | OFF | ON  |                       |    n/c
@@ -729,7 +726,7 @@ static INPUT_PORTS_START( kas89 )
 	PORT_DIPSETTING(    0x08, "Dura (Hard)" )
 	PORT_DIPSETTING(    0x00, "Muy Dura (Very Hard)" )
 
-	PORT_DIPNAME( 0x21, 0x21, "Aparicion del Corazon (Heart Appeareance)" ) PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPNAME( 0x21, 0x21, "Aparicion del Corazon (Heart Appearance)" ) PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(    0x01, "n/c" )
 	PORT_DIPSETTING(    0x21, "No (No)" )
 	PORT_DIPSETTING(    0x20, "Poco (Few)" )
@@ -750,7 +747,7 @@ static INPUT_PORTS_START( kas89 )
 	PORT_DIPSETTING(    0x50, "Alto (High)" )
 
 
-	PORT_START("UNK")   /* Unknown input set */
+	PORT_START("UNK")   // Unknown input set
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -758,7 +755,7 @@ static INPUT_PORTS_START( kas89 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Should be active for Audit/Test Mode, also for boot...*/
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // Should be active for Audit/Test Mode, also for boot...
 
 INPUT_PORTS_END
 
@@ -769,32 +766,32 @@ INPUT_PORTS_END
 
 void kas89_state::kas89(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* Confirmed */
+	// basic machine hardware
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    // Confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &kas89_state::kas89_map);
 	m_maincpu->set_addrmap(AS_IO, &kas89_state::kas89_io);
-	TIMER(config, "kas89_nmi").configure_periodic(FUNC(kas89_state::kas89_nmi_cb), attotime::from_hz(138));
+	TIMER(config, "kas89_nmi").configure_periodic(FUNC(kas89_state::nmi_cb), attotime::from_hz(138));
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/6);   /* Confirmed */
+	Z80(config, m_audiocpu, MASTER_CLOCK/6);   // Confirmed
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kas89_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &kas89_state::audio_io);
-	TIMER(config, "kas89_snmi").configure_periodic(FUNC(kas89_state::kas89_sound_nmi_cb), attotime::from_hz(138));
+	TIMER(config, "kas89_snmi").configure_periodic(FUNC(kas89_state::sound_nmi_cb), attotime::from_hz(138));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "aysnd", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0);    /* Confirmed */
+	AY8910(config, "aysnd", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0);    // Confirmed
 }
 
 
@@ -853,13 +850,13 @@ void kas89_state::init_kas89()
 	int memsize = memregion("maincpu")->bytes();
 	std::vector<uint8_t> buf;
 
-	/* Unscrambling data lines */
+	// Unscrambling data lines
 	for (int i = 0; i < memsize; i++)
 	{
 		buf.push_back(bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2));
 	}
 
-	/* Unscrambling address lines */
+	// Unscrambling address lines
 	for (int i = 0; i < memsize; i++)
 	{
 		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
@@ -872,4 +869,4 @@ void kas89_state::init_kas89()
 **************************************/
 
 //     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
-GAMEL( 1989, kas89, 0,      kas89,   kas89, kas89_state, init_kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )
+GAMEL( 1989, kas89, 0,      kas89,   kas89, kas89_state, init_kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_kas89 )

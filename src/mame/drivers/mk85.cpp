@@ -38,17 +38,17 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 
-	void mk85_mem(address_map &map);
+	void mem_map(address_map &map);
 
-	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<k1801vm2_device> m_maincpu;
 };
 
 
-void mk85_state::mk85_mem(address_map &map)
+void mk85_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().mirror(0x4000);
@@ -64,11 +64,11 @@ void mk85_state::machine_reset()
 {
 }
 
-void mk85_state::video_start()
+void mk85_state::machine_start()
 {
 }
 
-uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mk85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -78,7 +78,7 @@ void mk85_state::mk85(machine_config &config)
 	/* basic machine hardware */
 	K1801VM2(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_initial_mode(0);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mk85_state::mk85_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk85_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -86,7 +86,7 @@ void mk85_state::mk85(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(mk85_state::screen_update_mk85));
+	screen.set_screen_update(FUNC(mk85_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -94,11 +94,11 @@ void mk85_state::mk85(machine_config &config)
 
 /* ROM definition */
 ROM_START( mk85 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "mk85.rom", 0x0000, 0x4000, CRC(398e4fd1) SHA1(5e2f877d0f451b46840f01190004552bad5248c8))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME  FLAGS */
-COMP( 1986, mk85, 0,      0,      mk85,    mk85,  mk85_state, empty_init, "Elektronika", "MK-85",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, mk85, 0,      0,      mk85,    mk85,  mk85_state, empty_init, "Elektronika", "MK-85",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

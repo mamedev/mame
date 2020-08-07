@@ -10,6 +10,7 @@
 
 #include "nltypes.h"
 #include "plib/palloc.h"
+#include "plib/pmempool.h"
 #include "plib/ptypes.h"
 #include "plib/putil.h"
 
@@ -38,8 +39,6 @@
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);
 
 namespace netlist {
-	class core_device_t;
-	class netlist_state_t;
 
 namespace factory {
 

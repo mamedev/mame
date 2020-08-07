@@ -18,104 +18,95 @@
 /* Driver initialization */
 void special_state::init_special()
 {
-	/* set initialy ROM to be visible on first bank */
-	uint8_t *RAM = m_region_maincpu->base();
-	memset(RAM,0x0000,0x4000); // make first page empty by default
-	m_bank1->configure_entries(1, 2, RAM, 0x0000);
-	m_bank1->configure_entries(0, 2, RAM, 0xc000);
+	m_bank1->configure_entry(0, m_mram);
+	m_bank1->configure_entry(1, m_rom);
 }
 
-uint8_t special_state::specialist_8255_porta_r()
+uint8_t special_state::porta_r()
 {
 	for (int i = 0; i < 8; i++)
-		if (m_io_line[i]->read() != 0xff)
+		if (m_io_keyboard[i]->read() < 0xfc)
 			return (1 << i) ^ 0xff;
 
 	return 0xff;
 }
 
-uint8_t special_state::specialist_8255_portb_r()
+u8 special_state::kbd_r()
 {
-	uint8_t dat = 0xff;
+	u8 data = 0xfc;
 
-	for (int i = 0; i < 8; i++)
-		if (!BIT(m_specialist_8255_porta, i))
-			dat &= m_io_line[i]->read();
+	if (m_porta < 0xff)
+		for (u8 i = 0; i < 8; i++)
+			if (!BIT(m_porta, i))
+				data &= m_io_keyboard[i]->read();
 
-	for (int i = 0; i < 4; i++)
-		if (!BIT(m_specialist_8255_portc, i))
-			dat &= m_io_line[8 + i]->read();
+	if (BIT(m_portc, 0, 4) < 0x0f)
+		for (u8 i = 0; i < 4; i++)
+			if (!BIT(m_portc, i))
+				data &= m_io_keyboard[8 + i]->read();
 
 	// shift key
-	if (BIT(~m_io_line[12]->read(), 0))
-		dat &= 0xfd;
+	if (m_io_keyboard[12]->read())
+		data |= 2;
 
-	// cassette
-	if (m_cassette->input() > 0.01)
-		dat &= 0xfe;
+	return data;
+}
+
+uint8_t special_state::portb_r()
+{
+	u8 data = kbd_r();
 
 	// strobe if a key is pressed
-	if (dat < 0xfc) dat &= 0x7f;
-
-	return dat;
-}
-
-uint8_t special_state::specimx_8255_portb_r()
-{
-	uint8_t dat = 0xff;
-
-	for (int i = 0; i < 8; i++)
-		if (!BIT(m_specialist_8255_porta, i))
-			dat &= m_io_line[i]->read();
-
-	for (int i = 0; i < 4; i++)
-		if (!BIT(m_specialist_8255_portc, i))
-			dat &= m_io_line[8 + i]->read();
-
-	// shift key
-	if (BIT(~m_io_line[12]->read(), 0))
-		dat &= 0xfd;
+	// TODO: this conflicts with function keys - to check
+	if ((data & 0xfc) < 0xfc)
+		data &= 0x7f;
 
 	// cassette
 	if (m_cassette->input() > 0.01)
-		dat &= 0xfe;
+		data |= 0x81;
 
-	return dat;
+	return data;
 }
 
-uint8_t special_state::specialist_8255_portc_r()
+uint8_t special_state::specimx_portb_r()
 {
-	for (int i = 0; i < 4; i++)
-		if (m_io_line[8 + i]->read() != 0xff)
+	u8 data = kbd_r();
+
+	// cassette
+	if (m_cassette->input() > 0.01)
+		data |= 0x81;
+
+	return data;
+}
+
+uint8_t special_state::portc_r()
+{
+	for (u8 i = 0; i < 4; i++)
+		if (m_io_keyboard[8 + i]->read() < 0xfc)
 			return (1 << i) ^ 0x0f;
 
 	return 0x0f;
 }
 
-void special_state::specialist_8255_porta_w(uint8_t data)
+void special_state::porta_w(uint8_t data)
 {
-	m_specialist_8255_porta = data;
+	m_porta = data;
 }
 
-void special_state::specialist_8255_portb_w(uint8_t data)
+void special_state::portb_w(uint8_t data)
 {
-	m_specialist_8255_portb = data;
+	m_portb = data;
 }
 
-void special_state::specialist_8255_portc_w(uint8_t data)
+void special_state::portc_w(uint8_t data)
 {
-	m_specialist_8255_portc = data;
-
-	m_cassette->output(BIT(data, 7) ? 1 : -1);
-
-	m_dac->write(BIT(data, 5)); //beeper
-
+	specimx_portc_w(data);
 	m_bank1->set_entry(BIT(data, 4));
 }
 
-void special_state::specialistmx_8255_portc_w(uint8_t data)
+void special_state::specimx_portc_w(uint8_t data)
 {
-	m_specialist_8255_portc = data;
+	m_portc = data;
 
 	m_cassette->output(BIT(data, 7) ? 1 : -1);
 
@@ -186,13 +177,9 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 			space.unmap_write(0x0000, 0x8fff);
 			space.unmap_write(0x9000, 0xbfff);
 
-			m_bank1->set_base(m_region_maincpu->base() + 0x10000);
-			m_bank2->set_base(m_region_maincpu->base() + 0x19000);
-
-			if (data & 0x80)
-				m_bank3->set_base(ram + 0x1c000);
-			else
-				m_bank3->set_base(ram + 0xc000);
+			m_bank1->set_base(m_rom);
+			m_bank2->set_base(m_rom + 0x9000);
+			m_bank3->set_base(ram + (BIT(data, 7) ? 0x1c000 : 0xc000));
 
 			break;
 	}
@@ -201,17 +188,6 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 void special_state::specimx_select_bank(offs_t offset, uint8_t data)
 {
 	specimx_set_bank(offset, data);
-}
-
-MACHINE_START_MEMBER(special_state,specimx)
-{
-	m_drive = 0;
-}
-
-MACHINE_RESET_MEMBER(special_state,specimx)
-{
-	specimx_set_bank(2, 0); // Initiali load ROM disk
-	timer_set(attotime::zero, TIMER_PIT8253_GATES);
 }
 
 uint8_t special_state::specimx_disk_ctrl_r()
@@ -258,10 +234,9 @@ void special_state::specimx_disk_ctrl_w(offs_t offset, uint8_t data)
 void special_state::erik_set_bank()
 {
 	uint8_t bank1 = m_RR_register & 3;
-	uint8_t bank2 = (m_RR_register >> 2) & 3;
-	uint8_t bank3 = (m_RR_register >> 4) & 3;
-	uint8_t bank4 = (m_RR_register >> 6) & 3;
-	uint8_t *mem = m_region_maincpu->base();
+	uint8_t bank2 = BIT(m_RR_register, 2, 2);
+	uint8_t bank3 = BIT(m_RR_register, 4, 2);
+	uint8_t bank4 = BIT(m_RR_register, 6, 2);
 	uint8_t *ram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -281,7 +256,7 @@ void special_state::erik_set_bank()
 			break;
 		case    0:
 			space.unmap_write(0x0000, 0x3fff);
-			m_bank1->set_base(mem + 0x10000);
+			m_bank1->set_base(m_rom);
 			break;
 	}
 	switch(bank2)
@@ -293,7 +268,7 @@ void special_state::erik_set_bank()
 			break;
 		case    0:
 			space.unmap_write(0x4000, 0x8fff);
-			m_bank2->set_base(mem + 0x14000);
+			m_bank2->set_base(m_rom + 0x4000);
 			break;
 	}
 	switch(bank3)
@@ -305,7 +280,7 @@ void special_state::erik_set_bank()
 			break;
 		case    0:
 			space.unmap_write(0x9000, 0xbfff);
-			m_bank3->set_base(mem + 0x19000);
+			m_bank3->set_base(m_rom + 0x9000);
 			break;
 	}
 	switch(bank4)
@@ -313,13 +288,13 @@ void special_state::erik_set_bank()
 		case    1:
 		case    2:
 		case    3:
-			m_bank4->set_base(ram + 0x10000*(bank4-1) + 0x0c000);
-			m_bank5->set_base(ram + 0x10000*(bank4-1) + 0x0f000);
-			m_bank6->set_base(ram + 0x10000*(bank4-1) + 0x0f800);
+			m_bank4->set_base(ram + 0x10000*(bank4-1) + 0xc000);
+			m_bank5->set_base(ram + 0x10000*(bank4-1) + 0xf000);
+			m_bank6->set_base(ram + 0x10000*(bank4-1) + 0xf800);
 			break;
 		case    0:
 			space.unmap_write(0xc000, 0xefff);
-			m_bank4->set_base(mem + 0x1c000);
+			m_bank4->set_base(m_rom + 0xc000);
 			space.unmap_write(0xf000, 0xf7ff);
 			space.nop_read(0xf000, 0xf7ff);
 			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8sm_delegate(*m_ppi, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi, FUNC(i8255_device::write)));
@@ -334,11 +309,48 @@ void special_state::init_erik()
 	m_erik_background = 0;
 }
 
-MACHINE_RESET_MEMBER(special_state,erik)
+void special_state::machine_reset()
 {
-	m_RR_register = 0x00;
-	m_RC_register = 0x00;
-	erik_set_bank();
+	if (m_bank6) // erik
+	{
+		m_erik_color_1 = 0;
+		m_erik_color_2 = 0;
+		m_erik_background = 0;
+		m_RR_register = 0x00;
+		m_RC_register = 0x00;
+		erik_set_bank();
+	}
+	else
+	if (m_bank4) // specimx
+	{
+		m_specimx_color = 0xF0;  // default for -bios 1/2, since they don't have colour
+		specimx_set_bank(2, 0); // Initial load ROM disk
+		timer_set(attotime::zero, TIMER_PIT8253_GATES);
+	}
+}
+
+void special_state::machine_start()
+{
+	if (m_bank6) // erik
+	{
+		save_item(NAME(m_erik_color_1));
+		save_item(NAME(m_erik_color_2));
+		save_item(NAME(m_erik_background));
+		save_item(NAME(m_RR_register));
+		save_item(NAME(m_RC_register));
+	}
+	else
+	if (m_bank4) // specimx
+	{
+		m_specimx_colorram = std::make_unique<uint8_t[]>(0x3000);
+		save_pointer(NAME(m_specimx_colorram), 0x3000);
+		save_item(NAME(m_drive));
+		save_item(NAME(m_specimx_color));
+	}
+
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_portc));
 }
 
 uint8_t special_state::erik_rr_reg_r()
@@ -361,7 +373,7 @@ void special_state::erik_rc_reg_w(uint8_t data)
 {
 	m_RC_register = data;
 	m_erik_color_1 = m_RC_register & 7;
-	m_erik_color_2 = (m_RC_register >> 3) & 7;
+	m_erik_color_2 = BIT(m_RC_register, 3, 3);
 	m_erik_background = BIT(m_RC_register, 6) + BIT(m_RC_register, 7) * 4;
 }
 

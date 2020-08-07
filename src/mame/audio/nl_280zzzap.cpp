@@ -19,7 +19,7 @@
 // speedups have been employed to allow the game to run at full speed on
 // modern hardware with some CPU to spare. The main sources of complexity are
 // the op-amps (15 of them, all of which are National Semiconductor LM3900
-// current-differencing "Norton-type" opamps) and the Motorola MC3340
+// current-differencing "Norton-type" op-amps) and the Motorola MC3340
 // Electronic Attenuator, the latter of which is emulated at its internal
 // component level, which includes 10 bipolar junction transistors. Several of
 // the circuits are oscillators which run at frequencies up to hundreds of
@@ -51,6 +51,21 @@
 // oscillators to maintain their frequency and voltage levels.
 
 #define CONVERGENCE_FRONTIERS   1
+
+// Use the fast high-level emulation of the analog noise generator, based on
+// passing the noise signal to a simple AFUNC that outputs a high or low level
+// according to the sign of the noise. This sounds the same as an accurate run
+// of the component-level noise generator, but it is fast enough to run in
+// real time.
+
+#define FAST_HLE_NOISE_GEN  1
+
+// Enable a voltage limiter on the output of the op-amp which generates the
+// post-crash sound. This removes voltage glitches from the output which would
+// otherwise be audible when the netlist is run with a fixed 48 kHz timestep,
+// as it is in MAME.
+
+#define REMOVE_POST_CRASH_NOISE_GLITCHES  1
 
 
 static NETLIST_START(mc3340)
@@ -546,30 +561,62 @@ static NETLIST_START(280zzzap_schematics)
 	// **** (NOISE_CR_2).
 
 	// The noise generator circuit for 280-ZZZAP and Laguna Racer is based
-	// on a reverse-biased 9.1-volt 1N5239 Zener diode which generates a
-	// noisy current for an LM3900 Norton op-amp input. The op-amp then
-	// amplifies the noise in that current to generate more intense noise
-	// for the other circuits.
-
-	// The netlist library supports Zener diodes, but not their noise
-	// behavior, so I simulate it with an additional source of noise
-	// voltage, inserted in series between the Zener and the op-amp input.
-
+	// on a reverse-biased 9.1-volt 1N5239 zener diode which generates a
+	// noisy current for an LM3900 Norton op-amp input. This op-amp then
+	// amplifies the noise so strongly that its output saturates, randomly
+	// oscillating between the maximum and mininum values, producing a
+	// quasi-digital random waveform which is then smoothed and filtered
+	// by another op-amp to form a continuous analog noise signal.
+	// Following circuits re-filter and reshape this noise for the
+	// noise-based sound effects.
+	//
+	// The noise of zener diodes is not well controlled during their
+	// manufacture, and it can vary widely in strength from one part to
+	// another even within a single production lot. However, this
+	// op-amp-based noise generator takes zener noise of unpredictable
+	// strength and converts it into an analog noise stream whose strength
+	// is predictable, determined by the response of the op-amp circuits.
+	//
 	// Super Speed Race generates its noise in a different fashion, using
-	// a linear-feedback shift register on the main motherboard. However,
-	// it processes the noise signal through similar sound effect
-	// circuits.
-
+	// a linear-feedback shift register on the main motherboard to
+	// generate a true digital random noise signal. However, once this
+	// digital noise has been generated, it gets smoothed and filtered
+	// into continuous analog form in the same way and is further
+	// processed through similar sound effect circuits.
+	//
 	// Since the noise generator discrete components are unlabeled on the
 	// 280-ZZZAP and Laguna Racer schematics and are not present in Super
 	// Speed Race, I've chosen my own labels for them.
-
-	// Simple model of a 1N5239 9.1-volt Zener diode; according to
-	// datasheets, this diode conducts 20 mA of current at 9.1 V reverse
-	// bias. The amount of noise produced by the generator turns out to
-	// depend on NBV, as does the mean voltage. I choose NBV=1 to maximize
-	// the noise and reduce the mean voltage offset.
-	ZDIODE(ZD_1N5239, "D(BV=9.1 IBV=0.020 NBV=1)")
+	//
+	// The netlist library supports zener diodes, but not zener noise. The
+	// noise is simulated using an additional source of noise voltage.
+	// This noise is handled in one of two ways, depending on how the
+	// netlist is configured.
+	//
+	// If the netlist is configured for detailed circuit simulation, the
+	// noise source is inserted in series between the zener diode's output
+	// and the op-amp's non-inverting input. This netlist configuration
+	// tries to accurately reproduce the amplified noise signal which the
+	// op-amp would generate. Because of the rapidly changing noise signal
+	// and the op-amp's high gain, however, producing an accurate,
+	// glitch-free signal requires using dynamic time-stepping with a very
+	// short minimum time step on the order of 10 nanoseconds. This has an
+	// unacceptable impact on performance and is unsuitable for real-time
+	// operation, like in a normal MAME session.
+	//
+	// For such operation, a simpler high-level emulation configuration is
+	// used. Because of the very high gain of the op-amp, the real output
+	// signal will always lie at either the op-amp's maximum or minimum
+	// output value, almost never being in between. So we take the same
+	// input noise signal and replace the op-amp with a simple AFUNC()
+	// module which only checks the input signal's sign and outputs the
+	// corresponding maximum or minimum value. This version runs much
+	// faster, not requiring dynamic time-stepping at all for a
+	// glitch-free result, and its output is very similar to running the
+	// detailed emulation with a short minimum timestep. Once the output
+	// has been smoothed and filtered, the two configurations will be
+	// effectively identical, and there will be no difference in the
+	// resulting sound effects except for how fast they are computed.
 
 	// 24 kHz noise clock for the noise source, chosen to retain noise
 	// frequencies as high as possible for 48 kHz sample rate.
@@ -577,13 +624,51 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(I_V5.Q, NCLK.VCC)
 	NET_C(GND, NCLK.GND)
 
-	// Normally-distributed noise of 10 microvolts RMS voltage.
-	// With the Zener above using NBV=1, this seems to be good enough.
-	// Increasing it further begins to distort the NOISE_CR_2 post-crash
-	// noise while not adding much volume to the NOISE_CR_1 skid noise.
-	SYS_NOISE_MT_N(NOISE, 10e-6)
+	// Normally-distributed noise of 10 millivolts RMS voltage. With the
+	// zener passing about 25 microamps of current, the real noise may be
+	// even stronger than this, but this is strong enough to cause the
+	// op-amp to saturate its output, which this noise generator is
+	// designed to do.
+	// (If the simplified noise generator netlist is being used, the noise
+	// signal is re-centered on zero volts, and its amplitude no longer
+	// matters, only its sign.)
+	SYS_NOISE_MT_N(NOISE, 0.01)
 
 	NET_C(NCLK.Q, NOISE.I)
+
+	// Both the quasi-digital noise signal produced by the 280-ZZZAP and
+	// Laguna Racer noise generators and the digital noise signal produced
+	// by the Super Speed Race noise generator enter at the upstream end
+	// of capacitor C1.
+
+	CAP(C1, CAP_U(10))
+
+#if FAST_HLE_NOISE_GEN
+
+	// Simplified high-level emulation of the noise generator: oscillate
+	// between full on and full off according to the sign of the noise
+	// input.
+
+	NET_C(NOISE.1, A_NOISE.A0)
+	NET_C(NOISE.2, GND)
+	AFUNC(A_NOISE, 1, "if(A0 > 0, 4.5, 0.03)")
+
+	NET_C(A_NOISE.Q, C1.1)
+
+#else
+
+	// Simple model of a 1N5239 9.1-volt Zener diode. The 1N5239 is
+	// specified to conduct 20 mA of current at its nominal breakdown
+	// voltage of 9.1 V. The model produces an exponential I-V curve,
+	// passing through this point, which has the same general shape as
+	// that of a normal forward-biased diode. NBV is an exponent scale
+	// factor; its value here of 1 gives the curve a steep rise and a
+	// relatively sharp knee. Actual breakdown I-V curves have an even
+	// steeper rise and sharper knee, too steep and sharp to be
+	// represented by an exponential, but this model is good enough for
+	// this emulation, since the diode operates very close to a single
+	// point on the curve.
+	ZDIODE(ZD_1N5239, "D(BV=9.1 IBV=0.020 NBV=1)")
 
 	RES(RNOISE0, RES_K(100))
 	CAP(CNOISE0, CAP_U(10))
@@ -593,6 +678,9 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(RNOISE0.2, CNOISE0.1, ZD_1N5239.K)
 
 	LM3900(H4_2)
+
+	NET_C(I_V5.Q, H4_2.VCC)
+	NET_C(GND, H4_2.GND)
 
 	RES(RNOISE1, RES_K(56))
 	RES(RNOISE2, RES_K(47))
@@ -608,17 +696,16 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(H4_2.OUT, RNOISE2.2, RNOISE3.1, C1.1)
 	NET_C(RNOISE3.2, GND)
 
-	// In Super Speed Race, which lacks the noise generator described
-	// above, the noise signal enters at the upstream end of capacitor C1.
-
-	CAP(C1, CAP_U(10))
+#endif
 
 	NET_C(C1.2, R1.1)
 
 	// The noise generator is followed by a single-amplifier active
 	// low-pass filter with a corner frequency of about 6.3 kHz, a very
-	// broad Q of 0.014, and a gain of about 0.8. This filter basically
-	// attenuates the highest noise frequencies.
+	// broad Q of 0.014, and a gain of about 0.8. This filter attenuates
+	// the very highest noise frequencies, converting the initial
+	// quasi-digital noise waveform into a smoother analog noise waveform
+	// that is still of pretty high frequency.
 
 	RES(R1, RES_K(330))  // 680 Kohm in Super Speed Race
 
@@ -637,8 +724,8 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(H4_1.PLUS, R3.2)
 	NET_C(H4_1.OUT, C3.2, R4.2, R5.1, R17.1, C5.1, C4.1)
 
-	// The low-pass-filtered noise is passed to three different
-	// sound-effect circuits, each of which is also an active-filter type.
+	// The smoothed analog noise is passed to three different sound-effect
+	// circuits, each of which is also an active-filter type.
 
 	// First noise circuit: tire skid (NOISE_CR_1)
 
@@ -698,8 +785,8 @@ static NETLIST_START(280zzzap_schematics)
 	// number. (I'm not sure what effect this has on a filter, but it
 	// might indicate instability.)
 
-	// The result is saturated, clipped noise, a bit like randomized
-	// square waves, with frequencies mainly below 1 kHz.
+	// The result is saturated, heavily clipped noise with frequencies
+	// mainly below 1 kHz.
 
 	// I don't know why the circuit was designed this way, or whether it
 	// was deliberate or a design or production error which the makers
@@ -728,7 +815,21 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(H5_2.MINUS, R15.2, C9.1)
 	NET_C(I_V5.Q, R14.1)
 	NET_C(H5_2.PLUS, R14.2)
+#if REMOVE_POST_CRASH_NOISE_GLITCHES
+	// With the static time-stepping used to ensure acceptable performance
+	// with MAME, this part of the netlist will generate extra spikes on
+	// the op-amp output with voltages outside of the real op-amp's output
+	// range. These spikes give the sound an unwanted "grittiness" not in
+	// the original, so I've added a voltage-limiting AFUNC to the op-amp
+	// output beyond its feedback connection. This gives a smoother sound,
+	// closer to the original.
+
+	NET_C(H5_2.OUT, C9.2, R13.2, H5_2_LIM.A0)
+	AFUNC(H5_2_LIM, 1, "max(min(A0, 4.5), 0)")
+	NET_C(H5_2_LIM.Q, G4.8)
+#else
 	NET_C(H5_2.OUT, C9.2, R13.2, G4.8)
+#endif
 	NET_C(G4.9, R64.1)
 	NET_C(G4.6, NOISE_CR_2)
 
@@ -742,8 +843,8 @@ static NETLIST_START(280zzzap_schematics)
 	// The filter is normally cut off from the noise signal, and thus it
 	// remains quiet. When the BOOM signal is activated, CD4016 switch
 	// G4_A opens, letting in the noise to be filtered and amplified until
-	// the switch is cut off again, generating a loud sort of "boom".
-	// (The sound doesn't have much decay, though; it gets cut abruptly.)
+	// the switch is cut off again, generating a loud, fairly deep "boom".
+	// (The "boom" doesn't have much decay, though; it gets cut abruptly.)
 
 	LM3900(H5_1)
 
@@ -774,23 +875,32 @@ static NETLIST_START(280zzzap_schematics)
 	// **** Final mix of sound effects and sound preamplification.
 
 	// The preamplification stage after the final mix has two LM3900
-	// op-amps, only one of which is modeled here. This is because of the
-	// way the speaker is driven. The power amplification that drives the
-	// speaker is done by a National Semiconductor LM377 dual audio power
-	// amplifier chip, with the chip's two amplifiers wired in a so-called
-	// "bridge configuration" to drive the speaker's positive and negative
-	// terminals in a push-pull fashion. This effectively converts the
-	// dual power amp into a single amp of twice the power.
+	// op-amps. The audio power amplifier beyond it is a National
+	// Semiconductor LM377 integrated dual power amp, with two 2-watt
+	// power amps on the same chip. Both of these power amps drive the
+	// single speaker from opposite ends in a push-pull fashion, a
+	// so-called "bridge configuration" which effectively converts the
+	// dual 2-watt power amp into a single 4-watt amp.
 
-	// The preamplified input signals for these power amps are generated
-	// from the final mix by the two LM3900s, each driving one power amp.
-	// The first LM3900, J5_3, also preamplifies the final mix signal,
-	// sending its output to the first power amp. The second LM3900, J5_4,
-	// simply inverts J5_3's output so it can drive the second power amp
-	// in opposing fashion. Since the second LM3900 doesn't otherwise
-	// alter the output signal, and we don't care about power
-	// amplification, this op-amp and its associated circuitry can be
-	// omitted.
+	// The two power amps get their inputs from the outputs of the two
+	// LM3900 op-amps. The first LM3900, J5_3, pre-amplifies the signal
+	// from the final mix and has a master volume potentiometer to control
+	// its gain. Its output gets sent directly to one power amp and is
+	// also passed to the second LM3900, J5_4, which inverts the signal
+	// without changing the gain. The inverted signal is sent to the
+	// second power amp that drives the speaker's other end. The first
+	// LM3900 is AC-coupled to the second, and both are AC-coupled to the
+	// power amps. As a result, the output signal of the second LM3900
+	// more closely resembles the final output in waveform and tone
+	// quality than the first LM3900's output does, so I have chosen the
+	// second LM3900 as the final output for the emulation. The power amps
+	// themselves are not emulated.
+
+	// The master volume potentiometer is user-adjustable and is set to
+	// its midpoint by default. Higher settings may produce clipped,
+	// distorted output, but since the power amps are configured for a
+	// voltage gain of 20 and use a 20 V power supply, this is likely true
+	// for the original hardware as well.
 
 	RES(R63, RES_K(12))  // 3 Kohm in Super Speed Race
 	RES(R64, RES_K(150))
@@ -811,25 +921,34 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(R66.2, C21.1)
 
 	LM3900(J5_3)
+	LM3900(J5_4)
 
 	RES(R67, RES_K(2))
 	CAP(C22, CAP_U(10))
 	RES(R68, RES_K(220))
+	RES(R74, RES_K(220))
 
 	NET_C(I_V5.Q, R67.1)
-	NET_C(R67.2, C22.1, R68.1)
+	NET_C(R67.2, C22.1, R68.1, R74.1)
 	NET_C(C22.2, GND)
 	NET_C(J5_3.PLUS, R68.2)
+	NET_C(J5_4.PLUS, R74.2)
 
 	RES(R69, RES_K(100))
-	RES(R70, RES_K(10))  // actually a potentiometer, at max. volume
+	POT2(R70, RES_K(10))  // Master volume potentiometer (2 terminals)
 	CAP(C23, CAP_U(10))
+	CAP(C24, CAP_U(0.1))
+	RES(R73, RES_K(100))
+	RES(R75, RES_K(100))
 
 	NET_C(R70.2, C23.2)
 	NET_C(J5_3.MINUS, C20.2, C21.2, R69.1, R70.1)
-	NET_C(J5_3.OUT, C23.1, R69.2)
+	NET_C(J5_3.OUT, C23.1, R69.2, C24.1)
+	NET_C(C24.2, R73.1)
+	NET_C(J5_4.MINUS, R73.2, R75.1)
+	NET_C(J5_4.OUT, R75.2)
 
-	ALIAS(OUTPUT, J5_3.OUT)
+	ALIAS(OUTPUT, J5_4.OUT)
 
 NETLIST_END()
 
@@ -837,6 +956,14 @@ NETLIST_END()
 NETLIST_START(280zzzap)
 
 	SOLVER(Solver, 48000)
+
+#if !(FAST_HLE_NOISE_GEN)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	// 10 ns is the minimum timestep to avoid significant spikes outside
+	// the allowed LM3900 output region of 0-4.5 V; even 20 ns gives
+	// frequent spikes into the 4.5-5 volt region.
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-8)
+#endif
 
 	// All together, loosening both tolerances and reducing accuracy
 	// increases speed by ~10%, but it also causes audible "crackling".
@@ -910,16 +1037,18 @@ NETLIST_START(280zzzap)
 	// Power inputs for the LM3900 op-amps. These aren't shown on the
 	// schematics, but it looks like 5-volt power is needed to get proper
 	// results.
+	// (H4_2, the noise generator op-amp, is not listed here because it's
+	// inside the #else clause of the #if FAST_HLE_NOISE_GEN conditional.)
 	NET_C(I_V5.Q,
-		  H4_1.VCC, H4_2.VCC, H4_3.VCC, H4_4.VCC,
-		  H5_1.VCC, H5_2.VCC, H5_3.VCC, H5_4.VCC,
-		  J3_1.VCC, J3_2.VCC, J3_3.VCC, J3_4.VCC,
-		  J5_1.VCC, J5_2.VCC, J5_3.VCC)
+		H4_1.VCC, H4_3.VCC, H4_4.VCC,
+		H5_1.VCC, H5_2.VCC, H5_3.VCC, H5_4.VCC,
+		J3_1.VCC, J3_2.VCC, J3_3.VCC, J3_4.VCC,
+		J5_1.VCC, J5_2.VCC, J5_3.VCC, J5_4.VCC)
 	NET_C(GND,
-		  H4_1.GND, H4_2.GND, H4_3.GND, H4_4.GND,
-		  H5_1.GND, H5_2.GND, H5_3.GND, H5_4.GND,
-		  J3_1.GND, J3_2.GND, J3_3.GND, J3_4.GND,
-		  J5_1.GND, J5_2.GND, J5_3.GND)
+		H4_1.GND, H4_3.GND, H4_4.GND,
+		H5_1.GND, H5_2.GND, H5_3.GND, H5_4.GND,
+		J3_1.GND, J3_2.GND, J3_3.GND, J3_4.GND,
+		J5_1.GND, J5_2.GND, J5_3.GND, J5_4.GND)
 
 	// Power inputs for the CD4016 switches. Again, these aren't shown on
 	// the schematics, but 5-volt power must be used for the switches to
@@ -930,11 +1059,13 @@ NETLIST_START(280zzzap)
 	NET_C(GND, G5.10, G5.11, G5.12, J4.6, J4.8, J4.9, G4.10, G4.11, G4.12)
 
 	// Frontier after output of noise generator.
-	// This makes a speed boost of ~10%.
+	// FIXME: Anomaly - with FAST_HLE_NOISE_GEN set, this frontier cannot
+	// be removed, because doing so kills the noise entirely, even though
+	// the AFUNC is still generating the same output. Perhaps an AFUNC
+	// output by itself won't change the capacitor state?
 	OPTIMIZE_FRONTIER(C1.1, RES_M(1), 50)
 
 	// Frontier before skid screech generator.
-	// This makes a speed boost of ~8%.
 	OPTIMIZE_FRONTIER(R5.1, RES_K(39), 50)
 	// (Adding a frontier *after* the skid screech generator makes the
 	// sudden jumps in signal level on skids much larger, so the resulting
@@ -942,22 +1073,17 @@ NETLIST_START(280zzzap)
 	// nothing for speed. That's why I don't have such a frontier.)
 
 	// Frontiers after NOISE CR 2 and BOOM generators.
-	// Each of these boosts speed by several percent and reduces
-	// NEWTON_LOOPS warnings.
 	OPTIMIZE_FRONTIER(R64.1, RES_K(150), 50)
 	OPTIMIZE_FRONTIER(R65.1, RES_K(12), 50)
 
 	// Frontier after engine sound generation.
-	// This makes a speed boost of ~5%.
 	OPTIMIZE_FRONTIER(R66.1, RES_K(33), 50)
 
 	// Frontiers before MC3340 inputs.
-	// Together, these make a speed boost of ~15%.
 	OPTIMIZE_FRONTIER(C16.1, RES_M(1), 50)
 	OPTIMIZE_FRONTIER(C13.1, RES_M(1), 50)
 
 	// Frontiers before engine sound op-amp oscillators.
-	// All together, these make a speed boost of ~12%.
 	OPTIMIZE_FRONTIER(R36.1, RES_K(560), 50)
 	OPTIMIZE_FRONTIER(R37.1, RES_K(270), 50)
 	OPTIMIZE_FRONTIER(R31.1, RES_K(300), 50)

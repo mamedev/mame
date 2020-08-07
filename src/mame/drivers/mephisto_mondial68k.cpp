@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 // thanks-to:Berger
 /***************************************************************************
 
@@ -30,6 +30,8 @@ Hardware:
 #include "mephisto_mondial68k.lh"
 
 
+namespace {
+
 class mondial68k_state : public driver_device
 {
 public:
@@ -51,9 +53,9 @@ protected:
 	void mondial68k_mem(address_map &map);
 
 	void lcd_s_w(u32 data);
-	void input_mux_w(uint8_t data);
-	void board_mux_w(uint8_t data);
-	uint8_t inputs_r();
+	void input_mux_w(u8 data);
+	void board_mux_w(u8 data);
+	u8 inputs_r();
 	void update_display();
 
 	required_device<cpu_device> m_maincpu;
@@ -63,8 +65,8 @@ protected:
 	required_ioport_array<4> m_inputs;
 	output_finder<4> m_digits;
 
-	uint8_t m_input_mux = 0xff;
-	uint8_t m_board_mux = 0xff;
+	u8 m_input_mux = 0xff;
+	u8 m_board_mux = 0xff;
 };
 
 
@@ -94,14 +96,14 @@ void mondial68k_state::lcd_s_w(u32 data)
 		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
-void mondial68k_state::board_mux_w(uint8_t data)
+void mondial68k_state::board_mux_w(u8 data)
 {
 	// d0-d7: chessboard mux, led data
 	m_board_mux = data;
 	update_display();
 }
 
-void mondial68k_state::input_mux_w(uint8_t data)
+void mondial68k_state::input_mux_w(u8 data)
 {
 	// d0-d3: button mux
 	// d6,d7: led select
@@ -109,9 +111,9 @@ void mondial68k_state::input_mux_w(uint8_t data)
 	update_display();
 }
 
-uint8_t mondial68k_state::inputs_r()
+u8 mondial68k_state::inputs_r()
 {
-	uint8_t data = 0x00;
+	u8 data = 0x00;
 
 	// read buttons
 	for (int i=0; i<4; i++)
@@ -222,6 +224,8 @@ ROM_START( mondl68k )
 	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
 	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
+
+} // anonymous namespace
 
 
 

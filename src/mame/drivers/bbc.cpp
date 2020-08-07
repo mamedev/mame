@@ -168,7 +168,7 @@ void bbc_state::bbcb_mem(address_map &map)
 	map(0x0000, 0x7fff).rw(FUNC(bbc_state::bbc_ram_r), FUNC(bbc_state::bbc_ram_w));                                   //    0000-7fff                 Regular RAM
 	map(0x8000, 0xbfff).rw(FUNC(bbc_state::bbc_paged_r), FUNC(bbc_state::bbc_paged_w));                               //    8000-bfff                 Paged ROM/RAM
 	map(0xfe30, 0xfe3f).rw(FUNC(bbc_state::bbc_romsel_r), FUNC(bbc_state::bbc_romsel_w));                             // W: fe30-fe3f  84LS161        Paged ROM selector
-	map(0xfe80, 0xfe9f).rw(m_fdc, FUNC(bbc_fdc_slot_device::read), FUNC(bbc_fdc_slot_device::write));                 //    fe84-fe9f  8271 FDC       Floppy disc controller
+	map(0xfe80, 0xfe9f).rw(m_fdc, FUNC(bbc_fdc_slot_device::read), FUNC(bbc_fdc_slot_device::write));                 //    fe80-fe9f  8271 FDC       Floppy disc controller
 }
 
 
@@ -431,7 +431,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_START("COL8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ ~")                PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ \xC2\xA3")         PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR(0xA3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"_ £")              PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR(0xA3)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(": *")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] }")                PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
@@ -665,7 +665,7 @@ static INPUT_PORTS_START(torchi_keyboard)
 
 	PORT_START("COL5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 \xC2\xA3")         PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR(0xA3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"3 £")              PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR(0xA3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad +")           PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")                  PORT_CODE(KEYCODE_C)            PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
@@ -747,7 +747,7 @@ static INPUT_PORTS_START(torchi_keyboard)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')      PORT_CHAR('_')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")           PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_UP)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("# \xC2\xA3")         PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('#')      PORT_CHAR(0xA3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"# £")              PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('#')      PORT_CHAR(0xA3)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' @")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR('\'')     PORT_CHAR('@')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[')      PORT_CHAR('{')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)            PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -1296,11 +1296,11 @@ void torch_state::torchh(machine_config &config)
 	torchf(config);
 
 	/* fdc */
-	//m_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	//m_fdc->subdevice<floppy_connector>("acorn8271:i8271:1")->set_default_option(nullptr);
 
 	/* 10MB or 21MB HDD */
-	//m_1mhzbus->set_default_option("sasi");
-	//m_1mhzbus->set_fixed(true);
+	m_1mhzbus->set_default_option("torchhd");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1308,12 +1308,17 @@ void torch_state::torch301(machine_config &config)
 {
 	torchf(config);
 
+	/* fdc */
+	//m_fdc->subdevice<floppy_connector>("acorn8271:i8271:1")->set_default_option(nullptr);
+
 	/* Torch Z80 Communicator co-processor */
 	m_tube->set_default_option("zep100");
 	m_tube->set_fixed(true);
 	m_tube->set_insert_rom(false);
 
 	/* 20MB HDD */
+	m_1mhzbus->set_default_option("torchhd");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1321,12 +1326,17 @@ void torch_state::torch725(machine_config &config)
 {
 	torchf(config);
 
+	/* fdc */
+	//m_fdc->subdevice<floppy_connector>("acorn8271:i8271:1")->set_default_option(nullptr);
+
 	/* Torch 68000 Atlas co-processor */
 	//m_tube->set_default_option("atlas");
 	m_tube->set_fixed(true);
 	m_tube->set_insert_rom(false);
 
 	/* 20MB HDD */
+	m_1mhzbus->set_default_option("torchhd");
+	m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1407,17 +1417,12 @@ void bbcbp_state::abc110(machine_config &config)
 	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* Acorn Z80 co-processor */
-	m_tube->set_default_option("z80");
+	m_tube->set_default_option("z80w");
 	m_tube->set_fixed(true);
 
 	/* Acorn Winchester Disc 10MB */
 	m_1mhzbus->set_default_option("awhd");
 	m_1mhzbus->set_fixed(true);
-
-	/* software lists */
-	config.device_remove("cass_ls");
-	config.device_remove("flop_ls_b");
-	config.device_remove("flop_ls_b_orig");
 }
 
 
@@ -1437,9 +1442,6 @@ void bbcbp_state::acw443(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
-	config.device_remove("cass_ls");
-	config.device_remove("flop_ls_b");
-	config.device_remove("flop_ls_b_orig");
 }
 
 
@@ -1457,9 +1459,8 @@ void bbcbp_state::abc310(machine_config &config)
 	m_1mhzbus->set_default_option("awhd");
 	m_1mhzbus->set_fixed(true);
 
-	/* software lists */
-	config.device_remove("cass_ls");
-	config.device_remove("flop_ls_b");
+	/* Acorn Mouse */
+	m_userport->set_default_option("m512mouse");
 }
 
 
@@ -2161,7 +2162,24 @@ ROM_START(torchf)
 ROM_END
 
 
-#define rom_torchh rom_torchf
+ROM_START(torchh)
+	ROM_REGION(0x40000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	/* rom page 0 00000 IC52  BASIC */
+	/* rom page 1 04000 IC88  DNFS */
+	/* rom page 2 08000 IC100 CPN (inserted by device) */
+	/* rom page 3 0c000 IC101 SPARE SOCKET */
+	ROM_LOAD("basic2.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+	ROM_LOAD("dnfs120-201666.rom", 0x4000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_LOAD("os12.rom", 0x0000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d))
+
+	ROM_REGION(0x4000, "vsm", 0) /* system speech PHROM */
+	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
+
+	DISK_REGION("1mhzbus:torchhd:sasi:0:s1410:image")
+	DISK_IMAGE("torch_utilities", 0, BAD_DUMP SHA1(33a5f169bd91b9c6049e8bd0b237429c091fddd0)) /* NEC D5126 contains Standard and Hard Disc Utilities, not known what was factory installed */
+ROM_END
 
 
 ROM_START(torch301)
@@ -2887,10 +2905,10 @@ ROM_END
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT   CLASS        INIT       COMPANY            FULLNAME                              FLAGS */
 COMP ( 1981, bbcb,     0,      bbca,  bbcb,     bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,   0,     bbca,     bbca,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchf,   bbcb,   0,     torchf,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_NOT_WORKING)
 COMP ( 1982, bbcb_de,  bbcb,   0,     bbcb_de,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,   0,     bbcb_us,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1982, torchf,   bbcb,   0,     torchf,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1983, torchh,   bbcb,   0,     torchh,   torchb, torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1984, torch301, bbcb,   0,     torch301, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 301",                    MACHINE_NOT_WORKING)
 COMP ( 1984, torch725, bbcb,   0,     torch725, torchi, torch_state, init_bbc,  "Torch Computers", "Torch Model 725",                    MACHINE_NOT_WORKING)
 COMP ( 1985, bbcbp,    0,      bbcb,  bbcbp,    bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS)

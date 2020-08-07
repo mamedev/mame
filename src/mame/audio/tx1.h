@@ -111,7 +111,7 @@ protected:
 	double m_weights0[4] = { 0, 0, 0, 0 };
 	double m_weights1[3] = { 0, 0, 0 };
 	double m_weights2[3] = { 0, 0, 0 };
-	int m_eng0[4] = { 0, 0, 0, 0 };;
+	int m_eng0[4] = { 0, 0, 0, 0 };
 	int m_eng1[4] = { 0, 0, 0, 0 };
 	int m_eng2[4] = { 0, 0, 0, 0 };
 

@@ -24,9 +24,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
-		, m_region_gfx1(*this, "gfx1")
-	{
-	}
+		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "LINE%u", 0U)
+	{ }
 
 	void galaxy(machine_config &config);
 	void galaxyp(machine_config &config);
@@ -35,28 +35,19 @@ public:
 	void init_galaxyp();
 
 private:
-	uint8_t galaxy_keyboard_r(offs_t offset);
-	void galaxy_latch_w(uint8_t data);
-	virtual void video_start() override;
-	DECLARE_MACHINE_RESET(galaxy);
-	DECLARE_MACHINE_RESET(galaxyp);
-	uint32_t screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galaxy_interrupt);
+	uint8_t keyboard_r(offs_t offset);
+	void latch_w(uint8_t data);
+	void machine_start() override;
+	void machine_reset() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(gal_video);
-	IRQ_CALLBACK_MEMBER(galaxy_irq_callback);
-	void galaxy_set_timer();
-	void galaxy_setup_snapshot (const uint8_t * data, uint32_t size);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void set_timer();
+	void setup_snapshot (const uint8_t * data, uint32_t size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	void galaxy_mem(address_map &map);
 	void galaxyp_io(address_map &map);
 	void galaxyp_mem(address_map &map);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
-	required_memory_region m_region_gfx1;
-	ioport_port *m_io_ports[8];
 
 	int m_interrupts_enabled;
 	uint8_t m_latch_value;
@@ -66,6 +57,13 @@ private:
 	uint32_t m_start_addr;
 	emu_timer *m_gal_video_timer;
 	bitmap_ind16 m_bitmap;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<ram_device> m_ram;
+	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 #endif // MAME_INCLUDES_GALAXY_H

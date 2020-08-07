@@ -220,7 +220,7 @@ bra_rel
 	prefetch();
 
 brk_c_imp
-	if(irq_taken || nmi_state) {
+	if(irq_taken || nmi_pending) {
 		read_pc_noinc();
 	} else {
 		read_pc();
@@ -229,12 +229,12 @@ brk_c_imp
 	dec_SP();
 	write(SP, PC);
 	dec_SP();
-	write(SP, irq_taken || nmi_state ? P & ~F_B : P);
+	write(SP, irq_taken || nmi_pending ? P & ~F_B : P);
 	dec_SP();
-	if(irq_taken && nmi_state) {
+	if(irq_taken && nmi_pending) {
 		PC = read_arg(0xfffa);
 		PC = set_h(PC, read_arg(0xfffb));
-		nmi_state = false;
+		nmi_pending = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
 		PC = read_arg(0xfffe);
@@ -766,7 +766,7 @@ tsb_zpg
 wai_imp
 	read_pc_noinc();
 	read_pc_noinc();
-	while(!nmi_state && !irq_state) {
+	while(!nmi_pending && !irq_state) {
 		eat-all-cycles;
 	}
 	prefetch();

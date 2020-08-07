@@ -13,10 +13,9 @@ namespace netlist
 namespace devices
 {
 
-	/* FIXME: timing is not 100% accurate, Strobe and Select inputs have a
-	 *        slightly longer timing.
-	 *        Convert this to sub-devices at some time.
-	 */
+	// FIXME: timing is not 100% accurate, Strobe and Select inputs have a
+	//        slightly longer timing .
+	// FIXME: Truthtable candidate
 
 	NETLIB_OBJECT(74153)
 	{
@@ -25,8 +24,8 @@ namespace devices
 		, m_G(*this, "G", NETLIB_DELEGATE(sub))
 		, m_Y(*this, "AY") //FIXME: Change netlists
 		, m_chan(*this, "m_chan", 0)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
+		, m_A(*this, "A", NETLIB_DELEGATE(other))
+		, m_B(*this, "B", NETLIB_DELEGATE(other))
 		, m_power_pins(*this)
 		{
 		}
@@ -36,7 +35,7 @@ namespace devices
 			m_chan = 0;
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(other)
 		{
 			m_chan = (m_A() | (m_B()<<1));
 			sub();

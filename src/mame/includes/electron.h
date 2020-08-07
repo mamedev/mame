@@ -45,7 +45,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
-		, m_region_basic(*this, "basic")
 		, m_region_mos(*this, "mos")
 		, m_keybd(*this, "LINE.%u", 0)
 		, m_exp(*this, "exp")
@@ -57,6 +56,8 @@ public:
 	void btm2105(machine_config &config);
 
 	void electron64(machine_config &config);
+
+	static void plus3_default(device_t* device);
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
@@ -111,7 +112,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
-	required_memory_region m_region_basic;
 	required_memory_region m_region_mos;
 	required_ioport_array<14> m_keybd;
 	required_device<electron_expansion_slot_device> m_exp;

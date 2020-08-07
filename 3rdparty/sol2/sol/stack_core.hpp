@@ -173,9 +173,9 @@ namespace sol {
 			return pusher<meta::unqualified_t<T>>{}.push(L, std::forward<T>(t), std::forward<Args>(args)...);
 		}
 
-		// overload allows to use a pusher of a specific type, but pass in any kind of args
-		template<typename T, typename Arg, typename... Args, typename = std::enable_if_t<!std::is_same<T, Arg>::value>>
-		inline int push(lua_State* L, Arg&& arg, Args&&... args) {
+		// allow a pusher of a specific type, but pass in any kind of args
+		template<typename T, typename Arg, typename... Args>
+		inline int push_specific(lua_State* L, Arg&& arg, Args&&... args) {
 			return pusher<meta::unqualified_t<T>>{}.push(L, std::forward<Arg>(arg), std::forward<Args>(args)...);
 		}
 

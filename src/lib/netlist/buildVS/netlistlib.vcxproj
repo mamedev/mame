@@ -131,6 +131,7 @@
     <ClCompile Include="..\devices\nld_4066.cpp" />
     <ClCompile Include="..\devices\nld_4316.cpp" />
     <ClCompile Include="..\devices\nld_74107.cpp" />
+    <ClCompile Include="..\devices\nld_74113.cpp" />
     <ClCompile Include="..\devices\nld_74123.cpp" />
     <ClCompile Include="..\devices\nld_74153.cpp" />
     <ClCompile Include="..\devices\nld_74161.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="..\devices\nld_4066.h" />
     <ClInclude Include="..\devices\nld_4316.h" />
     <ClInclude Include="..\devices\nld_74107.h" />
+    <ClInclude Include="..\devices\nld_74113.h" />
     <ClInclude Include="..\devices\nld_74123.h" />
     <ClInclude Include="..\devices\nld_74153.h" />
     <ClInclude Include="..\devices\nld_74161.h" />

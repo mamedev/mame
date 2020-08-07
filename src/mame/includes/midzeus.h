@@ -69,7 +69,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_ram_base(*this, "ram_base"),
-		m_firewire(*this, "firewire"),
 		m_tms32031_control(*this, "tms32031_ctl"),
 		m_zeusbase(*this, "zeusbase"),
 		m_m48t35(*this, "m48t35"),
@@ -95,7 +94,6 @@ public:
 
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
-	optional_shared_ptr<uint32_t> m_firewire;
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_zeusbase;
 
@@ -104,12 +102,8 @@ public:
 	void cmos_protect_w(uint32_t data);
 	uint32_t zpram_r(offs_t offset);
 	void zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t disk_asic_r(offs_t offset);
-	void disk_asic_w(offs_t offset, uint32_t data);
 	uint32_t disk_asic_jr_r(offs_t offset);
 	void disk_asic_jr_w(offs_t offset, uint32_t data);
-	uint32_t firewire_r(offs_t offset);
-	void firewire_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t tms32031_control_r(offs_t offset);
 	void tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void keypad_select_w(offs_t offset, uint32_t data);
@@ -125,10 +119,8 @@ public:
 	uint32_t trackball_r(offs_t offset);
 	void init_invasn();
 	void init_mk4();
-	DECLARE_MACHINE_START(midzeus);
-	DECLARE_MACHINE_RESET(midzeus);
-	DECLARE_VIDEO_START(midzeus);
-	uint32_t screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
@@ -136,7 +128,12 @@ public:
 	void invasn(machine_config &config);
 	void mk4(machine_config &config);
 	void zeus_map(address_map &map);
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 	optional_device<timekeeper_device> m_m48t35;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -151,20 +148,22 @@ protected:
 	optional_ioport m_io_49way_y;
 	optional_ioport m_io_keypad;
 	output_finder<7> m_digits;
-	emu_timer *m_display_irq_off_timer;
-	uint8_t            crusnexo_leds_select;
-	uint32_t           disk_asic[0x10];
-	uint32_t           disk_asic_jr[0x10];
 
-	uint8_t cmos_protected;
+	emu_timer *     m_display_irq_off_timer;
+	uint8_t         m_crusnexo_leds_select;
+	uint32_t        m_disk_asic_jr[0x10];
 
-	emu_timer *timer[2];
+	uint8_t         m_cmos_protected;
+
+	emu_timer *     m_timer[2];
+
 private:
-	uint32_t           gun_control;
-	uint8_t            gun_irq_state;
-	emu_timer *        gun_timer[2];
-	int32_t            gun_x[2], gun_y[2];
-	uint8_t            keypad_select;
+	uint32_t        m_gun_control;
+	uint8_t         m_gun_irq_state;
+	emu_timer *     m_gun_timer[2];
+	int32_t         m_gun_x[2], m_gun_y[2];
+	uint8_t         m_keypad_select;
+
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
 	void zeus_register16_w(offs_t offset, uint16_t data, bool logit);
@@ -187,22 +186,22 @@ private:
 	void waveram_plot_check_depth_nowrite(int y, int x, uint16_t color, uint16_t depth);
 
 	std::unique_ptr<midzeus_renderer> m_poly;
-	uint8_t m_log_fifo;
+	uint8_t     m_log_fifo;
 
-	uint32_t m_zeus_fifo[20];
-	uint8_t m_zeus_fifo_words;
-	int16_t m_zeus_matrix[3][3];
-	int32_t m_zeus_point[3];
-	int16_t m_zeus_light[3];
-	void *m_zeus_renderbase;
-	uint32_t m_zeus_palbase;
-	uint32_t m_zeus_unkbase;
-	int m_zeus_enable_logging;
-	uint32_t m_zeus_objdata;
-	rectangle m_zeus_cliprect;
+	uint32_t    m_zeus_fifo[20];
+	uint8_t     m_zeus_fifo_words;
+	int16_t     m_zeus_matrix[3][3];
+	int32_t     m_zeus_point[3];
+	int16_t     m_zeus_light[3];
+	void *      m_zeus_renderbase;
+	uint32_t    m_zeus_palbase;
+	uint32_t    m_zeus_unkbase;
+	int         m_zeus_enable_logging;
+	uint32_t    m_zeus_objdata;
+	rectangle   m_zeus_cliprect;
 
 	std::unique_ptr<uint32_t[]> m_waveram[2];
-	int m_yoffs;
-	int m_texel_width;
-	int m_is_mk4b;
+	int         m_yoffs;
+	int         m_texel_width;
+	int         m_is_mk4b;
 };

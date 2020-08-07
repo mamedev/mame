@@ -45,12 +45,10 @@ public:
 
 private:
 	required_device<v9938_device> m_v9938;
-	void tonton_outport_w(offs_t offset, uint8_t data);
+	void outport_w(offs_t offset, uint8_t data);
 	void hopper_w(uint8_t data);
 	void ay_aout_w(uint8_t data);
 	void ay_bout_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	void tonton_io(address_map &map);
@@ -69,10 +67,10 @@ private:
 *          Multi-Purpose Output Port             *
 *************************************************/
 
-void tonton_state::tonton_outport_w(offs_t offset, uint8_t data)
+void tonton_state::outport_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
-	machine().bookkeeping().coin_lockout_global_w(data & 0x02);  /* Coin Lock */
+	machine().bookkeeping().coin_lockout_global_w(data & 0x02);  // Coin Lock
 
 //  if(data & 0xfe)
 //      logerror("%02x %02x\n",data,offset);
@@ -101,7 +99,7 @@ void tonton_state::tonton_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
-	map(0x00, 0x00).w(FUNC(tonton_state::tonton_outport_w));
+	map(0x00, 0x00).w(FUNC(tonton_state::outport_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x01, 0x01).w(FUNC(tonton_state::hopper_w));
 	map(0x02, 0x02).portr("DSW1");
@@ -192,19 +190,6 @@ INPUT_PORTS_END
 
 
 /*************************************************
-*        Machine Start & Reset Routines          *
-*************************************************/
-
-void tonton_state::machine_start()
-{
-}
-
-void tonton_state::machine_reset()
-{
-}
-
-
-/*************************************************
 *      R/W Handlers and Interrupt Routines       *
 *************************************************/
 
@@ -224,14 +209,14 @@ void tonton_state::ay_bout_w(uint8_t data)
 
 void tonton_state::tonton(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, CPU_CLOCK);  /* Guess. According to other MSX2 based gambling games */
+	// basic machine hardware
+	Z80(config, m_maincpu, CPU_CLOCK);  // Guess. According to other MSX2 based gambling games
 	m_maincpu->set_addrmap(AS_PROGRAM, &tonton_state::tonton_map);
 	m_maincpu->set_addrmap(AS_IO, &tonton_state::tonton_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	V9938(config, m_v9938, MAIN_CLOCK);
 	m_v9938->set_screen_ntsc("screen");
 	m_v9938->set_vram_size(0x20000);
@@ -240,9 +225,9 @@ void tonton_state::tonton(machine_config &config)
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &aysnd(YM2149(config, "aysnd", YM2149_CLOCK));   /* Guess. According to other MSX2 based gambling games */
+	ym2149_device &aysnd(YM2149(config, "aysnd", YM2149_CLOCK));   // Guess. According to other MSX2 based gambling games
 	/*
 	  AY8910: Port A out: FF
 	  AY8910: Port B out: FF
@@ -251,8 +236,8 @@ void tonton_state::tonton(machine_config &config)
 	  AY8910: Port A out: 00
 	  AY8910: Port B out: 00
 	*/
-	aysnd.port_a_write_callback().set(FUNC(tonton_state::ay_aout_w));    /* Write all bits twice, and then reset them at boot */
-	aysnd.port_b_write_callback().set(FUNC(tonton_state::ay_bout_w));    /* Write all bits twice, and then reset them at boot */
+	aysnd.port_a_write_callback().set(FUNC(tonton_state::ay_aout_w));    // Write all bits twice, and then reset them at boot
+	aysnd.port_b_write_callback().set(FUNC(tonton_state::ay_bout_w));    // Write all bits twice, and then reset them at boot
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
@@ -269,5 +254,5 @@ ROM_START( tonton )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                 FLAGS
-GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                  FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", MACHINE_SUPPORTS_SAVE )

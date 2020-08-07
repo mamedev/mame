@@ -54,21 +54,13 @@
 #define TTL_74123(name)                                                         \
 		NET_REGISTER_DEV(TTL_74123, name)
 
-#define TTL_74123_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_74123_DIP, name)
+#define TTL_74121(name)                                                         \
+		NET_REGISTER_DEV(TTL_74121, name)
 
-/* The 9602 is very similar to the 123. Input triggering is slightly different
- * The 9602 uses an OR gate instead of an AND gate.
- */
+#define TTL_9602(name)                                                         \
+		NET_REGISTER_DEV(TTL_9602, name)
 
-#define TTL_9602_DIP(name)                                                      \
-		NET_REGISTER_DEV(TTL_9602_DIP, name)
-
-/*
- * The CD4538 is pretty similar to the 9602
- */
-
-#define CD4538_DIP(name)                                                        \
-		NET_REGISTER_DEV(CD4538_DIP, name)
+#define CD4538(name)                                                         \
+		NET_REGISTER_DEV(CD4538, name)
 
 #endif /* NLD_74123_H_ */

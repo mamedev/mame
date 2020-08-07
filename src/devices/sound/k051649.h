@@ -46,6 +46,7 @@ private:
 	{
 		sound_channel() :
 			counter(0),
+			clock(0),
 			frequency(0),
 			volume(0),
 			key(false)
@@ -53,11 +54,12 @@ private:
 			std::fill(std::begin(waveram), std::end(waveram), 0);
 		}
 
-		u64 counter;
-		int frequency;
-		int volume;
-		bool key;
-		s8 waveram[32];
+		u8 counter;     // address counter for wavetable
+		u32 clock;      // internal clock
+		u16 frequency;  // frequency; result: (input clock / (32 * (frequency + 1)))
+		int volume;     // volume
+		bool key;       // keyon/off
+		s8 waveram[32]; // 32 byte wavetable
 	};
 
 	void make_mixer_table(int voices);
@@ -66,7 +68,6 @@ private:
 
 	/* global sound parameters */
 	sound_stream *m_stream;
-	int m_mclock;
 	int m_rate;
 
 	/* mixer tables and internal buffers */

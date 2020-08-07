@@ -3265,9 +3265,10 @@ EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 Korea and Australia is missing.
 
-EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
-EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+version text at 0x1ffd60 / version shown in test mode
+EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI GAME BOOT ROM Ver 2.01 (Japan)
+EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI GAME BOOT ROM Ver 2.01 (USA)
+EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI GAME BOOT ROM Ver 2.01 (Export)
 Korea and Australia is missing.
 
 EPR-21336  - No known dumps (Development BOOT ROM)
@@ -3514,9 +3515,10 @@ EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 EPR-23609B - NAOMI BOOT ROM 2001 09/10  1.70 (Korea)
 Australia is missing.
 
-EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-23607C - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
-EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+version text at 0x1ffd60 / version shown in test mode
+EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (Japan)
+EPR-23607C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (USA)
+EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (Export)
 Korea and Australia is missing.
 Actual build date Dec 19 2005.
 
@@ -6402,7 +6404,8 @@ ROM_START( shootplmp )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
-/* Oinori-daimyoujin Matsuri (medal) */
+// Oinori-daimyoujin Matsuri (medal)
+// 837-14391-01 SATL BD OND CRX MATSURI
 ROM_START( oinori )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM

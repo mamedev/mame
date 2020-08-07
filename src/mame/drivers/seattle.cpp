@@ -288,11 +288,15 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
 		m_io_analog(*this, "AN%u", 0U),
+		m_io_p4_8way(*this, "8WAY_P4"),
+		m_io_49way_x(*this, "49WAYX_P%u", 1U),
+		m_io_49way_y(*this, "49WAYY_P%u", 1U),
 		m_io_gun_x(*this, "LIGHT%u_X", 0U),
 		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
 		m_io_fake(*this, "FAKE"),
 		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
+		m_io_dips(*this, "DIPS"),
 		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
@@ -332,6 +336,8 @@ public:
 	void init_mace();
 	void init_blitz99();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(blitz_49way_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
 private:
@@ -345,14 +351,20 @@ private:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport m_io_p4_8way;
+	optional_ioport_array<4> m_io_49way_x;
+	optional_ioport_array<4> m_io_49way_y;
 	optional_ioport_array<2> m_io_gun_x;
 	optional_ioport_array<2> m_io_gun_y;
 	optional_ioport m_io_fake;
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
+	optional_ioport m_io_dips;
 	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
+
+	static const uint8_t translate49[7];
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -370,6 +382,7 @@ private:
 	uint32_t m_cmos_write_enabled;
 	uint16_t m_output_last;
 	uint8_t m_output_mode;
+	uint32_t m_i40_data;
 	uint32_t m_gear;
 	int8_t m_wheel_force;
 	int m_wheel_offset;
@@ -401,6 +414,7 @@ private:
 	void output_w(uint32_t data);
 	uint32_t widget_r(offs_t offset, uint32_t mem_mask = ~0);
 	void widget_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void i40_w(uint32_t data);
 	void wheel_board_w(offs_t offset, uint32_t data);
 
 
@@ -426,7 +440,6 @@ private:
 	void carnevil_cs3_map(address_map &map);
 	void flagstaff_cs3_map(address_map &map);
 };
-
 
 /*************************************
  *
@@ -460,6 +473,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_cmos_write_enabled));
 	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
+	save_item(NAME(m_i40_data));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
@@ -729,6 +743,83 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 		}
 	}
 	m_output_last = data;
+}
+
+/*************************************
+* 49 Way translation matrix
+*************************************/
+const uint8_t seattle_state::translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+
+/*************************************
+* 2 player 49 Way Joystick on Blitz
+*************************************/
+CUSTOM_INPUT_MEMBER(seattle_state::blitz_49way_r)
+{
+	return  (translate49[m_io_49way_y[1]->read() >> 4] << 12) | (translate49[m_io_49way_x[1]->read() >> 4] << 8) |
+		(translate49[m_io_49way_y[0]->read() >> 4] << 4) | (translate49[m_io_49way_x[0]->read() >> 4] << 0);
+}
+
+/*************************************
+* Optical 49 Way Joystick I40 Board
+*************************************/
+void seattle_state::i40_w(uint32_t data)
+{
+	//printf("i40_w: data = %08x\n", data);
+	//logerror("i40_w: data = %08x\n", data);
+	m_i40_data = data;
+}
+
+CUSTOM_INPUT_MEMBER(seattle_state::i40_r)
+{
+	if (m_io_dips->read() & 0x100) {
+		// 8 way joysticks
+		return m_io_p4_8way->read();
+	}
+	else {
+		// 49 way joysticks via i40 adapter board
+		int index = m_i40_data & 0xf;
+		uint8_t data = 0;
+		switch (index) {
+		case 0:
+			data = translate49[m_io_49way_x[0]->read() >> 4];
+			break;
+		case 1:
+			data = translate49[m_io_49way_y[0]->read() >> 4];
+			break;
+		case 2:
+			data = translate49[m_io_49way_x[1]->read() >> 4];
+			break;
+		case 3:
+			data = translate49[m_io_49way_y[1]->read() >> 4];
+			break;
+		case 4:
+			data = translate49[m_io_49way_x[2]->read() >> 4];
+			break;
+		case 5:
+			data = translate49[m_io_49way_y[2]->read() >> 4];
+			break;
+		case 6:
+			data = translate49[m_io_49way_x[3]->read() >> 4];
+			break;
+		case 7:
+			data = translate49[m_io_49way_y[3]->read() >> 4];
+			break;
+		case 10:
+		case 11:
+		case 12:
+			// I40 Detection
+			data = ~index & 0xf;
+			break;
+		default:
+			//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+			break;
+		}
+		logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+		//if (m_i40_data & 0x1000)
+		//  printf("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context().c_str(), m_i40_data, index, data);
+		//m_i40_data &= ~0x1000;
+		return data;
+	}
 }
 
 /*************************************
@@ -1247,8 +1338,8 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1273,18 +1364,6 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( seattle_4p )
-	PORT_INCLUDE(seattle_common)
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
-
-	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -1328,7 +1407,7 @@ INPUT_PORTS_END
  *************************************/
 
 static INPUT_PORTS_START( wg3dh )
-	PORT_INCLUDE(seattle_4p)
+	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0002, 0x0002, "Boot ROM Test" )
@@ -1547,7 +1626,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( blitz )
-	PORT_INCLUDE(seattle_4p)
+	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0001, 0x0000, "Coinage Source" )
@@ -1606,12 +1685,19 @@ static INPUT_PORTS_START( blitz )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Turbo")
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(seattle_state, blitz_49way_r)
+
+	PORT_START("49WAYX_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYY_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYX_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("49WAYY_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -1662,6 +1748,37 @@ static INPUT_PORTS_START( blitz99 )
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Players ) )
 	PORT_DIPSETTING(      0x2000, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, i40_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+
+	PORT_START("8WAY_P4")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
+
+	PORT_START("49WAYX_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYY_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYX_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
+
+	PORT_START("49WAYY_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
 
 INPUT_PORTS_END
 
@@ -2088,6 +2205,7 @@ void seattle_state::blitz(machine_config &config)
 	m_ioasic->set_upper(444); // or 528
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::blitz99(machine_config &config)
@@ -2102,6 +2220,7 @@ void seattle_state::blitz99(machine_config &config)
 	m_ioasic->set_upper(481); // or 484 or 520
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::blitz2k(machine_config &config)
@@ -2116,6 +2235,7 @@ void seattle_state::blitz2k(machine_config &config)
 	m_ioasic->set_upper(494); // or 498
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::carnevil(machine_config &config)

@@ -16,7 +16,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/6522via.h"
 #include "machine/i8255.h"
-#include "machine/ram.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -52,8 +51,9 @@ private:
 	required_device<z80_device> m_z80;
 	required_device<via6522_device> m_via;
 	required_device<i8255_device> m_ppi;
-	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+
+	std::unique_ptr<uint8_t[]> m_ram;
 
 	uint8_t m_port_b;
 
@@ -70,9 +70,43 @@ private:
 	void tube_zep100_mem(address_map &map);
 };
 
+class bbc_tube_zep100l_device : public bbc_tube_zep100_device
+{
+public:
+	bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class bbc_tube_zep100w_device : public bbc_tube_zep100_device
+{
+public:
+	static constexpr feature_type imperfect_features() { return feature::DISK; }
+
+	bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class bbc_tube_zep100m_device : public bbc_tube_zep100_device
+{
+public:
+	static constexpr feature_type imperfect_features() { return feature::DISK; }
+
+	bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100, bbc_tube_zep100_device)
+DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100L, bbc_tube_zep100l_device)
+DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100W, bbc_tube_zep100w_device)
+DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100M, bbc_tube_zep100m_device)
 
 
 #endif /* MAME_BUS_BBC_TUBE_ZEP100_H */

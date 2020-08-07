@@ -30,6 +30,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_chargen(*this, "chargen")
+		, m_palette(*this, "palette")
 	{ }
 
 	void unistar(machine_config &config);
@@ -44,11 +45,12 @@ private:
 	void unistar_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void unistar_io(address_map &map);
-	void unistar_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_chargen;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -62,14 +64,14 @@ void unistar_state::dma_mem_w(offs_t offset, u8 data)
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-void unistar_state::unistar_mem(address_map &map)
+void unistar_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x2fff).rom();
 	map(0x8000, 0x97ff).ram();
 }
 
-void unistar_state::unistar_io(address_map &map)
+void unistar_state::io_map(address_map &map)
 {
 	//map.unmap_value_high();
 	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
@@ -133,10 +135,25 @@ void unistar_state::unistar_palette(palette_device &palette) const
 
 I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 {
+	// This code just a guess, so that we can see something
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	u8 gfx = m_chargen[(linecount & 15) | (charcode << 4)];
+
+	if (vsp)
+		gfx = 0;
+
+	if (lten)
+		gfx = 0xff;
+
+	if (rvv)
+		gfx ^= 0xff;
+
+	for(u8 i=0;i<8;i++)
+		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */
-static const gfx_layout unistar_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 16,                  /* 8 x 16 characters */
 	128,                    /* 128 characters */
@@ -150,15 +167,15 @@ static const gfx_layout unistar_charlayout =
 };
 
 static GFXDECODE_START( gfx_unistar )
-	GFXDECODE_ENTRY( "chargen", 0x0000, unistar_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 void unistar_state::unistar(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, 20_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &unistar_state::unistar_mem);
-	m_maincpu->set_addrmap(AS_IO, &unistar_state::unistar_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unistar_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &unistar_state::io_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "rst65").output_handler().set_inputline(m_maincpu, I8085_RST65_LINE);
 	INPUT_MERGER_ANY_HIGH(config, "rst75").output_handler().set_inputline(m_maincpu, I8085_RST75_LINE);
@@ -205,21 +222,21 @@ void unistar_state::unistar(machine_config &config)
 	crtc.irq_wr_callback().set("rst75", FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_unistar);
-	PALETTE(config, "palette", FUNC(unistar_state::unistar_palette), 3);
+	PALETTE(config, m_palette, FUNC(unistar_state::unistar_palette), 3);
 }
 
 /* ROM definition */
 ROM_START( unistar )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x3000, "maincpu", 0 )
 	ROM_LOAD( "280010c.u48", 0x0000, 0x1000, CRC(613ef521) SHA1(a77459e91617d2882778ab2dada74fcb5f44e949))
 	ROM_LOAD( "280011c.u49", 0x1000, 0x1000, CRC(6cc5e704) SHA1(fb93645f51d5ad0635cbc8a9174c61f96799313d))
 	ROM_LOAD( "280012c.u50", 0x2000, 0x1000, CRC(0b9ca5a5) SHA1(20bf4aeacda14ff7a3cf988c7c0bff6ec60406c7))
 
-	ROM_REGION( 0x0800, "chargen", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "280014a.u1",  0x0000, 0x0800, CRC(a9e1b5b2) SHA1(6f5b597ee1417f1108ac5957b005a927acb5314a))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                FULLNAME                FLAGS
-COMP( 198?, unistar, 0,      0,      unistar, unistar, unistar_state, empty_init, "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )
+COMP( 198?, unistar, 0,      0,      unistar, unistar, unistar_state, empty_init, "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

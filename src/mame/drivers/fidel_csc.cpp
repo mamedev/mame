@@ -12,6 +12,8 @@ Fidelity CSC(and derived) hardware
 TODO:
 - dump/add original csce
 - hook up csce I/O properly, it doesn't have PIAs
+- IRQ Tlow duration, on csc it was measured and turned out to be 73.425us
+  but that's too long csce and super9cc
 
 *******************************************************************************
 
@@ -25,17 +27,17 @@ Memory map:
 0800-0FFF: 1K of RAM (note: mirrored twice)
 1000-17FF: PIA 1 (display, TSI speech chip)
 1800-1FFF: PIA 0 (keypad, LEDs)
-2000-3FFF: 101-64019 ROM*
+2000-3FFF: 101-64019 or 101-1025A04 ROM*
 4000-7FFF: mirror of 0000-3FFF
 8000-9FFF: not used
-A000-BFFF: 101-1025A03 ROM
+A000-BFFF: 101-1025A03 ROM (A12 tied high)
 C000-DFFF: 101-1025A02 ROM
 E000-FDFF: 101-1025A01 ROM
-FE00-FFFF: 512 byte 74S474 PROM
+FE00-FFFF: 512 byte 74S474 or N82S141N PROM
 
 *: 101-64019 is also used on the VSC(fidel_vsc.cpp). It contains the opening book
 and "64 greatest games", as well as some Z80 code. Obviously the latter is unused
-on the CSC.
+on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 
 CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
 
@@ -516,7 +518,8 @@ void csc_state::csc_map(address_map &map)
 	map(0x1000, 0x1003).mirror(0x47fc).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1800, 0x1803).mirror(0x47fc).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).mirror(0x4000).rom();
-	map(0xa000, 0xffff).rom();
+	map(0xa000, 0xafff).mirror(0x1000).rom();
+	map(0xc000, 0xffff).rom();
 }
 
 void csc_state::su9_map(address_map &map)
@@ -719,7 +722,8 @@ void csc_state::rsc(machine_config &config)
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-64019",   0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
-	ROM_LOAD("101-1025a03", 0xa000, 0x2000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
+	ROM_LOAD("101-1025a03", 0xa000, 0x1000, CRC(63982c07) SHA1(5ed4356323d5c80df216da55994abe94ba4aa94c) )
+	ROM_CONTINUE(           0xa000, 0x1000 ) // 1st half empty
 	ROM_LOAD("101-1025a02", 0xc000, 0x2000, CRC(9e6e7c69) SHA1(4f1ed9141b6596f4d2b1217d7a4ba48229f3f1b0) )
 	ROM_LOAD("101-1025a01", 0xe000, 0x2000, CRC(57f068c3) SHA1(7d2ac4b9a2fba19556782863bdd89e2d2d94e97b) )
 	ROM_LOAD("74s474",      0xfe00, 0x0200, CRC(4511ba31) SHA1(e275b1739f8c3aa445cccb6a2b597475f507e456) )
@@ -822,7 +826,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger (Travemuende version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

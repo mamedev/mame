@@ -1,0 +1,603 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="£10" defstate="0">
+		<text string="£10" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="£10" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="£5" defstate="0">
+		<text string="£5" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="£5" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="£3" defstate="0">
+		<text string="£3" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="£3" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="£2" defstate="0">
+		<text string="£2" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="£2" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="£1" defstate="0">
+		<text string="£1" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="£1" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="50p" defstate="0">
+		<text string="50p" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="50p" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="20p" defstate="0">
+		<text string="20p" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="20p" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="10p" defstate="0">
+		<text string="10p" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="10p" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="LIT" defstate="0">
+		<text string="LIT" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="LIT" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="8" defstate="0">
+		<text string="8" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="8" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="7" defstate="0">
+		<text string="7" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="7" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="6" defstate="0">
+		<text string="6" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="6" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="5" defstate="0">
+		<text string="5" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="5" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="4" defstate="0">
+		<text string="4" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="4" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="3" defstate="0">
+		<text string="3" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="3" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="2" defstate="0">
+		<text string="2" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="2" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="1" defstate="0">
+		<text string="1" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="1" state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+	<element name="BAR" defstate="0">
+		<text string="BAR" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="BAR" state="1">
+			<color red="0.8" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+
+	<element name="Q" defstate="0">
+		<text string="Q" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+		<text string="Q" state="1">
+			<color red="0.2" green="0.8" blue="0.2" />
+			<bounds x="0" y="0" width="4" height="4" />
+		</text>
+	</element>
+
+	<element name="A" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="A" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="A" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+	<element name="B" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.5" blue="0.0" />
+		</rect>
+		<text string="B" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<text string="B" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+	<element name="C" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="0.5" />
+		</rect>
+		<text string="C" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+		<text string="C" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+	<element name="CONTINUE" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.5" green="0.2" blue="0.0" />
+		</rect>
+		<text string="CONTINUE" state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="1.0" green="0.4" blue="0.0" />
+		</rect>
+		<text string="CONTINUE" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+	<element name="PASS" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.5" green="0.2" blue="0.0" />
+		</rect>
+		<text string="PASS" state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="1.0" green="0.4" blue="0.0" />
+		</rect>
+		<text string="PASS" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+
+	<element name="COLLECT" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.3" green="0.3" blue="0.0" />
+		</rect>
+		<text string="COLLECT" state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<text string="COLLECT" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+
+	<element name="START" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="START" state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<text string="START" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+
+
+
+
+	<view name="Monitor and Lamps">
+		<bezel name="lamp7" element="8" state="0">
+			<bounds x="150" y="0" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp7" element="BAR" state="0">
+			<bounds x="170" y="0" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp6" element="LIT" state="0">
+			<bounds x="190" y="0" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp5" element="£10" state="0">
+			<bounds x="210" y="0" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp15" element="7" state="0">
+			<bounds x="150" y="20" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp15" element="BAR" state="0">
+			<bounds x="170" y="20" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp14" element="LIT" state="0">
+			<bounds x="190" y="20" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp13" element="£5" state="0">
+			<bounds x="210" y="20" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp23" element="6" state="0">
+			<bounds x="150" y="40" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp23" element="BAR" state="0">
+			<bounds x="170" y="40" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp22" element="LIT" state="0">
+			<bounds x="190" y="40" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp21" element="£3" state="0">
+			<bounds x="210" y="40" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp31" element="5" state="0">
+			<bounds x="150" y="60" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp31" element="BAR" state="0">
+			<bounds x="170" y="60" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp30" element="LIT" state="0">
+			<bounds x="190" y="60" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp29" element="£2" state="0">
+			<bounds x="210" y="60" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp39" element="4" state="0">
+			<bounds x="150" y="80" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp39" element="BAR" state="0">
+			<bounds x="170" y="80" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp38" element="LIT" state="0">
+			<bounds x="190" y="80" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp37" element="£1" state="0">
+			<bounds x="210" y="80" width="20" height="20"/>
+		</bezel>
+
+
+		<bezel name="lamp47" element="3" state="0">
+			<bounds x="150" y="100" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp47" element="BAR" state="0">
+			<bounds x="170" y="100" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp46" element="LIT" state="0">
+			<bounds x="190" y="100" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp45" element="50p" state="0">
+			<bounds x="210" y="100" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp55" element="2" state="0">
+			<bounds x="150" y="120" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp55" element="BAR" state="0">
+			<bounds x="170" y="120" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp54" element="LIT" state="0">
+			<bounds x="190" y="120" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp53" element="20p" state="0">
+			<bounds x="210" y="120" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp63" element="1" state="0">
+			<bounds x="150" y="140" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp63" element="BAR" state="0">
+			<bounds x="170" y="140" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp62" element="LIT" state="0">
+			<bounds x="190" y="140" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp61" element="10p" state="0">
+			<bounds x="210" y="140" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp80" element="Q" state="0">
+			<bounds x="0" y="30" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp81" element="Q" state="0">
+			<bounds x="20" y="30" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp82" element="BAR" state="0">
+			<bounds x="40" y="30" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp83" element="Q" state="0">
+			<bounds x="60" y="30" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp84" element="Q" state="0">
+			<bounds x="80" y="30" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp85" element="Q" state="0">
+			<bounds x="100" y="30" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp86" element="BAR" state="0">
+			<bounds x="120" y="30" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp88" element="Q" state="0">
+			<bounds x="0" y="50" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp89" element="BAR" state="0">
+			<bounds x="20" y="50" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp90" element="Q" state="0">
+			<bounds x="40" y="50" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp91" element="Q" state="0">
+			<bounds x="60" y="50" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp92" element="BAR" state="0">
+			<bounds x="80" y="50" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp93" element="Q" state="0">
+			<bounds x="100" y="50" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp94" element="Q" state="0">
+			<bounds x="120" y="50" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp96" element="BAR" state="0">
+			<bounds x="0" y="70" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp97" element="Q" state="0">
+			<bounds x="20" y="70" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp98" element="Q" state="0">
+			<bounds x="40" y="70" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp99" element="BAR" state="0">
+			<bounds x="60" y="70" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp100" element="Q" state="0">
+			<bounds x="80" y="70" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp101" element="BAR" state="0">
+			<bounds x="100" y="70" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp102" element="Q" state="0">
+			<bounds x="120" y="70" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp104" element="BAR" state="0">
+			<bounds x="0" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp105" element="Q" state="0">
+			<bounds x="20" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp106" element="BAR" state="0">
+			<bounds x="40" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp107" element="Q" state="0">
+			<bounds x="60" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp108" element="Q" state="0">
+			<bounds x="80" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp109" element="Q" state="0">
+			<bounds x="100" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp110" element="BAR" state="0">
+			<bounds x="120" y="90" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp112" element="Q" state="0">
+			<bounds x="0" y="110" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp113" element="Q" state="0">
+			<bounds x="20" y="110" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp114" element="BAR" state="0">
+			<bounds x="40" y="110" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp115" element="Q" state="0">
+			<bounds x="60" y="110" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp116" element="BAR" state="0">
+			<bounds x="80" y="110" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp117" element="Q" state="0">
+			<bounds x="100" y="110" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp118" element="Q" state="0">
+			<bounds x="120" y="110" width="20" height="20"/>
+		</bezel>
+
+		<bezel name="lamp120" element="Q" state="0">
+			<bounds x="0" y="130" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp121" element="BAR" state="0">
+			<bounds x="20" y="130" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp122" element="Q" state="0">
+			<bounds x="40" y="130" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp123" element="Q" state="0">
+			<bounds x="60" y="130" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp124" element="BAR" state="0">
+			<bounds x="80" y="130" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp125" element="BAR" state="0">
+			<bounds x="100" y="130" width="20" height="20"/>
+		</bezel>
+		<bezel name="lamp126" element="Q" state="0">
+			<bounds x="120" y="130" width="20" height="20"/>
+		</bezel>
+
+
+		<bezel name="lamp25" element="COLLECT" inputtag="BLACK2" inputmask="0x40">
+			<bounds x="0" y="200" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp32" element="PASS" inputtag="BLACK1" inputmask="0x10">
+			<bounds x="0" y="220" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp33" element="A" inputtag="BLACK1" inputmask="0x08">
+			<bounds x="0" y="240" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp40" element="B" inputtag="BLACK1" inputmask="0x04">
+			<bounds x="0" y="260" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp42" element="C" inputtag="BLACK1" inputmask="0x02">
+			<bounds x="0" y="280" width="16" height="16" />
+		</bezel>
+
+		<bezel name="lamp24" element="START" inputtag="BLACK2" inputmask="0x80">
+			<bounds x="564" y="200" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp26" element="CONTINUE" inputtag="BLACK2" inputmask="0x10">
+			<bounds x="564" y="220" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp34" element="A" inputtag="BLACK2" inputmask="0x08">
+			<bounds x="564" y="240" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp41" element="B" inputtag="BLACK2" inputmask="0x04">
+			<bounds x="564" y="260" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp48" element="C" inputtag="BLACK2" inputmask="0x02">
+			<bounds x="564" y="280" width="16" height="16" />
+		</bezel>
+		<screen index="0">
+			<bounds x="50" y="200" width="504" height="296" />
+		</screen>
+	</view>
+</mamelayout>

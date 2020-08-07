@@ -13,19 +13,99 @@
 #define NLTYPES_H_
 
 #include "nl_config.h"
-#include "plib/pchrono.h"
-#include "plib/pdynlib.h"
-#include "plib/pfmtlog.h"
-#include "plib/pmempool.h"
-#include "plib/pstate.h"
+
 #include "plib/pstring.h"
 #include "plib/ptime.h"
-#include "plib/putil.h"
+#include "plib/ptypes.h"
+#include "plib/ppmf.h"
+#include "plib/pmempool.h"
 
-#include <unordered_map>
+#include <memory>
+
+// FIXME: Move to ptypes
+namespace plib
+{
+	// FORWARD declarations
+	template <typename BASEARENA, std::size_t MINALIGN>
+	class mempool_arena;
+
+	struct aligned_arena;
+	class dynlib_base;
+
+	template<class T, bool debug_enabled>
+	class plog_base;
+
+	struct plog_level;
+} // namespace plib
 
 namespace netlist
 {
+	// -----------------------------------------------------------------------------
+	// forward definitions
+	// -----------------------------------------------------------------------------
+
+	class logic_output_t;
+	class logic_input_t;
+	class analog_net_t;
+	class logic_net_t;
+	class setup_t;
+	class nlparse_t;
+	class netlist_t;
+	class netlist_state_t;
+	class core_device_t;
+	class device_t;
+	class netlist_state_t;
+	class param_t;
+	class logic_family_desc_t;
+	class terminal_t;
+
+	class models_t;
+
+	namespace devices
+	{
+		class nld_solver;
+		class nld_mainclock;
+		class nld_base_proxy;
+		class nld_base_d_to_a_proxy;
+		class nld_base_a_to_d_proxy;
+		class nld_netlistparams;
+	} // namespace devices
+
+	namespace solver
+	{
+		class matrix_solver_t;
+	} // namespace solver
+
+	namespace detail
+	{
+		struct abstract_t;
+		class core_terminal_t;
+		class net_t;
+		class device_object_t;
+	} // namespace detail
+
+	namespace factory
+	{
+		class list_t;
+		class element_t;
+		struct properties;
+	} // namespace factory
+
+	template <class CX>
+	class delegator_t : public CX
+	{
+	protected:
+		using base_type = delegator_t<CX>;
+		using delegated_type = CX;
+		using delegated_type::delegated_type;
+	};
+
+} // namespace netlist
+
+
+namespace netlist
+{
+
 	/// \brief Constants and const calculations for the library
 	///
 	template<typename T>
@@ -79,7 +159,7 @@ namespace netlist
 	///
 
 	using device_arena = std::conditional_t<config::use_mempool::value,
-		plib::mempool_arena<plib::aligned_arena>,
+		plib::mempool_arena<plib::aligned_arena, NL_MEMPOOL_ALIGN>,
 		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
@@ -109,7 +189,7 @@ namespace netlist
 		/// of a callbacks_t implementation to optionally provide such a collection
 		/// of symbols.
 		///
-		virtual host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const;
+		virtual std::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
@@ -117,6 +197,22 @@ namespace netlist
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
+
+	/// \brief Timestep type.
+	///
+	/// May be either FORWARD or RESTORE
+	///
+	enum class timestep_type
+	{
+		FORWARD,  ///< forward time
+		RESTORE   ///< restore state before last forward
+	};
+
+	/// \brief Delegate type for device notification.
+	///
+	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	namespace detail {
 

@@ -12,31 +12,75 @@ namespace netlist
 {
 	namespace devices
 	{
-	template <int DEVTYPE = 74123>
+
+	/// \brief Base monostable device
+	///
+	/// The basic operation is the following:
+	///
+	/// After a trigger signal has been detected, the output changes to high.
+	/// The capacitor is quickly discharged until it reaches Vlow.
+	/// The device toggles into charging mode until Vhigh is reached. At this
+	/// point, the output is set to low. Charging continues until VCC - or
+	/// more specific VRC is reached.
+	///
+	/// Using
+	///
+	/// - Vlow = alpha * VCC
+	/// - Vhigh = (1-alpha) * VCC
+	/// - Ignoring Rext during discharge
+	///
+	/// we have calculate the following time constants:
+	///
+	/// - tD = - X*C * ln(alpha)
+	/// - tC = - R*C * ln(alhpa)
+	/// - tL = - R*C * ln(1.0 - alpha)
+	///
+	/// where tD denotes the time to discharge from VCC to Vlow, tC denotes
+	/// the time to charge from 0.0 to Vhigh and tL denotes the time to charge
+	/// from 0 to Vlow. X denotes the internal resistance used to discharge the
+	/// capacitor. The total impulse duration is thus
+	///
+	/// tP = tD + tC - tL
+	///
+	/// Using K = ln(1 - alpha) - ln (alpha) = ln(1/alpha - 1)
+	///
+	/// we get
+	///
+	/// tP = R*C*K * (1 + X/R * ln(alpha) / K)
+	///
+	/// and alpha = 1 / (1 + exp(K))
+	///
+	/// Datasheets express the right term usually as
+	///
+	/// (1 + f * 1000 / R) = (1 + X/R * ln(alpha) / K)
+	///
+	/// and thus
+	///
+	/// X = f * 1000 * K / ln(alpha)
+	///
+	/// FIXME: Currently X is given directly (as RI). It would be better to use
+	/// f (usually 0.7) and K to calculate X.
+	///
+	template <typename D>
 	NETLIB_OBJECT(74123_base)
 	{
-		static_assert((DEVTYPE == 9602) || (DEVTYPE == 4538) || (DEVTYPE == 74123), "wrong device type");
-
 		NETLIB_CONSTRUCTOR(74123_base)
 		, m_RP(*this, "RP")
 		, m_RN(*this, "RN")
 		, m_RP_Q(*this, "_RP_Q")
 		, m_RN_Q(*this, "_RN_Q")
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_CLRQ(*this, "CLRQ")
+		, m_I(*this, D::names(), NETLIB_DELEGATE(ab_clear))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_CV(*this, "_CV") // internal
+		, m_CV(*this, "_CV", NETLIB_DELEGATE(cv)) // internal
 		, m_last_trig(*this, "m_last_trig", 0)
 		, m_state(*this, "m_state", 0)
-		, m_KP(*this, "m_KP", 0)
-		, m_K(*this, "K", (DEVTYPE == 4538) ? nlconst::one() : nlconst::magic(0.4)) // CD4538 datasheet states PW=RC
-		, m_RI(*this, "RI", nlconst::magic(400.0)) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
+		, m_KP(plib::reciprocal(nlconst::one() + plib::exp(D::K())))
+		//, m_power_pins(*this)
 		{
 
-			register_subalias("GND", m_RN.N());
-			register_subalias("VCC", m_RP.P());
+			register_subalias(pstring(D::gnd()), m_RN.N());
+			register_subalias(pstring(D::vcc()), m_RP.P());
 			register_subalias("C",   m_RN.N());
 			register_subalias("RC",  m_RN.P());
 
@@ -46,60 +90,45 @@ namespace netlist
 			connect(m_RN.P(), m_RP.N());
 			connect(m_CV, m_RN.P());
 
-			m_RP.m_RON.set(m_RI());
-			m_RN.m_RON.set(m_RI());
+			m_RP.m_RON.set(D::RI());
+			m_RN.m_RON.set(D::RI());
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(ab_clear)
 		{
 			netlist_sig_t m_trig(0);
-			netlist_sig_t res = !m_CLRQ();
-			netlist_time t_AB_to_Q = NLTIME_FROM_NS(10);
-			netlist_time t_C_to_Q = NLTIME_FROM_NS(10);
 
-			if (DEVTYPE == 74123)
-			{
-				m_trig = (m_A() ^ 1) & m_B() & m_CLRQ();
-			}
-			else if (DEVTYPE == 9602)
-			{
-				m_trig = (m_A() ^ 1) | m_B();
-			}
-			else // 4538
-			{
-				m_trig = (m_B() ^ 1) | m_A();
-				// The line below is from the datasheet truthtable ... doesn't make sense at all
-				//res = res | m_A) | (m_B) ^ 1);
-				t_AB_to_Q = NLTIME_FROM_NS(300);
-				t_C_to_Q = NLTIME_FROM_NS(250);
-			}
+			m_trig = D::trigfunc(m_I);
 
-			if (res)
+			if (!D::clear(m_I))
 			{
-				m_Q.push(0, t_C_to_Q);
-				m_QQ.push(1, t_C_to_Q);
+				m_Q.push(0, D::t_C_to_Q::value());
+				m_QQ.push(1, D::t_C_to_Q::value());
 				/* quick charge until trigger */
 				/* FIXME: SGS datasheet shows quick charge to 5V,
 				 * though schematics indicate quick charge to Vhigh only.
 				 */
-				m_RP_Q.push(1, t_C_to_Q); // R_ON
-				m_RN_Q.push(0, t_C_to_Q); // R_OFF
+				m_RP_Q.push(1, D::t_C_to_Q::value()); // R_ON
+				m_RN_Q.push(0, D::t_C_to_Q::value()); // R_OFF
 				m_state = 2; //charging (quick)
 			}
 			else if (!m_last_trig && m_trig)
 			{
 				// FIXME: Timing!
-				m_Q.push(1, t_AB_to_Q);
-				m_QQ.push(0,t_AB_to_Q);
+				m_Q.push(1, D::t_AB_to_Q::value());
+				m_QQ.push(0, D::t_AB_to_Q::value());
 
-				m_RN_Q.push(1, t_AB_to_Q); // R_ON
-				m_RP_Q.push(0, t_AB_to_Q); // R_OFF
+				m_RN_Q.push(1, D::t_AB_to_Q::value()); // R_ON
+				m_RP_Q.push(0, D::t_AB_to_Q::value()); // R_OFF
 
 				m_state = 1; // discharging
 			}
 
 			m_last_trig = m_trig;
+		}
 
+		NETLIB_HANDLERI(cv)
+		{
 			if (m_state == 1)
 			{
 				const nl_fptype vLow = m_KP * m_RP.P()();
@@ -111,7 +140,7 @@ namespace netlist
 			}
 			if (m_state == 2)
 			{
-				const nl_fptype vHigh = m_RP.P()() * (nlconst::one() - m_KP);
+				const nl_fptype vHigh = (nlconst::one() - m_KP) * m_RP.P()();
 				if (m_CV() > vHigh)
 				{
 					m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -125,8 +154,6 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_KP = plib::reciprocal(nlconst::one() + plib::exp(m_K()));
-
 			m_RP.reset();
 			m_RN.reset();
 
@@ -138,16 +165,13 @@ namespace netlist
 		}
 
 	private:
-	public:
 		NETLIB_SUB(sys_dsw1) m_RP;
 		NETLIB_SUB(sys_dsw1) m_RN;
 
 		logic_output_t m_RP_Q;
 		logic_output_t m_RN_Q;
 
-		logic_input_t m_A;
-		logic_input_t m_B;
-		logic_input_t m_CLRQ;
+		object_array_t<logic_input_t, 3> m_I;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 
@@ -155,130 +179,75 @@ namespace netlist
 
 		state_var<netlist_sig_t> m_last_trig;
 		state_var<unsigned>      m_state;
-		state_var<nl_fptype>        m_KP;
-
-		param_fp_t m_K;
-		param_fp_t m_RI;
+		nl_fptype                m_KP;
+		//nld_power_pins           m_power_pins; // not needed, device exposes VCC and GND
 	};
 
-	NETLIB_OBJECT(74123_dip)
+	struct desc_74123 : public desc_base
 	{
-		NETLIB_CONSTRUCTOR(74123_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
+		using t_AB_to_Q = time_ns<10>;
+		using t_C_to_Q = time_ns<10>;
+		static constexpr nl_fptype K()  { return nlconst::magic(0.4); }
+		static constexpr nl_fptype RI() { return nlconst::magic(400.0); }
+
+		static constexpr std::array<const char *, 3> names() { return {"CLRQ", "A", "B"};}
+		template<typename T>
+		static netlist_sig_t trigfunc(const T &in)
 		{
-			register_subalias("1", m_A.m_A);
-			register_subalias("2", m_A.m_B);
-			register_subalias("3", m_A.m_CLRQ);
-			register_subalias("4", m_A.m_QQ);
-			register_subalias("5", m_B.m_Q);
-			register_subalias("6", m_B.m_RN.N());
-			register_subalias("7", m_B.m_RN.P());
-			register_subalias("8", m_A.m_RN.N());
-			connect(m_A.m_RN.N(), m_B.m_RN.N());
-
-			register_subalias("9", m_B.m_A);
-			register_subalias("10", m_B.m_B);
-			register_subalias("11", m_B.m_CLRQ);
-			register_subalias("12", m_B.m_QQ);
-			register_subalias("13", m_A.m_Q);
-			register_subalias("14", m_A.m_RN.N());
-			register_subalias("15", m_A.m_RN.P());
-			register_subalias("16", m_A.m_RP.P());
-			connect(m_A.m_RP.P(), m_B.m_RP.P());
+			return ((in[1]() | (in[2]() ^ 1)) ^ 1) & in[0](); // ((m_A() | (m_B() ^ 1)) ^ 1) & m_CLRQ()
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(74123_base)<74123> m_A;
-		NETLIB_SUB(74123_base)<74123> m_B;
+		template<typename T> static constexpr netlist_sig_t clear(const T &in) { return in[0]();}
+
+		static constexpr const char *vcc() { return "VCC"; }
+		static constexpr const char *gnd() { return "GND"; }
 	};
 
-	NETLIB_OBJECT(9602_dip)
+	struct desc_74121 : public desc_74123
 	{
-		NETLIB_CONSTRUCTOR(9602_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
+		static constexpr nl_fptype K()  { return nlconst::magic(0.7); }
+
+		static constexpr std::array<const char *, 3> names() { return {"A1", "A2", "B"};}
+		template<typename T>
+		static netlist_sig_t trigfunc(const T &in)
 		{
-			register_subalias("1", m_A.m_RN.N()); // C1
-			register_subalias("2", m_A.m_RN.P()); // RC1
-			register_subalias("3", m_A.m_CLRQ);
-			register_subalias("4", m_A.m_B);
-			register_subalias("5", m_A.m_A);
-			register_subalias("6", m_A.m_Q);
-			register_subalias("7", m_A.m_QQ);
-			register_subalias("8", m_A.m_RN.N());
-			connect(m_A.m_RN.N(), m_B.m_RN.N());
-
-			register_subalias("9", m_B.m_QQ);
-			register_subalias("10", m_B.m_Q);
-			register_subalias("11", m_B.m_A);
-			register_subalias("12", m_B.m_B);
-			register_subalias("13", m_B.m_CLRQ);
-			register_subalias("14", m_B.m_RN.P()); // RC2
-			register_subalias("15", m_B.m_RN.N()); // C2
-			register_subalias("16", m_A.m_RP.P());
-			connect(m_A.m_RP.P(), m_B.m_RP.P());
+			return ((in[0]() ^ 1) | (in[1]() ^ 1)) & in[2](); // (~A1 | ~A2) & B
 		}
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
-	private:
-		NETLIB_SUB(74123_base)<9602> m_A;
-		NETLIB_SUB(74123_base)<9602> m_B;
+		template<typename T> static constexpr netlist_sig_t clear(const T &in) { plib::unused_var(in); return 1;}
 	};
 
-	NETLIB_OBJECT(4538_dip)
+	struct desc_9602 : public desc_74123
 	{
-		NETLIB_CONSTRUCTOR_MODEL(4538_dip, "CD4XXX")
-		, m_A(*this, "A")
-		, m_B(*this, "B")
+		template<typename T>
+		static netlist_sig_t trigfunc(const T &in)
 		{
-			register_subalias("1", m_A.m_RN.N()); // C1
-			register_subalias("2", m_A.m_RN.P()); // RC1
-			register_subalias("3", m_A.m_CLRQ);
-			register_subalias("4", m_A.m_A);
-			register_subalias("5", m_A.m_B);
-			register_subalias("6", m_A.m_Q);
-			register_subalias("7", m_A.m_QQ);
-			register_subalias("8", m_A.m_RN.N());
-			connect(m_A.m_RN.N(), m_B.m_RN.N());
-
-			register_subalias("9", m_B.m_QQ);
-			register_subalias("10", m_B.m_Q);
-			register_subalias("11", m_B.m_B);
-			register_subalias("12", m_B.m_A);
-			register_subalias("13", m_B.m_CLRQ);
-			register_subalias("14", m_B.m_RN.P()); // RC2
-			register_subalias("15", m_B.m_RN.N()); // C2
-			register_subalias("16", m_A.m_RP.P());
-			connect(m_A.m_RP.P(), m_B.m_RP.P());
+			return ((in[1]() ^ 1) | in[2]()); // (m_A() ^ 1) | m_B()
 		}
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-	private:
-		NETLIB_SUB(74123_base)<4538> m_A;
-		NETLIB_SUB(74123_base)<4538> m_B;
 	};
 
-	NETLIB_UPDATE(4538_dip)
+	struct desc_4538 : public desc_74123
 	{
-		/* only called during startup */
-		//m_1.update_dev();
-		//m_2.update_dev();
-	}
+		using t_AB_to_Q = time_ns<300>;
+		using t_C_to_Q = time_ns<250>;
+		static constexpr nl_fptype K() { return nlconst::one(); } // CD4538 datasheet states PW=RC
 
-	NETLIB_RESET(4538_dip)
-	{
-		m_A.reset();
-		m_B.reset();
-	}
+		template<typename T>
+		static netlist_sig_t trigfunc(const T &in)
+		{
+			return (in[1]() | (in[2]() ^ 1)); // m_A() | (m_B() ^ 1)
+		}
+		static constexpr const char *vcc() { return "VDD"; }
+		static constexpr const char *gnd() { return "VSS"; }
+	};
 
-	using NETLIB_NAME(74123) = NETLIB_NAME(74123_base)<74123>;
+	using NETLIB_NAME(74123) = NETLIB_NAME(74123_base)<desc_74123>;
+	using NETLIB_NAME(74121) = NETLIB_NAME(74123_base)<desc_74121>;
+	using NETLIB_NAME(4538) = NETLIB_NAME(74123_base)<desc_4538>;
+	using NETLIB_NAME(9602) = NETLIB_NAME(74123_base)<desc_9602>;
 
 	NETLIB_DEVICE_IMPL(74123, "TTL_74123", "")
-	NETLIB_DEVICE_IMPL(74123_dip, "TTL_74123_DIP", "")
-	NETLIB_DEVICE_IMPL(4538_dip, "CD4538_DIP", "")
-	NETLIB_DEVICE_IMPL(9602_dip, "TTL_9602_DIP",           "")
+	NETLIB_DEVICE_IMPL(74121, "TTL_74121", "")
+	NETLIB_DEVICE_IMPL(4538,  "CD4538",    "")
+	NETLIB_DEVICE_IMPL(9602,  "TTL_9602",  "")
 
 	} //namespace devices
 } // namespace netlist

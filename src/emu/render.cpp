@@ -1441,7 +1441,7 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 
 bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
-	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);;
+	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);
 }
 
 
@@ -1593,10 +1593,13 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		int cloneof = driver_list::clone(system);
 		while (0 <= cloneof)
 		{
-			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
-				m_external_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
-			else
-				m_external_artwork = true;
+			if (!m_external_artwork || driver_list::driver(cloneof).flags & MACHINE_IS_BIOS_ROOT)
+			{
+				if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
+					m_external_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
+				else
+					m_external_artwork = true;
+			}
 
 			// Check the parent of the parent to cover bios based artwork
 			const game_driver &parent(driver_list::driver(cloneof));

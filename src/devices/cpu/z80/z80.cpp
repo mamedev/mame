@@ -440,7 +440,7 @@ inline void z80_device::out(uint16_t port, uint8_t value)
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-inline uint8_t z80_device::rm(uint16_t addr)
+uint8_t z80_device::rm(uint16_t addr)
 {
 	return m_data.read_byte(addr);
 }
@@ -457,7 +457,7 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-inline void z80_device::wm(uint16_t addr, uint8_t value)
+void z80_device::wm(uint16_t addr, uint8_t value)
 {
 	m_data.write_byte(addr, value);
 }
@@ -476,7 +476,7 @@ inline void z80_device::wm16(uint16_t addr, PAIR &r)
  * reading opcodes. In case of system with memory mapped I/O,
  * this function can be used to greatly speed up emulation
  ***************************************************************/
-inline uint8_t z80_device::rop()
+uint8_t z80_device::rop()
 {
 	unsigned pc = PCD;
 	PC++;
@@ -493,14 +493,14 @@ inline uint8_t z80_device::rop()
  * support systems that use different encoding mechanisms for
  * opcodes and opcode arguments
  ***************************************************************/
-inline uint8_t z80_device::arg()
+uint8_t z80_device::arg()
 {
 	unsigned pc = PCD;
 	PC++;
 	return m_args.read_byte(pc);
 }
 
-inline uint16_t z80_device::arg16()
+uint16_t z80_device::arg16()
 {
 	unsigned pc = PCD;
 	PC += 2;
