@@ -341,7 +341,7 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().name, "xmcota") ||
               !core_stricmp(machine.system().parent, "xmcota") ||
               !core_stricmp(machine.system().name, "xmvsf") ||
-              !core_stricmp(machine.system().parent, "xmvsf")
+              !core_stricmp(machine.system().parent, "xmvsf") ||
               
               !core_stricmp(machine.system().name, "astrass") ||
               !core_stricmp(machine.system().parent, "astrass") ||
@@ -358,7 +358,7 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().name, "groovef") ||
               !core_stricmp(machine.system().parent, "groovef") ||
               !core_stricmp(machine.system().name, "kaiserkn") ||
-              !core_stricmp(machine.system().parent, "kaiserkn") ||
+              !core_stricmp(machine.system().parent, "kaiserkn")
            )
    {
       /* 6-button fighting games (Mainly Capcom (CPS-1, CPS-2, CPS-3, ZN-1, ZN-2) + Others)*/
