@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define SEGAUSB_FAKE_8253 (1)
+#define SEGAUSB_FAKE_8253 (0)
 
 NETLIST_EXTERNAL(segausb)
 
