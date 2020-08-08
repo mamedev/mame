@@ -13,7 +13,6 @@
       reimplement as a push, not a pull
     - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
-    - IRQ timing is hacked due to WY-100 needing to take JNI branch before servicing interrupt
 
 ****************************************************************************
 
@@ -747,8 +746,8 @@ OPHANDLER( jc )             { burn_cycles(2); execute_jcc((m_psw & C_FLAG) != 0)
 OPHANDLER( jf0 )            { burn_cycles(2); execute_jcc((m_psw & F_FLAG) != 0); }
 OPHANDLER( jf1 )            { burn_cycles(2); execute_jcc((m_sts & STS_F1) != 0); }
 OPHANDLER( jnc )            { burn_cycles(2); execute_jcc((m_psw & C_FLAG) == 0); }
-OPHANDLER( jni )            { burn_cycles(2); m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); }
-OPHANDLER( jnibf )          { burn_cycles(2); m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); }
+OPHANDLER( jni )            { burn_cycles(2); execute_jcc(m_irq_state != 0); }
+OPHANDLER( jnibf )          { burn_cycles(2); execute_jcc((m_sts & STS_IBF) == 0); }
 OPHANDLER( jnt_0 )          { burn_cycles(2); execute_jcc(test_r(0) == 0); }
 OPHANDLER( jnt_1 )          { burn_cycles(2); execute_jcc(test_r(1) == 0); }
 OPHANDLER( jnz )            { burn_cycles(2); execute_jcc(m_a != 0); }
@@ -1101,7 +1100,6 @@ void mcs48_cpu_device::device_start()
 	m_dbbi = 0;
 	m_dbbo = 0;
 	m_irq_state = 0;
-	m_irq_polled = 0;
 
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);
@@ -1170,7 +1168,6 @@ void mcs48_cpu_device::device_start()
 	save_item(NAME(m_dbbo));
 
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_irq_polled));
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_timer_overflow));
 	save_item(NAME(m_timer_flag));
@@ -1232,10 +1229,6 @@ int mcs48_cpu_device::check_irqs()
 	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
 		m_irq_in_progress = true;
-
-		// force JNI to be taken (hack)
-		if (m_irq_polled)
-			m_pc = ((m_pc - 1) & 0xf00) | m_program.read_byte(m_pc - 1);
 
 		/* transfer to location 0x03 */
 		push_pc_psw();
@@ -1321,16 +1314,15 @@ void mcs48_cpu_device::execute_run()
 	// iterate over remaining cycles, guaranteeing at least one instruction
 	do
 	{
-		// check interrupts
-		burn_cycles(check_irqs());
-
 		m_prevpc = m_pc;
-		m_irq_polled = false;
 		debugger_instruction_hook(m_pc);
 
 		// fetch and process opcode
 		unsigned opcode = opcode_fetch();
 		(this->*m_opcode_table[opcode])();
+
+		// check interrupts
+		burn_cycles(check_irqs());
 
 	} while (m_icount > 0);
 }
