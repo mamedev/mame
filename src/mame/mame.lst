@@ -34985,7 +34985,8 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 quizshow                        // 005464           1976/04 [2650]
 
 @source:qvt70.cpp
-qvt70                           //
+qvt70                           // (c) 1992 Qume Corp.
+qvt82                           // (c) 1993 Qume Corp.
 
 @source:qvt102.cpp
 qvt102                          // (c) 1983 Qume Corp.
