@@ -50,6 +50,7 @@ private:
 	void sound_w(u8 data);
 	u8 portb_r();
 	u8 portc_r();
+	u8 kristall2_portc_r();
 	void porta_w(u8 data);
 	void portc_w(u8 data);
 	void tape_w(u8 data);

@@ -10,7 +10,6 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/mikro80.h"
 
 /* Driver initialization */
@@ -39,6 +38,11 @@ u8 mikro80_state::portc_r()
 	return m_io_keyboard[8]->read();
 }
 
+u8 mikro80_state::kristall2_portc_r()
+{
+	return (m_io_keyboard[8]->read() & 0xfe) | ((m_cassette->input() < 0.04) ? 1 : 0);
+}
+
 void mikro80_state::porta_w(u8 data)
 {
 	m_keyboard_mask = data ^ 0xff;
@@ -46,6 +50,7 @@ void mikro80_state::porta_w(u8 data)
 
 void mikro80_state::portc_w(u8 data)
 {
+	m_cassette->output(BIT(data, 7) ? 1.0 : -1.0);   // for Kristall2 only
 }
 
 void mikro80_state::machine_start()
@@ -85,7 +90,7 @@ void mikro80_state::tape_w(u8 data)
 
 u8 mikro80_state::tape_r()
 {
-	return m_cassette->input() ? 0xff : 0;
+	return (m_cassette->input() < 0.04) ? 0xff : 0;
 }
 
 void mikro80_state::sound_w(u8 data)
