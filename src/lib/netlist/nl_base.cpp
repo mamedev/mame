@@ -975,6 +975,83 @@ namespace netlist
 			}
 	}
 
+	// ----------------------------------------------------------------------------------------
+	// netlist_t
+	//
+	// Hot section
+	//
+	// Any changes below will impact performance.
+	// -----------------------------------------------------------------------------
+
+	template <bool KEEP_STATS>
+	void netlist_t::process_queue_stats(const netlist_time_ext delta) noexcept
+	{
+		netlist_time_ext stop(m_time + delta);
+
+		qpush(stop, nullptr);
+
+		if (m_mainclock == nullptr)
+		{
+			m_time = m_queue.top().exec_time();
+			detail::net_t *obj(m_queue.top().object());
+			m_queue.pop();
+
+			while (obj != nullptr)
+			{
+				obj->template update_devs<KEEP_STATS>();
+				if (KEEP_STATS)
+					m_perf_out_processed.inc();
+				const detail::queue_t::entry_t *top = &m_queue.top();
+				m_time = top->exec_time();
+				obj = top->object();
+				m_queue.pop();
+			}
+		}
+		else
+		{
+			logic_net_t &mc_net(m_mainclock->m_Q.net());
+			const netlist_time inc(m_mainclock->m_inc);
+			netlist_time_ext mc_time(mc_net.next_scheduled_time());
+
+			do
+			{
+				const detail::queue_t::entry_t *top = &m_queue.top();
+				while (top->exec_time() > mc_time)
+				{
+					m_time = mc_time;
+					mc_net.toggle_new_Q();
+					mc_net.update_devs<KEEP_STATS>();
+					top = &m_queue.top();
+					mc_time += inc;
+				}
+
+				m_time = top->exec_time();
+				auto *const obj(top->object());
+				m_queue.pop();
+				if (obj != nullptr)
+					obj->template update_devs<KEEP_STATS>();
+				else
+					break;
+				if (KEEP_STATS)
+					m_perf_out_processed.inc();
+			} while (true);
+
+			mc_net.set_next_scheduled_time(mc_time);
+		}
+	}
+
+	void netlist_t::process_queue(netlist_time_ext delta) noexcept
+	{
+		if (!m_use_stats)
+			process_queue_stats<false>(delta);
+		else
+		{
+			auto sm_guard(m_stat_mainloop.guard());
+			process_queue_stats<true>(delta);
+		}
+	}
+
+
 	template struct state_var<std::uint8_t>;
 	template struct state_var<std::uint16_t>;
 	template struct state_var<std::uint32_t>;

@@ -24,11 +24,14 @@
 #include "../nltypes.h"
 
 #include "base_objects.h"
+#include "core_device.h"
+#include "setup.h"
 
 #include "../plib/palloc.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 #include "../plib/putil.h" // psource_t
+#include "../plib/pfunction.h"
 
 #include <memory>
 
@@ -63,8 +66,6 @@ namespace netlist
 
 	protected:
 
-		void update_param() noexcept;
-
 		pstring get_initial(const core_device_t *dev, bool *found) const;
 
 		template<typename C>
@@ -73,7 +74,7 @@ namespace netlist
 			if (p != v)
 			{
 				p = v;
-				update_param();
+				device().update_param();
 			}
 		}
 
@@ -170,13 +171,14 @@ namespace netlist
 			{
 				*m_param = param;
 				changed();
-				update_param();
+				device().update_param();
 			}
 		}
 		pstring valstr() const override
 		{
 			return *m_param;
 		}
+
 	protected:
 		virtual void changed() noexcept;
 		pstring str() const noexcept { return *m_param; }
@@ -268,6 +270,63 @@ namespace netlist
 	private:
 		std::array<ST, 1 << AW> m_data;
 	};
+
+	template <typename T>
+	param_num_t<T>::param_num_t(core_device_t &device, const pstring &name, const T val)
+	: param_t(device, name)
+	, m_param(val)
+	{
+		bool found = false;
+		pstring p = this->get_initial(&device, &found);
+		if (found)
+		{
+			plib::pfunction<nl_fptype> func;
+			func.compile_infix(p, {});
+			auto valx = func.evaluate();
+			if (plib::is_integral<T>::value)
+				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
+					throw nl_exception(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
+			m_param = plib::narrow_cast<T>(valx);
+		}
+
+		device.state().save(*this, m_param, this->name(), "m_param");
+	}
+
+	template <typename T>
+	param_enum_t<T>::param_enum_t(core_device_t &device, const pstring &name, const T val)
+	: param_t(device, name)
+	, m_param(val)
+	{
+		bool found = false;
+		pstring p = this->get_initial(&device, &found);
+		if (found)
+		{
+			T temp(val);
+			bool ok = temp.set_from_string(p);
+			if (!ok)
+			{
+				device.state().log().fatal(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+				throw nl_exception(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+			}
+			m_param = temp;
+		}
+
+		device.state().save(*this, m_param, this->name(), "m_param");
+	}
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	param_rom_t<ST, AW, DW>::param_rom_t(core_device_t &device, const pstring &name)
+	: param_data_t(device, name)
+	{
+		auto f = this->stream();
+		if (!f.empty())
+		{
+			plib::istream_read(f.stream(), m_data.data(), 1<<AW);
+			// FIXME: check for failbit if not in validation.
+		}
+		else
+			device.state().log().warning(MW_ROM_NOT_FOUND(str()));
+	}
 
 
 } // namespace netlist

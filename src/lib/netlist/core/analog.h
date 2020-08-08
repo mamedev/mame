@@ -156,6 +156,11 @@ namespace netlist
 		analog_net_t m_my_net;
 	};
 
+	inline solver::matrix_solver_t *analog_t::solver() const noexcept
+	{
+		return (this->has_net() ? net().solver() : nullptr);
+	}
+
 } // namespace netlist
 
 

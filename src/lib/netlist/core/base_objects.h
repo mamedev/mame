@@ -181,9 +181,6 @@ namespace netlist
 			netlist_state_t &state() noexcept;
 			const netlist_state_t &state() const noexcept;
 
-			netlist_t &exec() noexcept;
-			const netlist_t &exec() const noexcept;
-
 		private:
 			core_device_t * m_device;
 		};
