@@ -120,14 +120,14 @@ private:
 
 	uint16_t m_tempbuf[8];
 
-	DECLARE_WRITE16_MEMBER(fifo_data_w);
-	DECLARE_WRITE16_MEMBER(fifo_clear_w);
-	DECLARE_WRITE16_MEMBER(fifo_flush_w);
-	DECLARE_WRITE16_MEMBER(jpeg1_w);
-	DECLARE_WRITE16_MEMBER(jpeg2_w);
-	DECLARE_WRITE16_MEMBER(io_offset_w);
-	DECLARE_WRITE16_MEMBER(io_data_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
+	void fifo_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fifo_clear_w(uint16_t data);
+	void fifo_flush_w(uint16_t data);
+	void jpeg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void jpeg2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void io_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void io_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_w(uint16_t data);
 	void oki_setbank(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
@@ -186,7 +186,7 @@ void sliver_state::plot_pixel_pal(int x, int y, int addr)
 	m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
 }
 
-WRITE16_MEMBER(sliver_state::fifo_data_w)
+void sliver_state::fifo_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_tmp_counter < 8)
 	{
@@ -240,20 +240,20 @@ void sliver_state::blit_gfx()
 	}
 }
 
-WRITE16_MEMBER(sliver_state::fifo_clear_w)
+void sliver_state::fifo_clear_w(uint16_t data)
 {
 	m_bitmap_fg.fill(0);
 	m_fptr=0;
 	m_tmp_counter=0;
 }
 
-WRITE16_MEMBER(sliver_state::fifo_flush_w)
+void sliver_state::fifo_flush_w(uint16_t data)
 {
 	blit_gfx();
 }
 
 
-WRITE16_MEMBER(sliver_state::jpeg1_w)
+void sliver_state::jpeg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_jpeg1);
 }
@@ -313,7 +313,7 @@ void sliver_state::render_jpeg()
 
 }
 
-WRITE16_MEMBER(sliver_state::jpeg2_w)
+void sliver_state::jpeg2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_jpeg2);
 
@@ -321,12 +321,12 @@ WRITE16_MEMBER(sliver_state::jpeg2_w)
 
 }
 
-WRITE16_MEMBER(sliver_state::io_offset_w)
+void sliver_state::io_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_io_offset);
 }
 
-WRITE16_MEMBER(sliver_state::io_data_w)
+void sliver_state::io_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_io_offset < IO_SIZE)
 	{
@@ -349,7 +349,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 	}
 }
 
-WRITE16_MEMBER(sliver_state::sound_w)
+void sliver_state::sound_w(uint16_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);

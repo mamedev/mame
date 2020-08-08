@@ -290,15 +290,15 @@ private:
 	optional_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(pixmap_r);
-	DECLARE_WRITE8_MEMBER(pixmap_w);
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
-	DECLARE_WRITE16_MEMBER(priority_reg_w);
-	DECLARE_WRITE8_MEMBER(oki_banking_w);
+	uint8_t pixmap_r(offs_t offset);
+	void pixmap_w(offs_t offset, uint8_t data);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void soundlatch_w(uint8_t data);
+	uint16_t prot_r();
+	void prot_w(uint16_t data);
+	void gfx_bank_w(uint16_t data);
+	void priority_reg_w(uint16_t data);
+	void oki_banking_w(uint8_t data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmg5_map(address_map &map);
@@ -310,7 +310,7 @@ private:
 
 
 
-READ8_MEMBER(nmg5_state::pixmap_r)
+uint8_t nmg5_state::pixmap_r(offs_t offset)
 {
 	int const sy = offset >> 8;
 	int const sx = (offset & 0xff) << 1;
@@ -318,7 +318,7 @@ READ8_MEMBER(nmg5_state::pixmap_r)
 	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
 }
 
-WRITE8_MEMBER(nmg5_state::pixmap_w)
+void nmg5_state::pixmap_w(offs_t offset, uint8_t data)
 {
 	int const sy = offset >> 8;
 	int const sx = (offset & 0xff) << 1;
@@ -328,29 +328,29 @@ WRITE8_MEMBER(nmg5_state::pixmap_w)
 }
 
 template<int Layer>
-WRITE16_MEMBER(nmg5_state::vram_w)
+void nmg5_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(nmg5_state::soundlatch_w)
+void nmg5_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ16_MEMBER(nmg5_state::prot_r)
+uint16_t nmg5_state::prot_r()
 {
 	return m_prot_val | m_input_data;
 }
 
-WRITE16_MEMBER(nmg5_state::prot_w)
+void nmg5_state::prot_w(uint16_t data)
 {
 	m_input_data = data & 0x0f;
 }
 
-WRITE16_MEMBER(nmg5_state::gfx_bank_w)
+void nmg5_state::gfx_bank_w(uint16_t data)
 {
 	if (m_gfx_bank != (data & 3))
 	{
@@ -359,7 +359,7 @@ WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(nmg5_state::priority_reg_w)
+void nmg5_state::priority_reg_w(uint16_t data)
 {
 	m_priority_reg = data & 7;
 
@@ -367,7 +367,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
-WRITE8_MEMBER(nmg5_state::oki_banking_w)
+void nmg5_state::oki_banking_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }

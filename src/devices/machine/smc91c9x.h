@@ -22,8 +22,8 @@ class smc91c9x_device : public device_t,public device_network_interface
 public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	u16 read(offs_t offset, u16 mem_mask = ~0);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_link_connected(bool connected) { m_link_unconnected = !connected; };
 

@@ -19,7 +19,7 @@ class dragon_amtor_device :
 {
 public:
 	// construction/destruction
-	dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -28,10 +28,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual uint8_t* get_cart_base() override;
-	virtual memory_region* get_cart_memregion() override;
+	virtual u8 *get_cart_base() override;
+	virtual memory_region *get_cart_memregion() override;
 
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
+	virtual u8 cts_read(offs_t offset) override;
 
 private:
 	required_memory_region m_eprom;

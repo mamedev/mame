@@ -50,7 +50,7 @@ void cabal_state::video_start()
 
 /**************************************************************************/
 
-WRITE16_MEMBER(cabal_state::flipscreen_w)
+void cabal_state::flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -62,13 +62,13 @@ WRITE16_MEMBER(cabal_state::flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(cabal_state::background_videoram_w)
+void cabal_state::background_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(cabal_state::text_videoram_w)
+void cabal_state::text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_colorram[offset]);
 	m_text_layer->mark_tile_dirty(offset);

@@ -269,7 +269,7 @@ uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitma
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::priority_w)
+void dec0_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pri);
 }

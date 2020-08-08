@@ -147,9 +147,9 @@ private:
 
 	// I/O handlers
 	void bank_w(u8 data);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
+	u8 bank_r(offs_t offset);
+	void input_w(u8 data);
+	u8 input_r();
 	u8 switch_r();
 };
 
@@ -178,7 +178,7 @@ void talkingbb_state::bank_w(u8 data)
 	m_bank = data;
 }
 
-READ8_MEMBER(talkingbb_state::bank_r)
+u8 talkingbb_state::bank_r(offs_t offset)
 {
 	u32 hi = (~m_bank & 3) << 15;
 	u8 data = (m_bank & 4) ? 0xff : m_rom[offset | hi];
@@ -188,7 +188,7 @@ READ8_MEMBER(talkingbb_state::bank_r)
 	return data;
 }
 
-WRITE8_MEMBER(talkingbb_state::input_w)
+void talkingbb_state::input_w(u8 data)
 {
 	// no effect if P30 is low (never happens though)
 	if (~m_bank & 1)
@@ -200,7 +200,7 @@ WRITE8_MEMBER(talkingbb_state::input_w)
 	m_display->matrix(m_inp_mux, ~data & 7);
 }
 
-READ8_MEMBER(talkingbb_state::input_r)
+u8 talkingbb_state::input_r()
 {
 	// open bus if P30 is low (never happens though)
 	if (~m_bank & 1)

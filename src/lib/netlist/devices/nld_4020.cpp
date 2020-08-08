@@ -1,7 +1,39 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_4020.c
+ * nld_4020.cpp
+ *
+ *  CD4020: 14-Stage Ripple Carry Binary Counters
+ *
+ *          +--------------+
+ *      Q12 |1     ++    16| VDD
+ *      Q13 |2           15| Q11
+ *      Q14 |3           14| Q10
+ *       Q6 |4    4020   13| Q8
+ *       Q5 |5           12| Q9
+ *       Q7 |6           11| RESET
+ *       Q4 |7           10| IP (Input pulses)
+ *      VSS |8            9| Q1
+ *          +--------------+
+ *
+ *
+ *  CD4024: 7-Stage Ripple Carry Binary Counters
+ *
+ *          +--------------+
+ *       IP |1     ++    14| VDD
+ *    RESET |2           13| NC
+ *       Q7 |3           12| Q1
+ *       Q6 |4    4024   11| Q2
+ *       Q5 |5           10| NC
+ *       Q4 |6            9| Q3
+ *      VSS |7            8| NC
+ *          +--------------+
+ *
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  FIXME: Timing depends on VDD-VSS
+ *         This needs a cmos d-a/a-d proxy implementation.
  *
  */
 
@@ -13,14 +45,20 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	template <unsigned _LiveBitmask>
 	NETLIB_OBJECT(CD4020_sub)
 	{
+		static constexpr unsigned MAX_BITS = 14;
+		static constexpr unsigned MAX_BITMASK = (1 << MAX_BITS) - 1;
+
 		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
-		, m_IP(*this, "IP")
+		, m_IP(*this, "IP", NETLIB_DELEGATE(ip))
+		, m_RESET(*this, "RESET", NETLIB_DELEGATE(reseti))
 		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"})
 		, m_cnt(*this, "m_cnt", 0)
-		, m_supply(*this, "VDD", "VSS")
+		, m_supply(*this)
 		{
 		}
 
@@ -30,7 +68,26 @@ namespace netlist
 			m_cnt = 0;
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(ip)
+		{
+			++m_cnt;
+			update_outputs(m_cnt);
+		}
+
+		NETLIB_HANDLERI(reseti)
+		{
+			if (m_RESET())
+			{
+				m_cnt = 0;
+				m_IP.inactivate();
+				/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
+				for (unsigned i = 0; i < MAX_BITS; i++)
+					if (((_LiveBitmask >> i) & 1) != 0)
+						m_Q[i].push(0, reset_time);
+			}
+			else
+				m_IP.activate_hl();
+		}
 
 	public:
 		void update_outputs(const unsigned cnt) noexcept
@@ -45,12 +102,13 @@ namespace netlist
 					NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 			};
 
-			m_Q[0].push(cnt & 1, out_delayQn[0]);
-			for (std::size_t i=3; i<14; i++)
-				m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
+			for (unsigned i = 0; i < MAX_BITS; i++)
+				if (((_LiveBitmask >> i) & 1) != 0)
+					m_Q[i].push(cnt & 1, out_delayQn[i]);
 		}
 		logic_input_t m_IP;
-		object_array_t<logic_output_t, 14> m_Q;
+		logic_input_t m_RESET;
+		object_array_t<logic_output_t, MAX_BITS> m_Q;
 
 		state_var<unsigned> m_cnt;
 		nld_power_pins m_supply;
@@ -60,9 +118,9 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4020, "CD4XXX")
 		, m_sub(*this, "sub")
-		, m_RESET(*this, "RESET")
 		{
 			register_subalias("IP", m_sub.m_IP);
+			register_subalias("RESET", m_sub.m_RESET);
 			register_subalias("Q1", m_sub.m_Q[0]);
 			register_subalias("Q4", m_sub.m_Q[3]);
 			register_subalias("Q5", m_sub.m_Q[4]);
@@ -78,38 +136,43 @@ namespace netlist
 			register_subalias("VDD", "sub.VDD");
 			register_subalias("VSS", "sub.VSS");
 		}
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI();
+
+		//NETLIB_RESETI() {}
 
 	private:
-		NETLIB_SUB(CD4020_sub) m_sub;
-		logic_input_t m_RESET;
+		NETLIB_SUB(CD4020_sub)<0x3ff9> m_sub;
 	};
 
-	NETLIB_UPDATE(CD4020_sub)
+	NETLIB_OBJECT(CD4024)
 	{
-		++m_cnt;
-		m_cnt &= 0x3fff;
-		update_outputs(m_cnt);
-	}
-
-	NETLIB_UPDATE(CD4020)
-	{
-		if (m_RESET())
+		NETLIB_CONSTRUCTOR_MODEL(CD4024, "CD4XXX")
+		, m_sub(*this, "sub")
 		{
-			m_sub.m_cnt = 0;
-			m_sub.m_IP.inactivate();
-			/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-			m_sub.m_Q[0].push(0, reset_time);
-			for (std::size_t i=3; i<14; i++)
-				m_sub.m_Q[i].push(0, reset_time);
+			register_subalias("IP", m_sub.m_IP);
+			register_subalias("RESET", m_sub.m_RESET);
+			register_subalias("Q1", m_sub.m_Q[0]);
+			register_subalias("Q2", m_sub.m_Q[1]);
+			register_subalias("Q3", m_sub.m_Q[2]);
+			register_subalias("Q4", m_sub.m_Q[3]);
+			register_subalias("Q5", m_sub.m_Q[4]);
+			register_subalias("Q6", m_sub.m_Q[5]);
+			register_subalias("Q7", m_sub.m_Q[6]);
+			register_subalias("VDD", "sub.VDD");
+			register_subalias("VSS", "sub.VSS");
 		}
-		else
-			m_sub.m_IP.activate_hl();
-	}
+
+		//NETLIB_RESETI() {}
+
+	private:
+		NETLIB_SUB(CD4020_sub)<0x7f> m_sub;
+	};
+
+
 
 	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "")
 	NETLIB_DEVICE_IMPL_ALIAS(CD4020_WI, CD4020, "CD4020_WI", "+IP,+RESET,+VDD,+VSS")
+
+	NETLIB_DEVICE_IMPL(CD4024,         "CD4024", "")
 
 	} //namespace devices
 } // namespace netlist

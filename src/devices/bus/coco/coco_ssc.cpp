@@ -77,36 +77,36 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void device_reset() override;
 
-		uint8_t ssc_port_a_r();
-		void ssc_port_b_w(uint8_t data);
-		uint8_t ssc_port_c_r();
-		void ssc_port_c_w(uint8_t data);
-		uint8_t ssc_port_d_r();
-		void ssc_port_d_w(uint8_t data);
+		u8 ssc_port_a_r();
+		void ssc_port_b_w(u8 data);
+		u8 ssc_port_c_r();
+		void ssc_port_c_w(u8 data);
+		u8 ssc_port_d_r();
+		void ssc_port_d_w(u8 data);
 
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-		virtual DECLARE_READ8_MEMBER(ff7d_read);
-		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
+		u8 ff7d_read(offs_t offset);
+		void ff7d_write(offs_t offset, u8 data);
 		virtual void set_sound_enable(bool sound_enable) override;
 		static constexpr device_timer_id BUSY_TIMER_ID  = 0;
 
 	private:
-		uint8_t                                 m_reset_line;
+		u8                                      m_reset_line;
 		bool                                    m_tms7000_busy;
-		uint8_t                                 m_tms7000_porta;
-		uint8_t                                 m_tms7000_portb;
-		uint8_t                                 m_tms7000_portc;
-		uint8_t                                 m_tms7000_portd;
+		u8                                      m_tms7000_porta;
+		u8                                      m_tms7000_portb;
+		u8                                      m_tms7000_portc;
+		u8                                      m_tms7000_portd;
 		emu_timer                               *m_tms7000_busy_timer;
 		required_device<tms7040_device>         m_tms7040;
 		required_device<ram_device>             m_staticram;
@@ -121,7 +121,7 @@ namespace
 		public device_sound_interface
 	{
 	public:
-		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		~cocossc_sac_device() { }
 		bool sound_activity_circuit_output();
 
@@ -193,7 +193,7 @@ ROM_END
 //  coco_ssc_device - constructor
 //-------------------------------------------------
 
-coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, COCO_SSC, tag, owner, clock),
 		device_cococart_interface(mconfig, *this ),
 		m_tms7040(*this, PIC_TAG),
@@ -212,8 +212,8 @@ void coco_ssc_device::device_start()
 {
 	// install $FF7D-E handler
 	install_readwrite_handler(0xFF7D, 0xFF7E,
-			read8_delegate(*this, FUNC(coco_ssc_device::ff7d_read)),
-			write8_delegate(*this, FUNC(coco_ssc_device::ff7d_write)));
+			read8sm_delegate(*this, FUNC(coco_ssc_device::ff7d_read)),
+			write8sm_delegate(*this, FUNC(coco_ssc_device::ff7d_write)));
 
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_tms7000_busy));
@@ -290,9 +290,9 @@ void coco_ssc_device::set_sound_enable(bool sound_enable)
 //  ff7d_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_ssc_device::ff7d_read)
+u8 coco_ssc_device::ff7d_read(offs_t offset)
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	switch(offset)
 	{
@@ -348,7 +348,7 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 //  ff7d_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_ssc_device::ff7d_write)
+void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -391,7 +391,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 //  Handlers for secondary CPU ports
 //-------------------------------------------------
 
-uint8_t coco_ssc_device::ssc_port_a_r()
+u8 coco_ssc_device::ssc_port_a_r()
 {
 	if (LOG_SSC)
 	{
@@ -403,7 +403,7 @@ uint8_t coco_ssc_device::ssc_port_a_r()
 	return m_tms7000_porta;
 }
 
-void coco_ssc_device::ssc_port_b_w(uint8_t data)
+void coco_ssc_device::ssc_port_b_w(u8 data)
 {
 	if (LOG_SSC)
 	{
@@ -413,7 +413,7 @@ void coco_ssc_device::ssc_port_b_w(uint8_t data)
 	m_tms7000_portb = data;
 }
 
-uint8_t coco_ssc_device::ssc_port_c_r()
+u8 coco_ssc_device::ssc_port_c_r()
 {
 	if (LOG_SSC)
 	{
@@ -423,11 +423,11 @@ uint8_t coco_ssc_device::ssc_port_c_r()
 	return m_tms7000_portc;
 }
 
-void coco_ssc_device::ssc_port_c_w(uint8_t data)
+void coco_ssc_device::ssc_port_c_w(u8 data)
 {
 	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
 	{
-		uint16_t address = (uint16_t)data << 8;
+		u16 address = u16(data) << 8;
 		address += m_tms7000_portb;
 		address &= 0x7ff;
 
@@ -475,14 +475,14 @@ void coco_ssc_device::ssc_port_c_w(uint8_t data)
 	m_tms7000_portc = data;
 }
 
-uint8_t coco_ssc_device::ssc_port_d_r()
+u8 coco_ssc_device::ssc_port_d_r()
 {
 	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
 	if( ((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
 	{
-		uint16_t address = (uint16_t)m_tms7000_portc << 8;
+		u16 address = u16(m_tms7000_portc) << 8;
 		address += m_tms7000_portb;
 		address &= 0x7ff;
 
@@ -505,7 +505,7 @@ uint8_t coco_ssc_device::ssc_port_d_r()
 	return m_tms7000_portd;
 }
 
-void coco_ssc_device::ssc_port_d_w(uint8_t data)
+void coco_ssc_device::ssc_port_d_w(u8 data)
 {
 	if (LOG_SSC)
 	{
@@ -520,7 +520,7 @@ void coco_ssc_device::ssc_port_d_w(uint8_t data)
 //  cocossc_sac_device - constructor
 //-------------------------------------------------
 
-cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, COCOSSC_SAC, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

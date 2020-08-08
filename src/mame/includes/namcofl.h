@@ -69,12 +69,12 @@ private:
 		m_mainbank[1]->set_bank(bank ^ 1); // RAM, ROM
 	}
 
-	DECLARE_READ32_MEMBER(unk1_r);
-	DECLARE_READ32_MEMBER(network_r);
-	DECLARE_READ32_MEMBER(sysreg_r);
-	DECLARE_WRITE32_MEMBER(sysreg_w);
-	DECLARE_WRITE8_MEMBER(c116_w);
-	DECLARE_WRITE16_MEMBER(mcu_shared_w);
+	uint32_t unk1_r();
+	uint32_t network_r();
+	uint32_t sysreg_r();
+	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void c116_w(offs_t offset, uint8_t data);
+	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t port6_r();
 	void port6_w(uint8_t data);
 	uint8_t port7_r();
@@ -86,7 +86,7 @@ private:
 	uint8_t dac2_r();
 	uint8_t dac1_r();
 	uint8_t dac0_r();
-	DECLARE_WRITE32_MEMBER(spritebank_w);
+	void spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_MACHINE_START(namcofl);
 	DECLARE_MACHINE_RESET(namcofl);
 	DECLARE_VIDEO_START(namcofl);

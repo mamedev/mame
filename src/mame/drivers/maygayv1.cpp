@@ -229,13 +229,13 @@ public:
 	void init_screenpl();
 
 private:
-	DECLARE_WRITE16_MEMBER(i82716_w);
-	DECLARE_READ16_MEMBER(i82716_r);
-	DECLARE_WRITE16_MEMBER(write_odd);
-	DECLARE_READ16_MEMBER(read_odd);
-	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
+	void i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t i82716_r(offs_t offset);
+	void write_odd(uint16_t data);
+	uint16_t read_odd();
+	void vsync_int_ctrl(uint16_t data);
+	uint8_t mcu_r(offs_t offset);
+	void mcu_w(offs_t offset, uint8_t data);
 	uint8_t b_read();
 	void b_writ(uint8_t data);
 	void strobe_w(uint8_t data);
@@ -277,7 +277,7 @@ private:
 
 
 
-WRITE16_MEMBER(maygayv1_state::i82716_w)
+void maygayv1_state::i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
@@ -296,7 +296,7 @@ WRITE16_MEMBER(maygayv1_state::i82716_w)
 	}
 }
 
-READ16_MEMBER(maygayv1_state::i82716_r)
+uint16_t maygayv1_state::i82716_r(offs_t offset)
 {
 	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
@@ -513,12 +513,12 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 
 
 
-WRITE16_MEMBER(maygayv1_state::write_odd)
+void maygayv1_state::write_odd(uint16_t data)
 {
 }
 
 //;860008 is a latch of some sort
-READ16_MEMBER(maygayv1_state::read_odd)
+uint16_t maygayv1_state::read_odd()
 {
 	return 0;
 }
@@ -558,7 +558,7 @@ uint8_t maygayv1_state::kbd_r()
 	return m_kbd_ports[m_lamp_strobe & 0x07]->read();
 }
 
-WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
+void maygayv1_state::vsync_int_ctrl(uint16_t data)
 {
 	m_vsync_latch_preset = data & 0x0100;
 
@@ -618,7 +618,7 @@ void maygayv1_state::main_map(address_map &map)
 
 */
 
-READ8_MEMBER(maygayv1_state::mcu_r)
+uint8_t maygayv1_state::mcu_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -635,7 +635,7 @@ READ8_MEMBER(maygayv1_state::mcu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(maygayv1_state::mcu_w)
+void maygayv1_state::mcu_w(offs_t offset, uint8_t data)
 {
 			logerror("O %x D %x",offset,data);
 
@@ -918,7 +918,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 
 	MC68681(config, m_duart68681, DUART_CLOCK);
 	m_duart68681->irq_cb().set(FUNC(maygayv1_state::duart_irq_handler));
-	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));;
+	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));         // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));         // scan SL lines

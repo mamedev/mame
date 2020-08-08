@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    iwm.c
+    iwm.cpp
 
     Implementation of the Apple IWM floppy disk controller
 
@@ -15,10 +15,13 @@ DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM floppy controller")
 
 iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
 	applefdintf_device(mconfig, IWM, tag, owner, clock),
+	m_floppy(nullptr),
 	m_q3_clock(q3_clock)
 {
-	m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
-	m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
+	if (q3_clock != 0)
+		m_q3_fclk_ratio = double(clock)/double(q3_clock); // ~0.25
+	if (clock != 0)
+		m_fclk_q3_ratio = double(q3_clock)/double(clock); // ~4
 }
 
 u64 iwm_device::q3_to_fclk(u64 cycles) const
@@ -60,7 +63,6 @@ void iwm_device::device_reset()
 {
 	applefdintf_device::device_reset();
 
-	m_floppy = nullptr;
 	m_last_sync = machine().time().as_ticks(clock());
 	m_next_state_change = 0;
 	m_active = MODE_IDLE;
@@ -367,7 +369,7 @@ void iwm_device::sync()
 					break;
 				}
 				m_rsh = (m_rsh << 1) | (m_rw_state == SR_WINDOW_EDGE_1 ? 1 : 0);
-				m_next_state_change = m_last_sync = endw;				
+				m_next_state_change = m_last_sync = endw;
 				m_rw_state = SR_WINDOW_EDGE_0;
 				if(is_sync()) {
 					if(m_rsh >= 0x80) {

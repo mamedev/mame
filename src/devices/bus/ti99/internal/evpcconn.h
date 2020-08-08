@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
+#define TI99_EVPC_CONN_TAG   "evpc_conn"
 
 namespace bus { namespace ti99 { namespace internal {
 

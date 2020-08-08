@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/taito_b.h"
 
-WRITE16_MEMBER(hitice_state::pixelram_w)
+void hitice_state::pixelram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
@@ -18,21 +18,18 @@ WRITE16_MEMBER(hitice_state::pixelram_w)
 	}
 }
 
-WRITE16_MEMBER(hitice_state::pixel_scroll_w)
+void hitice_state::pixel_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixel_scroll[offset]);
 }
 
 void hitice_state::clear_pixel_bitmap()
 {
-	int i;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	for (i = 0; i < 0x40000; i++)
-		pixelram_w(space, i, 0, 0xffff);
+	for (int i = 0; i < 0x40000; i++)
+		pixelram_w(i, 0, 0xffff);
 }
 
-WRITE16_MEMBER(taitob_c_state::realpunc_video_ctrl_w)
+void taitob_c_state::realpunc_video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }

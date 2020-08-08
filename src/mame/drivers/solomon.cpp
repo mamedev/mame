@@ -17,7 +17,7 @@ driver by Mirko Buffoni
 #include "speaker.h"
 
 
-WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
+void solomon_state::solomon_sh_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -27,7 +27,7 @@ WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
    it could be a form of protection.  the real board needs to be analysed to find out
    what really lives here */
 
-READ8_MEMBER(solomon_state::solomon_0xe603_r)
+uint8_t solomon_state::solomon_0xe603_r()
 {
 	if (m_maincpu->pc() == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
@@ -44,7 +44,7 @@ READ8_MEMBER(solomon_state::solomon_0xe603_r)
 	}
 }
 
-WRITE8_MEMBER(solomon_state::nmi_mask_w)
+void solomon_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_mask = data & 1;
 }

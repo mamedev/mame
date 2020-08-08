@@ -433,9 +433,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
 	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
 
-	DECLARE_READ16_MEMBER( cia_r );
-	DECLARE_WRITE16_MEMBER( cia_w );
-	DECLARE_WRITE16_MEMBER( gayle_cia_w );
+	uint16_t cia_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cia_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void cia_0_port_a_write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
 	uint8_t cia_1_port_a_read();
@@ -453,13 +453,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w );
 	DECLARE_WRITE_LINE_MEMBER( centronics_select_w );
 
-	DECLARE_READ16_MEMBER( custom_chip_r );
+	uint16_t custom_chip_r(offs_t offset);
 	void custom_chip_w(offs_t offset, uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
 
-	DECLARE_READ16_MEMBER( rom_mirror_r );
-	DECLARE_READ32_MEMBER( rom_mirror32_r );
+	uint16_t rom_mirror_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint32_t rom_mirror32_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);

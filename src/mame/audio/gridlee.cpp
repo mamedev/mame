@@ -68,7 +68,7 @@ void gridlee_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-WRITE8_MEMBER( gridlee_sound_device::gridlee_sound_w )
+void gridlee_sound_device::gridlee_sound_w(offs_t offset, uint8_t data)
 {
 	uint8_t *sound_data = m_sound_data;
 

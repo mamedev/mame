@@ -330,13 +330,13 @@ void segas32_state::system32_set_vblank(int state)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::videoram_r)
+uint16_t segas32_state::videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
 
-WRITE16_MEMBER(segas32_state::videoram_w)
+void segas32_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 
@@ -361,7 +361,7 @@ WRITE16_MEMBER(segas32_state::videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(segas32_state::sprite_control_r)
+uint8_t segas32_state::sprite_control_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -419,7 +419,7 @@ READ8_MEMBER(segas32_state::sprite_control_r)
 }
 
 
-WRITE8_MEMBER(segas32_state::sprite_control_w)
+void segas32_state::sprite_control_w(offs_t offset, uint8_t data)
 {
 	m_sprite_control[offset & 7] = data;
 }
@@ -431,13 +431,13 @@ WRITE8_MEMBER(segas32_state::sprite_control_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::spriteram_r)
+uint16_t segas32_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
 
-WRITE16_MEMBER(segas32_state::spriteram_w)
+void segas32_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 	m_spriteram_32bit[offset>>1] =

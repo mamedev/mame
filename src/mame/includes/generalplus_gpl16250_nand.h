@@ -35,6 +35,7 @@ public:
 	void nand_vbaby();
 	void nand_tsm();
 	void nand_beambox();
+	void nand_kiugames();
 
 protected:
 	virtual void machine_start() override;
@@ -44,10 +45,10 @@ protected:
 	std::vector<uint16_t> m_sdram;
 	std::vector<uint16_t> m_sdram2;
 
-	virtual DECLARE_READ16_MEMBER(cs0_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
-	virtual DECLARE_READ16_MEMBER(cs1_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
+	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual void cs0_w(offs_t offset, uint16_t data) override;
+	virtual uint16_t cs1_r(offs_t offset) override;
+	virtual void cs1_w(offs_t offset, uint16_t data) override;
 
 private:
 	optional_region_ptr<uint8_t> m_nandregion;

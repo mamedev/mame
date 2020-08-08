@@ -134,15 +134,6 @@ u8 ks0164_device::mpu401_status_r()
 	if(m_mpu_status & MPUS_RX_FULL)
 		res |= 0x40;
 
-	static std::string pc;
-	static u8 pr;
-
-	std::string cc = machine().describe_context();
-	if(pc != cc || pr != res) {
-		//      logerror("status read %02x (%s)\n", res, cc);
-		pc = cc;
-		pr = res;
-	}
 	return res;
 }
 

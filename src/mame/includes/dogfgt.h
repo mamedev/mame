@@ -65,17 +65,17 @@ private:
 	int       m_soundlatch;
 	int       m_last_snd_ctrl;
 
-	DECLARE_WRITE8_MEMBER(subirqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sub_irqack_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(soundcontrol_w);
-	DECLARE_WRITE8_MEMBER(plane_select_w);
-	DECLARE_READ8_MEMBER(bitmapram_r);
-	DECLARE_WRITE8_MEMBER(internal_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(bitmapram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(_1800_w);
+	void subirqtrigger_w(uint8_t data);
+	void sub_irqack_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
+	void soundcontrol_w(uint8_t data);
+	void plane_select_w(uint8_t data);
+	uint8_t bitmapram_r(offs_t offset);
+	void internal_bitmapram_w(offs_t offset, uint8_t data);
+	void bitmapram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+	void _1800_w(uint8_t data);
 
 
 	TILE_GET_INFO_MEMBER(get_tile_info);

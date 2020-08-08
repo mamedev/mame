@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <sstream>
 #include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
@@ -123,6 +124,8 @@ namespace plib
 
 		PCOPYASSIGNMOVE(source_location, default)
 
+		~source_location() = default;
+
 		unsigned line() const noexcept { return m_line; }
 		unsigned column() const noexcept { return m_col; }
 		pstring file_name() const noexcept { return m_file; }
@@ -151,7 +154,38 @@ namespace plib
 	{
 	public:
 
-		using stream_ptr = plib::unique_ptr<std::istream>;
+		struct stream_ext
+		{
+			explicit stream_ext() = default;
+
+			stream_ext(std::unique_ptr<std::istream> &&strm, const pstring &filename)
+			: m_strm(std::move(strm))
+			, m_filename(filename)
+			{
+			}
+			stream_ext(const stream_ext &) = delete;
+			stream_ext &operator=(const stream_ext &) = delete;
+			stream_ext(stream_ext &&rhs) /*noexcept*/
+			{
+				m_strm = std::move(rhs.m_strm);
+				m_filename = rhs.m_filename;
+			}
+			stream_ext &operator=(stream_ext &&) /*noexcept*/ = delete;
+
+			std::istream &stream() noexcept { return *m_strm; }
+			pstring filename() { return m_filename; }
+
+			bool empty() { return m_strm == nullptr; }
+
+			// FIXME: workaround input context should accept stream_ptr
+
+			std::unique_ptr<std::istream> release_stream() { return std::move(m_strm); }
+		private:
+			std::unique_ptr<std::istream> m_strm;
+			pstring m_filename;
+		};
+
+		using stream_ptr = stream_ext; //FIXME: rename to stream_type
 
 		psource_t() noexcept = default;
 
@@ -168,10 +202,7 @@ namespace plib
 	/// Will return the given string when name matches.
 	/// Is used in preprocessor code to eliminate inclusion of certain files.
 	///
-	/// \tparam TS base stream class. Default is psource_t
-	///
-	template <typename TS = psource_t>
-	class psource_str_t : public TS
+	class psource_str_t : public psource_t
 	{
 	public:
 		psource_str_t(pstring name, pstring str)
@@ -181,10 +212,12 @@ namespace plib
 		PCOPYASSIGNMOVE(psource_str_t, delete)
 		~psource_str_t() noexcept override = default;
 
-		typename TS::stream_ptr stream(const pstring &name) override
+		typename psource_t::stream_ptr stream(const pstring &name) override
 		{
-			return (name == m_name) ?
-				plib::make_unique<std::stringstream>(m_str) : typename TS::stream_ptr(nullptr);
+			if (name == m_name)
+				return stream_ptr(std::make_unique<std::stringstream>(m_str), name);
+
+			return psource_t::stream_ptr();
 		}
 	private:
 		pstring m_name;
@@ -193,13 +226,13 @@ namespace plib
 
 	/// \brief Generic sources collection.
 	///
-	/// \tparam TS base stream class. Default is psource_t
+	/// \tparam ARENA memory arena, defaults to aligned_arena
 	///
-	template <typename TS = psource_t>
+	template <typename ARENA = aligned_arena>
 	class psource_collection_t
 	{
 	public:
-		using source_type = plib::unique_ptr<TS>;
+		using source_type = std::unique_ptr<psource_t>;
 		using list_t = std::vector<source_type>;
 
 		psource_collection_t() noexcept = default;
@@ -212,8 +245,8 @@ namespace plib
 			m_collection.push_back(std::move(src));
 		}
 
-		template <typename S = TS>
-		typename S::stream_ptr get_stream(pstring name)
+		template <typename S = psource_t>
+		typename psource_t::stream_ptr get_stream(pstring name)
 		{
 			for (auto &s : m_collection)
 			{
@@ -221,11 +254,11 @@ namespace plib
 				if (source)
 				{
 					auto strm = source->stream(name);
-					if (strm)
+					if (!strm.empty())
 						return strm;
 				}
 			}
-			return typename S::stream_ptr(nullptr);
+			return typename S::stream_ptr();
 		}
 
 		template <typename S, typename F>
@@ -251,6 +284,7 @@ namespace plib
 	{
 		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
+		bool    exists(const pstring &filename);
 		pstring buildpath(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
@@ -269,14 +303,14 @@ namespace plib
 		{
 			auto it = std::find(con.begin(), con.end(), elem);
 			if (it != con.end())
-				return static_cast<std::size_t>(it - con.begin());
+				return narrow_cast<std::size_t>(it - con.begin());
 			return npos;
 		}
 
 		template <class C>
 		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
 		{
-			con.insert(con.begin() + static_cast<std::ptrdiff_t>(index), elem);
+			con.insert(con.begin() + narrow_cast<std::ptrdiff_t>(index), elem);
 		}
 
 		template <class C>
@@ -315,7 +349,7 @@ namespace plib
 	{
 		std::size_t result = 5381; // NOLINT
 		for (const T* p = buf; p != buf + size; p++)
-			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<std::size_t>(*p); // NOLINT
+			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ narrow_cast<std::size_t>(*p); // NOLINT
 		return result;
 	}
 

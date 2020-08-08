@@ -211,11 +211,17 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		const uint16_t opb = op & 7;
 
 		m_core->m_icount -= 12; // unknown
+
+		LOGMASKED(LOG_UNSP_MULS, "%s: MUL uu with %04x (unsigned) * %04x (unsigned) (fra:%d) :\n", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb], m_core->m_fra);
+
 		lres = m_core->m_r[opa] * m_core->m_r[opb];
 		m_core->m_r[REG_R4] = lres >> 16;
 		m_core->m_r[REG_R3] = (uint16_t)lres;
+
+		LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
+
 		return;
-			}
+	}
 	else if (((op & 0xf180) == 0xe080))
 	{
 		// MULS     1 1 1 0*  r r r S*  1 s s s   s r r r    (* = sign bit, fixed here)
@@ -238,53 +244,27 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 
 		switch (shift)
 		{
-		case 0x00:
+		case 0x00: // jak_smwm train movement
 		{
 			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
-
-			uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
-			int shift = (m_core->m_r[rs] & 0x01f);
-			if (shift == 0)
-				return;
-
+			int16_t rdval = (int16_t)((uint16_t)m_core->m_r[rd]);
+			int shift = (m_core->m_r[rs] & 0x1f);
 			uint32_t res;
-			if (BIT(rd, (32 - shift)))
-			{
-				if (shift >= 16)
-				{
-					res = 0x0000ffff;
-				}
-				else
-				{
-					res = (rdval >> shift) | (uint16_t)(0xffff0000 >> shift);
-				}
-			}
-			else
-			{
-				if (shift >= 16)
-				{
-					res = 0;
-				}
-				else
-				{
-					res = rdval >> shift;
-				}
-			}
-
+			res = rdval >> shift;
 			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
 			m_core->m_r[rd] = res;
 			return;
 		}
 
-		case 0x01: // jak_car2 on starting a game
+		case 0x01: // jak_car2 on starting a game, myac220 'piggy golf' ball movement
 		{
 			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asror %s (%04x %04x)\n", regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
 			const int32_t rdval = (int32_t)(m_core->m_r[rd] << 16);
-			const int shift = (m_core->m_r[rs] & 0x01f);
+			const int shift = (m_core->m_r[rs] & 0x1f);
 			const uint32_t res = rdval >> shift;
 			m_core->m_r[REG_R3] |= (uint16_t)res;
-			m_core->m_r[REG_R4] |= (uint16_t)(res >> 16);
+			m_core->m_r[REG_R4] = (uint16_t)(res >> 16);
 			LOGMASKED(LOG_UNSP_SHIFTS, "result: %04x%04x\n", m_core->m_r[REG_R4], m_core->m_r[REG_R3]);
 			return;
 		}
@@ -293,7 +273,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		{
 			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsl %s (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			const uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
-			const int shift = (m_core->m_r[rs] & 0x01f);
+			const int shift = (m_core->m_r[rs] & 0x1f);
 			const uint32_t res = (uint16_t)(rdval << shift);
 			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
 			m_core->m_r[rd] = res;
@@ -305,8 +285,8 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			// wrlshunt uses this
 			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lslor %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
-			const uint32_t rdval = m_core->m_r[rd];
-			const int shift = (m_core->m_r[rs] & 0x01f);
+			const uint32_t rdval = (uint16_t)m_core->m_r[rd];
+			const int shift = (m_core->m_r[rs] & 0x1f);
 			const uint32_t res = rdval << shift;
 			m_core->m_r[REG_R3] = (uint16_t)res;
 			m_core->m_r[REG_R4] |= (uint16_t)(res >> 16);
@@ -320,7 +300,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsr %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
 			const uint32_t rdval = (uint16_t)(m_core->m_r[rd]);
-			const int shift = (m_core->m_r[rs] & 0x01f);
+			const int shift = (m_core->m_r[rs] & 0x1f);
 			const uint32_t res = (uint16_t)(rdval >> shift);
 			LOGMASKED(LOG_UNSP_SHIFTS, "result: %08x\n", res);
 			m_core->m_r[rd] = res;
@@ -331,7 +311,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		{
 			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			const uint32_t rdval = m_core->m_r[rd] << 16;
-			const int shift = (m_core->m_r[rs] & 0x01f);
+			const int shift = (m_core->m_r[rs] & 0x1f);
 			const uint32_t res = rdval >> shift;
 			m_core->m_r[REG_R3] |= (uint16_t)res;
 			m_core->m_r[REG_R4] = (uint16_t)(res >> 16);

@@ -105,7 +105,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 	}
 }
 
-WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
+void micro3d_state::micro3d_creg_w(uint16_t data)
 {
 	if (~data & 0x80)
 		m_vgb->set_input_line(0, CLEAR_LINE);
@@ -113,7 +113,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_creg_w)
 	m_creg = data;
 }
 
-WRITE16_MEMBER(micro3d_state::micro3d_xfer3dk_w)
+void micro3d_state::micro3d_xfer3dk_w(uint16_t data)
 {
 	m_xfer3dk = data;
 }
@@ -620,7 +620,7 @@ bc000000-1fc DPRAM address for read access
 
 ******************************************************************************/
 
-WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
+void micro3d_state::micro3d_fifo_w(uint32_t data)
 {
 	uint32_t opcode = data >> 24;
 
@@ -720,12 +720,12 @@ WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 	}
 }
 
-WRITE32_MEMBER(micro3d_state::micro3d_alt_fifo_w)
+void micro3d_state::micro3d_alt_fifo_w(uint32_t data)
 {
 	m_vtx_fifo[m_fifo_idx++] = VTX_SEX(data);
 }
 
-READ32_MEMBER(micro3d_state::micro3d_pipe_r)
+uint32_t micro3d_state::micro3d_pipe_r()
 {
 	m_drmath->set_input_line(AM29000_INTR1, CLEAR_LINE);
 	return m_pipe_data;

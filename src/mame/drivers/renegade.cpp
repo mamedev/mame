@@ -9,55 +9,55 @@ Nekketsu Kouha Kunio Kun
 (c)1986 Technos Japan
 
 Nekketsu Kouha Kunio Kun (bootleg)
+Renegade (bootleg)
 
 driver by Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 
 to enter test mode, hold down P1+P2 and press reset
 
 NMI is used to refresh the sprites
-IRQ is used to handle coin inputs
+IRQ is used to poll the coin and service inputs
+coin counter outputs are connected directly to coin inputs (via 74LS04 inverter gates IC55, IC43)
+no coin lockout
 
 Known issues:
-- Knockdown samples farts (coming from YM3526 DAC);
-- Static ADPCM sound, end trigger not understood.
-  Most likely ends when specific data format is encountered during playback
-  cfr. jantotsu.cpp;
-- Verify irq sources;
 - Unemulated partial update bg scrolling, which should effectively add layer
   tearing at line ~12 according to the refs. Scrolling currently
   triggers at line 6 with current timings so we are quite off.
   Additionally scrolling updates every other frame so simply using partial
   updates won't cope with it;
-- None of the refs has the top 8 pixels shown but 256x232 seems unlikely.
-  Verify what it shows on real HW, should be either garbage or vblank or
-  border color;
-- Verify if coin counter is really tied to $3807;
 
-Memory Map (Preliminary):
+Non-emulation issues:  (these are confirmed accurate, present on real pcb)
+- Knockdown samples farts (coming from YM3526 DAC)
+- Static ADPCM sound
+- Active video period is 238 lines but last 7 lines are unused
+
+
+Memory Map:
 
 Working RAM
-  $24       used to mirror bankswitch state
-  $25       coin trigger state
-  $26       #credits (decimal)
-  $27 -  $28    partial credits
-  $2C -  $2D    sprite refresh trigger (used by NMI)
-  $31       live/demo (if live, player controls are read from input ports)
-  $32       indicates 2 player (alternating) game, or 1 player game
-  $33       active player
-  $37       stage number
-  $38       stage state (for stages with more than one part)
-  $40       game status flags; 0x80 indicates time over, 0x40 indicates player dead
- $220       player health
- $222 -  $223   stage timer
- $48a -  $48b   horizontal scroll buffer
- $511 -  $690   sprite RAM buffer
- $693       num pending sound commands
- $694 -  $698   sound command queue
+  $24           used to mirror bankswitch state
+  $25           coin trigger state
+  $26           #credits (decimal)
+  $27 - $28     partial credits
+  $2C - $2D     sprite refresh trigger (used by NMI)
+  $31           live/demo (if live, player controls are read from input ports)
+  $32           indicates 2 player (alternating) game, or 1 player game
+  $33           active player
+  $37           stage number
+  $38           stage state (for stages with more than one part)
+  $40           game status flags; 0x80 indicates time over, 0x40 indicates player dead
+ $220           player health
+ $222 - $223    stage timer
+ $48a - $48b    horizontal scroll buffer
+ $511 - $690    sprite RAM buffer
+ $693           num pending sound commands
+ $694 - $698    sound command queue
 
-$1002       #lives
+$1002           #lives
 $1014 - $1015   stage timer - separated digits
 $1017 - $1019   stage timer: (ticks,seconds,minutes)
-$101a       timer for palette animation
+$101a           timer for palette animation
 $1020 - $1048   high score table
 $10e5 - $10ff   68705 data buffer
 
@@ -80,33 +80,33 @@ $3804w  send data to 68705
 $3804r  receive data from 68705
 
 $3805w  bankswitch
-$3806w  watchdog?
-$3807w  coin counter
+$3806w  nmi clear
+$3807w  irq clear
 
-$3800r  'player1'
-    xx      start buttons
-      xx    fire buttons
-        xxxx    joystick state
+$3800r  player 1 controls
+xx          start buttons
+  xx        fire buttons
+    xxxx    joystick state
 
-$3801r  'player2'
-    xx      coin inputs
-      xx    fire buttons
-        xxxx    joystick state
+$3801r  player 2 controls
+xx          coin inputs
+  xx        fire buttons
+    xxxx    joystick state
 
-$3802r  'DIP2'
-    x       unused?
-     x      vblank
-      x     0: 68705 is ready to send information
-       x    1: 68705 is ready to receive information
-        xx  3rd fire buttons for player 2,1
-          xx    difficulty
+$3802r  dipswitch 2 + misc
+x           service input
+ x          vblank (reads state of nmi flipflop)
+  x         0: 68705 is ready to send information
+   x        1: 68705 is ready to receive information
+    xx      3rd fire buttons for player 2,1
+      xx    difficulty
 
-$3803r 'DIP1'
-    x       screen flip
-     x      cabinet type
-      x     bonus (extra life for high score)
-       x    starting lives: 1 or 2
-        xxxx    coins per play
+$3803r dipswitch 1
+x           screen flip
+ x          cabinet type
+  x         bonus (extra life for high score)
+   x        starting lives: 1 or 2
+    xxxx    coins per play
 
 ROM
 $4000 - $7fff   bankswitched ROM
@@ -128,52 +128,61 @@ $8000 - $ffff   ROM
 /**************************************************************************/
 /*  ADPCM sound
 **
-**  Inferred from the 6809 code and analogy with ddragon
-**  NMI at end of sample is not needed in order for
-**  playback to work, but seems to be what the code expects
+**  oki m5205 s/w selectable 4/8KHz
+**  12x speech samples of 0x2000*2 samples each (approx 2.5 seconds)
+**  4x chained 4-bit binary counters clock out the rom data (2x 74LS393, IC48/IC46, 2 counters per chip)
+**  74LS74A @ IC45 is the nmi control flipflop, nmi = Q, m5205 and counter chain shared reset = /Q
+**  6809 wr to 3000-37ff asserts nmi (ff CLR pin)
+**  6809 wr to 1800-1fff clears nmi, releases m5205/counter shared reset line (ff SET pin)
+**  6809 wr to 2000-27ff selects 1 of 3 sample roms, sets upper 2 address lines, and sets m5205 sample rate
+**  counter asserts nmi on rollover (sample playback finished) (ff CLK pin, ff D = gnd)
+**  main system reset line is ANDed (74LS08 IC11) with ff CLR pin such that nmi is asserted on system reset
 */
 
-WRITE8_MEMBER(renegade_state::adpcm_start_w)
+void renegade_state::adpcm_start_w(uint8_t data)
 {
 	m_msm->reset_w(0);
 	m_adpcm_playing = true;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::adpcm_addr_w)
+void renegade_state::adpcm_addr_w(uint8_t data)
 {
 	// table at $CB52 in audiocpu program:
 	// 38 38 39 3A 3B 34 35 36 37 2C 2D 2E 2F
 	//
-	// bits 2-4 are active-low chip select; bit 5 is always set
-	// (chip select for an unpopulated fourth ROM?)
+	// bits 2-4 are active-low chip select
 	switch (data & 0x1c)
 	{
-		case 0x18: m_adpcm_pos = 0 * 0x8000 * 2; break;     // 110 -> ic33
-		case 0x14: m_adpcm_pos = 1 * 0x8000 * 2; break;     // 101 -> ic32
-		case 0x0c: m_adpcm_pos = 2 * 0x8000 * 2; break;     // 011 -> ic31
-		default: m_adpcm_pos = m_adpcm_end = 0; return; // doesn't happen
+		case 0x18: m_adpcm_pos = 0 * 0x8000 * 2; break;   // 110 -> ic33
+		case 0x14: m_adpcm_pos = 1 * 0x8000 * 2; break;   // 101 -> ic32
+		case 0x0c: m_adpcm_pos = 2 * 0x8000 * 2; break;   // 011 -> ic31
+		default: m_adpcm_pos = m_adpcm_end = 0; return;   // doesn't happen
 	}
 	// bits 0-1 are a13-a14
 	m_adpcm_pos |= (data & 0x03) * 0x2000 * 2;
 	// a0-a12 are driven by a binary counter; playback ends when it rolls over
 	m_adpcm_end = m_adpcm_pos + 0x2000 * 2;
+	// bit 5 selects 8 or 4 KHz m5205 sample rate (connected to the S1 pin, S2 pin is gnd)
+	m_msm->playmode_w(BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B);
 }
 
-WRITE8_MEMBER(renegade_state::adpcm_stop_w)
+void renegade_state::adpcm_stop_w(uint8_t data)
 {
 	m_msm->reset_w(1);
 	m_adpcm_playing = false;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 {
-	if (!m_adpcm_playing) return;
+	if (!m_adpcm_playing || !state) return;
 
 	if (m_adpcm_pos >= m_adpcm_end)
 	{
 		m_msm->reset_w(1);
 		m_adpcm_playing = false;
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	else
 	{
@@ -186,7 +195,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 void renegade_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
-
+	
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_playing));
@@ -199,7 +208,7 @@ void renegade_state::machine_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(renegade_state::mcu_reset_r)
+uint8_t renegade_state::mcu_reset_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -225,7 +234,7 @@ CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 
 /********************************************************************************************/
 
-WRITE8_MEMBER(renegade_state::bankswitch_w)
+void renegade_state::bankswitch_w(uint8_t data)
 {
 	m_rombank->set_entry(data & 1);
 }
@@ -234,25 +243,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 {
 	int scanline = param;
 
-	// vblank irq?
-	if (scanline == 240)
+	// nmi  8 lines before vsync
+	if (scanline == 265)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	
+	// irq  16 clks per frame: once every 16 lines, but increases to 24 lines during vblank
+	// (lines 16,40,56,72,88,104,120,136,152,168,184,200,216,232,248,264)
+	if (scanline == 0x10 || (scanline > 0x20 && (scanline & 0xf) == 8))
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::nmi_ack_w)
+void renegade_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::irq_ack_w)
+void renegade_state::irq_ack_w(uint8_t data)
 {
-	if (data != 0xff)
-	{
-		// guess: trigger a 1->0 transition on irq ack
-		machine().bookkeeping().coin_counter_w(0, 1);
-		machine().bookkeeping().coin_counter_w(0, 0);
-	}
-	//m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -287,18 +295,18 @@ void renegade_state::renegade_map(address_map &map)
 void renegade_state::renegade_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1800, 0x1800).w(FUNC(renegade_state::adpcm_start_w));
-	map(0x2000, 0x2000).w(FUNC(renegade_state::adpcm_addr_w));
-	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-	map(0x3000, 0x3000).w(FUNC(renegade_state::adpcm_stop_w));
-//  map(0x2000, 0x7fff) read in service mode during sound test
+	map(0x1000, 0x17ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1800, 0x1fff).w(FUNC(renegade_state::adpcm_start_w));
+	map(0x2000, 0x27ff).w(FUNC(renegade_state::adpcm_addr_w));
+	map(0x2800, 0x2fff).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x3000, 0x37ff).w(FUNC(renegade_state::adpcm_stop_w));
+	map(0x3800, 0x7fff).nopr(); // misc reads in service mode during sound test
 	map(0x8000, 0xffff).rom();
 }
 
 INPUT_CHANGED_MEMBER(renegade_state::coin_inserted)
 {
-	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
+	machine().bookkeeping().coin_counter_w(param ? 1 : 0, oldval);
 }
 
 
@@ -321,7 +329,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Left Attack")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 1)
 
 	PORT_START("DSW2")  /* DIP2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
@@ -333,7 +341,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Attack")
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(renegade_state, mcu_status_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, renegade_state, coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW1")  /* DIP1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -496,6 +504,7 @@ void renegade_state::machine_reset()
 	m_rombank->set_entry(0);
 	m_msm->reset_w(1);
 	m_adpcm_playing = 0;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -506,14 +515,14 @@ void renegade_state::renegade(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &renegade_state::renegade_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(renegade_state::interrupt), "screen", 0, 1);
 
-	MC6809(config, m_audiocpu, 12000000/2); // HD68A09P
+	MC6809(config, m_audiocpu, 12000000/2); /* HD68A09P 6 MHz (measured) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &renegade_state::renegade_sound_map);    /* IRQs are caused by the main CPU */
 
-	TAITO68705_MCU(config, m_mcu, 12000000/4); // ?
+	TAITO68705_MCU(config, m_mcu, 12000000/4); /* 3 MHz (measured) */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(12000000/2, 384, 0, 256, 272, 0, 240); // assume same as ddragon.cpp
+	m_screen->set_raw(12000000/2, 384, 0, 256, 272, 19, 257);
 	m_screen->set_screen_update(FUNC(renegade_state::screen_update));
 	m_screen->set_palette("palette");
 
@@ -526,13 +535,12 @@ void renegade_state::renegade(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	ym3526_device &ymsnd(YM3526(config, "ymsnd", 12000000/4));
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 12000000/4)); /* 3 MHz (measured) */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_msm, 12000000/32);
-	m_msm->vck_legacy_callback().set(FUNC(renegade_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8kHz */
+	MSM5205(config, m_msm, 12000000/32); /* 375 KHz (measured) */
+	m_msm->vck_callback().set(FUNC(renegade_state::adpcm_int));
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -709,7 +717,7 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

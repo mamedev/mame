@@ -75,7 +75,7 @@ void paula_8364_device::update()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ16_MEMBER( paula_8364_device::reg_r )
+uint16_t paula_8364_device::reg_r(offs_t offset)
 {
 	switch (offset)
 	{

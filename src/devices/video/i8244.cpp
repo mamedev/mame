@@ -2,10 +2,12 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    i8244.c
+Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
 
-    Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
-
+TODO:
+- NTSC has 263 scanlines, PAL has 313 scanlines, a quick fix will probably
+  cause small regressions here and there
+- PAL has 228 clocks per line (so, 456 half clocks)
 
 ***************************************************************************/
 
@@ -19,76 +21,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(I8244, i8244_device, "i8244", "Intel 8244")
 DEFINE_DEVICE_TYPE(I8245, i8245_device, "i8245", "Intel 8245")
-
-
-// Kevtris verified that the data below matches a dump
-// taken from a real chip.
-static const uint8_t c_shape[0x40 * 8] =
-{
-	0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00, // 0
-	0x18,0x38,0x18,0x18,0x18,0x18,0x3C,0x00,
-	0x3C,0x66,0x0C,0x18,0x30,0x60,0x7E,0x00,
-	0x7C,0xC6,0x06,0x3C,0x06,0xC6,0x7C,0x00,
-	0xCC,0xCC,0xCC,0xFE,0x0C,0x0C,0x0C,0x00,
-	0xFE,0xC0,0xC0,0x7C,0x06,0xC6,0x7C,0x00,
-	0x7C,0xC6,0xC0,0xFC,0xC6,0xC6,0x7C,0x00,
-	0xFE,0x06,0x0C,0x18,0x30,0x60,0xC0,0x00,
-	0x7C,0xC6,0xC6,0x7C,0xC6,0xC6,0x7C,0x00,
-	0x7C,0xC6,0xC6,0x7E,0x06,0xC6,0x7C,0x00,
-	0x00,0x18,0x18,0x00,0x18,0x18,0x00,0x00,
-	0x18,0x7E,0x58,0x7E,0x1A,0x7E,0x18,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x3C,0x66,0x0C,0x18,0x18,0x00,0x18,0x00,
-	0xC0,0xC0,0xC0,0xC0,0xC0,0xC0,0xFE,0x00,
-	0xFC,0xC6,0xC6,0xFC,0xC0,0xC0,0xC0,0x00,
-	0x00,0x18,0x18,0x7E,0x18,0x18,0x00,0x00,
-	0xC6,0xC6,0xC6,0xD6,0xFE,0xEE,0xC6,0x00,
-	0xFE,0xC0,0xC0,0xF8,0xC0,0xC0,0xFE,0x00,
-	0xFC,0xC6,0xC6,0xFC,0xD8,0xCC,0xC6,0x00,
-	0x7E,0x18,0x18,0x18,0x18,0x18,0x18,0x00,
-	0xC6,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,
-	0x3C,0x18,0x18,0x18,0x18,0x18,0x3C,0x00,
-	0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,
-	0x7C,0xC6,0xC6,0xC6,0xDE,0xCC,0x76,0x00,
-	0x7C,0xC6,0xC0,0x7C,0x06,0xC6,0x7C,0x00,
-	0xFC,0xC6,0xC6,0xC6,0xC6,0xC6,0xFC,0x00,
-	0xFE,0xC0,0xC0,0xF8,0xC0,0xC0,0xC0,0x00,
-	0x7C,0xC6,0xC0,0xC0,0xCE,0xC6,0x7E,0x00,
-	0xC6,0xC6,0xC6,0xFE,0xC6,0xC6,0xC6,0x00,
-	0x06,0x06,0x06,0x06,0x06,0xC6,0x7C,0x00,
-	0xC6,0xCC,0xD8,0xF0,0xD8,0xCC,0xC6,0x00,
-	0x38,0x6C,0xC6,0xC6,0xFE,0xC6,0xC6,0x00,
-	0x7E,0x06,0x0C,0x18,0x30,0x60,0x7E,0x00,
-	0xC6,0xC6,0x6C,0x38,0x6C,0xC6,0xC6,0x00,
-	0x7C,0xC6,0xC0,0xC0,0xC0,0xC6,0x7C,0x00,
-	0xC6,0xC6,0xC6,0xC6,0xC6,0x6C,0x38,0x00,
-	0xFC,0xC6,0xC6,0xFC,0xC6,0xC6,0xFC,0x00,
-	0xC6,0xEE,0xFE,0xD6,0xC6,0xC6,0xC6,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x18,0x18,0x00,
-	0x00,0x00,0x00,0x7E,0x00,0x00,0x00,0x00,
-	0x00,0x66,0x3C,0x18,0x3C,0x66,0x00,0x00,
-	0x00,0x18,0x00,0x7E,0x00,0x18,0x00,0x00,
-	0x00,0x00,0x7E,0x00,0x7E,0x00,0x00,0x00,
-	0x66,0x66,0x66,0x3C,0x18,0x18,0x18,0x00,
-	0xC6,0xE6,0xF6,0xFE,0xDE,0xCE,0xC6,0x00,
-	0x03,0x06,0x0C,0x18,0x30,0x60,0xC0,0x00,
-	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,
-	0xCE,0xDB,0xDB,0xDB,0xDB,0xDB,0xCE,0x00,
-	0x00,0x00,0x3C,0x7E,0x7E,0x7E,0x3C,0x00,
-	0x1C,0x1C,0x18,0x1E,0x18,0x18,0x1C,0x00,
-	0x1C,0x1C,0x18,0x1E,0x18,0x34,0x26,0x00,
-	0x38,0x38,0x18,0x78,0x18,0x2C,0x64,0x00,
-	0x38,0x38,0x18,0x78,0x18,0x18,0x38,0x00,
-	0x00,0x18,0x0C,0xFE,0x0C,0x18,0x00,0x00,
-	0x18,0x3C,0x7E,0xFF,0xFF,0x18,0x18,0x00,
-	0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF,0x00,
-	0xC0,0xE0,0xF0,0xF8,0xFC,0xFE,0xFF,0x00,
-	0x38,0x38,0x12,0xFE,0xB8,0x28,0x6C,0x00,
-	0xC0,0x60,0x30,0x18,0x0C,0x06,0x03,0x00,
-	0x00,0x00,0x0C,0x08,0x08,0x7F,0x3E,0x00,
-	0x00,0x03,0x63,0xFF,0xFF,0x18,0x08,0x00,
-	0x00,0x00,0x00,0x10,0x38,0xFF,0x7E,0x00
-};
 
 
 // Background and grid information is stored in RGB format
@@ -116,6 +48,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 	, device_video_interface(mconfig, *this)
 	, m_irq_func(*this)
 	, m_postprocess_func(*this)
+	, m_charset(*this, "cgrom")
 	, m_start_vpos(START_Y)
 	, m_start_vblank(START_Y + SCREEN_HEIGHT)
 	, m_screen_lines(lines)
@@ -126,6 +59,22 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8244_device(mconfig, I8245, tag, owner, clock, i8245_device::LINES)
 {
+}
+
+
+//-------------------------------------------------
+//  internal character set rom
+//-------------------------------------------------
+
+ROM_START( i8244 )
+	ROM_REGION( 0x200, "cgrom", 0 )
+	ROM_LOAD( "charset_i8244.bin", 0x0000, 0x0200, CRC(b46a3f31) SHA1(415382715455b47b69401b3d60bd8f0036dd7fef) )
+ROM_END
+
+
+const tiny_rom_entry *i8244_device::device_rom_region() const
+{
+	return ROM_NAME( i8244 );
 }
 
 
@@ -141,7 +90,7 @@ void i8244_device::device_config_complete()
 		return;
 
 	if (!screen().refresh_attoseconds())
-		screen().set_raw(clock(), LINE_CLOCKS, START_ACTIVE_SCAN, END_ACTIVE_SCAN, m_screen_lines, START_Y, START_Y + SCREEN_HEIGHT);
+		screen().set_raw(clock()*2, LINE_CLOCKS, START_ACTIVE_SCAN, END_ACTIVE_SCAN, m_screen_lines, START_Y, START_Y + SCREEN_HEIGHT);
 }
 
 
@@ -164,7 +113,7 @@ void i8244_device::device_start()
 	m_postprocess_func.resolve_safe();
 
 	// allocate a stream
-	m_stream = stream_alloc( 0, 1, clock()/(LINE_CLOCKS*4) );
+	m_stream = stream_alloc( 0, 1, (clock()*2)/(LINE_CLOCKS*4) );
 
 	// register our state
 	save_pointer(NAME(m_vdc.reg), 0x100);
@@ -276,19 +225,51 @@ int i8244_device::get_x_beam()
 
 offs_t i8244_device::fix_register_mirrors( offs_t offset )
 {
-	// registers $40,$41 are mirrored at $44,$45, $48,$49, and $4C,$4D
-	if ( ( offset & 0xF2 ) == 0x40 )
+	// quad x/y registers are mirrored for each quad
+	if ( ( offset & 0xC2 ) == 0x40 )
 	{
 		offset &= ~0x0C;
 	}
 
 	// registers $A0-$AF are mirrored at $B0-$BF
-	if ( ( offset & 0xF0 ) == 0xB0 )
+	if ( ( offset & 0xE0 ) == 0xA0 )
 	{
 		offset &= ~0x10;
 	}
 
-	return offset;
+	return offset & 0xFF;
+}
+
+bool i8244_device::unused_register( offs_t offset )
+{
+	bool unused = false;
+
+	u8 low = offset & 0xf;
+
+	// these registers are inaccessible
+	switch (offset & 0xf0)
+	{
+		case 0x00:
+			unused = ((low & 0x3) == 0x3);
+			break;
+		case 0xa0:
+			unused = (low == 0x6 || low >= 0xb);
+			break;
+		case 0xc0: case 0xd0:
+			unused = (low >= 0x9);
+			break;
+		case 0xe0:
+			unused = (low >= 0xa);
+			break;
+		case 0xf0:
+			unused = true;
+			break;
+
+		default:
+			break;
+	}
+
+	return unused;
 }
 
 
@@ -296,7 +277,10 @@ uint8_t i8244_device::read(offs_t offset)
 {
 	uint8_t data;
 
-	offset = fix_register_mirrors( offset );
+	offset = fix_register_mirrors(offset);
+
+	if (unused_register(offset))
+		return 0;
 
 	switch (offset)
 	{
@@ -324,13 +308,18 @@ uint8_t i8244_device::read(offs_t offset)
 			data = m_y_beam_pos;
 			break;
 
-
 		case 0xa5:
 			if ((m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
 				m_x_beam_pos = get_x_beam();
 			}
 			data = m_x_beam_pos;
+			break;
+
+		case 0x02: case 0x06: case 0x0a: case 0x0e:
+		case 0xa3: case 0xa7: case 0xa8: case 0xa9:
+			// write-only registers
+			data = 0;
 			break;
 
 		default:
@@ -344,11 +333,32 @@ uint8_t i8244_device::read(offs_t offset)
 
 void i8244_device::write(offs_t offset, uint8_t data)
 {
-	offset = fix_register_mirrors( offset );
+	offset = fix_register_mirrors(offset);
 
-	/* Update the sound */
-	if( offset >= 0xa7 && offset <= 0xaa )
+	if (unused_register(offset))
+		return;
+
+	// read-only registers
+	if (offset == 0xa1 || offset == 0xa4 || offset == 0xa5)
+		return;
+
+	// Color registers d4-d7 are not connected
+	if ((offset & 0x83) == 0x03)
+		data &= 0x0f;
+
+	// Major systems Y CAM d0 is not connected!
+	if (offset >= 0x10 && (offset & 0x83) == 0x00)
+		data &= ~0x01;
+
+	// Horizontal grid high byte only d0 is connected
+	if ((offset & 0xf0) == 0xd0)
+		data &= 0x01;
+
+	// Update the sound
+	if (offset >= 0xa7 && offset <= 0xaa)
 	{
+		if (offset == 0xaa)
+			data &= 0xbf;
 		m_stream->update();
 	}
 
@@ -357,7 +367,7 @@ void i8244_device::write(offs_t offset, uint8_t data)
 		if ( ( m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY )
 			&& !(data & VDC_CONTROL_REG_STROBE_XY))
 		{
-			/* Toggling strobe bit, tuck away values */
+			// Toggling strobe bit, tuck away values
 			m_x_beam_pos = get_x_beam();
 			m_y_beam_pos = get_y_beam();
 		}
@@ -416,26 +426,25 @@ void i8244_device::render_scanline(int vpos)
 	//static const uint8_t COLLISION_EXTERNAL_UNUSED = 0x40;
 	static const uint8_t COLLISION_CHARACTERS      = 0x80;
 
-	uint8_t   collision_map[160];
-
 	if ( vpos == m_start_vpos )
 	{
 		m_control_status &= ~0x08;
 	}
 
+	/* Clear collision map */
+	uint8_t collision_map[160];
+	memset( collision_map, 0, sizeof( collision_map ) );
+
+	/* Draw background color */
+	rectangle rect(START_ACTIVE_SCAN, END_ACTIVE_SCAN - 1, vpos, vpos);
+	rect &= screen().visible_area();
+	m_tmp_bitmap.fill( (m_vdc.s.color >> 3) & 0x7, rect );
+
 	if ( m_start_vpos < vpos && vpos < m_start_vblank )
 	{
-		rectangle rect;
 		int scanline = vpos - m_start_vpos;
 
 		m_control_status &= ~ 0x01;
-
-		/* Draw a line */
-		rect.set(START_ACTIVE_SCAN, END_ACTIVE_SCAN - 1, vpos, vpos);
-		m_tmp_bitmap.fill( (m_vdc.s.color >> 3) & 0x7, rect );
-
-		/* Clear collision map */
-		memset( collision_map, 0, sizeof( collision_map ) );
 
 		/* Display grid if enabled */
 		if ( m_vdc.s.control & 0x08 )
@@ -447,7 +456,7 @@ void i8244_device::render_scanline(int vpos)
 			int    height = 24;
 			int    w = ( m_vdc.s.control & 0x80 ) ? width : 2;
 
-			/* Draw horizontal part of grid */
+			/* Draw horizontal part of the grid */
 			for ( int j = 1, y = 0; y < 9; y++, j <<= 1 )
 			{
 				if ( y_grid_offset + y * height <= scanline && scanline < y_grid_offset + y * height + 3 )
@@ -472,7 +481,7 @@ void i8244_device::render_scanline(int vpos)
 				}
 			}
 
-			/* Draw vertical part of grid */
+			/* Draw vertical part of the grid */
 			for( int j = 1, y = 0; y < 8; y++, j <<= 1 )
 			{
 				if ( y_grid_offset + y * height <= scanline && scanline < y_grid_offset + ( y + 1 ) * height )
@@ -487,17 +496,32 @@ void i8244_device::render_scanline(int vpos)
 
 								if ( px < 160 )
 								{
-									/* Check if we collide with an already drawn source object */
-									if ( collision_map[ px ] & m_vdc.s.collision )
-									{
-										m_collision_status |= COLLISION_VERTICAL_GRID;
-									}
-									/* Check if an already drawn object would collide with us */
-									if ( COLLISION_VERTICAL_GRID & m_vdc.s.collision && collision_map[ px ] )
-									{
-										m_collision_status |= collision_map[ px ];
-									}
 									collision_map[ px ] |= COLLISION_VERTICAL_GRID;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			/* Draw dots part of the grid */
+			if ( m_vdc.s.control & 0x40 )
+			{
+				for ( int y = 0; y < 9; y++ )
+				{
+					if ( y_grid_offset + y * height <= scanline && scanline < y_grid_offset + y * height + 3 )
+					{
+						for ( int i = 0; i < 10; i++ )
+						{
+							for ( int k = 0; k < 2; k++ )
+							{
+								int px = x_grid_offset + i * width + k;
+
+								if ( px < 160 )
+								{
+									collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px ) = color;
 									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * px + 1 ) = color;
 								}
@@ -512,16 +536,17 @@ void i8244_device::render_scanline(int vpos)
 		if ( m_vdc.s.control & 0x20 )
 		{
 			/* Regular foreground objects */
-			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.foreground ); i++ )
+			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
 			{
-				int y = m_vdc.s.foreground[i].y & 0xFE;
+				int y = m_vdc.s.foreground[i].y;
 				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
+				if (height == 1) height = 8;
 
-				if ( y >= 0x0E && y <= scanline && scanline < y + height * 2 )
+				if ( y <= scanline && scanline < y + height * 2 )
 				{
 					uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 ) ];
 					int    offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-					uint8_t  chr = c_shape[ offset & 0x1FF ];
+					uint8_t  chr = m_charset[ offset & 0x1FF ];
 					int    x = m_vdc.s.foreground[i].x;
 
 					for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
@@ -550,59 +575,52 @@ void i8244_device::render_scanline(int vpos)
 			}
 
 			/* Quad objects */
-			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.quad ); i++ )
+			for ( int i = ARRAY_LENGTH( m_vdc.s.quad ) - 1; i >= 0; i-- )
 			{
 				int y = m_vdc.s.quad[i].single[0].y;
-				int height = 8;
+
+				// Character height is always determined by the height of the 4th character
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );
+				if (height == 1) height = 8;
 
 				if ( y <= scanline && scanline < y + height * 2 )
 				{
 					int x = m_vdc.s.quad[i].single[0].x;
 
-					// Charaecter height is always determined by the height of the 4th character
-					int char_height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );
-
 					for ( int j = 0; j < ARRAY_LENGTH( m_vdc.s.quad[0].single ); j++, x += 8 )
 					{
-						if ( y <= scanline && scanline < y + char_height * 2 )
-						{
-							uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
-							int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-							uint8_t chr = c_shape[ offset & 0x1FF ];
+						uint16_t color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
+						int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
+						uint8_t chr = m_charset[ offset & 0x1FF ];
 
-							for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
+						for ( uint8_t m = 0x80; m > 0; m >>= 1, x++ )
+						{
+							if ( chr & m )
 							{
-								if ( chr & m )
+								if ( x >= 0 && x < 160 )
 								{
-									if ( x >= 0 && x < 160 )
+									/* Check if we collide with an already drawn source object */
+									if ( collision_map[ x ] & m_vdc.s.collision )
 									{
-										/* Check if we collide with an already drawn source object */
-										if ( collision_map[ x ] & m_vdc.s.collision )
-										{
-											m_collision_status |= COLLISION_CHARACTERS;
-										}
-										/* Check if an already drawn object would collide with us */
-										if ( COLLISION_CHARACTERS & m_vdc.s.collision && collision_map[ x ] )
-										{
-											m_collision_status |= collision_map[ x ];
-										}
-										collision_map[ x ] |= COLLISION_CHARACTERS;
-										m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x ) = color;
-										m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x + 1 ) = color;
+										m_collision_status |= COLLISION_CHARACTERS;
 									}
+									/* Check if an already drawn object would collide with us */
+									if ( COLLISION_CHARACTERS & m_vdc.s.collision && collision_map[ x ] )
+									{
+										m_collision_status |= collision_map[ x ];
+									}
+									collision_map[ x ] |= COLLISION_CHARACTERS;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x ) = color;
+									m_tmp_bitmap.pix16( vpos, START_ACTIVE_SCAN + 10 + 2 * x + 1 ) = color;
 								}
 							}
-						}
-						else
-						{
-							x += 8;
 						}
 					}
 				}
 			}
 
 			/* Sprites */
-			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.sprites ); i++ )
+			for ( int i = ARRAY_LENGTH( m_vdc.s.sprites ) - 1; i >= 0; i-- )
 			{
 				int y = m_vdc.s.sprites[i].y;
 				int height = 8;

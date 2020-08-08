@@ -1326,21 +1326,21 @@ void bbc_state::bbcbp_drive_control_w(uint8_t data)
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wd1770->subdevice<floppy_connector>("1")->get_device();
-	m_wd1770->set_floppy(floppy);
+	if (BIT(data, 0)) floppy = m_wd_fdc->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd_fdc->subdevice<floppy_connector>("1")->get_device();
+	m_wd_fdc->set_floppy(floppy);
 
 	// bit 2: side select
 	if (floppy)
 		floppy->ss_w(BIT(data, 2));
 
 	// bit 3: density
-	m_wd1770->dden_w(BIT(data, 3));
+	m_wd_fdc->dden_w(BIT(data, 3));
 
 	// bit 4: interrupt enable (S5 wire link not fitted)
 
 	// bit 5: reset
-	m_wd1770->mr_w(BIT(data, 5));
+	m_wd_fdc->mr_w(BIT(data, 5));
 }
 
 /*
@@ -1362,39 +1362,19 @@ void bbc_state::bbcm_drive_control_w(uint8_t data)
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1, 3: drive select
-	if (BIT(data, 0)) floppy = m_wd1770->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wd1770->subdevice<floppy_connector>("1")->get_device();
-	m_wd1770->set_floppy(floppy);
+	if (BIT(data, 0)) floppy = m_wd_fdc->subdevice<floppy_connector>("0")->get_device();
+	if (BIT(data, 1)) floppy = m_wd_fdc->subdevice<floppy_connector>("1")->get_device();
+	m_wd_fdc->set_floppy(floppy);
 
 	// bit 4: side select
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
 
 	// bit 5: density
-	m_wd1770->dden_w(BIT(data, 5));
+	m_wd_fdc->dden_w(BIT(data, 5));
 
 	// bit 2: reset
-	m_wd1770->mr_w(BIT(data, 2));
-}
-
-void bbc_state::bbcmc_drive_control_w(uint8_t data)
-{
-	floppy_image_device *floppy = nullptr;
-
-	// bit 0, 1, 3: drive select
-	if (BIT(data, 0)) floppy = m_wd1772->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wd1772->subdevice<floppy_connector>("1")->get_device();
-	m_wd1772->set_floppy(floppy);
-
-	// bit 4: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 4));
-
-	// bit 5: density
-	m_wd1772->dden_w(BIT(data, 5));
-
-	// bit 2: reset
-	m_wd1772->mr_w(BIT(data, 2));
+	m_wd_fdc->mr_w(BIT(data, 2));
 }
 
 
@@ -1634,7 +1614,7 @@ void bbc_state::setup_device_roms()
 	/* list all inserted ROMs */
 	for (int i = 15; i >= 0; i--)
 	{
-		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)));
+		osd_printf_verbose("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)));
 	}
 }
 

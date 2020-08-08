@@ -98,13 +98,13 @@ private:
 	uint8_t m_scrollx_lo;
 	uint8_t m_gfx_switch;
 
-	DECLARE_WRITE8_MEMBER(charram_w);
-	DECLARE_WRITE8_MEMBER(char_vregs_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void charram_w(offs_t offset, uint8_t data);
+	void char_vregs_w(uint8_t data);
+	void scrollx_lo_w(uint8_t data);
+	void scrollx_hi_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	uint8_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -187,7 +187,7 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(progolf_state::charram_w)
+void progolf_state::charram_w(offs_t offset, uint8_t data)
 {
 	int i;
 	m_fbram[offset] = data;
@@ -209,31 +209,31 @@ WRITE8_MEMBER(progolf_state::charram_w)
 	}
 }
 
-WRITE8_MEMBER(progolf_state::char_vregs_w)
+void progolf_state::char_vregs_w(uint8_t data)
 {
 	m_char_pen = data & 0x07;
 	m_gfx_switch = data & 0xf0;
 	m_char_pen_vreg = data & 0x30;
 }
 
-WRITE8_MEMBER(progolf_state::scrollx_lo_w)
+void progolf_state::scrollx_lo_w(uint8_t data)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(progolf_state::scrollx_hi_w)
+void progolf_state::scrollx_hi_w(uint8_t data)
 {
 	m_scrollx_hi = data;
 }
 
-WRITE8_MEMBER(progolf_state::flip_screen_w)
+void progolf_state::flip_screen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 	if(data & 0xfe)
 		printf("$9600 with data = %02x used\n",data);
 }
 
-READ8_MEMBER(progolf_state::videoram_r)
+uint8_t progolf_state::videoram_r(offs_t offset)
 {
 	uint8_t *gfx_rom = memregion("gfx1")->base();
 
@@ -259,7 +259,7 @@ READ8_MEMBER(progolf_state::videoram_r)
 	}
 }
 
-WRITE8_MEMBER(progolf_state::videoram_w)
+void progolf_state::videoram_w(offs_t offset, uint8_t data)
 {
 	//if(m_gfx_switch & 0x40)
 	m_videoram[offset] = data;
@@ -488,6 +488,8 @@ ROM_START( progolf )
 	ROM_LOAD( "gam.k11",      0x0040, 0x0020, CRC(b9665de3) SHA1(4c5aba5f6589f4bce4692c0d5bb2811ab8e14aed) )
 ROM_END
 
+// top board: GGM-Ø2  DE-0087C-0
+// bottom board: GGM-Ø1  DE-0086B-0
 ROM_START( progolfa )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // custom DECO CPU-6 module
 	ROM_LOAD( "g4-m.a3",      0xb000, 0x1000, CRC(015a08d9) SHA1(671d5cd708e098dbda3e495a8b4ce3393c6971da) )
@@ -495,6 +497,8 @@ ROM_START( progolfa )
 	ROM_LOAD( "g2-m.a6",      0xd000, 0x1000, CRC(fafec36e) SHA1(70880d6f9b11505d466f36c12a43361ee2639fed) )
 	ROM_LOAD( "g1-m.a8",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.a9",      0xf000, 0x1000, CRC(a03c533f) SHA1(2e0006be40e32b64b1490bd339d9fc9302eee7c4) )
+	// the following single byte patch gets the ball position to be correct like in the parent. TODO: verify g3-m.a4 dump
+	// ROM_FILL( 0xc14b, 0x01, 0xf0) // from: EB 07    sbc #$07 to: F0 07    beq $c154
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "g5-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )

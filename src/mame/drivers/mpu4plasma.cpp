@@ -28,12 +28,12 @@ public:
 private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 
-	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
+	uint16_t mpu4plasma_unk_r()
 	{
 		return machine().rand();
 	}
 
-	DECLARE_WRITE16_MEMBER( mpu4plasma_unk_w )
+	void mpu4plasma_unk_w(uint16_t data)
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -173,8 +173,8 @@ ROM_END
 
 #define M4APACH_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
-	ROM_LOAD16_BYTE( "plasma.p0", 0x00000, 0x010000, NO_DUMP ) \
-	ROM_LOAD16_BYTE( "plasma.p1", 0x00001, 0x010000, NO_DUMP )
+	ROM_LOAD16_BYTE( "a6ppl.p0", 0x00000, 0x020000, CRC(350da2df) SHA1(a390e0c7e1e624c17f0e254e0b99ef9dbf56269d) ) \
+	ROM_LOAD16_BYTE( "a6ppl.p1", 0x00001, 0x020000, CRC(63038aba) SHA1(8ec4e02109e872460a9598e469b59919cc5450dd) ) \
 
 ROM_START( m4apach )
 	ROM_REGION( 0x10000, "maincpu", 0 )

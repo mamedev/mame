@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
+void nemesis_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bubsys_control_ram[offset]);
 	//logerror("bubsys_mcu_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
@@ -292,19 +292,19 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 	}
 }
 
-READ16_MEMBER(nemesis_state::gx400_sharedram_word_r)
+uint16_t nemesis_state::gx400_sharedram_word_r(offs_t offset)
 {
 	return m_gx400_shared_ram[offset];
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_sharedram_word_w)
+void nemesis_state::gx400_sharedram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_gx400_shared_ram[offset] = data;
 }
 
 
-READ16_MEMBER(nemesis_state::konamigt_input_word_r)
+uint16_t nemesis_state::konamigt_input_word_r()
 {
 /*
     bit 0-7:   steering
@@ -350,7 +350,7 @@ uint8_t nemesis_state::selected_ip_r()
 }
 
 
-WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
+void nemesis_state::nemesis_filter_w(offs_t offset, uint8_t data)
 {
 	int C1 = /* offset & 0x1000 ? 4700 : */ 0; // is this right? 4.7uF seems too large
 	int C2 = offset & 0x0800 ? 33 : 0;         // 0.033uF = 33 nF
@@ -362,13 +362,18 @@ WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
 	// konamigt also uses bits 0x0018, what are they for?
 }
 
-WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
+void nemesis_state::gx400_speech_w(offs_t offset, uint8_t data)
 {
-	m_vlm->st(1);
-	m_vlm->st(0);
+	m_vlm->rst(BIT(offset, 4));
+	m_vlm->st(BIT(offset, 5));
+	// bits 3, 6 also used (one is OE for VLM data?)
+	// data is irrelevant for most writes
+
+	if (offset == 0)
+		m_vlm->data_w(data);
 }
 
-WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
+void nemesis_state::salamand_speech_start_w(uint8_t data)
 {
 	m_vlm->rst(BIT(data, 0));
 	m_vlm->st(BIT(data, 1));
@@ -393,7 +398,7 @@ uint8_t nemesis_state::nemesis_portA_r()
 	return res;
 }
 
-WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
+void nemesis_state::city_sound_bank_w(uint8_t data)
 {
 	int bank_A = (data & 0x03);
 	int bank_B = ((data >> 2) & 0x03);
@@ -586,14 +591,13 @@ void nemesis_state::gx400_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("voiceram");
 	map(0xa000, 0xafff).w(m_k005289, FUNC(k005289_device::ld1_w));
 	map(0xc000, 0xcfff).w(m_k005289, FUNC(k005289_device::ld2_w));
-	map(0xe000, 0xe000).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0xe000, 0xe000).select(0x78).w(FUNC(nemesis_state::gx400_speech_w));
 	map(0xe001, 0xe001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xe003, 0xe003).w(m_k005289, FUNC(k005289_device::tg1_w));
 	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
 	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
 	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
-	map(0xe030, 0xe030).w(FUNC(nemesis_state::gx400_speech_start_w));
 	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
 	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
@@ -720,7 +724,7 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x311000, 0x311fff).ram();
 }
 
-READ8_MEMBER(nemesis_state::wd_r)
+uint8_t nemesis_state::wd_r()
 {
 	m_frame_counter ^= 1;
 	return m_frame_counter;
@@ -1802,7 +1806,7 @@ void nemesis_state::gx400(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
@@ -1932,7 +1936,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
@@ -3040,8 +3044,8 @@ ROM_START( twinbeeb )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
 
 	ROM_REGION( 0x806*0x90, "bubblememory", ROMREGION_ERASE00 )
-//	ROM_LOAD16_WORD_SWAP( "bubble_twinbeeb", 0x000, 0x48360, CRC(21599cf5) SHA1(7eb068e10134d5c66f7f90f6d6b265353b7bd8be) ) // re-encoded data
-	
+//  ROM_LOAD16_WORD_SWAP( "bubble_twinbeeb", 0x000, 0x48360, CRC(21599cf5) SHA1(7eb068e10134d5c66f7f90f6d6b265353b7bd8be) ) // re-encoded data
+
 	ROM_REGION( 0x806*0x80, "bubblememory_temp", 0 )
 	ROM_LOAD( "twinbee.bin", 0x00000, 0x40300, CRC(4d396a0a) SHA1(ee922a1bd7062c0fcf358f5079cca6424aadc975) )
 
@@ -3094,7 +3098,7 @@ void nemesis_state::bubsys_twinbeeb_init()
 	for (int i = 0; i < 0x806; i++)
 	{
 		uint16_t crc = 0;
-		
+
 		int sourcebase = i * 0x80;
 		int destbase = i * 0x90;
 

@@ -33,15 +33,15 @@ DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4c MMU")
 #define LOG_TYPE1_TIMEOUT   (1U << 12)
 #define LOG_UNKNOWN_SPACE   (1U << 13)
 #define LOG_WRITE_PROTECT   (1U << 14)
-#define LOG_READ_PROTECT	(1U << 15)
+#define LOG_READ_PROTECT    (1U << 15)
 #define LOG_PARITY          (1U << 16)
 #define LOG_ALL_ASI         (1U << 17) // WARNING: Heavy!
-#define LOG_UNKNOWN_ASI		(1U << 18)
-#define LOG_SEGMENT_FLUSH	(1U << 19)
-#define LOG_PAGE_FLUSH		(1U << 20)
-#define LOG_CONTEXT_FLUSH	(1U << 21)
-#define LOG_CACHE_FILLS		(1U << 22)
-#define LOG_PAGE_ENTRIES	(1U << 23)
+#define LOG_UNKNOWN_ASI     (1U << 18)
+#define LOG_SEGMENT_FLUSH   (1U << 19)
+#define LOG_PAGE_FLUSH      (1U << 20)
+#define LOG_CONTEXT_FLUSH   (1U << 21)
+#define LOG_CACHE_FILLS     (1U << 22)
+#define LOG_PAGE_ENTRIES    (1U << 23)
 
 #if SUN4CMMU_LOG_MEM_ACCESSES
 static FILE* s_mem_log = nullptr;

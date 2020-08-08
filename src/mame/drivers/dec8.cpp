@@ -59,7 +59,7 @@ To do:
 /******************************************************************************/
 
 
-WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
+void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(uint8_t data)
 {
 	uint8_t* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
@@ -75,22 +75,21 @@ WRITE_LINE_MEMBER(dec8_state::screen_vblank_dec8)
 	// rising edge
 	if (state)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
+		dec8_mxc06_karn_buffer_spriteram_w(0);
 	}
 }
 
-READ8_MEMBER(dec8_state::i8751_h_r)
+uint8_t dec8_state::i8751_h_r()
 {
 	return m_i8751_return >> 8; /* MSB */
 }
 
-READ8_MEMBER(dec8_state::i8751_l_r)
+uint8_t dec8_state::i8751_l_r()
 {
 	return m_i8751_return & 0xff; /* LSB */
 }
 
-WRITE8_MEMBER(dec8_state::i8751_reset_w)
+void dec8_state::i8751_reset_w(uint8_t data)
 {
 	// ? reset the actual MCU?
 	//m_i8751_return = 0;
@@ -98,7 +97,7 @@ WRITE8_MEMBER(dec8_state::i8751_reset_w)
 
 /******************************************************************************/
 
-READ8_MEMBER(dec8_state::gondo_player_1_r)
+uint8_t dec8_state::gondo_player_1_r(offs_t offset)
 {
 	int val = 1 << ioport("AN0")->read();
 
@@ -112,7 +111,7 @@ READ8_MEMBER(dec8_state::gondo_player_1_r)
 	return 0xff;
 }
 
-READ8_MEMBER(dec8_state::gondo_player_2_r)
+uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 {
 	int val = 1 << ioport("AN1")->read();
 
@@ -153,7 +152,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE8_MEMBER(dec8_state::dec8_i8751_w)
+void dec8_state::dec8_i8751_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -170,7 +169,7 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::dec8_bank_w)
+void dec8_state::dec8_bank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x0f);
 }
@@ -204,7 +203,7 @@ void dec8_state::ghostb_bank_w(uint8_t data)
 	flip_screen_set(BIT(data, 3));
 }
 
-WRITE8_MEMBER(dec8_state::csilver_control_w)
+void dec8_state::csilver_control_w(uint8_t data)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -216,7 +215,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 	m_mainbank->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(dec8_state::dec8_sound_w)
+void dec8_state::dec8_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
@@ -233,57 +232,57 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	m_msm5205next <<= 4;
 }
 
-READ8_MEMBER(dec8_state::csilver_adpcm_reset_r)
+uint8_t dec8_state::csilver_adpcm_reset_r()
 {
 	m_msm->reset_w(0);
 	return 0;
 }
 
-WRITE8_MEMBER(dec8_state::csilver_adpcm_data_w)
+void dec8_state::csilver_adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
+void dec8_state::csilver_sound_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry((data & 0x08) >> 3);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::main_irq_on_w)
+void dec8_state::main_irq_on_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::main_irq_off_w)
+void dec8_state::main_irq_off_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::main_firq_off_w)
+void dec8_state::main_firq_off_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::sub_irq_on_w)
+void dec8_state::sub_irq_on_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::sub_irq_off_w)
+void dec8_state::sub_irq_off_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::sub_firq_off_w)
+void dec8_state::sub_firq_off_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
+void dec8_state::flip_screen_w(uint8_t data) { flip_screen_set(data); }
 
 /******************************************************************************/
 
@@ -752,10 +751,10 @@ void dec8_state::csilver_mcu_to_main_w(uint8_t data)
 {
 	if (~data & 0x10)
 		m_i8751_port0 = m_i8751_value >> 8;
-	
+
 	if (~data & 0x20)
 		m_i8751_port1 = m_i8751_value & 0xff;
-	
+
 	if (~data & 0x40)
 	{
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
@@ -764,7 +763,7 @@ void dec8_state::csilver_mcu_to_main_w(uint8_t data)
 
 	if (~data & 0x80)
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
-	
+
 	m_i8751_p2 = data;
 }
 
@@ -1768,7 +1767,7 @@ WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
 	m_coin_state = bool(state);
 }
 
-WRITE8_MEMBER(dec8_state::oscar_coin_clear_w)
+void dec8_state::oscar_coin_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -3218,8 +3217,7 @@ ROM_START( csilver )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 017F: B4 4C 0D : cjne  a,#$4C,$018F   (ID code 0x4c = World version)
-	// 3 bytes (always bit 0x08 set incorrectly) had to be hand fixed, hence 'BAD_DUMP'
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, BAD_DUMP CRC(c0266263) SHA1(27ac6fa4af7195f04249c04dec168ab82158704e) ) // dx-8.19a ?
+	ROM_LOAD( "dx-8.19a", 0x0000, 0x1000, CRC(c0266263) SHA1(27ac6fa4af7195f04249c04dec168ab82158704e) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )

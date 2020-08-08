@@ -35,13 +35,13 @@
 #define LOG_FDC_CTRL        (1 << 6)
 #define LOG_FDC_PORT        (1 << 7)
 #define LOG_FDC_CMD         (1 << 8)
-#define LOG_FDC_MECH		(1 << 9)
+#define LOG_FDC_MECH        (1 << 9)
 #define LOG_OUTPUT_TIMING   (1 << 10)
 #define LOG_BRUSH_ADDR      (1 << 11)
-#define LOG_STORE_ADDR		(1 << 12)
-#define LOG_COMBINER		(1 << 13)
-#define LOG_SIZE_CARD		(1 << 14)
-#define LOG_FILTER_CARD		(1 << 15)
+#define LOG_STORE_ADDR      (1 << 12)
+#define LOG_COMBINER        (1 << 13)
+#define LOG_SIZE_CARD       (1 << 14)
+#define LOG_FILTER_CARD     (1 << 15)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
 
@@ -1276,55 +1276,55 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 					((data >> 8) & 0xf) == 6 ? "Initiate" : "Continue");
 				/*if (((data >> 8) & 0xf) == 6)
 				{
-					m_size_h = 0;
-					m_size_v = 0;
+				    m_size_h = 0;
+				    m_size_v = 0;
 				}
 				uint16_t disc_buffer_addr = 0;
 				uint16_t bx = m_bxlen_counter - m_bxlen;
 				uint16_t by = m_bylen_counter - m_bylen;
 				while (m_diskbuf_data_count > 0 && m_bylen_counter < 0x1000)
 				{
-					uint8_t hv = (m_size_h << 4) | m_size_v;
-					uint8_t hv_permuted = bitswap<8>(hv,4,6,0,2,5,7,1,3);
+				    uint8_t hv = (m_size_h << 4) | m_size_v;
+				    uint8_t hv_permuted = bitswap<8>(hv,4,6,0,2,5,7,1,3);
 
-					if (BIT(m_brush_addr_func, 7)) // Luma Enable
-					{
-						//printf("%02x ", m_diskbuf_ram[disc_buffer_addr]);
-						m_brushstore_lum[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
-					}
+				    if (BIT(m_brush_addr_func, 7)) // Luma Enable
+				    {
+				        //printf("%02x ", m_diskbuf_ram[disc_buffer_addr]);
+				        m_brushstore_lum[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
+				    }
 
-					disc_buffer_addr++;
-					m_diskbuf_data_count--;
+				    disc_buffer_addr++;
+				    m_diskbuf_data_count--;
 
-					if (BIT(m_brush_addr_func, 8)) // Chroma Enable
-					{
-						m_brushstore_chr[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
-					}
+				    if (BIT(m_brush_addr_func, 8)) // Chroma Enable
+				    {
+				        m_brushstore_chr[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
+				    }
 
-					disc_buffer_addr++;
-					m_diskbuf_data_count--;
+				    disc_buffer_addr++;
+				    m_diskbuf_data_count--;
 
-					m_size_h++;
-					if (m_size_h == 16)
-					{
-						m_size_h = 0;
-						m_size_v++;
-						if (m_size_v == 16)
-						{
-							m_size_v = 0;
-						}
-					}
+				    m_size_h++;
+				    if (m_size_h == 16)
+				    {
+				        m_size_h = 0;
+				        m_size_v++;
+				        if (m_size_v == 16)
+				        {
+				            m_size_v = 0;
+				        }
+				    }
 
-					bx++;
-					m_bxlen_counter++;
-					if (m_bxlen_counter == 0x1000)
-					{
-						bx = 0;
-						by++;
-						m_bxlen_counter = m_bxlen;
-						m_bylen_counter++;
-						//printf("\n");
-					}
+				    bx++;
+				    m_bxlen_counter++;
+				    if (m_bxlen_counter == 0x1000)
+				    {
+				        bx = 0;
+				        by++;
+				        m_bxlen_counter = m_bxlen;
+				        m_bylen_counter++;
+				        //printf("\n");
+				    }
 				}*/
 				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
 				break;
@@ -1563,7 +1563,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 					bit_idx++;
 					//if ((bit_idx % 8) == 0)
 					//{
-					//	printf("%02x ", (uint8_t)curr_window);
+					//  printf("%02x ", (uint8_t)curr_window);
 					//}
 
 					if (!seen_pregap && curr_window == PREGAP_MARK)

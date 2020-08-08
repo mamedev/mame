@@ -31,15 +31,14 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(printer_r);
-	DECLARE_WRITE8_MEMBER(shifter_w);
-	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_WRITE8_MEMBER(status_w);
-	DECLARE_WRITE8_MEMBER(printer_ctrl_w);
+	uint8_t keyboard_r();
+	uint8_t printer_r();
+	void shifter_w(uint8_t data);
+	void printer_w(uint8_t data);
+	void status_w(uint8_t data);
+	void printer_ctrl_w(uint8_t data);
 	void busicom_palette(palette_device &palette) const;
 	uint32_t screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);

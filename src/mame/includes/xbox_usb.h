@@ -6,6 +6,9 @@
 #pragma once
 
 #include <forward_list>
+#include <functional>
+#include <memory>
+
 
 struct OHCIEndpointDescriptor {
 	int mps; // MaximumPacketSize
@@ -361,8 +364,8 @@ public:
 	void reset();
 	void timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data);
 
 private:
 	void usb_ohci_interrupts();

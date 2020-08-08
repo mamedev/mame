@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugvw.c
+    debugvw.cpp
 
     Debugger view engine.
 

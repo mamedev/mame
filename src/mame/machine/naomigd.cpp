@@ -479,36 +479,36 @@ void idegdrom_device::map_dma(address_map &map)
 	map(0x0000, 0x000f).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
-READ32_MEMBER(idegdrom_device::ide_cs0_r)
+uint32_t idegdrom_device::ide_cs0_r(offs_t offset, uint32_t mem_mask)
 {
 	const int o = offset >> 2;
 	const int r = (offset & 3) << 3;
 
-	return m_ide->cs0_r(space, o, mem_mask << r) >> r;
+	return m_ide->cs0_r(o, mem_mask << r) >> r;
 }
 
-READ32_MEMBER(idegdrom_device::ide_cs1_r)
+uint32_t idegdrom_device::ide_cs1_r(offs_t offset, uint32_t mem_mask)
 {
 	const int o = offset >> 2;
 	const int r = (offset & 3) << 3;
 
-	return m_ide->cs1_r(space, o, mem_mask << r) >> r;
+	return m_ide->cs1_r(o, mem_mask << r) >> r;
 }
 
-WRITE32_MEMBER(idegdrom_device::ide_cs0_w)
+void idegdrom_device::ide_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const int o = offset >> 2;
 	const int r = (offset & 3) << 3;
 
-	m_ide->cs0_w(space, o, data << r, mem_mask << r);
+	m_ide->cs0_w(o, data << r, mem_mask << r);
 }
 
-WRITE32_MEMBER(idegdrom_device::ide_cs1_w)
+void idegdrom_device::ide_cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const int o = offset >> 2;
 	const int r = (offset & 3) << 3;
 
-	m_ide->cs1_w(space, o, data << r, mem_mask << r);
+	m_ide->cs1_w(o, data << r, mem_mask << r);
 }
 
 // The board
@@ -596,47 +596,47 @@ void naomi_gdrom_board::pci_map(address_map &map)
 	map(0x78000000, 0x783fffff).ram().share("6154sdram");
 }
 
-WRITE16_MEMBER(naomi_gdrom_board::dimm_command_w)
+void naomi_gdrom_board::dimm_command_w(uint16_t data)
 {
 	dimm_command = data;
 }
 
-READ16_MEMBER(naomi_gdrom_board::dimm_command_r)
+uint16_t naomi_gdrom_board::dimm_command_r()
 {
 	return dimm_command & 0xffff;
 }
 
-WRITE16_MEMBER(naomi_gdrom_board::dimm_offsetl_w)
+void naomi_gdrom_board::dimm_offsetl_w(uint16_t data)
 {
 	dimm_offsetl = data;
 }
 
-READ16_MEMBER(naomi_gdrom_board::dimm_offsetl_r)
+uint16_t naomi_gdrom_board::dimm_offsetl_r()
 {
 	return dimm_offsetl & 0xffff;
 }
 
-WRITE16_MEMBER(naomi_gdrom_board::dimm_parameterl_w)
+void naomi_gdrom_board::dimm_parameterl_w(uint16_t data)
 {
 	dimm_parameterl = data;
 }
 
-READ16_MEMBER(naomi_gdrom_board::dimm_parameterl_r)
+uint16_t naomi_gdrom_board::dimm_parameterl_r()
 {
 	return dimm_parameterl & 0xffff;
 }
 
-WRITE16_MEMBER(naomi_gdrom_board::dimm_parameterh_w)
+void naomi_gdrom_board::dimm_parameterh_w(uint16_t data)
 {
 	dimm_parameterh = data;
 }
 
-READ16_MEMBER(naomi_gdrom_board::dimm_parameterh_r)
+uint16_t naomi_gdrom_board::dimm_parameterh_r()
 {
 	return dimm_parameterh & 0xffff;
 }
 
-WRITE16_MEMBER(naomi_gdrom_board::dimm_status_w)
+void naomi_gdrom_board::dimm_status_w(uint16_t data)
 {
 	dimm_status = data;
 	if (dimm_status & 0x001)
@@ -649,62 +649,62 @@ WRITE16_MEMBER(naomi_gdrom_board::dimm_status_w)
 		set_ext_irq(ASSERT_LINE);
 }
 
-READ16_MEMBER(naomi_gdrom_board::dimm_status_r)
+uint16_t naomi_gdrom_board::dimm_status_r()
 {
 	return dimm_status & 0xffff;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_unknown_w)
+void naomi_gdrom_board::sh4_unknown_w(uint32_t data)
 {
 	sh4_unknown = data;
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_unknown_r)
+uint32_t naomi_gdrom_board::sh4_unknown_r()
 {
 	return sh4_unknown;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_command_w)
+void naomi_gdrom_board::sh4_command_w(uint32_t data)
 {
 	dimm_command = data;
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_command_r)
+uint32_t naomi_gdrom_board::sh4_command_r()
 {
 	return dimm_command;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_offsetl_w)
+void naomi_gdrom_board::sh4_offsetl_w(uint32_t data)
 {
 	dimm_offsetl = data;
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_offsetl_r)
+uint32_t naomi_gdrom_board::sh4_offsetl_r()
 {
 	return dimm_offsetl;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_parameterl_w)
+void naomi_gdrom_board::sh4_parameterl_w(uint32_t data)
 {
 	dimm_parameterl = data;
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_parameterl_r)
+uint32_t naomi_gdrom_board::sh4_parameterl_r()
 {
 	return dimm_parameterl;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_parameterh_w)
+void naomi_gdrom_board::sh4_parameterh_w(uint32_t data)
 {
 	dimm_parameterh = data;
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_parameterh_r)
+uint32_t naomi_gdrom_board::sh4_parameterh_r()
 {
 	return dimm_parameterh;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_status_w)
+void naomi_gdrom_board::sh4_status_w(uint32_t data)
 {
 	dimm_status = data;
 	if (dimm_status & 0x001)
@@ -717,12 +717,12 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_status_w)
 		set_ext_irq(ASSERT_LINE);
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_status_r)
+uint32_t naomi_gdrom_board::sh4_status_r()
 {
 	return dimm_status;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
+void naomi_gdrom_board::sh4_control_w(uint32_t data)
 {
 	uint32_t old = dimm_control;
 
@@ -740,43 +740,43 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
 		set_reset_out();
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_control_r)
+uint32_t naomi_gdrom_board::sh4_control_r()
 {
 	return dimm_control;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_sdramconfig_w)
+void naomi_gdrom_board::sh4_sdramconfig_w(uint32_t data)
 {
 	dimm_sdramconfig = data;
 	logerror("Detected sdram dimm module size: %d megabytes\n", 4 * (1 << ((data >> 1) & 7)));
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_sdramconfig_r)
+uint32_t naomi_gdrom_board::sh4_sdramconfig_r()
 {
 	return dimm_sdramconfig;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyl_w)
+void naomi_gdrom_board::sh4_des_keyl_w(uint32_t data)
 {
 	dimm_des_key = (dimm_des_key & 0xffffffff00000000) | (uint64_t)data;
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_des_keyl_r)
+uint32_t naomi_gdrom_board::sh4_des_keyl_r()
 {
 	return (uint32_t)dimm_des_key;
 }
 
-WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyh_w)
+void naomi_gdrom_board::sh4_des_keyh_w(uint32_t data)
 {
 	dimm_des_key = (dimm_des_key & 0xffffffff) | ((uint64_t)data << 32);
 }
 
-READ32_MEMBER(naomi_gdrom_board::sh4_des_keyh_r)
+uint32_t naomi_gdrom_board::sh4_des_keyh_r()
 {
 	return (uint32_t)(dimm_des_key >> 32);
 }
 
-READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
+uint64_t naomi_gdrom_board::i2cmem_dimm_r()
 {
 	uint8_t ret;
 
@@ -790,7 +790,7 @@ READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
 	return ret;
 }
 
-WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
+void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 {
 	if (data & 0x40000)
 	{
@@ -822,14 +822,14 @@ void naomi_gdrom_board::pic_map(address_map &map)
 	map(0x00, 0x1f).rw(FUNC(naomi_gdrom_board::pic_dimm_r), FUNC(naomi_gdrom_board::pic_dimm_w));
 }
 
-READ8_MEMBER(naomi_gdrom_board::pic_dimm_r)
+uint8_t naomi_gdrom_board::pic_dimm_r(offs_t offset)
 {
 	if (offset == 1)
 		return picbus | picbus_pullup;
 	return 0;
 }
 
-WRITE8_MEMBER(naomi_gdrom_board::pic_dimm_w)
+void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{

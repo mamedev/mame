@@ -33,7 +33,7 @@ public:
 		, m_laser_file(*this, "floppy%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_videoram(*this, "videoram")
+		, m_vram(*this, "videoram")
 		, m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROWD", "ROWC", "ROWB", "ROWA"})
 		, m_banka(*this, "banka")
 		, m_bankb(*this, "bankb")
@@ -52,19 +52,18 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(laser_bank_select_w);
-	DECLARE_WRITE8_MEMBER(laser_fdc_w);
-	DECLARE_WRITE8_MEMBER(laser_bg_mode_w);
-	DECLARE_WRITE8_MEMBER(laser_two_color_w);
-	DECLARE_READ8_MEMBER(laser_fdc_r);
+	void laser_fdc_w(offs_t offset, uint8_t data);
+	void laser_bg_mode_w(uint8_t data);
+	void laser_two_color_w(uint8_t data);
+	uint8_t laser_fdc_r(offs_t offset);
 	void vtech2_palette(palette_device &palette) const;
-	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
-	DECLARE_WRITE8_MEMBER(mmio_w);
-	DECLARE_READ8_MEMBER(mmio_r);
-	DECLARE_READ8_MEMBER(cart_r);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mmio_w(uint8_t data);
+	uint8_t mmio_r(offs_t offset);
+	uint8_t cart_r(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void laser_get_track();
@@ -83,7 +82,7 @@ private:
 	optional_device_array<legacy_floppy_image_device, 2> m_laser_file;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<u8> m_videoram;
+	optional_shared_ptr<u8> m_vram;
 	required_ioport_array<12> m_io_keyboard;
 	required_device<address_map_bank_device> m_banka;
 	required_device<address_map_bank_device> m_bankb;

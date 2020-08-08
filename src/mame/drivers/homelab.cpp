@@ -16,6 +16,8 @@
     - homelab2 - cassette to fix.
                  Note that rom code 0x40-48 is meaningless garbage,
                  had to patch to stop it crashing. Need a new dump.
+               - The speaker code is wrong, but it's the only way to
+                 get any sound. Needs to be looked at again.
     - homelab3/4 - Need a dump of the TM188 prom.
                  cassette to fix.
                  up to 64k ram can be fitted. schematic only shows 16k.
@@ -23,8 +25,7 @@
                  machine. /CE connects to A6, A/B = A0, C/D = A1.
                  The bios never talks to it. Official port numbers
                  are 3C-3F.
-    - Brailab4 - same as homelab3.
-    - Braiplus - no work has been done. Needs to be developed from scratch.
+    - Brailab4 - Same as homelab3.
 
 
 TM188 is (it seems) equivalent to 27S19, TBP18S030N, 6331-1, 74S288, 82S123,
@@ -36,9 +37,9 @@ MB7051 - fuse programmed prom.
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/dac.h"
 #include "sound/mea8000.h"
-#include "sound/volt_reg.h"
+#include "sound/spkrdev.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -51,132 +52,141 @@ public:
 	homelab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
 		, m_p_chargen(*this, "chargen")
-		, m_dac(*this, "dac")
+		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
+		, m_io_keyboard(*this, "X%d", 0)
 	{ }
+
+protected:
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	std::unique_ptr<u8[]> m_vram;
+	u8 m_rows;
+	u8 m_cols;
+	required_device<cpu_device> m_maincpu;
+	required_memory_bank    m_bank1;
+	required_region_ptr<u8> m_p_chargen;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cass;
+	required_ioport_array<16> m_io_keyboard;
+};
+
+class homelab2_state : public homelab_state
+{
+public:
+	homelab2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: homelab_state(mconfig, type, tag)
+		{ }
+
+	void homelab2(machine_config &config);
+
+private:
+	void machine_start() override;
+	INTERRUPT_GEN_MEMBER(homelab_frame);
+	void homelab2_mem(address_map &map);
+	u8 cass2_r();
+	bool m_nmi;
+	bool m_spr_bit;
+	u8 mem3800_r();
+	u8 mem3a00_r(offs_t);
+	void mem3c00_w(offs_t, u8);
+	void mem3e00_w(offs_t, u8);
+};
+
+class homelab3_state : public homelab_state
+{
+public:
+	homelab3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: homelab_state(mconfig, type, tag)
+		{ }
 
 	void homelab3(machine_config &config);
 	void brailab4(machine_config &config);
-	void homelab(machine_config &config);
-
-	void init_brailab4();
-
 	DECLARE_READ_LINE_MEMBER(cass3_r);
 
 private:
-	uint8_t key_r(offs_t offset);
-	void cass_w(offs_t offset, uint8_t data);
-	uint8_t cass2_r();
-	uint8_t exxx_r(offs_t offset);
-	void port7f_w(uint8_t data);
-	void portff_w(uint8_t data);
-	void brailab4_port7f_w(uint8_t data);
-	void brailab4_portff_w(uint8_t data);
-	DECLARE_VIDEO_START(homelab2);
-	DECLARE_MACHINE_RESET(homelab3);
-	DECLARE_VIDEO_START(homelab3);
-	DECLARE_MACHINE_RESET(brailab4);
-	DECLARE_VIDEO_START(brailab4);
-	INTERRUPT_GEN_MEMBER(homelab_frame);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void brailab4_io(address_map &map);
-	void brailab4_mem(address_map &map);
-	void homelab2_mem(address_map &map);
+	u8 exxx_r(offs_t offset);
+	std::unique_ptr<u8[]> m_ram;
+	void port7f_w(u8 data);
+	void portff_w(u8 data);
+	void machine_start() override;
+	void machine_reset() override;
 	void homelab3_io(address_map &map);
 	void homelab3_mem(address_map &map);
-
-	const uint8_t *m_p_videoram;
-	bool m_nmi;
-	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_chargen;
-	required_device<dac_bit_interface> m_dac;
-	required_device<cassette_image_device> m_cass;
+	void brailab4_io(address_map &map);
+	void brailab4_mem(address_map &map);
 };
 
-INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
+
+INTERRUPT_GEN_MEMBER(homelab2_state::homelab_frame)
 {
 	if (m_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-uint8_t homelab_state::key_r(offs_t offset) // offset 27F-2FE
+u8 homelab2_state::mem3800_r()
 {
-	if (offset == 0x38) // 0x3838
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		return 0;
-	}
+	return m_io_keyboard[15]->read();  // reset key
+}
 
-	uint8_t i,data = 0xff;
-	char kbdrow[8];
+u8 homelab2_state::mem3a00_r(offs_t offset)
+{
+	u8 i,data = 0xff;
 
 	for (i=0; i<8; i++)
-	{
 		if (!BIT(offset, i))
-		{
-			sprintf(kbdrow,"LINE%d", i);
-			data &= ioport(kbdrow)->read();
-		}
-	}
+			data &= m_io_keyboard[i]->read();
 
 	return data;
 }
 
-uint8_t homelab_state::cass2_r()
+void homelab2_state::mem3c00_w(offs_t offset, u8 data)
 {
-	return (m_cass->input() > 0.03) ? 0xff : 0;
+	m_spr_bit ^= 1;
+	m_speaker->level_w(m_spr_bit? -1.0 : +1.0);
+	m_cass->output(m_spr_bit ? -1.0 : +1.0);
 }
 
-void homelab_state::cass_w(offs_t offset, uint8_t data)
+void homelab2_state::mem3e00_w(offs_t offset, u8 data)
 {
-	if (offset == 0x73f) // 0x3f3f
+	if (BIT(offset, 8))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		m_nmi = true;
+	}
 	else
-	if (offset == 0x63e) // 0x3e3e
 		m_nmi = false;
-	else
-	if (offset == 0x400) // 0x3c00
-		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
 }
 
-MACHINE_RESET_MEMBER(homelab_state,homelab3)
+u8 homelab2_state::cass2_r()
 {
+	return (m_cass->input() > 0.03) ? 0x37 : 0;
 }
 
-MACHINE_RESET_MEMBER(homelab_state,brailab4)
+void homelab3_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
+	m_bank1->set_entry(1);
 }
 
-void homelab_state::port7f_w(uint8_t data)
+void homelab3_state::port7f_w(u8 data)
 {
+	m_bank1->set_entry(1);
 }
 
-void homelab_state::portff_w(uint8_t data)
+void homelab3_state::portff_w(u8 data)
 {
+	m_bank1->set_entry(0);
 }
 
-void homelab_state::brailab4_port7f_w(uint8_t data)
-{
-	membank("bank1")->set_entry(0);
-}
-
-void homelab_state::brailab4_portff_w(uint8_t data)
-{
-	membank("bank1")->set_entry(1);
-}
-
-READ_LINE_MEMBER( homelab_state::cass3_r )
+READ_LINE_MEMBER( homelab3_state::cass3_r )
 {
 	return (m_cass->input() > 0.03);
 }
 
 
-uint8_t homelab_state::exxx_r(offs_t offset)
+u8 homelab3_state::exxx_r(offs_t offset)
 {
 // keys E800-E813 but E810-E813 are not connected
 // cassin E883
@@ -188,29 +198,26 @@ uint8_t homelab_state::exxx_r(offs_t offset)
 	else
 	if (offset == 0x80)
 	{
-		m_dac->write(0);
+		m_speaker->level_w(0);
 		m_cass->output(-1.0);
 	}
 	else
 	if (offset == 0x02)
 	{
-		m_dac->write(1);
+		m_speaker->level_w(1);
 		m_cass->output(+1.0);
 	}
 
-	char kbdrow[8];
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 	if (offset < 0x10)
-	{
-		sprintf(kbdrow,"X%X", offset);
-		data = ioport(kbdrow)->read();
-	}
+		data = m_io_keyboard[offset]->read();
+
 	return data;
 }
 
 
 /* Address maps */
-void homelab_state::homelab2_mem(address_map &map)
+void homelab2_state::homelab2_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();  // ROM 1
 	map(0x0800, 0x0fff).rom();  // ROM 2
@@ -219,56 +226,55 @@ void homelab_state::homelab2_mem(address_map &map)
 	map(0x2000, 0x27ff).rom();  // ROM 5
 	map(0x2800, 0x2fff).rom();  // ROM 6
 	map(0x3000, 0x37ff).rom();  // Empty
-	map(0x3800, 0x3fff).rw(FUNC(homelab_state::key_r), FUNC(homelab_state::cass_w));
+	map(0x3800, 0x39ff).r(FUNC(homelab2_state::mem3800_r));
+	map(0x3a00, 0x3bff).r(FUNC(homelab2_state::mem3a00_r));
+	map(0x3c00, 0x3dff).w(FUNC(homelab2_state::mem3c00_w));
+	map(0x3e00, 0x3fff).w(FUNC(homelab2_state::mem3e00_w));
 	map(0x4000, 0x7fff).ram();
-	map(0xc000, 0xc3ff).ram().region("maincpu", 0xc000);
-	map(0xe000, 0xe0ff).r(FUNC(homelab_state::cass2_r));
+	map(0xc000, 0xc3ff).mirror(0xc00).bankrw("bank1");
+	map(0xe000, 0xffff).r(FUNC(homelab2_state::cass2_r));
 }
 
-void homelab_state::homelab3_mem(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).ram();
-	map(0xe800, 0xefff).r(FUNC(homelab_state::exxx_r));
-	map(0xf800, 0xffff).ram().region("maincpu", 0xf800);
-}
-
-void homelab_state::homelab3_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0x7f, 0x7f).w(FUNC(homelab_state::port7f_w));
-	map(0xff, 0xff).w(FUNC(homelab_state::portff_w));
-}
-
-void homelab_state::brailab4_mem(address_map &map)
+void homelab3_state::homelab3_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xcfff).ram();
-	map(0xd000, 0xdfff).rom();
-	map(0xe800, 0xefff).r(FUNC(homelab_state::exxx_r));
+	map(0xe800, 0xefff).r(FUNC(homelab3_state::exxx_r));
 	map(0xf800, 0xffff).bankrw("bank1");
 }
 
-void homelab_state::brailab4_io(address_map &map)
+void homelab3_state::homelab3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+	map(0x7f, 0x7f).w(FUNC(homelab3_state::port7f_w));
+	map(0xff, 0xff).w(FUNC(homelab3_state::portff_w));
+}
+
+void homelab3_state::brailab4_mem(address_map &map)
+{
+	homelab3_mem(map);
+	map(0xd000, 0xdfff).rom().region("maincpu", 0x4000);
+}
+
+void homelab3_state::brailab4_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	homelab3_io(map);
 	map(0xf8, 0xf9).rw("mea8000", FUNC(mea8000_device::read), FUNC(mea8000_device::write));
-	map(0x7f, 0x7f).w(FUNC(homelab_state::brailab4_port7f_w));
-	map(0xff, 0xff).w(FUNC(homelab_state::brailab4_portff_w));
 }
 
 
 
 /* Input ports */
-static INPUT_PORTS_START( homelab )
-	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) //PORT_CHAR(UCHAR_SHIFT_1)
+static INPUT_PORTS_START( homelab2 )
+	PORT_START("X0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE1")
+	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
@@ -278,7 +284,7 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Run/Brk") PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("LINE2")
+	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('<')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
@@ -288,7 +294,7 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
-	PORT_START("LINE3")
+	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(':') PORT_CHAR('*')
@@ -298,7 +304,7 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('>') PORT_CHAR('.')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?') PORT_CHAR('/')
 
-	PORT_START("LINE4")
+	PORT_START("X4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
@@ -308,7 +314,7 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 
-	PORT_START("LINE5")
+	PORT_START("X5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
@@ -318,7 +324,7 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 
-	PORT_START("LINE6")
+	PORT_START("X6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
@@ -328,7 +334,7 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 
-	PORT_START("LINE7")
+	PORT_START("X7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
@@ -337,6 +343,24 @@ static INPUT_PORTS_START( homelab )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('^')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT) PORT_CODE(KEYCODE_LALT) PORT_CHAR('_')
+
+	PORT_START("X8")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X9")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X10")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X11")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X12")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X13")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X14")
+	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("X15")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0xFE, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
@@ -356,13 +380,13 @@ static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_VBLANK("screen")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -409,42 +433,42 @@ static INPUT_PORTS_START( homelab3 ) // F4 to F8 are foreign characters
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XA")
+	PORT_START("X10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XB")
+	PORT_START("X11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XC")
+	PORT_START("X12")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XD")
+	PORT_START("X13")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XE")
+	PORT_START("X14")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XF")
+	PORT_START("X15")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
@@ -469,13 +493,13 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM)   PORT_VBLANK("screen")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -522,42 +546,42 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XA")
+	PORT_START("X10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XB")
+	PORT_START("X11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XC")
+	PORT_START("X12")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XD")
+	PORT_START("X13")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XE")
+	PORT_START("X14")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("XF")
+	PORT_START("X15")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
@@ -565,35 +589,51 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER(homelab_state,homelab2)
+void homelab2_state::machine_start()
 {
-	m_p_videoram = memregion("maincpu")->base()+0xc000;
+	save_item(NAME(m_nmi));
+	save_item(NAME(m_spr_bit));
+	save_item(NAME(m_rows));
+	save_item(NAME(m_cols));
+	m_vram = make_unique_clear<u8[]>(0x800);
+	save_pointer(NAME(m_vram), 0x800);
+	m_bank1->configure_entry(0, m_vram.get());
+	m_bank1->set_entry(0);
+	m_rows = 25;
+	m_cols = 40;
 }
 
-VIDEO_START_MEMBER(homelab_state,homelab3)
+void homelab3_state::machine_start()
 {
-	m_p_videoram = memregion("maincpu")->base()+0xf800;
+	save_item(NAME(m_rows));
+	save_item(NAME(m_cols));
+	m_vram = make_unique_clear<u8[]>(0x800);
+	save_pointer(NAME(m_vram), 0x800);
+	m_ram = make_unique_clear<u8[]>(0x800);
+	save_pointer(NAME(m_ram), 0x800);
+	m_bank1->configure_entry(0, m_vram.get());
+	m_bank1->configure_entry(1, m_ram.get());
+	m_rows = 32;
+	m_cols = 64;
 }
 
-VIDEO_START_MEMBER(homelab_state,brailab4)
+u32 homelab_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_p_videoram = memregion("maincpu")->base()+0x17800;
-}
+	if (!m_cols)
+		return 1;
 
-uint32_t homelab_state::screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
+	u8 y,ra,chr,gfx;
+	u16 sy=0,ma=0,x;
 
-	for(y = 0; y < 25; y++ )
+	for(y = 0; y < m_rows; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
-			for (x = ma; x < ma + 40; x++)
+			for (x = ma; x < ma + m_cols; x++)
 			{
-				chr = m_p_videoram[x]; // get char in videoram
+				chr = m_vram[x]; // get char in videoram
 				gfx = m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
 
 				/* Display a scanline of a character */
@@ -607,45 +647,14 @@ uint32_t homelab_state::screen_update_homelab2(screen_device &screen, bitmap_ind
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma+=40;
+		ma+=m_cols;
 	}
 	return 0;
 }
 
-uint32_t homelab_state::screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-
-	for(y = 0; y < 32; y++ )
-	{
-		for (ra = 0; ra < 8; ra++)
-		{
-			uint16_t *p = &bitmap.pix16(sy++);
-
-			for (x = ma; x < ma + 64; x++)
-			{
-				chr = m_p_videoram[x]; // get char in videoram
-				gfx = m_p_chargen[chr | (ra<<8)]; // get dot pattern in chargen
-
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-		ma+=64;
-	}
-	return 0;
-}
 
 /* F4 Character Displayer */
-static const gfx_layout homelab_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	256,                    /* 256 characters */
@@ -659,20 +668,20 @@ static const gfx_layout homelab_charlayout =
 };
 
 static GFXDECODE_START( gfx_homelab )
-	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i=0;
-	uint8_t ch;
-	uint16_t quick_addr;
-	uint16_t quick_length;
-	uint16_t quick_end;
-	std::vector<uint8_t> quick_data;
+	u8 ch;
+	u16 quick_addr;
+	u16 quick_length;
+	u16 quick_end;
+	std::vector<u8> quick_data;
 	char pgmname[256];
-	uint16_t args[2];
+	u16 args[2];
 	int read_;
 
 	quick_length = image.length();
@@ -749,12 +758,12 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 }
 
 /* Machine driver */
-void homelab_state::homelab(machine_config &config)
+void homelab2_state::homelab2(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab2_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(homelab_state::homelab_frame));
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab2_state::homelab2_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(homelab2_state::homelab_frame));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -762,33 +771,28 @@ void homelab_state::homelab(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(40*8, 25*8);
 	screen.set_visarea(0, 40*8-1, 0, 25*8-1);
-	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab2));
+	screen.set_screen_update(FUNC(homelab2_state::screen_update));
 	screen.set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab2_state::quickload_cb));
 }
 
-void homelab_state::homelab3(machine_config &config)
+void homelab3_state::homelab3(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab3_mem);
-	m_maincpu->set_addrmap(AS_IO, &homelab_state::homelab3_io);
-	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab3_state::homelab3_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab3_state::homelab3_io);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
@@ -796,116 +800,90 @@ void homelab_state::homelab3(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
-	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab3));
+	screen.set_screen_update(FUNC(homelab3_state::screen_update));
 	screen.set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb));
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab3_state::quickload_cb));
 }
 
-void homelab_state::brailab4(machine_config &config)
+void homelab3_state::brailab4(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::brailab4_mem);
-	m_maincpu->set_addrmap(AS_IO, &homelab_state::brailab4_io);
-	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
-	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab3));
-	screen.set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-
-	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-
-	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb));
+	homelab3(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab3_state::brailab4_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab3_state::brailab4_io);
+	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void homelab_state::init_brailab4()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);
-}
 
 /* ROM definition */
 
 ROM_START( homelab2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hl2_1.rom", 0x0000, 0x0800, BAD_DUMP CRC(205365f7) SHA1(da93b65befd83513dc762663b234227ba804124d))
-	ROM_LOAD( "hl2_2.rom", 0x0800, 0x0800, CRC(696af3c1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
-	ROM_LOAD( "hl2_3.rom", 0x1000, 0x0800, CRC(69e57e8c) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
-	ROM_LOAD( "hl2_4.rom", 0x1800, 0x0800, CRC(97cbbe74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
-	ROM_LOAD( "hl2_m.rom", 0x2000, 0x0800, CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
+	ROM_REGION( 0x3800, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "hl2_1.ic2", 0x0000, 0x0800, BAD_DUMP CRC(205365f7) SHA1(da93b65befd83513dc762663b234227ba804124d))
+	ROM_LOAD( "hl2_2.ic3", 0x0800, 0x0800, CRC(696af3c1) SHA1(b53bc6ae2b75975618fc90e7181fa5d21409fce1))
+	ROM_LOAD( "hl2_3.ic4", 0x1000, 0x0800, CRC(69e57e8c) SHA1(e98510abb715dbf513e1b29fb6b09ab54e9483b7))
+	ROM_LOAD( "hl2_4.ic5", 0x1800, 0x0800, CRC(97cbbe74) SHA1(34f0bad41302b059322018abc3d1c2336ecfbea8))
+	ROM_LOAD( "hl2_m.ic6", 0x2000, 0x0800, CRC(10040235) SHA1(e121dfb97cc8ea99193a9396a9f7af08585e0ff0) )
 	ROM_FILL(0x46, 1, 0x18) // fix bad code
 	ROM_FILL(0x47, 1, 0x0E)
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD( "hl2.chr", 0x0000, 0x0800, CRC(2e669d40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "hl2.ic33",  0x0000, 0x0800, CRC(2e669d40) SHA1(639dd82ed29985dc69830aca3b904b6acc8fe54a))
 	// found on net, looks like bad dump
 	//ROM_LOAD_OPTIONAL( "hl2_ch.rom", 0x0800, 0x1000, CRC(6a5c915a) SHA1(7e4e966358556c6aabae992f4c2b292b6aab59bd) )
 ROM_END
 
 ROM_START( homelab3 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hl3_1.rom", 0x0000, 0x1000, CRC(6b90a8ea) SHA1(8ac40ca889b8c26cdf74ca309fbafd70dcfdfbec))
-	ROM_LOAD( "hl3_2.rom", 0x1000, 0x1000, CRC(bcac3c24) SHA1(aff371d17f61cb60c464998e092f04d5d85c4d52))
-	ROM_LOAD( "hl3_3.rom", 0x2000, 0x1000, CRC(ab1b4ab0) SHA1(ad74c7793f5dc22061a88ef31d3407267ad08719))
-	ROM_LOAD( "hl3_4.rom", 0x3000, 0x1000, CRC(bf67eff9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b))
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "hl3_1.ic1", 0x0000, 0x1000, CRC(6b90a8ea) SHA1(8ac40ca889b8c26cdf74ca309fbafd70dcfdfbec) )
+	ROM_LOAD( "hl3_2.ic2", 0x1000, 0x1000, CRC(bcac3c24) SHA1(aff371d17f61cb60c464998e092f04d5d85c4d52) )
+	ROM_LOAD( "hl3_3.ic3", 0x2000, 0x1000, CRC(ab1b4ab0) SHA1(ad74c7793f5dc22061a88ef31d3407267ad08719) )
+	ROM_LOAD( "hl3_4.ic4", 0x3000, 0x1000, CRC(bf67eff9) SHA1(2ef5d46f359616e7d0e5a124df528de44f0e850b) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD( "hl3.chr", 0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "hl3.ic21",  0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tm188.ic7", 0x0000, 0x0040, NO_DUMP )
 ROM_END
 
 ROM_START( homelab4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hl4_1.rom", 0x0000, 0x1000, CRC(a549b2d4) SHA1(90fc5595da8431616aee56eb5143b9f04281e798))
-	ROM_LOAD( "hl4_2.rom", 0x1000, 0x1000, CRC(151d33e8) SHA1(d32004bc1553f802b9d3266709552f7d5315fe44))
-	ROM_LOAD( "hl4_3.rom", 0x2000, 0x1000, CRC(39571ab1) SHA1(8470cff2e3442101e6a0bc655358b3a6fc1ef944))
-	ROM_LOAD( "hl4_4.rom", 0x3000, 0x1000, CRC(f4b77ca2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5))
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "hl4_1.ic1", 0x0000, 0x1000, CRC(a549b2d4) SHA1(90fc5595da8431616aee56eb5143b9f04281e798) )
+	ROM_LOAD( "hl4_2.ic2", 0x1000, 0x1000, CRC(151d33e8) SHA1(d32004bc1553f802b9d3266709552f7d5315fe44) )
+	ROM_LOAD( "hl4_3.ic3", 0x2000, 0x1000, CRC(39571ab1) SHA1(8470cff2e3442101e6a0bc655358b3a6fc1ef944) )
+	ROM_LOAD( "hl4_4.ic4", 0x3000, 0x1000, CRC(f4b77ca2) SHA1(ffbdb3c1819c7357e2a0fc6317c111a8a7ecfcd5) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD( "hl4.chr", 0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_REGION( 0x0800, "chargen",0 )
+	ROM_LOAD( "hl4.ic21",  0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tm188.ic7", 0x0000, 0x0040, NO_DUMP )
 ROM_END
 
 ROM_START( brailab4 )
-	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "brl1.rom", 0x0000, 0x1000, CRC(02323403) SHA1(3a2e853e0a39e05a04a8db58e1a76de1eda579c9))
-	ROM_LOAD( "brl2.rom", 0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090))
-	ROM_LOAD( "brl3.rom", 0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5))
-	ROM_LOAD( "brl4.rom", 0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85))
-	ROM_LOAD( "brl5.rom", 0xd000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff))
+	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_LOAD( "brl1.ic1",  0x0000, 0x1000, CRC(02323403) SHA1(3a2e853e0a39e05a04a8db58e1a76de1eda579c9) )
+	ROM_LOAD( "brl2.ic2",  0x1000, 0x1000, CRC(36173fbc) SHA1(1c01398e16a1cbe4103e1be769347ceae873e090) )
+	ROM_LOAD( "brl3.ic3",  0x2000, 0x1000, CRC(d3cdd108) SHA1(1a24e6c5f9c370ff6cb25045cb9d95e664467eb5) )
+	ROM_LOAD( "brl4.ic4",  0x3000, 0x1000, CRC(d4047885) SHA1(00fe40c4c2c64a49bb429fb2b27cc7e0d0025a85) )
+	ROM_LOAD( "brl5.rom",  0x4000, 0x1000, CRC(8a76be04) SHA1(4b683b9be23b47117901fe874072eb7aa481e4ff) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD( "hl4.chr", 0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "hl4.ic21",  0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "tm188.ic7", 0x0000, 0x0040, NO_DUMP )
 
 	// these roms were found on the net, to be investigated
 	ROM_REGION( 0x5020, "user1", 0 )
@@ -917,19 +895,10 @@ ROM_START( brailab4 )
 	ROM_LOAD_OPTIONAL( "brlcpm.rom",      0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8) )
 ROM_END
 
-ROM_START( braiplus )
-	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "brailabplus.bin", 0x0000, 0x4000, CRC(521d6952) SHA1(f7405520d86fc7abd2dec51d1d016658472f6fe8) )
-
-	ROM_REGION(0x0800, "chargen",0) // no idea what chargen it uses
-	ROM_LOAD( "hl4.chr", 0x0000, 0x0800, CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
-ROM_END
-
 /* Driver */
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                    FULLNAME                  FLAGS */
-COMP( 1982, homelab2, 0,        0,      homelab,  homelab,  homelab_state,  empty_init,    "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1983, homelab3, homelab2, 0,      homelab3, homelab3, homelab_state,  empty_init,    "Jozsef and Endre Lukacs", "Homelab 3",              MACHINE_NOT_WORKING )
-COMP( 1984, homelab4, homelab2, 0,      homelab3, homelab3, homelab_state,  empty_init,    "Jozsef and Endre Lukacs", "Homelab 4",              MACHINE_NOT_WORKING )
-COMP( 1984, brailab4, homelab2, 0,      brailab4, brailab4, homelab_state,  init_brailab4, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING )
-COMP( 1988, braiplus, homelab2, 0,      brailab4, brailab4, homelab_state,  init_brailab4, "Jozsef and Endre Lukacs", "Brailab Plus",           MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY                    FULLNAME                  FLAGS */
+COMP( 1982, homelab2, 0,        0,      homelab2, homelab2, homelab2_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, homelab3, homelab2, 0,      homelab3, homelab3, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 3",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, homelab4, homelab2, 0,      homelab3, homelab3, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Homelab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, brailab4, homelab2, 0,      brailab4, brailab4, homelab3_state,  empty_init, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

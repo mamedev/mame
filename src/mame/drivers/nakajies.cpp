@@ -308,24 +308,24 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
-	DECLARE_READ8_MEMBER( irq_clear_r );
-	DECLARE_WRITE8_MEMBER( irq_clear_w );
-	DECLARE_READ8_MEMBER( irq_enable_r );
-	DECLARE_WRITE8_MEMBER( irq_enable_w );
-	DECLARE_READ8_MEMBER( unk_a0_r );
-	DECLARE_WRITE8_MEMBER( lcd_memory_start_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( banking_w );
+	uint8_t irq_clear_r();
+	void irq_clear_w(uint8_t data);
+	uint8_t irq_enable_r();
+	void irq_enable_w(uint8_t data);
+	uint8_t unk_a0_r();
+	void lcd_memory_start_w(uint8_t data);
+	uint8_t keyboard_r();
+	void banking_w(offs_t offset, uint8_t data) ;
 	void update_banks();
 	void bank_w(uint8_t banknr, offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( bank0_w );
-	DECLARE_WRITE8_MEMBER( bank1_w );
-	DECLARE_WRITE8_MEMBER( bank2_w );
-	DECLARE_WRITE8_MEMBER( bank3_w );
-	DECLARE_WRITE8_MEMBER( bank4_w );
-	DECLARE_WRITE8_MEMBER( bank5_w );
-	DECLARE_WRITE8_MEMBER( bank6_w );
-	DECLARE_WRITE8_MEMBER( bank7_w );
+	void bank0_w(offs_t offset, uint8_t data) ;
+	void bank1_w(offs_t offset, uint8_t data) ;
+	void bank2_w(offs_t offset, uint8_t data) ;
+	void bank3_w(offs_t offset, uint8_t data) ;
+	void bank4_w(offs_t offset, uint8_t data) ;
+	void bank5_w(offs_t offset, uint8_t data) ;
+	void bank6_w(offs_t offset, uint8_t data) ;
+	void bank7_w(offs_t offset, uint8_t data) ;
 
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
@@ -394,14 +394,14 @@ void nakajies_state::bank_w( uint8_t banknr, offs_t offset, uint8_t data )
 	}
 }
 
-WRITE8_MEMBER( nakajies_state::bank0_w ) { bank_w( 0, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank1_w ) { bank_w( 1, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank2_w ) { bank_w( 2, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank3_w ) { bank_w( 3, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank4_w ) { bank_w( 4, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank5_w ) { bank_w( 5, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank6_w ) { bank_w( 6, offset, data ); }
-WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
+void nakajies_state::bank0_w(offs_t offset, uint8_t data) { bank_w( 0, offset, data ); }
+void nakajies_state::bank1_w(offs_t offset, uint8_t data) { bank_w( 1, offset, data ); }
+void nakajies_state::bank2_w(offs_t offset, uint8_t data) { bank_w( 2, offset, data ); }
+void nakajies_state::bank3_w(offs_t offset, uint8_t data) { bank_w( 3, offset, data ); }
+void nakajies_state::bank4_w(offs_t offset, uint8_t data) { bank_w( 4, offset, data ); }
+void nakajies_state::bank5_w(offs_t offset, uint8_t data) { bank_w( 5, offset, data ); }
+void nakajies_state::bank6_w(offs_t offset, uint8_t data) { bank_w( 6, offset, data ); }
+void nakajies_state::bank7_w(offs_t offset, uint8_t data) { bank_w( 7, offset, data ); }
 
 
 void nakajies_state::nakajies_map(address_map &map)
@@ -449,26 +449,26 @@ void nakajies_state::nakajies_update_irqs()
 }
 
 
-READ8_MEMBER( nakajies_state::irq_clear_r )
+uint8_t nakajies_state::irq_clear_r()
 {
 	return 0x00;
 }
 
 
-WRITE8_MEMBER( nakajies_state::irq_clear_w )
+void nakajies_state::irq_clear_w(uint8_t data)
 {
 	m_irq_active &= ~data;
 	nakajies_update_irqs();
 }
 
 
-READ8_MEMBER( nakajies_state::irq_enable_r )
+uint8_t nakajies_state::irq_enable_r()
 {
 	return m_irq_enabled;
 }
 
 
-WRITE8_MEMBER( nakajies_state::irq_enable_w )
+void nakajies_state::irq_enable_w(uint8_t data)
 {
 	m_irq_enabled = data;
 	nakajies_update_irqs();
@@ -481,25 +481,25 @@ WRITE8_MEMBER( nakajies_state::irq_enable_w )
   bit 3   - battery low (when set)
   bit 2-0 - unknown
 */
-READ8_MEMBER( nakajies_state::unk_a0_r )
+uint8_t nakajies_state::unk_a0_r()
 {
 	return 0xf7;
 }
 
-WRITE8_MEMBER( nakajies_state::lcd_memory_start_w )
+void nakajies_state::lcd_memory_start_w(uint8_t data)
 {
 	m_lcd_memory_start = data;
 }
 
 
-WRITE8_MEMBER( nakajies_state::banking_w )
+void nakajies_state::banking_w(offs_t offset, uint8_t data)
 {
 	m_bank[offset] = data;
 	update_banks();
 }
 
 
-READ8_MEMBER( nakajies_state::keyboard_r )
+uint8_t nakajies_state::keyboard_r()
 {
 	static const char *const bitnames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 											"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };

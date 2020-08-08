@@ -16,76 +16,84 @@
 
 uint8_t busicom_state::get_bit_selected(uint32_t val,int num)
 {
-	int i;
-	for(i=0;i<num;i++) {
-		if (BIT(val,i)==0) return i;
-	}
+	for(int i=0;i<num;i++)
+		if (BIT(val,i)==0)
+			return i;
+
 	return 0;
 }
 
-READ8_MEMBER(busicom_state::keyboard_r)
+uint8_t busicom_state::keyboard_r()
 {
 	return m_input_lines[get_bit_selected(m_keyboard_shifter & 0x3ff, 10)]->read();
 }
 
-READ8_MEMBER(busicom_state::printer_r)
+uint8_t busicom_state::printer_r()
 {
 	uint8_t retVal = 0;
-	if (m_drum_index==0) retVal |= 1;
+	if (m_drum_index==0)
+		retVal |= 1;
 	retVal |= ioport("PAPERADV")->read() & 1 ? 8 : 0;
 	return retVal;
 }
 
 
-WRITE8_MEMBER(busicom_state::shifter_w)
+void busicom_state::shifter_w(uint8_t data)
 {
 	// FIXME: detect edges, maybe make 4003 shifter a device
-	if (BIT(data,0)) {
+	if (BIT(data,0))
+	{
 		m_keyboard_shifter <<= 1;
 		m_keyboard_shifter |= BIT(data,1);
 	}
-	if (BIT(data,2)) {
+
+	if (BIT(data,2))
+	{
 		m_printer_shifter <<= 1;
 		m_printer_shifter |= BIT(data,1);
 	}
 }
 
-WRITE8_MEMBER(busicom_state::printer_w)
+void busicom_state::printer_w(uint8_t data)
 {
-	int i,j;
-	if (BIT(data,0)) {
+	u8 i,j;
+	if (BIT(data,0))
+	{
 		logerror("color : %02x %02x %d\n",BIT(data,0),data,m_drum_index);
 		m_printer_line_color[10] = 1;
+	}
 
-	}
-	if (BIT(data,1)) {
-		for(i=3;i<18;i++) {
-			if(BIT(m_printer_shifter,i)) {
+	if (BIT(data,1))
+	{
+		for(i=3;i<18;i++)
+			if(BIT(m_printer_shifter,i))
 				m_printer_line[10][i-3] = m_drum_index + 1;
-			}
-		}
-		if(BIT(m_printer_shifter,0)) {
+
+		if(BIT(m_printer_shifter,0))
 			m_printer_line[10][15] = m_drum_index + 13 + 1;
-		}
-		if(BIT(m_printer_shifter,1)) {
+
+		if(BIT(m_printer_shifter,1))
 			m_printer_line[10][16] = m_drum_index + 26 + 1;
-		}
 	}
-	if (BIT(data,3)) {
-		for(j=0;j<10;j++) {
-			for(i=0;i<17;i++) {
+
+	if (BIT(data,3))
+	{
+		for(j=0;j<10;j++)
+		{
+			for(i=0;i<17;i++)
+			{
 				m_printer_line[j][i] = m_printer_line[j+1][i];
 				m_printer_line_color[j] = m_printer_line_color[j+1];
 			}
 		}
-		for(i=0;i<17;i++) {
-			m_printer_line[10][i] = 0;
-		}
-		m_printer_line_color[10] = 0;
 
+		for(i=0;i<17;i++)
+			m_printer_line[10][i] = 0;
+
+		m_printer_line_color[10] = 0;
 	}
 }
-WRITE8_MEMBER(busicom_state::status_w)
+void busicom_state::status_w(uint8_t data)
 {
 #if 0
 	uint8_t mem_lamp = BIT(data,0);
@@ -95,7 +103,7 @@ WRITE8_MEMBER(busicom_state::status_w)
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
 
-WRITE8_MEMBER(busicom_state::printer_ctrl_w)
+void busicom_state::printer_ctrl_w(uint8_t data)
 {
 }
 
@@ -197,13 +205,21 @@ INPUT_PORTS_END
 TIMER_DEVICE_CALLBACK_MEMBER(busicom_state::timer_callback)
 {
 	m_timer ^= 1;
-	if (m_timer == 1) m_drum_index++;
-	if (m_drum_index == 13) m_drum_index = 0;
+	if (m_timer == 1)
+		m_drum_index++;
+	if (m_drum_index == 13)
+		m_drum_index = 0;
 	m_maincpu->set_input_line(I4004_TEST_LINE, m_timer);
 }
 
 void busicom_state::machine_start()
 {
+	save_item(NAME(m_drum_index));
+	save_item(NAME(m_keyboard_shifter));
+	save_item(NAME(m_printer_shifter));
+	save_item(NAME(m_timer));
+	save_item(NAME(m_printer_line));
+	save_item(NAME(m_printer_line_color));
 }
 
 void busicom_state::machine_reset()
@@ -213,16 +229,16 @@ void busicom_state::machine_reset()
 	m_keyboard_shifter = 0;
 	m_printer_shifter = 0;
 
-	for(i=0;i<17;i++) {
-		for(j=0;j<11;j++) {
+	for(i=0;i<17;i++)
+	{
+		for(j=0;j<11;j++)
+		{
 			m_printer_line[j][i] = 0;
 			m_printer_line_color[j] = 0;
 		}
 	}
 
 }
-
-//static const char layout_busicom [] = "busicom";
 
 void busicom_state::busicom(machine_config &config)
 {
@@ -250,7 +266,7 @@ void busicom_state::busicom(machine_config &config)
 
 /* ROM definition */
 ROM_START( busicom )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0500, "maincpu", 0 )
 	ROM_LOAD( "busicom.l01", 0x0000, 0x0100, CRC(51ae2513) SHA1(5cb4097a3945db35af4ed64b629b20b08fc9824f))
 	ROM_LOAD( "busicom.l02", 0x0100, 0x0100, CRC(a05411ad) SHA1(81503a99a0d34fa29bf1245de0a44af2f174abdd))
 	ROM_LOAD( "busicom.l05", 0x0200, 0x0100, CRC(6120addf) SHA1(4b7ec183613630120b3c313c782122713d4327c5))
@@ -261,4 +277,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS
-COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

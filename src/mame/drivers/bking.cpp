@@ -29,50 +29,50 @@ DIP Locations verified for:
 #include "speaker.h"
 
 
-READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
+uint8_t bking_state::bking_sndnmi_disable_r()
 {
 	m_soundnmi->in_w<1>(0);
 	return 0;
 }
 
-WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
+void bking_state::bking_sndnmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(1);
 }
 
-WRITE8_MEMBER(bking_state::bking_soundlatch_w)
+void bking_state::bking_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
-WRITE8_MEMBER(bking_state::bking3_addr_l_w)
+void bking_state::bking3_addr_l_w(uint8_t data)
 {
 	m_addr_l = data;
 }
 
-WRITE8_MEMBER(bking_state::bking3_addr_h_w)
+void bking_state::bking3_addr_h_w(uint8_t data)
 {
 	m_addr_h = data;
 }
 
-READ8_MEMBER(bking_state::bking3_extrarom_r)
+uint8_t bking_state::bking3_extrarom_r()
 {
 	uint8_t *rom = memregion("user2")->base();
 	return rom[m_addr_h * 256 + m_addr_l];
 }
 
-WRITE8_MEMBER(bking_state::unk_w)
+void bking_state::unk_w(uint8_t data)
 {
 	// 0 = finished reading extra rom
 	// 1 = started reading extra rom
 }
 
-READ8_MEMBER(bking_state::bking3_ext_check_r)
+uint8_t bking_state::bking3_ext_check_r()
 {
 	return 0x31; //no "bad rom.", no "bad ext."
 }
 
-READ8_MEMBER(bking_state::bking3_mcu_status_r)
+uint8_t bking_state::bking3_mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU

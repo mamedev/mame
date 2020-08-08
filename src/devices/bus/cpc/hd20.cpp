@@ -58,8 +58,8 @@ void cpc_hd20_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
-	space.install_write_handler(0xfbe0,0xfbe4, write8_delegate(*this, FUNC(cpc_hd20_device::hdc_w)));
-	space.install_read_handler(0xfbe0,0xfbe4, read8_delegate(*this, FUNC(cpc_hd20_device::hdc_r)));
+	space.install_write_handler(0xfbe0,0xfbe4, write8sm_delegate(*this, FUNC(cpc_hd20_device::hdc_w)));
+	space.install_read_handler(0xfbe0,0xfbe4, read8sm_delegate(*this, FUNC(cpc_hd20_device::hdc_r)));
 }
 
 //-------------------------------------------------
@@ -71,7 +71,7 @@ void cpc_hd20_device::device_reset()
 	// TODO
 }
 
-READ8_MEMBER(cpc_hd20_device::hdc_r)
+uint8_t cpc_hd20_device::hdc_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -95,7 +95,7 @@ READ8_MEMBER(cpc_hd20_device::hdc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_hd20_device::hdc_w)
+void cpc_hd20_device::hdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{

@@ -84,7 +84,7 @@ public:
 	void rtype(machine_config &config);
 	void imgfightb(machine_config &config);
 	void lohtb(machine_config &config);
-	void imgfightj(machine_config &config);
+	void imgfight(machine_config &config);
 	void mrheli(machine_config &config);
 	void nspiritj(machine_config &config);
 
@@ -94,7 +94,6 @@ public:
 	void init_m72_8751();
 	void init_dbreedm72();
 	void init_nspirit();
-	void init_imgfight();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -166,17 +165,16 @@ private:
 	void mcu_low_w(u8 data);
 	void mcu_high_w(u8 data);
 
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(protection_w);
+	u16 protection_r(offs_t offset, u16 mem_mask = ~0);
+	void protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// game specific
-	DECLARE_WRITE16_MEMBER(bchopper_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(nspirit_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
+	void bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rtype2_port02_w(u8 data);
 	void poundfor_port02_w(u8 data);
 	void m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask);
@@ -192,7 +190,7 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_VIDEO_START(m72);
-	DECLARE_VIDEO_START(imgfightj);
+	DECLARE_VIDEO_START(imgfight);
 	DECLARE_VIDEO_START(mrheli);
 	DECLARE_VIDEO_START(nspiritj);
 	DECLARE_VIDEO_START(xmultipl);

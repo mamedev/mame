@@ -55,7 +55,7 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	DECLARE_WRITE8_MEMBER(sample_ctrl_w);
+	void sample_ctrl_w(uint8_t data);
 	void alligators_ctrl1_w(uint8_t data);
 	void alligators_ctrl2_w(uint8_t data);
 
@@ -69,8 +69,8 @@ private:
 	void pmm8713_ck(int i, int state);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(alligator_ck) { pmm8713_ck(N, state); }
 
-	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
-	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
+	void irq_ack_w(uint8_t data)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
+	void firq_ack_w(uint8_t data)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 
@@ -109,7 +109,7 @@ void wackygtr_state::status_lamps_w(uint8_t data)
 	m_ticket->motor_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
+void wackygtr_state::sample_ctrl_w(uint8_t data)
 {
 	/*
 	    --xx xxxx    sample index

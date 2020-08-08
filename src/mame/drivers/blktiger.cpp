@@ -32,12 +32,12 @@ Protection comms between main cpu and i8751
 
 **************************************************/
 
-READ8_MEMBER(blktiger_state::blktiger_from_mcu_r)
+uint8_t blktiger_state::blktiger_from_mcu_r()
 {
 	return m_i8751_latch;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_to_mcu_w)
+void blktiger_state::blktiger_to_mcu_w(uint8_t data)
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 	m_z80_latch = data;
@@ -58,12 +58,12 @@ void blktiger_state::blktiger_to_main_w(uint8_t data)
 
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_bankswitch_w)
+void blktiger_state::blktiger_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
+void blktiger_state::blktiger_coinlockout_w(uint8_t data)
 {
 	if (ioport("COIN_LOCKOUT")->read() & 0x01)
 	{

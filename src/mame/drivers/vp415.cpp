@@ -132,7 +132,7 @@ WRITE_LINE_MEMBER(vp415_state::cpu_int1_w)
 	set_int_line(0, state);
 }
 
-WRITE8_MEMBER(vp415_state::sel34_w)
+void vp415_state::sel34_w(uint8_t data)
 {
 	logerror("%s: sel34: /INTR=%d, RES=%d, ERD=%d, ENW=%d\n", machine().describe_context(), BIT(data, SEL34_INTR_N_BIT), BIT(data, SEL34_RES_BIT), BIT(data, SEL34_ERD_BIT), BIT(data, SEL34_ENW_BIT));
 	m_sel34 = data;
@@ -144,7 +144,7 @@ WRITE8_MEMBER(vp415_state::sel34_w)
 	}
 }
 
-READ8_MEMBER(vp415_state::sel37_r)
+uint8_t vp415_state::sel37_r()
 {
 	logerror("%s: sel37: ID0=%d, ID1=%d\n", machine().describe_context(), BIT(m_sel37, SEL37_ID0_BIT), BIT(m_sel37, SEL37_ID1_BIT));
 	return m_sel37;
@@ -211,7 +211,7 @@ void vp415_state::datamcu_program_map(address_map &map)
 
 // Control Module (S)
 
-WRITE8_MEMBER(vp415_state::ctrl_regs_w)
+void vp415_state::ctrl_regs_w(offs_t offset, uint8_t data)
 {
 	const uint8_t handler_index = (offset & 0x0c00) >> 10;
 	switch (handler_index)
@@ -233,7 +233,7 @@ WRITE8_MEMBER(vp415_state::ctrl_regs_w)
 	}
 }
 
-READ8_MEMBER(vp415_state::ctrl_regs_r)
+uint8_t vp415_state::ctrl_regs_r(offs_t offset)
 {
 	const uint8_t handler_index = (offset & 0x0c00) >> 10;
 	uint8_t value = 0;
@@ -508,7 +508,7 @@ void vp415_state::vp415(machine_config &config)
 
 	// Module S: Control
 	I8031(config, m_ctrlcpu, XTAL(11'059'200)); // 11.059MHz, per schematic
-	m_ctrlcpu->port_out_cb<1>().set(FUNC(vp415_state::ctrl_cpu_port1_w));;
+	m_ctrlcpu->port_out_cb<1>().set(FUNC(vp415_state::ctrl_cpu_port1_w));
 	m_ctrlcpu->port_in_cb<1>().set(FUNC(vp415_state::ctrl_cpu_port1_r));
 	m_ctrlcpu->port_out_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_w));
 	m_ctrlcpu->port_in_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_r));

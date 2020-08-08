@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::mac_autovector_w )
+void mac_state::mac_autovector_w(offs_t offset, uint16_t data)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_w: offset=0x%08x data=0x%04x\n", offset, data);
@@ -294,7 +294,7 @@ WRITE16_MEMBER ( mac_state::mac_autovector_w )
 	/* Not yet implemented */
 }
 
-READ16_MEMBER ( mac_state::mac_autovector_r )
+uint16_t mac_state::mac_autovector_r(offs_t offset)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_r: offset=0x%08x\n", offset);
@@ -344,7 +344,7 @@ void mac_state::v8_resize()
 		mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 
 		// install catcher in place of ROM that will detect the first access to ROM in its real location
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32sm_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
 	}
 	else
 	{
@@ -464,7 +464,7 @@ void mac_state::set_memory_overlay(int overlay)
 
 			if (is_rom)
 			{
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32sm_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
 			}
 			else
 			{
@@ -489,7 +489,7 @@ void mac_state::set_memory_overlay(int overlay)
 	}
 }
 
-READ32_MEMBER(mac_state::rom_switch_r)
+uint32_t mac_state::rom_switch_r(offs_t offset)
 {
 	offs_t ROM_size = memregion("bootrom")->bytes();
 	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
@@ -505,315 +505,6 @@ READ32_MEMBER(mac_state::rom_switch_r)
 	return ROM_data[offset & ((ROM_size - 1)>>2)];
 }
 
-
-/*
-    R Nabet 000531 : added keyboard code
-*/
-
-/* *************************************************************************
- * non-ADB keyboard support
- *
- * The keyboard uses a i8021 (?) microcontroller.
- * It uses a bidirectional synchonous serial line, connected to the VIA (SR feature)
- *
- * Our emulation is more a hack than anything else - the keyboard controller is
- * not emulated, instead we interpret keyboard commands directly.  I made
- * many guesses, which may be wrong
- *
- * todo :
- * * find the correct model number for the Mac Plus keyboard ?
- * * emulate original Macintosh keyboards (2 layouts : US and international)
- *
- * references :
- * * IM III-29 through III-32 and III-39 through III-42
- * * IM IV-250
- * *************************************************************************/
-
-/*
-    scan_keyboard()
-
-    scan the keyboard, and returns key transition code (or nullptr ($7B) if none)
-*/
-#ifndef MAC_USE_EMULATED_KBD
-int mac_state::scan_keyboard()
-{
-	int i, j;
-	int keybuf = 0;
-	int keycode;
-
-	if (m_keycode_buf_index)
-	{
-		return m_keycode_buf[--m_keycode_buf_index];
-	}
-
-	for (i=0; i<7; i++)
-	{
-		keybuf = m_keys[i]->read();
-
-		if (keybuf != m_key_matrix[i])
-		{
-			/* if state has changed, find first bit which has changed */
-			if (LOG_KEYBOARD)
-				logerror("keyboard state changed, %d %X\n", i, keybuf);
-
-			for (j=0; j<16; j++)
-			{
-				if (((keybuf ^ m_key_matrix[i]) >> j) & 1)
-				{
-					/* update m_key_matrix */
-					m_key_matrix[i] = (m_key_matrix[i] & ~ (1 << j)) | (keybuf & (1 << j));
-
-					if (i < 4)
-					{
-						/* create key code */
-						keycode = (i << 5) | (j << 1) | 0x01;
-						if (! (keybuf & (1 << j)))
-						{
-							/* key up */
-							keycode |= 0x80;
-						}
-						return keycode;
-					}
-					else if (i < 6)
-					{
-						/* create key code */
-						keycode = ((i & 3) << 5) | (j << 1) | 0x01;
-
-						if ((keycode == 0x05) || (keycode == 0x0d) || (keycode == 0x11) || (keycode == 0x1b))
-						{
-							/* these keys cause shift to be pressed (for compatibility with mac 128/512) */
-							if (keybuf & (1 << j))
-							{
-								/* key down */
-								if (! (m_key_matrix[3] & 0x0100))
-								{
-									/* shift key is really up */
-									m_keycode_buf[0] = keycode;
-									m_keycode_buf[1] = 0x79;
-									m_keycode_buf_index = 2;
-									return 0x71;    /* "presses" shift down */
-								}
-							}
-							else
-							{   /* key up */
-								if (! (m_key_matrix[3] & 0x0100))
-								{
-									/* shift key is really up */
-									m_keycode_buf[0] = keycode | 0x80;
-									m_keycode_buf[1] = 0x79;
-									m_keycode_buf_index = 2;
-									return 0xF1;    /* "releases" shift */
-								}
-							}
-						}
-
-						if (! (keybuf & (1 << j)))
-						{
-							/* key up */
-							keycode |= 0x80;
-						}
-						m_keycode_buf[0] = keycode;
-						m_keycode_buf_index = 1;
-						return 0x79;
-					}
-					else /* i == 6 */
-					{
-						/* create key code */
-						keycode = (j << 1) | 0x01;
-						if (! (keybuf & (1 << j)))
-						{
-							/* key up */
-							keycode |= 0x80;
-						}
-						m_keycode_buf[0] = keycode;
-						m_keycode_buf_index = 1;
-						return 0x79;
-					}
-				}
-			}
-		}
-	}
-
-	return 0x7B;    /* return nullptr */
-}
-
-/*
-    power-up init
-*/
-void mac_state::keyboard_init()
-{
-	int i;
-
-	/* init flag */
-	m_kbd_comm = false;
-	m_kbd_receive = false;
-	m_kbd_shift_reg=0;
-	m_kbd_shift_count=0;
-
-	/* clear key matrix */
-	for (i=0; i<7; i++)
-	{
-		m_key_matrix[i] = 0;
-	}
-
-	/* purge transmission buffer */
-	m_keycode_buf_index = 0;
-}
-#endif
-
-/******************* Keyboard <-> VIA communication ***********************/
-
-#ifdef MAC_USE_EMULATED_KBD
-
-WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
-{
-	printf("CLK: %d\n", state^1);
-	m_via1->write_cb1(state ? 0 : 1);
-}
-
-WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
-{
-	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
-	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-#else   // keyboard HLE
-
-TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
-{
-	int i;
-
-	if (m_kbd_comm == true)
-	{
-		for (i=0; i<8; i++)
-		{
-			/* Put data on CB2 if we are sending*/
-			if (m_kbd_receive == false)
-				m_via1->write_cb2(m_kbd_shift_reg&0x80?1:0);
-			m_kbd_shift_reg <<= 1;
-			m_via1->write_cb1(0);
-			m_via1->write_cb1(1);
-		}
-		if (m_kbd_receive == true)
-		{
-			m_kbd_receive = false;
-			/* Process the command received from mac */
-			keyboard_receive(m_kbd_shift_reg & 0xff);
-		}
-		else
-		{
-			/* Communication is over */
-			m_kbd_comm = false;
-		}
-	}
-}
-
-void mac_state::kbd_shift_out(int data)
-{
-	if (m_kbd_comm == true)
-	{
-		m_kbd_shift_reg = data;
-		machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(mac_state::kbd_clock),this));
-	}
-}
-
-WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
-{
-	if (m_kbd_comm == false && state == 0)
-	{
-		/* Mac pulls CB2 down to initiate communication */
-		m_kbd_comm = true;
-		m_kbd_receive = true;
-		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(mac_state::kbd_clock),this));
-	}
-	if (m_kbd_comm == true && m_kbd_receive == true)
-	{
-		/* Shift in what mac is sending */
-		m_kbd_shift_reg = (m_kbd_shift_reg & ~1) | state;
-	}
-}
-
-/*
-    called when inquiry times out (1/4s)
-*/
-TIMER_CALLBACK_MEMBER(mac_state::inquiry_timeout_func)
-{
-	if (LOG_KEYBOARD)
-		logerror("keyboard enquiry timeout\n");
-	kbd_shift_out(0x7B); /* always send nullptr */
-}
-
-/*
-    called when a command is received from the mac
-*/
-void mac_state::keyboard_receive(int val)
-{
-	switch (val)
-	{
-	case 0x10:
-		/* inquiry - returns key transition code, or nullptr ($7B) if time out (1/4s) */
-		if (LOG_KEYBOARD)
-			logerror("keyboard command : inquiry\n");
-
-		m_inquiry_timeout->adjust(
-			attotime(0, DOUBLE_TO_ATTOSECONDS(0.25)), 0);
-		break;
-
-	case 0x14:
-		/* instant - returns key transition code, or nullptr ($7B) */
-		if (LOG_KEYBOARD)
-			logerror("keyboard command : instant\n");
-
-		kbd_shift_out(scan_keyboard());
-		break;
-
-	case 0x16:
-		/* model number - resets keyboard, return model number */
-		if (LOG_KEYBOARD)
-			logerror("keyboard command : model number\n");
-
-		{   /* reset */
-			int i;
-
-			/* clear key matrix */
-			for (i=0; i<7; i++)
-			{
-				m_key_matrix[i] = 0;
-			}
-
-			/* purge transmission buffer */
-			m_keycode_buf_index = 0;
-		}
-
-		/* format : 1 if another device (-> keypad ?) connected | next device (-> keypad ?) number 1-8
-		                    | keyboard model number 1-8 | 1  */
-		/* keyboards :
-		    3 : mac 512k, US and international layout ? Mac plus ???
-		    other values : Apple II keyboards ?
-		*/
-		/* keypads :
-		    ??? : standard keypad (always available on Mac Plus) ???
-		*/
-		kbd_shift_out(0x17);   /* probably wrong */
-		break;
-
-	case 0x36:
-		/* test - resets keyboard, return ACK ($7D) or NAK ($77) */
-		if (LOG_KEYBOARD)
-			logerror("keyboard command : test\n");
-
-		kbd_shift_out(0x7D);   /* ACK */
-		break;
-
-	default:
-		if (LOG_KEYBOARD)
-			logerror("unknown keyboard command 0x%X\n", val);
-
-		kbd_shift_out(0);
-		break;
-	}
-}
-#endif
 
 /* *************************************************************************
  * Mouse
@@ -945,7 +636,7 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
              */
 
-READ16_MEMBER ( mac_state::macplus_scsi_r )
+uint16_t mac_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -959,7 +650,7 @@ READ16_MEMBER ( mac_state::macplus_scsi_r )
 	return m_ncr5380->ncr5380_read_reg(reg)<<8;
 }
 
-READ32_MEMBER (mac_state::macii_scsi_drq_r)
+uint32_t mac_state::macii_scsi_drq_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -979,7 +670,7 @@ READ32_MEMBER (mac_state::macii_scsi_drq_r)
 	return 0;
 }
 
-WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
+void mac_state::macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1005,7 +696,7 @@ WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::macplus_scsi_w )
+void mac_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1019,7 +710,7 @@ WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 	m_ncr5380->ncr5380_write_reg(reg, data);
 }
 
-WRITE16_MEMBER ( mac_state::macii_scsi_w )
+void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1165,7 +856,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 
 
-READ16_MEMBER ( mac_state::mac_scc_r )
+uint16_t mac_state::mac_scc_r(offs_t offset)
 {
 	uint16_t result;
 
@@ -1175,12 +866,12 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 
 
-WRITE16_MEMBER ( mac_state::mac_scc_w )
+void mac_state::mac_scc_w(offs_t offset, uint16_t data)
 {
 	m_scc->reg_w(offset, data);
 }
 
-WRITE16_MEMBER ( mac_state::mac_scc_2_w )
+void mac_state::mac_scc_2_w(offs_t offset, uint16_t data)
 {
 	m_scc->reg_w(offset, data >> 8);
 }
@@ -1189,7 +880,7 @@ WRITE16_MEMBER ( mac_state::mac_scc_2_w )
  * IWM Code specific to the Mac Plus  *
  * ********************************** */
 
-READ16_MEMBER ( mac_state::mac_iwm_r )
+uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 {
 	/* The first time this is called is in a floppy test, which goes from
 	 * $400104 to $400126.  After that, all access to the floppy goes through
@@ -1207,7 +898,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( mac_state::mac_iwm_w )
+void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_MAC_IWM)
 		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
@@ -1652,7 +1343,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via_r )
+uint16_t mac_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
 
@@ -1668,7 +1359,7 @@ READ16_MEMBER ( mac_state::mac_via_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via_w )
+void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1693,7 +1384,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
 	set_via2_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via2_r )
+uint16_t mac_state::mac_via2_r(offs_t offset)
 {
 	int data;
 
@@ -1708,7 +1399,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via2_w )
+void mac_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2040,13 +1731,6 @@ void mac_state::machine_reset()
 	m_via2_vbl = 0;
 	m_se30_vbl_enable = 0;
 	m_nubus_irq_state = 0xff;
-#ifndef MAC_USE_EMULATED_KBD
-	m_keyboard_reply = 0;
-	m_kbd_comm = 0;
-	m_kbd_receive = 0;
-	m_kbd_shift_reg = 0;
-	m_kbd_shift_count = 0;
-#endif
 	m_mouse_bit_x = m_mouse_bit_y = 0;
 	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
 	m_pm_state = 0;
@@ -2088,7 +1772,7 @@ TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
 	m_overlay_timeout->adjust(attotime::never);
 }
 
-READ32_MEMBER(mac_state::mac_read_id)
+uint32_t mac_state::mac_read_id()
 {
 //    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 
@@ -2186,16 +1870,11 @@ void mac_state::mac_driver_init(model_t model)
 	}
 
 	/* setup keyboard */
-#ifndef MAC_USE_EMULATED_KBD
-	keyboard_init();
-	m_inquiry_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::inquiry_timeout_func),this));
-#else
 	/* clear key matrix for macadb */
 	for (int i=0; i<7; i++)
 	{
 		m_key_matrix[i] = 0;
 	}
-#endif
 
 	/* save state stuff */
 	machine().save().register_postload(save_prepost_delegate(FUNC(mac_state::mac_state_load), this));
@@ -2292,24 +1971,6 @@ void mac_state::vblank_irq()
 	{
 		this->adb_vblank();
 	}
-
-#ifndef MAC_USE_EMULATED_KBD
-	/* handle keyboard */
-	if (m_kbd_comm == true && m_kbd_receive == false)
-	{
-		int keycode = scan_keyboard();
-
-		if (keycode != 0x7B)
-		{
-			/* if key pressed, send the code */
-
-			logerror("keyboard enquiry successful, keycode %X\n", keycode);
-
-			m_inquiry_timeout->reset();
-			kbd_shift_out(keycode);
-		}
-	}
-#endif
 
 	/* signal VBlank on CA1 input on the VIA */
 	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || (m_model == MODEL_MAC_QUADRA_700))

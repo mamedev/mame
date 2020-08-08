@@ -4,7 +4,7 @@
 #include "includes/kikikai.h"
 
 
-WRITE8_MEMBER(kikikai_state::main_bankswitch_w)
+void kikikai_state::main_bankswitch_w(uint8_t data)
 {
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");

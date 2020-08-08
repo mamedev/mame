@@ -97,6 +97,12 @@ public:
 	{ }
 
 	void srmp6(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_post_load() override { m_gfxdecode->gfx(0)->mark_all_dirty(); }
+
 private:
 	std::unique_ptr<u16[]> m_tileram;
 	required_shared_ptr<u16> m_chrram;
@@ -107,24 +113,23 @@ private:
 	required_memory_bank m_nile_bank;
 	required_ioport_array<4> m_key_io;
 
-	int m_brightness;
-	u16 m_input_select;
+	u16 m_brightness;
+	u8 m_input_select;
 
 	u16 m_lastb;
 	u16 m_lastb2;
 	int m_destl;
 
-	DECLARE_WRITE16_MEMBER(input_select_w);
-	DECLARE_READ16_MEMBER(inputs_r);
-	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_READ16_MEMBER(video_regs_r);
-	DECLARE_WRITE16_MEMBER(dma_w);
-	DECLARE_READ16_MEMBER(tileram_r);
-	DECLARE_WRITE16_MEMBER(tileram_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(irq_ack_r);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	void input_select_w(u16 data);
+	u16 inputs_r();
+	void video_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 video_regs_r(offs_t offset);
+	void dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tileram_r(offs_t offset);
+	void tileram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 irq_ack_r();
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette();
 	u32 process(u8 b,u32 dst_offset);
@@ -170,9 +175,9 @@ void srmp6_state::update_palette()
 
 	for (int i = 0; i < m_palette->entries(); i++)
 	{
-		u8 r = m_palette->basemem().read16(i) >>  0 & 0x1F;
-		u8 g = m_palette->basemem().read16(i) >>  5 & 0x1F;
-		u8 b = m_palette->basemem().read16(i) >> 10 & 0x1F;
+		u8 r = m_palette->basemem().read16(i) >>  0 & 0x1f;
+		u8 g = m_palette->basemem().read16(i) >>  5 & 0x1f;
+		u8 b = m_palette->basemem().read16(i) >> 10 & 0x1f;
 
 		if (brg & 0x40)
 		{
@@ -189,7 +194,7 @@ void srmp6_state::video_start()
 	m_tileram = make_unique_clear<u16[]>(0x100000*16/2);
 	m_dmaram.allocate(0x100/2);
 
-	/* create the char set (gfx will then be updated dynamically from RAM) */
+	// create the char set (gfx will then be updated dynamically from RAM)
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tiles8x8_layout, (u8*)m_tileram.get(), 0, m_palette->entries() / 256, 0));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
@@ -197,6 +202,9 @@ void srmp6_state::video_start()
 
 	save_pointer(NAME(m_tileram), 0x100000*16/2);
 	save_item(NAME(m_brightness));
+	save_item(NAME(m_destl));
+	save_item(NAME(m_lastb));
+	save_item(NAME(m_lastb2));
 }
 
 #if 0
@@ -219,7 +227,7 @@ u32 srmp6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	bitmap.fill(0, cliprect);
 
 #if 0
-	/* debug */
+	//debug
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		++xixi;
@@ -233,7 +241,7 @@ u32 srmp6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 #endif
 
-	/* Main spritelist is 0x0000 - 0x1fff in spriteram, sublists follow */
+	// Main spritelist is 0x0000 - 0x1fff in spriteram, sublists follow
 	while (mainlist_offset<0x2000/2)
 	{
 		u16 *sprite_sublist = &sprite_list[sprite_list[mainlist_offset+1]<<3];
@@ -241,7 +249,7 @@ u32 srmp6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		s16 global_x,global_y, flip_x, flip_y;
 		u16 global_pal;
 
-		/* end of list marker */
+		// end of list marker
 		if (sprite_list[mainlist_offset+0] == 0x8000)
 			break;
 
@@ -256,7 +264,7 @@ u32 srmp6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 			if ((sprite_list[mainlist_offset+5] & 0x700) == 0x700)
 			{
-				alpha = pal5bit(sprite_list[mainlist_offset+5] & 0x1F);
+				alpha = pal5bit(sprite_list[mainlist_offset+5] & 0x1f);
 			}
 			else
 			{
@@ -334,12 +342,12 @@ void srmp6_state::machine_start()
 	save_item(NAME(m_input_select));
 }
 
-WRITE16_MEMBER(srmp6_state::input_select_w)
+void srmp6_state::input_select_w(u16 data)
 {
 	m_input_select = data & 0x0f;
 }
 
-READ16_MEMBER(srmp6_state::inputs_r)
+u16 srmp6_state::inputs_r()
 {
 	switch (m_input_select) // inputs
 	{
@@ -353,7 +361,7 @@ READ16_MEMBER(srmp6_state::inputs_r)
 }
 
 
-WRITE16_MEMBER(srmp6_state::video_regs_w)
+void srmp6_state::video_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset)
 	{
@@ -365,7 +373,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 		}
 
 		// set by IT4
-		case 0x5c/2: // either 0x40 explicitely in many places, or according $2083b0 (IT4)
+		case 0x5c/2: // either 0x40 explicitly in many places, or according $2083b0 (IT4)
 			//Fade in/out (0x40(dark)-0x60(normal)-0x7e?(bright) reset by 0x00?
 			if (m_brightness != data)
 			{
@@ -374,7 +382,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 			}
 			break;
 
-		/* unknown registers - there are others */
+		// unknown registers - there are others
 
 		// set by IT4 (jsr $b3c), according flip screen dsw
 		case 0x48/2: //     0 /  0xb0 if flipscreen
@@ -391,14 +399,14 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 	COMBINE_DATA(&m_video_regs[offset]);
 }
 
-READ16_MEMBER(srmp6_state::video_regs_r)
+u16 srmp6_state::video_regs_r(offs_t offset)
 {
 	logerror("video_regs_r (PC=%06X): %04x\n", m_maincpu->pcbase(), offset*2);
 	return m_video_regs[offset];
 }
 
 
-/* DMA RLE stuff - the same as CPS3 */
+// DMA RLE stuff - the same as CPS3
 u32 srmp6_state::process(u8 b,u32 dst_offset)
 {
 	int l = 0;
@@ -433,36 +441,34 @@ u32 srmp6_state::process(u8 b,u32 dst_offset)
 }
 
 
-WRITE16_MEMBER(srmp6_state::dma_w)
+void srmp6_state::dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	u16* dmaram = m_dmaram;
-
-	COMBINE_DATA(&dmaram[offset]);
-	if (offset==13 && dmaram[offset]==0x40)
+	COMBINE_DATA(&m_dmaram[offset]);
+	if (offset==13 && m_dmaram[offset]==0x40)
 	{
-		u32 srctab=2*((((u32)dmaram[5])<<16)|dmaram[4]);
-		u32 srcdata=2*((((u32)dmaram[11])<<16)|dmaram[10]);
-		u32 len=4*(((((u32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!
+		u32 srctab=2*((((u32)m_dmaram[5])<<16)|m_dmaram[4]);
+		u32 srcdata=2*((((u32)m_dmaram[11])<<16)|m_dmaram[10]);
+		u32 len=4*(((((u32)m_dmaram[7]&3)<<16)|m_dmaram[6])+1); //??? WRONG!
 		int tempidx = 0;
 
-		/* show params */
+		// show params
 		LOG(("DMA! %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
-				dmaram[0x00/2],
-				dmaram[0x02/2],
-				dmaram[0x04/2],
-				dmaram[0x06/2],
-				dmaram[0x08/2],
-				dmaram[0x0a/2],
-				dmaram[0x0c/2],
-				dmaram[0x0e/2],
-				dmaram[0x10/2],
-				dmaram[0x12/2],
-				dmaram[0x14/2],
-				dmaram[0x16/2],
-				dmaram[0x18/2],
-				dmaram[0x1a/2]));
+				m_dmaram[0x00/2],
+				m_dmaram[0x02/2],
+				m_dmaram[0x04/2],
+				m_dmaram[0x06/2],
+				m_dmaram[0x08/2],
+				m_dmaram[0x0a/2],
+				m_dmaram[0x0c/2],
+				m_dmaram[0x0e/2],
+				m_dmaram[0x10/2],
+				m_dmaram[0x12/2],
+				m_dmaram[0x14/2],
+				m_dmaram[0x16/2],
+				m_dmaram[0x18/2],
+				m_dmaram[0x1a/2]));
 
-		m_destl = dmaram[9]*0x40000;
+		m_destl = m_dmaram[9]*0x40000;
 
 		m_lastb = 0xfffe;
 		m_lastb2 = 0xffff;
@@ -502,26 +508,26 @@ WRITE16_MEMBER(srmp6_state::dma_w)
 	}
 }
 
-/* if tileram is actually bigger than the mapped area, how do we access the rest? */
-READ16_MEMBER(srmp6_state::tileram_r)
+// if tileram is actually bigger than the mapped area, how do we access the rest?
+u16 srmp6_state::tileram_r(offs_t offset)
 {
 	return m_chrram[offset];
 }
 
-WRITE16_MEMBER(srmp6_state::tileram_w)
+void srmp6_state::tileram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	//u16 tmp;
 	COMBINE_DATA(&m_chrram[offset]);
 
-	/* are the DMA registers enabled some other way, or always mapped here, over RAM? */
+	// are the DMA registers enabled some other way, or always mapped here, over RAM?
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
 	{
 		offset &=0x1f;
-		dma_w(space,offset,data,mem_mask);
+		dma_w(offset ,data, mem_mask);
 	}
 }
 
-WRITE16_MEMBER(srmp6_state::paletteram_w)
+void srmp6_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int brg = m_brightness & 0x7f;
 
@@ -529,9 +535,9 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 
 	if (brg & 0x40)
 	{
-		u8 r = m_palette->basemem().read16(offset) >>  0 & 0x1F;
-		u8 g = m_palette->basemem().read16(offset) >>  5 & 0x1F;
-		u8 b = m_palette->basemem().read16(offset) >> 10 & 0x1F;
+		u8 r = m_palette->basemem().read16(offset) >>  0 & 0x1f;
+		u8 g = m_palette->basemem().read16(offset) >>  5 & 0x1f;
+		u8 b = m_palette->basemem().read16(offset) >> 10 & 0x1f;
 
 		r = get_fade(r, brg);
 		g = get_fade(g, brg);
@@ -541,7 +547,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	}
 }
 
-READ16_MEMBER(srmp6_state::irq_ack_r)
+u16 srmp6_state::irq_ack_r()
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0; // value read doesn't matter
@@ -561,18 +567,18 @@ void srmp6_state::srmp6_map(address_map &map)
 
 	map(0x480000, 0x480fff).ram().w(FUNC(srmp6_state::paletteram_w)).share("palette");
 
-	map(0x4c0000, 0x4c006f).rw(FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share("video_regs");    // ? gfx regs ST-0026 NiLe
+	map(0x4c0000, 0x4c006f).rw(FUNC(srmp6_state::video_regs_r), FUNC(srmp6_state::video_regs_w)).share(m_video_regs);    // ? gfx regs ST-0026 NiLe
 	map(0x4d0000, 0x4d0001).r(FUNC(srmp6_state::irq_ack_r));
 	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_device::nile_snd_r), FUNC(nile_device::nile_snd_w));
 	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_device::nile_sndctrl_r), FUNC(nile_device::nile_sndctrl_w));
 	//map(0x4e0110, 0x4e0111).noprw(); // ? accessed once ($268dc, written $b.w)
 
 	// CHR RAM: checked [$500000-$5fffff]
-	map(0x500000, 0x5fffff).rw(FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share("chrram");
+	map(0x500000, 0x5fffff).rw(FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share(m_chrram);
 	//map(0x5fff00, 0x5fff1f).ram(); // ? see routine $5ca8, video_regs related ???
-	//map(0x5fff00, 0x5fffff).w(FUNC(srmp6_state::dma_w)).share("dmaram");
+	//map(0x5fff00, 0x5fffff).w(FUNC(srmp6_state::dma_w)).share(m_dmaram);
 
-	map(0x600000, 0x7fffff).bankr("nile_bank");    // banked ROM (used by ROM check)
+	map(0x600000, 0x7fffff).bankr(m_nile_bank);    // banked ROM (used by ROM check)
 	map(0x800000, 0x9fffff).rom().region("user1", 0);
 	//map(0xf00004, 0xf00005).ram(); // ?
 	//map(0xf00006, 0xf00007).ram(); // ?
@@ -587,7 +593,7 @@ void srmp6_state::srmp6_map(address_map &map)
 static INPUT_PORTS_START( srmp6 )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0xfe01, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitely discarded
+	PORT_BIT( 0xfe01, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -598,7 +604,7 @@ static INPUT_PORTS_START( srmp6 )
 	PORT_SERVICE_NO_TOGGLE( 0x0100, IP_ACTIVE_LOW )
 
 	PORT_START("KEY1")
-	PORT_BIT( 0xfe41, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitely discarded
+	PORT_BIT( 0xfe41, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -607,7 +613,7 @@ static INPUT_PORTS_START( srmp6 )
 	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY2")
-	PORT_BIT( 0xfe41, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitely discarded
+	PORT_BIT( 0xfe41, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -616,14 +622,14 @@ static INPUT_PORTS_START( srmp6 )
 	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY3")
-	PORT_BIT( 0xfe61, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitely discarded
+	PORT_BIT( 0xfe61, IP_ACTIVE_LOW, IPT_UNUSED ) // explicitly discarded
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x0180, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")   /* 16-bit DSW1 (0x0000) +DSW2 (0x0700) */
+	PORT_START("DSW")   // 16-bit DSW1 (0x0000) +DSW2 (0x0700)
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
@@ -695,7 +701,7 @@ void srmp6_state::srmp6(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_sprram);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -710,15 +716,15 @@ void srmp6_state::srmp6(machine_config &config)
 ***************************************************************************/
 
 ROM_START( srmp6 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "sx011-10.4", 0x000001, 0x080000, CRC(8f4318a5) SHA1(44160968cca027b3d42805f2dd42662d11257ef6) )
 	ROM_LOAD16_BYTE( "sx011-11.5", 0x000000, 0x080000, CRC(7503d9cf) SHA1(03ab35f13b6166cb362aceeda18e6eda8d3abf50) )
 
-	ROM_REGION16_BE( 0x200000, "user1", 0 ) /* 68000 Data */
+	ROM_REGION16_BE( 0x200000, "user1", 0 ) // 68000 Data
 	ROM_LOAD16_WORD_SWAP( "sx011-09.10", 0x000000, 0x200000, CRC(58f74438) SHA1(a256e39ca0406e513ab4dbd812fb0b559b4f61f2) )
 
-	/* these are accessed directly by the 68k, DMA device etc.  NOT decoded */
-	ROM_REGION( 0x2000000, "nile", 0)   /* Banked ROM */
+	// these are accessed directly by the 68k, DMA device etc.  NOT decoded
+	ROM_REGION( 0x2000000, "nile", 0)   // Banked ROM
 	ROM_LOAD16_WORD_SWAP( "sx011-08.15", 0x0000000, 0x0400000, CRC(01b3b1f0) SHA1(bbd60509c9ba78358edbcbb5953eafafd6e2eaf5) ) // CHR00
 	ROM_LOAD16_WORD_SWAP( "sx011-07.16", 0x0400000, 0x0400000, CRC(26e57dac) SHA1(91272268977c5fbff7e8fbe1147bf108bd2ed321) ) // CHR01
 	ROM_LOAD16_WORD_SWAP( "sx011-06.17", 0x0800000, 0x0400000, CRC(220ee32c) SHA1(77f39b54891c2381b967534b0f6d380962eadcae) ) // CHR02
@@ -735,4 +741,4 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6_state, empty_init, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6_state, empty_init, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

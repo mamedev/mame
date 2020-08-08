@@ -217,7 +217,7 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data)
  DN3000/DN3500 CPU Status Register at 0x8000/0x10000
  -------------------------------------------------*/
 
-WRITE16_MEMBER(apollo_state::apollo_csr_status_register_w){
+void apollo_state::apollo_csr_status_register_w(offs_t offset, uint16_t data, uint16_t mem_mask){
 	// To clear bus timeouts or parity conditions from status register,
 	// write to the status register. This register is readonly.
 	// in DN3500 bit 15 is always set (undocumented !?)
@@ -225,7 +225,7 @@ WRITE16_MEMBER(apollo_state::apollo_csr_status_register_w){
 	SLOG1(("writing CPU Status Register at offset %X = %04x & %04x (%04x)", offset, data, mem_mask, cpu_status_register));
 }
 
-READ16_MEMBER(apollo_state::apollo_csr_status_register_r){
+uint16_t apollo_state::apollo_csr_status_register_r(offs_t offset, uint16_t mem_mask){
 	SLOG2(("reading CPU Status Register at offset %X = %04x & %04x", offset, cpu_status_register, mem_mask));
 	return cpu_status_register & mem_mask;
 }
@@ -234,7 +234,7 @@ READ16_MEMBER(apollo_state::apollo_csr_status_register_r){
  DN3000/DN3500 CPU Control Register at 0x8100/0x10100
  -------------------------------------------------*/
 
-WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
+void apollo_state::apollo_csr_control_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int leds;
 
@@ -288,7 +288,7 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 	}
 }
 
-READ16_MEMBER(apollo_state::apollo_csr_control_register_r)
+uint16_t apollo_state::apollo_csr_control_register_r(offs_t offset, uint16_t mem_mask)
 {
 	SLOG1(("reading CPU Control Register at offset %X = %04x & %04x", offset, cpu_control_register, mem_mask));
 	return cpu_control_register & mem_mask;
@@ -315,12 +315,12 @@ static uint8_t dn3000_dma_channel2 = 5; // 5 = memory dma channel
  DN3000/DN3500 DMA Controller 1 at 0x9000/0x10c00
  -------------------------------------------------*/
 
-WRITE8_MEMBER(apollo_state::apollo_dma_1_w){
+void apollo_state::apollo_dma_1_w(offs_t offset, uint8_t data){
 	SLOG1(("apollo_dma_1_w: writing DMA Controller 1 at offset %02x = %02x", offset, data));
 	m_dma8237_1->write(offset, data);
 }
 
-READ8_MEMBER(apollo_state::apollo_dma_1_r){
+uint8_t apollo_state::apollo_dma_1_r(offs_t offset){
 	uint8_t data = m_dma8237_1->read(offset);
 	SLOG1(("apollo_dma_1_r: reading DMA Controller 1 at offset %02x = %02x", offset, data));
 	return data;
@@ -330,12 +330,12 @@ READ8_MEMBER(apollo_state::apollo_dma_1_r){
  DN3000/DN3500 DMA Controller 2 at 0x9100/0x10d00
  -------------------------------------------------*/
 
-WRITE8_MEMBER(apollo_state::apollo_dma_2_w){
+void apollo_state::apollo_dma_2_w(offs_t offset, uint8_t data){
 	SLOG1(("apollo_dma_2_w: writing DMA Controller 2 at offset %02x = %02x", offset/2, data));
 	m_dma8237_2->write(offset / 2, data);
 }
 
-READ8_MEMBER(apollo_state::apollo_dma_2_r){
+uint8_t apollo_state::apollo_dma_2_r(offs_t offset){
 	// Nasty hack (13-06-15 - ost):
 	// MD self_test will test wrong DMA register and
 	// mem-to-mem DMA in am9517a.c is often starting much too late (for MD self_test)
@@ -360,12 +360,12 @@ READ8_MEMBER(apollo_state::apollo_dma_2_r){
  DN3000 DMA Page Register at 0x9200
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::apollo_dma_page_register_w){
+void apollo_state::apollo_dma_page_register_w(offs_t offset, uint8_t data){
 	dma_page_register[offset & 0x0f] = data;
 	SLOG1(("writing DMA Page Register at offset %02x = %02x", offset,  data));
 }
 
-READ8_MEMBER(apollo_state::apollo_dma_page_register_r){
+uint8_t apollo_state::apollo_dma_page_register_r(offs_t offset){
 	uint8_t data = dma_page_register[offset & 0x0f];
 	SLOG1(("reading DMA Page Register at offset %02x = %02x", offset, data));
 	return data;
@@ -375,12 +375,12 @@ READ8_MEMBER(apollo_state::apollo_dma_page_register_r){
  DN3500 Address Translation Map at 0x017000
  -------------------------------------------------*/
 
-WRITE16_MEMBER(apollo_state::apollo_address_translation_map_w){
+void apollo_state::apollo_address_translation_map_w(offs_t offset, uint16_t data){
 	address_translation_map[offset & 0x3ff] = data;
 	SLOG2(("writing Address Translation Map at offset %02x = %04x", offset, data));
 }
 
-READ16_MEMBER(apollo_state::apollo_address_translation_map_r){
+uint16_t apollo_state::apollo_address_translation_map_r(offs_t offset){
 	uint16_t data = address_translation_map[offset & 0x3ff];
 	SLOG2(("reading Address Translation Map at offset %02x = %04x", offset, data));
 	return data;
@@ -672,7 +672,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_ptm_irq_function)
  DN3000/DN3500 Realtime Calendar MC146818 at 0x8900/0x10900
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::apollo_rtc_w)
+void apollo_state::apollo_rtc_w(offs_t offset, uint8_t data)
 {
 	m_rtc->write_direct(offset, data);
 	if (offset >= 0x0b && offset <= 0x0c)
@@ -681,7 +681,7 @@ WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 	}
 }
 
-READ8_MEMBER(apollo_state::apollo_rtc_r)
+uint8_t apollo_state::apollo_rtc_r(offs_t offset)
 {
 	uint8_t data;
 	data = m_rtc->read_direct(offset);
@@ -899,12 +899,12 @@ void apollo_ni::set_node_id(uint32_t node_id)
 //  read/write
 //-------------------------------------------------
 
-WRITE16_MEMBER(apollo_ni::write)
+void apollo_ni::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	CLOG1(("Error: writing node id ROM at offset %02x = %04x & %04x", offset, data, mem_mask));
 }
 
-READ16_MEMBER(apollo_ni::read)
+uint16_t apollo_ni::read(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	switch (offset & 0x0f)
@@ -1207,8 +1207,7 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 
 MACHINE_RESET_MEMBER(apollo_state,apollo)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t year = apollo_rtc_r(space, 9);
+	uint8_t year = apollo_rtc_r(9);
 
 	MLOG1(("machine_reset_apollo"));
 
@@ -1219,18 +1218,18 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 	if (year < 25 && apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
 		year += 75;
-		apollo_rtc_w(space, 9, year);
+		apollo_rtc_w(9, year);
 	}
 	else if (year < 20 && apollo_config(APOLLO_CONF_20_YEARS_AGO))
 	{
 		year += 80;
-		apollo_rtc_w(space, 9, year);
+		apollo_rtc_w(9, year);
 	}
 	else if (year >= 80 && !apollo_config(APOLLO_CONF_20_YEARS_AGO)
 			&& !apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
 		year -= 80;
-		apollo_rtc_w(space, 9, year);
+		apollo_rtc_w(9, year);
 	}
 
 	ptm_counter = 0;

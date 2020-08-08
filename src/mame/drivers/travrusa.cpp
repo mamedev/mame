@@ -598,7 +598,7 @@ void travrusa_state::init_shtridra()
 		rom[A] = bitswap<8>(rom[A],7,5,6,3,4,2,1,0);
 }
 
-READ8_MEMBER(travrusa_state::shtridrb_port11_r)
+uint8_t travrusa_state::shtridrb_port11_r()
 {
 	printf("shtridrb_port11_r %04x\n", m_maincpu->pc());
 	// reads, masks with 0xa8, checks for 0x88, resets game if not happy with value?
@@ -608,7 +608,7 @@ READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 
 void travrusa_state::init_shtridrb()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8_delegate(*this, FUNC(travrusa_state::shtridrb_port11_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8smo_delegate(*this, FUNC(travrusa_state::shtridrb_port11_r)));
 }
 
 

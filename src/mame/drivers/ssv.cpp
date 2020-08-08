@@ -199,7 +199,7 @@ IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
 	return 0;
 }
 
-WRITE16_MEMBER(ssv_state::irq_ack_w)
+void ssv_state::irq_ack_w(offs_t offset, uint16_t data)
 {
 	int level = ((offset * 2) & 0x70) >> 4;
 
@@ -226,7 +226,7 @@ WRITE16_MEMBER(ssv_state::irq_ack_w)
     ultrax:     40,00 at the start then 42,4a
     twineag2:   40,00 at the start then 42,4a
 */
-WRITE16_MEMBER(ssv_state::irq_enable_w)
+void ssv_state::irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(gdfs_state::adc_int_w)
     survarts:   83
     sxyreact:   80
 */
-WRITE16_MEMBER(ssv_state::lockout_w)
+void ssv_state::lockout_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -307,7 +307,7 @@ WRITE16_MEMBER(ssv_state::lockout_w)
 }
 
 /* Same as above but with inverted lockout lines */
-WRITE16_MEMBER(ssv_state::lockout_inv_w)
+void ssv_state::lockout_inv_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -345,17 +345,17 @@ void ssv_state::dsp_data_map(address_map &map)
 	map(0x0000, 0x07ff).rom().region("dspdata", 0);
 }
 
-READ16_MEMBER(ssv_state::dsp_dr_r)
+uint16_t ssv_state::dsp_dr_r()
 {
 	return m_dsp->snesdsp_read(true);
 }
 
-WRITE16_MEMBER(ssv_state::dsp_dr_w)
+void ssv_state::dsp_dr_w(uint16_t data)
 {
 	m_dsp->snesdsp_write(true, data);
 }
 
-READ16_MEMBER(ssv_state::dsp_r)
+uint16_t ssv_state::dsp_r(offs_t offset)
 {
 	uint16_t temp = m_dsp->dataram_r(offset/2);
 	uint16_t res;
@@ -372,7 +372,7 @@ READ16_MEMBER(ssv_state::dsp_r)
 	return res;
 }
 
-WRITE16_MEMBER(ssv_state::dsp_w)
+void ssv_state::dsp_w(offs_t offset, uint16_t data)
 {
 	uint16_t temp = m_dsp->dataram_r(offset/2);
 
@@ -399,7 +399,7 @@ WRITE16_MEMBER(ssv_state::dsp_w)
 ***************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
+uint16_t ssv_state::fake_r(offs_t offset){   return ssv_scroll[offset];  }
 #endif
 
 void ssv_state::ssv_map(address_map &map, u32 rom)
@@ -428,7 +428,7 @@ void ssv_state::ssv_map(address_map &map, u32 rom)
                                 Drift Out '94
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::drifto94_unknown_r)
+uint16_t ssv_state::drifto94_unknown_r()
 {
 	return machine().rand() & 0xffff;
 }
@@ -452,12 +452,12 @@ void ssv_state::drifto94_map(address_map &map)
                      Mobil Suit Gundam Final Shooting
 ***************************************************************************/
 
-READ16_MEMBER(gdfs_state::eeprom_r)
+uint16_t gdfs_state::eeprom_r()
 {
 	return m_adc->data_r() | (m_eeprom->do_read() << 8);
 }
 
-WRITE16_MEMBER(gdfs_state::eeprom_w)
+void gdfs_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x7b00)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -509,7 +509,7 @@ void gdfs_state::gdfs_map(address_map &map)
     ROM board, AFAIK)
 */
 
-READ16_MEMBER(ssv_state::hypreact_input_r)
+uint16_t ssv_state::hypreact_input_r()
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -603,12 +603,12 @@ void ssv_state::meosism_map(address_map &map)
 
 /* Monster Slider needs the RAM mirrored for the gameplay logic to work correctly */
 
-READ16_MEMBER(ssv_state::mainram_r)
+uint16_t ssv_state::mainram_r(offs_t offset)
 {
 	return m_mainram[offset];
 }
 
-WRITE16_MEMBER(ssv_state::mainram_w)
+void ssv_state::mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 }
@@ -639,7 +639,7 @@ void ssv_state::ryorioh_map(address_map &map)
                             Super Real Mahjong PIV
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::srmp4_input_r)
+uint16_t ssv_state::srmp4_input_r()
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -670,12 +670,12 @@ void ssv_state::srmp4_map(address_map &map)
     Interrupts aren't supported by the chip emulator yet
     (lev 5 in this case, I guess)
 */
-READ16_MEMBER(ssv_state::srmp7_irqv_r)
+uint16_t ssv_state::srmp7_irqv_r()
 {
 	return 0x0080;
 }
 
-WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
+void ssv_state::srmp7_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -686,7 +686,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 //  popmessage("%04X",data);
 }
 
-READ16_MEMBER(ssv_state::srmp7_input_r)
+uint16_t ssv_state::srmp7_input_r()
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -736,7 +736,7 @@ void ssv_state::survarts_map(address_map &map)
 ***************************************************************************/
 
 
-READ16_MEMBER(sxyreact_state::ballswitch_r)
+uint16_t sxyreact_state::ballswitch_r()
 {
 	return m_io_service->read();
 }
@@ -752,7 +752,7 @@ void sxyreact_state::dial_w(uint8_t data)
 	m_sxyreact_adc->sck_w(BIT(data, 6));
 }
 
-WRITE16_MEMBER(sxyreact_state::motor_w)
+void sxyreact_state::motor_w(uint16_t data)
 {
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
@@ -811,16 +811,16 @@ void ssv_state::ultrax_map(address_map &map)
             Joryuu Syougi Kyoushitsu
 ***************************************************************************/
 
-/* from st0016.c */
+/* from simple_st0016.cpp */
 
-READ32_MEMBER(ssv_state::latch32_r)
+uint32_t ssv_state::latch32_r(offs_t offset)
 {
 	if(!offset)
 		m_latches[2]&=~2;
 	return m_latches[offset];
 }
 
-WRITE32_MEMBER(ssv_state::latch32_w)
+void ssv_state::latch32_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(!offset)
 		m_latches[2]|=1;
@@ -828,14 +828,14 @@ WRITE32_MEMBER(ssv_state::latch32_w)
 	machine().scheduler().synchronize();
 }
 
-READ16_MEMBER(ssv_state::latch16_r)
+uint16_t ssv_state::latch16_r(offs_t offset)
 {
 	if(!offset)
 		m_latches[2]&=~1;
 	return m_latches[offset];
 }
 
-WRITE16_MEMBER(ssv_state::latch16_w)
+void ssv_state::latch16_w(offs_t offset, uint16_t data)
 {
 	if(!offset)
 		m_latches[2]|=2;
@@ -4860,7 +4860,7 @@ GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     gdfs_state, init_ssv,     
 
 // Ultra X Weapon: "developed by Seta" in ending screen
 GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
-GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
+GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (Gamest review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 
 GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, init_ssv,           ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

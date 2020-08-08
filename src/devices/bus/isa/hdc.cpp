@@ -987,7 +987,7 @@ isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, co
 void isa8_hdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0320, 0x0323, read8_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_r)), write8_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_w)));
+	m_isa->install_device(0x0320, 0x0323, read8sm_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_r)), write8sm_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_w)));
 	m_isa->set_dma_channel(3, this, false);
 }
 
@@ -1009,7 +1009,7 @@ void isa8_hdc_device::device_reset()
  *      hard disk controller
  *
  *************************************************************************/
-READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
+uint8_t isa8_hdc_device::pc_hdc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1027,7 +1027,7 @@ READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_hdc_device::pc_hdc_w )
+void isa8_hdc_device::pc_hdc_w(offs_t offset, uint8_t data)
 {
 	if (LOG_HDC_CALL)
 		logerror("%s pc_hdc_w(): offs=%d data=0x%02x\n", machine().describe_context(), offset, data);

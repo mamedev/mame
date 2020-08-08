@@ -103,11 +103,11 @@ inline bool check_mem_write_stall() {
 }
 
 
-DECLARE_READ16_MEMBER ( mear_r );       //!< memory error address register read
-DECLARE_READ16_MEMBER ( mesr_r );       //!< memory error status register read
-DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write (clear)
-DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
-DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
+uint16_t mear_r();           //!< memory error address register read
+uint16_t mesr_r();           //!< memory error status register read
+void mesr_w(uint16_t data);  //!< memory error status register write (clear)
+uint16_t mecr_r();           //!< memory error control register read
+void mecr_w(uint16_t data);  //!< memory error control register write
 
 //! Read or write a memory double-word and calculate or compare its Hamming code.
 uint32_t hamming_code(bool write, uint32_t dw_addr, uint32_t dw_data);

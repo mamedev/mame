@@ -103,17 +103,17 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( dart_r );
-	DECLARE_WRITE8_MEMBER( dart_w );
-	DECLARE_READ8_MEMBER( scc_r );
-	DECLARE_WRITE8_MEMBER( scc_w );
-	DECLARE_READ8_MEMBER( cio_r );
-	DECLARE_WRITE8_MEMBER( cio_w );
-	DECLARE_WRITE8_MEMBER( fw0_w );
-	DECLARE_WRITE8_MEMBER( fw1_w );
-	DECLARE_WRITE8_MEMBER( spec_contr_reg_w );
+	uint8_t bus_r(offs_t offset);
+	void bus_w(offs_t offset, uint8_t data);
+	uint8_t dart_r(offs_t offset);
+	void dart_w(offs_t offset, uint8_t data);
+	uint8_t scc_r(offs_t offset);
+	void scc_w(offs_t offset, uint8_t data);
+	uint8_t cio_r(offs_t offset);
+	void cio_w(offs_t offset, uint8_t data);
+	void fw0_w(uint8_t data);
+	void fw1_w(uint8_t data);
+	void spec_contr_reg_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
 

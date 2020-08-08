@@ -4,6 +4,7 @@
 #include "ppreprocessor.h"
 #include "palloc.h"
 #include "pstonum.h"
+#include "pstrutil.h"
 #include "putil.h"
 
 namespace plib {
@@ -16,6 +17,8 @@ namespace plib {
 	: std::istream(new readbuffer(this))
 	, m_sources(sources)
 	, m_if_flag(0)
+	, m_if_seen(0)
+	, m_elif(0)
 	, m_if_level(0)
 	, m_pos(0)
 	, m_state(PROCESS)
@@ -196,7 +199,14 @@ namespace plib {
 			CHECKTOK2(||, 15)
 			else
 			{
-				val = plib::pstonum<decltype(val)>(tok);
+				try
+				{
+					val = plib::pstonum<decltype(val)>(tok);
+				}
+				catch (pexception &e)
+				{
+					sexpr.error(e.text());
+				}
 				has_val = true;
 				sexpr.next();
 			}
@@ -459,45 +469,78 @@ namespace plib {
 			if (lti[0] == "#if")
 			{
 				m_if_level++;
-				lt = replace_macros(lt);
-				simple_iter<ppreprocessor> t(this, tokenize(lt.substr(3), m_expr_sep, true, true));
-				auto val = static_cast<int>(prepro_expr(t, 255));
-				t.skip_ws();
-				if (!t.eod())
-					error("found unprocessed content at end of line");
-				if (val == 0)
-					m_if_flag |= (1 << m_if_level);
+				m_if_seen |= (1 << m_if_level);
+				if (m_if_flag == 0)
+				{
+					lt = replace_macros(lt);
+					simple_iter<ppreprocessor> t(this, tokenize(lt.substr(3), m_expr_sep, true, true));
+					auto val = narrow_cast<int>(prepro_expr(t, 255));
+					t.skip_ws();
+					if (!t.eod())
+						error("found unprocessed content at end of line");
+					if (val == 0)
+						m_if_flag |= (1 << m_if_level);
+					else
+						m_elif |= (1 << m_if_level);
+				}
 			}
 			else if (lti[0] == "#ifdef")
 			{
 				m_if_level++;
+				m_if_seen |= (1 << m_if_level);
 				if (get_define(lti[1]) == nullptr)
 					m_if_flag |= (1 << m_if_level);
+				else
+					m_elif |= (1 << m_if_level);
 			}
 			else if (lti[0] == "#ifndef")
 			{
 				m_if_level++;
+				m_if_seen |= (1 << m_if_level);
 				if (get_define(lti[1]) != nullptr)
 					m_if_flag |= (1 << m_if_level);
+				else
+					m_elif |= (1 << m_if_level);
 			}
 			else if (lti[0] == "#else")
 			{
+				if (!(m_if_seen & (1 << m_if_level)))
+					error("#else without #if");
 				m_if_flag ^= (1 << m_if_level);
+				m_elif &= ~(1 << m_if_level);
 			}
 			else if (lti[0] == "#elif")
 			{
-				m_if_flag ^= (1 << m_if_level);
-				lt = replace_macros(lt);
-				simple_iter<ppreprocessor> t(this, tokenize(lt.substr(5), m_expr_sep, true, true));
-				auto val = static_cast<int>(prepro_expr(t, 255));
-				t.skip_ws();
-				if (!t.eod())
-					error("found unprocessed content at end of line");
-				if (val == 0)
+				if (!(m_if_seen & (1 << m_if_level)))
+					error("#elif without #if");
+
+				//if ((m_if_flag & (1 << m_if_level)) == 0)
+				//	m_if_flag ^= (1 << m_if_level);
+				if (m_elif & (1 << m_if_level))
 					m_if_flag |= (1 << m_if_level);
+				else
+					m_if_flag &= ~(1 << m_if_level);
+				if (m_if_flag == 0)
+				{
+					//m_if_flag ^= (1 << m_if_level);
+					lt = replace_macros(lt);
+					simple_iter<ppreprocessor> t(this, tokenize(lt.substr(5), m_expr_sep, true, true));
+					auto val = narrow_cast<int>(prepro_expr(t, 255));
+					t.skip_ws();
+					if (!t.eod())
+						error("found unprocessed content at end of line");
+					if (val == 0)
+						m_if_flag |= (1 << m_if_level);
+					else
+						m_elif |= ~(1 << m_if_level);
+				}
 			}
 			else if (lti[0] == "#endif")
 			{
+				if (!(m_if_seen & (1 << m_if_level)))
+					error("#else without #if");
+				m_if_seen &= ~(1 << m_if_level);
+				m_elif &= ~(1 << m_if_level);
 				m_if_flag &= ~(1 << m_if_level);
 				m_if_level--;
 			}
@@ -516,17 +559,17 @@ namespace plib {
 						arg = arg.substr(1, arg.length() - 2);
 						// first try local context
 						auto l(plib::util::buildpath({m_stack.back().m_local_path, arg}));
-						auto lstrm(m_sources.get_stream<>(l));
-						if (lstrm)
+						auto lstrm(m_sources.get_stream(l));
+						if (!lstrm.empty())
 						{
-							m_stack.emplace_back(input_context(std::move(lstrm), plib::util::path(l), l));
+							m_stack.emplace_back(input_context(lstrm.release_stream(), plib::util::path(l), l));
 						}
 						else
 						{
-							auto strm(m_sources.get_stream<>(arg));
-							if (strm)
+							auto strm(m_sources.get_stream(arg));
+							if (!strm.empty())
 							{
-								m_stack.emplace_back(input_context(std::move(strm), plib::util::path(arg), arg));
+								m_stack.emplace_back(input_context(strm.release_stream(), plib::util::path(arg), arg));
 							}
 							else
 								error("include not found:" + arg);
@@ -556,10 +599,10 @@ namespace plib {
 					pstring n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
-					auto prevdef = get_define(n);
+					auto *prevdef = get_define(n);
 					if (lti.size() == 2)
 					{
-						if (prevdef != nullptr && prevdef->m_replace != "")
+						if (prevdef != nullptr && !prevdef->m_replace.empty())
 							error("redefinition of " + n);
 						m_defines.insert({n, define_t(n, "")});
 					}

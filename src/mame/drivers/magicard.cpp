@@ -10,16 +10,22 @@
 
   Games running on this hardware:
 
-  * Magic Card (set 1),        Impera, 199?.
-  * Magic Card (set 2),        Impera, 199?.
-  * Magic Card (set 3),        Impera, 199?.
-  * Magic Card Export 94,      Impera, 1994.
-  * Magic Card Jackpot (4.01), Impera, 1998.
-  * Magic Lotto Export (5.03), Impera, 2001.
-  * Hot Slots (6.00),          Impera, 2002.
-  * Quingo Export (5.00),      Impera, 1999.
-  * Bel Slots Export (5.01),   Impera, 1999.
-  * Big Deal Belgien (5.04),   Impera, 2001.
+  * Magic Card (set 1),                         Impera, 199?.
+  * Magic Card (set 2),                         Impera, 199?.
+  * Magic Card (set 3),                         Impera, 199?.
+  * Magic Card Export 94,                       Impera, 1994.
+  * Magic Export (V.211A),                      Impera, 1994.
+  * Magic Card Jackpot (4.01),                  Impera, 1998.
+  * Magic Card - Wien (Sicherheitsversion 1.2), Impera, 1993.
+  * Magic Lotto Export (5.03),                  Impera, 2001.
+  * Hot Slots (6.00),                           Impera, 2002.
+  * Quingo Export (5.00),                       Impera, 1999.
+  * Bel Slots Export (5.01),                    Impera, 1999.
+  * Big Deal Belgien (5.04),                    Impera, 2001.
+  * Puzzle Me!,                                 Impera, 199?.
+  * unknown 'TE06',                             Impera, 199?.
+  * Lucky 7 (Impera),                           Impera, 199?.
+
 
 *******************************************************************************
 
@@ -431,9 +437,9 @@ private:
 	required_shared_ptr<uint16_t> m_magicram;
 	required_shared_ptr<uint16_t> m_magicramb;
 	required_shared_ptr<uint16_t> m_pcab_vregs;
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_READ16_MEMBER(philips_66470_r);
-	DECLARE_WRITE16_MEMBER(philips_66470_w);
+	uint16_t test_r();
+	uint16_t philips_66470_r(offs_t offset);
+	void philips_66470_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -713,12 +719,12 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 *      R/W Handlers      *
 *************************/
 
-READ16_MEMBER(magicard_state::test_r)
+uint16_t magicard_state::test_r()
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(magicard_state::philips_66470_r)
+uint16_t magicard_state::philips_66470_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -737,7 +743,7 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 	return m_pcab_vregs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::philips_66470_w)
+void magicard_state::philips_66470_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pcab_vregs[offset]);
 
@@ -960,7 +966,6 @@ ROM_END
   XTAL: 3x unknown frequency.
 
 */
-
 ROM_START( magicardf )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(098258c0) SHA1(5f5dfe376c980ec88e68b324ba912022091e2426) )
@@ -970,6 +975,20 @@ ROM_START( magicardf )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) // Serial EEPROM
 	ROM_LOAD("24lc02b.ic26",    0x0000, 0x0100, CRC(47c8b137) SHA1(6581e1f4ea65c833fa566c21c76dbe741af488f4) )
+ROM_END
+
+/*
+
+  Magic Card - Wien
+  Sicherheitsversion 1.2
+
+*/
+ROM_START( magicardw )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "am27c4096.bin", 0x00000, 0x80000, CRC(d9e2a4ec) SHA1(b3000ded242fa25709c90b9b2541c9d1d5cabebb) )
+
+	ROM_REGION( 0x0200, "pic16c54", 0 ) // protected
+	ROM_LOAD("pic16c54a.bin",   0x0000, 0x0200, NO_DUMP )
 ROM_END
 
 
@@ -1068,6 +1087,47 @@ ROM_START( belslots )
 	ROM_LOAD16_WORD_SWAP("bel_slots_exp_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
 ROM_END
 
+/*
+  Puzzle Me!
+  Impera.
+
+  vectors are wrong.
+*/
+ROM_START( puzzleme )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(cd3bc5a9) SHA1(682f62eba454f4f00212b2a8dabb05d6747f22fd) )
+
+	ROM_REGION( 0x0200, "pic16c54", 0 ) /* protected */
+	ROM_LOAD("pic16c54.ic29",   0x0000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_LOAD("x24c02p.ic26",    0x0000, 0x0100, CRC(bc940f53) SHA1(6b870019752ba5c446a5ad5155e4a81dfbf6e523) )
+ROM_END
+
+
+/*
+
+  Unknown TE06
+
+*/
+ROM_START( unkte06 )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "m27c4002.bin", 0x00000, 0x80000, CRC(229a504f) SHA1(8033e9b4cb55f2364bf4606375ef9ac05fc715fe) )
+
+	ROM_REGION( 0x0200, "pic16c54", 0 ) // protected
+	ROM_LOAD("pic16c54.bin",   0x0000, 0x0200, NO_DUMP )
+ROM_END
+
+/*
+  Lucky 7
+  Impera
+
+*/
+ROM_START( lucky7i )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c210.6", 0x00000, 0x20000, CRC(3a99e9f3) SHA1(b9b533378ce514662cbd85a37ee138a2df760ed4) )
+	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
+ROM_END
 
 
 /*************************
@@ -1084,16 +1144,20 @@ void magicard_state::init_magicard()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY   FULLNAME                     FLAGS
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY   FULLNAME                                     FLAGS
 
-GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 1)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 3)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicardf, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Export (V.211A)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Hot Slots (6.00)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Quingo Export (5.00)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardf, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, magicardw, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, puzzleme,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown 'TE06'",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

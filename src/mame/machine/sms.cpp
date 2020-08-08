@@ -128,7 +128,7 @@ void sms_state::sms_get_inputs()
 }
 
 
-WRITE8_MEMBER(sms_state::sms_io_control_w)
+void sms_state::sms_io_control_w(uint8_t data)
 {
 	bool latch_hcount = false;
 	uint8_t ctrl1_port_data = 0xff;
@@ -206,7 +206,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 }
 
 
-READ8_MEMBER(sms_state::sms_count_r)
+uint8_t sms_state::sms_count_r(offs_t offset)
 {
 	if (offset & 0x01)
 		return m_vdp->hcount_read();
@@ -312,7 +312,7 @@ WRITE_LINE_MEMBER(sms_state::rapid_n_csync_callback)
 }
 
 
-READ8_MEMBER(sms_state::sms_input_port_dc_r)
+uint8_t sms_state::sms_input_port_dc_r()
 {
 	if (m_is_mark_iii)
 	{
@@ -359,7 +359,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 }
 
 
-READ8_MEMBER(sms_state::sms_input_port_dd_r)
+uint8_t sms_state::sms_input_port_dd_r()
 {
 	if (m_is_mark_iii)
 	{
@@ -480,13 +480,13 @@ void sms_state::smsj_set_audio_control(uint8_t data)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_audio_control_w)
+void sms_state::smsj_audio_control_w(uint8_t data)
 {
 	smsj_set_audio_control(data);
 }
 
 
-READ8_MEMBER(sms_state::smsj_audio_control_r)
+uint8_t sms_state::smsj_audio_control_r()
 {
 	uint8_t data;
 
@@ -515,20 +515,20 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
+void sms_state::smsj_ym2413_register_port_w(uint8_t data)
 {
 	m_ym->write(0, data & 0x3f);
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
+void sms_state::smsj_ym2413_data_port_w(uint8_t data)
 {
 	//logerror("data_port_w %x %x\n", offset, data);
 	m_ym->write(1, data);
 }
 
 
-WRITE8_MEMBER(gamegear_state::gg_psg_stereo_w)
+void gamegear_state::gg_psg_stereo_w(uint8_t data)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
@@ -537,7 +537,7 @@ WRITE8_MEMBER(gamegear_state::gg_psg_stereo_w)
 }
 
 
-READ8_MEMBER(gamegear_state::gg_input_port_00_r)
+uint8_t gamegear_state::gg_input_port_00_r()
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
@@ -557,7 +557,7 @@ READ8_MEMBER(gamegear_state::gg_input_port_00_r)
 }
 
 
-READ8_MEMBER(sms1_state::sscope_r)
+uint8_t sms1_state::sscope_r(offs_t offset)
 {
 	int sscope = m_port_scope->read();
 
@@ -570,13 +570,13 @@ READ8_MEMBER(sms1_state::sscope_r)
 		return m_sscope_state;
 	}
 
-	return read_ram(space, 0x3ff8 + offset);
+	return read_ram(0x3ff8 + offset);
 }
 
 
-WRITE8_MEMBER(sms1_state::sscope_w)
+void sms1_state::sscope_w(offs_t offset, uint8_t data)
 {
-	write_ram(space, 0x3ff8 + offset, data);
+	write_ram(0x3ff8 + offset, data);
 
 	int sscope = m_port_scope->read();
 
@@ -599,18 +599,18 @@ WRITE8_MEMBER(sms1_state::sscope_w)
 }
 
 
-READ8_MEMBER(sms_state::read_ram)
+uint8_t sms_state::read_ram(offs_t offset)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
 		uint8_t data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_ram(space, offset);
+			data &= m_cartslot->read_ram(offset);
 		if (m_mem_device_enabled & ENABLE_CARD)
-			data &= m_cardslot->read_ram(space, offset);
+			data &= m_cardslot->read_ram(offset);
 		if (m_mem_device_enabled & ENABLE_EXPANSION)
-			data &= m_smsexpslot->read_ram(space, offset);
+			data &= m_smsexpslot->read_ram(offset);
 
 		return data;
 	}
@@ -621,16 +621,16 @@ READ8_MEMBER(sms_state::read_ram)
 }
 
 
-WRITE8_MEMBER(sms_state::write_ram)
+void sms_state::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
 		if (m_mem_device_enabled & ENABLE_CART)
-			m_cartslot->write_ram(space, offset, data);
+			m_cartslot->write_ram(offset, data);
 		if (m_mem_device_enabled & ENABLE_CARD)
-			m_cardslot->write_ram(space, offset, data);
+			m_cardslot->write_ram(offset, data);
 		if (m_mem_device_enabled & ENABLE_EXPANSION)
-			m_smsexpslot->write_ram(space, offset, data);
+			m_smsexpslot->write_ram(offset, data);
 	}
 	else
 	{
@@ -639,16 +639,16 @@ WRITE8_MEMBER(sms_state::write_ram)
 }
 
 
-READ8_MEMBER(sms_state::sms_mapper_r)
+uint8_t sms_state::sms_mapper_r(offs_t offset)
 {
-	return read_ram(space, 0x3ffc + offset);
+	return read_ram(0x3ffc + offset);
 }
 
 
-WRITE8_MEMBER(sms_state::sms_mapper_w)
+void sms_state::sms_mapper_w(offs_t offset, uint8_t data)
 {
 	m_mapper[offset] = data;
-	write_ram(space, 0x3ffc + offset, data);
+	write_ram(0x3ffc + offset, data);
 
 	switch (offset)
 	{
@@ -662,15 +662,15 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 			}
 			if (m_mem_device_enabled & ENABLE_CART)    // CART ROM/RAM
 			{
-				m_cartslot->write_mapper(space, offset, data);
+				m_cartslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_CARD)    // CARD ROM/RAM
 			{
-				m_cardslot->write_mapper(space, offset, data);
+				m_cardslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_EXPANSION)    // expansion slot
 			{
-				m_smsexpslot->write_mapper(space, offset, data);
+				m_smsexpslot->write_mapper(offset, data);
 			}
 			break;
 
@@ -686,22 +686,22 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 			}
 			if (m_mem_device_enabled & ENABLE_CART)
 			{
-				m_cartslot->write_mapper(space, offset, data);
+				m_cartslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_CARD)
 			{
-				m_cardslot->write_mapper(space, offset, data);
+				m_cardslot->write_mapper(offset, data);
 			}
 			if (m_mem_device_enabled & ENABLE_EXPANSION)
 			{
-				m_smsexpslot->write_mapper(space, offset, data);
+				m_smsexpslot->write_mapper(offset, data);
 			}
 			break;
 	}
 }
 
 
-uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t base_addr, uint16_t offset)
+uint8_t sms_state::read_bus(unsigned int page, uint16_t base_addr, uint16_t offset)
 {
 	if (m_is_gamegear)
 	{
@@ -715,7 +715,7 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 		if ((m_mem_device_enabled & ENABLE_BIOS) && page == 3)
 			return m_BIOS[(m_bios_page[page] * 0x4000) + (offset & 0x3fff)];
 		if (m_mem_device_enabled & ENABLE_CART)
-			return m_cartslot->read_cart(space, base_addr + offset);
+			return m_cartslot->read_cart(base_addr + offset);
 	}
 	else if (m_mem_device_enabled != ENABLE_NONE)
 	{
@@ -728,11 +728,11 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 		if (m_mem_device_enabled & ENABLE_BIOS)
 			data &= m_BIOS[(m_bios_page[page] * 0x4000) + (offset & 0x3fff)];
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_cart(space, base_addr + offset);
+			data &= m_cartslot->read_cart(base_addr + offset);
 		if (m_mem_device_enabled & ENABLE_CARD)
-			data &= m_cardslot->read_cart(space, base_addr + offset);
+			data &= m_cardslot->read_cart(base_addr + offset);
 		if (m_mem_device_enabled & ENABLE_EXPANSION)
-			data &= m_smsexpslot->read(space, base_addr + offset);
+			data &= m_smsexpslot->read(base_addr + offset);
 
 		return data;
 	}
@@ -740,47 +740,47 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 }
 
 
-READ8_MEMBER(sms_state::read_0000)
+uint8_t sms_state::read_0000(offs_t offset)
 {
 	if (offset < 0x400)
 	{
-		return read_bus(space, 3, 0x0000, offset);
+		return read_bus(3, 0x0000, offset);
 	}
 	else
 	{
-		return read_bus(space, 0, 0x0000, offset);
+		return read_bus(0, 0x0000, offset);
 	}
 }
 
-READ8_MEMBER(sms_state::read_4000)
+uint8_t sms_state::read_4000(offs_t offset)
 {
-	return read_bus(space, 1, 0x4000, offset);
+	return read_bus(1, 0x4000, offset);
 }
 
-READ8_MEMBER(sms_state::read_8000)
+uint8_t sms_state::read_8000(offs_t offset)
 {
-	return read_bus(space, 2, 0x8000, offset);
+	return read_bus(2, 0x8000, offset);
 }
 
-WRITE8_MEMBER(sms_state::write_cart)
+void sms_state::write_cart(offs_t offset, uint8_t data)
 {
 	if (m_mem_device_enabled & ENABLE_CART)
-		m_cartslot->write_cart(space, offset, data);
+		m_cartslot->write_cart(offset, data);
 	if (m_mem_device_enabled & ENABLE_CARD)
-		m_cardslot->write_cart(space, offset, data);
+		m_cardslot->write_cart(offset, data);
 	if (m_mem_device_enabled & ENABLE_EXPANSION)
-		m_smsexpslot->write(space, offset, data);
+		m_smsexpslot->write(offset, data);
 }
 
 
-READ8_MEMBER(smssdisp_state::store_cart_peek)
+uint8_t smssdisp_state::store_cart_peek(offs_t offset)
 {
 	if (m_mem_device_enabled != ENABLE_NONE)
 	{
 		uint8_t data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_cart(space, 0x6000 + (offset & 0x1fff));
+			data &= m_cartslot->read_cart(0x6000 + (offset & 0x1fff));
 
 		return data;
 	}
@@ -790,7 +790,7 @@ READ8_MEMBER(smssdisp_state::store_cart_peek)
 	}
 }
 
-WRITE8_MEMBER(sms_state::sms_mem_control_w)
+void sms_state::sms_mem_control_w(uint8_t data)
 {
 	m_mem_ctrl_reg = data;
 
@@ -800,36 +800,36 @@ WRITE8_MEMBER(sms_state::sms_mem_control_w)
 }
 
 
-READ8_MEMBER(sms_state::sg1000m3_peripheral_r)
+uint8_t sms_state::sg1000m3_peripheral_r(offs_t offset)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
 	if (joy_ports_disabled)
 	{
-		return m_sgexpslot->read(space, offset);
+		return m_sgexpslot->read(offset);
 	}
 	else
 	{
 		if (offset & 0x01)
-			return sms_input_port_dd_r(space, offset);
+			return sms_input_port_dd_r();
 		else
-			return sms_input_port_dc_r(space, offset);
+			return sms_input_port_dc_r();
 	}
 }
 
 
-WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
+void sms_state::sg1000m3_peripheral_w(offs_t offset, uint8_t data)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
 	if (joy_ports_disabled)
 	{
-		m_sgexpslot->write(space, offset, data);
+		m_sgexpslot->write(offset, data);
 	}
 }
 
 
-WRITE8_MEMBER(gamegear_state::gg_sio_w)
+void gamegear_state::gg_sio_w(offs_t offset, uint8_t data)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
@@ -857,7 +857,7 @@ WRITE8_MEMBER(gamegear_state::gg_sio_w)
 }
 
 
-READ8_MEMBER(gamegear_state::gg_sio_r)
+uint8_t gamegear_state::gg_sio_r(offs_t offset)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
@@ -1024,7 +1024,6 @@ void sms_state::machine_start()
 	}
 
 	m_cartslot = m_slot.target();
-	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	if (m_mainram == nullptr)
 	{
@@ -1164,13 +1163,13 @@ void gamegear_state::machine_reset()
 	sms_state::machine_reset();
 }
 
-READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
+uint8_t smssdisp_state::sms_store_cart_select_r()
 {
 	return m_store_cart_selection_data;
 }
 
 
-WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
+void smssdisp_state::sms_store_cart_select_w(uint8_t data)
 {
 	store_select_cart(data);
 	m_store_cart_selection_data = data;
@@ -1208,7 +1207,7 @@ void smssdisp_state::store_select_cart(uint8_t data)
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 
-WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
+void smssdisp_state::sms_store_control_w(uint8_t data)
 {
 	int led_number = data >> 4;
 	int led_column = led_number / 4;

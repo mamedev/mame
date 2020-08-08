@@ -89,9 +89,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(cpubank_w);
-	DECLARE_WRITE8_MEMBER(coin_counters_w);
+	void fgram_w(offs_t offset, uint8_t data);
+	void cpubank_w(uint8_t data);
+	void coin_counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static rgb_t BBBGGGGGxBBRRRRR(uint32_t raw);
@@ -136,18 +136,18 @@ uint32_t onetwo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
  *
  *************************************/
 
-WRITE8_MEMBER(onetwo_state::fgram_w)
+void onetwo_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(onetwo_state::cpubank_w)
+void onetwo_state::cpubank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data);
 }
 
-WRITE8_MEMBER(onetwo_state::coin_counters_w)
+void onetwo_state::coin_counters_w(uint8_t data)
 {
 	m_watchdog->watchdog_reset();
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));

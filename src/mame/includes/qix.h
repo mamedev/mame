@@ -103,22 +103,22 @@ protected:
 	required_device<screen_device> m_screen;
 
 	pen_t m_pens[0x400];
-	DECLARE_WRITE8_MEMBER(qix_data_firq_w);
-	DECLARE_WRITE8_MEMBER(qix_data_firq_ack_w);
-	DECLARE_READ8_MEMBER(qix_data_firq_r);
-	DECLARE_READ8_MEMBER(qix_data_firq_ack_r);
-	DECLARE_WRITE8_MEMBER(qix_video_firq_w);
-	DECLARE_WRITE8_MEMBER(qix_video_firq_ack_w);
-	DECLARE_READ8_MEMBER(qix_video_firq_r);
-	DECLARE_READ8_MEMBER(qix_video_firq_ack_r);
-	DECLARE_READ8_MEMBER(qix_videoram_r);
-	DECLARE_WRITE8_MEMBER(qix_videoram_w);
-	DECLARE_WRITE8_MEMBER(slither_videoram_w);
-	DECLARE_READ8_MEMBER(qix_addresslatch_r);
-	DECLARE_WRITE8_MEMBER(qix_addresslatch_w);
-	DECLARE_WRITE8_MEMBER(slither_addresslatch_w);
-	DECLARE_WRITE8_MEMBER(qix_paletteram_w);
-	DECLARE_WRITE8_MEMBER(qix_palettebank_w);
+	void qix_data_firq_w(uint8_t data);
+	void qix_data_firq_ack_w(uint8_t data);
+	uint8_t qix_data_firq_r(address_space &space);
+	uint8_t qix_data_firq_ack_r(address_space &space);
+	void qix_video_firq_w(uint8_t data);
+	void qix_video_firq_ack_w(uint8_t data);
+	uint8_t qix_video_firq_r(address_space &space);
+	uint8_t qix_video_firq_ack_r(address_space &space);
+	uint8_t qix_videoram_r(offs_t offset);
+	void qix_videoram_w(offs_t offset, uint8_t data);
+	void slither_videoram_w(offs_t offset, uint8_t data);
+	uint8_t qix_addresslatch_r(offs_t offset);
+	void qix_addresslatch_w(offs_t offset, uint8_t data);
+	void slither_addresslatch_w(offs_t offset, uint8_t data);
+	void qix_paletteram_w(offs_t offset, uint8_t data);
+	void qix_palettebank_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
@@ -168,6 +168,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	optional_device<m68705p_device> m_mcu;
+
 private:
 	uint8_t coin_r();
 	void coin_w(uint8_t data);
@@ -177,8 +179,6 @@ private:
 	uint8_t mcu_portc_r();
 	void mcu_porta_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
-
-	required_device<m68705p_device> m_mcu;
 
 	/* machine state */
 	uint8_t  m_68705_porta_out;
@@ -194,13 +194,14 @@ public:
 	{ }
 
 	void zookeep(machine_config &config);
+	void zookeepbl(machine_config &config);
 	void video(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bankswitch_w(uint8_t data);
 
 	void main_map(address_map &map);
 	void video_map(address_map &map);

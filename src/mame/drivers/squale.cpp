@@ -98,13 +98,13 @@ public:
 	void squale(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(video_ram_read_reg1);
-	DECLARE_READ8_MEMBER(video_ram_read_reg2);
-	DECLARE_WRITE8_MEMBER(fdc_sel0_w);
-	DECLARE_READ8_MEMBER(fdc_sel0_r);
-	DECLARE_WRITE8_MEMBER(fdc_sel1_w);
-	DECLARE_READ8_MEMBER(fdc_sel1_r);
+	void ctrl_w(uint8_t data);
+	uint8_t video_ram_read_reg1();
+	uint8_t video_ram_read_reg2();
+	void fdc_sel0_w(uint8_t data);
+	uint8_t fdc_sel0_r();
+	void fdc_sel1_w(uint8_t data);
+	uint8_t fdc_sel1_r();
 	uint8_t pia_u72_porta_r();
 	uint8_t pia_u72_portb_r();
 	uint8_t pia_u75_porta_r();
@@ -159,7 +159,7 @@ private:
 * Machine control register I/O Handlers  *
 ******************************************/
 
-WRITE8_MEMBER( squale_state::ctrl_w )
+void squale_state::ctrl_w(uint8_t data)
 {
 	#ifdef DBGMODE
 	printf("write ctrl reg : 0x%X\n",data);
@@ -170,7 +170,7 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 	m_ef9365->set_color_filler(data & 0xF);
 }
 
-READ8_MEMBER( squale_state::video_ram_read_reg1 )
+uint8_t  squale_state::video_ram_read_reg1()
 {
 	uint8_t data;
 	int p;
@@ -205,7 +205,7 @@ READ8_MEMBER( squale_state::video_ram_read_reg1 )
 	return data;
 }
 
-READ8_MEMBER( squale_state::video_ram_read_reg2 )
+uint8_t squale_state::video_ram_read_reg2()
 {
 	uint8_t data;
 	int p;
@@ -244,7 +244,7 @@ READ8_MEMBER( squale_state::video_ram_read_reg2 )
 * Floppy controller I/O Handlers  *
 ***********************************/
 
-WRITE8_MEMBER( squale_state::fdc_sel0_w )
+void squale_state::fdc_sel0_w(uint8_t data)
 {
 	floppy_image_device *floppy = 0;
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER( squale_state::fdc_sel0_w )
 	m_fdc->set_floppy(floppy);
 }
 
-WRITE8_MEMBER( squale_state::fdc_sel1_w )
+void squale_state::fdc_sel1_w(uint8_t data)
 {
 	#ifdef DBGMODE
 	printf("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context().c_str(),data);
@@ -301,7 +301,7 @@ WRITE8_MEMBER( squale_state::fdc_sel1_w )
 	fdc_sel1 = data;
 }
 
-READ8_MEMBER( squale_state::fdc_sel0_r )
+uint8_t squale_state::fdc_sel0_r()
 {
 	uint8_t data;
 
@@ -314,7 +314,7 @@ READ8_MEMBER( squale_state::fdc_sel0_r )
 	return data;
 }
 
-READ8_MEMBER( squale_state::fdc_sel1_r )
+uint8_t squale_state::fdc_sel1_r()
 {
 	uint8_t data;
 

@@ -72,7 +72,8 @@ using namespace Windows::UI::Core;
 #define FULLSCREEN_STYLE_EX             WS_EX_TOPMOST
 
 // minimum window dimension
-#define MIN_WINDOW_DIM                  200
+#define MIN_WINDOW_DIMX                 200
+#define MIN_WINDOW_DIMY                 50
 
 // custom window messages
 #define WM_USER_REDRAW                  (WM_USER + 2)
@@ -1294,8 +1295,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		case WM_GETMINMAXINFO:
 		{
 			auto *minmax = (MINMAXINFO *)lparam;
-			minmax->ptMinTrackSize.x = MIN_WINDOW_DIM;
-			minmax->ptMinTrackSize.y = MIN_WINDOW_DIM;
+			minmax->ptMinTrackSize.x = MIN_WINDOW_DIMX;
+			minmax->ptMinTrackSize.y = MIN_WINDOW_DIMY;
 			break;
 		}
 
@@ -1498,14 +1499,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// get the minimum width/height for the current layout
 	m_target->compute_minimum_size(minwidth, minheight);
 
-	// clamp against the absolute minimum
-	propwidth = std::max(propwidth, MIN_WINDOW_DIM);
-	propheight = std::max(propheight, MIN_WINDOW_DIM);
-
-	// clamp against the minimum width and height
-	propwidth = std::max(propwidth, minwidth);
-	propheight = std::max(propheight, minheight);
-
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (fullscreen())
 	{
@@ -1517,12 +1510,24 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 		maxwidth = monitor->usuable_position_size().width() - extrawidth;
 		maxheight = monitor->usuable_position_size().height() - extraheight;
 
-		// further clamp to the maximum width/height in the window
+		// clamp minimum against half of maximum to allow resizing very large targets (eg. SVG screen)
+		minwidth = std::min(minwidth, maxwidth / 2);
+		minheight = std::min(minheight, maxheight / 2);
+
+		// clamp maximum to the maximum width/height in the window
 		if (m_win_config.width != 0)
 			maxwidth = std::min(maxwidth, m_win_config.width + extrawidth);
 		if (m_win_config.height != 0)
 			maxheight = std::min(maxheight, m_win_config.height + extraheight);
 	}
+
+	// clamp against the absolute minimum
+	propwidth = std::max(propwidth, MIN_WINDOW_DIMX);
+	propheight = std::max(propheight, MIN_WINDOW_DIMY);
+
+	// clamp against the minimum width and height
+	propwidth = std::max(propwidth, minwidth);
+	propheight = std::max(propheight, minheight);
 
 	// clamp to the maximum
 	propwidth = std::min(propwidth, maxwidth);
@@ -1580,10 +1585,10 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 	m_target->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
-	if (minwidth < MIN_WINDOW_DIM)
-		minwidth = MIN_WINDOW_DIM;
-	if (minheight < MIN_WINDOW_DIM)
-		minheight = MIN_WINDOW_DIM;
+	if (minwidth < MIN_WINDOW_DIMX)
+		minwidth = MIN_WINDOW_DIMX;
+	if (minheight < MIN_WINDOW_DIMY)
+		minheight = MIN_WINDOW_DIMY;
 
 	// account for extra window stuff
 	minwidth += wnd_extra_width();
@@ -1844,7 +1849,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 		// otherwise, set a small size and maximize from there
 		else
 		{
-			SetWindowPos(platform_window(), HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
+			SetWindowPos(platform_window(), HWND_TOP, 0, 0, MIN_WINDOW_DIMX, MIN_WINDOW_DIMY, SWP_NOZORDER);
 			maximize_window();
 		}
 	}

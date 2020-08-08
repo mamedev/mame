@@ -5,6 +5,7 @@
     config.h
 
     Wrappers for handling MAME configuration files
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_CONFIG_H

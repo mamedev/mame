@@ -87,11 +87,11 @@ public:
 	void mmagic(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(ball_x_w);
-	DECLARE_WRITE8_MEMBER(ball_y_w);
-	DECLARE_WRITE8_MEMBER(color_w);
-	DECLARE_WRITE8_MEMBER(audio_w);
+	uint8_t vblank_r();
+	void ball_x_w(uint8_t data);
+	void ball_y_w(uint8_t data);
+	void color_w(uint8_t data);
+	void audio_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -181,7 +181,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER( mmagic_state::vblank_r )
+uint8_t mmagic_state::vblank_r()
 {
 	uint8_t data = 0;
 
@@ -194,17 +194,17 @@ READ8_MEMBER( mmagic_state::vblank_r )
 	return data;
 }
 
-WRITE8_MEMBER( mmagic_state::ball_x_w )
+void mmagic_state::ball_x_w(uint8_t data)
 {
 	m_ball_x = data;
 }
 
-WRITE8_MEMBER( mmagic_state::ball_y_w )
+void mmagic_state::ball_y_w(uint8_t data)
 {
 	m_ball_y = data;
 }
 
-WRITE8_MEMBER( mmagic_state::color_w )
+void mmagic_state::color_w(uint8_t data)
 {
 	// bit 3 is always set
 	// bit 6 switches the palette (actually there is only a single differently colored tile)
@@ -272,7 +272,7 @@ static const char *const mmagic_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER( mmagic_state::audio_w )
+void mmagic_state::audio_w(uint8_t data)
 {
 	if (LOG_AUDIO)
 		logerror("audio_w: %02x\n", data);

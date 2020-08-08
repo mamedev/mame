@@ -51,7 +51,7 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL(21'477'272)     /* Dumper notes poorly refers to a 21.?727 Xtal. */
+#define MASTER_CLOCK        XTAL(21'477'272)     // Dumper notes poorly refers to a 21.?727 Xtal.
 
 
 #include "emu.h"
@@ -136,11 +136,11 @@ void big10_state::main_map(address_map &map)
 void big10_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         /* present in test mode */
-	map(0x02, 0x02).portr("SYSTEM"); /* coins and service */
+	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         // present in test mode
+	map(0x02, 0x02).portr("SYSTEM"); // coins and service
 	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r)); /* Dip-Switches routes here. */
+	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r)); // Dip-Switches routes here.
 }
 
 
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( big10 )
 	PORT_DIPSETTING(    0x80, "x5" )
 	PORT_DIPSETTING(    0xC0, "x10" )
 
-	/* Unconnected, probably missing from the board */
+	// Unconnected, probably missing from the board
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -231,23 +231,23 @@ INPUT_PORTS_END
 
 void big10_state::big10(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* guess */
+	// basic machine hardware
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &big10_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &big10_state::main_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &aysnd(YM2149(config, "aysnd", MASTER_CLOCK/12));    /* guess */
+	ym2149_device &aysnd(YM2149(config, "aysnd", MASTER_CLOCK/12));    // guess
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.port_a_write_callback().set(FUNC(big10_state::mux_w));
@@ -273,5 +273,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT      COMPANY     FULLNAME   FLAGS  */
-GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",   0 )
+/*    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",  MACHINE_SUPPORTS_SAVE )

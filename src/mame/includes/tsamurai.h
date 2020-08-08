@@ -39,38 +39,38 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(textbank1_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
+	void fg_videoram_w(offs_t offset, uint8_t data);
 
 	// tsamurai and m660 specific
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(fg_colorram_w);
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void fg_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(scrollx_w);
-	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	DECLARE_READ8_MEMBER(unknown_d806_r);
-	DECLARE_READ8_MEMBER(unknown_d900_r);
-	DECLARE_READ8_MEMBER(unknown_d938_r);
-	DECLARE_WRITE8_MEMBER(sound_command1_w);
-	DECLARE_WRITE8_MEMBER(sound_command2_w);
-	DECLARE_READ8_MEMBER(sound_command1_r);
-	DECLARE_READ8_MEMBER(sound_command2_r);
+	void scrolly_w(uint8_t data);
+	void scrollx_w(uint8_t data);
+	void bgcolor_w(uint8_t data);
+	uint8_t unknown_d806_r();
+	uint8_t unknown_d900_r();
+	uint8_t unknown_d938_r();
+	void sound_command1_w(uint8_t data);
+	void sound_command2_w(uint8_t data);
+	uint8_t sound_command1_r();
+	uint8_t sound_command2_r();
 
 	// tsamurai specific
-	DECLARE_READ8_MEMBER(tsamurai_unknown_d803_r);
+	uint8_t tsamurai_unknown_d803_r();
 
 	// m660 specific
 	DECLARE_WRITE_LINE_MEMBER(textbank2_w);
-	DECLARE_READ8_MEMBER(m660_unknown_d803_r);
-	DECLARE_WRITE8_MEMBER(m660_sound_command3_w);
-	DECLARE_READ8_MEMBER(m660_sound_command3_r);
+	uint8_t m660_unknown_d803_r();
+	void m660_sound_command3_w(uint8_t data);
+	uint8_t m660_sound_command3_r();
 
 	// vsgongf specific
-	DECLARE_WRITE8_MEMBER(vsgongf_color_w);
-	DECLARE_WRITE8_MEMBER(vsgongf_sound_nmi_enable_w);
-	DECLARE_READ8_MEMBER(vsgongf_a006_r);
-	DECLARE_READ8_MEMBER(vsgongf_a100_r);
-	DECLARE_WRITE8_MEMBER(vsgongf_sound_command_w);
+	void vsgongf_color_w(uint8_t data);
+	void vsgongf_sound_nmi_enable_w(uint8_t data);
+	uint8_t vsgongf_a006_r();
+	uint8_t vsgongf_a100_r();
+	void vsgongf_sound_command_w(uint8_t data);
 
 	DECLARE_MACHINE_START(m660);
 	DECLARE_MACHINE_START(tsamurai);

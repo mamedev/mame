@@ -34,6 +34,9 @@ public:
 	/* validates a parameter as a cpu and retrieves the given address space */
 	bool validate_cpu_space_parameter(const char *param, int spacenum, address_space *&result);
 
+	/* validates a parameter as a memory region name and retrieves the given region */
+	bool validate_memory_region_parameter(const std::string &param, memory_region *&result);
+
 private:
 	struct global_entry
 	{
@@ -139,7 +142,9 @@ private:
 	void execute_stateload(int ref, const std::vector<std::string> &params);
 	void execute_rewind(int ref, const std::vector<std::string> &params);
 	void execute_save(int ref, const std::vector<std::string> &params);
+	void execute_saveregion(int ref, const std::vector<std::string> &params);
 	void execute_load(int ref, const std::vector<std::string> &params);
+	void execute_loadregion(int ref, const std::vector<std::string> &params);
 	void execute_dump(int ref, const std::vector<std::string> &params);
 	void execute_cheatinit(int ref, const std::vector<std::string> &params);
 	void execute_cheatnext(int ref, const std::vector<std::string> &params);
@@ -147,6 +152,7 @@ private:
 	void execute_cheatundo(int ref, const std::vector<std::string> &params);
 	void execute_dasm(int ref, const std::vector<std::string> &params);
 	void execute_find(int ref, const std::vector<std::string> &params);
+	void execute_fill(int ref, const std::vector<std::string> &params);
 	void execute_trace(int ref, const std::vector<std::string> &params);
 	void execute_traceover(int ref, const std::vector<std::string> &params);
 	void execute_traceflush(int ref, const std::vector<std::string> &params);

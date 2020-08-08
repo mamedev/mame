@@ -239,7 +239,7 @@ m68705_device::m68705_device(machine_config const &mconfig, char const *tag, dev
 {
 }
 
-template <offs_t B> READ8_MEMBER(m68705_device::eprom_r)
+template <offs_t B> u8 m68705_device::eprom_r(offs_t offset)
 {
 	if (pcr_vpon() && !pcr_ple())
 		LOGEPROM("read EPROM %04X prevented when Vpp high and /PLE = 0\n", B + offset);
@@ -248,7 +248,7 @@ template <offs_t B> READ8_MEMBER(m68705_device::eprom_r)
 	return (!pcr_vpon() || !pcr_ple()) ? m_user_rom[B + offset] : 0xff;
 }
 
-template <offs_t B> WRITE8_MEMBER(m68705_device::eprom_w)
+template <offs_t B> void m68705_device::eprom_w(offs_t offset, u8 data)
 {
 	LOGEPROM("EPROM programming latch write%s%s: %04X = %02X\n",
 			!pcr_vpon() ? " [Vpp low]" : "", !pcr_ple() ? " [disabled]" : "", B + offset, data);
@@ -281,7 +281,7 @@ template <std::size_t N> void m6805_hmos_device::set_port_mask(u8 mask)
 	m_port_mask[N] = mask;
 }
 
-template <std::size_t N> READ8_MEMBER(m6805_hmos_device::port_r)
+template <std::size_t N> u8 m6805_hmos_device::port_r()
 {
 	if (!m_port_cb_r[N].isnull())
 	{
@@ -296,7 +296,7 @@ template <std::size_t N> READ8_MEMBER(m6805_hmos_device::port_r)
 	return m_port_mask[N] | (m_port_latch[N] & m_port_ddr[N]) | (m_port_input[N] & ~m_port_ddr[N]);
 }
 
-template <std::size_t N> WRITE8_MEMBER(m6805_hmos_device::port_latch_w)
+template <std::size_t N> void m6805_hmos_device::port_latch_w(u8 data)
 {
 	data &= ~m_port_mask[N];
 	u8 const diff = m_port_latch[N] ^ data;
@@ -307,7 +307,7 @@ template <std::size_t N> WRITE8_MEMBER(m6805_hmos_device::port_latch_w)
 		port_cb_w<N>();
 }
 
-template <std::size_t N> WRITE8_MEMBER(m6805_hmos_device::port_ddr_w)
+template <std::size_t N> void m6805_hmos_device::port_ddr_w(u8 data)
 {
 	data &= ~m_port_mask[N];
 	if (data != m_port_ddr[N])
@@ -325,12 +325,12 @@ template <std::size_t N> void m6805_hmos_device::port_cb_w()
 	m_port_cb_w[N](0, data, mask);
 }
 
-READ8_MEMBER(m68705_device::pcr_r)
+u8 m68705_device::pcr_r()
 {
 	return m_pcr;
 }
 
-WRITE8_MEMBER(m68705_device::pcr_w)
+void m68705_device::pcr_w(u8 data)
 {
 	// 7  1
 	// 6  1
@@ -358,13 +358,13 @@ WRITE8_MEMBER(m68705_device::pcr_w)
 	m_pcr = (m_pcr & 0xfc) | (data & 0x03);
 }
 
-READ8_MEMBER(m6805_hmos_device::acr_r)
+u8 m6805_hmos_device::acr_r()
 {
 	logerror("unsupported read ACR\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(m6805_hmos_device::acr_w)
+void m6805_hmos_device::acr_w(u8 data)
 {
 	// 7  conversion complete
 	// 6
@@ -392,13 +392,13 @@ WRITE8_MEMBER(m6805_hmos_device::acr_w)
 	logerror("unsupported write ACR = %02X\n", data);
 }
 
-READ8_MEMBER(m6805_hmos_device::arr_r)
+u8 m6805_hmos_device::arr_r()
 {
 	logerror("unsupported read ARR\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(m6805_hmos_device::arr_w)
+void m6805_hmos_device::arr_w(u8 data)
 {
 	logerror("unsupported write ARR = %02X\n", data);
 }
@@ -463,10 +463,10 @@ void m6805_hmos_device::device_reset()
 	m6805_base_device::device_reset();
 
 	// reset digital I/O
-	port_ddr_w<0>(space(AS_PROGRAM), 0, 0x00, 0xff);
-	port_ddr_w<1>(space(AS_PROGRAM), 0, 0x00, 0xff);
-	port_ddr_w<2>(space(AS_PROGRAM), 0, 0x00, 0xff);
-	port_ddr_w<3>(space(AS_PROGRAM), 0, 0x00, 0xff);
+	port_ddr_w<0>(0x00);
+	port_ddr_w<1>(0x00);
+	port_ddr_w<2>(0x00);
+	port_ddr_w<3>(0x00);
 
 	// reset timer/counter
 	m_timer.reset();

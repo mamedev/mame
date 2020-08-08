@@ -47,12 +47,12 @@ private:
 	int m_spprombank;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(attrib_w);
+	void irq_ack_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void scrollx_hi_w(uint8_t data);
+	void scrollx_lo_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void attrib_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(background_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

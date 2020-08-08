@@ -83,17 +83,17 @@ private:
 
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
+	void spyhuntertec_paletteram_w(offs_t offset, uint8_t data);
 
 	//  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
+	void spyhuntertec_port04_w(uint8_t data);
+	void spyhuntertec_portf0_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
-	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
-	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack);
+	void spyhunt_videoram_w(offs_t offset, uint8_t data);
+	void spyhunt_alpharam_w(offs_t offset, uint8_t data);
+	void spyhunt_scroll_value_w(offs_t offset, uint8_t data);
+	void sound_irq_ack(uint8_t data);
 
 
 	void ay1_porta_w(uint8_t data);
@@ -102,8 +102,8 @@ private:
 	void ay2_porta_w(uint8_t data);
 	uint8_t ay2_porta_r();
 
-	DECLARE_READ8_MEMBER(spyhuntertec_in2_r);
-	DECLARE_READ8_MEMBER(spyhuntertec_in3_r);
+	uint8_t spyhuntertec_in2_r();
+	uint8_t spyhuntertec_in3_r();
 
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
@@ -165,7 +165,7 @@ uint8_t spyhuntertec_state::ay2_porta_r()
 	return 0x00; // not sure value matters
 }
 
-WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
+void spyhuntertec_state::spyhunt_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -173,14 +173,14 @@ WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhunt_alpharam_w)
+void spyhuntertec_state::spyhunt_alpharam_w(offs_t offset, uint8_t data)
 {
 	m_spyhunt_alpharam[offset] = data;
 	m_alpha_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhunt_scroll_value_w)
+void spyhuntertec_state::spyhunt_scroll_value_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -203,7 +203,7 @@ WRITE8_MEMBER(spyhuntertec_state::spyhunt_scroll_value_w)
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_paletteram_w)
+void spyhuntertec_state::spyhuntertec_paletteram_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
 	offset = (offset & 0x0f) | (offset & 0x60) >> 1;
@@ -345,7 +345,7 @@ uint32_t spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, b
 
 
 
-READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
+uint8_t spyhuntertec_state::spyhuntertec_in2_r()
 {
 	// it writes 04 / 14 to the sound latch (at FD00) before
 	// reading bit 6 here a minimum of 32 times.
@@ -420,7 +420,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
 
-READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
+uint8_t spyhuntertec_state::spyhuntertec_in3_r()
 {
 	uint8_t ret = ioport("IN3")->read();
 //  printf("%04x spyhuntertec_in3_r\n",m_maincpu->pc());
@@ -451,11 +451,11 @@ void spyhuntertec_state::spyhuntertec_map(address_map &map)
 	map(0xfe00, 0xffff).ram().share("spriteram2"); // actual spriteram for this hw??
 }
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_port04_w)
+void spyhuntertec_state::spyhuntertec_port04_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_portf0_w)
+void spyhuntertec_state::spyhuntertec_portf0_w(uint8_t data)
 {
 	// 0x08 on startup, then 0x03, probably CTC leftovers from the original.
 	if ((data != 0x03) && (data != 0x08)) printf("spyhuntertec_portf0_w %02x\n", data);
@@ -482,7 +482,7 @@ void spyhuntertec_state::spyhuntertec_sound_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::sound_irq_ack)
+void spyhuntertec_state::sound_irq_ack(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }

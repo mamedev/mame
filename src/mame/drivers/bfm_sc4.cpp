@@ -271,7 +271,7 @@ uint8_t sc4_state::read_input_matrix(int row)
 	return value;
 }
 
-READ16_MEMBER(sc4_state::sc4_cs1_r)
+uint16_t sc4_state::sc4_cs1_r(offs_t offset, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 
@@ -321,7 +321,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 	return 0x0000;
 }
 
-READ16_MEMBER(sc4_state::sc4_mem_r)
+uint16_t sc4_state::sc4_mem_r(offs_t offset, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
@@ -333,7 +333,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	switch ( cs )
 	{
 		case 1:
-			return sc4_cs1_r(space,offset,mem_mask);
+			return sc4_cs1_r(offset);
 
 		case 2:
 			base = 0x800000/2;
@@ -452,7 +452,7 @@ void bfm_sc45_state::machine_start()
 	m_digits.resolve();
 }
 
-WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
+void bfm_sc45_state::mux_output_w(offs_t offset, uint8_t data)
 {
 	int const off = offset<<3;
 
@@ -460,7 +460,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 		m_lamps[off+i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
+void bfm_sc45_state::mux_output2_w(offs_t offset, uint8_t data)
 {
 	int const off = offset<<3;
 
@@ -495,7 +495,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	}
 }
 
-WRITE16_MEMBER(sc4_state::sc4_mem_w)
+void sc4_state::sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
@@ -536,7 +536,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 					if (ACCESSING_BITS_0_7)
 					{   // lamps
-						mux_output_w(space, (addr & 0x01f0)>>4, data);
+						mux_output_w((addr & 0x01f0)>>4, data);
 					}
 
 				}
@@ -549,7 +549,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 					if (ACCESSING_BITS_0_7)
 					{   // lamps
-						mux_output2_w(space, (addr & 0x01f0)>>4, data);
+						mux_output2_w((addr & 0x01f0)>>4, data);
 					}
 				}
 				else
@@ -571,7 +571,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 							break;
 
 						case 0x1330:
-							bfm_sc4_reel4_w(space,0,data&0xf);
+							bfm_sc4_reel4_w(data&0xf);
 							//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
 							m_sec->data_w(~data&0x10);
 							break;
@@ -621,7 +621,7 @@ void sc4_state::sc4_map(address_map &map)
 
 
 
-READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
+uint32_t sc4_adder4_state::adder4_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	int pc = m_adder4cpu->pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
@@ -644,7 +644,7 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
+void sc4_adder4_state::adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = m_adder4cpu->pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
@@ -749,7 +749,7 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint
 	}
 }
 
-WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
+void sc4_state::bfm_sc4_reel3_w(uint8_t data)
 {
 	m_reel3_latch = data;
 
@@ -760,7 +760,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 	}
 }
 
-WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
+void sc4_state::bfm_sc4_reel4_w(uint8_t data)
 {
 	m_reel4_latch = data;
 
@@ -781,7 +781,7 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint
 
 		bfm_sc45_write_serial_vfd((data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
 
-		bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8, 0xff);
+		bfm_sc4_reel3_w((data&0x0f00)>>8);
 	}
 
 }
@@ -910,8 +910,8 @@ void sc4_state::sc4_common(machine_config &config)
 	m_duart->set_clocks(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8);
 	m_duart->irq_cb().set(FUNC(sc4_state::bfm_sc4_duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(sc4_state::bfm_sc4_duart_txa));
-	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));;
-	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));;
+	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));
+	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 

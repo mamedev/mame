@@ -58,14 +58,14 @@ private:
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(vreg_120_w);
-	DECLARE_WRITE16_MEMBER(vreg_121_w);
-	DECLARE_WRITE16_MEMBER(vreg_122_w);
-	DECLARE_WRITE16_MEMBER(vreg_123_w);
-	DECLARE_WRITE16_MEMBER(vreg_124_w);
-	DECLARE_WRITE16_MEMBER(vreg_125_w);
-	DECLARE_WRITE16_MEMBER(vreg_126_w);
-	DECLARE_WRITE16_MEMBER(vreg_127_w);
+	void vreg_120_w(uint16_t data);
+	void vreg_121_w(uint16_t data);
+	void vreg_122_w(uint16_t data);
+	void vreg_123_w(uint16_t data);
+	void vreg_124_w(uint16_t data);
+	void vreg_125_w(uint16_t data);
+	void vreg_126_w(uint16_t data);
+	void vreg_127_w(uint16_t data);
 
 	void m50458_vram(address_map &map);
 

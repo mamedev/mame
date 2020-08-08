@@ -135,12 +135,12 @@ protected:
 	virtual void update_timers(int scanline);
 	void decode_gfx(uint16_t *pflookup, uint16_t *molookup);
 	int get_bank(uint8_t prom1, uint8_t prom2, int bpp);
-	DECLARE_READ16_MEMBER( atarisy1_int3state_r );
-	DECLARE_WRITE16_MEMBER( atarisy1_spriteram_w );
+	uint16_t atarisy1_int3state_r();
+	void atarisy1_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bankselect_w(uint8_t data);
-	DECLARE_WRITE16_MEMBER( atarisy1_xscroll_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_yscroll_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
+	void atarisy1_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void atarisy1_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static const atari_motion_objects_config s_mob_config;
 	void add_adc(machine_config &config);

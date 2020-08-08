@@ -134,7 +134,7 @@ void scramble_state::sh_init()
 
 // Harem (same as scorpion)
 
-READ8_MEMBER(scramble_state::harem_digitalker_intr_r)
+uint8_t scramble_state::harem_digitalker_intr_r()
 {
 	return m_digitalker->digitalker_0_intr_r();
 }
@@ -220,7 +220,7 @@ void scramble_state::harem_digitalker_control_w(uint8_t data)
  *
  */
 
-WRITE8_MEMBER( scramble_state::ad2083_tms5110_ctrl_w )
+void scramble_state::ad2083_tms5110_ctrl_w(uint8_t data)
 {
 	static const int tbl[8] = {0,4,2,6,1,5,3,7};
 

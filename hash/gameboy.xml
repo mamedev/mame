@@ -17239,7 +17239,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pocketmj" cloneof="pokeyell">
+	<software name="pocketmj">
 		<description>Pocket Mahjong (Japan)</description>
 		<year>1997</year>
 		<publisher>Bottom Up</publisher>

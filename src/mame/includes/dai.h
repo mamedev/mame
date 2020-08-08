@@ -13,7 +13,6 @@
 #include "audio/dai_snd.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "imagedev/cassette.h"
 #include "emupal.h"
@@ -22,15 +21,17 @@
 class dai_state : public driver_device
 {
 public:
-	dai_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit(*this, "pit8253"),
-		m_tms5501(*this, "tms5501"),
-		m_sound(*this, "custom"),
-		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette")
+	dai_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit")
+		, m_tms5501(*this, "tms5501")
+		, m_sound(*this, "custom")
+		, m_cassette(*this, "cassette")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_palette(*this, "palette")
+		, m_io_keyboard(*this, "IN%u", 0U)
 	{ }
 
 	void dai(machine_config &config);
@@ -38,46 +39,45 @@ public:
 private:
 	enum
 	{
-		TIMER_BOOTSTRAP,
 		TIMER_TMS5501
 	};
 
+	u8 m_paddle_select;
+	u8 m_paddle_enable;
+	u8 m_cassette_motor[2];
+	u8 m_keyboard_scan_mask;
+	u8 m_4_colours_palette[4];
+	void stack_interrupt_circuit_w(u8 data);
+	u8 io_discrete_devices_r(offs_t offset);
+	void io_discrete_devices_w(offs_t offset, u8 data);
+	u8 amd9511_r();
+	void amd9511_w(offs_t offset, u8 data);
+	u8 pit_r(offs_t offset);
+	void pit_w(offs_t offset, u8 data);
+	u8 keyboard_r();
+	void keyboard_w(u8 data);
+	void dai_palette(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(int_ack);
+
+	void mem_map(address_map &map);
+
+	static const rgb_t s_palette[16];
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;
 	required_device<dai_sound_device> m_sound;
 	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<palette_device> m_palette;
-
-	uint8_t m_paddle_select;
-	uint8_t m_paddle_enable;
-	uint8_t m_cassette_motor[2];
-	uint8_t m_keyboard_scan_mask;
-	unsigned short m_4_colours_palette[4];
-	DECLARE_WRITE8_MEMBER(dai_stack_interrupt_circuit_w);
-	DECLARE_READ8_MEMBER(dai_io_discrete_devices_r);
-	DECLARE_WRITE8_MEMBER(dai_io_discrete_devices_w);
-	DECLARE_READ8_MEMBER(dai_amd9511_r);
-	DECLARE_WRITE8_MEMBER(dai_amd9511_w);
-	DECLARE_READ8_MEMBER(dai_pit_r);
-	DECLARE_WRITE8_MEMBER(dai_pit_w);
-	uint8_t dai_keyboard_r();
-	void dai_keyboard_w(uint8_t data);
-	void dai_palette(palette_device &palette) const;
-	uint32_t screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dai_update_memory(int dai_rom_bank);
-	IRQ_CALLBACK_MEMBER(int_ack);
-
-	void dai_io(address_map &map);
-	void dai_mem(address_map &map);
-
-	static const rgb_t s_palette[16];
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_ioport_array<9> m_io_keyboard;
 };
 
 

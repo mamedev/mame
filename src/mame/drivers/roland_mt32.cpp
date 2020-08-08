@@ -210,13 +210,13 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(so_w);
+	void bank_w(uint8_t data);
+	void so_w(uint8_t data);
 	void midi_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER(lcd_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
+	uint8_t lcd_ctrl_r();
+	void lcd_ctrl_w(uint8_t data);
+	void lcd_data_w(uint8_t data);
 	uint16_t port0_r();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
@@ -270,7 +270,7 @@ void mt32_state::machine_reset()
 	port0 = 0;
 }
 
-WRITE8_MEMBER(mt32_state::lcd_ctrl_w)
+void mt32_state::lcd_ctrl_w(uint8_t data)
 {
 	lcd->control_w(data);
 	for(int i=0; i != lcd_data_buffer_pos; i++)
@@ -278,17 +278,17 @@ WRITE8_MEMBER(mt32_state::lcd_ctrl_w)
 	lcd_data_buffer_pos = 0;
 }
 
-READ8_MEMBER(mt32_state::lcd_ctrl_r)
+uint8_t mt32_state::lcd_ctrl_r()
 {
 	return lcd->control_r();
 }
 
-WRITE8_MEMBER(mt32_state::lcd_data_w)
+void mt32_state::lcd_data_w(uint8_t data)
 {
 	lcd_data_buffer[lcd_data_buffer_pos++] = data;
 }
 
-WRITE8_MEMBER(mt32_state::bank_w)
+void mt32_state::bank_w(uint8_t data)
 {
 	membank("bank")->set_entry(data);
 }
@@ -319,7 +319,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::samples_timer_cb)
 	port0 ^= 0x10;
 }
 
-WRITE8_MEMBER(mt32_state::so_w)
+void mt32_state::so_w(uint8_t data)
 {
 	// bit 0   = led
 	// bit 1-2 = reverb program a13/a14

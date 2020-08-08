@@ -96,6 +96,7 @@ attache.cpp
 aussiebyte.cpp
 ave_arb.cpp
 avigo.cpp
+avrmax.cpp
 ax20.cpp
 b16.cpp
 b2m.cpp
@@ -103,12 +104,12 @@ babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
 basic52.cpp
+basssta.cpp
 bbc.cpp
 bbcbc.cpp
 bbl380.cpp
 bcs3.cpp
 bebox.cpp
-beehive.cpp
 bert.cpp
 besta.cpp
 beta.cpp
@@ -125,6 +126,7 @@ boss_se70.cpp
 boss_sx700.cpp
 bpmmicro.cpp
 br8641.cpp
+braiplus.cpp
 bullet.cpp
 busicom.cpp
 bw12.cpp
@@ -148,7 +150,6 @@ cbm2.cpp
 cbnt2039.cpp
 cc40.cpp
 ccs2810.cpp
-ccs300.cpp
 cd100.cpp
 cd2650.cpp
 cdc721.cpp
@@ -161,9 +162,11 @@ chaos.cpp
 chessmate.cpp
 chessmst.cpp
 cit101.cpp
+cit101xl.cpp
 cit1500.cpp
 cit220.cpp
 cking_master.cpp
+ckz80.cpp
 clcd.cpp
 clickstart.cpp
 clxvme186.cpp
@@ -184,11 +187,11 @@ comx35.cpp
 concept.cpp
 conchess.cpp
 conic_cchess2.cpp
+consola_emt.cpp
 controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
-craft.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -200,7 +203,6 @@ cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
-czk80.cpp
 d400.cpp
 d6800.cpp
 d6809.cpp
@@ -231,6 +233,7 @@ dolphunk.cpp
 dpb7000.cpp
 dps1.cpp
 dragon.cpp
+drumsta.cpp
 dsb46.cpp
 dual68.cpp
 duet16.cpp
@@ -255,6 +258,7 @@ emate.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
+emu68k.cpp
 enmirage.cpp
 ep64.cpp
 epic14e.cpp
@@ -274,6 +278,8 @@ eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
+exorciser.cpp
+exorterm.cpp
 exp85.cpp
 facit4440.cpp
 falco5220.cpp
@@ -341,6 +347,7 @@ gizmondo.cpp
 gkidabc.cpp
 glcx.cpp
 gmaster.cpp
+gnat10.cpp
 goupil.cpp
 gp2x.cpp
 gp32.cpp
@@ -417,7 +424,6 @@ instruct.cpp
 inteladv.cpp
 intellec4.cpp
 intellect02.cpp
-interact.cpp
 interpro.cpp
 intv.cpp
 ipc.cpp
@@ -457,7 +463,9 @@ k8915.cpp
 kawai_k1.cpp
 kawai_k4.cpp
 kawai_k5.cpp
+kawai_ksp10.cpp
 kawai_r100.cpp
+kawai_sx240.cpp
 kaypro.cpp
 kc.cpp
 kdt6.cpp
@@ -468,6 +476,7 @@ korgdss1.cpp
 korgdvp1.cpp
 korgdw8k.cpp
 korgm1.cpp
+korgws.cpp
 korgz3.cpp
 kramermc.cpp
 krokha.cpp
@@ -485,10 +494,14 @@ leapster.cpp
 learnwin.cpp
 lee1214.cpp
 lft.cpp
+lft_chiptune.cpp
+lft_craft.cpp
+lft_phasor.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp
-llc.cpp
+llc1.cpp
+llc2.cpp
 lms46.cpp
 lola8a.cpp
 lviv.cpp
@@ -527,6 +540,7 @@ mekd2.cpp
 mekd3.cpp
 mekd4.cpp
 mekd5.cpp
+mephisto_academy.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
@@ -545,8 +559,10 @@ mfabfz.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
+microb.cpp
 microdec.cpp
 microkit.cpp
+microkorg.cpp
 micromon.cpp
 micronic.cpp
 microtan.cpp
@@ -577,6 +593,7 @@ mmd2.cpp
 mod8.cpp
 modellot.cpp
 molecular.cpp
+monkey_king_3b.cpp
 monon_color.cpp
 monty.cpp
 mpc3000.cpp
@@ -624,6 +641,7 @@ nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
+news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
 next.cpp
@@ -635,6 +653,7 @@ notetaker.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
+novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
@@ -805,11 +824,13 @@ rzone.cpp
 sacstate.cpp
 sag.cpp
 sage2.cpp
+saitek_ccompan.cpp
 saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_exchess.cpp
+saitek_intchess.cpp
 saitek_leonardo.cpp
 saitek_mark5.cpp
 saitek_minichess.cpp
@@ -994,7 +1015,6 @@ ts802.cpp
 ts803.cpp
 ts816.cpp
 tsispch.cpp
-tti.cpp
 tulip1.cpp
 tutor.cpp
 tv910.cpp
@@ -1010,6 +1030,7 @@ tvgame.cpp
 tx0.cpp
 uchroma68.cpp
 uknc.cpp
+ultim809.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp
@@ -1080,10 +1101,14 @@ x1.cpp
 x1twin.cpp
 x68k.cpp
 xavix.cpp
+xavix_2000.cpp
+xavix_2002.cpp
 xavix2.cpp
+xbase09.cpp
 xbox.cpp
 xerox820.cpp
 xor100.cpp
+ymdx11.cpp
 ymmu100.cpp
 ymmu50.cpp
 ymmu80.cpp

@@ -115,7 +115,7 @@ void naughtyb_state::video_start()
 
 
 
-WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
+void naughtyb_state::naughtyb_videoreg_w(uint8_t data)
 {
 	// bits 4+5 control the sound circuit
 	m_naughtyb_custom->control_c_w(data);
@@ -127,7 +127,7 @@ WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
 	m_bankreg = (data >> 2) & 0x01;         // banksel is just bit 2
 }
 
-WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
+void naughtyb_state::popflame_videoreg_w(uint8_t data)
 {
 	// bits 4+5 control the sound circuit
 	m_popflame_custom->control_c_w(data);

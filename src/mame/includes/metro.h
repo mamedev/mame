@@ -108,38 +108,38 @@ private:
 
 	u8 irq_cause_r(offs_t offset);
 	void irq_cause_w(offs_t offset, u8 data);
-	uint8_t irq_vector_r(offs_t offset);
-	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
+	u8 irq_vector_r(offs_t offset);
+	void mouja_irq_timer_ctrl_w(uint16_t data);
+	void sound_data_w(u8 data);
 	TIMER_CALLBACK_MEMBER(sound_data_sync);
-	DECLARE_READ8_MEMBER(soundstatus_r);
-	DECLARE_WRITE8_MEMBER(soundstatus_w);
-	template<int Mask> void upd7810_rombank_w(uint8_t data);
-	uint8_t upd7810_porta_r();
-	void upd7810_porta_w(uint8_t data);
-	void upd7810_portb_w(uint8_t data);
-	void daitorid_portb_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(coin_lockout_1word_w);
-	DECLARE_WRITE16_MEMBER(coin_lockout_4words_w);
-	DECLARE_READ16_MEMBER(balcube_dsw_r);
-	DECLARE_READ16_MEMBER(gakusai_input_r);
-	DECLARE_WRITE8_MEMBER(blzntrnd_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(puzzlet_irq_enable_w);
+	u8 soundstatus_r();
+	void soundstatus_w(u8 data);
+	template<int Mask> void upd7810_rombank_w(u8 data);
+	u8 upd7810_porta_r();
+	void upd7810_porta_w(u8 data);
+	void upd7810_portb_w(u8 data);
+	void daitorid_portb_w(u8 data);
+	void coin_lockout_1word_w(u8 data);
+	void coin_lockout_4words_w(offs_t offset, uint16_t data);
+	uint16_t balcube_dsw_r(offs_t offset);
+	uint16_t gakusai_input_r();
+	void blzntrnd_sh_bankswitch_w(u8 data);
+	void puzzlet_irq_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void puzzlet_portb_w(uint16_t data);
-	DECLARE_WRITE16_MEMBER(k053936_w);
-	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_hi_w);
-	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_lo_w);
-	DECLARE_READ8_MEMBER(gakusai_eeprom_r);
-	DECLARE_WRITE8_MEMBER(gakusai_eeprom_w);
-	DECLARE_READ8_MEMBER(dokyusp_eeprom_r);
-	DECLARE_WRITE8_MEMBER(dokyusp_eeprom_bit_w);
-	DECLARE_WRITE8_MEMBER(dokyusp_eeprom_reset_w);
-	DECLARE_WRITE8_MEMBER(mouja_sound_rombank_w);
+	void k053936_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gakusai_oki_bank_hi_w(u8 data);
+	void gakusai_oki_bank_lo_w(u8 data);
+	u8 gakusai_eeprom_r();
+	void gakusai_eeprom_w(u8 data);
+	u8 dokyusp_eeprom_r();
+	void dokyusp_eeprom_bit_w(u8 data);
+	void dokyusp_eeprom_reset_w(u8 data);
+	void mouja_sound_rombank_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 
 	// vmetal
-	DECLARE_WRITE8_MEMBER(vmetal_control_w);
-	DECLARE_WRITE8_MEMBER(es8712_reset_w);
+	void vmetal_control_w(u8 data);
+	void es8712_reset_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(vmetal_es8712_irq);
 
 	TILE_GET_INFO_MEMBER(k053936_get_tile_info);
@@ -223,12 +223,12 @@ private:
 	int         m_vblank_bit;
 	int         m_blitter_bit;
 	int         m_irq_line;
-	uint8_t     m_requested_int[8];
+	u8     m_requested_int[8];
 	emu_timer   *m_mouja_irq_timer;
 	emu_timer   *m_karatour_irq_timer;
 
 	/* sound related */
-	uint8_t     m_sound_data;
+	u8     m_sound_data;
 	uint16_t      m_soundstatus;
 	int         m_porta;
 	int         m_portb;

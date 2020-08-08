@@ -435,46 +435,46 @@ void epson_ex800_device::portc_w(uint8_t data)
 
 /* Memory mapped I/O access */
 
-READ8_MEMBER(epson_ex800_device::devsel_r)
+uint8_t epson_ex800_device::devsel_r(offs_t offset)
 {
 	logerror("DEVSEL R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::devsel_w)
+void epson_ex800_device::devsel_w(offs_t offset, uint8_t data)
 {
 	logerror("DEVSEL W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
-READ8_MEMBER(epson_ex800_device::gate5a_r)
+uint8_t epson_ex800_device::gate5a_r(offs_t offset)
 {
 	logerror("GATE5A R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::gate5a_w)
+void epson_ex800_device::gate5a_w(offs_t offset, uint8_t data)
 {
 	logerror("GATE5A W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
-READ8_MEMBER(epson_ex800_device::iosel_r)
+uint8_t epson_ex800_device::iosel_r(offs_t offset)
 {
 	logerror("IOSEL R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::iosel_w)
+void epson_ex800_device::iosel_w(offs_t offset, uint8_t data)
 {
 	logerror("IOSEL W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }
 
-READ8_MEMBER(epson_ex800_device::gate7a_r)
+uint8_t epson_ex800_device::gate7a_r(offs_t offset)
 {
 	logerror("GATE7A R %s with offset %x\n", machine().describe_context(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_device::gate7a_w)
+void epson_ex800_device::gate7a_w(offs_t offset, uint8_t data)
 {
 	logerror("GATE7A W %x %s with offset %x\n", data, machine().describe_context(), offset);
 }

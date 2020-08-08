@@ -24,24 +24,26 @@ public:
 	void init_topshoot();
 	void init_puckpkmn();
 	void init_hshavoc();
+	void init_barek2();
 	void init_barek3();
 	void init_sonic2mb();
 	void init_twinktmb();
 	void init_jparkmb();
 
 private:
-	DECLARE_WRITE16_MEMBER(bl_710000_w);
-	DECLARE_READ16_MEMBER(bl_710000_r);
-	DECLARE_WRITE16_MEMBER(aladmdb_w);
-	DECLARE_READ16_MEMBER(aladmdb_r);
-	DECLARE_READ16_MEMBER(jparkmb_r);
-	DECLARE_READ16_MEMBER(twinktmb_r);
-	DECLARE_READ16_MEMBER(mk3mdb_dsw_r);
-	DECLARE_READ16_MEMBER(ssf2mdb_dsw_r);
-	DECLARE_READ16_MEMBER(srmdb_dsw_r);
-	DECLARE_READ16_MEMBER(topshoot_200051_r);
-	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
-	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
+	void bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t bl_710000_r();
+	void aladmdb_w(uint16_t data);
+	uint16_t aladmdb_r();
+	uint16_t barek2mb_r();
+	uint16_t jparkmb_r();
+	uint16_t twinktmb_r();
+	uint16_t mk3mdb_dsw_r(offs_t offset);
+	uint16_t ssf2mdb_dsw_r(offs_t offset);
+	uint16_t srmdb_dsw_r(offs_t offset);
+	uint16_t topshoot_200051_r();
+	uint16_t puckpkmna_70001c_r();
+	uint16_t puckpkmna_4b2476_r();
 
 	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
 	DECLARE_MACHINE_START(md_6button);

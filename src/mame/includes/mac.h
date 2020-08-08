@@ -23,7 +23,6 @@
 #include "machine/applefdc.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
-#include "machine/mackbd.h"
 #include "machine/macrtc.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
@@ -35,10 +34,6 @@
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
-#define MACKBD_TAG "mackbd"
-
-// uncomment to run i8021 keyboard in original Mac/512(e)/Plus
-//#define MAC_USE_EMULATED_KBD (1)
 
 // model helpers
 #define ADB_IS_BITBANG  ((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
@@ -81,7 +76,6 @@ public:
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_fdc(*this, "fdc"),
-		m_mackbd(*this, MACKBD_TAG),
 		m_rtc(*this, "rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
@@ -100,7 +94,6 @@ public:
 	{
 	}
 
-	void add_mackbd(machine_config &config);
 	void add_scsi(machine_config &config, bool cdrom = false);
 	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
 	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
@@ -265,7 +258,6 @@ private:
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
 	required_device<applefdc_base_device> m_fdc;
-	optional_device<mackbd_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -303,29 +295,11 @@ private:
 
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
-	DECLARE_READ32_MEMBER(rom_switch_r);
+	uint32_t rom_switch_r(offs_t offset);
 
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
-
-#ifndef MAC_USE_EMULATED_KBD
-	/* used to store the reply to most keyboard commands */
-	int m_keyboard_reply;
-
-	/* Keyboard communication in progress? */
-	int m_kbd_comm;
-	int m_kbd_receive;
-	/* timer which is used to time out inquiry */
-	emu_timer *m_inquiry_timeout;
-
-	int m_kbd_shift_reg;
-	int m_kbd_shift_count;
-
-	/* keycode buffer (used for keypad/arrow key transition) */
-	int m_keycode_buf[2];
-	int m_keycode_buf_index;
-#endif
 
 	/* keyboard matrix to detect transition - macadb needs to stop relying on this */
 	int m_key_matrix[7];
@@ -399,64 +373,64 @@ private:
 	void set_adb_line(int linestate);
 	void update_volume();
 
-	DECLARE_READ16_MEMBER ( mac_via_r );
-	DECLARE_WRITE16_MEMBER ( mac_via_w );
-	DECLARE_READ16_MEMBER ( mac_via2_r );
-	DECLARE_WRITE16_MEMBER ( mac_via2_w );
-	DECLARE_READ16_MEMBER ( mac_autovector_r );
-	DECLARE_WRITE16_MEMBER ( mac_autovector_w );
-	DECLARE_READ16_MEMBER ( mac_iwm_r );
-	DECLARE_WRITE16_MEMBER ( mac_iwm_w );
-	DECLARE_READ16_MEMBER ( mac_scc_r );
-	DECLARE_WRITE16_MEMBER ( mac_scc_w );
-	DECLARE_WRITE16_MEMBER ( mac_scc_2_w );
-	DECLARE_READ16_MEMBER ( macplus_scsi_r );
-	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
-	DECLARE_WRITE16_MEMBER ( macii_scsi_w );
-	DECLARE_READ32_MEMBER (macii_scsi_drq_r);
-	DECLARE_WRITE32_MEMBER (macii_scsi_drq_w);
+	uint16_t mac_via_r(offs_t offset);
+	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_via2_r(offs_t offset);
+	void mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_autovector_r(offs_t offset);
+	void mac_autovector_w(offs_t offset, uint16_t data);
+	uint16_t mac_iwm_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mac_scc_r(offs_t offset);
+	void mac_scc_w(offs_t offset, uint16_t data);
+	void mac_scc_2_w(offs_t offset, uint16_t data);
+	uint16_t macplus_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
+	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t macii_scsi_drq_r(offs_t offset, uint32_t mem_mask = ~0);
+	void macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER( rbv_ramdac_r );
-	DECLARE_WRITE32_MEMBER( rbv_ramdac_w );
-	DECLARE_WRITE32_MEMBER( ariel_ramdac_w );
-	DECLARE_READ8_MEMBER( mac_sonora_vctl_r );
-	DECLARE_WRITE8_MEMBER( mac_sonora_vctl_w );
-	DECLARE_READ8_MEMBER ( mac_rbv_r );
-	DECLARE_WRITE8_MEMBER ( mac_rbv_w );
+	uint32_t rbv_ramdac_r();
+	void rbv_ramdac_w(offs_t offset, uint32_t data);
+	void ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t mac_sonora_vctl_r(offs_t offset);
+	void mac_sonora_vctl_w(offs_t offset, uint8_t data);
+	uint8_t mac_rbv_r(offs_t offset);
+	void mac_rbv_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ32_MEMBER(mac_read_id);
+	uint32_t mac_read_id();
 
-	DECLARE_READ16_MEMBER(mac_config_r);
+	uint16_t mac_config_r();
 
-	DECLARE_READ32_MEMBER(biu_r);
-	DECLARE_WRITE32_MEMBER(biu_w);
-	DECLARE_READ8_MEMBER(oss_r);
-	DECLARE_WRITE8_MEMBER(oss_w);
-	DECLARE_READ32_MEMBER(buserror_r);
-	DECLARE_READ8_MEMBER(swimiop_r);
-	DECLARE_WRITE8_MEMBER(swimiop_w);
-	DECLARE_READ8_MEMBER(scciop_r);
-	DECLARE_WRITE8_MEMBER(scciop_w);
+	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t oss_r(offs_t offset);
+	void oss_w(offs_t offset, uint8_t data);
+	uint32_t buserror_r();
+	uint8_t swimiop_r(offs_t offset);
+	void swimiop_w(offs_t offset, uint8_t data);
+	uint8_t scciop_r(offs_t offset);
+	void scciop_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(hmc_r);
-	DECLARE_WRITE8_MEMBER(hmc_w);
-	DECLARE_READ8_MEMBER(amic_dma_r);
-	DECLARE_WRITE8_MEMBER(amic_dma_w);
-	DECLARE_READ8_MEMBER(pmac_diag_r);
+	uint8_t hmc_r();
+	void hmc_w(offs_t offset, uint8_t data);
+	uint8_t amic_dma_r();
+	void amic_dma_w(offs_t offset, uint8_t data);
+	uint8_t pmac_diag_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(mac_gsc_r);
-	DECLARE_WRITE8_MEMBER(mac_gsc_w);
+	uint8_t mac_gsc_r(offs_t offset);
+	void mac_gsc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(offs_t offset);
+	void mac_5396_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ32_MEMBER(dafb_r);
-	DECLARE_WRITE32_MEMBER(dafb_w);
-	DECLARE_READ32_MEMBER(dafb_dac_r);
-	DECLARE_WRITE32_MEMBER(dafb_dac_w);
+	uint32_t dafb_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dafb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dafb_dac_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(macwd_r);
-	DECLARE_WRITE32_MEMBER(macwd_w);
+	uint32_t macwd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void macwd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
@@ -555,10 +529,6 @@ private:
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
-#ifndef MAC_USE_EMULATED_KBD
-	TIMER_CALLBACK_MEMBER(kbd_clock);
-	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
-#endif
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
@@ -566,7 +536,6 @@ private:
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
 	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
 	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
-	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();
@@ -595,10 +564,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 	void dafb_recalc_ints();
 	void set_scc_waitrequest(int waitrequest);
-	int scan_keyboard();
-	void keyboard_init();
-	void kbd_shift_out(int data);
-	void keyboard_receive(int val);
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);

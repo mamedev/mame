@@ -40,8 +40,7 @@
 /// introduces numerical instability.
 ///
 
-#include "nld_matrix_solver.h"
-#include "nld_solver.h"
+#include "nld_matrix_solver_ext.h"
 #include "plib/vector_ops.h"
 
 #include <algorithm>
@@ -61,10 +60,10 @@ namespace solver
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = 100;
 
-		matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+		matrix_solver_w_t(devices::nld_solver &main_solver, const pstring &name,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
+		: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params, size)
 		, m_cnt(0)
 		{
 			this->build_mat_ptr(m_A);
@@ -79,7 +78,6 @@ namespace solver
 
 		template <typename T>
 		void LE_compute_x(T & x);
-
 
 		template <typename T1, typename T2>
 		float_ext_type &A(const T1 &r, const T2 &c) { return m_A[r][c]; }

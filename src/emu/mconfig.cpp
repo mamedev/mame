@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mconfig.c
+    mconfig.cpp
 
     Machine configuration macros and functions.
 

@@ -76,7 +76,7 @@ void rampart_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(rampart_state::latch_w)
+void rampart_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit layout in this register:
 

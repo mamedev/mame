@@ -6,7 +6,7 @@
 
     Konami 'Hornet' Hardware
     Konami, 1997-2000
-f
+
     Known games on this hardware include....
 
     Game                             (C)      Year
@@ -392,6 +392,7 @@ public:
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog1(*this, "ANALOG1"),
 		m_analog2(*this, "ANALOG2"),
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_user3_ptr(*this, "user3"),
 		m_user5_ptr(*this, "user5"),
 		m_lan_ds2401(*this, "lan_serial_id"),
@@ -431,14 +432,13 @@ private:
 	optional_device_array<voodoo_device, 2> m_voodoo;
 	required_ioport m_in0, m_in1, m_in2, m_dsw;
 	optional_ioport m_eepromout, m_analog1, m_analog2;
+	output_finder<2> m_pcb_digit;
 	optional_region_ptr<uint8_t> m_user3_ptr;
 	optional_region_ptr<uint8_t> m_user5_ptr;
 	optional_device<ds2401_device> m_lan_ds2401;
 	required_device<watchdog_timer_device> m_watchdog;
 
 	emu_timer *m_sound_irq_timer;
-	uint8_t m_led_reg0;
-	uint8_t m_led_reg1;
 	std::unique_ptr<uint8_t[]> m_jvs_sdata;
 	uint32_t m_jvs_sdata_ptr;
 	uint16_t m_gn680_latch;
@@ -470,7 +470,7 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 	double adc12138_input_callback(uint8_t input);
-	DECLARE_WRITE8_MEMBER(jamma_jvs_w);
+	void jamma_jvs_w(uint8_t data);
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
 
@@ -549,8 +549,6 @@ uint32_t hornet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	m_k037122_1->tile_draw(screen, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -560,8 +558,6 @@ uint32_t hornet_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32
 
 	m_k037122_2->tile_draw(screen, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 	return 0;
 }
 
@@ -600,6 +596,9 @@ uint8_t hornet_state::sysreg_r(offs_t offset)
 		case 4: /* I/O port 4 - DIP switches */
 			r = m_dsw->read();
 			break;
+
+		default:
+			break;
 	}
 	return r;
 }
@@ -608,12 +607,9 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0: /* LED Register 0 */
-			m_led_reg0 = data;
-			break;
-
-		case 1: /* LED Register 1 */
-			m_led_reg1 = data;
+		case 0: /* 7seg LEDs on PCB */
+		case 1:
+			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
 			break;
 
 		case 2: /* Parallel data register */
@@ -1087,6 +1083,8 @@ INPUT_PORTS_END
 
 void hornet_state::machine_start()
 {
+	m_pcb_digit.resolve();
+
 	m_jvs_sdata_ptr = 0;
 	m_jvs_sdata = make_unique_clear<uint8_t[]>(1024);
 
@@ -1096,8 +1094,6 @@ void hornet_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_workram);
 
-	save_item(NAME(m_led_reg0));
-	save_item(NAME(m_led_reg1));
 	save_pointer(NAME(m_jvs_sdata), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
@@ -1157,7 +1153,7 @@ void hornet_state::hornet(machine_config &config)
 //  PCB description at top doesn't mention any EEPROM on the base board...
 //  EEPROM_93C46_16BIT(config, "eeprom");
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
 	m_voodoo[0]->set_screen_tag("screen");
@@ -1168,10 +1164,8 @@ void hornet_state::hornet(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// Screeen size and timing is re-calculated later in voodoo card
-	screen.set_refresh_hz(60);
-	screen.set_size(64 * 8, 48 * 8);
-	screen.set_visarea(0, 64 * 8 - 1, 0, 48 * 8 - 1);
+	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
+	screen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	screen.set_screen_update(FUNC(hornet_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(65536);
@@ -1223,13 +1217,13 @@ void hornet_state::sscope(machine_config &config)
 	m_k037122_1->set_screen("lscreen");
 	m_k037122_1->set_palette("palette");
 
-	K037122(config, m_k037122_2, 0);
+	K037122(config, m_k037122_2, 0); // unknown input clock
 	m_k037122_2->set_screen("rscreen");
 	m_k037122_2->set_palette("palette");
 
 	m_voodoo[0]->set_screen_tag("lscreen");
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4, 0);
 	m_voodoo[1]->set_screen_tag("rscreen");
@@ -1242,17 +1236,13 @@ void hornet_state::sscope(machine_config &config)
 	config.device_remove("screen");
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	// Screeen size and timing is re-calculated later in voodoo card
-	lscreen.set_refresh_hz(60);
-	lscreen.set_size(512, 384);
-	lscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
+	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
+	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	lscreen.set_screen_update(FUNC(hornet_state::screen_update));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	// Screeen size and timing is re-calculated later in voodoo card
-	rscreen.set_refresh_hz(60);
-	rscreen.set_size(512, 384);
-	rscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for scope
+	// scope screen is 15khz, verified default parameter in both 037122 and voodoo, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
+	rscreen.set_raw(XTAL(64'000'000) / 4, 1017, 106, 106 + 768, 262, 17, 17 + 236);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update_rscreen));
 
 /*  ADC12138(config, m_adc12138_2, 0);
@@ -1288,7 +1278,7 @@ void hornet_state::sscope2(machine_config &config)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(hornet_state::jamma_jvs_w)
+void hornet_state::jamma_jvs_w(uint8_t data)
 {
 	if (m_jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
@@ -1429,9 +1419,8 @@ void hornet_state::jamma_jvs_cmd_exec()
 void hornet_state::init_hornet()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_gradius4()
@@ -1456,18 +1445,16 @@ void hornet_state::init_sscope()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx roms from the comm board
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 /*****************************************************************************/

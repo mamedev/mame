@@ -1,18 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, Robbbert
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
-        Intel MCS-86 System Design Kit (SDK-86)
-
-        12/05/2009 Skeleton driver by Micko
-        29/11/2009 Some fleshing out by Lord Nightmare
-        22/06/2011 Working [Robbbert]
-
-    TODO:
-    Add optional 2x 8255A port read/write logging
-
-
-
+Intel MCS-86 System Design Kit (SDK-86)
 This is an evaluation kit for the 8086 cpu.
 
 There is no speaker or storage facility in the standard kit.
@@ -20,9 +10,12 @@ There is no speaker or storage facility in the standard kit.
 Download the User Manual to get the operating procedures.
 The user manual is available from: http://www.bitsavers.org/pdf/intel/8086/9800698A_SDK-86_Users_Man_Apr79.pdf
 
+2009-05-12 Skeleton driver by Micko
+2009-11-29 Some fleshing out by Lord Nightmare
+2011-06-22 Working [Robbbert]
+
 ToDo:
-- Artwork
-- Add INTR and RESET keys
+- Add optional 2x 8255A port read/write logging
 
 ****************************************************************************/
 
@@ -35,50 +28,56 @@ ToDo:
 #include "machine/i8279.h"
 #include "sdk86.lh"
 
-#define I8251_TAG       "i8251"
-#define RS232_TAG       "rs232"
-
-
 class sdk86_state : public driver_device
 {
 public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_kbdrow(*this, "X%X", 0U)
+		, m_uart(*this, "uart")
+		, m_kdc(*this, "i8279")
+		, m_ppi1(*this, "ppi1")
+		, m_ppi2(*this, "ppi2")
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void sdk86(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	void scanlines_w(uint8_t data);
-	void digit_w(uint8_t data);
-	uint8_t kbd_r();
+	void scanlines_w(u8 data);
+	void digit_w(u8 data);
+	u8 kbd_r();
 
-	void sdk86_io(address_map &map);
-	void sdk86_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_digit;
-	virtual void machine_start() override { m_digits.resolve(); }
+	u8 m_digit;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<3> m_kbdrow;
+	required_device<i8251_device> m_uart;
+	required_device<i8279_device> m_kdc;
+	required_device<i8255_device> m_ppi1;
+	required_device<i8255_device> m_ppi2;
+	required_ioport_array<3> m_io_keyboard;
 	output_finder<8> m_digits;
 };
 
-void sdk86_state::sdk86_mem(address_map &map)
+void sdk86_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x00fff).ram(); //2K standard, or 4k (board fully populated)
-	map(0xfe000, 0xfffff).rom();
+	map(0xfe000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void sdk86_state::sdk86_io(address_map &map)
+void sdk86_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xfff0, 0xfff3).mirror(4).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0xffe8, 0xffeb).mirror(4).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
-	map(0xfff8, 0xffff).rw("port1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0xfff8, 0xffff).rw("port2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0xfff0, 0xfff3).mirror(4).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xffe8, 0xffeb).mirror(4).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
+	map(0xfff8, 0xffff).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0xfff8, 0xffff).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
 /* Input ports */
@@ -111,28 +110,55 @@ static INPUT_PORTS_START( sdk86 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("X3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, sdk86_state, nmi_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Systm Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, sdk86_state, reset_button, 0)
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(sdk86_state::nmi_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
-void sdk86_state::scanlines_w(uint8_t data)
+// Reset button connects to i8284, output of this resets all major chips
+INPUT_CHANGED_MEMBER(sdk86_state::reset_button)
+{
+	if (newval)
+	{
+		m_ppi1->reset();
+		m_ppi2->reset();
+		m_uart->reset();
+		m_kdc->reset();
+		m_maincpu->reset();
+	}
+}
+
+void sdk86_state::scanlines_w(u8 data)
 {
 	m_digit = data;
 }
 
-void sdk86_state::digit_w(uint8_t data)
+void sdk86_state::digit_w(u8 data)
 {
 	if (m_digit < 8)
 		m_digits[m_digit] = data;
 }
 
-uint8_t sdk86_state::kbd_r()
+u8 sdk86_state::kbd_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	if ((m_digit & 7) < 3)
-		data = m_kbdrow[m_digit & 7]->read();
+		data = m_io_keyboard[m_digit & 7]->read();
 
 	return data;
+}
+
+void sdk86_state::machine_start()
+{
+	m_digits.resolve();
+	save_item(NAME(m_digit));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -148,41 +174,41 @@ void sdk86_state::sdk86(machine_config &config)
 {
 	/* basic machine hardware */
 	I8086(config, m_maincpu, XTAL(14'745'600)/3); /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sdk86_state::sdk86_mem);
-	m_maincpu->set_addrmap(AS_IO, &sdk86_state::sdk86_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sdk86_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sdk86_state::io_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
-	i8251_device &i8251(I8251(config, I8251_TAG, 0));
-	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	i8251.rts_handler().set(I8251_TAG, FUNC(i8251_device::write_cts));
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
-	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(14'745'600)/3/16));
-	usart_clock.signal_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
-	usart_clock.signal_handler().append(I8251_TAG, FUNC(i8251_device::write_rxc));
+	usart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	usart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	i8279_device &kbdc(I8279(config, "i8279", 2500000));        // based on divider
-	kbdc.out_sl_callback().set(FUNC(sdk86_state::scanlines_w)); // scan SL lines
-	kbdc.out_disp_callback().set(FUNC(sdk86_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set(FUNC(sdk86_state::kbd_r));        // kbd RL lines
-	kbdc.in_shift_callback().set_constant(0);                   // Shift key
-	kbdc.in_ctrl_callback().set_constant(0);
+	I8279(config, m_kdc, 2500000);        // based on divider
+	m_kdc->out_sl_callback().set(FUNC(sdk86_state::scanlines_w)); // scan SL lines
+	m_kdc->out_disp_callback().set(FUNC(sdk86_state::digit_w));   // display A&B
+	m_kdc->in_rl_callback().set(FUNC(sdk86_state::kbd_r));        // kbd RL lines
+	m_kdc->in_shift_callback().set_constant(0);                   // Shift key
+	m_kdc->in_ctrl_callback().set_constant(0);
 
-	I8255A(config, "port1");
-	I8255A(config, "port2");
+	I8255A(config, m_ppi1);
+	I8255A(config, m_ppi2);
 }
 
 /* ROM definition */
 ROM_START( sdk86 )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
 	/* Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are
 	   interchangeable; the ones at FF000-FFFFF are the ones which start on
 	   bootup, and the other ones live at FE000-FEFFF and can be switched in by
@@ -192,16 +218,16 @@ ROM_START( sdk86 )
 	   the opposite arrangement (Serial primary). */
 	// Keypad Monitor Version 1.1 (says "- 86   1.1" on LED display at startup)
 	ROM_SYSTEM_BIOS( 0, "keypad", "Keypad Monitor" )
-	ROMX_LOAD( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
-	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROMX_LOAD( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a36", 0x0000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a37", 0x0001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a27", 0x1000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a30", 0x1001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(0) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
 	ROM_SYSTEM_BIOS( 1, "serial", "Serial Monitor" )
-	ROMX_LOAD( "0169_102042-001.a36", 0xfe000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROMX_LOAD( "0170_102043-001.a37", 0xfe001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
-	ROMX_LOAD( "0456_104531-001.a27", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a30", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a36", 0x0000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a37", 0x0001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a27", 0x1000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a30", 0x1001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 
 	/* proms:
 	 * dumped 11/21/09 through 11/29/09 by LN
@@ -221,4 +247,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS */
-COMP( 1979, sdk86, 0,      0,      sdk86,   sdk86, sdk86_state, empty_init, "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW)
+COMP( 1979, sdk86, 0,      0,      sdk86,   sdk86, sdk86_state, empty_init, "Intel",  "MCS-86 System Design Kit", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

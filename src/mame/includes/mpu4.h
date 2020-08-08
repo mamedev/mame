@@ -14,12 +14,14 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+
+#include "machine/bacta_datalogger.h"
+
 #include "emupal.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
 #define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
-
 
 #ifdef MAME_DEBUG
 #define MPU4VIDVERBOSE 1
@@ -61,7 +63,7 @@ static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x
 #define SIX_REEL_1TO8  4    // Two reels on the meter drives
 #define SIX_REEL_5TO8  5    // Like FIVE_REEL_5TO8, but with an extra reel elsewhere
 #define SEVEN_REEL     6    // Mainly club machines, significant reworking of reel hardware
-#define FLUTTERBOX     7    // Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
+#define FLUTTERBOX     7    // A fan feature using a reel mux-like setup, but not actually a reel
 
 //Lamp extension
 #define NO_EXTENDER         0 // As originally designed
@@ -74,6 +76,8 @@ static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x
 #define CARD_A          1
 #define CARD_B          2
 #define CARD_C          3
+#define SIMPLE_CARD     4
+
 
 //Hopper info
 #define TUBES               0
@@ -112,6 +116,7 @@ public:
 		, m_pia6(*this, "pia_ic6")
 		, m_pia7(*this, "pia_ic7")
 		, m_pia8(*this, "pia_ic8")
+		, m_pia_ic4ss(*this, "pia_ic4ss")
 		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
 		, m_aux1_port(*this, "AUX1")
 		, m_aux2_port(*this, "AUX2")
@@ -122,6 +127,7 @@ public:
 		, m_meters(*this, "meters")
 		, m_ym2413(*this, "ym2413")
 		, m_ay8913(*this, "ay8913")
+		, m_dataport(*this, "dataport")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
@@ -160,6 +166,7 @@ public:
 	void init_m4_led_a();
 	void init_m4_led_b();
 	void init_m4_led_c();
+	void init_m4_led_simple();
 	void init_m4_andycp10c();
 	void init_m_blsbys();
 	void init_m_oldtmr();
@@ -233,7 +240,7 @@ protected:
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
-	void led_write_latch(int latch, int data, int column);
+	void led_write_extender(int latch, int data, int column);
 	void update_meters();
 	void ic23_update();
 	void ic24_output(int data);
@@ -259,18 +266,18 @@ protected:
 		return 0;
 	}
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankset_w);
-	DECLARE_WRITE8_MEMBER(characteriser_w);
-	DECLARE_READ8_MEMBER(characteriser_r);
-	DECLARE_WRITE8_MEMBER(bwb_characteriser_w);
-	DECLARE_READ8_MEMBER(bwb_characteriser_r);
-	DECLARE_WRITE8_MEMBER(mpu4_ym2413_w);
-	DECLARE_READ8_MEMBER(mpu4_ym2413_r);
-	DECLARE_READ8_MEMBER(crystal_sound_r);
-	DECLARE_WRITE8_MEMBER(crystal_sound_w);
-	DECLARE_WRITE8_MEMBER(ic3ss_w);
+	void bankswitch_w(uint8_t data);
+	uint8_t bankswitch_r();
+	void bankset_w(uint8_t data);
+	void characteriser_w(offs_t offset, uint8_t data);
+	uint8_t characteriser_r(address_space &space, offs_t offset);
+	void bwb_characteriser_w(offs_t offset, uint8_t data);
+	uint8_t bwb_characteriser_r(offs_t offset);
+	void mpu4_ym2413_w(offs_t offset, uint8_t data);
+	uint8_t mpu4_ym2413_r(offs_t offset);
+	uint8_t crystal_sound_r();
+	void crystal_sound_w(uint8_t data);
+	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
@@ -309,6 +316,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
+	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
@@ -319,6 +328,7 @@ protected:
 	optional_device<pia6821_device> m_pia6;
 	optional_device<pia6821_device> m_pia7;
 	optional_device<pia6821_device> m_pia8;
+	optional_device<pia6821_device> m_pia_ic4ss;
 	required_ioport_array<8> m_port_mux;
 	required_ioport m_aux1_port;
 	required_ioport m_aux2_port;
@@ -329,6 +339,7 @@ protected:
 	required_device<meters_device> m_meters;
 	optional_device<ym2413_device> m_ym2413;
 	optional_device<ay8913_device> m_ay8913;
+	optional_device<bacta_datalogger_device> m_dataport;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 

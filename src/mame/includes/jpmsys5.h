@@ -53,8 +53,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE16_MEMBER(jpm_upd7759_w);
-	DECLARE_READ16_MEMBER(jpm_upd7759_r);
+	void jpm_upd7759_w(offs_t offset, uint16_t data);
+	uint16_t jpm_upd7759_r();
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia6850;
@@ -64,14 +64,14 @@ protected:
 	void jpm_sys5_common_map(address_map &map);
 
 private:
-	DECLARE_READ16_MEMBER(coins_r);
-	DECLARE_WRITE16_MEMBER(coins_w);
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_WRITE16_MEMBER(mux_w);
-	DECLARE_READ16_MEMBER(mux_r);
+	uint16_t coins_r(offs_t offset);
+	void coins_w(uint16_t data);
+	uint16_t unk_r();
+	void mux_w(offs_t offset, uint16_t data);
+	uint16_t mux_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(mux_awp_r);
-	DECLARE_READ16_MEMBER(coins_awp_r);
+	uint16_t mux_awp_r(offs_t offset);
+	uint16_t coins_awp_r(offs_t offset);
 	void sys5_draw_lamps();
 
 	void m68000_awp_map(address_map &map);
@@ -113,10 +113,10 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
-	DECLARE_WRITE16_MEMBER(sys5_tms34061_w);
-	DECLARE_READ16_MEMBER(sys5_tms34061_r);
-	DECLARE_WRITE16_MEMBER(ramdac_w);
-	DECLARE_WRITE16_MEMBER(rombank_w);
+	void sys5_tms34061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sys5_tms34061_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ramdac_w(offs_t offset, uint16_t data);
+	void rombank_w(uint16_t data);
 	uint32_t screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(touch_cb);
 

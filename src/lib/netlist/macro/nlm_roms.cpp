@@ -42,7 +42,7 @@ static NETLIST_START(PROM_82S126_DIP)
 
 	DEFPARAM(ROM, "unknown")
 	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
-	DEFPARAM(MODEL, "$(A.MODEL)")
+	DEFPARAM(MODEL, "$(@.A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
 	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 	PARAM(A.MODEL, "$(@.MODEL)")
@@ -102,7 +102,7 @@ static NETLIST_START(PROM_74S287_DIP)
 
 	DEFPARAM(ROM, "unknown")
 	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
-	DEFPARAM(MODEL, "$(A.MODEL)")
+	DEFPARAM(MODEL, "$(@.A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
 	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 	PARAM(A.MODEL, "$(@.MODEL)")
@@ -162,7 +162,7 @@ static NETLIST_START(PROM_82S123_DIP)
 
 	DEFPARAM(ROM, "unknown")
 	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
-	DEFPARAM(MODEL, "$(A.MODEL)")
+	DEFPARAM(MODEL, "$(@.A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
 	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 	PARAM(A.MODEL, "$(@.MODEL)")
@@ -184,6 +184,27 @@ static NETLIST_START(PROM_82S123_DIP)
 	ALIAS(15, A.CEQ)
 	ALIAS(16, A.VCC)
 NETLIST_END()
+
+/*
+ * nld_82S16.h
+ *
+ *  DM82S16: 256 Bit bipolar ram
+ *
+ *          +--------------+
+ *       A1 |1     ++    16| VCC
+ *       A0 |2           15| A2
+ *     CE1Q |3           14| A3
+ *     CE2Q |4   82S16   13| DIN
+ *     CE3Q |5           12| WEQ
+ *    DOUTQ |6           11| A7
+ *       A4 |7           10| A6
+ *      GND |8            9| A5
+ *          +--------------+
+ *
+ *
+ *  Naming conventions follow Signetics datasheet
+ */
+
 
 //- Identifier:  EPROM_2716_DIP
 //- Title: 2716 16K (2K x 8) UV ERASABLE PROM
@@ -233,7 +254,7 @@ static NETLIST_START(EPROM_2716_DIP)
 
 	DEFPARAM(ROM, "unknown")
 	DEFPARAM(FORCE_TRISTATE_LOGIC, 0)
-	DEFPARAM(MODEL, "$(A.MODEL)")
+	DEFPARAM(MODEL, "$(@.A.MODEL)")
 	PARAM(A.ROM, "$(@.ROM)")
 	PARAM(A.FORCE_TRISTATE_LOGIC, "$(@.FORCE_TRISTATE_LOGIC)")
 	PARAM(A.MODEL, "$(@.MODEL)")
@@ -263,6 +284,107 @@ static NETLIST_START(EPROM_2716_DIP)
 	ALIAS(24, A.VCC)
 NETLIST_END()
 
+/*  DM82S16: 256 Bit bipolar ram
+ *
+ *          +--------------+
+ *       A1 |1     ++    16| VCC
+ *       A0 |2           15| A2
+ *     CE1Q |3           14| A3
+ *     CE2Q |4   82S16   13| DIN
+ *     CE3Q |5           12| WEQ
+ *    DOUTQ |6           11| A7
+ *       A4 |7           10| A6
+ *      GND |8            9| A5
+ *          +--------------+
+ *
+ *  Naming conventions follow Signetics datasheet
+ */
+
+static NETLIST_START(TTL_82S16_DIP)
+	TTL_82S16(A)
+
+	DIPPINS(     /*        +--------------+       */
+		   A.A1, /*     A1 |1     ++    16| VCC   */ A.VCC,
+		   A.A0, /*     A0 |2           15| A2    */ A.A2,
+		 A.CE1Q, /*   CE1Q |3           14| A3    */ A.A3,
+		 A.CE2Q, /*   CE2Q |4   82S16   13| DIN   */ A.DIN,
+		 A.CE3Q, /*   CE3Q |5           12| WEQ   */ A.WEQ,
+		A.DOUTQ, /*  DOUTQ |6           11| A7    */ A.A7,
+		   A.A4, /*     A4 |7           10| A6    */ A.A6,
+		  A.GND, /*    GND |8            9| A5    */ A.A5
+			     /*        +--------------+       */
+	)
+NETLIST_END()
+
+/*  82S115: 4K-bit TTL bipolar PROM (512 x 8)
+ *
+ *          +--------------+
+ *       A3 |1     ++    24| VCC
+ *       A4 |2           23| A2
+ *       A5 |3           22| A1
+ *       A6 |4   82S115  21| A0
+ *       A7 |5           20| CE1Q
+ *       A8 |6           19| CE2
+ *       O1 |7           18| STROBE
+ *       O2 |8           17| O8
+ *       O3 |9           16| O7
+ *       O4 |10          15| O6
+ *      FE2 |11          14| O5
+ *      GND |12          13| FE1
+ *          +--------------+
+ */
+
+static NETLIST_START(PROM_82S115_DIP)
+	PROM_82S115(A)
+	NC_PIN(NC)
+
+	DIPPINS(   /*      +--------------+        */
+		 A.A3, /*   A3 |1     ++    24| VCC    */ A.VCC,
+		 A.A4, /*   A4 |2           23| A2     */ A.A2,
+		 A.A5, /*   A5 |3           22| A1     */ A.A1,
+		 A.A6, /*   A6 |4   82S115  21| A0     */ A.A0,
+		 A.A7, /*   A7 |5           20| CE1Q   */ A.CE1Q,
+		 A.A8, /*   A8 |6           19| CE2    */ A.CE2,
+		 A.O1, /*   O1 |7           18| STROBE */ A.STROBE,
+		 A.O2, /*   O2 |8           17| O8     */ A.O8,
+		 A.O3, /*   O3 |9           16| O7     */ A.O7,
+		 A.O4, /*   O4 |10          15| O6     */ A.O6,
+		 NC.I, /*  FE2 |11          14| O5     */ A.O5,
+		A.GND, /*  GND |12          13| FE1    */ NC.I
+			   /*      +--------------+        */
+	)
+NETLIST_END()
+
+/*  2102: 1024 x 1-bit Static RAM
+ *
+ *          +--------------+
+ *       A6 |1     ++    16| A7
+ *       A5 |2           15| A8
+ *      RWQ |3           14| A9
+ *       A1 |4   82S16   13| CEQ
+ *       A2 |5           12| DO
+ *       A3 |6           11| DI
+ *       A4 |7           10| VCC
+ *       A0 |8            9| GND
+ *          +--------------+
+ */
+
+ static NETLIST_START(RAM_2102A_DIP)
+	RAM_2102A(A)
+
+	DIPPINS(   /*      +--------------+      */
+		 A.A6, /*   A6 |1     ++    16| A7   */ A.A7,
+		 A.A5, /*   A5 |2           15| A8   */ A.A8,
+		A.RWQ, /*  RWQ |3           14| A9   */ A.A9,
+		 A.A1, /*   A1 |4   82S16   13| CEQ  */ A.CEQ,
+		 A.A2, /*   A2 |5           12| DO   */ A.DO,
+		 A.A3, /*   A3 |6           11| DI   */ A.DI,
+		 A.A4, /*   A4 |7           10| VCC  */ A.VCC,
+		 A.A0, /*   A0 |8            9| GND  */ A.GND
+			   /*      +--------------+      */
+	)
+NETLIST_END()
+
 
 NETLIST_START(ROMS_lib)
 
@@ -270,6 +392,9 @@ NETLIST_START(ROMS_lib)
 	LOCAL_LIB_ENTRY(PROM_82S126_DIP)
 	LOCAL_LIB_ENTRY(PROM_74S287_DIP)
 	LOCAL_LIB_ENTRY(EPROM_2716_DIP)
+	LOCAL_LIB_ENTRY(TTL_82S16_DIP)
+	LOCAL_LIB_ENTRY(PROM_82S115_DIP)
+	LOCAL_LIB_ENTRY(RAM_2102A_DIP)
 
 	NETLIST_END()
 

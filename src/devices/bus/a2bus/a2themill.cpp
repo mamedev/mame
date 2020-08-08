@@ -18,8 +18,6 @@
     ProDOS "Stellation The Mill Disk.po" requires Mill in slot 2; boot
     the disc and type "-DEMO1" and press Enter to launch the simple demo.
 
-    TODO: Add DIP switch to select standard and OS-9 modes.
-
 *********************************************************************/
 
 #include "emu.h"
@@ -43,6 +41,23 @@ void a2bus_themill_device::m6809_mem(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(a2bus_themill_device::dma_r), FUNC(a2bus_themill_device::dma_w));
 }
 
+static INPUT_PORTS_START( themill )
+	PORT_START("MILLCFG")
+	PORT_DIPNAME( 0x01, 0x01, "6809 Mapping" )
+	PORT_DIPSETTING(    0x00, "Original")
+	PORT_DIPSETTING(    0x01, "OS-9")
+INPUT_PORTS_END
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor a2bus_themill_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( themill );
+}
+
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -65,6 +80,7 @@ a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_6809(*this, "m6809")
+	, m_cfgsw(*this, "MILLCFG")
 	, m_bEnabled(false)
 	, m_flipAddrSpace(false)
 	, m_6809Mode(false)
@@ -93,7 +109,7 @@ void a2bus_themill_device::device_reset()
 {
 	m_bEnabled = false;
 	m_flipAddrSpace = false;
-	m_6809Mode = true;
+	m_6809Mode = (m_cfgsw->read() & 1) ? true : false;
 	m_status = 0xc0;    // OS9 loader relies on this
 	m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -226,7 +242,7 @@ void a2bus_themill_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( a2bus_themill_device::dma_r )
+uint8_t a2bus_themill_device::dma_r(offs_t offset)
 {
 	// MAME startup ordering has the 6809 free-running at boot, which is undesirable
 	if (!m_bEnabled)
@@ -277,7 +293,7 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( a2bus_themill_device::dma_w )
+void a2bus_themill_device::dma_w(offs_t offset, uint8_t data)
 {
 	if (m_6809Mode)
 	{

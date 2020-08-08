@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Wilbert Pol, Fabio Priuli
 /***********************************************************************************************************
 
 
@@ -54,19 +54,10 @@ void o2_rom_device::device_start()
 	save_item(NAME(m_bank_base));
 }
 
-void o2_rom_device::device_reset()
-{
-	m_bank_base = 0;
-}
 
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-void o2_rom_device::write_bank(int bank)
-{
-	m_bank_base = bank;
-}
 
 uint8_t o2_rom_device::read_rom04(offs_t offset)
 {

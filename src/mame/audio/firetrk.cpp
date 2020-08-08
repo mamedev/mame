@@ -2,7 +2,7 @@
 // copyright-holders:K.Wilkins,Derrick Renaud
 /*************************************************************************
 
-    audio\firetrk.c
+    audio\firetrk.cpp
 
 *************************************************************************/
 
@@ -11,7 +11,7 @@
 #include "sound/discrete.h"
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_skid_reset_w)
+void firetrk_state::firetrk_skid_reset_w(uint8_t data)
 {
 	m_skid[0] = 0;
 	m_skid[1] = 0;
@@ -21,27 +21,27 @@ WRITE8_MEMBER(firetrk_state::firetrk_skid_reset_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_skid_reset_w)
+void firetrk_state::montecar_skid_reset_w(uint8_t data)
 {
 	m_discrete->write(MONTECAR_SKID_EN, 1);
 }
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_crash_snd_w)
+void firetrk_state::firetrk_crash_snd_w(uint8_t data)
 {
 	// also SUPERBUG_CRASH_DATA and MONTECAR_CRASH_DATA
 	m_discrete->write(FIRETRUCK_CRASH_DATA, data >> 4);
 }
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_skid_snd_w)
+void firetrk_state::firetrk_skid_snd_w(uint8_t data)
 {
 	// also SUPERBUG_SKID_EN and MONTECAR_SKID_EN
 	m_discrete->write(FIRETRUCK_SKID_EN, 0);
 }
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_motor_snd_w)
+void firetrk_state::firetrk_motor_snd_w(uint8_t data)
 {
 	// also MONTECAR_DRONE_MOTOR_DATA
 	m_discrete->write(FIRETRUCK_SIREN_DATA, data >> 4);
@@ -51,13 +51,13 @@ WRITE8_MEMBER(firetrk_state::firetrk_motor_snd_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::superbug_motor_snd_w)
+void firetrk_state::superbug_motor_snd_w(uint8_t data)
 {
 	m_discrete->write(SUPERBUG_SPEED_DATA, data & 0x0f);
 }
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_xtndply_w)
+void firetrk_state::firetrk_xtndply_w(uint8_t data)
 {
 	// also SUPERBUG_ASR_EN (extended play)
 	m_discrete->write(FIRETRUCK_XTNDPLY_EN, data);

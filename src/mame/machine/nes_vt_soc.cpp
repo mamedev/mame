@@ -230,7 +230,7 @@ void nes_vt_soc_device::device_start()
 
 	//m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
 	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_soc_device::nt_r)), write8_delegate(*this, FUNC(nes_vt_soc_device::nt_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_vt_soc_device::nt_r)), write8sm_delegate(*this, FUNC(nes_vt_soc_device::nt_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(nes_vt_soc_device::chr_r)), write8sm_delegate(*this, FUNC(nes_vt_soc_device::chr_w)));
 
 	m_write_0_callback.resolve_safe();
@@ -347,12 +347,12 @@ uint16_t nes_vt_soc_device::decode_nt_addr(uint16_t addr)
 	return ((vert_mirror ? a10 : a11) << 10) | base;
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::vt03_410x_w)
+void nes_vt_soc_device::vt03_410x_w(offs_t offset, uint8_t data)
 {
 	scrambled_410x_w(offset, data);
 }
 
-READ8_MEMBER(nes_vt_soc_device::vt03_410x_r)
+uint8_t nes_vt_soc_device::vt03_410x_r(offs_t offset)
 {
 	return m_410x[offset];
 }
@@ -534,12 +534,12 @@ void nes_vt_soc_device::video_irq(bool hblank, int scanline, int vblank, int bla
 }
 
 /* todo, handle custom VT nametable stuff here */
-READ8_MEMBER(nes_vt_soc_device::nt_r)
+uint8_t nes_vt_soc_device::nt_r(offs_t offset)
 {
 	return m_ntram[decode_nt_addr(offset)];
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::nt_w)
+void nes_vt_soc_device::nt_w(offs_t offset, uint8_t data)
 {
 	//logerror("nt wr %04x %02x", offset, data);
 	m_ntram[decode_nt_addr(offset)] = data;
@@ -768,7 +768,7 @@ int nes_vt_soc_device::calculate_real_video_address(int addr, int extended, int 
     but then seems to be able to alter internal state of extended PPU registers, which is awkward
 */
 
-void nes_vt_soc_device::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
+void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 {
 	offset &= 0x7fff;
 
@@ -868,22 +868,22 @@ void nes_vt_soc_device::scrambled_8000_w(address_space& space, uint16_t offset, 
 		else if ((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01))
 		{
 			// IRQ latch
-			vt03_410x_w(space, 1, data);
+			vt03_410x_w(1, data);
 		}
 		else if ((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01))
 		{
 			// IRQ reload
-			vt03_410x_w(space, 2, data);
+			vt03_410x_w(2, data);
 		}
 		else if ((addr >= 0xE000) && !(addr & 0x01))
 		{
 			// IRQ disable
-			vt03_410x_w(space, 3, data);
+			vt03_410x_w(3, data);
 		}
 		else if ((addr >= 0xE000) && (addr & 0x01))
 		{
 			// IRQ enable
-			vt03_410x_w(space, 4, data);
+			vt03_410x_w(4, data);
 		}
 		else
 		{
@@ -912,37 +912,37 @@ void nes_vt_soc_device::set_410x_scramble(uint8_t reg0, uint8_t reg1)
 	m_410x_scramble[1] = reg1;
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::vt03_8000_mapper_w)
+void nes_vt_soc_device::vt03_8000_mapper_w(offs_t offset, uint8_t data)
 {
-	scrambled_8000_w(space, offset, data);
+	scrambled_8000_w(offset, data);
 	//logerror("%s: vt03_8000_mapper_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 }
 
 /* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
 
-READ8_MEMBER(nes_vt_soc_device::psg1_4014_r)
+uint8_t nes_vt_soc_device::psg1_4014_r()
 {
 	//return m_apu->read(0x14);
 	return 0x00;
 }
 
-READ8_MEMBER(nes_vt_soc_device::psg1_4015_r)
+uint8_t nes_vt_soc_device::psg1_4015_r()
 {
 	return m_apu->read(0x15);
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::psg1_4015_w)
+void nes_vt_soc_device::psg1_4015_w(uint8_t data)
 {
 	m_apu->write(0x15, data);
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::psg1_4017_w)
+void nes_vt_soc_device::psg1_4017_w(uint8_t data)
 {
 	m_apu->write(0x17, data);
 }
 
 // early units (VT03?) have a DMA bug in NTSC mode
-WRITE8_MEMBER(nes_vt_soc_device::vt_dma_w)
+void nes_vt_soc_device::vt_dma_w(uint8_t data)
 {
 	if (!m_force_baddma)
 		do_dma(data, true);
@@ -1012,28 +1012,28 @@ void nes_vt_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 }
 
 
-WRITE8_MEMBER(nes_vt_soc_device::vt03_4034_w)
+void nes_vt_soc_device::vt03_4034_w(uint8_t data)
 {
 	logerror("vt03_4034_w %02x\n", data);
 	m_vdma_ctrl = data;
 }
 
-READ8_MEMBER(nes_vt_soc_device::in0_r)
+uint8_t nes_vt_soc_device::in0_r()
 {
 	return m_read_0_callback();
 }
 
-READ8_MEMBER(nes_vt_soc_device::in1_r)
+uint8_t nes_vt_soc_device::in1_r()
 {
 	return m_read_1_callback();
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::in0_w)
+void nes_vt_soc_device::in0_w(offs_t offset, uint8_t data)
 {
 	m_write_0_callback(offset, data);
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::extra_io_control_w)
+void nes_vt_soc_device::extra_io_control_w(uint8_t data)
 {
 	/*
 	410d Extra I/O control
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(nes_vt_soc_device::extra_io_control_w)
 	logerror("%s: extra_io_control_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(nes_vt_soc_device::extrain_01_r)
+uint8_t nes_vt_soc_device::extrain_01_r()
 {
 	// TODO: check status of 410d port to make sure we only read from enabled ports
 	uint8_t in0 = 0x00, in1 = 0x00;
@@ -1062,7 +1062,7 @@ READ8_MEMBER(nes_vt_soc_device::extrain_01_r)
 	return in0 | (in1<<4);
 }
 
-READ8_MEMBER(nes_vt_soc_device::extrain_23_r)
+uint8_t nes_vt_soc_device::extrain_23_r()
 {
 	// TODO: check status of 410d port to make sure we only read from enabled ports
 	uint8_t in2 = 0x00, in3 = 0x00;
@@ -1073,19 +1073,19 @@ READ8_MEMBER(nes_vt_soc_device::extrain_23_r)
 	return in2 | (in3<<4);
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::extraout_01_w)
+void nes_vt_soc_device::extraout_01_w(uint8_t data)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
 	logerror("%s: extraout_01_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::extraout_23_w)
+void nes_vt_soc_device::extraout_23_w(uint8_t data)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
 	logerror("%s: extraout_23_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(nes_vt_soc_device::rs232flags_region_r)
+uint8_t nes_vt_soc_device::rs232flags_region_r()
 {
 	/*
 	0x4119 RS232 Flags + Region
@@ -1111,7 +1111,7 @@ READ8_MEMBER(nes_vt_soc_device::rs232flags_region_r)
 }
 
 
-READ8_MEMBER(nes_vt_soc_device::external_space_read)
+uint8_t nes_vt_soc_device::external_space_read(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	int bank = (offset & 0x6000) >> 13;
@@ -1120,7 +1120,7 @@ READ8_MEMBER(nes_vt_soc_device::external_space_read)
 	return spc.read_byte(address);
 }
 
-WRITE8_MEMBER(nes_vt_soc_device::external_space_write)
+void nes_vt_soc_device::external_space_write(offs_t offset, uint8_t data)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	int bank = (offset & 0x6000) >> 13;
@@ -1131,7 +1131,7 @@ WRITE8_MEMBER(nes_vt_soc_device::external_space_write)
 
 void nes_vt_soc_device::nes_vt_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
+	map(0x0000, 0x07ff).ram().mirror(0x1800); // zudugo relies on mirror when selecting 'game' menu
 
 	// ddrdismx relies on the mirroring
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
@@ -1321,7 +1321,7 @@ void nes_vt_soc_4kram_cy_device::device_start()
 }
 
 
-READ8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_41bx_r)
+uint8_t nes_vt_soc_4kram_cy_device::vt03_41bx_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1332,18 +1332,18 @@ READ8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_41bx_r)
 	}
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_41bx_w)
+void nes_vt_soc_4kram_cy_device::vt03_41bx_w(offs_t offset, uint8_t data)
 {
 	logerror("vt03_41bx_w %02x %02x\n", offset, data);
 }
 
-READ8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_413x_r)
+uint8_t nes_vt_soc_4kram_cy_device::vt03_413x_r(offs_t offset)
 {
 	logerror("vt03_413x_r %02x\n", offset);
 	return m_413x[offset];
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_413x_w)
+void nes_vt_soc_4kram_cy_device::vt03_413x_w(offs_t offset, uint8_t data)
 {
 	logerror("vt03_413x_w %02x %02x\n", offset, data);
 	// VT168 style ALU ??
@@ -1369,23 +1369,23 @@ WRITE8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_413x_w)
 	}
 }
 
-READ8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_414f_r)
+uint8_t nes_vt_soc_4kram_cy_device::vt03_414f_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_415c_r)
+uint8_t nes_vt_soc_4kram_cy_device::vt03_415c_r()
 {
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_48ax_w)
+void nes_vt_soc_4kram_cy_device::vt03_48ax_w(offs_t offset, uint8_t data)
 {
 	logerror("vt03_48ax_w %02x %02x\n", offset, data);
 }
 
-READ8_MEMBER(nes_vt_soc_4kram_cy_device::vt03_48ax_r)
+uint8_t nes_vt_soc_4kram_cy_device::vt03_48ax_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1414,7 +1414,7 @@ void nes_vt_soc_4kram_bt_device::nes_vt_bt_map(address_map &map)
 	map(0x412c, 0x412c).w(FUNC(nes_vt_soc_4kram_bt_device::vt03_412c_extbank_w));
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_bt_device::vt03_412c_extbank_w)
+void nes_vt_soc_4kram_bt_device::vt03_412c_extbank_w(uint8_t data)
 {
 	m_upper_write_412c_callback(data);
 }
@@ -1430,7 +1430,7 @@ void nes_vt_soc_4kram_hh_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_hh_device::nes_vt_hh_map);
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_hh_device::vtfp_411d_w)
+void nes_vt_soc_4kram_hh_device::vtfp_411d_w(uint8_t data)
 {
 	// controls chram access and mapper emulation modes in later models
 	logerror("vtfp_411d_w  %02x\n", data);
@@ -1438,7 +1438,7 @@ WRITE8_MEMBER(nes_vt_soc_4kram_hh_device::vtfp_411d_w)
 	update_banks();
 }
 
-READ8_MEMBER(nes_vt_soc_4kram_hh_device::vthh_414a_r)
+uint8_t nes_vt_soc_4kram_hh_device::vthh_414a_r()
 {
 	return 0x80;
 }
@@ -1466,13 +1466,13 @@ void nes_vt_soc_4kram_fp_device::device_add_mconfig(machine_config& config)
 }
 
 
-READ8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4119_r)
+uint8_t nes_vt_soc_4kram_fp_device::vtfp_4119_r()
 {
 	// would be PAL/NTSC etc. in base system, maybe different here?
 	return 0x00;
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_411e_w)
+void nes_vt_soc_4kram_fp_device::vtfp_411e_w(uint8_t data)
 {
 	logerror("411e_w %02x\n", data);
 	if (data == 0x05)
@@ -1481,7 +1481,7 @@ WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_411e_w)
 		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(false);
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4a00_w)
+void nes_vt_soc_4kram_fp_device::vtfp_4a00_w(uint8_t data)
 {
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
@@ -1489,17 +1489,17 @@ WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4a00_w)
 }
 
 
-WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_412c_extbank_w)
+void nes_vt_soc_4kram_fp_device::vtfp_412c_extbank_w(uint8_t data)
 {
 	m_upper_write_412c_callback(data);
 }
 
-READ8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_412d_r)
+uint8_t nes_vt_soc_4kram_fp_device::vtfp_412d_r()
 {
 	return m_upper_read_412d_callback();
 }
 
-WRITE8_MEMBER(nes_vt_soc_4kram_fp_device::vtfp_4242_w)
+void nes_vt_soc_4kram_fp_device::vtfp_4242_w(uint8_t data)
 {
 	logerror("vtfp_4242_w %02x\n", data);
 	m_4242 = data;
@@ -1536,7 +1536,7 @@ void nes_vt_soc_8kram_dg_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_8kram_dg_device::nes_vt_dg_map);
 }
 
-WRITE8_MEMBER(nes_vt_soc_8kram_dg_device::vt03_411c_w)
+void nes_vt_soc_8kram_dg_device::vt03_411c_w(uint8_t data)
 {
 	logerror("vt03_411c_w  %02x\n", data);
 	m_411c = data;
@@ -1561,18 +1561,18 @@ void nes_vt_soc_8kram_fa_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_8kram_fa_device::nes_vt_fa_map);
 }
 
-READ8_MEMBER(nes_vt_soc_8kram_fa_device::vtfa_412c_r)
+uint8_t nes_vt_soc_8kram_fa_device::vtfa_412c_r()
 {
 	return m_upper_read_412c_callback();
 }
 
-WRITE8_MEMBER(nes_vt_soc_8kram_fa_device::vtfa_412c_extbank_w)
+void nes_vt_soc_8kram_fa_device::vtfa_412c_extbank_w(uint8_t data)
 {
 	m_upper_write_412c_callback(data);
 
 }
 
-WRITE8_MEMBER(nes_vt_soc_8kram_fa_device::vtfp_4242_w)
+void nes_vt_soc_8kram_fa_device::vtfp_4242_w(uint8_t data)
 {
 	logerror("vtfp_4242_w %02x\n", data);
 	m_4242 = data;

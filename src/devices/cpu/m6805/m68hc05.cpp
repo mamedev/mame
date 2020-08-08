@@ -89,6 +89,11 @@ std::pair<u16, char const *> const m68hc05l9_syms[] = {
 	{ 0x001d, "HOUR"   }, { 0x001e, "MIN"    }, { 0x001f, "SEC"    } };
 
 
+ROM_START( m68hc705c4a )
+	ROM_REGION(0x00f0, "bootstrap", 0)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x00f0, NO_DUMP)
+ROM_END
+
 ROM_START( m68hc705c8a )
 	ROM_REGION(0x00f0, "bootstrap", 0)
 	ROM_LOAD("bootstrap.bin", 0x0000, 0x00f0, NO_DUMP)
@@ -117,6 +122,7 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
 
 DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "Motorola MC68HC05C4")
 DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "Motorola MC68HC05C8")
+DEFINE_DEVICE_TYPE(M68HC705C4A, m68hc705c4a_device, "m68hc705c4a", "Motorola MC68HC705C4A")
 DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "Motorola MC68HC705C8A")
 DEFINE_DEVICE_TYPE(M68HC705J1A, m68hc705j1a_device, "m68hc705j1a", "Motorola MC68HC705J1A")
 DEFINE_DEVICE_TYPE(M68HC05L9,   m68hc05l9_device,   "m68hc05l9",   "Motorola MC68HC05L9")
@@ -195,7 +201,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 	if (diff) update_port_irq();
 }
 
-READ8_MEMBER(m68hc05_device::port_read)
+u8 m68hc05_device::port_read(offs_t offset)
 {
 	offset &= PORT_COUNT - 1;
 	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isnull())
@@ -214,7 +220,7 @@ READ8_MEMBER(m68hc05_device::port_read)
 	return port_value(offset);
 }
 
-WRITE8_MEMBER(m68hc05_device::port_latch_w)
+void m68hc05_device::port_latch_w(offs_t offset, u8 data)
 {
 	offset &= PORT_COUNT - 1;
 	data &= m_port_bits[offset];
@@ -229,12 +235,12 @@ WRITE8_MEMBER(m68hc05_device::port_latch_w)
 		m_port_cb_w[offset](0, port_value(offset), m_port_ddr[offset]);
 }
 
-READ8_MEMBER(m68hc05_device::port_ddr_r)
+u8 m68hc05_device::port_ddr_r(offs_t offset)
 {
 	return m_port_ddr[offset & (PORT_COUNT - 1)];
 }
 
-WRITE8_MEMBER(m68hc05_device::port_ddr_w)
+void m68hc05_device::port_ddr_w(offs_t offset, u8 data)
 {
 	offset &= PORT_COUNT - 1;
 	data &= m_port_bits[offset];
@@ -263,12 +269,12 @@ WRITE8_MEMBER(m68hc05_device::port_ddr_w)
 }
 
 
-READ8_MEMBER(m68hc05_device::tcr_r)
+u8 m68hc05_device::tcr_r()
 {
 	return m_tcr;
 }
 
-WRITE8_MEMBER(m68hc05_device::tcr_w)
+void m68hc05_device::tcr_w(u8 data)
 {
 	data &= 0xe3;
 	LOGTIMER("write TCR: ICIE=%u OCIE=%u TOIE=%u IEDG=%u OLVL=%u\n",
@@ -280,7 +286,7 @@ WRITE8_MEMBER(m68hc05_device::tcr_w)
 		m_pending_interrupts &= ~M68HC05_INT_TIMER;
 }
 
-READ8_MEMBER(m68hc05_device::tsr_r)
+u8 m68hc05_device::tsr_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -295,7 +301,7 @@ READ8_MEMBER(m68hc05_device::tsr_r)
 	return m_tsr;
 }
 
-READ8_MEMBER(m68hc05_device::icr_r)
+u8 m68hc05_device::icr_r(offs_t offset)
 {
 	// reading IRCH inhibits capture until ICRL is read
 	// reading ICRL after reading TCR with ICF set clears ICF
@@ -324,7 +330,7 @@ READ8_MEMBER(m68hc05_device::icr_r)
 	return u8(m_icr >> (low ? 0 : 8));
 }
 
-READ8_MEMBER(m68hc05_device::ocr_r)
+u8 m68hc05_device::ocr_r(offs_t offset)
 {
 	// reading OCRL after reading TCR with OCF set clears OCF
 
@@ -339,7 +345,7 @@ READ8_MEMBER(m68hc05_device::ocr_r)
 	return u8(m_ocr >> (low ? 0 : 8));
 }
 
-WRITE8_MEMBER(m68hc05_device::ocr_w)
+void m68hc05_device::ocr_w(offs_t offset, u8 data)
 {
 	// writing ORCH inhibits compare until OCRL is written
 	// writing OCRL after reading TCR with OCF set clears OCF
@@ -368,7 +374,7 @@ WRITE8_MEMBER(m68hc05_device::ocr_w)
 	m_ocr = (m_ocr & (low ? 0xff00 : 0x00ff)) | (u16(data) << (low ? 0 : 8));
 }
 
-READ8_MEMBER(m68hc05_device::timer_r)
+u8 m68hc05_device::timer_r(offs_t offset)
 {
 	// reading [A]TRH returns current counter MSB and latches [A]TRL buffer
 	// reading [A]TRL returns current [A]TRL buffer and completes read sequence
@@ -406,7 +412,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 }
 
 
-WRITE8_MEMBER(m68hc05_device::coprst_w)
+void m68hc05_device::coprst_w(u8 data)
 {
 	LOGCOP("write COPRST=%02x%s\n", data, ((0xaa == data) && (0x55 == m_coprst)) ? ", reset" : "");
 	if (0x55 == data)
@@ -420,22 +426,25 @@ WRITE8_MEMBER(m68hc05_device::coprst_w)
 	}
 }
 
-READ8_MEMBER(m68hc05_device::copcr_r)
+u8 m68hc05_device::copcr_r()
 {
-	if (copcr_copf()) LOGCOP("read COPCR, clear COPF\n");
 	u8 const result(m_copcr);
-	m_copcr &= 0xef;
+	if (!machine().side_effects_disabled())
+	{
+		if (copcr_copf()) LOGCOP("read COPCR, clear COPF\n");
+		m_copcr &= 0xef;
+	}
 	return result;
 }
 
-WRITE8_MEMBER(m68hc05_device::copcr_w)
+void m68hc05_device::copcr_w(u8 data)
 {
 	LOGCOP("write COPCR: CME=%u PCOPE=%u [%s] CM=%u\n",
 			BIT(data, 3), BIT(data, 2), (!copcr_pcope() && BIT(data, 2)) ? "set" : "ignored", data & 0x03);
 	m_copcr = (m_copcr & 0xf4) | (data & 0x0f); // PCOPE is set-only, hence the mask overlap
 }
 
-WRITE8_MEMBER(m68hc05_device::copr_w)
+void m68hc05_device::copr_w(u8 data)
 {
 	LOGCOP("write COPR: COPC=%u\n", BIT(data, 0));
 	if (!BIT(data, 0)) m_ncop_cnt = 0;
@@ -469,7 +478,7 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_counter));
 	save_item(NAME(m_icr));
 	save_item(NAME(m_ocr));
-	save_item(NAME(m_inhibit_cap));;
+	save_item(NAME(m_inhibit_cap));
 	save_item(NAME(m_inhibit_cmp));
 	save_item(NAME(m_trl_buf));
 	save_item(NAME(m_trl_latched));
@@ -896,6 +905,100 @@ std::unique_ptr<util::disasm_interface> m68hc05c8_device::create_disassembler()
 
 
 /****************************************************************************
+ * MC68HC705C4A device
+ ****************************************************************************/
+
+void m68hc705c4a_device::c4a_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map.unmap_value_high();
+
+	map(0x0000, 0x0003).rw(FUNC(m68hc705c4a_device::port_read), FUNC(m68hc705c4a_device::port_latch_w));
+	map(0x0004, 0x0006).rw(FUNC(m68hc705c4a_device::port_ddr_r), FUNC(m68hc705c4a_device::port_ddr_w));
+	// 0x0007-0x0009 unused
+	// 0x000a SPCR
+	// 0x000b SPSR
+	// 0x000c SPDR
+	// 0x000d BAUD
+	// 0x000e SCCR1
+	// 0x000f SCCR2
+	// 0x0010 SCSR
+	// 0x0011 SCDR
+	map(0x0012, 0x0012).rw(FUNC(m68hc705c4a_device::tcr_r), FUNC(m68hc705c4a_device::tcr_w));
+	map(0x0013, 0x0013).r(FUNC(m68hc705c4a_device::tsr_r));
+	map(0x0014, 0x0015).r(FUNC(m68hc705c4a_device::icr_r));
+	map(0x0016, 0x0017).rw(FUNC(m68hc705c4a_device::ocr_r), FUNC(m68hc705c4a_device::ocr_w));
+	map(0x0018, 0x001b).r(FUNC(m68hc705c4a_device::timer_r));
+	// 0x001c PROG
+	// 0x001d-0x001f unused
+	map(0x0020, 0x004f).rom();                                 // user PROM
+	map(0x0050, 0x00ff).ram();                                 // RAM/stack
+	map(0x0100, 0x10ff).rom();                                 // user PROM
+	// 0x1100-0x1eff unused
+	map(0x1f00, 0x1fde).rom().region("bootstrap", 0x0000);  // bootloader
+	map(0x1fdf, 0x1fdf).lw8(NAME([this] (u8 data) { m_option = data; }));
+	map(0x1fe0, 0x1fef).rom().region("bootstrap", 0x00e0);  // boot ROM vectors
+	map(0x1ff0, 0x1ff0).w(FUNC(m68hc705c4a_device::copr_w));
+	map(0x1ff0, 0x1fff).rom();                                 // user vectors
+}
+
+
+m68hc705c4a_device::m68hc705c4a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: m68hc705_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			M68HC705C4A,
+			13,
+			address_map_constructor(FUNC(m68hc705c4a_device::c4a_map), this))
+	, m_rom(*this, DEVICE_SELF, 0x2000)
+{
+	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
+}
+
+
+tiny_rom_entry const *m68hc705c4a_device::device_rom_region() const
+{
+	return ROM_NAME(m68hc705c4a);
+}
+
+
+void m68hc705c4a_device::device_start()
+{
+	m68hc705_device::device_start();
+
+	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
+	add_timer_state();
+	add_ncop_state();
+
+	state_add(M68HC705C8A_OPTION, "OPTION", m_option).mask(0xff);
+
+	save_item(NAME(m_option));
+}
+
+void m68hc705c4a_device::device_reset()
+{
+	m68hc705_device::device_reset();
+
+	// latch MOR registers on reset
+	set_port_interrupt(std::array<u8, PORT_COUNT>{{ 0x00, u8(rdmem<false>(0xfff0)), 0x00, 0x00 }});
+	set_ncope(BIT(rdmem<false>(0xfff1), 0));
+
+	// IRQ negative edge and level sensitive
+	m_option = 0x02;
+}
+
+
+std::unique_ptr<util::disasm_interface> m68hc705c4a_device::create_disassembler()
+{
+	return std::make_unique<m68hc05_disassembler>(m68hc705c8a_syms);
+}
+
+
+
+
+/****************************************************************************
  * MC68HC705C8A device
  ****************************************************************************/
 
@@ -994,7 +1097,7 @@ std::unique_ptr<util::disasm_interface> m68hc705c8a_device::create_disassembler(
 }
 
 
-READ8_MEMBER(m68hc705c8a_device::ram0_r)
+u8 m68hc705c8a_device::ram0_r(offs_t offset)
 {
 	if (BIT(m_option, 7))
 		return offset >= 0x10 ? m_ram[offset - 0x10] : 0x00; // 20-2f reserved
@@ -1002,13 +1105,13 @@ READ8_MEMBER(m68hc705c8a_device::ram0_r)
 		return m_rom[0x20 + offset];
 }
 
-WRITE8_MEMBER(m68hc705c8a_device::ram0_w)
+void m68hc705c8a_device::ram0_w(offs_t offset, u8 data)
 {
 	if (BIT(m_option, 7) && offset >= 0x10)
 		m_ram[offset - 0x10] = data;
 }
 
-READ8_MEMBER(m68hc705c8a_device::ram1_r)
+u8 m68hc705c8a_device::ram1_r(offs_t offset)
 {
 	if (BIT(m_option, 6))
 		return m_ram[0x20 + offset];
@@ -1016,7 +1119,7 @@ READ8_MEMBER(m68hc705c8a_device::ram1_r)
 		return m_rom[0x100 + offset];
 }
 
-WRITE8_MEMBER(m68hc705c8a_device::ram1_w)
+void m68hc705c8a_device::ram1_w(offs_t offset, u8 data)
 {
 	if (BIT(m_option, 6))
 		m_ram[0x20 + offset] = data;

@@ -86,36 +86,36 @@ Address          Dir Data     Description
  *
  *************************************/
 
-READ8_MEMBER(jackal_state::jackalr_rotary_r)
+uint8_t jackal_state::jackalr_rotary_r(offs_t offset)
 {
 	return (1 << m_dials[offset].read_safe(0x00)) ^ 0xff;
 }
 
-WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)
+void jackal_state::jackal_flipscreen_w(uint8_t data)
 {
 	m_irq_enable = data & 0x02;
 	flip_screen_set(data & 0x08);
 }
 
-READ8_MEMBER(jackal_state::jackal_zram_r)
+uint8_t jackal_state::jackal_zram_r(offs_t offset)
 {
 	return m_rambank[0x0020 + offset];
 }
 
 
-READ8_MEMBER(jackal_state::jackal_voram_r)
+uint8_t jackal_state::jackal_voram_r(offs_t offset)
 {
 	return m_rambank[0x2000 + offset];
 }
 
 
-READ8_MEMBER(jackal_state::jackal_spriteram_r)
+uint8_t jackal_state::jackal_spriteram_r(offs_t offset)
 {
 	return m_spritebank[0x3000 + offset];
 }
 
 
-WRITE8_MEMBER(jackal_state::jackal_rambank_w)
+void jackal_state::jackal_rambank_w(uint8_t data)
 {
 	uint8_t *rgn = memregion("master")->base();
 
@@ -136,13 +136,13 @@ WRITE8_MEMBER(jackal_state::jackal_rambank_w)
 }
 
 
-WRITE8_MEMBER(jackal_state::jackal_zram_w)
+void jackal_state::jackal_zram_w(offs_t offset, uint8_t data)
 {
 	m_rambank[0x0020 + offset] = data;
 }
 
 
-WRITE8_MEMBER(jackal_state::jackal_voram_w)
+void jackal_state::jackal_voram_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf800) == 0)
 		jackal_mark_tile_dirty(offset & 0x3ff);
@@ -151,7 +151,7 @@ WRITE8_MEMBER(jackal_state::jackal_voram_w)
 }
 
 
-WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
+void jackal_state::jackal_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_spritebank[0x3000 + offset] = data;
 }

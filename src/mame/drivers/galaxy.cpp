@@ -21,6 +21,10 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 03/01/2001 Snapshot loading added.
 01/01/2001 Preliminary driver.
 
+ToDo:
+- pacmanp not showing its hi-res graphics - get black screen
+- is the hack in the video still needed? commenting it out made no difference.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -28,13 +32,8 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 
 #include "cpu/z80/z80.h"
 #include "formats/gtp_cas.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
-#include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 
@@ -49,19 +48,21 @@ void galaxy_state::galaxyp_io(address_map &map)
 
 void galaxy_state::galaxy_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::latch_w));
+	// see init_galaxy for ram placement
 }
 
 void galaxy_state::galaxyp_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); // ROM A
 	map(0x1000, 0x1fff).rom(); // ROM B
-	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
-	map(0xe000, 0xefff).rom(); // ROM C
-	map(0xf000, 0xffff).rom(); // ROM D
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::latch_w));
+	map(0x2800, 0xdfff).ram();
+	map(0xe000, 0xefff).rom().region("maincpu",0x2000); // ROM C
+	map(0xf000, 0xffff).rom().region("maincpu",0x3000); // ROM D
 }
 
 /* 2008-05 FP:
@@ -70,7 +71,7 @@ Small note about natural keyboard support. Currently:
 - "Break" is mapped to 'F1'
 - "Repeat" is mapped to 'F2'                           */
 
-static INPUT_PORTS_START (galaxy_common)
+static INPUT_PORTS_START (galaxy)
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)       PORT_CHAR('A')
@@ -140,24 +141,12 @@ static INPUT_PORTS_START (galaxy_common)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
-INPUT_PORTS_END
 
-static INPUT_PORTS_START( galaxy )
-	PORT_INCLUDE( galaxy_common )
-	PORT_START("ROM2")
-		PORT_CONFNAME(0x01, 0x01, "ROM 2")
-			PORT_CONFSETTING(0x01, "Installed")
-			PORT_CONFSETTING(0x00, "Not installed")
+	PORT_START("LINE7")
 INPUT_PORTS_END
-
-static INPUT_PORTS_START( galaxyp )
-	PORT_INCLUDE( galaxy_common )
-INPUT_PORTS_END
-
-#define XTAL 6144000
 
 /* F4 Character Displayer */
-static const gfx_layout galaxy_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 16,                  /* 8 x 16 characters */
 	128,                    /* 128 characters */
@@ -171,19 +160,17 @@ static const gfx_layout galaxy_charlayout =
 };
 
 static GFXDECODE_START( gfx_galaxy )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxy_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
 void galaxy_state::galaxy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL / 2);
+	Z80(config, m_maincpu, 6'144'000 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxy_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::galaxy_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::galaxy_irq_callback));
-
-	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
+	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::irq_callback));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -191,7 +178,7 @@ void galaxy_state::galaxy(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->set_size(384, 212);
 	m_screen->set_visarea(0, 384-1, 0, 208-1);
-	m_screen->set_screen_update(FUNC(galaxy_state::screen_update_galaxy));
+	m_screen->set_screen_update(FUNC(galaxy_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -216,13 +203,11 @@ void galaxy_state::galaxy(machine_config &config)
 void galaxy_state::galaxyp(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL / 2);
+	Z80(config, m_maincpu, 6'144'000 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxyp_mem);
 	m_maincpu->set_addrmap(AS_IO, &galaxy_state::galaxyp_io);
-	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::galaxy_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::galaxy_irq_callback));
-
-	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
+	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::irq0_line_hold));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::irq_callback));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -230,17 +215,18 @@ void galaxy_state::galaxyp(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->set_size(384, 208);
 	m_screen->set_visarea(0, 384-1, 0, 208-1);
-	m_screen->set_screen_update(FUNC(galaxy_state::screen_update_galaxy));
+	m_screen->set_screen_update(FUNC(galaxy_state::screen_update));
 
+	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-
 
 	/* snapshot */
 	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
+	ay8910_device &ay(AY8910(config, "ay8910", 6'144'000 / 4));
+	ay.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(gtp_cassette_formats);
@@ -249,28 +235,27 @@ void galaxy_state::galaxyp(machine_config &config)
 	m_cassette->set_interface("galaxy_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("38K");
 }
 
 ROM_START (galaxy)
-	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739))
-	ROM_LOAD_OPTIONAL ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "galrom1.dd8", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
+	ROM_LOAD( "galrom2.dd9", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
 ROM_END
 
 ROM_START (galaxyp)
-	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD ("galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739))
-	ROM_LOAD ("galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1))
-	ROM_LOAD ("galplus.bin", 0xe000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee))
-	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "galrom1.bin", 0x0000, 0x1000, CRC(dc970a32) SHA1(dfc92163654a756b70f5a446daf49d7534f4c739) )
+	ROM_LOAD( "galrom2.bin", 0x1000, 0x1000, CRC(5dc5a100) SHA1(5d5ab4313a2d0effe7572bb129193b64cab002c1) )
+	ROM_LOAD( "galplus.bin", 0x2000, 0x1000, CRC(d4cfab14) SHA1(b507b9026844eeb757547679907394aa42055eee) )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "galchr.dd3",  0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88) )
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
-COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
-COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxyp, galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", 0)
+COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      MACHINE_SUPPORTS_SAVE )
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxy,  galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", MACHINE_SUPPORTS_SAVE )

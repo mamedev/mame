@@ -144,7 +144,7 @@ void sub_state::subm_map(address_map &map)
 	map(0xf060, 0xf060).portr("IN0");
 }
 
-WRITE8_MEMBER(sub_state::nmi_mask_w)
+void sub_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_en = data & 1;
 	if (!m_nmi_en)

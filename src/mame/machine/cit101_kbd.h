@@ -11,55 +11,80 @@
 
 #pragma once
 
-#include "machine/keyboard.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/beep.h"
-#include "diserial.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cit101_hle_keyboard_device
+// ======================> cit101_keyboard_device
 
-class cit101_hle_keyboard_device : public device_t, public device_matrix_keyboard_interface<4U>, public device_buffered_serial_interface<16U>
+class cit101_keyboard_device : public device_t
 {
 public:
-	// construction/destruction
-	cit101_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	// device type constructor
+	cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	// configuration
+	static constexpr feature_type unemulated_features() { return feature::SOUND; }
+
+	// callback configuration
 	auto txd_callback() { return m_txd_callback.bind(); }
 
+	// serial line input
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 
 protected:
-	// device_t overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	cit101_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	// device_buffered_serial_interface overrides
-	virtual void tra_callback() override;
-	virtual void received_byte(u8 byte) override;
-
-	// device_matrix_keyboard_interface overrides
-	virtual void key_make(u8 row, u8 column) override;
-	virtual void key_repeat(u8 row, u8 column) override;
-	virtual void scan_complete() override;
-
-	void send_translated(u8 row, u8 column);
-	void send_key(u8 code);
 private:
-	required_ioport m_modifiers;
+	// MCU handlers
+	void p2_w(u8 data);
+	void leds_w(u8 data);
+	u8 keys_r();
+
+	// address maps
+	void prog_map(address_map &map);
+	void ext_map(address_map &map);
+
+	// object finders
+	required_device<mcs48_cpu_device> m_mcu;
 	required_device<beep_device> m_beeper;
+	required_ioport_array<11> m_keys;
+	required_ioport m_kbid;
+	output_finder<7> m_leds;
+
+	// output callback
 	devcb_write_line m_txd_callback;
-	u8 m_command[2];
+
+	// internal state
+	bool m_kbid_enabled;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(CIT101_HLE_KEYBOARD, cit101_hle_keyboard_device)
+// ======================> cit101e_keyboard_device
+
+class cit101e_keyboard_device : public cit101_keyboard_device
+{
+public:
+	// device type constructor
+	cit101e_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+// device type declarations
+DECLARE_DEVICE_TYPE(CIT101_KEYBOARD, cit101_keyboard_device)
+DECLARE_DEVICE_TYPE(CIT101E_KEYBOARD, cit101e_keyboard_device)
 
 #endif

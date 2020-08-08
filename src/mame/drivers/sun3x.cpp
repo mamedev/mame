@@ -188,29 +188,29 @@ private:
 	required_shared_ptr<uint32_t> m_p_ram;
 	optional_shared_ptr<uint32_t> m_bw2_vram;
 
-	DECLARE_READ32_MEMBER(enable_r);
-	DECLARE_WRITE32_MEMBER(enable_w);
-	DECLARE_READ32_MEMBER(buserr_r);
-	DECLARE_WRITE32_MEMBER(buserr_w);
-	DECLARE_READ32_MEMBER(diag_r);
-	DECLARE_WRITE32_MEMBER(diag_w);
-	DECLARE_READ32_MEMBER(printer_r);
-	DECLARE_WRITE32_MEMBER(printer_w);
-	DECLARE_READ32_MEMBER(iommu_r);
-	DECLARE_WRITE32_MEMBER(iommu_w);
-	DECLARE_READ32_MEMBER(irqctrl_r);
-	DECLARE_WRITE32_MEMBER(irqctrl_w);
-	DECLARE_READ32_MEMBER(memreg_r);
-	DECLARE_WRITE32_MEMBER(memreg_w);
-	DECLARE_READ32_MEMBER(memrerraddr_r);
-	DECLARE_WRITE32_MEMBER(memrerraddr_w);
-	DECLARE_READ32_MEMBER(fdc_control_r);
-	DECLARE_WRITE32_MEMBER(fdc_control_w);
-	DECLARE_READ32_MEMBER(cause_buserr_r);
-	DECLARE_WRITE32_MEMBER(cause_buserr_w);
-	DECLARE_WRITE32_MEMBER(ramwrite_w);
-	DECLARE_READ32_MEMBER(fpa_r);
-	DECLARE_READ32_MEMBER(p4id_r);
+	uint32_t enable_r();
+	void enable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t buserr_r();
+	void buserr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t diag_r();
+	void diag_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t printer_r();
+	void printer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t iommu_r(offs_t offset);
+	void iommu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t irqctrl_r();
+	void irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t memreg_r();
+	void memreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t memrerraddr_r();
+	void memrerraddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t fdc_control_r();
+	void fdc_control_w(uint32_t data);
+	uint32_t cause_buserr_r();
+	void cause_buserr_w(uint32_t data);
+	void ramwrite_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t fpa_r();
+	uint32_t p4id_r();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -272,17 +272,17 @@ void sun3x_state::sun3_460_mem(address_map &map)
 	map(0xfefe0000, 0xfefeffff).rom().region("user1", 0);
 }
 
-READ32_MEMBER( sun3x_state::p4id_r )
+uint32_t sun3x_state::p4id_r()
 {
 	return (1<<24); // 0 = hires bw2 1600x1280, 1 = bw2 1152x900, 0x45 is "Ibis" color, blt 0x68 is "Lego" color
 }
 
-WRITE32_MEMBER( sun3x_state::fdc_control_w )
+void  sun3x_state::fdc_control_w(uint32_t data)
 {
 	logerror("FDC write %02x (%08x)\n", data >> 24, m_maincpu->pc());
 }
 
-READ32_MEMBER( sun3x_state::fdc_control_r )
+uint32_t sun3x_state::fdc_control_r()
 {
 	// Type of floppy present
 	// 0 = no floppy in drive
@@ -313,7 +313,7 @@ READ32_MEMBER( sun3x_state::fdc_control_r )
 	return 0 << 24;
 }
 
-WRITE32_MEMBER(sun3x_state::ramwrite_w)
+void sun3x_state::ramwrite_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *pRAM = (uint32_t *)m_p_ram.target();
 
@@ -367,58 +367,58 @@ WRITE32_MEMBER(sun3x_state::ramwrite_w)
 	COMBINE_DATA(&pRAM[offset]);
 }
 
-READ32_MEMBER(sun3x_state::enable_r)
+uint32_t sun3x_state::enable_r()
 {
 	return m_enable;
 }
 
-WRITE32_MEMBER(sun3x_state::enable_w)
+void sun3x_state::enable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to enable (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_enable);
 }
 
-READ32_MEMBER(sun3x_state::buserr_r)
+uint32_t sun3x_state::buserr_r()
 {
 	uint32_t rv = m_buserr;
 	m_buserr = 0;
 	return rv;
 }
 
-WRITE32_MEMBER(sun3x_state::buserr_w)
+void sun3x_state::buserr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to buserr (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_buserr);
 }
 
-READ32_MEMBER(sun3x_state::diag_r)
+uint32_t sun3x_state::diag_r()
 {
 	return m_diag;
 }
 
-WRITE32_MEMBER(sun3x_state::diag_w)
+void sun3x_state::diag_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to diag (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_diag);
 }
 
-READ32_MEMBER(sun3x_state::printer_r)
+uint32_t sun3x_state::printer_r()
 {
 	return m_printer;
 }
 
-WRITE32_MEMBER(sun3x_state::printer_w)
+void sun3x_state::printer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to printer (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_printer);
 }
 
-READ32_MEMBER(sun3x_state::irqctrl_r)
+uint32_t sun3x_state::irqctrl_r()
 {
 	return m_irqctrl;
 }
 
-WRITE32_MEMBER(sun3x_state::irqctrl_w)
+void sun3x_state::irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to interrupt control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_irqctrl);
@@ -454,31 +454,31 @@ WRITE32_MEMBER(sun3x_state::irqctrl_w)
 	}
 }
 
-READ32_MEMBER(sun3x_state::memreg_r)
+uint32_t sun3x_state::memreg_r()
 {
 	return m_memreg;
 }
 
-WRITE32_MEMBER(sun3x_state::memreg_w)
+void sun3x_state::memreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to memory control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_memreg);
 }
 
-READ32_MEMBER(sun3x_state::memrerraddr_r)
+uint32_t sun3x_state::memrerraddr_r()
 {
 	m_bInBusErr = false;
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 	return m_memerraddr;
 }
 
-WRITE32_MEMBER(sun3x_state::memrerraddr_w)
+void sun3x_state::memrerraddr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("sun3x: %08x to memory error address (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_memerraddr);
 }
 
-READ32_MEMBER(sun3x_state::iommu_r)
+uint32_t sun3x_state::iommu_r(offs_t offset)
 {
 	return m_iommu[offset];
 }
@@ -492,12 +492,12 @@ READ32_MEMBER(sun3x_state::iommu_r)
 // write prot:    0x00000004
 // bad:           0x00000002
 // valid:         0x00000001
-WRITE32_MEMBER(sun3x_state::iommu_w)
+void sun3x_state::iommu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_iommu[offset]);
 }
 
-READ32_MEMBER(sun3x_state::fpa_r)
+uint32_t sun3x_state::fpa_r()
 {
 	m_buserr |= 0x04000000;
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -505,7 +505,7 @@ READ32_MEMBER(sun3x_state::fpa_r)
 	return 0xffffffff;
 }
 
-READ32_MEMBER(sun3x_state::cause_buserr_r)
+uint32_t sun3x_state::cause_buserr_r()
 {
 	m_buserr |= 0x20000000;
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -513,7 +513,7 @@ READ32_MEMBER(sun3x_state::cause_buserr_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(sun3x_state::cause_buserr_w)
+void sun3x_state::cause_buserr_w(uint32_t data)
 {
 	m_buserr |= 0x20000000;
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);

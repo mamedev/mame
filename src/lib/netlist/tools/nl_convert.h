@@ -8,15 +8,25 @@
 /// \file nl_convert.h
 ///
 
+#include "plib/palloc.h"
 #include "plib/pstring.h"
-#include "plib/ptokenizer.h"
 #include "plib/ptypes.h"
 
 #include <memory>
 
+#include "../plib/ptokenizer.h"
+
 // -------------------------------------------------
 //  convert - convert a spice netlist
 // -------------------------------------------------
+
+namespace netlist
+{
+
+namespace convert
+{
+
+using arena = plib::aligned_arena;
 
 class nl_convert_base_t
 {
@@ -123,7 +133,7 @@ private:
 		double value() const { return m_val;}
 		const str_list &extra() const { return m_extra;}
 
-		bool has_model() const { return m_model != ""; }
+		bool has_model() const { return !m_model.empty(); }
 		bool has_value() const { return m_has_val; }
 
 		void add_extra(const pstring &s) { m_extra.push_back(s); }
@@ -155,7 +165,7 @@ private:
 		pstring m_alias;
 	};
 
-	void add_device(plib::unique_ptr<dev_t> dev);
+	void add_device(arena::unique_ptr<dev_t> dev);
 	dev_t *get_device(const pstring &name)
 	{
 		for (auto &e : m_devs)
@@ -166,10 +176,10 @@ private:
 
 	std::stringstream m_buf;
 
-	std::vector<plib::unique_ptr<dev_t>> m_devs;
-	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
+	std::vector<arena::unique_ptr<dev_t>> m_devs;
+	std::unordered_map<pstring, arena::unique_ptr<net_t> > m_nets;
 	std::vector<std::pair<pstring, pstring>> m_ext_alias;
-	std::unordered_map<pstring, plib::unique_ptr<pin_alias_t>> m_pins;
+	std::unordered_map<pstring, arena::unique_ptr<pin_alias_t>> m_pins;
 
 	std::vector<unit_t> m_units;
 	pstring m_numberchars;
@@ -203,10 +213,15 @@ public:
 
 	nl_convert_eagle_t() = default;
 
-	class tokenizer : public plib::ptokenizer
+	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
 	{
 	public:
-		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm);
+		using token_t = ptokenizer::token_t;
+		using token_type = ptokenizer::token_type;
+		using token_id_t = ptokenizer::token_id_t;
+		using token_store = ptokenizer::token_store;
+
+		tokenizer(nl_convert_eagle_t &convert);
 
 		token_id_t m_tok_ADD;       // NOLINT
 		token_id_t m_tok_VALUE;     // NOLINT
@@ -235,10 +250,14 @@ public:
 
 	nl_convert_rinf_t() = default;
 
-	class tokenizer : public plib::ptokenizer
+	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
 	{
 	public:
-		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm);
+		using token_t = ptokenizer::token_t;
+		using token_type = ptokenizer::token_type;
+		using token_id_t = ptokenizer::token_id_t;
+		using token_store = ptokenizer::token_store;
+		tokenizer(nl_convert_rinf_t &convert);
 
 		token_id_t m_tok_HEA; // NOLINT
 		token_id_t m_tok_APP; // NOLINT
@@ -265,5 +284,8 @@ protected:
 private:
 
 };
+
+} // namespace convert
+} // namespace netlist
 
 #endif // NL_CONVERT_H_

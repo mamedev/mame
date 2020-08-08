@@ -61,17 +61,17 @@ private:
 	virtual void video_start() override;
 	void irobot_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(irobot_clearirq_w);
-	DECLARE_WRITE8_MEMBER(irobot_clearfirq_w);
-	DECLARE_READ8_MEMBER(irobot_sharedmem_r);
-	DECLARE_WRITE8_MEMBER(irobot_sharedmem_w);
+	void irobot_clearirq_w(uint8_t data);
+	void irobot_clearfirq_w(uint8_t data);
+	uint8_t irobot_sharedmem_r(offs_t offset);
+	void irobot_sharedmem_w(offs_t offset, uint8_t data);
 	void irobot_statwr_w(uint8_t data);
 	void irobot_out0_w(uint8_t data);
 	void irobot_rom_banksel_w(uint8_t data);
-	DECLARE_READ8_MEMBER(irobot_status_r);
-	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
-	DECLARE_READ8_MEMBER(quad_pokeyn_r);
-	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
+	uint8_t irobot_status_r();
+	void irobot_paletteram_w(offs_t offset, uint8_t data);
+	uint8_t quad_pokeyn_r(offs_t offset);
+	void quad_pokeyn_w(offs_t offset, uint8_t data);
 	void irobot_palette(palette_device &palette) const;
 	uint32_t screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);

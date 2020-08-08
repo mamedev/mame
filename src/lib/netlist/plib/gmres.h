@@ -38,9 +38,9 @@ namespace plib
 
 		mat_precondition_ILU(std::size_t size, std::size_t ilu_scale = 4
 			, std::size_t bw = plib::pmatrix_cr_t<FT, SIZE>::FILL_INFINITY)
-		: m_mat(static_cast<typename mat_type::index_type>(size))
-		, m_LU(static_cast<typename mat_type::index_type>(size))
-		, m_ILU_scale(static_cast<std::size_t>(ilu_scale))
+		: m_mat(narrow_cast<typename mat_type::index_type>(size))
+		, m_LU(narrow_cast<typename mat_type::index_type>(size))
+		, m_ILU_scale(narrow_cast<std::size_t>(ilu_scale))
 		, m_band_width(bw)
 		{
 		}
@@ -103,7 +103,7 @@ namespace plib
 					if (m_mat.col_idx[k] == i && k < m_mat.row_idx[j+1])
 						nzcol[i].push_back(k);
 				}
-				nzcol[i].push_back(static_cast<std::size_t>(-1));
+				nzcol[i].push_back(narrow_cast<std::size_t>(-1));
 			}
 		}
 
@@ -139,7 +139,7 @@ namespace plib
 				const auto &nz = nzcol[i];
 				std::size_t j;
 
-				while ((j = nz[nzcolp++])!=static_cast<std::size_t>(-1)) // NOLINT(bugprone-infinite-loop)
+				while ((j = nz[nzcolp++])!=narrow_cast<std::size_t>(-1)) // NOLINT(bugprone-infinite-loop)
 				{
 					v += m_mat.A[j] * m_mat.A[j];
 				}
@@ -209,14 +209,12 @@ namespace plib
 	// FIXME: hardcoding RESTART to 20 becomes an issue on very large
 	// systems.
 
-	template <typename FT, int SIZE, int RESTART = 80>
+	template <typename FT, int SIZE, int RESTART = 16>
 	struct gmres_t
 	{
 	public:
 
 		using float_type = FT;
-		// FIXME: dirty hack to make this compile
-		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
 		explicit gmres_t(std::size_t size)
 			: residual(size)
@@ -236,7 +234,7 @@ namespace plib
 			g1 = s * g0_last + c * g1;
 		}
 
-		std::size_t size() const { return (SIZE<=0) ? m_size : static_cast<std::size_t>(SIZE); }
+		std::size_t size() const { return (SIZE<=0) ? m_size : narrow_cast<std::size_t>(SIZE); }
 
 		template <int k, typename OPS, typename VT>
 		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, bool dummy)
@@ -360,7 +358,7 @@ namespace plib
 				rho_delta = accuracy * rho_to_accuracy;
 			}
 			else
-				rho_delta = accuracy * plib::sqrt(static_cast<FT>(n));
+				rho_delta = accuracy * plib::sqrt(narrow_cast<FT>(n));
 
 			//
 			// Using
@@ -407,8 +405,6 @@ namespace plib
 
 	private:
 
-		//typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
-
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
@@ -423,8 +419,6 @@ namespace plib
 		std::size_t m_size;
 
 		bool m_use_more_precise_stop_condition;
-
-
 	};
 
 
@@ -454,7 +448,7 @@ namespace plib
 		{
 		}
 
-		std::size_t size() const { return (SIZE<=0) ? m_size : static_cast<std::size_t>(SIZE); }
+		std::size_t size() const { return (SIZE<=0) ? m_size : narrow_cast<std::size_t>(SIZE); }
 
 		template <typename OPS, typename VT, typename VRHS>
 		std::size_t solve(OPS &ops, VT &x0, const VRHS & rhs, const std::size_t iter_max, float_type accuracy)
@@ -478,7 +472,7 @@ namespace plib
 			ops.calc_rhs(Ax, x);
 			vec_sub(size(), rhs, Ax, residual);
 
-			FT rho_delta = accuracy * std::sqrt(static_cast<FT>(size()));
+			FT rho_delta = accuracy * std::sqrt(narrow_cast<FT>(size()));
 
 			rho_delta = 1e-9;
 

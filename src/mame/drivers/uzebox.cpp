@@ -53,14 +53,14 @@ private:
 	required_device<snes_control_port_device> m_ctrl2;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
-	DECLARE_READ8_MEMBER(port_d_r);
-	DECLARE_WRITE8_MEMBER(port_d_w);
+	uint8_t port_a_r();
+	void port_a_w(uint8_t data);
+	uint8_t port_b_r();
+	void port_b_w(uint8_t data);
+	uint8_t port_c_r();
+	void port_c_w(uint8_t data);
+	uint8_t port_d_r();
+	void port_d_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -102,7 +102,7 @@ void uzebox_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(uzebox_state::port_a_w)
+void uzebox_state::port_a_w(uint8_t data)
 {
 	//  xxxx ----   NC
 	//  ---- x---   SNES controller clk
@@ -124,12 +124,12 @@ WRITE8_MEMBER(uzebox_state::port_a_w)
 	m_port_a = (data & 0x0c) | (m_port_a & 0x03);
 }
 
-READ8_MEMBER(uzebox_state::port_a_r)
+uint8_t uzebox_state::port_a_r()
 {
 	return  m_port_a | 0xf0;
 }
 
-WRITE8_MEMBER(uzebox_state::port_b_w)
+void uzebox_state::port_b_w(uint8_t data)
 {
 	//  xxx- ----   SDCard
 	//  ---x ----   AD725 CE
@@ -156,12 +156,12 @@ WRITE8_MEMBER(uzebox_state::port_b_w)
 	m_port_b = data;
 }
 
-READ8_MEMBER(uzebox_state::port_b_r)
+uint8_t uzebox_state::port_b_r()
 {
 	return m_port_b;
 }
 
-WRITE8_MEMBER(uzebox_state::port_c_w)
+void uzebox_state::port_c_w(uint8_t data)
 {
 	//  xx-- ----   blue
 	//  --xx x---   green
@@ -171,12 +171,12 @@ WRITE8_MEMBER(uzebox_state::port_c_w)
 	m_port_c = data;
 }
 
-READ8_MEMBER(uzebox_state::port_c_r)
+uint8_t uzebox_state::port_c_r()
 {
 	return m_port_c;
 }
 
-WRITE8_MEMBER(uzebox_state::port_d_w)
+void uzebox_state::port_d_w(uint8_t data)
 {
 	//  x--- ----   sound
 	//  -x-- ----   SDCard CS
@@ -191,7 +191,7 @@ WRITE8_MEMBER(uzebox_state::port_d_w)
 	m_port_d = data;
 }
 
-READ8_MEMBER(uzebox_state::port_d_r)
+uint8_t uzebox_state::port_d_r()
 {
 	return m_port_d;
 }

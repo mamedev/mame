@@ -154,8 +154,8 @@ protected:
 	uint8_t m_page_register;
 
 	uint16_t pico_read_penpos(int pen);
-	DECLARE_READ16_MEMBER(pico_68k_io_read);
-	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
+	uint16_t pico_68k_io_read(offs_t offset);
+	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
 	void pico_mem(address_map &map);
@@ -202,7 +202,7 @@ uint16_t pico_base_state::pico_read_penpos(int pen)
 	return penpos;
 }
 
-READ16_MEMBER(pico_base_state::pico_68k_io_read )
+uint16_t pico_base_state::pico_68k_io_read(offs_t offset)
 {
 	uint8_t retdata = 0;
 
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
+void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("pico_68k_io_write %04x %04x %04x\n", offset*2, data, mem_mask);
 
@@ -385,10 +385,11 @@ static void pico_cart(device_slot_interface &device)
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
 	m_vdp->stop_timers();
 }
@@ -600,10 +601,11 @@ static void copera_cart(device_slot_interface &device)
 
 MACHINE_START_MEMBER(copera_state,copera)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x000000, 0x7fffff, write16s_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a13)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
 	m_sega_315_5641_pcm->reset_w(0);
 	m_sega_315_5641_pcm->start_w(0);

@@ -165,15 +165,15 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
 	uint16_t fifo_r();
-	DECLARE_READ16_MEMBER(fifo_status_r);
+	uint16_t fifo_status_r(address_space &space);
 
 	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( packed_r );
-	DECLARE_WRITE32_MEMBER( packed_w );
+	uint32_t read(address_space &space, offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t packed_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void packed_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void cage_irq_handler(uint8_t data);
 

@@ -144,12 +144,12 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_WRITE8_MEMBER(bg_ram_w);
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(irq_ack);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	void bg_ram_w(offs_t offset, uint8_t data);
+	void fg_ram_w(offs_t offset, uint8_t data);
+	void scroll_w(uint8_t data);
+	void rombank_w(uint8_t data);
+	void irq_ack(uint8_t data);
+	void soundlatch_w(uint8_t data);
 
 	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -170,8 +170,8 @@ private:
 	uint8_t quizpun_68705_port_c_r();
 	void quizpun_68705_port_c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(quizpun_protection_r);
-	DECLARE_WRITE8_MEMBER(quizpun_protection_w);
+	uint8_t quizpun_protection_r();
+	void quizpun_protection_w(uint8_t data);
 
 	void quizpun2_cop_map(address_map &map);
 	void quizpun2_io_map(address_map &map);
@@ -197,19 +197,19 @@ TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 	tileinfo.set(1, code, color / 2, 0);
 }
 
-WRITE8_MEMBER(quizpun2_state::bg_ram_w)
+void quizpun2_state::bg_ram_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset] = data;
 	m_bg_tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(quizpun2_state::fg_ram_w)
+void quizpun2_state::fg_ram_w(offs_t offset, uint8_t data)
 {
 	m_fg_ram[offset] = data;
 	m_fg_tmap->mark_tile_dirty(offset/4);
 }
 
-WRITE8_MEMBER(quizpun2_state::scroll_w)
+void quizpun2_state::scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }
@@ -315,17 +315,17 @@ uint8_t quizpun2_state::cop_in_r()
                             Memory Maps - Main CPU
 ***************************************************************************/
 
-WRITE8_MEMBER(quizpun2_state::rombank_w)
+void quizpun2_state::rombank_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(quizpun2_state::irq_ack)
+void quizpun2_state::irq_ack(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(quizpun2_state::soundlatch_w)
+void quizpun2_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data ^ 0x80);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -363,7 +363,7 @@ void quizpun2_state::quizpun2_cop_map(address_map &map)
 
 // quizpun
 
-READ8_MEMBER(quizpun2_state::quizpun_protection_r)
+uint8_t quizpun2_state::quizpun_protection_r()
 {
 //  logerror("%s: port A read %02x\n", machine().describe_context(), m_mcu_data_port);
 
@@ -395,7 +395,7 @@ READ8_MEMBER(quizpun2_state::quizpun_protection_r)
 	return m_mcu_data_port;
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun_protection_w)
+void quizpun2_state::quizpun_protection_w(uint8_t data)
 {
 //  logerror("%s: port A write %02x\n", machine().describe_context(), data);
 	m_mcu_data_port = data;

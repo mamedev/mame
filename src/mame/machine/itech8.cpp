@@ -410,7 +410,7 @@ void itech8_state::compute_sensors()
  *
  *************************************/
 
-READ8_MEMBER(itech8_state::slikz80_port_r )
+uint8_t itech8_state::slikz80_port_r()
 {
 	int result = 0;
 
@@ -440,7 +440,7 @@ READ8_MEMBER(itech8_state::slikz80_port_r )
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::slikz80_port_w )
+void itech8_state::slikz80_port_w(uint8_t data)
 {
 	m_z80_port_val = data;
 	m_z80_clear_to_send = 0;
@@ -454,7 +454,7 @@ WRITE8_MEMBER(itech8_state::slikz80_port_w )
  *
  *************************************/
 
-READ8_MEMBER(itech8_state::slikshot_z80_r )
+uint8_t itech8_state::slikshot_z80_r()
 {
 	/* allow the Z80 to send us stuff now */
 	m_z80_clear_to_send = 1;
@@ -469,7 +469,7 @@ READ8_MEMBER(itech8_state::slikshot_z80_r )
  *
  *************************************/
 
-READ8_MEMBER(itech8_state::slikshot_z80_control_r )
+uint8_t itech8_state::slikshot_z80_control_r()
 {
 	return m_z80_ctrl;
 }
@@ -507,7 +507,7 @@ TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
 }
 
 
-WRITE8_MEMBER(itech8_state::slikshot_z80_control_w )
+void itech8_state::slikshot_z80_control_w(uint8_t data)
 {
 	synchronize(TIMER_DELAYED_Z80_CONTROL, data);
 }

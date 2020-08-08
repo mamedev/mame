@@ -1,36 +1,51 @@
 language: cpp
-compiler:
-  - gcc
-  - clang
-os:
-  - linux
-  - osx
 dist: bionic
-osx_image: xcode11
-matrix:
-  exclude:
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-10
+    - g++-10
+    - libsdl2-dev
+    - libsdl2-ttf-dev
+    - libasound2-dev
+    - libxinerama-dev
+    - libxi-dev
+    - qt5-default
+    update: true
+  homebrew:
+    packages:
+    - sdl2
+    - sdl2_ttf
+    update: true
+jobs:
+  include:
     - os: osx
-      compiler: gcc
-    - os: linux
+      osx_image: xcode11.6
       compiler: clang
-env:
-  - SUBTARGET=tiny   MAME=mametiny64
+      env: SUBTARGET=tiny   MAME=mametiny64
+    - os: linux
+      arch: amd64
+      compiler: gcc
+      env: SUBTARGET=tiny   MAME=mametiny64
+    - os: linux
+      arch: arm64
+      compiler: gcc
+      env: SUBTARGET=tiny   MAME=mametiny
+    - os: linux
+      arch: s390x
+      compiler: gcc
+      env: SUBTARGET=tiny   MAME=mametiny64
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then
     make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" TOOLS=1 && ./$MAME -validate;
-    else make -j4 IGNORE_GIT=1 OPTIMIZE=0 OVERRIDE_CC="gcc-9" OVERRIDE_CXX="g++-9" TOOLS=1 && ./$MAME -validate;
+    else make -j4 IGNORE_GIT=1 OPTIMIZE=0 OVERRIDE_CC="gcc-10" OVERRIDE_CXX="g++-10" TOOLS=1 && ./$MAME -validate;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
     unset LDOPTS && make -j2 OPTIMIZE=0 USE_LIBSDL=1 TOOLS=1 && ./$MAME -validate;
     fi
-sudo: required
-before_install:
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi"
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get update -qq; fi"
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'linux' ]; then sudo apt-get install -y --force-yes gcc-9 g++-9 libsdl2-dev libsdl2-ttf-dev libasound2-dev libxinerama-dev libxi-dev qt5-default; fi"
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew update; fi"
-  - "if [ ${TRAVIS_OS_NAME:-'linux'} = 'osx' ]; then brew install sdl2 sdl2_ttf; fi"
 branches:
   only:
     - master

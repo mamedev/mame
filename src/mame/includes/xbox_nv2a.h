@@ -11,8 +11,6 @@
 #include "machine/pic8259.h"
 #include "video/poly.h"
 
-#include <mutex>
-
 class vertex_program_disassembler {
 	static char const *const srctypes[];
 	static char const *const scaops[];
@@ -126,7 +124,7 @@ public:
 	} c_constant[192];
 	union temp {
 		float fv[4];
-	} r_temp[32];
+	} r_register[32];
 	// output vertex
 	vertex_nv *output;
 	// instructions
@@ -134,9 +132,9 @@ public:
 		unsigned int i[4];
 		int modified;
 		struct decoded {
-			int SwizzleA[4], SignA, ParameterTypeA, TempIndexA;
-			int SwizzleB[4], SignB, ParameterTypeB, TempIndexB;
-			int SwizzleC[4], SignC, ParameterTypeC, TempIndexC;
+			int SwizzleA[4], NegateA, ParameterTypeA, TempIndexA;
+			int SwizzleB[4], NegateB, ParameterTypeB, TempIndexB;
+			int SwizzleC[4], NegateC, ParameterTypeC, TempIndexC;
 			VectorialOperation VecOperation;
 			ScalarOperation ScaOperation;
 			int OutputWriteMask, MultiplexerControl;
@@ -165,9 +163,163 @@ private:
 	void generate_input(float t[4], int sign, int type, int temp, int swizzle[4]);
 	void compute_vectorial_operation(float t[4], int instruction, float par[3 * 4]);
 	void compute_scalar_operation(float t[4], int instruction, float par[3 * 4]);
+	void assign_output(int index, float t[4], int mask);
+	void assign_register(int index, float t[4], int mask);
+	void assign_constant(int index, float t[4], int mask);
 
 	int ip;
 	int a0x;
+};
+
+struct Combiner {
+	enum class InputRegister {
+		Zero = 0,
+		Color0,
+		Color1,
+		FogColor,
+		PrimaryColor,
+		SecondaryColor,
+		Texture0Color = 8,
+		Texture1Color,
+		Texture2Color,
+		Texture3Color,
+		Spare0,
+		Spare1,
+		SumClamp,
+		EF
+	};
+	enum class MapFunction {
+		UnsignedIdentity = 0,
+		UnsignedInvert,
+		ExpandNormal,
+		ExpandNegate,
+		HalfBiasNormal,
+		HalfBiasNegate,
+		SignedIdentyty,
+		SignedNegate
+	};
+	struct {
+		struct {
+			float A[4]; // 0=R 1=G 2=B 3=A
+			float B[4];
+			float C[4];
+			float D[4];
+			float E[4];
+			float F[4];
+			float G;
+			float EF[4];
+			float sumclamp[4];
+		} variables;
+		struct {
+			float RGBop1[4]; // 0=R 1=G 2=B
+			float RGBop2[4];
+			float RGBop3[4];
+			float Aop1;
+			float Aop2;
+			float Aop3;
+		} functions;
+		struct {
+			float primarycolor[4]; // rw
+			float secondarycolor[4];
+			float texture0color[4];
+			float texture1color[4];
+			float texture2color[4];
+			float texture3color[4];
+			float color0[4];
+			float color1[4];
+			float spare0[4];
+			float spare1[4];
+			float fogcolor[4]; // ro
+			float zero[4];
+		} registers;
+		float output[4];
+	} work[WORK_MAX_THREADS];
+	struct {
+		struct {
+			float constantcolor0[4];
+			float constantcolor1[4];
+			struct {
+				InputRegister A_input;
+				int A_component;
+				MapFunction A_mapping;
+				InputRegister B_input;
+				int B_component;
+				MapFunction B_mapping;
+				InputRegister C_input;
+				int C_component;
+				MapFunction C_mapping;
+				InputRegister D_input;
+				int D_component;
+				MapFunction D_mapping;
+			} mapin_alpha;
+			struct {
+				InputRegister A_input;
+				int A_component;
+				MapFunction A_mapping;
+				InputRegister B_input;
+				int B_component;
+				MapFunction B_mapping;
+				InputRegister C_input;
+				int C_component;
+				MapFunction C_mapping;
+				InputRegister D_input;
+				int D_component;
+				MapFunction D_mapping;
+			} mapin_rgb;
+			struct {
+				InputRegister CD_output;
+				InputRegister AB_output;
+				InputRegister SUM_output;
+				int CD_dotproduct;
+				int AB_dotproduct;
+				int muxsum;
+				int bias;
+				int scale;
+			} mapout_alpha;
+			struct {
+				InputRegister CD_output;
+				InputRegister AB_output;
+				InputRegister SUM_output;
+				int CD_dotproduct;
+				int AB_dotproduct;
+				int muxsum;
+				int bias;
+				int scale;
+			} mapout_rgb;
+		} stage[8];
+		struct {
+			float constantcolor0[4];
+			float constantcolor1[4];
+			int color_sum_clamp;
+			struct {
+				InputRegister G_input;
+				int G_component;
+				MapFunction G_mapping;
+			} mapin_alpha;
+			struct {
+				InputRegister A_input;
+				int A_component;
+				MapFunction A_mapping;
+				InputRegister B_input;
+				int B_component;
+				MapFunction B_mapping;
+				InputRegister C_input;
+				int C_component;
+				MapFunction C_mapping;
+				InputRegister D_input;
+				int D_component;
+				MapFunction D_mapping;
+				InputRegister E_input;
+				int E_component;
+				MapFunction E_mapping;
+				InputRegister F_input;
+				int F_component;
+				MapFunction F_mapping;
+			} mapin_rgb;
+		} final;
+		int stages;
+	} setup;
+	int used;
 };
 
 class nv2a_renderer; // forward declaration
@@ -196,10 +348,10 @@ objects have methods used to do drawing
 most methods set parameters, others actually draw
 */
 
-class nv2a_rasterizer : public poly_manager<double, nvidia_object_data, 13, 8192>
+class nv2a_rasterizer : public poly_manager<double, nvidia_object_data, 26, 8192>
 {
 public:
-	nv2a_rasterizer(running_machine& machine) : poly_manager<double, nvidia_object_data, 13, 8192>(machine)
+	nv2a_rasterizer(running_machine &machine) : poly_manager<double, nvidia_object_data, 26, 8192>(machine)
 	{
 	}
 };
@@ -209,18 +361,32 @@ class nv2a_renderer
 public:
 	enum class VERTEX_PARAMETER {
 		PARAM_COLOR_B = 0,
-		PARAM_COLOR_G = 1,
-		PARAM_COLOR_R = 2,
-		PARAM_COLOR_A = 3,
-		PARAM_TEXTURE0_U = 4,
-		PARAM_TEXTURE0_V = 5,
-		PARAM_TEXTURE1_U = 6,
-		PARAM_TEXTURE1_V = 7,
-		PARAM_TEXTURE2_U = 8,
-		PARAM_TEXTURE2_V = 9,
-		PARAM_TEXTURE3_U = 10,
-		PARAM_TEXTURE3_V = 11,
-		PARAM_Z = 12
+		PARAM_COLOR_G,
+		PARAM_COLOR_R,
+		PARAM_COLOR_A,
+		PARAM_TEXTURE0_S,
+		PARAM_TEXTURE0_T,
+		PARAM_TEXTURE0_R,
+		PARAM_TEXTURE0_Q,
+		PARAM_TEXTURE1_S,
+		PARAM_TEXTURE1_T,
+		PARAM_TEXTURE1_R,
+		PARAM_TEXTURE1_Q,
+		PARAM_TEXTURE2_S,
+		PARAM_TEXTURE2_T,
+		PARAM_TEXTURE2_R,
+		PARAM_TEXTURE2_Q,
+		PARAM_TEXTURE3_S,
+		PARAM_TEXTURE3_T,
+		PARAM_TEXTURE3_R,
+		PARAM_TEXTURE3_Q,
+		PARAM_SECONDARY_COLOR_B,
+		PARAM_SECONDARY_COLOR_G,
+		PARAM_SECONDARY_COLOR_R,
+		PARAM_SECONDARY_COLOR_A,
+		PARAM_Z,
+		PARAM_1W,
+		ALL
 	};
 	enum class NV2A_BEGIN_END {
 		STOP = 0,
@@ -273,6 +439,7 @@ public:
 		A8R8G8B8_RECT = 0x12,
 		L8_RECT = 0x13,
 		DSDT8_RECT = 0x17,
+		A8 = 0x19,
 		A8L8 = 0x1a,
 		I8_RECT = 0x1b,
 		A4R4G4B4_RECT = 0x1d,
@@ -413,6 +580,7 @@ public:
 		objectdata->data = this;
 		combiner.used = 0;
 		primitives_total_count = 0;
+		primitives_batches_count = 0;
 		indexesleft_count = 0;
 		triangles_bfculled = 0;
 		vertex_pipeline = 4;
@@ -440,6 +608,14 @@ public:
 		blend_function_source = NV2A_BLEND_FACTOR::ONE;
 		logical_operation_enabled = false;
 		logical_operation = NV2A_LOGIC_OP::COPY;
+		fog_color = 0;
+		for (int n = 0; n < 4; n++) {
+			texture[n].enabled = 0;
+			texture[n].mode = 0;
+			texture[n].addrmodes = 1;
+			texture[n].addrmodet = 1;
+			texture[n].addrmoder = 1;
+		}
 		for (int n = 0; n < 8; n++)
 			clippingwindows[n].set(0, 0, 640, 480);
 		limits_rendertarget.set(0, 0, 640, 480);
@@ -463,6 +639,7 @@ public:
 		rendertarget = nullptr;
 		depthbuffer = nullptr;
 		displayedtarget = nullptr;
+		old_rendertarget = nullptr;
 		puller_waiting = 0;
 		debug_grab_texttype = -1;
 		debug_grab_textfile = nullptr;
@@ -474,8 +651,8 @@ public:
 			persistvertexattr.attribute[n].fv[3] = 1;
 	}
 	running_machine &machine() { return mach; }
-	DECLARE_READ32_MEMBER(geforce_r);
-	DECLARE_WRITE32_MEMBER(geforce_w);
+	uint32_t geforce_r(offs_t offset, uint32_t mem_mask = ~0);
+	void geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
@@ -497,29 +674,29 @@ public:
 	void surface_2d_blit();
 	uint32_t texture_get_texel(int number, int x, int y);
 	uint8_t *read_pixel(int x, int y, int32_t c[4]);
-	void write_pixel(int x, int y, uint32_t color, int depth);
-	void combiner_initialize_registers(uint32_t argb8[6]);
-	void combiner_initialize_stage(int stage_number);
-	void combiner_initialize_final();
-	void combiner_map_input(int stage_number); // map combiner registers to variables A..D
-	void combiner_map_output(int stage_number); // map combiner calculation results to combiner registers
-	void combiner_map_final_input(); // map final combiner registers to variables A..F
-	void combiner_final_output(); // generate final combiner output
-	float combiner_map_input_select(int code, int index); // get component index in register code
-	float *combiner_map_input_select3(int code); // get pointer to register code
-	float *combiner_map_output_select3(int code); // get pointer to register code for output
-	float combiner_map_input_function(int code, float value); // apply input mapping function code to value
-	void combiner_map_input_function3(int code, float *data); // apply input mapping function code to data
-	void combiner_function_AB(float result[4]);
-	void combiner_function_AdotB(float result[4]);
-	void combiner_function_CD(float result[4]);
-	void combiner_function_CdotD(float result[4]);
-	void combiner_function_ABmuxCD(float result[4]);
-	void combiner_function_ABsumCD(float result[4]);
-	void combiner_compute_rgb_outputs(int index);
-	void combiner_compute_a_outputs(int index);
-	void combiner_argb8_float(uint32_t color, float reg[4]);
-	uint32_t combiner_float_argb8(float reg[4]);
+	void write_pixel(int x, int y, uint32_t color, int z);
+	void combiner_initialize_registers(int id, float rgba[6][4]);
+	void combiner_initialize_stage(int id, int stage_number);
+	void combiner_initialize_final(int id);
+	void combiner_map_stage_input(int id, int stage_number); // map combiner registers to variables A..D
+	void combiner_map_stage_output(int id, int stage_number); // map combiner calculation results to combiner registers
+	void combiner_map_final_input(int id); // map final combiner registers to variables A..F
+	void combiner_final_output(int id); // generate final combiner output
+	float combiner_map_input_select(int id, Combiner::InputRegister code, int index); // get component index in register selected as input
+	float *combiner_map_input_select_array(int id, Combiner::InputRegister code); // get pointer to register selected as input
+	float *combiner_map_output_select_array(int id, Combiner::InputRegister code); // get pointer to register selected as output
+	float combiner_map_input_function(Combiner::MapFunction code, float value); // apply input mapping function code to value
+	void combiner_map_input_function_array(Combiner::MapFunction code, float *data); // apply input mapping function code to data
+	void combiner_function_AB(int id, float result[4]); // calculate values for possible outputs
+	void combiner_function_AdotB(int id, float result[4]);
+	void combiner_function_CD(int id, float result[4]);
+	void combiner_function_CdotD(int id, float result[4]);
+	void combiner_function_ABmuxCD(int id, float result[4]);
+	void combiner_function_ABsumCD(int id, float result[4]);
+	void combiner_compute_rgb_outputs(int id, int index);
+	void combiner_compute_alpha_outputs(int id, int index);
+	void combiner_argb8_float(uint32_t color, float reg[4]); // convert from color to float array
+	uint32_t combiner_float_argb8(float reg[4]); // convert from float array to color
 	uint32_t dilate0(uint32_t value, int bits);
 	uint32_t dilate1(uint32_t value, int bits);
 	void computedilated(void);
@@ -535,15 +712,16 @@ public:
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void extract_packed_float(uint32_t data, float &first, float &second, float &third);
-	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
-	int read_vertices_0x180x(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
-	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
-	void convert_vertices(vertex_nv *source, nv2avertex_t *destination, int count);
-	void assemble_primitive(vertex_nv *source, int count);
-	int clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo);
-	uint32_t render_triangle_clipping(const rectangle &cliprect, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
-	uint32_t render_triangle_culling(const rectangle &cliprect, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
+	void read_vertex(address_space &space, offs_t address, vertex_nv &vertex, int attrib);
+	int read_vertices_0x180x(address_space &space, int destination, uint32_t address, int limit);
+	int read_vertices_0x1810(address_space &space, int destination, int offset, int limit);
+	int read_vertices_0x1818(address_space &space, int destination, uint32_t address, int limit);
+	void convert_vertices(vertex_nv *source, nv2avertex_t *destination);
+	void assemble_primitive(int source, int count);
+	void process_persistent_vertex();
+	int clip_triangle_w(nv2avertex_t vi[3], nv2avertex_t *vo);
+	uint32_t render_triangle_clipping(const rectangle &cliprect, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
+	uint32_t render_triangle_culling(const rectangle &cliprect, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	void clear_render_target(int what, uint32_t value);
 	void clear_depth_buffer(int what, uint32_t value);
 	inline uint8_t *direct_access_ptr(offs_t address);
@@ -590,21 +768,20 @@ public:
 	uint32_t *rendertarget;
 	uint32_t *depthbuffer;
 	uint32_t *displayedtarget;
+	uint32_t *old_rendertarget;
 	struct {
 		uint32_t address[16];
 		int type[16];
 		int stride[16];
-		NV2A_VTXBUF_TYPE kind[16];
-		int size[16];
 		int words[16];
-		int offset[16];
+		int offset[16 + 1];
 		int enabled; // bitmask
 	} vertexbuffer;
 	struct {
 		int enabled;
-		int sizeu;
-		int sizev;
-		int sizew;
+		int sizes;
+		int sizet;
+		int sizer;
 		int dilate;
 		NV2A_TEX_FORMAT format;
 		bool rectangle;
@@ -612,6 +789,7 @@ public:
 		void *buffer;
 		int dma0;
 		int dma1;
+		int mode;
 		int cubic;
 		int noborder;
 		int dims;
@@ -623,11 +801,15 @@ public:
 		int mipmapminlod;
 		int rectheight;
 		int rectwidth;
+		int addrmodes;
+		int addrmodet;
+		int addrmoder;
 	} texture[4];
 	uint32_t triangles_bfculled;
 	NV2A_BEGIN_END primitive_type;
 	uint32_t primitives_count;
 	uint32_t primitives_total_count;
+	uint32_t primitives_batches_count;
 	int indexesleft_count;
 	int indexesleft_first;
 	uint32_t vertex_indexes[1024]; // vertex indices sent by the software to the 3d accelerator
@@ -638,134 +820,32 @@ public:
 	nv2avertex_t vertex_xy[1024+2]; // vertex attributes computed by the 3d accelerator
 	vertex_nv persistvertexattr; // persistent vertex attributes
 	nv2a_rasterizer::render_delegate render_spans_callback;
-
-	struct {
-		float variable_A[4]; // 0=R 1=G 2=B 3=A
-		float variable_B[4];
-		float variable_C[4];
-		float variable_D[4];
-		float variable_E[4];
-		float variable_F[4];
-		float variable_G;
-		float variable_EF[4];
-		float variable_sumclamp[4];
-		float function_RGBop1[4]; // 0=R 1=G 2=B
-		float function_RGBop2[4];
-		float function_RGBop3[4];
-		float function_Aop1;
-		float function_Aop2;
-		float function_Aop3;
-		float register_primarycolor[4]; // rw
-		float register_secondarycolor[4];
-		float register_texture0color[4];
-		float register_texture1color[4];
-		float register_texture2color[4];
-		float register_texture3color[4];
-		float register_color0[4];
-		float register_color1[4];
-		float register_spare0[4];
-		float register_spare1[4];
-		float register_fogcolor[4]; // ro
-		float register_zero[4];
-		float output[4];
-		struct {
-			float register_constantcolor0[4];
-			float register_constantcolor1[4];
-			int mapin_aA_input;
-			int mapin_aA_component;
-			int mapin_aA_mapping;
-			int mapin_aB_input;
-			int mapin_aB_component;
-			int mapin_aB_mapping;
-			int mapin_aC_input;
-			int mapin_aC_component;
-			int mapin_aC_mapping;
-			int mapin_aD_input;
-			int mapin_aD_component;
-			int mapin_aD_mapping;
-			int mapin_rgbA_input;
-			int mapin_rgbA_component;
-			int mapin_rgbA_mapping;
-			int mapin_rgbB_input;
-			int mapin_rgbB_component;
-			int mapin_rgbB_mapping;
-			int mapin_rgbC_input;
-			int mapin_rgbC_component;
-			int mapin_rgbC_mapping;
-			int mapin_rgbD_input;
-			int mapin_rgbD_component;
-			int mapin_rgbD_mapping;
-			int mapout_aCD_output;
-			int mapout_aAB_output;
-			int mapout_aSUM_output;
-			int mapout_aCD_dotproduct;
-			int mapout_aAB_dotproduct;
-			int mapout_a_muxsum;
-			int mapout_a_bias;
-			int mapout_a_scale;
-			int mapout_rgbCD_output;
-			int mapout_rgbAB_output;
-			int mapout_rgbSUM_output;
-			int mapout_rgbCD_dotproduct;
-			int mapout_rgbAB_dotproduct;
-			int mapout_rgb_muxsum;
-			int mapout_rgb_bias;
-			int mapout_rgb_scale;
-		} stage[8];
-		struct {
-			float register_constantcolor0[4];
-			float register_constantcolor1[4];
-			int color_sum_clamp;
-			int mapin_rgbA_input;
-			int mapin_rgbA_component;
-			int mapin_rgbA_mapping;
-			int mapin_rgbB_input;
-			int mapin_rgbB_component;
-			int mapin_rgbB_mapping;
-			int mapin_rgbC_input;
-			int mapin_rgbC_component;
-			int mapin_rgbC_mapping;
-			int mapin_rgbD_input;
-			int mapin_rgbD_component;
-			int mapin_rgbD_mapping;
-			int mapin_rgbE_input;
-			int mapin_rgbE_component;
-			int mapin_rgbE_mapping;
-			int mapin_rgbF_input;
-			int mapin_rgbF_component;
-			int mapin_rgbF_mapping;
-			int mapin_aG_input;
-			int mapin_aG_component;
-			int mapin_aG_mapping;
-		} final;
-		int stages;
-		int used;
-		std::mutex lock;
-	} combiner;
+	Combiner combiner;
 	uint32_t color_mask;
 	bool backface_culling_enabled;
 	NV2A_GL_FRONT_FACE backface_culling_winding;
 	NV2A_GL_CULL_FACE backface_culling_culled;
 	bool alpha_test_enabled;
+	bool depth_test_enabled;
+	bool stencil_test_enabled;
+	bool depth_write_enabled;
+	bool blending_enabled;
+	bool logical_operation_enabled;
 	NV2A_COMPARISON_OP alpha_func;
 	int alpha_reference;
-	bool depth_test_enabled;
 	NV2A_COMPARISON_OP depth_function;
-	bool depth_write_enabled;
-	bool stencil_test_enabled;
 	NV2A_COMPARISON_OP stencil_func;
 	int stencil_ref;
 	int stencil_mask;
 	NV2A_STENCIL_OP stencil_op_fail;
 	NV2A_STENCIL_OP stencil_op_zfail;
 	NV2A_STENCIL_OP stencil_op_zpass;
-	bool blending_enabled;
 	NV2A_BLEND_EQUATION blend_equation;
 	NV2A_BLEND_FACTOR blend_function_source;
 	NV2A_BLEND_FACTOR blend_function_destination;
 	uint32_t blend_color;
-	bool logical_operation_enabled;
 	NV2A_LOGIC_OP logical_operation;
+	uint32_t fog_color;
 	struct {
 		float modelview[4][4];
 		float modelview_inverse[4][4];
@@ -787,13 +867,17 @@ public:
 
 	struct {
 		int format;
-		int pitch_source;
-		int pitch_destination;
-		uint32_t source_address;
-		uint32_t destination_address;
+		uint32_t pitch_source;
+		uint32_t pitch_destination;
+		offs_t source_address;
+		offs_t destination_address;
 		int op;
 		int width;
 		int heigth;
+		uint32_t sourcex;
+		uint32_t sourcey;
+		uint32_t destinationx;
+		uint32_t destinationy;
 	} bitblit;
 	emu_timer *puller_timer;
 	int puller_waiting;

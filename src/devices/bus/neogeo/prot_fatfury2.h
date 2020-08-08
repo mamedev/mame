@@ -15,8 +15,8 @@ public:
 	// construction/destruction
 	fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ16_MEMBER( protection_r );
-	DECLARE_WRITE16_MEMBER( protection_w );
+	uint16_t protection_r(offs_t offset);
+	void protection_w(offs_t offset, uint16_t data);
 
 protected:
 	virtual void device_start() override;

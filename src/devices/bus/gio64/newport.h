@@ -292,8 +292,8 @@ class newport_base_device : public device_t
 public:
 	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ64_MEMBER(rex3_r);
-	DECLARE_WRITE64_MEMBER(rex3_w);
+	uint64_t rex3_r(offs_t offset, uint64_t mem_mask = ~0);
+	void rex3_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -475,8 +475,6 @@ protected:
 	uint32_t convert_4bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
 	uint32_t convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
 	uint32_t convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in);
-
-	uint32_t do_endian_swap(uint32_t color);
 
 	struct bresenham_octant_info_t
 	{

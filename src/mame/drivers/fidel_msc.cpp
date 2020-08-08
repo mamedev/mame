@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Sean Riddle
 /******************************************************************************
 
 Fidelity Mini Sensory Chess Challenger (model MSC, 1981 version)
@@ -15,15 +16,11 @@ Hardware notes:
 
 released modules, * denotes not dumped yet:
 - CAC: Challenger Advanced Chess
-- *CBO: Challenger Book Openings
+- CBO: Challenger Book Openings
 - *CGG: Challenger Greatest Games
 
 As noted in the hash file: The modules have 2 programs in them, one for Z8
 and one for MCS48. A12 is forced high or low to select the bank.
-
-TODO:
-- dump internal Z8 ROM, then it can be marked working, right now only the
-  external module is playable (luckily it doesn't jump to the internal ROM)
 
 ******************************************************************************/
 
@@ -226,20 +223,8 @@ void msc_state::msc(machine_config &config)
 ******************************************************************************/
 
 ROM_START( miniscco )
-	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD("sr0016_1001011a01", 0x0000, 0x0800, NO_DUMP ) // internal ROM
-
-	// force jump to external module
-	ROM_FILL(0x000a, 1, 0x08) // timer IRQ vector
-	ROM_FILL(0x000b, 1, 0x05) // "
-
-	ROM_FILL(0x000c, 1, 0xe6) // LD P01M, #4fh
-	ROM_FILL(0x000d, 1, 0xf8) // "
-	ROM_FILL(0x000e, 1, 0x4f) // "
-
-	ROM_FILL(0x000f, 1, 0x8d) // JP 0800h
-	ROM_FILL(0x0010, 1, 0x08) // "
-	ROM_FILL(0x0011, 1, 0x00) // "
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD("sr0016_1001011a01", 0x0000, 0x0800, CRC(c8cd9bf1) SHA1(4ba165555b8419b03b2ef355da0ed9675315e18b) ) // internal ROM
 ROM_END
 
 } // anonymous namespace
@@ -251,4 +236,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, miniscco, miniscc, 0, msc,     msc,   msc_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1981, miniscco, miniscc, 0, msc,     msc,   msc_state, empty_init, "Fidelity Electronics", "Mini Sensory Chess Challenger (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

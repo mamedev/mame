@@ -20,7 +20,7 @@ Preliminary driver by:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
+void aliens_state::aliens_coin_counter_w(uint8_t data)
 {
 	/* bits 0-1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -42,7 +42,7 @@ WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 #endif
 }
 
-WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
+void aliens_state::aliens_sh_irqtrigger_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -60,7 +60,7 @@ void aliens_state::aliens_snd_bankswitch_w(uint8_t data)
 }
 
 
-READ8_MEMBER(aliens_state::k052109_051960_r)
+uint8_t aliens_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -75,7 +75,7 @@ READ8_MEMBER(aliens_state::k052109_051960_r)
 		return m_k052109->read(offset);
 }
 
-WRITE8_MEMBER(aliens_state::k052109_051960_w)
+void aliens_state::k052109_051960_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(offset - 0x3800, data);

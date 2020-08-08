@@ -212,6 +212,8 @@ void r4000_base_device::device_reset()
 	m_ll_active = false;
 	m_bus_error = false;
 
+	m_cp0[CP0_Cause] = 0;
+
 	m_cp0[CP0_WatchLo] = 0;
 	m_cp0[CP0_WatchHi] = 0;
 

@@ -112,10 +112,10 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sc0_vram_w);
-	DECLARE_WRITE8_MEMBER(sc0_attr_w);
-	DECLARE_WRITE8_MEMBER(led_array_w);
-	DECLARE_WRITE8_MEMBER(kingdrbb_lamps_w);
+	void sc0_vram_w(offs_t offset, uint8_t data);
+	void sc0_attr_w(offs_t offset, uint8_t data);
+	void led_array_w(offs_t offset, uint8_t data);
+	void kingdrbb_lamps_w(uint8_t data);
 	uint8_t hopper_io_r();
 	void hopper_io_w(uint8_t data);
 	void sound_cmd_w(uint8_t data);
@@ -283,7 +283,7 @@ uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rg
 	m_sc0w_tilemap->set_scrolly(0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
-	clip.set(visarea.min_x, 256, 192, visarea.max_y);
+	clip.set(visarea.min_x, 255, 192, visarea.max_y);
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -294,7 +294,7 @@ uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
+void kingdrby_state::sc0_vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
@@ -302,7 +302,7 @@ WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
+void kingdrby_state::sc0_attr_w(offs_t offset, uint8_t data)
 {
 	m_attr[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
@@ -414,7 +414,7 @@ uint8_t kingdrby_state::sound_cmd_r()
 static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-WRITE8_MEMBER(kingdrby_state::led_array_w)
+void kingdrby_state::led_array_w(offs_t offset, uint8_t data)
 {
 	/*
 	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
@@ -464,7 +464,7 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x7c00, 0x7c00).portr("DSW");
 }
 
-WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
+void kingdrby_state::kingdrbb_lamps_w(uint8_t data)
 {
 	// (same as the inputs but active high)
 }

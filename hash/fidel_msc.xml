@@ -24,4 +24,15 @@ The 1st half is for Z8, 2nd half is for MCS48. A12 is forced high or low.
 		</part>
 	</software>
 
+	<software name="cbo">
+		<description>Challenger Book Openings</description>
+		<year>1982</year>
+		<publisher>Fidelity Electronics</publisher>
+		<part name="cart" interface="fidel_msc">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mk36a43n-4_101-1043a01" size="0x2000" crc="430d0969" sha1="34a436fdf26c5feb503228ffcf6ce5ac2632168e" /> <!-- MK36000 -->
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

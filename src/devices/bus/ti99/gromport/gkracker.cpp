@@ -174,7 +174,7 @@ bool ti99_gkracker_device::is_grom_idle()
 	return (m_cartridge != nullptr)? m_cartridge->is_grom_idle() : false;
 }
 
-READ8Z_MEMBER(ti99_gkracker_device::readz)
+void ti99_gkracker_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_grom_selected)
 	{
@@ -305,7 +305,7 @@ void ti99_gkracker_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-READ8Z_MEMBER( ti99_gkracker_device::crureadz )
+void ti99_gkracker_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if (m_cartridge != nullptr) m_cartridge->crureadz(offset, value);
 }

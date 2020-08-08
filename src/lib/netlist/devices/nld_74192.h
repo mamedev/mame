@@ -1,30 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_74192.h
- *
- *  DM74192: Synchronous 4-Bit Binary Counter with Dual Clock
- *           Decade counter
- *
- *  FIXME: This should be merged with the 74193 which counts to 16
- *
- *          +--------------+
- *        B |1     ++    16| VCC
- *       QB |2           15| A
- *       QA |3           14| CLEAR
- *       CD |4    74192  13| BORROWQ
- *       CU |5           12| CARRYQ
- *       QC |6           11| LOADQ
- *       QD |7           10| C
- *      GND |8            9| D
- *          +--------------+
- *
- * CD: Count up
- * CU: Count down
- *
- *  Naming conventions follow National Semiconductor datasheet
- *
- */
 
 #ifndef NLD_74192_H_
 #define NLD_74192_H_

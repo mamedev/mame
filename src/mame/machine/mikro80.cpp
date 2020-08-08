@@ -10,101 +10,90 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/mikro80.h"
 
 /* Driver initialization */
 void mikro80_state::init_mikro80()
 {
-	/* set initialy ROM to be visible on first bank */
-	uint8_t *RAM = m_region_maincpu->base();
-	memset(RAM,0x0000,0x0800); // make frist page empty by default
-	m_bank1->configure_entries(1, 2, RAM, 0x0000);
-	m_bank1->configure_entries(0, 2, RAM, 0xf800);
 	m_key_mask = 0x7f;
 }
 
 void mikro80_state::init_radio99()
 {
-	init_mikro80();
 	m_key_mask = 0xff;
 }
 
-uint8_t mikro80_state::mikro80_8255_portb_r()
+u8 mikro80_state::portb_r()
 {
-	uint8_t key = 0xff;
-	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
-	if ((m_keyboard_mask & 0x02)!=0) { key &= m_io_line1->read(); }
-	if ((m_keyboard_mask & 0x04)!=0) { key &= m_io_line2->read(); }
-	if ((m_keyboard_mask & 0x08)!=0) { key &= m_io_line3->read(); }
-	if ((m_keyboard_mask & 0x10)!=0) { key &= m_io_line4->read(); }
-	if ((m_keyboard_mask & 0x20)!=0) { key &= m_io_line5->read(); }
-	if ((m_keyboard_mask & 0x40)!=0) { key &= m_io_line6->read(); }
-	if ((m_keyboard_mask & 0x80)!=0) { key &= m_io_line7->read(); }
+	u8 key = 0xff;
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(m_keyboard_mask, i))
+			key &= m_io_keyboard[i]->read();
+
 	return key & m_key_mask;
 }
 
-uint8_t mikro80_state::mikro80_8255_portc_r()
+u8 mikro80_state::portc_r()
 {
-	return m_io_line8->read();
+	return m_io_keyboard[8]->read();
 }
 
-void mikro80_state::mikro80_8255_porta_w(uint8_t data)
+u8 mikro80_state::kristall2_portc_r()
+{
+	return (m_io_keyboard[8]->read() & 0xfe) | ((m_cassette->input() < 0.04) ? 1 : 0);
+}
+
+void mikro80_state::porta_w(u8 data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-void mikro80_state::mikro80_8255_portc_w(uint8_t data)
+void mikro80_state::portc_w(u8 data)
 {
+	m_cassette->output(BIT(data, 7) ? 1.0 : -1.0);   // for Kristall2 only
 }
 
-void mikro80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mikro80_state::machine_start()
 {
-	switch (id)
-	{
-	case TIMER_RESET:
-		m_bank1->set_entry(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mikro80_state::device_timer");
-	}
+	save_item(NAME(m_keyboard_mask));
+	save_item(NAME(m_key_mask));
 }
 
 void mikro80_state::machine_reset()
 {
-	timer_set(attotime::from_usec(10), TIMER_RESET);
-	m_bank1->set_entry(1);
 	m_keyboard_mask = 0;
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
-
-READ8_MEMBER(mikro80_state::mikro80_keyboard_r)
+void mikro80_state::tape_w(u8 data)
 {
-	return m_ppi8255->read(offset^0x03);
+	// Todo: this is incorrect, to be fixed when the CMT schematic can be found
+	m_cassette->output(BIT(data, 0) ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER(mikro80_state::mikro80_keyboard_w)
+
+u8 mikro80_state::tape_r()
 {
-	m_ppi8255->write(offset^0x03, data);
+	return (m_cassette->input() < 0.04) ? 0xff : 0;
 }
 
-
-WRITE8_MEMBER(mikro80_state::mikro80_tape_w)
-{
-	m_cassette->output(data & 0x01 ? 1 : -1);
-}
-
-
-READ8_MEMBER(mikro80_state::mikro80_tape_r)
-{
-	double level = m_cassette->input();
-	if (level <  0) {
-			return 0x00;
-	}
-	return 0xff;
-}
-
-WRITE8_MEMBER(mikro80_state::radio99_sound_w)
+void mikro80_state::sound_w(u8 data)
 {
 	m_dac->write(BIT(data, 1));
 }

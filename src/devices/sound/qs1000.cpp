@@ -259,6 +259,9 @@ void qs1000_device::device_start()
 		save_item(NAME(m_channels[i].m_regs), i);
 		save_item(NAME(m_channels[i].m_adpcm.m_signal), i);
 		save_item(NAME(m_channels[i].m_adpcm.m_step), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_loop_signal), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_loop_step), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_saved), i);
 	}
 }
 
@@ -504,8 +507,17 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					{
 						chan.m_adpcm_addr++;
 
-						if (chan.m_start + chan.m_adpcm_addr >=  chan.m_loop_end)
+						if (chan.m_start + chan.m_adpcm_addr >= chan.m_loop_end)
+						{
 							chan.m_adpcm_addr = chan.m_loop_start - chan.m_start;
+#if 0 // Looping disabled until envelopes work
+							chan.m_adpcm.restore();
+						}
+						if (chan.m_start + chan.m_adpcm_addr == chan.m_loop_start)
+						{
+							chan.m_adpcm.save();
+#endif
+						}
 
 						uint8_t data = read_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
 						uint8_t nibble = (chan.m_adpcm_addr & 1 ? data : data >> 4) & 0xf;

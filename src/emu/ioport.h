@@ -453,13 +453,13 @@ enum
 	INPUT_STRING_3C_1C,     //  0.333333
 	INPUT_STRING_8C_3C,     //  0.375000
 //  INPUT_STRING_10C_4C,    //  0.400000
-//  INPUT_STRING_5C_2C,     //  0.400000
 //  INPUT_STRING_7C_3C,     //  0.428571
 //  INPUT_STRING_9C_4C,     //  0.444444
 //  INPUT_STRING_10C_5C,    //  0.500000
 //  INPUT_STRING_8C_4C,     //  0.500000
 //  INPUT_STRING_6C_3C,     //  0.500000
 	INPUT_STRING_4C_2C,     //  0.500000
+	INPUT_STRING_5C_2C,     //  0.500000
 	INPUT_STRING_2C_1C,     //  0.500000
 //  INPUT_STRING_9C_5C,     //  0.555556
 //  INPUT_STRING_7C_4C,     //  0.571429
@@ -497,6 +497,7 @@ enum
 //  INPUT_STRING_6C_7C,     //  1.166667
 //  INPUT_STRING_5C_6C,     //  1.200000
 //  INPUT_STRING_8C_10C,    //  1.250000
+	INPUT_STRING_3C_5C,     //  1.250000
 	INPUT_STRING_4C_5C,     //  1.250000
 //  INPUT_STRING_7C_9C,     //  1.285714
 //  INPUT_STRING_6C_8C,     //  1.333333
@@ -1266,6 +1267,9 @@ public:
 	float crosshair_read();
 	void frame_update(running_machine &machine);
 
+	// setters
+	void set_value(s32 value);
+
 private:
 	// helpers
 	s32 apply_min_max(s32 value) const;
@@ -1293,6 +1297,7 @@ private:
 	s32                 m_accum;                // accumulated value (including relative adjustments)
 	s32                 m_previous;             // previous adjusted value
 	s32                 m_previousanalog;       // previous analog value
+	s32                 m_prog_analog_value;    // programmatically set analog value
 
 	// parameters for modifying live values
 	s32                 m_minimum;              // minimum adjusted value
@@ -1314,6 +1319,7 @@ private:
 	bool                m_single_scale;         // scale joystick differently if default is between min/max
 	bool                m_interpolate;          // should we do linear interpolation for mid-frame reads?
 	bool                m_lastdigital;          // was the last modification caused by a digital form?
+	bool                m_was_written;          // was the last modification caused programmatically?
 };
 
 

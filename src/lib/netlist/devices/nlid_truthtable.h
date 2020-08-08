@@ -26,7 +26,7 @@ namespace netlist
 			pstring m_family_name;
 		};
 
-		plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc,
+		host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc,
 			properties &&props);
 
 	} // namespace factory

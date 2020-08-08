@@ -242,13 +242,13 @@ void isa8_epc_mda_device::device_reset()
 
 	if (m_installed == false)
 	{
-		m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
+		m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
 		m_isa->install_bank(0xb0000, 0xb7fff, "bank_epc", &m_videoram[0]); // Monochrome emulation mode VRAM address
 
 		// This check allows a color monitor adapter to be installed at this address range if color emulation is disabled
 		if (m_color_mode & 1)
 		{
-			m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
+			m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8sm_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
 			m_isa->install_bank(0xb8000, 0xbffff, "bank_epc", &m_videoram[0]); // Color emulation mode VRAM address, but same 32KB areas as there are only this amount on the board
 		}
 		m_installed = true;
@@ -266,7 +266,7 @@ void isa8_epc_mda_device::device_reset()
  * Status Register        0x3ba      0x3da     r  CGA/MDA status reg (incompatible)
  *                                              w EGA/VGA feature ccontrol reg (not used by this board)
  */
-WRITE8_MEMBER(isa8_epc_mda_device::io_write )
+void isa8_epc_mda_device::io_write(offs_t offset, uint8_t data)
 {
 	LOG("%s: %04x <- %02x\n", FUNCNAME, offset, data);
 	switch( offset )
@@ -318,7 +318,7 @@ WRITE8_MEMBER(isa8_epc_mda_device::io_write )
 	}
 }
 
-READ8_MEMBER( isa8_epc_mda_device::io_read )
+uint8_t isa8_epc_mda_device::io_read(offs_t offset)
 {
 	LOG("%s: %04x <- ???\n", FUNCNAME, offset);
 	int data = 0xff;
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER( isa8_epc_mda_device::vsync_changed )
 /*
  *  rW  MDA mode control register (see #P138)
  */
-WRITE8_MEMBER( isa8_epc_mda_device::mode_control_w )
+void isa8_epc_mda_device::mode_control_w(uint8_t data)
 {
 	m_mode_control = data;
 
@@ -399,10 +399,11 @@ WRITE8_MEMBER( isa8_epc_mda_device::mode_control_w )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-READ8_MEMBER( isa8_epc_mda_device::status_r )
+uint8_t isa8_epc_mda_device::status_r()
 {
 	// Faking pixel stream here
-	m_pixel++;
+	if (!machine().side_effects_disabled())
+		m_pixel++;
 
 	return 0xF0 | (m_pixel & 0x08) | m_hsync;
 }

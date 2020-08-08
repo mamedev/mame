@@ -45,7 +45,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
-		, m_region_basic(*this, "basic")
 		, m_region_mos(*this, "mos")
 		, m_keybd(*this, "LINE.%u", 0)
 		, m_exp(*this, "exp")
@@ -57,6 +56,8 @@ public:
 	void btm2105(machine_config &config);
 
 	void electron64(machine_config &config);
+
+	static void plus3_default(device_t* device);
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
@@ -72,19 +73,19 @@ protected:
 	int m_map4[256];
 	int m_map16[256];
 	emu_timer *m_scanline_timer;
-	DECLARE_READ8_MEMBER(electron64_fetch_r);
-	DECLARE_READ8_MEMBER(electron_mem_r);
-	DECLARE_WRITE8_MEMBER(electron_mem_w);
-	virtual DECLARE_READ8_MEMBER(electron_paged_r);
-	virtual DECLARE_WRITE8_MEMBER(electron_paged_w);
-	DECLARE_READ8_MEMBER(electron_mos_r);
-	DECLARE_WRITE8_MEMBER(electron_mos_w);
-	virtual DECLARE_READ8_MEMBER(electron_fred_r);
-	virtual DECLARE_WRITE8_MEMBER(electron_fred_w);
-	DECLARE_READ8_MEMBER(electron_jim_r);
-	DECLARE_WRITE8_MEMBER(electron_jim_w);
-	DECLARE_READ8_MEMBER(electron_sheila_r);
-	DECLARE_WRITE8_MEMBER(electron_sheila_w);
+	uint8_t electron64_fetch_r(offs_t offset);
+	uint8_t electron_mem_r(offs_t offset);
+	void electron_mem_w(offs_t offset, uint8_t data);
+	virtual uint8_t electron_paged_r(offs_t offset);
+	virtual void electron_paged_w(offs_t offset, uint8_t data);
+	uint8_t electron_mos_r(offs_t offset);
+	void electron_mos_w(offs_t offset, uint8_t data);
+	virtual uint8_t electron_fred_r(offs_t offset);
+	virtual void electron_fred_w(offs_t offset, uint8_t data);
+	uint8_t electron_jim_r(offs_t offset);
+	void electron_jim_w(offs_t offset, uint8_t data);
+	uint8_t electron_sheila_r(offs_t offset);
+	void electron_sheila_w(offs_t offset, uint8_t data);
 
 	void electron_colours(palette_device &palette) const;
 	uint32_t screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -111,7 +112,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
-	required_memory_region m_region_basic;
 	required_memory_region m_region_mos;
 	required_ioport_array<14> m_keybd;
 	required_device<electron_expansion_slot_device> m_exp;
@@ -170,10 +170,10 @@ public:
 	void electronsp(machine_config &config);
 
 protected:
-	virtual DECLARE_READ8_MEMBER(electron_paged_r) override;
-	virtual DECLARE_WRITE8_MEMBER(electron_paged_w) override;
-	virtual DECLARE_READ8_MEMBER(electron_fred_r) override;
-	virtual DECLARE_WRITE8_MEMBER(electron_fred_w) override;
+	virtual uint8_t electron_paged_r(offs_t offset) override;
+	virtual void electron_paged_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t electron_fred_r(offs_t offset) override;
+	virtual void electron_fred_w(offs_t offset, uint8_t data) override;
 
 	virtual void machine_start() override;
 

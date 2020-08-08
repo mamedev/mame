@@ -100,7 +100,7 @@ static void slicer_floppies(device_slot_interface &device)
 
 void slicer_state::slicer(machine_config &config)
 {
-	i80186_cpu_device &maincpu(I80186(config, "maincpu", 16_MHz_XTAL / 2));
+	i80186_cpu_device &maincpu(I80186(config, "maincpu", 16_MHz_XTAL)); // 8 MHz clock output
 	maincpu.set_addrmap(AS_PROGRAM, &slicer_state::slicer_map);
 	maincpu.set_addrmap(AS_IO, &slicer_state::slicer_io);
 

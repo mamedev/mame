@@ -82,14 +82,14 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
-READ32_MEMBER( next_state::rom_map_r )
+uint32_t next_state::rom_map_r()
 {
 	if(0 && !machine().side_effects_disabled())
 		printf("%08x ROM MAP?\n",maincpu->pc());
 	return 0x01000000;
 }
 
-READ32_MEMBER( next_state::scr2_r )
+uint32_t next_state::scr2_r()
 {
 	if(0 && !machine().side_effects_disabled())
 		printf("%08x\n",maincpu->pc());
@@ -126,7 +126,7 @@ READ32_MEMBER( next_state::scr2_r )
 	return data;
 }
 
-WRITE32_MEMBER( next_state::scr2_w )
+void next_state::scr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(0 && !machine().side_effects_disabled())
 		printf("scr2_w %08x (%08x)\n", data, maincpu->pc());
@@ -139,7 +139,7 @@ WRITE32_MEMBER( next_state::scr2_w )
 	irq_set(1, scr2 & 0x02000000);
 }
 
-READ32_MEMBER( next_state::scr1_r )
+uint32_t next_state::scr1_r()
 {
 	/*
 	    xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
@@ -217,17 +217,17 @@ void next_state::irq_set(int id, bool raise)
 }
 
 
-READ32_MEMBER( next_state::irq_status_r )
+uint32_t next_state::irq_status_r()
 {
 	return irq_status;
 }
 
-READ32_MEMBER( next_state::irq_mask_r )
+uint32_t next_state::irq_mask_r()
 {
 	return irq_mask;
 }
 
-WRITE32_MEMBER( next_state::irq_mask_w )
+void next_state::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&irq_mask);
 	irq_check();
@@ -434,7 +434,7 @@ void next_state::dma_check_end(int slot, bool eof)
 		dma_end(slot);
 }
 
-READ32_MEMBER( next_state::dma_regs_r)
+uint32_t next_state::dma_regs_r(offs_t offset)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -462,7 +462,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	return res;
 }
 
-WRITE32_MEMBER( next_state::dma_regs_w)
+void next_state::dma_regs_w(offs_t offset, uint32_t data)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -487,7 +487,7 @@ WRITE32_MEMBER( next_state::dma_regs_w)
 	}
 }
 
-READ32_MEMBER( next_state::dma_ctrl_r)
+uint32_t next_state::dma_ctrl_r(offs_t offset)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -500,7 +500,7 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
 
-WRITE32_MEMBER( next_state::dma_ctrl_w)
+void next_state::dma_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -559,14 +559,14 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 
 int const next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
 
-READ32_MEMBER( next_state::scsictrl_r )
+uint32_t next_state::scsictrl_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res = (scsictrl << 24) | (scsistat << 16);
 	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, maincpu->pc());
 	return res;
 }
 
-WRITE32_MEMBER( next_state::scsictrl_w )
+void next_state::scsictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_24_31) {
 		scsictrl = data >> 24;
@@ -590,7 +590,7 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 	}
 }
 
-READ32_MEMBER( next_state::event_counter_r)
+uint32_t next_state::event_counter_r(offs_t offset, uint32_t mem_mask)
 {
 	// Event counters, around that time, are usually fixed-frequency counters.
 	// This one being 1MHz seems to make sense
@@ -602,17 +602,17 @@ READ32_MEMBER( next_state::event_counter_r)
 	return eventc_latch;
 }
 
-READ32_MEMBER( next_state::dsp_r)
+uint32_t next_state::dsp_r()
 {
 	return 0x7fffffff;
 }
 
-WRITE32_MEMBER( next_state::fdc_control_w )
+void next_state::fdc_control_w(uint32_t data)
 {
 	logerror("FDC write %02x (%08x)\n", data >> 24, maincpu->pc());
 }
 
-READ32_MEMBER( next_state::fdc_control_r )
+uint32_t next_state::fdc_control_r()
 {
 	// Type of floppy present
 	// 0 = no floppy in drive
@@ -646,13 +646,13 @@ READ32_MEMBER( next_state::fdc_control_r )
 	return 0 << 24;
 }
 
-READ32_MEMBER( next_state::phy_r )
+uint32_t next_state::phy_r(offs_t offset)
 {
 	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 	return phy[offset] | (0 << 24);
 }
 
-WRITE32_MEMBER( next_state::phy_w )
+void next_state::phy_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(phy+offset);
 	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
@@ -668,14 +668,14 @@ void next_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_ctrl &= 0x7fffffff;
 }
 
-READ32_MEMBER( next_state::timer_data_r )
+uint32_t next_state::timer_data_r()
 {
 	if(timer_ctrl & 0x80000000)
 		timer_update();
 	return timer_data;
 }
 
-WRITE32_MEMBER( next_state::timer_data_w )
+void next_state::timer_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(timer_ctrl & 0x80000000) {
 		COMBINE_DATA(&timer_next_data);
@@ -686,13 +686,13 @@ WRITE32_MEMBER( next_state::timer_data_w )
 	}
 }
 
-READ32_MEMBER( next_state::timer_ctrl_r )
+uint32_t next_state::timer_ctrl_r()
 {
 	irq_set(29, false);
 	return timer_ctrl;
 }
 
-WRITE32_MEMBER( next_state::timer_ctrl_w )
+void next_state::timer_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	bool oldact = timer_ctrl & 0x80000000;
 	COMBINE_DATA(&timer_ctrl);
@@ -793,7 +793,7 @@ WRITE_LINE_MEMBER(next_state::scsi_drq)
 	dma_drq_w(1, state);
 }
 
-WRITE8_MEMBER(next_state::ramdac_w)
+void next_state::ramdac_w(offs_t offset, uint8_t data)
 {
 	switch(offset) {
 	case 0:

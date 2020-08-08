@@ -800,7 +800,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- boot OK, sometimes a line of garbage appear on background during gameplay (happened after continue on stage 3, hard to repro?) --> 
+	<!-- boot OK, sometimes a line of garbage appear on background during gameplay (happened after continue on stage 3, hard to repro?) -->
 	<!-- old note: has video glitches on first stage, Ajax title logo on background (cannot repro) -->
 	<software name="ajax" supported="partial">
 		<description>Ajax</description>
@@ -22164,7 +22164,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
-	<!-- boot OK --> 
+	<!-- boot OK -->
 	<!-- some projectiles don't move (cannot repro) -->
 	<software name="actshoot">
 		<description>Active Shoot</description>

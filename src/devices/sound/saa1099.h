@@ -47,22 +47,19 @@ private:
 		u8 envelope[2];             // envelope (0x00..0x0f or 0x10 == off)
 
 		/* vars to simulate the square wave */
-		double counter = 0.0;
-		double freq = 0.0;
+		inline u32 freq() const { return (511 - frequency) << (8 - octave); } // clock / ((511 - frequency) * 2^(8 - octave))
+		int counter = 0;
 		u8 level = 0;
 	};
 
 	struct saa1099_noise
 	{
-		saa1099_noise() { (void)pad; }
+		saa1099_noise() { }
 
 		/* vars to simulate the noise generator output */
-		double counter = 0.0;
-		double freq = 0.0;
+		int counter = 0;
+		int freq = 0;
 		u32 level = 0xffffffffU;    // noise polynomial shifter
-
-	private:
-		u32 pad; // pad out structure to multiple of sizeof(double)
 	};
 
 	void envelope_w(int ch);
@@ -80,7 +77,6 @@ private:
 	u8 m_selected_reg;              // selected register
 	saa1099_channel m_channels[6];  // channels
 	saa1099_noise m_noise[2];       // noise generators
-	double m_sample_rate;
 };
 
 DECLARE_DEVICE_TYPE(SAA1099, saa1099_device)

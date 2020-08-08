@@ -77,12 +77,13 @@ private:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void dim68k_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	bool m_speaker_bit;
 	u8 m_video_control;
 	u8 m_term_data;
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
@@ -189,7 +190,7 @@ void dim68k_state::dim68k_banksw_w(u16 data)
 {
 }
 
-void dim68k_state::dim68k_mem(address_map &map)
+void dim68k_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x00feffff).ram().share("ram"); // 16MB RAM / ROM at boot
@@ -310,11 +311,18 @@ void dim68k_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
+void dim68k_state::machine_start()
+{
+	save_item(NAME(m_speaker_bit));
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_term_data));
+}
+
 void dim68k_state::dim68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::dim68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -406,4 +414,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME           FLAGS
-COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

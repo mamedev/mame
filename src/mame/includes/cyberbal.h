@@ -69,7 +69,7 @@ public:
 	void cyberbal2p(machine_config &config);
 
 protected:
-	DECLARE_READ16_MEMBER(sound_state_r);
+	uint16_t sound_state_r();
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -111,7 +111,7 @@ public:
 	void cyberbalt(machine_config &config);
 
 protected:
-	DECLARE_WRITE16_MEMBER(p2_reset_w);
+	void p2_reset_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 

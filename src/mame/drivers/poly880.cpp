@@ -45,7 +45,7 @@ void poly880_state::update_display()
 			m_digits[7 - i] = m_segment;
 }
 
-WRITE8_MEMBER( poly880_state::cldig_w )
+void poly880_state::cldig_w(uint8_t data)
 {
 	m_digit = data;
 

@@ -109,8 +109,8 @@ private:
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_device> m_microtouch;
 
-	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
-	DECLARE_READ8_MEMBER(pcat_nit_io_r);
+	void pcat_nit_rombank_w(uint8_t data);
+	uint8_t pcat_nit_io_r(offs_t offset);
 	virtual void machine_start() override;
 	void bonanza_io_map(address_map &map);
 	void bonanza_map(address_map &map);
@@ -124,7 +124,7 @@ private:
  *
  *************************************/
 
-WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
+void pcat_nit_state::pcat_nit_rombank_w(uint8_t data)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	//logerror( "rom bank #%02x at PC=%08X\n", data, m_maincpu->pc() );
@@ -179,7 +179,7 @@ void pcat_nit_state::bonanza_map(address_map &map)
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
 }
 
-READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
+uint8_t pcat_nit_state::pcat_nit_io_r(offs_t offset)
 {
 	switch(offset)
 	{

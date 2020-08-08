@@ -110,7 +110,7 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16::array<2> m_adc_in;
+	devcb_read16::array<4> m_adc_in;
 
 	devcb_read16 m_guny_in;
 	devcb_read16 m_gunx_in;

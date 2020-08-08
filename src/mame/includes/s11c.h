@@ -28,8 +28,6 @@ protected:
 private:
 
 	void s11c_main_map(address_map &map);
-	void s11c_audio_map(address_map &map);
-	void s11c_bg_map(address_map &map);
 };
 
 

@@ -90,7 +90,7 @@ void mz_state::init_mz800()
 void mz_state::machine_start()
 {
 	/* reset memory map to defaults */
-	mz700_bank_4_w(m_maincpu->space(AS_IO), 0, 0);
+	mz700_bank_4_w(0);
 }
 
 MACHINE_RESET_MEMBER( mz_state, mz700 )
@@ -118,7 +118,7 @@ MACHINE_RESET_MEMBER( mz_state, mz800 )
     MMIO
 ***************************************************************************/
 
-READ8_MEMBER(mz_state::mz700_e008_r)
+uint8_t mz_state::mz700_e008_r()
 {
 	uint8_t data = 0;
 
@@ -131,7 +131,7 @@ READ8_MEMBER(mz_state::mz700_e008_r)
 	return data;
 }
 
-WRITE8_MEMBER(mz_state::mz700_e008_w)
+void mz_state::mz700_e008_w(uint8_t data)
 {
 	m_pit->write_gate0(BIT(data, 0));
 }
@@ -141,7 +141,7 @@ WRITE8_MEMBER(mz_state::mz700_e008_w)
     BANK SWITCHING
 ***************************************************************************/
 
-READ8_MEMBER(mz_state::mz800_bank_0_r)
+uint8_t mz_state::mz800_bank_0_r()
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -184,7 +184,7 @@ READ8_MEMBER(mz_state::mz800_bank_0_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_0_w)
+void mz_state::mz700_bank_0_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -193,7 +193,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_0_w)
 	membank("bankr0")->set_entry(0); // ram
 }
 
-WRITE8_MEMBER(mz_state::mz800_bank_0_w)
+void mz_state::mz800_bank_0_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER(mz_state::mz800_bank_0_w)
 	membank("bankr0")->set_entry(0); // ram
 }
 
-READ8_MEMBER(mz_state::mz800_bank_1_r)
+uint8_t mz_state::mz800_bank_1_r()
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -230,7 +230,7 @@ READ8_MEMBER(mz_state::mz800_bank_1_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_1_w)
+void mz_state::mz700_bank_1_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 	membank("bankd")->set_entry(0); // ram
@@ -268,7 +268,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 	}
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_2_w)
+void mz_state::mz700_bank_2_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -279,7 +279,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_2_w)
 
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_3_w)
+void mz_state::mz700_bank_3_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -327,15 +327,15 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 	}
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_4_w)
+void mz_state::mz700_bank_4_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
 		m_mz700_ram_lock = false;       /* reset lock */
-		mz700_bank_2_w(space, 0, 0);    /* switch in monitor rom */
-		mz700_bank_3_w(space, 0, 0);    /* switch in videoram, colorram, and mmio */
+		mz700_bank_2_w(0);    /* switch in monitor rom */
+		mz700_bank_3_w(0);    /* switch in videoram, colorram, and mmio */
 
 		if (!m_mz700)
 		{
@@ -395,7 +395,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 	}
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_5_w)
+void mz_state::mz700_bank_5_w(uint8_t data)
 {
 	//address_space &spc = m_maincpu->space(AS_PROGRAM);
 
@@ -419,7 +419,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_5_w)
 	}
 }
 
-WRITE8_MEMBER(mz_state::mz700_bank_6_w)
+void mz_state::mz700_bank_6_w(uint8_t data)
 {
 	if (m_mz700_mode)
 	{
@@ -427,9 +427,9 @@ WRITE8_MEMBER(mz_state::mz700_bank_6_w)
 
 		/* restore access */
 		if (m_mz700_ram_vram)
-			mz700_bank_3_w(space, 0, 0);
+			mz700_bank_3_w(0);
 		else
-			mz700_bank_1_w(space, 0, 0);
+			mz700_bank_1_w(0);
 	}
 	else
 	{
@@ -437,9 +437,9 @@ WRITE8_MEMBER(mz_state::mz700_bank_6_w)
 
 		/* restore access from 0xe000 to 0xffff */
 		if (m_mz800_ram_monitor)
-			mz700_bank_3_w(space, 0, 0);
+			mz700_bank_3_w(0);
 		else
-			mz700_bank_1_w(space, 0, 0);
+			mz700_bank_1_w(0);
 	}
 }
 
@@ -603,7 +603,7 @@ void mz_state::mz800_z80pio_port_a_w(uint8_t data)
 }
 
 /* port CE */
-READ8_MEMBER(mz_state::mz800_crtc_r)
+uint8_t mz_state::mz800_crtc_r()
 {
 	uint8_t data = 0x00;
 	LOG(1,"mz800_crtc_r",("%02X\n",data),machine());
@@ -612,7 +612,7 @@ READ8_MEMBER(mz_state::mz800_crtc_r)
 
 
 /* port EA */
-READ8_MEMBER(mz_state::mz800_ramdisk_r)
+uint8_t mz_state::mz800_ramdisk_r()
 {
 	uint8_t *mem = memregion("user1")->base();
 	uint8_t data = mem[m_mz800_ramaddr];
@@ -623,13 +623,13 @@ READ8_MEMBER(mz_state::mz800_ramdisk_r)
 }
 
 /* port CC */
-WRITE8_MEMBER(mz_state::mz800_write_format_w)
+void mz_state::mz800_write_format_w(uint8_t data)
 {
 	LOG(1,"mz800_write_format_w",("%02X\n", data),machine());
 }
 
 /* port CD */
-WRITE8_MEMBER(mz_state::mz800_read_format_w)
+void mz_state::mz800_read_format_w(uint8_t data)
 {
 	LOG(1,"mz800_read_format_w",("%02X\n", data),machine());
 }
@@ -640,7 +640,7 @@ WRITE8_MEMBER(mz_state::mz800_read_format_w)
  * bit 1    1: 4bpp/2bpp        0: 2bpp/1bpp
  * bit 0    ???
  */
-WRITE8_MEMBER(mz_state::mz800_display_mode_w)
+void mz_state::mz800_display_mode_w(uint8_t data)
 {
 	m_mz700_mode = BIT(data, 3);
 	m_hires_mode = BIT(data, 2);
@@ -656,13 +656,13 @@ WRITE8_MEMBER(mz_state::mz800_display_mode_w)
 }
 
 /* port CF */
-WRITE8_MEMBER(mz_state::mz800_scroll_border_w)
+void mz_state::mz800_scroll_border_w(uint8_t data)
 {
 	LOG(1,"mz800_scroll_border_w",("%02X\n", data),machine());
 }
 
 /* port EA */
-WRITE8_MEMBER(mz_state::mz800_ramdisk_w)
+void mz_state::mz800_ramdisk_w(uint8_t data)
 {
 	uint8_t *mem = memregion("user1")->base();
 	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", m_mz800_ramaddr, data),machine());
@@ -672,14 +672,14 @@ WRITE8_MEMBER(mz_state::mz800_ramdisk_w)
 }
 
 /* port EB */
-WRITE8_MEMBER(mz_state::mz800_ramaddr_w)
+void mz_state::mz800_ramaddr_w(uint8_t data)
 {
 	m_mz800_ramaddr = (m_maincpu->state_int(Z80_BC) & 0xff00) | (data & 0xff);
 	LOG(1,"mz800_ramaddr_w",("%04X\n", m_mz800_ramaddr),machine());
 }
 
 /* port F0 */
-WRITE8_MEMBER(mz_state::mz800_palette_w)
+void mz_state::mz800_palette_w(uint8_t data)
 {
 	if (data & 0x40)
 	{

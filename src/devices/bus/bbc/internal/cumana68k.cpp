@@ -207,7 +207,7 @@ void bbc_cumana68k_device::fsel_w(offs_t offset, uint8_t data)
 }
 
 
-READ8_MEMBER(bbc_cumana68k_device::mem6502_r)
+uint8_t bbc_cumana68k_device::mem6502_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -228,7 +228,7 @@ READ8_MEMBER(bbc_cumana68k_device::mem6502_r)
 	return data;
 }
 
-WRITE8_MEMBER(bbc_cumana68k_device::mem6502_w)
+void bbc_cumana68k_device::mem6502_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

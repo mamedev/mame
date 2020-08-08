@@ -117,10 +117,14 @@ private:
 	void exit();
 
 	void execute_help_custom(int ref, const std::vector<std::string> &params);
+	void execute_condump(int ref, const std::vector<std::string>& params);
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
+
+	void print_core(const char *text);                   // core text output
+	void print_core_wrap(const char *text, int wrapcol); // core text output
 
 	struct debug_command
 	{
@@ -147,6 +151,7 @@ private:
 	std::forward_list<debug_command> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
+	std::unique_ptr<emu_file> m_logfile;                // logfile for debug console output
 };
 
 #endif // MAME_EMU_DEBUG_DEBUGCON_H

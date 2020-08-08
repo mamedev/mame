@@ -14,14 +14,14 @@ bit 2 = sound cpu reset line
 bit 1 = microcontroller reset line
 bit 0 = ? (unused?)
 */
-WRITE8_MEMBER(kikikai_state::main_f008_w)
+void kikikai_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(mexico86_state::main_f008_w)
+void mexico86_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -29,7 +29,7 @@ WRITE8_MEMBER(mexico86_state::main_f008_w)
 	m_68705mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(kikikai_simulation_state::main_f008_w)
+void kikikai_simulation_state::main_f008_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -344,54 +344,54 @@ Kiki KaiKai / Kick 'n Run MCU
 
 ***************************************************************************/
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr1_r)
+uint8_t kikikai_state::kikikai_mcu_ddr1_r()
 {
 	return m_ddr1;
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr1_w)
+void kikikai_state::kikikai_mcu_ddr1_w(uint8_t data)
 {
 	m_ddr1 = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr2_r)
+uint8_t kikikai_state::kikikai_mcu_ddr2_r()
 {
 	return m_ddr2;
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr2_w)
+void kikikai_state::kikikai_mcu_ddr2_w(uint8_t data)
 {
 	m_ddr2 = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr3_r)
+uint8_t kikikai_state::kikikai_mcu_ddr3_r()
 {
 	return m_ddr3;
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr3_w)
+void kikikai_state::kikikai_mcu_ddr3_w(uint8_t data)
 {
 	m_ddr3 = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_ddr4_r)
+uint8_t kikikai_state::kikikai_mcu_ddr4_r()
 {
 	return m_ddr4;
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_ddr4_w)
+void kikikai_state::kikikai_mcu_ddr4_w(uint8_t data)
 {
 	m_ddr4 = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port1_r)
+uint8_t kikikai_state::kikikai_mcu_port1_r()
 {
 	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port1_w)
+void kikikai_state::kikikai_mcu_port1_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
 
@@ -413,13 +413,13 @@ WRITE8_MEMBER(kikikai_state::kikikai_mcu_port1_w)
 	m_port1_out = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port2_r)
+uint8_t kikikai_state::kikikai_mcu_port2_r()
 {
 	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port2_w)
+void kikikai_state::kikikai_mcu_port2_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
 	static const char *const portnames[] = { "IN1", "IN2" };
@@ -452,25 +452,25 @@ WRITE8_MEMBER(kikikai_state::kikikai_mcu_port2_w)
 	m_port2_out = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port3_r)
+uint8_t kikikai_state::kikikai_mcu_port3_r()
 {
 	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
 	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port3_w)
+void kikikai_state::kikikai_mcu_port3_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
 	m_port3_out = data;
 }
 
-READ8_MEMBER(kikikai_state::kikikai_mcu_port4_r)
+uint8_t kikikai_state::kikikai_mcu_port4_r()
 {
 	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
 	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
 }
 
-WRITE8_MEMBER(kikikai_state::kikikai_mcu_port4_w)
+void kikikai_state::kikikai_mcu_port4_w(uint8_t data)
 {
 	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
 

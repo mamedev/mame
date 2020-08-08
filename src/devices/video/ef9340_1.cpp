@@ -2,8 +2,6 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    ef9340_1.h
-
     Thomson EF9340 + EF9341 teletext graphics chips with 1KB external
     character ram.
 

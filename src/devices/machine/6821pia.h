@@ -57,7 +57,7 @@ public:
 	uint8_t read_alt(offs_t offset) { return read(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
 	void write_alt(offs_t offset, uint8_t data) { write(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
 
-	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
+	uint8_t port_b_z_mask() const { return ~m_ddr_b; } // see notes
 
 	void porta_w(uint8_t data);
 	void write_porta_line(int line, bool state);

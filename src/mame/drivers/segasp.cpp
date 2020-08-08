@@ -71,6 +71,7 @@ Ocha-Ken Hot Medal                          837-14790    G            ROM  JP   
 Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Yataimura Kingyosukui (4-player, China)     ???-?????                 CF   EXP    253-5508-0526J  AAFE-xxxxxxxxxxx
 Unknown                                     834-14865                      JAP
 
 REV PCB       IC6s      Flash       AU1500
@@ -88,14 +89,14 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 #include "includes/segasp.h"
 #include "machine/naomim4.h"
 
-READ64_MEMBER(segasp_state::sp_bank_r)
+uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_bank;
 }
 
-WRITE64_MEMBER(segasp_state::sp_bank_w)
+void segasp_state::sp_bank_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
@@ -105,7 +106,7 @@ WRITE64_MEMBER(segasp_state::sp_bank_w)
 	m_sp_bank = bank;
 }
 
-READ64_MEMBER(segasp_state::sn_93c46a_r)
+uint64_t segasp_state::sn_93c46a_r()
 {
 	int res;
 
@@ -115,7 +116,7 @@ READ64_MEMBER(segasp_state::sn_93c46a_r)
 	return res;
 }
 
-WRITE64_MEMBER(segasp_state::sn_93c46a_w)
+void segasp_state::sn_93c46a_w(uint64_t data)
 {
 	/* bit 4 is data */
 	/* bit 2 is clock */
@@ -125,14 +126,14 @@ WRITE64_MEMBER(segasp_state::sn_93c46a_w)
 	m_eeprom->clk_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(segasp_state::sp_eeprom_r)
+uint64_t segasp_state::sp_eeprom_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_eeprom->do_read() << 4;
 }
 
-WRITE64_MEMBER(segasp_state::sp_eeprom_w)
+void segasp_state::sp_eeprom_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		return;
@@ -141,14 +142,14 @@ WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 	m_sp_eeprom->clk_write((data & 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(segasp_state::sp_rombdflg_r)
+uint64_t segasp_state::sp_rombdflg_r()
 {
 	// bit 0 - romboard type, 1 = M4
 	// bit 1 - debug mode (enable easter eggs in BIOS, can boot game without proper eeproms/settings)
 	return ioport("CFG")->read();
 }
 
-READ64_MEMBER(segasp_state::sp_io_r)
+uint64_t segasp_state::sp_io_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t retval;
 
@@ -645,6 +646,25 @@ ROM_START( dinoki4 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
 ROM_END
 
+ROM_START( kingyoch )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_EXP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	// YATAIMURA
+	// KINGYOSUKUI EX
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "kingyo", 0, SHA1(f3685a0c6109b78f4812972b71bcec4ef9e9198f) ) // free space contain other game leftovers, presumable Issyouni Wan Wan, encrypted, key is 511248c2
+
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0526-jpn.ic15", 0, 0x800, BAD_DUMP CRC(8af67833) SHA1(0b79abf9182c249a6d4976d6fd3b90101d66354f) )
+ROM_END
+
 ROM_START( loveber3 )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v200" )
@@ -723,6 +743,7 @@ GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
 GAME( 2008, dinoki4,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
+GAME( 2009, kingyoch,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
 GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

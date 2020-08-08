@@ -11,8 +11,8 @@
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
 
-#include "netlist/nl_base.h"
 #include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -69,10 +69,10 @@ namespace devices
 		}
 
 	protected:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-
+		//NETLIB_RESETI();
 	private:
+		NETLIB_HANDLERI(input);
+
 		logic_output_t m_Q;
 		analog_input_t m_I;
 	};
@@ -109,9 +109,9 @@ namespace devices
 	protected:
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
 
 	private:
+		NETLIB_HANDLERI(input);
 
 		static constexpr const nl_fptype G_OFF = nlconst::cgmin();
 

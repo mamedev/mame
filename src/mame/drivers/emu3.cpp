@@ -22,15 +22,17 @@ public:
 	}
 
 	void emu3(machine_config &config);
+	void emax2(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void emu3_map(address_map &map);
+	void emax2_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
 
 
-void emu3_state::mem_map(address_map &map)
+void emu3_state::emu3_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("bootprom", 0);
 	map(0x008000, 0x027fff).ram();
@@ -41,14 +43,22 @@ void emu3_state::mem_map(address_map &map)
 	map(0x400000, 0xbfffff).ram();
 }
 
+void emu3_state::emax2_map(address_map &map)
+{
+	map(0x000000, 0x003fff).rom().region("bootprom", 0);
+}
+
 
 static INPUT_PORTS_START(emu3)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(emax2)
 INPUT_PORTS_END
 
 void emu3_state::emu3(machine_config &config)
 {
 	NS32016(config, m_maincpu, 20_MHz_XTAL / 2); // 32016-10 CPU + 32001-10 TCU
-	m_maincpu->set_addrmap(AS_PROGRAM, &emu3_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &emu3_state::emu3_map);
 
 	//NS32081(config, "fpu", 20_MHz_XTAL / 2);
 
@@ -65,6 +75,14 @@ void emu3_state::emu3(machine_config &config)
 	SCC85230(config, "uart", 16_MHz_XTAL / 4);
 }
 
+void emu3_state::emax2(machine_config &config)
+{
+	NS32016(config, m_maincpu, 20_MHz_XTAL / 2); // NS32CG16V-10 (EMAX I uses a NS32008D-8)
+	m_maincpu->set_addrmap(AS_PROGRAM, &emu3_state::emax2_map);
+
+	// TODO: add NMC93C06N EEPROM & other unknown peripherals
+}
+
 ROM_START(emu3)
 	ROM_REGION16_LE(0x8000, "bootprom", 0)
 	ROM_LOAD16_BYTE("e3-lsboot_ip381a_emu_systems_4088.ic3", 0x0000, 0x4000, CRC(34e5283f) SHA1(902c2a9a2b37b34331fb57d45b88ffabc1f12a53)) // 27128B
@@ -74,4 +92,11 @@ ROM_START(emu3)
 	ROM_LOAD("im368.ic31", 0x000, 0xc00, NO_DUMP)
 ROM_END
 
+ROM_START(emax2)
+	ROM_REGION16_LE(0x4000, "bootprom", 0)
+	ROM_LOAD16_BYTE("ip43aemu_3891.ic20", 0x0000, 0x2000, CRC(51fdccb8) SHA1(0cab6540ed5d03ba202569b8730e0ec6dce1a477)) // Am27C64-250DC
+	ROM_LOAD16_BYTE("ip43bemu_4291.ic19", 0x0001, 0x2000, CRC(810160b3) SHA1(6f490f9014bc221e047ccd77428b002d0a3c3168)) // Am27C64-250DC
+ROM_END
+
 SYST(1987, emu3, 0, 0, emu3, emu3, emu3_state, empty_init, "E-mu Systems", "Emulator Three Digital Sound Production System", MACHINE_IS_SKELETON)
+SYST(1989, emax2, 0, 0, emax2, emax2, emu3_state, empty_init, "E-mu Systems", "EMAX II 16-Bit Digital Sound System", MACHINE_IS_SKELETON)

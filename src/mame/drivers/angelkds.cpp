@@ -427,22 +427,22 @@ sound related ?
 
 */
 
-WRITE8_MEMBER(angelkds_state::angelkds_main_sound_w)
+void angelkds_state::angelkds_main_sound_w(offs_t offset, uint8_t data)
 {
 	m_sound[offset] = data;
 }
 
-READ8_MEMBER(angelkds_state::angelkds_main_sound_r)
+uint8_t angelkds_state::angelkds_main_sound_r(offs_t offset)
 {
 	return m_sound2[offset];
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_sub_sound_w)
+void angelkds_state::angelkds_sub_sound_w(offs_t offset, uint8_t data)
 {
 	m_sound2[offset] = data;
 }
 
-READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
+uint8_t angelkds_state::angelkds_sub_sound_r(offs_t offset)
 {
 	return m_sound[offset];
 }

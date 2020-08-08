@@ -254,20 +254,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-READ16_MEMBER(m92_state::eeprom_r)
+uint16_t m92_state::eeprom_r(offs_t offset)
 {
 //  logerror("%05x: EEPROM RE %04x\n",m_maincpu->pc(),offset);
 	return m_eeprom[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(m92_state::eeprom_w)
+void m92_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%05x: EEPROM WR %04x\n",m_maincpu->pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		m_eeprom[offset] = data;
 }
 
-WRITE8_MEMBER(m92_state::coincounter_w)
+void m92_state::coincounter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -276,7 +276,7 @@ WRITE8_MEMBER(m92_state::coincounter_w)
 	/* Bit 0x40 set in Blade Master test mode input check */
 }
 
-WRITE8_MEMBER(m92_state::bankswitch_w)
+void m92_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
@@ -289,7 +289,7 @@ READ_LINE_MEMBER(m92_state::sprite_busy_r)
 }
 
 template<int Layer>
-WRITE16_MEMBER(m92_state::pf_control_w)
+void m92_state::pf_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//Fix for nbbm stage start screen
 	//m_screen->update_partial(m_screen->vpos());
@@ -298,7 +298,7 @@ WRITE16_MEMBER(m92_state::pf_control_w)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::sound_reset_w)
+void m92_state::sound_reset_w(uint16_t data)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
@@ -371,7 +371,7 @@ void m92_state::m92_banked_portmap(address_map &map)
 	map(0x20, 0x20).w(FUNC(m92_state::bankswitch_w));
 }
 
-WRITE16_MEMBER(m92_state::oki_bank_w)
+void m92_state::oki_bank_w(uint16_t data)
 {
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }

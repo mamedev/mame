@@ -25,24 +25,6 @@ static const uint8_t hex_to_7seg[16] =
 
 
 /* Driver initialization */
-void ut88_state::driver_init()
-{
-	/* set initially ROM to be visible on first bank */
-	uint8_t *ram = m_region_maincpu->base();
-	memset(ram, 0x0000, 0x0800); // make first page empty by default
-	m_bank1->configure_entries(1, 2, ram, 0x0000);
-	m_bank1->configure_entries(0, 2, ram, 0xf800);
-}
-
-
-void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_RESET)
-	{
-		m_bank1->set_entry(0);
-	}
-}
-
 void ut88mini_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_UPDATE_DISPLAY)
@@ -89,41 +71,59 @@ void ut88_state::ppi_porta_w(uint8_t data)
 
 void ut88_state::machine_reset()
 {
-	timer_set(attotime::from_usec(10), TIMER_RESET);
-	m_bank1->set_entry(1);
 	m_keyboard_mask = 0;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf800, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
+void ut88_state::machine_start()
+{
+	save_item(NAME(m_keyboard_mask));
+}
 
-READ8_MEMBER( ut88_state::keyboard_r )
+uint8_t ut88_state::keyboard_r(offs_t offset)
 {
 	return m_ppi->read(offset ^ 0x03);
 }
 
 
-WRITE8_MEMBER( ut88_state::keyboard_w )
+void ut88_state::keyboard_w(offs_t offset, uint8_t data)
 {
 	m_ppi->write(offset ^ 0x03, data);
 }
 
-WRITE8_MEMBER( ut88_state::sound_w )
+void ut88_state::sound_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 0));
 	m_cassette->output(BIT(data, 0) ? 1 : -1);
 }
 
 
-READ8_MEMBER( ut88_base_state::tape_r )
+uint8_t ut88_common::tape_r()
 {
 	double level = m_cassette->input();
 	return (level <  0) ? 0 : 0xff;
 }
 
-READ8_MEMBER( ut88mini_state::keyboard_r )
+uint8_t ut88mini_state::keyboard_r()
 {
 	// This is real keyboard implementation
-	uint8_t *keyrom1 = m_region_proms->base();
-	uint8_t *keyrom2 = m_region_proms->base()+100;
+	uint8_t *keyrom1 = m_proms->base();
+	uint8_t *keyrom2 = m_proms->base()+100;
 
 	uint8_t key = keyrom2[m_io_line1->read()];
 
@@ -145,7 +145,7 @@ READ8_MEMBER( ut88mini_state::keyboard_r )
 }
 
 
-WRITE8_MEMBER( ut88mini_state::led_w )
+void ut88mini_state::led_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -165,6 +165,7 @@ void ut88mini_state::machine_start()
 {
 	m_digits.resolve();
 	timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
+	save_item(NAME(m_lcd_digit));
 }
 
 void ut88mini_state::machine_reset()

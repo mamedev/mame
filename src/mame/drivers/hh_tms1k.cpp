@@ -57,6 +57,7 @@
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
  *MP1296   TMS1100?  1982, Entex Black Knight
+ *MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball

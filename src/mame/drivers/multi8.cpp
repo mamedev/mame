@@ -52,20 +52,20 @@ public:
 	void multi8(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(key_input_r);
-	DECLARE_READ8_MEMBER(key_status_r);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(pal_r);
-	DECLARE_WRITE8_MEMBER(pal_w);
-	DECLARE_READ8_MEMBER(kanji_r);
-	DECLARE_WRITE8_MEMBER(kanji_w);
+	uint8_t key_input_r();
+	uint8_t key_status_r();
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t pal_r(offs_t offset);
+	void pal_w(offs_t offset, uint8_t data);
+	uint8_t kanji_r(offs_t offset);
+	void kanji_w(offs_t offset, uint8_t data);
 	uint8_t porta_r();
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
 	void ym2203_porta_w(uint8_t data);
-	DECLARE_READ8_MEMBER(ay8912_0_r);
-	DECLARE_READ8_MEMBER(ay8912_1_r);
+	uint8_t ay8912_0_r();
+	uint8_t ay8912_1_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
@@ -189,7 +189,7 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 	}
 }
 
-READ8_MEMBER( multi8_state::key_input_r )
+uint8_t multi8_state::key_input_r()
 {
 	if (m_mcu_init == 0)
 	{
@@ -202,7 +202,7 @@ READ8_MEMBER( multi8_state::key_input_r )
 	return m_keyb_press;
 }
 
-READ8_MEMBER( multi8_state::key_status_r )
+uint8_t multi8_state::key_status_r()
 {
 	if (m_mcu_init == 0)
 		return 1;
@@ -222,7 +222,7 @@ READ8_MEMBER( multi8_state::key_status_r )
 	return m_keyb_press_flag | (m_shift_press_flag << 7);
 }
 
-READ8_MEMBER( multi8_state::vram_r )
+uint8_t multi8_state::vram_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -246,7 +246,7 @@ READ8_MEMBER( multi8_state::vram_r )
 	return res;
 }
 
-WRITE8_MEMBER( multi8_state::vram_w )
+void multi8_state::vram_w(offs_t offset, uint8_t data)
 {
 	if (!BIT(m_vram_bank, 4)) //select plain work ram
 	{
@@ -267,12 +267,12 @@ WRITE8_MEMBER( multi8_state::vram_w )
 		m_p_vram[offset | 0xc000] = data;
 }
 
-READ8_MEMBER( multi8_state::pal_r )
+uint8_t multi8_state::pal_r(offs_t offset)
 {
 	return m_pen_clut[offset];
 }
 
-WRITE8_MEMBER( multi8_state::pal_w )
+void multi8_state::pal_w(offs_t offset, uint8_t data)
 {
 	m_pen_clut[offset] = data;
 
@@ -288,15 +288,15 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-READ8_MEMBER(multi8_state::ay8912_0_r){ return m_aysnd->data_r(); }
-READ8_MEMBER(multi8_state::ay8912_1_r){ return m_aysnd->data_r(); }
+uint8_t multi8_state::ay8912_0_r(){ return m_aysnd->data_r(); }
+uint8_t multi8_state::ay8912_1_r(){ return m_aysnd->data_r(); }
 
-READ8_MEMBER( multi8_state::kanji_r )
+uint8_t multi8_state::kanji_r(offs_t offset)
 {
 	return m_p_kanji[(m_knj_addr << 1) | (offset & 1)];
 }
 
-WRITE8_MEMBER( multi8_state::kanji_w )
+void multi8_state::kanji_w(offs_t offset, uint8_t data)
 {
 	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }

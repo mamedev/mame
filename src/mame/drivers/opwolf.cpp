@@ -328,14 +328,14 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ16_MEMBER(cchip_r);
-	DECLARE_WRITE16_MEMBER(cchip_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
-	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
+	uint16_t cchip_r(offs_t offset);
+	void cchip_w(offs_t offset, uint16_t data);
+	void opwolf_adpcm_d_w(uint8_t data);
+	void opwolf_adpcm_e_w(uint8_t data);
+	void opwolf_spritectrl_w(offs_t offset, uint16_t data);
 	void sound_bankswitch_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
+	void opwolf_adpcm_b_w(offs_t offset, uint8_t data);
+	void opwolf_adpcm_c_w(offs_t offset, uint8_t data);
 	void counters_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -637,7 +637,7 @@ CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
 //  VIDEO
 //**************************************************************************
 
-WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
+void opwolf_state::opwolf_spritectrl_w(offs_t offset, uint16_t data)
 {
 	// popmessage("opwolf_spritectrl_w ctrl = %4x", data);
 	if (offset == 0)
@@ -743,7 +743,7 @@ WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
 	}
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
+void opwolf_state::opwolf_adpcm_b_w(offs_t offset, uint8_t data)
 {
 	int start;
 	int end;
@@ -766,7 +766,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
+void opwolf_state::opwolf_adpcm_c_w(offs_t offset, uint8_t data)
 {
 	int start;
 	int end;
@@ -789,14 +789,14 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
+void opwolf_state::opwolf_adpcm_d_w(uint8_t data)
 {
 	// total volume (speaker 1)
 	for (int i = 0; i <= 2; i++)
 		m_lspeaker->set_input_gain(i, data / 255.0);
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
+void opwolf_state::opwolf_adpcm_e_w(uint8_t data)
 {
 	// total volume (speaker 2)
 	for (int i = 0; i <= 2; i++)
@@ -862,12 +862,12 @@ MACHINE_RESET_MEMBER(opwolf_state,opwolf)
 	m_msm[1]->reset_w(1);
 }
 
-READ16_MEMBER(opwolf_state::cchip_r)
+uint16_t opwolf_state::cchip_r(offs_t offset)
 {
 	return m_cchip_ram[offset];
 }
 
-WRITE16_MEMBER(opwolf_state::cchip_w)
+void opwolf_state::cchip_w(offs_t offset, uint16_t data)
 {
 	m_cchip_ram[offset] = data &0xff;
 }

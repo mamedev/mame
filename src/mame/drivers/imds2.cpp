@@ -103,14 +103,14 @@ public:
 	void imds2(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ipc_mem_read);
-	DECLARE_WRITE8_MEMBER(ipc_mem_write);
-	DECLARE_WRITE8_MEMBER(ipc_control_w);
+	uint8_t ipc_mem_read(offs_t offset);
+	void ipc_mem_write(offs_t offset, uint8_t data);
+	void ipc_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ipc_intr_w);
-	DECLARE_READ8_MEMBER(ipcsyspic_r);
-	DECLARE_READ8_MEMBER(ipclocpic_r);
-	DECLARE_WRITE8_MEMBER(ipcsyspic_w);
-	DECLARE_WRITE8_MEMBER(ipclocpic_w);
+	uint8_t ipcsyspic_r(offs_t offset);
+	uint8_t ipclocpic_r(offs_t offset);
+	void ipcsyspic_w(offs_t offset, uint8_t data);
+	void ipclocpic_w(offs_t offset, uint8_t data);
 
 	virtual void driver_start() override;
 
@@ -168,7 +168,7 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 {
 }
 
-READ8_MEMBER(imds2_state::ipc_mem_read)
+uint8_t imds2_state::ipc_mem_read(offs_t offset)
 {
 	if (in_ipc_rom(offset)) {
 		return m_ipc_rom[ (offset & 0x07ff) | ((offset & 0x1000) >> 1) ];
@@ -177,14 +177,14 @@ READ8_MEMBER(imds2_state::ipc_mem_read)
 	}
 }
 
-WRITE8_MEMBER(imds2_state::ipc_mem_write)
+void imds2_state::ipc_mem_write(offs_t offset, uint8_t data)
 {
 	if (!in_ipc_rom(offset)) {
 		m_ipc_ram[ offset ] = data;
 	}
 }
 
-WRITE8_MEMBER(imds2_state::ipc_control_w)
+void imds2_state::ipc_control_w(uint8_t data)
 {
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
@@ -197,22 +197,22 @@ WRITE_LINE_MEMBER(imds2_state::ipc_intr_w)
 	m_ipccpu->set_input_line(I8085_INTR_LINE, (state != 0) && m_ipcctrl->q2_r());
 }
 
-READ8_MEMBER(imds2_state::ipcsyspic_r)
+uint8_t imds2_state::ipcsyspic_r(offs_t offset)
 {
 	return m_ipcsyspic->read(!BIT(offset, 0));
 }
 
-READ8_MEMBER(imds2_state::ipclocpic_r)
+uint8_t imds2_state::ipclocpic_r(offs_t offset)
 {
 	return m_ipclocpic->read(!BIT(offset, 0));
 }
 
-WRITE8_MEMBER(imds2_state::ipcsyspic_w)
+void imds2_state::ipcsyspic_w(offs_t offset, uint8_t data)
 {
 	m_ipcsyspic->write(!BIT(offset, 0), data);
 }
 
-WRITE8_MEMBER(imds2_state::ipclocpic_w)
+void imds2_state::ipclocpic_w(offs_t offset, uint8_t data)
 {
 	m_ipclocpic->write(!BIT(offset, 0), data);
 }

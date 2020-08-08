@@ -1069,10 +1069,118 @@ ROM_END
 // According to http://nerdlypleasures.blogspot.com/2014/04/the-original-8-bit-ide-interface.html
 // the IBM PS/1 Model 2011 use a customised version of the XTA (8-bit IDE) harddisk interface
 
-ROM_START( ibmps1es )
-	ROM_REGION16_LE(0x40000, "bios", 0)
-	ROM_LOAD16_BYTE( "ibm_1057757_24-05-90.bin", 0x00000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe))
-	ROM_LOAD16_BYTE( "ibm_1057757_29-15-90.bin", 0x00001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6))
+// https://en.wikipedia.org/wiki/IBM_PS/1
+// http://ps-2.kev009.com/pcpartnerinfo/ctstips/937e.htm
+// https://ps1stuff.wordpress.com/documentation/ibm-ps1-model-2011/
+// https://barotto.github.io/IBMulator/#download
+
+ROM_START( ibm2011 )
+	ROM_REGION16_LE( 0x40000, "bios", 0)
+	// Spanish version
+	ROM_SYSTEM_BIOS( 0, "2011es", "IBM PS/1 2011 ES")
+	ROMX_LOAD( "ibm_1057757_24-05-90.bin", 0x00000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "ibm_1057757_29-15-90.bin", 0x00001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(0))
+	// US version
+	ROM_SYSTEM_BIOS( 1, "2011us", "IBM PS/1 2011 US") // constant resets
+	ROMX_LOAD( "1057754.bin", 0x00000, 0x20000, CRC(648a6a61) SHA1(6cebaf9f2431e67fea37f34b06916264d6737ab6), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "1057756.bin", 0x00001, 0x20000, CRC(862f94ac) SHA1(1eba7fa20301403db7c4f53032267902191ea2c7), ROM_SKIP(1) |  ROM_BIOS(1))
+ROM_END
+
+ROM_START( ibm2011rd ) // these international versions were shipped with DOS in a ROM disk and require a different memory map, they don't yet load properly
+	ROM_REGION16_LE( 0x80000, "bios", 0)
+	// Swedish version
+	ROM_SYSTEM_BIOS( 0, "2011se", "IBM PS/1 2011 SE")
+	ROMX_LOAD( "ibm2011se_f80000.bin", 0x00000, 0x40000, CRC(1b90693b) SHA1(2cdcfda55fea25a991c1568ff398d97c5e07e96d),  ROM_BIOS(0))
+	ROMX_LOAD( "ibm2011se_fc0000.bin", 0x40000, 0x40000, CRC(ef7aa453) SHA1(993dd6e17c6fd5c2ef513d94383f36b1929d1936),  ROM_BIOS(0))
+	// Portuguese version
+	ROM_SYSTEM_BIOS( 1, "2011pt", "IBM PS/1 2011 PT")
+	ROMX_LOAD( "u18_x1_1057451.bin", 0x00000, 0x20000, CRC(0484e15d) SHA1(39fb05843c8371f4b716679e6ce512bcf5a05dac), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "u36_x4_1057449.bin", 0x00001, 0x20000, CRC(23d7e4fe) SHA1(9c89efa61fc77485b65fff9133d6a19caca553e9), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "u23_x2_1057757.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(1))
+	ROMX_LOAD( "u28_x3_1057759.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(1))
+	// German version
+	ROM_SYSTEM_BIOS( 2, "2011de", "IBM PS/1 2011 DE")
+	ROMX_LOAD( "x1_1057866_u10.bin", 0x00000, 0x20000, CRC(ef0f0bb4) SHA1(d1e4c081f1a74732eb6e37a3bfb9403819b7d891), ROM_SKIP(1) |  ROM_BIOS(2))
+	ROMX_LOAD( "x4_1057864_u36.bin", 0x00001, 0x20000, CRC(16d357ff) SHA1(6521b160bf0dd05b890ad197d9c9359d806da18a), ROM_SKIP(1) |  ROM_BIOS(2))
+	ROMX_LOAD( "x2_1057757_u23.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(2))
+	ROMX_LOAD( "x3_1057759_u28.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(2))
+	// Italian version
+	ROM_SYSTEM_BIOS( 3, "2011it", "IBM_PS/1 2011 IT")
+	ROMX_LOAD( "x1-1057630-u18.bin", 0x00000, 0x20000, CRC(3843830c) SHA1(68b2f443b6ceadbc94a725fe66ad9c9685490dcb), ROM_SKIP(1) |  ROM_BIOS(3))
+	ROMX_LOAD( "x4-1057628-u36.bin", 0x00001, 0x20000, CRC(1ddf3afb) SHA1(da55abaf4f775e2e3efdd952beb9f97769e3cac3), ROM_SKIP(1) |  ROM_BIOS(3))
+	ROMX_LOAD( "x2_1057757_u23.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(3))
+	ROMX_LOAD( "x3_1057759_u28.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(3))
+	// UK version
+	ROM_SYSTEM_BIOS( 4, "2011uk", "IBM_PS/1 2011 UK")
+	ROMX_LOAD( "u18_x1.bin", 0x00000, 0x20000, CRC(029c4d8a) SHA1(bf2f56ac2e03098144b3dcc34f7daa09c8e08288), ROM_SKIP(1) |  ROM_BIOS(4))
+	ROMX_LOAD( "u36_x4.bin", 0x00001, 0x20000, CRC(bf6c5631) SHA1(68cbff7e229cd77ae8c2e8835dbb9b3047f41e4c), ROM_SKIP(1) |  ROM_BIOS(4))
+	ROMX_LOAD( "u23_x2.bin", 0x40000, 0x20000, CRC(c8f81ea4) SHA1(925ed0e98f9f2997cb86554ef384bcfaf2a4ecbe), ROM_SKIP(1) |  ROM_BIOS(4))
+	ROMX_LOAD( "u28_x3.bin", 0x40001, 0x20000, CRC(c2dd6b5c) SHA1(f6b5785002dd628b6b1fb3bb101e076299eba3b6), ROM_SKIP(1) |  ROM_BIOS(4))
+ROM_END
+
+// From Wikipedia:
+// Model     MB FRU    CPU                   ISA Sl.  RAM   VRAM   Hard-Drive         Serial/Modem
+// 2121-C42  92F9690   Intel 80386SX @ 16 MHz  0      2 MB  256KB  95F4720  40MB IDE  2400 baud modem
+// 2121-B82  92F9690   Intel 80386SX @ 16 MHz  2      2 MB  256KB  92F9943  80MB IDE  2400 baud modem
+// 2121-C92            Intel 80386SX @ 16 MHz  0      2 MB  256KB          129MB IDE  2400 baud modem
+// 2121-G42            Intel 80386SX @ 20 MHz  0      2 MB  256KB           40MB IDE  2400 baud modem
+// 2121-A82            Intel 80386SX @ 20 MHz  2      2 MB  256KB           40MB IDE  2400 baud modem
+// 2121-S92            Intel 80386SX @ 20 MHz  0      2 MB  256KB          129MB IDE  2400 baud modem
+// 2121-M82            Intel 80386SX @ 20 MHz  2      2 MB  256KB           80MB IDE  2400 baud modem
+// 2121-A62                                           2     256KB  56F8863 160MB IDE  2400 baud modem
+// 2121-A92                                                 256KB                     serial port
+// 2121-A94            Intel 80386SX @ 20 MHz  2    6 MB    256KB          129MB IDE  2400 baud modem
+
+ROM_START( ibm2121 )
+	ROM_REGION16_LE( 0x40000, "bios", 0)
+	ROM_SYSTEM_BIOS( 0, "2121", "IBM PS/1 2121" )
+	ROMX_LOAD( "fc0000.bin", 0x00000, 0x40000, CRC(96bbaf52) SHA1(8737d805444837023a58702279f8fe6e7f08e7ba), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "2121us", "IBM PS/1 2121 US" )
+	ROMX_LOAD( "ibm2121us_fc0000.bin", 0x00000, 0x40000, CRC(817aad71) SHA1(43b7b84390fcc081a946cdb4bdce4ba7a4a88074), ROM_BIOS(1))
+ROM_END
+
+ROM_START( ibm2121rd ) // international versions shipped with ROM DOS, need a different memory map at least
+	ROM_REGION16_LE( 0x80000, "bios", 0)
+	ROM_SYSTEM_BIOS( 0, "2121sp", "IBM PS/1 2121 Spanish" )
+	ROMX_LOAD( "ibm2121sp_f80000.bin", 0x00000, 0x40000, CRC(90505c4b) SHA1(59becaec25644820a78464d66e472a8a225d94cc), ROM_BIOS(0))
+	ROMX_LOAD( "ibm2121sp_fc0000.bin", 0x40000, 0x40000, CRC(f83fac75) SHA1(a42b1b9465983392eaa0159d4bfc30620a7af499), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "2121fr", "IBM PS/1 2121 French" )
+	ROMX_LOAD( "ibm2121fr_f80000.bin", 0x00000, 0x40000, CRC(9c6de65d) SHA1(6b219c9480a06bc9218e8212acc7cfd1ceaccd4b), ROM_BIOS(1))
+	ROMX_LOAD( "ibm2121fr_fc0000.bin", 0x40000, 0x40000, CRC(f83fac75) SHA1(a42b1b9465983392eaa0159d4bfc30620a7af499), ROM_BIOS(1))
+ROM_END
+
+// http://ps-2.kev009.com/pcpartnerinfo/ctstips/937e.htm
+ROM_START( ibm2123 )
+	ROM_REGION16_LE( 0x20000, "bios", 0)
+	ROM_LOAD( "ps1_2123_87f4794_rom.bin", 0x00000, 0x20000, CRC(64f921b8) SHA1(e1856bf3dd3ce21f44078aeca1f58c491b202ad2))
+ROM_END
+
+// From Wikipedia:
+// 2133 Desktop case. The 3x3 references the available slots and drive bays.
+// 2155 Desktop case larger than 2133. The 5x5 references the available slots and drive bays. Including a 5.25" bay.
+// 2168 Tower unit. The 6x8 references the available slots and bays. Including 5.25" bays.
+// Model     MB FRU      CPU                        RAM   SIMM          Video chip   VRAM   Hard-Drive          Notes
+// 2133-711  93F2397  Intel 80386SX @ 25 MHz    2 MB  2×72 Pin FPM                   256KB  59G9567  85MB IDE
+// 2133-811          Intel 80386SX @ 25 MHz     4 MB                                                 85MB IDE
+// 2133-13   ???      Intel 80386SX @ 25 MHz    2 MB  2x72 Pin FPM                   256KB
+// 2133-W13          Intel 80386SX @ 25 MHz     2 MB                                                129MB IDE
+// 2133-13T  65G3766  Intel 80486SX @ 25 MHz    4 MB  2×72 Pin FPM                   256KB  93F2329 129MB IDE
+// 2133-?43  34G1885  Intel 80486SX @ 20 MHz    4 MB  2×30 Pin FPM                   512KB  93F2329 129MB IDE
+// 2133-?50  34G1848  Intel 80486SX @ 25 MHz    4 MB  2×30 Pin FPM                   512KB  93F2329 129MB IDE
+// 2133-?53  34G1848  Intel 80486SX @ 25 MHz    4 MB  2×30 Pin FPM                   512KB  93F2329 129MB IDE
+// 2133-652          Intel 80486SX @ 33 MHz     4 MB  4×72 Pin FPM  Cirrus CL-GD5424 512KB  84G3927 171MB IDE
+// 2133-575          Intel 80486DX @ 33 MHz     4 MB  4×72 Pin FPM                   512KB          170MB IDE
+// 2133-594          Intel 80486DX2 @66 MHz     4 MB  4×72 Pin FPM                   512KB          253MB IDE
+// 2133-E11          Intel 80386SX @ 25 MHz     2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB          85MB IDE   Canada models, English model
+// 2133-F11          Intel 80386SX @ 25 MHz     2 MB  2×72 Pin FPM  Cirrus CL-GD5424 512 KB          85MB IDE   Canada models, French model
+// 2133-E43          Intel 80486SX @ 20 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
+// 2133-F43          Intel 80486SX @ 20 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model
+// 2133-E53          Intel 80486SX @ 25 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, English model
+// 2133-F53          Intel 80486SX @ 25 MHz     2 MB  8×30 Pin FPM  Tseng ET4000     512KB          129MB IDE   Canada models, French model
+
+ROM_START( ibm2133 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
+	ROM_LOAD( "ps1_2133_52g2974_rom.bin", 0x00000, 0x20000, CRC(89fc7600) SHA1(758e161353f6781c39ac67f1ba293c14038b17dc))
 ROM_END
 
 
@@ -2152,7 +2260,7 @@ ROM_END
 
 // Schneider EuroAT - Uses the same case as the Schneider EuroXT, a compact desktop with room for a single floppy drive and an AT IDE harddisk (Seagate ST-142A, ST-157A)
 // Mainboard: Baugr.Nr. 51513 with internal EGA, 52591 EGA components omitted (see: EURO VGA)
-// Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773, WD37C65BJM, Siemens SAB 16C450-N
+// Chipset: 2xHeadland GC102-PC, HT101A/B1A4924, Schneider BIGJIM 30773 (cf. EuroPC 2/EuroXT), WD37C65BJM, Siemens SAB 16C450-N
 // EGA chipset (mainboard 51513): G2 GC201-PC, 64K RAM - Main RAM: 1MB
 // CPU: Siemens SAB 80286-12, Keyboard-BIOS: Schneider ROM BIOS 1985, 1989 Phoenix
 // Connectors: Keyboard, Printer, Serial, Floppy (can use the same external floppy disk drives as the EuroXT), EGA monitor
@@ -2162,7 +2270,7 @@ ROM_END
 // blank screen, beeps 1-2-4
 ROM_START( euroat )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "v201", "V2.01" )
+	ROM_SYSTEM_BIOS( 0, "v201", "V2.01" ) // also used on Tower AT
 	ROMX_LOAD( "euro_at_v201a_l.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "euro_at_v201a_h.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(0) )
 	// EGA ROM dump missing
@@ -2174,6 +2282,53 @@ ROM_START( euroat )
 	ROM_REGION( 0x10000, "vga", 0 )
 	ROM_LOAD( "euro-vga_52255_bios_v1.02_row.bin", 0x00000, 0x10000, CRC(71d42e58) SHA1(be64990325f52128e102dfc3ed87d2d831183ddc))
 ROM_END
+
+// Schneider Tower AT 220 (other designations for the 10 MHz 80826, 512KB RAM series are 201, 202, 240), the last two digits are related to the originally installed
+// number of 3.5" 720K floppy drives or the size of the MFM harddisk), Model 260 has a 60MB harddisk and can have a 12.5 MHz CPU (depending on where you look and
+// probably what was available in Schneider's part bin), systems with a "mega" in the name have 1MB RAM and 1.44MB floppy drives. All have an EGA graphcis card on board
+// The case looks like a stack of three thinner slices, and extra modules were available that clamped on: a tape streamer, and a 5.25" 1.2MB or a 360KB drive. They were
+// connected to the "External drive" port of the Tower AT, much like with Schneider's other PCs. The mainboard as such is divided between the I/O and video portion that resides on
+// the backplane board and the CPU and RAM on the CPU card that also contains the keyboard connector.
+// Model 220, Schneider Tower-EGA I/O: Chipset: JIM 50101-1 (cf. EuroPC), WD37C65BJM, Gemini VC-001, VLSI VL16C450-PC, Paradise Systems Inc PPC1 38302C
+// 104 pin CPU card connector (ISA without the key), 3xISA16, 1xISA8 - on board: parallel, serial, bus mouse (Atari compatible), EGA, internal floppy (26pin), external floppy (DB25)
+// Model 220, Schneider Tower-CPU 286 (Baugr.Nr. 50229 Rev.3B): Dallas DS1287, MBL8042H (Compatibility Software 1986/K Phoenix Technologies Ltd - 805931) - Chipset: 2x G2 GC102, G2 GC101
+// OSC: 20.000MHz, 14.318180, beeper, CPU: AMD N80L286-10/S, FPU socket provided - RAM: solder pads for 4xSIMM30, 4x16pin (empty), 4x or 8x51C4256 (512KB or 1MB)
+// The Tower AT was available with the Schneider VGA I/O that is described in the tower386sx section. The Tower VGA System 40 and System 70 models had the 12.5MHz CPU card.
+// Its BIOS version 2.03 is undumped so far.
+// blank screen, beeps 1-2-4
+ROM_START( towerat2xx )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	ROM_SYSTEM_BIOS(0, "v2.02", "V2.02" ) // from a model 220
+	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" )
+	ROM_SYSTEM_BIOS(2, "v1.07", "V1.07" ) // seen on a model 240 "mega"
+	ROM_SYSTEM_BIOS(3, "v1.06", "V1.06" ) // from a model 220
+	ROM_SYSTEM_BIOS(4, "v1.05a", "V1.05a" )
+	ROM_SYSTEM_BIOS(5, "v1.01a", "V1.01a" ) // from a model 220
+
+	ROMX_LOAD( "phoenix_860376_schneider_ag_tower_at_bios_0_id.nr.50445_v2.02.bin", 0x10000, 0x8000, CRC(8566b3f2) SHA1(a12b5e9e848de123c62374f78ee1d2b4b53dd468), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "phoenix_860376_schneider_ag_tower_at_bios_1_id.nr.50445_v2.02.bin", 0x10001, 0x8000, CRC(7d8249cf) SHA1(d894332aad4c26798e6b41a5e94c471b0235bd50), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "schneider_tower_at_bios_0_low_v2.01a.bin", 0x10000, 0x8000, CRC(0f8a2688) SHA1(95db9010b1c0465f878e5036bcf242ddf0a3be6a), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "schneider_tower_at_bios_1_high_v2.01a.bin", 0x10001, 0x8000, CRC(75b6771b) SHA1(3aa0921914ea6e24249ce3f995fdcb341124d7e9), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "schneider_tower_at_bios_0_low_v1.07.bin", 0x10000, 0x8000, CRC(70a9421d) SHA1(bf6529f259d5bc7c28df19655c57ecce1c57260f), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "schneider_tower_at_bios_1_high_v1.07.bin", 0x10001, 0x8000, CRC(995a62db) SHA1(42e9a866b5f02509d3094c42842eafed1d577f4e), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "schneider_ag_50444_v1.06.u3", 0x10000, 0x8000, CRC(42891d5a) SHA1(d94292b14f9155b4e05c78960f9722fffca976be), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "schneider_ag_50445_v1.06.u4", 0x10001, 0x8000, CRC(bdced2b9) SHA1(cba58c70420695ec69dbb4817d0c6b14b8bdbadd), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "schneider_tower_at_bios_low_v1.05a.bin", 0x10000, 0x8000, CRC(94ad1628) SHA1(bf7319ed9b37a57e67b0b4bf7845d95d0f593d68), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "schneider_tower_at_bios_high_v1.05a.bin", 0x10001, 0x8000, CRC(f3d48773) SHA1(9386313b6d05acb30e7ba7e1353c259deaaa77bc), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "schneider_tower_at_bios_low_v1.01.bin", 0x10000, 0x8000, CRC(a94ca070) SHA1(2acca0601c00e76d510c81dfe92d33397fbeccd1), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "schneider_tower_at_bios_high_v1.01.bin", 0x10001, 0x8000, CRC(d8f67320) SHA1(3ddf7fdb1370f745c4f1902101605477ee0bb392), ROM_SKIP(1) | ROM_BIOS(5) )
+
+	// todo: find matching EGA ROMs for BIOS V2.01, 1.07 and 1.05
+	ROM_REGION( 0x8000, "gfx", 0)
+	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(0) ) // R1.04 matched with system BIOS V2.02
+	ROMX_LOAD( "schneider_ag_tower_ega-bios_50477_v1.04.bin", 0x0000, 0x8000, CRC(aabd1017) SHA1(e019c21d6108a0387f7c98e92e4dbc32ab19929f), ROM_BIOS(1) )
+	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(2) )
+	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(3) ) // R1.02 matched with system BIOS V1.06
+	ROMX_LOAD( "schneider_ag_tower_ega_bios_id.nr._50447_r1.02.bin", 0x0000, 0x8000, CRC(1c43aaf6) SHA1(cf98dd8f0d8258761e36e70f086b1234ec703823), ROM_BIOS(4) )
+	ROMX_LOAD( "schneider_ega_r1.00.bin", 0x0000, 0x8000, CRC(4e14cb0a) SHA1(6cef69274a52b11201a3477631fa343a7e1a5970), ROM_BIOS(5) ) // R1.00 matched with system BIOS V1.01 */
+ROM_END
+
+
 
 // Victor V286C - a VGA version exists as well
 // CPU: AMD 802L86-10/S  - one ISA16 extended to ISA8: 1, ISA16: 3 on a riser card - Keyboard-BIOS: AT-KB M5L8042
@@ -2342,6 +2497,21 @@ ROM_START( ncrpc8 )
 	ROMX_LOAD( "ncr_u113-27_v.4.bin", 0x10001, 0x8000, CRC(87424492) SHA1(5b7aba5678fe55c81fee2e07730b8ae03a23160f), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD ("ncr_keyboard_mcu_35091.bin", 0x0000, 0x800, CRC(632556cc) SHA1(b35f30bd0664fc1c2775a594f248d1e30237900a))
+ROM_END
+
+// NCR Class 3302 - CPU: AMD N80L286-12/S, FPU socket provided - Chipset: Chips & Technologies NEAT (82C206, 82C211, 82C212, 82C215), VLSI VL16C452-QC, INMOS IMSG176J-50Z
+// Motherboard: PN-386XV REV R4.B - RAM: SIMM30x4, On board: 8x4C4256DJ-10, 4x41C256-10 - BIOS: NCR 3.5 - Keyboard BIOS: M5L8042-277P
+// OSC: 24.000MHz, 32.000MHz, 36.000MHz, 1.8432MHz, 25.175/28.322, 14.31818, ISA16: 1 on board, used for a riser with 2 slots
+ROM_START( ncr3302 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "f000-flex_drive_test.bin", 0x10000, 0x8000, CRC(09c9eb6b) SHA1(5eb00f65659cee018726e7a4122da1c42b2bbef9))
+	ROM_LOAD( "f800-setup_ncr3.5-013190.bin", 0x18000, 0x8000, CRC(31e6a1ba) SHA1(2ff7dc233d167775ec3641c7a4b2d891db5f8ba7))
+
+	// on board Paradise VGA PVGA1A-JK
+	// DIP switches (x8 near the Paradise PVGA1A-JK) are undocumented. Setting switch 7 to 'open' generates VGA compatible (yet monochrome) signal, closing switch 7
+	// causes 'out of range' on a fixed frequency VGA LCD - Graphics RAM: 8xD6164, 8 empty sockets (18 pin) provided
+	ROM_REGION(0x8000, "video", 0)
+	ROM_LOAD( "c000-wd_1987-1989-740011-003058-019c.bin", 0x0000, 0x8000, CRC(658da782) SHA1(6addcf24795c2e8004c21a8e546b53de41766420))
 ROM_END
 
 // Nixdorf 8810 M30
@@ -3469,6 +3639,31 @@ ROM_END
 //**************************************************************************
 //  80386 SX and DX Desktop
 //**************************************************************************
+
+// Schneider 386SX VGA System 40 (the number indicates the size of the harddisk, there were System 70 as well) - uses the same case as the Schneider Tower AT
+// Schneider Tower VGA I/O: Chipset: WD37C65BJM, BIGJIM 50773 1108-0056, two other bigger chips can't be read on the photos
+// 104 pin CPU card connector (ISA without the key), 4xISA16, 1xISA8 - on board: IDE, parallel, serial, bus mouse (Atari compatible), VGA, internal floppy (26pin), external floppy (DB25)
+// On board graphics: ATI VGA Wonder-16 (256KB), ATI18800-1 1138-0069
+// CPU card: CPU: Intel NG680386SX-16 (C-Step), FPU socket provided - Chipset: DDA14-075E, Chips P82C812, P82C811, P82C206, P82C215-12 (16MHz) - RAM: 8xSIMM30
+// OSC: 20.000, 14.31818, 24.000000MHz, 32.000000MHz, - keyboard
+// beeps 1-2-4
+ROM_START( tower386sx )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v103", "V1.03") // from a 386SX System 70
+	ROMX_LOAD("t386s103.bin", 0x10000, 0x10000, CRC(d4e177e6) SHA1(fa11d49d629cdcac4467a9deedd25171ae499346), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v100", "V1.00") // from a 386SX System 40
+	ROMX_LOAD("schneider_ag_386sx_bios_1_version_1.00a_id.nr.52504.u16", 0x10000, 0x8000, CRC(2fec2d3a) SHA1(4227da07f6652b89b9d02d7570ad0476672fd80d), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("schneider_ag_386sx_bios_0_version_1.00a_id.nr.52504.u15", 0x10001, 0x8000, CRC(b3331429) SHA1(b214bccfb62add9caea3d734885bc945b868967a), ROM_SKIP(1) |ROM_BIOS(1))
+
+	// models upgraded to 512KB video memory were sold as "CEG" models as the memory upgrade enabled some sort of antialiasing ("continuous edge graphics")
+	// in a 256 color mode with a choice from 792.096 colors.
+	// according to https://archive.org/stream/byte-magazine-1991-01/1991_01_BYTE_16-01_1990_BYTE_Award_of_Excellence#page/n197/mode/2up this needs an EDSUN D/A chip, it is unknown
+	// if it's contained on the platter or on the graphics upgrade piggyback card
+	// The 12.5MHz version of the towerat2xx (VGA Tower System 40 or 70) used the same I/O backplane and were also offered with the CEG upgrade.
+	ROM_REGION16_LE(0x10000, "vga", 0)
+	ROM_LOAD16_BYTE("schneider_ag_vga_bios_low_v1.00_id.nr_51368.u13", 0x0000, 0x8000, CRC(ec4ef170) SHA1(0049ae5eab1a21838e674cf77e88994b954b1da3))
+	ROM_LOAD16_BYTE("schneider_ag_vga_bios_high_v1.00_id.nr_51368.u14", 0x0001, 0x8000, CRC(5354962a) SHA1(11a503473e2011f323cc81c0b63d24f231c54c31))
+ROM_END
 
 // Atari PC 5 - American Megatrends 386XT Series-4 motherboard - on board EGA
 // screen remains blank, 1 beep repeated (DRAM refresh failure)
@@ -5075,7 +5270,12 @@ ROM_END
 COMP( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "International Business Machines",  "PC/XT-286 5162", MACHINE_NOT_WORKING )
-COMP( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 (Spanish)", MACHINE_NOT_WORKING )
+COMP( 1989, ibm2011,   ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 2011", MACHINE_NOT_WORKING )
+COMP( 1989, ibm2011rd, ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 2011 (international models with ROM DOS)", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2121,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "International Business Machines",  "PS/1 2121", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2121rd, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "International Business Machines",  "PS/1 2121 (international models with ROM DOS)", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2123,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "International Business Machines",  "PS/1 2123", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2133,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "International Business Machines",  "PS/1 2133", MACHINE_NOT_WORKING )
 COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<generic>",   "PC/AT (6 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1987, atturbo,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<generic>",   "PC/AT Turbo (12 MHz, MF2 Keyboard)" , MACHINE_NOT_WORKING )
 COMP( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,     at_state,     init_at,        "<generic>",   "NEAT 386SX (16 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
@@ -5161,6 +5361,7 @@ COMP( 1987, ataripc4,  ibm5170, 0,       neat,      0,     at_state,     init_at
 COMP( 1989, atariabc286,ibm5170,0,       neat,      0,     at_state,     init_at,        "Atari", "ABC-286/30", MACHINE_NOT_WORKING )
 COMP( 199?, micral45,  ibm5170, 0,       micral45,  0,     at_state,     init_at,        "Bull", "Micral 45", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
+COMP( 199?, ncr3302,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "NCR", "Class 3302 Model 0110", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 198?, epsax,     ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Epson",       "PC AX", MACHINE_NOT_WORKING )
 COMP( 198?, epsax2e,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Epson",       "PC AX2e", MACHINE_NOT_WORKING )
@@ -5184,6 +5385,8 @@ COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 1989, euroat,    ibm5170, 0,       euroat,    0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Euro AT", MACHINE_NOT_WORKING )
+COMP( 198?, towerat2xx,ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "Tower AT 201, 202, 220, 240 and 260 (286,EGA)", MACHINE_NOT_WORKING )
+COMP( 198?, tower386sx,ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Schneider Rundfunkwerke AG", "386SX System 40 (VGA)", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 1993, cxsxd,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "CX Technology", "CX SXD", MACHINE_NOT_WORKING )

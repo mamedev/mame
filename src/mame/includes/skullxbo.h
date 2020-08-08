@@ -39,21 +39,21 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(skullxbo_halt_until_hblank_0_w);
-	DECLARE_WRITE16_MEMBER(skullxbo_mobwr_w);
+	void skullxbo_halt_until_hblank_0_w(uint16_t data);
+	void skullxbo_mobwr_w(offs_t offset, uint16_t data);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	WRITE16_MEMBER(playfield_latch_w);
-	WRITE16_MEMBER(playfield_latched_w);
+	void playfield_latch_w(uint16_t data);
+	void playfield_latched_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	void scanline_int_ack_w(uint16_t data = 0);
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	void skullxbo_scanline_update(int scanline);
-	DECLARE_WRITE16_MEMBER( skullxbo_xscroll_w );
-	DECLARE_WRITE16_MEMBER( skullxbo_yscroll_w );
-	DECLARE_WRITE16_MEMBER( skullxbo_mobmsb_w );
+	void skullxbo_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void skullxbo_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void skullxbo_mobmsb_w(offs_t offset, uint16_t data);
 
 	void main_map(address_map &map);
 

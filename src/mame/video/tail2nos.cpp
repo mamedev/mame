@@ -64,13 +64,13 @@ void tail2nos_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tail2nos_state::tail2nos_txvideoram_w)
+void tail2nos_state::tail2nos_txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
+void tail2nos_state::tail2nos_zoomdata_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_zoomram[offset];
 	COMBINE_DATA(&m_zoomram[offset]);
@@ -79,7 +79,7 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 		m_k051316->mark_gfx_dirty(offset * 2);
 }
 
-WRITE8_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
+void tail2nos_state::tail2nos_gfxbank_w(uint8_t data)
 {
 	// -------- --pe-b-b
 	// p = palette bank

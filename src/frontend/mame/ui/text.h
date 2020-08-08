@@ -13,9 +13,6 @@
 #ifndef MAME_FRONTEND_UI_TEXT_H
 #define MAME_FRONTEND_UI_TEXT_H
 
-#include "palette.h"
-#include "unicode.h"
-
 class render_font;
 class render_container;
 

@@ -52,6 +52,8 @@ Known undumped protos
   * Jack Nicklaus Power Challenge
   * Danny Sullivan's Indy Heat
   * Star Trek Starfleet Academy
+  * Teenage Mutant Hero Turtles - The Hyperstone Heist (Euro)
+  * Spot Goes to Hollywood (Euro)
 
 Known undumped pirates
 
@@ -13664,7 +13666,7 @@ but dumps still have to be confirmed.
 
 <!-- This dump comes from an internal "Confidential Preview" cart at Acclaim USA -->
 	<software name="cutthrp" cloneof="cutthr">
-		<description>CutThroat Island (Prototye)</description>
+		<description>CutThroat Island (Prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14703,6 +14705,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<!-- Majesco re-release comes on a 670128 REV 1 PCB with a single chip, while original release is split into two chips. -->
 	<software name="ejimu" cloneof="ejim">
 		<description>Earthworm Jim (USA)</description>
 		<year>1994</year>
@@ -26245,6 +26248,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Board comes with two chips, proper dumps required. -->
 	<software name="sor3u" cloneof="sor3">
 		<description>Streets of Rage 3 (USA)</description>
 		<year>1994</year>
@@ -32500,6 +32504,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="star wars (unl).bin" size="1048576" crc="94af8d44" sha1="54a2515b9f35b494afcdd77972898049e8b8df2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwarsp">
+		<description>Starwars (Prototype 19930125)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Star Wars (Jan 25, 1993 prototype).md" size="1048576" crc="e1c32fec" sha1="46cd5c0380f09c93f4a53de14a65481037e4dba5"/>
 			</dataarea>
 		</part>
 	</software>

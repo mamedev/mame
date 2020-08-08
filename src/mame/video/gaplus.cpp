@@ -117,6 +117,8 @@ TILE_GET_INFO_MEMBER(gaplus_base_state::get_tile_info)
 #define SPEED_1 1.0f
 #define SPEED_2 2.0f
 #define SPEED_3 3.0f
+
+/* starfield: top and bottom clipping size */
 #define STARFIELD_CLIPPING_X 16
 
 void gaplus_base_state::starfield_init()
@@ -213,13 +215,13 @@ void gaplus_base_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_base_state::videoram_w)
+void gaplus_base_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gaplus_base_state::starfield_control_w)
+void gaplus_base_state::starfield_control_w(offs_t offset, uint8_t data)
 {
 	m_starfield_control[offset & 3] = data;
 }
@@ -247,7 +249,11 @@ void gaplus_base_state::starfield_render(bitmap_ind16 &bitmap)
 		int x = m_stars[i].x;
 		int y = m_stars[i].y;
 
-		/* Some stars in the second tier will flash erratically while changing their movements. */
+		/* Some stars in the second layer will flash erratically when changing their movements.
+		   (It is when at reverse scrolling stage or get elephant head.)
+		   This is based on a guess from the video output of the PCB.
+		   https://www.youtube.com/watch?v=_1x5Oid3uPg (3:35-, 13:12-)
+		   https://www.youtube.com/watch?v=vrmZAUJYXnI (3:14-, 12:40-) */
 		if (m_stars[i].set == 1 && m_starfield_control[2] != 0x85 && i % 2 == 0)
 		{
 			int bit = BIT(m_starfield_framecount + i, 3) ? 1 : 2;
@@ -367,7 +373,7 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 					/* scroll down (speed 2) */
 					stars[i].x += SPEED_2;
 				break;
-				
+
 				case 0x80:
 					/* scroll up (speed 1) */
 					stars[i].x -= SPEED_1;
@@ -384,12 +390,12 @@ WRITE_LINE_MEMBER(gaplus_base_state::screen_vblank)/* update starfields */
 				break;
 
 				case 0x9f:
-					/* scroll left (speed 2) */
+					/* scroll left (speed 3) */
 					stars[i].y += SPEED_3;
 				break;
 
 				case 0xaf:
-					/* scroll right (speed 1) */
+					/* scroll right (speed 3) */
 					stars[i].y -= SPEED_3;
 				break;
 			}

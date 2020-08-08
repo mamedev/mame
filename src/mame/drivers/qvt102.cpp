@@ -103,13 +103,13 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	DECLARE_READ8_MEMBER(vsync_ack_r);
+	uint8_t vsync_ack_r();
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
+	uint8_t kbd_r();
+	void latch_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
+	uint8_t ctc_r();
+	void ctc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_txd_w);
 	DECLARE_WRITE_LINE_MEMBER(acia_rts_w);
@@ -431,7 +431,7 @@ void qvt102_state::mcu_p2_w(uint8_t data)
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER(qvt102_state::vsync_ack_r)
+uint8_t qvt102_state::vsync_ack_r()
 {
 	m_irqs->in_w<0>(CLEAR_LINE);
 	return 0;
@@ -517,7 +517,7 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER(qvt102_state::latch_w)
+void qvt102_state::latch_w(uint8_t data)
 {
 	// 7------- host to keyboard
 	// -6------ aux print
@@ -538,7 +538,7 @@ WRITE8_MEMBER(qvt102_state::latch_w)
 	m_kbdmcu->set_input_line(MCS48_INPUT_IRQ, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(qvt102_state::kbd_r)
+uint8_t qvt102_state::kbd_r()
 {
 	// 7------- keyboard to host
 	// -6------ dtr2
@@ -551,12 +551,12 @@ READ8_MEMBER(qvt102_state::kbd_r)
 	return data;
 }
 
-READ8_MEMBER(qvt102_state::ctc_r)
+uint8_t qvt102_state::ctc_r()
 {
 	return m_ctc->read(BIT(m_latch, 5));
 }
 
-WRITE8_MEMBER(qvt102_state::ctc_w)
+void qvt102_state::ctc_w(uint8_t data)
 {
 	m_ctc->write(BIT(m_latch, 5), data);
 }

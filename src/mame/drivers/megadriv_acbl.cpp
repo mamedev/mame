@@ -6,6 +6,7 @@
 
     Games supported:
         * Aladdin
+        * Bare Knuckle II
         * Bare Knuckle III
         * Jurassic Park
         * Mortal Kombat 3
@@ -301,7 +302,7 @@ void md_boot_state::md_bootleg(machine_config &config)
  *
  *************************************/
 
-WRITE16_MEMBER(md_boot_state::aladmdb_w )
+void md_boot_state::aladmdb_w(uint16_t data)
 {
 	/*
 	Values returned from the log file :
@@ -313,7 +314,7 @@ WRITE16_MEMBER(md_boot_state::aladmdb_w )
 	logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
 }
 
-READ16_MEMBER(md_boot_state::aladmdb_r )
+uint16_t md_boot_state::aladmdb_r()
 {
 	if (m_maincpu->pc()==0x1b2a56)
 	{
@@ -332,7 +333,7 @@ READ16_MEMBER(md_boot_state::aladmdb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::twinktmb_r )
+uint16_t md_boot_state::twinktmb_r()
 {
 	if (m_maincpu->pc()==0x02f81e)
 		return ioport("COIN")->read(); // TODO: coins don't respond well
@@ -344,7 +345,7 @@ READ16_MEMBER(md_boot_state::twinktmb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::jparkmb_r )
+uint16_t md_boot_state::jparkmb_r()
 {
 	if (m_maincpu->pc()==0x1e327a)
 		return ioport("COIN")->read(); // TODO: coins don't respond well
@@ -356,31 +357,43 @@ READ16_MEMBER(md_boot_state::jparkmb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::mk3mdb_dsw_r )
+uint16_t md_boot_state::barek2mb_r()
+{
+	if (m_maincpu->pc()==0xfa40)
+		return 0x0400; // TODO: what's this? Needed or the game doesn't boot
+
+	if (m_maincpu->pc()==0xfa88)
+		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
+
+	logerror("aladbl_r : %06x\n",m_maincpu->pc());
+	return 0x0000;
+}
+
+uint16_t md_boot_state::mk3mdb_dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::ssf2mdb_dsw_r )
+uint16_t md_boot_state::ssf2mdb_dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::srmdb_dsw_r )
+uint16_t md_boot_state::srmdb_dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::topshoot_200051_r )
+uint16_t md_boot_state::topshoot_200051_r()
 {
 	return -0x5b;
 }
 
 // jzth protection
-WRITE16_MEMBER(md_boot_state::bl_710000_w)
+void md_boot_state::bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 
@@ -435,7 +448,7 @@ WRITE16_MEMBER(md_boot_state::bl_710000_w)
 }
 
 
-READ16_MEMBER(md_boot_state::bl_710000_r)
+uint16_t md_boot_state::bl_710000_r()
 {
 	uint16_t ret;
 	int pc = m_maincpu->pc();
@@ -769,6 +782,11 @@ static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( barek2 )
+	PORT_INCLUDE( aladmdb )
+	// TODO!
+INPUT_PORTS_END
+
 INPUT_PORTS_START( barek3 )
 	PORT_INCLUDE( md_common )
 
@@ -843,7 +861,7 @@ ROM_START( aladmdb )
 	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(5e2671e4) SHA1(54705c7614fc7b5a1065478fa41f51dd1d8045b7) )
 	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(142a0366) SHA1(6c94aa9936cd11ccda503b52019a6721e64a32f0) )
 	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(0feeeb19) SHA1(bd567a33077ab9997871d21736066140d50e3d70) )
-	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
+	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0) )
 
 	ROM_REGION( 0x2000, "pic", ROMREGION_ERASE00 )
 	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
@@ -888,7 +906,7 @@ ROM_START( srmdb )
 	ROM_LOAD16_BYTE( "u1", 0x000001, 0x020000,  CRC(c59f33bd) SHA1(bd5bce7698a70ea005b79ab34bcdb056872ef980) )
 	ROM_LOAD16_BYTE( "u2", 0x000000, 0x020000,  CRC(9125c054) SHA1(c73bdeb6b11c59d2b5f5968959b02697957ca894) )
 	ROM_LOAD16_BYTE( "u3", 0x040001, 0x020000,  CRC(0fee0fbe) SHA1(001e0fda12707512aad537e533acf28e726e6107) )
-	ROM_LOAD16_BYTE( "u4", 0x040000, 0x020000,  CRC(fc2aed41) SHA1(27eb3957f5ed26ee5276523b1df46fa7eb298e1f))
+	ROM_LOAD16_BYTE( "u4", 0x040000, 0x020000,  CRC(fc2aed41) SHA1(27eb3957f5ed26ee5276523b1df46fa7eb298e1f) )
 ROM_END
 
 ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
@@ -905,6 +923,17 @@ ROM_START( sonic2mb )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "m1", 0x000001, 0x080000,  CRC(7b40aa24) SHA1(247882cd1f412366d61aeb4d85bbeefd5f108e1d) )
 	ROM_LOAD16_BYTE( "m2", 0x000000, 0x080000,  CRC(84b3f758) SHA1(19846b9d951db6f78f3e155d33f1b6349fb87f1a) )
+ROM_END
+
+ROM_START( barek2mb )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(1c1fa718) SHA1(393488f7747478728eb4f20c10b0cfce3b188719) )
+	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(59ee0905) SHA1(0e9f1f6e17aae2dd99bf9d7f640568b48ba699c7) )
+	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(6ec5af5d) SHA1(9088a2d4cff5e7eb439ebaa91ad3bfff11366127) )
+	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(d8c61e0d) SHA1(3d06e656f6621bb0741211f80c1ecff1669475ee) )
+
+	ROM_REGION( 0x2000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 ROM_START( barek3mb )
@@ -956,8 +985,8 @@ void md_boot_state::init_aladmdb()
 	#endif
 
 	// 220000 = writes to mcu? 330000 = reads?
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16_delegate(*this, FUNC(md_boot_state::aladmdb_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16smo_delegate(*this, FUNC(md_boot_state::aladmdb_r)));
 
 	init_megadrij();
 }
@@ -1005,12 +1034,12 @@ void md_boot_state::init_mk3mdb()
 	rom[0x07] = 0x02;
 	rom[0x06] = 0x10;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(*this, FUNC(md_boot_state::mk3mdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::mk3mdb_dsw_r)));
 
 	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void md_boot_state::init_ssf2mdb()
@@ -1021,12 +1050,12 @@ void md_boot_state::init_ssf2mdb()
 
 	membank("bank5")->set_base(memregion( "maincpu" )->base() + 0x400000 );
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(*this, FUNC(md_boot_state::ssf2mdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::ssf2mdb_dsw_r)));
 
 	init_megadrij();
 	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
+	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
+	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
 
 void md_boot_state::init_srmdb()
@@ -1052,20 +1081,28 @@ void md_boot_state::init_srmdb()
 	rom[0x06] = 0xd2;
 	rom[0x07] = 0x00;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(*this, FUNC(md_boot_state::srmdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::srmdb_dsw_r)));
 
 	init_megadriv();
 }
 
 void md_boot_state::init_topshoot()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16_delegate(*this, FUNC(md_boot_state::topshoot_200051_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16smo_delegate(*this, FUNC(md_boot_state::topshoot_200051_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
 
 	init_megadriv();
+}
+
+void md_boot_state::init_barek2()
+{
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16smo_delegate(*this, FUNC(md_boot_state::barek2mb_r)));
+
+	init_megadrij();
 }
 
 void md_boot_state::init_barek3()
@@ -1086,7 +1123,7 @@ void md_boot_state::init_barek3()
 void md_boot_state::init_sonic2mb()
 {
 	// 100000 = writes to unpopulated MCU?
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x300000, 0x300001, "DSW");
 
 	init_megadrij();
@@ -1103,15 +1140,15 @@ void md_boot_state::init_twinktmb()
 	rom[0x06] = 0xcc;
 
 	init_megadrij();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(md_boot_state::twinktmb_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::twinktmb_r)));
 }
 
 void md_boot_state::init_jparkmb()
 {
 	init_megadrij();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(md_boot_state::jparkmb_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(md_boot_state::aladmdb_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::jparkmb_r)));
 }
 
 /*************************************
@@ -1126,6 +1163,7 @@ GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state, init_ssf2mdb,  R
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", 0 ) // flying wires going through the empty PIC space aren't completely understood
+GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
-GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
-GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
+GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
+GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation

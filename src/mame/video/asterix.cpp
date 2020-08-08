@@ -14,7 +14,7 @@ void asterix_state::reset_spritebank()
 	m_spritebanks[3] = (m_spritebank <<  3) & 0x7000;
 }
 
-WRITE16_MEMBER(asterix_state::asterix_spritebank_w)
+void asterix_state::asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritebank);
 	reset_spritebank();

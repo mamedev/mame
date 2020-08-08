@@ -99,7 +99,7 @@ Notes:
 #include "speaker.h"
 
 
-WRITE16_MEMBER(pirates_state::out_w)
+void pirates_state::out_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -450,7 +450,7 @@ void pirates_state::init_pirates()
 	rom[0x62c0/2] = 0x6006; // beq -> bra
 }
 
-READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else return 0x0000; }
+uint16_t pirates_state::genix_prot_r(offs_t offset){ if(!offset) return 0x0004; else return 0x0000; }
 
 void pirates_state::init_genix()
 {
@@ -461,7 +461,7 @@ void pirates_state::init_genix()
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x109e98, 0x109e9b, read16_delegate(*this, FUNC(pirates_state::genix_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x109e98, 0x109e9b, read16sm_delegate(*this, FUNC(pirates_state::genix_prot_r)));
 }
 
 /* GAME */

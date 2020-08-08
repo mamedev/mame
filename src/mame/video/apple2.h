@@ -32,8 +32,8 @@ public:
 	bool m_an2;
 	bool m_80store;
 	bool m_monohgr;
-	uint8_t m_GSfg, m_GSbg, m_GSborder, m_newvideo, m_monochrome;
-	uint32_t m_GSborder_colors[16], m_shr_palette[256];
+	u8 m_GSfg, m_GSbg, m_GSborder, m_newvideo, m_monochrome, m_rgbmode;
+	u32 m_GSborder_colors[16], m_shr_palette[256];
 	std::unique_ptr<bitmap_ind16> m_8bit_graphics;
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
@@ -53,6 +53,7 @@ public:
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+	void text_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_updateGS(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);

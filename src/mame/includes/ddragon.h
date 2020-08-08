@@ -96,8 +96,8 @@ protected:
 	int            m_m5205_clk;
 #endif
 
-	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
+	void ddragon_bgvideoram_w(offs_t offset, uint8_t data);
+	void ddragon_fgvideoram_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(background_scan);
 
@@ -137,16 +137,16 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 
-	DECLARE_WRITE8_MEMBER(ddragon_bankswitch_w);
-	DECLARE_READ8_MEMBER(ddragon_interrupt_r);
-	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
-	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
+	void ddragon_bankswitch_w(uint8_t data);
+	uint8_t ddragon_interrupt_r(offs_t offset);
+	void ddragon_interrupt_w(offs_t offset, uint8_t data);
+	void ddragon2_sub_irq_ack_w(uint8_t data);
+	void ddragon2_sub_irq_w(uint8_t data);
 	void sub_port6_w(uint8_t data);
-	DECLARE_READ8_MEMBER(ddragon_comram_r);
-	DECLARE_WRITE8_MEMBER(ddragon_comram_w);
-	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
-	DECLARE_READ8_MEMBER(dd_adpcm_status_r);
+	uint8_t ddragon_comram_r(offs_t offset);
+	void ddragon_comram_w(offs_t offset, uint8_t data);
+	void dd_adpcm_w(offs_t offset, uint8_t data);
+	uint8_t dd_adpcm_status_r();
 	void ddragonba_port_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
@@ -157,8 +157,10 @@ private:
 	void ddragon_map(address_map &map);
 	void ddragonba_sub_map(address_map &map);
 	void sound_map(address_map &map);
+	void ddragon6809_sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void sub_6309_map(address_map &map);
+	void sub_6809_map(address_map &map);
 };
 
 
@@ -178,9 +180,9 @@ public:
 	void init_darktowr();
 
 private:
-	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
-	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
-	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
+	uint8_t darktowr_mcu_bank_r(offs_t offset);
+	void darktowr_mcu_bank_w(offs_t offset, uint8_t data);
+	void darktowr_bankswitch_w(uint8_t data);
 	void mcu_port_a_w(offs_t offset, uint8_t data);
 
 	void darktowr_map(address_map &map);
@@ -206,7 +208,7 @@ public:
 	void init_toffy();
 
 private:
-	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
+	void toffy_bankswitch_w(uint8_t data);
 
 	void toffy_map(address_map &map);
 };

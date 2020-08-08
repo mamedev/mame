@@ -85,11 +85,11 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	void control_w(u8 data);
+	void lcd_data_w(u8 data);
+	void leds_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
@@ -156,7 +156,7 @@ void diablo_state::update_display()
 	m_display->matrix(led_select, m_led_side << 8 | m_led_data);
 }
 
-WRITE8_MEMBER(diablo_state::control_w)
+void diablo_state::control_w(u8 data)
 {
 	// d0: HD44780 E
 	// d1: HD44780 RS
@@ -175,26 +175,26 @@ WRITE8_MEMBER(diablo_state::control_w)
 	update_display();
 }
 
-WRITE8_MEMBER(diablo_state::lcd_data_w)
+void diablo_state::lcd_data_w(u8 data)
 {
 	// d0-d7: HD44780 data
 	m_lcd_data = data;
 }
 
-WRITE8_MEMBER(diablo_state::leds_w)
+void diablo_state::leds_w(u8 data)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
 	update_display();
 }
 
-READ8_MEMBER(diablo_state::input1_r)
+u8 diablo_state::input1_r()
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~m_board->read_rank(m_inp_mux, true);
 }
 
-READ8_MEMBER(diablo_state::input2_r)
+u8 diablo_state::input2_r()
 {
 	// d0-d2: multiplexed inputs (side panel)
 	// other: ?
@@ -299,6 +299,7 @@ void diablo_state::diablo68k(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

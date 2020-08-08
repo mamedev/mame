@@ -200,7 +200,7 @@ void gstriker_state::machine_start()
 /*** SOUND RELATED ***********************************************************/
 
 
-WRITE8_MEMBER(gstriker_state::sh_bankswitch_w)
+void gstriker_state::sh_bankswitch_w(uint8_t data)
 {
 	membank("soundbank")->set_entry(data & 0x07);
 }
@@ -1071,12 +1071,12 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 #define TICKCOUNT_3 m_work_ram[0x290e/2]
 #define COUNTER_1 m_work_ram[0x2928/2]
 #define COUNTER_2 m_work_ram[0x292a/2]
-READ16_MEMBER(gstriker_state::vbl_toggle_r)
+uint16_t gstriker_state::vbl_toggle_r()
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
+void gstriker_state::vbl_toggle_w(uint16_t data)
 {
 	if( COUNTER1_ENABLE == 1 )
 	{
@@ -1127,8 +1127,8 @@ void gstriker_state::init_vgoalsoc()
 	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(*this, FUNC(gstriker_state::vbl_toggle_w))); // vblank toggle
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16_delegate(*this, FUNC(gstriker_state::vbl_toggle_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_w))); // vblank toggle
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_r)));
 }
 
 

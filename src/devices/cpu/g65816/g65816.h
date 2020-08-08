@@ -1540,6 +1540,13 @@ protected:
 };
 
 
+class g65802_device : public g65816_device
+{
+public:
+	g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class _5a22_device : public g65816_device
 {
 public:
@@ -1571,6 +1578,7 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(G65816, g65816_device)
+DECLARE_DEVICE_TYPE(G65802, g65802_device)
 DECLARE_DEVICE_TYPE(_5A22,  _5a22_device)
 
 

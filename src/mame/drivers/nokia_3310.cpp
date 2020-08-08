@@ -52,22 +52,22 @@ private:
 
 	PCD8544_SCREEN_UPDATE(pcd8544_screen_update);
 
-	DECLARE_READ8_MEMBER(mad2_io_r);
-	DECLARE_WRITE8_MEMBER(mad2_io_w);
-	DECLARE_READ8_MEMBER(mad2_dspif_r);
-	DECLARE_WRITE8_MEMBER(mad2_dspif_w);
-	DECLARE_READ8_MEMBER(mad2_mcuif_r);
-	DECLARE_WRITE8_MEMBER(mad2_mcuif_w);
+	uint8_t mad2_io_r(offs_t offset);
+	void mad2_io_w(offs_t offset, uint8_t data);
+	uint8_t mad2_dspif_r(offs_t offset);
+	void mad2_dspif_w(offs_t offset, uint8_t data);
+	uint8_t mad2_mcuif_r(offs_t offset);
+	void mad2_mcuif_w(offs_t offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(timer0);
 	TIMER_CALLBACK_MEMBER(timer1);
 	TIMER_CALLBACK_MEMBER(timer_watchdog);
 	TIMER_CALLBACK_MEMBER(timer_fiq8);
 
-	DECLARE_READ16_MEMBER(ram_r)        { return m_ram[offset] & mem_mask; }
-	DECLARE_WRITE16_MEMBER(ram_w)       { COMBINE_DATA(&m_ram[offset]); }
-	DECLARE_READ16_MEMBER(dsp_ram_r);
-	DECLARE_WRITE16_MEMBER(dsp_ram_w);
+	uint16_t ram_r(offs_t offset, uint16_t mem_mask = ~0) { return m_ram[offset] & mem_mask; }
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_ram[offset]); }
+	uint16_t dsp_ram_r(offs_t offset);
+	void dsp_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void noki3310_map(address_map &map);
 
@@ -479,7 +479,7 @@ TIMER_CALLBACK_MEMBER(noki3310_state::timer_watchdog)
 	}
 }
 
-READ16_MEMBER(noki3310_state::dsp_ram_r)
+uint16_t noki3310_state::dsp_ram_r(offs_t offset)
 {
 	// HACK: avoid hangs when ARM try to communicate with the DSP
 	if (offset <= 0x004 >> 1)   return 0x01;
@@ -490,12 +490,12 @@ READ16_MEMBER(noki3310_state::dsp_ram_r)
 	return m_dsp_ram[offset & 0x7ff];
 }
 
-WRITE16_MEMBER(noki3310_state::dsp_ram_w)
+void noki3310_state::dsp_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_ram[offset & 0x7ff]);
 }
 
-READ8_MEMBER(noki3310_state::mad2_io_r)
+uint8_t noki3310_state::mad2_io_r(offs_t offset)
 {
 	uint8_t data = m_mad2_regs[offset];
 
@@ -559,7 +559,7 @@ READ8_MEMBER(noki3310_state::mad2_io_r)
 	return data;
 }
 
-WRITE8_MEMBER(noki3310_state::mad2_io_w)
+void noki3310_state::mad2_io_w(offs_t offset, uint8_t data)
 {
 	m_mad2_regs[offset] = data;
 
@@ -605,7 +605,7 @@ WRITE8_MEMBER(noki3310_state::mad2_io_w)
 #endif
 }
 
-READ8_MEMBER(noki3310_state::mad2_dspif_r)
+uint8_t noki3310_state::mad2_dspif_r(offs_t offset)
 {
 #if LOG_MAD2_REGISTER_ACCESS
 	logerror("MAD2 R %02x DSPIF\n", offset);
@@ -613,14 +613,14 @@ READ8_MEMBER(noki3310_state::mad2_dspif_r)
 	return 0;
 }
 
-WRITE8_MEMBER(noki3310_state::mad2_dspif_w)
+void noki3310_state::mad2_dspif_w(offs_t offset, uint8_t data)
 {
 #if LOG_MAD2_REGISTER_ACCESS
 	logerror("MAD2 W %02x = %02x DSPIF\n", offset, data);
 #endif
 }
 
-READ8_MEMBER(noki3310_state::mad2_mcuif_r)
+uint8_t noki3310_state::mad2_mcuif_r(offs_t offset)
 {
 #if LOG_MAD2_REGISTER_ACCESS
 	logerror("MAD2 R %02x MCUIF\n", offset);
@@ -628,7 +628,7 @@ READ8_MEMBER(noki3310_state::mad2_mcuif_r)
 	return 0;
 }
 
-WRITE8_MEMBER(noki3310_state::mad2_mcuif_w)
+void noki3310_state::mad2_mcuif_w(offs_t offset, uint8_t data)
 {
 #if LOG_MAD2_REGISTER_ACCESS
 	logerror("MAD2 W %02x = %02x MCUIF\n", offset, data);

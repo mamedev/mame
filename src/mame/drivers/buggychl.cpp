@@ -103,12 +103,12 @@ Schematics show the jumper set to the 6mhz setting.
 #include "buggychl.lh"
 
 
-WRITE8_MEMBER(buggychl_state::bankswitch_w)
+void buggychl_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
 }
 
-WRITE8_MEMBER(buggychl_state::sound_enable_w)
+void buggychl_state::sound_enable_w(uint8_t data)
 {
 	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
 	// this would be more in line with the (admittedly incorrect) schematic...
@@ -116,7 +116,7 @@ WRITE8_MEMBER(buggychl_state::sound_enable_w)
 	machine().sound().system_enable(data & 1);
 }
 
-READ8_MEMBER(buggychl_state::mcu_status_r)
+uint8_t buggychl_state::mcu_status_r()
 {
 	// bit 0 = when 1, MCU is ready to receive data from main CPU
 	// bit 1 = when 1, MCU has sent data to the main CPU
@@ -134,12 +134,12 @@ READ8_MEMBER(buggychl_state::mcu_status_r)
 // a cpu read of soundlatch2 sets ic12.1 so /Q is low, so cpu bit 0 and sound bit 1 read as clear
 // a sound read of soundlatch clears ic12.2 so /Q is high, so cpu bit 1 and sound bit 0 read as set
 // ic12.1 is set and ic12.2 is cleared by /SRESET
-READ8_MEMBER(buggychl_state::sound_status_main_r)
+uint8_t buggychl_state::sound_status_main_r()
 {
 	return (m_soundlatch2->pending_r() ? 1 : 0) | (m_soundlatch->pending_r() ? 0 : 2);
 }
 
-READ8_MEMBER(buggychl_state::sound_status_sound_r)
+uint8_t buggychl_state::sound_status_sound_r()
 {
 	return (m_soundlatch2->pending_r() ? 2 : 0) | (m_soundlatch->pending_r() ? 0 : 1);
 }
@@ -458,7 +458,7 @@ static GFXDECODE_START( gfx_buggychl )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(buggychl_state::ta7630_volbal_msm_w)
+void buggychl_state::ta7630_volbal_msm_w(uint8_t data)
 {
 	m_ta7630->set_device_volume(m_msm, data >> 4);
 }

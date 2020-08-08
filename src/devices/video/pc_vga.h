@@ -26,14 +26,14 @@ public:
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual uint8_t port_03b0_r(offs_t offset);
+	virtual void port_03b0_w(offs_t offset, uint8_t data);
+	virtual uint8_t port_03c0_r(offs_t offset);
+	virtual void port_03c0_w(offs_t offset, uint8_t data);
+	virtual uint8_t port_03d0_r(offs_t offset);
+	virtual void port_03d0_w(offs_t offset, uint8_t data);
+	virtual uint8_t mem_r(offs_t offset);
+	virtual void mem_w(offs_t offset, uint8_t data);
 	virtual uint8_t mem_linear_r(offs_t offset);
 	virtual void mem_linear_w(offs_t offset,uint8_t data);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
@@ -77,8 +77,8 @@ protected:
 	void crtc_reg_write(uint8_t index, uint8_t data);
 	void seq_reg_write(uint8_t index, uint8_t data);
 	uint8_t vga_vblank();
-	READ8_MEMBER(vga_crtc_r);
-	WRITE8_MEMBER(vga_crtc_w);
+	uint8_t vga_crtc_r(offs_t offset);
+	void vga_crtc_w(offs_t offset, uint8_t data);
 	uint8_t gc_reg_read(uint8_t index);
 	void attribute_reg_write(uint8_t index, uint8_t data);
 	void gc_reg_write(uint8_t index,uint8_t data);
@@ -114,7 +114,7 @@ protected:
 	{
 		vga_t(device_t &owner) : read_dipswitch(owner) { }
 
-		read8_delegate read_dipswitch;
+		read8smo_delegate read_dipswitch;
 		struct
 		{
 			size_t vram_size;
@@ -289,52 +289,52 @@ public:
 	bool is_8514a_enabled() { return ibm8514.enabled; }
 	bool is_passthrough_set() { return ibm8514.passthrough; }
 
-	READ16_MEMBER(ibm8514_gpstatus_r);
-	WRITE16_MEMBER(ibm8514_cmd_w);
-	WRITE16_MEMBER(ibm8514_display_ctrl_w);
-	READ16_MEMBER(ibm8514_line_error_r);
-	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ8_MEMBER(ibm8514_status_r);
-	WRITE8_MEMBER(ibm8514_htotal_w);
-	READ16_MEMBER(ibm8514_substatus_r);
-	WRITE16_MEMBER(ibm8514_subcontrol_w);
-	READ16_MEMBER(ibm8514_subcontrol_r);
-	READ16_MEMBER(ibm8514_htotal_r);
-	READ16_MEMBER(ibm8514_vtotal_r);
-	WRITE16_MEMBER(ibm8514_vtotal_w);
-	READ16_MEMBER(ibm8514_vdisp_r);
-	WRITE16_MEMBER(ibm8514_vdisp_w);
-	READ16_MEMBER(ibm8514_vsync_r);
-	WRITE16_MEMBER(ibm8514_vsync_w);
-	READ16_MEMBER(ibm8514_desty_r);
-	WRITE16_MEMBER(ibm8514_desty_w);
-	READ16_MEMBER(ibm8514_destx_r);
-	WRITE16_MEMBER(ibm8514_destx_w);
-	READ16_MEMBER(ibm8514_ssv_r);
-	WRITE16_MEMBER(ibm8514_ssv_w);
-	READ16_MEMBER(ibm8514_currentx_r);
-	WRITE16_MEMBER(ibm8514_currentx_w);
-	READ16_MEMBER(ibm8514_currenty_r);
-	WRITE16_MEMBER(ibm8514_currenty_w);
-	READ16_MEMBER(ibm8514_width_r);
-	WRITE16_MEMBER(ibm8514_width_w);
-	READ16_MEMBER(ibm8514_fgcolour_r);
-	WRITE16_MEMBER(ibm8514_fgcolour_w);
-	READ16_MEMBER(ibm8514_bgcolour_r);
-	WRITE16_MEMBER(ibm8514_bgcolour_w);
-	READ16_MEMBER(ibm8514_multifunc_r);
-	WRITE16_MEMBER(ibm8514_multifunc_w);
-	READ16_MEMBER(ibm8514_backmix_r);
-	WRITE16_MEMBER(ibm8514_backmix_w);
-	READ16_MEMBER(ibm8514_foremix_r);
-	WRITE16_MEMBER(ibm8514_foremix_w);
-	READ16_MEMBER(ibm8514_pixel_xfer_r);
-	virtual WRITE16_MEMBER(ibm8514_pixel_xfer_w);
-	READ16_MEMBER(ibm8514_read_mask_r);
-	WRITE16_MEMBER(ibm8514_read_mask_w);
-	READ16_MEMBER(ibm8514_write_mask_r);
-	WRITE16_MEMBER(ibm8514_write_mask_w);
-	WRITE16_MEMBER(ibm8514_advfunc_w);
+	uint16_t ibm8514_gpstatus_r();
+	void ibm8514_cmd_w(uint16_t data);
+	void ibm8514_display_ctrl_w(uint16_t data);
+	uint16_t ibm8514_line_error_r();
+	void ibm8514_line_error_w(uint16_t data);
+	uint8_t ibm8514_status_r(offs_t offset);
+	void ibm8514_htotal_w(offs_t offset, uint8_t data);
+	uint16_t ibm8514_substatus_r();
+	void ibm8514_subcontrol_w(uint16_t data);
+	uint16_t ibm8514_subcontrol_r();
+	uint16_t ibm8514_htotal_r();
+	uint16_t ibm8514_vtotal_r();
+	void ibm8514_vtotal_w(uint16_t data);
+	uint16_t ibm8514_vdisp_r();
+	void ibm8514_vdisp_w(uint16_t data);
+	uint16_t ibm8514_vsync_r();
+	void ibm8514_vsync_w(uint16_t data);
+	uint16_t ibm8514_desty_r();
+	void ibm8514_desty_w(uint16_t data);
+	uint16_t ibm8514_destx_r();
+	void ibm8514_destx_w(uint16_t data);
+	uint16_t ibm8514_ssv_r();
+	void ibm8514_ssv_w(uint16_t data);
+	uint16_t ibm8514_currentx_r();
+	void ibm8514_currentx_w(uint16_t data);
+	uint16_t ibm8514_currenty_r();
+	void ibm8514_currenty_w(uint16_t data);
+	uint16_t ibm8514_width_r();
+	void ibm8514_width_w(uint16_t data);
+	uint16_t ibm8514_fgcolour_r();
+	void ibm8514_fgcolour_w(uint16_t data);
+	uint16_t ibm8514_bgcolour_r();
+	void ibm8514_bgcolour_w(uint16_t data);
+	uint16_t ibm8514_multifunc_r();
+	void ibm8514_multifunc_w(uint16_t data);
+	uint16_t ibm8514_backmix_r();
+	void ibm8514_backmix_w(uint16_t data);
+	uint16_t ibm8514_foremix_r();
+	void ibm8514_foremix_w(uint16_t data);
+	uint16_t ibm8514_pixel_xfer_r(offs_t offset);
+	virtual void ibm8514_pixel_xfer_w(offs_t offset, uint16_t data);
+	uint16_t ibm8514_read_mask_r();
+	void ibm8514_read_mask_w(uint16_t data);
+	uint16_t ibm8514_write_mask_r();
+	void ibm8514_write_mask_w(uint16_t data);
+	void ibm8514_advfunc_w(uint16_t data);
 
 	void ibm8514_wait_draw();
 	struct
@@ -423,44 +423,44 @@ class mach8_device : public ibm8514a_device
 public:
 	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	READ16_MEMBER(mach8_ec0_r);
-	WRITE16_MEMBER(mach8_ec0_w);
-	READ16_MEMBER(mach8_ec1_r);
-	WRITE16_MEMBER(mach8_ec1_w);
-	READ16_MEMBER(mach8_ec2_r);
-	WRITE16_MEMBER(mach8_ec2_w);
-	READ16_MEMBER(mach8_ec3_r);
-	WRITE16_MEMBER(mach8_ec3_w);
-	READ16_MEMBER(mach8_ext_fifo_r);
-	WRITE16_MEMBER(mach8_linedraw_index_w);
-	READ16_MEMBER(mach8_bresenham_count_r);
-	WRITE16_MEMBER(mach8_bresenham_count_w);
-	WRITE16_MEMBER(mach8_linedraw_w);
-	READ16_MEMBER(mach8_linedraw_r);
-	READ16_MEMBER(mach8_scratch0_r);
-	WRITE16_MEMBER(mach8_scratch0_w);
-	READ16_MEMBER(mach8_scratch1_r);
-	WRITE16_MEMBER(mach8_scratch1_w);
-	READ16_MEMBER(mach8_config1_r);
-	READ16_MEMBER(mach8_config2_r);
-	READ16_MEMBER(mach8_sourcex_r);
-	READ16_MEMBER(mach8_sourcey_r);
-	WRITE16_MEMBER(mach8_ext_leftscissor_w);
-	WRITE16_MEMBER(mach8_ext_topscissor_w);
-	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
-	WRITE16_MEMBER(mach8_crt_pitch_w);
-	WRITE16_MEMBER(mach8_patt_data_w) { logerror("Mach8: Pattern Data write (unimplemented)\n"); }
-	WRITE16_MEMBER(mach8_ge_offset_l_w);
-	WRITE16_MEMBER(mach8_ge_offset_h_w);
-	WRITE16_MEMBER(mach8_ge_pitch_w);
-	READ16_MEMBER(mach8_ge_ext_config_r) { return mach8.ge_ext_config; }
-	WRITE16_MEMBER(mach8_ge_ext_config_w);  // TODO: handle 8-bit I/O
-	WRITE16_MEMBER(mach8_scan_x_w);
-	WRITE16_MEMBER(mach8_dp_config_w);
-	READ16_MEMBER(mach8_readonly_r) { return 0; }
-	WRITE16_MEMBER(mach8_pixel_xfer_w);
-	WRITE16_MEMBER(mach8_clksel_w) { mach8.ati_mode = true; ibm8514.passthrough = data & 0x0001; mach8.clksel = data; }  // read only on the mach8
-	WRITE16_MEMBER(mach8_advfunc_w) { mach8.ati_mode = false; ibm8514_advfunc_w(space,offset,data,mem_mask); }
+	uint16_t mach8_ec0_r();
+	void mach8_ec0_w(uint16_t data);
+	uint16_t mach8_ec1_r();
+	void mach8_ec1_w(uint16_t data);
+	uint16_t mach8_ec2_r();
+	void mach8_ec2_w(uint16_t data);
+	uint16_t mach8_ec3_r();
+	void mach8_ec3_w(uint16_t data);
+	uint16_t mach8_ext_fifo_r();
+	void mach8_linedraw_index_w(uint16_t data);
+	uint16_t mach8_bresenham_count_r();
+	void mach8_bresenham_count_w(uint16_t data);
+	void mach8_linedraw_w(uint16_t data);
+	uint16_t mach8_linedraw_r();
+	uint16_t mach8_scratch0_r();
+	void mach8_scratch0_w(uint16_t data);
+	uint16_t mach8_scratch1_r();
+	void mach8_scratch1_w(uint16_t data);
+	uint16_t mach8_config1_r();
+	uint16_t mach8_config2_r();
+	uint16_t mach8_sourcex_r();
+	uint16_t mach8_sourcey_r();
+	void mach8_ext_leftscissor_w(uint16_t data);
+	void mach8_ext_topscissor_w(uint16_t data);
+	uint16_t mach8_clksel_r() { return mach8.clksel; }
+	void mach8_crt_pitch_w(uint16_t data);
+	void mach8_patt_data_w(uint16_t data) { logerror("Mach8: Pattern Data write (unimplemented)\n"); }
+	void mach8_ge_offset_l_w(uint16_t data);
+	void mach8_ge_offset_h_w(uint16_t data);
+	void mach8_ge_pitch_w(uint16_t data);
+	uint16_t mach8_ge_ext_config_r() { return mach8.ge_ext_config; }
+	void mach8_ge_ext_config_w(uint16_t data);  // TODO: handle 8-bit I/O
+	void mach8_scan_x_w(uint16_t data);
+	void mach8_dp_config_w(uint16_t data);
+	uint16_t mach8_readonly_r() { return 0; }
+	void mach8_pixel_xfer_w(offs_t offset, uint16_t data);
+	void mach8_clksel_w(uint16_t data) { mach8.ati_mode = true; ibm8514.passthrough = data & 0x0001; mach8.clksel = data; }  // read only on the mach8
+	void mach8_advfunc_w(uint16_t data) { mach8.ati_mode = false; ibm8514_advfunc_w(data); }
 	uint16_t get_ext_config() { return mach8.ge_ext_config; }
 	uint16_t offset() { if(mach8.ati_mode) return mach8.ge_pitch; else return 128; }
 
@@ -499,14 +499,14 @@ public:
 	// construction/destruction
 	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override;
@@ -546,13 +546,13 @@ public:
 	// construction/destruction
 	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 	// VGA registers
-	virtual READ8_MEMBER(port_03c0_r) override;
-	READ8_MEMBER(ati_port_ext_r);
-	WRITE8_MEMBER(ati_port_ext_w);
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	uint8_t ati_port_ext_r(offs_t offset);
+	void ati_port_ext_w(offs_t offset, uint8_t data);
 
 	virtual uint16_t offset() override;
 
@@ -587,14 +587,14 @@ public:
 	// construction/destruction
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -680,14 +680,14 @@ public:
 	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 };
 
 

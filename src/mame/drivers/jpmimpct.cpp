@@ -210,7 +210,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_timer_event)
 	update_irqs();
 }
 
-READ16_MEMBER(jpmimpct_state::duart_1_r)
+uint16_t jpmimpct_state::duart_1_r(offs_t offset)
 {
 	struct duart_t &duart_1 = m_duart_1;
 	uint16_t val = 0xffff;
@@ -274,7 +274,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 	return val;
 }
 
-WRITE16_MEMBER(jpmimpct_state::duart_1_w)
+void jpmimpct_state::duart_1_w(offs_t offset, uint16_t data)
 {
 	struct duart_t &duart_1 = m_duart_1;
 	//int old_val;
@@ -360,7 +360,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_1_w)
     Communication with a touchscreen interface PCB
     is handled via UART B.
 */
-READ16_MEMBER(jpmimpct_state::duart_2_r)
+uint16_t jpmimpct_state::duart_2_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -401,7 +401,7 @@ READ16_MEMBER(jpmimpct_state::duart_2_r)
 /*
     Nothing important here?
 */
-WRITE16_MEMBER(jpmimpct_state::duart_2_w)
+void jpmimpct_state::duart_2_w(uint16_t data)
 {
 }
 
@@ -428,7 +428,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_2_w)
  *  9: Coin mechanism
  */
 
-READ16_MEMBER(jpmimpct_state::inputs1_r)
+uint16_t jpmimpct_state::inputs1_r(offs_t offset)
 {
 	uint16_t val = 0x00ff;
 
@@ -465,7 +465,7 @@ READ16_MEMBER(jpmimpct_state::inputs1_r)
  *  Sound control
  *
  *************************************/
-WRITE16_MEMBER(jpmimpct_state::volume_w)
+void jpmimpct_state::volume_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -474,7 +474,7 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 	}
 }
 
-WRITE16_MEMBER(jpmimpct_state::upd7759_w)
+void jpmimpct_state::upd7759_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -484,7 +484,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::upd7759_r)
+uint16_t jpmimpct_state::upd7759_r(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -500,12 +500,12 @@ READ16_MEMBER(jpmimpct_state::upd7759_r)
  *
  *************************************/
 
-READ16_MEMBER(jpmimpct_state::unk_r)
+uint16_t jpmimpct_state::unk_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmimpct_state::unk_w)
+void jpmimpct_state::unk_w(uint16_t data)
 {
 }
 
@@ -520,12 +520,12 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::jpmio_r)
+uint16_t jpmimpct_state::jpmio_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmimpct_state::jpmio_w)
+void jpmimpct_state::jpmio_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -1003,7 +1003,7 @@ MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
  *  8: Payslides
  *  9: Coin mechanism
  */
-READ16_MEMBER(jpmimpct_state::inputs1awp_r)
+uint16_t jpmimpct_state::inputs1awp_r(offs_t offset)
 {
 	uint16_t val = 0x00;
 
@@ -1060,22 +1060,22 @@ READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::optos_r)
+uint16_t jpmimpct_state::optos_r()
 {
 	return m_optic_pattern;
 }
 
-READ16_MEMBER(jpmimpct_state::prot_1_r)
+uint16_t jpmimpct_state::prot_1_r()
 {
 	return 0x01;
 }
 
-READ16_MEMBER(jpmimpct_state::prot_0_r)
+uint16_t jpmimpct_state::prot_0_r()
 {
 	return 0x00;
 }
 
-WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
+void jpmimpct_state::jpmioawp_w(offs_t offset, uint16_t data)
 {
 	int i,metno;
 	switch (offset)
@@ -1176,7 +1176,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::ump_r)
+uint16_t jpmimpct_state::ump_r()
 {
 	return 0xff;//0xffff;
 }
@@ -1737,6 +1737,20 @@ ROM_START( monspdr )
 	/* missing? */
 ROM_END
 
+ROM_START( jpmreno ) // was in an MPU4 video set
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "reno_71_27c040.bin",0x000000, 0x080000,  CRC(c1125c51) SHA1(a461049cd3768096c03f3a5149cdef31d0ab447e) )
+	ROM_LOAD16_BYTE( "reno_72_27c040.bin",0x000001, 0x080000,  CRC(31773743) SHA1(e1245f6b35c9049b3d1478e93fb1b6cfff34733e) )
+
+	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "gr1.bin", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "gr2.bin", 0x000001, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "upd", 0 )
+	ROM_LOAD( "reno reels sound 1a",  0x000000, 0x080000,  CRC(a8b7bba7) SHA1(5fa3512a6fdcf512fafa6261b3a99922a00d6874) )
+ROM_END
+
+
 /************************************
  *
  *  Game driver(s)
@@ -1760,5 +1774,6 @@ GAME( 1999, coronatn,  0,        jpmimpct, coronatn, jpmimpct_state, empty_init,
 GAME( 1999, coronatnd, coronatn, jpmimpct, coronatn, jpmimpct_state, empty_init, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, tqst,      0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
 GAME( 199?, snlad,     0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
+GAME( 199?, jpmreno ,  0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "JPM", "Reno Reels (JPM)", MACHINE_NOT_WORKING ) // incomplete
 GAME( 199?, buzzundr,  0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
 GAME( 199?, monspdr ,  0,        jpmimpct, cluedo,   jpmimpct_state, empty_init, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )

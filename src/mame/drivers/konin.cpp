@@ -40,11 +40,10 @@ public:
 	void konin(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
-	void konin_io(address_map &map);
-	void konin_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -53,17 +52,12 @@ private:
 	required_device<pit8253_device> m_iopit;
 };
 
-WRITE8_MEMBER(konin_state::picu_b_w)
-{
-	m_picu->b_w(data);
-}
-
 WRITE_LINE_MEMBER(konin_state::picu_r3_w)
 {
 	m_picu->r_w(4, !state);
 }
 
-void konin_state::konin_mem(address_map &map)
+void konin_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x4fff).rom();
@@ -75,11 +69,11 @@ void konin_state::konin_mem(address_map &map)
 	map(0xff00, 0xffff).ram();
 }
 
-void konin_state::konin_io(address_map &map)
+void konin_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
+	map(0x24, 0x24).w(m_picu, FUNC(i8214_device::b_w));
 	map(0x80, 0x83).lrw8(
 		NAME([this](offs_t offset) { return m_ioppi->read(offset^3); }),
 		NAME([this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); }));
@@ -103,8 +97,8 @@ void konin_state::konin(machine_config &config)
 {
 	/* basic machine hardware */
 	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL(4'000'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &konin_state::konin_mem);
-	maincpu.set_addrmap(AS_IO, &konin_state::konin_io);
+	maincpu.set_addrmap(AS_PROGRAM, &konin_state::mem_map);
+	maincpu.set_addrmap(AS_IO, &konin_state::io_map);
 	maincpu.out_inte_func().set(m_picu, FUNC(i8214_device::inte_w));
 	maincpu.set_irq_acknowledge_callback("intlatch", FUNC(i8212_device::inta_cb));
 
@@ -142,7 +136,7 @@ void konin_state::konin(machine_config &config)
 
 /* ROM definition */
 ROM_START( konin )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x5000, "maincpu", 0 )
 	ROM_LOAD( "001.bin", 0x0000, 0x0800, CRC(0b13208a) SHA1(38ea17be591b729158d601c03bfd9954f32e0e67))
 	ROM_LOAD( "008.bin", 0x0800, 0x0800, CRC(f003e407) SHA1(11f79ef3b90788cf627ee39705bbbd04dbf45f50))
 	ROM_LOAD( "007.bin", 0x1000, 0x0800, CRC(3d390c03) SHA1(ac2fe31c065e8f630381d6cebd2eb58b403c1e02))
@@ -158,4 +152,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME  FLAGS
-COMP( 198?, konin, 0,      0,      konin,   konin, konin_state, empty_init, "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON )
+COMP( 198?, konin, 0,      0,      konin,   konin, konin_state, empty_init, "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

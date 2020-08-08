@@ -16,19 +16,19 @@ public:
 
 	void amap(address_map &map);
 
-	DECLARE_READ8_MEMBER(status_snd_r);
-	DECLARE_READ8_MEMBER(status_kms_r);
-	DECLARE_READ8_MEMBER(status_dma_r);
-	DECLARE_READ8_MEMBER(status_cmd_r);
-	DECLARE_READ32_MEMBER(cdata_r);
-	DECLARE_READ32_MEMBER(kmdata_r);
+	uint8_t status_snd_r();
+	uint8_t status_kms_r();
+	uint8_t status_dma_r();
+	uint8_t status_cmd_r();
+	uint32_t cdata_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t kmdata_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(ctrl_snd_w);
-	DECLARE_WRITE8_MEMBER(ctrl_kms_w);
-	DECLARE_WRITE8_MEMBER(ctrl_dma_w);
-	DECLARE_WRITE8_MEMBER(ctrl_cmd_w);
-	DECLARE_WRITE32_MEMBER(cdata_w);
-	DECLARE_WRITE32_MEMBER(kmdata_w);
+	void ctrl_snd_w(uint8_t data);
+	void ctrl_kms_w(uint8_t data);
+	void ctrl_dma_w(uint8_t data);
+	void ctrl_cmd_w(uint8_t data);
+	void cdata_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void kmdata_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(update);
 

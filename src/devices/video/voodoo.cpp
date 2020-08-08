@@ -156,7 +156,8 @@ bits(7:4) and bit(24)), X, and Y:
  *************************************/
 
 #define DEBUG_DEPTH         (0)
-#define DEBUG_LOD           (0)
+#define DEBUG_BACKBUF       (0)
+#define DEBUG_STATS         (0)
 
 #define LOG_VBLANK_SWAP     (0)
 #define LOG_FIFO            (0)
@@ -824,7 +825,6 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 {
 	int changed = fbi.video_changed;
 	int drawbuf = fbi.frontbuf;
-	int statskey;
 	int x, y;
 
 	/* reset the video changed flag */
@@ -910,7 +910,7 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	}
 
 	/* debugging! */
-	if (machine().input().code_pressed(KEYCODE_L))
+	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
 		drawbuf = fbi.backbuf;
 
 	/* copy from the current front buffer */
@@ -924,25 +924,31 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		}
 
 	/* update stats display */
-	statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH) != 0);
-	if (statskey && statskey != stats.lastkey)
-		stats.display = !stats.display;
-	stats.lastkey = statskey;
+	if (DEBUG_STATS)
+	{
+		int statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH));
+		if (statskey && statskey != stats.lastkey)
+			stats.display = !stats.display;
+		stats.lastkey = statskey;
 
-	/* display stats */
-	if (stats.display)
-		popmessage(stats.buffer, 0, 0);
+		/* display stats */
+		if (stats.display)
+			popmessage(stats.buffer, 0, 0);
+	}
 
 	/* update render override */
-	stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
-	if (DEBUG_DEPTH && stats.render_override)
+	if (DEBUG_DEPTH)
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
+		if (stats.render_override)
 		{
-			uint16_t *src = (uint16_t *)(fbi.ram + fbi.auxoffs) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
-			uint32_t *dst = &bitmap.pix32(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
+			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+			{
+				uint16_t* src = (uint16_t*)(fbi.ram + fbi.auxoffs) + (y - fbi.yoffs) * fbi.rowpixels - fbi.xoffs;
+				uint32_t* dst = &bitmap.pix32(y);
+				for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
+			}
 		}
 	}
 	return changed;
@@ -1086,7 +1092,7 @@ void voodoo_device::tmu_state::init(uint8_t vdt, tmu_shared_state &share, voodoo
 	ram = reinterpret_cast<uint8_t *>(memory);
 	mask = tmem - 1;
 	reg = r;
-	regdirty = true;
+	regdirty = false;
 	bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
@@ -3395,16 +3401,21 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case texBaseAddr_1:
 		case texBaseAddr_2:
 		case texBaseAddr_3_8:
-			poly_wait(vd->poly, vd->regnames[regnum]);
 			if (chips & 2)
 			{
-				vd->tmu[0].reg[regnum].u = data;
-				vd->tmu[0].regdirty = true;
+				if (vd->tmu[0].reg[regnum].u != data) {
+					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->tmu[0].regdirty = true;
+					vd->tmu[0].reg[regnum].u = data;
+				}
 			}
 			if (chips & 4)
 			{
-				vd->tmu[1].reg[regnum].u = data;
-				vd->tmu[1].regdirty = true;
+				if (vd->tmu[1].reg[regnum].u != data) {
+					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->tmu[1].regdirty = true;
+					vd->tmu[1].reg[regnum].u = data;
+				}
 			}
 			break;
 

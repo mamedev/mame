@@ -41,13 +41,13 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 		0);
 }
 
-WRITE8_MEMBER(pitnrun_state::videoram_w)
+void pitnrun_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::videoram2_w)
+void pitnrun_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg ->mark_all_dirty();
@@ -60,28 +60,28 @@ WRITE_LINE_MEMBER(pitnrun_state::char_bank_select_w)
 }
 
 
-WRITE8_MEMBER(pitnrun_state::scroll_w)
+void pitnrun_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll = (m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
 	m_bg->set_scrollx(0, m_scroll);
 }
 
-WRITE8_MEMBER(pitnrun_state::scroll_y_w)
+void pitnrun_state::scroll_y_w(uint8_t data)
 {
 	m_bg->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(pitnrun_state::ha_w)
+void pitnrun_state::ha_w(uint8_t data)
 {
 	m_ha=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::h_heed_w)
+void pitnrun_state::h_heed_w(uint8_t data)
 {
 	m_h_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::v_heed_w)
+void pitnrun_state::v_heed_w(uint8_t data)
 {
 	m_v_heed=data;
 }

@@ -74,6 +74,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// inline configuration state
 	double              m_x;
@@ -81,11 +82,10 @@ protected:
 	double              m_z;
 
 	// internal state
-#ifdef MAME_DEBUG
-	s32                 m_max_sample;           // largest sample value we've seen
-	s32                 m_clipped_samples;      // total number of clipped samples
-	s32                 m_total_samples;        // total number of samples
-#endif
+	static constexpr int BUCKETS_PER_SECOND = 10;
+	std::vector<s32> 	m_max_sample;
+	s32					m_current_max;
+	u32					m_samples_this_bucket;
 };
 
 

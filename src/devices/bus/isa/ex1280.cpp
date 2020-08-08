@@ -90,7 +90,7 @@ void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 //  regs_r - register read handler
 //-------------------------------------------------
 
-READ16_MEMBER(isa16_ex1280_device::regs_r)
+uint16_t isa16_ex1280_device::regs_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	if (offset == 0)
@@ -110,7 +110,7 @@ READ16_MEMBER(isa16_ex1280_device::regs_r)
 //  regs_w - register write handler
 //-------------------------------------------------
 
-WRITE16_MEMBER(isa16_ex1280_device::regs_w)
+void isa16_ex1280_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: regs_w: %08x = %04x & %04x\n", machine().describe_context(), 0x04000000 | (offset << 1), data, mem_mask);
 }
@@ -120,7 +120,7 @@ WRITE16_MEMBER(isa16_ex1280_device::regs_w)
 //  vram_r - VRAM direct read handler
 //-------------------------------------------------
 
-READ16_MEMBER(isa16_ex1280_device::vram_r)
+uint16_t isa16_ex1280_device::vram_r(offs_t offset)
 {
 	logerror("vram_r: %08x = %04x\n", offset, m_vram[offset]);
 	return m_vram[offset];
@@ -128,10 +128,10 @@ READ16_MEMBER(isa16_ex1280_device::vram_r)
 
 
 //-------------------------------------------------
-//  vram_r - VRAM direct write handler
+//  vram_w - VRAM direct write handler
 //-------------------------------------------------
 
-WRITE16_MEMBER(isa16_ex1280_device::vram_w)
+void isa16_ex1280_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("vram_r: %08x = %04x & %04x\n", offset, data, mem_mask);
 	COMBINE_DATA(&m_vram[offset]);

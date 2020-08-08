@@ -3,62 +3,62 @@
 #include "emu.h"
 #include "includes/pk8000.h"
 
-READ8_MEMBER(pk8000_base_state::video_color_r)
+uint8_t pk8000_base_state::video_color_r()
 {
 	return m_video_color;
 }
 
-WRITE8_MEMBER(pk8000_base_state::video_color_w)
+void pk8000_base_state::video_color_w(uint8_t data)
 {
 	m_video_color = data;
 }
 
-READ8_MEMBER(pk8000_base_state::text_start_r)
+uint8_t pk8000_base_state::text_start_r()
 {
 	return m_text_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::text_start_w)
+void pk8000_base_state::text_start_w(uint8_t data)
 {
 	m_text_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::chargen_start_r)
+uint8_t pk8000_base_state::chargen_start_r()
 {
 	return m_chargen_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::chargen_start_w)
+void pk8000_base_state::chargen_start_w(uint8_t data)
 {
 	m_chargen_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::video_start_r)
+uint8_t pk8000_base_state::video_start_r()
 {
 	return m_video_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::video_start_w)
+void pk8000_base_state::video_start_w(uint8_t data)
 {
 	m_video_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::color_start_r)
+uint8_t pk8000_base_state::color_start_r()
 {
 	return m_color_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::color_start_w)
+void pk8000_base_state::color_start_w(uint8_t data)
 {
 	m_color_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::color_r)
+uint8_t pk8000_base_state::color_r(offs_t offset)
 {
 	return m_color[offset];
 }
 
-WRITE8_MEMBER(pk8000_base_state::color_w)
+void pk8000_base_state::color_w(offs_t offset, uint8_t data)
 {
 	m_color[offset] = data;
 }

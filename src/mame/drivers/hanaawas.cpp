@@ -36,7 +36,7 @@
 #include "speaker.h"
 
 
-READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
+uint8_t hanaawas_state::hanaawas_input_port_0_r()
 {
 	int i, ordinal = 0;
 	uint16_t buttons = 0;
@@ -83,17 +83,17 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 	return ordinal;
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
+void hanaawas_state::hanaawas_inputs_mux_w(uint8_t data)
 {
 	m_mux = data;
 }
 
-WRITE8_MEMBER(hanaawas_state::irq_ack_w)
+void hanaawas_state::irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0,CLEAR_LINE);
 }
 
-WRITE8_MEMBER(hanaawas_state::key_matrix_status_w)
+void hanaawas_state::key_matrix_status_w(uint8_t data)
 {
 	if((data & 0xf0) == 0x40) //coinage setting command
 		m_coin_settings = data & 0xf;

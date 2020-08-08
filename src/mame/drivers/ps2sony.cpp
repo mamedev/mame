@@ -228,25 +228,25 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(vblank);
 
-	DECLARE_READ32_MEMBER(ipu_r);
-	DECLARE_WRITE32_MEMBER(ipu_w);
-	DECLARE_READ64_MEMBER(vif0_fifo_r);
-	DECLARE_WRITE64_MEMBER(vif0_fifo_w);
-	DECLARE_READ64_MEMBER(gif_fifo_r);
-	DECLARE_WRITE64_MEMBER(gif_fifo_w);
-	DECLARE_READ64_MEMBER(ipu_fifo_r);
-	DECLARE_WRITE64_MEMBER(ipu_fifo_w);
-	DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_READ32_MEMBER(unk_f430_r);
-	DECLARE_WRITE32_MEMBER(unk_f430_w);
-	DECLARE_READ32_MEMBER(unk_f440_r);
-	DECLARE_WRITE32_MEMBER(unk_f440_w);
-	DECLARE_READ32_MEMBER(unk_f520_r);
-	DECLARE_READ64_MEMBER(board_id_r);
+	uint32_t ipu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ipu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint64_t vif0_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void vif0_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t gif_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void gif_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ipu_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ipu_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void debug_w(uint8_t data);
+	uint32_t unk_f430_r();
+	void unk_f430_w(uint32_t data);
+	uint32_t unk_f440_r();
+	void unk_f440_w(uint32_t data);
+	uint32_t unk_f520_r();
+	uint64_t board_id_r();
 
-	DECLARE_WRITE64_MEMBER(ee_iop_ram_w);
-	DECLARE_READ64_MEMBER(ee_iop_ram_r);
-	DECLARE_WRITE32_MEMBER(iop_debug_w);
+	void ee_iop_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ee_iop_ram_r(offs_t offset);
+	void iop_debug_w(uint32_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
 
@@ -300,7 +300,7 @@ protected:
  *
  */
 
-READ64_MEMBER(ps2sony_state::vif0_fifo_r)
+uint64_t ps2sony_state::vif0_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	if (offset)
@@ -314,7 +314,7 @@ READ64_MEMBER(ps2sony_state::vif0_fifo_r)
 	return ret;
 }
 
-WRITE64_MEMBER(ps2sony_state::vif0_fifo_w)
+void ps2sony_state::vif0_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (offset)
 	{
@@ -326,7 +326,7 @@ WRITE64_MEMBER(ps2sony_state::vif0_fifo_w)
 	}
 }
 
-READ64_MEMBER(ps2sony_state::gif_fifo_r)
+uint64_t ps2sony_state::gif_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	if (offset)
@@ -340,7 +340,7 @@ READ64_MEMBER(ps2sony_state::gif_fifo_r)
 	return ret;
 }
 
-WRITE64_MEMBER(ps2sony_state::gif_fifo_w)
+void ps2sony_state::gif_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (offset)
 	{
@@ -352,7 +352,7 @@ WRITE64_MEMBER(ps2sony_state::gif_fifo_w)
 	}
 }
 
-READ32_MEMBER(ps2sony_state::ipu_r)
+uint32_t ps2sony_state::ipu_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -378,7 +378,7 @@ READ32_MEMBER(ps2sony_state::ipu_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2sony_state::ipu_w)
+void ps2sony_state::ipu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -462,7 +462,7 @@ WRITE32_MEMBER(ps2sony_state::ipu_w)
 	}
 }
 
-READ64_MEMBER(ps2sony_state::ipu_fifo_r)
+uint64_t ps2sony_state::ipu_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0ULL;
 	switch (offset)
@@ -486,7 +486,7 @@ READ64_MEMBER(ps2sony_state::ipu_fifo_r)
 	return ret;
 }
 
-WRITE64_MEMBER(ps2sony_state::ipu_fifo_w)
+void ps2sony_state::ipu_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch (offset)
 	{
@@ -518,7 +518,7 @@ WRITE_LINE_MEMBER(ps2sony_state::iop_timer_irq)
 		m_iop_intc->raise_interrupt(iop_intc_device::INT_TIMER);
 }
 
-WRITE32_MEMBER(ps2sony_state::iop_debug_w)
+void ps2sony_state::iop_debug_w(uint32_t data)
 {
 	//printf("%08x ", data);
 }
@@ -576,12 +576,12 @@ TIMER_CALLBACK_MEMBER(ps2sony_state::vblank)
 	}
 }
 
-WRITE8_MEMBER(ps2sony_state::debug_w)
+void ps2sony_state::debug_w(uint8_t data)
 {
 	printf("%c", (char)data);
 }
 
-WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
+void ps2sony_state::ee_iop_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	const uint32_t offset_hi = (offset << 1);
 	const uint32_t offset_lo = (offset << 1) + 1;
@@ -593,17 +593,17 @@ WRITE64_MEMBER(ps2sony_state::ee_iop_ram_w)
 	m_iop_ram[offset_lo] |= (uint32_t)data & mask_lo;
 }
 
-READ64_MEMBER(ps2sony_state::ee_iop_ram_r)
+uint64_t ps2sony_state::ee_iop_ram_r(offs_t offset)
 {
 	return ((uint64_t)m_iop_ram[offset << 1] << 32) | m_iop_ram[(offset << 1) + 1];
 }
 
-READ64_MEMBER(ps2sony_state::board_id_r)
+uint64_t ps2sony_state::board_id_r()
 {
 	return 0x1234;
 }
 
-READ32_MEMBER(ps2sony_state::unk_f430_r)
+uint32_t ps2sony_state::unk_f430_r()
 {
 	logerror("%s: Unknown 1000f430 read: %08x\n", machine().describe_context(), 0);
 	//return m_unk_f430_reg;
@@ -611,7 +611,7 @@ READ32_MEMBER(ps2sony_state::unk_f430_r)
 	return 0; // BIOS seems unhappy if we return anything else
 }
 
-WRITE32_MEMBER(ps2sony_state::unk_f430_w)
+void ps2sony_state::unk_f430_w(uint32_t data)
 {
 	m_unk_f430_reg = data & ~0x80000000;
 	const uint16_t cmd = (data >> 16) & 0xfff;
@@ -628,7 +628,7 @@ WRITE32_MEMBER(ps2sony_state::unk_f430_w)
 	logerror("%s: Unknown 1000f430 write: %08x (cmd:%02x lsb:%02x)\n", machine().describe_context(), data, (data >> 16) & 0xff, data & 0xff);
 }
 
-READ32_MEMBER(ps2sony_state::unk_f440_r)
+uint32_t ps2sony_state::unk_f440_r()
 {
 	uint32_t ret = 0;
 
@@ -661,7 +661,7 @@ READ32_MEMBER(ps2sony_state::unk_f440_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2sony_state::unk_f440_w)
+void ps2sony_state::unk_f440_w(uint32_t data)
 {
 	logerror("%s: Unknown 1000f440 write: %08x\n", machine().describe_context(), data);
 	m_unk_f440_reg = data;
@@ -691,7 +691,7 @@ void ps2sony_state::mem_map(address_map &map)
 	map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vu1, FUNC(sonyvu1_device::vif_r), FUNC(sonyvu1_device::vif_w));
 	map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(ps2sony_state::gif_fifo_r), FUNC(ps2sony_state::gif_fifo_w));
 	map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(ps2sony_state::ipu_fifo_r), FUNC(ps2sony_state::ipu_fifo_w));
-	map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);;
+	map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);
 	map(0x1000e000, 0x1000efff).rw(m_dmac, FUNC(ps2_dmac_device::read), FUNC(ps2_dmac_device::write)).umask64(0x00000000ffffffff);
 	map(0x1000f000, 0x1000f017).rw(m_intc, FUNC(ps2_intc_device::read), FUNC(ps2_intc_device::write)).umask64(0x00000000ffffffff);
 	map(0x1000f130, 0x1000f137).nopr();

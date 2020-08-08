@@ -3,6 +3,7 @@
 
 #include "nl_parser.h"
 #include "nl_base.h"
+#include "nl_setup.h"
 #include "nl_errstr.h"
 #include "nl_factory.h"
 
@@ -18,42 +19,64 @@ void parser_t::verror(const pstring &msg)
 	throw nl_exception(plib::pfmt("{1}")(msg));
 }
 
-bool parser_t::parse(const pstring &nlname)
+parser_t::parser_t(nlparse_t &setup)
+	: m_setup(setup)
 {
-	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-$@")
+	m_tokenizer.identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-$@")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13))
 		.comment("/*", "*/", "//");
-	m_tok_paren_left = register_token("(");
-	m_tok_paren_right = register_token(")");
-	m_tok_comma = register_token(",");
+	m_tok_paren_left = m_tokenizer.register_token("(");
+	m_tok_paren_right = m_tokenizer.register_token(")");
+	m_tok_comma = m_tokenizer.register_token(",");
 
-	m_tok_ALIAS = register_token("ALIAS");
-	m_tok_DIPPINS = register_token("DIPPINS");
-	m_tok_NET_C = register_token("NET_C");
-	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
-	m_tok_PARAM = register_token("PARAM");
-	m_tok_DEFPARAM = register_token("DEFPARAM");
-	m_tok_HINT = register_token("HINT");
-	m_tok_NET_MODEL = register_token("NET_MODEL");
-	m_tok_INCLUDE = register_token("INCLUDE");
-	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
-	m_tok_LOCAL_LIB_ENTRY = register_token("LOCAL_LIB_ENTRY");
-	m_tok_SUBMODEL = register_token("SUBMODEL");
-	m_tok_NETLIST_START = register_token("NETLIST_START");
-	m_tok_NETLIST_END = register_token("NETLIST_END");
-	m_tok_TRUTHTABLE_START = register_token("TRUTHTABLE_START");
-	m_tok_TRUTHTABLE_END = register_token("TRUTHTABLE_END");
-	m_tok_TT_HEAD = register_token("TT_HEAD");
-	m_tok_TT_LINE = register_token("TT_LINE");
-	m_tok_TT_FAMILY = register_token("TT_FAMILY");
+	m_tok_static = m_tokenizer.register_token("static");
+	m_tok_ALIAS = m_tokenizer.register_token("ALIAS");
+	m_tok_DIPPINS = m_tokenizer.register_token("DIPPINS");
+	m_tok_NET_C = m_tokenizer.register_token("NET_C");
+	m_tok_FRONTIER = m_tokenizer.register_token("OPTIMIZE_FRONTIER");
+	m_tok_PARAM = m_tokenizer.register_token("PARAM");
+	m_tok_DEFPARAM = m_tokenizer.register_token("DEFPARAM");
+	m_tok_HINT = m_tokenizer.register_token("HINT");
+	m_tok_NET_MODEL = m_tokenizer.register_token("NET_MODEL");
+	m_tok_NET_REGISTER_DEV = m_tokenizer.register_token("NET_REGISTER_DEV");
+	m_tok_INCLUDE = m_tokenizer.register_token("INCLUDE");
+	m_tok_LOCAL_SOURCE = m_tokenizer.register_token("LOCAL_SOURCE");
+	m_tok_LOCAL_LIB_ENTRY = m_tokenizer.register_token("LOCAL_LIB_ENTRY");
+	m_tok_SUBMODEL = m_tokenizer.register_token("SUBMODEL");
+	m_tok_NETLIST_START = m_tokenizer.register_token("NETLIST_START");
+	m_tok_NETLIST_END = m_tokenizer.register_token("NETLIST_END");
+	m_tok_TRUTHTABLE_START = m_tokenizer.register_token("TRUTHTABLE_START");
+	m_tok_TRUTHTABLE_END = m_tokenizer.register_token("TRUTHTABLE_END");
+	m_tok_TT_HEAD = m_tokenizer.register_token("TT_HEAD");
+	m_tok_TT_LINE = m_tokenizer.register_token("TT_LINE");
+	m_tok_TT_FAMILY = m_tokenizer.register_token("TT_FAMILY");
 
-	register_token("RES_R");
-	register_token("RES_K");
-	register_token("RES_M");
-	register_token("CAP_U");
-	register_token("CAP_N");
-	register_token("CAP_P");
+	m_tokenizer.register_token("RES_R");
+	m_tokenizer.register_token("RES_K");
+	m_tokenizer.register_token("RES_M");
+	m_tokenizer.register_token("CAP_U");
+	m_tokenizer.register_token("CAP_N");
+	m_tokenizer.register_token("CAP_P");
+
+}
+
+bool parser_t::parse(plib::psource_t::stream_ptr &&strm, const pstring &nlname)
+{
+	token_store tokstor;
+	parse_tokens(std::move(strm), tokstor);
+	return parse(tokstor, nlname);
+}
+
+void parser_t::parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tokstor)
+{
+	plib::putf8_reader u8reader(strm.release_stream());
+	m_tokenizer.append_to_store(&u8reader, tokstor);
+}
+
+bool parser_t::parse(token_store &tokstor, const pstring &nlname)
+{
+	set_token_source(&tokstor);
 
 	bool in_nl = false;
 
@@ -83,13 +106,18 @@ bool parser_t::parse(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			token_t name = get_token();
 			require_token(m_tok_paren_right);
-			if (name.str() == nlname || nlname == "")
+			if (name.str() == nlname || nlname.empty())
 			{
 				parse_netlist(name.str());
 				return true;
 			}
 
 			in_nl = true;
+		}
+		else if (!in_nl)
+		{
+			if (!token.is(m_tok_static))
+				error(MF_EXPECTED_NETLIST_START_1(token.str()));
 		}
 	}
 }
@@ -133,8 +161,12 @@ void parser_t::parse_netlist(const pstring &nlname)
 		{
 			require_token(m_tok_paren_left);
 			// FIXME: Need to pass in parameter definition FIXME: get line number right
-			m_setup.register_lib_entry(get_identifier(), factory::properties("", plib::source_location("parser: " + nlname, 1)));
+			m_setup.register_lib_entry(get_identifier(), "", plib::source_location("parser: " + nlname, 1));
 			require_token(m_tok_paren_right);
+		}
+		else if (token.is(m_tok_NET_REGISTER_DEV))
+		{
+			net_register_dev();
 		}
 		else if (token.is(m_tok_NETLIST_END))
 		{
@@ -164,8 +196,8 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 
 	netlist::tt_desc desc;
 	desc.name = name;
-	desc.ni = static_cast<unsigned long>(ni);
-	desc.no = static_cast<unsigned long>(no);
+	desc.ni = gsl::narrow<unsigned long>(ni);
+	desc.no = gsl::narrow<unsigned long>(no);
 	desc.family = "";
 
 	while (true)
@@ -199,7 +231,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truthtable_create(desc, factory::properties("+" + def_param, plib::source_location(nlname, 1)));
+			m_setup.truthtable_create(desc, def_param, plib::source_location(nlname, 1));
 			return;
 		}
 	}
@@ -375,11 +407,22 @@ void parser_t::netdev_defparam()
 void parser_t::netdev_hint()
 {
 	require_token(m_tok_paren_left);
-	pstring dev(get_identifier());
+	pstring id(get_identifier());
 	require_token(m_tok_comma);
 	pstring hint(get_identifier());
-	m_setup.register_param_val(dev + ".HINT_" + hint, 1);
+	m_setup.register_hint(id, ".HINT_" + hint);
 	require_token(m_tok_paren_right);
+}
+
+void parser_t::net_register_dev()
+{
+	require_token(m_tok_paren_left);
+	pstring type(get_identifier());
+	require_token(m_tok_comma);
+	pstring name(get_identifier());
+	require_token(m_tok_paren_right);
+
+	m_setup.register_dev(type, name);
 }
 
 void parser_t::device(const pstring &dev_type)

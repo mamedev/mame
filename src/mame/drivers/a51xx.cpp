@@ -31,7 +31,7 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(a5130);
 	DECLARE_VIDEO_START(a5130);
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,7 +80,7 @@ void a51xx_state::machine_reset()
 {
 }
 
-void a51xx_state::video_start()
+void a51xx_state::machine_start()
 {
 }
 
@@ -165,7 +165,7 @@ void a51xx_state::a5130(machine_config &config)
 
 /* ROM definition */
 ROM_START( a5120 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v1", "v1" )
 	ROMX_LOAD( "a5120_v1.rom", 0x0000, 0x0400, CRC(b2b3fee0) SHA1(6198513b263d8a7a867f1dda368b415bb37fcdae), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2", "v2" )
@@ -178,7 +178,7 @@ ROM_END
 
 /* ROM definition */
 ROM_START( a5130 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dzr5130.rom", 0x0000, 0x1000, CRC(4719beb7) SHA1(09295a658b8c5b75b20faea57ad925f69f07a9b5))
 
 	ROM_REGION(0x0800, "chargen",0)
@@ -189,5 +189,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
-COMP( 1982, a5120, 0,      0,      a5120,   a5120, a51xx_state, empty_init, "VEB Robotron", "A5120",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, a5130, a5120,  0,      a5130,   a5130, a51xx_state, empty_init, "VEB Robotron", "A5130",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, a5120, 0,      0,      a5120,   a5120, a51xx_state, empty_init, "VEB Robotron", "A5120",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, a5130, a5120,  0,      a5130,   a5130, a51xx_state, empty_init, "VEB Robotron", "A5130",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

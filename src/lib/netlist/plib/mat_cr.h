@@ -14,6 +14,7 @@
 #include "parray.h"
 #include "pconfig.h"
 #include "pmath.h"
+#include "pmatrix2d.h"
 #include "pomp.h"
 #include "pstate.h"
 #include "ptypes.h"
@@ -62,7 +63,7 @@ namespace plib
 		, A(n*n)
 		, nz_num(0)
 		//, nzbd(n * (n+1) / 2)
-		, nzbd(n)
+		, m_nzbd(n, n)
 		, m_size(n)
 		{
 			for (std::size_t i=0; i<n+1; i++)
@@ -73,7 +74,7 @@ namespace plib
 
 		~pmatrix_cr_t() = default;
 
-		constexpr std::size_t size() const noexcept { return (N>0) ? static_cast<std::size_t>(N) : m_size; }
+		constexpr std::size_t size() const noexcept { return (N>0) ? narrow_cast<std::size_t>(N) : m_size; }
 
 		void clear() noexcept
 		{
@@ -132,9 +133,9 @@ namespace plib
 				row_idx[k] = nz;
 
 				for (std::size_t j=0; j < size(); j++)
-					if (f[k][j] <= max_fill && plib::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
+					if (f[k][j] <= max_fill && plib::abs(narrow_cast<int>(k)-narrow_cast<int>(j)) <= narrow_cast<int>(band_width))
 					{
-						col_idx[nz] = static_cast<C>(j);
+						col_idx[nz] = narrow_cast<C>(j);
 						if (j == k)
 							diag[k] = nz;
 						nz++;
@@ -148,10 +149,17 @@ namespace plib
 
 			for (std::size_t k=0; k < size(); k++)
 			{
+#if 0
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
-						nzbd[k].push_back(static_cast<C>(j));
-				nzbd[k].push_back(0); // end of sequence
+						m_nzbd[k].push_back(narrow_cast<C>(j));
+				m_nzbd[k].push_back(0); // end of sequence
+#else
+				for (std::size_t j=k + 1; j < size(); j++)
+					if (f[j][k] < FILL_INFINITY)
+						m_nzbd.set(k, m_nzbd.colcount(k), narrow_cast<C>(j));
+				m_nzbd.set(k, m_nzbd.colcount(k), 0); // end of sequence
+#endif
 			}
 
 		}
@@ -160,7 +168,7 @@ namespace plib
 		void mult_vec(VTR & res, const VTV & x) const noexcept
 		{
 
-			 // res = A * x
+			// res = A * x
 #if 0
 			//plib::omp::set_num_threads(4);
 			plib::omp::for_static(0, constants<std::size_t>::zero(), m_size, [this, &res, &x](std::size_t row)
@@ -241,10 +249,13 @@ namespace plib
 				A[k] = src.A[k];
 		}
 
+		index_type * nzbd(std::size_t row) { return m_nzbd[row]; }
+		std::size_t nzbd_count(std::size_t row) { return m_nzbd.colcount(row) - 1; }
 	protected:
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
-		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
+		//parray<std::vector<index_type>, N > m_nzbd;    // Support for gaussian elimination
+		pmatrix2d_vrl<index_type> m_nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
 		std::size_t m_size;
@@ -309,8 +320,8 @@ namespace plib
 				std::size_t pi = base::diag[i];
 				auto f = reciprocal(base::A[pi++]);
 				const std::size_t piie = base::row_idx[i+1];
-				const auto &nz = base::nzbd[i];
 
+				const auto *nz = base::m_nzbd[i];
 				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
 				{
 					// proceed to column i
@@ -343,7 +354,7 @@ namespace plib
 		{
 			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
 				if (plib::container::contains( m_ge_par[i], k))
-					return static_cast<int>(i);
+					return narrow_cast<int>(i);
 			return -1;
 		}
 
@@ -525,7 +536,7 @@ namespace plib
 					}
 				}
 				if (found)
-					ilu_rows[p++] = static_cast<index_type>(i);
+					ilu_rows[p++] = narrow_cast<index_type>(i);
 			}
 			ilu_rows[p] = 0; // end of array
 			this->build_from_fill_mat(fill, ilup); //, m_band_width); // ILU(2)

@@ -16,7 +16,7 @@ Processor: Z80
 Support Chips:(2) 8255s
 RAM: 6117on ROM board and (24) MCM4517s on main board
 
-When games are first run a RAM error will occur because the nvram needs initialising.
+When games are first run a RAM error will occur because the NVRAM needs initializing.
 When ERROR appears, press F2, then F3 to reset, then F2 again and the game will start
 
 Trivia games "No Coins" mode: if DSW "No Coins" is on, coin inputs are
@@ -46,28 +46,74 @@ Hollywood                  Elvismania                 Honeymooners
 Television I               The Wild West              Television II
 
 
-Series 7: (128K)           Series 8: (256K)           * Starting with Series 8
-----------------           ----------------           "Announcement":
-T.V. Dallas                Science                    3 Times as many
-General V                  General                    questions in this
-Kids Korner                Sports                     series!
-Good Guys                  T.V./Entertainment
-Biblical                   Adult Sex
-                            or alt: Potpourri
+Series 7: (128K)
+----------------
+T.V. Dallas
+General V
+Kids Korner
+Good Guys
+Biblical
 
 
-Series 9: (256K)           Series 10: (256K)          Series 11: (256K)
-----------------           -----------------          -----------------
-Facts                      New Science                Rich and Famous
-Rock-N-Roll                New General                Fast Women and Cars
-Television                 New T.V. Mash              Aerospace
-Artists-Athletes           New Entertainment          TV/Music Alternative
-U.S.A. Trivia              New Sports                 General Facts
- or alt: Adult Sex 2        or alt: Adult Sex 3        or alt: Gay Times
+NOTE: Series 8 through 14 are "T3" sets as noted by the first 2 bytes of the questions ROMs.
+      The question ROMs are 27256 (twice the size of previous question ROMs) and contain 3
+      times the number of questions.  ROM labels are yellow.
 
-NOTE: Trivia Question rom names are the internal names used. IE: read from the file with
-      a Hex Editor. Any "_alt" extension is used to separate different roms with the same
-      label or internal name.
+
+Series 8: (256K)           Series 9: (256K)           Series 10: (256K)
+----------------           ----------------           -----------------
+Science                    Facts                      New Science
+General                    Rock-N-Roll                New General
+Sports                     Television                 New T.V. Mash
+T.V./Entertainment         Artists-Athletes           New Entertainment
+Adult Sex 1                U.S.A. Trivia              New Sports
+ or alt: Potpourri          or alt: Adult Sex 2        or alt: Adult Sex 3
+
+
+Series 11: (256K)          Series 12: (256K)          Series 14: (256K)
+-----------------          -----------------          -----------------
+Rich and Famous            New Science 2              Famous Couples
+General Facts              Cops and Robbers           The Sixties
+TV / Music                 Rock Music                 TV Comedies
+Fast Women and Cars        Famous Quotes              Horrors
+Aerospace                  Vices                      War and Peace
+ or alt: Gay Times          or alt: Adult Sex 4        or alt: Adult Sex 5
+
+
+NOTE: Series 15 and later are "T4" sets as noted by the first 2 bytes of the question
+      ROMs.  These sets have a built in signature. Bytes 0x03 through 0x0A must match
+      expected values or the question ROM will not be visible. This was done to prevent
+      operator ROM swaps. These sets use the TRIV3D ROM board which has 2 PALs, so it's
+      believed one of the PALs supplies the values for the signature. ROM labels are
+      pink.
+
+
+Series 15: (256K)          Series 16: (256K)          Series 17: (256K)
+-----------------          -----------------          -----------------
+Entertainment 2            Late TV Shows              Night Time TV
+The Seventies              The Eighties               New Eighties
+Facts 2                    People and Places          History and Geography
+New Science 3              Potluck                    New Potpourri
+N F L Football             N B A Basketball           N H L Hockey
+ or alt: Adult Sex 6        or alt: Adult Sex 7        or alt: Adult Sex 8
+
+
+Series 18: (256K)          Series 19: (256K)
+-----------------          -----------------
+Entertainment              Social Study
+This is Music              Television 2
+Super Trivia               Variety Pack
+World Geography            Famous Firsts
+More Sports                Adult Sex 10
+ or alt: Adult Sex 9
+
+
+NOTE: There is no known documented Series 13 questions set.
+
+NOTE: Trivia Question ROM names are the internal names used. IE: read from the file with
+      a Hex Editor. Any "_alt" extension is used to separate different ROMs with the same
+      label or internal name. Any "_old" extension is used to distinguish between ROM labels
+      where the later ROM label included an asterisk to denote a revised version ROM.
 
 */
 
@@ -1272,7 +1318,7 @@ ROM_START( gtsersb ) /* alt or older version questions */
 	ROM_LOAD( "beatlemania",    0x10000, 0x4000, CRC(cb241960) SHA1(e560b776b2cb5fd29d1663fffdf68f4427d674a9) ) /* Dated 3/9 */
 	ROM_LOAD( "sports_3",       0x14000, 0x4000, CRC(5986996c) SHA1(56432c15a3b0204ed527c18e24716f17bb52dc4e) ) /* Dated 3/9 */
 	ROM_LOAD( "television",     0x18000, 0x4000, CRC(413f34c8) SHA1(318f6b464449bf3f0c43c4210a667190c774eb67) ) /* Dated 4/9 */
-	ROM_LOAD( "sex_triv",       0x1c000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) /* Dated 7/9 - likely an alt series 7 question set */
+	ROM_LOAD( "sex_triv",       0x1c000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) /* Dated 7/9 - Unknown series question set */
 	ROM_LOAD( "facts_of_life",  0x20000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) ) /* Unknown series question set */
 ROM_END
 
@@ -1573,14 +1619,14 @@ ROM_START( findout )
 	ROM_LOAD( "findout.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
-ROM_START( gt507uk )
+ROM_START( gt507uk ) /* All question ROMs used here are "T3" ROMs */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "triv_3_2.bin",    0x00000, 0x4000, CRC(2d72a081) SHA1(8aa32acf335d027466799b097e0de66bcf13247f) )
 	ROM_LOAD( "rom_ad.bin",      0x08000, 0x2000, CRC(c81cc847) SHA1(057b7b75a2fe1abf88b23e7b2de230d9f96139f5) )
 	ROM_LOAD( "aerospace",       0x10000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) ) /* Also found in Series #11 set */
 	ROM_LOAD( "english_sport_4", 0x18000, 0x8000, CRC(6ae8a63d) SHA1(c6018141d8bbe0ed7619980bf7da89dd91d7fcc2) )
 	ROM_LOAD( "general_facts",   0x20000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) ) /* Also found in Series #11 set */
-	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) ) /* Possibly Series #13 rom */
+	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) ) /* Also found in Series #14 set */
 	ROM_LOAD( "pop_music",       0x30000, 0x8000, CRC(884fec7c) SHA1(b389216c17f516df4e15eee46246719dd4acb587) )
 ROM_END
 
@@ -1609,7 +1655,7 @@ ROM_START( gtsers9 ) /* TRIV-3 PCB, stickered 256 TRIV #9 7/85 */
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "facts",           0x10000, 0x8000, CRC(21bd6181) SHA1(609ae1097a4011e90d03d4c4f03140fbe84c084a) )
 	ROM_LOAD( "rock-n-roll",     0x18000, 0x8000, CRC(1be036b1) SHA1(0b262906044950319dd911b956ac2e0b433f6c7f) )
-	ROM_LOAD( "television",      0x20000, 0x8000, CRC(731d4cc0) SHA1(184b6e48edda24f50e377a473a1a4709a218181b) )
+	ROM_LOAD( "television+",     0x20000, 0x8000, CRC(731d4cc0) SHA1(184b6e48edda24f50e377a473a1a4709a218181b) ) /* Labeled as T.V.* */
 	ROM_LOAD( "usa_trivia",      0x28000, 0x8000, CRC(829543b4) SHA1(deb0a4132852643ad884cf194b0a2e6671aa2b4e) )
 	ROM_LOAD( "adult_sex_2",     0x30000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* Listed as an alternate question set */
 	/* Missing "Artists-Athletes" */
@@ -1646,25 +1692,46 @@ ROM_START( gtsers11a ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
 	ROM_LOAD( "gay_times",      0x30000, 0x8000, CRC(c4f9a8cf) SHA1(9247ecc5708aba263e0365fc43a1a7d0c2b7c391) ) /* Listed as an alternate question set */
 ROM_END
 
-ROM_START( gtsers12 )
+ROM_START( gtsers12 ) /* TRIV-3 PCB */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program_v5.03",   0x00000, 0x4000, CRC(888b7d9b) SHA1(e5ed4f22bff99c26cd6ef9a06cb386221e84bbf5) )
 	ROM_LOAD( "new_science_2+",  0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
-	ROM_LOAD( "adult_sex_4+",    0x18000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* Labeled as ADULT SEX 4* */
-	ROM_LOAD( "cops_+_robbers",  0x20000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
+	ROM_LOAD( "cops_+_robbers+", 0x18000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) ) /* Labeled as COPS ROBR* */
+	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
 	ROM_LOAD( "famous_quotes",   0x28000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
 	ROM_LOAD( "vices",           0x30000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
-	/* Missing unknown alternate question? */
 ROM_END
+
+ROM_START( gtsers12a ) /* TRIV-3 PCB */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "program_v5.03",   0x00000, 0x4000, CRC(888b7d9b) SHA1(e5ed4f22bff99c26cd6ef9a06cb386221e84bbf5) )
+	ROM_LOAD( "new_science_2+",  0x10000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) ) /* Labeled as NEW SCNE 2* */
+	ROM_LOAD( "cops_+_robbers+", 0x18000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) ) /* Labeled as COPS ROBR* */
+	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
+	ROM_LOAD( "famous_quotes",   0x28000, 0x8000, CRC(0a27d8ae) SHA1(427e6ae25e47da7f7f7c3e92a37e330d711da90c) )
+	ROM_LOAD( "adult_sex_4+",    0x30000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* Listed as an alternate question set - Labeled as ADULT SEX 4* */
+ROM_END
+
+/* Trivia: There is no Series 13 question set.  ;-) */
 
 ROM_START( gtsers14 ) /* TRIV-3 PCB, stickered 256 TRIV #14 11/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) /* Unknown version, but earlier then the 5.06 for Series #15 */
 	ROM_LOAD( "famous_couples",  0x10000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) )
-	ROM_LOAD( "war_and_peace",   0x18000, 0x8000, CRC(bc709383) SHA1(2fba4c80773abea7bbd826c39378b821cddaa255) )
+	ROM_LOAD( "the_sixties",     0x18000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
 	ROM_LOAD( "tv_comedies",     0x20000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
-	ROM_LOAD( "the_sixties",     0x28000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
-	/* Missing unknown question rom (and alternate question?) */
+	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
+	ROM_LOAD( "war_and_peace",   0x30000, 0x8000, CRC(bc709383) SHA1(2fba4c80773abea7bbd826c39378b821cddaa255) )
+ROM_END
+
+ROM_START( gtsers14a ) /* TRIV-3 PCB, stickered 256 TRIV #14 11/85 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "program5",        0x00000, 0x4000, CRC(99ddaaa7) SHA1(c929d7b67367f303dadf07d508bc72af19e9c2ef) ) /* Unknown version, but earlier then the 5.06 for Series #15 */
+	ROM_LOAD( "famous_couples",  0x10000, 0x8000, CRC(e0618218) SHA1(ff64fcd6dec83a2271b63c3ae64dc932a3954ec5) )
+	ROM_LOAD( "the_sixties",     0x18000, 0x8000, CRC(8cfa854e) SHA1(81428c12f99841db1c61b471ac8d00f0c411883b) )
+	ROM_LOAD( "tv_comedies",     0x20000, 0x8000, CRC(992ae38e) SHA1(312780d651a85a1c433f587ff2ede579456d3fd9) )
+	ROM_LOAD( "horrors",         0x28000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
+	ROM_LOAD( "adult_sex_5",     0x30000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) /* Listed as an alternate question set */
 ROM_END
 
 ROM_START( gtsers15 ) /* v5.06, From a TRIV3D romboard */
@@ -1674,51 +1741,60 @@ ROM_START( gtsers15 ) /* v5.06, From a TRIV3D romboard */
 	ROM_LOAD( "facts_2",         0x18000, 0x8000, CRC(7836ef31) SHA1(6a84cfa39de392eed46a4b37752e00b6d094bbd6) )
 	ROM_LOAD( "new_science_3",   0x20000, 0x8000, CRC(fcbc3bc3) SHA1(2dbdd39dce9dbf53c0954dec44a4f5109243dc60) )
 	ROM_LOAD( "nfl_football",    0x28000, 0x8000, CRC(42eb2849) SHA1(c24e681a508ef8350f7e5d50aea2c31cf70ce5c9) )
-	ROM_LOAD( "adult_sex_6",     0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) )
-	/* Missing unknown question rom (and alternate question?) */
+	ROM_LOAD( "adult_sex_6",     0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) /* Listed as an alternate question set */
+	/* Missing "the_seventies" */
+
+	ROM_REGION( 0x0400, "pld", 0 ) // probably one of the two GALs provides the "signature"
+	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP )  /* read protected */
+	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP )  /* read protected */
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "gtsers15.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
-ROM_START( gt103a1 ) /* Need to verify which series these belong to */
+ROM_START( gt103a1 ) /* Need to verify which series or sets these belong to */
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) ) /* Currently unverified Series 13 and or alt ? roms */
-	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) )
-	ROM_LOAD( "n.f.l._football", 0x18000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) )
-	ROM_LOAD( "rock_music",      0x20000, 0x8000, CRC(7f11733a) SHA1(d4d0dee75518edf986cb1241ade45ccb4840f088) )
-	ROM_LOAD( "soccer",          0x28000, 0x8000, CRC(f821f860) SHA1(b0437ef5d31c507c6499c1fb732d2ba3b9beb151) )
-	ROM_LOAD( "horrors",         0x30000, 0x8000, CRC(5f7b262a) SHA1(047480d6bf5c6d0603d538b84c996bd226f07f77) )
+	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) )
+	ROM_LOAD( "history-geog",    0x10000, 0x8000, CRC(c9a70fc3) SHA1(4021e5d702844416e8c798ed0a57c9ecd20b1d4b) ) /* T3 question ROM, NOT from series 17 */
+	ROM_LOAD( "n.f.l._football", 0x18000, 0x8000, CRC(d676b7cd) SHA1(d652d2441adb500f7af526d110d0335ea453d75b) ) /* T3 question ROM, NOT from series 15 */
+	ROM_LOAD( "soccer",          0x20000, 0x8000, CRC(f821f860) SHA1(b0437ef5d31c507c6499c1fb732d2ba3b9beb151) ) /* T3 question ROM - Likely a UK question ROM */
 ROM_END
 
-ROM_START( gt103aa )
+ROM_START( gt103aa ) /* Series 8 questions ROMs. Need to verify proper revision level for most of these.  */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
-	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) ) /* From series 8 */
+	ROM_LOAD( "entertainment_old", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) )
 	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) )
-	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) ) /* From series 8 */
-	ROM_LOAD( "science_alt2",      0x28000, 0x8000, CRC(ac93d348) SHA1(55550ba6b5daffdf9653854075ad4f8398a5e621) ) /* From series 8 */
-	ROM_LOAD( "sports_alt2",       0x30000, 0x8000, CRC(40207845) SHA1(2dddb9685dcefabfde07057a639aa9d08da2329e) )
+	ROM_LOAD( "science_alt",       0x20000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) )
+	ROM_LOAD( "science_alt2",      0x28000, 0x8000, CRC(ac93d348) SHA1(55550ba6b5daffdf9653854075ad4f8398a5e621) )
+	ROM_LOAD( "sports_alt",        0x30000, 0x8000, CRC(40207845) SHA1(2dddb9685dcefabfde07057a639aa9d08da2329e) )
 ROM_END
 
 ROM_START( gt103ab )
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
-	ROM_LOAD( "new_science_2_alt", 0x10000, 0x8000, CRC(95836bfb) SHA1(deb546bcd9109efd2b1f405354916e439cd0749b) )
-	ROM_LOAD( "adult_sex_2_alt",   0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) )
-	ROM_LOAD( "adult_sex_3_alt",   0x20000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) )
-	ROM_LOAD( "rock-n-roll_alt",   0x28000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
-	ROM_LOAD( "cops_+_robbers_alt",0x30000, 0x8000, CRC(5176751a) SHA1(fbf0aeceeedb8a93c12920fecf6268893b393541) )
+	ROM_LOAD( "t_3a-8_1.bin",       0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) ) /* "Park" alternate version sets here */
+	ROM_LOAD( "rock-n-roll_alt",    0x10000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) ) /* From series 9 - need to verify revision level */
+	ROM_LOAD( "usa_trivia_alt",     0x18000, 0x8000, CRC(1ec59636) SHA1(65d63066a7ff500eda32468c8c9fef6cfd32f024) ) /* From series 9 - need to verify revision level */
+	ROM_LOAD( "new_science_2_old",  0x20000, 0x8000, CRC(95836bfb) SHA1(deb546bcd9109efd2b1f405354916e439cd0749b) ) /* From series 12 */
+	ROM_LOAD( "cops_+_robbers_old", 0x28000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) ) /* From series 12 */
 ROM_END
 
-ROM_START( gt103asx ) /* Not sure there was ever an all Adult Trivia version. These are just the collection from all the series combined here */
+ROM_START( gt103asx ) /* Was there an all Adult Trivia version. These are just the alt questions from all the series combined here */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin", 0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
-	ROM_LOAD( "adult_sex_2",  0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* From series 9 */
-	ROM_LOAD( "adult_sex_3",  0x18000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* From series 10 as alt ? rom */
-	ROM_LOAD( "adult_sex_4",  0x20000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) ) /* From series 12 */
-	ROM_LOAD( "adult_sex_5",  0x28000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) /* Likely from series 13 or 14 as alt ? rom */
+	ROM_LOAD( "adult_sex_2",  0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) ) /* From series 9  */
+	ROM_LOAD( "adult_sex_3",  0x18000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* From series 10 */
+	ROM_LOAD( "adult_sex_4+", 0x20000, 0x8000, CRC(9c32730e) SHA1(9d060e49a4c1dd8d978619b1c357c9e8238e5c96) ) /* From series 12 - Labeled as ADULT SEX 4* */
+	ROM_LOAD( "adult_sex_5",  0x28000, 0x8000, CRC(fdbc3729) SHA1(7cb7cec4439ddc39de2f7f62c25623cfb869f493) ) /* From series 14 */
 	ROM_LOAD( "adult_sex_6",  0x30000, 0x8000, CRC(d66f35f7) SHA1(81b56756230b27b0903d0c5df30439726526afe2) ) /* From series 15 */
+ROM_END
+
+ROM_START( gt103asxa ) /* Alternate / older? versions of the questions */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
+	ROM_LOAD( "adult_sex_2_alt", 0x10000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) ) /* From series 9  - need to verify revision level */
+	ROM_LOAD( "adult_sex_3_alt", 0x18000, 0x8000, CRC(63cbd1d6) SHA1(8dcd5546dc8688d6b8404d5cf63d8a59acc9bf4c) ) /* From series 10 - need to verify revision level */
+	ROM_LOAD( "adult_sex_4_old", 0x20000, 0x8000, CRC(36a75071) SHA1(f08d31f241e1dc9b94b940cd2872a692f6f8475b) ) /* From series 12 */
 ROM_END
 
 ROM_START( quiz )
@@ -1779,7 +1855,7 @@ ROM_START( bigjoke )  /* TRIV3D PCB, stickered THE JOKE 11/87 */
 	ROM_LOAD( "joke_cont_128",       0x00000, 0x4000, CRC(acb4355f) SHA1(0fc9a218e94fc49297bd11547fb193d1f91ce90c) )
 	ROM_LOAD( "joke_2764",           0x08000, 0x2000, CRC(8a7ac263) SHA1(6f9a18b7f38e83cc2d1f1911e3b01ada7df4d2ba) )   /* banked */
 	ROM_LOAD( "joke_drty_nsty_1012", 0x10000, 0x8000, CRC(e3fcd0e3) SHA1(fae1ddfb244e5c84e9ba6d4b90bd265365a4f662) )   /* banked ROMs for solution data */
-	ROM_LOAD( "joke_fams_folk_1012", 0x18000, 0x8000, CRC(08eb35f2) SHA1(0dba706750a9276dac9976eb07f64ecf4a42e658) )
+	ROM_LOAD( "joke_fams_folk_1012", 0x18000, 0x8000, CRC(08eb35f2) SHA1(0dba706750a9276dac9976eb07f64ecf4a42e658) )   /* J1 question ROMs */
 	ROM_LOAD( "joke_jmbl_joke_1012", 0x20000, 0x8000, CRC(26daf757) SHA1(76560bf437b4ee851f075b30e79df563367830cf) )
 	ROM_LOAD( "joke_racl_ethn_1012", 0x28000, 0x8000, CRC(ca814fa9) SHA1(0c2ac15568bd64c282f257089305309ef7f91411) )
 	ROM_LOAD( "joke_wrkg_wrld_1012", 0x30000, 0x8000, CRC(f4b0fa76) SHA1(70b4a29d928729da52948c12e55473ecf83b3daa) )
@@ -1800,7 +1876,7 @@ ROM_START( sexappl )  /* TRIV3D PCB, stickered SEX APPL 6.02 5/92 */
 	ROM_LOAD( "6.02_cont", 0x00000, 0x4000, CRC(63ad3593) SHA1(fd93a71b82ef04757d79485ca4c7e306b2983c76) )
 	ROM_LOAD( "6.02_kb",   0x08000, 0x2000, CRC(025a5c7e) SHA1(bc935fb5ac081d089f3f9991d04cdf3708fa35c6) )   /* banked */
 	ROM_LOAD( "hot_sex",   0x10000, 0x8000, CRC(f16b3363) SHA1(a05bb2ae6467cd28021321bb526ea2ae3da82361) )   /* banked ROMs for solution data */
-	ROM_LOAD( "wild_sex",  0x18000, 0x8000, CRC(f257a023) SHA1(9c72c18f1acd7b36033a20dd1c8fafc801a3d174) )
+	ROM_LOAD( "wild_sex",  0x18000, 0x8000, CRC(f257a023) SHA1(9c72c18f1acd7b36033a20dd1c8fafc801a3d174) )   /* T6 question ROMs */
 	ROM_LOAD( "hard_sex",  0x20000, 0x8000, CRC(bdab9ac1) SHA1(e09a5276a5bd346e2b88dd8fa196f204267efe09) )
 	ROM_LOAD( "kinky_sex", 0x28000, 0x8000, CRC(6b4c016d) SHA1(7d0b8af7c5ef384412535ab3e2ed1eb7c4ecd824) )
 	ROM_LOAD( "adult_sex", 0x30000, 0x8000, CRC(05798340) SHA1(8db308bb725112327027a725b2c69299e6da1dad) )
@@ -1856,25 +1932,25 @@ ROM_START( geimulti )
 	ROM_LOAD( "cont", 0x00000, 0x8000, CRC(920020df) SHA1(01cb0a58bf863d63bcafe1e198ce5ea10bb8f59e) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
-	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) )
-	ROM_LOAD( "bljk",      0x08000, 0x8000, CRC(afde21e6) SHA1(4db37ee4ffc72e3513cbfe31d018caa062683adf) )
-	ROM_LOAD( "bone",      0x10000, 0x8000, CRC(6a84fc5d) SHA1(09d5d052a90744e5c6e0b06cabfdbbaa2458bbb5) )
-	ROM_LOAD( "slot",      0x18000, 0x8000, CRC(11b85a71) SHA1(5672f6f796b2743c252d159778bd8746cf1f5f86) )
-	ROM_LOAD( "sprd",      0x20000, 0x8000, CRC(2f067b3d) SHA1(cd7cae3d2def74369b8d015b9f36d5a174bea92c) )
-	ROM_LOAD( "hrse",      0x28000, 0x8000, CRC(ab1d014a) SHA1(aa7a372266decd7b65234de4d866fe7baf71c9bb) )
-	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) )
-	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) )
-	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) )
-	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) )
-	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) )
-	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) )
-	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) )
-	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) )
+	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "bljk",      0x08000, 0x8000, CRC(afde21e6) SHA1(4db37ee4ffc72e3513cbfe31d018caa062683adf) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "bone",      0x10000, 0x8000, CRC(6a84fc5d) SHA1(09d5d052a90744e5c6e0b06cabfdbbaa2458bbb5) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "slot",      0x18000, 0x8000, CRC(11b85a71) SHA1(5672f6f796b2743c252d159778bd8746cf1f5f86) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "sprd",      0x20000, 0x8000, CRC(2f067b3d) SHA1(cd7cae3d2def74369b8d015b9f36d5a174bea92c) ) /* C5 game ROM 4-21-92 */
+	ROM_LOAD( "hrse",      0x28000, 0x8000, CRC(ab1d014a) SHA1(aa7a372266decd7b65234de4d866fe7baf71c9bb) ) /* C5 game ROM IAM 07-02-92 */
+	ROM_LOAD( "dogs",      0x30000, 0x8000, CRC(83cd070a) SHA1(ed7ce3ffe030802e99dd27f2310524615fcfc8bf) ) /* C5 game ROM IAM 07-02-92 */
+	ROM_LOAD( "memotest",  0x38000, 0x8000, CRC(8942b98c) SHA1(3f182eb6d00618d9859cd8acdf13c829d4469075) ) /* C5 game ROM 9-30-92 */
+	ROM_LOAD( "reelfun",   0x40000, 0x8000, CRC(b3ede904) SHA1(e77c15e893583572650bb60432d68a1f7bf67d09) ) /* C5 game ROM 9-11-92 */
+	ROM_LOAD( "fact@1",    0x48000, 0x8000, CRC(949b5519) SHA1(d4ac35ccbbb50f4e0d1e21e8427e6ad535e6da53) ) /* T5 question ROM */
+	ROM_LOAD( "adltsex@1", 0x50000, 0x8000, CRC(9e4d320b) SHA1(76a6280bce884acb3faa9ef3882de016612c34f6) ) /* T5 question ROM */
+	ROM_LOAD( "nfl@1",     0x58000, 0x8000, CRC(74fbbf17) SHA1(9d559034d3ec0b293d4b720150197daea3d450ff) ) /* T5 question ROM */
+	ROM_LOAD( "entr@1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) ) /* T5 question ROM */
+	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) ) /* game graphics */
 
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "geimulti.nvram",   0x0000, 0x0800, CRC(232bbad1) SHA1(23a4011ad3b322cbda40859a1619dc1f5472fdfc) ) /* Defaults */
 
-	// strangely checks the signature only for questions "fact#1", "adltsex#1", "nfl#1" and "entr#1"
+	// Only questions ROMs are checked for signatures, not the "game" ROMs
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of the listed question ROMs - to prevent ROM swaps
 	ROM_LOAD( "geimulti.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
@@ -1884,7 +1960,7 @@ ROM_START( sprtauth )
 	ROM_LOAD( "sprt-auth-rev1-cont.cont", 0x00000, 0x8000, CRC(19dd0aa6) SHA1(7805d8139ac20061fc782bcaeff2202ed451fa91) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
-	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) )
+	ROM_LOAD( "sprt-auth-prem-bsbl.bank1",    0x00000, 0x8000, CRC(ef296636) SHA1(e727fe58bc961f56503788b2b670f5b3b04743f2) ) /* T8 question ROMs */
 	ROM_LOAD( "sprt-auth-prem-bskt.bank2",    0x08000, 0x8000, CRC(4649d523) SHA1(fdfa1263cc6b3c45e62af0e3baf79311f243ac5f) )
 	ROM_LOAD( "sprt-auth-prem-foot.bank3",    0x10000, 0x8000, CRC(76076022) SHA1(5014133e7143c4f4ccf4c7d1f05effe286b5a30a) )
 	ROM_LOAD( "sprt-auth-prem-hcky.bank4",    0x18000, 0x8000, CRC(135beec3) SHA1(66fce1c0c0abbbf4971ab0f764d27f1d0849ccdc) )
@@ -1893,7 +1969,7 @@ ROM_START( sprtauth )
 	ROM_LOAD( "sprt-auth-ii-bsbl-ball.bank7", 0x30000, 0x8000, CRC(bad3e6bd) SHA1(e3df34a4d5db7cfbd014a841d224eeefc8386d40) )
 	ROM_LOAD( "sprt-auth-ii-foot-ball.bank8", 0x38000, 0x8000, CRC(c305dec2) SHA1(924e608cd327bf6ffe831225affa270181599cea) )
 	ROM_LOAD( "sprt-auth-supr-bowl.bank9",    0x40000, 0x8000, CRC(3a548fe5) SHA1(6ad35516651a8a878b512cb3eff697952e194dd0) )
-	ROM_LOAD( "sprt-auth-rev1-kb.grph",       0x68000, 0x8000, CRC(c4f734ac) SHA1(028217fe6d7be75f75e9f67b665d465c729d2995) )
+	ROM_LOAD( "sprt-auth-rev1-kb.grph",       0x68000, 0x8000, CRC(c4f734ac) SHA1(028217fe6d7be75f75e9f67b665d465c729d2995) ) /* game graphics */
 
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "sprtauth.nvram",   0x0000, 0x0800, CRC(969869f9) SHA1(a5a7b679e99255650dc8ea12d2b36e97e6296aae) ) /* Defaults but with card dispenser OFF! */
@@ -1952,18 +2028,21 @@ GAME( 1984, gtsers7,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   
 GAME( 1984, gtsersa,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsersb,   gtsers1,  getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers8,   0,        findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers8a,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers8a,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 8 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers9,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 9)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers10,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 10)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers11,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers11a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 11 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers12,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers12a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 12 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers14,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gtsers14a, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers15,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103ab,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103asx,  gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gt103asxa, gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Sex questions, Alt revision questions)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, sextriv1,  0,        getrivia,  sextriv1, gei_state, init_bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sextriv2,  sextriv1, getrivia,  sextriv1, gei_state, init_bank2k,   ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -122,7 +122,7 @@ offs_t upd78k1_disassembler::dasm_02xx(std::ostream &stream, u8 op1, u8 op2, off
 			util::stream_format(stream, "%s.%d,", s_r_names[(op2 & 0x08) >> 3], op2 & 0x07);
 		else
 			util::stream_format(stream, "%s,", s_psw_bits[op2 & 0x07]);
-		format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
+		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
 		return 3 | SUPPORTED;
 	}
 	else

@@ -47,8 +47,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(com_int_tx);
 	DECLARE_WRITE_LINE_MEMBER(dcd_w);
 	DECLARE_WRITE_LINE_MEMBER(ri_w);
-	DECLARE_WRITE8_MEMBER(dce_control);
-	DECLARE_READ8_MEMBER(dce_status);
+	void dce_control(uint8_t data);
+	uint8_t dce_status();
 
 protected:
 	isa8_myb3k_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

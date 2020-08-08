@@ -313,15 +313,15 @@ private:
 	TILE_GET_INFO_MEMBER(get_bk2_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER(bk1vram_w);
-	DECLARE_WRITE16_MEMBER(bk2vram_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void bk1vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bk2vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	tilemap_t *m_bk1_tilemap;
 	tilemap_t *m_bk2_tilemap;
 	tilemap_t *m_tx_tilemap;
 
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	u8 palette_r(offs_t offset);
+	void palette_w(offs_t offset, u8 data);
 	std::unique_ptr<u8 []> m_paletteram;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -329,11 +329,13 @@ private:
 	void tokims_map(address_map &map);
 	void audio_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	u8 sound_status_r();
+	void sound_command_w(u8 data);
+	void adpcm_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	u8 m_adpcm_data;
+
+	void descramble_16x16tiles(uint8_t* src, int len);
 };
 
 TILE_GET_INFO_MEMBER(toki_ms_state::get_tile_info)
@@ -457,30 +459,30 @@ uint32_t toki_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE16_MEMBER(toki_ms_state::bk1vram_w)
+void toki_ms_state::bk1vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bk1vram[offset]);
 	m_bk1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_ms_state::bk2vram_w)
+void toki_ms_state::bk2vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bk2vram[offset]);
 	m_bk2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_ms_state::vram_w)
+void toki_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(toki_ms_state::palette_r)
+u8 toki_ms_state::palette_r(offs_t offset)
 {
 	return m_paletteram[offset];
 }
 
-WRITE8_MEMBER(toki_ms_state::palette_w)
+void toki_ms_state::palette_w(offs_t offset, u8 data)
 {
 	m_paletteram[offset] = data;
 	// xBGR444 over an 8-bit bus
@@ -493,7 +495,7 @@ WRITE8_MEMBER(toki_ms_state::palette_w)
 	m_palette->set_pen_color(pal_entry, pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-READ8_MEMBER(toki_ms_state::sound_status_r)
+u8 toki_ms_state::sound_status_r()
 {
 	// if non-zero skips new command, either soundlatch readback or audiocpu handshake
 	return 0;
@@ -501,7 +503,7 @@ READ8_MEMBER(toki_ms_state::sound_status_r)
 
 // TODO: remove this trampoline after confirming it just writes to the sound latch
 // (definitely it isn't tied to irq 0)
-WRITE8_MEMBER(toki_ms_state::sound_command_w)
+void toki_ms_state::sound_command_w(u8 data)
 {
 	m_soundlatch->write(data & 0xff);
 }
@@ -524,7 +526,7 @@ void toki_ms_state::tokims_map(address_map &map)
 	map(0x0c000e, 0x0c000f).rw(FUNC(toki_ms_state::sound_status_r), FUNC(toki_ms_state::sound_command_w)).umask16(0x00ff);
 }
 
-WRITE8_MEMBER(toki_ms_state::adpcm_w)
+void toki_ms_state::adpcm_w(u8 data)
 {
 //  membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
 	m_msm->reset_w(BIT(data, 4));
@@ -545,7 +547,7 @@ void toki_ms_state::audio_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram();
 	// area 0xdff0-5 is never ever readback, applying a RAM mirror causes sound to go significantly worse,
-	// what they are even for?
+	// what they are even for?  (offset select bankswitch rather than data select?)
 	map(0xdfff, 0xdfff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe001).w(m_ym1, FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w(m_ym2, FUNC(ym2203_device::write));
@@ -637,6 +639,7 @@ static INPUT_PORTS_START( tokims )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
 static const gfx_layout tiles16x16x4_layout =
 {
 	16,16,
@@ -649,28 +652,26 @@ static const gfx_layout tiles16x16x4_layout =
 };
 
 
-static const gfx_layout tokib_tilelayout =
+static const gfx_layout tiles8x8x4_layout =
 {
-	16,16,  /* 16 by 16 */
-	4096,   /* 4096 characters */
-	4,  /* 4 bits per pixel */
-	{ 4096*16*16*3,4096*16*16*2,4096*16*16*1,4096*16*16*0 },    /* planes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		0x8000*8+0, 0x8000*8+1, 0x8000*8+2, 0x8000*8+3, 0x8000*8+4,
-		0x8000*8+5, 0x8000*8+6, 0x8000*8+7 },           /* x bit */
-	{
-		0,8,16,24,32,40,48,56,
-		0x10000*8+ 0, 0x10000*8+ 8, 0x10000*8+16, 0x10000*8+24, 0x10000*8+32,
-		0x10000*8+40, 0x10000*8+48, 0x10000*8+56 },         /* y bit */
-	8*8
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,8,16,24 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,32) },
+	16 * 16
 };
 
+
 static GFXDECODE_START( gfx_toki_ms )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,    0x100, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tokib_tilelayout,    0x200, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tokib_tilelayout,    0x300, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout, 0x100, 16 )
+
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16x4_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, tiles16x16x4_layout, 0x300, 16 )
 GFXDECODE_END
+
 
 void toki_ms_state::machine_start()
 {
@@ -742,51 +743,48 @@ ROM_START( tokims )
 	ROM_LOAD( "1_tk_101.c19", 0x000000, 0x10000, CRC(a447a394) SHA1(ccaa6aca5c2afc7c05035cb551b8368b18188dd6) )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "8_tk_825.ic9",      0x000000, 0x10000, CRC(6d04def0) SHA1(36f23b0893dfae6cf4c6f4414ff54bb13cfdad41) )
-	ROM_LOAD( "8_tk_826.ic16",     0x010000, 0x10000, CRC(d3a2a038) SHA1(a2a020397a427f5fd401aad09048c7d4a21cd728) )
-	ROM_LOAD( "8_tk_827.ic24",     0x020000, 0x10000, CRC(d254ae6c) SHA1(cdbdd7d7c6cd4de8b8a0f54e1543caba5f3d11cb) )
-	ROM_LOAD( "8_tk_828.ic31",     0x030000, 0x10000, CRC(a6fae34b) SHA1(d9a276d30bdcc25d9cd299c2502cf910273890f6) )
+	ROM_LOAD32_BYTE( "8_tk_825.ic9",      0x000003, 0x10000, CRC(6d04def0) SHA1(36f23b0893dfae6cf4c6f4414ff54bb13cfdad41) )
+	ROM_LOAD32_BYTE( "8_tk_826.ic16",     0x000002, 0x10000, CRC(d3a2a038) SHA1(a2a020397a427f5fd401aad09048c7d4a21cd728) )
+	ROM_LOAD32_BYTE( "8_tk_827.ic24",     0x000001, 0x10000, CRC(d254ae6c) SHA1(cdbdd7d7c6cd4de8b8a0f54e1543caba5f3d11cb) )
+	ROM_LOAD32_BYTE( "8_tk_828.ic31",     0x000000, 0x10000, CRC(a6fae34b) SHA1(d9a276d30bdcc25d9cd299c2502cf910273890f6) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
+	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_tk_501.ic3",         0x000003, 0x010000, CRC(c3cd26b6) SHA1(20d5a68eada4150642365dd61c699b7771de5372) )
 	ROM_LOAD32_BYTE( "5_tk_505.ic12",        0x000002, 0x010000, CRC(ec096351) SHA1(10417266c2280b2d9c301423d8c41ed73d9654c9) )
 	ROM_LOAD32_BYTE( "5_tk_509.ic18",        0x000001, 0x010000, CRC(a1a4ef7b) SHA1(92aad84f14f8257477920012bd1fe033ec96301b) )
 	ROM_LOAD32_BYTE( "5_tk_513.ic24",        0x000000, 0x010000, CRC(8dfda6fa) SHA1(ee2600d6cdcb27500e61dd1beebed904fd2c3ac5) )
-
 	ROM_LOAD32_BYTE( "5_tk_502.ic4",         0x040003, 0x010000, CRC(122d59eb) SHA1(5dc9c55667021630f49cfb70c0c70bdf3ac1e3a7) )
 	ROM_LOAD32_BYTE( "5_tk_506.ic13",        0x040002, 0x010000, CRC(ed92289f) SHA1(fe612e704bf6aefdbd85f1d49a9bbc4d0fef0f95) )
 	ROM_LOAD32_BYTE( "5_tk_510.ic19",        0x040001, 0x010000, CRC(56eb4876) SHA1(113d2b300d7670068e3587f63b4f0b0bd38d84a3) )
 	ROM_LOAD32_BYTE( "5_tk_514.ic25",        0x040000, 0x010000, CRC(b0c7801c) SHA1(99e898bcb4a8c4dc00726908f9095df512539776) )
-
 	ROM_LOAD32_BYTE( "5_tk_503.ic5",         0x080003, 0x010000, CRC(9201545b) SHA1(dee1736946ec781ee035714281298f2e2a48fec1) )
 	ROM_LOAD32_BYTE( "5_tk_507.ic14",        0x080002, 0x010000, CRC(e61eebbd) SHA1(1f854ba98a1cde4473107b8282b88e6412094d19) )
 	ROM_LOAD32_BYTE( "5_tk_511.ic20",        0x080001, 0x010000, CRC(06d9fd86) SHA1(22472905672c956941d41b3e5febb4cb57c91283) )
 	ROM_LOAD32_BYTE( "5_tk_515.ic26",        0x080000, 0x010000, CRC(04b575a7) SHA1(c6c65745511e27b594818e3f7ba7313c0a6f599e) )
-
 	ROM_LOAD32_BYTE( "5_tk_504.ic6",         0x0c0003, 0x010000, CRC(cec71122) SHA1(283d38f998b1ca4fa080bf9fac797f5ac91dd072) )
 	ROM_LOAD32_BYTE( "5_tk_508.ic15",        0x0c0002, 0x010000, CRC(1873ae38) SHA1(a1633ab5c417e9851e285a6b322c06e7d2d0bccd) )
 	ROM_LOAD32_BYTE( "5_tk_512.ic21",        0x0c0001, 0x010000, CRC(0228110f) SHA1(33a29f9f458ca9d0af3c8da8a5b67bab79cecdec) )
 	ROM_LOAD32_BYTE( "5_tk_516.ic27",        0x0c0000, 0x010000, CRC(f4e29429) SHA1(706050b51e0afbddf6ec5c8f14d3649bb05c8550) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 ) // same ROMs as some of the other Toki bootlegs
-	ROM_LOAD( "8_tk_809.ic13",     0x000000, 0x10000, CRC(feb13d35) SHA1(1b78ce1e48d16e58ad0721b30ab87765ded7d24e) )
-	ROM_LOAD( "8_tk_813.ic12",     0x010000, 0x10000, CRC(5b365637) SHA1(434775b0614d904beaf40d7e00c1eaf59b704cb1) )
-	ROM_LOAD( "8_tk_810.ic20",     0x020000, 0x10000, CRC(617c32e6) SHA1(a80f93c83a06acf836e638e4ad2453692622015d) )
-	ROM_LOAD( "8_tk_814.ic19",     0x030000, 0x10000, CRC(2a11c0f0) SHA1(f9b1910c4932f5b95e5a9a8e8d5376c7210bcde7) )
-	ROM_LOAD( "8_tk_811.ic28",     0x040000, 0x10000, CRC(fbc3d456) SHA1(dd10455f2e6c415fb5e39fb239904c499b38ca3e) )
-	ROM_LOAD( "8_tk_815.ic27",     0x050000, 0x10000, CRC(4c2a72e1) SHA1(52a31f88e02e1689c2fffbbd86cbccd0bdab7dcc) )
-	ROM_LOAD( "8_tk_812.ic35",     0x060000, 0x10000, CRC(46a1b821) SHA1(74d9762aef3891463dc100d1bc2d4fdc3c1d163f) )
-	ROM_LOAD( "8_tk_816.ic34",     0x070000, 0x10000, CRC(82ce27f6) SHA1(db29396a336098664f48e3c04930b973a6ffe969) )
+	ROM_LOAD32_BYTE( "8_tk_809.ic13",     0x000003, 0x10000, CRC(feb13d35) SHA1(1b78ce1e48d16e58ad0721b30ab87765ded7d24e) )
+	ROM_LOAD32_BYTE( "8_tk_810.ic20",     0x000002, 0x10000, CRC(617c32e6) SHA1(a80f93c83a06acf836e638e4ad2453692622015d) )
+	ROM_LOAD32_BYTE( "8_tk_811.ic28",     0x000001, 0x10000, CRC(fbc3d456) SHA1(dd10455f2e6c415fb5e39fb239904c499b38ca3e) )
+	ROM_LOAD32_BYTE( "8_tk_812.ic35",     0x000000, 0x10000, CRC(46a1b821) SHA1(74d9762aef3891463dc100d1bc2d4fdc3c1d163f) )
+	ROM_LOAD32_BYTE( "8_tk_813.ic12",     0x040003, 0x10000, CRC(5b365637) SHA1(434775b0614d904beaf40d7e00c1eaf59b704cb1) )
+	ROM_LOAD32_BYTE( "8_tk_814.ic19",     0x040002, 0x10000, CRC(2a11c0f0) SHA1(f9b1910c4932f5b95e5a9a8e8d5376c7210bcde7) )
+	ROM_LOAD32_BYTE( "8_tk_815.ic27",     0x040001, 0x10000, CRC(4c2a72e1) SHA1(52a31f88e02e1689c2fffbbd86cbccd0bdab7dcc) )
+	ROM_LOAD32_BYTE( "8_tk_816.ic34",     0x040000, 0x10000, CRC(82ce27f6) SHA1(db29396a336098664f48e3c04930b973a6ffe969) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) // same ROMs as some of the other Toki bootlegs
-	ROM_LOAD( "8_tk_801.ic15",     0x000000, 0x10000, CRC(63026cad) SHA1(c8f3898985d99f2a61d4e17eba66b5989a23d0d7) )
-	ROM_LOAD( "8_tk_805.ic14",     0x010000, 0x10000, CRC(a7f2ce26) SHA1(6b12b3bd872112b42d91ce3c0d5bc95c0fc0f5b5) )
-	ROM_LOAD( "8_tk_802.ic22",     0x020000, 0x10000, CRC(48989aa0) SHA1(109c68c9f0966862194226cecc8b269d9307dd25) )
-	ROM_LOAD( "8_tk_806.ic21",     0x030000, 0x10000, CRC(c2ad9342) SHA1(7c9b5c14c8061e1a57797b79677741b1b98e64fa) )
-	ROM_LOAD( "8_tk_803.ic30",     0x040000, 0x10000, CRC(6cd22b18) SHA1(8281cfd46738448b6890c50c64fb72941e169bee) )
-	ROM_LOAD( "8_tk_807.ic29",     0x050000, 0x10000, CRC(859e313a) SHA1(18ac471a72b3ed42ba74456789adbe323f723660) )
-	ROM_LOAD( "8_tk_804.ic37",     0x060000, 0x10000, CRC(e15c1d0f) SHA1(d0d571dd1055d7307379850313216da86b0704e6) )
-	ROM_LOAD( "8_tk_808.ic36",     0x070000, 0x10000, CRC(6f4b878a) SHA1(4560b1e705a0eb9fad7fdc11fadf952ff67eb264) )
+	ROM_LOAD32_BYTE( "8_tk_801.ic15",     0x000003, 0x10000, CRC(63026cad) SHA1(c8f3898985d99f2a61d4e17eba66b5989a23d0d7) )
+	ROM_LOAD32_BYTE( "8_tk_802.ic22",     0x000002, 0x10000, CRC(48989aa0) SHA1(109c68c9f0966862194226cecc8b269d9307dd25) )
+	ROM_LOAD32_BYTE( "8_tk_803.ic30",     0x000001, 0x10000, CRC(6cd22b18) SHA1(8281cfd46738448b6890c50c64fb72941e169bee) )
+	ROM_LOAD32_BYTE( "8_tk_804.ic37",     0x000000, 0x10000, CRC(e15c1d0f) SHA1(d0d571dd1055d7307379850313216da86b0704e6) )
+	ROM_LOAD32_BYTE( "8_tk_805.ic14",     0x040003, 0x10000, CRC(a7f2ce26) SHA1(6b12b3bd872112b42d91ce3c0d5bc95c0fc0f5b5) )
+	ROM_LOAD32_BYTE( "8_tk_806.ic21",     0x040002, 0x10000, CRC(c2ad9342) SHA1(7c9b5c14c8061e1a57797b79677741b1b98e64fa) )
+	ROM_LOAD32_BYTE( "8_tk_807.ic29",     0x040001, 0x10000, CRC(859e313a) SHA1(18ac471a72b3ed42ba74456789adbe323f723660) )
+	ROM_LOAD32_BYTE( "8_tk_808.ic36",     0x040000, 0x10000, CRC(6f4b878a) SHA1(4560b1e705a0eb9fad7fdc11fadf952ff67eb264) )
 
 	ROM_REGION( 0x100, "protpal", 0 ) // all read protected
 	ROM_LOAD( "5_5140_palce16v8h-25pc.ic9", 0, 1, NO_DUMP )
@@ -808,40 +806,26 @@ ROM_START( tokims )
 	ROM_LOAD( "1_10110_82s123.ic20",  0x0300, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
 ROM_END
 
+// reorganize graphics into something we can decode with a single pass
+void toki_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+{
+	std::vector<uint8_t> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
+			buffer[j] = src[i];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
 void toki_ms_state::init_tokims()
 {
-	// copied verbatim from toki.cpp
-	uint8_t temp[0x20000];
-
-	int len = memregion("gfx3")->bytes();
-	uint8_t *rom = memregion("gfx3")->base();
-	for (int offs = 0; offs < len; offs += 0x20000)
-	{
-		uint8_t *base = &rom[offs];
-		memcpy (&temp[0], base, 65536 * 2);
-		for (int i = 0; i < 16; i++)
-		{
-			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
-		}
-	}
-
-	len = memregion("gfx4")->bytes();
-	rom = memregion("gfx4")->base();
-	for (int offs = 0; offs < len; offs += 0x20000)
-	{
-		uint8_t *base = &rom[offs];
-		memcpy (&temp[0], base, 65536 * 2);
-		for (int i = 0; i < 16; i++)
-		{
-			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
-		}
-	}
+	descramble_16x16tiles(memregion("gfx3")->base(), memregion("gfx3")->bytes());
+	descramble_16x16tiles(memregion("gfx4")->base(), memregion("gfx4")->bytes());
+	// gfx3 is 8x8 tiles
 }
 
 GAME( 1991, tokims,  toki,  tokims,  tokims,  toki_ms_state, init_tokims, ROT0, "bootleg", "Toki (Modular System)", MACHINE_IMPERFECT_SOUND )

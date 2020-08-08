@@ -15,23 +15,23 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+protected:
 	uint8_t _84_porta_r();
 	void _84_porta_w(uint8_t data);
 	void _84_portc_w(uint8_t data);
 
-protected:
-	DECLARE_READ8_MEMBER(video_color_r);
-	DECLARE_WRITE8_MEMBER(video_color_w);
-	DECLARE_READ8_MEMBER(text_start_r);
-	DECLARE_WRITE8_MEMBER(text_start_w);
-	DECLARE_READ8_MEMBER(chargen_start_r);
-	DECLARE_WRITE8_MEMBER(chargen_start_w);
-	DECLARE_READ8_MEMBER(video_start_r);
-	DECLARE_WRITE8_MEMBER(video_start_w);
-	DECLARE_READ8_MEMBER(color_start_r);
-	DECLARE_WRITE8_MEMBER(color_start_w);
-	DECLARE_READ8_MEMBER(color_r);
-	DECLARE_WRITE8_MEMBER(color_w);
+	uint8_t video_color_r();
+	void video_color_w(uint8_t data);
+	uint8_t text_start_r();
+	void text_start_w(uint8_t data);
+	uint8_t chargen_start_r();
+	void chargen_start_w(uint8_t data);
+	uint8_t video_start_r();
+	void video_start_w(uint8_t data);
+	uint8_t color_start_r();
+	void color_start_w(uint8_t data);
+	uint8_t color_r(offs_t offset);
+	void color_w(offs_t offset, uint8_t data);
 
 	void pk8000_palette(palette_device &palette) const;
 	uint32_t video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem);

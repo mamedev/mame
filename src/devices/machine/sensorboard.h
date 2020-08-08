@@ -11,7 +11,7 @@
 
 #pragma once
 
-class sensorboard_device : public device_t
+class sensorboard_device : public device_t, public device_nvram_interface
 {
 public:
 	sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -30,8 +30,9 @@ public:
 	sensorboard_device &set_spawnpoints(u8 i) { m_maxspawn = i; m_maxid = i; return *this; } // number of piece spawnpoints, max 16
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)
 	sensorboard_device &set_delay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable
-	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 3 : 0; return *this; } // enable UI inputs
-	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= 2; return *this; } // enable modifier keys
+	sensorboard_device &set_nvram_enable(bool b) { m_nvram_auto = b; return *this; } // load last board position on start
+	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 7 : 0; return *this; } // enable UI inputs
+	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= ~1; return *this; } // enable modifier keys
 
 	auto init_cb() { return m_custom_init_cb.bind(); } // for setting pieces starting position
 	auto sensor_cb() { return m_custom_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
@@ -50,7 +51,7 @@ public:
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }
-	void clear_board() { memset(m_curstate, 0, ARRAY_LENGTH(m_curstate)); }
+	void clear_board() { memset(m_curstate, 0, sizeof(m_curstate)); }
 
 	void refresh();
 	void cancel_sensor();
@@ -67,6 +68,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ui_hand);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_undo);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_init);
+	DECLARE_INPUT_CHANGED_MEMBER(ui_refresh) { refresh(); }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(check_sensor_busy) { return (m_sensorpos == -1) ? 0 : 1; }
 	DECLARE_CUSTOM_INPUT_MEMBER(check_bs_mask) { return m_bs_mask; }
@@ -81,6 +83,12 @@ protected:
 
 	virtual ioport_constructor device_input_ports() const override;
 
+	// device_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_can_write() override;
+
 private:
 	output_finder<0x10, 0x10> m_out_piece;
 	output_finder<0x20+1> m_out_pui;
@@ -88,6 +96,7 @@ private:
 	required_ioport_array<10> m_inp_rank;
 	required_ioport m_inp_spawn;
 	required_ioport m_inp_ui;
+	required_ioport m_inp_conf;
 
 	devcb_write_line m_custom_init_cb;
 	devcb_read8 m_custom_sensor_cb;
@@ -118,8 +127,12 @@ private:
 	u32 m_ulast;
 	u32 m_usize;
 
+	bool m_nvram_auto;
+	bool nvram_on();
+
 	emu_timer *m_undotimer;
 	TIMER_CALLBACK_MEMBER(undo_tick);
+	void undo_reset();
 
 	attotime m_sensordelay;
 	emu_timer *m_sensortimer;

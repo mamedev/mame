@@ -84,6 +84,11 @@ namespace analog
 			m_v = v;
 		}
 
+		void restore_state() noexcept
+		{
+			// no state used
+		}
+
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 
 	private:
@@ -126,7 +131,7 @@ namespace analog
 		nl_fptype m_gmin;
 	};
 
-#if 1
+#if (NL_USE_BACKWARD_EULER)
 	// Constant model for constant capacitor model
 	// Backward Euler
 	// "Circuit simulation", page 274
@@ -146,6 +151,10 @@ namespace analog
 			const nl_fptype G(cap * h + m_gmin);
 			return { G, - G * v };
 		}
+		void restore_state() noexcept
+		{
+			// this one has no state
+		}
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
@@ -157,7 +166,7 @@ namespace analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(device_t &dev, const pstring &name)
+		generic_capacitor_const(core_device_t &dev, const pstring &name)
 		: m_gmin(nlconst::zero())
 		, m_vn(0)
 		, m_in(0)
@@ -185,6 +194,10 @@ namespace analog
 			m_vn = v;
 			m_trn = h;
 			return { G + m_gmin, -Ieq };
+		}
+		void restore_state() noexcept
+		{
+			// this one has no state
 		}
 		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:

@@ -21,16 +21,16 @@ public:
 	void mpu5(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(mpu5_mem_r);
-	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
+	uint32_t mpu5_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mpu5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(asic_r32);
-	DECLARE_READ8_MEMBER(asic_r8);
-	DECLARE_WRITE32_MEMBER(asic_w32);
-	DECLARE_WRITE8_MEMBER(asic_w8);
+	uint32_t asic_r32(offs_t offset, uint32_t mem_mask = ~0);
+	uint8_t asic_r8(offs_t offset);
+	void asic_w32(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void asic_w8(offs_t offset, uint8_t data);
 
-	DECLARE_READ32_MEMBER(pic_r);
-	DECLARE_WRITE32_MEMBER(pic_w);
+	uint32_t pic_r(offs_t offset);
+	void pic_w(offs_t offset, uint32_t data);
 
 	virtual void machine_start() override;
 	void mpu5_map(address_map &map);

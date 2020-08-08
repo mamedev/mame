@@ -90,25 +90,25 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gladiatr_state_base::videoram_w)
+void gladiatr_state_base::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state_base::colorram_w)
+void gladiatr_state_base::colorram_w(offs_t offset, u8 data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state_base::textram_w)
+void gladiatr_state_base::textram_w(offs_t offset, u8 data)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state_base::paletteram_w)
+void gladiatr_state_base::paletteram_w(offs_t offset, u8 data)
 {
 	int r,g,b;
 
@@ -138,7 +138,7 @@ WRITE_LINE_MEMBER(gladiatr_state::spritebank_w)
 }
 
 
-WRITE8_MEMBER(ppking_state::ppking_video_registers_w)
+void ppking_state::ppking_video_registers_w(offs_t offset, u8 data)
 {
 	switch (offset & 0x300)
 	{
@@ -164,7 +164,7 @@ WRITE8_MEMBER(ppking_state::ppking_video_registers_w)
 //popmessage("%02x %02x",m_fg_scrolly, m_video_attributes);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
+void gladiatr_state::gladiatr_video_registers_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{

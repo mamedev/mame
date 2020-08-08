@@ -481,6 +481,7 @@ void univac_state::machine_start()
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_aux_dsr));
 	save_item(NAME(m_sio_wrdyb));
+	save_item(NAME(m_disp_mask));
 }
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -534,7 +535,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 }
 
 /* F4 Character Displayer */
-static const gfx_layout uts_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 14,                   /* 8 x 14 characters */
 	128,                    /* 128 characters */
@@ -548,7 +549,7 @@ static const gfx_layout uts_charlayout =
 };
 
 static GFXDECODE_START( gfx_uts )
-	GFXDECODE_ENTRY( "chargen", 0x0000, uts_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 static const z80_daisy_config daisy_chain[] =

@@ -194,7 +194,7 @@ uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER(darkmist_state::tx_vram_w)
+void darkmist_state::tx_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_txtilemap->mark_tile_dirty(offset & 0x3ff);

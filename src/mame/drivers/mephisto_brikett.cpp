@@ -140,9 +140,9 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(sound_r);
+	void lcd_w(u8 data);
+	u8 input_r(offs_t offset);
+	u8 sound_r();
 
 	void esb_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(esb_r);
@@ -237,7 +237,7 @@ WRITE_LINE_MEMBER(brikett_state::q_w)
 	m_lcd_mask = state ? 0xff : 0;
 }
 
-WRITE8_MEMBER(brikett_state::lcd_w)
+void brikett_state::lcd_w(u8 data)
 {
 	// d0-d7: write/shift LCD digit (4*CD4015)
 	// note: last digit "dp" is the colon in the middle
@@ -245,7 +245,7 @@ WRITE8_MEMBER(brikett_state::lcd_w)
 	m_digit_idx = (m_digit_idx + 1) & 3;
 }
 
-READ8_MEMBER(brikett_state::sound_r)
+u8 brikett_state::sound_r()
 {
 	// port 1 read enables the speaker
 	if (!machine().side_effects_disabled())
@@ -257,7 +257,7 @@ READ8_MEMBER(brikett_state::sound_r)
 	return 0xff;
 }
 
-READ8_MEMBER(brikett_state::input_r)
+u8 brikett_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 

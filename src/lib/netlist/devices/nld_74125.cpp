@@ -12,22 +12,6 @@
 
 namespace netlist
 {
-	template <typename T>
-	struct uptr : public unique_pool_ptr<T>
-	{
-		uptr() = default;
-
-		using base_type = unique_pool_ptr<T>;
-
-		template<typename O, typename... Args>
-		uptr(O &owner, const pstring &name, Args&&... args)
-		: unique_pool_ptr<T>(owner.template make_pool_object<T>(owner, name, std::forward<Args>(args)...))
-		{ }
-
-		C14CONSTEXPR auto operator ()() noexcept -> decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
-		constexpr auto operator ()() const noexcept -> const decltype((*unique_pool_ptr<T>::get())()) { return (*this->get())(); }
-	};
-
 	namespace devices
 	{
 
@@ -36,8 +20,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74125_base)
 		, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
-		, m_A(*this, "A", NETLIB_DELEGATE(74125_base, A))
-		, m_G(*this, pstring(D::invert_g::value ? "GQ" : "G"), NETLIB_DELEGATE(74125_base, G))
+		, m_A(*this, "A", NETLIB_DELEGATE(A))
+		, m_G(*this, pstring(D::invert_g::value ? "G" : "GQ"), NETLIB_DELEGATE(G))
 		, m_Y(*this, "Y", m_TE())
 		//, m_Y(*this, "Y")
 		, m_power_pins(*this)
@@ -45,11 +29,9 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI()
-		{
-		}
+		//NETLIB_RESETI() {}
 
-		NETLIB_UPDATEI()
+		NETLIB_UPDATE_PARAMI()
 		{
 			// this one is only called during startup. Ensure all outputs
 			// are in a consistent state.
@@ -71,14 +53,14 @@ namespace netlist
 
 		param_logic_t      m_TE;
 		logic_input_t      m_A;
-		uptr<logic_input_t>      m_G;
+		logic_input_t      m_G;
 		tristate_output_t  m_Y;
 		nld_power_pins     m_power_pins;
 	};
 
 	struct desc_74125 : public desc_base
 	{
-		using invert_g = desc_const<1>;
+		using invert_g = desc_const<0>;
 		using ts_off_on = time_ns<11>;
 		using ts_on_off = time_ns<13>;
 		using sig_off_on = time_ns<8>;
@@ -87,7 +69,7 @@ namespace netlist
 
 	struct desc_74126 : public desc_74125
 	{
-		using invert_g = desc_const<0>;
+		using invert_g = desc_const<1>;
 	};
 
 	using NETLIB_NAME(74125) = NETLIB_NAME(74125_base)<desc_74125>;

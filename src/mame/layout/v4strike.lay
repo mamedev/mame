@@ -1,0 +1,465 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="GEMS" defstate="0">
+		<text string="GEMS" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="7" />
+		</text>
+		<text string="FOR" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="8" width="16" height="7" />
+		</text>
+	</element>
+	<element name="FREEZE" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="0.2" />
+		</rect>
+		<text string="FREEZE">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="7" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+	</element>
+	<element name="GO" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.2" green="0.2" blue="0.0" />
+		</rect>
+		<text string="GO ON">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="7" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.8" green="0.8" blue="0.0" />
+		</rect>
+	</element>
+	<element name="FREEGAME">
+		<text string="FREE">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="7" />
+		</text>
+		<text string="GAME">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="8" width="16" height="7" />
+		</text>
+	</element>
+	<element name="50P" defstate="0">
+		<text string="50p" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£1" defstate="0">
+		<text string="£1" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£2" defstate="0">
+		<text string="£2" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£3" defstate="0">
+		<text string="£3" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£4" defstate="0">
+		<text string="£4" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£5" defstate="0">
+		<text string="£5" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£6" defstate="0">
+		<text string="£6" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£10" defstate="0">
+		<text string="£10" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="£20" defstate="0">
+		<text string="£20" state="0">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="16" height="16" />
+		</text>
+	</element>
+	<element name="TRAIL1" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="252" height="16" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="252" height="16" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+	<element name="TRAIL2" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="80" height="16" />
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="80" height="16" />
+			<color red="0.0" green="1.0" blue="0.3" />
+		</rect>
+	</element>
+	<element name="TRAIL3" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="80" height="16" />
+			<color red="0.2" green="0.2" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="80" height="16" />
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="TRAIL4" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="80" height="16" />
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="80" height="16" />
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="RED" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="YELLOW" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.5" green="0.5" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="GREEN" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="PASS" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="0.2" />
+		</rect>
+		<text string="PASS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="GET" defstate="0">
+		<text string="COLLECT" state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="16" height="8" />
+		</text>
+		<text string="COLLECT" state="1">
+			<color red="1" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="16" height="8" />
+		</text>
+	</element>
+
+	<element name="COLLECT" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="16" height="10" />
+			<color red="0.5" green="0.2" blue="0.0" />
+		</rect>
+		<text string="COLLECT" state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="16" height="10" />
+			<color red="1.0" green="0.4" blue="0.0" />
+		</rect>
+		<text string="COLLECT" state="1">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="16" height="8" />
+		</text>
+	</element>
+
+	<element name="START" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="16" height="10" />
+			<color red="0.0" green="0.3" blue="0.1" />
+		</rect>
+		<text string="START" state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="16" height="10" />
+			<color red="0.0" green="1.0" blue="0.3" />
+		</rect>
+		<text string="START" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0" width="16" height="8" />
+		</text>
+	</element>
+
+	<element name="HELP" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HELP" state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HELP" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+	</element>
+
+	<element name="PLAY" defstate="0">
+		<rect state ="0">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="0.3" />
+		</rect>
+		<text string="PLAY">
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds x="2" y="2" width="16" height="8" />
+		</text>
+		<rect state ="1">
+			<bounds x="0" y="0" width="20" height="10" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="digit" defstate="0">
+	<led7seg>
+		<color red="1.0" green="0.0" blue="0.0" />
+	</led7seg>
+	</element>
+
+
+	<view name="Monitor and Lamps">
+		<bezel name="lamp85" element="TRAIL1">
+			<bounds x="50" y="10" width="252" height="60" />
+		</bezel>
+		<bezel name="lamp85" element="TRAIL2">
+			<bounds x="252" y="10" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp85" element="TRAIL3">
+			<bounds x="332" y="10" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp85" element="TRAIL4">
+			<bounds x="412" y="10" width="80" height="60" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds x="100" y="10" width="40" height="60" />
+		</bezel>
+		<bezel name="digit15" element="digit">
+			<bounds x="140" y="10" width="40" height="60" />
+		</bezel>
+		<bezel name="lamp85" element="GET">
+			<bounds x="50" y="10" width="50" height="60" />
+		</bezel>
+		<bezel name="GEMS" element="GEMS">
+			<bounds x="180" y="10" width="72" height="60" />
+		</bezel>
+		<bezel name="£5" element="£5">
+			<bounds x="252" y="10" width="80" height="60" />
+		</bezel>
+		<bezel name="£10" element="£10">
+			<bounds x="332" y="10" width="80" height="60" />
+		</bezel>
+		<bezel name="£20" element="£20">
+			<bounds x="412" y="10" width="80" height="60" />
+		</bezel>
+
+		<bezel name="lamp93" element="TRAIL1">
+			<bounds x="50" y="70" width="252" height="60" />
+		</bezel>
+		<bezel name="lamp93" element="TRAIL2">
+			<bounds x="252" y="70" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp93" element="TRAIL3">
+			<bounds x="332" y="70" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp93" element="TRAIL4">
+			<bounds x="412" y="70" width="80" height="60" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds x="100" y="70" width="40" height="60" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds x="140" y="70" width="40" height="60" />
+		</bezel>
+		<bezel name="lamp93" element="GET">
+			<bounds x="50" y="70" width="50" height="60" />
+		</bezel>
+		<bezel name="GEMS" element="GEMS">
+			<bounds x="180" y="70" width="72" height="60" />
+		</bezel>
+		<bezel name="£2" element="£2">
+			<bounds x="252" y="70" width="80" height="60" />
+		</bezel>
+		<bezel name="£4" element="£4">
+			<bounds x="332" y="70" width="80" height="60" />
+		</bezel>
+		<bezel name="£6" element="£6">
+			<bounds x="412" y="70" width="80" height="60" />
+		</bezel>
+
+		<bezel name="lamp101" element="TRAIL1">
+			<bounds x="50" y="130" width="252" height="60" />
+		</bezel>
+		<bezel name="lamp101" element="TRAIL2">
+			<bounds x="252" y="130" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp101" element="TRAIL3">
+			<bounds x="332" y="130" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp101" element="TRAIL4">
+			<bounds x="412" y="130" width="80" height="60" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds x="100" y="130" width="40" height="60" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds x="140" y="130" width="40" height="60" />
+		</bezel>
+		<bezel name="lamp101" element="GET">
+			<bounds x="50" y="130" width="50" height="60" />
+		</bezel>
+		<bezel name="GEMS" element="GEMS">
+			<bounds x="180" y="130" width="72" height="60" />
+		</bezel>
+		<bezel name="£1" element="£1">
+			<bounds x="252" y="130" width="80" height="60" />
+		</bezel>
+		<bezel name="£2" element="£2">
+			<bounds x="332" y="130" width="80" height="60" />
+		</bezel>
+		<bezel name="£3" element="£3">
+			<bounds x="412" y="130" width="80" height="60" />
+		</bezel>
+
+		<bezel name="lamp109" element="TRAIL1">
+			<bounds x="50" y="190" width="252" height="60" />
+		</bezel>
+		<bezel name="lamp109" element="TRAIL2">
+			<bounds x="252" y="190" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp109" element="TRAIL3">
+			<bounds x="332" y="190" width="80" height="60" />
+		</bezel>
+		<bezel name="lamp109" element="TRAIL4">
+			<bounds x="412" y="190" width="80" height="60" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds x="100" y="190" width="40" height="60" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds x="140" y="190" width="40" height="60" />
+		</bezel>
+		<bezel name="lamp109" element="GET">
+			<bounds x="50" y="190" width="50" height="60" />
+		</bezel>
+		<bezel name="GEMS" element="GEMS">
+			<bounds x="180" y="190" width="72" height="60" />
+		</bezel>
+		<bezel name="FREEGAME" element="FREEGAME">
+			<bounds x="252" y="190" width="80" height="60" />
+		</bezel>
+		<bezel name="50P" element="50P">
+			<bounds x="332" y="190" width="80" height="60" />
+		</bezel>
+		<bezel name="£1" element="£1">
+			<bounds x="412" y="190" width="80" height="60" />
+		</bezel>
+
+		<bezel name="lamp25" element="COLLECT" inputtag="BLACK2" inputmask="0x40">
+			<bounds x="0" y="310" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp32" element="RED" inputtag="BLACK1" inputmask="0x10">
+			<bounds x="0" y="360" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp34" element="YELLOW" inputtag="BLACK1" inputmask="0x08">
+			<bounds x="0" y="410" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp41" element="GREEN" inputtag="BLACK1" inputmask="0x04">
+			<bounds x="0" y="460" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp48" element="PLAY" inputtag="BLACK1" inputmask="0x02">
+			<bounds x="0" y="510" width="48" height="50" />
+		</bezel>
+
+		<bezel name="lamp24" element="START" inputtag="BLACK2" inputmask="0x80">
+			<bounds x="560" y="310" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp26" element="RED" inputtag="BLACK2" inputmask="0x10">
+			<bounds x="560" y="360" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp33" element="YELLOW" inputtag="BLACK2" inputmask="0x08">
+			<bounds x="560" y="410" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp40" element="GREEN" inputtag="BLACK2" inputmask="0x04">
+			<bounds x="560" y="460" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp42" element="HELP" inputtag="BLACK2" inputmask="0x02">
+			<bounds x="564" y="510" width="48" height="50" />
+		</bezel>
+		<bezel name="lamp51" element="FREEZE" inputtag="ORANGE1" inputmask="0x10">
+			<bounds x="250" y="560" width="50" height="50" />
+		</bezel>
+
+		<bezel name="lamp35" element="GO" inputtag="ORANGE1" inputmask="0x40">
+			<bounds x="300" y="560" width="50" height="50" />
+		</bezel>
+
+		<screen index="0">
+			<bounds x="50" y="260" width="504" height="296" />
+		</screen>
+
+	</view>
+</mamelayout>

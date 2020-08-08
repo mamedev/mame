@@ -75,16 +75,16 @@ private:
 	uint8_t m_gunx[2];
 	void get_crosshair_xy(int player, int &x, int &y);
 
-	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
-	DECLARE_READ16_MEMBER(rapidfir_transparent_r);
-	DECLARE_WRITE16_MEMBER(tickee_control_w);
-	DECLARE_READ16_MEMBER(ffff_r);
-	DECLARE_READ16_MEMBER(rapidfir_gun1_r);
-	DECLARE_READ16_MEMBER(rapidfir_gun2_r);
-	DECLARE_READ16_MEMBER(ff7f_r);
-	DECLARE_WRITE16_MEMBER(ff7f_w);
-	DECLARE_WRITE16_MEMBER(rapidfir_control_w);
-	DECLARE_WRITE16_MEMBER(sound_bank_w);
+	void rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rapidfir_transparent_r(offs_t offset);
+	void tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ffff_r();
+	uint16_t rapidfir_gun1_r();
+	uint16_t rapidfir_gun2_r();
+	uint16_t ff7f_r();
+	void ff7f_w(uint16_t data);
+	void rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_MACHINE_RESET(tickee);
 	DECLARE_VIDEO_START(tickee);
 	DECLARE_MACHINE_RESET(rapidfir);
@@ -298,7 +298,7 @@ MACHINE_RESET_MEMBER(tickee_state,rapidfir)
  *
  *************************************/
 
-WRITE16_MEMBER(tickee_state::rapidfir_transparent_w)
+void tickee_state::rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
@@ -306,7 +306,7 @@ WRITE16_MEMBER(tickee_state::rapidfir_transparent_w)
 }
 
 
-READ16_MEMBER(tickee_state::rapidfir_transparent_r)
+uint16_t tickee_state::rapidfir_transparent_r(offs_t offset)
 {
 	return m_vram[offset];
 }
@@ -333,7 +333,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(tickee_state::tickee_control_w)
+void tickee_state::tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t olddata = m_control[offset];
 
@@ -364,36 +364,36 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
  *
  *************************************/
 
-READ16_MEMBER(tickee_state::ffff_r)
+uint16_t tickee_state::ffff_r()
 {
 	return 0xffff;
 }
 
 
-READ16_MEMBER(tickee_state::rapidfir_gun1_r)
+uint16_t tickee_state::rapidfir_gun1_r()
 {
 	return m_gunx[0];
 }
 
 
-READ16_MEMBER(tickee_state::rapidfir_gun2_r)
+uint16_t tickee_state::rapidfir_gun2_r()
 {
 	return m_gunx[1];
 }
 
 
-READ16_MEMBER(tickee_state::ff7f_r)
+uint16_t tickee_state::ff7f_r()
 {
 	/* Ticket dispenser status? */
 	return 0xff7f;
 }
 
-WRITE16_MEMBER(tickee_state::ff7f_w)
+void tickee_state::ff7f_w(uint16_t data)
 {
 	/* Ticket dispenser output? */
 }
 
-WRITE16_MEMBER(tickee_state::rapidfir_control_w)
+void tickee_state::rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
@@ -408,7 +408,7 @@ WRITE16_MEMBER(tickee_state::rapidfir_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(tickee_state::sound_bank_w)
+void tickee_state::sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (data & 0xff)
 	{

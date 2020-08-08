@@ -3,13 +3,13 @@
 #include "emu.h"
 #include "includes/higemaru.h"
 
-WRITE8_MEMBER(higemaru_state::higemaru_videoram_w)
+void higemaru_state::higemaru_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(higemaru_state::higemaru_colorram_w)
+void higemaru_state::higemaru_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -69,7 +69,7 @@ void higemaru_state::higemaru_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(higemaru_state::higemaru_c800_w)
+void higemaru_state::higemaru_c800_w(uint8_t data)
 {
 	if (data & 0x7c)
 		logerror("c800 = %02x\n",data);

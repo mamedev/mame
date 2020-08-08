@@ -23,7 +23,7 @@ template<int Width, int AddrShift, endianness_t Endian> std::string handler_entr
 }
 
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_unmapped<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)const 
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_unmapped<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)const
 {
 	if (inh::m_space->log_unmap() && !inh::m_space->m_manager.machine().side_effects_disabled())
 		inh::m_space->device().logerror(inh::m_space->is_octal()

@@ -8,9 +8,7 @@
 /// \file plists.h
 ///
 
-#include "palloc.h"
-#include "pchrono.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <array>
@@ -19,14 +17,13 @@
 
 namespace plib {
 
-	/// \brief fixed size array allowing to override constructor and initialize members by placement new.
+	/// \brief Array holding uninitialized elements
 	///
 	/// Use with care. This template is provided to improve locality of storage
 	/// in high frequency applications. It should not be used for anything else.
 	///
-	///
 	template <class C, std::size_t N>
-	class uninitialised_array_t
+	class uninitialised_array
 	{
 	public:
 
@@ -43,18 +40,10 @@ namespace plib {
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 		//uninitialised_array_t() noexcept = default;
-		uninitialised_array_t() noexcept
-		: m_initialized(0)
-		{
-		}
+		uninitialised_array() noexcept = default;
 
-		PCOPYASSIGNMOVE(uninitialised_array_t, delete)
-		~uninitialised_array_t() noexcept
-		{
-			if (m_initialized>=N)
-				for (size_type i=0; i<N; ++i)
-					(*this)[i].~C();
-		}
+		PCOPYASSIGNMOVE(uninitialised_array, delete)
+		~uninitialised_array() noexcept = default;
 
 		constexpr size_t size() const noexcept { return N; }
 
@@ -62,39 +51,123 @@ namespace plib {
 
 		reference operator[](size_type index) noexcept
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return reinterpret_cast<reference>(m_buf[index]);
 		}
 
 		constexpr const_reference operator[](size_type index) const noexcept
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			return reinterpret_cast<const_reference>(m_buf[index]);
 		}
 
-		template<typename... Args>
-		void emplace(size_type index, Args&&... args)
-		{
-			m_initialized++;
-			// allocate on buffer
-			new (&m_buf[index]) C(std::forward<Args>(args)...);
-		}
-
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
-		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
 
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
-		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[N]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
 
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
-		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[N]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0] + N); }
 
 	protected:
 
 	private:
-
-		// ensure proper alignment
-		PALIGNAS_VECTOROPT()
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
-		unsigned m_initialized;
+	};
+
+	/// \brief fixed allocation vector
+	///
+	/// Currently only emplace_back and clear are supported.
+	///
+	/// Use with care. This template is provided to improve locality of storage
+	/// in high frequency applications. It should not be used for anything else.
+	///
+	template <class C, std::size_t N>
+	class static_vector
+	{
+	public:
+
+		using value_type = C;
+		using pointer = value_type *;
+		using const_pointer = const value_type *;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using iterator = value_type *;
+		using const_iterator = const value_type *;
+		using size_type = std::size_t;
+		using difference_type = std::ptrdiff_t;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+		static_vector() noexcept
+		: m_pos(0)
+		{
+		}
+
+		PCOPYASSIGNMOVE(static_vector, delete)
+		~static_vector() noexcept
+		{
+			clear();
+		}
+
+		constexpr size_t size() const noexcept { return m_pos; }
+
+		constexpr bool empty() const noexcept { return size() == 0; }
+
+		void clear()
+		{
+			for (size_type i=0; i<m_pos; ++i)
+				(*this)[i].~C();
+			m_pos = 0;
+		}
+
+		template<typename... Args>
+		void emplace_back(Args&&... args)
+		{
+			// placement new on buffer
+			new (&m_buf[m_pos]) C(std::forward<Args>(args)...);
+			m_pos++;
+		}
+
+		reference operator[](size_type index) noexcept
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return reinterpret_cast<reference>(m_buf[index]);
+		}
+
+		constexpr const_reference operator[](size_type index) const noexcept
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			return reinterpret_cast<const_reference>(m_buf[index]);
+		}
+
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[0] + m_pos); }
+
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[0] + m_pos); }
+
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0] + m_pos); }
+
+	protected:
+
+	private:
+		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
+		size_type m_pos;
 	};
 
 	/// \brief a simple linked list.
@@ -150,11 +223,11 @@ namespace plib {
 
 			constexpr bool operator==(const iter_t& rhs) const noexcept { return p == rhs.p; }
 			constexpr bool operator!=(const iter_t& rhs) const noexcept { return p != rhs.p; }
-			C14CONSTEXPR LC& operator*() noexcept { return *p; }
-			C14CONSTEXPR LC* operator->() noexcept { return p; }
+			constexpr LC& operator*() noexcept { return *p; }
+			constexpr LC* operator->() noexcept { return p; }
 
-			C14CONSTEXPR LC& operator*() const noexcept { return *p; }
-			C14CONSTEXPR LC* operator->() const noexcept { return p; }
+			constexpr LC& operator*() const noexcept { return *p; }
+			constexpr LC* operator->() const noexcept { return p; }
 		};
 
 		constexpr linkedlist_t() noexcept : m_head(nullptr) {}

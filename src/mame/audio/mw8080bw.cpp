@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "audio/mw8080bw.h"
 #include "audio/nl_gunfight.h"
+#include "audio/nl_280zzzap.h"
 
 #include "includes/mw8080bw.h"
 #include "speaker.h"
@@ -572,6 +573,7 @@ DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Mid
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
 DEFINE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device, "invad2ct_audio", "Midway Space Invaders II Audio")
+DEFINE_DEVICE_TYPE(ZZZAP_AUDIO,    zzzap_audio_device,    "zzzap_audio",    "Midway 280-ZZZAP Audio")
 
 
 /*************************************
@@ -713,6 +715,24 @@ void seawolf_audio_device::device_start()
  *
  *************************************/
 
+// Sound board volume potentiometers. By default, these are all set to their
+// midpoint values.
+
+static INPUT_PORTS_START(gunfight_audio)
+	PORT_START("POT_1_LEFT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Left Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_left_master_vol")
+	PORT_START("POT_2_RIGHT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Right Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_master_vol")
+	PORT_START("POT_3_LEFT_SHOT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Left Shot Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_left_shot_vol")
+	PORT_START("POT_4_RIGHT_SHOT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Right Shot Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_shot_vol")
+	PORT_START("POT_5_LEFT_HIT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Left Hit Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_left_hit_vol")
+	PORT_START("POT_6_RIGHT_HIT_VOL")
+	PORT_ADJUSTER( 50, "Pot: Right Hit Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_hit_vol")
+INPUT_PORTS_END
+
 gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, GUNFIGHT_AUDIO, tag, owner, clock),
 	m_left_shot(*this, "sound_nl:left_shot"),
@@ -731,10 +751,10 @@ void gunfight_audio_device::write(u8 data)
 	// the 74175 latches and inverts the top 4 bits
 	switch ((~data >> 4) & 0x0f)
 	{
-	case 0x01: // LEFT SHOOT sound (left speaker)
+	case 0x01: // LEFT SHOT sound (left speaker)
 		m_left_shot->write_line(1);
 		break;
-	case 0x02: // RIGHT SHOOT sound (right speaker)
+	case 0x02: // RIGHT SHOT sound (right speaker)
 		m_right_shot->write_line(1);
 		break;
 	case 0x03: // LEFT HIT sound (left speaker)
@@ -768,15 +788,30 @@ void gunfight_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:left_hit",   "I_LEFT_HIT.IN",  0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:right_hit",  "I_RIGHT_HIT.IN",  0);
 
-	// Multipliers set so that the highest output spikes of
-	// +/- 3 volts at mid potentiometer settings give safe
-	// non-clipping sample values of +/- 30,000. This would
-	// lead to clipping if all the potentiometers were set to max,
-	// but that's unlikely to happen, since the potentiometers are
-	// currently fixed and even on the real machine were service
-	// adjustments only.
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(30000.0 / 3.0, 0.0);
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(30000.0 / 3.0, 0.0);
+	// With all the volume potentiometers at their default midpoint
+	// settings, the highest output spikes are around +/- 3 volts, for an
+	// extreme output swing of 6 volts. Gun Fight's audio power amplifiers
+	// are configured with a voltage gain of 15 and have a single power
+	// supply of about 22 volts, so they will definitely clip the highest
+	// output peaks, but we don't model them. Instead, be cautious: scale
+	// the outputs before the power amps so that the highest output spikes
+	// of +/- 3 volts just reach the clipping limits for signed 16-bit
+	// samples.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(32767.0 / 3.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(32767.0 / 3.0, 0.0);
+
+	// Netlist volume-potentiometer interfaces
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_master_vol", "R103.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_right_master_vol", "R203.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_shot_vol", "R123.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_right_shot_vol", "R223.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_hit_vol", "R110.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_right_hit_vol", "R210.DIAL");
+}
+
+ioport_constructor gunfight_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(gunfight_audio);
 }
 
 void gunfight_audio_device::device_start()
@@ -3575,7 +3610,7 @@ void mw8080bw_state::tornbase_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
+void mw8080bw_state::tornbase_audio_w(uint8_t data)
 {
 	m_discrete->write(TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
 
@@ -3611,40 +3646,126 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
  *
  *************************************/
 
-void mw8080bw_state::zzzap_audio(machine_config &config)
+// Sound board volume potentiometer, set to its midpoint value by default.
+
+static INPUT_PORTS_START(zzzap_audio)
+	PORT_START("POT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_master_vol")
+INPUT_PORTS_END
+
+zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, ZZZAP_AUDIO, tag, owner, clock),
+	m_pedal_bit0(*this, "sound_nl:pedal_bit0"),
+	m_pedal_bit1(*this, "sound_nl:pedal_bit1"),
+	m_pedal_bit2(*this, "sound_nl:pedal_bit2"),
+	m_pedal_bit3(*this, "sound_nl:pedal_bit3"),
+	m_hi_shift(*this, "sound_nl:hi_shift"),
+	m_lo_shift(*this, "sound_nl:lo_shift"),
+	m_boom(*this, "sound_nl:boom"),
+	m_engine_sound_off(*this, "sound_nl:engine_sound_off"),
+	m_noise_cr_1(*this, "sound_nl:noise_cr_1"),
+	m_noise_cr_2(*this, "sound_nl:noise_cr_2")
 {
-	SPEAKER(config, "mono").front_center();
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::zzzap_audio_1_w)
+void zzzap_audio_device::p1_w(u8 data)
 {
-	/* set ENGINE SOUND FREQ(data & 0x0f)  the value written is
-	                                       the gas pedal position */
+	// **** Output pins from 74174 latch at F5 ****
 
-	/* if (data & 0x10)  enable HI SHIFT engine sound modifier */
+	// Bits 0-3 (PEDAL_BIT0 to PEDAL_BIT3): accelerator pedal position
+	// Sets the frequency and volume of the engine sound oscillators.
+	m_pedal_bit0->write_line(BIT(data, 0));
+	m_pedal_bit1->write_line(BIT(data, 1));
+	m_pedal_bit2->write_line(BIT(data, 2));
+	m_pedal_bit3->write_line(BIT(data, 3));
 
-	/* if (data & 0x20)  enable LO SHIFT engine sound modifier */
+	// Bit 4 (HI SHIFT): set when gearshift is in high gear
+	// Modifies the engine sound to be lower pitched at a given speed and
+	// to change more slowly.
+	m_hi_shift->write_line(BIT(data, 4));
 
-	/* D6 and D7 are not connected */
+	// Bit 5 (LO SHIFT): set when gearshift is in low gear
+	// Modifies the engine sound to be higher pitched at a given speed and
+	// to change faster.
+	m_lo_shift->write_line(BIT(data, 5));
+
+	// Bits 6-7 (D6, D7): not connected.
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::zzzap_audio_2_w)
+void zzzap_audio_device::p2_w(u8 data)
 {
-	/* if (data & 0x01)  enable BOOM sound */
+	// **** Output pins from 74174 latch at F4 ****
 
-	/* if (data & 0x02)  enable ENGINE sound (global) */
+	// Bit 0 (BOOM): Set to activate boom sound for a crash. Cleared to
+	// terminate boom.
+	m_boom->write_line(BIT(data, 0));
 
-	/* if (data & 0x04)  enable CR 1 (screeching sound) */
+	// Bit 1 (ENGINE SOUND OFF): Set to turn *off* engine sound.
+	// Used in a crash or when game is not running.
+	m_engine_sound_off->write_line(BIT(data, 1));
 
-	/* if (data & 0x08)  enable NOISE CR 2 (happens only after the car blows up, but
-	                                        before it appears again, not sure what
-	                                        it is supposed to sound like) */
+	// Bit 2 (NOISE CR 1): tire squealing sound
+	// Set to activate "tire squeal" noise from noise generator.
+	m_noise_cr_1->write_line(BIT(data, 2));
 
+	// Bit 3 (NOISE CR 2): post-crash noise
+	// Set to activate screeching noise that follows BOOM (the car blowing
+	// up). This sounds like a generic high-pitched screeching hiss, and
+	// it is unclear what it was meant to represent. It's just as
+	// ambiguous in the real game.
+	m_noise_cr_2->write_line(BIT(data, 3));
+
+	// Bit 5 is for the coin counter.
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
-	/* D4, D6 and D7 are not connected */
+	// Bits 4, 6-7 (D4, D6, D7): not connected.
+}
+
+
+void zzzap_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(280zzzap))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit0", "I_PEDAL_BIT0", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit1", "I_PEDAL_BIT1", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit2", "I_PEDAL_BIT2", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit3", "I_PEDAL_BIT3", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift", "I_HI_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off", "I_ENGINE_SOUND_OFF", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
+
+	// The audio output is taken from an LM3900 op-amp whose output has a
+	// peak-to-peak range of about 5 volts, centered on 2.5 volts. With
+	// the master volume potentiometer at its default midpoint setting,
+	// this range is cut in half, to 2.5 volts peak to peak. In the real
+	// machine, the audio power amps might clip the highest output peaks,
+	// but I don't model this. Instead, I take the easy way out: assume
+	// the output at midpoint volume will just avoid clipping the extreme
+	// peaks, and scale and offset it so that those peaks will just reach
+	// the clipping limits for signed 16-bit samples. So turning the
+	// volume up much higher than the default will give clipped output.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 1.25, -(32767.0 / 1.25) * 2.50);
+
+	// Netlist volume-potentiometer interface
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");
+}
+
+ioport_constructor zzzap_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(zzzap_audio);
+}
+
+void zzzap_audio_device::device_start()
+{
 }
 
 
@@ -4052,7 +4173,7 @@ void mw8080bw_state::checkmat_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::checkmat_audio_w)
+void mw8080bw_state::checkmat_audio_w(uint8_t data)
 {
 	m_discrete->write(CHECKMAT_TONE_EN, data & 0x01);
 
@@ -4270,7 +4391,7 @@ void mw8080bw_state::shuffle_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::shuffle_audio_1_w)
+void mw8080bw_state::shuffle_audio_1_w(uint8_t data)
 {
 	m_discrete->write(SHUFFLE_CLICK_EN, (data >> 0) & 0x01);
 
@@ -4288,7 +4409,7 @@ WRITE8_MEMBER(mw8080bw_state::shuffle_audio_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::shuffle_audio_2_w)
+void mw8080bw_state::shuffle_audio_2_w(uint8_t data)
 {
 	m_discrete->write(SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
@@ -4387,7 +4508,7 @@ void mw8080bw_state::bowler_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
+void mw8080bw_state::bowler_audio_1_w(uint8_t data)
 {
 	/* D0 - selects controller on the cocktail PCB */
 
@@ -4407,7 +4528,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_2_w)
+void mw8080bw_state::bowler_audio_2_w(uint8_t data)
 {
 	/* set BALL ROLLING SOUND FREQ(data & 0x0f)
 	   0, if no rolling, 0x08 used during ball return */
@@ -4421,28 +4542,28 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_2_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_3_w)
+void mw8080bw_state::bowler_audio_3_w(uint8_t data)
 {
 	/* regardless of the data, enable BALL HITS PIN 1 sound
 	   (top circuit on the schematics) */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_4_w)
+void mw8080bw_state::bowler_audio_4_w(uint8_t data)
 {
 	/* regardless of the data, enable BALL HITS PIN 2 sound
 	   (bottom circuit on the schematics) */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_5_w)
+void mw8080bw_state::bowler_audio_5_w(uint8_t data)
 {
-	/* not sure, appears to me trigerred alongside the two
+	/* not sure, appears to me triggered alongside the two
 	   BALL HITS PIN sounds */
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_audio_6_w)
+void mw8080bw_state::bowler_audio_6_w(uint8_t data)
 {
 	/* D0 is not connected */
 
@@ -4827,7 +4948,7 @@ void mw8080bw_state::blueshrk_audio(machine_config &config)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::blueshrk_audio_w)
+void mw8080bw_state::blueshrk_audio_w(uint8_t data)
 {
 	m_discrete->write(BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 

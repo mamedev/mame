@@ -111,7 +111,7 @@ void dpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 //  Read / Write accesses
 //-------------------------------------------------
 
-READ8_MEMBER(dpc_device::read)
+uint8_t dpc_device::read(offs_t offset)
 {
 	static const uint8_t dpc_amplitude[8] = { 0x00, 0x04, 0x05, 0x09, 0x06, 0x0a, 0x0b, 0x0f };
 	uint8_t   data_fetcher = offset & 0x07;
@@ -181,7 +181,7 @@ READ8_MEMBER(dpc_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(dpc_device::write)
+void dpc_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t data_fetcher = offset & 0x07;
 
@@ -268,18 +268,18 @@ void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 	ATARI_DPC(config, m_dpc, 0);
 }
 
-READ8_MEMBER(a26_rom_dpc_device::read_rom)
+uint8_t a26_rom_dpc_device::read_rom(offs_t offset)
 {
 	if (offset < 0x40)
-		return m_dpc->read(space, offset);
+		return m_dpc->read(offset);
 	else
-		return a26_rom_f8_device::read_rom(space, offset);
+		return a26_rom_f8_device::read_rom(offset);
 }
 
-WRITE8_MEMBER(a26_rom_dpc_device::write_bank)
+void a26_rom_dpc_device::write_bank(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset >= 0x40 && offset < 0x80)
-		m_dpc->write(space, offset, data);
+		m_dpc->write(offset, data);
 	else
 		a26_rom_f8_device::write_bank(space, offset, data);
 }

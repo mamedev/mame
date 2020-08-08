@@ -65,12 +65,12 @@ public:
 	{ }
 
 	/* Public for access by the rendering functions */
-	required_shared_ptr<uint32_t> m_textureram0;
-	required_shared_ptr<uint32_t> m_textureram1;
-	std::unique_ptr<uint16_t[]> m_palram;
-	std::unique_ptr<uint16_t[]> m_colorxlat;
-	std::unique_ptr<uint16_t[]> m_lumaram;
-	uint8_t m_gamma_table[256];
+	required_shared_ptr<u32> m_textureram0;
+	required_shared_ptr<u32> m_textureram1;
+	std::unique_ptr<u16[]> m_palram;
+	std::unique_ptr<u16[]> m_colorxlat;
+	std::unique_ptr<u16[]> m_lumaram;
+	u8 m_gamma_table[256];
 	std::unique_ptr<model2_renderer> m_poly;
 
 	/* Public for access by the ioports */
@@ -78,7 +78,7 @@ public:
 
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
-	uint16_t crypt_read_callback(uint32_t addr);
+	u16 crypt_read_callback(u32 addr);
 	DECLARE_MACHINE_START(model2);
 
 
@@ -97,11 +97,11 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint32_t> m_bufferram;
-	std::unique_ptr<uint16_t[]> m_fbvramA;
-	std::unique_ptr<uint16_t[]> m_fbvramB;
-	optional_shared_ptr<uint16_t> m_soundram;
+	required_shared_ptr<u32> m_workram;
+	required_shared_ptr<u32> m_bufferram;
+	std::unique_ptr<u16[]> m_fbvramA;
+	std::unique_ptr<u16[]> m_fbvramB;
+	optional_shared_ptr<u16> m_soundram;
 
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
@@ -126,101 +126,99 @@ protected:
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
 
-	uint32_t m_timervals[4];
-	uint32_t m_timerorig[4];
+	u32 m_timervals[4];
+	u32 m_timerorig[4];
 	int m_timerrun[4];
 	int m_ctrlmode;
-	uint16_t m_cmd_data;
-	uint8_t m_driveio_comm_data;
+	u16 m_cmd_data;
+	u8 m_driveio_comm_data;
 	int m_iop_write_num;
-	uint32_t m_iop_data;
+	u32 m_iop_data;
 	int m_geo_iop_write_num;
-	uint32_t m_geo_iop_data;
+	u32 m_geo_iop_data;
 
-	uint32_t m_geo_read_start_address;
-	uint32_t m_geo_write_start_address;
+	u32 m_geo_read_start_address;
+	u32 m_geo_write_start_address;
 	std::unique_ptr<raster_state> m_raster;
 	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-//  uint32_t m_soundack;
+//  u32 m_soundack;
 	void model2_check_irq_state();
-	void model2_check_irqack_state(uint32_t data);
-	uint8_t m_gearsel;
-	uint8_t m_lightgun_mux;
+	void model2_check_irqack_state(u32 data);
+	u8 m_gearsel;
+	u8 m_lightgun_mux;
 
 	// Coprocessor communications
-	DECLARE_READ32_MEMBER(copro_prg_r);
-	DECLARE_WRITE32_MEMBER(copro_prg_w);
-	DECLARE_READ32_MEMBER(copro_ctl1_r);
-	DECLARE_WRITE32_MEMBER(copro_ctl1_w);
-	DECLARE_READ32_MEMBER(copro_status_r);
+	u32 copro_prg_r();
+	u32 copro_ctl1_r();
+	void copro_ctl1_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_status_r();
 
 	// Geometrizer communications
-	DECLARE_WRITE32_MEMBER(geo_ctl1_w);
-	DECLARE_READ32_MEMBER(geo_prg_r);
-	DECLARE_WRITE32_MEMBER(geo_prg_w);
-	DECLARE_READ32_MEMBER(geo_r);
-	DECLARE_WRITE32_MEMBER(geo_w);
+	void geo_ctl1_w(u32 data);
+	u32 geo_prg_r(offs_t offset);
+	void geo_prg_w(u32 data);
+	u32 geo_r(offs_t offset);
+	void geo_w(offs_t offset, u32 data);
 
 	// Everything else
-	DECLARE_READ32_MEMBER(timers_r);
-	DECLARE_WRITE32_MEMBER(timers_w);
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_READ16_MEMBER(colorxlat_r);
-	DECLARE_WRITE16_MEMBER(colorxlat_w);
-	void eeprom_w(uint8_t data);
-	uint8_t in0_r();
-	DECLARE_READ32_MEMBER(fifo_control_2a_r);
-	DECLARE_READ32_MEMBER(videoctl_r);
-	DECLARE_WRITE32_MEMBER(videoctl_w);
-	uint8_t rchase2_drive_board_r();
-	void rchase2_drive_board_w(uint8_t data);
-	void drive_board_w(uint8_t data);
-	uint8_t lightgun_data_r(offs_t offset);
-	uint8_t lightgun_mux_r();
-	void lightgun_mux_w(uint8_t data);
-	uint8_t lightgun_offscreen_r(offs_t offset);
-	DECLARE_READ32_MEMBER(irq_request_r);
-	DECLARE_WRITE32_MEMBER(irq_ack_w);
-	DECLARE_READ32_MEMBER(irq_enable_r);
-	DECLARE_WRITE32_MEMBER(irq_enable_w);
-	DECLARE_READ32_MEMBER(model2_serial_r);
-	DECLARE_WRITE32_MEMBER(model2o_serial_w);
-	DECLARE_WRITE32_MEMBER(model2_serial_w);
-	void horizontal_sync_w(uint16_t data);
-	void vertical_sync_w(uint16_t data);
-	DECLARE_READ32_MEMBER(doa_prot_r);
-	DECLARE_READ32_MEMBER(doa_unk_r);
+	u32 timers_r(offs_t offset);
+	void timers_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 palette_r(offs_t offset);
+	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 colorxlat_r(offs_t offset);
+	void colorxlat_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void eeprom_w(u8 data);
+	u8 in0_r();
+	u32 fifo_control_2a_r();
+	u32 videoctl_r();
+	void videoctl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 rchase2_drive_board_r();
+	void rchase2_drive_board_w(u8 data);
+	void drive_board_w(u8 data);
+	u8 lightgun_data_r(offs_t offset);
+	u8 lightgun_mux_r();
+	void lightgun_mux_w(u8 data);
+	u8 lightgun_offscreen_r(offs_t offset);
+	u32 irq_request_r();
+	void irq_ack_w(u32 data);
+	u32 irq_enable_r();
+	void irq_enable_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 model2_serial_r(offs_t offset, u32 mem_mask = ~0);
+	void model2_serial_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void horizontal_sync_w(u16 data);
+	void vertical_sync_w(u16 data);
+	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);
+	u32 doa_unk_r();
 	void sega_0229_map(address_map &map);
 	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
-	DECLARE_READ32_MEMBER(render_mode_r);
-	DECLARE_WRITE32_MEMBER(render_mode_w);
-	DECLARE_READ16_MEMBER(lumaram_r);
-	DECLARE_WRITE16_MEMBER(lumaram_w);
-	DECLARE_READ16_MEMBER(fbvram_bankA_r);
-	DECLARE_WRITE16_MEMBER(fbvram_bankA_w);
-	DECLARE_READ16_MEMBER(fbvram_bankB_r);
-	DECLARE_WRITE16_MEMBER(fbvram_bankB_w);
-	DECLARE_WRITE32_MEMBER(model2_3d_zclip_w);
-	DECLARE_WRITE16_MEMBER(model2snd_ctrl);
-	DECLARE_READ8_MEMBER(tgpid_r);
-	DECLARE_READ32_MEMBER(polygon_count_r);
+	u32 render_mode_r();
+	void render_mode_w(u32 data);
+	u16 lumaram_r(offs_t offset);
+	void lumaram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 fbvram_bankA_r(offs_t offset);
+	void fbvram_bankA_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 fbvram_bankB_r(offs_t offset);
+	void fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void model2_3d_zclip_w(u32 data);
+	void model2snd_ctrl(u16 data);
+	u8 tgpid_r(offs_t offset);
+	u32 polygon_count_r();
 
-	uint8_t driveio_portg_r();
-	uint8_t driveio_porth_r();
-	void driveio_port_w(uint8_t data);
-	void push_geo_data(uint32_t data);
+	u8 driveio_portg_r();
+	u8 driveio_porth_r();
+	void driveio_port_w(u8 data);
+	void push_geo_data(u32 data);
 	DECLARE_VIDEO_START(model2);
 	void reset_model2_scsp();
-	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
-	void scsp_irq(offs_t offset, uint8_t data);
+	void scsp_irq(offs_t offset, u8 data);
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
@@ -250,10 +248,10 @@ protected:
 
 	virtual void video_start() override;
 
-	uint32_t m_intreq;
-	uint32_t m_intena;
-	uint32_t m_coproctl;
-	uint32_t m_coprocnt;
+	u32 m_intreq;
+	u32 m_intena;
+	u32 m_coproctl;
+	u32 m_coprocnt;
 
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
@@ -261,55 +259,55 @@ protected:
 private:
 	void tri_list_dump(FILE *dst);
 
-	uint32_t m_geoctl;
-	uint32_t m_geocnt;
-	uint32_t m_videocontrol;
+	u32 m_geoctl;
+	u32 m_geocnt;
+	u32 m_videocontrol;
 
 	bool m_render_unk;
 	bool m_render_mode;
 	bool m_render_test_mode;
 	int16 m_crtc_xoffset, m_crtc_yoffset;
 
-	uint32_t *geo_process_command( geo_state *geo, uint32_t opcode, uint32_t *input, bool *end_code );
+	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
-	uint32_t *geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_test( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_end( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_lod( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_code_upload( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_code_jump( geo_state *geo, uint32_t opcode, uint32_t *input );
+	u32 *geo_nop( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_object_data( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_direct_data( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_window_data( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_texture_data( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_polygon_data( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_texture_parameters( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_mode( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_zsort_mode( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_focal_distance( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_light_source( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_matrix_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_translate_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_data_mem_push( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_test( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_end( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_dummy( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_log_data( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_lod( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_code_upload( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_code_jump( geo_state *geo, u32 opcode, u32 *input );
 	// geo code drawing paths
-	void geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t count );
-	void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count );
-	void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count );
-	void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count );
+	void geo_parse_np_ns( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_np_s( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count );
 
 	// raster functions
 	// main data input port
-	void model2_3d_push( raster_state *raster, uint32_t input );
+	void model2_3d_push( raster_state *raster, u32 input );
 	// quad & triangle push paths
-	void model2_3d_process_quad( raster_state *raster, uint32_t attr );
-	void model2_3d_process_triangle( raster_state *raster, uint32_t attr );
+	void model2_3d_process_quad( raster_state *raster, u32 attr );
+	void model2_3d_process_triangle( raster_state *raster, u32 attr );
 
 	// inliners
 	inline void model2_3d_project( triangle *tri );
-	inline uint16_t float_to_zval( float floatval );
-	inline bool check_culling( raster_state *raster, uint32_t attr, float min_z, float max_z );
+	inline u16 float_to_zval( float floatval );
+	inline bool check_culling( raster_state *raster, u32 attr, float min_z, float max_z );
 };
 
 /*****************************
@@ -334,8 +332,8 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<mb86234_device> m_copro_tgp;
-	required_shared_ptr<uint32_t> m_copro_tgp_program;
-	required_region_ptr<uint32_t> m_copro_tgp_tables;
+	required_shared_ptr<u32> m_copro_tgp_program;
+	required_region_ptr<u32> m_copro_tgp_tables;
 	required_device<address_map_bank_device> m_copro_tgp_bank;
 
 	u32 m_copro_tgp_bank_reg;
@@ -344,28 +342,24 @@ protected:
 	u32 m_copro_isqrt_base;
 	u32 m_copro_atan_base[4];
 
-	DECLARE_READ32_MEMBER(copro_tgp_buffer_r);
-	DECLARE_WRITE32_MEMBER(copro_tgp_buffer_w);
-	DECLARE_WRITE32_MEMBER(copro_function_port_w);
-	DECLARE_READ32_MEMBER(copro_fifo_r);
-	DECLARE_WRITE32_MEMBER(copro_fifo_w);
-	DECLARE_WRITE32_MEMBER(tex0_w);
-	DECLARE_WRITE32_MEMBER(tex1_w);
+	void copro_function_port_w(offs_t offset, u32 data);
+	u32 copro_fifo_r();
+	void copro_fifo_w(u32 data);
+	void tex0_w(offs_t offset, u32 data);
+	void tex1_w(offs_t offset, u32 data);
 
-	DECLARE_READ32_MEMBER(copro_tgp_fifoin_pop);
-	DECLARE_WRITE32_MEMBER(copro_tgp_fifoout_push);
-	DECLARE_WRITE32_MEMBER(copro_tgp_bank_w);
-	DECLARE_READ32_MEMBER(copro_tgp_memory_r);
-	DECLARE_WRITE32_MEMBER(copro_tgp_memory_w);
+	void copro_tgp_bank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_tgp_memory_r(offs_t offset);
+	void copro_tgp_memory_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER(copro_sincos_w);
-	DECLARE_READ32_MEMBER(copro_sincos_r);
-	DECLARE_WRITE32_MEMBER(copro_inv_w);
-	DECLARE_READ32_MEMBER(copro_inv_r);
-	DECLARE_WRITE32_MEMBER(copro_isqrt_w);
-	DECLARE_READ32_MEMBER(copro_isqrt_r);
-	DECLARE_WRITE32_MEMBER(copro_atan_w);
-	DECLARE_READ32_MEMBER(copro_atan_r);
+	void copro_sincos_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_sincos_r(offs_t offset);
+	void copro_inv_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_inv_r(offs_t offset);
+	void copro_isqrt_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_isqrt_r(offs_t offset);
+	void copro_atan_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 copro_atan_r();
 
 	void model2_tgp_mem(address_map &map);
 
@@ -398,10 +392,10 @@ public:
 	void vcop(machine_config &config);
 
 protected:
-	DECLARE_READ32_MEMBER(fifo_control_2o_r);
-	void daytona_output_w(uint8_t data);
-	void desert_output_w(uint8_t data);
-	void vcop_output_w(uint8_t data);
+	u32 fifo_control_2o_r();
+	void daytona_output_w(u8 data);
+	void desert_output_w(u8 data);
+	void vcop_output_w(u8 data);
 
 	void model2o_mem(address_map &map);
 };
@@ -419,7 +413,7 @@ public:
 		: model2o_state(mconfig, type, tag)
 	{}
 
-	DECLARE_READ32_MEMBER(maxx_r);
+	u32 maxx_r(offs_t offset, u32 mem_mask = ~0);
 	void daytona_maxx(machine_config &config);
 	void model2o_maxx_mem(address_map &map);
 
@@ -440,7 +434,7 @@ public:
 		: model2o_state(mconfig, type, tag)
 	{}
 
-	DECLARE_READ8_MEMBER(gtx_r);
+	u8 gtx_r(offs_t offset);
 	void daytona_gtx(machine_config &config);
 	void model2o_gtx_mem(address_map &map);
 
@@ -515,12 +509,12 @@ protected:
 
 	required_device<adsp21062_device> m_copro_adsp;
 
-	DECLARE_WRITE32_MEMBER(copro_function_port_w);
-	DECLARE_READ32_MEMBER(copro_fifo_r);
-	DECLARE_WRITE32_MEMBER(copro_fifo_w);
-	DECLARE_WRITE32_MEMBER(copro_sharc_iop_w);
-	DECLARE_READ32_MEMBER(copro_sharc_buffer_r);
-	DECLARE_WRITE32_MEMBER(copro_sharc_buffer_w);
+	void copro_function_port_w(offs_t offset, u32 data);
+	u32 copro_fifo_r();
+	void copro_fifo_w(u32 data);
+	void copro_sharc_iop_w(offs_t offset, u32 data);
+	u32 copro_sharc_buffer_r(offs_t offset);
+	void copro_sharc_buffer_w(offs_t offset, u32 data);
 
 	void model2b_crx_mem(address_map &map);
 	void model2b_5881_mem(address_map &map);
@@ -569,11 +563,11 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<mb86235_device> m_copro_tgpx4;
-	required_shared_ptr<uint64_t> m_copro_tgpx4_program;
+	required_shared_ptr<u64> m_copro_tgpx4_program;
 
-	DECLARE_WRITE32_MEMBER(copro_function_port_w);
-	DECLARE_READ32_MEMBER(copro_fifo_r);
-	DECLARE_WRITE32_MEMBER(copro_fifo_w);
+	void copro_function_port_w(offs_t offset, u32 data);
+	u32 copro_fifo_r();
+	void copro_fifo_w(u32 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 
@@ -595,23 +589,23 @@ protected:
 struct m2_poly_extra_data
 {
 	model2_state *  state;
-	uint32_t      lumabase;
-	uint32_t      colorbase;
-	uint32_t *    texsheet;
-	uint32_t      texwidth;
-	uint32_t      texheight;
-	uint32_t      texx, texy;
-	uint8_t       texmirrorx;
-	uint8_t       texmirrory;
+	u32      lumabase;
+	u32      colorbase;
+	u32 *    texsheet;
+	u32      texwidth;
+	u32      texheight;
+	u32      texx, texy;
+	u8       texmirrorx;
+	u8       texmirrory;
 };
 
 
-static inline uint16_t get_texel( uint32_t base_x, uint32_t base_y, int x, int y, uint32_t *sheet )
+static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 {
-	uint32_t  baseoffs = ((base_y/2)*512)+(base_x/2);
-	uint32_t  texeloffs = ((y/2)*512)+(x/2);
-	uint32_t  offset = baseoffs + texeloffs;
-	uint32_t  texel = sheet[offset>>1];
+	u32  baseoffs = ((base_y/2)*512)+(base_x/2);
+	u32  texeloffs = ((y/2)*512)+(x/2);
+	u32  offset = baseoffs + texeloffs;
+	u32  texel = sheet[offset>>1];
 
 	if ( offset & 1 )
 		texel >>= 16;
@@ -738,7 +732,7 @@ struct texture_parameter
 {
 	float   diffuse;
 	float   ambient;
-	uint32_t  specular_control;
+	u32  specular_control;
 	float   specular_scale;
 };
 
@@ -746,9 +740,9 @@ struct triangle
 {
 	void *              next;
 	poly_vertex         v[3];
-	uint16_t              z;
-	uint16_t              texheader[4];
-	uint8_t               luma;
+	u16              z;
+	u16              texheader[4];
+	u8               luma;
 	int16_t               viewport[4];
 	int16_t               center[2];
 };
@@ -756,9 +750,9 @@ struct triangle
 struct quad_m2
 {
 	poly_vertex         v[4];
-	uint16_t              z;
-	uint16_t              texheader[4];
-	uint8_t               luma;
+	u16              z;
+	u16              texheader[4];
+	u8               luma;
 };
 
 /*******************************************
@@ -771,26 +765,26 @@ struct quad_m2
 
 struct raster_state
 {
-//  uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
-	uint16_t *texture_rom;              /* Texture ROM pointer */
-	uint32_t texture_rom_mask;          /* Texture ROM mask */
+//  u32 mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+	u16 *texture_rom;              /* Texture ROM pointer */
+	u32 texture_rom_mask;          /* Texture ROM mask */
 	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
 	int16_t center[4][2];               /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
-	uint16_t center_sel;                /* Selected center */
-	uint32_t reverse;                   /* Left/Right Reverse */
+	u16 center_sel;                /* Selected center */
+	u32 reverse;                   /* Left/Right Reverse */
 	float z_adjust;                     /* ZSort Mode */
 	float triangle_z;                   /* Current Triangle z value */
-	uint8_t master_z_clip;              /* Master Z-Clip value */
-	uint32_t cur_command;               /* Current command */
-	uint32_t command_buffer[32];        /* Command buffer */
-	uint32_t command_index;             /* Command buffer index */
+	u8 master_z_clip;              /* Master Z-Clip value */
+	u32 cur_command;               /* Current command */
+	u32 command_buffer[32];        /* Command buffer */
+	u32 command_index;             /* Command buffer index */
 	triangle tri_list[MAX_TRIANGLES];   /* Triangle list */
-	uint32_t tri_list_index;            /* Triangle list index */
+	u32 tri_list_index;            /* Triangle list index */
 	triangle *tri_sorted_list[0x10000]; /* Sorted Triangle list */
-	uint16_t min_z;                     /* Minimum sortable Z value */
-	uint16_t max_z;                     /* Maximum sortable Z value */
-	uint16_t texture_ram[0x10000];      /* Texture RAM pointer */
-	uint8_t log_ram[0x40000];           /* Log RAM pointer */
+	u16 min_z;                     /* Minimum sortable Z value */
+	u16 max_z;                     /* Maximum sortable Z value */
+	u16 texture_ram[0x10000];      /* Texture RAM pointer */
+	u8 log_ram[0x40000];           /* Log RAM pointer */
 };
 
 /*******************************************
@@ -802,17 +796,17 @@ struct raster_state
 struct geo_state
 {
 	raster_state *          raster;
-	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
-	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
-	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
+	u32              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
+	u32 *          polygon_rom;            /* Polygon ROM pointer */
+	u32            polygon_rom_mask;       /* Polygon ROM mask */
 	float               matrix[12];             /* Current Transformation Matrix */
 	poly_vertex         focus;                  /* Focus (x,y) */
 	poly_vertex         light;                  /* Light Vector */
 	float               lod;                    /* LOD */
 	float               coef_table[32];         /* Distane Coefficient table */
 	texture_parameter   texture_parameters[32]; /* Texture parameters */
-	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
-	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
+	u32          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
+	u32          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
 	model2_state    *state;
 };
 

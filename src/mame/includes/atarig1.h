@@ -56,10 +56,10 @@ public:
 	virtual void device_post_load() override;
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
-	DECLARE_WRITE16_MEMBER(mo_command_w);
-	DECLARE_WRITE16_MEMBER(a2d_select_w);
-	DECLARE_READ16_MEMBER(a2d_data_r);
-	DECLARE_READ16_MEMBER(pitfightb_cheap_slapstic_r);
+	void mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void a2d_select_w(offs_t offset, uint16_t data);
+	uint16_t a2d_data_r();
+	uint16_t pitfightb_cheap_slapstic_r(offs_t offset);
 	void update_bank(int bank);
 	void init_hydrap();
 	void init_hydra();

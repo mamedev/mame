@@ -91,10 +91,9 @@ WRITE_LINE_MEMBER(gridlee_state::cocktail_flip_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::gridlee_videoram_w)
+void gridlee_state::gridlee_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	/* expand the two pixel values into two bytes */
 	m_local_videoram[offset * 2 + 0] = data >> 4;
@@ -109,7 +108,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
+void gridlee_state::gridlee_palette_select_w(uint8_t data)
 {
 	/* update the scanline palette */
 	m_screen->update_partial(m_screen->vpos() - 1 + GRIDLEE_VBEND);

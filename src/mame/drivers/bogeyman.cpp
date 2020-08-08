@@ -25,12 +25,12 @@
 
 // Sound section is copied from Mysterious Stones driver by Nicola, Mike, Brad
 
-WRITE8_MEMBER(bogeyman_state::ay8910_latch_w)
+void bogeyman_state::ay8910_latch_w(uint8_t data)
 {
 	m_psg_latch = data;
 }
 
-WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
+void bogeyman_state::ay8910_control_w(uint8_t data)
 {
 	// bit 0 is flipscreen
 	flip_screen_set(data & 0x01);

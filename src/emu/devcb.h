@@ -7,6 +7,7 @@
     Device callback interface helpers.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DEVCB_H
 #define MAME_EMU_DEVCB_H
 
@@ -29,12 +30,16 @@
 //**************************************************************************
 
 #if defined(__GNUC__) && !defined(__clang__)
-#if __GNUC__ >= 8
+#if (__GNUC__ >= 8)
 #define MAME_DEVCB_GNUC_BROKEN_FRIEND 1
-#endif // __GNUC__ >= 8
-#endif // defined(__GNUC__) && !defined(__clang__)
+#endif // (__GNUC__ >= 8) && !defined(__clang__)
+#endif // defined(__GNUC__)
 
-
+#if defined(__clang__)
+#if (__clang_major__ == 8)
+#define MAME_DEVCB_GNUC_BROKEN_FRIEND 1
+#endif // (__clang_major__ == 8)
+#endif // defined(__clang__)
 
 //**************************************************************************
 //  DELEGATE TYPES

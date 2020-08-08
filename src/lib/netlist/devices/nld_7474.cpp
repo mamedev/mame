@@ -2,8 +2,42 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_7474.c
+ * nld_7474.cpp
  *
+ *  DM7474: Dual Positive-Edge-Triggered D Flip-Flops
+ *          with Preset, Clear and Complementary Outputs
+ *
+ *          +--------------+
+ *     CLR1 |1     ++    14| VCC
+ *       D1 |2           13| CLR2
+ *     CLK1 |3           12| D2
+ *      PR1 |4    7474   11| CLK2
+ *       Q1 |5           10| PR2
+ *      Q1Q |6            9| Q2
+ *      GND |7            8| Q2Q
+ *          +--------------+
+ *
+ *          +-----+-----+-----+---++---+-----+
+ *          | PR  | CLR | CLK | D || Q | QQ  |
+ *          +=====+=====+=====+===++===+=====+
+ *          |  0  |  1  |  X  | X || 1 |  0  |
+ *          |  1  |  0  |  X  | X || 0 |  1  |
+ *          |  0  |  0  |  X  | X || 1 |  1  | (*)
+ *          |  1  |  1  |  R  | 1 || 1 |  0  |
+ *          |  1  |  1  |  R  | 0 || 0 |  1  |
+ *          |  1  |  1  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+-----+---++---+-----+
+ *
+ *  (*) This configuration is not stable, i.e. it will not persist
+ *  when either the preset and or clear inputs return to their inactive (high) level
+ *
+ *  Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -. 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ *  FIXME: Check that (*) is emulated properly
  */
 
 #include "nld_7474.h"
@@ -19,10 +53,10 @@ namespace netlist
 	NETLIB_OBJECT(7474)
 	{
 		NETLIB_CONSTRUCTOR(7474)
-		, m_D(*this, "D")
-		, m_CLRQ(*this, "CLRQ")
-		, m_PREQ(*this, "PREQ")
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(7474, clk))
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(inputs))
+		, m_PREQ(*this, "PREQ", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)
@@ -31,9 +65,36 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-		NETLIB_HANDLERI(clk);
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_D.set_state(logic_t::STATE_INP_ACTIVE);
+			m_nextD = 0;
+		}
+
+		NETLIB_HANDLERI(clk)
+		{
+			newstate(m_nextD, !m_nextD);
+			m_CLK.inactivate();
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const auto preq(m_PREQ());
+			const auto clrq(m_CLRQ());
+			if (preq & clrq)
+			{
+				m_D.activate();
+				m_nextD = m_D();
+				m_CLK.activate_lh();
+			}
+			else
+			{
+				newstate(preq ^ 1, clrq ^ 1);
+				m_CLK.inactivate();
+				m_D.inactivate();
+			}
+		}
 
 		logic_input_t m_D;
 		logic_input_t m_CLRQ;
@@ -55,80 +116,7 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(7474_dip)
-	{
-		NETLIB_CONSTRUCTOR(7474_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", "A.CLRQ");
-			register_subalias("2", "A.D");
-			register_subalias("3", "A.CLK");
-			register_subalias("4", "A.PREQ");
-			register_subalias("5", "A.Q");
-			register_subalias("6", "A.QQ");
-			register_subalias("7", "A.GND");
-
-			register_subalias("8", "B.QQ");
-			register_subalias("9", "B.Q");
-			register_subalias("10", "B.PREQ");
-			register_subalias("11", "B.CLK");
-			register_subalias("12", "B.D");
-			register_subalias("13", "B.CLRQ");
-			register_subalias("14", "A.VCC");
-
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
-		}
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-
-	private:
-		NETLIB_SUB(7474) m_A;
-		NETLIB_SUB(7474) m_B;
-	};
-
-	NETLIB_HANDLER(7474, clk)
-	{
-		newstate(m_nextD, !m_nextD);
-		m_CLK.inactivate();
-	}
-
-	NETLIB_UPDATE(7474)
-	{
-		const auto preq(m_PREQ());
-		const auto clrq(m_CLRQ());
-		if (preq & clrq)
-		{
-			m_D.activate();
-			m_nextD = m_D();
-			m_CLK.activate_lh();
-		}
-		else
-		{
-			newstate(preq ^ 1, clrq ^ 1);
-			m_CLK.inactivate();
-			m_D.inactivate();
-		}
-	}
-
-	NETLIB_RESET(7474)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_D.set_state(logic_t::STATE_INP_ACTIVE);
-		m_nextD = 0;
-	}
-
-	NETLIB_RESET(7474_dip)
-	{
-	}
-
-	NETLIB_UPDATE(7474_dip)
-	{
-	}
-
 	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7474_dip, "TTL_7474_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

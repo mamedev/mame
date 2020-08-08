@@ -15,6 +15,9 @@ driver provided with thanks to:
 TODO:
 - finish slave DSP emulation
 - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
+- Rave Racer car will sometimes do a 'strafe slide' when playing the game with a small analog device (such as an
+  Xbox 360 pad), does not happen with keyboard controls or larger device like a steering wheel. BTANB or related
+  to HLE I/O board emulation?
 - alpinesa doesn't work, protection related? - depending on value written, it looks like it changes the addressing
   of some of the gfx chips on the fly. This is probably due to the PAL modification on the PROGRAM ROM PCB. Check
   the modification details of the TYPE 4 Program ROM PCB below.
@@ -1082,47 +1085,47 @@ Notes:
 
 // Main CPU
 
-/* SCI, prelim! */
-READ32_MEMBER(namcos22_state::namcos22_sci_r)
+/* SCI, preliminary!
+
+20020000  2 R/W RX Status
+            0x01 : Frame Error
+            0x02 : Frame Received
+            0x04 : ?
+
+20020002  2 R/W Status/Control Flags
+            0x01 :
+            0x02 : RX flag? (cleared every vsync)
+            0x04 : RX flag? (cleared every vsync)
+            0x08 :
+
+20020004  2 W   FIFO Control Register
+            0x01 : sync bit enable?
+            0x02 : TX FIFO sync bit (bit-8)
+
+20020006  2 W   TX Control Register
+            0x01 : TX start/stop
+            0x02 : ?
+            0x10 : ?
+
+20020008  2 W   -
+2002000a  2 W   TX Frame Size
+2002000c  2 R/W RX FIFO Pointer (0x0000 - 0x0fff)
+2002000e  2 W   TX FIFO Pointer (0x0000 - 0x1fff)
+*/
+u16 namcos22_state::namcos22_sci_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0x0/4:
-			return 0x0004 << 16;
+		case 0x0:
+			return 0x0004;
 
 		default:
 			return 0;
 	}
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
+void namcos22_state::namcos22_sci_w(offs_t offset, u16 data)
 {
-	/*
-	20020000  2 R/W RX Status
-	            0x01 : Frame Error
-	            0x02 : Frame Received
-	            0x04 : ?
-
-	20020002  2 R/W Status/Control Flags
-	            0x01 :
-	            0x02 : RX flag? (cleared every vsync)
-	            0x04 : RX flag? (cleared every vsync)
-	            0x08 :
-
-	20020004  2 W   FIFO Control Register
-	            0x01 : sync bit enable?
-	            0x02 : TX FIFO sync bit (bit-8)
-
-	20020006  2 W   TX Control Register
-	            0x01 : TX start/stop
-	            0x02 : ?
-	            0x10 : ?
-
-	20020008  2 W   -
-	2002000a  2 W   TX Frame Size
-	2002000c  2 R/W RX FIFO Pointer (0x0000 - 0x0fff)
-	2002000e  2 W   TX FIFO Pointer (0x0000 - 0x1fff)
-	*/
 }
 
 
@@ -1197,7 +1200,7 @@ void namcos22_state::syscon_mcucontrol(offs_t offset, u8 data)
 	m_mcu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(namcos22_state::syscon_r)
+u8 namcos22_state::syscon_r(offs_t offset)
 {
 	return m_syscontrol[offset];
 }
@@ -1242,7 +1245,7 @@ READ8_MEMBER(namcos22_state::syscon_r)
 
 0x1c: dsp control
 */
-WRITE8_MEMBER(namcos22_state::ss22_syscon_w)
+void namcos22_state::ss22_syscon_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1345,7 +1348,7 @@ INTERRUPT_GEN_MEMBER(namcos22s_state::namcos22s_interrupt)
 0x1a: 0 or 1 or 0xff -> DSP control
 0x1b: ?
 */
-WRITE8_MEMBER(namcos22_state::s22_syscon_w)
+void namcos22_state::s22_syscon_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1463,23 +1466,23 @@ INTERRUPT_GEN_MEMBER(namcos22_state::namcos22_interrupt)
 }
 
 
-READ16_MEMBER(namcos22_state::namcos22_shared_r)
+u16 namcos22_state::namcos22_shared_r(offs_t offset)
 {
 	return m_shareram[offset];
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_shared_w)
+void namcos22_state::namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_shareram[offset]);
 }
 
 
-READ32_MEMBER(namcos22_state::namcos22_dspram_r)
+u32 namcos22_state::namcos22_dspram_r(offs_t offset)
 {
 	return m_polygonram[offset] | 0xff000000; // only d0-23 are connected
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
+void namcos22_state::namcos22_dspram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -1491,7 +1494,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 }
 
 
-READ16_MEMBER(namcos22_state::namcos22_keycus_r)
+u16 namcos22_state::namcos22_keycus_r(offs_t offset)
 {
 	// Like other Namco hardware, this chip is used for protection as well as
 	// reading random values in some games.
@@ -1539,6 +1542,10 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 			if (offset == 4) return 0x01a8;
 			break;
 
+		// no keycus
+		case NAMCOS22_AIR_COMBAT22:
+			return 0;
+
 		default:
 			break;
 	}
@@ -1556,7 +1563,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	return m_keycus_rng;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
+void namcos22_state::namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// for obfuscating keycus and/or random seed?
 }
@@ -1568,7 +1575,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
  * Writes to 0x50000008 and 0x5000000a reset the state of the input buffer.
  * It appears to be meant for debugging, not all games use it.
  */
-READ16_MEMBER(namcos22_state::namcos22_portbit_r)
+u16 namcos22_state::namcos22_portbit_r(offs_t offset)
 {
 	u16 ret = m_portbits[offset] & 1;
 
@@ -1578,26 +1585,22 @@ READ16_MEMBER(namcos22_state::namcos22_portbit_r)
 	return ret;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_portbit_w)
+void namcos22_state::namcos22_portbit_w(offs_t offset, u16 data)
 {
 	m_portbits[offset] = m_custom[offset].read_safe(0xffff);
 }
 
-READ16_MEMBER(namcos22_state::namcos22_dipswitch_r)
-{
-	return m_dsw->read();
-}
-
-WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
+void namcos22_state::namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// 8 leds on cpu board, 0=on 1=off
 	// on System22: two rows of 4 red leds
 	// on SS22: GYRGYRGY green/yellow/red
+	COMBINE_DATA(&m_cpuled_data);
 	for (int i = 0; i < 8; i++)
-		m_cpuled[i] = (~data << i & 0x80) ? 0 : 1;
+		m_cpuled_out[i] = (~data << i & 0x800000) ? 0 : 1;
 }
 
-WRITE32_MEMBER(namcos22s_state::namcos22s_chipselect_w)
+void namcos22s_state::namcos22s_chipselect_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// assume that this register is for chip enable/disable
 	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
@@ -1704,7 +1707,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     0x50000000 - DIPSW3
 	 *     0x50000001 - DIPSW2
 	 */
-	map(0x50000000, 0x50000003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w)).umask32(0xffff0000);
+	map(0x50000000, 0x50000003).portr("DSW").w(FUNC(namcos22_state::namcos22_cpuleds_w));
 	map(0x50000008, 0x5000000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 
 	/**
@@ -1825,8 +1828,8 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x400000, 0x40001f).rw(FUNC(namcos22s_state::namcos22_keycus_r), FUNC(namcos22s_state::namcos22_keycus_w));
 	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
 	map(0x420000, 0x42000f).rw(FUNC(namcos22s_state::namcos22_sci_r), FUNC(namcos22s_state::namcos22_sci_w)); // C139 SCI registers
-	map(0x430000, 0x430003).w(FUNC(namcos22s_state::namcos22_cpuleds_w)).umask32(0xffff0000);
-	map(0x440000, 0x440003).r(FUNC(namcos22s_state::namcos22_dipswitch_r)).umask32(0xffff0000);
+	map(0x430000, 0x430003).w(FUNC(namcos22s_state::namcos22_cpuleds_w));
+	map(0x440000, 0x440003).portr("DSW");
 	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_portbit_r), FUNC(namcos22s_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22s_state::syscon_r), FUNC(namcos22s_state::ss22_syscon_w));
@@ -1850,7 +1853,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 
 
 // Time Crisis gun
-READ16_MEMBER(namcos22s_state::timecris_gun_r)
+u16 namcos22s_state::timecris_gun_r(offs_t offset)
 {
 	u16 xpos = m_opt[0]->read();
 	u16 ypos = m_opt[1]->read();
@@ -1887,12 +1890,12 @@ void namcos22s_state::timecris_am(address_map &map)
 
 
 // Alpine Surfer protection
-READ32_MEMBER(namcos22s_state::alpinesa_prot_r)
+u32 namcos22s_state::alpinesa_prot_r()
 {
 	return m_alpinesa_protection;
 }
 
-WRITE32_MEMBER(namcos22s_state::alpinesa_prot_w)
+void namcos22s_state::alpinesa_prot_w(u32 data)
 {
 	switch (data)
 	{
@@ -1938,7 +1941,7 @@ void namcos22_state::slave_enable(bool enable)
 }
 
 
-READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
+u16 namcos22_state::namcos22_dspram16_r(offs_t offset)
 {
 	u32 value = m_polygonram[offset];
 
@@ -1966,7 +1969,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 	return value;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
+void namcos22_state::namcos22_dspram16_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u32 value = m_polygonram[offset];
 	u16 lo = value & 0xffff;
@@ -1994,7 +1997,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 	m_polygonram[offset] = (hi << 16) | lo;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_dspram16_bank_w)
+void namcos22_state::namcos22_dspram16_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dspram_bank);
 }
@@ -2034,29 +2037,29 @@ s32 namcos22_state::pointram_read(offs_t offs) // called from point_read
 }
 
 
-WRITE16_MEMBER(namcos22_state::point_address_w)
+void namcos22_state::point_address_w(u16 data)
 {
 	m_point_address <<= 16;
 	m_point_address |= data;
 }
 
-WRITE16_MEMBER(namcos22_state::point_loword_iw)
+void namcos22_state::point_loword_iw(u16 data)
 {
 	m_point_data |= data;
 	point_write(m_point_address++, m_point_data);
 }
 
-WRITE16_MEMBER(namcos22_state::point_hiword_w)
+void namcos22_state::point_hiword_w(u16 data)
 {
 	m_point_data = data << 16;
 }
 
-READ16_MEMBER(namcos22_state::point_loword_r)
+u16 namcos22_state::point_loword_r()
 {
 	return point_read(m_point_address) & 0xffff;
 }
 
-READ16_MEMBER(namcos22_state::point_hiword_ir)
+u16 namcos22_state::point_hiword_ir()
 {
 	// high bit is unknown busy signal (ridgerac, ridgera2, raveracw, cybrcomm)
 	return 0x8000 | (point_read(m_point_address++) >> 16 & 0x00ff);
@@ -2068,7 +2071,7 @@ u16 namcos22_state::pdp_status_r()
 	return m_dsp_master_bioz;
 }
 
-READ16_MEMBER(namcos22_state::pdp_begin_r)
+u16 namcos22_state::pdp_begin_r()
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -2232,7 +2235,7 @@ void namcos22_state::dsp_xf_output_w(u16 data)
 	/* STUB */
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
+void namcos22_state::dsp_unk2_w(u16 data)
 {
 	/**
 	* Used by Ridge Racer (Japan) to specify baseaddr
@@ -2244,14 +2247,14 @@ WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
 	m_pdp_base = data;
 }
 
-READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
+u16 namcos22_state::dsp_unk_port3_r()
 {
 	m_dsp_master_bioz = 0;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
+void namcos22_state::upload_code_to_slave_dsp_w(u16 data)
 {
 	switch (m_dsp_upload_state)
 	{
@@ -2305,19 +2308,19 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 	}
 }
 
-READ16_MEMBER(namcos22_state::dsp_unk8_r)
+u16 namcos22_state::dsp_unk8_r()
 {
 	/* bit 0x0001 is busy signal */
 	return 0x0000;
 }
 
-READ16_MEMBER(namcos22_state::custom_ic_status_r)
+u16 namcos22_state::custom_ic_status_r()
 {
 	/* bit 0x0001 signals completion */
 	return 0x0063;
 }
 
-READ16_MEMBER(namcos22_state::dsp_upload_status_r)
+u16 namcos22_state::dsp_upload_status_r()
 {
 	/* bit 0x0001 is polled to confirm that code/data has been successfully uploaded to the slave dsp via port 0x7. */
 	return 0x0000;
@@ -2354,11 +2357,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
 	}
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_unk_porta_w)
+void namcos22_state::dsp_unk_porta_w(u16 data)
 {
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_led_w)
+void namcos22_state::dsp_led_w(u16 data)
 {
 	/* I believe this port controls diagnostic LEDs on the DSP PCB. */
 }
@@ -2399,13 +2402,13 @@ WRITE16_MEMBER(namcos22_state::dsp_led_w)
  * 0x0075 0xf205 // sx,sy
  * 0x602b 0x93e8 // i,zpos
  */
-WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
+void namcos22_state::dsp_unk8_w(u16 data)
 {
 	m_RenderBufSize = 0;
 	m_render_refresh = true; // this one is more likely controlled by slavedsp somewhere
 }
 
-WRITE16_MEMBER(namcos22_state::master_render_device_w)
+void namcos22_state::master_render_device_w(u16 data)
 {
 	if (m_RenderBufSize < NAMCOS22_MAX_RENDER_CMD_SEQ)
 	{
@@ -2455,18 +2458,18 @@ u16 namcos22_state::dsp_slave_bioz_r()
 	return 1;
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port3_r)
+u16 namcos22_state::dsp_slave_port3_r()
 {
 	return 0x0010; /* ? */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port4_r)
+u16 namcos22_state::dsp_slave_port4_r()
 {
 	return 0;
 	//return ReadDataFromSlaveBuf();
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
+u16 namcos22_state::dsp_slave_port5_r()
 {
 #if 0
 	int numWords = SlaveBufSize();
@@ -2476,32 +2479,32 @@ READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port6_r)
+u16 namcos22_state::dsp_slave_port6_r()
 {
 	/* bit 0x9 indicates whether device at port2 is ready to receive data */
 	/* bit 0xd indicates whether data is available from port4 */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_slave_portc_w)
+void namcos22_state::dsp_slave_portc_w(u16 data)
 {
 	/* Unknown; used before transmitting a command sequence. */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port8_r)
+u16 namcos22_state::dsp_slave_port8_r()
 {
 	/* This reports  status of the device mapped at port 0xb. */
 	/* The slave dsp waits for bit 0x0001 to be zero before writing a new command sequence. */
 	return 0; /* status */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_portb_r)
+u16 namcos22_state::dsp_slave_portb_r()
 {
 	/* The slave DSP reads before transmitting a command sequence. */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_slave_portb_w)
+void namcos22_state::dsp_slave_portb_w(u16 data)
 {
 	/* The slave dsp uses this to transmit a command sequence to an external device. */
 }
@@ -2675,14 +2678,14 @@ void namcos22s_state::mcu_port4_w(u8 data)
 	if (~m_mcu_iocontrol & data & 0x20)
 	{
 		for (int i = 0; i < 8; i++)
-			m_mcuout[i] = BIT(m_mcu_outdata, i);
+			m_mcu_out[i] = BIT(m_mcu_outdata, i);
 
 		machine().bookkeeping().coin_counter_w(0, m_mcu_outdata & 1);
 	}
 	if (~m_mcu_iocontrol & data & 0x40)
 	{
 		for (int i = 0; i < 8; i++)
-			m_mcuout[8+i] = BIT(m_mcu_outdata, i);
+			m_mcu_out[8+i] = BIT(m_mcu_outdata, i);
 	}
 
 	m_mcu_iocontrol = data;
@@ -2766,37 +2769,25 @@ void namcos22_state::handle_driving_io()
 		{
 			case NAMCOS22_RIDGE_RACER:
 			case NAMCOS22_RIDGE_RACER2:
-				steer <<= 4;
 				steer += 0x160;
-				gas <<= 3;
 				gas += 884;
-				brake <<= 3;
 				brake += 809;
 				break;
 
 			case NAMCOS22_RAVE_RACER:
-				steer <<= 4;
 				steer += 32;
-				gas <<= 3;
 				gas += 992;
-				brake <<= 3;
 				brake += 3008;
 				break;
 
 			case NAMCOS22_ACE_DRIVER:
 			case NAMCOS22_VICTORY_LAP:
-				steer <<= 4;
 				steer += 2048;
-				gas <<= 3;
 				gas += 992;
-				brake <<= 3;
 				brake += 3008;
 				break;
 
 			default:
-				steer <<= 4;
-				gas <<= 3;
-				brake <<= 3;
 				break;
 		}
 
@@ -2970,34 +2961,35 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_START("ADC.0") // 1408 (deluxe cabs have higher range)
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x280, 0xd80) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xd0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_START("ADC.1") // 1552
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
 
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_START("ADC.2") // 1552
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x610) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW3:8" )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW2:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01000000, 0x01000000, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02000000, 0x02000000, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04000000, 0x04000000, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08000000, 0x08000000, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10000000, 0x10000000, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20000000, 0x20000000, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40000000, 0x40000000, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80000000, 0x80000000, "SW3:8" )
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgeracf )
@@ -3012,13 +3004,13 @@ static INPUT_PORTS_START( ridgeracf )
 	// DIP3-1 to DIP3-3 are for setting up the viewing angle (game used one board per screen?)
 	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
 	PORT_MODIFY("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
-	PORT_DIPNAME( 0x0002, 0x0000, "Unknown" ) PORT_DIPLOCATION("SW2:2") // always on?
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW2:1" )
+	PORT_DIPNAME( 0x00020000, 0x00000000, "Unknown" ) PORT_DIPLOCATION("SW2:2") // always on?
+	PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x80000000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgera2 )
@@ -3039,9 +3031,9 @@ static INPUT_PORTS_START( ridgera2 )
 	    3-7 : debug polygons
 	*/
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x80000000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raveracw )
@@ -3092,22 +3084,23 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47, 0xb7) PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW3:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW2:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01000000, 0x01000000, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02000000, 0x02000000, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04000000, 0x04000000, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08000000, 0x08000000, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10000000, 0x10000000, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20000000, 0x20000000, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40000000, 0x40000000, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80000000, 0x80000000, "SW3:8" )
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( acedrvr )
@@ -3129,36 +3122,37 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
 
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_START("ADC.0") // 1536
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x200, 0xe00) PORT_SENSITIVITY(100) PORT_KEYDELTA(160) PORT_NAME("Steering Wheel")
 
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_START("ADC.1") // 1152
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x480) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Gas Pedal")
 
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0x48) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_START("ADC.2") // 576
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x240) PORT_SENSITIVITY(100) PORT_KEYDELTA(80) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW3:6" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Test Mode?" ) PORT_DIPLOCATION("SW3:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode?" ) PORT_DIPLOCATION("SW3:8") // enter test mode if SW3:7 is on
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW2:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01000000, 0x01000000, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02000000, 0x02000000, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04000000, 0x04000000, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08000000, 0x08000000, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10000000, 0x10000000, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20000000, 0x20000000, "SW3:6" )
+	PORT_DIPNAME( 0x40000000, 0x40000000, "Test Mode?" ) PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x80000000, "Test Mode?" ) PORT_DIPLOCATION("SW3:8") // enter test mode if SW3:7 is on
+	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DEV")
 	PORT_CONFNAME( 0x01, 0x00, "Enable Dev Inputs" )
@@ -3224,15 +3218,15 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x080, 0x380) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_PLAYER(2) PORT_NAME("Steps Edge")
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
@@ -3257,15 +3251,15 @@ static INPUT_PORTS_START( airco22 )
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Z ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_NAME("Throttle Stick")
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cybrcycc )
@@ -3290,17 +3284,17 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtdash )
@@ -3329,15 +3323,15 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tokyowar )
@@ -3364,17 +3358,17 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Brake Pedal")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajet )
@@ -3399,17 +3393,17 @@ static INPUT_PORTS_START( aquajet )
 	PORT_BIT( 0x3ff, 0x1fc, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x3f8) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( adillor )
@@ -3432,17 +3426,17 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball Y") PORT_REVERSE
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(          0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DEV")
 	PORT_CONFNAME( 0x01, 0x00, "Enable Dev Inputs" )
@@ -3483,15 +3477,15 @@ static INPUT_PORTS_START( propcycl )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Cycle Pedal")
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( timecris )
@@ -3513,17 +3507,17 @@ static INPUT_PORTS_START( timecris )
 	PORT_BIT( 0xffff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Test Mode" ) PORT_DIPLOCATION("SW4:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPNAME( 0x00800000, 0x00800000, "Test Mode" ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(          0x00800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -3606,8 +3600,6 @@ void namcos22_state::machine_reset()
 	m_dsp_irq_enabled = false;
 
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	if (!m_is_ss22)
-		m_iomcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void namcos22_state::device_post_load()
@@ -3620,11 +3612,12 @@ ALLOW_SAVE_TYPE(namcos22_dsp_upload_state);
 
 void namcos22_state::machine_start()
 {
-	m_mcuout.resolve();
-	m_cpuled.resolve();
+	m_mcu_out.resolve();
+	m_cpuled_out.resolve();
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
 
+	m_cpuled_data = 0;
 	m_keycus_rng = 0;
 	m_su_82 = 0;
 	m_irq_state = 0;
@@ -3665,6 +3658,7 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_dsp_upload_state));
 	save_item(NAME(m_UploadDestIdx));
+	save_item(NAME(m_cpuled_data));
 	save_item(NAME(m_su_82));
 	save_item(NAME(m_keycus_id));
 	save_item(NAME(m_keycus_rng));
@@ -3756,12 +3750,12 @@ void namcos22_state::namcos22(machine_config &config)
 	NAMCO_C74(config, m_iomcu, 6.144_MHz_XTAL);
 	m_iomcu->set_addrmap(AS_PROGRAM, &namcos22_state::iomcu_s22_program);
 	m_iomcu->p4_in_cb().set(FUNC(namcos22_state::iomcu_port4_s22_r));
+	m_iomcu->set_disable(); // not emulated yet
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22));
 	m_screen->screen_vblank().set(FUNC(namcos22_state::screen_vblank));
@@ -5498,7 +5492,7 @@ ROM_END
 // MCU speed cheats (every bit helps with these games)
 
 // for MCU BIOS v1.41
-READ16_MEMBER(namcos22s_state::mcu141_speedup_r)
+u16 namcos22s_state::mcu141_speedup_r()
 {
 	if ((m_mcu->pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
@@ -5508,13 +5502,13 @@ READ16_MEMBER(namcos22s_state::mcu141_speedup_r)
 	return m_su_82;
 }
 
-WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
+void namcos22_state::mcu_speedup_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_su_82);
 }
 
 // for MCU BIOS v1.20/v1.30
-READ16_MEMBER(namcos22s_state::mcu130_speedup_r)
+u16 namcos22s_state::mcu130_speedup_r()
 {
 	if ((m_mcu->pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
@@ -5525,7 +5519,7 @@ READ16_MEMBER(namcos22s_state::mcu130_speedup_r)
 }
 
 // for NSTX7702 v1.00 (C74)
-READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
+u16 namcos22_state::mcuc74_speedup_r()
 {
 	if (((m_mcu->pc() == 0xc0df) || (m_mcu->pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
@@ -5538,21 +5532,30 @@ READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 void namcos22_state::install_c74_speedup()
 {
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)), write16_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
+	{
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x80, 0x81, read16smo_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x80, 0x81, write16s_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
+	}
 }
 
 void namcos22s_state::install_130_speedup()
 {
 	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	{
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x82, 0x83, read16smo_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x82, 0x83, write16s_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	}
 }
 
 void namcos22s_state::install_141_speedup()
 {
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	{
+		m_mcu->space(AS_PROGRAM).install_read_handler(0x82, 0x83, read16smo_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)));
+		m_mcu->space(AS_PROGRAM).install_write_handler(0x82, 0x83, write16s_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
+	}
 }
 
 

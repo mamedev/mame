@@ -32,7 +32,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
  *************************************/
 
 
-READ8_MEMBER( trs80_state::port_e8_r )
+uint8_t trs80_state::port_e8_r()
 {
 /* not emulated
     d7 Clear-to-Send (CTS), Pin 5
@@ -45,7 +45,7 @@ READ8_MEMBER( trs80_state::port_e8_r )
 	return 0;
 }
 
-READ8_MEMBER( trs80_state::port_ea_r )
+uint8_t trs80_state::port_ea_r()
 {
 /* UART Status Register
     d7 Data Received ('1'=condition true)
@@ -67,12 +67,12 @@ READ8_MEMBER( trs80_state::port_ea_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80_state::port_e8_w )
+void trs80_state::port_e8_w(uint8_t data)
 {
 	m_reg_load = BIT(data, 1);
 }
 
-WRITE8_MEMBER( trs80_state::port_ea_w )
+void trs80_state::port_ea_w(uint8_t data)
 {
 	if (m_reg_load)
 
@@ -112,7 +112,7 @@ WRITE8_MEMBER( trs80_state::port_ea_w )
 }
 
 
-READ8_MEMBER( trs80_state::sys80_f9_r )
+uint8_t trs80_state::sys80_f9_r()
 {
 /* UART Status Register - d6..d4 not emulated
     d7 Transmit buffer empty (inverted)
@@ -136,12 +136,12 @@ READ8_MEMBER( trs80_state::sys80_f9_r )
 	return data;
 }
 
-READ8_MEMBER( trs80_state::lnw80_fe_r )
+uint8_t trs80_state::lnw80_fe_r()
 {
 	return m_lnw_mode;
 }
 
-READ8_MEMBER( trs80_state::port_ff_r )
+uint8_t trs80_state::port_ff_r()
 {
 /* ModeSel and cassette data
     d7 cassette data from tape
@@ -150,7 +150,7 @@ READ8_MEMBER( trs80_state::port_ff_r )
 	return (BIT(m_mode, 0) ? 0 : 0x40) | (m_cassette_data ? 0x80 : 0) | 0x3f;
 }
 
-WRITE8_MEMBER( trs80_state::sys80_f8_w )
+void trs80_state::sys80_f8_w(uint8_t data)
 {
 /* not emulated
     d2 reset UART (XR pin)
@@ -158,7 +158,7 @@ WRITE8_MEMBER( trs80_state::sys80_f8_w )
     d0 RTS */
 }
 
-WRITE8_MEMBER( trs80_state::sys80_fe_w )
+void trs80_state::sys80_fe_w(uint8_t data)
 {
 /* not emulated
     d4 select internal or external cassette player */
@@ -167,7 +167,7 @@ WRITE8_MEMBER( trs80_state::sys80_fe_w )
 }
 
 /* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
-WRITE8_MEMBER( trs80_state::lnw80_fe_w )
+void trs80_state::lnw80_fe_w(uint8_t data)
 {
 /* lnw80 video options
     d3 bankswitch lower 16k between roms and hires ram (1=hires)
@@ -180,7 +180,7 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 	m_lnw_bank->set_bank(BIT(data, 3));
 }
 
-WRITE8_MEMBER( trs80_state::port_ff_w )
+void trs80_state::port_ff_w(uint8_t data)
 {
 /* Standard output port of Model I
     d3 ModeSel bit
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER(trs80_state::intrq_w)
  *                                   *
  *************************************/
 
-READ8_MEMBER( trs80_state::wd179x_r )
+uint8_t trs80_state::wd179x_r()
 {
 	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
@@ -261,19 +261,19 @@ READ8_MEMBER( trs80_state::wd179x_r )
 	return data;
 }
 
-READ8_MEMBER( trs80_state::printer_r )
+uint8_t trs80_state::printer_r()
 {
 	return m_cent_status_in->read();
 }
 
-WRITE8_MEMBER( trs80_state::printer_w )
+void trs80_state::printer_w(uint8_t data)
 {
 	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }
 
-WRITE8_MEMBER( trs80_state::cassunit_w )
+void trs80_state::cassunit_w(uint8_t data)
 {
 /* not emulated
     01 for unit 1 (default)
@@ -282,7 +282,7 @@ WRITE8_MEMBER( trs80_state::cassunit_w )
 	m_tape_unit = data;
 }
 
-READ8_MEMBER( trs80_state::irq_status_r )
+uint8_t trs80_state::irq_status_r()
 {
 /* (trs80l2) Whenever an interrupt occurs, 37E0 is read to see what devices require service.
     d7 = RTC
@@ -298,7 +298,7 @@ READ8_MEMBER( trs80_state::irq_status_r )
 }
 
 
-WRITE8_MEMBER( trs80_state::motor_w )
+void trs80_state::motor_w(uint8_t data)
 {
 	m_floppy = nullptr;
 
@@ -323,7 +323,7 @@ WRITE8_MEMBER( trs80_state::motor_w )
 /*************************************
  *      Keyboard         *
  *************************************/
-READ8_MEMBER( trs80_state::keyboard_r )
+uint8_t trs80_state::keyboard_r(offs_t offset)
 {
 	u8 i, result = 0;
 
@@ -341,6 +341,17 @@ READ8_MEMBER( trs80_state::keyboard_r )
 
 void trs80_state::machine_start()
 {
+	save_item(NAME(m_mode));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_tape_unit));
+	save_item(NAME(m_reg_load));
+	save_item(NAME(m_lnw_mode));
+	save_item(NAME(m_cassette_data));
+	save_item(NAME(m_old_cassette_val));
+	save_item(NAME(m_size_store));
+	save_item(NAME(m_timeout));
+
 	m_size_store = 0xff;
 	m_tape_unit=1;
 	m_reg_load=1;
@@ -364,10 +375,9 @@ void trs80_state::machine_reset()
 MACHINE_RESET_MEMBER(trs80_state,lnw80)
 {
 	machine_reset();
-	address_space &space = m_maincpu->space(AS_IO);
 	m_reg_load = 1;
 	m_lnw_mode = 0;
-	lnw80_fe_w(space, 0, 0);
+	lnw80_fe_w(0);
 }
 
 

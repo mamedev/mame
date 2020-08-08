@@ -19,6 +19,9 @@ Hardware notes:
 It also appeared in Tandy's Chess Champion 2150, not as a simple rebrand, but
 with hardware differences: 3MHz R65C02, 1 64KB ROM and no EGR socket.
 
+TODO:
+- where does the IRQ come from? same problem as with stratos
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -88,11 +91,11 @@ private:
 	void lcd_pwm_w(offs_t offset, u8 data);
 	void lcd_output_w(offs_t offset, u64 data);
 
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(chessboard_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void select_w(u8 data);
+	u8 chessboard_r();
+	void sound_w(u8 data);
+	u8 control_r();
+	void control_w(u8 data);
 
 	bool m_power = false;
 	u8 m_select = 0;
@@ -162,12 +165,12 @@ void simultano_state::lcd_output_w(offs_t offset, u64 data)
 
 // HELIOS
 
-WRITE8_MEMBER(simultano_state::sound_w)
+void simultano_state::sound_w(u8 data)
 {
 	m_dac->write(1);
 }
 
-WRITE8_MEMBER(simultano_state::select_w)
+void simultano_state::select_w(u8 data)
 {
 	m_dac->write(0); // guessed
 
@@ -179,13 +182,13 @@ WRITE8_MEMBER(simultano_state::select_w)
 	m_select = data;
 }
 
-READ8_MEMBER(simultano_state::chessboard_r)
+u8 simultano_state::chessboard_r()
 {
 	// d0-d7: chessboard sensors
 	return ~m_board->read_file(m_select & 0xf);
 }
 
-READ8_MEMBER(simultano_state::control_r)
+u8 simultano_state::control_r()
 {
 	u8 data = 0;
 	u8 sel = m_select & 0xf;
@@ -197,7 +200,7 @@ READ8_MEMBER(simultano_state::control_r)
 	return data;
 }
 
-WRITE8_MEMBER(simultano_state::control_w)
+void simultano_state::control_w(u8 data)
 {
 	u8 prev = m_control;
 	m_control = data;
@@ -303,7 +306,7 @@ void simultano_state::simultano(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76));
+	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&simultano_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
 
@@ -312,6 +315,7 @@ void simultano_state::simultano(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(350));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(simultano_state::lcd_output_w));

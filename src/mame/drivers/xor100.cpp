@@ -117,7 +117,7 @@ void xor100_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( xor100_state::mmu_w )
+void xor100_state::mmu_w(uint8_t data)
 {
 	/*
 
@@ -139,7 +139,7 @@ WRITE8_MEMBER( xor100_state::mmu_w )
 	bankswitch();
 }
 
-WRITE8_MEMBER( xor100_state::prom_toggle_w )
+void xor100_state::prom_toggle_w(uint8_t data)
 {
 	switch (m_mode)
 	{
@@ -150,7 +150,7 @@ WRITE8_MEMBER( xor100_state::prom_toggle_w )
 	bankswitch();
 }
 
-READ8_MEMBER( xor100_state::prom_disable_r )
+uint8_t xor100_state::prom_disable_r()
 {
 	m_mode = EPROM_F800;
 
@@ -159,7 +159,7 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-READ8_MEMBER( xor100_state::fdc_wait_r )
+uint8_t xor100_state::fdc_wait_r()
 {
 	/*
 
@@ -187,7 +187,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	return m_fdc_irq ? 0x7f : 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dcont_w )
+void xor100_state::fdc_dcont_w(uint8_t data)
 {
 	/*
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 	if (floppy) floppy->mon_w(0);
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dsel_w )
+void xor100_state::fdc_dsel_w(uint8_t data)
 {
 	/*
 

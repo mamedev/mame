@@ -357,7 +357,7 @@ public:
 	{
 	}
 
-	void init_coh3002t_nz();
+	void init_nozoom();
 
 	void base_config(machine_config &config);
 	void coh3002t_t2_mp(machine_config &config);
@@ -368,17 +368,17 @@ public:
 	void coh3002t_t1(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(control3_r);
-	DECLARE_WRITE8_MEMBER(control3_w);
-	DECLARE_READ16_MEMBER(gn_1fb70000_r);
-	DECLARE_WRITE16_MEMBER(gn_1fb70000_w);
-	DECLARE_READ16_MEMBER(hack1_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
+	uint8_t control_r();
+	void control_w(uint8_t data);
+	void control2_w(uint16_t data);
+	uint8_t control3_r();
+	void control3_w(uint8_t data);
+	uint16_t gn_1fb70000_r();
+	void gn_1fb70000_w(uint16_t data);
+	uint16_t hack1_r(offs_t offset);
+	void coin_w(uint8_t data);
+	uint8_t coin_r();
+	uint8_t gnet_mahjong_panel_r();
 	uint32_t zsg2_ext_r(offs_t offset);
 
 	void flashbank_map(address_map &map);
@@ -408,12 +408,12 @@ private:
 
 // Misc. controls
 
-READ8_MEMBER(taitogn_state::control_r)
+uint8_t taitogn_state::control_r()
 {
 	return m_control;
 }
 
-WRITE8_MEMBER(taitogn_state::control_w)
+void taitogn_state::control_w(uint8_t data)
 {
 	// 20 = watchdog
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
@@ -445,22 +445,22 @@ WRITE8_MEMBER(taitogn_state::control_w)
 	m_control = data;
 }
 
-WRITE16_MEMBER(taitogn_state::control2_w)
+void taitogn_state::control2_w(uint16_t data)
 {
 	m_control2 = data;
 }
 
-READ8_MEMBER(taitogn_state::control3_r)
+uint8_t taitogn_state::control3_r()
 {
 	return m_control3;
 }
 
-WRITE8_MEMBER(taitogn_state::control3_w)
+void taitogn_state::control3_w(uint8_t data)
 {
 	m_control3 = data;
 }
 
-READ16_MEMBER(taitogn_state::gn_1fb70000_r)
+uint16_t taitogn_state::gn_1fb70000_r()
 {
 	// (1328) 1348 tests mask 0002, 8 times.
 	// Called by 1434, exit at 143c
@@ -472,13 +472,13 @@ READ16_MEMBER(taitogn_state::gn_1fb70000_r)
 	return 2;
 }
 
-WRITE16_MEMBER(taitogn_state::gn_1fb70000_w)
+void taitogn_state::gn_1fb70000_w(uint16_t data)
 {
-	// Writes 0 or 1 all the time, it *may* have somthing to do with
+	// Writes 0 or 1 all the time, it *may* have something to do with
 	// i/o port width, but then maybe not
 }
 
-READ16_MEMBER(taitogn_state::hack1_r)
+uint16_t taitogn_state::hack1_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -497,7 +497,7 @@ READ16_MEMBER(taitogn_state::hack1_r)
 
 
 
-WRITE8_MEMBER(taitogn_state::coin_w)
+void taitogn_state::coin_w(uint8_t data)
 {
 	/* 0x01=counter
 	   0x02=coin lock 1
@@ -511,13 +511,13 @@ WRITE8_MEMBER(taitogn_state::coin_w)
 	m_coin_info = data;
 }
 
-READ8_MEMBER(taitogn_state::coin_r)
+uint8_t taitogn_state::coin_r()
 {
 	return m_coin_info;
 }
 
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
-READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
+uint8_t taitogn_state::gnet_mahjong_panel_r()
 {
 	switch (m_coin_info & 0xcc)
 	{
@@ -569,7 +569,7 @@ void taitogn_state::machine_reset()
 	m_flashbank->set_bank(m_jp1->read() << 1);
 }
 
-void taitogn_state::init_coh3002t_nz()
+void taitogn_state::init_nozoom()
 {
 	m_has_zoom = false;
 }
@@ -1095,18 +1095,18 @@ GAME( 1999, rcdego,    gobyrc,   coh3002t_t1,    gobyrc,       taitogn_state, em
 GAME( 1999, flipmaze,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "MOSS / Taito", "Flip Maze (V2.04J 1999/09/02 20:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, shikigam,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Alfa System / Taito", "Shikigami no Shiro (V2.03J 2001/08/07 18:11)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, shikigama, coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Alfa System / Taito", "Shikigami no Shiro - internal build (V1.02J 2001/09/27 18:45)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, sianniv,   coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // IRQ at the wrong time
+GAME( 2003, sianniv,   coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // IRQ at the wrong time
 GAME( 2003, kollon,    coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Taito", "Kollon (V2.04JA 2003/11/01 12:00)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, kollonc,   kollon,   coh3002t_cf,    coh3002t_jp1, taitogn_state, empty_init, ROT0,   "Taito", "Kollon (V2.04JC 2003/11/01 12:00)", MACHINE_IMPERFECT_SOUND )
 
 /* Success */
-GAME( 1999, otenamih,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_coh3002t_nz, ROT0,   "Success", "Otenami Haiken (V2.04J 1999/02/01 18:00:00)", 0 )
-GAME( 2000, psyvaria,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init,       ROT270, "Success", "Psyvariar -Medium Unit- (V2.02O 2000/02/22 13:00)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, psyvarij,  psyvaria, coh3002t_t1,    coh3002t,     taitogn_state, empty_init,       ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J 2000/02/15 11:00)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, psyvarrv,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init,       ROT270, "Success", "Psyvariar -Revision- (V2.04J 2000/08/11 22:00)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, zokuoten,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_coh3002t_nz, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J 2001/02/16 16:00)", 0 ) // boots the soundcpu without any valid code, causing an infinite NMI loop (currently circumvented)
-GAME( 2004, zooo,      coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_coh3002t_nz, ROT0,   "Success", "Zooo (V2.01JA 2004/04/13 12:00)", 0 )
-GAME( 2005, otenamhf,  coh3002t, coh3002t_cf,    coh3002t_jp1, taitogn_state, init_coh3002t_nz, ROT0,   "Success / Warashi", "Otenami Haiken Final (V2.07JC 2005/04/20 15:36)", 0 )
+GAME( 1999, otenamih,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Otenami Haiken (V2.04J 1999/02/01 18:00:00)", 0 )
+GAME( 2000, psyvaria,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Medium Unit- (V2.02O 2000/02/22 13:00)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, psyvarij,  psyvaria, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J 2000/02/15 11:00)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, psyvarrv,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT270, "Success", "Psyvariar -Revision- (V2.04J 2000/08/11 22:00)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, zokuoten,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zoku Otenamihaiken (V2.03J 2001/02/16 16:00)", 0 ) // boots the soundcpu without any valid code, causing an infinite NMI loop (currently circumvented)
+GAME( 2004, zooo,      coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, init_nozoom,ROT0,   "Success", "Zooo (V2.01JA 2004/04/13 12:00)", 0 )
+GAME( 2005, otenamhf,  coh3002t, coh3002t_cf,    coh3002t_jp1, taitogn_state, init_nozoom,ROT0,   "Success / Warashi", "Otenami Haiken Final (V2.07JC 2005/04/20 15:36)", 0 )
 
 /* Takumi */
 GAME( 2001, nightrai,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Takumi", "Night Raid (V2.03J 2001/02/26 17:00)", MACHINE_IMPERFECT_SOUND )

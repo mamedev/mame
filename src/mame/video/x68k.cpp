@@ -113,7 +113,7 @@ void x68k_state::gvram_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_gvram[offset]);
 }
 
-WRITE16_MEMBER(x68k_state::spritereg_w )
+void x68k_state::spritereg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritereg[offset]);
 	switch(offset)
@@ -161,14 +161,14 @@ WRITE16_MEMBER(x68k_state::spritereg_w )
 	}
 }
 
-READ16_MEMBER(x68k_state::spritereg_r )
+uint16_t x68k_state::spritereg_r(offs_t offset)
 {
 	if(offset >= 0x400 && offset < 0x404)
 		return m_spritereg[offset] & 0x3ff;
 	return m_spritereg[offset];
 }
 
-WRITE16_MEMBER(x68k_state::spriteram_w )
+void x68k_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_spriteram+offset);
 	m_video.tile8_dirty[offset / 16] = 1;
@@ -192,7 +192,7 @@ WRITE16_MEMBER(x68k_state::spriteram_w )
 	}
 }
 
-READ16_MEMBER(x68k_state::spriteram_r )
+uint16_t x68k_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }

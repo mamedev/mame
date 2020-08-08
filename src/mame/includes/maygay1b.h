@@ -98,9 +98,9 @@ private:
 	void lamp_data_w(uint8_t data);
 	void lamp_data_2_w(uint8_t data);
 	uint8_t kbd_r();
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(reel56_w);
+	void reel12_w(uint8_t data);
+	void reel34_w(uint8_t data);
+	void reel56_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ramen_w);
 	DECLARE_WRITE_LINE_MEMBER(alarmen_w);
 	DECLARE_WRITE_LINE_MEMBER(nmien_w);
@@ -108,21 +108,21 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(psurelay_w);
 	DECLARE_WRITE_LINE_MEMBER(wdog_w);
 	DECLARE_WRITE_LINE_MEMBER(srsel_w);
-	DECLARE_WRITE8_MEMBER(latch_ch2_w);
-	DECLARE_READ8_MEMBER(latch_st_hi);
-	DECLARE_READ8_MEMBER(latch_st_lo);
-	DECLARE_WRITE8_MEMBER(m1ab_no_oki_w);
+	void latch_ch2_w(uint8_t data);
+	uint8_t latch_st_hi();
+	uint8_t latch_st_lo();
+	void m1ab_no_oki_w(uint8_t data);
 	void m1_pia_porta_w(uint8_t data);
 	void m1_pia_portb_w(uint8_t data);
 	void m1_lockout_w(uint8_t data);
 	void m1_meter_w(uint8_t data);
-	DECLARE_READ8_MEMBER(m1_meter_r);
-	DECLARE_READ8_MEMBER(m1_firq_clr_r);
-	DECLARE_READ8_MEMBER(m1_firq_trg_r);
-	DECLARE_READ8_MEMBER(m1_firq_nec_r);
-	DECLARE_READ8_MEMBER(nec_reset_r);
-	DECLARE_WRITE8_MEMBER(nec_bank0_w);
-	DECLARE_WRITE8_MEMBER(nec_bank1_w);
+	uint8_t m1_meter_r();
+	uint8_t m1_firq_clr_r();
+	uint8_t m1_firq_trg_r();
+	uint8_t m1_firq_nec_r();
+	uint8_t nec_reset_r();
+	void nec_bank0_w(uint8_t data);
+	void nec_bank1_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	uint8_t m1_duart_r();
 	void mcu_port0_w(uint8_t data);
@@ -132,8 +132,8 @@ private:
 	uint8_t mcu_port0_r();
 	uint8_t mcu_port2_r();
 
-	DECLARE_WRITE8_MEMBER(main_to_mcu_0_w);
-	DECLARE_WRITE8_MEMBER(main_to_mcu_1_w);
+	void main_to_mcu_0_w(uint8_t data);
+	void main_to_mcu_1_w(uint8_t data);
 
 	uint8_t m_main_to_mcu;
 

@@ -70,12 +70,12 @@ Added Dip locations according to manual.
  *
  *************************************/
 
-READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
+uint8_t copsnrob_state::copsnrob_misc_r()
 {
 	return m_screen->vblank() ? 0x00 : 0x80;
 }
 
-WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
+void copsnrob_state::copsnrob_misc2_w(uint8_t data)
 {
 	m_misc = data & 0x7f;
 	/* Multi Player Start */

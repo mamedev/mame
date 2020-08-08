@@ -95,30 +95,30 @@
 #include "includes/pgm2.h"
 
 // checked on startup, or doesn't boot
-READ32_MEMBER(pgm2_state::unk_startup_r)
+u32 pgm2_state::unk_startup_r()
 {
 	logerror("%s: unk_startup_r\n", machine().describe_context().c_str());
 	return 0x00000180;
 }
 
-READ32_MEMBER(pgm2_state::rtc_r)
+u32 pgm2_state::rtc_r()
 {
 	// write to FFFFFD20 if bit 18 set (0x40000) probably reset this RTC timer
 	// TODO: somehow hook here current time/date, which is a bit complicated because value is relative, later to it added "base time" stored in SRAM
 	return machine().time().seconds();
 }
 
-READ8_MEMBER(pgm2_state::encryption_r)
+u8 pgm2_state::encryption_r(offs_t offset)
 {
 	return m_encryption_table[offset];
 }
 
-WRITE8_MEMBER(pgm2_state::encryption_w)
+void pgm2_state::encryption_w(offs_t offset, u8 data)
 {
 	m_encryption_table[offset] = data;
 }
 
-WRITE32_MEMBER(pgm2_state::sprite_encryption_w)
+void pgm2_state::sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritekey);
 
@@ -152,7 +152,7 @@ void pgm2_state::device_post_load()
 	}
 }
 
-WRITE32_MEMBER(pgm2_state::encryption_do_w)
+void pgm2_state::encryption_do_w(u32 data)
 {
 	igs036_decryptor decrypter(m_encryption_table);
 	if (m_romboard_ram)
@@ -168,16 +168,16 @@ WRITE32_MEMBER(pgm2_state::encryption_do_w)
 }
 
 
-WRITE16_MEMBER(pgm2_state::share_bank_w)
+void pgm2_state::share_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_share_bank);
 }
 
-READ8_MEMBER(pgm2_state::shareram_r)
+u8 pgm2_state::shareram_r(offs_t offset)
 {
 	return m_shareram[offset + (m_share_bank & 1) * 128];
 }
-WRITE8_MEMBER(pgm2_state::shareram_w)
+void pgm2_state::shareram_w(offs_t offset, u8 data)
 {
 	m_shareram[offset + (m_share_bank & 1) * 128] = data;
 }
@@ -332,12 +332,12 @@ void pgm2_state::mcu_command(bool is_command)
 	}
 }
 
-READ32_MEMBER(pgm2_state::mcu_r)
+u32 pgm2_state::mcu_r(offs_t offset)
 {
 	return m_mcu_regs[(offset >> 15) & 7];
 }
 
-WRITE32_MEMBER(pgm2_state::mcu_w)
+void pgm2_state::mcu_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	int reg = (offset >> 15) & 7;
 	COMBINE_DATA(&m_mcu_regs[reg]);
@@ -351,12 +351,12 @@ WRITE32_MEMBER(pgm2_state::mcu_w)
 	}
 }
 
-WRITE16_MEMBER(pgm2_state::vbl_ack_w)
+void pgm2_state::vbl_ack_w(u16 data)
 {
 	m_arm_aic->set_irq(12, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(pgm2_state::unk30120014_w)
+void pgm2_state::unk30120014_w(offs_t offset, u16 data)
 {
 	if (offset == 0)
 	{
@@ -448,7 +448,7 @@ void pgm2_state::module_clk_w(int state)
 	module_prev_state = state;
 }
 
-READ16_MEMBER(pgm2_state::module_rom_r)
+u16 pgm2_state::module_rom_r(offs_t offset)
 {
 	if (module_sum_read && offset > 0 && offset < 5) // checksum read mode
 	{
@@ -461,7 +461,7 @@ READ16_MEMBER(pgm2_state::module_rom_r)
 	return ((u16 *)m_mainrom->base())[offset];
 }
 
-WRITE16_MEMBER(pgm2_state::module_rom_w)
+void pgm2_state::module_rom_w(offs_t offset, u16 data)
 {
 	//logerror("module write %04X at %08X\n", data, offset);
 	u32 const dec_val = ((module_key->key[0] | (module_key->key[1] << 8) | (module_key->key[2] << 16)) >> 6) & 0xffff;
@@ -490,19 +490,19 @@ WRITE16_MEMBER(pgm2_state::module_rom_w)
 }
 
 // very primitive Atmel ARM PIO simulation, should be improved and devicified
-WRITE32_MEMBER(pgm2_state::pio_sodr_w)
+void pgm2_state::pio_sodr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_pio_out_data |= data & mem_mask;
 	module_data_w((m_pio_out_data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
 	module_clk_w((m_pio_out_data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
 }
-WRITE32_MEMBER(pgm2_state::pio_codr_w)
+void pgm2_state::pio_codr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_pio_out_data &= ~(data & mem_mask);
 	module_data_w((m_pio_out_data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
 	module_clk_w((m_pio_out_data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
 }
-READ32_MEMBER(pgm2_state::pio_pdsr_r)
+u32 pgm2_state::pio_pdsr_r()
 {
 	return (module_data_r() == ASSERT_LINE ? 1 : 0) << 8; // fpga data read and status (bit 7, must be 0)
 }
@@ -1257,7 +1257,7 @@ static void sprite_colour_decode(u16* rom, int len)
 	}
 }
 
-READ32_MEMBER(pgm2_state::orleg2_speedup_r)
+u32 pgm2_state::orleg2_speedup_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if ((pc == 0x1002faec) || (pc == 0x1002f9b8))
@@ -1273,7 +1273,7 @@ READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 	return m_mainram[0x20114 / 4];
 }
 
-READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
+u32 pgm2_state::kov2nl_speedup_r()
 {
 	u32 const pc = m_maincpu->pc();
 
@@ -1292,7 +1292,7 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 	return m_mainram[0x20470 / 4];
 }
 
-READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
+u32 pgm2_state::kof98umh_speedup_r()
 {
 	u32 const pc = m_maincpu->pc();
 
@@ -1311,7 +1311,7 @@ READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 	return m_mainram[0x00060 / 4];
 }
 
-READ32_MEMBER(pgm2_state::kov3_speedup_r)
+u32 pgm2_state::kov3_speedup_r()
 {
 	u32 const pc = m_maincpu->pc();
 
@@ -1333,7 +1333,7 @@ READ32_MEMBER(pgm2_state::kov3_speedup_r)
 
 
 
-READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
+u32 pgm2_state::ddpdojt_speedup_r()
 {
 	u32 const pc = m_maincpu->pc();
 
@@ -1352,7 +1352,7 @@ READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
 	return m_mainram[0x00060 / 4];
 }
 
-READ32_MEMBER(pgm2_state::ddpdojt_speedup2_r)
+u32 pgm2_state::ddpdojt_speedup2_r()
 {
 	u32 const pc = m_maincpu->pc();
 
@@ -1394,20 +1394,20 @@ void pgm2_state::common_encryption_init()
 void pgm2_state::init_orleg2()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(*this, FUNC(pgm2_state::orleg2_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::orleg2_speedup_r)));
 }
 
 void pgm2_state::init_kov2nl()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(*this, FUNC(pgm2_state::kov2nl_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32smo_delegate(*this, FUNC(pgm2_state::kov2nl_speedup_r)));
 }
 
 void pgm2_state::init_ddpdojt()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32smo_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup2_r)));
 }
 
 // currently we don't know how to derive address/data xor values from real keys, so we need both
@@ -1419,7 +1419,7 @@ static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x
 void pgm2_state::init_kov3()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(*this, FUNC(pgm2_state::kov3_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32smo_delegate(*this, FUNC(pgm2_state::kov3_speedup_r)));
 }
 
 void pgm2_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
@@ -1464,7 +1464,7 @@ void pgm2_state::init_kov3_100()
 void pgm2_state::init_kof98umh()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
 }
 
 

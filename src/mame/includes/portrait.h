@@ -33,11 +33,11 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(positive_scroll_w);
-	DECLARE_WRITE8_MEMBER(negative_scroll_w);
-	DECLARE_WRITE8_MEMBER(bgvideo_write);
-	DECLARE_WRITE8_MEMBER(fgvideo_write);
+	void ctrl_w(uint8_t data);
+	void positive_scroll_w(uint8_t data);
+	void negative_scroll_w(uint8_t data);
+	void bgvideo_write(offs_t offset, uint8_t data);
+	void fgvideo_write(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

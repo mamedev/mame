@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "device.h"
-
 
 class r10696_device : public device_t
 {

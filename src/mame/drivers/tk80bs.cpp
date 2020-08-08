@@ -32,29 +32,28 @@ TODO:
 class tk80bs_state : public driver_device
 {
 public:
-	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_ppi(*this, "ppi"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{
-	}
+	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{ }
 
 	void tk80bs(machine_config &config);
 
 private:
 	uint8_t ppi_custom_r(offs_t offse);
+	void machine_start() override;
 	void ppi_custom_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 	uint8_t port_a_r();
 	uint8_t port_b_r();
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
-	void tk80bs_mem(address_map &map);
-
+	void mem_map(address_map &map);
 	uint8_t m_term_data;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -111,7 +110,7 @@ void tk80bs_state::ppi_custom_w(offs_t offset, uint8_t data)
 	}
 }
 
-void tk80bs_state::tk80bs_mem(address_map &map)
+void tk80bs_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
@@ -155,8 +154,14 @@ void tk80bs_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
+void tk80bs_state::machine_start()
+{
+	save_item(NAME(m_term_data));
+}
+
+
 /* F4 Character Displayer */
-static const gfx_layout tk80bs_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,
 	512,
@@ -168,7 +173,7 @@ static const gfx_layout tk80bs_charlayout =
 };
 
 static GFXDECODE_START( gfx_tk80bs )
-	GFXDECODE_ENTRY( "chargen", 0x0000, tk80bs_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -176,7 +181,7 @@ void tk80bs_state::tk80bs(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(1'000'000)); //unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &tk80bs_state::tk80bs_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80bs_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -221,11 +226,11 @@ ROM_START( tk80bs )
 	ROMX_LOAD( "lv2basic.11",0xd000, 0x2000, BAD_DUMP CRC(3df9a3bd) SHA1(9539409c876bce27d630fe47d07a4316d2ce09cb), ROM_BIOS(2))
 	ROMX_LOAD( "bsmon.11",   0xf000, 0x0ff6, BAD_DUMP CRC(fca7a609) SHA1(7c7eb5e5e4cf1e0021383bdfc192b88262aba6f5), ROM_BIOS(2))
 
-	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "font.rom",    0x0000, 0x1000, BAD_DUMP CRC(94d95199) SHA1(9fe741eab866b0c520d4108bccc6277172fa190c))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
-COMP( 1980, tk80bs, tk80,   0,      tk80bs,  tk80bs, tk80bs_state, empty_init, "NEC",   "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1980, tk80bs, tk80,   0,      tk80bs,  tk80bs, tk80bs_state, empty_init, "NEC",   "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

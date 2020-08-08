@@ -91,8 +91,8 @@ private:
 	void tstar432_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux = 0;
 };
@@ -108,7 +108,7 @@ void star_state::machine_start()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(star_state::control_w)
+void star_state::control_w(u8 data)
 {
 	// d0-d3: input mux, led select
 	m_inp_mux = data & 0xf;
@@ -120,7 +120,7 @@ WRITE8_MEMBER(star_state::control_w)
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(star_state::input_r)
+u8 star_state::input_r()
 {
 	u8 data = 0;
 
@@ -199,8 +199,8 @@ void star_state::sstar28k(machine_config &config)
 	M6502(config, m_maincpu, 2000000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	const attotime irq_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -224,8 +224,8 @@ void star_state::tstar432(machine_config &config)
 	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(4_MHz_XTAL / 0x4000); // 4020 Q14
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 
 	config.set_default_layout(layout_saitek_tstar432);
 
@@ -242,8 +242,8 @@ void star_state::sstar36k(machine_config &config)
 	M6502(config.replace(), m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::tstar432_map);
 
-	const attotime irq_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // 4020 Q13
-	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(star_state::nmi_line_pulse), nmi_period);
 }
 
 

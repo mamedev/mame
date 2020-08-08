@@ -2,9 +2,9 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Digital Microsystems DMS-86
+Digital Microsystems DMS-86
 
-        11/01/2010 Skeleton driver.
+2010-01-11 Skeleton driver.
 
 Monitor commands:
 A Display incoming terminal data in hex
@@ -63,7 +63,7 @@ private:
 	void mem_map(address_map &map);
 
 	u8 m_term_data;
-	virtual void machine_reset() override;
+	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device_array<z80sio_device, 2> m_sio;
@@ -128,8 +128,9 @@ static INPUT_PORTS_START( dms86 )
 INPUT_PORTS_END
 
 
-void dms86_state::machine_reset()
+void dms86_state::machine_start()
 {
+	save_item(NAME(m_term_data));
 }
 
 void dms86_state::kbd_put(u8 data)
@@ -180,4 +181,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS */
-COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, dms86, 0,      0,      dms86,   dms86, dms86_state, empty_init, "Digital Microsystems", "DMS-86", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -68,11 +68,11 @@ private:
 	required_region_ptr<uint8_t> m_mainregion;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t    m_videoram2[0x4000];
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(jongkyo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
+	void bank_select_w(offs_t offset, uint8_t data);
+	void mux_w(uint8_t data);
+	void jongkyo_coin_counter_w(uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void unknown_w(offs_t offset, uint8_t data);
 	uint8_t input_1p_r();
 	uint8_t input_2p_r();
 	virtual void machine_start() override;
@@ -148,7 +148,7 @@ uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(jongkyo_state::bank_select_w)
+void jongkyo_state::bank_select_w(offs_t offset, uint8_t data)
 {
 	int mask = 1 << (offset >> 1);
 
@@ -161,13 +161,13 @@ WRITE8_MEMBER(jongkyo_state::bank_select_w)
 	m_bank1d->set_entry(m_rom_bank);
 }
 
-WRITE8_MEMBER(jongkyo_state::mux_w)
+void jongkyo_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 	//  printf("%02x\n", m_mux_data);
 }
 
-WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
+void jongkyo_state::jongkyo_coin_counter_w(uint8_t data)
 {
 	/* bit 0 = hopper out? */
 
@@ -216,18 +216,18 @@ uint8_t jongkyo_state::input_2p_r()
 			ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
 }
 
-WRITE8_MEMBER(jongkyo_state::videoram2_w)
+void jongkyo_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 }
 
-WRITE8_MEMBER(jongkyo_state::unknown_w)
+void jongkyo_state::unknown_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0: // different values
 			break;
-		case 1: // set to 0 at the boot and set to 1 continuesly
+		case 1: // set to 0 at the boot and set to 1 continuously
 			break;
 		case 2: // only set to 0 at the boot
 			break;

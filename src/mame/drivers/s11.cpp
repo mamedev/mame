@@ -9,11 +9,15 @@
 
 
 ToDo:
-- Can coin up but not start
-- Doesn't react to the Advance button very well
+- tic-tac-strike belongs in s11a.cpp
+- gold mine belongs in s11b.cpp
+- top dawg belongs in s11b.cpp
+- shuffle inn belongs in s11b.cpp
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
-    - Road Kings: press 'Up' (the direction key) and Q, and press "1" after inserting 1 or more credits.
+    - Grand Lizard: Press S, D, F, and press "1" after inserting 1 or more credits.
+    - Road Kings: press 'Up' (the direction key) and 'Delete', and press "1" after inserting 1 or more credits.
+    - High Speed: press D (ball trough center), F (ball trough lower right) and Enter (Ball Shooter) after inserting 1 or more credits.
 
 *****************************************************************************************/
 
@@ -26,10 +30,22 @@ ToDo:
 
 #include "s11.lh"
 
-
+/*
+15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00 RW MEMPROT
+0  0  0  0  0  x  x  x  0  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  x  x  0  x  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  x  0  x  x  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  0  x  x  x  *  *  *  *  *  *  *  *  * battery backed RAM RW normal
+0  0  0  0  0  1  1  1  1  *  *  *  *  *  *  *  *  0 battery backed RAM RW in protected area, but protection switch is off
+0  0  0  0  0  1  1  1  1  *  *  *  *  *  *  *  R  1 battery backed RAM Read in protected area, but protection switch is on, read is allowed
+0  0  0  0  0  1  1  1  1  *  *  *  *  *  *  *  W  1 battery backed RAM Write in protected area, but protection switch is on, write is BLOCKED
+*/
 void s11_state::s11_main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
+	// TODO:
+	//map(0x0000, 0x077f).ram().share("nvram"); // unprotected ram area
+	//map(0x0780, 0x07ff).rw(FUNC(prot_ram_r), FUNC(prot_ram_w)); // protected ram area
 	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
 	map(0x2200, 0x2200).w(FUNC(s11_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
@@ -49,29 +65,18 @@ void s11_state::s11_audio_map(address_map &map)
 	map(0xc000, 0xffff).bankr("bank1");
 }
 
-void s11_state::s11_bg_map(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x8000, 0xffff).rom();
-}
-
 static INPUT_PORTS_START( s11 )
-	PORT_START("X0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_START("SW.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) // always plumb-bob tilt
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RSHIFT) // a relay from the power section
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LSHIFT) // usually slam tilt
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RCONTROL) // usually high score reset
 
-	PORT_START("X2")
+	PORT_START("SW.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
@@ -81,7 +86,7 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
 
-	PORT_START("X4")
+	PORT_START("SW.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
@@ -91,7 +96,7 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
 
-	PORT_START("X8")
+	PORT_START("SW.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
@@ -101,7 +106,7 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
 
-	PORT_START("X10")
+	PORT_START("SW.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
@@ -111,7 +116,17 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
 
-	PORT_START("X20")
+	PORT_START("SW.5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_END)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_DEL_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER_PAD)
+
+	PORT_START("SW.6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
@@ -121,11 +136,15 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
-	PORT_START("X40")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("X80")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("SW.7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PLUS_PAD)
 
 	PORT_START("DIAGS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11_state, audio_nmi, 1)
@@ -142,26 +161,30 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	switch(id)
 	{
 	case TIMER_IRQ:
-		if(param == 1)
+		// handle the cd4020 14-bit timer irq counter; this timer fires on the rising and falling edges of Q5, every 32 clocks
+		m_timer_count += 0x20;
+		m_timer_count &= 0x3fff;
+		// handle the reset case (happens on the high level of Eclock, so supersedes the firing of the timer int)
+		if (BIT(m_timer_count, 5) && (m_timer_irq_active || m_pia_irq_active))
 		{
-			m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-			if(m_pias)
-				m_pias->cb1_w(0);
-			m_irq_active = true;
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+			m_timer_count = 0;
+			m_timer_irq_active = false;
 		}
-		else
+		else // handle the timer int firing case
 		{
-			m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-			if(m_pias)
-				m_pias->cb1_w(1);
-			m_irq_active = false;
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
+#ifndef S11_W15
+			// W14 jumper present (Q7), W15 absent (Q10)
+			m_timer_irq_active = (BIT(m_timer_count, 7) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
+#else
+			// W14 jumper absent (Q7), W15 present (Q10)
+			m_timer_irq_active = (BIT(m_timer_count, 10) && BIT(m_timer_count, 8) && BIT(m_timer_count, 9));
+#endif
 		}
+
+		m_mainirq->in_w<0>(m_timer_irq_active);
+		if(m_pias)
+			m_pias->cb1_w(m_timer_irq_active);
+		m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 		break;
 	}
 }
@@ -189,22 +212,27 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 
 WRITE_LINE_MEMBER( s11_state::pia_irq )
 {
+	m_pia_irq_active = state;
+	m_mainirq->in_w<1>(state);
+}
+
+WRITE_LINE_MEMBER( s11_state::main_irq )
+{
+	// handle the fact that the Advance and Up/Down switches are gated by the combined timer/pia irq signal
 	if(state == CLEAR_LINE)
 	{
-		// restart IRQ timer
-		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-		m_irq_active = false;
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 	else
 	{
-		// disable IRQ timer while other IRQs are being handled
-		// (counter is reset every 32 cycles while a PIA IRQ is handled)
-		m_irq_timer->adjust(attotime::zero);
-		m_irq_active = true;
+		m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+		m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
 	}
+	m_maincpu->set_input_line(M6802_IRQ_LINE, state);
 }
 
-WRITE8_MEMBER( s11_state::sol3_w )
+void s11_state::sol3_w(uint8_t data)
 {
 }
 
@@ -218,13 +246,10 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 // sound ns
 	if(m_pias)
 		m_pias->ca1_w(state);
-	if(m_pia40)
-		m_pia40->cb2_w(state);
 }
 
 void s11_state::lamp0_w(uint8_t data)
 {
-	m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
 void s11_state::dig0_w(uint8_t data)
@@ -286,14 +311,22 @@ void s11_state::pia2c_pb_w(uint8_t data)
 
 uint8_t s11_state::switch_r()
 {
-	char kbdrow[8];
-	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ~ioport(kbdrow)->read();
+	uint8_t retval = 0xff;
+	// scan all 8 input columns, since multiple can be selected at once
+	for (int i = 0; i < 7; i++)
+	{
+		if (m_switch_col & (1<<i))
+			retval &= m_swarray[i]->read();
+	}
+	//retval &= ioport("OPTOS")->read(); // optos should be read here as well, and are always active even if no column is selected
+	return ~retval;
 }
 
 void s11_state::switch_w(uint8_t data)
 {
-	m_kbdrow = data;
+	// this drives the pulldown 2N3904 NPN transistors Q42-Q49, each of which drives one column of the switch matrix low
+	// it is possible for multiple columns to be enabled at once, this is handled in switch_r above.
+	m_switch_col = data;
 }
 
 void s11_state::pia34_pa_w(uint8_t data)
@@ -309,21 +342,17 @@ void s11_state::pia34_pa_w(uint8_t data)
 
 void s11_state::pia34_pb_w(uint8_t data)
 {
-	if(m_pia40)
-		m_pia40->portb_w(data);
-	else
+	if(m_bg)
 		m_bg->data_w(data);
 }
 
 WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
 {
-	if(m_pia40)
-		m_pia40->cb1_w(state);  // MCB2 through CPU interface
-	else
-		m_bg->ctrl_w(state);
+	if(m_bg)
+		m_bg->ctrl_w(state); // MCB2 through CPU interface
 }
 
-WRITE8_MEMBER( s11_state::bank_w )
+void s11_state::bank_w(uint8_t data)
 {
 	membank("bank0")->set_entry(BIT(data, 1));
 	membank("bank1")->set_entry(BIT(data, 0));
@@ -348,27 +377,6 @@ uint8_t s11_state::sound_r()
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
-{
-	if(m_pia40)
-	{
-		if(state == CLEAR_LINE)
-			m_pia40->ca1_w(1);
-		else
-			m_pia40->ca1_w(0);
-	}
-}
-
-WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
-{
-	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
-}
-
-void s11_state::pia40_pb_w(uint8_t data)
-{
-	m_pia34->portb_w(data);
-}
-
 void s11_state::init_s11()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
@@ -376,9 +384,11 @@ void s11_state::init_s11()
 	membank("bank1")->configure_entries(0, 2, &ROM[0x18000], 0x4000);
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
+	m_timer_count = 0;
 	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-	m_irq_active = false;
+	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
+	m_timer_irq_active = false;
+	m_pia_irq_active = false;
 }
 
 void s11_state::s11(machine_config &config)
@@ -387,6 +397,8 @@ void s11_state::s11(machine_config &config)
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
+	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
+	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 
 	/* Video */
 	config.set_default_layout(layout_s11);
@@ -397,90 +409,100 @@ void s11_state::s11(machine_config &config)
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
 	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pia21->set_port_a_input_overrides_output_mask(0xff);
 	m_pia21->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
 	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
-	m_pia21->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia21->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia21->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<1>));
+	m_pia21->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia24, 0);
 	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
 	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
-	m_pia24->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia24->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia24->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<3>));
+	m_pia24->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<4>));
 
 	PIA6821(config, m_pia28, 0);
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
+	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s11_state::dig0_w));
 	m_pia28->writepb_handler().set(FUNC(s11_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
 	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
-	m_pia28->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia28->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
+	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
 	PIA6821(config, m_pia2c, 0);
 	m_pia2c->writepa_handler().set(FUNC(s11_state::pia2c_pa_w));
 	m_pia2c->writepb_handler().set(FUNC(s11_state::pia2c_pb_w));
-	m_pia2c->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia2c->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
+	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
 	PIA6821(config, m_pia30, 0);
 	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
+	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
 	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
-	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia30->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia30->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<9>));
+	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
-	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
-	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
+	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
+	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	M6808(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
+	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 1.00);
+	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.5);
 
 	PIA6821(config, m_pias, 0);
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
 	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
-	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
-	m_pias->irqa_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
+	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
+	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
+}
 
+void s11_state::s11_bgs(machine_config &config)
+{
+	s11(config);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
+	/* Add the background sound card */
+	SPEAKER(config, "bgspk").front_center();
+	S11_BGS(config, m_bg);
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 0.5);
+}
+
+void s11_state::s11_bgm(machine_config &config)
+{
+	s11(config);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	/* Add the background music card */
-	MC6809E(config, m_bgcpu, 8000000 / 4); // MC68B09E
-	m_bgcpu->set_addrmap(AS_PROGRAM, &s11_state::s11_bg_map);
-
-	SPEAKER(config, "bg").front_center();
-	YM2151(config, m_ym, 3580000);
-	m_ym->irq_handler().set(FUNC(s11_state::ym2151_irq_w));
-	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
-
-	MC1408(config, "dac1", 0).add_route(ALL_OUTPUTS, "bg", 0.25);
-
-	PIA6821(config, m_pia40, 0);
-	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
-	m_pia40->writepb_handler().set(FUNC(s11_state::pia40_pb_w));
-	m_pia40->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
-	m_pia40->irqa_handler().set_inputline(m_bgcpu, M6809_FIRQ_LINE);
-	m_pia40->irqb_handler().set_inputline(m_bgcpu, INPUT_LINE_NMI);
+	SPEAKER(config, "bgspk").front_center();
+	S11_BGM(config, m_bg);
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
 }
 
 
@@ -501,8 +523,8 @@ ROM_START(grand_l4)
 	ROM_LOAD("lzrd_u22.l1", 0x14000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
 	ROM_RELOAD( 0x10000, 0x4000)
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("lzrd_u4.l1", 0x8000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
 ROM_END
 
 ROM_START(grand_l3)
@@ -519,8 +541,8 @@ ROM_START(grand_l3)
 	ROM_LOAD("lzrd_u22.l1", 0x14000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
 	ROM_RELOAD( 0x10000, 0x4000)
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("lzrd_u4.l1", 0x8000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x0000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
 ROM_END
 
 /*-------------------------
@@ -536,8 +558,8 @@ ROM_START(hs_l4)
 	ROM_LOAD("hs_u21.l2", 0x18000, 0x8000, CRC(c0580037) SHA1(675ca65a6a20f8607232c532b4d127641f77d837))
 	ROM_LOAD("hs_u22.l2", 0x10000, 0x8000, CRC(c03be631) SHA1(53823e0f55377a45aa181882c310dd307cf368f5))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("hs_u4.l1", 0x8000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("hs_u4.l1", 0x0000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
 ROM_END
 
 ROM_START(hs_l3)
@@ -550,8 +572,8 @@ ROM_START(hs_l3)
 	ROM_LOAD("hs_u21.l2", 0x18000, 0x8000, CRC(c0580037) SHA1(675ca65a6a20f8607232c532b4d127641f77d837))
 	ROM_LOAD("hs_u22.l2", 0x10000, 0x8000, CRC(c03be631) SHA1(53823e0f55377a45aa181882c310dd307cf368f5))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("hs_u4.l1", 0x8000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("hs_u4.l1", 0x0000, 0x8000, CRC(0f96e094) SHA1(58650705a02a71ced85f5c2a243722a35282cbf7))
 ROM_END
 
 /*-------------------------
@@ -567,8 +589,8 @@ ROM_START(rdkng_l1)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 ROM_START(rdkng_l2)
@@ -580,8 +602,8 @@ ROM_START(rdkng_l2)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 ROM_START(rdkng_l3)
@@ -593,8 +615,8 @@ ROM_START(rdkng_l3)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 ROM_START(rdkng_l4)
@@ -606,8 +628,8 @@ ROM_START(rdkng_l4)
 	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
 	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
 
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("road_u4.l1", 0x0000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
 /************************ From here, not pinball machines **************************************/
@@ -623,8 +645,6 @@ ROM_START(tts_l2)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
 	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(tts_l1)
@@ -635,8 +655,6 @@ ROM_START(tts_l1)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tts_u21.256", 0x18000, 0x8000, NO_DUMP)
 	ROM_LOAD("tts_u22.256", 0x10000, 0x8000, NO_DUMP)
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*-------------------------------
@@ -650,8 +668,6 @@ ROM_START(gmine_l2)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u21.256", 0x18000, 0x8000, CRC(3b801570) SHA1(50b50ff826dcb031a30940fa3099bd3a8d773831))
 	ROM_LOAD("u22.256", 0x10000, 0x8000, CRC(08352101) SHA1(a7437847a71cf037a80686292f9616b1e08922df))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*-------------------------
@@ -665,8 +681,6 @@ ROM_START(tdawg_l1)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tdsu21r1.256", 0x18000, 0x8000, CRC(6a323227) SHA1(7c7263754e5672c654a2ee9582f0b278e637a909))
 	ROM_LOAD("tdsu22r1.256", 0x10000, 0x8000, CRC(58407eb4) SHA1(6bd9b304c88d9470eae5afb6621187f4a8313573))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
 /*----------------------------
@@ -680,18 +694,16 @@ ROM_START(shfin_l1)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("u21snd-2.rv1", 0x18000, 0x8000, CRC(80ddce05) SHA1(9498260e5ccd2fe0eb03ff321dd34eb945b0213a))
 	ROM_LOAD("u22snd-2.rv1", 0x10000, 0x8000, CRC(6894abaf) SHA1(2d661765fbfce33a73a20778c41233c0bd9933e9))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
-GAME( 1986, grand_l4, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l4,    0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l4, 0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l3, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l4,    0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l3,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l4, 0,        s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 GAME( 1986, tts_l2,   0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

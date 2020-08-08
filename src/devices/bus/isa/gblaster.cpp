@@ -22,22 +22,22 @@
 */
 
 
-READ8_MEMBER( isa8_gblaster_device::saa1099_16_r )
+uint8_t isa8_gblaster_device::saa1099_16_r(offs_t offset)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( isa8_gblaster_device::saa1099_1_16_w )
+void isa8_gblaster_device::saa1099_1_16_w(offs_t offset, uint8_t data)
 {
 	m_saa1099_1->write(offset, data);
 }
 
-WRITE8_MEMBER( isa8_gblaster_device::saa1099_2_16_w )
+void isa8_gblaster_device::saa1099_2_16_w(offs_t offset, uint8_t data)
 {
 	m_saa1099_2->write(offset, data);
 }
 
-READ8_MEMBER( isa8_gblaster_device::detect_r )
+uint8_t isa8_gblaster_device::detect_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -49,7 +49,7 @@ READ8_MEMBER( isa8_gblaster_device::detect_r )
 	}
 }
 
-WRITE8_MEMBER( isa8_gblaster_device::detect_w )
+void isa8_gblaster_device::detect_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -72,12 +72,12 @@ void isa8_gblaster_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SAA1099(config, m_saa1099_1, 7159090);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
-	SAA1099(config, m_saa1099_2, 7159090);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_1->add_route(0, "lspeaker", 0.50);
+	m_saa1099_1->add_route(1, "rspeaker", 0.50);
+	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_2->add_route(0, "lspeaker", 0.50);
+	m_saa1099_2->add_route(1, "rspeaker", 0.50);
 }
 
 //**************************************************************************
@@ -104,9 +104,9 @@ isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const 
 void isa8_gblaster_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0220, 0x0221, read8_delegate(*this, FUNC(isa8_gblaster_device::saa1099_16_r)), write8_delegate(*this, FUNC(isa8_gblaster_device::saa1099_1_16_w)));
-	m_isa->install_device(0x0222, 0x0223, read8_delegate(*this, FUNC(isa8_gblaster_device::saa1099_16_r)), write8_delegate(*this, FUNC(isa8_gblaster_device::saa1099_2_16_w)));
-	m_isa->install_device(0x0224, 0x022F, read8_delegate(*this, FUNC(isa8_gblaster_device::detect_r)), write8_delegate(*this, FUNC(isa8_gblaster_device::detect_w)));
+	m_isa->install_device(0x0220, 0x0221, read8sm_delegate(*this, FUNC(isa8_gblaster_device::saa1099_16_r)), write8sm_delegate(*this, FUNC(isa8_gblaster_device::saa1099_1_16_w)));
+	m_isa->install_device(0x0222, 0x0223, read8sm_delegate(*this, FUNC(isa8_gblaster_device::saa1099_16_r)), write8sm_delegate(*this, FUNC(isa8_gblaster_device::saa1099_2_16_w)));
+	m_isa->install_device(0x0224, 0x022F, read8sm_delegate(*this, FUNC(isa8_gblaster_device::detect_r)), write8sm_delegate(*this, FUNC(isa8_gblaster_device::detect_w)));
 }
 
 //-------------------------------------------------

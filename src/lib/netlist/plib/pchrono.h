@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "pgsl.h"
 #include "ptypes.h"
 
 #include <chrono>
@@ -212,10 +213,16 @@ namespace plib {
 			ctype count() const noexcept { return m_count; }
 
 			template <typename S>
-			S as_seconds() const noexcept { return static_cast<S>(total())
-					/ static_cast<S>(T::per_second()); }
+			S as_seconds() const noexcept { return narrow_cast<S>(total())
+					/ narrow_cast<S>(T::per_second()); }
 
 			guard_t guard() noexcept { return guard_t(*this); }
+
+			// pause must be followed by cont(inue)
+			void stop() noexcept { m_time += T::stop(); }
+			void start() noexcept { m_time -= T::start(); }
+
+
 		private:
 			type m_time;
 			ctype m_count;
@@ -244,7 +251,7 @@ namespace plib {
 			constexpr type total() const noexcept { return 0; }
 			constexpr ctype count() const noexcept { return 0; }
 			template <typename S>
-			S as_seconds() const noexcept { return static_cast<S>(0.0); }
+			S as_seconds() const noexcept { return narrow_cast<S>(0); }
 			constexpr static bool enabled = false;
 			guard_t guard() { return guard_t(); }
 		};

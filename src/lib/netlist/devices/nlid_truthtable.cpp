@@ -1,6 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
+#include "plib/pstonum.h"
+#include "plib/pstrutil.h"
+
 #include "nl_base.h"
 #include "nl_factory.h"
 #include "nlid_truthtable.h"
@@ -75,8 +78,7 @@ namespace devices
 			set_active_outputs(active_outputs);
 		}
 
-		// update is only called during startup here ...
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 #if USE_TT_ALTERNATIVE
 			m_state = 0;
@@ -157,7 +159,7 @@ namespace devices
 
 			if (doOUT)
 				//for (std::size_t i = 0; i < m_NO; ++i)
-				//	m_Q[i].push((out >> i) & 1, tim[t[i]]);
+				//  m_Q[i].push((out >> i) & 1, tim[t[i]]);
 				this->push(out, t);
 			else
 			{
@@ -191,8 +193,8 @@ namespace devices
 		}
 
 
-		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
-		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
+		plib::static_vector<logic_input_t, m_NI> m_I;
+		plib::static_vector<logic_output_t, m_NO> m_Q;
 
 #if USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
@@ -387,7 +389,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
-			m_I.emplace(i, *this, inout[i]);
+			m_I.emplace_back(*this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
 		}
 #else
 		for (std::size_t i=0; i < m_NI; i++)
@@ -410,7 +412,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NO; i++)
 		{
 			outputs[i] = plib::trim(outputs[i]);
-			m_Q.emplace(i, *this, outputs[i]);
+			m_Q.emplace_back(*this, outputs[i]);
 			// Connect output "Q" to input "_Q" if this exists
 			// This enables timed state without having explicit state ....
 			pstring tmp = "_" + outputs[i];
@@ -434,13 +436,13 @@ namespace devices
 		: truthtable_base_element_t(name, std::move(props))
 		{ }
 
-		unique_pool_ptr<core_device_t> make_device(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
+		device_arena::unique_ptr<core_device_t> make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name) override
 		{
 			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 
 			if (!m_ttbl)
 			{
-				m_ttbl = pool.make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>();
+				m_ttbl = plib::make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>(pool);
 				truthtable_parser desc_s(m_NO, m_NI,
 						packed_int(m_ttbl->m_out_state.data(), sizeof(m_ttbl->m_out_state[0]) * 8),
 						m_ttbl->m_timing_index.data(), m_ttbl->m_timing_nt.data());
@@ -448,10 +450,10 @@ namespace devices
 				desc_s.parse(m_desc);
 			}
 
-			return pool.make_unique<tt_type>(anetlist, name, m_family_name, *m_ttbl, m_desc);
+			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_ttbl, m_desc);
 		}
 	private:
-		unique_pool_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
+		device_arena::unique_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
 	};
 
 	tt_bitset truthtable_parser::calculate_ignored_inputs(tt_bitset state) const
@@ -578,7 +580,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	for (int j=0; j < 16; j++)
 		m_timing_nt[j] = netlist_time::zero();
 
-	while (!(ttline == ""))
+	while (!ttline.empty())
 	{
 		std::vector<pstring> io(plib::psplit(ttline,"|"));
 		// checks
@@ -670,16 +672,17 @@ namespace factory
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
 		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
 			auto cs=s; \
-			ret = plib::make_unique<xtype>(desc.name, std::move(cs)); } \
+			ret = plib::make_unique<xtype, host_arena>(desc.name, std::move(cs)); } \
 			break
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 						ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
-						ENTRYY(n, 7, s); ENTRYY(n, 8, s)
+						ENTRYY(n, 7, s); ENTRYY(n, 8, s); ENTRYY(n, 9, s); \
+						ENTRYY(n, 10, s)
 
-	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, properties &&props)
+	host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, properties &&props)
 	{
-		plib::unique_ptr<truthtable_base_element_t> ret;
+		host_arena::unique_ptr<truthtable_base_element_t> ret;
 
 		switch (desc.ni * 100 + desc.no)
 		{
@@ -700,7 +703,7 @@ namespace factory
 				nl_assert_always(false, msg.c_str());
 		}
 		ret->m_desc = desc.desc;
-		ret->m_family_name = (desc.family != "" ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
+		ret->m_family_name = (!desc.family.empty() ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));
 
 		return ret;
 	}

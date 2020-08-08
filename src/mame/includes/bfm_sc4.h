@@ -120,8 +120,8 @@ protected:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(mux_output_w);
-	DECLARE_WRITE8_MEMBER(mux_output2_w);
+	void mux_output_w(offs_t offset, uint8_t data);
+	void mux_output2_w(offs_t offset, uint8_t data);
 	void bfm_sc4_reset_serial_vfd();
 	void bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data);
 };
@@ -175,10 +175,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 
-	DECLARE_READ16_MEMBER(sc4_mem_r);
-	DECLARE_WRITE16_MEMBER(sc4_mem_w);
+	uint16_t sc4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sc4_cs1_r);
+	uint16_t sc4_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
@@ -605,8 +605,8 @@ public:
 	virtual void machine_reset() override;
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
-	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
-	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
+	void bfm_sc4_reel3_w(uint8_t data);
+	void bfm_sc4_reel4_w(uint8_t data);
 	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask);
 	uint8_t bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask);
 	uint16_t bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask);
@@ -656,8 +656,8 @@ public:
 	required_region_ptr<uint32_t> m_adder4cpuregion;
 	std::unique_ptr<uint32_t[]> m_adder4ram;
 
-	DECLARE_READ32_MEMBER(adder4_mem_r);
-	DECLARE_WRITE32_MEMBER(adder4_mem_w);
+	uint32_t adder4_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 
 	// devices

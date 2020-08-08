@@ -1653,7 +1653,7 @@ DISCRETE_STEP(dsd_ls624)
 	double  freq, t1;
 	double  v_freq_2, v_freq_3, v_freq_4;
 	double  t_used = m_t_used;
-	double  dt = this->sample_time();;
+	double  dt = this->sample_time();
 	double  v_freq = DSD_LS624__VMOD;
 	double  v_rng = DSD_LS624__VRNG;
 	int     count_f = 0, count_r = 0;

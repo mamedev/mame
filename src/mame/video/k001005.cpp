@@ -1252,7 +1252,7 @@ void k001005_device::swap_buffers( )
 	m_renderer->swap_buffers();
 }
 
-READ32_MEMBER( k001005_device::read )
+uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	adsp21062_device *dsp = downcast<adsp21062_device*>(&space.device());
 
@@ -1314,7 +1314,7 @@ READ32_MEMBER( k001005_device::read )
 	return 0;
 }
 
-WRITE32_MEMBER( k001005_device::write )
+void k001005_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	adsp21062_device *dsp = downcast<adsp21062_device*>(&space.device());
 

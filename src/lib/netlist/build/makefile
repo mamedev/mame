@@ -25,11 +25,13 @@ VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 
 TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
-TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
-#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+TIDY_FLAGSX += -llvm-header-guard,
+# TIDY_FLAGSX += -cppcoreguidelines-pro-type-reinterpret-cast,
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
 #TIDY_FLAGSX += -cppcoreguidelines-owning-memory,
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
-TIDY_FLAGSX += -modernize-pass-by-value,-cppcoreguidelines-pro-type-static-cast-downcast,
+TIDY_FLAGSX += -modernize-pass-by-value,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-type-static-cast-downcast,
 TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
@@ -37,9 +39,9 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,
 #TIDY_FLAGSX += -misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
-TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-braces-around-statements,
-#TIDY_FLAGSX += -readability-implicit-bool-conversion,
+TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
 TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
@@ -51,7 +53,7 @@ TIDY_SOURCES = $(SOURCES)
 
 #TIDY_SOURCES = $(SRC)/devices/nld_7442.cpp $(SRC)/devices/nld_7492.cpp
 
-#TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
+TIDY_FLAGS = -p $(OBJ) -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix
 #TIDY_FLAGS = -checks=llvm-namespace-comment -fix
 #TIDY_FLAGS = -checks=modernize-use-override -fix
@@ -72,10 +74,10 @@ endif
 TIDY_DB = $(OBJ)/compile_commands.json
 
 
-# LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
+#LTO decreases performance :-(
+#LTO = -flto=4  -fuse-linker-plugin -Wodr
 
 CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../..
-
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
@@ -90,7 +92,7 @@ DEPENDCC=$(CC)
 
 
 ifndef FAST
-FAST=1
+FAST=0
 endif
 
 ifeq ($(FAST),1)
@@ -101,6 +103,7 @@ TARGETS = nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 
 NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
+TESTOBJ = $(OBJ)/tests
 
 DEPEND = $(OBJ)/.depend
 
@@ -111,12 +114,13 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
 
-OBJS = $(POBJS) $(NLOBJS)
+OBJS = $(POBJS) $(NLOBJS) $(TESTOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
@@ -132,6 +136,8 @@ POBJS := \
 PMAIN := $(POBJ)/pmain.o
 
 NLOBJS := \
+	$(NLOBJ)/solver/nld_solver.o \
+	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/nl_base.o \
 	$(NLOBJ)/nl_parser.o \
 	$(NLOBJ)/nl_setup.o \
@@ -142,18 +148,17 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
-	$(NLOBJ)/solver/nld_solver.o \
-	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/tools/nl_convert.o \
 	$(NLOBJ)/generated/static_solvers.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4006.o \
 	$(NLOBJ)/devices/nld_4013.o \
+	$(NLOBJ)/devices/nld_4017.o \
 	$(NLOBJ)/devices/nld_4020.o \
+	$(NLOBJ)/devices/nld_4053.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_4316.o \
-	$(NLOBJ)/devices/nld_7442.o \
 	$(NLOBJ)/devices/nld_7448.o \
 	$(NLOBJ)/devices/nld_7450.o \
 	$(NLOBJ)/devices/nld_7473.o \
@@ -166,6 +171,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_7497.o \
 	$(NLOBJ)/devices/nld_74107.o \
+	$(NLOBJ)/devices/nld_74113.o \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74125.o \
 	$(NLOBJ)/devices/nld_74153.o \
@@ -210,6 +216,9 @@ NLOBJS := \
 	$(NLOBJ)/macro/nlm_roms.o \
 	$(NLOBJ)/macro/nlm_ttl74xx.o \
 
+TESTOBJS := \
+	$(TESTOBJ)/test_pfunction.o \
+
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
 	$(VSBUILD/netlistlib.vcxproj.user \
@@ -232,7 +241,7 @@ ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc clang-libc
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy runtests
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -242,7 +251,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc clang-libc
 # PHONY
 #-------------------------------------------------
 
-.PHONY: clang clang-5 mingw doc native maketree $(DEPEND) depend 
+.PHONY: all gcc9 clang clang-5 mingw doc man native maketree $(DEPEND) depend runtests
 
 #-------------------------------------------------
 # all
@@ -287,27 +296,33 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -finline-limit=100 -fpermissive -fext-numeric-literals -msse4.2 -Wall -pedantic -Wpedantic -Wsign-compare -Wextra " EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
 		-mllvm -inline-threshold=2000 \
-		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
-		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
+		-Wunknown-warning-option \
+		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
+		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
 
 clang-libc:
-	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
-	$(MAKE) CC=clang++-libc++ LD=clang++-libc++ OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
-		-mllvm -inline-threshold=2000 \
-		-msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
-		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wno-unused-template \
-		-Wno-missing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override"
+	#clang-11 currently broken
+	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native
+	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
+		-stdlib=libc++ -mllvm -inline-threshold=2000 \
+		-Wunknown-warning-option \
+		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
+		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
+		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code" \
+		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
@@ -316,9 +331,12 @@ nvcc:
 	$(MAKE) CC=/usr/local/cuda-10.2/bin/nvcc LD=/usr/local/cuda-10.2/bin/nvcc \
 		OBJ=obj/nvcc CEXTRAFLAGS="--std c++14 -x cu  -DNVCCBUILD=102 --expt-extended-lambda \
 		--expt-relaxed-constexpr --default-stream per-thread --restrict \
-		--ftemplate-depth 1024 \
+		--ftemplate-depth 1024  \
 		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
 		DEPENDCC=g++
+
+runtests:
+	./nltool$(EXESUFFIX) -c tests
 
 tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 
@@ -343,8 +361,13 @@ mingw:
 #     LDEXTRAFLAGS = -municode
 #
 
+man: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
+	@mkdir -p man
+	@mkdir -p html
+	help2man --include=nltool.help2man --no-info ./nltool$(EXESUFFIX) > man/nltool.1
+	groff -mandoc -Thtml man/nltool.1 > html/nltool.html
 
-doc: nltool$(EXESUFFIX)
+doc: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 

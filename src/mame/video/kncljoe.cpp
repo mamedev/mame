@@ -112,13 +112,13 @@ void kncljoe_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(kncljoe_state::kncljoe_videoram_w)
+void kncljoe_state::kncljoe_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
+void kncljoe_state::kncljoe_control_w(uint8_t data)
 {
 	int i;
 	/*
@@ -152,7 +152,7 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 	}
 }
 
-WRITE8_MEMBER(kncljoe_state::kncljoe_scroll_w)
+void kncljoe_state::kncljoe_scroll_w(offs_t offset, uint8_t data)
 {
 	int scrollx;
 

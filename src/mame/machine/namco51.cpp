@@ -61,7 +61,7 @@
 #include "screen.h"
 
 
-WRITE_LINE_MEMBER( namco_51xx_device::reset ) // make active low in the name
+WRITE_LINE_MEMBER( namco_51xx_device::reset )
 {
 	// Reset line is active low.
 	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
@@ -85,12 +85,7 @@ TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
 
 WRITE_LINE_MEMBER( namco_51xx_device::chip_select )
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::chip_select_sync),this), state);
-}
-
-TIMER_CALLBACK_MEMBER( namco_51xx_device::chip_select_sync )
-{
-	m_cpu->set_input_line(0, param);
+	m_cpu->set_input_line(0, state);
 }
 
 uint8_t namco_51xx_device::read()

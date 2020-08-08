@@ -791,7 +791,7 @@ void smc91c9x_device::process_command(uint16_t data)
     smc91c9x_r - handle a read from the device
 -------------------------------------------------*/
 
-READ16_MEMBER( smc91c9x_device::read )
+u16 smc91c9x_device::read(offs_t offset, u16 mem_mask)
 {
 	uint32_t result;
 
@@ -839,7 +839,7 @@ READ16_MEMBER( smc91c9x_device::read )
 			if ( m_reg[B2_POINTER] & 0x8000 )
 				buffer = &m_buffer[curr_completed_rx() * ETHER_BUFFER_SIZE];
 			else
-				buffer = &m_buffer[(m_reg[B2_PNR_ARR] & 0x1f) * ETHER_BUFFER_SIZE];;
+				buffer = &m_buffer[(m_reg[B2_PNR_ARR] & 0x1f) * ETHER_BUFFER_SIZE];
 
 			result = buffer[addr++];
 			if ( ACCESSING_BITS_8_15 )
@@ -860,7 +860,7 @@ READ16_MEMBER( smc91c9x_device::read )
     smc91c9x_w - handle a write to the device
 -------------------------------------------------*/
 
-WRITE16_MEMBER( smc91c9x_device::write )
+void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* determine the effective register */
 	offset %= 8;
@@ -1000,7 +1000,7 @@ WRITE16_MEMBER( smc91c9x_device::write )
 			if (m_reg[B2_POINTER] & RCV)
 				buffer = &m_buffer[curr_completed_rx() * ETHER_BUFFER_SIZE];
 			else
-				buffer = &m_buffer[(m_reg[B2_PNR_ARR] & 0x1f) * ETHER_BUFFER_SIZE];;
+				buffer = &m_buffer[(m_reg[B2_PNR_ARR] & 0x1f) * ETHER_BUFFER_SIZE];
 
 			buffer[addr++] = data;
 			if ( ACCESSING_BITS_8_15 )

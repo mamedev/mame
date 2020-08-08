@@ -292,22 +292,22 @@ std::unique_ptr<util::disasm_interface> tms32025_device::create_disassembler()
 	return std::make_unique<tms32025_disassembler>();
 }
 
-READ16_MEMBER( tms32025_device::drr_r)
+uint16_t tms32025_device::drr_r()
 {
 	return m_drr;
 }
 
-WRITE16_MEMBER(tms32025_device::drr_w)
+void tms32025_device::drr_w(uint16_t data)
 {
 	m_drr = data;
 }
 
-READ16_MEMBER( tms32025_device::dxr_r)
+uint16_t tms32025_device::dxr_r()
 {
 	return m_dxr;
 }
 
-WRITE16_MEMBER(tms32025_device::dxr_w)
+void tms32025_device::dxr_w(uint16_t data)
 {
 	m_dxr = data;
 
@@ -319,42 +319,42 @@ WRITE16_MEMBER(tms32025_device::dxr_w)
 	}
 }
 
-READ16_MEMBER( tms32025_device::tim_r)
+uint16_t tms32025_device::tim_r()
 {
 	return m_tim;
 }
 
-WRITE16_MEMBER(tms32025_device::tim_w)
+void tms32025_device::tim_w(uint16_t data)
 {
 	m_tim = data;
 }
 
-READ16_MEMBER( tms32025_device::prd_r)
+uint16_t tms32025_device::prd_r()
 {
 	return m_prd;
 }
 
-WRITE16_MEMBER(tms32025_device::prd_w)
+void tms32025_device::prd_w(uint16_t data)
 {
 	m_prd = data;
 }
 
-READ16_MEMBER( tms32025_device::imr_r)
+uint16_t tms32025_device::imr_r()
 {
 	return m_imr;
 }
 
-WRITE16_MEMBER(tms32025_device::imr_w)
+void tms32025_device::imr_w(uint16_t data)
 {
 	m_imr = data;
 }
 
-READ16_MEMBER( tms32025_device::greg_r)
+uint16_t tms32025_device::greg_r()
 {
 	return m_greg;
 }
 
-WRITE16_MEMBER(tms32025_device::greg_w)
+void tms32025_device::greg_w(uint16_t data)
 {
 	m_greg = data;
 }

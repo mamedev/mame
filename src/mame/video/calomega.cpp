@@ -19,13 +19,13 @@
 #include "includes/calomega.h"
 
 
-WRITE8_MEMBER(calomega_state::calomega_videoram_w)
+void calomega_state::calomega_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(calomega_state::calomega_colorram_w)
+void calomega_state::calomega_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

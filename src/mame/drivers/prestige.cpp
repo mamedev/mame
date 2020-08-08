@@ -171,13 +171,13 @@ private:
 	uint32_t screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( bankswitch_r );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_WRITE8_MEMBER( kb_w );
-	DECLARE_READ8_MEMBER( mouse_r );
-	DECLARE_WRITE8_MEMBER( mouse_w );
-	DECLARE_WRITE8_MEMBER( lcdc_w );
+	uint8_t bankswitch_r(offs_t offset);
+	void bankswitch_w(offs_t offset, uint8_t data);
+	uint8_t kb_r(offs_t offset);
+	void kb_w(uint8_t data);
+	uint8_t mouse_r(offs_t offset);
+	void mouse_w(offs_t offset, uint8_t data);
+	void lcdc_w(offs_t offset, uint8_t data);
 	void prestige_palette(palette_device &palette) const;
 	void glcolor_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
@@ -189,12 +189,12 @@ private:
 };
 
 
-READ8_MEMBER( prestige_state::bankswitch_r )
+uint8_t prestige_state::bankswitch_r(offs_t offset)
 {
 	return m_bank[offset];
 }
 
-WRITE8_MEMBER( prestige_state::bankswitch_w )
+void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 	m_bank[offset] = data;
 }
 
-READ8_MEMBER( prestige_state::kb_r )
+uint8_t prestige_state::kb_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -272,12 +272,12 @@ READ8_MEMBER( prestige_state::kb_r )
 	return data;
 }
 
-WRITE8_MEMBER( prestige_state::kb_w )
+void prestige_state::kb_w(uint8_t data)
 {
 	m_kb_matrix = data;
 }
 
-READ8_MEMBER( prestige_state::mouse_r )
+uint8_t prestige_state::mouse_r(offs_t offset)
 {
 	int16_t data = 0;
 
@@ -297,7 +297,7 @@ READ8_MEMBER( prestige_state::mouse_r )
 	return 0x80 + data;
 }
 
-WRITE8_MEMBER( prestige_state::mouse_w )
+void prestige_state::mouse_w(offs_t offset, uint8_t data)
 {
 	switch( offset )
 	{
@@ -310,7 +310,7 @@ WRITE8_MEMBER( prestige_state::mouse_w )
 	}
 }
 
-WRITE8_MEMBER( prestige_state::lcdc_w )
+void prestige_state::lcdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -929,8 +929,8 @@ COMP( 1995, snotec,   0,       0,      snotec,   glcolor,  prestige_state, empty
 COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club \xce\xbc (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ (Japan)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 19??, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 199?, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

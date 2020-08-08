@@ -3,6 +3,40 @@
 /*
  * nld_4013.cpp
  *
+ *  CD4013: Dual Positive-Edge-Triggered D Flip-Flops
+ *          with Set, Reset and Complementary Outputs
+ *
+ *          +--------------+
+ *       Q1 |1     ++    14| VDD
+ *      Q1Q |2           13| Q2
+ *   CLOCK1 |3           12| Q2Q
+ *   RESET1 |4    4013   11| CLOCK2
+ *    DATA1 |5           10| RESET2
+ *     SET1 |6            9| DATA2
+ *      VSS |7            8| SET2
+ *          +--------------+
+ *
+ *          +-----+-----+-----+---++---+-----+
+ *          | SET | RES | CLK | D || Q | QQ  |
+ *          +=====+=====+=====+===++===+=====+
+ *          |  1  |  0  |  X  | X || 1 |  0  |
+ *          |  0  |  1  |  X  | X || 0 |  1  |
+ *          |  1  |  1  |  X  | X || 1 |  1  | (*)
+ *          |  0  |  0  |  R  | 1 || 1 |  0  |
+ *          |  0  |  0  |  R  | 0 || 0 |  1  |
+ *          |  0  |  0  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+-----+---++---+-----+
+ *
+ *  (*) This configuration is not stable, i.e. it will not persist
+ *  when either the preset and or clear inputs return to their inactive (high) level
+ *
+ *  Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -. 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ *  FIXME: Check that (*) is emulated properly
  */
 
 #include "netlist/nl_base.h"
@@ -16,10 +50,10 @@ namespace netlist
 	NETLIB_OBJECT(CD4013)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4013, "CD4XXX")
-		, m_D(*this, "DATA")
-		, m_RESET(*this, "RESET")
-		, m_SET(*this, "SET")
-		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(CD4013, clk))
+		, m_D(*this, "DATA", NETLIB_DELEGATE(inputs))
+		, m_RESET(*this, "RESET", NETLIB_DELEGATE(inputs))
+		, m_SET(*this, "SET", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLOCK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)
@@ -28,9 +62,36 @@ namespace netlist
 		}
 
 	private:
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-		NETLIB_HANDLERI(clk);
+		NETLIB_RESETI()
+		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_D.set_state(logic_t::STATE_INP_ACTIVE);
+			m_nextD = 0;
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const auto set(m_SET());
+			const auto reset(m_RESET());
+			if ((set ^ 1) & (reset ^ 1))
+			{
+				m_D.activate();
+				m_nextD = m_D();
+				m_CLK.activate_lh();
+			}
+			else
+			{
+				newstate_setreset(set, reset);
+				m_CLK.inactivate();
+				m_D.inactivate();
+			}
+		}
+
+		NETLIB_HANDLERI(clk)
+		{
+			newstate_clk(m_nextD);
+			m_CLK.inactivate();
+		}
 
 		logic_input_t m_D;
 		logic_input_t m_RESET;
@@ -59,80 +120,7 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(CD4013_dip)
-	{
-		NETLIB_CONSTRUCTOR(CD4013_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", "A.Q");
-			register_subalias("2", "A.QQ");
-			register_subalias("3", "A.CLOCK");
-			register_subalias("4", "A.RESET");
-			register_subalias("5", "A.DATA");
-			register_subalias("6", "A.SET");
-			register_subalias("7", "A.VSS");
-
-			register_subalias("8", "B.SET");
-			register_subalias("9", "B.DATA");
-			register_subalias("10", "B.RESET");
-			register_subalias("11", "B.CLOCK");
-			register_subalias("12", "B.QQ");
-			register_subalias("13", "B.Q");
-			register_subalias("14", "A.VDD");
-
-			connect("A.VSS", "B.VSS");
-			connect("A.VDD", "B.VDD");
-		}
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-
-	private:
-		NETLIB_SUB(CD4013) m_A;
-		NETLIB_SUB(CD4013) m_B;
-	};
-
-	NETLIB_HANDLER(CD4013, clk)
-	{
-		newstate_clk(m_nextD);
-		m_CLK.inactivate();
-	}
-
-	NETLIB_UPDATE(CD4013)
-	{
-		const auto set(m_SET());
-		const auto reset(m_RESET());
-		if ((set ^ 1) & (reset ^ 1))
-		{
-			m_D.activate();
-			m_nextD = m_D();
-			m_CLK.activate_lh();
-		}
-		else
-		{
-			newstate_setreset(set, reset);
-			m_CLK.inactivate();
-			m_D.inactivate();
-		}
-	}
-
-	NETLIB_RESET(CD4013)
-	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
-		m_D.set_state(logic_t::STATE_INP_ACTIVE);
-		m_nextD = 0;
-	}
-
-	NETLIB_RESET(CD4013_dip)
-	{
-	}
-
-	NETLIB_UPDATE(CD4013_dip)
-	{
-	}
-
 	NETLIB_DEVICE_IMPL(CD4013, "CD4013", "+CLOCK,+DATA,+RESET,+SET,@VDD,@VSS")
-	NETLIB_DEVICE_IMPL(CD4013_dip, "CD4013_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

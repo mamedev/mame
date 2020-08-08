@@ -510,7 +510,7 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 }
 
 
-READ32_MEMBER(ms32_state::ms32_read_inputs3)
+u32 ms32_state::ms32_read_inputs3()
 {
 	int a,b,c,d;
 	a = ioport("AN2?")->read(); // unused?
@@ -521,7 +521,7 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 }
 
 
-WRITE32_MEMBER(ms32_state::ms32_sound_w)
+void ms32_state::ms32_sound_w(u32 data)
 {
 	m_soundlatch->write(data & 0xff);
 
@@ -529,12 +529,12 @@ WRITE32_MEMBER(ms32_state::ms32_sound_w)
 	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
-READ32_MEMBER(ms32_state::ms32_sound_r)
+u32 ms32_state::ms32_sound_r()
 {
 	return m_to_main^0xff;
 }
 
-WRITE32_MEMBER(ms32_state::reset_sub_w)
+void ms32_state::reset_sub_w(u32 data)
 {
 	if(data) m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // 0 too ?
 }
@@ -545,91 +545,91 @@ WRITE32_MEMBER(ms32_state::reset_sub_w)
 /********** MEMORY MAP **********/
 
 
-READ8_MEMBER(ms32_state::ms32_nvram_r8)
+u8 ms32_state::ms32_nvram_r8(offs_t offset)
 {
 	return m_nvram_8[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_nvram_w8)
+void ms32_state::ms32_nvram_w8(offs_t offset, u8 data)
 {
 	m_nvram_8[offset] = data;
 }
 
-READ8_MEMBER(ms32_state::ms32_priram_r8)
+u8 ms32_state::ms32_priram_r8(offs_t offset)
 {
 	return m_priram[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_priram_w8)
+void ms32_state::ms32_priram_w8(offs_t offset, u8 data)
 {
 	m_priram[offset] = data;
 }
 
-READ16_MEMBER(ms32_state::ms32_palram_r16)
+u16 ms32_state::ms32_palram_r16(offs_t offset)
 {
 	return m_palram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_palram_w16)
+void ms32_state::ms32_palram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_rozram_r16)
+u16 ms32_state::ms32_rozram_r16(offs_t offset)
 {
 	return m_rozram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_rozram_w16)
+void ms32_state::ms32_rozram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_lineram_r16)
+u16 ms32_state::ms32_lineram_r16(offs_t offset)
 {
 	return m_lineram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_lineram_w16)
+void ms32_state::ms32_lineram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_sprram_r16)
+u16 ms32_state::ms32_sprram_r16(offs_t offset)
 {
 	return m_sprram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_sprram_w16)
+void ms32_state::ms32_sprram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_txram_r16)
+u16 ms32_state::ms32_txram_r16(offs_t offset)
 {
 	return m_txram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_txram_w16)
+void ms32_state::ms32_txram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_bgram_r16)
+u16 ms32_state::ms32_bgram_r16(offs_t offset)
 {
 	return m_bgram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_bgram_w16)
+void ms32_state::ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
-WRITE32_MEMBER(ms32_state::pip_w)
+void ms32_state::pip_w(u32 data)
 {
 	m_tilemaplayoutcontrol = data;
 
@@ -637,7 +637,7 @@ WRITE32_MEMBER(ms32_state::pip_w)
 		popmessage("fce00a7c = %02x",data);
 }
 
-WRITE32_MEMBER(ms32_state::coin_counter_w)
+void ms32_state::coin_counter_w(u32 data)
 {
 	// desertwr/p47aces sets 4 here
 	// f1superb sets 2
@@ -690,23 +690,23 @@ void ms32_state::ms32_map(address_map &map)
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use its own memory map */
 
-WRITE16_MEMBER(ms32_state::ms32_extra_w16)
+void ms32_state::ms32_extra_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_f1superb_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_extra_r16)
+u16 ms32_state::ms32_extra_r16(offs_t offset)
 {
 	return m_f1superb_extraram[offset];
 }
 
-WRITE32_MEMBER(ms32_state::ms32_irq2_guess_w)
+void ms32_state::ms32_irq2_guess_w(u32 data)
 {
 	irq_raise(2);
 }
 
-WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
+void ms32_state::ms32_irq5_guess_w(u32 data)
 {
 	irq_raise(5);
 }
@@ -1662,18 +1662,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
  code at $38 reads the 2nd command latch ??
 */
 
-READ8_MEMBER(ms32_state::latch_r)
+u8 ms32_state::latch_r()
 {
 	return m_soundlatch->read()^0xff;
 }
 
-WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
+void ms32_state::ms32_snd_bank_w(u8 data)
 {
 	m_z80bank[0]->set_entry((data >> 0) & 0x0F);
 	m_z80bank[1]->set_entry((data >> 4) & 0x0F);
 }
 
-WRITE8_MEMBER(ms32_state::to_main_w)
+void ms32_state::to_main_w(u8 data)
 {
 	m_to_main=data;
 	irq_raise(1);

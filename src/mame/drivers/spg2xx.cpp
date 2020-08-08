@@ -318,6 +318,167 @@ void spg2xx_game_gssytts_state::mem_map_upperbank(address_map &map)
 }
 
 
+void spg2xx_game_wfcentro_state::mem_map_wfcentro(address_map &map)
+{
+	map(0x000000, 0x37ffff).bankr("cartbank");
+	map(0x380000, 0x3fffff).ram();
+}
+
+
+static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
+	PORT_START("P1")
+	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_DIPNAME( 0x0002, 0x0002, "P1:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0004, "P1:0004" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_DIPNAME( 0x0008, 0x0008, "P1:0008" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0008, "0008" )
+	PORT_DIPNAME( 0x0010, 0x0010, "P1:0010" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_DIPNAME( 0x0020, 0x0020, "P1:0020" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0020, "0020" )
+	PORT_DIPNAME( 0x0040, 0x0040, "P1:0040" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0040, "0040" )
+	PORT_DIPNAME( 0x0080, 0x0080, "P1:0080" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0080, "0080" )
+	PORT_DIPNAME( 0x0100, 0x0100, "P1:0100" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0100, "0100" )
+	PORT_DIPNAME( 0x0200, 0x0200, "P1:0200" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0200, "0200" )
+	PORT_DIPNAME( 0x0400, 0x0400, "P1:0400" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0400, "0400" )
+	PORT_DIPNAME( 0x0800, 0x0800, "P1:0800" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0800, "0800" )
+	PORT_DIPNAME( 0x1000, 0x1000, "P1:1000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x1000, "1000" )
+	PORT_DIPNAME( 0x2000, 0x2000, "P1:2000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x2000, "2000" )
+	PORT_DIPNAME( 0x4000, 0x4000, "P1:4000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x4000, "4000" )
+	PORT_DIPNAME( 0x8000, 0x8000, "P1:8000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x8000, "8000" )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "P2:0001" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_DIPNAME( 0x0002, 0x0002, "P2:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0004, "P2:0004" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_DIPNAME( 0x0008, 0x0008, "P2:0008" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0008, "0008" )
+	PORT_DIPNAME( 0x0010, 0x0010, "P2:0010" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_DIPNAME( 0x0020, 0x0020, "P2:0020" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0020, "0020" )
+	PORT_DIPNAME( 0x0040, 0x0040, "P2:0040" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0040, "0040" )
+	PORT_DIPNAME( 0x0080, 0x0080, "P2:0080" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0080, "0080" )
+	PORT_DIPNAME( 0x0100, 0x0100, "P2:0100" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0100, "0100" )
+	PORT_DIPNAME( 0x0200, 0x0200, "P2:0200" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0200, "0200" )
+	PORT_DIPNAME( 0x0400, 0x0400, "P2:0400" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0400, "0400" )
+	PORT_DIPNAME( 0x0800, 0x0800, "P2:0800" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0800, "0800" )
+	PORT_DIPNAME( 0x1000, 0x1000, "P2:1000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x1000, "1000" )
+	PORT_DIPNAME( 0x2000, 0x2000, "P2:2000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x2000, "2000" )
+	PORT_DIPNAME( 0x4000, 0x4000, "P2:4000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x4000, "4000" )
+	PORT_DIPNAME( 0x8000, 0x8000, "P2:8000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x8000, "8000" )
+
+	PORT_START("P3")
+	PORT_DIPNAME( 0x0001, 0x0001, "P3:0001" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_DIPNAME( 0x0002, 0x0002, "P3:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0004, "P3:0004" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_DIPNAME( 0x0008, 0x0008, "P3:0008" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0008, "0008" )
+	PORT_DIPNAME( 0x0010, 0x0010, "P3:0010" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_DIPNAME( 0x0020, 0x0020, "P3:0020" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0020, "0020" )
+	PORT_DIPNAME( 0x0040, 0x0040, "P3:0040" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0040, "0040" )
+	PORT_DIPNAME( 0x0080, 0x0080, "P3:0080" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0080, "0080" )
+	PORT_DIPNAME( 0x0100, 0x0100, "P3:0100" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0100, "0100" )
+	PORT_DIPNAME( 0x0200, 0x0200, "P3:0200" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0200, "0200" )
+	PORT_DIPNAME( 0x0400, 0x0400, "P3:0400" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0400, "0400" )
+	PORT_DIPNAME( 0x0800, 0x0800, "P3:0800" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0800, "0800" )
+	PORT_DIPNAME( 0x1000, 0x1000, "P3:1000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x1000, "1000" )
+	PORT_DIPNAME( 0x2000, 0x2000, "P3:2000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x2000, "2000" )
+	PORT_DIPNAME( 0x4000, 0x4000, "P3:4000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x4000, "4000" )
+	PORT_DIPNAME( 0x8000, 0x8000, "P3:8000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x8000, "8000" )
+INPUT_PORTS_END
+
+
+
 static INPUT_PORTS_START( rad_skat )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Full Left")
@@ -456,7 +617,9 @@ static INPUT_PORTS_START( rad_fb2 ) // controls must be multiplexed somehow, as 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abltenni )
-	PORT_START("P1") // Down and both buttons on startup for Diagnostics Menu
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1") // Down and both buttons on startup for Diagnostics Menu
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -466,261 +629,125 @@ static INPUT_PORTS_START( abltenni )
 	// all remaining bits in this port will stop the demo mode, also having them high/low determines if you get 2P demos or Vs. CPU demos, not sure what the real state would be
 	PORT_BIT( 0xffc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Used" )
+	PORT_MODIFY("P2")
+	PORT_DIPNAME( 0x0020, 0x0000, "Used" ) // doesn't boot otherwise
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P3")
-	PORT_DIPNAME( 0x0001, 0x0001, "P3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_MODIFY("P3")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ordentv )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fordrace )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1") // hold button 1 on powerup for test
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select / Start")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Up")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Down")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Pause")
+
+	PORT_MODIFY("P2")
+
+	PORT_MODIFY("P3")
+
+	PORT_START("AD0") // 12-bit port, Accelerator
+	PORT_BIT(0x0fff, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+
+	PORT_START("AD1") // 12-bit port, Brake
+	PORT_BIT(0x0fff, 0x0000, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+
+	PORT_START("AD2") // 12-bit port, Wheel is split across 2 ports, value added together?
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel2_r)
+
+	PORT_START("AD3") // 12-bit port, Wheel (see above)
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel_r)
+
+	PORT_START("WHEEL_REAL")
+	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( totspies )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// unit also has a 'select' button next to 'OK' and while test mode shows it onscreen too, it doesn't get tested, so probably isn't connected to anything?
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("OK")
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+
+CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
+{
+	return ioport("WHEEL_REAL")->read() >> 1;
+}
+
+CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel2_r)
+{
+//  return 0x0800;
+	uint16_t dat = ioport("WHEEL_REAL")->read();
+
+	return ((dat >> 1) ^ 0xfff) + (dat & 1);
+}
+
+static INPUT_PORTS_START( senspeed )
 	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Accelerate / Select")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Reverse / Confirm")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A (Autojacks)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B (Belt Tires)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C (Cutting Saw)")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("D (Deflector)")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("E (Evening Eyes)")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("F (Frogman Mode)")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("G (Go Robot)")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Pause")
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) // eeprom bit, handled in read function
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_DIPNAME( 0x0001, 0x0001, "P3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ablkickb )
-	PORT_START("P1")
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -730,133 +757,10 @@ static INPUT_PORTS_START( ablkickb )
 	PORT_DIPNAME( 0x0040, 0x0040, "Show Coleco Logo" ) // must be wired inside unit for Coleco distributed ones (US?)
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_MODIFY("P2")
 
-	PORT_START("P3")
-	PORT_DIPNAME( 0x0001, 0x0001, "P3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_MODIFY("P3")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lxspidaj )
@@ -960,6 +864,31 @@ static INPUT_PORTS_START( guitarss )
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
 
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( senwfit )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )  PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )  PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Weight Left")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Weight Right")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Up-Left")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Down-Left")
+	PORT_BIT( 0x1c00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Up-Right")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Down-Right")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jjstrip )
@@ -1154,17 +1083,83 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
 
-void spg2xx_game_state::abltenni(machine_config &config)
+void spg2xx_game_state::spg2xx(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set_ioport("P1");
-	m_maincpu->portb_in().set_ioport("P2");
-	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
 }
+
+void spg2xx_game_state::spg2xx_pal(machine_config& config)
+{
+	spg2xx(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
+
+void spg2xx_game_fordrace_state::fordrace(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_fordrace_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_fordrace_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_fordrace_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_fordrace_state::base_portc_r));
+
+	// these do something in test mode, but in game the ADC interrupt is never generated?
+	m_maincpu->adc_in<0>().set_ioport("AD0"); // pedals1
+	m_maincpu->adc_in<1>().set_ioport("AD1"); // pedal2
+	m_maincpu->adc_in<2>().set_ioport("AD2"); // steering
+	m_maincpu->adc_in<3>().set_ioport("AD3"); // steering
+
+}
+
+uint16_t spg2xx_game_senspeed_state::portb_r()
+{
+	uint16_t ret = 0x0000;
+	ret = m_i2cmem->read_sda() ? 1: 0;
+
+	logerror("%s: spg2xx_game_senspeed_state::portb_r (%04x)\n", machine().describe_context(), ret);
+	return ret;
+}
+
+void spg2xx_game_senspeed_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (BIT(mem_mask, 1))
+		m_i2cmem->write_scl(BIT(data, 1));
+	if (BIT(mem_mask, 0))
+		m_i2cmem->write_sda(BIT(data, 0));
+}
+
+void spg2xx_game_senspeed_state::senspeed(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_senspeed_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_senspeed_state::portb_r));
+	m_maincpu->portc_in().set_ioport("P3");
+
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_senspeed_state::portb_w));
+
+	/*
+	    ATMLH806
+	    02B 1
+	    A7J4565E
+	*/
+	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
+}
+
 
 uint16_t spg2xx_game_comil_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
@@ -1477,7 +1472,7 @@ void spg2xx_game_gssytts_state::portc_w(offs_t offset, uint16_t data, uint16_t m
 
 void spg2xx_game_gssytts_state::machine_start()
 {
-	m_upperbank->configure_entries(0, 4, memregion("maincpu")->base(), 0x400000);
+	m_upperbank->configure_entries(0, memregion("maincpu")->bytes()/0x400000, memregion("maincpu")->base(), 0x400000);
 	m_upperbank->set_entry(1);
 
 	spg2xx_game_state::machine_start();
@@ -1508,6 +1503,75 @@ void spg2xx_game_gssytts_state::gssytts(machine_config &config)
 }
 
 
+void spg2xx_game_wfcentro_state::wfcentro(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_wfcentro_state::mem_map_wfcentro);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_wfcentro_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_wfcentro_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_wfcentro_state::base_portc_r));
+}
+
+
+
+void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int bank = 0;
+
+	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	if (mem_mask & 1)
+		if (data & 1)
+			bank |= 1;
+
+	if (mem_mask & 2)
+		if (data & 2)
+			bank |= 2;
+
+	if (mem_mask & 4)
+		if (data & 4)
+			bank |= 4;
+
+	m_upperbank->set_entry(bank);
+	m_maincpu->invalidate_cache();
+}
+
+
+void spg2xx_game_senwfit_state::init_senwfit()
+{
+	uint8_t *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	std::vector<u8> buffer(len);
+
+	for (int i = 0; i < len; i++)
+	{
+		int newaddr = bitswap<25>(i, 24,23,22,20,9,19,18,21,17,16,15,14,13,12,11,10,8,7,6,5,4,3,2,1,0);
+		buffer[i] = src[newaddr];
+	}
+	std::copy(buffer.begin(), buffer.end(), &src[0]);
+
+}
+
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
 	rad_skat(config);
@@ -1530,6 +1594,26 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_maincpu->i2c_w().set(FUNC(spg2xx_game_state::i2c_w));
 	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
+
+uint16_t spg2xx_game_ordentv_state::ordentv_portc_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = m_io_p3->read() ^ (machine().rand() & 1);
+	logerror("%s: Port C Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void spg2xx_game_ordentv_state::ordentv(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_ordentv_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_ordentv_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_ordentv_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_ordentv_state::ordentv_portc_r));
+}
+
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -1561,6 +1645,11 @@ ROM_END
 ROM_START( abltenni )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ablpnpwirelesstennis.bin", 0x000000, 0x400000, CRC(66bd8ef1) SHA1(a83640d5d9e84e10d29a065a61e0d7bbec16c6e4) )
+ROM_END
+
+ROM_START( totspies )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "w321tg.u2", 0x000000, 0x400000, CRC(76152ad7) SHA1(b37ea950670eb927f3f0ab5e38d0e2a5f3ca7904) )
 ROM_END
 
 ROM_START( ablkickb )
@@ -1630,7 +1719,10 @@ ROM_START( gssytts )
 	ROM_CONTINUE(0x800000, 0x800000) // 2nd 8mb
 ROM_END
 
-
+ROM_START( senwfit )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "wirelessfit.bin", 0x000000, 0x2000000, CRC(bfdc9c56) SHA1(dd0d4262720fcc3fab5b66d39df9be3419b07178) )
+ROM_END
 
 
 ROM_START( jjstrip )
@@ -1672,6 +1764,26 @@ ROM_END
 ROM_START( vtechtvsgr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
+ROM_END
+
+ROM_START( senspeed )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "speedracer.bin", 0x000000, 0x800000, CRC(4efbcd39) SHA1(2edffbaa9ea309ad308fa60f32d8b7a98ee313c7) )
+ROM_END
+
+ROM_START( ordentv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "taikeeordenadortv.bin", 0x000000, 0x800000, CRC(ba15895a) SHA1(0a18076cbc3264c91473b8518dfb10d679321b47) )
+ROM_END
+
+ROM_START( wfcentro )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
+ROM_END
+
+ROM_START( tiktokmm )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
 ROM_END
 
 void spg2xx_game_state::init_crc()
@@ -1722,45 +1834,63 @@ void spg2xx_game_albkickb_state::init_ablkickb()
 	decrypt_ac_ff(ROM, size);
 }
 
+void spg2xx_game_ordentv_state::init_ordentv()
+{
+	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x4fef8] = 0xee07;
+}
+
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // Radica TV games
 CONS( 2006, rad_skat,   0,        0, rad_skat,  rad_skat,  spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Skateboarder (NTSC)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, rad_skatp,  rad_skat, 0, rad_skatp, rad_skatp, spg2xx_game_state,          init_crc,      "Radica",                                                 "Connectv Skateboarder (PAL)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,          init_crc,      "Radica",                                                 "Connectv Cricket (PAL)",                                                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+
 CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
 // ABL TV Games
-CONS( 2006, abltenni,   0,        0, abltenni,  abltenni,  spg2xx_game_state,          empty_init,    "f / V-Tac Technology Co Ltd.",                           "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
-CONS( 2007, lxspidaj,   0,        0, abltenni,  lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, fordrace,   0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, lxspidaj,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2008, comil,      0,        0, comil,     comil,     spg2xx_game_comil_state,    empty_init,    "Character Options",                                      "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Same as Excalibur Decathlon? Not the same as the ABL game
+// Same as Excalibur Decathlon? Not identical to the ABL game below, but built on the same engine
 CONS( 2006, tvsprt10,   0,        0, tvsprt10,  tvsprt10,  spg2xx_game_state,          init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",                       "TV Sports 10-in-1 / Decathlon Athletic Sport Games",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 CONS( 200?, decathln,   0,        0, tvsprt10,  decathln,  spg2xx_game_state,          init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Decathlon (set 1)",                                                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
 CONS( 200?, decathlna,  decathln, 0, tvsprt10,  decathln,  spg2xx_game_state,          init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Decathlon (set 2, SM570, ABL TV Game)",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in UK
 
 CONS( 2007, guitarfv,   0,        0, guitarfv,  guitarfv,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd",                                     "Guitar Fever (2007.07.03 Ver 2.7)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The box for these has 'YOU take the stage' text, but unlike the sequel, it is not part of the ingame title screen, this sometimes causes confusion
-CONS( 200?, guitarss,   0,        0, abltenni,  guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star ('Fender Stratocaster' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, guitarssa,  guitarss, 0, abltenni,  guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star (red 'Gibson Flying V' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarss,   0,        0, spg2xx,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star ('Fender Stratocaster' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, guitarssa,  guitarss, 0, spg2xx,    guitarss,  spg2xx_game_state,          empty_init,    "Senario",                                                "Guitar Super Star (red 'Gibson Flying V' style)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // The sequel has 'You Take The Stage' on both the box and title screen
 CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_state,  empty_init,    "Senario",                                                "Guitar Super Star: You Take The Stage",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
-CONS( 2006, vtechtvssp, 0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
-CONS( 2006, vtechtvsgr, 0,        0, abltenni,  fordrace,  spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
+
+CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_state, empty_init,    "Senario",                                                "Speed Racer (Senario)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntbftc,   0,        0, abltenni,  tmntbftc,  spg2xx_game_state,          empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Battle for the City",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntbftc,   0,        0, spg2xx,    tmntbftc,  spg2xx_game_state,          empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Battle for the City",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_state, empty_init,    "Tech2Go / WayForward",                                   "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -1768,10 +1898,15 @@ CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_
 
 CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Needs a hack to not show garbage sprite on startup, seeprom hookup (24LC08), gun fine-tuning, etc.
+// Needs a hack to not show garbage sprite on startup
 CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars - The Clone Wars",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
-CONS( 2005, mattelcs,   0,        0, rad_skat, mattelcs,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// Both the WiWi and Fox Sports units seem to be related to the 'Virtual Interactive' (aka 'Vi') console
+CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
+
+CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+
+// set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
+CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )

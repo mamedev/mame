@@ -69,16 +69,16 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<input_merger_device> m_soundnmi;
 
-	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_enable_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_READ8_MEMBER(port_fetch_r);
-	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_READ8_MEMBER(fake_mcu_r);
-	DECLARE_WRITE8_MEMBER(fake_mcu_w);
-	DECLARE_READ8_MEMBER(fake_status_r);
+	void lkage_sh_nmi_disable_w(uint8_t data);
+	void lkage_sh_nmi_enable_w(uint8_t data);
+	uint8_t sound_status_r();
+	uint8_t port_fetch_r(offs_t offset);
+	uint8_t mcu_status_r();
+	uint8_t fake_mcu_r();
+	void fake_mcu_w(uint8_t data);
+	uint8_t fake_status_r();
 
-	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
+	void lkage_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

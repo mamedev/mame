@@ -42,7 +42,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-READ16_MEMBER( m68340_cpu_device::m68340_internal_sim_r )
+uint16_t m68340_cpu_device::m68340_internal_sim_r(offs_t offset, uint16_t mem_mask)
 {
 	LOGR("%s\n", FUNCNAME);
 	assert(m_m68340SIM);
@@ -98,7 +98,7 @@ READ16_MEMBER( m68340_cpu_device::m68340_internal_sim_r )
 	return val;
 }
 
-WRITE16_MEMBER( m68340_cpu_device::m68340_internal_sim_w )
+void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("\n%s\n", FUNCNAME);
 	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset * 2, data,
@@ -194,7 +194,7 @@ WRITE16_MEMBER( m68340_cpu_device::m68340_internal_sim_w )
 	}
 }
 
-READ8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_r )
+uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 {
 	LOGR("%s\n", FUNCNAME);
 	offset += 0x10;
@@ -280,7 +280,7 @@ READ8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_r )
 	return val;
 }
 
-WRITE8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_w )
+void m68340_cpu_device::m68340_internal_sim_ports_w(offs_t offset, uint8_t data)
 {
 	LOG("%s", FUNCNAME);
 	offset += 0x10;
@@ -342,7 +342,7 @@ WRITE8_MEMBER( m68340_cpu_device::m68340_internal_sim_ports_w )
 	}
 }
 
-READ32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_r )
+uint32_t m68340_cpu_device::m68340_internal_sim_cs_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGR("%s\n", FUNCNAME);
 	offset += m68340_sim::REG_AM_CS0>>2;
@@ -368,7 +368,7 @@ READ32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_r )
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68340_cpu_device::m68340_internal_sim_cs_w )
+void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG("%s\n", FUNCNAME);
 	offset += m68340_sim::REG_AM_CS0>>2;

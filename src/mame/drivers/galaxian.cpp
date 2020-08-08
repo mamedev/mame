@@ -661,6 +661,7 @@ TODO:
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/volt_reg.h"
@@ -694,7 +695,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::tenspot_fake)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(galaxian_state::irq_enable_w)
+void galaxian_state::irq_enable_w(uint8_t data)
 {
 	/* the latched D0 bit here goes to the CLEAR line on the interrupt flip-flop */
 	m_irq_enabled = data & 1;
@@ -710,7 +711,7 @@ WRITE8_MEMBER(galaxian_state::irq_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::start_lamp_w)
+void galaxian_state::start_lamp_w(offs_t offset, uint8_t data)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
@@ -718,20 +719,20 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::coin_lock_w)
+void galaxian_state::coin_lock_w(uint8_t data)
 {
 	/* many variants and bootlegs don't have this */
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
-WRITE8_MEMBER(galaxian_state::coin_count_0_w)
+void galaxian_state::coin_count_0_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
-WRITE8_MEMBER(galaxian_state::coin_count_1_w)
+void galaxian_state::coin_count_1_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 1);
 }
@@ -744,7 +745,7 @@ WRITE8_MEMBER(galaxian_state::coin_count_1_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::konami_ay8910_r)
+uint8_t galaxian_state::konami_ay8910_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -754,7 +755,7 @@ READ8_MEMBER(galaxian_state::konami_ay8910_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
+void galaxian_state::konami_ay8910_w(offs_t offset, uint8_t data)
 {
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
@@ -819,7 +820,7 @@ uint8_t galaxian_state::konami_sound_timer_r()
 			0x0e;                   /* assume remaining bits are high, except B0 which is grounded */
 }
 
-WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
+void galaxian_state::konami_sound_filter_w(offs_t offset, uint8_t data)
 {
 	if (m_netlist != nullptr)
 	{
@@ -863,7 +864,7 @@ void galaxian_state::konami_portc_1_w(uint8_t data)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::theend_ppi8255_r)
+uint8_t galaxian_state::theend_ppi8255_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -873,7 +874,7 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
+void galaxian_state::theend_ppi8255_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x0100) m_ppi8255[0]->write(offset & 3, data);
@@ -948,7 +949,7 @@ READ_LINE_MEMBER(galaxian_state::theend_protection_alt_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
+void galaxian_state::explorer_sound_control_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
@@ -968,7 +969,7 @@ uint8_t galaxian_state::explorer_sound_latch_r()
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::sfx_sample_io_r)
+uint8_t galaxian_state::sfx_sample_io_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -977,7 +978,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
+void galaxian_state::sfx_sample_io_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x04) m_ppi8255[2]->write(offset & 3, data);
@@ -1013,7 +1014,7 @@ void galaxian_state::sfx_sample_control_w(uint8_t data)
     The data(code) in the extra RAM is later jumped/called to in many parts of the game.
 */
 
-READ8_MEMBER(galaxian_state::monsterz_protection_r)
+uint8_t galaxian_state::monsterz_protection_r()
 {
 	return m_protection_result;
 }
@@ -1060,7 +1061,7 @@ void galaxian_state::monsterz_portc_1_w(uint8_t data)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
+uint8_t galaxian_state::frogger_ppi8255_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -1070,7 +1071,7 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
+void galaxian_state::frogger_ppi8255_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x1000) m_ppi8255[1]->write((offset >> 1) & 3, data);
@@ -1078,7 +1079,7 @@ WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 }
 
 
-READ8_MEMBER(galaxian_state::frogger_ay8910_r)
+uint8_t galaxian_state::frogger_ay8910_r(offs_t offset)
 {
 	/* the decoding here is very simplistic */
 	uint8_t result = 0xff;
@@ -1087,7 +1088,7 @@ READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
+void galaxian_state::frogger_ay8910_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
@@ -1106,7 +1107,7 @@ uint8_t galaxian_state::frogger_sound_timer_r()
 }
 
 
-WRITE8_MEMBER(galaxian_state::froggermc_sound_control_w)
+void galaxian_state::froggermc_sound_control_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -1125,7 +1126,7 @@ IRQ_CALLBACK_MEMBER(galaxian_state::froggermc_audiocpu_irq_ack)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
+uint8_t galaxian_state::frogf_ppi8255_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -1135,7 +1136,7 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
+void galaxian_state::frogf_ppi8255_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x1000) m_ppi8255[0]->write((offset >> 3) & 3, data);
@@ -1150,10 +1151,10 @@ WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read((offset >> 4) & 3); }
-READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read((offset >> 4) & 3); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write((offset >> 4) & 3, data); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write((offset >> 4) & 3, data); }
+uint8_t galaxian_state::turtles_ppi8255_0_r(offs_t offset){ return m_ppi8255[0]->read((offset >> 4) & 3); }
+uint8_t galaxian_state::turtles_ppi8255_1_r(offs_t offset){ return m_ppi8255[1]->read((offset >> 4) & 3); }
+void galaxian_state::turtles_ppi8255_0_w(offs_t offset, uint8_t data){ m_ppi8255[0]->write((offset >> 4) & 3, data); }
+void galaxian_state::turtles_ppi8255_1_w(offs_t offset, uint8_t data){ m_ppi8255[1]->write((offset >> 4) & 3, data); }
 
 
 
@@ -1163,7 +1164,7 @@ WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write((offset 
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
+uint8_t galaxian_state::scorpion_ay8910_r(offs_t offset)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
@@ -1174,7 +1175,7 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
+void galaxian_state::scorpion_ay8910_w(offs_t offset, uint8_t data)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
 	if (offset & 0x04) m_ay8910[2]->address_w(data);
@@ -1215,7 +1216,7 @@ void galaxian_state::scorpion_protection_w(uint8_t data)
 	}
 }
 
-READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
+uint8_t galaxian_state::scorpion_digitalker_intr_r()
 {
 	return m_digitalker->digitalker_0_intr_r();
 }
@@ -1235,17 +1236,15 @@ void galaxian_state::scorpion_digitalker_control_w(uint8_t data)
 
 INPUT_CHANGED_MEMBER(gmgalax_state::game_changed)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* new value is the selected game */
 	m_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
 	membank("bank1")->set_entry(m_selected_game);
-	galaxian_gfxbank_w(space, 0, m_selected_game);
+	galaxian_gfxbank_w(0, m_selected_game);
 
 	/* reset the stars */
-	galaxian_stars_enable_w(space, 0, 0);
+	galaxian_stars_enable_w(0);
 
 	/* reset the CPU */
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -1266,7 +1265,7 @@ CUSTOM_INPUT_MEMBER(gmgalax_state::port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
+void galaxian_state::zigzag_bankswap_w(uint8_t data)
 {
 	/* Zig Zag can swap ROMs 2 and 3 as a form of copy protection */
 	membank("bank1")->set_entry(data & 1);
@@ -1274,7 +1273,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
+void galaxian_state::zigzag_ay8910_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x300)
 	{
@@ -1335,26 +1334,26 @@ READ_LINE_MEMBER(galaxian_state::kingball_noise_r)
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_speech_dip_w)
+void galaxian_state::kingball_speech_dip_w(uint8_t data)
 {
 	m_kingball_speech_dip = data;
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_sound1_w)
+void galaxian_state::kingball_sound1_w(uint8_t data)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x01) | data;
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
+void galaxian_state::kingball_sound2_w(uint8_t data)
 {
 	m_kingball_sound = (m_kingball_sound & ~0x02) | (data << 1);
 	m_soundlatch->write(m_kingball_sound | 0xf0);
 }
 
 
-WRITE8_MEMBER(galaxian_state::kingball_dac_w)
+void galaxian_state::kingball_dac_w(uint8_t data)
 {
 	m_dac->write(data >> 4);
 }
@@ -1367,27 +1366,27 @@ WRITE8_MEMBER(galaxian_state::kingball_dac_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
+void galaxian_state::mshuttle_ay8910_cs_w(uint8_t data)
 {
 	m_mshuttle_ay8910_cs = data & 1;
 }
 
 
-WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
+void galaxian_state::mshuttle_ay8910_control_w(uint8_t data)
 {
 	if (!m_mshuttle_ay8910_cs)
 		m_ay8910_cclimber->address_w(data);
 }
 
 
-WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
+void galaxian_state::mshuttle_ay8910_data_w(uint8_t data)
 {
 	if (!m_mshuttle_ay8910_cs)
 		m_ay8910_cclimber->data_w(data);
 }
 
 
-READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
+uint8_t galaxian_state::mshuttle_ay8910_data_r()
 {
 	if (!m_mshuttle_ay8910_cs)
 		return m_ay8910_cclimber->data_r();
@@ -1402,7 +1401,7 @@ READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::jumpbug_protection_r)
+uint8_t galaxian_state::jumpbug_protection_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1424,7 +1423,7 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
+void galaxian_state::checkman_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -1437,7 +1436,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
 }
 
 
-READ8_MEMBER(galaxian_state::checkmaj_protection_r)
+uint8_t galaxian_state::checkmaj_protection_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -1462,19 +1461,19 @@ READ8_MEMBER(galaxian_state::checkmaj_protection_r)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::dingo_3000_r)
+uint8_t galaxian_state::dingo_3000_r()
 {
 	return 0xaa;
 }
 
 
-READ8_MEMBER(galaxian_state::dingo_3035_r)
+uint8_t galaxian_state::dingo_3035_r()
 {
 	return 0x8c;
 }
 
 
-READ8_MEMBER(galaxian_state::dingoe_3001_r)
+uint8_t galaxian_state::dingoe_3001_r()
 {
 	return 0xaa;
 }
@@ -1608,6 +1607,12 @@ void galaxian_state::victoryc_map(address_map &map)
 	galaxian_map(map);
 	map(0x7004, 0x7004).mirror(0x07f8).nopw(); // disable the stars
 	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
+}
+
+void galaxian_state::highroll_map(address_map &map)
+{
+	galaxian_map(map);
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("nvram");
 }
 
 /* map derived from schematics */
@@ -2204,17 +2209,17 @@ void galaxian_state::videight_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(galaxian_state::tenspot_unk_6000_w)
+void galaxian_state::tenspot_unk_6000_w(uint8_t data)
 {
 	logerror("tenspot_unk_6000_w %02x\n",data);
 }
 
-WRITE8_MEMBER(galaxian_state::tenspot_unk_8000_w)
+void galaxian_state::tenspot_unk_8000_w(uint8_t data)
 {
 	logerror("tenspot_unk_8000_w %02x\n",data);
 }
 
-WRITE8_MEMBER(galaxian_state::tenspot_unk_e000_w)
+void galaxian_state::tenspot_unk_e000_w(uint8_t data)
 {
 	logerror("tenspot_unk_e000_w %02x\n",data);
 }
@@ -2233,7 +2238,7 @@ void galaxian_state::tenspot_select_map(address_map &map)
 }
 
 
-READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
+uint8_t galaxian_state::froggeram_ppi8255_r(offs_t offset)
 {
 	// same as theend, but accesses are scrambled
 	uint8_t result = 0xff;
@@ -2242,7 +2247,7 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 	return bitswap<8>(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
+void galaxian_state::froggeram_ppi8255_w(offs_t offset, uint8_t data)
 {
 	// same as theend, but accesses are scrambled
 	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -5900,34 +5905,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( highroll )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 1") PORT_CODE(KEYCODE_0_PAD) // this and the others are just for testing and should be removed when the game works correctly and all inputs can be tested
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Bet / Hold")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 2") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 3") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 4") PORT_CODE(KEYCODE_3_PAD)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 5") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 6") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 7") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 8") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 9") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 10") PORT_CODE(KEYCODE_9_PAD)
+	PORT_DIPNAME( 0x80, 0x00, "Bookkeeping" ) // at first boot, without default NVRAM, this needs to be on, or the games gives error 99, then needs to be switched off to exit bookkeeping
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x07, 0x07, "House" )
+	PORT_DIPSETTING(    0x00, "5 Percent" )
+	PORT_DIPSETTING(    0x01, "10 Percent" )
+	PORT_DIPSETTING(    0x02, "15 Percent" )
+	PORT_DIPSETTING(    0x03, "20 Percent" )
+	PORT_DIPSETTING(    0x04, "25 Percent" )
+	PORT_DIPSETTING(    0x05, "30 Percent" )
+	PORT_DIPSETTING(    0x06, "35 Percent" )
+	PORT_DIPSETTING(    0x07, "40 Percent" )
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
 /*************************************
@@ -6276,7 +6289,10 @@ void galaxian_state::highroll(machine_config &config)
 {
 	galaxian(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::highroll_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &galaxian_state::moonqsr_decrypted_opcodes_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 void galaxian_state::mooncrst(machine_config &config)
@@ -7105,7 +7121,7 @@ void galaxian_state::init_galaxian()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 }
 
-void galaxian_state::init_highroll() // possibly still something wrong?
+void galaxian_state::init_highroll()
 {
 	init_galaxian();
 
@@ -7211,7 +7227,7 @@ void galaxian_state::init_pisces()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 }
 
 
@@ -7223,7 +7239,7 @@ void galaxian_state::init_batman2()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 }
 
 
@@ -7291,7 +7307,7 @@ void galaxian_state::init_mooncrgx()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
 
 	/* LEDs and coin lockout replaced by graphics banking */
-	space.install_write_handler(0x6000, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	space.install_write_handler(0x6000, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 }
 
 
@@ -7304,7 +7320,7 @@ void galaxian_state::init_moonqsr()
 	decode_mooncrst(0x4000, m_decrypted_opcodes);
 }
 
-WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
+void galaxian_state::artic_gfxbank_w(uint8_t data)
 {
 //  printf("artic_gfxbank_w %02x\n",data);
 }
@@ -7317,10 +7333,10 @@ void galaxian_state::init_pacmanbl()
 	init_galaxian();
 
 	/* ...but coin lockout disabled/disconnected */
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
 }
 
-READ8_MEMBER(galaxian_state::tenspot_dsw_read)
+uint8_t galaxian_state::tenspot_dsw_read()
 {
 	if (m_tenspot_current_game >= 0 && m_tenspot_current_game < 10)
 		return m_tenspot_game_dsw[m_tenspot_current_game]->read();
@@ -7380,18 +7396,18 @@ void galaxian_state::init_tenspot()
 	//common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 
 	/* coin lockout replaced by graphics bank */
-	//space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
+	//space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8sm_delegate(*this, FUNC(galaxian_state::galaxian_gfxbank_w)));
 
 
 	init_galaxian();
 
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
+	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
 
 	m_tenspot_current_game = 0;
 
 	tenspot_set_game_bank(m_tenspot_current_game, 0);
 
-	space.install_read_handler(0x7000, 0x7000, read8_delegate(*this, FUNC(galaxian_state::tenspot_dsw_read)));
+	space.install_read_handler(0x7000, 0x7000, read8smo_delegate(*this, FUNC(galaxian_state::tenspot_dsw_read)));
 }
 
 
@@ -7408,8 +7424,6 @@ void galaxian_state::init_devilfsg()
 
 void galaxian_state::init_zigzag()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 	m_draw_bullet_ptr = nullptr;
@@ -7422,7 +7436,7 @@ void galaxian_state::init_zigzag()
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x1000);
 
 	/* handler for doing the swaps */
-	zigzag_bankswap_w(space, 0, 0);
+	zigzag_bankswap_w(0);
 }
 
 
@@ -7443,10 +7457,10 @@ void galaxian_state::init_checkman()
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space.unmap_write(0xb000, 0xb000, 0x7f8);
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
 
 	/* attach the sound command handler */
-	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
 	/* decrypt program code */
 	decode_checkman();
@@ -7461,10 +7475,10 @@ void galaxian_state::init_checkmaj()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 
 	/* attach the sound command handler */
-	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
 	/* for the title screen */
-	space.install_read_handler(0x3800, 0x3800, read8_delegate(*this, FUNC(galaxian_state::checkmaj_protection_r)));
+	space.install_read_handler(0x3800, 0x3800, read8smo_delegate(*this, FUNC(galaxian_state::checkmaj_protection_r)));
 }
 
 
@@ -7476,10 +7490,10 @@ void galaxian_state::init_dingo()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
 
 	/* attach the sound command handler */
-	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	space.install_write_handler(0x7800, 0x7800, 0, 0x7ff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
-	space.install_read_handler(0x3000, 0x3000, read8_delegate(*this, FUNC(galaxian_state::dingo_3000_r)));
-	space.install_read_handler(0x3035, 0x3035, read8_delegate(*this, FUNC(galaxian_state::dingo_3035_r)));
+	space.install_read_handler(0x3000, 0x3000, read8smo_delegate(*this, FUNC(galaxian_state::dingo_3000_r)));
+	space.install_read_handler(0x3035, 0x3035, read8smo_delegate(*this, FUNC(galaxian_state::dingo_3035_r)));
 }
 
 
@@ -7493,12 +7507,12 @@ void galaxian_state::init_dingoe()
 
 	/* move the interrupt enable from $b000 to $b001 */
 	space.unmap_write(0xb000, 0xb000, 0x7f8);
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
 
 	/* attach the sound command handler */
-	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
+	iospace.install_write_handler(0x00, 0x00, 0, 0xffff, 0, write8smo_delegate(*this, FUNC(galaxian_state::checkman_sound_command_w)));
 
-	space.install_read_handler(0x3001, 0x3001, read8_delegate(*this, FUNC(galaxian_state::dingoe_3001_r)));   // Protection check
+	space.install_read_handler(0x3001, 0x3001, read8smo_delegate(*this, FUNC(galaxian_state::dingoe_3001_r)));   // Protection check
 
 	/* decrypt program code */
 	decode_dingoe();
@@ -7648,10 +7662,10 @@ void galaxian_state::init_kingball()
 	/* disable the stars */
 	space.unmap_write(0xb004, 0xb004, 0x7f8);
 
-	space.install_write_handler(0xb000, 0xb000, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::kingball_sound1_w)));
-	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
-	space.install_write_handler(0xb002, 0xb002, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::kingball_sound2_w)));
-	space.install_write_handler(0xb003, 0xb003, 0, 0x7f8, 0, write8_delegate(*this, FUNC(galaxian_state::kingball_speech_dip_w)));
+	space.install_write_handler(0xb000, 0xb000, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::kingball_sound1_w)));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::irq_enable_w)));
+	space.install_write_handler(0xb002, 0xb002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::kingball_sound2_w)));
+	space.install_write_handler(0xb003, 0xb003, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::kingball_speech_dip_w)));
 
 	save_item(NAME(m_kingball_speech_dip));
 	save_item(NAME(m_kingball_sound));
@@ -8337,7 +8351,7 @@ ROM_START( zerotimed )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-/* Marti Colls (Falgas) bootleg */
+// Marti Colls (Falgas) bootleg
 ROM_START( zerotimemc )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "4_7k.bin", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
@@ -8352,9 +8366,42 @@ ROM_START( zerotimemc )
 
 	/* Not dumped on the Marti Colls PCB, taken from the parent set */
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+	ROM_LOAD( "6l.bpr",    0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+// Unknown manufacturer / bootleger
+ROM_START( zerotimeu )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
+	ROM_LOAD( "2.bin", 0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "3.bin", 0x1000, 0x0800, CRC(aaf038d4) SHA1(2d070fe7c4e9b26092f0f12a9db3392f7d8a65f1) )
+	ROM_LOAD( "4.bin", 0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
+	ROM_LOAD( "5.bin", 0x2000, 0x0800, CRC(af9260d7) SHA1(955e466a8989993351dc69d73ca322c1c9af7b63) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "hj.bin", 0x0000, 0x0800, CRC(84decf98) SHA1(2e565cb6057b1816a6b4541e6dfadd3c3762fa36) )
+	ROM_LOAD( "kl.bin", 0x0800, 0x0800, CRC(18df5c90) SHA1(6d6151c95c4f0da24e21934a360a40c5526f0be2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+// Cirsa bootleg
+ROM_START( galaxcirsa )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "cirsagal.1", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
+	ROM_LOAD( "cirsagal.2", 0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "cirsagal.3", 0x1000, 0x0800, CRC(7c86fc8a) SHA1(ea7e16cfd765fb992bd476796e2e3a5f87e8360c) )
+	ROM_LOAD( "cirsagal.4", 0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
+	ROM_LOAD( "cirsagal.5", 0x2000, 0x0800, CRC(863a688f) SHA1(fa1f92476e10af9a63290ed30359bc88e7721528) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "cirsagal.h", 0x0000, 0x0800, CRC(6babd14e) SHA1(c8601803bc74c1089f767c4672376d4788dc4f49) )
+	ROM_LOAD( "cirsagal.i", 0x0800, 0x0800, CRC(0997e81b) SHA1(a5c6b2b59f7a807b44e5d49c54c42d1abf2fc71a) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6113_1.bin", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
 
 ROM_START( starfght )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -8555,9 +8602,9 @@ Custom CPU contains:  Z80 CPU
 ROM_START( highroll ) // even if the PCB is by Sega, copyright in game is 'Kne Wla'?
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "epr66", 0x0000, 0x1000, CRC(508ace44) SHA1(c7d830cf2ca0011c6e218240c46aa094c29ae083) )
-	ROM_LOAD( "epr65", 0x1000, 0x1000, CRC(727129c3) SHA1(d4c92690b8f4f280f78eadd9290b2a349c4f9d0d) )
+	ROM_LOAD( "epr63", 0x1000, 0x1000, CRC(b0d2ec11) SHA1(1c226684fd869781a67bc533519c1db25d313fa3) )
 	ROM_LOAD( "epr64", 0x2000, 0x1000, CRC(f70ded8f) SHA1(a41f2b96f3ab93d1c22f09caa21c22258f12bc6b) )
-	ROM_LOAD( "epr63", 0x3000, 0x1000, CRC(b0d2ec11) SHA1(1c226684fd869781a67bc533519c1db25d313fa3) )
+	ROM_LOAD( "epr65", 0x3000, 0x1000, CRC(727129c3) SHA1(d4c92690b8f4f280f78eadd9290b2a349c4f9d0d) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "epra",  0x0000, 0x1000, CRC(7033c767) SHA1(df0adceb067ed158b9fa182b110e85e58ea851c5) )
@@ -8565,6 +8612,9 @@ ROM_START( highroll ) // even if the PCB is by Sega, copyright in game is 'Kne W
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr50",  0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+
+	ROM_REGION( 0x0400, "nvram", 0 )
+	ROM_LOAD( "nvram",  0x0000, 0x0400, CRC(51fd843a) SHA1(67291750a98248964d2e8bcdef5a082c230d829f) )
 ROM_END
 
 ROM_START( blkhole )
@@ -10257,35 +10307,8 @@ ROM_START( sirio2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sirio2_1.bin",      0x0000, 0x0800, CRC(1e6a4b49) SHA1(6f71f10e73b7a385cd455e74129544cd58932781) )
 	ROM_LOAD( "sirio2_2.bin",      0x0800, 0x0800, CRC(0b316f33) SHA1(687cbc9b1a7b9ead836a074f8418b1fe96b9e1bf) )
-	ROM_LOAD( "sirio2_3.bin",      0x1000, 0x0800, CRC(716eaa10) SHA1(780fc785e6651f19dc1a0ccf48cf9485d6562a71) ) //  = 929 smooncrs Super Moon Cresta
-	ROM_LOAD( "sirio2_4.bin",      0x1800, 0x0800, CRC(092ab94b) SHA1(5a71aeead0968b660e6fb42e57564bd267cc8ba6) )
-	ROM_LOAD( "sirio2_5.bin",      0x2000, 0x0800, CRC(413a836a) SHA1(64c95b8ad78e19b718a68fdbd03c72ee0603396d) )
-	ROM_LOAD( "sirio2_6.bin",      0x2800, 0x0800, CRC(2a9c3f13) SHA1(a3b1c9e11a18fdf94517457f80b3a87a6c2c96e6) )
-	ROM_LOAD( "sirio2_7.bin",      0x3000, 0x0800, CRC(eafd4d02) SHA1(b75ed5358646d8a377ccd1f282136e638aaa9d0c) )
-	ROM_LOAD( "sirio2_8.bin",      0x3800, 0x0800, CRC(6e614bd6) SHA1(52da7f6ae444352c035c1bf29f380812ccd535de) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "sirio2_f2.bin",     0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) ) // == 1h_1_10.bin
-	ROM_LOAD( "sirio2_f4.bin",     0x0800, 0x0200, CRC(8acfabb9) SHA1(c212be2aa158161365f712e7a5a25f27bf6412f3) )
-	ROM_CONTINUE(                  0x0c00, 0x0200 )  // this version of the gfx ROMs has two
-	ROM_CONTINUE(                  0x0a00, 0x0200 )  // groups of 16 sprites swapped
-	ROM_CONTINUE(                  0x0e00, 0x0200 )
-	ROM_LOAD( "sirio2_f1.bin",     0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) ) // == 1k_1_11.bin
-	ROM_LOAD( "sirio2_f3.bin",     0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) ) // == 11.chr
-	ROM_CONTINUE(                  0x1c00, 0x0200 )
-	ROM_CONTINUE(                  0x1a00, 0x0200 )
-	ROM_CONTINUE(                  0x1e00, 0x0200 )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "sirio2_im5610.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Compatible with 82s123 PROM
-ROM_END
-
-ROM_START( sirio2a )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "sirio2_1.bin",      0x0000, 0x0800, CRC(1e6a4b49) SHA1(6f71f10e73b7a385cd455e74129544cd58932781) )
-	ROM_LOAD( "sirio2_2.bin",      0x0800, 0x0800, CRC(0b316f33) SHA1(687cbc9b1a7b9ead836a074f8418b1fe96b9e1bf) )
 	ROM_LOAD( "sirio2_3.bin",      0x1000, 0x0800, CRC(716eaa10) SHA1(780fc785e6651f19dc1a0ccf48cf9485d6562a71) )
-	ROM_LOAD( "sirio2b_4.bin",     0x1800, 0x0800, CRC(73d0b1f2) SHA1(102f609f586206d28b3a61c43fd243715866dd18) )
+	ROM_LOAD( "sirio2_4.bin",      0x1800, 0x0800, CRC(73d0b1f2) SHA1(102f609f586206d28b3a61c43fd243715866dd18) )
 	ROM_LOAD( "sirio2_5.bin",      0x2000, 0x0800, CRC(413a836a) SHA1(64c95b8ad78e19b718a68fdbd03c72ee0603396d) )
 	ROM_LOAD( "sirio2_6.bin",      0x2800, 0x0800, CRC(2a9c3f13) SHA1(a3b1c9e11a18fdf94517457f80b3a87a6c2c96e6) )
 	ROM_LOAD( "sirio2_7.bin",      0x3000, 0x0800, CRC(eafd4d02) SHA1(b75ed5358646d8a377ccd1f282136e638aaa9d0c) )
@@ -10293,18 +10316,18 @@ ROM_START( sirio2a )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "sirio2_f2.bin",     0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
-	ROM_LOAD( "sirio2_f4b.bin",    0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
-	ROM_CONTINUE(                  0x0c00, 0x0200 )  // this version of the gfx ROMs has two
+	ROM_LOAD( "sirio2_f4.bin",     0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(                  0x0c00, 0x0200 )  // this version of the GFX ROMs has two
 	ROM_CONTINUE(                  0x0a00, 0x0200 )  // groups of 16 sprites swapped
 	ROM_CONTINUE(                  0x0e00, 0x0200 )
-	ROM_LOAD( "sirio2_f1b.bin",    0x1000, 0x0800, CRC(b3a10228) SHA1(d7051f9b8c4f76048b6de7f1705e605c7ec467f3) )
+	ROM_LOAD( "sirio2_f1.bin",     0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
 	ROM_LOAD( "sirio2_f3.bin",     0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
 	ROM_CONTINUE(                  0x1c00, 0x0200 )
 	ROM_CONTINUE(                  0x1a00, 0x0200 )
 	ROM_CONTINUE(                  0x1e00, 0x0200 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "sirio2_im5610.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Readed as 82s123
+	ROM_LOAD( "sirio2_im5610.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Compatible with 82s123 PROM
 ROM_END
 
 ROM_START( ataqandr )
@@ -11902,6 +11925,29 @@ ROM_START( scramblebf )
 	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+ROM_START( spctrek ) // Two PCBs, one labeled MU-1 and the other probably MU-2 (partially covered with a sticker, not readable)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7301.bin", 0x0000, 0x0800, CRC(65cc2c6d) SHA1(75f6317da58ac0ef42c63fc8a641135036c2082c) ) // only different ROM from scrambp (4 bytes at 0x134-x137 and BURROS instead of KONAMI)
+	ROM_LOAD( "7202.bin", 0x0800, 0x0800, CRC(66ebc070) SHA1(ada52d7880185d1ac3a39c94896d5127ea05b14a) )
+	ROM_LOAD( "7103.bin", 0x1000, 0x0800, CRC(317548fd) SHA1(687c309d476cd5fc830d90e9e6293d1dcab96df7) )
+	ROM_LOAD( "t4.bin",   0x1800, 0x0800, CRC(dd380a22) SHA1(125e713a58cc5f2c1e38f67dad29f8c985ce5a8b) )
+	ROM_LOAD( "7105.bin", 0x2000, 0x0800, CRC(fa4f1a70) SHA1(9d797eaab0f19a2ed003f782716719c9d752bd56) )
+	ROM_LOAD( "t6.bin",   0x2800, 0x0800, CRC(9fd96374) SHA1(c8456dd8a012353a023a2d3fa5d508e49c36ace8) )
+	ROM_LOAD( "t7.bin",   0x3000, 0x0800, CRC(88ac07a0) SHA1(c57061db5984b472039356bf84a050b5b66e3813) )
+	ROM_LOAD( "7108.bin", 0x3800, 0x0800, CRC(d20088ee) SHA1(4b2deb64f1185780e5b6d1527ed5f691591b9ea0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "s1.bin",   0x0000, 0x0800, CRC(be037cf6) SHA1(f28e5ead496e70beaada24775aa58bd5d75f2d25) )
+	ROM_LOAD( "s2.bin",   0x0800, 0x0800, CRC(de7912da) SHA1(8558b4eff5d7e63029b325edef9914feda5834c3) )
+	ROM_LOAD( "s3.bin",   0x1000, 0x0800, CRC(ba2fa933) SHA1(1f976d8595706730e29f93027e7ab4620075c078) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "t9.bin",   0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
+	ROM_LOAD( "10.bin",   0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set, probably same as others
+	ROM_LOAD( "c01s.6e",  0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
 
 ROM_START( scrambp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -13076,6 +13122,8 @@ GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_
 GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Petaco S.A.)",                      "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                          "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",                      "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1979, zerotimeu,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Zero Time (Spanish bootleg)",                                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxcirsa,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Cirsa)",                            "Galaxian (Cirsa Spanish bootleg)",                                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg (Jeutel)",                           "Star Fighter",                                                                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 1)",                                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,  galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxian (bootleg, set 2)",                                                                    MACHINE_SUPPORTS_SAVE )
@@ -13112,7 +13160,7 @@ GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, init_
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, init_galaxian,   ROT90,  "<unknown>",                       "Chewing Gum",      MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, init_galaxian,   ROT90,  "MTM Games",                       "Catacomb",         MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, init_galaxian,   ROT270, "bootleg?",                        "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, highroll,    0,        highroll,   highroll,   galaxian_state, init_highroll,   ROT90,  "bootleg?",                        "High Roller",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // cards GFX messed up, no inputs, terrible sound, decryption needs verifying
+GAME( 1982, highroll,    0,        highroll,   highroll,   galaxian_state, init_highroll,   ROT90,  "bootleg?",                        "High Roller",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // auto starts game after inserting coin, bad cards GFX, bad inputs response, not all inputs are mapped
 
 // Basic hardware + extra RAM
 GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)",           MACHINE_SUPPORTS_SAVE )
@@ -13212,8 +13260,7 @@ GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)",            "Super Moon Cresta (Gremlin, bootleg)",                       MACHINE_SUPPORTS_SAVE ) // Probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!
 GAME( 1980, mooncrstso,  mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Sonic)",              "Moon Cresta (SegaSA / Sonic)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Petaco S.A.)",        "Moon Cresta (Petaco S.A. Spanish bootleg)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE) // Ship explodes when starting a game, the game resets on each demo loop, behaviour on the demo seems wrong, as the ships explodes after a good assemble
-GAME( 1980?,sirio2a,     mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,ataqandr,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (FAR S.A.)",           "Ataque Androide - Moon Cresta (FAR S.A. Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
 // There may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Taito do Brasil)",    "Super Star Crest",                                       MACHINE_SUPPORTS_SAVE )
@@ -13320,22 +13367,23 @@ GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_
 GAME( 1981, theendss,    theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "bootleg (Sonic)",                    "The End (SegaSA / Sonic)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
 
-GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami",                             "Scramble",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambles2,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, strfbomb,    scramble, scramble,   strfbomb,   galaxian_state, init_scramble,   ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
-GAME( 1981, scramblebf,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Karateco)",                 "Scramble (Karateco, French bootleg)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)",   MACHINE_SUPPORTS_SAVE ) // similar to the Karateco set above
-GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)",           MACHINE_SUPPORTS_SAVE ) // similar to above
-GAME( 1981, scrampt,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)",                MACHINE_SUPPORTS_SAVE ) // ^^
-GAME( 1981, scramrf,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Recreativos Franco)",       "Scramble (Recreativos Franco, Spanish bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, offensiv,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Video Dens)",               "Offensive (Spanish bootleg of Scramble)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ncentury,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
-GAME( 1981, scrammr,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
-GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg?",                           "Scramble (bootleg?)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Euromatic S.A.)",           "Kamikaze (Euromatic S.A., Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami",                             "Scramble",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambles2,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, strfbomb,    scramble, scramble,   strfbomb,   galaxian_state, init_scramble,   ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+GAME( 1981, scramblebf,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Karateco)",                 "Scramble (Karateco, French bootleg)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)",      MACHINE_SUPPORTS_SAVE ) // similar to the Karateco set above
+GAME( 1981, spctrek,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Video Game S.A.)",          "Space Trek (Video Game S.A., Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)",              MACHINE_SUPPORTS_SAVE ) // similar to above
+GAME( 1981, scrampt,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)",                   MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1981, scramrf,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Recreativos Franco)",       "Scramble (Recreativos Franco, Spanish bootleg)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, offensiv,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Video Dens)",               "Offensive (Spanish bootleg of Scramble)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ncentury,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
+GAME( 1981, scrammr,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
+GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg?",                           "Scramble (bootleg?)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Euromatic S.A.)",           "Kamikaze (Euromatic S.A., Spanish bootleg of Scramble)",    MACHINE_SUPPORTS_SAVE )
+GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                              MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+    GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
-	GPL16250 is the GeneralPlus / SunPlus part number
-	GPAC800 is the JAKKS Pacific codename
-	GMC384 / GCM420 is what is printed on the die
+    GPL16250 is the GeneralPlus / SunPlus part number
+    GPAC800 is the JAKKS Pacific codename
+    GMC384 / GCM420 is what is printed on the die
 
-	----
+    ----
 
-	GPL16250 games using ROM (no extra RAM) configuration
+    GPL16250 games using ROM (no extra RAM) configuration
 */
 
 #include "emu.h"
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( tkmag220 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )   // set 0x0001 and 0x0002 on to get a test mode (some of the ROM banks fail their test, but dumps were repeatable, should be verified on another unit) 
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )   // set 0x0001 and 0x0002 on to get a test mode (some of the ROM banks fail their test, but dumps were repeatable, should be verified on another unit)
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -396,10 +396,25 @@ ROM_START( tkmag220 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "u1g-2a.u2", 0x0000000, 0x8000000, BAD_DUMP CRC(0fd769a1) SHA1(df19402bcd20075483d63fb98fb3fa42bd33ccfd) ) // several sections of ROM appear to be erased, and fails ROM test, some games have missing graphics pulling from those areas, others crash due to missing code
+	ROM_LOAD16_WORD_SWAP( "taikee220.bin", 0x0000000, 0x8000000, CRC(02881534) SHA1(a0e0c9cfa3a6b1c6107f06abd3268b82bd663d06) )
 ROM_END
 
 
+ROM_START( imgame )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // the 2nd half of this ROM required multiple attempts to get a matching dump, so could be suspect, might also be unused as this only has 120 games
+	ROM_LOAD16_WORD_SWAP( "imgame.bin", 0x0000000, 0x8000000, CRC(6fba9021) SHA1(852f4c0aaed682aa8ff5b8cd52313ea2d3d920a1))
+ROM_END
+
+ROM_START( myac220 )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
+ROM_END
 
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
@@ -430,7 +445,7 @@ void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-READ16_MEMBER(tkmag220_game_state::cs0_r)
+uint16_t tkmag220_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
 	return m_romregion[(offset & 0x07fffff) + m_upperbase];
@@ -461,11 +476,15 @@ void gormiti_game_state::machine_reset()
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-// This is a port of the 'Family Sport' games to GPL16250 type hardware, but it doesn't seem to use any unSP 2.0 instructions.
+// These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
-// do "go A1595" then "r1 = 0" in debugger to show menu, controls not yet working (which might be why it drops to test mode by default) will need banking hookup later.
-// This could be useful for figuring out how the sound registers have been remapped when compared to spg2xx
-CONS(200?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
+CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// 2012 date from manual
+CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// a 180 game Family Sport I'm Game! also exists (and some Famiclones)
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

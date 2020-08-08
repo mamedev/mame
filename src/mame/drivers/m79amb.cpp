@@ -68,7 +68,7 @@ void m79amb_state::machine_start()
 	m_self_test.resolve();
 }
 
-WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
+void m79amb_state::ramtek_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data & ~*m_mask;
 }
@@ -99,7 +99,7 @@ uint32_t m79amb_state::screen_update_ramtek(screen_device &screen, bitmap_rgb32 
 }
 
 
-READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
+uint8_t m79amb_state::gray5bit_controller0_r()
 {
 	uint8_t port_data = ioport("8004")->read();
 	uint8_t gun_pos = ioport("GUN1")->read();
@@ -107,7 +107,7 @@ READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
 	return (port_data & 0xe0) | m_lut_gun1[gun_pos];
 }
 
-READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
+uint8_t m79amb_state::gray5bit_controller1_r()
 {
 	uint8_t port_data = ioport("8005")->read();
 	uint8_t gun_pos = ioport("GUN2")->read();
@@ -115,7 +115,7 @@ READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
 	return (port_data & 0xe0) | m_lut_gun2[gun_pos];
 }
 
-WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
+void m79amb_state::m79amb_8002_w(uint8_t data)
 {
 	/* D1 may also be watchdog reset */
 	/* port goes to 0x7f to turn on explosion lamp */

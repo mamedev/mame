@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dinvram.c
+    dinvram.cpp
 
     Device NVRAM interfaces.
 

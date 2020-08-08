@@ -51,7 +51,7 @@ uint8_t actfancr_state::triothep_control_r()
 
 /******************************************************************************/
 
-WRITE8_MEMBER(actfancr_state::buffer_spriteram_w)
+void actfancr_state::buffer_spriteram_w(uint8_t data)
 {
 	uint8_t *src = reinterpret_cast<uint8_t *>(memshare("spriteram")->ptr());
 	// copy to a 16-bit region for our sprite draw code too

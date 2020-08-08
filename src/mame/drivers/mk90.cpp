@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Elektronika MK-90
+Elektronika MK-90
 
-        12/05/2009 Skeleton driver.
+2009-05-12 Skeleton driver.
 
 
     http://www.pisi.com.pl/piotr433/index.htm#mk90
@@ -13,6 +13,8 @@
 This is a Soviet computer-calculator, very similar in looks to the Sharp.
 It has a LCD display. It cost about 1500 roubles, which is the wages for 6
 months for an average citizen.
+
+Status: Starts in the weeds.
 
 ****************************************************************************/
 
@@ -34,17 +36,17 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override;
 
-	void mk90_mem(address_map &map);
+	void mem_map(address_map &map);
 
-	uint32_t screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<k1801vm2_device> m_maincpu;
 };
 
 
-void mk90_state::mk90_mem(address_map &map)
+void mk90_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).ram(); // RAM
@@ -68,11 +70,11 @@ void mk90_state::machine_reset()
 {
 }
 
-void mk90_state::video_start()
+void mk90_state::machine_start()
 {
 }
 
-uint32_t mk90_state::screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mk90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -82,7 +84,7 @@ void mk90_state::mk90(machine_config &config)
 	/* basic machine hardware */
 	K1801VM2(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_initial_mode(0x8000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mk90_state::mk90_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk90_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -90,7 +92,7 @@ void mk90_state::mk90(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(mk90_state::screen_update_mk90));
+	screen.set_screen_update(FUNC(mk90_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -110,4 +112,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME  FLAGS */
-COMP( 1988, mk90, 0,      0,      mk90,    mk90,  mk90_state, empty_init, "Elektronika", "MK-90",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, mk90, 0,      0,      mk90,    mk90,  mk90_state, empty_init, "Elektronika", "MK-90",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

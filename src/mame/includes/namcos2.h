@@ -126,6 +126,11 @@ public:
 	void init_marvland();
 	void init_rthun2();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 
 enum
@@ -187,22 +192,21 @@ enum
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t dpram_byte_r(offs_t offset);
 	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(c140_rom_r);
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	uint16_t c140_rom_r(offs_t offset);
+	void sound_bankselect_w(uint8_t data);
 
 	void sound_reset_w(uint8_t data);
 	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
-	virtual void video_start() override;
 	void video_start_luckywld();
 	void video_start_metlhawk();
 	void video_start_sgunner();
@@ -213,13 +217,10 @@ enum
 	uint32_t screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( c116_r );
+	uint8_t c116_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER( gfx_ctrl_r );
-	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	uint16_t gfx_ctrl_r();
+	void gfx_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void create_shadow_table();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
@@ -230,7 +231,6 @@ enum
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	optional_shared_ptr<uint16_t> m_spriteram;
 	uint16_t m_gfx_ctrl;
-	uint16_t m_serial_comms_ctrl[0x8];
 	unsigned m_finallap_prot_count;
 	int m_sendval;
 
@@ -238,14 +238,14 @@ enum
 	optional_device<namcos2_sprite_device> m_ns2sprite;
 	optional_device<namcos2_roz_device> m_ns2roz;
 
-	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
-	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
-	void GollyGhostUpdateLED_c4( int data );
-	void GollyGhostUpdateLED_c6( int data );
-	void GollyGhostUpdateLED_c8( int data );
-	void GollyGhostUpdateLED_ca( int data );
-	void GollyGhostUpdateDiorama_c0( int data );
+	uint16_t namcos2_68k_key_r(offs_t offset);
+	void namcos2_68k_key_w(offs_t offset, uint16_t data);
+	uint16_t namcos2_finallap_prot_r(offs_t offset);
+	void GollyGhostUpdateLED_c4(int data);
+	void GollyGhostUpdateLED_c6(int data);
+	void GollyGhostUpdateLED_c8(int data);
+	void GollyGhostUpdateLED_ca(int data);
+	void GollyGhostUpdateDiorama_c0(int data);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void TilemapCB_finalap2(uint16_t code, int *tile, int *mask);
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);

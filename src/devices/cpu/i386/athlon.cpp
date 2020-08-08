@@ -32,7 +32,7 @@ void athlonxp_device::device_start()
 	space(AS_OPCODES).specific(m_opcodes);
 	space(AS_DATA).cache(mmacache32);
 
-	space(AS_OPCODES).install_read_handler(0, 0xffffffff, read32_delegate(*this, FUNC(athlonxp_device::debug_read_memory)));
+	space(AS_OPCODES).install_read_handler(0, 0xffffffff, read32sm_delegate(*this, FUNC(athlonxp_device::debug_read_memory)));
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
@@ -188,7 +188,7 @@ int athlonxp_device::address_mode(offs_t address)
 	return 1;
 }
 
-READ32_MEMBER(athlonxp_device::debug_read_memory)
+u32 athlonxp_device::debug_read_memory(offs_t offset)
 {
 	offs_t address = offset << 2;
 	int mode = check_cacheable(address);

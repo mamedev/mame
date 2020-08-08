@@ -3516,6 +3516,8 @@ void psxgpu_device::gpu_reset()
 	n_twy = 0;
 	n_twh = 255;
 	n_tww = 255;
+	m_draw_stp = false;
+	m_check_stp = false;
 	updatevisiblearea();
 }
 

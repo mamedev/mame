@@ -11,8 +11,8 @@
       Currently implementation is similar to single stepping
       with single cycle
     - Implement and acknowlodge remain registers;
-	- Improve delay slot display in debugger (highlight current instruction 
-	  doesn't work but instruction hook does);
+    - Improve delay slot display in debugger (highlight current instruction
+      doesn't work but instruction hook does);
 
 ***************************************************************************/
 
@@ -265,7 +265,7 @@ void jaguar_cpu_device::check_irqs()
 	latch &= mask;
 	if (latch == 0)
 		return;
-	
+
 	/* determine which interrupt */
 	for (int i = 0; i < 6; i++)
 		if (latch & (1 << i))
@@ -371,7 +371,7 @@ void jaguar_cpu_device::device_start()
 	save_item(NAME(m_imask));
 	save_item(NAME(m_div_remainder));
 	save_item(NAME(m_div_offset));
-	
+
 	save_item(NAME(m_io_end));
 	save_item(NAME(m_io_pc));
 	save_item(NAME(m_io_status));
@@ -1292,10 +1292,10 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 	map(0x00, 0x03).rw(FUNC(jaguar_cpu_device::flags_r), FUNC(jaguar_cpu_device::flags_w));
 	map(0x04, 0x07).w(FUNC(jaguar_cpu_device::matrix_control_w));
 	map(0x08, 0x0b).w(FUNC(jaguar_cpu_device::matrix_address_w));
-//	map(0x0c, 0x0f) endian
+//  map(0x0c, 0x0f) endian
 	map(0x10, 0x13).w(FUNC(jaguar_cpu_device::pc_w));
 	map(0x14, 0x17).rw(FUNC(jaguar_cpu_device::status_r), FUNC(jaguar_cpu_device::control_w));
-//	map(0x18, 0x1b) implementation specific
+//  map(0x18, 0x1b) implementation specific
 	map(0x1c, 0x1f).rw(FUNC(jaguar_cpu_device::div_remainder_r), FUNC(jaguar_cpu_device::div_control_w));
 }
 
@@ -1316,22 +1316,22 @@ void jaguardsp_cpu_device::io_map(address_map &map)
 	map(0x20, 0x23).r(FUNC(jaguardsp_cpu_device::high_accum_r));
 }
 
-READ32_MEMBER(jaguar_cpu_device::flags_r)
+u32 jaguar_cpu_device::flags_r()
 {
 	return (m_flags & 0x1c1f7) | (m_imask << 3);
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::flags_w)
+void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_flags);
 	// clear imask only on bit 3 clear (1 has no effect)
 	if ((m_flags & 0x08) == 0)
 		m_imask = false;
-	
+
 	// update int latch & mask
 	m_int_mask = (m_flags >> 4) & 0x1f;
 	m_int_latch &= ~((m_flags >> 9) & 0x1f);
-	
+
 	// TODO: move to specific handler
 	if (m_isdsp)
 	{
@@ -1345,21 +1345,21 @@ WRITE32_MEMBER(jaguar_cpu_device::flags_w)
 	check_irqs();
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::matrix_control_w)
+void jaguar_cpu_device::matrix_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_mtxc);
 	m_mwidth = m_io_mtxc & 0xf;
 	m_maddw = BIT(m_io_mtxc, 4);
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::matrix_address_w)
+void jaguar_cpu_device::matrix_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_mtxa);
 	// matrix can be long word address only, and only read from internal RAM
 	m_mtxaddr = m_internal_ram_start | (m_io_mtxa & 0xffc);
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::pc_w)
+void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_pc);
 	if (m_go == false)
@@ -1370,14 +1370,14 @@ WRITE32_MEMBER(jaguar_cpu_device::pc_w)
 
 /*
  * Data Organization Register
- * Note: The canonical way to set this up from 68k is $00070007, 
+ * Note: The canonical way to set this up from 68k is $00070007,
  * so that Power-On endianness doesn't matter. 1=Big Endian
  * ---- -x-- Instruction endianness
  * ---- --x- Pixel endianness (GPU only)
- * ----	---x I/O endianness
+ * ---- ---x I/O endianness
  */
 // TODO: just log if anything farts for now, change to bit struct once we have something to test out
-WRITE32_MEMBER(jaguar_cpu_device::end_w)
+void jaguar_cpu_device::end_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
 	// sburnout sets bit 1 == 0
@@ -1385,7 +1385,7 @@ WRITE32_MEMBER(jaguar_cpu_device::end_w)
 		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 }
 
-WRITE32_MEMBER(jaguardsp_cpu_device::dsp_end_w)
+void jaguardsp_cpu_device::dsp_end_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
 	// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
@@ -1400,12 +1400,12 @@ WRITE32_MEMBER(jaguardsp_cpu_device::dsp_end_w)
  * y ---- -xxx xx-- ---- interrupt latch (y is DSP specific) (r/o)
  * - ---- ---- --0- ---- <unused>
  * - ---- ---- ---x x--- single step regs
- * - ---- ---- ---- -x-- GPUINT0 or DSPINT0 
+ * - ---- ---- ---- -x-- GPUINT0 or DSPINT0
  * - ---- ---- ---- --x- Host interrupt (w/o)
  * - ---- ---- ---- ---x GPUGO or DSPGO flag
  *
  */
-READ32_MEMBER(jaguar_cpu_device::status_r)
+u32 jaguar_cpu_device::status_r()
 {
 	u32 result = ((m_version & 0xf)<<12) | (m_bus_hog<<11) | m_go;
 	result|= (m_int_latch & 0x1f) << 6;
@@ -1422,58 +1422,58 @@ WRITE_LINE_MEMBER(jaguar_cpu_device::go_w)
 	yield();
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::control_w)
+void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_status);
 	bool new_go = BIT(m_io_status, 0);
 	if (new_go != m_go)
 		go_w(new_go);
-	
+
 	if (BIT(m_io_status, 1))
 		m_cpu_interrupt(ASSERT_LINE);
-	
+
 	// TODO: following does nothing if set by itself, or acts as a trap?
 	if (BIT(m_io_status, 2))
 	{
 		m_int_latch |= 1;
 		check_irqs();
 	}
-	
+
 	// TODO: single step handling
-	
+
 	m_bus_hog = BIT(m_io_status, 11);
 	// TODO: protect/protectse uses this, why?
 	if (m_bus_hog == true)
 		logerror("%s: bus hog enabled\n", this->tag());
 }
 
-READ32_MEMBER(jaguargpu_cpu_device::hidata_r)
+u32 jaguargpu_cpu_device::hidata_r()
 {
 	return m_hidata;
 }
 
-WRITE32_MEMBER(jaguargpu_cpu_device::hidata_w)
+void jaguargpu_cpu_device::hidata_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_hidata);
 }
 
-READ32_MEMBER(jaguar_cpu_device::div_remainder_r)
+u32 jaguar_cpu_device::div_remainder_r()
 {
 	// TODO: truly 32-bit?
 	return m_div_remainder;
 }
 
-WRITE32_MEMBER(jaguar_cpu_device::div_control_w)
+void jaguar_cpu_device::div_control_w(u32 data)
 {
 	m_div_offset = BIT(data, 0);
 }
 
-WRITE32_MEMBER(jaguardsp_cpu_device::modulo_w)
+void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_modulo);
 }
 
-READ32_MEMBER(jaguardsp_cpu_device::high_accum_r)
+u32 jaguardsp_cpu_device::high_accum_r()
 {
 	printf("%s: high 16-bit accumulator read\n", this->tag());
 	return (m_accum >> 32) & 0xff;

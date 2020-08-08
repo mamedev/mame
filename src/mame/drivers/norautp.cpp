@@ -712,12 +712,12 @@ void norautp_state::counterlamps_w(uint8_t data)
    PC0-PC2 could be set as input or output.
 */
 
-//READ8_MEMBER(norautp_state::ppi2_portc_r )
+//uint8_t norautp_state::ppi2_portc_r()
 //{
 //  return;
 //}
 
-//WRITE8_MEMBER(norautp_state::ppi2_portc_w )
+//void norautp_state::ppi2_portc_w(uint8_t data)
 //{
 //  /* PC0-PC2 don't seems to be connected to any output */
 //}
@@ -741,17 +741,17 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 
 #ifdef UNUSED_FUNCTION // old implementation
 /*game waits for /OBF signal (bit 7) to be set.*/
-READ8_MEMBER(norautp_state::test_r)
+uint8_t norautp_state::test_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(norautp_state::vram_data_r)
+uint8_t norautp_state::vram_data_r()
 {
 	return m_np_vram[m_np_addr];
 }
 
-WRITE8_MEMBER(norautp_state::vram_data_w)
+void norautp_state::vram_data_w(uint8_t data)
 {
 	m_np_vram[m_np_addr] = data & 0xff;
 
@@ -761,14 +761,14 @@ WRITE8_MEMBER(norautp_state::vram_data_w)
 
 }
 
-WRITE8_MEMBER(norautp_state::vram_addr_w)
+void norautp_state::vram_addr_w(uint8_t data)
 {
 	m_np_addr = data;
 }
 #endif
 
 /* game waits for bit 4 (0x10) to be reset.*/
-READ8_MEMBER(norautp_state::test2_r)
+uint8_t norautp_state::test2_r()
 {
 	return 0x00;
 }

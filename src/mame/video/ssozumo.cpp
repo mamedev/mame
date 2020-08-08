@@ -45,31 +45,31 @@ void ssozumo_state::ssozumo_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(ssozumo_state::videoram_w)
+void ssozumo_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::colorram_w)
+void ssozumo_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::videoram2_w)
+void ssozumo_state::videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::colorram2_w)
+void ssozumo_state::colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::paletteram_w)
+void ssozumo_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;
@@ -102,12 +102,12 @@ WRITE8_MEMBER(ssozumo_state::paletteram_w)
 	m_palette->set_pen_color(offs2 + 64, rgb_t(r, g, b));
 }
 
-WRITE8_MEMBER(ssozumo_state::scroll_w)
+void ssozumo_state::scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(ssozumo_state::flipscreen_w)
+void ssozumo_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x80);
 	m_color_bank = data & 3;

@@ -7,7 +7,12 @@
     different from the BQ4842/BQ4852 that a separate implementation
     makes sense.
 
+    This chip is functionally equivalent to the BQ4845; it does not support
+    a backup battery. Most datasheets about the BQ4847 are incomplete and
+    refer to the BQ4845.
+
     Supports 24h/12h and Daylight saving
+    Supports leap years
 
     No internal memory, only clock registers
 
@@ -18,8 +23,9 @@
 
 #define LOG_WARN         (1U<<1)    // Warnings
 #define LOG_CLOCK        (1U<<2)    // Clock operation
-#define LOG_REGW         (1U<<3)    // Register write
+#define LOG_REG          (1U<<3)    // Register write
 #define LOG_WATCHDOG     (1U<<4)    // Watchdog
+#define LOG_TRANSFER     (1U<<5)    // Transfer
 
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 #include "logmacro.h"
@@ -33,17 +39,17 @@ enum
 	reg_alarmseconds,       // 0xc0 to ignore
 	reg_minutes,            // 0x00 - 0x59
 	reg_alarmminutes,       // 0xc0 to ignore
-	reg_hours,              // 0x00 - 0x23 (24h) or 0x81 - 0x92 (12h)
+	reg_hours,              // 0x00 - 0x23 (24h) or 0x01-0x12 (AM), 0x81-0x92 (PM)
 	reg_alarmhours,         // 0xc0 to ignore
 	reg_date,               // 0x01 - 0x31
 	reg_alarmdate,          // 0xc0 to ignore
 	reg_days,               // 0x01 (sun) - 0x07 (sat)
 	reg_month,              // 0x01 - 0x12
 	reg_year,               // 0x00 - 0x99
-	reg_rates,              // 0 [--WD--] [-----RS---------]
-	reg_interrupts,         // 0  0  0  0 AIE  PIE PWRIE ABE    0x00 on powerup
-	reg_flags,              // 0  0  0  0  AF   PF  PWRF BVF    0x00 after reading
-	reg_control,            // 0  0  0  0 UTI STOP 24/12 DSE
+	reg_rates,              // 0 [--WD--] [-------RS---------]
+	reg_interrupts,         // 0  0  0  0 AIE  PIE   PWRIE ABE    0x00 on powerup
+	reg_flags,              // 0  0  0  0  AF   PF    PWRF BVF    0x00 after reading
+	reg_control,            // 0  0  0  0 UTI STOP* 24/12* DSE
 	reg_unused              // 0x00
 };
 
@@ -70,6 +76,7 @@ enum
 bq4847_device::bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BQ4847, tag, owner, clock),
 	  device_nvram_interface(mconfig, *this),
+	  device_rtc_interface(mconfig, *this),
 	  m_interrupt_cb(*this),
 	  m_wdout_cb(*this),
 	  m_watchdog_active(false),
@@ -77,15 +84,31 @@ bq4847_device::bq4847_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+/*
+    Inherited from device_rtc_interface. The date and time is given as integer
+    and must be converted to BCD.
+*/
+void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_intreg[reg_hours] = convert_to_bcd(hour);
+	m_intreg[reg_minutes] = convert_to_bcd(minute);
+	m_intreg[reg_seconds] = convert_to_bcd(second);
+	m_intreg[reg_year] = convert_to_bcd(year);
+	m_intreg[reg_month] = convert_to_bcd(month);
+	m_intreg[reg_date] = convert_to_bcd(day);
+	m_intreg[reg_days] = convert_to_bcd(day_of_week);
+	// What about the DSE flag?
+}
+
 bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min)
 {
-	if (!valid_bcd(bcdnumber, min, limit))
-	{
-		bcdnumber = min;
-		return false;
-	}
-
-	if (bcdnumber==limit)
+/*  if (!valid_bcd(bcdnumber, min, limit))
+    {
+        bcdnumber = min;
+        return false;
+    }
+*/
+	if (bcdnumber>=limit)
 	{
 		bcdnumber = min;
 		return true;
@@ -104,6 +127,7 @@ bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min
 	return false;
 }
 
+// TODO: Remove; the real clock cannot verify BCD numbers.
 bool bq4847_device::valid_bcd(uint8_t value, uint8_t min, uint8_t max)
 {
 	bool valid = ((value>=min) && (value<=max) && ((value&0x0f)<=9));
@@ -111,31 +135,17 @@ bool bq4847_device::valid_bcd(uint8_t value, uint8_t min, uint8_t max)
 	return valid;
 }
 
-uint8_t bq4847_device::to_bcd(uint8_t value)
-{
-	return (((value / 10) << 4) & 0xf0) | (value % 10);
-}
-
-uint8_t bq4847_device::from_bcd(uint8_t value)
-{
-	return ((value & 0xf0)>>4)*10 + (value & 0x0f);
-}
-
 // ----------------------------------------------------
 
 /*
     Update cycle, called every second
     The BQ RTCs use BCD representation
+
+    TODO: We may not be able to use the parent class advance methods, since we
+    have to work with BCD (even with invalid values). Check this.
 */
 TIMER_CALLBACK_MEMBER(bq4847_device::rtc_clock_cb)
 {
-	// BCD-encoded numbers
-	static const int days_in_month_table[12] =
-	{
-		0x31,0x28,0x31, 0x30,0x31,0x30,
-		0x31, 0x31, 0x30, 0x31, 0x30, 0x31
-	};
-
 	// Just for debugging
 	static const char* dow[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
@@ -153,46 +163,19 @@ TIMER_CALLBACK_MEMBER(bq4847_device::rtc_clock_cb)
 
 	if (carry)
 	{
-		// Handle DST
-		if (is_set(reg_control, FLAG_DSE)
-			 && (m_reg[reg_month]==4) && (m_reg[reg_days]==0) && (m_reg[reg_date] < 8)  // first Sunday in April
-			&& (m_reg[reg_hours]==0x01))
-			m_reg[reg_hours] = 0x03;
-		else
-		{
-			if (!is_set(reg_control, FLAG_DSE)
-				|| (m_reg[reg_month]!=10) || (m_reg[reg_days]!=0) || (m_reg[reg_date] <= 23)  // last Sunday in October
-				|| (m_reg[reg_hours]!=0x01))
-				carry = increment_bcd(m_intreg[reg_hours], 0x23, 0);
-		}
+		carry = advance_hours_bcd();
 	}
 
 	if (carry)
 	{
-		uint8_t month = m_intreg[reg_month];
-		if (!valid_bcd(month, 0x01, 0x12)) month = 1;
-		uint8_t days = days_in_month_table[month-1];
-
-		// Are leap years considered?
-		if ((month==2)
-			&& ((m_intreg[reg_year]%4)==0)
-			&& ((m_intreg[reg_year]%100)!=0
-			   || (m_intreg[reg_year]%400)==0))
-			days = 0x29;
-
-		increment_bcd(m_intreg[reg_days], 7, 1);
-		carry = increment_bcd(m_intreg[reg_date], days, 1);
+		advance_days_bcd();
 	}
-	if (carry)
-		carry = increment_bcd(m_intreg[reg_month], 0x12, 1);
-	if (carry)
-		carry = increment_bcd(m_intreg[reg_year], 0x99, 0);
 
 	LOGMASKED(LOG_CLOCK, "%s 20%02x-%02x-%02x %02x:%02x:%02x\n",
 		dow[m_intreg[reg_days]-1], m_intreg[reg_year], m_intreg[reg_month], m_intreg[reg_date],
 		m_intreg[reg_hours], m_intreg[reg_minutes], m_intreg[reg_seconds]);
 
-	// Copy into memory registers if the read bit is reset
+	// Copy into memory registers if the UTI bit is reset
 	if (newsec)
 	{
 		if (!is_set(reg_control, FLAG_UTI))
@@ -208,6 +191,93 @@ TIMER_CALLBACK_MEMBER(bq4847_device::rtc_clock_cb)
 		{
 			set_register(reg_flags, FLAG_AF, true);
 			m_interrupt_cb(intrq_r());
+		}
+	}
+}
+
+bool bq4847_device::advance_hours_bcd()
+{
+	bool carry = false;
+	// Handle DST
+	if (is_set(reg_control, FLAG_DSE)
+		&& (m_intreg[reg_month]==4) && (m_intreg[reg_days]==0) && (m_intreg[reg_date] < 8)  // first Sunday in April
+		&& (m_intreg[reg_hours]==0x01))
+		m_intreg[reg_hours] = 0x03;
+	else
+	{
+		// Increment hour unless the DSE bit is set and we are at 1:59 on the last Sunday in October
+		if (!is_set(reg_control, FLAG_DSE)
+			|| (m_intreg[reg_month]!=10) || (m_intreg[reg_days]!=0) || (m_intreg[reg_date] <= 23)  // last Sunday in October
+			|| (m_intreg[reg_hours]!=0x01))
+		{
+			if (is_set(reg_control, FLAG_24))
+			{
+				// 24h:  0->1->...->23->0(+1)
+				increment_bcd(m_intreg[reg_hours], 0xff, 0);
+				if (m_intreg[reg_hours] == 0x24)
+				{
+					m_intreg[reg_hours] = 0;
+					carry = true;
+				}
+			}
+
+			else
+			{
+				// 12h:  12->1->2->...->11->12'->1'->...->11'->12(+1)
+				increment_bcd(m_intreg[reg_hours], 0xff, 0);
+				switch (m_intreg[reg_hours])
+				{
+				case 0x12:
+					m_intreg[reg_hours]=0x92;  // 11:59 am -> 12:00 pm
+					break;
+				case 0x93:
+					m_intreg[reg_hours]=0x81;  // 12:59 pm -> 01:00 pm
+					break;
+				case 0x92:
+					m_intreg[reg_hours]=0x12;  // 11:59 pm -> 12:00 am
+					carry = true;
+					break;
+				case 0x13:
+					m_intreg[reg_hours]=0x01;  // 12:59 am -> 01:00 am
+					break;
+				}
+			}
+		}
+	}
+	return carry;
+}
+
+void bq4847_device::advance_days_bcd()
+{
+	bool carry = false;
+
+	// BCD-encoded numbers
+	static const int days_in_month_table[12] =
+	{
+		0x31, 0x28, 0x31, 0x30, 0x31, 0x30,
+		0x31, 0x31, 0x30, 0x31, 0x30, 0x31
+	};
+
+	uint8_t month = bcd_to_integer(m_intreg[reg_month]);
+	if (month > 12) month = 12;
+
+	// if (!valid_bcd(month, 0x01, 0x12)) month = 1;
+	uint8_t days = days_in_month_table[month-1];
+
+	// Leap years are indeed handled (but the year is only 2-digit)
+	if ((month==2) && ((m_intreg[reg_year]%4)==0))
+		days = 0x29;
+
+	increment_bcd(m_intreg[reg_days], 7, 1);  // Increment the day-of-week (without carry)
+	carry = increment_bcd(m_intreg[reg_date], days, 1);
+
+	if (carry)
+	{
+		increment_bcd(m_intreg[reg_month], 0xff, 1);
+		if (m_intreg[reg_month] == 0x13)
+		{
+			m_intreg[reg_month] = 0x01;
+			increment_bcd(m_intreg[reg_year], 0xff, 0);
 		}
 	}
 }
@@ -236,6 +306,8 @@ uint8_t bq4847_device::read(offs_t address)
 		m_interrupt_cb(intrq_r());
 	}
 
+	LOGMASKED(LOG_REG, "Reg %d -> %02x\n", regnum, value);
+
 	return value;
 }
 
@@ -246,11 +318,15 @@ void bq4847_device::write(offs_t address, uint8_t data)
 {
 	int regnum = address & 0x0f;
 
+	LOGMASKED(LOG_REG, "Reg %d <- %02x\n", regnum, data);
+
 	if (regnum == reg_flags)
 	{
 		LOGMASKED(LOG_WARN, "Ignoring write attempt to flag bit register (%02x)\n", data);
 		return;
 	}
+
+	bool uti_set = is_set(reg_control, FLAG_UTI); // Get it before we change the flag
 
 	m_reg[regnum] = data;
 
@@ -263,17 +339,41 @@ void bq4847_device::write(offs_t address, uint8_t data)
 	{
 		if (regnum == reg_control)
 		{
+			LOGMASKED(LOG_TRANSFER, "Update transfer %s\n", ((data & FLAG_UTI)!=0)? "inhibit" : "enable");
+
 			// After we have written to the registers, transfer to the internal regs
-			if (is_set(reg_control, FLAG_UTI) && ((data & FLAG_UTI)==0) && m_writing)
-				transfer_to_int();
+			if (uti_set && ((data & FLAG_UTI)==0) && m_writing)
+			{
+				LOGMASKED(LOG_TRANSFER, "Transfer to internal regs\n");
+				for (int i=reg_seconds; i < reg_unused; i++)
+				{
+					if (is_internal_register(i)) m_intreg[i] = m_reg[i];
+				}
+				// The real device does not auto-convert hours according to AM/PM
+			}
 
 			// We ignore the STOP* flag, since it only covers behaviour on power-off
 			// We ignore the 24h/12h flag here; it requires reloading the registers anyway
 			// The DSE flag will have effect on update
 		}
 		else
+		{
 			m_writing = true;
+			// If inhibit is not set, any write to the time/date registers
+			// is immediately set
+			if (!uti_set && is_internal_register(regnum))
+			{
+				m_intreg[regnum] = m_reg[regnum];
+			}
+		}
 	}
+}
+
+bool bq4847_device::is_internal_register(int regnum)
+{
+	return (regnum == reg_seconds || regnum == reg_minutes || regnum == reg_hours ||
+				regnum == reg_date || regnum == reg_days || regnum == reg_month
+				|| regnum == reg_year);
 }
 
 void bq4847_device::set_register(int number, uint8_t bits, bool set)
@@ -284,78 +384,18 @@ void bq4847_device::set_register(int number, uint8_t bits, bool set)
 		m_reg[number] &= ~bits;
 }
 
-uint8_t bq4847_device::ampmto24(uint8_t ampm)
-{
-	uint8_t f24 = from_bcd(ampm);
-
-	if (f24==12) f24 = 0;
-	else
-	{
-		if (ampm & 0x80)
-		{
-			if (f24 == 92)
-				f24 = 12;
-			else
-				f24 = f24 - 68;
-		}
-	}
-	return to_bcd(f24);
-}
-
-uint8_t bq4847_device::ampmfrom24(uint8_t f24)
-{
-	uint8_t ampm = from_bcd(f24);
-	if (ampm==0)
-		ampm = 12;
-	else
-	{
-		if (ampm == 12)
-			ampm = 92;
-		else
-		{
-			if (ampm > 12)
-				ampm = ampm + 68;
-		}
-	}
-	return to_bcd(ampm);
-}
-
 bool bq4847_device::is_set(int number, uint8_t flag)
 {
 	return (m_reg[number] & flag)!=0;
 }
 
-void bq4847_device::transfer_to_int()
-{
-	m_intreg[reg_year] = m_reg[reg_year];
-	m_intreg[reg_month] = m_reg[reg_month];
-	m_intreg[reg_date] = m_reg[reg_date];
-	m_intreg[reg_days] = m_reg[reg_days];
-	m_intreg[reg_minutes] = m_reg[reg_minutes];
-	m_intreg[reg_seconds] = m_reg[reg_seconds];
-
-	// Check: What is the real device's behavior on inconsistent time formats?
-	if (is_set(reg_control, FLAG_24))
-		m_intreg[reg_hours] = m_reg[reg_hours];
-	else
-		m_intreg[reg_hours] = ampmto24(m_reg[reg_hours]);
-}
-
 void bq4847_device::transfer_to_access()
 {
-	m_reg[reg_year] = m_intreg[reg_year];
-	m_reg[reg_month] = m_intreg[reg_month];
-	m_reg[reg_date] = m_intreg[reg_date];
-	m_reg[reg_days] = m_intreg[reg_days];
-	m_reg[reg_minutes] = m_intreg[reg_minutes];
-	m_reg[reg_seconds] = m_intreg[reg_seconds];
-
-	// Convert to AM/PM if selected
-	if (is_set(reg_control, FLAG_24))
-		m_reg[reg_hours] = m_intreg[reg_hours];
-	else
-		m_reg[reg_hours] = ampmfrom24(m_intreg[reg_hours]);
-
+	LOGMASKED(LOG_TRANSFER, "Transfer to external regs\n");
+	for (int i=reg_seconds; i < reg_unused; i++)
+	{
+		if (is_internal_register(i)) m_reg[i] = m_intreg[i];
+	}
 	// Clear the flag
 	m_writing = false;
 }
@@ -458,23 +498,6 @@ void bq4847_device::connect_osc(bool conn)
 	}
 }
 
-void bq4847_device::get_system_time()
-{
-	// Set time from system time
-	// We always use 24h internally
-	system_time systime;
-	machine().current_datetime(systime);
-	m_intreg[reg_hours] = to_bcd(systime.local_time.hour);
-	m_intreg[reg_minutes] = to_bcd(systime.local_time.minute);
-	m_intreg[reg_seconds] = to_bcd(systime.local_time.second);
-	m_intreg[reg_year] = to_bcd(systime.local_time.year%100);
-	m_intreg[reg_month] = to_bcd(systime.local_time.month+1);
-	m_intreg[reg_date] = to_bcd(systime.local_time.mday);
-	m_intreg[reg_days] = to_bcd(systime.local_time.weekday+1);
-
-	set_register(reg_control, FLAG_DSE, systime.local_time.is_dst);
-}
-
 void bq4847_device::device_start()
 {
 	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_clock_cb), this));
@@ -499,7 +522,6 @@ void bq4847_device::device_start()
 	save_pointer(NAME(m_intreg), 16);
 
 	// Start clock
-	get_system_time();
 	connect_osc(true);
 }
 
@@ -513,7 +535,6 @@ void bq4847_device::nvram_default()
 void bq4847_device::nvram_read(emu_file &file)
 {
 	file.read(m_reg, 16);
-	get_system_time();
 	transfer_to_access();
 
 	// Clear the saved flags

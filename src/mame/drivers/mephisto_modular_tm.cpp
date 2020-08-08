@@ -92,7 +92,7 @@ private:
 
 	bool m_bootrom_enabled;
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { m_bootrom_enabled = false; }
-	DECLARE_READ32_MEMBER(bootrom_r) { return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset]; }
+	u32 bootrom_r(offs_t offset) { return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset]; }
 
 	void set_cpu_freq();
 };
@@ -213,6 +213,8 @@ void mmtm_state::mmtm_v(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmtm_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
+	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
+
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_modular_tm);
 }

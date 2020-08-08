@@ -1231,7 +1231,7 @@ void model1_state::end_frame()
 		m_listctl[0] ^= 0x40;
 }
 
-READ16_MEMBER(model1_state::model1_listctl_r)
+u16 model1_state::model1_listctl_r(offs_t offset)
 {
 	if(!offset)
 		return m_listctl[0] | 0x30;
@@ -1239,7 +1239,7 @@ READ16_MEMBER(model1_state::model1_listctl_r)
 		return m_listctl[1];
 }
 
-WRITE16_MEMBER(model1_state::model1_listctl_w)
+void model1_state::model1_listctl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_listctl + offset);
 	LOG_TGP(("VIDEO: control=%08x\n", (m_listctl[1] << 16) | m_listctl[0]));

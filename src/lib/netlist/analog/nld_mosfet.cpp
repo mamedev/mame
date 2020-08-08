@@ -162,7 +162,6 @@ namespace analog
 		NETLIB_IS_DYNAMIC(true)
 
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI() { }
 
 		q_type qtype() const noexcept { return m_qtype; }
 		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
@@ -182,9 +181,9 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR(MOSFET)
-		, m_DG(*this, "m_DG", true)
-		, m_SG(*this, "m_SG", true)
-		, m_SD(*this, "m_SD", true)
+		, m_DG(*this, "m_DG", NETLIB_DELEGATE(termhandler))
+		, m_SG(*this, "m_SG", NETLIB_DELEGATE(termhandler))
+		, m_SD(*this, "m_SD", NETLIB_DELEGATE(termhandler))
 		, m_D_BD(*this, "m_D_BD")
 #if (!BODY_CONNECTED_TO_SOURCE)
 		, m_D_BS(*this, "m_D_BS")
@@ -280,7 +279,7 @@ namespace analog
 
 			m_vto = m_modacc.m_VTO;
 			// FIXME zero conversion
-			if(m_vto != nlconst::zero())
+			if(m_vto == nlconst::zero())
 				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
 
 			// FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
@@ -297,16 +296,25 @@ namespace analog
 		{
 			if (m_capmod != 0)
 			{
-				//const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-				//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
-				const nl_fptype Ugd = m_Vgd; // Gate - Drain
-				const nl_fptype Ugs = m_Vgs; // Gate - Source
-				const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
-				const nl_fptype Ugb = Ugs - Ubs;
+				if (ts_type == timestep_type::FORWARD)
+				{
+					//const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+					//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
+					const nl_fptype Ugd = m_Vgd; // Gate - Drain
+					const nl_fptype Ugs = m_Vgs; // Gate - Source
+					const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
+					const nl_fptype Ugb = Ugs - Ubs;
 
-				m_cap_gb.timestep(m_Cgb, Ugb, step);
-				m_cap_gs.timestep(m_Cgs, Ugs, step);
-				m_cap_gd.timestep(m_Cgd, Ugd, step);
+					m_cap_gb.timestep(m_Cgb, Ugb, step);
+					m_cap_gs.timestep(m_Cgs, Ugs, step);
+					m_cap_gd.timestep(m_Cgd, Ugd, step);
+				}
+				else
+				{
+					m_cap_gb.restore_state();
+					m_cap_gs.restore_state();
+					m_cap_gd.restore_state();
+				}
 			}
 		}
 
@@ -323,7 +331,15 @@ namespace analog
 			#endif
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(termhandler)
+		{
+			// only called if connected to a rail net ==> notify the solver to recalculate
+			auto *solv(m_SG.solver());
+			if (solv != nullptr)
+				solv->solve_now();
+			else
+				m_DG.solver()->solve_now();
+		}
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
@@ -415,8 +431,8 @@ namespace analog
 				else
 				{
 					// linear
-					const auto Sqr1(static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
-					const auto Sqr2(static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
+					const auto Sqr1(plib::narrow_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
+					const auto Sqr2(plib::narrow_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
 					Cgb = 0;
 					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::two_thirds();
 					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::two_thirds();
@@ -428,17 +444,6 @@ namespace analog
 	// ----------------------------------------------------------------------------------------
 	// MOSFET
 	// ----------------------------------------------------------------------------------------
-
-	NETLIB_UPDATE(MOSFET)
-	{
-		// FIXME: This should never be called
-		if (!m_SG.P().net().is_rail_net())
-			m_SG.P().solve_now();   // Basis
-		else if (!m_SG.N().net().is_rail_net())
-			m_SG.N().solve_now();   // Emitter
-		else
-			m_DG.N().solve_now();   // Collector
-	}
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
 	{

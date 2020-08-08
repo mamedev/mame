@@ -94,24 +94,24 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 
 	/* memory */
-	//DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_0_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_1_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_2_w);
-	DECLARE_READ8_MEMBER(royalqn_nsc_blit_r);
-	DECLARE_READ8_MEMBER(royalqn_comm_r);
-	DECLARE_WRITE8_MEMBER(royalqn_comm_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	//void sexygal_nsc_true_blitter_w(uint8_t data);
+	void royalqn_blitter_0_w(uint8_t data);
+	void royalqn_blitter_1_w(uint8_t data);
+	void royalqn_blitter_2_w(uint8_t data);
+	uint8_t royalqn_nsc_blit_r(offs_t offset);
+	uint8_t royalqn_comm_r(offs_t offset);
+	void royalqn_comm_w(offs_t offset, uint8_t data);
+	void mux_w(uint8_t data);
 	uint8_t input_1p_r();
 	uint8_t input_2p_r();
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(sexygal_soundram_r);
-	DECLARE_READ8_MEMBER(sexygal_unknown_sound_r);
-	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
-	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
+	void output_w(uint8_t data);
+	uint8_t sexygal_soundram_r(offs_t offset);
+	uint8_t sexygal_unknown_sound_r();
+	void sexygal_audioff_w(uint8_t data);
+	void sexygal_audionmi_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
-	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
+	void ngalsumr_prot_latch_w(uint8_t data);
+	uint8_t ngalsumr_prot_value_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -243,23 +243,23 @@ void nightgal_state::nightgal_palette(palette_device &palette) const
    There are three unidirectional latches that also sends an irq from z80 to MCU.
  */
 // TODO: simplify this (error in the document)
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_0_w)
+void nightgal_state::royalqn_blitter_0_w(uint8_t data)
 {
 	m_blit_raw_data[0] = data;
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_1_w)
+void nightgal_state::royalqn_blitter_1_w(uint8_t data)
 {
 	m_blit_raw_data[1] = data;
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_2_w)
+void nightgal_state::royalqn_blitter_2_w(uint8_t data)
 {
 	m_blit_raw_data[2] = data;
 	m_subcpu->set_input_line(0, ASSERT_LINE );
 }
 
-READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
+uint8_t nightgal_state::royalqn_nsc_blit_r(offs_t offset)
 {
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
@@ -281,7 +281,7 @@ void nightgal_state::z80_wait_assert_cb()
 	m_z80_wait_ack_timer->adjust(m_maincpu->cycles_to_attotime(4));
 }
 
-READ8_MEMBER(nightgal_state::royalqn_comm_r)
+uint8_t nightgal_state::royalqn_comm_r(offs_t offset)
 {
 	z80_wait_assert_cb();
 	machine().scheduler().synchronize(); // force resync
@@ -289,7 +289,7 @@ READ8_MEMBER(nightgal_state::royalqn_comm_r)
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
+void nightgal_state::royalqn_comm_w(offs_t offset, uint8_t data)
 {
 	z80_wait_assert_cb();
 	machine().scheduler().synchronize(); // force resync
@@ -303,7 +303,7 @@ WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 *
 ********************************************/
 
-WRITE8_MEMBER(nightgal_state::mux_w)
+void nightgal_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 	//printf("%02x\n", m_mux_data);
@@ -347,7 +347,7 @@ uint8_t nightgal_state::input_2p_r()
 			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
 }
 
-WRITE8_MEMBER(nightgal_state::output_w)
+void nightgal_state::output_w(uint8_t data)
 {
 	/*
 	Doesn't match Charles notes?
@@ -384,20 +384,20 @@ void nightgal_state::common_nsc_map(address_map &map)
 * Sexy Gal
 ********************************/
 
-READ8_MEMBER(nightgal_state::sexygal_soundram_r)
+uint8_t nightgal_state::sexygal_soundram_r(offs_t offset)
 {
 	// bit 7 set = contention?
 	return BIT(m_sound_ram[offset], 7) ? 0x00 : 0x40;
 }
 
-READ8_MEMBER(nightgal_state::sexygal_unknown_sound_r)
+uint8_t nightgal_state::sexygal_unknown_sound_r()
 {
 	// value read here stored in (1-bit) shared RAM but not used?
 	return 0;
 }
 
 // flip flop from main to audio CPU
-WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
+void nightgal_state::sexygal_audioff_w(uint8_t data)
 {
 	// causes an irq
 	m_audiocpu->set_input_line(0, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
@@ -408,7 +408,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
 	m_sexygal_audioff = data;
 }
 
-WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
+void nightgal_state::sexygal_audionmi_w(uint8_t data)
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
@@ -1271,12 +1271,12 @@ void nightgal_state::init_royalqn()
 }
 
 // Night Gal Summer uses a protection latch device to get some layer clearances width/height values.
-WRITE8_MEMBER(nightgal_state::ngalsumr_prot_latch_w)
+void nightgal_state::ngalsumr_prot_latch_w(uint8_t data)
 {
 	m_z80_latch = data;
 }
 
-READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
+uint8_t nightgal_state::ngalsumr_prot_value_r()
 {
 	switch(m_z80_latch)
 	{
@@ -1323,8 +1323,8 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 
 void nightgal_state::init_ngalsumr()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8smo_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
 	// 0x6003 some kind of f/f state
 }
 

@@ -72,7 +72,7 @@ void cms_hires_device::device_start()
 	address_space &space = m_bus->memspace();
 
 	space.install_readwrite_handler(0xfc10, 0xfc1f, read8sm_delegate(*m_gdp, FUNC(ef9365_device::data_r)), write8sm_delegate(*m_gdp, FUNC(ef9365_device::data_w)));
-	space.install_write_handler(0xfc20, 0xfc2f, write8_delegate(*this, FUNC(cms_hires_device::colour_reg_w)));
+	space.install_write_handler(0xfc20, 0xfc2f, write8smo_delegate(*this, FUNC(cms_hires_device::colour_reg_w)));
 
 	save_item(NAME(m_flash_state));
 }
@@ -109,7 +109,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cms_hires_device::flash_rate)
 	}
 }
 
-WRITE8_MEMBER(cms_hires_device::colour_reg_w)
+void cms_hires_device::colour_reg_w(uint8_t data)
 {
 	m_gdp->set_color_filler(data & 0x0f);
 }

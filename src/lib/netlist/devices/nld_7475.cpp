@@ -4,6 +4,34 @@
  * nld_7475.cpp
  *
  * TODO: Correct timing for clock-induced state changes, rather than assuming timing is always due to data-induced state changes
+ *
+ *  7475: 4-Bit Bistable Latches with Complementary Outputs
+ *  7477: 4-Bit Bistable Latches
+ *
+ *          +----------+               +----------+
+ *      1QQ |1   ++  16| 1Q         1D |1   ++  14| 1Q
+ *       1D |2       15| 2Q         2D |2       13| 2Q
+ *       2D |3       14| 2QQ      3C4C |3       12| 1C2C
+ *     3C4C |4  7475 13| 1C2C      VCC |4  7477 11| GND
+ *      VCC |5       12| GND        3D |5       10| NC
+ *       3D |6       11| 3QQ        4D |6        9| 3Q
+ *       4D |7       10| 3Q         NC |7        8| 4Q
+ *      4QQ |8        9| 4Q            +----------+
+ *          +----------+
+ *
+ *
+ *          Function table
+ *
+ *          +---+---++---+-----+
+ *          | D | C || Q | QQ  |
+ *          +===+===++===+=====+
+ *          | 0 | 1 || 0 |  1  |
+ *          | 1 | 1 || 1 |  0  |
+ *          | X | 0 || Q0| Q0Q |
+ *          +---+---++---+-----+
+ *
+ *  Naming conventions follow Texas instruments datasheet
+ *
  */
 
 #include "nld_7475.h"
@@ -13,161 +41,62 @@ namespace netlist
 {
 	namespace devices
 	{
-	NETLIB_OBJECT(7477)
+	template<bool _HasQQ>
+	NETLIB_OBJECT(7475_GATE_BASE)
 	{
-		NETLIB_CONSTRUCTOR(7477)
-		, m_C1C2(*this, "C1C2")
-		, m_C3C4(*this, "C3C4")
-		, m_last_Q(*this, "m_last_Q", 0)
-		, m_D(*this, {"D1", "D2", "D3", "D4"})
-		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
+		NETLIB_CONSTRUCTOR(7475_GATE_BASE)
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
+		, m_nextD(*this, "m_nextD", 0)
 		, m_power_pins(*this)
 		{
-			register_subalias("Q1", m_Q[0]);
 		}
 
 		NETLIB_RESETI()
 		{
-			m_last_Q = 0;
+			m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_nextD = 0;
 		}
-		NETLIB_UPDATEI();
 
-		void update_outputs(std::size_t start, std::size_t end);
+		NETLIB_HANDLERI(clk)
+		{
+			newstate(m_nextD, !m_nextD);
+			m_CLK.inactivate();
+		}
 
-		friend class NETLIB_NAME(7477_dip);
-		friend class NETLIB_NAME(7475_dip);
-		// FIXME: needs cleanup
-		friend class NETLIB_NAME(7475);
+		NETLIB_HANDLERI(inputs)
+		{
+			m_nextD = m_D();
+			m_CLK.activate_lh();
+		}
+
 	private:
-		logic_input_t m_C1C2;
-		logic_input_t m_C3C4;
-		state_var<unsigned> m_last_Q;
-		object_array_t<logic_input_t, 4> m_D;
-		object_array_t<logic_output_t, 4> m_Q;
+		logic_input_t m_D;
+		logic_input_t m_CLK;
+		logic_output_t m_Q;
+		logic_output_t m_QQ;
+
+		state_var<netlist_sig_t> m_nextD;
+
 		nld_power_pins m_power_pins;
+
+		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
+		{
+			// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
+			static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+			m_Q.push(stateQ, delay[stateQ]);
+			if (_HasQQ)
+				m_QQ.push(stateQQ, delay[stateQQ]);
+		}
 	};
 
-	NETLIB_OBJECT_DERIVED(7475, 7477)
-	{
-		NETLIB_CONSTRUCTOR(7475)
-		, m_QQ(*this, {"QQ1", "QQ2", "QQ3", "QQ4"})
-		{
-		}
+	using NETLIB_NAME(7475_GATE) = NETLIB_NAME(7475_GATE_BASE)<true>;
+	using NETLIB_NAME(7477_GATE) = NETLIB_NAME(7475_GATE_BASE)<false>;
 
-		NETLIB_UPDATEI();
-
-		friend class NETLIB_NAME(7477_dip);
-		friend class NETLIB_NAME(7475_dip);
-	private:
-		object_array_t<logic_output_t, 4> m_QQ;
-	};
-
-	NETLIB_OBJECT(7475_dip)
-	{
-		NETLIB_CONSTRUCTOR(7475_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_QQ[0]);
-			register_subalias("2", A.m_D[0]);
-			register_subalias("3", A.m_D[1]);
-			register_subalias("4", A.m_C3C4);
-			register_subalias("5", "A.VCC");
-			register_subalias("6", A.m_D[2]);
-			register_subalias("7", A.m_D[3]);
-			register_subalias("8", A.m_QQ[3]);
-
-			register_subalias("9",  A.m_Q[3]);
-			register_subalias("10", A.m_Q[2]);
-			register_subalias("11", A.m_QQ[2]);
-			register_subalias("12", "A.GND");
-			register_subalias("13", A.m_C1C2);
-			register_subalias("14", A.m_QQ[1]);
-			register_subalias("15", A.m_Q[1]);
-			register_subalias("16", A.m_Q[0]);
-		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(7475) A;
-	};
-
-	NETLIB_OBJECT(7477_dip)
-	{
-		NETLIB_CONSTRUCTOR(7477_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_D[0]);
-			register_subalias("2", A.m_D[1]);
-			register_subalias("3", A.m_C3C4);
-			register_subalias("4", "A.VCC");
-			register_subalias("5", A.m_D[2]);
-			register_subalias("6", A.m_D[3]);
-			//register_subalias("7", ); ==> NC
-
-			register_subalias("8",  A.m_Q[3]);
-			register_subalias("9",  A.m_Q[2]);
-			//register_subalias("10", ); ==> NC
-			register_subalias("11", "A.GND");
-			register_subalias("12", A.m_C1C2);
-			register_subalias("13", A.m_Q[1]);
-			register_subalias("14", A.m_Q[0]);
-		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(7477) A;
-	};
-
-	NETLIB_UPDATE(7475)
-	{
-		unsigned start_q = m_last_Q;
-
-		NETLIB_NAME(7477)::update();
-
-		for (std::size_t i=0; i<4; i++)
-		{
-			unsigned last_bit = (m_last_Q >> i) & 1;
-			unsigned start_bit = (start_q >> i) & 1;
-			if (last_bit != start_bit)
-				m_QQ[i].push(last_bit ^ 1, last_bit != 0 ? NLTIME_FROM_NS(15) : NLTIME_FROM_NS(40));
-		}
-	}
-
-	void NETLIB_NAME(7477)::update_outputs(std::size_t start, std::size_t end)
-	{
-		for (std::size_t i=start; i<end; i++)
-		{
-			netlist_sig_t d = m_D[i]();
-			if (d != ((m_last_Q >> i) & 1))
-				m_Q[i].push(d, d != 0 ? NLTIME_FROM_NS(30) : NLTIME_FROM_NS(25));
-			m_last_Q &= ~(1 << i);
-			m_last_Q |= d << i;
-		}
-	}
-
-	NETLIB_UPDATE(7477)
-	{
-		netlist_sig_t c1c2 = m_C1C2();
-		netlist_sig_t c3c4 = m_C3C4();
-		if (c1c2 && c3c4)
-		{
-			update_outputs(0, 4);
-		}
-		else if (c1c2)
-		{
-			update_outputs(0, 2);
-		}
-		else if (c3c4)
-		{
-			update_outputs(2, 4);
-		}
-
-	}
-
-	NETLIB_DEVICE_IMPL(7475,     "TTL_7475",     "")
-	NETLIB_DEVICE_IMPL(7475_dip, "TTL_7475_DIP", "")
-	NETLIB_DEVICE_IMPL(7477,     "TTL_7477",     "")
-	NETLIB_DEVICE_IMPL(7477_dip, "TTL_7477_DIP", "")
+	NETLIB_DEVICE_IMPL(7475_GATE, "TTL_7475_GATE", "")
+	NETLIB_DEVICE_IMPL(7477_GATE, "TTL_7477_GATE", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -137,6 +137,176 @@ static NETLIST_START(MB3614_DIP)
 
 NETLIST_END()
 
+static NETLIST_START(MC3340_DIP)
+	// A netlist description of the Motorola MC3340 Electronic Attenuator
+	// IC, a voltage-controlled amplifier/attenuator. It amplifies or
+	// attenuates an input signal according to the voltage of a second,
+	// control signal, with a maximum gain of about 12-13 dB (about a
+	// factor of 4 in voltage), and higher control voltages giving greater
+	// attenuation, which scales logarithmically.
+
+	// The netlist here is based on the circuit schematic given in
+	// Motorola's own data books, especially the most recent ones
+	// published in the 1990s (e.g. _Motorola Analog/Interface ICs Device
+	// Data, Vol. II_ (1996), p. 9-67), which are the only schematics that
+	// include resistor values. However, the 1990s schematics are missing
+	// one crossover connection which is present in older schematics
+	// published in the 1970s (e.g. _Motorola Linear Integrated Circuits_
+	// (1979), p. 5-130). This missing connection is clearly an error
+	// which has been fixed in this netlist; without it, the circuit won't
+	// amplify properly, generating only a very weak output signal.
+
+	// The 1990s schematics also omit a couple of diodes which are present
+	// in the 1970s schematics. Both of these diodes have been included
+	// here. One raises the minimum control voltage at which signal
+	// attenuation starts, so it makes the netlist's profile of
+	// attenuation vs. control voltage better match Motorola's charts for
+	// the device. The other affects the level of the input "midpoint",
+	// and including it makes the engine sound closer to that on real
+	// 280-ZZZAP machines.
+
+	// The Motorola schematics do not label components, so I've created my
+	// own labeling scheme based on numbering components on the schematics
+	// from top to bottom, left to right, with resistors also getting
+	// their value (expressed European-style to avoid decimal points) as
+	// part of the name. The netlist is also listed following the
+	// schematics in roughly top-to-bottom, left-to-right order.
+
+	// A very simple model is used for the transistors here, based on the
+	// generic NPN default but with a larger scale current. Again, this
+	// was chosen to better match the netlist's attenuation vs. control
+	// voltage profile to that given in Motorola's charts for the device.
+
+	// The MC3340 has the same circuit internally as an older Motorola
+	// device, the MFC6040, which was replaced by the MC3340 in the
+	// mid-1970s. The two chips differ only in packaging. Older arcade
+	// games which use the MFC6040 may also benefit from this netlist
+	// implementation.
+
+	RES(R1_5K1, RES_K(5.1))
+
+	DIODE(D1, "D(IS=1e-15 N=1)")
+
+	RES(R2_4K7, RES_K(4.7))
+
+	QBJT_EB(Q1, "NPN(IS=1E-13 BF=100)")
+
+	RES(R3_750, RES_R(750))
+	RES(R4_10K, RES_K(10))
+
+	QBJT_EB(Q2, "NPN(IS=1E-13 BF=100)")
+
+	RES(R5_750, RES_R(750))
+	RES(R6_3K9, RES_K(3.9))
+
+	RES(R7_5K1, RES_K(5.1))
+	RES(R8_20K, RES_K(20))
+
+	DIODE(D2, "D(IS=1e-15 N=1)")
+
+	RES(R9_510, RES_R(510))
+
+	QBJT_EB(Q3, "NPN(IS=1E-13 BF=100)")
+
+	QBJT_EB(Q4, "NPN(IS=1E-13 BF=100)")
+
+	QBJT_EB(Q5, "NPN(IS=1E-13 BF=100)")
+
+	RES(R10_1K3, RES_K(1.3))
+
+	QBJT_EB(Q6, "NPN(IS=1E-13 BF=100)")
+
+	RES(R11_5K1, RES_K(5.1))
+
+	QBJT_EB(Q7, "NPN(IS=1E-13 BF=100)")
+
+	QBJT_EB(Q8, "NPN(IS=1E-13 BF=100)")
+
+	RES(R12_1K5, RES_K(1.5))
+
+	RES(R13_6K2, RES_K(6.2))
+
+	QBJT_EB(Q9, "NPN(IS=1E-13 BF=100)")
+
+	RES(R14_5K1, RES_K(5.1))
+
+	QBJT_EB(Q10, "NPN(IS=1E-13 BF=100)")
+
+	RES(R15_5K1, RES_K(5.1))
+
+	RES(R16_200, RES_R(200))
+
+	RES(R17_5K1, RES_K(5.1))
+
+	DIODE(D3, "D(IS=1e-15 N=1)")
+
+	RES(R18_510, RES_R(510))
+
+	ALIAS(VCC, R1_5K1.1)
+	NET_C(R1_5K1.1, Q1.C, Q2.C, R7_5K1.1, Q3.C, Q4.C, Q7.C,
+		R13_6K2.1, Q10.C, R17_5K1.1)
+	// Location of first diode present on 1970s schematics but omitted on
+	// 1990s ones. Including it raises the control voltage threshold for
+	// attenuation significantly.
+	NET_C(R1_5K1.2, D1.A, Q1.B)
+	NET_C(D1.K, R2_4K7.1)
+	NET_C(R2_4K7.2, GND)
+
+	NET_C(Q1.E, R3_750.1, R5_750.1)
+	NET_C(R3_750.2, R4_10K.1, Q2.B)
+	NET_C(R4_10K.2, GND)
+
+	NET_C(R5_750.2, R6_3K9.1, Q3.B)
+	ALIAS(CONTROL, R6_3K9.2)
+
+	ALIAS(INPUT, Q5.B)
+
+	NET_C(INPUT, R8_20K.1)
+	// Location of second diode present on 1970s schematics but omitted on
+	// 1990s ones. Including it is critical to making the tone of the
+	// output engine sound match that of real 280-ZZZAP machines.
+	NET_C(R7_5K1.2, R8_20K.2, D2.A)
+	NET_C(D2.K, R9_510.1)
+	NET_C(R9_510.2, GND)
+
+	NET_C(Q4.E, Q6.E, Q5.C)
+	NET_C(Q5.E, R10_1K3.1)
+	NET_C(R10_1K3.2, GND)
+
+	NET_C(Q6.B, Q7.B, Q2.E, R11_5K1.1)
+	NET_C(R11_5K1.2, GND)
+
+	NET_C(Q7.E, Q9.E, Q8.C)
+	NET_C(Q8.E, R12_1K5.1)
+	NET_C(R12_1K5.2, GND)
+
+	NET_C(Q4.B, Q9.B, Q3.E, R14_5K1.1)
+	NET_C(R14_5K1.2, GND)
+
+	// This is where the cross-connection is erroneously omitted from
+	// 1990s schematics.
+	NET_C(Q6.C, R13_6K2.2, Q9.C, Q10.B)
+
+	// Connection for external frequency compensation capacitor; unused
+	// here.
+	ALIAS(ROLLOFF, Q10.B)
+
+	NET_C(Q10.E, R16_200.1, R15_5K1.1)
+	NET_C(R15_5K1.2, GND)
+	ALIAS(OUTPUT, R16_200.2)
+
+	NET_C(R17_5K1.2, D3.A, Q8.B)
+	NET_C(D3.K, R18_510.1)
+	ALIAS(GND, R18_510.2);
+
+	ALIAS(1, INPUT)
+	ALIAS(2, CONTROL)
+	ALIAS(3, GND)
+	ALIAS(6, ROLLOFF)
+	ALIAS(7, OUTPUT)
+	ALIAS(8, VCC)
+NETLIST_END()
+
 static NETLIST_START(TL081_DIP)
 	OPAMP(A, "TL084")
 
@@ -201,6 +371,14 @@ static NETLIST_START(UA741_DIP14)
 	OPAMP(A, "UA741")
 
 	INCLUDE(opamp_layout_1_11_6)
+
+NETLIST_END()
+
+static NETLIST_START(MC1558_DIP)
+	OPAMP(A, "UA741")
+	OPAMP(B, "UA741")
+
+	INCLUDE(opamp_layout_2_8_4)
 
 NETLIST_END()
 
@@ -405,6 +583,7 @@ NETLIST_START(OPAMP_lib)
 	NET_MODEL("UA741       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=75 DAB=0.0017)")
 	NET_MODEL("LM747       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=50 DAB=0.0017)")
 	NET_MODEL("LM747A      OPAMP(TYPE=3 VLH=2.0 VLL=2.0 FPF=5 UGF=1000k SLEW=0.7M RI=6000k RO=50 DAB=0.0015)")
+	// FIXME: LM748 values are calculated based on a documented schematic of the part and may be wrong.
 	// TI and Motorola Datasheets differ - below are Motorola values, SLEW is average of LH and HL
 	NET_MODEL("LM3900      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=2k UGF=4M SLEW=10M RI=10M RO=2k DAB=0.0015)")
 
@@ -413,6 +592,7 @@ NETLIST_START(OPAMP_lib)
 	NET_MODEL("LM3900_PNP1 PNP(IS=1E-14 BF=40 TF=1E-7 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5)")
 #endif
 	LOCAL_LIB_ENTRY(MB3614_DIP)
+	LOCAL_LIB_ENTRY(MC3340_DIP)
 	LOCAL_LIB_ENTRY(TL081_DIP)
 	LOCAL_LIB_ENTRY(TL084_DIP)
 	LOCAL_LIB_ENTRY(LM324_DIP)
@@ -421,6 +601,7 @@ NETLIST_START(OPAMP_lib)
 	LOCAL_LIB_ENTRY(UA741_DIP8)
 	LOCAL_LIB_ENTRY(UA741_DIP10)
 	LOCAL_LIB_ENTRY(UA741_DIP14)
+	LOCAL_LIB_ENTRY(MC1558_DIP)
 	LOCAL_LIB_ENTRY(LM747_DIP)
 	LOCAL_LIB_ENTRY(LM747A_DIP)
 	LOCAL_LIB_ENTRY(LM3900)

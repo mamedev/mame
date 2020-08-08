@@ -123,15 +123,15 @@ private:
 	/* memory */
 	std::unique_ptr<uint8_t[]> m_bitmap0[2];
 	std::unique_ptr<uint8_t[]> m_bitmap1[2];
-	DECLARE_WRITE16_MEMBER(pasha2_misc_w);
-	DECLARE_WRITE16_MEMBER(pasha2_palette_w);
-	DECLARE_WRITE16_MEMBER(vbuffer_set_w);
-	DECLARE_WRITE16_MEMBER(vbuffer_clear_w);
-	DECLARE_WRITE8_MEMBER(bitmap_0_w);
-	DECLARE_WRITE8_MEMBER(bitmap_1_w);
-	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
-	DECLARE_READ16_MEMBER(pasha2_speedup_r);
-	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void pasha2_misc_w(offs_t offset, uint16_t data);
+	void pasha2_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vbuffer_set_w(uint16_t data);
+	void vbuffer_clear_w(uint16_t data);
+	void bitmap_0_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void bitmap_1_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void pasha2_lamps_w(uint16_t data);
+	uint16_t pasha2_speedup_r(offs_t offset);
+	template<int Chip> void oki_bank_w(offs_t offset, uint16_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -145,7 +145,7 @@ private:
 };
 
 
-WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
+void pasha2_state::pasha2_misc_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 	{
@@ -167,7 +167,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 	}
 }
 
-WRITE16_MEMBER(pasha2_state::pasha2_palette_w)
+void pasha2_state::pasha2_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int color;
 
@@ -182,22 +182,22 @@ WRITE16_MEMBER(pasha2_state::pasha2_palette_w)
 	m_palette->set_pen_color(offset * 2 + 1, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
 }
 
-WRITE16_MEMBER(pasha2_state::vbuffer_set_w)
+void pasha2_state::vbuffer_set_w(uint16_t data)
 {
 	m_vbuffer = 1;
 }
 
-WRITE16_MEMBER(pasha2_state::vbuffer_clear_w)
+void pasha2_state::vbuffer_clear_w(uint16_t data)
 {
 	m_vbuffer = 0;
 }
 
-WRITE8_MEMBER(pasha2_state::bitmap_0_w)
+void pasha2_state::bitmap_0_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_bitmap0[m_vbuffer][offset]);
 }
 
-WRITE8_MEMBER(pasha2_state::bitmap_1_w)
+void pasha2_state::bitmap_1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// handle overlapping pixels without writing them
 	if ((data & 0xff) == 0xff)
@@ -207,13 +207,13 @@ WRITE8_MEMBER(pasha2_state::bitmap_1_w)
 }
 
 template<int Chip>
-WRITE16_MEMBER(pasha2_state::oki_bank_w)
+void pasha2_state::oki_bank_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_oki[Chip]->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
+void pasha2_state::pasha2_lamps_w(uint16_t data)
 {
 	for (int p = 0; p < 3; p++)
 	{
@@ -456,7 +456,7 @@ ROM_START( pasha2 )
 	ROM_LOAD( "pp2.um53",     0x00000, 0x80000, CRC(8a29ad03) SHA1(3e9b0c86d8e3bb0b7691f68ad45431f6f9e8edbd) )
 ROM_END
 
-READ16_MEMBER(pasha2_state::pasha2_speedup_r)
+uint16_t pasha2_state::pasha2_speedup_r(offs_t offset)
 {
 	if(m_maincpu->pc() == 0x8302)
 		m_maincpu->spin_until_interrupt();
@@ -466,7 +466,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 
 void pasha2_state::init_pasha2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(*this, FUNC(pasha2_state::pasha2_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16sm_delegate(*this, FUNC(pasha2_state::pasha2_speedup_r)));
 
 	m_mainbank->configure_entries(0, 6, memregion("bankeddata")->base(), 0x400000);
 	m_mainbank->set_entry(0);

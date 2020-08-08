@@ -108,18 +108,18 @@
 #include "softlist.h"
 
 
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
+uint8_t tdv2324_state::tdv2324_main_io_30()
 {
 	return 0xff;
 }
 
 // Not sure what this is for, i/o read at 0xE6 on maincpu, post fails if it does not return bit 4 set
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
+uint8_t tdv2324_state::tdv2324_main_io_e6()
 {
 	return 0x10; // TODO: this should actually return something meaningful, for now is enough to pass early boot test
 }
 
-WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
+void tdv2324_state::tdv2324_main_io_e2(uint8_t data)
 {
 	printf("%c\n", data);
 }

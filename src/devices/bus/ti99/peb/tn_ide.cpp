@@ -64,6 +64,48 @@
     Once this is done, the bootstrap code must be activated; it will load the
     IDEAL files into the SRAM on each power-up of the system.
 
+    Memory map
+    ----------
+
+    CRU bit 0 == 1:
+       CRU bit 1 == DIP switch setting:  (bit 1==0 on power-up, switch==0 when closed)
+          RTC65271:
+             4000-401F: XRAM (32 bytes of page given in 4080)
+             402x: RTC data register (mirrored)
+             403x: RTC indirect address register (mirrored)
+             408x,409x: Page register for XRAM (mirrored)
+             40Ax: mirror of 402x
+             40Bx: mirror of 403x
+
+          BQ4842/4852: (switch should be open (1) on power-up)
+             4000-403F: not mapped
+             4080-40BF: not mapped
+
+          BQ4847:
+             4020-403F: Registers (even addresses, mirrored on address+1)
+
+          4040-404E: CS1Fx read  (IDE register group 1), mirrored at 40C0-40CE
+          4050-405E: CS1Fx write (IDE register group 1), mirrored at 40D0-40DE
+          4060-406E: CS3Fx read  (IDE register group 2), mirrored at 40E0-40FE
+          4070-407E: CS3Fx write (IDE register group 2), mirrored at 40F0-40FE
+
+       4000-40FF: SRAM (CRU bit 1 != DIP switch setting)
+       4100-4FFF: SRAM
+
+    6000-7FFF: SRAM (CRU bit 4 == 1)  [RAMBO support]
+
+    BQ4842/52: Clock registers are located at upper end of SRAM
+       BQ4842: page 0F (mirrored 1F, 2F, 3F)
+       BQ4852: page 3F
+
+    Write SRAM:
+       CRU bit 2 == 0:
+          normal write
+       CRU bit 2 == 1:
+          Set SRAM page nn/2 (address 40nn, mirrored in 4000-5FFF, 6000-7FFF)
+       CRU bit 5 == 1:
+          SRAM write protect
+
     Original version by Raphael Nabet
     Rewritten by Michael Zapf
 
@@ -140,7 +182,7 @@ nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconf
 {
 }
 
-READ8Z_MEMBER(nouspikel_ide_card_device::readz)
+void nouspikel_ide_card_device::readz(offs_t offset, uint8_t *value)
 {
 	bool mmap = false;
 	bool sramsel = false;
@@ -183,14 +225,14 @@ READ8Z_MEMBER(nouspikel_ide_card_device::readz)
 				if (m_rtctype==RTC47)
 				{
 					*value = m_rtc47->read((offset & 0x1e)>>1);
-					LOGMASKED(LOG_RTC, "rtc reg %02d -> %02x\n", (offset & 0x1e)>>1, *value);
+					LOGMASKED(LOG_RTC, "rtc reg %02d (%04x) -> %02x\n", (offset & 0x1e)>>1, offset & 0xffff, *value);
 				}
 				// No reaction for RTC42, RTC52
 			}
 		}
 		else
 		{
-			if (m_rtctype==RTC65)
+			if (m_rtctype==RTC65)   // xram, only for 65271, unmapped for others
 			{
 				int addr = (offset & 0x1f) | ((offset&0x80)>>2);
 				*value = m_rtc65->read(1, addr);
@@ -214,6 +256,7 @@ READ8Z_MEMBER(nouspikel_ide_card_device::readz)
 		}
 		else
 		{
+			// The BQ4842/52 offer SRAM by themselves
 			if (m_rtctype==RTC42)
 				*value = m_rtc42->read(addr);
 			else
@@ -324,7 +367,7 @@ void nouspikel_ide_card_device::write(offs_t offset, uint8_t data)
 			{
 				if (m_rtctype == RTC47)
 				{
-					LOGMASKED(LOG_RTC, "rtc reg %02d <- %02x\n", (offset & 0x1e)>>1, data);
+					LOGMASKED(LOG_RTC, "rtc reg %02d (%04x) <- %02x\n", (offset & 0x1e)>>1, offset & 0xffff, data);
 					m_rtc47->write((offset & 0x1e)>>1, data);
 				}
 				// No reaction for RTC42, RTC52
@@ -441,14 +484,13 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 	}
 
 	// mmap = 0x4000 - 0x40ff (if bit 1 == DIP setting)
-	// sramsel = 0x4100 - 0x4fff (if bit 0 = 1)
-	// sramsel = 0x6000 - 0x7fff (if bit 4 = 1, bit 0 unchecked)
+	// sramsel = 0x4100 - 0x4fff (if bit 0 = 1) or 0x6000 - 0x7fff (if bit 4 = 1)
 
 	// A0 is not checked again (subsumed in inspace)
 
 	mmap = ((offset & 0x7f00)==0x4000) && (m_crulatch->q0_r()==1)
 			&& ((m_crulatch->q1_r()!=0) == m_srammap) && inspace;
-	sramsel = ((((offset & 0x6000)==0x4000) && !mmap && (m_crulatch->q4_r()==0) && (m_crulatch->q0_r()==1))
+	sramsel = ((((offset & 0x6000)==0x4000) && !mmap && (m_crulatch->q0_r()==1))
 				|| (((offset & 0x6000)==0x6000) && (m_crulatch->q4_r()==1))) && inspace;
 
 	xramsel = false;
@@ -458,7 +500,7 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 
 	if (mmap)
 	{
-		xramsel = ((offset & 0x60)==0x00);  // 4000-401F  (only 65271)
+		xramsel = ((offset & 0x60)==0x00);  // 4000-401F, 4080  (only 65271)
 		rtcsel = ((offset & 0x60)==0x20);   // 4020-403F  (65271 and 4847)
 		cs1fx = ((offset & 0x60)==0x40);    // 4040-405F
 		cs3fx = ((offset & 0x60)==0x60);    // 4060-407F
@@ -468,7 +510,7 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 /*
     CRU read access to the LS251 multiplexer.
 */
-READ8Z_MEMBER( nouspikel_ide_card_device::crureadz )
+void nouspikel_ide_card_device::crureadz(offs_t offset, uint8_t *value)
 {
 	uint8_t bit = 0;
 
@@ -523,9 +565,40 @@ void nouspikel_ide_card_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		LOGMASKED(LOG_CRU, "cru %04x (bit %d) <- %d\n", offset, (offset & 0xff)>>1, data);
+		// LOGMASKED(LOG_CRU, "cru %04x (bit %d) <- %d\n", offset, (offset & 0xff)>>1, data);
 		int bitnumber = (offset >> 1) & 0x07;
 		m_crulatch->write_bit(bitnumber, data&1);
+
+#if 0
+		// Just debugging
+		switch (bitnumber)
+		{
+		case 0:
+			LOGMASKED(LOG_CRU, "Turn card %s\n", (data&1)? "on" : "off");
+			break;
+		case 1:
+			LOGMASKED(LOG_CRU, "Map %s at 4000-40FF\n", ((data&1)==m_srammap)? "register" : "SRAM");
+			break;
+		case 2:
+			LOGMASKED(LOG_CRU, "%s SRAM page\n", (data&1)? "Enable switch" : "Fixed");
+			break;
+		case 3:
+			LOGMASKED(LOG_CRU, "%s\n", (data&1)? "Same page at 4000-5FFF" : "Fix page 0 at 4000-4FFF");
+			break;
+		case 4:
+			LOGMASKED(LOG_CRU, "%s RAMBO\n", (data&1)? "Enable" : "Disable");
+			break;
+		case 5:
+			LOGMASKED(LOG_CRU, "Write %s SRAM\n", (data&1)? "protect" : "enable");
+			break;
+		case 6:
+			LOGMASKED(LOG_CRU, "%s IDE interrupt\n", (data&1)? "Enable" : "Disable");
+			break;
+		case 7:
+			LOGMASKED(LOG_CRU, "%s\n", (data&1)? "Reset drives" : "Normal operation");
+			break;
+		}
+#endif
 	}
 }
 
@@ -604,6 +677,15 @@ void nouspikel_ide_card_device::device_reset()
 	m_rtc52->connect_osc(ioport("RTC")->read()==3);
 }
 
+INPUT_CHANGED_MEMBER( nouspikel_ide_card_device::mode_changed )
+{
+	// Card mode changed
+	if (param==0)
+		m_srammap = (newval != 0);
+	else
+		m_mode = newval;
+}
+
 INPUT_PORTS_START( tn_ide )
 
 	PORT_START("RTC")
@@ -613,13 +695,15 @@ INPUT_PORTS_START( tn_ide )
 		PORT_CONFSETTING(2, "BQ4842 (128K)")
 		PORT_CONFSETTING(3, "BQ4852 (512K)")
 
+	// The switch should be open (1) on powerup for BQ clock chips
 	PORT_START("MAPMODE")
-	PORT_DIPNAME(0x1, 0, "Map at boot time")
+	PORT_DIPNAME(0x1, 1, "Map at boot time") PORT_CHANGED_MEMBER(DEVICE_SELF, nouspikel_ide_card_device, mode_changed, 0)
 		PORT_DIPSETTING(0, "RTC")
 		PORT_DIPSETTING(1, "SRAM")
 
+	// Set to off as default, because random contents in SRAM may lead to lockup
 	PORT_START("MODE")
-	PORT_DIPNAME(0x3, MODE_TI, "Card mode")
+	PORT_DIPNAME(0x3, MODE_OFF, "Card mode") PORT_CHANGED_MEMBER(DEVICE_SELF, nouspikel_ide_card_device, mode_changed, 1)
 		PORT_DIPSETTING(MODE_OFF, "Off")
 		PORT_DIPSETTING(MODE_GENEVE, "Geneve")
 		PORT_DIPSETTING(MODE_TI, "TI")

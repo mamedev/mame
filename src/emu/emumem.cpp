@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Olivier Galibert
 /***************************************************************************
 
-    emumem.c
+    emumem.cpp
 
     Functions which handle device memory access.
 
@@ -599,7 +599,7 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);;
+		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);
 	}
 
 	// mask-less native read
@@ -611,13 +611,13 @@ public:
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
 	}
 
 	// virtual access to these functions

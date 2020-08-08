@@ -113,7 +113,7 @@ TODO:
 
 #define CLOCK_XTAL 12000000
 
-READ8_MEMBER(naughtyb_state::in0_port_r)
+uint8_t naughtyb_state::in0_port_r()
 {
 	int in0 = ioport("IN0")->read();
 
@@ -128,7 +128,7 @@ READ8_MEMBER(naughtyb_state::in0_port_r)
 	return in0;
 }
 
-READ8_MEMBER(naughtyb_state::dsw0_port_r)
+uint8_t naughtyb_state::dsw0_port_r()
 {
 	// vblank replaces the cabinet dip
 
@@ -144,7 +144,7 @@ READ8_MEMBER(naughtyb_state::dsw0_port_r)
    Paul Priest: tourniquet@mameworld.net */
 
 
-READ8_MEMBER(naughtyb_state::popflame_protection_r)/* Not used by bootleg/hack */
+uint8_t naughtyb_state::popflame_protection_r()/* Not used by bootleg/hack */
 {
 	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
@@ -183,7 +183,7 @@ READ8_MEMBER(naughtyb_state::popflame_protection_r)/* Not used by bootleg/hack *
 #endif
 }
 
-WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
+void naughtyb_state::popflame_protection_w(uint8_t data)
 {
 	/*
 	Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
@@ -839,10 +839,10 @@ ROM_END
 void naughtyb_state::init_popflame()
 {
 	/* install a handler to catch protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x9000, read8_delegate(*this, FUNC(naughtyb_state::popflame_protection_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9090, 0x9090, read8_delegate(*this, FUNC(naughtyb_state::popflame_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x9000, read8smo_delegate(*this, FUNC(naughtyb_state::popflame_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9090, 0x9090, read8smo_delegate(*this, FUNC(naughtyb_state::popflame_protection_r)));
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb0ff, write8_delegate(*this, FUNC(naughtyb_state::popflame_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb0ff, write8smo_delegate(*this, FUNC(naughtyb_state::popflame_protection_w)));
 
 	save_item(NAME(m_popflame_prot_seed));
 	save_item(NAME(m_r_index));
@@ -850,12 +850,12 @@ void naughtyb_state::init_popflame()
 }
 
 
-READ8_MEMBER(naughtyb_state::trvmstr_questions_r)
+uint8_t naughtyb_state::trvmstr_questions_r()
 {
 	return memregion("user1")->base()[m_question_offset];
 }
 
-WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
+void naughtyb_state::trvmstr_questions_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -874,7 +874,8 @@ WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
 void naughtyb_state::init_trvmstr()
 {
 	/* install questions' handlers  */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(*this, FUNC(naughtyb_state::trvmstr_questions_r)), write8_delegate(*this, FUNC(naughtyb_state::trvmstr_questions_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc002, read8smo_delegate(*this, FUNC(naughtyb_state::trvmstr_questions_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xc002, write8sm_delegate(*this, FUNC(naughtyb_state::trvmstr_questions_w)));
 
 	save_item(NAME(m_question_offset));
 }

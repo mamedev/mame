@@ -18,18 +18,18 @@ public:
 		: s11_state(mconfig, type, tag)
 	{ }
 
+	void s11a_common(machine_config &config);
 	void s11a(machine_config &config);
+	void s11a_obg(machine_config &config);
 
 	void init_s11a();
 
-	DECLARE_WRITE8_MEMBER(bgbank_w);
 	void dig0_w(uint8_t data);
 
 private:
 	DECLARE_MACHINE_RESET(s11a);
 
 	void s11a_audio_map(address_map &map);
-	void s11a_bg_map(address_map &map);
 	void s11a_main_map(address_map &map);
 };
 

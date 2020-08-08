@@ -241,17 +241,17 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_WRITE8_MEMBER(bank_w);
+	uint8_t vsync_r();
+	void beep_w(uint8_t data);
+	void bank_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
 	void kbd_matrix_w(uint8_t data);
 	uint8_t kbd_port2_r();
 	void kbd_port2_w(uint8_t data);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_stat_r();
+	void fdc_cmd_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
@@ -466,7 +466,7 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-READ8_MEMBER(itt3030_state::vsync_r)
+uint8_t itt3030_state::vsync_r()
 {
 	uint8_t ret = 0;
 
@@ -483,7 +483,7 @@ READ8_MEMBER(itt3030_state::vsync_r)
 	return ret;
 }
 
-WRITE8_MEMBER(itt3030_state::bank_w)
+void itt3030_state::bank_w(uint8_t data)
 {
 	int bank = 8;
 
@@ -543,7 +543,7 @@ void itt3030_state::itt3030_palette(palette_device &palette) const
 //  SOUND
 //**************************************************************************
 
-WRITE8_MEMBER( itt3030_state::beep_w )
+void itt3030_state::beep_w(uint8_t data)
 {
 	m_beep->set_state(data&1);
 }
@@ -578,7 +578,7 @@ WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
     1 Write protect (the disk in the selected drive is write protected)
     0 HLT (Halt signal during head load and track change)
 */
-READ8_MEMBER(itt3030_state::fdc_stat_r)
+uint8_t itt3030_state::fdc_stat_r()
 {
 	uint8_t res = 0;
 	floppy_image_device *floppy1 = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
@@ -597,12 +597,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 }
 
 /* As far as we can tell, the mess of ttl de-inverts the bus */
-READ8_MEMBER(itt3030_state::fdc_r)
+uint8_t itt3030_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(itt3030_state::fdc_w)
+void itt3030_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
@@ -617,7 +617,7 @@ WRITE8_MEMBER(itt3030_state::fdc_w)
     1 KOMP - write comp on/off
     0 RG J - Change separator stage to read
 */
-WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
+void itt3030_state::fdc_cmd_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

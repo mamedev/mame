@@ -41,8 +41,8 @@ public:
 		m_burst_clock[3] = clk4;
 	}
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w);
 	DECLARE_WRITE_LINE_MEMBER(drq1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq2_w);

@@ -490,7 +490,7 @@ WRITE_LINE_MEMBER(hp9895_device::phi_int_w)
 	}
 }
 
-READ8_MEMBER(hp9895_device::phi_reg_r)
+uint8_t hp9895_device::phi_reg_r(offs_t offset)
 {
 	uint16_t reg = m_phi->reg16_r(offset);
 
@@ -512,7 +512,7 @@ void hp9895_device::z80_m1_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(hp9895_device::data_w)
+void hp9895_device::data_w(uint8_t data)
 {
 	LOG_0(("W DATA=%02x\n" , data));
 	// CPU stalls until next SDOK
@@ -522,13 +522,13 @@ WRITE8_MEMBER(hp9895_device::data_w)
 	m_accdata = true;
 }
 
-WRITE8_MEMBER(hp9895_device::clock_w)
+void hp9895_device::clock_w(uint8_t data)
 {
 	LOG_0(("W CLOCK=%02x\n" , data));
 	m_clock_reg = data;
 }
 
-WRITE8_MEMBER(hp9895_device::reset_w)
+void hp9895_device::reset_w(uint8_t data)
 {
 	LOG_0(("W RESET=%02x\n" , data));
 	if (BIT(data , REG_RESET_TIMEOUT_START_BIT)) {
@@ -541,13 +541,13 @@ WRITE8_MEMBER(hp9895_device::reset_w)
 	// TODO: PROGRES
 }
 
-WRITE8_MEMBER(hp9895_device::leds_w)
+void hp9895_device::leds_w(uint8_t data)
 {
 	LOG(("W LEDS=%02x %c%c%c%c%c\n" , data , BIT(data , 4) ? '.' : '*' , BIT(data , 3) ? '.' : '*' , BIT(data , 2) ? '.' : '*' , BIT(data , 1) ? '.' : '*' , BIT(data , 0) ? '.' : '*'));
 	// TODO:
 }
 
-WRITE8_MEMBER(hp9895_device::cntl_w)
+void hp9895_device::cntl_w(uint8_t data)
 {
 	if (data != m_cntl_reg) {
 		LOG_0(("W CNTL=%02x -> %02x\n" , m_cntl_reg , data));
@@ -608,7 +608,7 @@ WRITE8_MEMBER(hp9895_device::cntl_w)
 	}
 }
 
-WRITE8_MEMBER(hp9895_device::drv_w)
+void hp9895_device::drv_w(uint8_t data)
 {
 	LOG_0(("W DRV=%02x\n" , data));
 	m_mgnena = BIT(data , REG_DRV_MGNENA_BIT);
@@ -620,7 +620,7 @@ WRITE8_MEMBER(hp9895_device::drv_w)
 	}
 }
 
-WRITE8_MEMBER(hp9895_device::xv_w)
+void hp9895_device::xv_w(uint8_t data)
 {
 	LOG_0(("W XV=%02x\n" , data));
 	// Disk Changed flag is cleared when drive is ready and it is deselected
@@ -644,7 +644,7 @@ WRITE8_MEMBER(hp9895_device::xv_w)
 	m_hiden = BIT(data , REG_XV_HIDEN_BIT);
 }
 
-READ8_MEMBER(hp9895_device::data_r)
+uint8_t hp9895_device::data_r()
 {
 	m_clock_reg = m_clock_sr;
 	m_accdata = true;
@@ -654,12 +654,12 @@ READ8_MEMBER(hp9895_device::data_r)
 	return m_data_sr;
 }
 
-READ8_MEMBER(hp9895_device::clock_r)
+uint8_t hp9895_device::clock_r()
 {
 	return m_clock_reg;
 }
 
-READ8_MEMBER(hp9895_device::drivstat_r)
+uint8_t hp9895_device::drivstat_r()
 {
 	uint8_t res = 0;
 
@@ -693,14 +693,14 @@ READ8_MEMBER(hp9895_device::drivstat_r)
 	return res;
 }
 
-READ8_MEMBER(hp9895_device::switches_r)
+uint8_t hp9895_device::switches_r()
 {
 	uint8_t res = get_switches2();
 	res |= m_switches->read();
 	return res;
 }
 
-READ8_MEMBER(hp9895_device::switches2_r)
+uint8_t hp9895_device::switches2_r()
 {
 	return get_switches2();
 }

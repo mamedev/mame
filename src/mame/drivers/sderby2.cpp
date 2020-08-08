@@ -65,15 +65,15 @@ private:
 	void sderby2_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(host_r);
-	DECLARE_WRITE8_MEMBER(main_nmi);
-	DECLARE_WRITE8_MEMBER(sub_nmi);
-	DECLARE_READ8_MEMBER(sub_r);
-	DECLARE_WRITE8_MEMBER(host_io_40_w);
-	DECLARE_READ8_MEMBER(sub_io_0_r);
-	DECLARE_READ8_MEMBER(sub_unk_r);
-	DECLARE_WRITE8_MEMBER(sub_unk_w);
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t host_r();
+	void main_nmi(uint8_t data);
+	void sub_nmi(uint8_t data);
+	uint8_t sub_r();
+	void host_io_40_w(uint8_t data);
+	uint8_t sub_io_0_r();
+	uint8_t sub_unk_r();
+	void sub_unk_w(uint8_t data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_subcpu;
@@ -102,7 +102,7 @@ void sderby2_state::sderby2_palette(palette_device &palette) const
 
 }
 
-WRITE8_MEMBER(sderby2_state::palette_w)
+void sderby2_state::palette_w(offs_t offset, uint8_t data)
 {
 	const rgb_t color = m_palette->pen_color(data & 0xff);
 	m_palette->set_pen_color(0x100 + offset, color);
@@ -126,46 +126,46 @@ uint32_t sderby2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-READ8_MEMBER(sderby2_state::host_r)
+uint8_t sderby2_state::host_r()
 {
 	return main_data;
 }
 
-WRITE8_MEMBER(sderby2_state::main_nmi)
+void sderby2_state::main_nmi(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	main_data = data;
 }
 
-WRITE8_MEMBER(sderby2_state::host_io_40_w)
+void sderby2_state::host_io_40_w(uint8_t data)
 {
 	host_io_40 = data;
 }
 
-READ8_MEMBER(sderby2_state::sub_r)
+uint8_t sderby2_state::sub_r()
 {
 	return sub_data;
 }
 
-WRITE8_MEMBER(sderby2_state::sub_nmi)
+void sderby2_state::sub_nmi(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	sub_data = data;
 }
 
-READ8_MEMBER(sderby2_state::sub_unk_r)
+uint8_t sderby2_state::sub_unk_r()
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(sderby2_state::sub_unk_w)
+void sderby2_state::sub_unk_w(uint8_t data)
 {
 
 }
 
-READ8_MEMBER(sderby2_state::sub_io_0_r)
+uint8_t sderby2_state::sub_io_0_r()
 {
 	return host_io_40;
 }

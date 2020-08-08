@@ -142,14 +142,14 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	}
 }
 
-READ8_MEMBER(electron_state::electron64_fetch_r)
+uint8_t electron_state::electron64_fetch_r(offs_t offset)
 {
 	m_vdu_drivers = (offset & 0xe000) == 0xc000 ? true : false;
 
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-READ8_MEMBER(electron_state::electron_mem_r)
+uint8_t electron_state::electron_mem_r(offs_t offset)
 {
 	switch (m_mrb.read_safe(0))
 	{
@@ -170,7 +170,7 @@ READ8_MEMBER(electron_state::electron_mem_r)
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER(electron_state::electron_mem_w)
+void electron_state::electron_mem_w(offs_t offset, uint8_t data)
 {
 	switch (m_mrb.read_safe(0))
 	{
@@ -191,7 +191,7 @@ WRITE8_MEMBER(electron_state::electron_mem_w)
 	m_ram->write(offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_paged_r)
+uint8_t electron_state::electron_paged_r(offs_t offset)
 {
 	/*  0 Second external socket on the expansion module (SK2) */
 	/*  1 Second external socket on the expansion module (SK2) */
@@ -232,7 +232,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 	case 10:
 	case 11:
 		/* BASIC */
-		data = m_region_basic->base()[offset & 0x3fff];
+		data = m_region_mos->base()[offset & 0x3fff];
 		break;
 
 	default:
@@ -243,7 +243,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 	return data;
 }
 
-WRITE8_MEMBER(electron_state::electron_paged_w)
+void electron_state::electron_paged_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -251,7 +251,7 @@ WRITE8_MEMBER(electron_state::electron_paged_w)
 	m_exp->expbus_w(0x8000 + offset, data);
 }
 
-READ8_MEMBER(electronsp_state::electron_paged_r)
+uint8_t electronsp_state::electron_paged_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -279,14 +279,14 @@ READ8_MEMBER(electronsp_state::electron_paged_r)
 			break;
 
 		default:
-			data = electron_state::electron_paged_r(space, offset, mem_mask);
+			data = electron_state::electron_paged_r(offset);
 			break;
 		}
 	}
 	return data;
 }
 
-WRITE8_MEMBER(electronsp_state::electron_paged_w)
+void electronsp_state::electron_paged_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -308,21 +308,21 @@ WRITE8_MEMBER(electronsp_state::electron_paged_w)
 			break;
 
 		default:
-			electronsp_state::electron_paged_w(space, offset, data, mem_mask);
+			electronsp_state::electron_paged_w(offset, data);
 			break;
 		}
 	}
 }
 
-READ8_MEMBER(electron_state::electron_mos_r)
+uint8_t electron_state::electron_mos_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
-	return m_region_mos->base()[offset & 0x3fff];
+	return m_region_mos->base()[0x4000 | offset];
 }
 
-WRITE8_MEMBER(electron_state::electron_mos_w)
+void electron_state::electron_mos_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -331,7 +331,7 @@ WRITE8_MEMBER(electron_state::electron_mos_w)
 	m_exp->expbus_w(0xc000 + offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_fred_r)
+uint8_t electron_state::electron_fred_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -341,7 +341,7 @@ READ8_MEMBER(electron_state::electron_fred_r)
 	return m_exp->expbus_r(0xfc00 + offset);
 }
 
-WRITE8_MEMBER(electron_state::electron_fred_w)
+void electron_state::electron_fred_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -353,7 +353,7 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 	m_exp->expbus_w(0xfc00 + offset, data);
 }
 
-READ8_MEMBER(electronsp_state::electron_fred_r)
+uint8_t electronsp_state::electron_fred_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -366,17 +366,17 @@ READ8_MEMBER(electronsp_state::electron_fred_r)
 	}
 	else
 	{
-		data = electron_state::electron_fred_r(space, offset, mem_mask);
+		data = electron_state::electron_fred_r(offset);
 	}
 	return data;;
 }
 
-WRITE8_MEMBER(electronsp_state::electron_fred_w)
+void electronsp_state::electron_fred_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
-	electron_state::electron_fred_w(space, offset, data, mem_mask);
+	electron_state::electron_fred_w(offset, data);
 
 	if ((offset & 0xf0) == 0xb0)
 	{
@@ -388,7 +388,7 @@ WRITE8_MEMBER(electronsp_state::electron_fred_w)
 	}
 }
 
-READ8_MEMBER(electron_state::electron_jim_r)
+uint8_t electron_state::electron_jim_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -398,7 +398,7 @@ READ8_MEMBER(electron_state::electron_jim_r)
 	return m_exp->expbus_r(0xfd00 + offset);
 }
 
-WRITE8_MEMBER(electron_state::electron_jim_w)
+void electron_state::electron_jim_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -407,7 +407,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 	m_exp->expbus_w(0xfd00 + offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_sheila_r)
+uint8_t electron_state::electron_sheila_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -436,7 +436,7 @@ static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
 static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x6000 };
 static const int electron_mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249 };
 
-WRITE8_MEMBER(electron_state::electron_sheila_w)
+void electron_state::electron_sheila_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);

@@ -138,6 +138,7 @@ void z8_device::preprogrammed_map(address_map &map)
 
 void z8_device::register_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x00, 0x00).rw(FUNC(z8_device::p0_read), FUNC(z8_device::p0_write));
 	map(0x01, 0x01).rw(FUNC(z8_device::p1_read), FUNC(z8_device::p1_write));
 	map(0x02, 0x02).rw(FUNC(z8_device::p2_read), FUNC(z8_device::p2_write));

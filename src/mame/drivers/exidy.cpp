@@ -189,7 +189,7 @@ CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy_state::fax_bank_select_w)
+void exidy_state::fax_bank_select_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 
@@ -198,7 +198,7 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
 
 }
 
-WRITE8_MEMBER(exidy_state::mtrap_ocl_w) // Mouse Trap (possibly others) set P1 and P2 leds value at 5101, too.
+void exidy_state::mtrap_ocl_w(uint8_t data) // Mouse Trap (possibly others) set P1 and P2 leds value at 5101, too.
 {
 	*m_sprite_enable = data;
 
@@ -999,38 +999,43 @@ ROM_END
 
 ROM_START( targ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hrl10a-1", 0x1800, 0x0800, CRC(969744e1) SHA1(e123bdb02b3b5f6a59c1e7c9ef557fe6bb19c62c) )
-	ROM_LOAD( "hrl9a-1",  0x2000, 0x0800, CRC(a177a72d) SHA1(0e705e3e32021e55af4414fa0e2ccbc4980ee848) )
-	ROM_LOAD( "hrl8a-1",  0x2800, 0x0800, CRC(6e6928a5) SHA1(10c725b27225ac5aad8639b081df68dd61522cf2) )
-	ROM_LOAD( "hrl7a-1",  0x3000, 0x0800, CRC(e2f37f93) SHA1(b66743c296d3d4caba3bcbe6aa68cd6edd414816) )
-	ROM_LOAD( "hrl6a-1",  0x3800, 0x0800, CRC(a60a1bfc) SHA1(17c0e67e1a0b263b57d70a148cc5d5099fecbb40) )
+	ROM_LOAD( "hrl_10a1.10a", 0x1800, 0x0800, CRC(969744e1) SHA1(e123bdb02b3b5f6a59c1e7c9ef557fe6bb19c62c) )
+	ROM_LOAD( "hrl_9a1.9a",   0x2000, 0x0800, CRC(a177a72d) SHA1(0e705e3e32021e55af4414fa0e2ccbc4980ee848) )
+	ROM_LOAD( "hrl_8a1.8a",   0x2800, 0x0800, CRC(6e6928a5) SHA1(10c725b27225ac5aad8639b081df68dd61522cf2) )
+	ROM_LOAD( "hrl_7a4.7a",   0x3000, 0x0800, CRC(e2f37f93) SHA1(b66743c296d3d4caba3bcbe6aa68cd6edd414816) )
+	ROM_LOAD( "hrl_6a3.6a",   0x3800, 0x0800, CRC(a60a1bfc) SHA1(17c0e67e1a0b263b57d70a148cc5d5099fecbb40) )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "hrl11d-1", 0x0000, 0x0400, CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893) )
+	ROM_LOAD( "hrl_11d-1.11d", 0x0000, 0x0400, CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "hrl5c-1",  0x0000, 0x0100, CRC(a24290d0) SHA1(5f2888d168de874021b51c5d19a62fb8165e4454) )    /* address decoder */
-	ROM_LOAD( "stl6d-1",  0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )    /* unknown */
-	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )    /* unknown */
+	ROM_LOAD( "hrl_5c-1.5c",   0x0000, 0x0100, CRC(a24290d0) SHA1(5f2888d168de874021b51c5d19a62fb8165e4454) ) // IM5623CJE (N82S129 compatible) BPROM - address decoder
+	ROM_LOAD( "stl_6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // IM5610CPE (N82S123 compatible) BPROM - video RAM control
+	ROM_LOAD( "hrl_14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // IM5610CPE (N82S123 compatible) BPROM - sprite control
 
 	ROM_REGION( 0x0020, "targ", 0 )
-	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    /* unknown */
+	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    // sound "program" (tone frequencies)
 ROM_END
 
 
 ROM_START( targc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ctl.10a",  0x1800, 0x0800, CRC(058b3983) SHA1(8079667613c9273e95131c3c68cd92ce34c18148) )
-	ROM_LOAD( "ctl.9a1",  0x2000, 0x0800, CRC(3ac44b6b) SHA1(8261ee7ee1c3cb05b2549464086bf6df09685743) )
-	ROM_LOAD( "ctl.8a1",  0x2800, 0x0800, CRC(5c470021) SHA1(3638fc6827640857848cd649f10c1493025014de) )
-	ROM_LOAD( "ctl.7a1",  0x3000, 0x0800, CRC(c774fd9b) SHA1(46272a64ad5cda0ff5ef3e9eeedefc555100a71a) )
-	ROM_LOAD( "ctl.6a1",  0x3800, 0x0800, CRC(3d020439) SHA1(ebde4c851c9ecc310f110c7643a80275d97dc02c) )
+	ROM_LOAD( "358_ctl_10a-1_tsv_11-10-80.10a", 0x1800, 0x0800, CRC(058b3983) SHA1(8079667613c9273e95131c3c68cd92ce34c18148) ) // hand written label:  358   CTL   10A-1   TSV   11/10/80
+	ROM_LOAD( "358_ctl_9a-1_tsv_11-10-80.9a",   0x2000, 0x0800, CRC(3ac44b6b) SHA1(8261ee7ee1c3cb05b2549464086bf6df09685743) ) // hand written label:  358   CTL   9A-1   TSV   11/10/80
+	ROM_LOAD( "358_ctl_8a-1_tsv_11-10-80.8a",   0x2800, 0x0800, CRC(5c470021) SHA1(3638fc6827640857848cd649f10c1493025014de) ) // hand written label:  358   CTL   8A-1   TSV   11/10/80
+	ROM_LOAD( "358_ctl_7a-1_tsv_11-10-80.7a",   0x3000, 0x0800, CRC(c774fd9b) SHA1(46272a64ad5cda0ff5ef3e9eeedefc555100a71a) ) // hand written label:  358   CTL   7A-1   TSV   11/10/80
+	ROM_LOAD( "358_ctl_6a-1_tsv_11-10-80.6a",   0x3800, 0x0800, CRC(3d020439) SHA1(ebde4c851c9ecc310f110c7643a80275d97dc02c) ) // hand written label:  358   CTL   6A-1   TSV   11/10/80
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "hrl11d-1", 0x0000, 0x0400, CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893) )
+	ROM_LOAD( "hrl_11d-1.11d", 0x0000, 0x0400, CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "hrl_5c-1.5c",   0x0000, 0x0100, CRC(a24290d0) SHA1(5f2888d168de874021b51c5d19a62fb8165e4454) ) // IM5623CJE (N82S129 compatible) BPROM - address decoder
+	ROM_LOAD( "stl_6d-1.6d",   0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // IM5610CPE (N82S123 compatible) BPROM - video RAM control
+	ROM_LOAD( "hrl_14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // IM5610CPE (N82S123 compatible) BPROM - sprite control
 
 	ROM_REGION( 0x0020, "targ", 0 )
-	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    /* unknown */
+	ROM_LOAD( "hra2b-1",  0x0000, 0x0020, CRC(38e8024b) SHA1(adf1c1770695f7614c95eceb803f662c5b096a76) )    // sound "program" (tone frequencies)
 ROM_END
 
 

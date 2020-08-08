@@ -3,6 +3,25 @@
 /*
  * nld_74165.cpp
  *
+ *  74165: Parallel-Load 8-Bit Shift Register
+ *
+ *          +--------------+
+ *   SH/LDQ |1     ++    16| VCC
+ *      CLK |2           15| CLKINH
+ *        E |3           14| D
+ *        F |4    74165  13| C
+ *        G |5           12| B
+ *        H |6           11| A
+ *      QHQ |7           10| SER
+ *      GND |8            9| QH
+ *          +--------------+
+ *
+ * SH/LDQ: Shift / !Load
+ * CLKINH: Clock Inhibit
+ * SER: Serial In
+ *
+ *  Naming convention attempts to follow NTE Electronics datasheet
+ *
  */
 
 #include "nld_74165.h"
@@ -15,11 +34,11 @@ namespace netlist
 	NETLIB_OBJECT(74165)
 	{
 		NETLIB_CONSTRUCTOR(74165)
-		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" })
-		, m_SER(*this, "SER")
-		, m_SH_LDQ(*this, "SH_LDQ")
-		, m_CLK(*this, "CLK")
-		, m_CLKINH(*this, "CLKINH")
+		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" }, NETLIB_DELEGATE(inputs))
+		, m_SER(*this, "SER", NETLIB_DELEGATE(inputs))
+		, m_SH_LDQ(*this, "SH_LDQ", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
+		, m_CLKINH(*this, "CLKINH", NETLIB_DELEGATE(inputs))
 		, m_QH(*this, "QH")
 		, m_QHQ(*this, "QHQ")
 		, m_shifter(*this, "m_shifter", 0)
@@ -33,7 +52,38 @@ namespace netlist
 			m_shifter = 0;
 			m_last_CLK = 0;
 		}
-		NETLIB_UPDATEI();
+
+		NETLIB_HANDLERI(inputs)
+		{
+			{
+				netlist_sig_t old_qh = m_QH.net().Q();
+				netlist_sig_t qh = 0;
+
+				if (!m_SH_LDQ())
+				{
+					m_shifter = 0;
+					for (std::size_t i=0; i<8; i++)
+						m_shifter |= (m_DATA[i]() << i);
+				}
+				else if (!m_CLK() || m_CLKINH())
+				{
+					// FIXME: qh is overwritten below?
+					qh = old_qh;
+				}
+				else if (!m_last_CLK)
+				{
+					unsigned high_bit = m_SER() ? 0x80 : 0;
+					m_shifter = high_bit | (m_shifter >> 1);
+				}
+
+				qh = m_shifter & 1;
+
+				m_last_CLK = m_CLK();
+
+				m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
+			}
+
+		}
 
 		friend class NETLIB_NAME(74165_dip);
 	private:
@@ -50,67 +100,8 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74165_dip)
-	{
-		NETLIB_CONSTRUCTOR(74165_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_SH_LDQ);
-			register_subalias("2", A.m_CLK);
-			register_subalias("3", A.m_DATA[4]);
-			register_subalias("4", A.m_DATA[5]);
-			register_subalias("5", A.m_DATA[6]);
-			register_subalias("6", A.m_DATA[7]);
-			register_subalias("7", A.m_QHQ);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9",  A.m_QH);
-			register_subalias("10", A.m_SER);
-			register_subalias("11", A.m_DATA[0]);
-			register_subalias("12", A.m_DATA[1]);
-			register_subalias("13", A.m_DATA[2]);
-			register_subalias("14", A.m_DATA[3]);
-			register_subalias("15", A.m_CLKINH);
-			register_subalias("16", "A.VCC");
-		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(74165) A;
-	};
-
 	// FIXME: Timing
-	NETLIB_UPDATE(74165)
-	{
-		netlist_sig_t old_qh = m_QH.net().Q();
-		netlist_sig_t qh = 0;
-
-		if (!m_SH_LDQ())
-		{
-			m_shifter = 0;
-			for (std::size_t i=0; i<8; i++)
-				m_shifter |= (m_DATA[i]() << i);
-		}
-		else if (!m_CLK() || m_CLKINH())
-		{
-			// FIXME: qh is overwritten below?
-			qh = old_qh;
-		}
-		else if (!m_last_CLK)
-		{
-			unsigned high_bit = m_SER() ? 0x80 : 0;
-			m_shifter = high_bit | (m_shifter >> 1);
-		}
-
-		qh = m_shifter & 1;
-
-		m_last_CLK = m_CLK();
-
-		m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
-	}
-
 	NETLIB_DEVICE_IMPL(74165, "TTL_74165", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74165_dip, "TTL_74165_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

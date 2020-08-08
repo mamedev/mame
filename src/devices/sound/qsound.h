@@ -20,8 +20,8 @@ public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
 
-	DECLARE_WRITE8_MEMBER(qsound_w);
-	DECLARE_READ8_MEMBER(qsound_r);
+	void qsound_w(offs_t offset, u8 data);
+	u8 qsound_r();
 
 protected:
 	// device_t implementation
@@ -41,7 +41,7 @@ protected:
 
 private:
 	// DSP ROM access
-	DECLARE_READ16_MEMBER(dsp_sample_r);
+	u16 dsp_sample_r(offs_t offset);
 	void dsp_pio_w(offs_t offset, u16 data);
 
 	// for synchronised DSP communication

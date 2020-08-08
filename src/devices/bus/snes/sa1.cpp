@@ -34,13 +34,13 @@
     derbyjo2: hangs going into game
     dbzhypd, dbzhypdj: plays OK
     habumeij: boots, goes into game, on-screen timer counts down after SA-1 is enabled but controls aren't responsive
-    haruaug3a, pebble, haruaug3: uses SA-1 DMA
+    haruaug3a, pebble, haruaug3: plays OK
     itoibass: boots, some missing gfx
     jikkparo: plays OK
     jl96drem: plays OK
     jumpind: boots and runs, uses SA-1 normal DMA only but has corrupt gfx
     kakinoki: S-CPU crashes after pressing start
-    kirby3j, kirby3: uses SA-1 DMA
+    kirby3j, kirby3: plays OK
     kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
     marvelou: plays OK, uses SA-1 normal DMA only but has corrupt gfx
     miniyonk: plays OK
@@ -55,7 +55,7 @@
     shinshog: plays OK
     shogisai: plays OK
     shogisa2: plays OK
-    smrpgj, smrpg: needs SA-1 character conversion for level up Bonus Chance (possible to get past now)
+    smrpgj, smrpg: plays OK
     srobotg: some corrupt in-game GFX, may be SNES rendering errors
     sshogi3: plays OK
     taikyoid: plays OK

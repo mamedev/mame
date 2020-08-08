@@ -528,24 +528,24 @@ void segas24_tile_device::draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 void segas24_tile_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
 { draw_common(screen, bitmap, cliprect, layer, lpri, flags); }
 
-READ16_MEMBER(segas24_tile_device::tile_r)
+uint16_t segas24_tile_device::tile_r(offs_t offset)
 {
 	return tile_ram[offset];
 }
 
-READ16_MEMBER(segas24_tile_device::char_r)
+uint16_t segas24_tile_device::char_r(offs_t offset)
 {
 	return char_ram[offset];
 }
 
-WRITE16_MEMBER(segas24_tile_device::tile_w)
+void segas24_tile_device::tile_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(tile_ram.get() + offset);
 	if(offset < 0x4000)
 		tile_layer[offset >> 12]->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE16_MEMBER(segas24_tile_device::char_w)
+void segas24_tile_device::char_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = char_ram[offset];
 	COMBINE_DATA(char_ram.get() + offset);
@@ -553,12 +553,12 @@ WRITE16_MEMBER(segas24_tile_device::char_w)
 		gfx(char_gfx_index)->mark_dirty(offset / 16);
 }
 
-WRITE16_MEMBER(segas24_tile_device::xhout_w)
+void segas24_tile_device::xhout_w(uint16_t data)
 {
 	m_xhout_write_cb(data);
 }
 
-WRITE16_MEMBER(segas24_tile_device::xvout_w)
+void segas24_tile_device::xvout_w(uint16_t data)
 {
 	m_xvout_write_cb(data);
 }
@@ -802,12 +802,12 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-WRITE16_MEMBER(segas24_sprite_device::write)
+void segas24_sprite_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(sprite_ram.get() + offset);
 }
 
-READ16_MEMBER(segas24_sprite_device::read)
+uint16_t segas24_sprite_device::read(offs_t offset)
 {
 	return sprite_ram[offset];
 }
@@ -824,12 +824,12 @@ void segas24_mixer_device::device_start()
 	save_item(NAME(mixer_reg));
 }
 
-WRITE16_MEMBER(segas24_mixer_device::write)
+void segas24_mixer_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(mixer_reg + offset);
 }
 
-READ16_MEMBER(segas24_mixer_device::read)
+uint16_t segas24_mixer_device::read(offs_t offset)
 {
 	return mixer_reg[offset];
 }

@@ -436,6 +436,7 @@ g627.cpp
 gaelco.cpp
 gaelco2.cpp
 gaelco3d.cpp
+gaelcof3.cpp
 gaelcopc.cpp
 gaiden.cpp
 gal3.cpp
@@ -1017,6 +1018,7 @@ re900.cpp
 realbrk.cpp
 redalert.cpp
 redclash.cpp
+regama.cpp
 relief.cpp
 renegade.cpp
 retofinv.cpp
@@ -1065,6 +1067,7 @@ sbasketb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schick.cpp
 scm_500.cpp
 scobra.cpp
 scotrsht.cpp
@@ -1125,6 +1128,7 @@ shuuz.cpp
 sidearms.cpp
 sidepckt.cpp
 sigma21.cpp
+sigmab31.cpp
 sigmab52.cpp
 sigmab98.cpp
 silkroad.cpp
@@ -1147,6 +1151,7 @@ slapshot.cpp
 sleic.cpp
 sliver.cpp
 slotcarn.cpp
+smotor.cpp
 smsmcorp.cpp
 sms_bootleg.cpp
 snesb.cpp
@@ -1166,6 +1171,7 @@ spbactn.cpp
 spcforce.cpp
 spdheat.cpp
 spdodgeb.cpp
+special_gambl.cpp
 spectra.cpp
 speedatk.cpp
 speedbal.cpp
@@ -1175,6 +1181,7 @@ spiders.cpp
 spinb.cpp
 spirit76.cpp
 splash.cpp
+splash_ms.cpp
 splus.cpp
 spoker.cpp
 spool99.cpp
@@ -1282,6 +1289,7 @@ techno.cpp
 tecmo.cpp
 tecmo16.cpp
 tecmosys.cpp
+tecnodar.cpp
 tehkanwc.cpp
 tempest.cpp
 terracre.cpp

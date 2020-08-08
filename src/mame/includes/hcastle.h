@@ -58,16 +58,16 @@ private:
 	required_device<k007121_device> m_k007121_2;
 	required_device<k007232_device> m_k007232;
 
-	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);
-	DECLARE_WRITE8_MEMBER(hcastle_coin_w);
-	DECLARE_WRITE8_MEMBER(hcastle_pf1_video_w);
-	DECLARE_WRITE8_MEMBER(hcastle_pf2_video_w);
-	DECLARE_WRITE8_MEMBER(hcastle_gfxbank_w);
-	DECLARE_READ8_MEMBER(hcastle_gfxbank_r);
-	DECLARE_WRITE8_MEMBER(hcastle_pf1_control_w);
-	DECLARE_WRITE8_MEMBER(hcastle_pf2_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	void hcastle_bankswitch_w(uint8_t data);
+	void hcastle_soundirq_w(uint8_t data);
+	void hcastle_coin_w(uint8_t data);
+	void hcastle_pf1_video_w(offs_t offset, uint8_t data);
+	void hcastle_pf2_video_w(offs_t offset, uint8_t data);
+	void hcastle_gfxbank_w(uint8_t data);
+	uint8_t hcastle_gfxbank_r();
+	void hcastle_pf1_control_w(offs_t offset, uint8_t data);
+	void hcastle_pf2_control_w(offs_t offset, uint8_t data);
+	void sound_bank_w(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

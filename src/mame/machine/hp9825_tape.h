@@ -23,8 +23,8 @@ public:
 	// construction/destruction
 	hp9825_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(tape_r);
-	DECLARE_WRITE16_MEMBER(tape_w);
+	uint16_t tape_r(offs_t offset);
+	void tape_w(offs_t offset, uint16_t data);
 
 	auto flg() { return m_flg_handler.bind(); }
 	auto sts() { return m_sts_handler.bind(); }

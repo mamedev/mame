@@ -118,6 +118,7 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 #include "ieee488.h"
 #include "m2000.h"
 //#include "m5000.h"
+#include "sasi.h"
 #include "scsi.h"
 #include "multiform.h"
 #include "opus3.h"
@@ -151,6 +152,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("pdram",      BBC_PDRAM);           /* Micro User Pull Down RAM */
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
 	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
+	device.option_add("torchhd",    BBC_TORCHHD);         /* Torch Hard Disc Pack */
 	device.option_add("dc",         BBC_DATACENTRE);      /* RetroClinic DataCentre */
 	//device.option_add("graduate",   BBC_GRADUATE);        /* Torch Graduate G400/G800 */
 	device.option_add("beebopl",    BBC_BEEBOPL);         /* BeebOPL */
@@ -181,6 +183,7 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("pdram",      BBC_PDRAM);           /* Micro User Pull Down RAM */
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
 	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
+	device.option_add("torchhd",    BBC_TORCHHD);         /* Torch Hard Disc Pack */
 	device.option_add("dc",         BBC_DATACENTRE);      /* RetroClinic DataCentre */
 	//device.option_add("graduate",   BBC_GRADUATE);        /* Torch Graduate G400/G800 */
 	device.option_add("beebopl",    BBC_BEEBOPL);         /* BeebOPL */

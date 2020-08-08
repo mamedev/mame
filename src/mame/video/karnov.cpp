@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(karnov_state::get_bg_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(karnov_state::videoram_w)
+void karnov_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);

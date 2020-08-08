@@ -15,10 +15,10 @@ class el2_3c503_device : public device_t, public device_isa8_card_interface
 public:
 	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(el2_3c503_loport_r);
-	DECLARE_WRITE8_MEMBER(el2_3c503_loport_w);
-	DECLARE_READ8_MEMBER(el2_3c503_hiport_r);
-	DECLARE_WRITE8_MEMBER(el2_3c503_hiport_w);
+	uint8_t el2_3c503_loport_r(offs_t offset);
+	void el2_3c503_loport_w(offs_t offset, uint8_t data);
+	uint8_t el2_3c503_hiport_r(offs_t offset);
+	void el2_3c503_hiport_w(offs_t offset, uint8_t data);
 	void eop_w(int state) override;
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;

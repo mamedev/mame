@@ -61,11 +61,13 @@
 
 #include <zlib.h>
 
+#include <algorithm>
+#include <iterator>
 #include <list>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
-#include <queue>
 
 #define AS_IO16             1
 
@@ -246,35 +248,35 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	template<int Index> DECLARE_READ8_MEMBER(segapcm_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ym2608_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ym2610_adpcm_a_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ym2610_adpcm_b_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(y8950_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ymf278b_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ymf271_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ymz280b_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(multipcm_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(upd7759_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(okim6295_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(k054539_rom_r);
-	template<int Index> DECLARE_READ16_MEMBER(c140_rom_r);
-	template<int Index> DECLARE_READ16_MEMBER(c219_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(k053260_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(qsound_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(es5505_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(x1_010_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(c352_rom_r);
-	template<int Index> DECLARE_READ8_MEMBER(ga20_rom_r);
+	template<int Index> uint8_t segapcm_rom_r(offs_t offset);
+	template<int Index> uint8_t ym2608_rom_r(offs_t offset);
+	template<int Index> uint8_t ym2610_adpcm_a_rom_r(offs_t offset);
+	template<int Index> uint8_t ym2610_adpcm_b_rom_r(offs_t offset);
+	template<int Index> uint8_t y8950_rom_r(offs_t offset);
+	template<int Index> uint8_t ymf278b_rom_r(offs_t offset);
+	template<int Index> uint8_t ymf271_rom_r(offs_t offset);
+	template<int Index> uint8_t ymz280b_rom_r(offs_t offset);
+	template<int Index> uint8_t multipcm_rom_r(offs_t offset);
+	template<int Index> uint8_t upd7759_rom_r(offs_t offset);
+	template<int Index> uint8_t okim6295_rom_r(offs_t offset);
+	template<int Index> uint8_t k054539_rom_r(offs_t offset);
+	template<int Index> uint16_t c140_rom_r(offs_t offset);
+	template<int Index> uint16_t c219_rom_r(offs_t offset);
+	template<int Index> uint8_t k053260_rom_r(offs_t offset);
+	template<int Index> uint8_t qsound_rom_r(offs_t offset);
+	template<int Index> uint8_t es5505_rom_r(offs_t offset);
+	template<int Index> uint8_t x1_010_rom_r(offs_t offset);
+	template<int Index> uint8_t c352_rom_r(offs_t offset);
+	template<int Index> uint8_t ga20_rom_r(offs_t offset);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
+	template<int Index> void multipcm_bank_hi_w(offs_t offset, uint8_t data);
+	template<int Index> void multipcm_bank_lo_w(offs_t offset, uint8_t data);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(upd7759_bank_w);
+	template<int Index> void upd7759_bank_w(uint8_t data);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
+	template<int Index> void okim6295_nmk112_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_nmk112_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 	void set_c140_bank_type(int index, C140_TYPE type);
 	C140_TYPE c140_bank(int index) { return m_c140_bank[index]; }
@@ -421,19 +423,19 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(load_file);
 
-	DECLARE_READ8_MEMBER(file_r);
-	DECLARE_READ8_MEMBER(file_size_r);
+	uint8_t file_r(offs_t offset);
+	uint8_t file_size_r(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
-	template<int Index> DECLARE_WRITE8_MEMBER(upd7759_reset_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(upd7759_data_w);
+	template<int Index> void upd7759_reset_w(uint8_t data);
+	template<int Index> void upd7759_data_w(uint8_t data);
 	template<int Index> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6258_clock_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6258_divider_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(scc_w);
-	template<int Index> DECLARE_WRITE8_MEMBER(c140_c219_w);
+	template<int Index> void okim6258_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6258_divider_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void okim6295_pin7_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	template<int Index> void scc_w(offs_t offset, uint8_t data);
+	template<int Index> void c140_c219_w(offs_t offset, uint8_t data);
 
 	void vgmplay(machine_config &config);
 	void file_map(address_map &map);
@@ -2423,55 +2425,55 @@ uint8_t vgmplay_device::rom_r(int index, uint8_t type, offs_t offset)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::segapcm_rom_r)
+uint8_t vgmplay_device::segapcm_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x80, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ym2608_rom_r)
+uint8_t vgmplay_device::ym2608_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x81, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ym2610_adpcm_a_rom_r)
+uint8_t vgmplay_device::ym2610_adpcm_a_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x82, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ym2610_adpcm_b_rom_r)
+uint8_t vgmplay_device::ym2610_adpcm_b_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x83, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ymf278b_rom_r)
+uint8_t vgmplay_device::ymf278b_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x84, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ymf271_rom_r)
+uint8_t vgmplay_device::ymf271_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x85, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
+uint8_t vgmplay_device::ymz280b_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x86, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::y8950_rom_r)
+uint8_t vgmplay_device::y8950_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x88, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::multipcm_rom_r)
+uint8_t vgmplay_device::multipcm_rom_r(offs_t offset)
 {
 	if (m_multipcm_banked[Index] == 1)
 	{
@@ -2499,13 +2501,13 @@ READ8_MEMBER(vgmplay_device::multipcm_rom_r)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::upd7759_rom_r)
+uint8_t vgmplay_device::upd7759_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8a, m_upd7759_bank[Index] | offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::okim6295_rom_r)
+uint8_t vgmplay_device::okim6295_rom_r(offs_t offset)
 {
 	if (m_okim6295_nmk112_enable[Index])
 	{
@@ -2526,13 +2528,13 @@ READ8_MEMBER(vgmplay_device::okim6295_rom_r)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::k054539_rom_r)
+uint8_t vgmplay_device::k054539_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8c, offset);
 }
 
 template<int Index>
-READ16_MEMBER(vgmplay_device::c140_rom_r)
+uint16_t vgmplay_device::c140_rom_r(offs_t offset)
 {
 	switch (m_c140_bank[Index])
 	{
@@ -2551,7 +2553,7 @@ READ16_MEMBER(vgmplay_device::c140_rom_r)
 }
 
 template<int Index>
-READ16_MEMBER(vgmplay_device::c219_rom_r)
+uint16_t vgmplay_device::c219_rom_r(offs_t offset)
 {
 	if (m_c140_bank[Index] == C140_ASIC219)
 		return (rom_r(Index, 0x8d, offset * 2 + 1) << 8) | rom_r(Index, 0x8d, offset * 2); // 8 bit sample
@@ -2560,37 +2562,37 @@ READ16_MEMBER(vgmplay_device::c219_rom_r)
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::k053260_rom_r)
+uint8_t vgmplay_device::k053260_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8e, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::qsound_rom_r)
+uint8_t vgmplay_device::qsound_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x8f, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::es5505_rom_r)
+uint8_t vgmplay_device::es5505_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x90, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::x1_010_rom_r)
+uint8_t vgmplay_device::x1_010_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x91, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::c352_rom_r)
+uint8_t vgmplay_device::c352_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x92, offset);
 }
 
 template<int Index>
-READ8_MEMBER(vgmplay_device::ga20_rom_r)
+uint8_t vgmplay_device::ga20_rom_r(offs_t offset)
 {
 	return rom_r(Index, 0x93, offset);
 }
@@ -3017,21 +3019,21 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 	}
 }
 
-READ8_MEMBER(vgmplay_state::file_r)
+uint8_t vgmplay_state::file_r(offs_t offset)
 {
 	if (offset < m_file_data.size())
 		return m_file_data[offset];
 	return 0;
 }
 
-READ8_MEMBER(vgmplay_state::file_size_r)
+uint8_t vgmplay_state::file_size_r(offs_t offset)
 {
 	uint32_t size = m_file_data.size();
 	return size >> (8 * offset);
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_w)
+void vgmplay_device::multipcm_bank_hi_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 		m_multipcm_bank_l[Index] = (m_multipcm_bank_l[Index] & 0xff) | (data << 16);
@@ -3040,7 +3042,7 @@ WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_w)
+void vgmplay_device::multipcm_bank_lo_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 		m_multipcm_bank_l[Index] = (m_multipcm_bank_l[Index] & 0xff00) | data;
@@ -3051,7 +3053,7 @@ WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::upd7759_reset_w)
+void vgmplay_state::upd7759_reset_w(uint8_t data)
 {
 	int reset = data != 0;
 
@@ -3067,7 +3069,7 @@ WRITE8_MEMBER(vgmplay_state::upd7759_reset_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::upd7759_data_w)
+void vgmplay_state::upd7759_data_w(uint8_t data)
 {
 	if (!m_upd7759_md[Index] && !m_upd7759_drq[Index])
 	{
@@ -3098,14 +3100,14 @@ WRITE_LINE_MEMBER(vgmplay_state::upd7759_drq_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::upd7759_bank_w)
+void vgmplay_device::upd7759_bank_w(uint8_t data)
 {
 	// TODO: upd7759 update stream
 	m_upd7759_bank[Index] = data * 0x20000;
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6258_clock_w)
+void vgmplay_state::okim6258_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int shift = ((offset & 3) << 3);
 	uint32_t c = (m_okim6258[Index]->unscaled_clock() & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
@@ -3114,7 +3116,7 @@ WRITE8_MEMBER(vgmplay_state::okim6258_clock_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6258_divider_w)
+void vgmplay_state::okim6258_divider_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & mem_mask) != (m_okim6258_divider[Index] & mem_mask))
 	{
@@ -3124,7 +3126,7 @@ WRITE8_MEMBER(vgmplay_state::okim6258_divider_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6295_clock_w)
+void vgmplay_state::okim6295_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int shift = ((offset & 3) << 3);
 	uint32_t c = (m_okim6295[Index]->unscaled_clock() & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
@@ -3133,7 +3135,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_clock_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
+void vgmplay_state::okim6295_pin7_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & mem_mask) != (m_okim6295_pin7[Index] & mem_mask))
 	{
@@ -3143,13 +3145,13 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_enable_w)
+void vgmplay_device::okim6295_nmk112_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_okim6295_nmk112_enable[Index]);
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::okim6295_bank_w)
+void vgmplay_device::okim6295_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & mem_mask) != (m_okim6295_bank[Index] & mem_mask))
 	{
@@ -3158,7 +3160,7 @@ WRITE8_MEMBER(vgmplay_device::okim6295_bank_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_w)
+void vgmplay_device::okim6295_nmk112_bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 3;
 	if ((data & mem_mask) != (m_okim6295_nmk112_bank[Index][offset] & mem_mask))
@@ -3168,7 +3170,7 @@ WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::scc_w)
+void vgmplay_state::scc_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 1)
 	{
@@ -3202,7 +3204,7 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 }
 
 template<int Index>
-WRITE8_MEMBER(vgmplay_state::c140_c219_w)
+void vgmplay_state::c140_c219_w(offs_t offset, uint8_t data)
 {
 	if (m_vgmplay->c140_bank(Index) == C140_ASIC219)
 		m_c219[Index]->c219_w(offset, data);
@@ -3935,12 +3937,12 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_vsu_vue[1]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SAA1099(config, m_saa1099[0], 0);
-	m_saa1099[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_saa1099[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_saa1099[0]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_saa1099[0]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SAA1099(config, m_saa1099[1], 0);
-	m_saa1099[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_saa1099[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_saa1099[1]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_saa1099[1]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	ES5503(config, m_es5503[0], 0);
 	m_es5503[0]->set_channels(2);
@@ -3956,12 +3958,14 @@ void vgmplay_state::vgmplay(machine_config &config)
 
 	ES5505(config, m_es5505[0], 0);
 	// TODO m_es5505[0]->set_addrmap(0, &vgmplay_state::es5505_map<0>);
+	// TODO m_es5505[0]->set_addrmap(1, &vgmplay_state::es5505_map<0>);
 	m_es5505[0]->set_channels(1);
 	m_es5505[0]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
 	m_es5505[0]->add_route(1, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	ES5505(config, m_es5505[1], 0);
 	// TODO m_es5505[1]->set_addrmap(0, &vgmplay_state::es5505_map<1>);
+	// TODO m_es5505[1]->set_addrmap(1, &vgmplay_state::es5505_map<1>);
 	m_es5505[1]->set_channels(1);
 	m_es5505[1]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
 	m_es5505[1]->add_route(1, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);

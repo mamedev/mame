@@ -5,6 +5,12 @@
     Sunplus Technology S+core
     by Sandro Ronco
 
+    TODO:
+    - unemulated opcodes
+    - irq priority
+    - instruction cycles
+    - cache
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -201,7 +207,7 @@ void score7_cpu_device::execute_run()
 				break;
 		}
 
-		m_icount -= 3;  // FIXME: if available use correct cycles per instructions
+		m_icount -= 6;  // FIXME: if available use correct cycles per instructions
 	}
 	while (m_icount > 0);
 }
@@ -213,19 +219,13 @@ void score7_cpu_device::execute_run()
 
 void score7_cpu_device::execute_set_input(int inputnum, int state)
 {
-	switch (inputnum)
+	if (state)
 	{
-	case 0:
-		if(state)
+		standard_irq_callback(inputnum);
+		if (inputnum > 0 && inputnum < 64)
 		{
-			int vector = standard_irq_callback(0);
-			if (vector > 0 && vector < 64)
-			{
-				if((REG_PSR & 0x01) && state)
-					m_pending_interrupt[vector] = true;
-			}
+			m_pending_interrupt[inputnum] = true;
 		}
-		break;
 	}
 }
 
@@ -276,7 +276,7 @@ bool score7_cpu_device::check_condition(uint8_t bc)
 
 int32_t score7_cpu_device::sign_extend(uint32_t data, uint8_t len)
 {
-	data &= (1 << len) - 1;
+	data &= (1ULL << len) - 1;
 	uint32_t sign = 1 << (len - 1);
 	return (data ^ sign) - sign;
 }
@@ -1149,6 +1149,18 @@ void score7_cpu_device::op_rform1()
 		case 0x05:  // t!
 			SET_T(check_condition(rd));
 			break;
+		case 0x08:  // sll!
+			m_gpr[rd] = m_gpr[rd] << (m_gpr[ra] & 0x1f);
+			break;
+		case 0x09:  // addc!
+			m_gpr[rd] = m_gpr[rd] + m_gpr[ra] + GET_C;
+			break;
+		case 0x0a:  // srl!
+			m_gpr[rd] = m_gpr[rd] >> (m_gpr[ra] & 0x1f);
+			break;
+		case 0x0b:  // sra!
+			m_gpr[rd] = sign_extend(m_gpr[rd] >> (m_gpr[ra] & 0x1f), 32 - (m_gpr[ra] & 0x1f));
+			break;
 		case 0x0c:  // brl!
 			if (check_condition_branch(rd))
 			{
@@ -1275,7 +1287,12 @@ void score7_cpu_device::op_iform1a()
 	switch(GET_I16_FUNC3(m_op))
 	{
 		case 0x00:  // addei!
-			unemulated_op("addei!");
+			if (imm5 & 0x10)
+				m_gpr[rd] -= 1 << (imm5 & 0xf);
+			else
+				m_gpr[rd] += 1 << (imm5 & 0xf);
+
+			// condition flags are invalid after this instruction
 			break;
 		case 0x01:  // slli!
 			m_gpr[rd] <<= imm5;

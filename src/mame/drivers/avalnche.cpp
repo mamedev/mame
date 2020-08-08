@@ -89,7 +89,7 @@ WRITE_LINE_MEMBER(avalnche_state::video_invert_w)
 	m_avalance_video_inverted = state;
 }
 
-WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
+void avalnche_state::catch_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);

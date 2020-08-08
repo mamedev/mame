@@ -116,6 +116,7 @@ static const o2_slot slot_list[] =
 	{ O2_STD,      "o2_rom" },
 	{ O2_ROM12,    "o2_rom12" },
 	{ O2_ROM16,    "o2_rom16" },
+	{ O2_4IN1,     "o2_4in1" },
 	{ O2_CHESS,    "o2_chess" },
 	{ O2_VOICE,    "o2_voice" }
 };
@@ -174,7 +175,7 @@ image_init_result o2_cart_slot_device::call_load()
 				m_type = o2_get_pcb_id(pcb_name);
 		}
 
-		//printf("Type: %s\n", o2_get_slot(m_type));
+		m_cart->cart_init();
 
 		return image_init_result::PASS;
 	}
@@ -231,7 +232,7 @@ uint8_t o2_cart_slot_device::read_rom0c(offs_t offset)
 }
 
 /*-------------------------------------------------
- io_write
+ io
  -------------------------------------------------*/
 
 void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
@@ -240,8 +241,17 @@ void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
 		m_cart->io_write(offset, data);
 }
 
+uint8_t o2_cart_slot_device::io_read(offs_t offset)
+{
+	if (m_cart)
+		return m_cart->io_read(offset);
+	else
+		return 0xff;
+}
+
 
 #include "bus/odyssey2/rom.h"
+#include "bus/odyssey2/4in1.h"
 #include "bus/odyssey2/chess.h"
 #include "bus/odyssey2/voice.h"
 
@@ -250,6 +260,7 @@ void o2_cart(device_slot_interface &device)
 	device.option_add_internal("o2_rom",    O2_ROM_STD);
 	device.option_add_internal("o2_rom12",  O2_ROM_12K);
 	device.option_add_internal("o2_rom16",  O2_ROM_16K);
+	device.option_add_internal("o2_4in1",   O2_ROM_4IN1);
 	device.option_add_internal("o2_chess",  O2_ROM_CHESS);
 	device.option_add_internal("o2_voice",  O2_ROM_VOICE);
 }

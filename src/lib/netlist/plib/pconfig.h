@@ -22,15 +22,6 @@
 #define PUSE_ACCURATE_STATS (0)
 #endif
 
-/// \brief System supports INT128
-///
-/// Set this to one if you want to use 128 bit int for ptime.
-/// This is about 10% slower on a skylake processor for pongf.
-///
-#ifndef PHAS_INT128
-#define PHAS_INT128 (0)
-#endif
-
 /// \brief Add support for the __float128 floating point type.
 ///
 #ifndef PUSE_FLOAT128
@@ -42,7 +33,7 @@
 /// OpenMP adds about 10% to 20% performance for analog netlists.
 ///
 #ifndef PUSE_OPENMP
-#define PUSE_OPENMP              (0)
+#define PUSE_OPENMP              (1)
 #endif
 
 /// \brief Use aligned optimizations.
@@ -50,7 +41,11 @@
 /// Set this to one if you want to use aligned storage optimizations.
 ///
 #ifndef PUSE_ALIGNED_OPTIMIZATIONS
+#if defined(__EMSCRIPTEN__)
 #define PUSE_ALIGNED_OPTIMIZATIONS (0)
+#else
+#define PUSE_ALIGNED_OPTIMIZATIONS (1)
+#endif
 #endif
 
 /// \brief Use aligned allocations.
@@ -72,19 +67,22 @@
 
 /// \brief Number of bytes for cache line alignment
 ///
-#define PALIGN_CACHELINE        (16)
+#define PALIGN_CACHELINE        (64)
 
 /// \brief Number of bytes for vector alignment
 ///
-#define PALIGN_VECTOROPT        (16)
+#define PALIGN_VECTOROPT        (32)
+
+#define PALIGN_MIN_SIZE         (16)
 
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
 
-// FIXME: Breaks mame build on windows due to -Wattribute
+// FIXME: Breaks mame build on windows mingw due to -Wattribute
 //        also triggers -Wattribute on ARM
+//        This is fixed on mingw version 10
 // FIXME: no error on cross-compile - need further checks
-#if defined(__GNUC__) && (defined(_WIN32) || defined(__arm__) || defined(__ARMEL__))
+#if defined(__GNUC__) && ((defined(_WIN32) && __GNUC__ < 10) || defined(__arm__) || defined(__ARMEL__))
 #define PALIGNAS(x)
 #else
 #define PALIGNAS(x) alignas(x)
@@ -92,7 +90,7 @@
 
 /// \brief nvcc build flag.
 ///
-/// Set this to 1 if you are building with NVIDIA nvcc
+/// Set this to 101 if you are building with NVIDIA nvcc 10.1
 ///
 #ifndef NVCCBUILD
 #define NVCCBUILD (0)
@@ -113,35 +111,30 @@
 //============================================================
 
 
-#ifdef NVCCBUILD
-	#define C14CONSTEXPR constexpr
+#if (NVCCBUILD > 0)
 	#if NVCCBUILD == 101
 		#define NVCC_CONSTEXPR constexpr
 	#else
 		#define NVCC_CONSTEXPR constexpr
 	#endif
 	#if __cplusplus != 201402L
-		#error nvcc - something is wrong
+		#error nvcc - use c++14 to compile
 	#endif
 #else
 	#define NVCC_CONSTEXPR constexpr
 	#if __cplusplus == 201103L
-		#define C14CONSTEXPR
+		#error c++11 not supported - you need c++14
 	#elif __cplusplus == 201402L
-		#define C14CONSTEXPR constexpr
+		// Ok
 	#elif __cplusplus == 201703L
-		#define C14CONSTEXPR constexpr
+		// Ok
 	#elif defined(_MSC_VER)
-		#define C14CONSTEXPR
+		// Ok
 	#else
 		#error "C++ version not supported"
 	#endif
 #endif
 
-#if (PHAS_INT128)
-typedef __uint128_t UINT128;
-typedef __int128_t INT128;
-#endif
 
 #if (PUSE_FLOAT128)
 typedef __float128 FLOAT128;
@@ -174,7 +167,19 @@ typedef __float128 FLOAT128;
 
 #if (PUSE_OPENMP)
 #if (!(PHAS_OPENMP))
-#error To use openmp compile and link with "-fopenmp"
+//#error To use openmp compile and link with "-fopenmp"
+#undef PUSE_OPENMP
+#define PUSE_OPENMP (0)
+#endif
+#endif
+
+#if (PUSE_FLOAT128)
+#if defined(__has_include)
+#if !__has_include(<quadmath.h>)
+//#pragma message "disabling PUSE_FLOAT128 due to missing quadmath.h"
+#undef PUSE_FLOAT128
+#define PUSE_FLOAT128 (0)
+#endif
 #endif
 #endif
 

@@ -346,25 +346,25 @@ private:
 
 	uint16_t m_winrun_color;
 	uint16_t m_winrun_gpu_register[0x10/2];
-	DECLARE_READ16_MEMBER(video_enable_r);
-	DECLARE_WRITE16_MEMBER(video_enable_w);
+	uint16_t video_enable_r();
+	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t dpram_byte_r(offs_t offset);
 	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ16_MEMBER(winrun_gpu_color_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_color_w);
-	DECLARE_READ16_MEMBER(winrun_gpu_register_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
-	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
+	uint16_t winrun_gpu_color_r();
+	void winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t winrun_gpu_register_r(offs_t offset);
+	void winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void winrun_gpu_videoram_w(offs_t offset, uint16_t data);
+	uint16_t winrun_gpu_videoram_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	void sound_bankselect_w(uint8_t data);
 
 	void sound_reset_w(uint8_t data);
 	void system_reset_w(uint8_t data);
@@ -391,33 +391,32 @@ private:
 	void c140_map(address_map &map);
 };
 
-READ16_MEMBER(namcos21_state::winrun_gpu_color_r)
+uint16_t namcos21_state::winrun_gpu_color_r()
 {
 	return m_winrun_color;
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_color_w)
+void namcos21_state::winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_color );
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
+uint16_t namcos21_state::winrun_gpu_register_r(offs_t offset)
 {
 	return m_winrun_gpu_register[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
+void namcos21_state::winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_gpu_register[offset] );
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
+void namcos21_state::winrun_gpu_videoram_w(offs_t offset, uint16_t data)
 {
 	int color = data>>8;
 	int mask  = data&0xff;
-	int i;
-	for( i=0; i<8; i++ )
+	for( int i=0; i<8; i++ )
 	{
 		if( mask&(0x01<<i) )
 		{
@@ -427,7 +426,7 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 	}
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
+uint16_t namcos21_state::winrun_gpu_videoram_r(offs_t offset)
 {
 	return (m_gpu_videoram[offset]<<8) | m_gpu_maskram[offset];
 }
@@ -483,12 +482,12 @@ uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-READ16_MEMBER(namcos21_state::video_enable_r)
+uint16_t namcos21_state::video_enable_r()
 {
 	return m_video_enable;
 }
 
-WRITE16_MEMBER(namcos21_state::video_enable_w)
+void namcos21_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
 	if( m_video_enable!=0 && m_video_enable!=0x40 )
@@ -501,12 +500,12 @@ WRITE16_MEMBER(namcos21_state::video_enable_w)
 
 /* dual port ram memory handlers */
 
-READ16_MEMBER(namcos21_state::dpram_word_r)
+uint16_t namcos21_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::dpram_word_w)
+void namcos21_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -765,7 +764,7 @@ static INPUT_PORTS_START( winrungp )
 	PORT_DIPSETTING(    0x00, "4M" )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( namcos21_state::sound_bankselect_w )
+void namcos21_state::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
 }
@@ -799,12 +798,12 @@ void namcos21_state::reset_all_subcpus(int state)
 	m_c65->ext_reset(state);
 }
 
-WRITE8_MEMBER(namcos21_state::eeprom_w)
+void namcos21_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER(namcos21_state::eeprom_r)
+uint8_t namcos21_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }

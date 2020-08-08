@@ -156,7 +156,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::nvram_write_timeout)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
+void coolpool_state::nvram_thrash_w(offs_t offset, uint16_t data)
 {
 	/* keep track of the last few writes */
 	memmove(&m_nvram_write_seq[0], &m_nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(m_nvram_write_seq[0]));
@@ -171,7 +171,7 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_data_w)
+void coolpool_state::nvram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* only the low 8 bits matter */
 	if (ACCESSING_BITS_0_7)
@@ -184,10 +184,10 @@ WRITE16_MEMBER(coolpool_state::nvram_data_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
+void coolpool_state::nvram_thrash_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	nvram_data_w(space, offset, data, mem_mask);
-	nvram_thrash_w(space, offset, data, mem_mask);
+	nvram_data_w(offset, data, mem_mask);
+	nvram_thrash_w(offset, data);
 }
 
 
@@ -205,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
 }
 
 
-WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
+void coolpool_state::amerdart_misc_w(uint16_t data)
 {
 	logerror("%08x:IOP_system_w %04x\n",m_maincpu->pc(),data);
 
@@ -317,7 +317,7 @@ int coolpool_state::amerdart_trackball_direction(int num, int data)
 }
 
 
-READ16_MEMBER(coolpool_state::amerdart_trackball_r)
+uint16_t coolpool_state::amerdart_trackball_r(offs_t offset)
 {
 /*
     Trackballs seem to be handled as though they're rotated 45 degrees anti-clockwise.
@@ -389,7 +389,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
  *
  *************************************/
 
-WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
+void coolpool_state::coolpool_misc_w(uint16_t data)
 {
 	logerror("%08x:IOP_system_w %04x\n",m_maincpu->pc(),data);
 
@@ -426,13 +426,13 @@ uint16_t coolpool_state::dsp_hold_line_r()
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::dsp_rom_r)
+uint16_t coolpool_state::dsp_rom_r()
 {
 	return m_dsp_rom[m_iop_romaddr & (m_dsp_rom.mask())];
 }
 
 
-WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
+void coolpool_state::dsp_romaddr_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -454,7 +454,7 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::coolpool_input_r)
+uint16_t coolpool_state::coolpool_input_r(offs_t offset)
 {
 	m_result = (ioport("IN1")->read() & 0x00ff) | (m_lastresult & 0xff00);
 	m_newx[1] = ioport("XAXIS")->read();

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    render.c
+    render.cpp
 
     Core rendering system.
 
@@ -906,6 +906,7 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 	, m_maxtexwidth(65536)
 	, m_maxtexheight(65536)
 	, m_transform_container(true)
+	, m_external_artwork(false)
 {
 	// determine the base layer configuration based on options
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
@@ -1440,7 +1441,7 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 
 bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
-	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);;
+	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);
 }
 
 
@@ -1530,7 +1531,7 @@ void render_target::update_layer_config()
 
 void render_target::load_layout_files(const internal_layout *layoutfile, bool singlefile)
 {
-	bool have_artwork  = false;
+	bool have_artwork = false;
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
@@ -1544,7 +1545,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 
 void render_target::load_layout_files(util::xml::data_node const &rootnode, bool singlefile)
 {
-	bool have_artwork  = false;
+	bool have_artwork = false;
 
 	// if there's an explicit file, load that first
 	const std::string &basename = m_manager.machine().basename();
@@ -1557,32 +1558,31 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 
 void render_target::load_additional_layout_files(const char *basename, bool have_artwork)
 {
-	bool have_default  = false;
-	bool have_override = false;
+	m_external_artwork = false;
 
 	// if override_artwork defined, load that and skip artwork other than default
 	const char *const override_art = m_manager.machine().options().override_artwork();
 	if (override_art && *override_art)
 	{
 		if (load_layout_file(override_art, override_art))
-			have_override = true;
+			m_external_artwork = true;
 		else if (load_layout_file(override_art, "default"))
-			have_override = true;
+			m_external_artwork = true;
 	}
 
 	const game_driver &system = m_manager.machine().system();
 
 	// Skip if override_artwork has found artwork
-	if (!have_override)
+	if (!m_external_artwork)
 	{
-
 		// try to load a file based on the driver name
 		if (!load_layout_file(basename, system.name))
-			have_artwork |= load_layout_file(basename, "default");
+			m_external_artwork |= load_layout_file(basename, "default");
 		else
-			have_artwork = true;
+			m_external_artwork = true;
 
 		// if a default view has been specified, use that as a fallback
+		bool have_default = false;
 		if (system.default_layout)
 			have_default |= load_layout_file(nullptr, *system.default_layout);
 		m_manager.machine().config().apply_default_layouts(
@@ -1593,15 +1593,20 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		int cloneof = driver_list::clone(system);
 		while (0 <= cloneof)
 		{
-			if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
-				have_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
-			else
-				have_artwork = true;
+			if (!m_external_artwork || driver_list::driver(cloneof).flags & MACHINE_IS_BIOS_ROOT)
+			{
+				if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
+					m_external_artwork |= load_layout_file(driver_list::driver(cloneof).name, "default");
+				else
+					m_external_artwork = true;
+			}
 
 			// Check the parent of the parent to cover bios based artwork
 			const game_driver &parent(driver_list::driver(cloneof));
 			cloneof = driver_list::clone(parent);
 		}
+
+		have_artwork |= m_external_artwork;
 
 		// Use fallback artwork if defined and no artwork has been found yet
 		if (!have_artwork)

@@ -29,24 +29,24 @@
         - MK5089N - DTMF generator
         - ...
 
-	high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
+    high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
 
-	differences between models:
-	- Compass 110x do not have GRiDROM slots.
-	- Compass II (112x, 113x) have 4 of them.
-	- Compass II 113x have 512x256 screen size
-	- Compass 11x9 have 512K ram
-	- Compass II have DMA addresses different from Compass 110x
+    differences between models:
+    - Compass 110x do not have GRiDROM slots.
+    - Compass II (112x, 113x) have 4 of them.
+    - Compass II 113x have 512x256 screen size
+    - Compass 11x9 have 512K ram
+    - Compass II have DMA addresses different from Compass 110x
 
     to do:
 
     - keyboard: decode and add the rest of keycodes
-	    keycode table can be found here on page A-2:
-	    http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
+        keycode table can be found here on page A-2:
+        http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
     - EAROM, RTC
     - serial port (incomplete), modem (incl. DTMF generator)
-	- proper custom DMA logic timing
-	- implement units other than 1101
+    - proper custom DMA logic timing
+    - implement units other than 1101
 
     missing dumps:
 
@@ -56,9 +56,9 @@
     - external floppy and hard disk (2101, 2102)
 
     to boot CCOS 3.0.1:
-	- convert GRIDOS.IMD to IMG format
+    - convert GRIDOS.IMD to IMG format
     - create zero-filled 384K bubble memory image and attach it as -memcard
-	- attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
+    - attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
     - use grid1101 with 'ccos' ROM
 
 ***************************************************************************/
@@ -72,6 +72,7 @@
 #include "machine/i7220.h"
 #include "machine/i80130.h"
 #include "machine/i8255.h"
+#include "machine/mm58174.h"
 #include "machine/ram.h"
 #include "machine/tms9914.h"
 #include "machine/z80sio.h"
@@ -104,12 +105,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_osp(*this, I80130_TAG)
+		, m_rtc(*this, "rtc")
 		, m_modem(*this, "modem")
 		, m_uart8274(*this, "uart8274")
 		, m_speaker(*this, "speaker")
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
 	{ }
+
+	static constexpr feature_type unemulated_features() { return feature::WAN; }
 
 	void grid1129(machine_config &config);
 	void grid1131(machine_config &config);
@@ -123,6 +127,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
+	required_device<mm58174_device> m_rtc;
 	required_device<i8255_device> m_modem;
 	optional_device<i8274_device> m_uart8274;
 	required_device<speaker_sound_device> m_speaker;
@@ -307,7 +312,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
-	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
+	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xe0000, 0xeffff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
@@ -326,7 +331,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
-	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
+	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
@@ -362,6 +367,8 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
+
+	MM58174(config, m_rtc, 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -615,7 +622,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_TYPE_COMPUTER | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_LAN )
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS )
 COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IS_SKELETON )
 COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IS_SKELETON )
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )

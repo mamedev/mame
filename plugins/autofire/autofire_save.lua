@@ -74,11 +74,16 @@ function lib:save_settings(buttons)
 	elseif attr.mode ~= 'directory' then
 		return
 	end
+	if #buttons == 0 then
+		os.remove(path .. get_settings_filename())
+		return
+	end
 	local json = require('json')
 	local settings = serialize_settings(buttons)
+	local data = json.stringify(settings, {indent = true})
 	local file = io.open(path .. get_settings_filename(), 'w')
 	if file then
-		file:write(json.stringify(settings, {indent = true}))
+		file:write(data)
 		file:close()
 	end
 end

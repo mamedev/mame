@@ -1,15 +1,33 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_log.c
+ * nld_log.cpp
+ *
+ *  Devices supporting analysis and logging
+ *
+ *  nld_log:
+ *
+ *          +---------+
+ *          |    ++   |
+ *        I |         | ==> Log to file "netlist_" + name() + ".log"
+ *          |         |
+ *          +---------+
  *
  */
 
 #include "netlist/nl_base.h"
 #include "nld_log.h"
 #include "plib/pfmtlog.h"
+#include "plib/pmulti_threading.h"
 #include "plib/pstream.h"
 //#include "sound/wavwrite.h"
+
+#include <array>
+#include <atomic>
+#include <functional>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 namespace netlist
 {
@@ -18,50 +36,116 @@ namespace netlist
 	NETLIB_OBJECT(log)
 	{
 		NETLIB_CONSTRUCTOR(log)
-		, m_I(*this, "I")
+		, m_I(*this, "I", NETLIB_DELEGATE(input))
 		, m_strm(plib::filesystem::u8path(plib::pfmt("{1}.log")(this->name())))
 		, m_writer(&m_strm)
 		, m_reset(false)
+		, m_done(false)
+		, m_sem_w(0)
+		, m_sem_r(0)
+		, m_w(0)
+		, m_r(0)
 		{
 			if (m_strm.fail())
 				throw plib::file_open_e(plib::pfmt("{1}.log")(this->name()));
 
 			m_strm.imbue(std::locale::classic());
+
+			//m_write_thread = std::thread(std::bind(&nld_log::thread_writer, this));
+			m_write_thread = std::thread([this]{this->thread_writer(); });
+			m_sem_r.acquire();
 		}
+
+		PCOPYASSIGNMOVE(NETLIB_NAME(log), delete)
 
 		NETLIB_DESTRUCTOR(log)
 		{
 			if (m_reset)
-				m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
+				log_value(m_I());
+			m_sem_w.release();
+			m_done = true;
+			m_write_thread.join();
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(input)
 		{
-			/* use pstring::sprintf, it is a LOT faster */
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
+			log_value(static_cast<nl_fptype>(m_I()));
+		}
+
+		void log_value(nl_fptype val)
+		{
+			if (m_buffers[m_w].size() == BUF_SIZE)
+			{
+				m_sem_w.release();
+				m_sem_r.acquire();
+				m_w++;
+				if (m_w >= BUFFERS)
+					m_w = 0;
+			}
+			m_buffers[m_w].push_back({exec().time(), val});
 		}
 
 		NETLIB_RESETI() { m_reset = true; }
 	protected:
+
+		void thread_writer()
+		{
+			m_sem_r.release(BUFFERS);
+			while (true)
+			{
+				if (!m_sem_w.try_acquire())
+				{
+					if (m_done)
+						break;
+					m_sem_w.acquire();
+				}
+				auto &b = m_buffers[m_r];
+
+				for (auto &e : b)
+					/* use pstring::sprintf, it is a LOT faster */
+					m_writer.writeline(plib::pfmt("{1:.9} {2}").e(e.t.as_fp<nl_fptype>()).e(e.v));
+				b.clear();
+				m_sem_r.release();
+				m_r++;
+				if (m_r >= BUFFERS)
+					m_r = 0;
+			}
+		}
+
+		struct entry
+		{
+			netlist_time_ext t;
+			nl_fptype v;
+		};
+		static const std::size_t BUF_SIZE=16384;
+		static const std::size_t BUFFERS=4;
 		analog_input_t m_I;
-		std::ofstream m_strm;
+		plib::ofstream m_strm;
 		plib::putf8_writer m_writer;
 		bool m_reset;
+		std::array<std::vector<entry>, BUFFERS> m_buffers;
+		std::atomic<bool> m_done;
+		plib::psemaphore m_sem_w;
+		plib::psemaphore m_sem_r;
+		std::size_t m_w;
+		std::size_t m_r;
+		std::thread m_write_thread;
 	};
 
 	NETLIB_OBJECT_DERIVED(logD, log)
 	{
 		NETLIB_CONSTRUCTOR(logD)
-		, m_I2(*this, "I2")
+		, m_I2(*this, "I2", nldelegate(&NETLIB_NAME(logD)::input, this))
 		{
+			m_I.set_delegate(nldelegate(&NETLIB_NAME(logD)::input, this));
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(input)
 		{
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I() - m_I2())));
+			log_value(static_cast<nl_fptype>(m_I() - m_I2()));
 		}
 
-		NETLIB_RESETI() { }
+		//NETLIB_RESETI() {}
 		analog_input_t m_I2;
 	};
 

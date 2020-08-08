@@ -371,91 +371,91 @@ VIDEO_START_MEMBER(snk_state,tdfever)
 
 /**************************************************************************************/
 
-WRITE8_MEMBER(snk_state::snk_tx_videoram_w)
+void snk_state::snk_tx_videoram_w(offs_t offset, uint8_t data)
 {
 	m_tx_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk_state::marvins_fg_videoram_w)
+void snk_state::marvins_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk_state::marvins_bg_videoram_w)
+void snk_state::marvins_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk_state::snk_bg_videoram_w)
+void snk_state::snk_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
-WRITE8_MEMBER(snk_state::snk_fg_scrollx_w)
+void snk_state::snk_fg_scrollx_w(uint8_t data)
 {
 	m_fg_scrollx = (m_fg_scrollx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_fg_scrolly_w)
+void snk_state::snk_fg_scrolly_w(uint8_t data)
 {
 	m_fg_scrolly = (m_fg_scrolly & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_bg_scrollx_w)
+void snk_state::snk_bg_scrollx_w(uint8_t data)
 {
 	m_bg_scrollx = (m_bg_scrollx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_bg_scrolly_w)
+void snk_state::snk_bg_scrolly_w(uint8_t data)
 {
 	m_bg_scrolly = (m_bg_scrolly & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_sp16_scrollx_w)
+void snk_state::snk_sp16_scrollx_w(uint8_t data)
 {
 	m_sp16_scrollx = (m_sp16_scrollx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_sp16_scrolly_w)
+void snk_state::snk_sp16_scrolly_w(uint8_t data)
 {
 	m_sp16_scrolly = (m_sp16_scrolly & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_sp32_scrollx_w)
+void snk_state::snk_sp32_scrollx_w(uint8_t data)
 {
 	m_sp32_scrollx = (m_sp32_scrollx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_sp32_scrolly_w)
+void snk_state::snk_sp32_scrolly_w(uint8_t data)
 {
 	m_sp32_scrolly = (m_sp32_scrolly & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::snk_sprite_split_point_w)
+void snk_state::snk_sprite_split_point_w(uint8_t data)
 {
 	m_sprite_split_point = data;
 }
 
 
-WRITE8_MEMBER(snk_state::marvins_palette_bank_w)
+void snk_state::marvins_palette_bank_w(uint8_t data)
 {
 	m_bg_tilemap->set_palette_offset(data & 0x70);
 	m_fg_tilemap->set_palette_offset((data & 0x07) << 4);
 }
 
-WRITE8_MEMBER(snk_state::marvins_flipscreen_w)
+void snk_state::marvins_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x80);
 
 	// other bits unknown
 }
 
-WRITE8_MEMBER(snk_state::sgladiat_flipscreen_w)
+void snk_state::sgladiat_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x80);
 
@@ -464,7 +464,7 @@ WRITE8_MEMBER(snk_state::sgladiat_flipscreen_w)
 	// other bits unknown
 }
 
-WRITE8_MEMBER(snk_state::hal21_flipscreen_w)
+void snk_state::hal21_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 0x80);
 
@@ -478,14 +478,14 @@ WRITE8_MEMBER(snk_state::hal21_flipscreen_w)
 	// other bits unknown
 }
 
-WRITE8_MEMBER(snk_state::marvins_scroll_msb_w)
+void snk_state::marvins_scroll_msb_w(uint8_t data)
 {
 	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x04) << 6);
 	m_fg_scrollx =   (m_fg_scrollx   & 0xff) | ((data & 0x02) << 7);
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::jcross_scroll_msb_w)
+void snk_state::jcross_scroll_msb_w(uint8_t data)
 {
 	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x10) << 4);
 	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x08) << 5);
@@ -493,13 +493,13 @@ WRITE8_MEMBER(snk_state::jcross_scroll_msb_w)
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::sgladiat_scroll_msb_w)
+void snk_state::sgladiat_scroll_msb_w(uint8_t data)
 {
 	m_bg_scrollx =   (m_bg_scrollx   & 0xff) | ((data & 0x02) << 7);
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::aso_videoattrs_w)
+void snk_state::aso_videoattrs_w(uint8_t data)
 {
 	/*
 	    video attributes:
@@ -522,7 +522,7 @@ WRITE8_MEMBER(snk_state::aso_videoattrs_w)
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::tnk3_videoattrs_w)
+void snk_state::tnk3_videoattrs_w(uint8_t data)
 {
 	/*
 	    video attributes:
@@ -551,7 +551,7 @@ WRITE8_MEMBER(snk_state::tnk3_videoattrs_w)
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::aso_bg_bank_w)
+void snk_state::aso_bg_bank_w(uint8_t data)
 {
 	m_bg_tilemap->set_palette_offset(((data & 0xf) ^ 8) << 4);
 	if (m_bg_tile_offset != ((data & 0x30) << 4))
@@ -561,13 +561,13 @@ WRITE8_MEMBER(snk_state::aso_bg_bank_w)
 	}
 }
 
-WRITE8_MEMBER(snk_state::ikari_bg_scroll_msb_w)
+void snk_state::ikari_bg_scroll_msb_w(uint8_t data)
 {
 	m_bg_scrollx = (m_bg_scrollx & 0xff) | ((data & 0x02) << 7);
 	m_bg_scrolly = (m_bg_scrolly & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::ikari_sp_scroll_msb_w)
+void snk_state::ikari_sp_scroll_msb_w(uint8_t data)
 {
 	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x20) << 3);
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x10) << 4);
@@ -575,7 +575,7 @@ WRITE8_MEMBER(snk_state::ikari_sp_scroll_msb_w)
 	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x04) << 6);
 }
 
-WRITE8_MEMBER(snk_state::ikari_unknown_video_w)
+void snk_state::ikari_unknown_video_w(uint8_t data)
 {
 	/* meaning of 0xc980 uncertain.
 	   Normally 0x20, ikaria/ikarijp sets it to 0x31 during test mode.
@@ -597,7 +597,7 @@ WRITE8_MEMBER(snk_state::ikari_unknown_video_w)
 	}
 }
 
-WRITE8_MEMBER(snk_state::gwar_tx_bank_w)
+void snk_state::gwar_tx_bank_w(uint8_t data)
 {
 	m_tx_tilemap->set_palette_offset((data & 0xf) << 4);
 	if (m_tx_tile_offset != ((data & 0x30) << 4))
@@ -610,7 +610,7 @@ WRITE8_MEMBER(snk_state::gwar_tx_bank_w)
 		m_bg_tilemap->set_palette_offset((data & 0x80));
 }
 
-WRITE8_MEMBER(snk_state::gwar_videoattrs_w)
+void snk_state::gwar_videoattrs_w(uint8_t data)
 {
 	flip_screen_set(data & 0x04);
 
@@ -622,7 +622,7 @@ WRITE8_MEMBER(snk_state::gwar_videoattrs_w)
 	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::gwara_videoattrs_w)
+void snk_state::gwara_videoattrs_w(uint8_t data)
 {
 	flip_screen_set(data & 0x10);
 
@@ -630,7 +630,7 @@ WRITE8_MEMBER(snk_state::gwara_videoattrs_w)
 	m_bg_scrolly =   (m_bg_scrolly   & 0xff) | ((data & 0x01) << 8);
 }
 
-WRITE8_MEMBER(snk_state::gwara_sp_scroll_msb_w)
+void snk_state::gwara_sp_scroll_msb_w(uint8_t data)
 {
 	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x20) << 3);
 	m_sp16_scrollx = (m_sp16_scrollx & 0xff) | ((data & 0x10) << 4);
@@ -638,13 +638,13 @@ WRITE8_MEMBER(snk_state::gwara_sp_scroll_msb_w)
 	m_sp16_scrolly = (m_sp16_scrolly & 0xff) | ((data & 0x04) << 6);
 }
 
-WRITE8_MEMBER(snk_state::tdfever_sp_scroll_msb_w)
+void snk_state::tdfever_sp_scroll_msb_w(uint8_t data)
 {
 	m_sp32_scrolly = (m_sp32_scrolly & 0xff) | ((data & 0x80) << 1);
 	m_sp32_scrollx = (m_sp32_scrollx & 0xff) | ((data & 0x40) << 2);
 }
 
-WRITE8_MEMBER(snk_state::tdfever_spriteram_w)
+void snk_state::tdfever_spriteram_w(offs_t offset, uint8_t data)
 {
 	/*  partial updates avoid flickers in the fsoccer radar. */
 	if (offset < 0x80 && m_spriteram[offset] != data)

@@ -479,7 +479,7 @@ void dbox_state::machine_start()
 #if LOCALFLASH
 	save_pointer (NAME (m_sysflash), sizeof(m_sysflash));
 
-	m_sysflash = (uint16_t*)(memregion ("flash")->base());
+	m_sysflash = (uint16_t*)(memregion ("flash0")->base());
 	m_sf_mode  = 0;
 	m_sf_state = 0;
 #endif
@@ -580,10 +580,11 @@ void dbox_state::dbox_map(address_map &map)
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes
 #if LOCALFLASH
-	map(0x000000, 0x3fffff).rom().r(FUNC(dbox_state::sysflash_r)).region("flash", 0);
+	map(0x000000, 0x3fffff).rom().r(FUNC(dbox_state::sysflash_r)).region("flash0", 0);
 	map(0x000000, 0x3fffff).w(FUNC(dbox_state::sysflash_w));
 #else
-	map(0x000000, 0x3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x000000, 0x0fffff).rw("flash0", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
+	map(0x100000, 0x1fffff).rw("flash1", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 #endif
 // CS2 - CS demux
 // 0000009a Address mask CS2 00000050, 00007fff (ffffffff) - Mask: 00007f00 FCM:0f DD:3 PS: External DSACK response
@@ -625,7 +626,8 @@ void dbox_state::dbox(machine_config &config)
 	modem.rxd_handler().set("maincpu:serial", FUNC(mc68340_serial_module_device::rx_b_w));
 
 	/* Add the boot flash */
-	AMD_29F800B_16BIT(config, "flash");
+	AMD_29F800B_16BIT(config, "flash0");
+	AMD_29F800B_16BIT(config, "flash1");
 
 	/* LED Matrix Display */
 	SDA5708(config, m_display, 0);
@@ -643,7 +645,7 @@ void dbox_state::init_dbox()
 // TODO: Figure out correct ROM address map
 // TODO: Figure out what DVB2000 is doing
 ROM_START( dbox )
-	ROM_REGION16_BE(0x400000, "flash", ROMREGION_ERASEFF)
+	ROM_REGION16_BE(0x400000, "flash0", ROMREGION_ERASEFF) // should be 0x100000
 	ROM_DEFAULT_BIOS("b200uns")
 
 	ROM_SYSTEM_BIOS(0, "b200uns", "Nokia Bootloader B200uns")

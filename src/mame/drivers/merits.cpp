@@ -7,7 +7,9 @@
     Hardware overview:
     Main CPU: Dallas DS80C3202-UM or compatible
     Sound: DAC?
-    Other: Dallas DS1220Y-120 or compatible
+    NVRAM: Dallas DS1220Y-120 or compatible
+    Other: Dallas DS1232 MicroMonitor
+           Dallas DS1204U-3 Electronic Key (not populated)
     OSCs: 12.000 MHz, 3.2768 MHz
     Dips: 2 x 8 dips banks
 
@@ -61,7 +63,7 @@ INPUT_PORTS_END
 
 void merits_state::scrpiond(machine_config &config)
 {
-	I80C32(config, m_maincpu, 12_MHz_XTAL);
+	DS80C320(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merits_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &merits_state::io_map);
 

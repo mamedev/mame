@@ -229,7 +229,7 @@ void skns_state::hit_recalc()
 */
 }
 
-WRITE32_MEMBER(skns_state::hit_w)
+void skns_state::hit_w(offs_t offset, uint32_t data)
 //void hit_w(uint32_t adr, uint32_t data, int type)
 {
 	hit_t &hit = m_hit;
@@ -294,7 +294,7 @@ WRITE32_MEMBER(skns_state::hit_w)
 	hit_recalc();
 }
 
-WRITE32_MEMBER(skns_state::hit2_w)
+void skns_state::hit2_w(uint32_t data)
 {
 	hit_t &hit = m_hit;
 
@@ -327,7 +327,7 @@ WRITE32_MEMBER(skns_state::hit2_w)
 }
 
 
-READ32_MEMBER(skns_state::hit_r)
+uint32_t skns_state::hit_r(offs_t offset)
 //uint32_t hit_r(uint32_t adr, int type)
 {
 	hit_t &hit = m_hit;
@@ -642,7 +642,7 @@ INPUT_PORTS_END
 
 
 
-WRITE32_MEMBER(skns_state::io_w)
+void skns_state::io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset) {
 	case 2:
@@ -705,7 +705,7 @@ WRITE32_MEMBER(skns_state::io_w)
 
 /* end old driver code */
 
-WRITE32_MEMBER(skns_state::v3t_w)
+void skns_state::v3t_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_v3t_ram[offset]);
 
@@ -868,7 +868,7 @@ void skns_state::sknsk(machine_config &config)
 
 /***** IDLE SKIPPING *****/
 
-READ32_MEMBER(skns_state::gutsn_speedup_r)
+uint32_t skns_state::gutsn_speedup_r()
 {
 /*
     0402206A: MOV.L   @($8C,PC),R5
@@ -886,31 +886,31 @@ READ32_MEMBER(skns_state::gutsn_speedup_r)
 	return m_main_ram[0x0c780/4];
 }
 
-READ32_MEMBER(skns_state::cyvern_speedup_r)
+uint32_t skns_state::cyvern_speedup_r()
 {
 	if (m_maincpu->pc()==0x402ebd2) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x4d3c8/4];
 }
 
-READ32_MEMBER(skns_state::puzzloopj_speedup_r)
+uint32_t skns_state::puzzloopj_speedup_r()
 {
 	if (m_maincpu->pc()==0x401dca0) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x86714/4];
 }
 
-READ32_MEMBER(skns_state::puzzloopa_speedup_r)
+uint32_t skns_state::puzzloopa_speedup_r()
 {
 	if (m_maincpu->pc()==0x401d9d4) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x85bcc/4];
 }
 
-READ32_MEMBER(skns_state::puzzloopu_speedup_r)
+uint32_t skns_state::puzzloopu_speedup_r()
 {
 	if (m_maincpu->pc()==0x401dab0) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x85cec/4];
 }
 
-READ32_MEMBER(skns_state::puzzloope_speedup_r)
+uint32_t skns_state::puzzloope_speedup_r()
 {
 /*
     0401DA12: MOV.L   @($80,PC),R1
@@ -923,55 +923,55 @@ READ32_MEMBER(skns_state::puzzloope_speedup_r)
 	return m_main_ram[0x81d38/4];
 }
 
-READ32_MEMBER(skns_state::senknow_speedup_r)
+uint32_t skns_state::senknow_speedup_r()
 {
 	if (m_maincpu->pc()==0x4017dce) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x0000dc/4];
 }
 
-READ32_MEMBER(skns_state::teljan_speedup_r)
+uint32_t skns_state::teljan_speedup_r()
 {
 	if (m_maincpu->pc()==0x401ba32) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x002fb4/4];
 }
 
-READ32_MEMBER(skns_state::jjparads_speedup_r)
+uint32_t skns_state::jjparads_speedup_r()
 {
 	if (m_maincpu->pc()==0x4015e84) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x000994/4];
 }
 
-READ32_MEMBER(skns_state::jjparad2_speedup_r)
+uint32_t skns_state::jjparad2_speedup_r()
 {
 	if (m_maincpu->pc()==0x401620a) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x000984/4];
 }
 
-READ32_MEMBER(skns_state::ryouran_speedup_r)
+uint32_t skns_state::ryouran_speedup_r()
 {
 	if (m_maincpu->pc()==0x40182ce) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x000a14/4];
 }
 
-READ32_MEMBER(skns_state::galpans2_speedup_r)
+uint32_t skns_state::galpans2_speedup_r()
 {
 	if (m_maincpu->pc()==0x4049ae2) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x0fb6bc/4];
 }
 
-READ32_MEMBER(skns_state::panicstr_speedup_r)
+uint32_t skns_state::panicstr_speedup_r()
 {
 	if (m_maincpu->pc()==0x404e68a) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0x0f19e4/4];
 }
 
-READ32_MEMBER(skns_state::sengekis_speedup_r)// 60006ee  600308e
+uint32_t skns_state::sengekis_speedup_r()// 60006ee  600308e
 {
 	if (m_maincpu->pc()==0x60006ec) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0xb74bc/4];
 }
 
-READ32_MEMBER(skns_state::sengekij_speedup_r)// 60006ee  600308e
+uint32_t skns_state::sengekij_speedup_r()// 60006ee  600308e
 {
 	if (m_maincpu->pc()==0x60006ec) m_maincpu->spin_until_interrupt();
 	return m_main_ram[0xb7380/4];
@@ -993,21 +993,21 @@ void skns_state::set_drc_pcflush(uint32_t addr)
 
 void skns_state::init_galpani4()   { m_spritegen->skns_sprite_kludge(-5,-1); init_drc();  }
 void skns_state::init_galpanis()   { m_spritegen->skns_sprite_kludge(-5,-1); init_drc();  }
-void skns_state::init_cyvern()     { m_spritegen->skns_sprite_kludge(+0,+2); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x604d3c8, 0x604d3cb, read32_delegate(*this, FUNC(skns_state::cyvern_speedup_r)) );  set_drc_pcflush(0x402ebd2);  }
-void skns_state::init_galpans2()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60fb6bc, 0x60fb6bf, read32_delegate(*this, FUNC(skns_state::galpans2_speedup_r)) ); set_drc_pcflush(0x4049ae2); }
-void skns_state::init_gutsn()      { m_spritegen->skns_sprite_kludge(+0,+0); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x600c780, 0x600c783, read32_delegate(*this, FUNC(skns_state::gutsn_speedup_r)) ); set_drc_pcflush(0x402206e); }
-void skns_state::init_panicstr()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60f19e4, 0x60f19e7, read32_delegate(*this, FUNC(skns_state::panicstr_speedup_r)) ); set_drc_pcflush(0x404e68a);  }
-void skns_state::init_senknow()    { m_spritegen->skns_sprite_kludge(+1,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60000dc, 0x60000df, read32_delegate(*this, FUNC(skns_state::senknow_speedup_r)) ); set_drc_pcflush(0x4017dce);  }
-void skns_state::init_puzzloope()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6081d38, 0x6081d3b, read32_delegate(*this, FUNC(skns_state::puzzloope_speedup_r)) ); set_drc_pcflush(0x401da14); }
-void skns_state::init_puzzloopj()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6086714, 0x6086717, read32_delegate(*this, FUNC(skns_state::puzzloopj_speedup_r)) ); set_drc_pcflush(0x401dca0); }
-void skns_state::init_puzzloopa()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085bcc, 0x6085bcf, read32_delegate(*this, FUNC(skns_state::puzzloopa_speedup_r)) ); set_drc_pcflush(0x401d9d4); }
-void skns_state::init_puzzloopu()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085cec, 0x6085cef, read32_delegate(*this, FUNC(skns_state::puzzloopu_speedup_r)) ); set_drc_pcflush(0x401dab0); }
-void skns_state::init_jjparads()   { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000994, 0x6000997, read32_delegate(*this, FUNC(skns_state::jjparads_speedup_r)) ); set_drc_pcflush(0x4015e84); }
-void skns_state::init_jjparad2()   { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000984, 0x6000987, read32_delegate(*this, FUNC(skns_state::jjparad2_speedup_r)) ); set_drc_pcflush(0x401620a); }
-void skns_state::init_ryouran()    { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000a14, 0x6000a17, read32_delegate(*this, FUNC(skns_state::ryouran_speedup_r)) );  set_drc_pcflush(0x40182ce); }
-void skns_state::init_teljan()     { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6002fb4, 0x6002fb7, read32_delegate(*this, FUNC(skns_state::teljan_speedup_r)) ); set_drc_pcflush(0x401ba32); }
-void skns_state::init_sengekis()   { m_spritegen->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b74bc, 0x60b74bf, read32_delegate(*this, FUNC(skns_state::sengekis_speedup_r)) ); set_drc_pcflush(0x60006ec); }
-void skns_state::init_sengekij()   { m_spritegen->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b7380, 0x60b7383, read32_delegate(*this, FUNC(skns_state::sengekij_speedup_r)) ); set_drc_pcflush(0x60006ec); }
+void skns_state::init_cyvern()     { m_spritegen->skns_sprite_kludge(+0,+2); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x604d3c8, 0x604d3cb, read32smo_delegate(*this, FUNC(skns_state::cyvern_speedup_r)) );  set_drc_pcflush(0x402ebd2);  }
+void skns_state::init_galpans2()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60fb6bc, 0x60fb6bf, read32smo_delegate(*this, FUNC(skns_state::galpans2_speedup_r)) ); set_drc_pcflush(0x4049ae2); }
+void skns_state::init_gutsn()      { m_spritegen->skns_sprite_kludge(+0,+0); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x600c780, 0x600c783, read32smo_delegate(*this, FUNC(skns_state::gutsn_speedup_r)) ); set_drc_pcflush(0x402206e); }
+void skns_state::init_panicstr()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60f19e4, 0x60f19e7, read32smo_delegate(*this, FUNC(skns_state::panicstr_speedup_r)) ); set_drc_pcflush(0x404e68a);  }
+void skns_state::init_senknow()    { m_spritegen->skns_sprite_kludge(+1,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60000dc, 0x60000df, read32smo_delegate(*this, FUNC(skns_state::senknow_speedup_r)) ); set_drc_pcflush(0x4017dce);  }
+void skns_state::init_puzzloope()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6081d38, 0x6081d3b, read32smo_delegate(*this, FUNC(skns_state::puzzloope_speedup_r)) ); set_drc_pcflush(0x401da14); }
+void skns_state::init_puzzloopj()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6086714, 0x6086717, read32smo_delegate(*this, FUNC(skns_state::puzzloopj_speedup_r)) ); set_drc_pcflush(0x401dca0); }
+void skns_state::init_puzzloopa()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085bcc, 0x6085bcf, read32smo_delegate(*this, FUNC(skns_state::puzzloopa_speedup_r)) ); set_drc_pcflush(0x401d9d4); }
+void skns_state::init_puzzloopu()  { m_spritegen->skns_sprite_kludge(-9,-1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6085cec, 0x6085cef, read32smo_delegate(*this, FUNC(skns_state::puzzloopu_speedup_r)) ); set_drc_pcflush(0x401dab0); }
+void skns_state::init_jjparads()   { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000994, 0x6000997, read32smo_delegate(*this, FUNC(skns_state::jjparads_speedup_r)) ); set_drc_pcflush(0x4015e84); }
+void skns_state::init_jjparad2()   { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000984, 0x6000987, read32smo_delegate(*this, FUNC(skns_state::jjparad2_speedup_r)) ); set_drc_pcflush(0x401620a); }
+void skns_state::init_ryouran()    { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000a14, 0x6000a17, read32smo_delegate(*this, FUNC(skns_state::ryouran_speedup_r)) );  set_drc_pcflush(0x40182ce); }
+void skns_state::init_teljan()     { m_spritegen->skns_sprite_kludge(+5,+1); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x6002fb4, 0x6002fb7, read32smo_delegate(*this, FUNC(skns_state::teljan_speedup_r)) ); set_drc_pcflush(0x401ba32); }
+void skns_state::init_sengekis()   { m_spritegen->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b74bc, 0x60b74bf, read32smo_delegate(*this, FUNC(skns_state::sengekis_speedup_r)) ); set_drc_pcflush(0x60006ec); }
+void skns_state::init_sengekij()   { m_spritegen->skns_sprite_kludge(-192,-272); init_drc();m_maincpu->space(AS_PROGRAM).install_read_handler(0x60b7380, 0x60b7383, read32smo_delegate(*this, FUNC(skns_state::sengekij_speedup_r)) ); set_drc_pcflush(0x60006ec); }
 void skns_state::init_sarukani()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc(); set_drc_pcflush(0x4013b42); } // Speedup is in io_w()
 void skns_state::init_galpans3()   { m_spritegen->skns_sprite_kludge(-1,-1); init_drc();  }
 

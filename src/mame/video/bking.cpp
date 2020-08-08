@@ -80,38 +80,38 @@ void bking_state::bking_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(bking_state::bking_xld1_w)
+void bking_state::bking_xld1_w(uint8_t data)
 {
 	m_xld1 = -data;
 }
 
-WRITE8_MEMBER(bking_state::bking_yld1_w)
+void bking_state::bking_yld1_w(uint8_t data)
 {
 	m_yld1 = -data;
 }
 
-WRITE8_MEMBER(bking_state::bking_xld2_w)
+void bking_state::bking_xld2_w(uint8_t data)
 {
 	m_xld2 = -data;
 }
 
-WRITE8_MEMBER(bking_state::bking_yld2_w)
+void bking_state::bking_yld2_w(uint8_t data)
 {
 	m_yld2 = -data;
 }
 
-WRITE8_MEMBER(bking_state::bking_xld3_w)
+void bking_state::bking_xld3_w(uint8_t data)
 {
 	m_xld3 = -data;
 }
 
-WRITE8_MEMBER(bking_state::bking_yld3_w)
+void bking_state::bking_yld3_w(uint8_t data)
 {
 	m_yld3 = -data;
 }
 
 
-WRITE8_MEMBER(bking_state::bking_cont1_w)
+void bking_state::bking_cont1_w(uint8_t data)
 {
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
@@ -128,7 +128,7 @@ WRITE8_MEMBER(bking_state::bking_cont1_w)
 	m_crow_pic = (data >> 4) & 0x0f;
 }
 
-WRITE8_MEMBER(bking_state::bking_cont2_w)
+void bking_state::bking_cont2_w(uint8_t data)
 {
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
@@ -141,7 +141,7 @@ WRITE8_MEMBER(bking_state::bking_cont2_w)
 	m_hit = data >> 6;
 }
 
-WRITE8_MEMBER(bking_state::bking_cont3_w)
+void bking_state::bking_cont3_w(uint8_t data)
 {
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
@@ -159,13 +159,13 @@ WRITE8_MEMBER(bking_state::bking_cont3_w)
 }
 
 
-WRITE8_MEMBER(bking_state::bking_msk_w)
+void bking_state::bking_msk_w(uint8_t data)
 {
 	m_pc3259_mask++;
 }
 
 
-WRITE8_MEMBER(bking_state::bking_hitclr_w)
+void bking_state::bking_hitclr_w(uint8_t data)
 {
 	m_pc3259_mask = 0;
 
@@ -176,24 +176,24 @@ WRITE8_MEMBER(bking_state::bking_hitclr_w)
 }
 
 
-WRITE8_MEMBER(bking_state::bking_playfield_w)
+void bking_state::bking_playfield_w(offs_t offset, uint8_t data)
 {
 	m_playfield_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-READ8_MEMBER(bking_state::bking_input_port_5_r)
+uint8_t bking_state::bking_input_port_5_r()
 {
 	return ioport(m_controller ? "TRACK1_X" : "TRACK0_X")->read();
 }
 
-READ8_MEMBER(bking_state::bking_input_port_6_r)
+uint8_t bking_state::bking_input_port_6_r()
 {
 	return ioport(m_controller ? "TRACK1_Y" : "TRACK0_Y")->read();
 }
 
-READ8_MEMBER(bking_state::bking_pos_r)
+uint8_t bking_state::bking_pos_r(offs_t offset)
 {
 	return m_pc3259_output[offset / 8] << 4;
 }

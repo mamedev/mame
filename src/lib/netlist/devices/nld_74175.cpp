@@ -1,24 +1,58 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_74175.c
+ * nld_74175.cpp
+ *
+ *  DM74175: Quad D Flip-Flops with Clear
+ *
+ *          +--------------+
+ *      CLR |1     ++    16| VCC
+ *       Q1 |2           15| Q4
+ *      Q1Q |3           14| Q4Q
+ *       D1 |4   74175   13| D4
+ *       D2 |5           12| D3
+ *      Q2Q |6           11| Q3Q
+ *       Q2 |7           10| Q3
+ *      GND |8            9| CLK
+ *          +--------------+
+ *
+ *          +-----+-----+---++---+-----+
+ *          | CLR | CLK | D || Q | QQ  |
+ *          +=====+=====+===++===+=====+
+ *          |  0  |  X  | X || 0 |  1  |
+ *          |  1  |  R  | 1 || 1 |  0  |
+ *          |  1  |  R  | 0 || 0 |  1  |
+ *          |  1  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+---++---+-----+
+ *
+ *   Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -> 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
  *
  */
 
 #include "nld_74175.h"
 #include "netlist/nl_base.h"
 
+// FIXME: optimize
+
 namespace netlist
 {
 	namespace devices
 	{
 
+	static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
+	static constexpr const std::array<netlist_time, 2> delay_clear = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+
+
 	NETLIB_OBJECT(74175)
 	{
 		NETLIB_CONSTRUCTOR(74175)
-		, m_D(*this, {"D1", "D2", "D3", "D4"})
-		, m_CLRQ(*this, "CLRQ")
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(74175, clk))
+		, m_D(*this, {"D1", "D2", "D3", "D4"}, NETLIB_DELEGATE(other))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(other))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4"})
 		, m_QQ(*this, {"Q1Q", "Q2Q", "Q3Q", "Q4Q"})
 		, m_data(*this, "m_data", 0)
@@ -31,8 +65,42 @@ namespace netlist
 			m_CLK.set_state(logic_t::STATE_INP_LH);
 			m_data = 0xFF;
 		}
-		NETLIB_UPDATEI();
-		NETLIB_HANDLERI(clk);
+
+		NETLIB_HANDLERI(other)
+		{
+			uint_fast8_t d = 0;
+			for (std::size_t i=0; i<4; i++)
+			{
+				d |= (m_D[i]() << i);
+			}
+			if (!m_CLRQ())
+			{
+				for (std::size_t i=0; i<4; i++)
+				{
+					m_Q[i].push(0, delay_clear[0]);
+					m_QQ[i].push(1, delay_clear[1]);
+				}
+				m_data = 0;
+			} else if (d != m_data)
+			{
+				m_data = d;
+				m_CLK.activate_lh();
+			}
+		}
+
+		NETLIB_HANDLERI(clk)
+		{
+			if (m_CLRQ())
+			{
+				for (std::size_t i=0; i<4; i++)
+				{
+					netlist_sig_t d = (m_data >> i) & 1;
+					m_Q[i].push(d, delay[d]);
+					m_QQ[i].push(d ^ 1, delay[d ^ 1]);
+				}
+				m_CLK.inactivate();
+			}
+		}
 
 		friend class NETLIB_NAME(74175_dip);
 	private:
@@ -74,51 +142,10 @@ namespace netlist
 			register_subalias("8",  "A.GND");
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(74175) A;
 	};
-
-	constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
-	constexpr const std::array<netlist_time, 2> delay_clear = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
-
-	NETLIB_HANDLER(74175, clk)
-	{
-		if (m_CLRQ())
-		{
-			for (std::size_t i=0; i<4; i++)
-			{
-				netlist_sig_t d = (m_data >> i) & 1;
-				m_Q[i].push(d, delay[d]);
-				m_QQ[i].push(d ^ 1, delay[d ^ 1]);
-			}
-			m_CLK.inactivate();
-		}
-	}
-
-	NETLIB_UPDATE(74175)
-	{
-		uint_fast8_t d = 0;
-		for (std::size_t i=0; i<4; i++)
-		{
-			d |= (m_D[i]() << i);
-		}
-		if (!m_CLRQ())
-		{
-			for (std::size_t i=0; i<4; i++)
-			{
-				m_Q[i].push(0, delay_clear[0]);
-				m_QQ[i].push(1, delay_clear[1]);
-			}
-			m_data = 0;
-		} else if (d != m_data)
-		{
-			m_data = d;
-			m_CLK.activate_lh();
-		}
-	}
-
 
 	NETLIB_DEVICE_IMPL(74175,   "TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74175_dip,"TTL_74175_DIP", "")

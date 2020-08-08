@@ -52,7 +52,7 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
+	void mouser_sound_nmi_clear_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void mouser_palette(palette_device &palette) const;

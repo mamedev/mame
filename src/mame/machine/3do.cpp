@@ -170,8 +170,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 	}
 }
 
-READ8_MEMBER(_3do_state::nvarea_r) { return m_nvmem[offset]; }
-WRITE8_MEMBER(_3do_state::nvarea_w) { m_nvmem[offset] = data; }
+uint8_t _3do_state::nvarea_r(offs_t offset) { return m_nvmem[offset]; }
+void _3do_state::nvarea_w(offs_t offset, uint8_t data) { m_nvmem[offset] = data; }
 
 
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER(_3do_state::nvarea_w) { m_nvmem[offset] = data; }
 3022630
 */
 
-READ32_MEMBER(_3do_state::slow2_r){
+uint32_t _3do_state::slow2_r(offs_t offset){
 	uint32_t data = 0;
 
 	logerror( "%08X: UNK_318 read offset = %08X\n", m_maincpu->pc(), offset );
@@ -215,7 +215,7 @@ READ32_MEMBER(_3do_state::slow2_r){
 }
 
 
-WRITE32_MEMBER(_3do_state::slow2_w)
+void _3do_state::slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset, data, mem_mask );
 
@@ -237,7 +237,7 @@ WRITE32_MEMBER(_3do_state::slow2_w)
 
 
 
-READ32_MEMBER(_3do_state::svf_r)
+uint32_t _3do_state::svf_r(offs_t offset)
 {
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
@@ -262,7 +262,7 @@ READ32_MEMBER(_3do_state::svf_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_3do_state::svf_w)
+void _3do_state::svf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
@@ -302,7 +302,7 @@ WRITE32_MEMBER(_3do_state::svf_w)
 
 
 
-READ32_MEMBER(_3do_state::madam_r){
+uint32_t _3do_state::madam_r(offs_t offset){
 	logerror( "%08X: MADAM read offset = %08X\n", m_maincpu->pc(), offset*4 );
 
 	switch( offset ) {
@@ -461,7 +461,7 @@ READ32_MEMBER(_3do_state::madam_r){
 }
 
 
-WRITE32_MEMBER(_3do_state::madam_w){
+void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	if(offset == 0)
 	{
 		if(data == 0x0a)
@@ -655,7 +655,7 @@ WRITE32_MEMBER(_3do_state::madam_w){
 
 
 
-READ32_MEMBER(_3do_state::clio_r)
+uint32_t _3do_state::clio_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -782,7 +782,7 @@ READ32_MEMBER(_3do_state::clio_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_3do_state::clio_w)
+void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
 		offset != 0x118/4 && offset != 0x11c/4)

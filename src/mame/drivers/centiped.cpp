@@ -471,7 +471,7 @@ MACHINE_RESET_MEMBER(centiped_state,magworm)
 }
 
 
-WRITE8_MEMBER(centiped_state::irq_ack_w)
+void centiped_state::irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -529,24 +529,24 @@ inline int centiped_state::read_trackball(int idx, int switch_port)
 }
 
 
-READ8_MEMBER(centiped_state::centiped_IN0_r)
+uint8_t centiped_state::centiped_IN0_r()
 {
 	return read_trackball(0, 0);
 }
 
 
-READ8_MEMBER(centiped_state::centiped_IN2_r)
+uint8_t centiped_state::centiped_IN2_r()
 {
 	return read_trackball(1, 2);
 }
 
 
-READ8_MEMBER(centiped_state::milliped_IN1_r)
+uint8_t centiped_state::milliped_IN1_r()
 {
 	return read_trackball(1, 1);
 }
 
-READ8_MEMBER(centiped_state::milliped_IN2_r)
+uint8_t centiped_state::milliped_IN2_r()
 {
 	uint8_t data = ioport("IN2")->read();
 
@@ -580,7 +580,7 @@ WRITE_LINE_MEMBER(centiped_state::control_select_w)
 }
 
 
-READ8_MEMBER(centiped_state::mazeinv_input_r)
+uint8_t centiped_state::mazeinv_input_r()
 {
 	static const char *const sticknames[] = { "STICK0", "STICK1", "STICK2", "STICK3" };
 
@@ -588,12 +588,12 @@ READ8_MEMBER(centiped_state::mazeinv_input_r)
 }
 
 
-WRITE8_MEMBER(centiped_state::mazeinv_input_select_w)
+void centiped_state::mazeinv_input_select_w(offs_t offset, uint8_t data)
 {
 	m_control_select = offset & 3;
 }
 
-READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
+uint8_t centiped_state::bullsdrt_data_port_r()
 {
 	switch (m_maincpu->pc())
 	{
@@ -653,12 +653,12 @@ WRITE_LINE_MEMBER(centiped_state::bullsdrt_coin_count_w)
  *
  *************************************/
 
-READ8_MEMBER(centiped_state::earom_read)
+uint8_t centiped_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(centiped_state::earom_write)
+void centiped_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);
@@ -760,13 +760,13 @@ void centiped_state::caterplr_map(address_map &map)
 	map(0x1000, 0x100f).rw(FUNC(centiped_state::caterplr_AY8910_r), FUNC(centiped_state::caterplr_AY8910_w));
 }
 
-WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
+void centiped_state::caterplr_AY8910_w(offs_t offset, uint8_t data)
 {
 	m_aysnd->address_w(offset);
 	m_aysnd->data_w(data);
 }
 
-READ8_MEMBER(centiped_state::caterplr_AY8910_r)
+uint8_t centiped_state::caterplr_AY8910_r(offs_t offset)
 {
 	m_aysnd->address_w(offset);
 	return m_aysnd->data_r();
@@ -852,12 +852,12 @@ void centiped_state::multiped_map(address_map &map)
 	map(0xdc00, 0xdc00).mirror(0x03ff).w(FUNC(centiped_state::multiped_gfxbank_w));
 }
 
-READ8_MEMBER(centiped_state::multiped_eeprom_r)
+uint8_t centiped_state::multiped_eeprom_r()
 {
 	return m_eeprom->do_read() ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
+void centiped_state::multiped_eeprom_w(offs_t offset, uint8_t data)
 {
 	// a0: always high
 	// a3-a7: always low
@@ -877,7 +877,7 @@ WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
 		m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(centiped_state::multiped_prgbank_w)
+void centiped_state::multiped_prgbank_w(uint8_t data)
 {
 	// d0-d6: N/C?
 	// d7: prg (and gfx) rom bank
@@ -885,7 +885,7 @@ WRITE8_MEMBER(centiped_state::multiped_prgbank_w)
 	if (bank != m_prg_bank)
 	{
 		m_prg_bank = bank;
-		multiped_gfxbank_w(space, 0, m_gfx_bank << 6);
+		multiped_gfxbank_w(m_gfx_bank << 6);
 
 		// TODO: prg bankswitch and alt memory map layout for centiped
 	}

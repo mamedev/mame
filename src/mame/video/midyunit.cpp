@@ -122,7 +122,7 @@ VIDEO_START_MEMBER(midyunit_state,midzunit)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::midyunit_gfxrom_r)
+uint16_t midyunit_state::midyunit_gfxrom_r(offs_t offset)
 {
 	offset *= 2;
 	if (m_palette_mask == 0x00ff)
@@ -140,7 +140,7 @@ READ16_MEMBER(midyunit_state::midyunit_gfxrom_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_vram_w)
+void midyunit_state::midyunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -160,7 +160,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_vram_w)
 }
 
 
-READ16_MEMBER(midyunit_state::midyunit_vram_r)
+uint16_t midyunit_state::midyunit_vram_r(offs_t offset)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -196,7 +196,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(midyunit_state::from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_control_w)
+void midyunit_state::midyunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 * Narc system register
@@ -233,7 +233,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_paletteram_w)
+void midyunit_state::midyunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword;
 
@@ -390,7 +390,7 @@ TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::midyunit_dma_r)
+uint16_t midyunit_state::midyunit_dma_r(offs_t offset)
 {
 	return m_dma_register[offset];
 }
@@ -428,7 +428,7 @@ READ16_MEMBER(midyunit_state::midyunit_dma_r)
  *     9     | xxxxxxxxxxxxxxxx | color
  */
 
-WRITE16_MEMBER(midyunit_state::midyunit_dma_w)
+void midyunit_state::midyunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct dma_state_t &dma_state = m_dma_state;
 	uint32_t gfxoffset;

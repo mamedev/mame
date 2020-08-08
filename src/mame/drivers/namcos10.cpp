@@ -446,30 +446,30 @@ public:
 
 private:
 	// memm variant interface
-	DECLARE_WRITE16_MEMBER(crypto_switch_w);
-	DECLARE_READ16_MEMBER(range_r);
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void crypto_switch_w(uint16_t data);
+	uint16_t range_r(offs_t offset);
+	void bank_w(offs_t offset, uint16_t data);
 
 	// memn variant interface
-	DECLARE_READ16_MEMBER(nand_status_r);
-	DECLARE_WRITE8_MEMBER(nand_address1_w);
-	DECLARE_WRITE8_MEMBER(nand_address2_w);
-	DECLARE_WRITE8_MEMBER(nand_address3_w);
-	DECLARE_WRITE8_MEMBER(nand_address4_w);
-	DECLARE_READ16_MEMBER(nand_data_r);
-	DECLARE_WRITE16_MEMBER(nand_block_w);
-	DECLARE_READ16_MEMBER(nand_block_r);
+	uint16_t nand_status_r();
+	void nand_address1_w(uint8_t data);
+	void nand_address2_w(uint8_t data);
+	void nand_address3_w(uint8_t data);
+	void nand_address4_w(uint8_t data);
+	uint16_t nand_data_r();
+	void nand_block_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t nand_block_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER (control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data);
 
-	DECLARE_READ16_MEMBER (i2c_clock_r);
-	DECLARE_WRITE16_MEMBER(i2c_clock_w);
-	DECLARE_READ16_MEMBER (i2c_data_r);
-	DECLARE_WRITE16_MEMBER(i2c_data_w);
+	uint16_t i2c_clock_r();
+	void i2c_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t i2c_data_r();
+	void i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER (sprot_r);
-	DECLARE_WRITE16_MEMBER(sprot_w);
+	uint16_t sprot_r();
+	void sprot_w(uint16_t data);
 
 	uint8_t *nand_base;
 	void nand_copy( uint32_t *dst, uint32_t address, int len );
@@ -529,7 +529,7 @@ void namcos10_state::namcos10_map(address_map &map)
 // bios copies 62000-37ffff from the flash to 80012000 in ram through the
 // decryption in range_r then jumps there
 
-WRITE16_MEMBER(namcos10_state::crypto_switch_w)
+void namcos10_state::crypto_switch_w(uint16_t data)
 {
 	printf("crypto_switch_w: %04x\n", data);
 	if (decrypter == nullptr)
@@ -541,12 +541,12 @@ WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 		decrypter->deactivate();
 }
 
-WRITE16_MEMBER(namcos10_state::bank_w)
+void namcos10_state::bank_w(offs_t offset, uint16_t data)
 {
 	bank_base = 0x100000 * offset;
 }
 
-READ16_MEMBER(namcos10_state::range_r)
+uint16_t namcos10_state::range_r(offs_t offset)
 {
 	uint16_t data = ((const uint16_t *)(memregion("maincpu:rom")->base()))[bank_base+offset];
 
@@ -559,7 +559,7 @@ READ16_MEMBER(namcos10_state::range_r)
 		return data;
 }
 
-READ16_MEMBER(namcos10_state::control_r)
+uint16_t namcos10_state::control_r(offs_t offset)
 {
 	logerror("%s: control_r %d (%x)\n", machine().describe_context(), offset);
 	if(offset == 2)
@@ -567,12 +567,12 @@ READ16_MEMBER(namcos10_state::control_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos10_state::control_w)
+void namcos10_state::control_w(offs_t offset, uint16_t data)
 {
 	logerror("%s: control_w %d, %04x (%x)\n", machine().describe_context(), offset, data);
 }
 
-WRITE16_MEMBER(namcos10_state::sprot_w)
+void namcos10_state::sprot_w(uint16_t data)
 {
 	logerror("%s: sprot_w %04x (%x)\n", machine().describe_context(), data);
 	sprot_bit = 7;
@@ -587,7 +587,7 @@ WRITE16_MEMBER(namcos10_state::sprot_w)
 // 800128e0: jal 1649c
 // 800128e8: jal 2c47c
 
-READ16_MEMBER(namcos10_state::sprot_r)
+uint16_t namcos10_state::sprot_r()
 {
 	// If line 3 has 0x30/0x31 in it, something happens.  That
 	// something currently kills the system though.
@@ -610,7 +610,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 	return res;
 }
 
-READ16_MEMBER(namcos10_state::i2c_clock_r)
+uint16_t namcos10_state::i2c_clock_r()
 {
 	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
 	//  logerror("i2c_clock_r %d (%x)\n", res, m_maincpu->pc());
@@ -618,14 +618,14 @@ READ16_MEMBER(namcos10_state::i2c_clock_r)
 }
 
 
-WRITE16_MEMBER(namcos10_state::i2c_clock_w)
+void namcos10_state::i2c_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&i2c_host_clock);
 	//  logerror("i2c_clock_w %d (%x)\n", data, m_maincpu->pc());
 	i2c_update();
 }
 
-READ16_MEMBER(namcos10_state::i2c_data_r)
+uint16_t namcos10_state::i2c_data_r()
 {
 	uint16_t res = i2c_dev_data & i2c_host_data & 1;
 	//  logerror("i2c_data_r %d (%x)\n", res, m_maincpu->pc());
@@ -633,7 +633,7 @@ READ16_MEMBER(namcos10_state::i2c_data_r)
 }
 
 
-WRITE16_MEMBER(namcos10_state::i2c_data_w)
+void namcos10_state::i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&i2c_host_data);
 	//  logerror("i2c_data_w %d (%x)\n", data, m_maincpu->pc());
@@ -709,30 +709,30 @@ void namcos10_state::namcos10_memm_map(address_map &map)
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
 
-READ16_MEMBER(namcos10_state::nand_status_r )
+uint16_t namcos10_state::nand_status_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(namcos10_state::nand_address1_w )
+void namcos10_state::nand_address1_w(uint8_t data)
 {
 	logerror("%s: nand_a1_w %08x (%08x)\n", machine().describe_context(), data);
 	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address2_w )
+void namcos10_state::nand_address2_w(uint8_t data)
 {
 	logerror("%s: nand_a2_w %08x (%08x)\n", machine().describe_context(), data);
 	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address3_w )
+void namcos10_state::nand_address3_w(uint8_t data)
 {
 	logerror("%s: nand_a3_w %08x (%08x)\n", machine().describe_context(), data);
 	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address4_w )
+void namcos10_state::nand_address4_w(uint8_t data)
 {
 	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
 	logerror("%s: nand_a4_w %08x (%08x) -> %08x\n", machine().describe_context(), data, nand_address*2);
@@ -750,7 +750,7 @@ uint16_t namcos10_state::nand_read2( uint32_t address )
 	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
 }
 
-READ16_MEMBER( namcos10_state::nand_data_r )
+uint16_t namcos10_state::nand_data_r()
 {
 	uint16_t data = nand_read2( nand_address * 2 );
 
@@ -780,12 +780,12 @@ void namcos10_state::nand_copy( uint32_t *dst, uint32_t address, int len )
 	}
 }
 
-WRITE16_MEMBER(namcos10_state::nand_block_w)
+void namcos10_state::nand_block_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &block[offset] );
 }
 
-READ16_MEMBER(namcos10_state::nand_block_r)
+uint16_t namcos10_state::nand_block_r(offs_t offset)
 {
 	return block[ offset ];
 }

@@ -45,9 +45,6 @@ protected:
 	// configuration
 	required_device<gio64_device> m_gio64;
 	slot_type_t const m_slot_type;
-
-	DECLARE_READ32_MEMBER(timeout_r);
-	DECLARE_WRITE32_MEMBER(timeout_w);
 };
 
 DECLARE_DEVICE_TYPE(GIO64_SLOT, gio64_slot_device)

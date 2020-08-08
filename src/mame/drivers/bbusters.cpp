@@ -249,32 +249,32 @@ void bbusters_state::machine_start()
 	bbusters_state_base::machine_start();
 }
 
-WRITE8_MEMBER(bbusters_state_base::sound_cpu_w)
+void bbusters_state_base::sound_cpu_w(uint8_t data)
 {
 	m_soundlatch[0]->write(data&0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
-READ16_MEMBER(bbusters_state::eprom_r)
+uint16_t bbusters_state::eprom_r(offs_t offset)
 {
 	return (m_eprom_data[offset]&0xff) | 0xff00;
 }
 
-WRITE16_MEMBER(bbusters_state::three_gun_output_w)
+void bbusters_state::three_gun_output_w(uint16_t data)
 {
 	for (int i = 0; i < 3; i++)
 		m_gun_recoil[i] = BIT(data, i);
 }
 
 template<int Layer>
-WRITE16_MEMBER(bbusters_state_base::pf_w)
+void bbusters_state_base::pf_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_data[Layer][offset]);
 	m_pf_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bbusters_state_base::coin_counter_w)
+void bbusters_state_base::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -312,13 +312,13 @@ void bbusters_state::bbusters_map(address_map &map)
 
 /*******************************************************************************/
 
-WRITE16_MEMBER(mechatt_state::two_gun_output_w)
+void mechatt_state::two_gun_output_w(uint16_t data)
 {
 	for (int i = 0; i < 2; i++)
 		m_gun_recoil[i] = BIT(data, i);
 }
 
-READ16_MEMBER(mechatt_state::mechatt_gun_r)
+uint16_t mechatt_state::mechatt_gun_r(offs_t offset)
 {
 	int x, y;
 

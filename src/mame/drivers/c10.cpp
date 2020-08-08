@@ -29,38 +29,38 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
-		, m_p_chargen(*this, "chargen")
 		, m_ram(*this, "mainram")
+		, m_vram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void c10(machine_config &config);
 
 private:
-	void c10_io(address_map &map);
-	void c10_mem(address_map &map);
-	virtual void machine_reset() override;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void machine_reset() override;
+	void machine_start() override;
+	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	required_shared_ptr<u8> m_p_videoram;
-	required_region_ptr<u8> m_p_chargen;
-	memory_passthrough_handler *m_rom_shadow_tap;
 	required_shared_ptr<u8> m_ram;
+	required_shared_ptr<u8> m_vram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
 
-void c10_state::c10_mem(address_map &map)
+void c10_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram().share("mainram");
 	map(0x8000, 0xbfff).rom().region("maincpu", 0);
 	map(0xc000, 0xf0a1).ram();
 	map(0xf0a2, 0xffff).ram().share("videoram");
 }
 
-void c10_state::c10_io(address_map &map)
+void c10_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 }
@@ -68,6 +68,10 @@ void c10_state::c10_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( c10 )
 INPUT_PORTS_END
+
+void c10_state::machine_start()
+{
+}
 
 void c10_state::machine_reset()
 {
@@ -111,7 +115,7 @@ uint32_t c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_p_videoram[xx++];
+					chr = m_vram[xx++];
 
 				//  /* Take care of flashing characters */
 				//  if ((chr < 0x80) && (framecnt & 0x08))
@@ -139,7 +143,7 @@ uint32_t c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 /* F4 Character Displayer */
-static const gfx_layout c10_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 9,                   /* 8 x 9 characters */
 	512,                    /* 512 characters */
@@ -153,7 +157,7 @@ static const gfx_layout c10_charlayout =
 };
 
 static GFXDECODE_START( gfx_c10 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -161,8 +165,8 @@ void c10_state::c10(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c10_state::c10_mem);
-	m_maincpu->set_addrmap(AS_IO, &c10_state::c10_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c10_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &c10_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

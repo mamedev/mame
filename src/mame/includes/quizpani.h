@@ -32,9 +32,9 @@ public:
 	int m_bgbank;
 	int m_txtbank;
 
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(txt_videoram_w);
-	DECLARE_WRITE16_MEMBER(tilesbank_w);
+	void bg_videoram_w(offs_t offset, uint16_t data);
+	void txt_videoram_w(offs_t offset, uint16_t data);
+	void tilesbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(bg_tile_info);

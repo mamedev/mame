@@ -38,7 +38,7 @@ protected:
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(flash_rate);
-	DECLARE_WRITE8_MEMBER(colour_reg_w);
+	void colour_reg_w(uint8_t data);
 
 	required_device<screen_device> m_screen;
 	required_device<ef9365_device> m_gdp;

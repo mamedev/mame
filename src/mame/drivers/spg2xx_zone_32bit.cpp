@@ -16,6 +16,7 @@ public:
 	{ }
 
 	void zon32bit(machine_config& config);
+	void zon32bit_bat(machine_config& config);
 
 	void mem_map_zon32bit(address_map &map);
 
@@ -36,6 +37,8 @@ protected:
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
+	uint16_t an3_r();
+
 	int m_porta_dat;
 	int m_portb_dat;
 	int m_portc_dat;
@@ -45,6 +48,18 @@ protected:
 
 	int m_basebank;
 };
+
+class mywicogt_state : public zon32bit_state
+{
+public:
+	mywicogt_state(const machine_config& mconfig, device_type type, const char* tag) :
+		zon32bit_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
 
 class mywicodx_state : public zon32bit_state
 {
@@ -67,9 +82,7 @@ public:
 	{ }
 
 	void init_oplayer();
-
 	void init_m505neo();
-
 
 protected:
 	virtual uint16_t porta_r() override;
@@ -85,6 +98,7 @@ public:
 	{ }
 
 	void init_denver();
+	void init_m521neo();
 
 protected:
 	virtual void machine_reset() override;
@@ -95,6 +109,15 @@ protected:
 
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
+
+uint16_t zon32bit_state::an3_r()
+{
+	int status = ioport("BATT")->read();
+	if (status)
+		return 0xfff;
+	else
+		return 0x000;
+}
 
 void zon32bit_state::device_post_load()
 {
@@ -139,6 +162,52 @@ void zon32bit_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		logerror("bank is now %d\n", m_basebank);
 		m_maincpu->invalidate_cache();
 	}
+}
+
+
+void mywicogt_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (1)
+		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+//[:] ':maincpu' (000508): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x  
+//[:] ':maincpu' (000510): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x  
+//[:] ':maincpu' (000518): porta_w 0f00 (0f00) x x x x | 1 1 1 1 | x x x x | x x x x  
+
+	if (m_maincpu->pc() < 0x1000)
+	{
+		if (data == 0x0f00)
+		{
+			m_basebank = 1;
+			m_maincpu->invalidate_cache();
+			logerror("changing to bank 1\n");
+
+		}
+		else if (data == 0x0b00)
+		{
+			m_basebank = 0;
+			m_maincpu->invalidate_cache();
+			logerror("changing to bank 0\n");
+		}
+	}
+	
+	m_porta_dat = data;
 }
 
 
@@ -691,6 +760,11 @@ static INPUT_PORTS_START( oplayer )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("BATT")
+	PORT_CONFNAME( 0x0001,  0x0001, "Battery Status" )
+	PORT_CONFSETTING(       0x0000, "Low" )
+	PORT_CONFSETTING(       0x0001, "High" )
 INPUT_PORTS_END
 
 
@@ -710,6 +784,12 @@ void zon32bit_state::zon32bit(machine_config &config)
 	m_maincpu->portc_out().set(FUNC(zon32bit_state::portc_w));
 }
 
+void zon32bit_state::zon32bit_bat(machine_config& config)
+{
+	zon32bit(config);
+	m_maincpu->adc_in<3>().set(FUNC(zon32bit_state::an3_r));
+}
+
 ROM_START( mywicodx )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	// the first bank contains the Mi Guitar game, the 2nd half of the ROM is where the Menu starts
@@ -720,6 +800,14 @@ ROM_END
 ROM_START( zon32bit )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // probably should just swap upper 2 line of ROM, as pinout was unknown
 	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000000, 0x0800000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+ROM_END
+
+ROM_START( mywicogt )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mywicoguitar.bin", 0x0000000, 0x0800000, CRC(3c037c50) SHA1(3b9a28fb643c9f90563d653be0f38eba09c26f26) )
 	ROM_CONTINUE(0x1000000, 0x0800000)
 	ROM_CONTINUE(0x0800000, 0x0800000)
 	ROM_CONTINUE(0x1800000, 0x0800000)
@@ -788,6 +876,29 @@ ROM_START( m505neo )
 	ROM_IGNORE(0x4000000)
 ROM_END
 
+ROM_START( m521neo )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?
+	ROM_LOAD16_WORD_SWAP( "6gu-1cd-a.u2", 0x0000000, 0x800000, CRC(7cb31b4c) SHA1(8de44756747a292c5d39bd491048d6fac4219953) )
+	ROM_CONTINUE(0x01000000, 0x800000)
+	ROM_CONTINUE(0x00800000, 0x800000)
+	ROM_CONTINUE(0x01800000, 0x800000)
+
+	ROM_CONTINUE(0x02000000, 0x800000)
+	ROM_CONTINUE(0x03000000, 0x800000)
+	ROM_CONTINUE(0x02800000, 0x800000)
+	ROM_CONTINUE(0x03800000, 0x800000)
+
+	ROM_CONTINUE(0x04000000, 0x800000)
+	ROM_CONTINUE(0x05000000, 0x800000)
+	ROM_CONTINUE(0x04800000, 0x800000)
+	ROM_CONTINUE(0x05800000, 0x800000)
+
+	ROM_CONTINUE(0x06000000, 0x800000)
+	ROM_CONTINUE(0x07000000, 0x800000)
+	ROM_CONTINUE(0x06800000, 0x800000)
+	ROM_CONTINUE(0x07800000, 0x800000)
+ROM_END
+
 
 void oplayer_100in1_state::init_oplayer()
 {
@@ -839,16 +950,16 @@ void oplayer_100in1_state::init_m505neo()
 		ROM[i] = bitswap<16>(ROM[i],
 									 11,  3,   10,  2,
 									 9,  1,  8,  0,
-			
+
 									 4, 12, 5, 13,
-									 6, 14,  7,  15		
+									 6, 14,  7,  15
 			);
 
 	}
 
 	// TODO: remove these hacks
 	// port a checks when starting the system
-	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot		
+	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank
 }
 
 
@@ -858,20 +969,21 @@ void denver_200in1_state::init_denver()
 
 	// patch checks when booting each bank, similar to oplayer
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	rom[0x175f7 + (0x0000000 / 2)] = 0xf165;
-	rom[0x18f47 + (0x1000000 / 2)] = 0xf165;
-	rom[0x33488 + (0x2000000 / 2)] = 0xf165;
-	rom[0x87f81 + (0x3000000 / 2)] = 0xf165;
-	rom[0x764d9 + (0x4000000 / 2)] = 0xf165;
-	rom[0xb454e + (0x5000000 / 2)] = 0xf165;
-	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot
-	rom[0x1fb00 + (0x7000000 / 2)] = 0xf165;
-
-	// no exit patches required?
+	//rom[0x175f7 + (0x0000000 / 2)] = 0xf165;
+	//rom[0x18f47 + (0x1000000 / 2)] = 0xf165;
+	//rom[0x33488 + (0x2000000 / 2)] = 0xf165;
+	//rom[0x87f81 + (0x3000000 / 2)] = 0xf165;
+	//rom[0x764d9 + (0x4000000 / 2)] = 0xf165;
+	//rom[0xb454e + (0x5000000 / 2)] = 0xf165;
+	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot main bank
+	//rom[0x1fb00 + (0x7000000 / 2)] = 0xf165;
 }
 
-
-
+void denver_200in1_state::init_m521neo()
+{
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x43c30 + (0x6000000 / 2)] = 0xf165; // boot main bank
+}
 
 
 
@@ -882,10 +994,15 @@ CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,   
 // The Mi Guitar menu contains 24 games, but they're dupes, and just counting those would exclude the other Mi Fit and Mi Papacon menus (which also contain dupes)
 CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// issues with 'low battery' always showing, but otherwise functional
-CONS( 200?, oplayer,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicogt,  0, 0, zon32bit, zon32bit, mywicogt_state,  empty_init,      "<unknown>",                                   "My Wico Guitar", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2012, m505neo,   0, 0, zon32bit, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// issues with 'low battery' always showing, but otherwise functional
+CONS( 200?, oplayer,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2012, m505neo,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_m505neo, "Millennium 2000 GmbH", "Millennium M505 Arcade Neo Portable Spielkonsole (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// a version of this exists with the 'newer' style title screen seen in m505neo
+CONS( 2012, m521neo,   0, 0, zon32bit_bat, oplayer, denver_200in1_state,  init_m521neo, "Millennium 2000 GmbH", "Millennium M521 Arcade Neo 2.0 (Family Sport 220-in-1) ", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /*
 DENVER(r)
@@ -904,6 +1021,6 @@ DENMARK
 
 */
 
-CONS( 200?, dnv200fs,   0, 0, zon32bit, oplayer, denver_200in1_state, init_denver, "Denver", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, dnv200fs,   0, 0, zon32bit_bat, oplayer, denver_200in1_state, init_denver, "Denver", "Denver (GMP-270CMK2) (Family Sport 200-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 

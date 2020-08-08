@@ -110,7 +110,7 @@ INTERRUPT_GEN_MEMBER(victory_state::vblank_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::paletteram_w)
+void victory_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset & 0x3f] = ((offset & 0x80) << 1) | data;
 }
@@ -136,7 +136,7 @@ void victory_state::set_palette()
  *
  *************************************/
 
-READ8_MEMBER(victory_state::video_control_r)
+uint8_t victory_state::video_control_r(offs_t offset)
 {
 	int result = 0;
 
@@ -202,7 +202,7 @@ READ8_MEMBER(victory_state::video_control_r)
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::video_control_w)
+void victory_state::video_control_w(offs_t offset, uint8_t data)
 {
 	struct micro_t &micro = m_micro;
 	switch (offset)

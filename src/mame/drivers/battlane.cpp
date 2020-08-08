@@ -27,7 +27,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
+void battlane_state::battlane_cpu_command_w(uint8_t data)
 {
 	m_cpu_control = data;
 

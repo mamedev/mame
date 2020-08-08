@@ -33,7 +33,7 @@
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(otheric_lib)
+// moved to net_lib.h
 
 #endif
 

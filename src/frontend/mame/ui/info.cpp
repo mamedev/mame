@@ -104,6 +104,17 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 			local_ports.append(device, sink);
 	}
 
+	// suppress "requires external artwork" warning when external artwork was loaded
+	if (config.root_device().has_running_machine())
+	{
+		for (render_target *target = config.root_device().machine().render().first_target(); target != nullptr; target = target->next())
+			if (!target->hidden() && target->external_artwork())
+			{
+				m_flags &= ~::machine_flags::REQUIRES_ARTWORK;
+				break;
+			}
+	}
+
 	// unemulated trumps imperfect when aggregating (always be pessimistic)
 	m_imperfect_features &= ~m_unemulated_features;
 
@@ -136,7 +147,7 @@ rgb_t machine_static_info::status_color() const
 {
 	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
 		return UI_RED_COLOR;
-	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
+	else if ((machine_flags() & MACHINE_WARNINGS & ~::machine_flags::REQUIRES_ARTWORK) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
 	else
 		return UI_GREEN_COLOR;
@@ -238,11 +249,11 @@ std::string machine_info::warnings_string() const
 	// add one line per machine warning flag
 	if (machine_flags() & ::machine_flags::NO_COCKTAIL)
 		buf << _("Screen flipping in cocktail mode is not supported.\n");
-	if (machine_flags() & ::machine_flags::REQUIRES_ARTWORK) // check if external artwork is present before displaying this warning?
+	if (machine_flags() & ::machine_flags::REQUIRES_ARTWORK)
 		buf << _("This machine requires external artwork files.\n");
-	if (machine_flags() & ::machine_flags::IS_INCOMPLETE )
+	if (machine_flags() & ::machine_flags::IS_INCOMPLETE)
 		buf << _("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
-	if (machine_flags() & ::machine_flags::NO_SOUND_HW )
+	if (machine_flags() & ::machine_flags::NO_SOUND_HW)
 		buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
 
 	// these are more severe warnings
@@ -281,10 +292,6 @@ std::string machine_info::warnings_string() const
 		if (foundworking)
 			buf << '\n';
 	}
-
-	// add the 'press OK' string
-	if (!buf.str().empty())
-		buf << _("\n\nPress any key to continue");
 
 	return buf.str();
 }
@@ -440,9 +447,8 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
 
 
 /*-------------------------------------------------
-  menu_game_info - handle the game information
-  menu
- -------------------------------------------------*/
+  menu_game_info - handle the game information menu
+-------------------------------------------------*/
 
 menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
@@ -466,9 +472,33 @@ void menu_game_info::handle()
 
 
 /*-------------------------------------------------
-  menu_image_info - handle the image information
-  menu
- -------------------------------------------------*/
+  menu_warn_info - handle the emulation warnings menu
+-------------------------------------------------*/
+
+menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+{
+}
+
+menu_warn_info::~menu_warn_info()
+{
+}
+
+void menu_warn_info::populate(float &customtop, float &custombottom)
+{
+	std::string tempstring = ui().machine_info().warnings_string();
+	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+}
+
+void menu_warn_info::handle()
+{
+	// process the menu
+	process(0);
+}
+
+
+/*-------------------------------------------------
+  menu_image_info - handle the image information menu
+-------------------------------------------------*/
 
 menu_image_info::menu_image_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {

@@ -47,7 +47,7 @@ inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
  *
  *************************************/
 
-READ16_MEMBER(lethalj_state::lethalj_gun_r)
+uint16_t lethalj_state::lethalj_gun_r(offs_t offset)
 {
 	uint16_t result = 0;
 	int beamx, beamy;
@@ -156,7 +156,7 @@ void lethalj_state::do_blit()
 }
 
 
-WRITE16_MEMBER(lethalj_state::blitter_w)
+void lethalj_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* combine the data */
 	COMBINE_DATA(&m_blitter_data[offset]);

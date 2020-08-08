@@ -219,7 +219,7 @@ void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	}
 }
 
-WRITE16_MEMBER(m90_state::m90_video_w)
+void m90_state::m90_video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 
@@ -235,7 +235,7 @@ WRITE16_MEMBER(m90_state::m90_video_w)
 	}
 }
 
-WRITE16_MEMBER(m90_state::bootleg_video_w)
+void m90_state::bootleg_video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 

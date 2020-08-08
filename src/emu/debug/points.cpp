@@ -379,9 +379,9 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 							   data,
 							   address);
 
-		if (debug.cpu().live_cpu() == &m_space.device())
+		if (debug.cpu().live_cpu() == &m_debugInterface->device())
 		{
-			offs_t pc = m_space.device().state().pcbase();
+			offs_t pc = m_debugInterface->device().state().pcbase();
 			debug.console().printf("%s (PC=%X)\n", buffer, pc);
 			m_debugInterface->compute_debug_flags();
 		}
@@ -389,7 +389,7 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 		{
 			debug.console().printf("%s\n", buffer);
 			debug.cpu().set_execution_running();
-			debug.cpu().set_break_cpu(&m_space.device());
+			debug.cpu().set_break_cpu(&m_debugInterface->device());
 		}
 		m_debugInterface->set_triggered_watchpoint(this);
 	}

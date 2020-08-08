@@ -373,7 +373,7 @@ void hyperspt_state::hypersptb(machine_config &config)
 	hyperspt(config);
 	config.device_remove("vlm");
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::soundb_map, tag(), this));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hyperspt_state::soundb_map);
 
 	M6802(config, "adpcm", XTAL(14'318'181)/8)  /* unknown clock */
 		.set_addrmap(AS_PROGRAM, &hyperspt_state::hyprolyb_adpcm_map);
@@ -392,13 +392,21 @@ void hyperspt_state::roadf(machine_config &config)
 {
 	hyperspt(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::roadf_map, tag(), this));
-	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::roadf_sound_map, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyperspt_state::roadf_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hyperspt_state::roadf_sound_map);
 	m_gfxdecode->set_info(gfx_roadf);
 
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
 	config.device_remove("vlm");
+}
+
+void hyperspt_state::roadfu(machine_config &config)
+{
+	roadf(config);
+
+	MC6809E(config.replace(), m_maincpu, XTAL(18'432'000)/12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyperspt_state::roadf_map);
 }
 
 
@@ -589,14 +597,39 @@ ROM_START( roadf2 )
 	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) )
 ROM_END
 
-ROM_START( roadf3 ) // This hack was found on an original GX330 (Hyper Sports) PCB. If has some ROMs of different sizes, with small changes.
+ROM_START( roadfu ) // GX461 PCB, unencrypted
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "461_k02.g7",   0x4000, 0x4000, CRC(7db4b175) SHA1(6741b383161b2bfd5f177575f08df681f2aa1c63) )
+	ROM_LOAD( "461_k04.g11",  0x8000, 0x4000, CRC(dda627e9) SHA1(93863e42a18b86192e4fb8fe0c6e03df62d06f00) )
+	ROM_LOAD( "461_k06.g15",  0xc000, 0x4000, CRC(91c1788b) SHA1(2ccb084cd751a605d551e0c83b223ff3c887dc9d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "461_d10.a17",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "j19_e14.bin",  0x00000, 0x4000, CRC(16d2bcff) SHA1(37c63faaaca43909bfb1e2ccb370efe4b276d8a9) )
+	ROM_LOAD( "g19_e18.bin",  0x04000, 0x4000, CRC(490685ff) SHA1(5ca0aa3771d60688671aae196f10f9feecb15106) )
+
+	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_LOAD( "a14_e26.bin",  0x00000, 0x4000, CRC(f5c738e2) SHA1(9f10be775791dee9801b1167f838a9110084842d) )
+	ROM_LOAD( "a12_d24.bin",  0x04000, 0x2000, CRC(2d82c930) SHA1(fea26c00ad3acb1f44a5fdc79a7dd8ddce17d317) )
+	ROM_LOAD( "c14_e22.bin",  0x06000, 0x4000, CRC(fbcfbeb9) SHA1(e5a938fc2fe2378d836dfe8ba516994cd5cf0bb5) )
+	ROM_LOAD( "c12_d20.bin",  0x0a000, 0x2000, CRC(5e0cf994) SHA1(c81274d809c685ccf24108f56a4fa54146d4f493) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "c03_c27.bin",  0x0000, 0x0020, CRC(45d5e352) SHA1(0f4d358aaffcb68193247090e82f093752730518) )
+	ROM_LOAD( "j12_c28.bin",  0x0020, 0x0100, CRC(2955e01f) SHA1(b0652d177a45571edc5978143d4023e7b173b383) )
+	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) )
+ROM_END
+
+ROM_START( roadfh ) // This hack was found on an original GX330 (Hyper Sports) PCB. If has some ROMs of different sizes, with small changes.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1-2.g7",  0x4000, 0x4000, CRC(93b168f2) SHA1(da1fa5c171ded4add188b2a146ebcbc73336a1e7) ) // identical to g05_g01.bin + g07_f02.bin
 	ROM_LOAD( "3-4.g11", 0x8000, 0x4000, CRC(b9ba77f0) SHA1(7f4f7d2c9e0f946a36e2979b966bd5ba1578eefd) ) // almost identical to g09_g03.bin + g11_f04.bin
 	ROM_LOAD( "5-6.g15", 0xc000, 0x4000, CRC(91c1788b) SHA1(2ccb084cd751a605d551e0c83b223ff3c887dc9d) ) // almost identical to g13_f05.bin + g15_f06.bin
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound7.a9",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) ) // identical to a17_d10.bin
+	ROM_LOAD( "suond7.a9",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) ) // yes: "SUOND", identical to a17_d10.bin
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "j19.bin",  0x00000, 0x2000, CRC(5eeb0283) SHA1(67e3a079e091a41e10be7c8584d7069455780a24) ) // j19.bin + j18.bin identical to j19_e14.bin
@@ -623,4 +656,5 @@ GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, empty_init
 GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, empty_init, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, roadf,     0,        roadf,     roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, roadf2,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf3,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "hack",    "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadfu,    roadf,    roadfu,    roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 3, unencrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadfh,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "bootleg", "Road Fighter (bootleg GX330 conversion)", MACHINE_SUPPORTS_SAVE ) // GX330 = Hyper Sports

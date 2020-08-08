@@ -7,7 +7,12 @@
     This component implements the custom video controller and interface chip
     from the TI-99/2 console.
 
+    Also, we emulate the expansion port at the backside of the console; there
+    are no known expansions except for a RAM expansion that is mentioned
+    in the specifications.
+
     May 2018
+    June 2020
 
 ***************************************************************************/
 
@@ -20,8 +25,9 @@
 #define LOG_HEXBUS      (1U<<4)     // Hexbus logging
 #define LOG_BANK        (1U<<5)     // Change ROM banks
 #define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
+#define LOG_EXPRAM      (1U<<7)   // Expansion RAM
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
 
@@ -128,6 +134,8 @@ DEFINE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device, "vide
 DEFINE_DEVICE_TYPE_NS(IO99224, bus::ti99::internal, io992_24_device, "io992_24", "TI-99/2 I/O controller 24K version")
 DEFINE_DEVICE_TYPE_NS(IO99232, bus::ti99::internal, io992_32_device, "io992_32", "TI-99/2 I/O controller 32K version")
 
+DEFINE_DEVICE_TYPE_NS(TI992_EXPPORT, bus::ti99::internal, ti992_expport_device, "ti992_expport", "TI-99/2 Expansion Port")
+DEFINE_DEVICE_TYPE_NS(TI992_RAM32K, bus::ti99::internal, ti992_expram_device, "ti992_ram32k", "TI-99/2 RAM Expansion 32K")
 
 namespace bus { namespace ti99 { namespace internal {
 
@@ -344,15 +352,13 @@ void video992_device::device_reset()
     E80E: Cassette
 
     [3] I/O Controller CF40051, Preliminary specification, Texas Instruments
-
-    TODO: Loading still unstable; often failing
 */
 
 io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: bus::hexbus::hexbus_chained_device(mconfig, type, tag, owner, clock),
-		m_hexbus(*this, "^" TI_HEXBUS_TAG),
-		m_cassette(*this, "^" TI_CASSETTE),
-		m_videoctrl(*this, "^" TI992_VDC_TAG),
+		m_hexbus(*owner, TI992_HEXBUS_TAG),
+		m_cassette(*owner, TI992_CASSETTE),
+		m_videoctrl(*owner, TI992_VDC_TAG),
 		m_keyboard(*this, "LINE%u", 0U),
 		m_set_rom_bank(*this),
 		m_key_row(0),
@@ -598,6 +604,82 @@ ioport_constructor io992_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keys992 );
 }
 
+/********************************************************************
+    Expansion port
+********************************************************************/
+
+ti992_expport_device::ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	:   device_t(mconfig, TI992_EXPPORT, tag, owner, clock),
+		device_slot_interface(mconfig, *this),
+		m_connected(nullptr)
+{
+}
+
+void ti992_expport_device::readz(offs_t offset, uint8_t *value)
+{
+	if (m_connected != nullptr)
+		m_connected->readz(offset, value);
+}
+
+void ti992_expport_device::write(offs_t offset, uint8_t data)
+{
+	if (m_connected != nullptr)
+		m_connected->write(offset, data);
+}
+
+void ti992_expport_device::device_config_complete()
+{
+	m_connected = static_cast<ti992_expport_attached_device*>(subdevices().first());
+}
+
+/*
+    32K Expansion cartridge
+    Maps at 6000 - DFFF
+    This is the only known expansion device
+*/
+ti992_expram_device::ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ti992_expport_attached_device(mconfig, TI992_RAM32K, tag, owner, clock),
+	m_ram(*this, "ram32k")
+{
+}
+
+void ti992_expram_device::readz(offs_t offset, uint8_t *value)
+{
+	// 000 -> 100     100 -> 000
+	// 001 -> 101     101 -> 001
+	// 010 -> 110     110 -> 010
+	// 011 -> 011     111 -> 111
+	offs_t address = offset;
+	if ((offset & 0x6000) != 0x6000) address ^= 0x8000;
+	if ((address & 0x8000)==0)
+	{
+		*value = m_ram->read(address);
+		LOGMASKED(LOG_EXPRAM, "expram %04x -> %02x\n", offset, *value);
+	}
+}
+
+void ti992_expram_device::write(offs_t offset, uint8_t value)
+{
+	offs_t address = offset;
+	if ((offset & 0x6000) != 0x6000) address ^= 0x8000;
+	if ((address & 0x8000)==0)
+	{
+		m_ram->write(address, value);
+		LOGMASKED(LOG_EXPRAM, "expram %04x <- %02x\n", offset, value);
+	}
+}
+
+void ti992_expram_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("32k");
+	m_ram->set_default_value(0);
+}
+
 }   }   }
 
+void ti992_expport_options(device_slot_interface &device)
+{
+	device.option_add("ram32k", TI992_RAM32K);
+}
 

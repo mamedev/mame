@@ -22,6 +22,33 @@
 
 /* FIXME: games commented out complain about being a clone of a game not in the driver */
 
+@source:cinemat.cpp
+armora                          // (c) 1980
+armorap                         // (c) 1980
+armorar                         // (c) 1980 Cinematronics (Rock-ola license)
+barrier                         // (c) 1979 Vectorbeam
+boxingb                         // (c) 1981
+demon                           // (c) 1982 Rock-ola
+qb3                             // (c) 1982 Rock-ola - prototype
+ripoff                          // (c) 1980
+solarq                          // (c) 1981
+spaceftr                        // (c) 1981 Zaccaria
+spaceshp                        // (c) 1978 Cinematronics (Sega licence)
+spacewar                        // (c) 1977
+speedfrk                        // (c) 1979 Vectorbeam
+starcas                         // (c) 1980
+starcas1                        // (c) 1980
+starcasc                        // (c) 1980
+starcase                        // (c) 1980 Cinematronics (Mottoeis license)
+starcasp                        // (c) 1980 prototype
+starhawk                        // (c) 1979
+stellcas                        // bootleg
+sundance                        // (c) 1979
+tailg                           // (c) 1979
+warrior                         // (c) 1979 Vectorbeam
+wotw                            // (c) 1981
+wotwc                           // (c) 1981
+
 @source:galaxian.cpp
 600                             // GX353 (c) 1981 Konami
 amidar                          // GX337 (c) 1982 Konami
@@ -278,6 +305,7 @@ masao                           // bootleg
 @source:mw8080bw.cpp
 gunfight                        // 597 [1975] Dave Nutting Associates / Midway
 gunfighto                       // 597 [1975] Dave Nutting Associates / Midway
+280zzzap                        // 610 [1976] Dave Nutting Associates / Midway
 
 @source:palestra.cpp
 palestra

@@ -46,14 +46,15 @@ Fathom (Imagic)
 
 NOTE:
 PAL colours leave a lot to be desired
-Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS microprocessor, which gave the G7000 extra CPU and memory.
-The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.574 MHz,
-adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
+The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 -->
+
 <softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
+
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
 
 <!-- Applications -->
+
 	<software name="compprog">
 		<description>Computer Programmer (Euro)</description>
 		<year>1980</year>
@@ -112,7 +113,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="serial" value="31"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="musician (europe).bin" size="4096" crc="afb23f89" sha1="7445f4df9017c4d2ea94542d0db335dc18c9d7ed" offset="0" />
 			</dataarea>
@@ -133,7 +134,10 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+
 <!-- Educational -->
+
 	<software name="number">
 		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
 		<year>1980</year>
@@ -263,14 +267,17 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+
 <!-- Games -->
+
 	<software name="4in1">
 		<description>4 in 1 Row (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="40"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="4 in 1 row (europe).bin" size="4096" crc="3bfef56b" sha1="e9a8996c4fb87120d8620ab8876b90ddb48335db" offset="0" />
 			</dataarea>
@@ -282,7 +289,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1982</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="4 en 1 ligne (france).bin" size="4096" crc="9b5e9356" sha1="0831c3212a9e0a588a242dcd2b136e350aaceac9" offset="0" />
 			</dataarea>
@@ -363,6 +370,20 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="attack of the timelord (usa).bin" size="4096" crc="fc5a7f08" sha1="c63ad4e9aaa903ded9fcf185caf24e76f8aaf3a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamm" supported="partial">
+		<description>Backgammon (Euro)</description>
+		<year>1983</year>
+		<publisher>GST Video</publisher>
+		<info name="programmer" value="Mick Rouse"/>
+		<info name="serial" value="48"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -522,15 +543,16 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="chess" supported="no"><!-- needs chess module emulation -->
-		<description>Chess (Euro)</description>
-		<year>198?</year>
+	<software name="chess">
+		<description>Chess Module (Euro)</description>
+		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="G7010"/>
+		<info name="serial" value="C7010"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
-			<dataarea name="rom" size="2048">
-				<rom name="chess (europe).bin" size="2048" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0" />
+			<dataarea name="rom" size="0x2800">
+				<rom name="z80_c7010.bin" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" offset="0" />
+				<rom name="vp_c7010.bin" size="0x800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -688,7 +710,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2dpthmrk" supported="partial">
+	<software name="2dpthmrk">
 		<description>Depth Charge/Marksman (Euro)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
@@ -1794,7 +1816,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-<!-- NTSC Cartidge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
+	<!-- NTSC Cartridge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
 	<software name="deathrac">
 		<description>Death Race (USA)</description>
 		<year>2014</year>
@@ -1899,4 +1921,5 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

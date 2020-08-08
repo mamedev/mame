@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb, Ryan Holtz
 /***************************************************************************
 
-    rgbsse.c
+    rgbsse.cpp
 
     SSE optimized RGB utilities.
 

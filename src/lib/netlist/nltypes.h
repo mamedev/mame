@@ -13,19 +13,100 @@
 #define NLTYPES_H_
 
 #include "nl_config.h"
-#include "plib/pchrono.h"
-#include "plib/pdynlib.h"
-#include "plib/pfmtlog.h"
+
 #include "plib/pmempool.h"
-#include "plib/pstate.h"
+#include "plib/ppmf.h"
 #include "plib/pstring.h"
 #include "plib/ptime.h"
-#include "plib/putil.h"
+#include "plib/ptypes.h"
 
-#include <unordered_map>
+#include <memory>
+
+// FIXME: Move to ptypes
+namespace plib
+{
+	// FORWARD declarations
+	template <typename BASEARENA, std::size_t MINALIGN>
+	class mempool_arena;
+
+	struct aligned_arena;
+	class dynlib_base;
+
+	template<class T, bool debug_enabled>
+	class plog_base;
+
+	struct plog_level;
+} // namespace plib
 
 namespace netlist
 {
+	// -----------------------------------------------------------------------------
+	// forward definitions
+	// -----------------------------------------------------------------------------
+
+	class logic_output_t;
+	class tristate_output_t;
+	class logic_input_t;
+	class analog_net_t;
+	class logic_net_t;
+	class setup_t;
+	class nlparse_t;
+	class netlist_t;
+	class netlist_state_t;
+	class core_device_t;
+	class device_t;
+	class netlist_state_t;
+	class param_t;
+	class logic_family_desc_t;
+	class terminal_t;
+
+	class models_t;
+
+	namespace devices
+	{
+		class nld_solver;
+		class nld_mainclock;
+		class nld_base_proxy;
+		class nld_base_d_to_a_proxy;
+		class nld_base_a_to_d_proxy;
+		class nld_netlistparams;
+	} // namespace devices
+
+	namespace solver
+	{
+		class matrix_solver_t;
+	} // namespace solver
+
+	namespace detail
+	{
+		struct abstract_t;
+		class core_terminal_t;
+		class net_t;
+		class device_object_t;
+	} // namespace detail
+
+	namespace factory
+	{
+		class list_t;
+		class element_t;
+		struct properties;
+	} // namespace factory
+
+	template <class CX>
+	class delegator_t : public CX
+	{
+	protected:
+		using base_type = delegator_t<CX>;
+		using delegated_type = CX;
+		using delegated_type::delegated_type;
+	};
+
+} // namespace netlist
+
+
+namespace netlist
+{
+
 	/// \brief Constants and const calculations for the library
 	///
 	template<typename T>
@@ -73,6 +154,16 @@ namespace netlist
 	///
 	using netlist_sig_t = std::uint32_t;
 
+	/// \brief The memory pool for netlist objects
+	///
+	/// \note This is not the right location yet.
+	///
+
+	using device_arena = std::conditional_t<config::use_mempool::value,
+		plib::mempool_arena<plib::aligned_arena, NL_MEMPOOL_ALIGN>,
+		plib::aligned_arena>;
+	using host_arena   = plib::aligned_arena;
+
 	/// \brief Interface definition for netlist callbacks into calling code
 	///
 	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
@@ -99,7 +190,7 @@ namespace netlist
 		/// of a callbacks_t implementation to optionally provide such a collection
 		/// of symbols.
 		///
-		virtual plib::unique_ptr<plib::dynlib_base> static_solver_lib() const;
+		virtual std::unique_ptr<plib::dynlib_base> static_solver_lib() const;
 	};
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
@@ -108,27 +199,21 @@ namespace netlist
 	//  Types needed by various includes
 	//============================================================
 
-	/// \brief The memory pool for netlist objects
+	/// \brief Timestep type.
 	///
-	/// \note This is not the right location yet.
+	/// May be either FORWARD or RESTORE
 	///
+	enum class timestep_type
+	{
+		FORWARD,  ///< forward time
+		RESTORE   ///< restore state before last forward
+	};
 
-#if (NL_USE_MEMPOOL)
-	using nlmempool = plib::mempool_arena;
-#else
-	using nlmempool = plib::aligned_arena;
-#endif
-
-	/// \brief Owned pointer type for pooled allocations.
+	/// \brief Delegate type for device notification.
 	///
-	template <typename T>
-	using owned_pool_ptr = nlmempool::owned_pool_ptr<T>;
-
-	/// \brief Unique pointer type for pooled allocations.
-	///
-
-	template <typename T>
-	using unique_pool_ptr = nlmempool::unique_pool_ptr<T>;
+	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	namespace detail {
 
@@ -142,13 +227,9 @@ namespace netlist
 
 	} // namespace detail
 
-#if (PHAS_INT128)
 	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = plib::ptime<INT128, config::INTERNAL_RES::value>;
-#else
-	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = netlist_time;
-#endif
+	using netlist_time_ext = plib::ptime<std::conditional<NL_PREFER_INT128 && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
+
 	static_assert(noexcept(netlist_time::from_nsec(1)), "Not evaluated as constexpr");
 
 	//============================================================
@@ -203,7 +284,7 @@ namespace netlist
 			}
 		};
 
-		/// \brief: used define a constant in device description struct
+		/// \brief: used to define a constant in device description struct
 		///
 		/// See the 74125 implementation
 		///
@@ -214,6 +295,32 @@ namespace netlist
 		using desc_const_t =  std::integral_constant<const T, V>;
 	};
 
+	//============================================================
+	//  Exceptions
+	//============================================================
+
+	/// \brief Generic netlist exception.
+	///  The exception is used in all events which are considered fatal.
+
+	class nl_exception : public plib::pexception
+	{
+	public:
+		/// \brief Constructor.
+		///  Allows a descriptive text to be passed to the exception
+
+		explicit nl_exception(const pstring &text //!< text to be passed
+				)
+		: plib::pexception(text) { }
+
+		/// \brief Constructor.
+		///  Allows to use \ref plib::pfmt logic to be used in exception
+
+		template<typename... Args>
+		explicit nl_exception(const pstring &fmt //!< format to be used
+			, Args&&... args //!< arguments to be passed
+			)
+		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
+	};
 
 } // namespace netlist
 

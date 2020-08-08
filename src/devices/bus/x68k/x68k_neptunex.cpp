@@ -47,14 +47,14 @@ void x68k_neptune_device::device_start()
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
-	m_slot->space().install_readwrite_handler(0xece000,0xece3ff, read16_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_r)), write16_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_w)), 0xffffffff);
+	m_slot->space().install_readwrite_handler(0xece000,0xece3ff, read16s_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_r)), write16s_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_w)), 0xffffffff);
 }
 
 void x68k_neptune_device::device_reset() {
 	memcpy(m_prom, m_dp8390->get_mac(), 6);
 }
 
-READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
+uint16_t x68k_neptune_device::x68k_neptune_port_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -62,17 +62,15 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 		return 0xffff;
 	if(offset < 0x100+16)
 	{
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return (m_dp8390->dp8390_r(offset) << 8)|
-				m_dp8390->dp8390_r(offset+1);
+		return (m_dp8390->cs_read(offset) << 8)|
+				m_dp8390->cs_read(offset+1);
 	}
 	//if(mem_mask == 0x00ff) offset++;
 	switch(offset)
 	{
 	case 0x100+16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		data = m_dp8390->dp8390_r(offset);
-		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
+		data = m_dp8390->remote_read();
+		data = swapendian_int16(data);
 		return data;
 	case 0x100+31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
@@ -83,29 +81,26 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 	return 0;
 }
 
-WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
+void x68k_neptune_device::x68k_neptune_port_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset >= 0x100+32 || offset < 0x100)
 		return;
 	if(offset < 0x100+16)
 	{
-		m_dp8390->dp8390_cs(CLEAR_LINE);
 		if(mem_mask == 0x00ff)
 		{
 			data <<= 8;
 			offset++;
 		}
-		m_dp8390->dp8390_w(offset, data>>8);
-		if(mem_mask == 0xffff) m_dp8390->dp8390_w(offset+1, data & 0xff);
+		m_dp8390->cs_write(offset, data>>8);
+		if(mem_mask == 0xffff) m_dp8390->cs_write(offset+1, data & 0xff);
 		return;
 	}
 	//if(mem_mask == 0x00ff) offset++;
 	switch(offset)
 	{
 	case 0x100+16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
-		m_dp8390->dp8390_w(offset, data);
+		m_dp8390->remote_write(swapendian_int16(data));
 		return;
 	case 0x100+31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);

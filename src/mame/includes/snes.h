@@ -420,14 +420,14 @@ protected:
 	virtual uint8_t oldjoy1_read(int latched);
 	virtual uint8_t oldjoy2_read(int latched);
 
-	DECLARE_READ8_MEMBER(snes_r_io);
-	DECLARE_WRITE8_MEMBER(snes_w_io);
-	DECLARE_READ8_MEMBER(snes_io_dma_r);
-	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
-	DECLARE_READ8_MEMBER(snes_r_bank1);
-	DECLARE_READ8_MEMBER(snes_r_bank2);
-	DECLARE_WRITE8_MEMBER(snes_w_bank1);
-	DECLARE_WRITE8_MEMBER(snes_w_bank2);
+	uint8_t snes_r_io(offs_t offset);
+	void snes_w_io(address_space &space, offs_t offset, uint8_t data);
+	uint8_t snes_io_dma_r(offs_t offset);
+	void snes_io_dma_w(offs_t offset, uint8_t data);
+	uint8_t snes_r_bank1(offs_t offset);
+	uint8_t snes_r_bank2(offs_t offset);
+	void snes_w_bank1(address_space &space, offs_t offset, uint8_t data);
+	void snes_w_bank2(offs_t offset, uint8_t data);
 	uint8_t snes_open_bus_r();
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);

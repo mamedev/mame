@@ -2,10 +2,12 @@
 // copyright-holders:Carl
 /***************************************************************************
 
-    network.c
+    network.cpp
 
     Core network functions and definitions.
+
 ***************************************************************************/
+
 #include <cctype>
 
 #include "emu.h"

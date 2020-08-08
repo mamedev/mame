@@ -49,8 +49,8 @@ private:
 	uint8_t mcu_portk_r();
 	void mcu_port_o_w(uint8_t data);
 	void mcu_port_p_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(arabian_blitter_w);
-	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
+	void arabian_blitter_w(offs_t offset, uint8_t data);
+	void arabian_videoram_w(offs_t offset, uint8_t data);
 	void ay8910_porta_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 	void arabian_palette(palette_device &palette) const;

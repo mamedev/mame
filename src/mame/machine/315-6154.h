@@ -16,8 +16,8 @@ public:
 	sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	address_space *memory() { return memory_space; }
 
-	DECLARE_READ32_MEMBER(registers_r);
-	DECLARE_WRITE32_MEMBER(registers_w);
+	u32 registers_r(offs_t offset);
+	void registers_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
 	template<int Aperture>
 	u32 aperture_r(address_space &space, offs_t offset, u32 mem_mask = 0xffffffff);
 	template<int Aperture>

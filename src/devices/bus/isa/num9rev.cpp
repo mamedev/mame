@@ -95,12 +95,12 @@ void isa8_number_9_rev_device::device_start()
 	set_isa_device();
 
 	m_isa->install_memory(0xc0000, 0xc0001, read8sm_delegate(*m_upd7220, FUNC(upd7220_device::read)), write8sm_delegate(*m_upd7220, FUNC(upd7220_device::write)));
-	m_isa->install_memory(0xc0100, 0xc03ff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::pal8_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::pal8_w)));
-	m_isa->install_memory(0xc0400, 0xc0401, read8_delegate(*this, FUNC(isa8_number_9_rev_device::bank_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::bank_w)));
-	m_isa->install_memory(0xc0500, 0xc06ff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::overlay_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::overlay_w)));
-	m_isa->install_memory(0xc0700, 0xc070f, read8_delegate(*this, FUNC(isa8_number_9_rev_device::ctrl_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::ctrl_w)));
-	m_isa->install_memory(0xc1000, 0xc3fff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::pal12_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::pal12_w)));
-	m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::read8)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::write8)));
+	m_isa->install_memory(0xc0100, 0xc03ff, read8sm_delegate(*this, FUNC(isa8_number_9_rev_device::pal8_r)), write8sm_delegate(*this, FUNC(isa8_number_9_rev_device::pal8_w)));
+	m_isa->install_memory(0xc0400, 0xc0401, read8smo_delegate(*this, FUNC(isa8_number_9_rev_device::bank_r)), write8smo_delegate(*this, FUNC(isa8_number_9_rev_device::bank_w)));
+	m_isa->install_memory(0xc0500, 0xc06ff, read8sm_delegate(*this, FUNC(isa8_number_9_rev_device::overlay_r)), write8sm_delegate(*this, FUNC(isa8_number_9_rev_device::overlay_w)));
+	m_isa->install_memory(0xc0700, 0xc070f, read8sm_delegate(*this, FUNC(isa8_number_9_rev_device::ctrl_r)), write8sm_delegate(*this, FUNC(isa8_number_9_rev_device::ctrl_w)));
+	m_isa->install_memory(0xc1000, 0xc3fff, read8sm_delegate(*this, FUNC(isa8_number_9_rev_device::pal12_r)), write8sm_delegate(*this, FUNC(isa8_number_9_rev_device::pal12_w)));
+	m_isa->install_memory(0xa0000, 0xaffff, read8sm_delegate(*this, FUNC(isa8_number_9_rev_device::read8)), write8sm_delegate(*this, FUNC(isa8_number_9_rev_device::write8)));
 }
 
 //-------------------------------------------------
@@ -114,7 +114,7 @@ void isa8_number_9_rev_device::device_reset()
 	m_1024 = false;
 }
 
-READ8_MEMBER(isa8_number_9_rev_device::read8)
+uint8_t isa8_number_9_rev_device::read8(offs_t offset)
 {
 	if((m_mode & 1) && !m_1024)
 		return m_ram[offset + ((m_mode & 0xc) << 14)];
@@ -127,7 +127,7 @@ READ8_MEMBER(isa8_number_9_rev_device::read8)
 		return m_ram[offset + (m_bank << 16)];
 }
 
-WRITE8_MEMBER(isa8_number_9_rev_device::write8)
+void isa8_number_9_rev_device::write8(offs_t offset, uint8_t data)
 {
 	if(m_1024 || ((m_mode & 6) == 0))
 		m_ram[offset + (m_bank << 16)] = data;
@@ -159,7 +159,7 @@ WRITE8_MEMBER(isa8_number_9_rev_device::write8)
 	}
 }
 
-READ8_MEMBER(isa8_number_9_rev_device::pal8_r)
+uint8_t isa8_number_9_rev_device::pal8_r(offs_t offset)
 {
 	offset += 0x100;
 	palette_t *pal = m_palette->palette();
@@ -175,7 +175,7 @@ READ8_MEMBER(isa8_number_9_rev_device::pal8_r)
 	return 0;
 }
 
-WRITE8_MEMBER(isa8_number_9_rev_device::pal8_w)
+void isa8_number_9_rev_device::pal8_w(offs_t offset, uint8_t data)
 {
 	offset += 0x100;
 	palette_t *pal = m_palette->palette();
@@ -195,7 +195,7 @@ WRITE8_MEMBER(isa8_number_9_rev_device::pal8_w)
 	pal->entry_set_color(offset, pen);
 }
 
-READ8_MEMBER(isa8_number_9_rev_device::pal12_r)
+uint8_t isa8_number_9_rev_device::pal12_r(offs_t offset)
 {
 	uint16_t color = offset & 0xfff;
 	palette_t *pal = m_palette->palette();
@@ -211,7 +211,7 @@ READ8_MEMBER(isa8_number_9_rev_device::pal12_r)
 	return 0;
 }
 
-WRITE8_MEMBER(isa8_number_9_rev_device::pal12_w)
+void isa8_number_9_rev_device::pal12_w(offs_t offset, uint8_t data)
 {
 	uint16_t color = offset & 0xfff;
 	palette_t *pal = m_palette->palette();
@@ -231,26 +231,26 @@ WRITE8_MEMBER(isa8_number_9_rev_device::pal12_w)
 	pal->entry_set_color(color, pen);
 }
 
-READ8_MEMBER(isa8_number_9_rev_device::overlay_r)
+uint8_t isa8_number_9_rev_device::overlay_r(offs_t offset)
 {
 	return m_overlay[offset + ((m_mode & 8) ? 512 : 0)];
 }
-WRITE8_MEMBER(isa8_number_9_rev_device::overlay_w)
+void isa8_number_9_rev_device::overlay_w(offs_t offset, uint8_t data)
 {
 	m_overlay[offset + ((m_mode & 8) ? 512 : 0)] = data;
 }
 
-READ8_MEMBER(isa8_number_9_rev_device::bank_r)
+uint8_t isa8_number_9_rev_device::bank_r()
 {
 	return m_bank;
 }
 
-WRITE8_MEMBER(isa8_number_9_rev_device::bank_w)
+void isa8_number_9_rev_device::bank_w(uint8_t data)
 {
 	m_bank = data & 0xf;
 }
 
-READ8_MEMBER(isa8_number_9_rev_device::ctrl_r)
+uint8_t isa8_number_9_rev_device::ctrl_r(offs_t offset)
 {
 	switch(offset & 0xf)
 	{
@@ -272,7 +272,7 @@ READ8_MEMBER(isa8_number_9_rev_device::ctrl_r)
 	return 0;
 }
 
-WRITE8_MEMBER(isa8_number_9_rev_device::ctrl_w)
+void isa8_number_9_rev_device::ctrl_w(offs_t offset, uint8_t data)
 {
 	switch(offset & 0xf)
 	{

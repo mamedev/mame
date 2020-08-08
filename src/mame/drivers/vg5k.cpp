@@ -95,13 +95,13 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER ( ef9345_offset_w );
-	DECLARE_READ8_MEMBER ( ef9345_io_r );
-	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
-	DECLARE_READ8_MEMBER ( cassette_r );
-	DECLARE_WRITE8_MEMBER ( cassette_w );
+	uint8_t printer_r();
+	void printer_w(uint8_t data);
+	void ef9345_offset_w(uint8_t data);
+	uint8_t ef9345_io_r();
+	void ef9345_io_w(uint8_t data);
+	uint8_t cassette_r();
+	void cassette_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
@@ -110,37 +110,37 @@ private:
 };
 
 
-READ8_MEMBER( vg5k_state::printer_r )
+uint8_t vg5k_state::printer_r()
 {
 	return (m_printer->is_ready() ? 0x00 : 0xff);
 }
 
 
-WRITE8_MEMBER( vg5k_state::printer_w )
+void vg5k_state::printer_w(uint8_t data)
 {
 	m_printer->output(data);
 }
 
 
-WRITE8_MEMBER ( vg5k_state::ef9345_offset_w )
+void vg5k_state::ef9345_offset_w(uint8_t data)
 {
 	m_ef9345_offset = data;
 }
 
 
-READ8_MEMBER ( vg5k_state::ef9345_io_r )
+uint8_t vg5k_state::ef9345_io_r()
 {
 	return m_ef9345->data_r(m_ef9345_offset);
 }
 
 
-WRITE8_MEMBER ( vg5k_state::ef9345_io_w )
+void vg5k_state::ef9345_io_w(uint8_t data)
 {
 	m_ef9345->data_w(m_ef9345_offset, data);
 }
 
 
-READ8_MEMBER ( vg5k_state::cassette_r )
+uint8_t vg5k_state::cassette_r()
 {
 	double level = m_cassette->input();
 
@@ -148,7 +148,7 @@ READ8_MEMBER ( vg5k_state::cassette_r )
 }
 
 
-WRITE8_MEMBER ( vg5k_state::cassette_w )
+void vg5k_state::cassette_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 3));
 

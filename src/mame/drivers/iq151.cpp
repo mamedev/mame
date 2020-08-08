@@ -91,11 +91,11 @@ private:
 	uint8_t keyboard_column_r();
 	uint8_t ppi_portc_r();
 	void ppi_portc_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER(boot_bank_w);
-	DECLARE_READ8_MEMBER(cartslot_r);
-	DECLARE_WRITE8_MEMBER(cartslot_w);
-	DECLARE_READ8_MEMBER(cartslot_io_r);
-	DECLARE_WRITE8_MEMBER(cartslot_io_w);
+	void boot_bank_w(uint8_t data);
+	uint8_t cartslot_r(offs_t offset);
+	void cartslot_w(offs_t offset, uint8_t data);
+	uint8_t cartslot_io_r(offs_t offset);
+	void cartslot_io_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -172,7 +172,7 @@ void iq151_state::ppi_portc_w(uint8_t data)
 	m_cassette_data = data;
 }
 
-WRITE8_MEMBER(iq151_state::boot_bank_w)
+void iq151_state::boot_bank_w(uint8_t data)
 {
 	m_boot_bank->set_entry(data & 1);
 }
@@ -182,7 +182,7 @@ WRITE8_MEMBER(iq151_state::boot_bank_w)
 //  Cartridge slot emulation
 //**************************************************************************
 
-READ8_MEMBER(iq151_state::cartslot_r)
+uint8_t iq151_state::cartslot_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -192,13 +192,13 @@ READ8_MEMBER(iq151_state::cartslot_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::cartslot_w)
+void iq151_state::cartslot_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_carts)
 		elem->write(offset, data);
 }
 
-READ8_MEMBER(iq151_state::cartslot_io_r)
+uint8_t iq151_state::cartslot_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -208,7 +208,7 @@ READ8_MEMBER(iq151_state::cartslot_io_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::cartslot_io_w)
+void iq151_state::cartslot_io_w(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_carts)
 		elem->io_write(offset, data);

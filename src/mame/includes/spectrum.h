@@ -140,22 +140,22 @@ protected:
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
-	DECLARE_READ8_MEMBER(pre_opcode_fetch_r);
-	DECLARE_WRITE8_MEMBER(spectrum_rom_w);
-	DECLARE_READ8_MEMBER(spectrum_rom_r);
-	DECLARE_READ8_MEMBER(spectrum_data_r);
-	DECLARE_WRITE8_MEMBER(spectrum_data_w);
+	uint8_t pre_opcode_fetch_r(offs_t offset);
+	void spectrum_rom_w(offs_t offset, uint8_t data);
+	uint8_t spectrum_rom_r(offs_t offset);
+	uint8_t spectrum_data_r(offs_t offset);
+	void spectrum_data_w(offs_t offset, uint8_t data);
 
-	void spectrum_port_fe_w(uint8_t data);
-	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
-	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
-	DECLARE_READ8_MEMBER(spectrum_clone_port_ula_r);
+	void spectrum_port_fe_w(offs_t offset, uint8_t data);
+	uint8_t spectrum_port_fe_r(offs_t offset);
+	uint8_t spectrum_port_ula_r(offs_t offset);
+	uint8_t spectrum_clone_port_ula_r();
 
-	DECLARE_READ8_MEMBER(spectrum_128_pre_opcode_fetch_r);
-	DECLARE_WRITE8_MEMBER(spectrum_128_bank1_w);
-	DECLARE_READ8_MEMBER(spectrum_128_bank1_r);
-	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
-	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
+	uint8_t spectrum_128_pre_opcode_fetch_r(offs_t offset);
+	void spectrum_128_bank1_w(offs_t offset, uint8_t data);
+	uint8_t spectrum_128_bank1_r(offs_t offset);
+	void spectrum_128_port_7ffd_w(offs_t offset, uint8_t data);
+	uint8_t spectrum_128_ula_r();
 
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);

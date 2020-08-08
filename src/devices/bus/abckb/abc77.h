@@ -83,7 +83,7 @@ private:
 	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t1_r );
 	DECLARE_WRITE_LINE_MEMBER( prog_w );
-	DECLARE_WRITE8_MEMBER( j3_w );
+	void j3_w(uint8_t data);
 
 	void abc77_io(address_map &map);
 	void abc77_map(address_map &map);

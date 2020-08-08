@@ -2,11 +2,14 @@
 // copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
- * Skeleton device for Gigatron CPU Core
+ * Gigatron CPU Core
+ *
+ * Based on Gigatron.js by Phil Thomas
+ * https://github.com/PhilThomas/gigatron
+ *
+ * Ported to MAME framework by Sterophonick
  *
  *****************************************************************************/
-
- //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #ifndef MAME_CPU_GTRON_H
 #define MAME_CPU_GTRON_H
@@ -16,7 +19,8 @@
 enum
 {
 	GTRON_PC, GTRON_NPC,
-	GTRON_AC, GTRON_X, GTRON_Y
+	GTRON_AC, GTRON_X, GTRON_Y, GTRON_IREG,
+	GTRON_OUTX, GTRON_OUT
 };
 
 
@@ -26,6 +30,8 @@ public:
 	// construction/destruction
 	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	auto outx_cb() { return m_outx_cb.bind(); }
+	auto out_cb() { return m_out_cb.bind(); }
+	auto ir_cb() { return m_ir_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -48,6 +54,8 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	void reset_cpu();
+
 	void branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
 	void aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
 	void storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
@@ -61,16 +69,15 @@ protected:
 	uint16_t m_ppc;
 	uint8_t m_inReg;
 	uint16_t m_ramMask;
-	uint16_t m_out;
-	uint16_t m_outx;
-
-	virtual void init();
+	uint16_t m_romMask;
+	uint8_t m_out;
+	uint8_t m_outx;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
-	uint16_t  m_pc;   /* registers */
+	uint16_t  m_pc;   /* program counter */
 	uint8_t   m_flags;  /* flags */
 	address_space *m_program;
 	address_space *m_data;
@@ -79,6 +86,8 @@ private:
 	void gigatron_illegal();
 
 	devcb_write8 m_outx_cb;
+	devcb_write8 m_out_cb;
+	devcb_read8 m_ir_cb;
 };
 
 

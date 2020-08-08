@@ -2,7 +2,7 @@
 // copyright-holders:Derrick Renaud
 /*************************************************************************
 
-    audio\orbit.c
+    audio\orbit.cpp
 
 *************************************************************************/
 #include "emu.h"
@@ -14,24 +14,24 @@
  *
  *************************************/
 
-WRITE8_MEMBER(orbit_state::note_w)
+void orbit_state::note_w(uint8_t data)
 {
 	m_discrete->write(ORBIT_NOTE_FREQ, (~data) & 0xff);
 }
 
-WRITE8_MEMBER(orbit_state::note_amp_w)
+void orbit_state::note_amp_w(uint8_t data)
 {
 	m_discrete->write(ORBIT_ANOTE1_AMP, data & 0x0f);
 	m_discrete->write(ORBIT_ANOTE2_AMP, data >> 4);
 }
 
-WRITE8_MEMBER(orbit_state::noise_amp_w)
+void orbit_state::noise_amp_w(uint8_t data)
 {
 	m_discrete->write(ORBIT_NOISE1_AMP, data & 0x0f);
 	m_discrete->write(ORBIT_NOISE2_AMP, data >> 4);
 }
 
-WRITE8_MEMBER(orbit_state::noise_rst_w)
+void orbit_state::noise_rst_w(uint8_t data)
 {
 	m_discrete->write(ORBIT_NOISE_EN, 0);
 }

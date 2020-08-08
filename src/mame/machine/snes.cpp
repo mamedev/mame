@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 /***************************************************************************
 
-  snes.c
+  snes.cpp
 
   Machine file to handle emulation of the Nintendo Super NES
 
@@ -267,7 +267,7 @@ uint8_t snes_state::snes_open_bus_r()
 }
 
 /* read & write to DMA addresses are defined separately, to be called by snessdd1 handlers */
-READ8_MEMBER( snes_state::snes_io_dma_r )
+uint8_t snes_state::snes_io_dma_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -313,7 +313,7 @@ READ8_MEMBER( snes_state::snes_io_dma_r )
 	return snes_open_bus_r();
 }
 
-WRITE8_MEMBER( snes_state::snes_io_dma_w )
+void snes_state::snes_io_dma_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -377,14 +377,14 @@ WRITE8_MEMBER( snes_state::snes_io_dma_w )
  * mid  - This is the middle byte of a 24 bit value
  * high - This is the high byte of a 16 or 24 bit value
  */
-READ8_MEMBER( snes_state::snes_r_io )
+uint8_t snes_state::snes_r_io(offs_t offset)
 {
 	uint8_t value = 0;
 
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		return m_ppu->read(space, offset, SNES_CPU_REG(WRIO) & 0x80);
+		return m_ppu->read(offset, SNES_CPU_REG(WRIO) & 0x80);
 	}
 
 	// APU is mirrored from 2140 to 217f
@@ -396,7 +396,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 	// DMA accesses are from 4300 to 437f
 	if (offset >= DMAP0 && offset < 0x4380)
 	{
-		return snes_io_dma_r(space, offset);
+		return snes_io_dma_r(offset);
 	}
 
 
@@ -467,12 +467,12 @@ READ8_MEMBER( snes_state::snes_r_io )
  * mid  - This is the middle byte of a 24 bit value
  * high - This is the high byte of a 16 or 24 bit value
  */
-WRITE8_MEMBER( snes_state::snes_w_io )
+void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 {
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		m_ppu->write(space, offset, data);
+		m_ppu->write(offset, data);
 		return;
 	}
 
@@ -488,7 +488,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 	// DMA accesses are from 4300 to 437f
 	if (offset >= DMAP0 && offset < 0x4380)
 	{
-		snes_io_dma_w(space, offset, data);
+		snes_io_dma_w(offset, data);
 		return;
 	}
 
@@ -712,7 +712,7 @@ inline uint8_t snes_state::snes_rom_access(uint32_t offset)
 }
 
 /* 0x000000 - 0x7dffff */
-READ8_MEMBER(snes_state::snes_r_bank1)
+uint8_t snes_state::snes_r_bank1(offs_t offset)
 {
 	uint8_t value = 0xff;
 	uint16_t address = offset & 0xffff;
@@ -722,7 +722,7 @@ READ8_MEMBER(snes_state::snes_r_bank1)
 		if (address < 0x2000)                                           /* Mirror of Low RAM */
 			value = m_wram[address];
 		else if (address < 0x6000)                                      /* I/O */
-			value = snes_r_io(space, address);
+			value = snes_r_io(address);
 		else if (address < 0x8000)
 		{
 			if (offset >= 0x300000 && m_cart.mode == SNES_MODE_21 && m_cart.m_nvram_size > 0)
@@ -776,7 +776,7 @@ READ8_MEMBER(snes_state::snes_r_bank1)
 
 
 /* 0x800000 - 0xffffff */
-READ8_MEMBER(snes_state::snes_r_bank2)
+uint8_t snes_state::snes_r_bank2(offs_t offset)
 {
 	uint8_t value = 0;
 	uint16_t address = offset & 0xffff;
@@ -824,7 +824,7 @@ READ8_MEMBER(snes_state::snes_r_bank2)
 
 
 /* 0x000000 - 0x7dffff */
-WRITE8_MEMBER(snes_state::snes_w_bank1)
+void snes_state::snes_w_bank1(address_space &space, offs_t offset, uint8_t data)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -881,7 +881,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank1)
 }
 
 /* 0x800000 - 0xffffff */
-WRITE8_MEMBER(snes_state::snes_w_bank2)
+void snes_state::snes_w_bank2(offs_t offset, uint8_t data)
 {
 	uint16_t address = offset & 0xffff;
 

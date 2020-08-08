@@ -18,7 +18,13 @@
  * PCB also contains a custom ASIC, probably used for the decryption
  *
  * TODO:
- *   PXA255 peripherals
+ *   - PXA255 peripherals
+ *   - 4in1a and 4in1b are very similar to 39in1, currently boot but stuck at
+ *     'Hardware Check' with an error
+ *   - rodent should be correctly decrypted but expects something different
+       from the CPLD (probably)
+ *   - 19in1, 48in1, 48in1a, 48in1b seem to have a slightly different encryption
+ *   - 60in1 expects something different from the CPLD (probably)
  *
  * 39in1 notes:
  * The actual PCB just normally boots up to the game, whereas in MAME it
@@ -49,14 +55,24 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void _60in1(machine_config &config);
 	void _39in1(machine_config &config);
 
-	void driver_init() override;
+	void init_4in1a();
+	void init_4in1b();
+	void init_19in1();
+	void init_39in1();
+	void init_48in1();
+	void init_48in1a();
+	void init_60in1();
+	void init_rodent();
+
 private:
 	uint32_t m_seed;
 	uint32_t m_magic;
 	uint32_t m_state;
+	uint32_t m_mcu_ipt_pc;
+
+	void driver_init() override;
 
 	required_device<pxa255_periphs_device> m_pxa_periphs;
 	required_shared_ptr<uint32_t> m_ram;
@@ -68,12 +84,12 @@ private:
 	uint32_t cpld_r(offs_t offset);
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t prot_cheater_r();
-	DECLARE_MACHINE_START(60in1);
-	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	void _39in1_map(address_map &map);
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
+
+	void decrypt(uint8_t xor00, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0);
 };
 
 
@@ -109,13 +125,13 @@ void _39in1_state::eeprom_w(uint32_t data, uint32_t mem_mask)
 
 uint32_t _39in1_state::cpld_r(offs_t offset)
 {
-	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
+	// if (m_maincpu->pc() != m_mcu_ipt_pc) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), m_state);
 
 	if (m_maincpu->pc() == 0x3f04)
 	{
 		return 0xf0;      // any non-zero value works here
 	}
-	else if (m_maincpu->pc() == 0xe3af4)
+	else if (m_maincpu->pc() == m_mcu_ipt_pc)
 	{
 		return ioport("MCUIPT")->read();
 	}
@@ -249,35 +265,64 @@ static INPUT_PORTS_START( 39in1 )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80000000, IP_ACTIVE_LOW )
 
-/*  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
+//  The following dips apply to 39in1 and 48in1. 60in1 is the same but the last unused dipsw#4 is test mode off/on.
 
-    PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
-    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1")
-    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x02, "Display Mode" )            PORT_DIPLOCATION("SW3:2")
-    PORT_DIPSETTING(    0x02, "CGA 15.75kHz" )
-    PORT_DIPSETTING(    0x00, "VGA 31.5kHz" )
-    PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3")
-    PORT_DIPSETTING(    0x04, "Disabled" )
-    PORT_DIPSETTING(    0x00, "Enabled" )
-    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW3:4")
-    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-*/
+	PORT_START("DSW")      // 1x 4-position DIP switch labelled SW3
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Display Mode" )            PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, "VGA 31.5kHz" )
+	PORT_DIPSETTING(    0x00, "CGA 15.75kHz" )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Saver" )        PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, "Disabled" )
+	PORT_DIPSETTING(    0x00, "Enabled" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void _39in1_state::machine_start()
+void _39in1_state::decrypt(uint8_t xor00, uint8_t xor08, uint8_t xor10, uint8_t xor20, uint8_t xor40, uint8_t bit7, uint8_t bit6, uint8_t bit5, uint8_t bit4, uint8_t bit3, uint8_t bit2, uint8_t bit1, uint8_t bit0)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+
 	for (int i = 0; i < 0x80000; i += 2)
 	{
-		ROM[i] = bitswap<8>(ROM[i],7,2,5,6,0,3,1,4) ^ bitswap<8>((i>>3)&0xf, 3,2,4,1,4,4,0,4) ^ 0x90;
+		if (i & 0x08)
+			rom[i] ^= xor08;
+		if (i & 0x10)
+			rom[i] ^= xor10;
+		if (i & 0x20)
+			rom[i] ^= xor20;
+		if (i & 0x40)
+			rom[i] ^= xor40;
+
+		rom[i] = bitswap<8>(rom[i] ^ xor00, bit7, bit6, bit5, bit4, bit3, bit2, bit1, bit0);
 	}
+
+	/*{
+	    char filename[256];
+	    sprintf(filename,"p_decrypted_%s", machine().system().name);
+	    FILE *fp = fopen(filename, "w+b");
+	    if (fp)
+	    {
+	        fwrite(rom, 0x80000, 1, fp);
+	        fclose(fp);
+	    }
+	}*/
 }
 
-MACHINE_START_MEMBER(_39in1_state,60in1)
+void _39in1_state::init_39in1()  { driver_init(); decrypt(0xc0, 0x02, 0x40, 0x04, 0x80, 7, 2, 5, 6, 0, 3, 1, 4); m_mcu_ipt_pc = 0xe3af4; } // good
+void _39in1_state::init_4in1a()  { driver_init(); decrypt(0x25, 0x01, 0x80, 0x04, 0x40, 6, 0, 2, 1, 7, 5, 4, 3); m_mcu_ipt_pc = 0x45814; } // good
+void _39in1_state::init_4in1b()  { driver_init(); decrypt(0x43, 0x80, 0x04, 0x40, 0x08, 2, 4, 0, 6, 7, 3, 1, 5); m_mcu_ipt_pc = 0x57628; } // good
+void _39in1_state::init_19in1()  { driver_init(); decrypt(0x00, 0x04, 0x01, 0x80, 0x40, 2, 1, 7, 4, 5, 0, 6, 3); m_mcu_ipt_pc = 0x00000; } // TODO: seems to have different bitswaps depending on XOR address
+void _39in1_state::init_48in1()  { driver_init(); decrypt(0x00, 0x01, 0x40, 0x00, 0x20, 5, 3, 2, 1, 4, 6, 0, 7); m_mcu_ipt_pc = 0x00000; } // applies to both 48in1 and 48in1b, same main CPU ROM. TODO: see above
+void _39in1_state::init_48in1a() { init_48in1(); m_mcu_ipt_pc = 0x00000; } // same encryption as 48in1
+void _39in1_state::init_rodent() { init_4in1b(); /*m_mcu_ipt_pc = 0x?????;*/ } // same encryption as 4in1b, thus good, but doesn't boot because of different CPLD calls
+
+void _39in1_state::init_60in1() // different encryption scheme
 {
+	driver_init();
 	// TODO: Machine is marked as MNW; is this decrypt correct?
 	uint8_t *ROM = memregion("maincpu")->base();
 	for (int i = 0; i < 0x80000; i += 2)
@@ -287,6 +332,8 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 			ROM[i] = bitswap<8>(ROM[i],5,1,4,2,0,7,6,3)^bitswap<8>(i, 6,0,4,13,0,5,3,11);
 		}
 	}
+
+	// m_mcu_ipt_pc = 0x?????;
 }
 
 void _39in1_state::_39in1(machine_config &config)
@@ -299,12 +346,7 @@ void _39in1_state::_39in1(machine_config &config)
 	PXA255_PERIPHERALS(config, m_pxa_periphs, 200000000, m_maincpu);
 	m_pxa_periphs->gpio0_write().set(FUNC(_39in1_state::eeprom_w));
 	m_pxa_periphs->gpio0_read().set(FUNC(_39in1_state::eeprom_r));
-}
-
-void _39in1_state::_60in1(machine_config &config)
-{
-	_39in1(config);
-	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
+	m_pxa_periphs->gpio1_read().set_ioport("DSW").lshift(21);
 }
 
 ROM_START( 39in1 )
@@ -436,12 +478,12 @@ ROM_START( rodent )
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, CRC(c311c7bc) SHA1(8328002b7f6a8b7a3ffca079b7960bc990211d7b) )
 ROM_END
 
-GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,  39in1, _60in1, 39in1, _39in1_state, driver_init, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, driver_init, ROT270, "The Game Room", "Rodent Exterminator",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, init_4in1a,  ROT90, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00, PLZ-V014)",   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, init_4in1b,  ROT90, "bootleg", "4 in 1 MAME bootleg (set 2, PLZ-V001)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, init_19in1,  ROT90, "bootleg", "19 in 1 MAME bootleg (SAC-V000)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, init_39in1,  ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                   MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, init_48in1,  ROT90, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, init_48in1a, ROT90, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,  39in1, _39in1, 39in1, _39in1_state, init_60in1,  ROT90, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent, 0,     _39in1, 39in1, _39in1_state, init_rodent, ROT0,  "The Game Room", "Rodent Exterminator",                         MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

@@ -37,6 +37,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -44,6 +45,8 @@ TODO:
 #include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -93,13 +96,13 @@ private:
 	void update_display();
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_WRITE8_MEMBER(board_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(keypad_w);
-	DECLARE_READ8_MEMBER(board_r);
+	void sound_w(u8 data);
+	void unknown_w(u8 data);
+	void lcd_w(u8 data);
+	void board_w(u8 data);
+	void led_w(u8 data);
+	void keypad_w(u8 data);
+	u8 board_r();
 	template<int P> DECLARE_READ_LINE_MEMBER(keypad_r);
 
 	bool m_reset;
@@ -174,7 +177,7 @@ WRITE_LINE_MEMBER(mm1_state::q_w)
 	m_lcd_mask = state ? 0xff : 0;
 }
 
-WRITE8_MEMBER(mm1_state::lcd_w)
+void mm1_state::lcd_w(u8 data)
 {
 	// d0-d7: write/shift LCD digit (4*CD4015)
 	// note: last digit "dp" is the colon in the middle
@@ -182,13 +185,13 @@ WRITE8_MEMBER(mm1_state::lcd_w)
 	m_digit_idx = (m_digit_idx + 1) & 3;
 }
 
-WRITE8_MEMBER(mm1_state::sound_w)
+void mm1_state::sound_w(u8 data)
 {
 	// d0: speaker out
 	m_dac->write(~data & 1);
 }
 
-WRITE8_MEMBER(mm1_state::unknown_w)
+void mm1_state::unknown_w(u8 data)
 {
 	// mmirage: unused serial device?
 }
@@ -199,21 +202,21 @@ void mm1_state::update_display()
 	m_display->matrix_partial(4, 8, m_cb_mux, m_led_data);
 }
 
-WRITE8_MEMBER(mm1_state::led_w)
+void mm1_state::led_w(u8 data)
 {
 	// d0-d7: chessboard led data
 	m_led_data = data;
 	update_display();
 }
 
-WRITE8_MEMBER(mm1_state::board_w)
+void mm1_state::board_w(u8 data)
 {
 	// d0-d7: chessboard input/led mux
 	m_cb_mux = ~data;
 	update_display();
 }
 
-READ8_MEMBER(mm1_state::board_r)
+u8 mm1_state::board_r()
 {
 	u8 data = 0;
 
@@ -225,7 +228,7 @@ READ8_MEMBER(mm1_state::board_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(mm1_state::keypad_w)
+void mm1_state::keypad_w(u8 data)
 {
 	// d0-d7: keypad input mux
 	m_kp_mux = ~data;

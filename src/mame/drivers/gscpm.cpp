@@ -1,9 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 
 // MAME driver for Grant Searle's Simple CP/M Computer
-// http://searle.x10host.com/cpm/index.html
-// Written by Frank Palazzolo - frank@avoidspikes.com
+// http://www.searle.wales/
 
-// This driver uses a compact flash card as a hard disk device.  
+// This driver uses a compact flash card as a hard disk device.
 // To create a virtual disk file, use the following (for a 128MB card):
 //     chdman createhd -s 134217728 -o filename.chd
 // (or use -s 67108864 for 64MB card)
@@ -40,12 +41,12 @@ protected:
 	void gscpm_mem(address_map &map);
 	void gscpm_io(address_map &map);
 
-	READ8_MEMBER( cflash_r );
-	WRITE8_MEMBER( cflash_w );
-	READ8_MEMBER( sio_r );
-	WRITE8_MEMBER( sio_w );
+	uint8_t cflash_r(offs_t offset);
+	void cflash_w(offs_t offset, uint8_t data);
+	uint8_t sio_r(offs_t offset);
+	void sio_w(offs_t offset, uint8_t data);
 
-	WRITE8_MEMBER( switch_to_ram_w );
+	void switch_to_ram_w(uint8_t data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -56,7 +57,7 @@ protected:
 void gscpm_state::gscpm_mem(address_map &map)
 {
 	//map(0x0000, 0x3fff).rom("maincpu");  // This is ROM after reset, and RAM is switched in when CP/M is booted
-	                                       // (will install handlers dynamically)
+										   // (will install handlers dynamically)
 	map(0x4000, 0xffff).ram();
 }
 
@@ -69,56 +70,52 @@ void gscpm_state::gscpm_io(address_map &map)
 	map(0x38, 0x3f).w(FUNC(gscpm_state::switch_to_ram_w));
 }
 
-READ8_MEMBER( gscpm_state::cflash_r )
+uint8_t gscpm_state::cflash_r(offs_t offset)
 {
 	return m_ide->cs0_r(offset, 0xff);
 }
 
-WRITE8_MEMBER( gscpm_state::cflash_w )
+void gscpm_state::cflash_w(offs_t offset, uint8_t data)
 {
 	m_ide->cs0_w(offset, data, 0xff);
 }
 
-READ8_MEMBER( gscpm_state::sio_r )
+uint8_t gscpm_state::sio_r(offs_t offset)
 {
-	switch(offset & 3)
+	switch (offset & 3)
 	{
-		case 0x00:
-			return m_sio->da_r();
-		break;
-		case 0x01:
-			return m_sio->db_r();
-		break;
-		case 0x02:
-			return m_sio->ca_r();
-		break;
-		case 0x03:
-			return m_sio->cb_r();
-		break;
+	case 0x00:
+		return m_sio->da_r();
+	case 0x01:
+		return m_sio->db_r();
+	case 0x02:
+		return m_sio->ca_r();
+	case 0x03:
+		return m_sio->cb_r();
 	}
 	return 0x00; // can't happen
 }
 
-WRITE8_MEMBER( gscpm_state::sio_w )
+void gscpm_state::sio_w(offs_t offset, uint8_t data)
 {
-	switch(offset & 3)
+	switch (offset & 3)
 	{
-		case 0x00:
-			m_sio->da_w(data);
+	case 0x00:
+		m_sio->da_w(data);
 		break;
-		case 0x01:
-			m_sio->db_w(data);
+	case 0x01:
+		m_sio->db_w(data);
 		break;
-		case 0x02:
-			m_sio->ca_w(data);
+	case 0x02:
+		m_sio->ca_w(data);
 		break;
-		case 0x03:
-			m_sio->cb_w(data);
+	case 0x03:
+		m_sio->cb_w(data);
 		break;
 	}
 }
 
-WRITE8_MEMBER( gscpm_state::switch_to_ram_w )
+void gscpm_state::switch_to_ram_w(uint8_t data)
 {
 	// Install the RAM handler here
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x3fff); // Unmap the ROM handler
@@ -166,13 +163,13 @@ void gscpm_state::gscpm(machine_config &config)
 	m_sio->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_sio->out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
-	
+
 	clock_device &sio_clock(CLOCK(config, "sio_clock", 7'372'800));
 	sio_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::txcb_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
-	
+
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be below the DEVICE_INPUT_DEFAULTS_START block

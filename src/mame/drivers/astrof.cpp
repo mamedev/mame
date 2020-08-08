@@ -81,7 +81,7 @@
  *
  *************************************/
 
-READ8_MEMBER(astrof_state::irq_clear_r)
+uint8_t astrof_state::irq_clear_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -270,21 +270,21 @@ void astrof_state::tomahawk_get_pens( pen_t *pens )
 }
 
 
-WRITE8_MEMBER(astrof_state::astrof_videoram_w)
+void astrof_state::astrof_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = *m_astrof_color & 0x0e;
 }
 
 
-WRITE8_MEMBER(astrof_state::tomahawk_videoram_w)
+void astrof_state::tomahawk_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = (*m_astrof_color & 0x0e) | ((*m_astrof_color & 0x01) << 4);
 }
 
 
-WRITE8_MEMBER(astrof_state::video_control_1_w)
+void astrof_state::video_control_1_w(uint8_t data)
 {
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
@@ -312,7 +312,7 @@ void astrof_state::astrof_set_video_control_2( uint8_t data )
 	/* D4-D7 - not connected */
 }
 
-WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
+void astrof_state::astrof_video_control_2_w(uint8_t data)
 {
 	astrof_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -330,7 +330,7 @@ void astrof_state::spfghmk2_set_video_control_2( uint8_t data )
 	/* D3-D7 - not connected */
 }
 
-WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
+void astrof_state::spfghmk2_video_control_2_w(uint8_t data)
 {
 	spfghmk2_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -347,7 +347,7 @@ void astrof_state::tomahawk_set_video_control_2( uint8_t data )
 	m_red_on = (data & 0x08) ? true : false;
 }
 
-WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
+void astrof_state::tomahawk_video_control_2_w(uint8_t data)
 {
 	tomahawk_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -429,28 +429,28 @@ uint32_t astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-READ8_MEMBER(astrof_state::shoot_r)
+uint8_t astrof_state::shoot_r()
 {
 	/* not really sure about this */
 	return machine().rand() & 8;
 }
 
 
-READ8_MEMBER(astrof_state::abattle_coin_prot_r)
+uint8_t astrof_state::abattle_coin_prot_r()
 {
 	m_abattle_count = (m_abattle_count + 1) % 0x0101;
 	return m_abattle_count ? 0x07 : 0x00;
 }
 
 
-READ8_MEMBER(astrof_state::afire_coin_prot_r)
+uint8_t astrof_state::afire_coin_prot_r()
 {
 	m_abattle_count = m_abattle_count ^ 0x01;
 	return m_abattle_count ? 0x07 : 0x00;
 }
 
 
-READ8_MEMBER(astrof_state::tomahawk_protection_r)
+uint8_t astrof_state::tomahawk_protection_r()
 {
 	/* flip the byte */
 	return bitswap<8>(*m_tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -1049,6 +1049,26 @@ ROM_START( astrof3 )
 ROM_END
 
 
+ROM_START( astroff )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b.4a",        0xd000, 0x0400, CRC(18bdc2d9) SHA1(1fc93de1212f04f04acc224d91c2308758f5d5ca) )
+	ROM_LOAD( "a.4c",        0xd400, 0x0400, CRC(2344521c) SHA1(7f50890df10219b51bf4cf617e8ffb4336e19ae3) )
+	ROM_LOAD( "9.5a",        0xd800, 0x0400, CRC(9bd0e10d) SHA1(0170f56ce0c7a3827548bdd954acb2c0e4a2cb24) )
+	ROM_LOAD( "8.5c",        0xdc00, 0x0400, CRC(c00d8f28) SHA1(08abc667b2c079bee1242b30545002fa7fea8a72) )
+	ROM_LOAD( "7.4d",        0xe000, 0x0400, CRC(6cd01b9e) SHA1(597db331008a4a561bc8d9bbd42ffde9bcd565dc) )
+	ROM_LOAD( "6.4f",        0xe400, 0x0400, CRC(69cd2604) SHA1(09201ae691330e3bd788f9c714f6dcbb7e8335d0) )
+	ROM_LOAD( "5.5d",        0xe800, 0x0400, CRC(14a4118f) SHA1(d99876f405dd646a7f0e85e584f2509d9cf17372) )
+	ROM_LOAD( "4.5f",        0xec00, 0x0400, CRC(0513bc92) SHA1(dbf774e8353c966c303e02ce8196b888d235bdb2) )
+	ROM_LOAD( "3.4h",        0xf000, 0x0400, CRC(e01713bd) SHA1(e0370a070c727f8f7ff767fdd84f7aeef31c8347) )
+	ROM_LOAD( "2.4k",        0xf400, 0x0400, CRC(24ab94d5) SHA1(1e0a61d83fa67340d4b1477377ed9d65cf826f53) )
+	ROM_LOAD( "1.5h",        0xf800, 0x0400, CRC(142bbc5d) SHA1(55017fd88a19d09943cde16d583db00cf4c3218b) )
+	ROM_LOAD( "0.5k",        0xfc00, 0x0400, CRC(c63a9c80) SHA1(f51694912d823a5ae7883c603915b9c1aa0e0733) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "im5610-82s123.2f",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+
 ROM_START( abattle )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10405-b.bin",  0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
@@ -1341,8 +1361,8 @@ void astrof_state::init_abattle()
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 
@@ -1353,8 +1373,8 @@ void astrof_state::init_afire()
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::afire_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::afire_coin_prot_r)));
 }
 
 
@@ -1365,15 +1385,15 @@ void astrof_state::init_sstarbtl()
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 void astrof_state::init_acombat3()
 {
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8smo_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8smo_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 
@@ -1386,6 +1406,7 @@ void astrof_state::init_acombat3()
 GAME( 1979, astrof,    0,        astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, astrof2,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, astrof3,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 3)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg? (Famaresa)",   "Astro Fighter (set 4)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)", "Astro Fire",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

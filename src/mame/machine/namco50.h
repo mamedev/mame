@@ -32,7 +32,6 @@ private:
 	uint8_t                   m_cmd;
 	uint8_t                   m_portO;
 
-	TIMER_CALLBACK_MEMBER( chip_select_sync );
 	TIMER_CALLBACK_MEMBER( rw_sync );
 	TIMER_CALLBACK_MEMBER( write_sync );
 

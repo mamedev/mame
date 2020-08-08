@@ -66,15 +66,15 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
 
-	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
-	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
+	void pc_nmi_enable_w(uint8_t data);
+	uint8_t pcjr_nmi_enable_r();
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
 	void pcjr_ppi_portb_w(uint8_t data);
 	uint8_t pcjr_ppi_portc_r();
-	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
-	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
-	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
+	void pcjr_fdc_dor_w(uint8_t data);
+	uint8_t pcjx_port_1ff_r();
+	void pcjx_port_1ff_w(uint8_t data);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
@@ -310,14 +310,14 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjr_nmi_enable_r)
+uint8_t pcjr_state::pcjr_nmi_enable_r()
 {
 	m_latch = 0;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_nmi_enabled;
 }
 
-WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
+void pcjr_state::pc_nmi_enable_w(uint8_t data)
 {
 	m_nmi_enabled = data & 0x80;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
@@ -380,7 +380,7 @@ uint8_t pcjr_state::pcjr_ppi_portc_r()
 	return data;
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
+void pcjr_state::pcjr_fdc_dor_w(uint8_t data)
 {
 	logerror("fdc: dor = %02x\n", data);
 	uint8_t pdor = m_pcjr_dor;
@@ -422,7 +422,7 @@ void pcjr_state::pcjx_set_bank(int unk1, int unk2, int unk3)
 	logerror("pcjx: 0x1ff 0:%02x 1:%02x 2:%02x\n", unk1, unk2, unk3);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
+void pcjr_state::pcjx_port_1ff_w(uint8_t data)
 {
 	switch(m_pcjx_1ff_count) {
 	case 0:
@@ -441,7 +441,7 @@ WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
+uint8_t pcjr_state::pcjx_port_1ff_r()
 {
 	if(m_pcjx_1ff_count == 2)
 		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1]);

@@ -40,15 +40,13 @@ public:
 	void paso1600(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(paso1600_pcg_r);
-	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
-	DECLARE_WRITE8_MEMBER(paso1600_6845_address_w);
-	DECLARE_WRITE8_MEMBER(paso1600_6845_data_w);
-	DECLARE_READ8_MEMBER(paso1600_6845_data_r);
-	DECLARE_READ8_MEMBER(paso1600_6845_status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ16_MEMBER(test_hi_r);
+	uint8_t paso1600_pcg_r(offs_t offset);
+	void paso1600_pcg_w(offs_t offset, uint8_t data);
+	void paso1600_6845_address_w(uint8_t data);
+	void paso1600_6845_data_w(uint8_t data);
+	uint8_t key_r(offs_t offset);
+	void key_w(offs_t offset, uint8_t data);
+	uint16_t test_hi_r();
 	uint8_t pc_dma_read_byte(offs_t offset);
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint32_t screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -174,40 +172,30 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER( paso1600_state::paso1600_pcg_r )
+uint8_t paso1600_state::paso1600_pcg_r(offs_t offset)
 {
 	return m_p_pcg[offset];
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
+void paso1600_state::paso1600_pcg_w(offs_t offset, uint8_t data)
 {
 	m_p_pcg[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )
+void paso1600_state::paso1600_6845_address_w(uint8_t data)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(data);
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_6845_data_w )
+void paso1600_state::paso1600_6845_data_w(uint8_t data)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(data);
 }
 
-READ8_MEMBER( paso1600_state::paso1600_6845_data_r )
-{
-	return m_crtc->register_r();
-}
-
-READ8_MEMBER( paso1600_state::paso1600_6845_status_r )
-{
-	return m_crtc->status_r();
-}
-
-READ8_MEMBER( paso1600_state::key_r )
+uint8_t paso1600_state::key_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -219,7 +207,7 @@ READ8_MEMBER( paso1600_state::key_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( paso1600_state::key_w )
+void paso1600_state::key_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -227,7 +215,7 @@ WRITE8_MEMBER( paso1600_state::key_w )
 	}
 }
 
-READ16_MEMBER( paso1600_state::test_hi_r )
+uint16_t  paso1600_state::test_hi_r()
 {
 	return 0xffff;
 }
@@ -251,8 +239,8 @@ void paso1600_state::paso1600_io(address_map &map)
 	map(0x001a, 0x001b).r(FUNC(paso1600_state::test_hi_r)); // causes RAM error otherwise?
 	map(0x0030, 0x0033).rw(FUNC(paso1600_state::key_r), FUNC(paso1600_state::key_w)); //UART keyboard?
 	map(0x0048, 0x0049).r(FUNC(paso1600_state::test_hi_r));
-	map(0x0090, 0x0090).rw(FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
-	map(0x0091, 0x0091).rw(FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
+	map(0x0090, 0x0090).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(paso1600_state::paso1600_6845_address_w));
+	map(0x0091, 0x0091).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(paso1600_state::paso1600_6845_data_w));
 //  map(0x00d8,0x00df) //fdc, unknown type
 // other undefined ports: 18, 1C, 92
 }

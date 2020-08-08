@@ -194,8 +194,6 @@ enum
 
 void tms9995_device::device_start()
 {
-	// TODO: Restore save state suport
-
 	m_prgspace = &space(AS_PROGRAM);
 	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
@@ -215,6 +213,8 @@ void tms9995_device::device_start()
 	m_mid_active = false;
 	m_nmi_active = false;
 	m_int_overflow = false;
+
+	m_reset = false;
 
 	m_idle_state = false;
 

@@ -49,8 +49,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(calomega_videoram_w);
-	DECLARE_WRITE8_MEMBER(calomega_colorram_w);
+	void calomega_videoram_w(offs_t offset, uint8_t data);
+	void calomega_colorram_w(offs_t offset, uint8_t data);
 	uint8_t s903_mux_port_r();
 	void s903_mux_w(uint8_t data);
 	uint8_t s905_mux_port_r();

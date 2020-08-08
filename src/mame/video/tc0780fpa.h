@@ -49,11 +49,11 @@ public:
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(tex_addr_r);
-	DECLARE_WRITE16_MEMBER(tex_addr_w);
-	DECLARE_WRITE16_MEMBER(tex_w);
-	DECLARE_WRITE16_MEMBER(poly_fifo_w);
-	DECLARE_WRITE16_MEMBER(render_w);
+	uint16_t tex_addr_r();
+	void tex_addr_w(uint16_t data);
+	void tex_w(uint16_t data);
+	void poly_fifo_w(uint16_t data);
+	void render_w(uint16_t data);
 
 protected:
 	// device-level overrides

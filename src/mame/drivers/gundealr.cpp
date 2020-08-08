@@ -77,14 +77,14 @@ Z80 CPU - 12MHz/2
 #include "speaker.h"
 
 
-WRITE8_MEMBER(gundealr_state::bankswitch_w)
+void gundealr_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x07);
 }
 
 
 template<int Xor>
-WRITE8_MEMBER(gundealr_state::fg_scroll_w)
+void gundealr_state::fg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll[offset] = data;
 	m_fg_tilemap->set_scrollx(0, m_scroll[0^Xor] | ((m_scroll[1^Xor] & 0x03) << 8));
@@ -92,7 +92,7 @@ WRITE8_MEMBER(gundealr_state::fg_scroll_w)
 }
 
 template<int Bit>
-WRITE8_MEMBER(gundealr_state::flipscreen_w)
+void gundealr_state::flipscreen_w(uint8_t data)
 {
 	machine().tilemap().set_flip_all(BIT(data, Bit) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }

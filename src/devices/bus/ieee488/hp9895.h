@@ -68,21 +68,21 @@ private:
 	void z80_m1_w(uint8_t data);
 
 	// Floppy interface
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_WRITE8_MEMBER(clock_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(cntl_w);
-	DECLARE_WRITE8_MEMBER(drv_w);
-	DECLARE_WRITE8_MEMBER(xv_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(clock_r);
-	DECLARE_READ8_MEMBER(drivstat_r);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(switches2_r);
+	void data_w(uint8_t data);
+	void clock_w(uint8_t data);
+	void reset_w(uint8_t data);
+	void leds_w(uint8_t data);
+	void cntl_w(uint8_t data);
+	void drv_w(uint8_t data);
+	void xv_w(uint8_t data);
+	uint8_t data_r();
+	uint8_t clock_r();
+	uint8_t drivstat_r();
+	uint8_t switches_r();
+	uint8_t switches2_r();
 
 	// PHI register read
-	DECLARE_READ8_MEMBER(phi_reg_r);
+	uint8_t phi_reg_r(offs_t offset);
 
 	// Floppy drive interface
 	void floppy_ready_cb(floppy_image_device *floppy , int state);

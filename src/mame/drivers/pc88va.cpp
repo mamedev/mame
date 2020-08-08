@@ -422,12 +422,12 @@ void pc88va_state::pc88va_map(address_map &map)
 /* 0x40000 - 0x4ffff Kanji ROM 2*/
 /* 0x50000 - 0x53fff Backup RAM */
 /* above that is a NOP presumably */
-READ8_MEMBER(pc88va_state::kanji_ram_r)
+uint8_t pc88va_state::kanji_ram_r(offs_t offset)
 {
 	return m_kanjiram[offset];
 }
 
-WRITE8_MEMBER(pc88va_state::kanji_ram_w)
+void pc88va_state::kanji_ram_w(offs_t offset, uint8_t data)
 {
 	// TODO: there's an area that can be write protected
 	m_kanjiram[offset] = data;
@@ -452,7 +452,7 @@ void pc88va_state::sysbank_map(address_map &map)
 }
 
 /* IDP = NEC uPD72022 */
-READ8_MEMBER(pc88va_state::idp_status_r)
+uint8_t pc88va_state::idp_status_r()
 {
 /*
     x--- ---- LP   Light-pen signal detection (with VA use failure)
@@ -482,7 +482,7 @@ READ8_MEMBER(pc88va_state::idp_status_r)
 #define SPRSW  0x85
 #define SPROV  0x81
 
-WRITE8_MEMBER(pc88va_state::idp_command_w)
+void pc88va_state::idp_command_w(uint8_t data)
 {
 	switch(data)
 	{
@@ -697,7 +697,7 @@ void pc88va_state::execute_sprsw_cmd()
 	tsp_sprite_enable(m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
 }
 
-WRITE8_MEMBER(pc88va_state::idp_param_w)
+void pc88va_state::idp_param_w(uint8_t data)
 {
 	if(m_cmd == DSPOFF || m_cmd == EXIT || m_cmd == SPROFF || m_cmd == SPROV) // no param commands
 		return;
@@ -727,7 +727,7 @@ WRITE8_MEMBER(pc88va_state::idp_param_w)
 	}
 }
 
-WRITE16_MEMBER(pc88va_state::palette_ram_w)
+void pc88va_state::palette_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b;
 	COMBINE_DATA(&m_palram[offset]);
@@ -739,7 +739,7 @@ WRITE16_MEMBER(pc88va_state::palette_ram_w)
 	m_palette->set_pen_color(offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-READ16_MEMBER(pc88va_state::sys_port4_r)
+uint16_t pc88va_state::sys_port4_r()
 {
 	uint8_t vrtc,sw1;
 	vrtc = (m_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
@@ -749,12 +749,12 @@ READ16_MEMBER(pc88va_state::sys_port4_r)
 	return vrtc | sw1 | 0xc0;
 }
 
-READ16_MEMBER(pc88va_state::bios_bank_r)
+uint16_t pc88va_state::bios_bank_r()
 {
 	return m_bank_reg;
 }
 
-WRITE16_MEMBER(pc88va_state::bios_bank_w)
+void pc88va_state::bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	-x-- ---- ---- ---- SMM (compatibility mode)
@@ -784,12 +784,12 @@ WRITE16_MEMBER(pc88va_state::bios_bank_w)
 	}
 }
 
-READ8_MEMBER(pc88va_state::rom_bank_r)
+uint8_t pc88va_state::rom_bank_r()
 {
 	return 0xff; // bit 7 low is va91 rom bank status
 }
 
-READ8_MEMBER(pc88va_state::key_r)
+uint8_t pc88va_state::key_r(offs_t offset)
 {
 	// note row D bit 2 does something at POST ... some kind of test mode?
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
@@ -800,22 +800,22 @@ READ8_MEMBER(pc88va_state::key_r)
 	return ioport(keynames[offset])->read();
 }
 
-WRITE16_MEMBER(pc88va_state::backupram_wp_1_w)
+void pc88va_state::backupram_wp_1_w(uint16_t data)
 {
 	m_backupram_wp = 1;
 }
 
-WRITE16_MEMBER(pc88va_state::backupram_wp_0_w)
+void pc88va_state::backupram_wp_0_w(uint16_t data)
 {
 	m_backupram_wp = 0;
 }
 
-READ8_MEMBER(pc88va_state::hdd_status_r)
+uint8_t pc88va_state::hdd_status_r()
 {
 	return 0x20;
 }
 
-READ8_MEMBER(pc88va_state::pc88va_fdc_r)
+uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 {
 	printf("%08x\n",offset);
 
@@ -868,7 +868,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	m_fdc->ready_w(ready);
 }
 
-WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
+void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 {
 	printf("%08x %02x\n",offset<<1,data);
 	switch(offset<<1)
@@ -945,7 +945,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 }
 
 
-READ16_MEMBER(pc88va_state::sysop_r)
+uint16_t pc88va_state::sysop_r()
 {
 	uint8_t sys_op;
 
@@ -954,12 +954,12 @@ READ16_MEMBER(pc88va_state::sysop_r)
 	return 0xfffc | sys_op; // docs says all the other bits are high
 }
 
-READ16_MEMBER(pc88va_state::screen_ctrl_r)
+uint16_t pc88va_state::screen_ctrl_r()
 {
 	return m_screen_ctrl_reg;
 }
 
-WRITE16_MEMBER(pc88va_state::screen_ctrl_w)
+void pc88va_state::screen_ctrl_w(uint16_t data)
 {
 	m_screen_ctrl_reg = data;
 }
@@ -974,7 +974,7 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 	}
 }
 
-WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
+void pc88va_state::timer3_ctrl_reg_w(uint8_t data)
 {
 	/*
 	x--- ---- MINTEN (TCU irq enable)
@@ -991,12 +991,12 @@ WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
 	}
 }
 
-WRITE16_MEMBER(pc88va_state::video_pri_w)
+void pc88va_state::video_pri_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_pri_reg[offset]);
 }
 
-READ8_MEMBER(pc88va_state::backupram_dsw_r)
+uint8_t pc88va_state::backupram_dsw_r(offs_t offset)
 {
 	if(offset == 0)
 		return m_kanjiram[0x1fc2 / 2] & 0xff;
@@ -1004,13 +1004,13 @@ READ8_MEMBER(pc88va_state::backupram_dsw_r)
 	return m_kanjiram[0x1fc6 / 2] & 0xff;
 }
 
-WRITE8_MEMBER(pc88va_state::sys_port1_w)
+void pc88va_state::sys_port1_w(uint8_t data)
 {
 	// ...
 }
 
 #if !TEST_SUBFDC
-READ8_MEMBER(pc88va_state::no_subfdc_r)
+uint8_t pc88va_state::no_subfdc_r()
 {
 	return machine().rand();
 }
@@ -1107,19 +1107,19 @@ void pc88va_state::pc88va_z80_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 }
 
-READ8_MEMBER(pc88va_state::upd765_tc_r)
+uint8_t pc88va_state::upd765_tc_r()
 {
 	m_fdc->tc_w(true);
 	timer_set(attotime::from_usec(50), TIMER_PC8801FD_UPD765_TC_TO_ZERO);
 	return 0;
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_irq_vector_w)
+void pc88va_state::fdc_irq_vector_w(uint8_t data)
 {
 	m_fdc_irq_opcode = data;
 }
 
-WRITE8_MEMBER(pc88va_state::upd765_mc_w)
+void pc88va_state::upd765_mc_w(uint8_t data)
 {
 	m_fdd[0]->get_device()->mon_w(!(data & 1));
 	m_fdd[1]->get_device()->mon_w(!(data & 2));

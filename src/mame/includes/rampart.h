@@ -42,7 +42,7 @@ protected:
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	void scanline_int_ack_w(uint16_t data);
-	DECLARE_WRITE16_MEMBER(latch_w);
+	void latch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update_rampart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

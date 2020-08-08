@@ -69,6 +69,11 @@ private:
 void elekscmp_state::machine_start()
 {
 	m_digit.resolve();
+
+	save_item(NAME(m_cassinbit));
+	save_item(NAME(m_cassoutbit));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cass_data));
 }
 
 void elekscmp_state::hex_display_w(offs_t offset, u8 data)
@@ -214,7 +219,7 @@ void elekscmp_state::elekscmp(machine_config &config)
 
 /* ROM definition */
 ROM_START( elekscmp )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0600, "maincpu", 0 )
 	ROM_LOAD( "elbug.001", 0x0000, 0x0200, CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
 	ROM_LOAD( "elbug.002", 0x0200, 0x0200, CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
 	ROM_LOAD( "elbug.003", 0x0400, 0x0200, CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
@@ -222,5 +227,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS */
-COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME         FLAGS */
+COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor", "Elektor SC/MP", MACHINE_SUPPORTS_SAVE )

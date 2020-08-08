@@ -2,8 +2,6 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    i8244.h
-
     Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
 
 ***************************************************************************/
@@ -58,32 +56,44 @@ protected:
 	union vdc_t {
 		uint8_t reg[0x100];
 		struct {
+			// 0x00
 			struct {
-				uint8_t y,x,color,res;
+				uint8_t y,x,color,unused;
 			} sprites[4];
+
+			// 0x10
 			struct {
 				uint8_t y,x,ptr,color;
 			} foreground[12];
+
+			// 0x40
 			struct {
 				struct {
 					uint8_t y,x,ptr,color;
 				} single[4];
 			} quad[4];
+
+			// 0x80
 			uint8_t shape[4][8];
+
+			// 0xa0
 			uint8_t control;
 			uint8_t status;
 			uint8_t collision;
 			uint8_t color;
 			uint8_t y;
 			uint8_t x;
-			uint8_t res;
+			uint8_t unused;
 			uint8_t shift1;
 			uint8_t shift2;
 			uint8_t shift3;
 			uint8_t sound;
-			uint8_t res2[5+0x10];
+			uint8_t unused2[5+0x10];
+
+			// 0xc0
 			uint8_t hgrid[2][0x10];
 			uint8_t vgrid[0x10];
+			uint8_t unused3[0x10];
 		} s;
 	};
 
@@ -94,6 +104,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -102,6 +113,7 @@ protected:
 	int get_y_beam();
 	int get_x_beam();
 	offs_t fix_register_mirrors( offs_t offset );
+	bool unused_register( offs_t offset );
 
 	// Local constants
 	static constexpr uint8_t VDC_CONTROL_REG_STROBE_XY = 0x02;
@@ -113,6 +125,8 @@ protected:
 	// callbacks
 	devcb_write_line m_irq_func;
 	devcb_write16 m_postprocess_func;
+
+	required_region_ptr<uint8_t> m_charset;
 
 	bitmap_ind16 m_tmp_bitmap;
 	emu_timer *m_line_timer;

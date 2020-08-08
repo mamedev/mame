@@ -97,7 +97,7 @@ protected:
 	void coin_w(u8 data);
 
 	u16 frame_done_r();
-	DECLARE_WRITE16_MEMBER(tile_offsets_w);
+	void tile_offsets_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bcu_flipscreen_w(u8 data);
 	void fcu_flipscreen_w(u8 data);
 	u16 spriteram_offs_r();

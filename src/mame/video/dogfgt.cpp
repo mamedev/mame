@@ -84,12 +84,12 @@ void dogfgt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(dogfgt_state::plane_select_w)
+void dogfgt_state::plane_select_w(uint8_t data)
 {
 	m_bm_plane = data;
 }
 
-READ8_MEMBER(dogfgt_state::bitmapram_r)
+uint8_t dogfgt_state::bitmapram_r(offs_t offset)
 {
 	if (m_bm_plane > 2)
 	{
@@ -100,7 +100,7 @@ READ8_MEMBER(dogfgt_state::bitmapram_r)
 	return m_bitmapram[offset + BITMAPRAM_SIZE / 3 * m_bm_plane];
 }
 
-WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
+void dogfgt_state::internal_bitmapram_w(offs_t offset, uint8_t data)
 {
 	m_bitmapram[offset] = data;
 
@@ -122,7 +122,7 @@ WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(dogfgt_state::bitmapram_w)
+void dogfgt_state::bitmapram_w(offs_t offset, uint8_t data)
 {
 	if (m_bm_plane > 2)
 	{
@@ -130,23 +130,23 @@ WRITE8_MEMBER(dogfgt_state::bitmapram_w)
 		return;
 	}
 
-	internal_bitmapram_w(space, offset + BITMAPRAM_SIZE / 3 * m_bm_plane, data);
+	internal_bitmapram_w(offset + BITMAPRAM_SIZE / 3 * m_bm_plane, data);
 }
 
-WRITE8_MEMBER(dogfgt_state::bgvideoram_w)
+void dogfgt_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(dogfgt_state::scroll_w)
+void dogfgt_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] + 256 * m_scroll[1] + 256);
 	m_bg_tilemap->set_scrolly(0, m_scroll[2] + 256 * m_scroll[3]);
 }
 
-WRITE8_MEMBER(dogfgt_state::_1800_w)
+void dogfgt_state::_1800_w(uint8_t data)
 {
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
@@ -201,13 +201,11 @@ uint32_t dogfgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
 		m_lastflip = flip_screen();
 		m_lastpixcolor = m_pixcolor;
 
 		for (int offs = 0; offs < BITMAPRAM_SIZE; offs++)
-			internal_bitmapram_w(space, offs, m_bitmapram[offs]);
+			internal_bitmapram_w(offs, m_bitmapram[offs]);
 	}
 
 

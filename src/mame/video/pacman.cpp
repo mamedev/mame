@@ -181,13 +181,13 @@ VIDEO_START_MEMBER(pacman_state,birdiy)
 	m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
 }
 
-WRITE8_MEMBER(pacman_state::pacman_videoram_w)
+void pacman_state::pacman_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE8_MEMBER(pacman_state::pacman_colorram_w)
+void pacman_state::pacman_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset );
@@ -428,13 +428,13 @@ uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_videoram_w)
+void pacman_state::s2650games_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_colorram_w)
+void pacman_state::s2650games_colorram_w(offs_t offset, uint8_t data)
 {
 	int i;
 	m_colorram[offset & 0x1f] = data;
@@ -442,12 +442,12 @@ WRITE8_MEMBER(pacman_state::s2650games_colorram_w)
 		m_bg_tilemap->mark_tile_dirty(i);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_scroll_w)
+void pacman_state::s2650games_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_tilesbank_w)
+void pacman_state::s2650games_tilesbank_w(offs_t offset, uint8_t data)
 {
 	m_s2650games_tileram[offset] = data;
 	m_bg_tilemap->mark_all_dirty();
@@ -548,7 +548,7 @@ VIDEO_START_MEMBER(pacman_state,jrpacman)
 	m_bg_tilemap->set_scroll_cols(36 );
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_videoram_w)
+void pacman_state::jrpacman_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	jrpacman_mark_tile_dirty(offset);
@@ -565,7 +565,7 @@ WRITE_LINE_MEMBER(pacman_state::jrpacman_spritebank_w)
 	m_spritebank = state;
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
+void pacman_state::jrpacman_scroll_w(uint8_t data)
 {
 	int i;
 	for( i = 2; i < 34; i++ )

@@ -52,8 +52,8 @@ public:
 	int16_t current_y() const { return screen().vpos(); }
 	void set_latch_hv(int16_t x, int16_t y);
 
-	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);
-	void write(address_space &space, uint32_t offset, uint8_t data);
+	uint8_t read(uint32_t offset, uint8_t wrio_bit7);
+	void write(uint32_t offset, uint8_t data);
 
 	int vtotal() const { return ((m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL; }
 	uint16_t htmult() const { return m_htmult; }

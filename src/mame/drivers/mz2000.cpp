@@ -103,26 +103,26 @@ private:
 
 	uint8_t m_porta_latch;
 	uint8_t m_tape_ctrl;
-	DECLARE_READ8_MEMBER(mz2000_ipl_r);
-	DECLARE_READ8_MEMBER(mz2000_wram_r);
-	DECLARE_WRITE8_MEMBER(mz2000_wram_w);
-	DECLARE_READ8_MEMBER(mz2000_tvram_r);
-	DECLARE_WRITE8_MEMBER(mz2000_tvram_w);
-	DECLARE_READ8_MEMBER(mz2000_gvram_r);
-	DECLARE_WRITE8_MEMBER(mz2000_gvram_w);
-	DECLARE_READ8_MEMBER(mz2000_mem_r);
-	DECLARE_WRITE8_MEMBER(mz2000_mem_w);
-	DECLARE_WRITE8_MEMBER(mz2000_gvram_bank_w);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_side_w);
-	DECLARE_WRITE8_MEMBER(timer_w);
-	DECLARE_WRITE8_MEMBER(mz2000_tvram_attr_w);
-	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
+	uint8_t mz2000_ipl_r(offs_t offset);
+	uint8_t mz2000_wram_r(offs_t offset);
+	void mz2000_wram_w(offs_t offset, uint8_t data);
+	uint8_t mz2000_tvram_r(offs_t offset);
+	void mz2000_tvram_w(offs_t offset, uint8_t data);
+	uint8_t mz2000_gvram_r(offs_t offset);
+	void mz2000_gvram_w(offs_t offset, uint8_t data);
+	uint8_t mz2000_mem_r(offs_t offset);
+	void mz2000_mem_w(offs_t offset, uint8_t data);
+	void mz2000_gvram_bank_w(uint8_t data);
+	void floppy_select_w(uint8_t data);
+	void floppy_side_w(uint8_t data);
+	void timer_w(uint8_t data);
+	void mz2000_tvram_attr_w(uint8_t data);
+	void mz2000_gvram_mask_w(uint8_t data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 	uint8_t mz2000_porta_r();
 	uint8_t mz2000_portb_r();
 	uint8_t mz2000_portc_r();
@@ -256,100 +256,100 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_ipl_r)
+uint8_t mz2000_state::mz2000_ipl_r(offs_t offset)
 {
 	return m_region_ipl->base()[offset];
 }
 
-READ8_MEMBER(mz2000_state::mz2000_wram_r)
+uint8_t mz2000_state::mz2000_wram_r(offs_t offset)
 {
 	return m_region_wram->base()[offset];
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_wram_w)
+void mz2000_state::mz2000_wram_w(offs_t offset, uint8_t data)
 {
 	m_region_wram->base()[offset] = data;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_tvram_r)
+uint8_t mz2000_state::mz2000_tvram_r(offs_t offset)
 {
 	return m_region_tvram->base()[offset];
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_tvram_w)
+void mz2000_state::mz2000_tvram_w(offs_t offset, uint8_t data)
 {
 	m_region_tvram->base()[offset] = data;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_gvram_r)
+uint8_t mz2000_state::mz2000_gvram_r(offs_t offset)
 {
 	return m_region_gvram->base()[offset+m_gvram_bank*0x4000];
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_gvram_w)
+void mz2000_state::mz2000_gvram_w(offs_t offset, uint8_t data)
 {
 	m_region_gvram->base()[offset+m_gvram_bank*0x4000] = data;
 }
 
 
-READ8_MEMBER(mz2000_state::mz2000_mem_r)
+uint8_t mz2000_state::mz2000_mem_r(offs_t offset)
 {
 	uint8_t page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
 
 	if(page_mem == 0 && m_ipl_enable)
-		return mz2000_ipl_r(space,offset & 0xfff);
+		return mz2000_ipl_r(offset & 0xfff);
 
 	if(((page_mem & 8) == 0) && m_ipl_enable == 0) // if ipl is enabled, 0x1000 - 0x7fff accesses to dummy region
-		return mz2000_wram_r(space,offset);
+		return mz2000_wram_r(offset);
 
 	if(page_mem & 8)
 	{
 		if(page_mem == 0xd && m_tvram_enable)
-			return mz2000_tvram_r(space,offset & 0xfff);
+			return mz2000_tvram_r(offset & 0xfff);
 		else if(page_mem >= 0xc && m_gvram_enable)
-			return mz2000_gvram_r(space,offset & 0x3fff);
+			return mz2000_gvram_r(offset & 0x3fff);
 		else
 		{
 			uint16_t wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
-			return mz2000_wram_r(space,offset & wram_mask);
+			return mz2000_wram_r(offset & wram_mask);
 		}
 	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
+void mz2000_state::mz2000_mem_w(offs_t offset, uint8_t data)
 {
 	uint8_t page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
 
 	if((page_mem & 8) == 0 && m_ipl_enable == 0)
-		mz2000_wram_w(space,offset,data);
+		mz2000_wram_w(offset,data);
 
 	if(page_mem & 8)
 	{
 		if(page_mem == 0xd && m_tvram_enable)
-			mz2000_tvram_w(space,offset & 0xfff,data);
+			mz2000_tvram_w(offset & 0xfff,data);
 		else if(page_mem >= 0xc && m_gvram_enable)
-			mz2000_gvram_w(space,offset & 0x3fff,data);
+			mz2000_gvram_w(offset & 0x3fff,data);
 		else
 		{
 			uint16_t wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
 
-			mz2000_wram_w(space,offset & wram_mask,data);
+			mz2000_wram_w(offset & wram_mask,data);
 		}
 	}
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
+void mz2000_state::mz2000_gvram_bank_w(uint8_t data)
 {
 	m_gvram_bank = data & 3;
 }
 
-READ8_MEMBER(mz2000_state::fdc_r)
+uint8_t mz2000_state::fdc_r(offs_t offset)
 {
 	if(m_has_fdc)
 		return m_mb8877a->read(offset) ^ 0xff;
@@ -357,13 +357,13 @@ READ8_MEMBER(mz2000_state::fdc_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::fdc_w)
+void mz2000_state::fdc_w(offs_t offset, uint8_t data)
 {
 	if(m_has_fdc)
 		m_mb8877a->write(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER(mz2000_state::floppy_select_w)
+void mz2000_state::floppy_select_w(uint8_t data)
 {
 	switch (data & 0x03)
 	{
@@ -381,13 +381,13 @@ WRITE8_MEMBER(mz2000_state::floppy_select_w)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER(mz2000_state::floppy_side_w)
+void mz2000_state::floppy_side_w(uint8_t data)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER(mz2000_state::timer_w)
+void mz2000_state::timer_w(uint8_t data)
 {
 	m_pit8253->write_gate0(1);
 	m_pit8253->write_gate1(1);
@@ -397,12 +397,12 @@ WRITE8_MEMBER(mz2000_state::timer_w)
 	m_pit8253->write_gate1(1);
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_tvram_attr_w)
+void mz2000_state::mz2000_tvram_attr_w(uint8_t data)
 {
 	m_tvram_attr = data;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_gvram_mask_w)
+void mz2000_state::mz2000_gvram_mask_w(uint8_t data)
 {
 	m_gvram_mask = data;
 }
@@ -884,7 +884,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
 	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
-	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));;
+	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));
 	ppi.in_pb_callback().set(FUNC(mz2000_state::mz2000_portb_r));
 	ppi.out_pb_callback().set(FUNC(mz2000_state::mz2000_portb_w));
 	ppi.in_pc_callback().set(FUNC(mz2000_state::mz2000_portc_r));

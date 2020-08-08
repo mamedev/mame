@@ -3,6 +3,55 @@
 /*
  * nld_7493.cpp
  *
+ *  DM7493: Binary Counters
+ *
+ *          +--------------+
+ *        B |1     ++    14| A
+ *      R01 |2           13| NC
+ *      R02 |3           12| QA
+ *       NC |4    7493   11| QD
+ *      VCC |5           10| GND
+ *       NC |6            9| QB
+ *       NC |7            8| QC
+ *          +--------------+
+ *
+ *          Counter Sequence
+ *
+ *          +-------++----+----+----+----+
+ *          | COUNT || QD | QC | QB | QA |
+ *          +=======++====+====+====+====+
+ *          |    0  ||  0 |  0 |  0 |  0 |
+ *          |    1  ||  0 |  0 |  0 |  1 |
+ *          |    2  ||  0 |  0 |  1 |  0 |
+ *          |    3  ||  0 |  0 |  1 |  1 |
+ *          |    4  ||  0 |  1 |  0 |  0 |
+ *          |    5  ||  0 |  1 |  0 |  1 |
+ *          |    6  ||  0 |  1 |  1 |  0 |
+ *          |    7  ||  0 |  1 |  1 |  1 |
+ *          |    8  ||  1 |  0 |  0 |  0 |
+ *          |    9  ||  1 |  0 |  0 |  1 |
+ *          |   10  ||  1 |  0 |  1 |  0 |
+ *          |   11  ||  1 |  0 |  1 |  1 |
+ *          |   12  ||  1 |  1 |  0 |  0 |
+ *          |   13  ||  1 |  1 |  0 |  1 |
+ *          |   14  ||  1 |  1 |  1 |  0 |
+ *          |   15  ||  1 |  1 |  1 |  1 |
+ *          +-------++----+----+----+----+
+ *
+ *          Note C Output QA is connected to input B
+ *
+ *          Reset Count Function table
+ *
+ *          +-----+-----++----+----+----+----+
+ *          | R01 | R02 || QD | QC | QB | QA |
+ *          +=====+=====++====+====+====+====+
+ *          |  1  |  1  ||  0 |  0 |  0 |  0 |
+ *          |  0  |  X  ||       COUNT       |
+ *          |  X  |  0  ||       COUNT       |
+ *          +-----+-----++----+----+----+----+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
  */
 
 #include "nld_7493.h"
@@ -81,13 +130,13 @@ namespace netlist
 	NETLIB_OBJECT(7493)
 	{
 		NETLIB_CONSTRUCTOR(7493)
-		, m_R1(*this, "R1")
-		, m_R2(*this, "R2")
+		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
+		, m_R2(*this, "R2", NETLIB_DELEGATE(inputs))
 		, m_a(*this, "_m_a", 0)
 		, m_bcd(*this, "_m_b", 0)
 		, m_r(*this, "_m_r", 0)
-		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(7493, updA))
-		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(7493, updB))
+		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(updA))
+		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(updB))
 		, m_QA(*this, "QA")
 		, m_QB(*this, {"QB", "QC", "QD"})
 		, m_power_pins(*this)
@@ -102,7 +151,7 @@ namespace netlist
 			m_CLKB.set_state(logic_t::STATE_INP_HL);
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			if (!(m_R1() && m_R2()))
 			{
@@ -128,15 +177,10 @@ namespace netlist
 		NETLIB_HANDLERI(updB)
 		{
 			const auto cnt(++m_bcd &= 0x07);
-#if 1
+
 			m_QB[2].push((cnt >> 2) & 1, out_delay3);
 			m_QB[1].push((cnt >> 1) & 1, out_delay2);
 			m_QB[0].push(cnt & 1, out_delay);
-#else
-			m_QB[0].push(cnt & 1, out_delay);
-			m_QB[1].push((cnt >> 1) & 1, out_delay2);
-			m_QB[2].push((cnt >> 2) & 1, out_delay3);
-#endif
 		}
 
 		logic_input_t m_R1;
@@ -154,36 +198,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(7493_dip)
-	{
-		NETLIB_CONSTRUCTOR(7493_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", "A.CLKB");
-			register_subalias("2", "A.R1");
-			register_subalias("3", "A.R2");
-
-			// register_subalias("4", ); --> NC
-			register_subalias("5", "A.VCC");
-			// register_subalias("6", ); --> NC
-			// register_subalias("7", ); --> NC
-
-			register_subalias("8", "A.QC");
-			register_subalias("9", "A.QB");
-			register_subalias("10", "A.GND");
-			register_subalias("11", "A.QD");
-			register_subalias("12", "A.QA");
-			// register_subalias("13", ); -. NC
-			register_subalias("14", "A.CLKA");
-		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(7493) A;
-	};
-
 	NETLIB_DEVICE_IMPL(7493,        "TTL_7493", "+CLKA,+CLKB,+R1,+R2,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7493_dip,    "TTL_7493_DIP", "")
 
 	} // namespace devices
 } // namespace netlist

@@ -515,7 +515,7 @@ void bloodbro_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_m
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
+void bloodbro_state::weststry_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

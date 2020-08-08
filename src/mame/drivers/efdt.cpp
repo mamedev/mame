@@ -431,12 +431,12 @@ void efdt_state::machine_reset()
 *               Sound Latches                *
 *********************************************/
 
-READ8_MEMBER(efdt_state::main_soundlatch_r)
+uint8_t efdt_state::main_soundlatch_r(offs_t offset)
 {
 	return m_soundlatch[offset];
 }
 
-WRITE8_MEMBER(efdt_state::main_soundlatch_w)
+void efdt_state::main_soundlatch_w(offs_t offset, uint8_t data)
 {
 	m_soundlatch[offset] = data;
 	switch (offset)

@@ -4,7 +4,7 @@
 
     TRS-80 Radio Shack MicroColor Computer
 
-	May 2020: Added emulation for Darren Atkinson's MCX 128.
+    May 2020: Added emulation for Darren Atkinson's MCX 128.
 
 ***************************************************************************/
 
@@ -44,8 +44,8 @@ public:
 	void alice32(machine_config &config);
 	void mc10(machine_config &config);
 
-	DECLARE_READ8_MEMBER(mc10_bfff_r);
-	DECLARE_WRITE8_MEMBER(mc10_bfff_w);
+	uint8_t mc10_bfff_r();
+	void mc10_bfff_w(uint8_t data);
 
 protected:
 	required_device<m6803_cpu_device> m_maincpu;
@@ -54,8 +54,8 @@ protected:
 	void mc10_port1_w(uint8_t data);
 	uint8_t mc10_port2_r();
 	void mc10_port2_w(uint8_t data);
-	DECLARE_READ8_MEMBER(alice90_bfff_r);
-	DECLARE_WRITE8_MEMBER(alice32_bfff_w);
+	uint8_t alice90_bfff_r();
+	void alice32_bfff_w(uint8_t data);
 
 	uint8_t mc6847_videoram_r(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
@@ -95,8 +95,8 @@ public:
 	void mcx128(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(mcx128_bf00_r);
-	DECLARE_WRITE8_MEMBER(mcx128_bf00_w);
+	uint8_t mcx128_bf00_r(offs_t offset);
+	void mcx128_bf00_w(offs_t offset, uint8_t data);
 
 	void mcx128_mem(address_map &map);
 	void update_mcx128_banking();
@@ -143,17 +143,17 @@ uint8_t mc10_state::read_keyboard_strobe(bool single_line)
 }
 
 
-READ8_MEMBER( mc10_state::mc10_bfff_r )
+uint8_t mc10_state::mc10_bfff_r()
 {
 	return read_keyboard_strobe(false);
 }
 
-READ8_MEMBER( mc10_state::alice90_bfff_r )
+uint8_t mc10_state::alice90_bfff_r()
 {
 	return read_keyboard_strobe(true);
 }
 
-WRITE8_MEMBER( mc10_state::mc10_bfff_w )
+void mc10_state::mc10_bfff_w(uint8_t data)
 {
 	// bit 2 to 6, mc6847 mode lines
 	m_mc6847->gm2_w(BIT(data, 2));
@@ -167,7 +167,7 @@ WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER( mc10_state::alice32_bfff_w )
+void mc10_state::alice32_bfff_w(uint8_t data)
 {
 	// bit 7, dac output
 	m_dac->write(BIT(data, 7));
@@ -247,14 +247,14 @@ void mcx128_state::update_mcx128_banking()
 	}
 }
 
-READ8_MEMBER( mcx128_state::mcx128_bf00_r )
+uint8_t mcx128_state::mcx128_bf00_r(offs_t offset)
 {
 	if( (offset & 1) == 0 ) return m_bank_control;
 
 	return m_map_control;
 }
 
-WRITE8_MEMBER( mcx128_state::mcx128_bf00_w )
+void mcx128_state::mcx128_bf00_w(offs_t offset, uint8_t data)
 {
 	if( (offset & 1) == 0 )
 		m_bank_control = data & 3;

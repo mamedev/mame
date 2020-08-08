@@ -597,18 +597,18 @@ uint8_t mz2500_state::mz2500_cg_latch_compare()
 	return res;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bank_addr_r)
+uint8_t mz2500_state::mz2500_bank_addr_r()
 {
 	return m_bank_addr;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_bank_addr_w)
+void mz2500_state::mz2500_bank_addr_w(uint8_t data)
 {
 //  printf("%02x\n",data);
 	m_bank_addr = data & 7;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
+uint8_t mz2500_state::mz2500_bank_data_r()
 {
 	uint8_t res;
 
@@ -620,7 +620,7 @@ READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 	return res;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
+void mz2500_state::mz2500_bank_data_w(uint8_t data)
 {
 	m_bank_val[m_bank_addr] = data & 0x3f;
 	m_rambank[m_bank_addr]->set_bank(m_bank_val[m_bank_addr]);
@@ -634,18 +634,18 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 	m_bank_addr&=7;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_kanji_bank_w)
+void mz2500_state::mz2500_kanji_bank_w(uint8_t data)
 {
 	m_kanji_bank = data;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_dictionary_bank_w)
+void mz2500_state::mz2500_dictionary_bank_w(uint8_t data)
 {
 	m_dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
-READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
+uint8_t mz2500_state::mz2500_crtc_hvblank_r()
 {
 	uint8_t vblank_bit, hblank_bit;
 
@@ -694,7 +694,7 @@ uint8_t mz2500_state::pal_256_param(int index, int param)
 	return val;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
+void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -774,7 +774,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 	}
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
+void mz2500_state::mz2500_irq_sel_w(uint8_t data)
 {
 	m_irq_sel = data;
 	//printf("%02x\n",m_irq_sel);
@@ -785,7 +785,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
 	m_irq_mask[3] = (data & 0x01); //RP5c15
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
+void mz2500_state::mz2500_irq_data_w(uint8_t data)
 {
 	if(m_irq_sel & 0x80)
 		m_irq_vector[0] = data; //CRTC
@@ -799,7 +799,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 //  popmessage("%02x %02x %02x %02x",m_irq_vector[0],m_irq_vector[1],m_irq_vector[2],m_irq_vector[3]);
 }
 
-WRITE8_MEMBER(mz2500_state::floppy_select_w)
+void mz2500_state::floppy_select_w(uint8_t data)
 {
 	switch ((data & 0x03) ^ m_fdc_reverse)
 	{
@@ -815,7 +815,7 @@ WRITE8_MEMBER(mz2500_state::floppy_select_w)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER(mz2500_state::floppy_side_w)
+void mz2500_state::floppy_side_w(uint8_t data)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
@@ -833,7 +833,7 @@ void mz2500_state::mz2500_map(address_map &map)
 	map(0xe000, 0xffff).m(m_rambank[7], FUNC(address_map_bank_device::amap8));
 }
 
-READ8_MEMBER(mz2500_state::rmw_r)
+uint8_t mz2500_state::rmw_r(offs_t offset)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
@@ -852,7 +852,7 @@ READ8_MEMBER(mz2500_state::rmw_r)
 	return m_cg_latch[plane];
 }
 
-WRITE8_MEMBER(mz2500_state::rmw_w)
+void mz2500_state::rmw_w(offs_t offset, uint8_t data)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
@@ -906,7 +906,7 @@ WRITE8_MEMBER(mz2500_state::rmw_w)
 	}
 }
 
-READ8_MEMBER(mz2500_state::kanji_pcg_r)
+uint8_t mz2500_state::kanji_pcg_r(offs_t offset)
 {
 	if(m_kanji_bank & 0x80) //kanji ROM
 		return m_kanji_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
@@ -915,7 +915,7 @@ READ8_MEMBER(mz2500_state::kanji_pcg_r)
 	return m_pcg_ram[offset];
 }
 
-WRITE8_MEMBER(mz2500_state::kanji_pcg_w)
+void mz2500_state::kanji_pcg_w(offs_t offset, uint8_t data)
 {
 	if((m_kanji_bank & 0x80) == 0) ////PCG RAM
 	{
@@ -928,7 +928,7 @@ WRITE8_MEMBER(mz2500_state::kanji_pcg_w)
 	// kanji ROM is read only
 }
 
-READ8_MEMBER(mz2500_state::dict_rom_r)
+uint8_t mz2500_state::dict_rom_r(offs_t offset)
 {
 	return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 }
@@ -957,7 +957,7 @@ void mz2500_state::mz2500_bank_window_map(address_map &map)
 	map(0x78000,0x7ffff).rom().region("phone", 0);
 }
 
-READ8_MEMBER(mz2500_state::mz2500_rom_r)
+uint8_t mz2500_state::mz2500_rom_r()
 {
 	m_lrom_index = (m_maincpu->state_int(Z80_B));
 
@@ -966,7 +966,7 @@ READ8_MEMBER(mz2500_state::mz2500_rom_r)
 	return m_iplpro_rom[m_rom_index];
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
+void mz2500_state::mz2500_rom_w(uint8_t data)
 {
 	m_hrom_index = (m_maincpu->state_int(Z80_B));
 
@@ -975,7 +975,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 }
 
 /* sets 16 color entries out of 4096 possible combinations */
-WRITE8_MEMBER(mz2500_state::palette4096_io_w)
+void mz2500_state::palette4096_io_w(uint8_t data)
 {
 	uint8_t pal_index;
 	uint8_t pal_entry;
@@ -994,17 +994,17 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
-READ8_MEMBER(mz2500_state::fdc_r)
+uint8_t mz2500_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::fdc_w)
+void mz2500_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
+uint8_t mz2500_state::mz2500_bplane_latch_r()
 {
 	if(m_cg_reg[7] & 0x10)
 		return mz2500_cg_latch_compare();
@@ -1013,7 +1013,7 @@ READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
+uint8_t mz2500_state::mz2500_rplane_latch_r()
 {
 	if(m_cg_reg[0x07] & 0x10)
 	{
@@ -1027,12 +1027,12 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 		return m_cg_latch[1];
 }
 
-READ8_MEMBER(mz2500_state::mz2500_gplane_latch_r)
+uint8_t mz2500_state::mz2500_gplane_latch_r()
 {
 	return m_cg_latch[2];
 }
 
-READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
+uint8_t mz2500_state::mz2500_iplane_latch_r()
 {
 	return m_cg_latch[3];
 }
@@ -1067,12 +1067,12 @@ READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
 0x18: CG color masking
 */
 
-WRITE8_MEMBER(mz2500_state::mz2500_cg_addr_w)
+void mz2500_state::mz2500_cg_addr_w(uint8_t data)
 {
 	m_cg_reg_index = data;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
+void mz2500_state::mz2500_cg_data_w(uint8_t data)
 {
 	m_cg_reg[m_cg_reg_index & 0x1f] = data;
 
@@ -1122,7 +1122,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 		m_cg_reg_index = (m_cg_reg_index & 0xfc) | ((m_cg_reg_index + 1) & 0x03);
 }
 
-WRITE8_MEMBER(mz2500_state::timer_w)
+void mz2500_state::timer_w(uint8_t data)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
@@ -1133,7 +1133,7 @@ WRITE8_MEMBER(mz2500_state::timer_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_joystick_r)
+uint8_t mz2500_state::mz2500_joystick_r()
 {
 	uint8_t res,dir_en,in_r;
 
@@ -1161,32 +1161,32 @@ READ8_MEMBER(mz2500_state::mz2500_joystick_r)
 	return res;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_joystick_w)
+void mz2500_state::mz2500_joystick_w(uint8_t data)
 {
 	m_joy_mode = data;
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_kanji_r)
+uint8_t mz2500_state::mz2500_kanji_r(offs_t offset)
 {
 	printf("Read from kanji 2 ROM\n");
 
 	return m_kanji2_rom[(m_kanji_index << 1) | (offset & 1)];
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
+void mz2500_state::mz2500_kanji_w(offs_t offset, uint8_t data)
 {
 	(offset & 1) ? (m_kanji_index = (data << 8) | (m_kanji_index & 0xff)) : (m_kanji_index = (data & 0xff) | (m_kanji_index & 0xff00));
 }
 
-READ8_MEMBER(mz2500_state::rp5c15_8_r)
+uint8_t mz2500_state::rp5c15_8_r()
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
 	return m_rtc->read(rtc_index);
 }
 
-WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
+void mz2500_state::rp5c15_8_w(uint8_t data)
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
@@ -1194,7 +1194,7 @@ WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
+uint8_t mz2500_state::mz2500_emm_data_r()
 {
 	uint8_t emm_lo_index;
 
@@ -1208,7 +1208,7 @@ READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
+void mz2500_state::mz2500_emm_addr_w(uint8_t data)
 {
 	uint8_t emm_hi_index;
 
@@ -1217,7 +1217,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
+void mz2500_state::mz2500_emm_data_w(uint8_t data)
 {
 	uint8_t emm_lo_index;
 

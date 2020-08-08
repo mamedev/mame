@@ -46,13 +46,12 @@ public:
 	void gridlee(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(analog_port_r);
-	DECLARE_READ8_MEMBER(random_num_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
+	uint8_t analog_port_r(offs_t offset);
+	uint8_t random_num_r();
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
-	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
-	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
+	void gridlee_videoram_w(offs_t offset, uint8_t data);
+	void gridlee_palette_select_w(uint8_t data);
 	void gridlee_palette(palette_device &palette) const;
 	uint32_t screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off_tick);
@@ -89,7 +88,7 @@ private:
 };
 
 
-/*----------- defined in audio/gridlee.c -----------*/
+/*----------- defined in audio/gridlee.cpp -----------*/
 
 class gridlee_sound_device : public device_t, public device_sound_interface
 {
@@ -105,7 +104,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( gridlee_sound_w );
+	void gridlee_sound_w(offs_t offset, uint8_t data);
 
 private:
 	/* tone variables */

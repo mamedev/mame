@@ -31,14 +31,8 @@ STATUS:
   * PC85010 DSP
 
   Quizard:
-- Quizard does not work due to MCU not being fully hooked up.
-
-- The Quizard MCU makes use of both serial ports, the second of which is
-  connected to the SCC68070's UART, and the first of which, which is connected
-  to the RDI and TDO pins of the SLAVE MCU's UART. Thus the Quizard MCU cannot
-  be hooked up fully until there is proper LLE of the SLAVE MCU, or input
-  reading is decoupled from the high-level simulation so that arbitrary serial
-  devices can be hooked up.
+- Quizard 3 and 4 fail when going in-game, presumably due to CD-i emulation
+  faults.
 
 TODO:
 
@@ -69,7 +63,13 @@ TODO:
 // TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
 #define CLOCK_A 30_MHz_XTAL
 
-#define VERBOSE         (1)
+#define LOG_DVC             (1 << 1)
+#define LOG_QUIZARD_READS   (1 << 2)
+#define LOG_QUIZARD_WRITES  (1 << 3)
+#define LOG_QUIZARD_OTHER   (1 << 4)
+#define LOG_UART            (1 << 5)
+
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 #define ENABLE_UART_PRINTING (0)
@@ -143,52 +143,6 @@ void cdi_state::cdi910_mem(address_map &map)
 /*************************
 *      Input ports       *
 *************************/
-
-INPUT_CHANGED_MEMBER(quizard_state::mcu_input)
-{
-	bool send = false;
-
-	switch (param)
-	{
-		case 0x39:
-			//if (m_input1.read_safe(0) & 0x01) send = true;
-			break;
-		case 0x37:
-			//if (m_input1.read_safe(0) & 0x02) send = true;
-			break;
-		case 0x31:
-			//if (m_input1.read_safe(0) & 0x04) send = true;
-			break;
-		case 0x32:
-			//if (m_input1.read_safe(0) & 0x08) send = true;
-			break;
-		case 0x33:
-			//if (m_input1.read_safe(0) & 0x10) send = true;
-			break;
-
-		case 0x30:
-			//if (m_input2.read_safe(0) & 0x01) send = true;
-			break;
-		case 0x38:
-			//if (m_input2.read_safe(0) & 0x02) send = true;
-			break;
-		case 0x34:
-			//if (m_input2.read_safe(0) & 0x04) send = true;
-			break;
-		case 0x35:
-			//if (m_input2.read_safe(0) & 0x08) send = true;
-			break;
-		case 0x36:
-			//if (m_input2.read_safe(0) & 0x10) send = true;
-			break;
-	}
-
-	if (send)
-	{
-		uint8_t data = uint8_t(param & 0x000000ff);
-		mcu_hle_tx(data);
-	}
-}
 
 static INPUT_PORTS_START( cdi )
 	PORT_START("DEBUG")
@@ -269,8 +223,7 @@ static INPUT_PORTS_START( quizard )
 	PORT_BIT( 0xc8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -283,10 +236,6 @@ static INPUT_PORTS_START( quizard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Player 2 B")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Player 2 C")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Fake RTS from Console")
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -303,236 +252,103 @@ void cdi_state::machine_reset()
 
 void quizard_state::machine_start()
 {
-	save_item(NAME(m_seeds));
-	save_item(NAME(m_state));
-	save_item(NAME(m_mcu_value));
-	save_item(NAME(m_mcu_ack));
+	save_item(NAME(m_mcu_rx_from_cpu));
+	save_item(NAME(m_mcu_initial_byte));
 }
 
 void quizard_state::machine_reset()
 {
 	cdi_state::machine_reset();
 
-	memset(m_seeds, 0, 10 * sizeof(uint16_t));
-	memset(m_state, 0, 8 * sizeof(uint8_t));
+	m_mcu_rx_from_cpu = 0x00;
+	m_mcu_initial_byte = true;
 }
 
 
-/***************************
-*  Quizard Protection HLE  *
-***************************/
+/**********************
+*  Quizard Protection *
+**********************/
 
-void quizard_state::set_mcu_ack(uint8_t ack)
+void quizard_state::mcu_rtsn_from_cpu(int state)
 {
-	m_mcu_ack = ack;
+	LOGMASKED(LOG_UART, "MCU receiving RTSN from CPU: %d\n", state);
 }
 
-void quizard_state::set_mcu_value(uint16_t value)
+void quizard_state::mcu_rx_from_cpu(uint8_t data)
 {
-	m_mcu_value = value;
-}
-
-void quizard_state::mcu_hle_tx(uint8_t data)
-{
-	m_maincpu->uart_rx(0x5a);
-	m_maincpu->uart_rx(data);
-}
-
-void quizard_state::mcu_set_seeds(uint8_t *rx)
-{
-	m_seeds[0] = (rx[1] << 8) | rx[0];
-	m_seeds[1] = (rx[3] << 8) | rx[2];
-	m_seeds[2] = (rx[5] << 8) | rx[4];
-	m_seeds[3] = (rx[7] << 8) | rx[6];
-	m_seeds[4] = (rx[9] << 8) | rx[8];
-	m_seeds[5] = (rx[11] << 8) | rx[10];
-	m_seeds[6] = (rx[13] << 8) | rx[12];
-	m_seeds[7] = (rx[15] << 8) | rx[14];
-	m_seeds[8] = (rx[17] << 8) | rx[16];
-	m_seeds[9] = (rx[19] << 8) | rx[18];
-}
-
-void quizard_state::mcu_calculate_state()
-{
-	//const uint16_t desired_bitfield = mcu_value;
-	const uint16_t field0 = 0x00ff;
-	const uint16_t field1 = m_mcu_value ^ 0x00ff;
-
-	uint16_t total0 = 0;
-	uint16_t total1 = 0;
-
-	for(int index = 0; index < 10; index++)
+	LOGMASKED(LOG_UART, "MCU receiving %02x from CPU\n", data);
+	if (m_mcu_initial_byte)
 	{
-		if (field0 & (1 << index))
-		{
-			total0 += m_seeds[index];
-		}
-		if (field1 & (1 << index))
-		{
-			total1 += m_seeds[index];
-		}
+		m_mcu_initial_byte = false;
+		return;
 	}
 
-	uint16_t hi0 = (total0 >> 8) + 0x40;
-	m_state[2] = hi0 / 2;
-	m_state[3] = hi0 - m_state[2];
+	m_mcu_rx_from_cpu = data;
 
-	uint16_t lo0 = (total0 & 0x00ff) + 0x40;
-	m_state[0] = lo0 / 2;
-	m_state[1] = lo0 - m_state[0];
-
-	uint16_t hi1 = (total1 >> 8) + 0x40;
-	m_state[6] = hi1 / 2;
-	m_state[7] = hi1 - m_state[6];
-
-	uint16_t lo1 = (total1 & 0x00ff) + 0x40;
-	m_state[4] = lo1 / 2;
-	m_state[5] = lo1 - m_state[4];
-}
-
-void quizard_state::mcu_hle_rx(uint8_t data)
-{
-	static int state = 0;
-	static uint8_t rx[0x100];
-	static uint8_t rx_ptr = 0xff;
-
-	switch (state)
-	{
-		case 0: // Waiting for a leadoff byte
-			if (data == m_mcu_ack) // Sequence end
-			{
-				//scc68070_uart_rx(machine, scc68070, 0x5a);
-				//scc68070_uart_rx(machine, scc68070, 0x42);
-			}
-			else
-			{
-				switch (data)
-				{
-					case 0x44: // DATABASEPATH = **_DATABASE/
-						rx[0] = 0x44;
-						rx_ptr = 1;
-						state = 3;
-						break;
-					case 0x2e: // Unknown; ignored
-						break;
-					case 0x56: // Seed start
-						rx_ptr = 0;
-						state = 1;
-						break;
-					default:
-						//printf("Unknown leadoff byte: %02x\n", data);
-						break;
-				}
-			}
-			break;
-
-		case 1: // Receiving the seed
-			rx[rx_ptr] = data;
-			rx_ptr++;
-			if (rx_ptr == 20)
-			{
-				//printf("Calculating seeds\n");
-				mcu_set_seeds(rx);
-				mcu_calculate_state();
-				state = 2;
-			}
-			break;
-
-		case 2: // Receiving the seed acknowledge
-		case 4:
-			if (data == m_mcu_ack)
-			{
-				if (state == 2)
-				{
-					state = 4;
-				}
-				else
-				{
-					state = 0;
-				}
-				//printf("Sending seed ack\n");
-				m_maincpu->uart_rx(0x5a);
-				m_maincpu->uart_rx(m_state[0]);
-				m_maincpu->uart_rx(m_state[1]);
-				m_maincpu->uart_rx(m_state[2]);
-				m_maincpu->uart_rx(m_state[3]);
-				m_maincpu->uart_rx(m_state[4]);
-				m_maincpu->uart_rx(m_state[5]);
-				m_maincpu->uart_rx(m_state[6]);
-				m_maincpu->uart_rx(m_state[7]);
-			}
-			break;
-
-		case 3: // Receiving the database path
-			rx[rx_ptr] = data;
-			rx_ptr++;
-			if (data == 0x0a)
-			{
-				/*rx[rx_ptr] = 0;
-				//printf("Database path: %s\n", rx);
-				scc68070_uart_rx(machine, scc68070, 0x5a);
-				scc68070_uart_rx(machine, scc68070, g_state[0]);
-				scc68070_uart_rx(machine, scc68070, g_state[1]);
-				scc68070_uart_rx(machine, scc68070, g_state[2]);
-				scc68070_uart_rx(machine, scc68070, g_state[3]);
-				scc68070_uart_rx(machine, scc68070, g_state[4]);
-				scc68070_uart_rx(machine, scc68070, g_state[5]);
-				scc68070_uart_rx(machine, scc68070, g_state[6]);
-				scc68070_uart_rx(machine, scc68070, g_state[7]);*/
-				state = 0;
-			}
-			break;
-	}
+	m_mcu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	m_mcu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 uint8_t quizard_state::mcu_p0_r()
 {
 	const uint8_t data = m_inputs[0]->read();
-	LOG("%s: MCU Port 0 Read (%02x)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 0 Read (%02x)\n", machine().describe_context(), data);
 	return data;
 }
 
 uint8_t quizard_state::mcu_p1_r()
 {
-	const uint8_t data = m_inputs[1]->read();
-	LOG("%s: MCU Port 1 Read (%02x)\n", machine().describe_context(), data);
+	uint8_t data = m_inputs[1]->read();
+	if (BIT(~m_inputs[0]->read(), 4))
+		data &= ~(1 << 4);
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 1 Read (%02x)\n", machine().describe_context(), data);
 	return data;
 }
 
 uint8_t quizard_state::mcu_p2_r()
 {
 	const uint8_t data = m_inputs[2]->read();
-	LOG("%s: MCU Port 2 Read (%02x)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 2 Read (%02x)\n", machine().describe_context(), data);
 	return data;
 }
 
 uint8_t quizard_state::mcu_p3_r()
 {
-	const uint8_t data = 0x04 | (m_inputs[3]->read() ? 0x80 : 0x00);
-	LOG("%s: MCU Port 3 Read (%02x)\n", machine().describe_context(), data);
-	return data;
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 3 Read (%02x)\n", machine().describe_context(), 0x04);
+	return 0x04;
+}
+
+void quizard_state::mcu_p0_w(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 0 Write (%02x)\n", machine().describe_context(), data);
+}
+
+void quizard_state::mcu_p1_w(uint8_t data)
+{
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 1 Write (%02x)\n", machine().describe_context(), data);
 }
 
 void quizard_state::mcu_p2_w(uint8_t data)
 {
-	LOG("%s: MCU Port 2 Write (%02x)\n", machine().describe_context(), data);
-	m_mcu->set_input_line(MCS51_INT1_LINE, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 2 Write (%02x)\n", machine().describe_context(), data);
 }
 
 void quizard_state::mcu_p3_w(uint8_t data)
 {
-	LOG("%s: MCU Port 3 Write (%02x)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 3 Write (%02x)\n", machine().describe_context(), data);
+	m_maincpu->uart_ctsn(BIT(data, 6));
 }
 
 void quizard_state::mcu_tx(uint8_t data)
 {
-	LOG("%s: MCU transmitting %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_QUIZARD_OTHER, "%s: MCU transmitting %02x\n", machine().describe_context(), data);
+	m_maincpu->uart_rx(data);
 }
 
 uint8_t quizard_state::mcu_rx()
 {
-	uint8_t data = 0;
-	LOG("%s: MCU receiving %02x\n", machine().describe_context(), data);
+	uint8_t data = m_mcu_rx_from_cpu;
+	LOGMASKED(LOG_QUIZARD_OTHER, "%s: MCU receiving %02x\n", machine().describe_context(), data);
 	return data;
 }
 
@@ -540,15 +356,15 @@ uint8_t quizard_state::mcu_rx()
 *     DVC cartridge      *
 *************************/
 
-READ16_MEMBER( cdi_state::dvc_r )
+uint16_t cdi_state::dvc_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
+	LOGMASKED(LOG_DVC, "%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
 	return 0;
 }
 
-WRITE16_MEMBER( cdi_state::dvc_w )
+void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
+	LOGMASKED(LOG_DVC, "%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
 }
 
 /*************************
@@ -635,14 +451,14 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 302);
 	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
-	m_lcd->set_refresh_hz(60);
+	m_lcd->set_refresh_hz(50);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
 	m_lcd->set_visarea(0, 192-1, 0, 22-1);
@@ -741,10 +557,10 @@ void cdi_state::cdi910(machine_config &config)
 	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_size(384, 312);
+	screen.set_visarea(0, 384-1, 32, 312-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
@@ -794,13 +610,16 @@ void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizard_state::cdimono1_mem);
-	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_hle_rx));
+	m_maincpu->uart_rtsn_callback().set(FUNC(quizard_state::mcu_rtsn_from_cpu));
+	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_rx_from_cpu));
 
 	I8751(config, m_mcu, 8000000);
 	m_mcu->port_in_cb<0>().set(FUNC(quizard_state::mcu_p0_r));
 	m_mcu->port_in_cb<1>().set(FUNC(quizard_state::mcu_p1_r));
 	m_mcu->port_in_cb<2>().set(FUNC(quizard_state::mcu_p2_r));
 	m_mcu->port_in_cb<3>().set(FUNC(quizard_state::mcu_p3_r));
+	m_mcu->port_out_cb<0>().set(FUNC(quizard_state::mcu_p0_w));
+	m_mcu->port_out_cb<1>().set(FUNC(quizard_state::mcu_p1_w));
 	m_mcu->port_out_cb<2>().set(FUNC(quizard_state::mcu_p2_w));
 	m_mcu->port_out_cb<3>().set(FUNC(quizard_state::mcu_p3_w));
 	m_mcu->serial_tx_cb().set(FUNC(quizard_state::mcu_tx));
@@ -882,15 +701,15 @@ ROM_END
 /*  Quizard notes
 
     The MCU controls the protection sequence, which in turn controls the game display language.
-    Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
+    Each Quizard game (1,2,3,4) requires its own MCU, you can upgrade between revisions by changing
     just the CD, but not between games as a new MCU is required.
 
     MCU Notes:
     i8751 MCU dumps confirmed good on original hardware
     German language MCUs for Quizard 1 through 4 are dumped
-    Czechoslovakian language MCU for Quizard 4 is dumped
-    Known to exist a Quizard 1 Italian language MCU IT 11 L2 (not dumped)
-    Known to exist is an alternate Quizard 2 German language MCU DE 122 D3 (not dumped)
+    Czech language MCU for Quizard 4 is dumped
+    Italian language MCU for Quizard 1 is known to exist (IT 11 L2, not dumped)
+    Alt. German language MCU for Quizard 2 is known to exist (DE 122 D3, not dumped)
 
 */
 
@@ -1066,29 +885,29 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
 // BIOS / System
-CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
 
-// The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
+// The Quizard games are retail CD-i units in a cabinet, with an additional JAMMA adapter and dongle for protection, hence being clones of the system.
 /*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */
-GAME( 1995, cdibios,     0,        cdimono1,      quizard,  cdi_state,      empty_init,  ROT0,     "Philips",  "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cdibios,     0,        cdimono1,      quizard,  cdi_state,     empty_init,  ROT0,     "Philips",  "CD-i (Mono-I) (PAL) BIOS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8, German, i8751 DE 11 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7, German, i8751 DE 11 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_12,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2, German, i8751 DE 11 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0, German, i8751 DE 11 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard_12,  quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3, German, i8751 DN 122 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2, German, i8751 DN 122 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND )
 
-// Quizard 3 and 4 will hang after inserting a coin (incomplete protection sims?)
-GAME( 1995, quizard3,    cdibios,  quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard3a,   quizard3, quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 A1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, quizard3_32, quizard3, quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.2, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+// Quizard 3 and 4 will hang after starting a game (CDIC issues?)
+GAME( 1995, quizard3,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, quizard3a,   quizard3, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 A1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, quizard3_32, quizard3, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.2, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, quizard4cz,  quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, Czech, i8751 TS142 CZ1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, quizard4cz,  quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, Czech, i8751 TS142 CZ1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

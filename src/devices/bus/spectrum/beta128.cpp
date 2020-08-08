@@ -10,22 +10,8 @@
     due to changes in the 128k ROM structure etc. (enable address
     is moved from 3cxx to 3dxx for example)
 
-    Issues:
-
-    Using the FD1793 device a 'CAT' operation in the 'spectrum' driver
-    will always report 'No Disk' but using the Soviet clone KR1818VG93
-    it properly gives the disk catalogue.  Despite this files can still
-    be loaded from disk.
-
-    The 128k Spectrum drivers have a similar issues, although even if
-    you replace the controller doing a 'CAT' operation seems to have
-    an adverse effect on the system memory setup as things become
-    corrupt (LOADing or MERGEing a program afterwards can cause a reset)
-
-    Neither of these issues occur in other Spectrum emulators using
-    the same ROMs and floppy images.
-
     TODO:
+    original ROMs should have bits 0 and 7 swapped
 
     there were many unofficial ROMs available for this, make them
     available for use.
@@ -54,7 +40,7 @@ INPUT_PORTS_START(beta128)
 	PORT_START("SWITCH")
 	PORT_CONFNAME(0x03, 0x01, "System Switch") //PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, switch_changed, 0)
 	PORT_CONFSETTING(0x00, "Off (128)")
-	PORT_CONFSETTING(0x01, "Normal (auto-boot)")
+	PORT_CONFSETTING(0x01, "Normal (auto-boot)") // also enable Beta-disk V3/V4 compatibility, auto-boot feature does not work on Spectrum128.
 	//PORT_CONFSETTING(0x02, "Reset") // TODO: implement RESET callback
 INPUT_PORTS_END
 
@@ -91,12 +77,20 @@ FLOPPY_FORMATS_END
 ROM_START(beta128)
 	ROM_REGION(0x4000, "rom", 0)
 	ROM_DEFAULT_BIOS("trd503")
+
+	// original, but in plain form, should be replaced with "proper dumps" with data bits 0 and 7 swapped
 	ROM_SYSTEM_BIOS(0, "trd501", "TR-DOS v5.01")
 	ROMX_LOAD("trd501.rom", 0x0000, 0x4000, CRC(3e3cdd4c) SHA1(8303ba0cc79daa6c04cd1e6ce27e8b6886a3f0de), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "trd503", "TR-DOS v5.03")
-	ROMX_LOAD("trd503.rom", 0x0000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "trd504", "TR-DOS v5.04 (hack)")
-	ROMX_LOAD("trd504.rom", 0x0000, 0x4000, CRC(ba310874) SHA1(05e55e37df8eee6c68601ba9cf6c92195852ce3f), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "trd502", "TR-DOS v5.02")
+	ROMX_LOAD("trd502.rom", 0x0000, 0x4000, CRC(64f0fcf8) SHA1(862e0af2245f68fca3d6a5b10186d09fd1faee55), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "trd503", "TR-DOS v5.03")
+	ROMX_LOAD("trd503.rom", 0x0000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(2))
+
+	// clone/homebrew modifications based on original v5.03
+	ROM_SYSTEM_BIOS(3, "trd504t", "TR-DOS v5.04T (hack)")
+	// increased step rate (6ms), FORMAT command got interleave 1:1 option for faster read/write speed, this firmware was most common at post-soviet space in 90x.
+	ROMX_LOAD("trd504t.rom", 0x0000, 0x4000, CRC(e212d1e0) SHA1(745e9caf576e64a5386ad845256d28593d34cc40), ROM_BIOS(3))
+	// trd504.rom CRC ba310874 is bad dump of 5.03 with edited version text, no actual code changes.
 ROM_END
 
 //-------------------------------------------------
@@ -156,6 +150,7 @@ void spectrum_beta128_device::device_start()
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_control));
 	save_item(NAME(m_motor_active));
+	save_item(NAME(m_128rom_bit));
 }
 
 //-------------------------------------------------
@@ -170,7 +165,7 @@ void spectrum_beta128_device::device_reset()
 	else
 		m_romcs = 0;
 
-	m_control = 0;
+	m_128rom_bit = true;
 }
 
 //**************************************************************************
@@ -189,46 +184,55 @@ void spectrum_beta128_device::pre_opcode_fetch(offs_t offset)
 
 	if (!machine().side_effects_disabled())
 	{
-		if ((offset == 0x0066) || (offset & 0xff00) == 0x3d00)
+		u8 offs = offset >> 8;
+
+		if (offs == 0x3d && m_128rom_bit)
 			m_romcs = 1;
-		else if (offset >= 0x4000)
+		else if (offs == 0x3c && m_128rom_bit && m_switch->read() == 0x01)
+			m_romcs = 1;
+		else if (offs >= 0x40)
 			m_romcs = 0;
 	}
 }
 
 uint8_t spectrum_beta128_device::iorq_r(offs_t offset)
 {
-	uint8_t data = m_exp->iorq_r(offset);
+	uint8_t data = 0xff;
 
 	if (m_romcs)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0x83)
 		{
-		case 0x1f: case 0x3f: case 0x5f: case 0x7f:
+		case 0x03:
 			data = m_fdc->read((offset >> 5) & 0x03);
 			break;
 
-		case 0xff:
+		case 0x83:
 			data &= 0x3f; // actually open bus
 			data |= m_fdc->drq_r() ? 0x40 : 0;
 			data |= m_fdc->intrq_r() ? 0x80 : 0;
 			break;
 		}
-	}
+	} else
+		data = m_exp->iorq_r(offset);
+
 	return data;
 }
 
 void spectrum_beta128_device::iorq_w(offs_t offset, uint8_t data)
 {
+	if ((offset & 0x8002) == 0)
+		m_128rom_bit = bool(data & 0x10);
+
 	if (m_romcs)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0x83)
 		{
-		case 0x1f: case 0x3f: case 0x5f: case 0x7f:
+		case 0x03:
 			m_fdc->write((offset >> 5) & 0x03, data);
 			break;
 
-		case 0xff:
+		case 0x83:
 			floppy_image_device* floppy = m_floppy[data & 3]->get_device();
 
 			m_control = data;
@@ -237,15 +241,17 @@ void spectrum_beta128_device::iorq_w(offs_t offset, uint8_t data)
 				floppy->ss_w(BIT(data, 4) ? 0 : 1);
 			m_fdc->dden_w(BIT(data, 6));
 
-			// bit 3 connected to pin 23 "HLT" of FDC and via diode to INDEX
-			//m_fdc->hlt_w(BIT(data, 3)); // not handled in current wd_fdc
+			m_fdc->hlt_w(BIT(data, 3));
+			// bit 3 also connected to FDC /IP pin via diode, AND logic: if this bit is 0 - /IP will be forcibly set to low.
+			// used for bitbang index pulses generation to stop FDD drive motor with no disk inserted, currently not emulated.
 
 			m_fdc->mr_w(BIT(data, 2));
 			motors_control();
 			break;
 		}
 	}
-	m_exp->iorq_w(offset, data);
+	else
+		m_exp->iorq_w(offset, data);
 }
 
 uint8_t spectrum_beta128_device::mreq_r(offs_t offset)
@@ -263,16 +269,11 @@ uint8_t spectrum_beta128_device::mreq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_beta128_device::mreq_w(offs_t offset, uint8_t data)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
-}
-
 INPUT_CHANGED_MEMBER(spectrum_beta128_device::magic_button)
 {
 	if (newval && !oldval)
 	{
+		m_romcs = 1;
 		m_slot->nmi_w(ASSERT_LINE);
 	}
 	else
@@ -283,7 +284,7 @@ INPUT_CHANGED_MEMBER(spectrum_beta128_device::magic_button)
 
 void spectrum_beta128_device::fdc_hld_w(int state)
 {
-	// TODO: HLD connected to RDY pin (current wd_fdc have no external RDY control)
+	m_fdc->set_force_ready(state); // HLD connected to RDY pin
 	m_motor_active = state;
 	motors_control();
 }

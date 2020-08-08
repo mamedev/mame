@@ -288,11 +288,15 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
 		m_io_analog(*this, "AN%u", 0U),
+		m_io_p4_8way(*this, "8WAY_P4"),
+		m_io_49way_x(*this, "49WAYX_P%u", 1U),
+		m_io_49way_y(*this, "49WAYY_P%u", 1U),
 		m_io_gun_x(*this, "LIGHT%u_X", 0U),
 		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
 		m_io_fake(*this, "FAKE"),
 		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
+		m_io_dips(*this, "DIPS"),
 		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
@@ -332,6 +336,8 @@ public:
 	void init_mace();
 	void init_blitz99();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(blitz_49way_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
 private:
@@ -345,14 +351,20 @@ private:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport m_io_p4_8way;
+	optional_ioport_array<4> m_io_49way_x;
+	optional_ioport_array<4> m_io_49way_y;
 	optional_ioport_array<2> m_io_gun_x;
 	optional_ioport_array<2> m_io_gun_y;
 	optional_ioport m_io_fake;
 	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
+	optional_ioport m_io_dips;
 	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
+
+	static const uint8_t translate49[7];
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -370,37 +382,39 @@ private:
 	uint32_t m_cmos_write_enabled;
 	uint16_t m_output_last;
 	uint8_t m_output_mode;
+	uint32_t m_i40_data;
 	uint32_t m_gear;
 	int8_t m_wheel_force;
 	int m_wheel_offset;
 	bool m_wheel_calibrated;
-	DECLARE_READ32_MEMBER(interrupt_state_r);
-	DECLARE_READ32_MEMBER(interrupt_state2_r);
-	DECLARE_READ32_MEMBER(interrupt_config_r);
-	DECLARE_WRITE32_MEMBER(interrupt_config_w);
-	DECLARE_READ32_MEMBER(seattle_interrupt_enable_r);
-	DECLARE_WRITE32_MEMBER(seattle_interrupt_enable_w);
-	DECLARE_WRITE32_MEMBER(vblank_clear_w);
+	uint32_t interrupt_state_r();
+	uint32_t interrupt_state2_r();
+	uint32_t interrupt_config_r();
+	void interrupt_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t seattle_interrupt_enable_r();
+	void seattle_interrupt_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void vblank_clear_w(uint32_t data);
 	uint32_t analog_port_r();
 	void analog_port_w(uint32_t data);
-	DECLARE_READ32_MEMBER(carnevil_gun_r);
-	DECLARE_WRITE32_MEMBER(carnevil_gun_w);
-	DECLARE_WRITE32_MEMBER(cmos_w);
-	DECLARE_READ32_MEMBER(cmos_r);
-	DECLARE_WRITE32_MEMBER(cmos_protect_w);
-	DECLARE_READ32_MEMBER(cmos_protect_r);
-	DECLARE_WRITE32_MEMBER(seattle_watchdog_w);
-	DECLARE_READ32_MEMBER(asic_reset_r);
-	DECLARE_WRITE32_MEMBER(asic_reset_w);
-	DECLARE_WRITE32_MEMBER(asic_fifo_w);
-	DECLARE_READ32_MEMBER(status_leds_r);
-	DECLARE_WRITE32_MEMBER(status_leds_w);
-	DECLARE_READ32_MEMBER(ethernet_r);
-	DECLARE_WRITE32_MEMBER(ethernet_w);
+	uint32_t carnevil_gun_r(offs_t offset);
+	void carnevil_gun_w(offs_t offset, uint32_t data);
+	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cmos_r(offs_t offset);
+	void cmos_protect_w(uint32_t data);
+	uint32_t cmos_protect_r();
+	void seattle_watchdog_w(uint32_t data);
+	uint32_t asic_reset_r();
+	void asic_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void asic_fifo_w(uint32_t data);
+	uint32_t status_leds_r();
+	void status_leds_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ethernet_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t output_r();
 	void output_w(uint32_t data);
-	DECLARE_READ32_MEMBER(widget_r);
-	DECLARE_WRITE32_MEMBER(widget_w);
+	uint32_t widget_r(offs_t offset, uint32_t mem_mask = ~0);
+	void widget_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void i40_w(uint32_t data);
 	void wheel_board_w(offs_t offset, uint32_t data);
 
 
@@ -427,7 +441,6 @@ private:
 	void flagstaff_cs3_map(address_map &map);
 };
 
-
 /*************************************
  *
  *  Machine init
@@ -440,8 +453,8 @@ void seattle_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	// configure fast RAM regions
-//	m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
-//	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+//  m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
+//  m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	save_item(NAME(m_widget.ethernet_addr));
 	save_item(NAME(m_widget.irq_num));
@@ -460,6 +473,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_cmos_write_enabled));
 	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
+	save_item(NAME(m_i40_data));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
@@ -531,7 +545,7 @@ WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::interrupt_state_r)
+uint32_t seattle_state::interrupt_state_r()
 {
 	uint32_t result = 0;
 	result |= m_ethernet_irq_state << ETHERNET_IRQ_SHIFT;
@@ -540,20 +554,20 @@ READ32_MEMBER(seattle_state::interrupt_state_r)
 }
 
 
-READ32_MEMBER(seattle_state::interrupt_state2_r)
+uint32_t seattle_state::interrupt_state2_r()
 {
-	uint32_t result = interrupt_state_r(space, offset, mem_mask);
+	uint32_t result = interrupt_state_r();
 	result |= m_vblank_state << 8;
 	return result;
 }
 
 
-READ32_MEMBER(seattle_state::interrupt_config_r)
+uint32_t seattle_state::interrupt_config_r()
 {
 	return m_interrupt_config;
 }
 
-WRITE32_MEMBER(seattle_state::interrupt_config_w)
+void seattle_state::interrupt_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int irq;
 	COMBINE_DATA(&m_interrupt_config);
@@ -597,12 +611,12 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 }
 
 
-READ32_MEMBER(seattle_state::seattle_interrupt_enable_r)
+uint32_t seattle_state::seattle_interrupt_enable_r()
 {
 	return m_interrupt_enable;
 }
 
-WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
+void seattle_state::seattle_interrupt_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_interrupt_enable;
 	COMBINE_DATA(&m_interrupt_enable);
@@ -639,7 +653,7 @@ void seattle_state::update_vblank_irq()
 }
 
 
-WRITE32_MEMBER(seattle_state::vblank_clear_w)
+void seattle_state::vblank_clear_w(uint32_t data)
 {
 	// clear the latch and update the IRQ
 	m_vblank_latch = 0;
@@ -732,6 +746,83 @@ void seattle_state::wheel_board_w(offs_t offset, uint32_t data)
 }
 
 /*************************************
+* 49 Way translation matrix
+*************************************/
+const uint8_t seattle_state::translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+
+/*************************************
+* 2 player 49 Way Joystick on Blitz
+*************************************/
+CUSTOM_INPUT_MEMBER(seattle_state::blitz_49way_r)
+{
+	return  (translate49[m_io_49way_y[1]->read() >> 4] << 12) | (translate49[m_io_49way_x[1]->read() >> 4] << 8) |
+		(translate49[m_io_49way_y[0]->read() >> 4] << 4) | (translate49[m_io_49way_x[0]->read() >> 4] << 0);
+}
+
+/*************************************
+* Optical 49 Way Joystick I40 Board
+*************************************/
+void seattle_state::i40_w(uint32_t data)
+{
+	//printf("i40_w: data = %08x\n", data);
+	//logerror("i40_w: data = %08x\n", data);
+	m_i40_data = data;
+}
+
+CUSTOM_INPUT_MEMBER(seattle_state::i40_r)
+{
+	if (m_io_dips->read() & 0x100) {
+		// 8 way joysticks
+		return m_io_p4_8way->read();
+	}
+	else {
+		// 49 way joysticks via i40 adapter board
+		int index = m_i40_data & 0xf;
+		uint8_t data = 0;
+		switch (index) {
+		case 0:
+			data = translate49[m_io_49way_x[0]->read() >> 4];
+			break;
+		case 1:
+			data = translate49[m_io_49way_y[0]->read() >> 4];
+			break;
+		case 2:
+			data = translate49[m_io_49way_x[1]->read() >> 4];
+			break;
+		case 3:
+			data = translate49[m_io_49way_y[1]->read() >> 4];
+			break;
+		case 4:
+			data = translate49[m_io_49way_x[2]->read() >> 4];
+			break;
+		case 5:
+			data = translate49[m_io_49way_y[2]->read() >> 4];
+			break;
+		case 6:
+			data = translate49[m_io_49way_x[3]->read() >> 4];
+			break;
+		case 7:
+			data = translate49[m_io_49way_y[3]->read() >> 4];
+			break;
+		case 10:
+		case 11:
+		case 12:
+			// I40 Detection
+			data = ~index & 0xf;
+			break;
+		default:
+			//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+			break;
+		}
+		logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
+		//if (m_i40_data & 0x1000)
+		//  printf("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context().c_str(), m_i40_data, index, data);
+		//m_i40_data &= ~0x1000;
+		return data;
+	}
+}
+
+/*************************************
 *
 *  Gearshift (calspeed)
 *
@@ -754,7 +845,7 @@ DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::carnevil_gun_r)
+uint32_t seattle_state::carnevil_gun_r(offs_t offset)
 {
 	uint32_t result = 0;
 
@@ -800,7 +891,7 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::carnevil_gun_w)
+void seattle_state::carnevil_gun_w(offs_t offset, uint32_t data)
 {
 	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
@@ -811,25 +902,25 @@ WRITE32_MEMBER(seattle_state::carnevil_gun_w)
 *
 *************************************/
 
-READ32_MEMBER(seattle_state::ethernet_r)
+uint32_t seattle_state::ethernet_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	if (!(offset & 8))
-		data = m_ethernet->read(space, offset & 7, mem_mask & 0xffff);
+		data = m_ethernet->read(offset & 7, mem_mask & 0xffff);
 	else
-		data = m_ethernet->read(space, offset & 7, mem_mask & 0x00ff);
+		data = m_ethernet->read(offset & 7, mem_mask & 0x00ff);
 	//logerror("ethernet_r: @%08x=%08x mask: %08x\n", offset, data, mem_mask);
 	return data;
 }
 
 
-WRITE32_MEMBER(seattle_state::ethernet_w)
+void seattle_state::ethernet_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("ethernet_w: @%08x=%08x mask: %08x\n", offset, data, mem_mask);
 	if (!(offset & 8))
-		m_ethernet->write(space, offset & 7, data & 0xffff, mem_mask | 0xffff);
+		m_ethernet->write(offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
-		m_ethernet->write(space, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
+		m_ethernet->write(offset & 7, data & 0x00ff, mem_mask | 0x00ff);
 }
 
 /*************************************
@@ -915,7 +1006,7 @@ void seattle_state::output_w(uint32_t data)
 }
 
 
-READ32_MEMBER(seattle_state::widget_r)
+uint32_t seattle_state::widget_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = ~0;
 
@@ -939,7 +1030,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_ETHER_DATA:
-			result = m_ethernet->read(space, m_widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = m_ethernet->read(m_widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -949,7 +1040,7 @@ READ32_MEMBER(seattle_state::widget_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::widget_w)
+void seattle_state::widget_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
@@ -974,7 +1065,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_ETHER_DATA:
-			m_ethernet->write(space, m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			m_ethernet->write(m_widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }
@@ -986,7 +1077,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 *
 *************************************/
 
-WRITE32_MEMBER(seattle_state::cmos_w)
+void seattle_state::cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cmos_write_enabled)
 		COMBINE_DATA(&m_nvram_data[offset]);
@@ -994,19 +1085,19 @@ WRITE32_MEMBER(seattle_state::cmos_w)
 }
 
 
-READ32_MEMBER(seattle_state::cmos_r)
+uint32_t seattle_state::cmos_r(offs_t offset)
 {
 	return m_nvram_data[offset];
 }
 
 
-WRITE32_MEMBER(seattle_state::cmos_protect_w)
+void seattle_state::cmos_protect_w(uint32_t data)
 {
 	m_cmos_write_enabled = true;
 }
 
 
-READ32_MEMBER(seattle_state::cmos_protect_r)
+uint32_t seattle_state::cmos_protect_r()
 {
 	return m_cmos_write_enabled;
 }
@@ -1019,17 +1110,17 @@ READ32_MEMBER(seattle_state::cmos_protect_r)
 *
 *************************************/
 
-WRITE32_MEMBER(seattle_state::seattle_watchdog_w)
+void seattle_state::seattle_watchdog_w(uint32_t data)
 {
 	m_maincpu->eat_cycles(100);
 }
 
-READ32_MEMBER(seattle_state::asic_reset_r)
+uint32_t seattle_state::asic_reset_r()
 {
 	return m_asic_reset;
 }
 
-WRITE32_MEMBER(seattle_state::asic_reset_w)
+void seattle_state::asic_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_asic_reset);
 	if (!(m_asic_reset & 0x0002))
@@ -1037,19 +1128,19 @@ WRITE32_MEMBER(seattle_state::asic_reset_w)
 }
 
 
-WRITE32_MEMBER(seattle_state::asic_fifo_w)
+void seattle_state::asic_fifo_w(uint32_t data)
 {
 	m_ioasic->fifo_w(data);
 }
 
 
-READ32_MEMBER(seattle_state::status_leds_r)
+uint32_t seattle_state::status_leds_r()
 {
 	return m_status_leds | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(seattle_state::status_leds_w)
+void seattle_state::status_leds_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_status_leds = data;
@@ -1247,8 +1338,8 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1271,20 +1362,8 @@ static INPUT_PORTS_START( seattle_common )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( seattle_4p )
-	PORT_INCLUDE(seattle_common)
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
-
-	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -1301,12 +1380,12 @@ static INPUT_PORTS_START( seattle_4p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( seattle_analog )
 	PORT_INCLUDE(seattle_common)
-	
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Button")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1328,13 +1407,13 @@ INPUT_PORTS_END
  *************************************/
 
 static INPUT_PORTS_START( wg3dh )
-	PORT_INCLUDE(seattle_4p)
+	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0002, 0x0002, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot/Block")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Pass/Steal")
@@ -1344,7 +1423,7 @@ static INPUT_PORTS_START( wg3dh )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Steal")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Burst/Turbo")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Shoot/Block")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Pass/Steal")
@@ -1547,7 +1626,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( blitz )
-	PORT_INCLUDE(seattle_4p)
+	PORT_INCLUDE(seattle_common)
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x0001, 0x0000, "Coinage Source" )
@@ -1604,14 +1683,21 @@ static INPUT_PORTS_START( blitz )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Turbo")
-	
+
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(seattle_state, blitz_49way_r)
+
+	PORT_START("49WAYX_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYY_P1")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("49WAYX_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("49WAYY_P2")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -1662,6 +1748,37 @@ static INPUT_PORTS_START( blitz99 )
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Players ) )
 	PORT_DIPSETTING(      0x2000, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(seattle_state, i40_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
+
+	PORT_START("8WAY_P4")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
+
+	PORT_START("49WAYX_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYY_P3")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+
+	PORT_START("49WAYX_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
+
+	PORT_START("49WAYY_P4")
+	PORT_BIT(0xff, 0x38, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(4)
 
 INPUT_PORTS_END
 
@@ -1948,7 +2065,7 @@ void seattle_state::seattle200_widget(machine_config &config)
 	seattle200(config);
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
-	
+
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
@@ -2088,6 +2205,7 @@ void seattle_state::blitz(machine_config &config)
 	m_ioasic->set_upper(444); // or 528
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::blitz99(machine_config &config)
@@ -2102,6 +2220,7 @@ void seattle_state::blitz99(machine_config &config)
 	m_ioasic->set_upper(481); // or 484 or 520
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::blitz2k(machine_config &config)
@@ -2116,13 +2235,14 @@ void seattle_state::blitz2k(machine_config &config)
 	m_ioasic->set_upper(494); // or 498
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::i40_w));
 }
 
 void seattle_state::carnevil(machine_config &config)
 {
 	seattle150(config);
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::carnevil_cs3_map, "carnevil_cs3_map", this), this);
-	
+
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
@@ -2479,7 +2599,7 @@ ROM_START( carnevil1 )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9 
+	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Rom Version 1.9
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41
@@ -2506,7 +2626,7 @@ ROM_START( hyprdriv )
 
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
 	ROM_LOAD( "hyperdrive1.1.u32", 0x000000, 0x80000, CRC(3120991e) SHA1(8e47888a5a23c9d3c0d0c64497e1cfb4e46c2cd6) )  // Boot Rom Version 2. Doesn't work, maybe for older drive?
-	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9. 
+	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9.
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Version 1.40  Oct 23 1998  15:16:00
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
@@ -2668,7 +2788,7 @@ void seattle_state::init_hyprdriv()
 	// speedups
 	m_maincpu->mips3drc_add_hotspot(0x801643BC, 0x3C03801B, 250); // confirmed
 	m_maincpu->mips3drc_add_hotspot(0x80011FB8, 0x8E020018, 250); // confirmed
-//	m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250); // potential
+//  m_maincpu->mips3drc_add_hotspot(0x80136A80, 0x3C02801D, 250); // potential
 }
 
 

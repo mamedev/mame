@@ -291,12 +291,12 @@ WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
  *
  *************************************/
 
-READ8_MEMBER(asteroid_state::earom_read)
+uint8_t asteroid_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(asteroid_state::earom_write)
+void asteroid_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);
@@ -1174,7 +1174,7 @@ void asteroid_state::init_asteroidb()
 
 void asteroid_state::init_asterock()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(*this, FUNC(asteroid_state::asterock_IN0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8sm_delegate(*this, FUNC(asteroid_state::asterock_IN0_r)));
 }
 
 

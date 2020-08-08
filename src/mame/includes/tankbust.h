@@ -51,15 +51,15 @@ private:
 	uint8_t m_yscroll[2];
 	uint8_t m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(e0xx_w);
-	DECLARE_READ8_MEMBER(debug_output_area_r);
-	DECLARE_READ8_MEMBER(some_changing_input);
-	DECLARE_WRITE8_MEMBER(background_videoram_w);
-	DECLARE_WRITE8_MEMBER(background_colorram_w);
-	DECLARE_WRITE8_MEMBER(txtram_w);
-	DECLARE_WRITE8_MEMBER(xscroll_w);
-	DECLARE_WRITE8_MEMBER(yscroll_w);
+	void soundlatch_w(uint8_t data);
+	void e0xx_w(offs_t offset, uint8_t data);
+	uint8_t debug_output_area_r(offs_t offset);
+	uint8_t some_changing_input();
+	void background_videoram_w(offs_t offset, uint8_t data);
+	void background_colorram_w(offs_t offset, uint8_t data);
+	void txtram_w(offs_t offset, uint8_t data);
+	void xscroll_w(offs_t offset, uint8_t data);
+	void yscroll_w(offs_t offset, uint8_t data);
 	uint8_t soundlatch_r();
 	uint8_t soundtimer_r();
 

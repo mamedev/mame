@@ -321,7 +321,7 @@ void towns_state::init_serial_rom()
 	m_towns_serial_rom[25] = 0x10;
 }
 
-READ8_MEMBER(towns_state::towns_system_r)
+uint8_t towns_state::towns_system_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -366,7 +366,7 @@ READ8_MEMBER(towns_state::towns_system_r)
 	}
 }
 
-WRITE8_MEMBER(towns_state::towns_system_w)
+void towns_state::towns_system_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -400,7 +400,7 @@ WRITE8_MEMBER(towns_state::towns_system_w)
 	}
 }
 
-WRITE8_MEMBER(towns_state::towns_intervaltimer2_w)
+void towns_state::towns_intervaltimer2_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -418,7 +418,7 @@ WRITE8_MEMBER(towns_state::towns_intervaltimer2_w)
 	}
 }
 
-READ8_MEMBER(towns_state::towns_intervaltimer2_r)
+uint8_t towns_state::towns_intervaltimer2_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -481,13 +481,13 @@ void towns_state::wait_end()
 	m_maincpu->set_input_line(INPUT_LINE_HALT,CLEAR_LINE);
 }
 
-READ8_MEMBER(towns_state::towns_sys6c_r)
+uint8_t towns_state::towns_sys6c_r()
 {
 	if(LOG_SYS) logerror("SYS: (0x6c) Timer? read\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_sys6c_w)
+void towns_state::towns_sys6c_w(uint8_t data)
 {
 	// halts the CPU for 1 microsecond
 	m_maincpu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
@@ -495,14 +495,14 @@ WRITE8_MEMBER(towns_state::towns_sys6c_w)
 }
 
 template<int Chip>
-READ8_MEMBER(towns_state::towns_dma_r)
+uint8_t towns_state::towns_dma_r(offs_t offset)
 {
 	logerror("DMA#%01x: read register %i\n",Chip,offset);
 	return m_dma[Chip]->read(offset);
 }
 
 template<int Chip>
-WRITE8_MEMBER(towns_state::towns_dma_w)
+void towns_state::towns_dma_w(offs_t offset, uint8_t data)
 {
 	logerror("DMA#%01x: wrote 0x%02x to register %i\n",Chip,data,offset);
 	m_dma[Chip]->write(offset, data);
@@ -525,7 +525,7 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
 	m_dma[0]->dmarq(state, 0);
 }
 
-READ8_MEMBER(towns_state::towns_floppy_r)
+uint8_t towns_state::towns_floppy_r(offs_t offset)
 {
 	uint8_t ret;
 
@@ -576,7 +576,7 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(towns_state::towns_floppy_w)
+void towns_state::towns_floppy_w(offs_t offset, uint8_t data)
 {
 	floppy_image_device* sel[4] = { m_flop[0]->get_device(), m_flop[1]->get_device(), nullptr, nullptr };
 
@@ -748,7 +748,7 @@ void towns_state::poll_keyboard()
 	}
 }
 
-READ8_MEMBER(towns_state::towns_keyboard_r)
+uint8_t towns_state::towns_keyboard_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 
@@ -775,7 +775,7 @@ READ8_MEMBER(towns_state::towns_keyboard_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_keyboard_w)
+void towns_state::towns_keyboard_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -815,7 +815,7 @@ void towns_state::speaker_set_spkrdata(uint8_t data)
 }
 
 
-READ8_MEMBER(towns_state::towns_port60_r)
+uint8_t towns_state::towns_port60_r()
 {
 	uint8_t val = 0x00;
 
@@ -830,7 +830,7 @@ READ8_MEMBER(towns_state::towns_port60_r)
 	return val;
 }
 
-WRITE8_MEMBER(towns_state::towns_port60_w)
+void towns_state::towns_port60_w(uint8_t data)
 {
 	if(data & 0x80)
 	{
@@ -845,7 +845,7 @@ WRITE8_MEMBER(towns_state::towns_port60_w)
 	//logerror("PIT: wrote 0x%02x to port 0x60\n",data);
 }
 
-READ8_MEMBER(towns_state::towns_sys5e8_r)
+uint8_t towns_state::towns_sys5e8_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -859,7 +859,7 @@ READ8_MEMBER(towns_state::towns_sys5e8_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_sys5e8_w)
+void towns_state::towns_sys5e8_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -878,7 +878,7 @@ WRITE8_MEMBER(towns_state::towns_sys5e8_w)
 // (0x4ea) PCM IRQ mask
 // R/W  -- (0x4eb) PCM IRQ flag
 // W/O  -- (0x4ec) LED control
-READ8_MEMBER(towns_state::towns_sound_ctrl_r)
+uint8_t towns_state::towns_sound_ctrl_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -912,7 +912,7 @@ READ8_MEMBER(towns_state::towns_sound_ctrl_r)
 	return ret;
 }
 
-WRITE8_MEMBER(towns_state::towns_sound_ctrl_w)
+void towns_state::towns_sound_ctrl_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -931,7 +931,7 @@ void towns_state::mouse_timeout()
 	m_towns_mouse_output = MOUSE_START;  // reset mouse data
 }
 
-READ8_MEMBER(towns_state::towns_padport_r)
+uint8_t towns_state::towns_padport_r(offs_t offset)
 {
 	uint8_t ret = 0x00;
 	uint32_t porttype = m_ctrltype->read();
@@ -1118,7 +1118,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 	return ret;
 }
 
-WRITE8_MEMBER(towns_state::towns_pad_mask_w)
+void towns_state::towns_pad_mask_w(uint8_t data)
 {
 	uint8_t current_x,current_y;
 	uint32_t type = m_ctrltype->read();
@@ -1198,7 +1198,7 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_cmos_low_r )
+uint8_t towns_state::towns_cmos_low_r(offs_t offset)
 {
 	if(m_towns_mainmem_enable != 0)
 		return m_ram->pointer()[offset + 0xd8000];
@@ -1209,7 +1209,7 @@ READ8_MEMBER( towns_state::towns_cmos_low_r )
 		return m_nvram16[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_cmos_low_w )
+void towns_state::towns_cmos_low_w(offs_t offset, uint8_t data)
 {
 	if(m_towns_mainmem_enable != 0)
 		m_ram->pointer()[offset+0xd8000] = data;
@@ -1220,7 +1220,7 @@ WRITE8_MEMBER( towns_state::towns_cmos_low_w )
 			m_nvram16[offset] = data;
 }
 
-READ8_MEMBER( towns_state::towns_cmos_r )
+uint8_t towns_state::towns_cmos_r(offs_t offset)
 {
 	if(m_nvram)
 		return m_nvram[offset];
@@ -1228,7 +1228,7 @@ READ8_MEMBER( towns_state::towns_cmos_r )
 		return m_nvram16[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_cmos_w )
+void towns_state::towns_cmos_w(offs_t offset, uint8_t data)
 {
 	if(m_nvram)
 		m_nvram[offset] = data;
@@ -1236,7 +1236,7 @@ WRITE8_MEMBER( towns_state::towns_cmos_w )
 		m_nvram16[offset] = data;
 }
 
-void towns_state::towns_update_video_banks(address_space& space)
+void towns_state::towns_update_video_banks()
 {
 	uint8_t* ROM = m_user->base();
 
@@ -1282,7 +1282,7 @@ void towns_state::towns_update_video_banks(address_space& space)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_sys480_r )
+uint8_t towns_state::towns_sys480_r()
 {
 	if(m_towns_system_port & 0x02)
 		return 0x02;
@@ -1290,20 +1290,20 @@ READ8_MEMBER( towns_state::towns_sys480_r )
 		return 0x00;
 }
 
-WRITE8_MEMBER( towns_state::towns_sys480_w )
+void towns_state::towns_sys480_w(uint8_t data)
 {
 	m_towns_system_port = data;
 	m_towns_ram_enable = data & 0x02;
-	towns_update_video_banks(space);
+	towns_update_video_banks();
 }
 
-WRITE8_MEMBER( towns_state::towns_video_404_w )
+void towns_state::towns_video_404_w(uint8_t data)
 {
 	m_towns_mainmem_enable = data & 0x80;
-	towns_update_video_banks(space);
+	towns_update_video_banks();
 }
 
-READ8_MEMBER( towns_state::towns_video_404_r )
+uint8_t towns_state::towns_video_404_r()
 {
 	if(m_towns_mainmem_enable != 0)
 		return 0x80;
@@ -1741,7 +1741,7 @@ uint16_t towns_state::towns_cdrom_dma_r()
 	return m_towns_cd.buffer[m_towns_cd.buffer_ptr++];
 }
 
-READ8_MEMBER(towns_state::towns_cdrom_r)
+uint8_t towns_state::towns_cdrom_r(offs_t offset)
 {
 	uint32_t addr = 0;
 	uint8_t ret = 0;
@@ -1901,7 +1901,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 	}
 }
 
-WRITE8_MEMBER(towns_state::towns_cdrom_w)
+void towns_state::towns_cdrom_w(offs_t offset, uint8_t data)
 {
 	int x;
 	switch(offset)
@@ -1963,12 +1963,12 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
  * 0x70: Data port
  * 0x80: Register select
  */
-READ8_MEMBER(towns_state::towns_rtc_r)
+uint8_t towns_state::towns_rtc_r()
 {
 	return (m_rtc_busy ? 0 : 0x80) | m_rtc_d;
 }
 
-WRITE8_MEMBER(towns_state::towns_rtc_w)
+void towns_state::towns_rtc_w(uint8_t data)
 {
 	m_rtc->d0_w(BIT(data, 0));
 	m_rtc->d1_w(BIT(data, 1));
@@ -1976,7 +1976,7 @@ WRITE8_MEMBER(towns_state::towns_rtc_w)
 	m_rtc->d3_w(BIT(data, 3));
 }
 
-WRITE8_MEMBER(towns_state::towns_rtc_select_w)
+void towns_state::towns_rtc_select_w(uint8_t data)
 {
 	m_rtc->cs1_w(BIT(data, 7));
 	m_rtc->cs2_w(BIT(data, 7));
@@ -2046,7 +2046,7 @@ WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
 //         1 = CD-DA right channel
 //         2 = MIC
 //         3 = MODEM
-READ8_MEMBER(towns_state::towns_volume_r)
+uint8_t towns_state::towns_volume_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -2070,7 +2070,7 @@ void towns_state::cdda_db_to_gain(float db)
 	m_cdda->set_output_gain(port, gain);
 }
 
-WRITE8_MEMBER(towns_state::towns_volume_w)
+void towns_state::towns_volume_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -2094,13 +2094,13 @@ WRITE8_MEMBER(towns_state::towns_volume_w)
 	}
 }
 
-READ8_MEMBER(towns_state::unksnd_r)
+uint8_t towns_state::unksnd_r()
 {
 	return 0;
 }
 
 // some unknown ports...
-READ8_MEMBER(towns_state::towns_41ff_r)
+uint8_t towns_state::towns_41ff_r()
 {
 	logerror("I/O port 0x41ff read\n");
 	return 0x01;
@@ -2180,7 +2180,7 @@ WRITE_LINE_MEMBER( towns_state::pit2_out1_changed )
 	m_i8251->write_txc(state);
 }
 
-WRITE8_MEMBER( towns_state::towns_serial_w )
+void towns_state::towns_serial_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -2196,7 +2196,7 @@ WRITE8_MEMBER( towns_state::towns_serial_w )
 	}
 }
 
-READ8_MEMBER( towns_state::towns_serial_r )
+uint8_t towns_state::towns_serial_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -2752,7 +2752,6 @@ void towns_state::machine_start()
 
 void towns_state::machine_reset()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;
@@ -2761,7 +2760,7 @@ void towns_state::machine_reset()
 	m_towns_mainmem_enable = 0x00;
 	m_towns_system_port = 0x00;
 	m_towns_ram_enable = 0x00;
-	towns_update_video_banks(program);
+	towns_update_video_banks();
 	m_towns_kb_status = 0x18;
 	m_towns_kb_irq1_enable = 0;
 	m_towns_pad_mask = 0x7f;

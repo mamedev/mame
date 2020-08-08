@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Wilbert Pol, Fabio Priuli
 #ifndef MAME_BUS_ODYSSEY2_ROM_H
 #define MAME_BUS_ODYSSEY2_ROM_H
 
@@ -21,14 +21,13 @@ public:
 	virtual uint8_t read_rom04(offs_t offset) override;
 	virtual uint8_t read_rom0c(offs_t offset) override;
 
-	virtual void write_bank(int bank) override;
+	virtual void write_p1(uint8_t data) override { m_bank_base = data & 3; }
 
 protected:
 	o2_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	int m_bank_base;
 };

@@ -78,7 +78,7 @@ void circusc_state::machine_reset()
 	m_sn_latch = 0;
 }
 
-READ8_MEMBER(circusc_state::circusc_sh_timer_r)
+uint8_t circusc_state::circusc_sh_timer_r()
 {
 	/* This port reads the output of a counter clocked from the CPU clock.
 	 * The CPU XTAL is 14.31818MHz divided by 4.  It then goes through 10
@@ -91,14 +91,12 @@ READ8_MEMBER(circusc_state::circusc_sh_timer_r)
 	 * Can be shortened to:
 	 */
 
-	int clock;
-
-	clock = m_audiocpu->total_cycles() >> 9;
+	int clock = m_audiocpu->total_cycles() >> 9;
 
 	return clock & 0x1e;
 }
 
-WRITE8_MEMBER(circusc_state::circusc_sh_irqtrigger_w)
+void circusc_state::circusc_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -113,7 +111,7 @@ WRITE_LINE_MEMBER(circusc_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_sound_w)
+void circusc_state::circusc_sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 7)
 	{

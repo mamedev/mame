@@ -357,22 +357,22 @@ void gsword_state_base::machine_reset()
 {
 }
 
-WRITE8_MEMBER(gsword_state_base::ay8910_control_port_0_w)
+void gsword_state_base::ay8910_control_port_0_w(u8 data)
 {
 	m_ay0->address_w(data);
 	m_fake8910_0 = data;
 }
-WRITE8_MEMBER(gsword_state_base::ay8910_control_port_1_w)
+void gsword_state_base::ay8910_control_port_1_w(u8 data)
 {
 	m_ay1->address_w(data);
 	m_fake8910_1 = data;
 }
 
-READ8_MEMBER(gsword_state_base::fake_0_r)
+u8 gsword_state_base::fake_0_r()
 {
 	return m_fake8910_0+1;
 }
-READ8_MEMBER(gsword_state_base::fake_1_r)
+u8 gsword_state_base::fake_1_r()
 {
 	return m_fake8910_1+1;
 }
@@ -381,7 +381,7 @@ READ8_MEMBER(gsword_state_base::fake_1_r)
 /* CPU 2 memory hack */
 /* (402E) timeout upcount must be under 0AH                         */
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
-READ8_MEMBER(gsword_state::hack_r)
+u8 gsword_state::hack_r(offs_t offset)
 {
 	u8 const data = m_cpu2_ram[offset + 4];
 
@@ -434,13 +434,13 @@ void gsword_state::nmi_set_w(u8 data)
 #endif
 }
 
-WRITE8_MEMBER(gsword_state::sound_command_w)
+void gsword_state::sound_command_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(gsword_state::adpcm_data_w)
+void gsword_state::adpcm_data_w(u8 data)
 {
 	m_msm->data_w(data & 0x0f);     // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
@@ -477,7 +477,7 @@ void gsword_state::init_gsword()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -492,7 +492,7 @@ void gsword_state::init_gsword2()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -543,12 +543,12 @@ u8 josvolly_state::mcu2_p2_r()
 	return 0x7fU & ioport("DSW2")->read();
 }
 
-WRITE8_MEMBER(josvolly_state::cpu2_nmi_enable_w)
+void josvolly_state::cpu2_nmi_enable_w(u8 data)
 {
 	m_cpu2_nmi_enable = true;
 }
 
-WRITE8_MEMBER(josvolly_state::cpu2_irq_clear_w)
+void josvolly_state::cpu2_irq_clear_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }

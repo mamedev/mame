@@ -41,13 +41,13 @@ void funkybee_state::funkybee_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_videoram_w)
+void funkybee_state::funkybee_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_colorram_w)
+void funkybee_state::funkybee_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(funkybee_state::gfx_bank_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
+void funkybee_state::funkybee_scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? -data : data);
 }

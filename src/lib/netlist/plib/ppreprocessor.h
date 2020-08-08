@@ -68,10 +68,17 @@ namespace plib {
 			delete rdbuf();
 		}
 
+		/// \brief process stream
+		///
+		/// \param filename a filename or identifier identifying the stream.
+		///
+		/// FIXME: this is sub-optimal. Refactor input_context into pinput_context
+		/// and pass this to ppreprocessor.
+		///
 		template <typename T>
-		ppreprocessor & process(T &&istrm)
+		ppreprocessor & process(T &&istrm, const pstring &filename)
 		{
-			m_stack.emplace_back(input_context(std::forward<T>(istrm),"","<stream>"));
+			m_stack.emplace_back(input_context(istrm.release_stream(),plib::util::path(filename), filename));
 			process_stack();
 			return *this;
 		}
@@ -95,14 +102,14 @@ namespace plib {
 				if (this->gptr() == this->egptr())
 				{
 					// clang reports sign error - weird
-					std::size_t bytes = pstring_mem_t_size(m_strm->m_outbuf) - static_cast<std::size_t>(m_strm->m_pos);
+					std::size_t bytes = m_strm->m_outbuf.size() - narrow_cast<std::size_t>(m_strm->m_pos);
 
 					if (bytes > m_buf.size())
 						bytes = m_buf.size();
 					std::copy(m_strm->m_outbuf.c_str() + m_strm->m_pos, m_strm->m_outbuf.c_str() + m_strm->m_pos + bytes, m_buf.data());
 					this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
 
-					m_strm->m_pos += static_cast<long>(bytes);
+					m_strm->m_pos += narrow_cast<long>(bytes);
 				}
 
 				return this->gptr() == this->egptr()
@@ -139,7 +146,9 @@ namespace plib {
 		psource_collection_t<> &m_sources;
 		string_list m_expr_sep;
 
-		std::uint_least64_t m_if_flag; // 31 if levels
+		std::uint_least64_t m_if_flag; // 63 if levels
+		std::uint_least64_t m_if_seen; // 63 if levels
+		std::uint_least64_t m_elif; // 63 if levels - for #elif
 		int m_if_level;
 
 		struct input_context
@@ -160,7 +169,7 @@ namespace plib {
 
 		// vector used as stack because we need to loop through stack
 		std::vector<input_context> m_stack;
-		pstring_t<pu8_traits> m_outbuf;
+		std::string m_outbuf;
 		std::istream::pos_type m_pos;
 		state_e m_state;
 		pstring m_line;

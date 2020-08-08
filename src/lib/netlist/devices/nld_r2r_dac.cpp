@@ -1,7 +1,45 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_R2R_dac.c
+ * nld_r2r_dac.cpp
+ *
+ *  DMR2R_DAC: R-2R DAC
+ *
+ *  Generic R-2R DAC ... This is fast.
+ *                 2R
+ *  Bit n    >----RRR----+---------> Vout
+ *                       |
+ *                       R
+ *                       R R
+ *                       R
+ *                       |
+ *                       .
+ *                       .
+ *                 2R    |
+ *  Bit 2    >----RRR----+
+ *                       |
+ *                       R
+ *                       R R
+ *                       R
+ *                       |
+ *                 2R    |
+ *  Bit 1    >----RRR----+
+ *                       |
+ *                       R
+ *                       R 2R
+ *                       R
+ *                       |
+ *                      V0
+ *
+ * Using Thevenin's Theorem, this can be written as
+ *
+ *          +---RRR-----------> Vout
+ *          |
+ *          V
+ *          V  V = VAL / 2^n * Vin
+ *          V
+ *          |
+ *          V0
  *
  */
 

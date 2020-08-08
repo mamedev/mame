@@ -412,6 +412,10 @@ public:
 	void ppj(machine_config &config);
 	void kurukuru(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -422,16 +426,14 @@ private:
 
 	uint8_t m_adpcm_data;
 
-	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
-	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
-	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
+	void kurukuru_out_latch_w(uint8_t data);
+	void kurukuru_bankswitch_w(uint8_t data);
+	void kurukuru_adpcm_reset_w(uint8_t data);
+	uint8_t kurukuru_adpcm_timer_irqack_r();
+	void kurukuru_adpcm_data_w(uint8_t data);
 	void ym2149_aout_w(uint8_t data);
 	void ym2149_bout_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 	void kurukuru_audio_io(address_map &map);
 	void kurukuru_audio_map(address_map &map);
@@ -470,7 +472,7 @@ WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 
 // Main CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
+void kurukuru_state::kurukuru_out_latch_w(uint8_t data)
 {
 /*
    00-0f is output latch (controls jamma output pins)
@@ -496,7 +498,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
+void kurukuru_state::kurukuru_bankswitch_w(uint8_t data)
 {
 	m_bank1->set_entry(7); // remove banked rom
 /*
@@ -540,7 +542,7 @@ void kurukuru_state::kurukuru_io(address_map &map)
 void kurukuru_state::ppj_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0xdfff).bankr("bank1");
+	map(0x6000, 0xdfff).bankr(m_bank1);
 	map(0xe000, 0xffff).ram().share("nvram");
 }
 
@@ -567,7 +569,7 @@ void kurukuru_state::ppj_io(address_map &map)
  13h  W -->                /
 
  30h  W --> soundlatch...
- 40h R  --> (very begining) seems DSW1
+ 40h R  --> (very beginning) seems DSW1
  50h  W --> Output port (counters)
  60h R  --> Input port
  70h R  --> Input port
@@ -580,7 +582,7 @@ void kurukuru_state::ppj_io(address_map &map)
 
 // Audio CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
+void kurukuru_state::kurukuru_adpcm_data_w(uint8_t data)
 {
 /*
      6-bit latch. only 4 connected...
@@ -589,7 +591,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
 	m_adpcm_data = data & 0xf;
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
+void kurukuru_state::kurukuru_adpcm_reset_w(uint8_t data)
 {
 /*
      6-bit latch. only 4 connected...
@@ -602,7 +604,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 	m_adpcm->reset_w(data & 1);
 }
 
-READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
+uint8_t kurukuru_state::kurukuru_adpcm_timer_irqack_r()
 {
 	if (!machine().side_effects_disabled())
 		m_soundirq->rst30_w(0);
@@ -645,7 +647,7 @@ void kurukuru_state::ppj_audio_io(address_map &map)
   50h R-  --> adpcm irq ack
 */
 
-/* YM2149 ports */
+// YM2149 ports
 void kurukuru_state::ym2149_aout_w(uint8_t data)
 {
 	logerror("YM2149: Port A out: %02X\n", data);
@@ -830,6 +832,8 @@ INPUT_PORTS_END
 void kurukuru_state::machine_start()
 {
 	m_bank1->configure_entries(0, 8, memregion("user1")->base(), 0x8000);
+
+	save_item(NAME(m_adpcm_data));
 }
 
 void kurukuru_state::machine_reset()
@@ -842,7 +846,7 @@ void kurukuru_state::machine_reset()
 
 void kurukuru_state::kurukuru(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kurukuru_state::kurukuru_map);
 	m_maincpu->set_addrmap(AS_IO, &kurukuru_state::kurukuru_io);
@@ -854,7 +858,7 @@ void kurukuru_state::kurukuru(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MAIN_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
@@ -863,7 +867,7 @@ void kurukuru_state::kurukuru(machine_config &config)
 
 	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set(m_soundirq, FUNC(rst_neg_buffer_device::rst28_w));
@@ -881,7 +885,7 @@ void kurukuru_state::kurukuru(machine_config &config)
 
 	MSM5205(config, m_adpcm, M5205_CLOCK);
 	m_adpcm->vck_legacy_callback().set(FUNC(kurukuru_state::kurukuru_msm5205_vck));
-	m_adpcm->set_prescaler_selector(msm5205_device::S48_4B);    /* changed on the fly */
+	m_adpcm->set_prescaler_selector(msm5205_device::S48_4B);    // changed on the fly
 	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
@@ -889,7 +893,7 @@ void kurukuru_state::ppj(machine_config &config)
 {
 	kurukuru(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &kurukuru_state::ppj_map);
 	m_maincpu->set_addrmap(AS_IO, &kurukuru_state::ppj_io);
 
@@ -958,9 +962,9 @@ ROM_END
 *                              Game Drivers                                *
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        dROT    COMPANY                   FULLNAME                        FLAGS
-GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
-GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY                   FULLNAME                         FLAGS
+GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", MACHINE_SUPPORTS_SAVE )
 
 // unemulated....
 

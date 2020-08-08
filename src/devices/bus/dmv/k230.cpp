@@ -147,7 +147,7 @@ void dmv_k230_device::device_start()
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	iospace().install_readwrite_handler(0xd8, 0xdf, read8_delegate(*this, FUNC(dmv_k234_device::snr_r)), write8_delegate(*this, FUNC(dmv_k234_device::snr_w)), 0);
+	iospace().install_readwrite_handler(0xd8, 0xdf, read8smo_delegate(*this, FUNC(dmv_k234_device::snr_r)), write8smo_delegate(*this, FUNC(dmv_k234_device::snr_w)), 0);
 
 	// register for state saving
 	save_item(NAME(m_snr));
@@ -247,7 +247,7 @@ void dmv_k230_device::switch16_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, (m_hold || !m_switch16) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(dmv_k230_device::rom_r)
+uint8_t dmv_k230_device::rom_r(offs_t offset)
 {
 	return m_rom->base()[offset & 0x0fff];
 }
@@ -289,7 +289,7 @@ void dmv_k234_device::switch16_w(int state)
 	}
 }
 
-READ8_MEMBER( dmv_k234_device::snr_r )
+uint8_t dmv_k234_device::snr_r()
 {
 	m_snr = ASSERT_LINE;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -299,7 +299,7 @@ READ8_MEMBER( dmv_k234_device::snr_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( dmv_k234_device::snr_w )
+void dmv_k234_device::snr_w(uint8_t data)
 {
 	m_snr = ASSERT_LINE;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);

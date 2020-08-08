@@ -94,21 +94,21 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
-	DECLARE_WRITE8_MEMBER(pic_w);
+	void pic_w(u8 data);
 	IRQ_CALLBACK_MEMBER(ms6102_int_ack);
 
 	u8 memory_read_byte(offs_t offset);
 	void vdack_w(u8 data);
 
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
+	u8 crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(misc_status_r);
+	u8 misc_status_r();
 	u16 m_dmaaddr;
 
 	void kbd_uart_clock_w(u8 data);
 
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<kr1601rr1_device> m_earom;
 	required_device<i8214_device> m_pic;
@@ -199,21 +199,21 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes
 {
 }
 
-READ8_MEMBER(ms6102_state::crtc_r)
+u8 ms6102_state::crtc_r(offs_t offset)
 {
 	m_crtc2->read(offset);
 	return m_crtc1->read(offset); // cs is same for both crtcs so they should return the same thing
 }
 
-WRITE8_MEMBER(ms6102_state::crtc_w)
+void ms6102_state::crtc_w(offs_t offset, u8 data)
 {
 	m_crtc1->write(offset, data);
 	m_crtc2->write(offset, data);
 }
 
-READ8_MEMBER(ms6102_state::misc_status_r)
+u8 ms6102_state::misc_status_r()
 {
-	uint8_t status = 0;
+	u8 status = 0;
 	if (!m_kbd_uart->tbmt_r())
 		status |= 1 << 6;
 	return status;
@@ -231,7 +231,7 @@ void ms6102_state::kbd_uart_clock_w(u8 data)
 }
 
 
-WRITE8_MEMBER(ms6102_state::pic_w)
+void ms6102_state::pic_w(u8 data)
 {
 	m_pic->b_sgs_w(~data);
 }

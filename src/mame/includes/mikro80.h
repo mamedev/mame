@@ -23,26 +23,18 @@ public:
 		TIMER_RESET
 	};
 
-	mikro80_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_cursor_ram(*this, "cursor_ram"),
-		m_video_ram(*this, "video_ram"),
-		m_ppi8255(*this, "ppi8255"),
-		m_cassette(*this, "cassette"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_gfx1(*this, "gfx1"),
-		m_bank1(*this, "bank1"),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_line4(*this, "LINE4"),
-		m_io_line5(*this, "LINE5"),
-		m_io_line6(*this, "LINE6"),
-		m_io_line7(*this, "LINE7"),
-		m_io_line8(*this, "LINE8") ,
-		m_dac(*this, "dac"),
-		m_maincpu(*this, "maincpu")
+	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_aram(*this, "attrram")
+		, m_vram(*this, "videoram")
+		, m_ppi(*this, "ppi8255")
+		, m_cassette(*this, "cassette")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "LINE%u", 0U)
+		, m_dac(*this, "dac")
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void kristall(machine_config &config);
@@ -53,43 +45,34 @@ public:
 	void init_mikro80();
 
 private:
-	required_shared_ptr<uint8_t> m_cursor_ram;
-	required_shared_ptr<uint8_t> m_video_ram;
-	int m_keyboard_mask;
-	int m_key_mask;
-	DECLARE_WRITE8_MEMBER(radio99_sound_w);
-	uint8_t mikro80_8255_portb_r();
-	uint8_t mikro80_8255_portc_r();
-	void mikro80_8255_porta_w(uint8_t data);
-	void mikro80_8255_portc_w(uint8_t data);
-	DECLARE_READ8_MEMBER(mikro80_keyboard_r);
-	DECLARE_WRITE8_MEMBER(mikro80_keyboard_w);
-	DECLARE_WRITE8_MEMBER(mikro80_tape_w);
-	DECLARE_READ8_MEMBER(mikro80_tape_r);
+	u8 m_keyboard_mask;
+	u8 m_key_mask;
+	void sound_w(u8 data);
+	u8 portb_r();
+	u8 portc_r();
+	u8 kristall2_portc_r();
+	void porta_w(u8 data);
+	void portc_w(u8 data);
+	void tape_w(u8 data);
+	u8 tape_r();
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_start() override;
+	u32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kristall_io(address_map &map);
 	void mikro80_io(address_map &map);
 	void mikro80_mem(address_map &map);
 	void radio99_io(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	required_device<i8255_device> m_ppi8255;
+	memory_passthrough_handler *m_rom_shadow_tap;
+	required_shared_ptr<uint8_t> m_aram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_device<i8255_device> m_ppi;
 	required_device<cassette_image_device> m_cassette;
-	required_memory_region m_region_maincpu;
-	required_memory_region m_region_gfx1;
-	required_memory_bank m_bank1;
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
-	required_ioport m_io_line5;
-	required_ioport m_io_line6;
-	required_ioport m_io_line7;
-	required_ioport m_io_line8;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<9> m_io_keyboard;
 	optional_device<dac_bit_interface> m_dac;
 	required_device<cpu_device> m_maincpu;
 };

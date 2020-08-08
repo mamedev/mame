@@ -52,7 +52,7 @@ public:
 	{ m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_update);
-	DECLARE_WRITE8_MEMBER(serial_rx_w);
+	void serial_rx_w(uint8_t data);
 
 	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
 	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
@@ -107,15 +107,15 @@ private:
 	void fpga_map(address_map &map);
 	void ram_map(address_map &map);
 
-	DECLARE_READ32_MEMBER( fpga_r );
-	DECLARE_WRITE32_MEMBER( fpga_w );
-	DECLARE_READ32_MEMBER( rtc_r );
-	DECLARE_WRITE32_MEMBER( rtc_w );
+	uint32_t fpga_r(offs_t offset, uint32_t mem_mask = ~0);
+	void fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(e1_nvram_r);
-	DECLARE_WRITE32_MEMBER(e1_nvram_w);
-	DECLARE_READ32_MEMBER( e1_ram_r );
-	DECLARE_WRITE32_MEMBER( e1_ram_w );
+	uint32_t e1_nvram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void e1_nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t e1_ram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void e1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(serial_interrupt);
 };
@@ -142,8 +142,8 @@ private:
 	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
 	void eeprom_map(address_map &map);
-	DECLARE_READ32_MEMBER( eeprom_r );
-	DECLARE_WRITE32_MEMBER( eeprom_w );
+	uint32_t eeprom_r(offs_t offset, uint32_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
@@ -166,8 +166,8 @@ private:
 
 	void ctrl_map(address_map &map);
 
-	DECLARE_READ32_MEMBER( ctrl_r );
-	DECLARE_WRITE32_MEMBER( ctrl_w );
+	uint32_t ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 };
 

@@ -442,39 +442,31 @@ INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 }
 
 
-WRITE16_MEMBER(m72_state::bchopper_sample_trigger_w)
+void m72_state::bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::nspirit_sample_trigger_w)
+void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::imgfight_sample_trigger_w)
-{
-	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
-}
-
-WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
+void m72_state::loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-
-
-WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
+void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
+void m72_state::dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[28] = {
 		0x00000, 0x00020, 0x01800, 0x02da0, 0x03be0, 0x05ae0, 0x06100, 0x06de0,
@@ -485,7 +477,7 @@ WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::gallop_sample_trigger_w)
+void m72_state::gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[31] = {
 		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
@@ -576,34 +568,15 @@ static const u8 nspirit_code[CODE_LEN] =
 };
 static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
-/* Image Fight */
-static const u8 imgfight_code[CODE_LEN] =
-{
-	0x68,0x00,0xa0,             // push 0a000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x38,0x38,0x50,   // mov [3838h], byte 050h
-	0xc6,0x06,0x3a,0x38,0x49,   // mov [383ah], byte 049h
-	0xc6,0x06,0x3c,0x38,0x43,   // mov [383ch], byte 043h
-	0xc6,0x06,0x3e,0x38,0x4b,   // mov [383eh], byte 04bh
-	0xc6,0x06,0x40,0x38,0x45,   // mov [3840h], byte 045h
-	0xc6,0x06,0x42,0x38,0x54,   // mov [3842h], byte 054h
-	0x68,0x00,0xb0,             // push 0b000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x00,0x09,0x49^0xff,  // mov [0900h], byte 049h
-	0xc6,0x06,0x00,0x0a,0x49^0xff,  // mov [0a00h], byte 049h
-	0xc6,0x06,0x00,0x0b,0x49^0xff,  // mov [0b00h], byte 049h
-	0xc6,0x06,0x20,0x09,0x49^0xff,  // mov [0920h], byte 049h
-	0xc6,0x06,0x21,0x09,0x4d^0xff,  // mov [0921h], byte 04dh
-	0xc6,0x06,0x22,0x09,0x41^0xff,  // mov [0922h], byte 041h
-	0xc6,0x06,0x23,0x09,0x47^0xff,  // mov [0923h], byte 047h
-	0x68,0x00,0xd0,             // push 0d000h
-	0x1f,                       // pop ds
-	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
-};
+/*
+// these are for the world set where we have the mcu anyway...
+static const u8 imgfight_crc[CRC_LEN] =  {  0xf8,0x91,0xc0,0x58, 0x04,0x33,0xb6,0xc5,
+                                                0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 // these are for the japan set where we have the mcu anyway...
 static const u8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
-												0xbf,0x37,0x92,0x94, 0x00,0x00 };
+                                                0xbf,0x37,0x92,0x94, 0x00,0x00 };
+*/
 
 /* Dragon Breed */
 static const u8 dbreedm72_code[CODE_LEN] =
@@ -632,14 +605,14 @@ void m72_state::copy_le(u16 *dest, const u8 *src, u8 bytes)
 		dest[i/2] = src[i+0] | (src[i+1] << 8);
 }
 
-READ16_MEMBER(m72_state::protection_r)
+u16 m72_state::protection_r(offs_t offset, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		copy_le(m_protection_ram.get(),m_protection_code,CODE_LEN);
 	return m_protection_ram[0xffa/2+offset];
 }
 
-WRITE16_MEMBER(m72_state::protection_w)
+void m72_state::protection_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data ^= 0xffff;
 	COMBINE_DATA(&m_protection_ram[offset]);
@@ -655,8 +628,8 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(*this, FUNC(m72_state::protection_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(*this, FUNC(m72_state::protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16s_delegate(*this, FUNC(m72_state::protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16s_delegate(*this, FUNC(m72_state::protection_w)));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
@@ -665,36 +638,30 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 void m72_state::init_bchopper()
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::bchopper_sample_trigger_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::bchopper_sample_trigger_w)));
 }
 
 void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::nspirit_sample_trigger_w)));
-}
-
-void m72_state::init_imgfight()
-{
-	install_protection_handler(imgfight_code,imgfightj_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::imgfight_sample_trigger_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::nspirit_sample_trigger_w)));
 }
 
 void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::dbreedm72_sample_trigger_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dbreedm72_sample_trigger_w)));
 }
 
 void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
 }
 
 void m72_state::init_gallop()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::gallop_sample_trigger_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::gallop_sample_trigger_w)));
 }
 
 
@@ -2079,10 +2046,10 @@ void m72_state::kengo(machine_config &config)
 	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
 }
 
-void m72_state::imgfightj(machine_config &config)
+void m72_state::imgfight(machine_config &config)
 {
 	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_state,imgfightj)
+	MCFG_VIDEO_START_OVERRIDE(m72_state,imgfight)
 }
 
 void m72_state::nspiritj(machine_config &config)
@@ -2712,7 +2679,7 @@ ROM_START( imgfight )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "if_c-pr-a.ic1",  0x00000, 0x01000, NO_DUMP )
+	ROM_LOAD( "if_c-pr-a.ic1",  0x00000, 0x01000, CRC(55f10458) SHA1(d520ec2b075c94d76d97e0105644ff96384b378c) ) /* i8751 MCU labeled  IF C-PR-A */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "if-c-00.ic53", 0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
@@ -3381,7 +3348,7 @@ ROM_START( xmultiplm72 )
 	ROM_LOAD( "t45.01.ic52", 0x20000, 0x20000, CRC(4d0764d4) SHA1(4942333336a110b033f16ac1afa06ffef7b2dad6) )
 	ROM_LOAD( "t46.10.ic51", 0x40000, 0x20000, CRC(f0c465a4) SHA1(69c107c860d4e8736431fd86b6821b70a8367eb3) )
 	ROM_LOAD( "t47.11.ic50", 0x60000, 0x20000, CRC(1263b24b) SHA1(0445a5381df3a868bed6967c8e5de7169e4be6a3) )
-	ROM_LOAD( "t48.20.ic48", 0x80000, 0x20000, CRC(4129944f) SHA1(988b072032d1667c3ac0731fada32fb6978505dc) )
+	ROM_LOAD( "t48.20.ic49", 0x80000, 0x20000, CRC(4129944f) SHA1(988b072032d1667c3ac0731fada32fb6978505dc) )
 	ROM_LOAD( "t49.21.ic48", 0xa0000, 0x20000, CRC(2346e6f9) SHA1(b3de017dd0353e04d279f57e151c47f5fcc70e9c) )
 	ROM_LOAD( "t50.30.ic47", 0xc0000, 0x20000, CRC(e322543e) SHA1(b4c3a7f202d81485d5f0a7b7668ee89fc1edb215) )
 	ROM_LOAD( "t51.31.ic46", 0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
@@ -4108,6 +4075,40 @@ ROM_START( dkgensan )
 	ROM_LOAD( "gen-vo.bin",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
 ROM_END
 
+ROM_START( hharryb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "4-a-27c010a.bin", 0x00001, 0x20000, CRC(755c0874) SHA1(28ea0f7d700cc0119d8cb5693d0bcfef3da78c95) )
+	ROM_LOAD16_BYTE( "6-a-27c010a.bin", 0x00000, 0x20000, CRC(f10fb55c) SHA1(1bb0d56a29ca34b003c57faa9693b96413718608) )
+	ROM_LOAD16_BYTE( "3-a-27c512.bin",  0x60001, 0x10000, CRC(31b741c5) SHA1(46c1c4cea09477cc4989f3e06e08851d02743e62) )
+	ROM_RELOAD(                         0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "5-a-27c512.bin",  0x60000, 0x10000, CRC(b23e966c) SHA1(f506f6d1f4f7874070e91d1df8f141cca031ce29) )
+	ROM_RELOAD(                         0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "2-a-27c512.bin",   0x00000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "17-c-27c010a.bin",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )
+	ROM_LOAD( "16-c-27c010a.bin",    0x20000, 0x20000, CRC(def65294) SHA1(23f5d99fa9f604fde37cb52113bff233d9be1d25) )
+	ROM_LOAD( "14-c-27c010a.bin",    0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
+	ROM_LOAD( "15-c-27c010a.bin",    0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "13-b-27c010a.bin",   0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  // tiles
+	ROM_LOAD( "11-b-27c010a.bin",   0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
+	ROM_LOAD( "9-b-27c010a.bin",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
+	ROM_LOAD( "7-b-27c010a.bin",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
+
+	ROM_REGION( 0x20000, "samples", 0 )
+	ROM_LOAD( "1-a-27c010a.bin",   0x00000, 0x20000, CRC(faaacaff) SHA1(ea3a3920255c07aa9c0a7e0191eae257a9f7f558) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "19-c-82s129.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
+	ROM_LOAD( "18-c-82s129.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a-pal16l8.bin", 0x000, 0x104, CRC(1358c513) SHA1(7c8f44e4d63867d54e16fc29d168a27be5f4babf) )
+ROM_END
 
 ROM_START( cosmccop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -4325,8 +4326,8 @@ GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m
 GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
 GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, imgfightj,   imgfight, imgfightj,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightb,   imgfight, imgfightb,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, which isn't hooked up correctly yet. Gives 'RAM NG 7' error
 
 GAME( 1989, loht,        0,        m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -4359,13 +4360,13 @@ GAME( 1990, airduelu,    airduel,  m82,          airduel,      m72_state, empty_
 
 GAME( 1990, dkgensanm82, hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M82 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
-
-GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
+GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
+GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg M82 conversion)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
 GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryb,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "bootleg", "Hammerin' Harry (World, M84 hardware bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

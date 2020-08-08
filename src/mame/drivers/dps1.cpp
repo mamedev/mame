@@ -29,16 +29,19 @@ public:
 	dps1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		//, m_floppy1(*this, "fdc:1")
 	{ }
 
 	void dps1(machine_config &config);
-	void init_dps1();
 
 private:
-	virtual void machine_reset() override;
+	void machine_reset() override;
+	void machine_start() override;
 	void portb2_w(u8 data);
 	void portb4_w(u8 data);
 	void portb6_w(u8 data);
@@ -55,6 +58,9 @@ private:
 	bool m_dma_dir;
 	u16 m_dma_adr;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	//required_device<floppy_connector> m_floppy1;
@@ -62,8 +68,8 @@ private:
 
 void dps1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x03ff).bankr("bankr0").bankw("bankw0");
-	map(0x0400, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x03ff).bankr("bank1");
 }
 
 void dps1_state::io_map(address_map &map)
@@ -108,7 +114,7 @@ void dps1_state::portb4_w(u8 data)
 // enable eprom
 void dps1_state::portb6_w(u8 data)
 {
-	membank("bankr0")->set_entry(1); // point at rom
+	m_bank1->set_entry(1);
 }
 
 // set A16-23
@@ -131,7 +137,7 @@ void dps1_state::portbc_w(u8 data)
 // disable eprom
 void dps1_state::portbe_w(u8 data)
 {
-	membank("bankr0")->set_entry(0); // point at ram
+	m_bank1->set_entry(0);
 }
 
 // read 8 front-panel switches
@@ -166,25 +172,23 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 	// else take /dack high (unsupported)
 }
 
+void dps1_state::machine_start()
+{
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
+	save_item(NAME(m_dma_dir));
+	save_item(NAME(m_dma_adr));
+}
+
 void dps1_state::machine_reset()
 {
-	membank("bankr0")->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
+	m_bank1->set_entry(1);
 	// set fdc for 8 inch floppies
 	m_fdc->set_rate(500000);
 	// turn on the motor
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->mon_w(0);
-}
-
-void dps1_state::init_dps1()
-{
-	u8 *main = memregion("maincpu")->base();
-
-	membank("bankr0")->configure_entry(1, &main[0x0000]);
-	membank("bankr0")->configure_entry(0, &main[0x0400]);
-	membank("bankw0")->configure_entry(0, &main[0x0400]);
 }
 
 static INPUT_PORTS_START( dps1 )
@@ -228,8 +232,8 @@ void dps1_state::dps1(machine_config &config)
 }
 
 ROM_START( dps1 )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "boot 1280", 0x000, 0x400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "boot 1280", 0x0000, 0x0400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
 
-COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, init_dps1, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW )
+COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, empty_init, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

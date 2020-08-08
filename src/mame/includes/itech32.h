@@ -161,7 +161,7 @@ protected:
 	template<unsigned Layer> void color_w(u8 data);
 	void bloodstm_plane_w(u8 data);
 	void itech020_plane_w(u8 data);
-	DECLARE_WRITE16_MEMBER(bloodstm_paletteram_w);
+	void bloodstm_paletteram_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	void video_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	u16 video_r(offs_t offset);
 	void bloodstm_video_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
@@ -228,14 +228,14 @@ protected:
 	u16 steering_r();
 	u16 gas_r();
 
-	DECLARE_READ32_MEMBER(tms1_speedup_r);
-	DECLARE_READ32_MEMBER(tms2_speedup_r);
-	DECLARE_WRITE32_MEMBER(tms_reset_assert_w);
-	DECLARE_WRITE32_MEMBER(tms_reset_clear_w);
-	DECLARE_WRITE32_MEMBER(tms1_68k_ram_w);
-	DECLARE_WRITE32_MEMBER(tms2_68k_ram_w);
-	DECLARE_WRITE32_MEMBER(tms1_trigger_w);
-	DECLARE_WRITE32_MEMBER(tms2_trigger_w);
+	u32 tms1_speedup_r(address_space &space);
+	u32 tms2_speedup_r(address_space &space);
+	void tms_reset_assert_w(u32 data);
+	void tms_reset_clear_w(u32 data);
+	void tms1_68k_ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tms2_68k_ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tms1_trigger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tms2_trigger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void zbuf_control_w(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 

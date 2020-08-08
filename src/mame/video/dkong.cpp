@@ -453,7 +453,7 @@ TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_videoram_w)
+void dkong_state::dkong_videoram_w(offs_t offset, uint8_t data)
 {
 	if (m_video_ram[offset] != data)
 	{
@@ -462,7 +462,7 @@ WRITE8_MEMBER(dkong_state::dkong_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
+void dkong_state::dkongjr_gfxbank_w(uint8_t data)
 {
 	if (m_gfx_bank != (data & 0x01))
 	{
@@ -471,7 +471,7 @@ WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong3_gfxbank_w)
+void dkong_state::dkong3_gfxbank_w(uint8_t data)
 {
 	if (m_gfx_bank != (~data & 0x01))
 	{
@@ -480,7 +480,7 @@ WRITE8_MEMBER(dkong_state::dkong3_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_palettebank_w)
+void dkong_state::dkong_palettebank_w(offs_t offset, uint8_t data)
 {
 	int newbank;
 
@@ -498,23 +498,23 @@ WRITE8_MEMBER(dkong_state::dkong_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::radarscp_grid_enable_w)
+void dkong_state::radarscp_grid_enable_w(uint8_t data)
 {
 	m_grid_on = data & 0x01;
 }
 
-WRITE8_MEMBER(dkong_state::radarscp_grid_color_w)
+void dkong_state::radarscp_grid_color_w(uint8_t data)
 {
 	m_grid_col = (data & 0x07) ^ 0x07;
 	/* popmessage("Gridcol: %d", m_grid_col); */
 }
 
-WRITE8_MEMBER(dkong_state::dkong_flipscreen_w)
+void dkong_state::dkong_flipscreen_w(uint8_t data)
 {
 	m_flip = data & 0x01;
 }
 
-WRITE8_MEMBER(dkong_state::dkong_spritebank_w)
+void dkong_state::dkong_spritebank_w(uint8_t data)
 {
 	m_sprite_bank = data & 0x01;
 }

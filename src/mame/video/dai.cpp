@@ -9,7 +9,7 @@
   Krzysztof Strzecha
 
   All video modes are emulated but not fully tested yet.
-  dai_state::screen_update_dai() function needs strong cleanup and optimalisation.
+  dai_state::screen_update() function needs strong cleanup and optimisation.
 
 
 ***************************************************************************/
@@ -47,12 +47,12 @@ void dai_state::dai_palette(palette_device &palette) const
 	palette.set_pen_colors(0, s_palette);
 }
 
-uint32_t dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i, j, k, l;
 
-	uint8_t* char_rom = memregion("gfx1")->base();
+	uint8_t* char_rom = memregion("chargen")->base();
 
 	uint16_t dai_video_memory_start = 0xbfff;
 	uint16_t dai_scan_lines = 604;    /* scan lines of PAL tv */

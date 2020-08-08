@@ -19,6 +19,7 @@ enum
 	O2_STD = 0,
 	O2_ROM12,
 	O2_ROM16,
+	O2_4IN1,
 	O2_CHESS,
 	O2_VOICE
 };
@@ -35,10 +36,14 @@ public:
 	// reading and writing
 	virtual uint8_t read_rom04(offs_t offset) { return 0xff; }
 	virtual uint8_t read_rom0c(offs_t offset) { return 0xff; }
-	virtual void write_bank(int bank) { }
+	virtual void write_p1(uint8_t data) { }
+	virtual void write_p2(uint8_t data) { }
 
 	virtual void io_write(offs_t offset, uint8_t data) { }
+	virtual uint8_t io_read(offs_t offset) { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
+
+	virtual void cart_init() { } // called after loading ROM
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -86,7 +91,7 @@ public:
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "odyssey_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
@@ -100,9 +105,11 @@ public:
 	uint8_t read_rom04(offs_t offset);
 	uint8_t read_rom0c(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
+	uint8_t io_read(offs_t offset);
 	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
 
-	void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }
+	void write_p1(uint8_t data) { if (m_cart) m_cart->write_p1(data); }
+	void write_p2(uint8_t data) { if (m_cart) m_cart->write_p2(data); }
 
 protected:
 	// device-level overrides

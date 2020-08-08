@@ -333,12 +333,12 @@ void vrc5074_device::map_cpu_space()
 			winStart = regConfig & 0xffe00000;
 			if (winSize > 0) {
 				if (index == 0) {
-					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(*this, FUNC(vrc5074_device::pci0_r)));
-					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(*this, FUNC(vrc5074_device::pci0_w)));
+					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32s_delegate(*this, FUNC(vrc5074_device::pci0_r)));
+					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32s_delegate(*this, FUNC(vrc5074_device::pci0_w)));
 				}
 				else {
-					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(*this, FUNC(vrc5074_device::pci1_r)));
-					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(*this, FUNC(vrc5074_device::pci1_w)));
+					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32s_delegate(*this, FUNC(vrc5074_device::pci1_r)));
+					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32s_delegate(*this, FUNC(vrc5074_device::pci1_w)));
 				}
 			}
 			if (LOG_NILE | LOG_MAP)
@@ -362,8 +362,8 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winStart = 0x0;
 
 		winEnd = winStart + winSize -1;
-		memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc5074_device::target1_r)));
-		memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc5074_device::target1_w)));
+		memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(vrc5074_device::target1_r)));
+		memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(vrc5074_device::target1_w)));
 		if (LOG_NILE | LOG_MAP)
 			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
 	}
@@ -372,8 +372,8 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	//  winStart = m_cpu_regs[NREG_PCITW2]&0xffe00000;
 	//  winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW2]>>13)&0x7f)<<21)));
 	//  winSize = winEnd - winStart + 1;
-	//  memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc5074_device::target2_r)));
-	//  memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc5074_device::target2_w)));
+	//  memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(vrc5074_device::target2_r)));
+	//  memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(vrc5074_device::target2_w)));
 	//  if (LOG_NILE)
 	//      logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
 	//}
@@ -384,12 +384,12 @@ void vrc5074_device::reset_all_mappings()
 	pci_device::reset_all_mappings();
 }
 
-READ32_MEMBER(vrc5074_device::sdram_addr_r)
+uint32_t vrc5074_device::sdram_addr_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER(vrc5074_device::sdram_addr_w)
+void vrc5074_device::sdram_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 		m_sdram_addr[0] = data;
@@ -411,7 +411,7 @@ void vrc5074_device::setup_pci_space()
 	}
 }
 // PCI Master Window 0
-READ32_MEMBER (vrc5074_device::pci0_r)
+uint32_t vrc5074_device::pci0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	int index = 0;
@@ -434,11 +434,11 @@ READ32_MEMBER (vrc5074_device::pci0_r)
 				if ((pci_addr >> (21 + dev)) & 0x1) {
 					new_data = (dev << 11) | (0x80000000) | (pci_addr & 0xff);
 					//printf("writing pci_addr: %08x dev: %x new_data: %08x\n", pci_addr, dev, new_data);
-					pci_host_device::config_address_w(space, offset, new_data);
+					pci_host_device::config_address_w(offset, new_data);
 					break;
 				}
 			}
-			result = pci_host_device::config_data_r(space, offset);
+			result = pci_host_device::config_data_r(offset);
 		}
 		break;
 	default:
@@ -449,7 +449,7 @@ READ32_MEMBER (vrc5074_device::pci0_r)
 		logerror("%s nile pci0_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc5074_device::pci0_w)
+void vrc5074_device::pci0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int index = 0;
 	uint32_t pci_addr = m_pci_laddr[index] | ((offset << 2) & m_pci_mask[index]);
@@ -472,11 +472,11 @@ WRITE32_MEMBER (vrc5074_device::pci0_w)
 				if ((pci_addr >> (21 + dev)) & 0x1) {
 					new_data = (dev << 11) | (0x80000000) | (pci_addr & 0xff);
 					//printf("writing pci_addr: %08x dev: %x new_data: %08x\n", pci_addr, dev, new_data);
-					pci_host_device::config_address_w(space, offset, new_data);
+					pci_host_device::config_address_w(offset, new_data);
 					break;
 				}
 			}
-			pci_host_device::config_data_w(space, offset, data);
+			pci_host_device::config_data_w(offset, data);
 		}
 		break;
 	default:
@@ -489,7 +489,7 @@ WRITE32_MEMBER (vrc5074_device::pci0_w)
 }
 
 // PCI Master Window 1
-READ32_MEMBER (vrc5074_device::pci1_r)
+uint32_t vrc5074_device::pci1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	int index = 1;
@@ -512,11 +512,11 @@ READ32_MEMBER (vrc5074_device::pci1_r)
 				if ((pci_addr >> (21 + dev)) & 0x1) {
 					new_data = (dev << 11) | (0x80000000) | (pci_addr & 0xff);
 					//printf("writing pci_addr: %08x dev: %x new_data: %08x\n", pci_addr, dev, new_data);
-					pci_host_device::config_address_w(space, offset, new_data);
+					pci_host_device::config_address_w(offset, new_data);
 					break;
 				}
 			}
-			result = pci_host_device::config_data_r(space, offset);
+			result = pci_host_device::config_data_r(offset);
 		}
 		break;
 	default:
@@ -527,7 +527,7 @@ READ32_MEMBER (vrc5074_device::pci1_r)
 		logerror("%s nile pci1_r offset %08X = %08X & %08X\n", machine().describe_context(), pci_addr, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc5074_device::pci1_w)
+void vrc5074_device::pci1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int index = 1;
 	uint32_t pci_addr = m_pci_laddr[index] | ((offset << 2) & m_pci_mask[index]);
@@ -549,11 +549,11 @@ WRITE32_MEMBER (vrc5074_device::pci1_w)
 				if ((pci_addr >> (21 + dev)) & 0x1) {
 					new_data = (dev << 11) | (0x80000000) | (pci_addr & 0xff);
 					//printf("writing pci_addr: %08x dev: %x new_data: %08x\n", pci_addr, dev, new_data);
-					pci_host_device::config_address_w(space, offset, new_data);
+					pci_host_device::config_address_w(offset, new_data);
 					break;
 				}
 			}
-			pci_host_device::config_data_w(space, offset, data);
+			pci_host_device::config_data_w(offset, data);
 		}
 		break;
 	default:
@@ -566,14 +566,14 @@ WRITE32_MEMBER (vrc5074_device::pci1_w)
 }
 
 // PCI Target Window 1
-READ32_MEMBER (vrc5074_device::target1_r)
+uint32_t vrc5074_device::target1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_sdram[0][offset];
 	if (LOG_NILE_TARGET)
 		logerror("%s nile target1 read from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc5074_device::target1_w)
+void vrc5074_device::target1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//m_cpu->space(AS_PROGRAM).write_dword(m_target1_laddr | (offset*4), data, mem_mask);
 	COMBINE_DATA(&m_sdram[0][offset]);
@@ -770,7 +770,7 @@ TIMER_CALLBACK_MEMBER(vrc5074_device::nile_timer_callback)
 *
 *************************************/
 
-READ32_MEMBER(vrc5074_device::cpu_reg_r)
+uint32_t vrc5074_device::cpu_reg_r(offs_t offset)
 {
 	uint32_t result = m_cpu_regs[offset];
 	bool logit = true;
@@ -846,7 +846,7 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 	return result;
 }
 
-WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
+void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t olddata = m_cpu_regs[offset];
 	bool logit = true;
@@ -1006,7 +1006,7 @@ WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
 	}
 }
 
-READ32_MEMBER(vrc5074_device::serial_r)
+uint32_t vrc5074_device::serial_r(offs_t offset)
 {
 	uint32_t result = m_uart->ins8250_r(offset>>1);
 
@@ -1015,7 +1015,7 @@ READ32_MEMBER(vrc5074_device::serial_r)
 	return result;
 }
 
-WRITE32_MEMBER(vrc5074_device::serial_w)
+void vrc5074_device::serial_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_uart->ins8250_w(offset>>1, data);
 	if (PRINTF_SERIAL && offset == NREG_UARTTHR) {

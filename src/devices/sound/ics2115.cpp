@@ -1,14 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex Marshall,nimitz,austere
-//ICS2115 by Raiden II team (c) 2010
-//members: austere, nimitz, Alex Marshal
-//
-//Original driver by O. Galibert, ElSemi
-//
-//Use tab size = 4 for your viewing pleasure.
+/*
+    ICS2115 by Raiden II team (c) 2010
+    members: austere, nimitz, Alex Marshal
+
+    Original driver by O. Galibert, ElSemi
+
+    Use tab size = 4 for your viewing pleasure.
+
+    TODO:
+    - Implement Panning, Chip has support stereo
+    - Verify BYTE/ROMEN pin behaviors
+    - DRAM, DMA, MIDI interface is unimplemented
+    - Verify interrupt, envelope, timer period
+    - Verify unemulated registers
+
+    Changelog:
+
+    25th july 2020 [cam900]:
+    - Improve envelope behavior, Improve debugging registers, Fix ramping
+*/
 
 #include "emu.h"
 #include "ics2115.h"
+#include <algorithm>
 #include <cmath>
 
 //#define ICS2115_DEBUG
@@ -18,15 +33,34 @@
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ICS2115, tag, owner, clock),
-		device_sound_interface(mconfig, *this), m_stream(nullptr),
-		m_rom(*this, DEVICE_SELF),
-		m_irq_cb(*this), m_active_osc(0), m_osc_select(0), m_reg_select(0), m_irq_enabled(0), m_irq_pending(0), m_irq_on(false), m_vmode(0)
+	: device_t(mconfig, ICS2115, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 24) // 24 bit address bus, 8 bit data bus(ROM), 11 bit address bus, 8 bit data bus, 4 banks(DRAM)
+	, m_stream(nullptr)
+	, m_rom(*this, DEVICE_SELF)
+	, m_irq_cb(*this)
+	, m_active_osc(0)
+	, m_osc_select(0)
+	, m_reg_select(0)
+	, m_irq_enabled(0)
+	, m_irq_pending(0)
+	, m_irq_on(false)
+	, m_vmode(0)
 {
 }
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
 void ics2115_device::device_start()
 {
+	if (m_rom && !has_configured_map(0))
+		space(0).install_rom(0, std::min<offs_t>((1 << 24) - 1, m_rom.bytes()), m_rom.target());
+
+	space(0).cache(m_cache);
+
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / (32 * 32));
@@ -48,7 +82,7 @@ void ics2115_device::device_start()
 
 	//u-Law table as per MIL-STD-188-113
 	u16 lut[8];
-	u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
+	const u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
 	for (int i = 0; i < 256; i++)
@@ -72,11 +106,14 @@ void ics2115_device::device_start()
 	save_item(NAME(m_irq_on));
 	save_item(NAME(m_active_osc));
 	save_item(NAME(m_vmode));
+	save_item(NAME(m_regs));
+	save_item(STRUCT_MEMBER(m_voice, regs));
 
 	for (int i = 0; i < 32; i++)
 	{
 		save_item(NAME(m_voice[i].osc_conf.value), i);
-		save_item(NAME(m_voice[i].state.value), i);
+		save_item(NAME(m_voice[i].state.on), i);
+		save_item(NAME(m_voice[i].state.ramp), i);
 		save_item(NAME(m_voice[i].vol_ctrl.value), i);
 		save_item(NAME(m_voice[i].osc.left), i);
 		save_item(NAME(m_voice[i].osc.acc), i);
@@ -97,6 +134,9 @@ void ics2115_device::device_start()
 	}
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
 void ics2115_device::device_reset()
 {
@@ -133,14 +173,33 @@ void ics2115_device::device_reset()
 		elem.vol.pan = 0x7f;
 		elem.vol_ctrl.value = 1;
 		elem.vol.mode = 0;
-		elem.state.value = 0;
+		elem.state.on = false;
+		elem.state.ramp = 0;
 	}
 }
+
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
 
 void ics2115_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / ((m_active_osc + 1) * 32));
 }
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector ics2115_device::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
+}
+
 
 //TODO: improve using next-state logic from column 126 of patent 5809466
 int ics2115_device::ics2115_voice::update_volume_envelope()
@@ -183,14 +242,7 @@ int ics2115_device::ics2115_voice::update_volume_envelope()
 			vol.acc = vol.start - vol.left;
 	}
 	else
-	{
-		state.bitflags.on = false;
 		vol_ctrl.bitflags.done = true;
-		if (vol_ctrl.bitflags.invert)
-			vol.acc = vol.end;
-		else
-			vol.acc = vol.start;
-	}
 
 	return ret;
 }
@@ -253,7 +305,7 @@ int ics2115_device::ics2115_voice::update_oscillator()
 	}
 	else
 	{
-		state.bitflags.on = false;
+		state.on = false;
 		osc_conf.bitflags.stop = true;
 		if (!osc_conf.bitflags.invert)
 			osc.acc = osc.end;
@@ -263,100 +315,95 @@ int ics2115_device::ics2115_voice::update_oscillator()
 	return ret;
 }
 
-//TODO: proper interpolation for uLaw (fill_output doesn't use this) and 8-bit samples (looping)
+//TODO: proper interpolation for 8-bit samples (looping)
 stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 {
-	u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+	const u32 curaddr = voice.osc.acc >> 12;
 	u32 nextaddr;
 
-	if (voice.state.bitflags.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
-			(voice.osc.left < (voice.osc.fc <<2)))
+	if (voice.state.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
+			(voice.osc.left < (voice.osc.fc << 2)))
 	{
 		//logerror("C?[%x:%x]", voice.osc.left, voice.osc.acc);
-		nextaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.start >> 12);
+		nextaddr = voice.osc.start >> 12;
 	}
 	else
 		nextaddr = curaddr + 2;
 
-
 	s16 sample1, sample2;
-	if (voice.osc_conf.bitflags.eightbit)
+	if (voice.osc_conf.bitflags.ulaw)
 	{
-		sample1 = ((s8)m_rom[curaddr]) << 8;
-		sample2 = ((s8)m_rom[curaddr + 1]) << 8;
+		sample1 = m_ulaw[read_sample(voice, curaddr)];
+		sample2 = m_ulaw[read_sample(voice, curaddr + 1)];
+	}
+	else if (voice.osc_conf.bitflags.eightbit)
+	{
+		sample1 = ((s8)read_sample(voice, curaddr)) << 8;
+		sample2 = ((s8)read_sample(voice, curaddr + 1)) << 8;
 	}
 	else
 	{
-		sample1 = m_rom[curaddr + 0] | (((s8)m_rom[curaddr + 1]) << 8);
-		sample2 = m_rom[nextaddr+ 0] | (((s8)m_rom[nextaddr+ 1]) << 8);
-		//sample2 = m_rom[curaddr + 2] | (((s8)m_rom[curaddr + 3]) << 8);
+		sample1 = read_sample(voice, curaddr + 0) | (((s8)read_sample(voice, curaddr + 1)) << 8);
+		sample2 = read_sample(voice, nextaddr+ 0) | (((s8)read_sample(voice, nextaddr+ 1)) << 8);
+		//sample2 = read_sample(voice, curaddr + 2) | (((s8)read_sample(voice, curaddr + 3)) << 8);
 	}
-
-	//no need for interpolation since it's around 1 note a cycle?
-	//if (voice.osc.fc >> 10)
-	//    return sample1;
 
 	//linear interpolation as in US patent 6,246,774 B1, column 2 row 59
 	//LEN=1, BLEN=0, DIR=0, start+end interpolation
-	s32 sample, diff;
-	u16 fract;
-	diff = sample2 - sample1;
-	fract = (voice.osc.acc >> 3) & 0x1ff;
+	const s32 diff = sample2 - sample1;
+	const u16 fract = (voice.osc.acc >> 3) & 0x1ff;
 
-	sample = (((s32)sample1 << 9) + diff * fract) >> 9;
+	//no need for interpolation since it's around 1 note a cycle?
+	//if (!fract)
+	//    return sample1;
+
+	const s32 sample = (((s32)sample1 << 9) + diff * fract) >> 9;
 	//sample = sample1;
 	return sample;
 }
 
 bool ics2115_device::ics2115_voice::playing()
 {
-	return state.bitflags.on && !((vol_ctrl.bitflags.done || vol_ctrl.bitflags.stop) && osc_conf.bitflags.stop);
+	return state.on && !(osc_conf.bitflags.stop);
 }
 
 void ics2115_device::ics2115_voice::update_ramp()
 {
 	//slow attack
-	if (state.bitflags.on && !osc_conf.bitflags.stop)
+	if (state.on && !osc_conf.bitflags.stop)
 	{
-		if (state.bitflags.ramp < 0x40)
-			state.bitflags.ramp += 0x1;
+		if (state.ramp < 0x40)
+			state.ramp += 0x1;
 		else
-			state.bitflags.ramp = 0x40;
+			state.ramp = 0x40;
 	}
 	//slow release
 	else
 	{
-		if (state.bitflags.ramp)
-			state.bitflags.ramp -= 0x1;
+		if (state.ramp)
+			state.ramp -= 0x1;
 	}
 }
 
 int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples)
 {
 	bool irq_invalid = false;
-	u16 fine = 1 << (3*(voice.vol.incr >> 6));
+	const u16 fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3f)<< (10 - fine);
 
 	for (int i = 0; i < samples; i++)
 	{
-		u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		u32 volume = (m_volume[volacc >> 4] * voice.state.bitflags.ramp) >> 6;
-		u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
+		const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
+		const u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
+		const u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
 		//final output, even if they are not running.  This means that whatever data value
 		//that the voice is pointing at is contributing to the summation.
 		//(austere note: this will of course fix some of the glitches due to multiple transition)
-		stream_sample_t sample;
-		if (voice.osc_conf.bitflags.ulaw)
-		{
-			u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-			sample = m_ulaw[m_rom[curaddr]];
-		}
-		else
-			sample = get_sample(voice);
+		stream_sample_t sample = get_sample(voice);
 
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
 		if (!m_vmode || voice.playing())
@@ -396,11 +443,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /*
 #ifdef ICS2115_DEBUG
         u32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-        stream_sample_t sample;
-        if (voice.osc_conf.bitflags.ulaw)
-            sample = m_ulaw[m_rom[curaddr]];
-        else
-            sample = get_sample(voice);
+        stream_sample_t sample = get_sample(voice);
         logerror("[%06x=%04x]", curaddr, (s16)sample);
 #endif
 */
@@ -451,7 +494,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //Helper Function (Reads off current register)
 u16 ics2115_device::reg_read()
 {
-	u16 ret;
+	u16 ret = 0;
 	ics2115_voice& voice = m_voice[m_osc_select];
 
 	switch (m_reg_select)
@@ -587,6 +630,9 @@ u16 ics2115_device::reg_read()
 			ret = m_irq_pending & 3;
 			break;
 
+		// case 0x48: // Accumulator Monitor Status
+		// case 0x49: // Accumulator Monitor Data
+
 		case 0x4a: // IRQ Pending
 			ret = m_irq_pending;
 			break;
@@ -598,6 +644,17 @@ u16 ics2115_device::reg_read()
 		case 0x4c: // Chip Revision
 			ret = revision;
 			break;
+
+		// case 0x4d: // System Control
+
+		// case 0x50: // MIDI Data Register
+		// case 0x51: // MIDI Status Register
+		// case 0x52: // Host Data Register
+		// case 0x53: // Host Status Register
+		// case 0x54: // MIDI Emulation Interrupt Control
+		// case 0x55: // Host Emulation Interrupt Control
+		// case 0x56: // Host/MIDI Emulation Interrupt Status
+		// case 0x57: // Emulation Mode
 
 		default:
 #ifdef ICS2115_DEBUG
@@ -612,6 +669,10 @@ u16 ics2115_device::reg_read()
 void ics2115_device::reg_write(u16 data, u16 mem_mask)
 {
 	ics2115_voice& voice = m_voice[m_osc_select];
+	if (m_reg_select < 0x20)
+		COMBINE_DATA(&voice.regs[m_reg_select]);
+	else if (m_reg_select >= 0x40 && m_reg_select < 0x80)
+		COMBINE_DATA(&m_regs[m_reg_select - 0x40]);
 
 	switch (m_reg_select)
 	{
@@ -739,6 +800,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			{
 				data >>= 8;
 				voice.osc.ctl = data;
+				voice.state.on = !voice.osc.ctl; // some early PGM games need this
 				if (!data)
 					keyon();
 				//guessing here
@@ -753,10 +815,9 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 #endif
 					if (!m_vmode)
 					{
+						//try to key it off as well!
 						voice.osc_conf.bitflags.stop = true;
 						voice.vol_ctrl.bitflags.stop = true;
-						//try to key it off as well!
-						voice.state.bitflags.on = false;
 					}
 				}
 #ifdef ICS2115_DEBUG
@@ -794,6 +855,11 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			}
 			break;
 
+		// case 0x44: // DMA Start Address Low (11:4)
+		// case 0x45: // DMA Start Address Low (19:12)
+		// case 0x46: // DMA Start Address Low (21:20)
+		// case 0x47: // DMA Control
+
 		case 0x4a: // IRQ Enable
 			if (ACCESSING_BITS_0_7)
 			{
@@ -802,10 +868,22 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			}
 			break;
 
+		// case 0x4c: // Memory Config
+		// case 0x4d: // System Control
+
 		case 0x4f: // Oscillator Address being Programmed
 			if (ACCESSING_BITS_0_7)
 				m_osc_select = (data & 0xff) % (1+m_active_osc);
 			break;
+
+		// case 0x50: // MIDI Data Register
+		// case 0x51: // MIDI Control Register
+		// case 0x52: // Host Data Register
+		// case 0x53: // Host Control Register
+		// case 0x54: // MIDI Emulation Interrupt Control
+		// case 0x55: // Host Emulation Interrupt Control
+		// case 0x57: // Emulation Mode
+
 		default:
 #ifdef ICS2115_DEBUG
 			logerror("ICS2115: Unhandled write %x onto %x [voice = %d]\n", data, m_reg_select, m_osc_select);
@@ -938,9 +1016,8 @@ void ics2115_device::keyon()
 		return;
 #endif
 	//set initial condition (may need to invert?) -- does NOT work since these are set to zero even
-	m_voice[m_osc_select].state.bitflags.on = true;
 	//no ramp up...
-	m_voice[m_osc_select].state.bitflags.ramp = 0x40;
+	m_voice[m_osc_select].state.ramp = 0x40;
 
 #ifdef ICS2115_DEBUG
 	logerror("[%02d vs:%04x ve:%04x va:%04x vi:%02x vc:%02x os:%06x oe:%06x oa:%06x of:%04x SA:%02x oc:%02x][%04x]\n", m_osc_select,

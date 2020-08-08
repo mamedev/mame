@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    save.c
+    save.cpp
 
     Save state management functions.
 

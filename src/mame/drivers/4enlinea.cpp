@@ -181,7 +181,7 @@
 
   - [DUMPED]  4 en Línea (Compumatic)
   - [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
-  - [MISSING] Sport Dart TV (Compumatic)
+  - [DUMPED]  Sport Dart TV (Compumatic / Desarrollos y Recambios S.L.)
   - [MISSING] Dart Queen (Compumatic / Daryde)
 
 **************************************************************************
@@ -211,10 +211,10 @@
 #define SEC_CLOCK            XTAL(8'000'000)
 #define HCGA_CLOCK           XTAL(14'318'181)
 
-#define PRG_CPU_CLOCK        MAIN_CLOCK /2      /* 8 MHz. (measured) */
-#define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. (measured) */
-#define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz. (measured) */
-#define CRTC_CLOCK           SEC_CLOCK /2       /* 8 MHz. (measured) */
+#define PRG_CPU_CLOCK        MAIN_CLOCK /2      // 8 MHz. (measured)
+#define SND_CPU_CLOCK        SEC_CLOCK /2       // 4 MHz. (measured)
+#define SND_AY_CLOCK         SEC_CLOCK /4       // 2 MHz. (measured)
+#define CRTC_CLOCK           SEC_CLOCK /2       // 8 MHz. (measured)
 
 class _4enlinea_state : public driver_device
 {
@@ -335,7 +335,7 @@ void isa8_cga_4enlinea_device::device_start()
 	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read)), write8sm_delegate(*this, FUNC(isa8_cga_device::io_write)));
 	m_isa->install_bank(0x8000, 0xbfff, "bank1", &m_vram[0]);
 
-	/* Initialise the cga palette */
+	// Initialise the CGA palette
 	int i;
 
 	for (int i = 0; i < CGA_PALETTE_SETS * 16; i++ )
@@ -405,7 +405,7 @@ void _4enlinea_state::serial_status_w(uint8_t data)
 	m_serial_flags = data; // probably just clears
 }
 
-/* TODO: do this really routes to 0xe000-0xe001 of Main CPU? */
+// TODO: do this really routes to 0xe000-0xe001 of Main CPU?
 void _4enlinea_state::serial_w(offs_t offset, uint8_t data)
 {
 	m_serial_data[offset] = data;
@@ -584,7 +584,7 @@ void _4enlinea_isa8_cards(device_slot_interface &device)
 	device.option_add_internal("4enlinea",  ISA8_CGA_4ENLINEA);
 }
 
-/* TODO: irq sources are unknown */
+// TODO: IRQ sources are unknown
 INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 {
 	if(m_irq_count == 0)
@@ -605,7 +605,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
 
 void _4enlinea_state::_4enlinea(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, PRG_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_4enlinea_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &_4enlinea_state::main_portmap);
@@ -635,7 +635,7 @@ void _4enlinea_state::_4enlinea(machine_config &config)
     CRTC_CLOCK / 5.0 = 53.569037 Hz.
 */
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, SND_AY_CLOCK);
 	m_ay->port_a_read_callback().set_ioport("IN-P2");
@@ -679,11 +679,25 @@ ROM_START( 4enlinea )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cuatro_en_linea_27c256__cicplay-1.ic19", 0x0000, 0x8000, CRC(307a57a3) SHA1(241329d919ec43d0eeb1dad0a4db6cf6de06e7e1) )
 
-	ROM_REGION( 0x0800, "eeprom", 0 )   /* default serial EEPROM */
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default serial EEPROM
 	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x0000, 0x0800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x0000, 0x0117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
+ROM_END
+
+ROM_START( 4enlineb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cuatro_en_linea_2_a06.ic6",  0x0000, 0x8000, CRC(f8f14bf8) SHA1(e48fbedbd1b9be6fb56a0f65db80eddbedb487c7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "cuatro_en_linea_1_a06.ic19", 0x0000, 0x8000, CRC(993d0581) SHA1(d6e366dd827543508037d2071c4b6e638c2cf87b) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 ) // From an operated PCB, a clean one for default need to be created...
+	ROM_LOAD( "cuatro_en_linea_24c16.ic17", 0x0000, 0x0800, CRC(56722dd4) SHA1(f818d882b3070f9b1fac486987a044ab1d418985) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "cuatro_en_linea_gal16v8a.ic04", 0x0000, 0x0117, CRC(1edaf06c) SHA1(51e44c2e6b54991330d6ef945e98fa2c8a49408d) )
 ROM_END
 
 /* Kursaal K7 Olympic Darts PCB
@@ -730,10 +744,25 @@ ROM_START( k7_olym )
 ROM_END
 
 
+ROM_START( sprtdart )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sport_dart_27c512.ic19", 0x00000, 0x10000, CRC(6c9ae27f) SHA1(92fbdef7747a9096daf4714f45b119ad8f3a1436) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 )
+	ROM_LOAD( "24c16.ic17", 0x0000, 0x0800, NO_DUMP ) // Undumped
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	ROM_LOAD( "gal16v8a.ic11", 0x0000, 0x0117, NO_DUMP ) // protected
+	ROM_LOAD( "gal16v8a.ic4",  0x0117, 0x0117, NO_DUMP ) // protected
+ROM_END
+
+
 /***********************************
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME              FLAGS  */
-GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea",    MACHINE_NOT_WORKING )
-GAME( 1994, k7_olym,  0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal", "Olympic Darts (K7)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS            INIT        ROT   COMPANY                                      FULLNAME                       FLAGS
+GAME( 1991, 4enlinea, 0,        _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-07)", MACHINE_NOT_WORKING )
+GAME( 1991, 4enlineb, 4enlinea, _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic / CIC Play",                     "Cuatro en Linea (rev. A-06)", MACHINE_NOT_WORKING )
+GAME( 1994, k7_olym,  0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal",                                "Olympic Darts (K7)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1993, sprtdart, 0,        k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "Compumatic / Desarrollos y Recambios S.L.", "Sport Dart TV",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

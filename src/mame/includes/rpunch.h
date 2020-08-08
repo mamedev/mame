@@ -71,7 +71,7 @@ private:
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void videoreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void scrollreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_WRITE8_MEMBER(gga_w);
+	void gga_w(offs_t offset, u8 data);
 	void gga_data_w(offs_t offset, u8 data);
 	void sprite_ctrl_w(offs_t offset, u8 data);
 	void upd_control_w(u8 data);

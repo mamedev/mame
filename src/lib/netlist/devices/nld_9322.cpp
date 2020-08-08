@@ -3,6 +3,19 @@
 /*
  * nld_9322.cpp
  *
+ *  9322: Quad 2-Line to 1-Line Data Selectors/Multiplexers
+ *
+ *          +------------+
+ *   SELECT |1    ++   16| VCC
+ *       A1 |2         15| STROBE
+ *       B1 |3         14| A4
+ *       Y1 |4   9322  13| B4
+ *       A2 |5         12| Y4
+ *       B2 |6         11| A3
+ *       Y2 |7         10| B3
+ *      GND |8          9| Y3
+ *          +------------+
+ *
  */
 
 #include "nld_9322.h"
@@ -14,23 +27,34 @@ namespace netlist
 	{
 	class NETLIB_NAME(9322);
 
-	NETLIB_OBJECT(9322_selector)
+	NETLIB_OBJECT(9322_GATE)
 	{
-		NETLIB_CONSTRUCTOR(9322_selector)
-		, m_parent(owner)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
+		NETLIB_CONSTRUCTOR(9322_GATE)
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_SELECT(*this, "SELECT", NETLIB_DELEGATE(inputs))
+		, m_STROBE(*this, "STROBE", NETLIB_DELEGATE(inputs))
 		, m_Y(*this, "Y")
 		, m_power_pins(*this)
 		{
 		}
 
-		NETLIB_UPDATEI();
+		// FIXME: Timing
+		NETLIB_HANDLERI(inputs)
+		{
+			if (m_STROBE())
+				m_Y.push(0, NLTIME_FROM_NS(21));
+			else if (m_SELECT())
+				m_Y.push(m_B(), NLTIME_FROM_NS(14));
+			else
+				m_Y.push(m_A(), NLTIME_FROM_NS(14));
+		}
 
 	public:
-		NETLIB_NAME(9322) &m_parent;
 		logic_input_t m_A;
 		logic_input_t m_B;
+		logic_input_t m_SELECT;
+		logic_input_t m_STROBE;
 		logic_output_t m_Y;
 		nld_power_pins m_power_pins;
 	};
@@ -38,8 +62,6 @@ namespace netlist
 	NETLIB_OBJECT(9322)
 	{
 		NETLIB_CONSTRUCTOR(9322)
-		, m_SELECT(*this, "SELECT")
-		, m_STROBE(*this, "STROBE")
 		, m_1(*this, "A")
 		, m_2(*this, "B")
 		, m_3(*this, "C")
@@ -64,77 +86,29 @@ namespace netlist
 			connect("A.GND", "B.GND");
 			connect("A.GND", "C.GND");
 			connect("A.GND", "D.GND");
+			connect("A.SELECT", "B.SELECT");
+			connect("A.SELECT", "C.SELECT");
+			connect("A.SELECT", "D.SELECT");
+			connect("A.STROBE", "B.STROBE");
+			connect("A.STROBE", "C.STROBE");
+			connect("A.STROBE", "D.STROBE");
 
+			register_subalias("SELECT", "A.SELECT");
+			register_subalias("STROBE", "A.STROBE");
 			register_subalias("GND", "A.GND");
 			register_subalias("VCC", "B.VCC");
-
 		}
 
-		NETLIB_UPDATEI();
-
-		friend class NETLIB_NAME(9322_dip);
-	public:
-		logic_input_t m_SELECT;
-		logic_input_t m_STROBE;
 	private:
-		NETLIB_SUB(9322_selector) m_1;
-		NETLIB_SUB(9322_selector) m_2;
-		NETLIB_SUB(9322_selector) m_3;
-		NETLIB_SUB(9322_selector) m_4;
+		NETLIB_SUB(9322_GATE) m_1;
+		NETLIB_SUB(9322_GATE) m_2;
+		NETLIB_SUB(9322_GATE) m_3;
+		NETLIB_SUB(9322_GATE) m_4;
 
 	};
 
-	NETLIB_OBJECT(9322_dip)
-	{
-		NETLIB_CONSTRUCTOR(9322_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_SELECT);
-			register_subalias("2", A.m_1.m_A);
-			register_subalias("3", A.m_1.m_B);
-			register_subalias("4", A.m_1.m_Y);
-			register_subalias("5", A.m_2.m_A);
-			register_subalias("6", A.m_2.m_B);
-			register_subalias("7", A.m_2.m_Y);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9",  A.m_3.m_Y);
-			register_subalias("10", A.m_3.m_B);
-			register_subalias("11", A.m_3.m_A);
-			register_subalias("12", A.m_4.m_Y);
-			register_subalias("13", A.m_4.m_B);
-			register_subalias("14", A.m_4.m_A);
-			register_subalias("15", A.m_STROBE);
-			register_subalias("16", "A.VCC");
-		}
-
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
-	private:
-		NETLIB_SUB(9322) A;
-	};
-
-	// FIXME: Timing
-	NETLIB_UPDATE(9322_selector)
-	{
-		if (m_parent.m_STROBE())
-			m_Y.push(0, NLTIME_FROM_NS(21));
-		else if (m_parent.m_SELECT())
-			m_Y.push(m_B(), NLTIME_FROM_NS(14));
-		else
-			m_Y.push(m_A(), NLTIME_FROM_NS(14));
-	}
-
-	NETLIB_UPDATE(9322)
-	{
-		m_1.update();
-		m_2.update();
-		m_3.update();
-		m_4.update();
-	}
-
-	NETLIB_DEVICE_IMPL(9322,     "TTL_9322",     "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(9322_dip, "TTL_9322_DIP", "")
+	NETLIB_DEVICE_IMPL(9322_GATE, "TTL_9322_GATE", "")
+	NETLIB_DEVICE_IMPL(9322,      "TTL_9322",      "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

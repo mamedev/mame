@@ -1032,13 +1032,13 @@ static INPUT_PORTS_START( bigfghtr )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Debug 2 (requires Debug On) (P2 Start skip stage, Invulnerability)" ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Debug (P1 Start to pause)" ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1206,7 +1206,7 @@ void armedf_state::armedf(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	video_config(config, 12, 16, 240);
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 
 	/* sound hardware */

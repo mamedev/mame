@@ -156,6 +156,7 @@ private:
 
 	// frameskipping
 	u8                  m_empty_skip_count;         // number of empty frames we have skipped
+	u8                  m_frameskip_max;            // maximum frameskip level
 	u8                  m_frameskip_level;          // current frameskip level
 	u8                  m_frameskip_counter;        // counter that counts through the frameskip steps
 	s8                  m_frameskip_adjust;

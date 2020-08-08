@@ -6,8 +6,11 @@
  */
 
 #include "nlid_proxy.h"
-#include "solver/nld_solver.h"
+#include "core/setup.h"
 #include "nl_errstr.h"
+#include "solver/nld_solver.h"
+
+#include <array>
 
 namespace netlist
 {
@@ -17,6 +20,8 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
+
+	static const std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 		const logic_t *inout_proxied)
@@ -29,16 +34,15 @@ namespace netlist
 			throw nl_exception(MF_NULLPTR_FAMILY_NP("nld_base_proxy"));
 		}
 
-		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
 		bool f = false;
 		for (const auto & pwr_sym : power_syms)
 		{
 			pstring devname = inout_proxied->device().name();
 
-			auto *tp_ct(anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
+			auto *tp_ct(anetlist.setup().find_terminal(devname + "." + pstring(pwr_sym.first),
 					/*detail::terminal_type::INPUT,*/ false));
-			auto *tp_cn(anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
+			auto *tp_cn(anetlist.setup().find_terminal(devname + "." + pstring(pwr_sym.second),
 				/*detail::terminal_type::INPUT,*/ false));
 			if ((tp_ct != nullptr) && (tp_cn != nullptr))
 			{
@@ -47,8 +51,8 @@ namespace netlist
 				if (!tp_cn->is_analog())
 					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
 
-				auto *tp_t = static_cast<analog_t* >(tp_ct);
-				auto *tn_t = static_cast<analog_t *>(tp_cn);
+				auto *tp_t = dynamic_cast<analog_t* >(tp_ct);
+				auto *tn_t = dynamic_cast<analog_t *>(tp_cn);
 				if (f && (tp_t != nullptr && tn_t != nullptr))
 					log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
 						m_tp->name(), m_tn->name(),
@@ -81,15 +85,11 @@ namespace netlist
 	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *in_proxied)
 	: nld_base_a_to_d_proxy(anetlist, name, in_proxied)
 	, m_Q(*this, "Q")
-	, m_I(*this, "I")
+	, m_I(*this, "I", nldelegate(&nld_a_to_d_proxy::input, this))
 	{
 	}
 
-	NETLIB_RESET(a_to_d_proxy)
-	{
-	}
-
-	NETLIB_UPDATE(a_to_d_proxy)
+	NETLIB_HANDLER(a_to_d_proxy, input)
 	{
 		const auto v(m_I.Q_Analog());
 		const auto vn(m_tn->net().Q_Analog());
@@ -117,7 +117,7 @@ namespace netlist
 
 	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied)
-	, m_I(*this, "I")
+	, m_I(*this, "I", nldelegate(&nld_d_to_a_proxy :: input, this))
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", terminal_t::OUT_TRISTATE())
@@ -154,7 +154,7 @@ namespace netlist
 			nlconst::zero());
 	}
 
-	NETLIB_UPDATE(d_to_a_proxy)
+	NETLIB_HANDLER(d_to_a_proxy ,input)
 	{
 		const auto state = m_I();
 		if (state != m_last_state)
@@ -187,7 +187,7 @@ namespace netlist
 							nlconst::zero());
 						break;
 					default:
-						throw nl_exception("unknown state for proxy: this should never happen! %d\n", static_cast<int>(state));
+						plib::terminate("unknown state for proxy: this should never happen!");
 				}
 			});
 			m_last_state = state;

@@ -99,17 +99,17 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(sound_latch_w);
-	DECLARE_READ8_MEMBER(sound_latch_r);
-	DECLARE_WRITE8_MEMBER(cvsd_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_READ8_MEMBER(master_com_r);
-	DECLARE_WRITE8_MEMBER(master_com_w);
-	DECLARE_READ8_MEMBER(slave_com_r);
-	DECLARE_WRITE8_MEMBER(slave_com_w);
-	DECLARE_READ8_MEMBER(jngolady_rng_r);
+	void mux_w(uint8_t data);
+	void output_w(uint8_t data);
+	void sound_latch_w(uint8_t data);
+	uint8_t sound_latch_r();
+	void cvsd_w(uint8_t data);
+	void adpcm_w(uint8_t data);
+	uint8_t master_com_r();
+	void master_com_w(uint8_t data);
+	uint8_t slave_com_r();
+	void slave_com_w(uint8_t data);
+	uint8_t jngolady_rng_r();
 	uint8_t input_mux_r();
 
 	void jangou_palette(palette_device &palette) const;
@@ -215,12 +215,12 @@ uint32_t jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-WRITE8_MEMBER(jangou_state::mux_w)
+void jangou_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 }
 
-WRITE8_MEMBER(jangou_state::output_w)
+void jangou_state::output_w(uint8_t data)
 {
 	/*
 	--x- ---- ? (polls between high and low in irq routine, most likely irq mask)
@@ -255,20 +255,20 @@ uint8_t jangou_state::input_mux_r()
  *
  *************************************/
 
-WRITE8_MEMBER(jangou_state::sound_latch_w)
+void jangou_state::sound_latch_w(uint8_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(jangou_state::sound_latch_r)
+uint8_t jangou_state::sound_latch_r()
 {
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read();
 }
 
 /* Jangou HC-55516 CVSD */
-WRITE8_MEMBER(jangou_state::cvsd_w)
+void jangou_state::cvsd_w(uint8_t data)
 {
 	m_cvsd_shiftreg = data;
 }
@@ -286,7 +286,7 @@ TIMER_CALLBACK_MEMBER(jangou_state::cvsd_bit_timer_callback)
 
 
 /* Jangou Lady MSM5218 (MSM5205-compatible) ADPCM */
-WRITE8_MEMBER(jangou_state::adpcm_w)
+void jangou_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_byte = data;
 }
@@ -311,24 +311,24 @@ WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
  *
  *************************************/
 
-READ8_MEMBER(jangou_state::master_com_r)
+uint8_t jangou_state::master_com_r()
 {
 	return m_z80_latch;
 }
 
-WRITE8_MEMBER(jangou_state::master_com_w)
+void jangou_state::master_com_w(uint8_t data)
 {
 	m_nsc->set_input_line(0, ASSERT_LINE);
 	m_nsc_latch = data;
 }
 
-READ8_MEMBER(jangou_state::slave_com_r)
+uint8_t jangou_state::slave_com_r()
 {
 	m_nsc->set_input_line(0, CLEAR_LINE);
 	return m_nsc_latch;
 }
 
-WRITE8_MEMBER(jangou_state::slave_com_w)
+void jangou_state::slave_com_w(uint8_t data)
 {
 	m_z80_latch = data;
 }
@@ -1358,15 +1358,15 @@ ROM_END
  *
  *************************************/
 
-/*Temporary kludge for make the RNG work*/
-READ8_MEMBER(jangou_state::jngolady_rng_r)
+/*Temporary kludge to make the RNG work*/
+uint8_t jangou_state::jngolady_rng_r()
 {
 	return machine().rand();
 }
 
 void jangou_state::init_jngolady()
 {
-	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(*this, FUNC(jangou_state::jngolady_rng_r)));
+	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8smo_delegate(*this, FUNC(jangou_state::jngolady_rng_r)));
 }
 
 

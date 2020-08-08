@@ -6,9 +6,10 @@
 
     Skeleton driver
 
-    Currently there are dumps for a Mortal Kombat 3 board and a board with
-    4 slots that supports various games directly and also has a generic
-    timer based mode.
+	The following systems are dumped:
+	- Mortal Kombat 3
+	- 4 Slot board
+	- 4 Slot board with built-in NBA Jam
 
     Hardware (for the 4 slot switcher):
     - MCS-51 based CPU 44-pin (markings removed)
@@ -67,6 +68,7 @@ public:
 
 	void mk3snes(machine_config &config);
 	void snes4sl(machine_config &config);
+	void snes4sln(machine_config &config);
 
 protected:
 	void machine_start() override;
@@ -180,7 +182,7 @@ void snesb51_state::machine_start()
 
 void snesb51_state::mk3snes(machine_config &config)
 {
-	I8751(config, m_mcu, 12_MHz_XTAL / 6);
+	I8751(config, m_mcu, 12_MHz_XTAL);
 	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
@@ -189,8 +191,8 @@ void snesb51_state::mk3snes(machine_config &config)
 
 void snesb51_state::snes4sl(machine_config &config)
 {
-	// exact type and clock unknown
-	I8031(config, m_mcu, 12_MHz_XTAL / 6);
+	// exact type unknown
+	I8031(config, m_mcu, 12_MHz_XTAL);
 	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
 	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
@@ -200,6 +202,16 @@ void snesb51_state::snes4sl(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	GFXDECODE(config, "gfxdecode", "palette", chars);
+}
+
+void snesb51_state::snes4sln(machine_config &config)
+{
+	I8051(config, m_mcu, 12_MHz_XTAL); // SAB 8051A-P
+	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
+	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
+	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
+	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
 }
 
 // this is identical to the snes release apart from a single byte
@@ -227,6 +239,19 @@ ROM_START( snes4sl )
 	ROM_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670))
 ROM_END
 
-//    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME                          FLAGS
-GAME( 199?, mk3snes, 0,       mk3snes, mk3snes, snesb51_state, empty_init, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)", MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl, 0,       snes4sl, snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher",    MACHINE_IS_SKELETON )
+ROM_START( snes4sln )
+	// identical to NBA Jam (nbajamua)
+	ROM_REGION(0x400000, "game", 0)
+	ROM_LOAD("4.bin", 0x000000, 0x080000, CRC(d27bbebe) SHA1(fcf614fcd3c0fb06037038514d828f0cb597838e))
+	ROM_LOAD("3.bin", 0x080000, 0x080000, CRC(c0ca8c3c) SHA1(af5caa1b0254f6b42e4f7f3ba07d0af904017e3c))
+	ROM_LOAD("2.bin", 0x100000, 0x080000, CRC(4de70641) SHA1(1f575282a1bb842afcc80e29cebc13d96f8158a4))
+	ROM_LOAD("1.bin", 0x180000, 0x080000, CRC(9d59835f) SHA1(061872d9a2b39d271fbfc90b9e8f9abefcfa4282))
+
+	ROM_REGION(0x8000, "mcu", 0)
+	ROM_LOAD("5.bin", 0x0000, 0x8000, CRC(af8a64e3) SHA1(f13187d213fe7c2a0edcb88d4e828bd24112e812))
+ROM_END
+
+//    YEAR  NAME      PARENT  MACHINE   INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME                                 FLAGS
+GAME( 199?, mk3snes,  0,      mk3snes,  mk3snes, snesb51_state, empty_init, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg)",        MACHINE_IS_SKELETON )
+GAME( 1993, snes4sl,  0,      snes4sl,  snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher",           MACHINE_IS_SKELETON )
+GAME( 1994, snes4sln, 0,      snes4sln, snes4sl, snesb51_state, empty_init, ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)", MACHINE_IS_SKELETON )

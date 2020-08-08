@@ -81,9 +81,8 @@ Notes:
                     like a V60. The BIOS is tied directly to it.
       RH-7500     - Casio RH-7500 5C315 (QFP208). This is the graphics generator chip.
       RH-7501     - Casio RH-7501 5C350 (QFP64). This is probably the sound chip.
-      SH7021      - Hitachi HD6437021TE20 SuperH RISC Engine SH-2A CPU with 32k internal maskROM (TQFP100)
-                    The internal ROM (BIOS1) is not dumped. A SH-2A software programming manual is available here...
-                    http://documentation.renesas.com/eng/products/mpumcu/rej09b0051_sh2a.pdf
+      SH7021      - Hitachi HD6437021TE20 SuperH RISC Engine SH-1 CPU with 32k internal maskROM (TQFP100)
+                    The internal ROM (BIOS1) is not dumped.
       CXA1645M    - Sony CXA1645M RGB Encoder (RGB -> Composite Video) (SOIC24)
       A1603C      - NEC uPA1603C Compound Field Effect Power Transistor Array (DIP16)
       HM514260    - Hitachi HM514260 256k x 16 DRAM (SOJ40)
@@ -431,7 +430,7 @@ void casloopy_state::casloopy_map(address_map &map)
 //  map(0x05ffff00, 0x05ffffff).rw(FUNC(casloopy_state::sh7021_r), FUNC(casloopy_state::sh7021_w));
 //  map(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	map(0x06000000, 0x062fffff).r(m_cart, FUNC(generic_cartslot_device::read32_rom));
-	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
+	//map(0x07000000, 0x070003ff).ram();// area 7 (CS7), NOT on-chip RAM mirror
 	map(0x09000000, 0x0907ffff).ram().share("wram");
 	map(0x0e000000, 0x0e2fffff).r(m_cart, FUNC(generic_cartslot_device::read32_rom));
 	map(0x0f000000, 0x0f0003ff).ram().share("oram");

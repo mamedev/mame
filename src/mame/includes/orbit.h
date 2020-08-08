@@ -52,16 +52,16 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE8_MEMBER(playfield_w);
+	void playfield_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
-	DECLARE_WRITE8_MEMBER(note_w);
-	DECLARE_WRITE8_MEMBER(note_amp_w);
-	DECLARE_WRITE8_MEMBER(noise_amp_w);
-	DECLARE_WRITE8_MEMBER(noise_rst_w);
+	void note_w(uint8_t data);
+	void note_amp_w(uint8_t data);
+	void noise_amp_w(uint8_t data);
+	void noise_rst_w(uint8_t data);
 
 	void main_map(address_map &map);
 

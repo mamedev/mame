@@ -31,7 +31,7 @@ void ne2000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install16_device(0x0300, 0x031f, read16_delegate(*this, FUNC(ne2000_device::ne2000_port_r)), write16_delegate(*this, FUNC(ne2000_device::ne2000_port_w)));
+	m_isa->install16_device(0x0300, 0x031f, read16s_delegate(*this, FUNC(ne2000_device::ne2000_port_r)), write16s_delegate(*this, FUNC(ne2000_device::ne2000_port_w)));
 }
 
 void ne2000_device::device_reset() {
@@ -39,18 +39,16 @@ void ne2000_device::device_reset() {
 	m_irq = ioport("CONFIG")->read() & 3;
 }
 
-READ16_MEMBER(ne2000_device::ne2000_port_r) {
+uint16_t ne2000_device::ne2000_port_r(offs_t offset, uint16_t mem_mask) {
 	offset <<= 1;
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
-		return m_dp8390->dp8390_r(offset) |
-				m_dp8390->dp8390_r(offset+1) << 8;
+		return m_dp8390->cs_read(offset) |
+				m_dp8390->cs_read(offset+1) << 8;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		return m_dp8390->dp8390_r(offset);
+		return m_dp8390->remote_read();
 	case 31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
@@ -60,23 +58,21 @@ READ16_MEMBER(ne2000_device::ne2000_port_r) {
 	return 0;
 }
 
-WRITE16_MEMBER(ne2000_device::ne2000_port_w) {
+void ne2000_device::ne2000_port_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	offset <<= 1;
 	if(offset < 16) {
-		m_dp8390->dp8390_cs(CLEAR_LINE);
 		if(mem_mask == 0xff00) {
 			data >>= 8;
 			offset++;
 		}
-		m_dp8390->dp8390_w(offset, data & 0xff);
-		if(mem_mask == 0xffff) m_dp8390->dp8390_w(offset+1, data>>8);
+		m_dp8390->cs_write(offset, data & 0xff);
+		if(mem_mask == 0xffff) m_dp8390->cs_write(offset+1, data>>8);
 		return;
 	}
 	if(mem_mask == 0xff00) offset++;
 	switch(offset) {
 	case 16:
-		m_dp8390->dp8390_cs(ASSERT_LINE);
-		m_dp8390->dp8390_w(offset, data);
+		m_dp8390->remote_write(data);
 		return;
 	case 31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);

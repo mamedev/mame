@@ -11,22 +11,22 @@
 #include "includes/laserbat.h"
 
 
-READ8_MEMBER(laserbat_state_base::rhsc_r)
+uint8_t laserbat_state_base::rhsc_r()
 {
 	return m_rhsc;
 }
 
-WRITE8_MEMBER(laserbat_state_base::whsc_w)
+void laserbat_state_base::whsc_w(uint8_t data)
 {
 	m_whsc = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::csound1_w)
+void laserbat_state_base::csound1_w(uint8_t data)
 {
 	m_csound1 = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::csound2_w)
+void laserbat_state_base::csound2_w(uint8_t data)
 {
 	m_csound2 = data;
 }
@@ -127,7 +127,7 @@ WRITE8_MEMBER(laserbat_state_base::csound2_w)
 
 */
 
-WRITE8_MEMBER(laserbat_state::csound2_w)
+void laserbat_state::csound2_w(uint8_t data)
 {
 	// there are a bunch of edge-triggered things, so grab changes
 	unsigned const diff = data ^ m_csound2;
@@ -307,14 +307,14 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     it isn't routed anywhere.
 */
 
-WRITE8_MEMBER(catnmous_state::csound1_w)
+void catnmous_state::csound1_w(uint8_t data)
 {
 	m_audiopcb->sound_w(data);
 
 	m_csound1 = data;
 }
 
-WRITE8_MEMBER(catnmous_state::csound2_w)
+void catnmous_state::csound2_w(uint8_t data)
 {
 	// the bottom bit is used for sprite banking, of all things
 	m_gfx2 = memregion("gfx2")->base() + ((data & 0x01) ? 0x0800 : 0x0000);

@@ -305,7 +305,7 @@ void karnov_state::wndrplnt_i8751_w( int data )
  *
  *************************************/
 
-WRITE16_MEMBER(karnov_state::mcusim_ack_w)
+void karnov_state::mcusim_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 
@@ -345,7 +345,7 @@ void karnov_state::mcusim_w(u16 data)
 		wndrplnt_i8751_w(data);
 }
 
-WRITE16_MEMBER(karnov_state::mcusim_reset_w)
+void karnov_state::mcusim_reset_w(u16 data)
 {
 	logerror("Reset i8751\n");
 	m_i8751_needs_ack = 0;
@@ -354,7 +354,7 @@ WRITE16_MEMBER(karnov_state::mcusim_reset_w)
 	m_i8751_return = 0;
 }
 
-WRITE16_MEMBER(karnov_state::vint_ack_w)
+void karnov_state::vint_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(7, CLEAR_LINE);
 }

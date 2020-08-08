@@ -95,7 +95,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
-		, m_p_ram(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
 		, m_ctc1(*this, "ctc1")
 		, m_ctc2(*this, "ctc2")
@@ -107,8 +106,11 @@ public:
 		, m_syslatch1(*this, "syslatch1")
 		, m_dsw(*this, "DSW")
 		, m_bankr(*this, "bankr")
+		, m_bankw(*this, "bankw")
 		, m_bankv(*this, "bankv")
 		, m_banka(*this, "banka")
+		, m_bankv1(*this, "bankv1")
+		, m_banka1(*this, "banka1")
 	{ }
 
 	void bigbord2(machine_config &config);
@@ -130,13 +132,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	uint8_t memory_read_byte(offs_t offset);
-	void memory_write_byte(offs_t offset, uint8_t data);
-	uint8_t io_read_byte(offs_t offset);
-	void io_write_byte(offs_t offset, uint8_t data);
+	u8 memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, u8 data);
+	u8 io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void bigbord2_io(address_map &map);
-	void bigbord2_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data;
 	u8 m_term_status;
@@ -147,9 +149,12 @@ private:
 	virtual void machine_reset() override;
 	address_space *m_mem;
 	address_space *m_io;
+	std::unique_ptr<u8[]> m_vram; // video ram 2k
+	std::unique_ptr<u8[]> m_aram; // attribute ram 2k
+	std::unique_ptr<u8[]> m_ram;  // main ram 64k
+	std::unique_ptr<u8[]> m_dummy;  // black hole for write to rom
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
-	required_region_ptr<u8> m_p_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80ctc_device> m_ctc2;
@@ -161,8 +166,11 @@ private:
 	required_device<ls259_device> m_syslatch1;
 	required_ioport m_dsw;
 	required_memory_bank m_bankr;
+	required_memory_bank m_bankw;
 	required_memory_bank m_bankv;
 	required_memory_bank m_banka;
+	required_memory_bank m_bankv1;
+	required_memory_bank m_banka1;
 };
 
 /* Status port
@@ -228,22 +236,22 @@ WRITE_LINE_MEMBER( bigbord2_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-uint8_t bigbord2_state::memory_read_byte(offs_t offset)
+u8 bigbord2_state::memory_read_byte(offs_t offset)
 {
 	return m_mem->read_byte(offset);
 }
 
-void bigbord2_state::memory_write_byte(offs_t offset, uint8_t data)
+void bigbord2_state::memory_write_byte(offs_t offset, u8 data)
 {
 	m_mem->write_byte(offset, data);
 }
 
-uint8_t bigbord2_state::io_read_byte(offs_t offset)
+u8 bigbord2_state::io_read_byte(offs_t offset)
 {
 	return m_io->read_byte(offset);
 }
 
-void bigbord2_state::io_write_byte(offs_t offset, uint8_t data)
+void bigbord2_state::io_write_byte(offs_t offset, u8 data)
 {
 	m_io->write_byte(offset, data);
 }
@@ -323,17 +331,18 @@ void bigbord2_state::syslatch2_w(u8 data)
 
 /* Memory Maps */
 
-void bigbord2_state::bigbord2_mem(address_map &map)
+void bigbord2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankrw("bankr");
-	map(0x1000, 0x5fff).ram();
-	map(0x6000, 0x6fff).bankrw("bankv");
-	map(0x7000, 0x7fff).bankrw("banka");
+	map(0x0000, 0x5fff).bankr("bankr").bankw("bankw");
+	map(0x6000, 0x67ff).bankrw("bankv");
+	map(0x6800, 0x6fff).bankrw("bankv1");
+	map(0x7000, 0x77ff).bankrw("banka");
+	map(0x7800, 0x7fff).bankrw("banka1");
 	map(0x8000, 0xffff).ram();
 }
 
-void bigbord2_state::bigbord2_io(address_map &map)
+void bigbord2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -414,8 +423,16 @@ static void bigbord2_floppies(device_slot_interface &device)
 
 void bigbord2_state::machine_start()
 {
+	save_pointer(NAME(m_vram), 0x2000);
+	save_pointer(NAME(m_aram), 0x2000);
+	save_pointer(NAME(m_ram),  0x8000);
+
 	/* register for state saving */
 	save_item(NAME(m_term_data));
+	save_item(NAME(m_term_status));
+	save_item(NAME(m_cnt));
+	save_item(NAME(m_cc));
+
 	m_floppy = nullptr;
 }
 
@@ -426,17 +443,39 @@ void bigbord2_state::machine_reset()
 		m_cc[i] = 1;
 	m_cc[2] = 0;
 	m_bankr->set_entry(0);
+	m_bankw->set_entry(0);
 	m_bankv->set_entry(0);
 	m_banka->set_entry(0);
+	m_bankv1->set_entry(0);
+	m_banka1->set_entry(0);
 }
 
 void bigbord2_state::init_bigbord2()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
-	m_bankr->configure_entries(0, 2, &m_p_ram[0x0000], 0x10000);
-	m_bankv->configure_entries(0, 2, &m_p_ram[0x6000], 0x10000);
-	m_banka->configure_entries(0, 2, &m_p_ram[0x7000], 0x10000);
+	m_vram = std::make_unique<u8[]>(0x2000);
+	m_aram = std::make_unique<u8[]>(0x2000);
+	m_ram = make_unique_clear<u8[]>(0x8000);
+	m_dummy = std::make_unique<u8[]>(0x6000);
+
+	u8 *v = m_vram.get();
+	u8 *a = m_aram.get();
+	u8 *r = m_ram.get();
+	u8 *d = m_dummy.get();
+	u8 *m = memregion("maincpu")->base();
+	m_bankr->configure_entry( 0, &m[0]);
+	m_bankr->configure_entry( 1, r);
+	m_bankw->configure_entry( 0, d);
+	m_bankw->configure_entry( 1, r);
+	m_bankv->configure_entry( 0, v);
+	m_bankv->configure_entry( 1, r+0x6000);
+	m_bankv1->configure_entry(0, v);
+	m_bankv1->configure_entry(1, r+0x6800);
+	m_banka->configure_entry( 0, a);
+	m_banka->configure_entry( 1, r+0x7000);
+	m_banka1->configure_entry(0, a);
+	m_banka1->configure_entry(1, r+0x7800);
 }
 
 
@@ -525,8 +564,8 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (ma + x) & 0x7ff;
-		attr = m_p_ram[mem + 0x7000];
-		chr = m_p_ram[mem + 0x6000];
+		attr = m_aram[mem];
+		chr = m_vram[mem];
 
 		/* process attributes */
 		gfx = crt8002(ra, chr, attr, m_cnt, (x==cursor_x));
@@ -550,9 +589,9 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 void bigbord2_state::bigbord2(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::bigbord2_mem);
-	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::bigbord2_io);
+	Z80(config, m_maincpu, MAIN_CLOCK);  // U39
+	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
@@ -565,7 +604,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));
 
 	/* devices */
-	Z80DMA(config, m_dma, MAIN_CLOCK);
+	Z80DMA(config, m_dma, MAIN_CLOCK);  // U62
 	m_dma->out_busreq_callback().set(FUNC(bigbord2_state::busreq_w));
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(bigbord2_state::memory_read_byte));
@@ -573,27 +612,27 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(bigbord2_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(bigbord2_state::io_write_byte));
 
-	Z80SIO(config, m_sio, MAIN_CLOCK);
+	Z80SIO(config, m_sio, MAIN_CLOCK); // U16
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_sio->out_synca_callback().set(m_ctc1, FUNC(z80ctc_device::trg2));
 	m_sio->out_wrdya_callback().set(FUNC(bigbord2_state::sio_wrdya_w));
 	m_sio->out_wrdyb_callback().set(FUNC(bigbord2_state::sio_wrdyb_w));
 
-	Z80CTC(config, m_ctc1, MAIN_CLOCK);
+	Z80CTC(config, m_ctc1, MAIN_CLOCK); // U37
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80CTC(config, m_ctc2, MAIN_CLOCK);
+	Z80CTC(config, m_ctc2, MAIN_CLOCK); // U21
 	m_ctc2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc2->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));    // to SIO Ch B
 	m_ctc2->zc_callback<1>().set(FUNC(bigbord2_state::ctc_z1_w));  // to SIO Ch A
 	m_ctc2->zc_callback<2>().set(m_ctc2, FUNC(z80ctc_device::trg3));
 
-	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
+	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // U10 : 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
 	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));
+	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));  // U30
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -601,12 +640,16 @@ void bigbord2_state::bigbord2(machine_config &config)
 	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41
+	// d0=to U42; d1=DECODE; d3=PGM; d4=VPPENB; d5=STD-B8
 	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877
 
 	LS259(config, m_syslatch1, 0); // U14
 	m_syslatch1->q_out_cb<0>().set_membank(m_bankr); // D_S
 	m_syslatch1->q_out_cb<0>().append_membank(m_bankv);
 	m_syslatch1->q_out_cb<0>().append_membank(m_banka);
+	m_syslatch1->q_out_cb<0>().append_membank(m_bankw);
+	m_syslatch1->q_out_cb<0>().append_membank(m_bankv1);
+	m_syslatch1->q_out_cb<0>().append_membank(m_banka1);
 	m_syslatch1->q_out_cb<1>().set(FUNC(bigbord2_state::side_select_w)); // SIDSEL
 	m_syslatch1->q_out_cb<2>().set(FUNC(bigbord2_state::smc1_w)); // SMC1
 	m_syslatch1->q_out_cb<3>().set(FUNC(bigbord2_state::smc2_w)); // SMC2
@@ -631,13 +674,18 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 
 ROM_START( bigbord2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "bigbrdii.bin", 0x0000, 0x1000, CRC(c588189e) SHA1(4133903171ee8b9fcf12cc72de843af782b4a645) )
+	// for optional roms and eproms
+	ROM_REGION( 0x6000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bigbrdii.u85", 0x0000, 0x1000, CRC(c588189e) SHA1(4133903171ee8b9fcf12cc72de843af782b4a645) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "8002.bin", 0x0000, 0x0800, CRC(fdd6eb13) SHA1(a094d416e66bdab916e72238112a6265a75ca690) )
+	ROM_LOAD( "8002.u52", 0x0000, 0x0800, CRC(fdd6eb13) SHA1(a094d416e66bdab916e72238112a6265a75ca690) )
+
+	ROM_REGION( 0x1800, "proms", 0)
+	ROM_LOAD( "pal16l8.u23", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "pal10l8.u34", 0x0400, 0x0400, NO_DUMP )
 ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                       FULLNAME        FLAGS
-COMP( 1982, bigbord2, 0,      0,      bigbord2, bigbord2, bigbord2_state, init_bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )
+COMP( 1982, bigbord2, 0,      0,      bigbord2, bigbord2, bigbord2_state, init_bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

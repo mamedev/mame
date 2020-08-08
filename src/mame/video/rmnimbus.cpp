@@ -47,7 +47,7 @@
 
 #define DEBUG_SET(flags)    ((m_debug_video & (flags))==(flags))
 
-READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
+uint16_t rmnimbus_state::nimbus_video_io_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0;
 
@@ -202,7 +202,7 @@ uint16_t rmnimbus_state::read_pixel_data(uint16_t x, uint16_t y)
 
 */
 
-WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
+void rmnimbus_state::nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t colours = data;
 	if(offset < 0x14)

@@ -42,10 +42,12 @@ Each key causes a beep to be heard. You may need to press more than once
 to get it to register.
 
 Inbuilt games - press the following sequence of keys:
-- Welcome: RESET D 1 + 0 2 AD 0 2 7 0 GO GO (Paste: D1^02 -0270XX)
-- Nim: RESET AD 3 E 0 GO GO (Paste: -3E0XX)
-- Invaders: RESET AD 3 2 0 GO GO (Paste: -320XX)
-- Luna Lander: RESET AD 4 9 0 GO GO (Paste: -490XX)
+- Invaders:     RESET AD 0 0 0 8 GO GO (Paste: -0008XX)
+- Nim:          RESET AD 0 0 1 0 GO GO (Paste: -0010XX)
+- Lunar Lander: RESET AD 0 0 1 8 GO GO (Paste: -0018XX)
+Tunes:
+- Bealach An Doirin: RESET AD 0 0 2 8 GO GO (Paste: -0028XX)
+- Biking up the strand: RESET AD 0 0 3 0 GO GO (Paste: -0030XX)
 
 Thanks to Chris Schwartz who dumped his ROM for me way back in the old days.
 It's only taken 25 years to get around to emulating it...
@@ -58,10 +60,6 @@ the jmon it sets bit 6 of port 3 low instead. The NMI code is simply
 a 'retn' in the jmon rom, so we can use the same code.
 The jmon includes a cassette interface, a serial input connection,
 and an optional LCD, but the games of the tec1 have been removed.
-
-
-ToDo:
-- Save state support
 
 
 
@@ -88,11 +86,11 @@ class tec1_state : public driver_device
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_key_pressed(0)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
 		, m_kb(*this, "keyboard")
-		, m_key_pressed(0)
 		, m_io_shift(*this, "SHIFT")
 		, m_display(*this, "display")
 	{ }
@@ -103,27 +101,26 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	optional_device<cassette_image_device> m_cass;
-	required_device<mm74c923_device> m_kb;
-	bool m_key_pressed;
-	required_ioport m_io_shift;
-	required_device<pwm_display_device> m_display;
-
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(tec1_digit_w);
-	DECLARE_WRITE8_MEMBER(tecjmon_digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w);
+	virtual void machine_start() override;
+	u8 kbd_r();
+	u8 latch_r();
+	void tec1_digit_w(u8 data);
+	void tecjmon_digit_w(u8 data);
+	void segment_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(da_w);
-	uint8_t m_seg;
-	uint8_t m_digit;
-
+	bool m_key_pressed;
+	u8 m_seg;
+	u8 m_digit;
 	void tec1_io(address_map &map);
 	void tec1_map(address_map &map);
 	void tecjmon_io(address_map &map);
 	void tecjmon_map(address_map &map);
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	optional_device<cassette_image_device> m_cass;
+	required_device<mm74c923_device> m_kb;
+	required_ioport m_io_shift;
+	required_device<pwm_display_device> m_display;
 };
 
 
@@ -135,7 +132,7 @@ private:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( tec1_state::segment_w )
+void tec1_state::segment_w(u8 data)
 {
 /*  d7 segment d
     d6 segment e
@@ -150,7 +147,7 @@ WRITE8_MEMBER( tec1_state::segment_w )
 	m_display->matrix(m_digit, m_seg);
 }
 
-WRITE8_MEMBER( tec1_state::tec1_digit_w )
+void tec1_state::tec1_digit_w(u8 data)
 {
 /*  d7 speaker
     d6 not used
@@ -167,7 +164,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
 	m_display->matrix(m_digit, m_seg);
 }
 
-WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
+void tec1_state::tecjmon_digit_w(u8 data)
 {
 /*  d7 speaker & cassout
     d6 not used
@@ -191,10 +188,10 @@ WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
 
 ***************************************************************************/
 
-READ8_MEMBER( tec1_state::latch_r )
+u8 tec1_state::latch_r()
 {
 // bit 7 - cass in ; bit 6 low = key pressed
-	uint8_t data = (m_key_pressed) ? 0 : 0x40;
+	u8 data = (m_key_pressed) ? 0 : 0x40;
 
 	if (m_cass->input() > 0.03)
 		data |= 0x80;
@@ -203,7 +200,7 @@ READ8_MEMBER( tec1_state::latch_r )
 }
 
 
-READ8_MEMBER( tec1_state::kbd_r )
+u8 tec1_state::kbd_r()
 {
 	return m_kb->read() | m_io_shift->read();
 }
@@ -221,7 +218,12 @@ WRITE_LINE_MEMBER( tec1_state::da_w )
 
 ***************************************************************************/
 
-
+void tec1_state::machine_start()
+{
+	save_item(NAME(m_key_pressed));
+	save_item(NAME(m_seg));
+	save_item(NAME(m_digit));
+}
 
 /***************************************************************************
 
@@ -251,7 +253,7 @@ void tec1_state::tecjmon_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x07ff).rom();
 	map(0x0800, 0x37ff).ram();
-	map(0x3800, 0x3fff).rom();
+	map(0x3800, 0x3fff).rom().region("maincpu", 0x0800);
 }
 
 void tec1_state::tecjmon_io(address_map &map)
@@ -386,7 +388,7 @@ void tec1_state::tecjmon(machine_config &config)
 ***************************************************************************/
 
 ROM_START(tec1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x0800, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "mon1", "MON1")
 	ROMX_LOAD( "mon1.rom",   0x0000, 0x0800, CRC(5d379e6c) SHA1(5c810885a3f0d03c54aea74aaaa8fae8a2fd9ad4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "mon1a", "MON1A")
@@ -399,11 +401,11 @@ ROM_START(tec1)
 ROM_END
 
 ROM_START(tecjmon)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x1000, "maincpu", 0 )
 	ROM_LOAD("jmon.rom",    0x0000, 0x0800, CRC(202c47a2) SHA1(701588ec5640d633d90d94b2ccd6f65422e19a70) )
-	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
+	ROM_LOAD("util.rom",    0x0800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME            FLAGS
-COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon, tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1A with JMON", 0 )
+COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon, tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1A with JMON", MACHINE_SUPPORTS_SAVE )

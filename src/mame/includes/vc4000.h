@@ -113,13 +113,13 @@ private:
 		} reg;
 	} ;
 
-	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
-	DECLARE_READ8_MEMBER(vc4000_key_r);
-	DECLARE_READ8_MEMBER(vc4000_video_r);
-	DECLARE_WRITE8_MEMBER(vc4000_video_w);
+	void vc4000_sound_ctl(offs_t offset, uint8_t data);
+	uint8_t vc4000_key_r(offs_t offset);
+	uint8_t vc4000_video_r(offs_t offset);
+	void vc4000_video_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(vc4000_vsync_r);
-	DECLARE_READ8_MEMBER(elektor_cass_r);
-	DECLARE_WRITE8_MEMBER(elektor_cass_w);
+	uint8_t elektor_cass_r();
+	void elektor_cass_w(uint8_t data);
 	vc4000_video_t m_video;
 	uint8_t m_sprite_collision[0x20];
 	uint8_t m_background_collision[0x20];

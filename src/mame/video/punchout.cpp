@@ -128,25 +128,25 @@ VIDEO_START_MEMBER(punchout_state,armwrest)
 
 
 
-WRITE8_MEMBER(punchout_state::punchout_bg_top_videoram_w)
+void punchout_state::punchout_bg_top_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_top_videoram[offset] = data;
 	m_bg_top_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(punchout_state::punchout_bg_bot_videoram_w)
+void punchout_state::punchout_bg_bot_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_bot_videoram[offset] = data;
 	m_bg_bot_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(punchout_state::armwrest_fg_videoram_w)
+void punchout_state::armwrest_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_armwrest_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(punchout_state::punchout_spr1_videoram_w)
+void punchout_state::punchout_spr1_videoram_w(offs_t offset, uint8_t data)
 {
 	m_spr1_videoram[offset] = data;
 	m_spr1_tilemap->mark_tile_dirty(offset/4);
@@ -154,7 +154,7 @@ WRITE8_MEMBER(punchout_state::punchout_spr1_videoram_w)
 		m_spr1_tilemap_flipx->mark_tile_dirty(offset/4);
 }
 
-WRITE8_MEMBER(punchout_state::punchout_spr2_videoram_w)
+void punchout_state::punchout_spr2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_spr2_videoram[offset] = data;
 	m_spr2_tilemap->mark_tile_dirty(offset/4);

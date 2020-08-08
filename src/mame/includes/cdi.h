@@ -61,8 +61,8 @@ private:
 	void cdimono2_mem(address_map &map);
 	void cdi070_cpuspace(address_map &map);
 
-	DECLARE_READ16_MEMBER(dvc_r);
-	DECLARE_WRITE16_MEMBER(dvc_w);
+	uint16_t dvc_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	required_shared_ptr<uint16_t> m_planea;
 	optional_device<cdislave_hle_device> m_slave_hle;
@@ -89,12 +89,6 @@ public:
 
 	void quizard(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
-
-protected:
-	void set_mcu_value(uint16_t value);
-	void set_mcu_ack(uint8_t ack);
-
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -103,71 +97,26 @@ private:
 	uint8_t mcu_p1_r();
 	uint8_t mcu_p2_r();
 	uint8_t mcu_p3_r();
+	void mcu_p0_w(uint8_t data);
+	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
 	void mcu_tx(uint8_t data);
 	uint8_t mcu_rx();
 
-	void mcu_hle_tx(uint8_t data);
-	void mcu_calculate_state();
-	void mcu_set_seeds(uint8_t *rx);
-	void mcu_hle_rx(uint8_t data);
+	void mcu_rx_from_cpu(uint8_t data);
+	void mcu_rtsn_from_cpu(int state);
 
 	required_device<i8751_device> m_mcu;
-	required_ioport_array<4> m_inputs;
+	required_ioport_array<3> m_inputs;
 
-	uint16_t m_seeds[10];
-	uint8_t m_state[8];
-
-	uint16_t m_mcu_value;
-	uint8_t m_mcu_ack;
+	uint8_t m_mcu_rx_from_cpu;
+	bool m_mcu_initial_byte;
 };
 
-class quizard1_state : public quizard_state
-{
-public:
-	quizard1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: quizard_state(mconfig, type, tag)
-	{
-		set_mcu_value(0x021f);
-		set_mcu_ack(0x5a);
-	}
-};
-
-class quizard2_state : public quizard_state
-{
-public:
-	quizard2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: quizard_state(mconfig, type, tag)
-	{
-		// 0x2b1: Italian
-		// 0x001: French
-		// 0x188: German
-		set_mcu_value(0x0188);
-		set_mcu_ack(0x59);
-	}
-};
-
-class quizard3_state : public quizard_state
-{
-public:
-	quizard3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: quizard_state(mconfig, type, tag)
-	{
-		set_mcu_value(0x00ae);
-		set_mcu_ack(0x58);
-	}
-};
-
-class quizard4_state : public quizard_state
-{
-public:
-	quizard4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: quizard_state(mconfig, type, tag)
-	{
-		set_mcu_value(0x011f);
-		set_mcu_ack(0x57);
-	}
-};
+// Quizard 2 language values:
+// 0x2b1: Italian
+// 0x001: French
+// 0x188: German
 
 #endif // MAME_INCLUDES_CDI_H

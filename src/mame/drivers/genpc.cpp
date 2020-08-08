@@ -157,7 +157,6 @@ ROM_START(pc)
 	ROM_SYSTEM_BIOS(9, "v10", "XT Anonymous Generic Turbo BIOS")
 	ROMX_LOAD("pcxt.rom",       0xe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f),ROM_BIOS(9))
 
-
 	// List of bioses to go to separate drivers
 	// 10: 8088-BIOS (C)AMI, 1985, 1986 / (C)AMI, 3000-100386
 	ROM_SYSTEM_BIOS(10, "ami", "XT AMI")
@@ -165,133 +164,112 @@ ROM_START(pc)
 	// 11: XT BIOS V2.05 COPYRIGHT Award Software Inc. 1986 / SUPERWAVE ELECTRONIC CO., LTD.
 	ROM_SYSTEM_BIOS(11, "award", "XT Award 2.05 #1")
 	ROMX_LOAD( "award2.05.bin", 0xe000, 0x2000, CRC(5b3953e5) SHA1(4a36171aa8d993008187f39f732b9296401b7b6c),ROM_BIOS(11))
-	// 12: DTK Corp. COMPUTER XT / DTK/ERSO/BIOS 2.26 (C) 1986
-	ROM_SYSTEM_BIOS(12, "dtk226", "XT DTK Erso bios 2.26")
-	ROMX_LOAD( "dtk-ers0.rom", 0xe000, 0x2000, CRC(85fd5e10) SHA1(2ae152f042e7e43e27621f071af763e3f9dc68d2),ROM_BIOS(12))
-	// 13: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.40 (C) 1986
-	ROM_SYSTEM_BIOS(13, "dtk240", "XT DTK Erso bios 2.40") // 8 MHz Turbo
-	ROMX_LOAD( "dtk2.40.bin", 0xe000, 0x2000, CRC(a4ed27c3) SHA1(66b67540d94c0d049ebc14ee14eadd2ab7304818),ROM_BIOS(13))
-	// 14: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.42 (C) 1986
-	ROM_SYSTEM_BIOS(14, "dtk242", "XT DTK Erso bios 2.42") // 10 MHz Turbo
-	ROMX_LOAD( "dtk2.42.bin", 0xe000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(14))
-	// 15: Phoenix ROM BIOS Ver 2.27
-	ROM_SYSTEM_BIOS(15, "pho2271", "XT Phoenix Bios 2.27 #1")
-	ROMX_LOAD( "phoenix2.27.bin", 0xe000, 0x2000, CRC(168ffef0) SHA1(69465db2f9246a614044d1f433d374506a13a07f),ROM_BIOS(15))
-	// 16: Phoenix ROM BIOS Ver 2.27
-	ROM_SYSTEM_BIOS(16, "pho2272", "XT Phoenix Bios 2.27 #2") // V20 installed on board, 8 ISA8 slots
-	ROMX_LOAD( "compatibility_software_phoenix_technologies_1985_1986_1121277.bin", 0xe000, 0x2000, CRC(33ceb81a) SHA1(7c7db75e61e19025938f30798d9d0f8b4f6ab0ee),ROM_BIOS(16))
-	// 17: Phoenix ROM BIOS Ver 2.51 / Micro-Universe ver 1.0B
-	ROM_SYSTEM_BIOS(17, "pho251", "XT Phoenix Bios 2.51")
-	ROMX_LOAD( "phoenix2.51.bin", 0xe000, 0x2000, CRC(9b7e9c40) SHA1(c948a8d3d715e469105c6e2acd8b46ec274b25a8),ROM_BIOS(17))
+	// 12: Phoenix ROM BIOS Ver 2.27
+	ROM_SYSTEM_BIOS(12, "pho2271", "XT Phoenix Bios 2.27 #1")
+	ROMX_LOAD( "phoenix2.27.bin", 0xe000, 0x2000, CRC(168ffef0) SHA1(69465db2f9246a614044d1f433d374506a13a07f),ROM_BIOS(12))
+	// 13: Phoenix ROM BIOS Ver 2.27
+	ROM_SYSTEM_BIOS(13, "pho2272", "XT Phoenix Bios 2.27 #2") // V20 installed on board, 8 ISA8 slots
+	ROMX_LOAD( "compatibility_software_phoenix_technologies_1985_1986_1121277.bin", 0xe000, 0x2000, CRC(33ceb81a) SHA1(7c7db75e61e19025938f30798d9d0f8b4f6ab0ee),ROM_BIOS(13))
+	// 14: Phoenix ROM BIOS Ver 2.51 / Micro-Universe ver 1.0B
+	ROM_SYSTEM_BIOS(14, "pho251", "XT Phoenix Bios 2.51")
+	ROMX_LOAD( "phoenix2.51.bin", 0xe000, 0x2000, CRC(9b7e9c40) SHA1(c948a8d3d715e469105c6e2acd8b46ec274b25a8),ROM_BIOS(14))
+	// 15: T U R B O - XT 1986 / Version 3.10
+	ROM_SYSTEM_BIOS(15, "turbo", "XT Turbo Bios 3.10")
+	ROMX_LOAD( "turbo3.10.bin", 0xe000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(15))
+	// 16: System 100 ! / S.pecial I.ntegrated D.esigns / BIOS For PC,XT-16 Version 4.1 / (C) 1986
+	ROM_SYSTEM_BIOS(16, "sid41", "SID BIOS v4.1") // from X'GOLDEN mainboard
+	ROMX_LOAD( "sid_bios_version_v4.1.bin", 0xe000, 0x2000, CRC(c58daf4d) SHA1(7066f8f993500383b99103a9fa1e6c125c89581b),ROM_BIOS(16))
+	// 17: System Already !
+	ROM_SYSTEM_BIOS(17, "scb12", "Super Computer BIOS 1.2" ) // from X'GOLDEN mainboard
+	ROMX_LOAD( "super_computer_bios_1.2_1984.bin", 0xe000, 0x2000, CRC(0768a9ba) SHA1(d05c893e9dfc84a3c11c35f87859429f350571c3), ROM_BIOS(17))
 	// 18: T U R B O - XT 1986 / Version 3.10
-	ROM_SYSTEM_BIOS(18, "turbo", "XT Turbo Bios 3.10")
-	ROMX_LOAD( "turbo3.10.bin", 0xe000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(18))
-	// 19: BIOS ver 2.00 VEGAS COMPUTER COMMUNICATIONS.
-	ROM_SYSTEM_BIOS(19, "nestv200", "JUKO NEST v2.00")
-	ROMX_LOAD( "jukoa.bin", 0xe000, 0x2000, CRC(7d78707e) SHA1(8b09a32658a850e7f03254d1328fe6e336e91871),ROM_BIOS(19))
-	// 20: Juko ST BIOS ver 2.30 / Copyright 1988 Juko Electronics Industrial Co., Ltd.
-	ROM_SYSTEM_BIOS(20, "nest230", "JUKO NEST v2.30")
-	ROMX_LOAD( "juko_st_v2.30.bin", 0xe000, 0x2000, CRC(7a1c6dfa) SHA1(0b343f3028ca06c9e6dc69427d1b15a47c74b9fc),ROM_BIOS(20))
-	// 21: BIOS Ver 2.32
-	ROM_SYSTEM_BIOS(21, "nest232", "JUKO NEST v2.32")
-	ROMX_LOAD( "xt-juko-st-2.32.bin", 0xe000, 0x2000, CRC(0768524e) SHA1(259520bb7a6796e5b987c2b9bef1acd501df1670),ROM_BIOS(21))
-	// 22: System 100 ! / S.pecial I.ntegrated D.esigns / BIOS For PC,XT-16 Version 4.1 / (C) 1986
-	ROM_SYSTEM_BIOS(22, "sid41", "SID BIOS v4.1") // from X'GOLDEN mainboard
-	ROMX_LOAD( "sid_bios_version_v4.1.bin", 0xe000, 0x2000, CRC(c58daf4d) SHA1(7066f8f993500383b99103a9fa1e6c125c89581b),ROM_BIOS(22))
-	// 23: System Already !
-	ROM_SYSTEM_BIOS(23, "scb12", "Super Computer BIOS 1.2" ) // from X'GOLDEN mainboard
-	ROMX_LOAD( "super_computer_bios_1.2_1984.bin", 0xe000, 0x2000, CRC(0768a9ba) SHA1(d05c893e9dfc84a3c11c35f87859429f350571c3), ROM_BIOS(23))
-	// 24: T U R B O - XT 1986 / Version 3.10
-	ROM_SYSTEM_BIOS(24, "txt310", "T U R B O  XT Version 3.10") // from X'GOLDEN Turbo mainboard, computer can operate in 8MHz mode, source mentions possible corruption
-	ROMX_LOAD( "turbo_xt_3.10_2764.bin", 0xe000, 0x2000,  BAD_DUMP CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(24))
-	// 25: Phoenix ROM BIOS Ver 2.27
-	ROM_SYSTEM_BIOS(25, "alco", "ALCO 8MHz") // another Phoenix v2.27 variant, probably overdumped, therefore BAD_DUMP
-	ROMX_LOAD( "alco8mhz.bin", 0xe000, 0x2000, BAD_DUMP CRC(96a56814) SHA1(7f752cbe1a25ed6ea5f77fed79cfbf608c667dc3),ROM_BIOS(25))
-	// 26: System   Ready / American XT Computer / (C) 1986 For American XT BIOS V.1.32
-	ROM_SYSTEM_BIOS(26, "american", "American XT 1.32")
-	ROMX_LOAD( "americxt.rom", 0xe000, 0x2000, CRC(4c6e23f3) SHA1(6e16f42da9c3d7bd408cf885caf93de9aa02ebe4),ROM_BIOS(26))
-	// 27: EXCEL-TURBO SPEEDY SYSTEM / EXCEL-TURBO Computer 9/20/1985 Version 2.14
-	ROM_SYSTEM_BIOS(27, "excel214", "Excel-Turbo Computer Version 2.14")
-	ROMX_LOAD( "excelturbobios.bin", 0xe000, 0x2000, CRC(8ef472a6) SHA1(8f3d512e23ecffb6d9a650d126b11270ff5cf175), ROM_BIOS(27))
-	// 28: EXCEL-TURBO SPEEDY SYSTEM / Excel-Turbo Computer 9/20/1985 Version 3.1
-	ROM_SYSTEM_BIOS(28, "excel31", "Excel-Turbo Computer Version 3.1")
-	ROMX_LOAD( "excel-turbo_computer_3.1_2764.bin", 0xe000, 0x2000, CRC(d319fea7) SHA1(5b4b0eb35889602aa7f18de82800599528690e15),ROM_BIOS(28))
-	// 29: Phoenix ROM BIOS Ver 2.51
-	ROM_SYSTEM_BIOS(29, "s10b1", "Super 10-B1") // another Phoenix 2.51 variant
-	ROMX_LOAD( "super_10-b1_27c64.bin", 0xe000, 0x2000, CRC(ba7797db) SHA1(2ee8863640b860a1807cc41e1ac9d94f73a087aa),ROM_BIOS(29))
-	// 30: 86(C) TD3.86 ID: 75102637
-	ROM_SYSTEM_BIOS(30, "td386", "TD 3.86")
-	ROMX_LOAD( "td3.86_id_75102637.bin", 0xe000, 0x2000, CRC(aec96e13) SHA1(6e3143418f439a0373fba626cf69df34e41815e5),ROM_BIOS(30))
-	// 31: 86(C) TD3.91 ID:
-	ROM_SYSTEM_BIOS(31, "td391", "TD 3.91")
-	ROMX_LOAD( "td391-td.rom", 0xe000, 0x2000, CRC(508b1bad) SHA1(ee9f51423f4cccfdc160c565ecd95fabbcb8a4d4),ROM_BIOS(31))
-	// 32: 86(C) TD3.93 ID:
-	ROM_SYSTEM_BIOS(32, "td393", "TD 3.93")
-	ROMX_LOAD( "td3.93.bin", 0xe000, 0x2000, CRC(807620d9) SHA1(3f0ca24e33feb32051de9e819b962df1528a0403),ROM_BIOS(32))
-	// 33: Phoenix ROM BIOS Ver 2.27 / YANGTECH.INC
-	ROM_SYSTEM_BIOS(33, "yangp227", "YANGTECH.INC Phoenix 2.27")
-	ROMX_LOAD( "000p001.bin", 0xe000, 0x2000, CRC(16f4fdc8) SHA1(8e73e9d1456aadd65bb89cc813d1aa1354c90d68),ROM_BIOS(33))
-	// 34: ETHOM Associates Inc. Personal Computer Version 1.1F
-	ROM_SYSTEM_BIOS(34, "ethom11f", "ETHOM Associates Version 1.1f") // 8 MHz
-	ROMX_LOAD( "ethom_associates_version_1.1f.bin", 0xe000, 0x02000, CRC(bbe7dc12) SHA1(195989a43e6701ff247329524622f1d6f41db7b4),ROM_BIOS(34))
-	// 35: ARC Turbo Board - X Turbo System
-	ROM_SYSTEM_BIOS(35, "arc20", "ARC BIOS 2.0")
-	ROMX_LOAD( "ibm-artb.rom", 0xe000, 0x2000, CRC(0ae5bf8e) SHA1(79b043070c92f9b2f6f9ca25fe61b4c1fcdf1bc8),ROM_BIOS(35))
-	// 36:  Phoenix ROM BIOS Ver 2.52
-	ROM_SYSTEM_BIOS(36, "pho252", "XT Phoenix Bios 2.52")
-	ROMX_LOAD( "ibm-phxt.rom", 0xe000, 0x2000, CRC(c0bc9482) SHA1(a527403c92b6bf4fd876f516c18ca499cb7d4b13),ROM_BIOS(36))
-	// 37: System Already ! IBM COMPATIBLE BIOS v3.3  .......1985
-	ROM_SYSTEM_BIOS(37, "com33", "IBM Compatible BIOS v3.3")
-	ROMX_LOAD( "ibm3-3.rom", 0xe000, 0x02000, CRC(bf6dde1a) SHA1(e63456a888b887b8c0f77f35261ff067f0e2020d),ROM_BIOS(37))
-	// 38: TURBO SYSTEM / Compatible Computer TURBO
-	ROM_SYSTEM_BIOS(38, "xt16", "Turbo BIOS for PC XT-16")
-	ROMX_LOAD( "ibmturb.rom", 0xe000, 0x2000, CRC(ba4a711e) SHA1(82fe2f76fd6668d2b38f8e6552a605d70c822792),ROM_BIOS(38))
-	// 39: Z-NIX PC-1600
-	ROM_SYSTEM_BIOS(39, "znix", "Z-NIX PC-1600")
-	ROMX_LOAD( "ibmzen.rom", 0xe000, 0x2000, CRC(c5468172) SHA1(499a7813f870b04003e246cc90d4a591d043c6bb),ROM_BIOS(39))
-	// 40: PC/88 BIOS Ver1.92
-	ROM_SYSTEM_BIOS(40, "pcpi", "PC/88 BIOS Ver1.92") // use pcega
-	ROMX_LOAD( "pcpi-192.rom", 0xe000, 0x2000, CRC(ef2da5ce) SHA1(95376440be1276e6f1c16fe49c847056bb1e4d5c),ROM_BIOS(40))
+	ROM_SYSTEM_BIOS(18, "txt310", "T U R B O  XT Version 3.10") // from X'GOLDEN Turbo mainboard, computer can operate in 8MHz mode, source mentions possible corruption
+	ROMX_LOAD( "turbo_xt_3.10_2764.bin", 0xe000, 0x2000,  BAD_DUMP CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(18))
+	// 19: Phoenix ROM BIOS Ver 2.27
+	ROM_SYSTEM_BIOS(19, "alco", "ALCO 8MHz") // another Phoenix v2.27 variant, probably overdumped, therefore BAD_DUMP
+	ROMX_LOAD( "alco8mhz.bin", 0xe000, 0x2000, BAD_DUMP CRC(96a56814) SHA1(7f752cbe1a25ed6ea5f77fed79cfbf608c667dc3),ROM_BIOS(19))
+	// 20: System   Ready / American XT Computer / (C) 1986 For American XT BIOS V.1.32
+	ROM_SYSTEM_BIOS(20, "american", "American XT 1.32")
+	ROMX_LOAD( "americxt.rom", 0xe000, 0x2000, CRC(4c6e23f3) SHA1(6e16f42da9c3d7bd408cf885caf93de9aa02ebe4),ROM_BIOS(20))
+	// 21: EXCEL-TURBO SPEEDY SYSTEM / EXCEL-TURBO Computer 9/20/1985 Version 2.14
+	ROM_SYSTEM_BIOS(21, "excel214", "Excel-Turbo Computer Version 2.14")
+	ROMX_LOAD( "excelturbobios.bin", 0xe000, 0x2000, CRC(8ef472a6) SHA1(8f3d512e23ecffb6d9a650d126b11270ff5cf175), ROM_BIOS(21))
+	// 22: EXCEL-TURBO SPEEDY SYSTEM / Excel-Turbo Computer 9/20/1985 Version 3.1
+	ROM_SYSTEM_BIOS(22, "excel31", "Excel-Turbo Computer Version 3.1")
+	ROMX_LOAD( "excel-turbo_computer_3.1_2764.bin", 0xe000, 0x2000, CRC(d319fea7) SHA1(5b4b0eb35889602aa7f18de82800599528690e15),ROM_BIOS(22))
+	// 23: Phoenix ROM BIOS Ver 2.51
+	ROM_SYSTEM_BIOS(23, "s10b1", "Super 10-B1") // another Phoenix 2.51 variant
+	ROMX_LOAD( "super_10-b1_27c64.bin", 0xe000, 0x2000, CRC(ba7797db) SHA1(2ee8863640b860a1807cc41e1ac9d94f73a087aa),ROM_BIOS(23))
+	// 24: 86(C) TD3.86 ID: 75102637
+	ROM_SYSTEM_BIOS(24, "td386", "TD 3.86")
+	ROMX_LOAD( "td3.86_id_75102637.bin", 0xe000, 0x2000, CRC(aec96e13) SHA1(6e3143418f439a0373fba626cf69df34e41815e5),ROM_BIOS(24))
+	// 25: 86(C) TD3.91 ID:
+	ROM_SYSTEM_BIOS(25, "td391", "TD 3.91")
+	ROMX_LOAD( "td391-td.rom", 0xe000, 0x2000, CRC(508b1bad) SHA1(ee9f51423f4cccfdc160c565ecd95fabbcb8a4d4),ROM_BIOS(25))
+	// 26: 86(C) TD3.93 ID:
+	ROM_SYSTEM_BIOS(26, "td393", "TD 3.93")
+	ROMX_LOAD( "td3.93.bin", 0xe000, 0x2000, CRC(807620d9) SHA1(3f0ca24e33feb32051de9e819b962df1528a0403),ROM_BIOS(26))
+	// 27: Phoenix ROM BIOS Ver 2.27 / YANGTECH.INC
+	ROM_SYSTEM_BIOS(27, "yangp227", "YANGTECH.INC Phoenix 2.27")
+	ROMX_LOAD( "000p001.bin", 0xe000, 0x2000, CRC(16f4fdc8) SHA1(8e73e9d1456aadd65bb89cc813d1aa1354c90d68),ROM_BIOS(27))
+	// 28: ETHOM Associates Inc. Personal Computer Version 1.1F
+	ROM_SYSTEM_BIOS(28, "ethom11f", "ETHOM Associates Version 1.1f") // 8 MHz
+	ROMX_LOAD( "ethom_associates_version_1.1f.bin", 0xe000, 0x02000, CRC(bbe7dc12) SHA1(195989a43e6701ff247329524622f1d6f41db7b4),ROM_BIOS(28))
+	// 29: ARC Turbo Board - X Turbo System
+	ROM_SYSTEM_BIOS(29, "arc20", "ARC BIOS 2.0")
+	ROMX_LOAD( "ibm-artb.rom", 0xe000, 0x2000, CRC(0ae5bf8e) SHA1(79b043070c92f9b2f6f9ca25fe61b4c1fcdf1bc8),ROM_BIOS(29))
+	// 30:  Phoenix ROM BIOS Ver 2.52
+	ROM_SYSTEM_BIOS(30, "pho252", "XT Phoenix Bios 2.52")
+	ROMX_LOAD( "ibm-phxt.rom", 0xe000, 0x2000, CRC(c0bc9482) SHA1(a527403c92b6bf4fd876f516c18ca499cb7d4b13),ROM_BIOS(30))
+	// 31: System Already ! IBM COMPATIBLE BIOS v3.3  .......1985
+	ROM_SYSTEM_BIOS(31, "com33", "IBM Compatible BIOS v3.3")
+	ROMX_LOAD( "ibm3-3.rom", 0xe000, 0x02000, CRC(bf6dde1a) SHA1(e63456a888b887b8c0f77f35261ff067f0e2020d),ROM_BIOS(31))
+	// 32: TURBO SYSTEM / Compatible Computer TURBO
+	ROM_SYSTEM_BIOS(32, "xt16", "Turbo BIOS for PC XT-16")
+	ROMX_LOAD( "ibmturb.rom", 0xe000, 0x2000, CRC(ba4a711e) SHA1(82fe2f76fd6668d2b38f8e6552a605d70c822792),ROM_BIOS(32))
+	// 33: Z-NIX PC-1600
+	ROM_SYSTEM_BIOS(33, "znix", "Z-NIX PC-1600")
+	ROMX_LOAD( "ibmzen.rom", 0xe000, 0x2000, CRC(c5468172) SHA1(499a7813f870b04003e246cc90d4a591d043c6bb),ROM_BIOS(33))
+	// 34: PC/88 BIOS Ver1.92
+	ROM_SYSTEM_BIOS(34, "pcpi", "PC/88 BIOS Ver1.92") // use pcega
+	ROMX_LOAD( "pcpi-192.rom", 0xe000, 0x2000, CRC(ef2da5ce) SHA1(95376440be1276e6f1c16fe49c847056bb1e4d5c),ROM_BIOS(34))
+	// 35: no POST screen, takes a few seconds to beep, then boots
+	ROM_SYSTEM_BIOS(35, "fday17", "Faraday 5 slot PC")
+	ROMX_LOAD( "fdaypc17.rom", 0xe000, 0x2000, CRC(26bb29ac) SHA1(5a58680b9193f4323db3e7894f853dc82d17f4ee),ROM_BIOS(35))
+	// 36: (c) E C D Computer GmbH 1985 - BIOS for ECD Professional Microcomputer - use pcherc
+	ROM_SYSTEM_BIOS(36, "ecd", "ECD-Computer")
+	ROMX_LOAD( "ecd_computer.bin", 0xe000, 0x2000, CRC(caab05f5) SHA1(060aa6c17ff9405c256684cec8a5165227c7c522), ROM_BIOS(36))
+	// 37: Triple D International TD-20 - 8088/86 Modular BIOS Ver 3.1jk 06/19&/89 15:42 / Copyright Award Software  Inc.
+	ROM_SYSTEM_BIOS(37, "td20", "TD-20")
+	ROMX_LOAD( "td20bios.bin", 0xc000, 0x4000, CRC(dfce8cd5) SHA1(c4a9624f230ecdeeee606ee1d0bc685226938505), ROM_BIOS(37))
+	// 38: B-190-B' P1.830 810.02, Chipset: Faraday FE2010A ICs: UM8272A, INS8250N-BT, MM58167AN-T
+	// 86(C) CD3.98 ID:
+	ROM_SYSTEM_BIOS(38, "b190b", "B-190-B")
+	ROMX_LOAD( "b190bios.bin", 0xc000, 0x4000, CRC(4178d321) SHA1(a6b30c0805beabe3566b7d22984aa683fc62d7dc), ROM_BIOS(38))
+	// 39: XT BIOS V2.05 COPYRIGHT Award Software Inc. 1986
+	ROM_SYSTEM_BIOS(39, "kt10mb", "KT 10 M/B") // Award XT BIOS 2.05
+	ROMX_LOAD( "kt10bios.bin", 0xe000, 0x2000, CRC(94e9836e) SHA1(793a9359ffd6f0964aa25edce31a3f37aa0dadc8), ROM_BIOS(39))
+	// 40: // http://www.vcfed.org/forum/showthread.php?68214-Ruud-s-diagnostic-ROM-for-IBM-PC-XT-and-compatibles
+	ROM_SYSTEM_BIOS(40, "diag", "Ruud Baltissen's Diagnostics")
+	ROMX_LOAD( "diagrom.bin", 0xe000, 0x2000, CRC(747b1853) SHA1(204a484bc83b3607d5e1404a2dbe629f5f3044b1), ROM_BIOS(40))
 	// 41:
-	ROM_SYSTEM_BIOS(41, "fday17", "Faraday 5 slot PC")
-	ROMX_LOAD( "fdaypc17.rom", 0xe000, 0x2000, CRC(26bb29ac) SHA1(5a58680b9193f4323db3e7894f853dc82d17f4ee),ROM_BIOS(41))
-	// 42: DTK Corp. COMPUTER '88 / DTK/ERSO/BIOS 2.38 (C) 1986
-	ROM_SYSTEM_BIOS(42, "tava238", "Tava DTK Erso V2.38")
-	ROMX_LOAD( "tava_dtk_erso_bios_2.38_u87.bin", 0xe000, 0x2000, CRC(34f5c0e5) SHA1(5a1590f948670a5ef85a1ee7cbb40387fced8a1f), ROM_BIOS(42))
-	// 43: (c) E C D Computer GmbH 1985 - BIOS for ECD Professional Microcomputer - use pcherc
-	ROM_SYSTEM_BIOS(43, "ecd", "ECD-Computer")
-	ROMX_LOAD( "ecd_computer.bin", 0xe000, 0x2000, CRC(caab05f5) SHA1(060aa6c17ff9405c256684cec8a5165227c7c522), ROM_BIOS(43))
-	// 44: Triple D International TD-20 - 8088/86 Modular BIOS Ver 3.1jk 06/19&/89 15:42 / Copyright Award Software  Inc.
-	ROM_SYSTEM_BIOS(44, "td20", "TD-20")
-	ROMX_LOAD( "td20bios.bin", 0xc000, 0x4000, CRC(dfce8cd5) SHA1(c4a9624f230ecdeeee606ee1d0bc685226938505), ROM_BIOS(44))
-	// 45: B-190-B' P1.830 810.02, Chipset: Faraday FE2010A ICs: UM8272A, INS8250N-BT, MM58167AN-T
-	// 86(C) CD3.98 ID - continuous beep but works
-	ROM_SYSTEM_BIOS(45, "b190b", "B-190-B")
-	ROMX_LOAD( "b190bios.bin", 0xc000, 0x4000, CRC(4178d321) SHA1(a6b30c0805beabe3566b7d22984aa683fc62d7dc), ROM_BIOS(45))
-	// 46: XT BIOS V2.05 COPYRIGHT Award Software Inc. 1986
-	ROM_SYSTEM_BIOS(46, "kt10mb", "KT 10 M/B") // Award XT BIOS 2.05
-	ROMX_LOAD( "kt10bios.bin", 0xe000, 0x2000, CRC(94e9836e) SHA1(793a9359ffd6f0964aa25edce31a3f37aa0dadc8), ROM_BIOS(46))
-	// 47: // http://www.vcfed.org/forum/showthread.php?68214-Ruud-s-diagnostic-ROM-for-IBM-PC-XT-and-compatibles
-	ROM_SYSTEM_BIOS(47, "diag", "Ruud Baltissen's Diagnostics")
-	ROMX_LOAD( "diagrom.bin", 0xe000, 0x2000, CRC(747b1853) SHA1(204a484bc83b3607d5e1404a2dbe629f5f3044b1), ROM_BIOS(47))
-	// 48:
-	ROM_SYSTEM_BIOS(48, "081682", "08/16/1982")
-	ROMX_LOAD( "xt_rom_1_081682_clone.bin", 0xe000, 0x2000, CRC(cfce9b2c) SHA1(14145acb0aca2baf8a6f3c7613f4521fdf0cbe92), ROM_BIOS(48))
-	// 49: V20 NEC D70108C-8 - OSC: 14.31818, 24.000 MHz
+	ROM_SYSTEM_BIOS(41, "081682", "08/16/1982")
+	ROMX_LOAD( "xt_rom_1_081682_clone.bin", 0xe000, 0x2000, CRC(cfce9b2c) SHA1(14145acb0aca2baf8a6f3c7613f4521fdf0cbe92), ROM_BIOS(41))
+	// 42: V20 NEC D70108C-8 - OSC: 14.31818, 24.000 MHz
 	// XT BIOS V2.05 COPYRIGHT Award Software Inc. 1986
-	ROM_SYSTEM_BIOS(49, "awxt205", "XT Award 2.05 #2")
-	ROMX_LOAD( "rom7.u35", 0xe000, 0x2000, CRC(aa3def6b) SHA1(9fb88b6b522d939f7080a567f4a24279ca6c0928), ROM_BIOS(49))
-	// 50: 8 MHz TURBO BOARD - ISA8: 8 -
+	ROM_SYSTEM_BIOS(42, "awxt205", "XT Award 2.05 #2")
+	ROMX_LOAD( "rom7.u35", 0xe000, 0x2000, CRC(aa3def6b) SHA1(9fb88b6b522d939f7080a567f4a24279ca6c0928), ROM_BIOS(42))
+	// 43: 8 MHz TURBO BOARD - ISA8: 8 -
 	// American Research Corp., Copyright 1985, ARC TURBO BIOS VERSION 1.23 6/27/85
-	ROM_SYSTEM_BIOS(50, "arc123", "ARC Turbo BIOS 1.23")
-	ROMX_LOAD( "arcturbobios.bin", 0xe000, 0x2000, CRC(07692e7b) SHA1(27aa350dbc0d846cee8f9149bde0ef72d3862254), ROM_BIOS(50))
-	// 51: XT-Faraday PAC - Chipset: Faraday FE2010A-ES, Faraday FE2100, MM58167AN, Z0765A08PSC, NS8250N - CPU: SONY CXQ70108P-8 (V20)
+	ROM_SYSTEM_BIOS(43, "arc123", "ARC Turbo BIOS 1.23")
+	ROMX_LOAD( "arcturbobios.bin", 0xe000, 0x2000, CRC(07692e7b) SHA1(27aa350dbc0d846cee8f9149bde0ef72d3862254), ROM_BIOS(43))
+	// 44: XT-Faraday PAC - Chipset: Faraday FE2010A-ES, Faraday FE2100, MM58167AN, Z0765A08PSC, NS8250N - CPU: SONY CXQ70108P-8 (V20)
 	// OSC: 28.6363, 18.4328.000 - ISA8: 6 - BIOS: PCBIOS 05017 / FARADAY'84'87 / 07017007 - on board: Floppy, ... (ser/par?)
-	ROM_SYSTEM_BIOS(51, "pac", "XT-Faraday PAC")
-	ROMX_LOAD( "xt-faraday_pac_32k.bin", 0x8000, 0x8000, CRC(d1edf110) SHA1(09570ef36dada08a6d3b97d17ad64814fe32d345), ROM_BIOS(51))
+	ROM_SYSTEM_BIOS(44, "pac", "XT-Faraday PAC")
+	ROMX_LOAD( "xt-faraday_pac_32k.bin", 0x8000, 0x8000, CRC(d1edf110) SHA1(09570ef36dada08a6d3b97d17ad64814fe32d345), ROM_BIOS(44))
 ROM_END
 
-// BIOS versions specifically for NEC V20 CPUs, don't run on plain 8088
+// BIOS versions specifically for NEC V20 CPUs, these don't run on plain 8088
 ROM_START( pcv20 )
 	ROM_REGION(0x10000, "bios", 0)
 	// 0: V20-BIOS Version 3.75 c't // (C) Peter Köhlmann 1987
@@ -301,6 +279,7 @@ ROM_START( pcv20 )
 	ROM_SYSTEM_BIOS(1, "v372", "c't v3.72")
 	ROMX_LOAD( "v20xtbios.bin", 0xe000, 0x2000, CRC(b2dca2e4) SHA1(18b0cb90084723eae08cf6b27bfb3fec8e9fb11b), ROM_BIOS(1))
 ROM_END
+
 
 #define rom_pcmda    rom_pc
 

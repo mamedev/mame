@@ -297,19 +297,19 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ata_int);
 
-	DECLARE_READ16_MEMBER(konami_io0_r);
-	DECLARE_WRITE16_MEMBER(konami_io0_w);
-	DECLARE_READ16_MEMBER(konami_sio_r);
-	DECLARE_WRITE16_MEMBER(konami_sio_w);
-	DECLARE_READ16_MEMBER(konami_io1_r);
-	DECLARE_WRITE16_MEMBER(konami_io1_w);
-	DECLARE_WRITE16_MEMBER(konami_eeprom_w);
+	uint16_t konami_io0_r(offs_t offset);
+	void konami_io0_w(offs_t offset, uint16_t data);
+	uint16_t konami_sio_r(offs_t offset, uint16_t mem_mask = ~0);
+	void konami_sio_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t konami_io1_r(offs_t offset);
+	void konami_io1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void konami_eeprom_w(uint16_t data);
 
 	void init_totlvice();
 	void init_btltryst();
 	void init_hellngt();
 
-	DECLARE_WRITE16_MEMBER(konami_atapi_unk_w)
+	void konami_atapi_unk_w(uint16_t data)
 	{
 		// 8000 = /Reset
 		// 4000 = C000 ... DOIO DMA ... 4000
@@ -324,12 +324,12 @@ public:
 		}
 	}
 
-	DECLARE_READ16_MEMBER(konami_ide_r)
+	uint16_t konami_ide_r(offs_t offset, uint16_t mem_mask = ~0)
 	{
 		return swapendian_int16(m_ata->cs0_r(offset, mem_mask));
 	}
 
-	DECLARE_WRITE16_MEMBER(konami_ide_w)
+	void konami_ide_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0)
 	{
 		m_ata->cs0_w(offset, swapendian_int16(data), mem_mask);
 	}
@@ -436,7 +436,7 @@ WRITE_LINE_MEMBER( konamim2_state::ata_int )
  *
  *************************************/
 
-READ16_MEMBER( konamim2_state::konami_io0_r )
+uint16_t konamim2_state::konami_io0_r(offs_t offset)
 {
 //  printf("IO R: %08X\n", offset);
 
@@ -500,7 +500,7 @@ READ16_MEMBER( konamim2_state::konami_io0_r )
 	return 0;
 }
 
-WRITE16_MEMBER( konamim2_state::konami_io0_w )
+void konamim2_state::konami_io0_w(offs_t offset, uint16_t data)
 {
 	// 9: 0000, 0xFFF
 //  printf("IO W: %08x %08x\n", offset, data);
@@ -531,7 +531,7 @@ WRITE16_MEMBER( konamim2_state::konami_io0_w )
  7: |........ ........| Unknown
 */
 
-READ16_MEMBER( konamim2_state::konami_io1_r )
+uint16_t konamim2_state::konami_io1_r(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -590,7 +590,7 @@ READ16_MEMBER( konamim2_state::konami_io1_r )
 	return data;
 }
 
-WRITE16_MEMBER( konamim2_state::konami_io1_w )
+void konamim2_state::konami_io1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 0x0200 = ADC?
 	// 0x0800 = Coin counter 1
@@ -635,7 +635,7 @@ WRITE16_MEMBER( konamim2_state::konami_io1_w )
  7: |xxxxxxxx xxxxxxxx| Register R/W
 */
 
-READ16_MEMBER( konamim2_state::konami_sio_r )
+uint16_t konamim2_state::konami_sio_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -651,7 +651,7 @@ READ16_MEMBER( konamim2_state::konami_sio_r )
 	return data;
 }
 
-WRITE16_MEMBER( konamim2_state::konami_sio_w )
+void konamim2_state::konami_sio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -664,7 +664,7 @@ WRITE16_MEMBER( konamim2_state::konami_sio_w )
 }
 
 // TODO: Use output port
-WRITE16_MEMBER( konamim2_state::konami_eeprom_w )
+void konamim2_state::konami_eeprom_w(uint16_t data)
 {
 	// 3 = CS
 	// 2 = CLK

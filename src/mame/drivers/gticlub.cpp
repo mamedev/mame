@@ -275,9 +275,9 @@ public:
 		m_analog1(*this, "AN1"),
 		m_analog2(*this, "AN2"),
 		m_analog3(*this, "AN3"),
-		m_ports(*this, "IN%u", 0)
-	{
-	}
+		m_ports(*this, "IN%u", 0),
+		m_pcb_digit(*this, "pcbdigit%u", 0U)
+	{ }
 
 	void thunderh(machine_config &config);
 	void hangplt(machine_config &config);
@@ -288,6 +288,9 @@ public:
 	void init_hangplt();
 	void init_hangpltu();
 	void init_gticlub();
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -312,13 +315,11 @@ private:
 	optional_device<screen_device> m_lscreen;
 	optional_device<screen_device> m_rscreen;
 	optional_device_array<voodoo_device, 2> m_voodoo;
-
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
-
 	required_ioport_array<4> m_ports;
+	output_finder<2> m_pcb_digit;
 
 	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gticlub_k001604_tile_r(offs_t offset);
@@ -339,7 +340,6 @@ private:
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 
-	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
 	DECLARE_VIDEO_START(gticlub);
@@ -360,9 +360,6 @@ private:
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
 
-	void gticlub_led_setreg(int offset, uint8_t data);
-
-	uint8_t m_gticlub_led_reg[2];
 	emu_timer *m_sound_irq_timer;
 	std::unique_ptr<uint32_t[]> m_sharc_dataram_0;
 	std::unique_ptr<uint32_t[]> m_sharc_dataram_1;
@@ -420,7 +417,7 @@ uint32_t gticlub_state::gticlub_k001604_reg_r(offs_t offset)
 void gticlub_state::gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->reg_w(offset, data);
+	k001604->reg_w(offset, data, mem_mask);
 }
 
 
@@ -464,7 +461,7 @@ void gticlub_state::sysreg_w(offs_t offset, uint8_t data)
 	{
 		case 0:
 		case 1:
-			gticlub_led_setreg(offset, data);
+			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
 			break;
 
 		case 3:
@@ -484,6 +481,9 @@ void gticlub_state::sysreg_w(offs_t offset, uint8_t data)
 			m_adc1038->clk_write((data >> 1) & 1);
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
+			break;
+
+		default:
 			break;
 	}
 }
@@ -520,8 +520,10 @@ void gticlub_state::soundtimer_count_w(uint16_t data)
 
 /******************************************************************/
 
-MACHINE_START_MEMBER(gticlub_state,gticlub)
+void gticlub_state::machine_start()
 {
+	m_pcb_digit.resolve();
+
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -597,8 +599,8 @@ void gticlub_state::gn680_memmap(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl_w));
-//	map(0x310000, 0x311fff).nopw(); //056230 regs?
-//	map(0x312000, 0x313fff).nopw(); //056230 ram?
+//  map(0x310000, 0x311fff).nopw(); //056230 regs?
+//  map(0x312000, 0x313fff).nopw(); //056230 ram?
 }
 
 /*****************************************************************************/
@@ -848,15 +850,9 @@ MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void gticlub_state::gticlub_led_setreg(int offset, uint8_t data)
-{
-	m_gticlub_led_reg[offset] = data;
-}
-
 
 VIDEO_START_MEMBER(gticlub_state,gticlub)
 {
-	m_gticlub_led_reg[0] = m_gticlub_led_reg[1] = 0x7f;
 	/*
 	tick = 0;
 	debug_tex_page = 0;
@@ -922,9 +918,6 @@ uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb3
 	}
 #endif
 
-	draw_7segment_led(bitmap, 3, 3, m_gticlub_led_reg[0]);
-	draw_7segment_led(bitmap, 9, 3, m_gticlub_led_reg[1]);
-
 	//m_dsp->set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
@@ -938,9 +931,6 @@ uint32_t gticlub_state::screen_update_lscreen(screen_device &screen, bitmap_rgb3
 	m_voodoo[0]->voodoo_update(bitmap, cliprect);
 	m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, m_gticlub_led_reg[0]);
-	draw_7segment_led(bitmap, 9, 3, m_gticlub_led_reg[1]);
-
 	return 0;
 }
 
@@ -951,9 +941,6 @@ uint32_t gticlub_state::screen_update_rscreen(screen_device &screen, bitmap_rgb3
 //  m_k001604_2->draw_back_layer(bitmap, cliprect);
 	m_voodoo[1]->voodoo_update(bitmap, cliprect);
 	m_k001604_2->draw_front_layer(screen, bitmap, cliprect);
-
-	draw_7segment_led(bitmap, 3, 3, m_gticlub_led_reg[0]);
-	draw_7segment_led(bitmap, 9, 3, m_gticlub_led_reg[1]);
 
 	return 0;
 }
@@ -976,7 +963,6 @@ void gticlub_state::gticlub(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
 	ADC1038(config, m_adc1038, 0);
@@ -1037,7 +1023,7 @@ void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I
 	m_adc1038->set_gti_club_hack(false);
 
 	m_k056230->set_thunderh_hack(true);
-	
+
 	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
 }
@@ -1081,7 +1067,6 @@ void gticlub_state::hangplt(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
 	ADC1038(config, m_adc1038, 0);

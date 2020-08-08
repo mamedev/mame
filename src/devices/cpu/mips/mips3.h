@@ -310,7 +310,6 @@ public:
 	void clear_fastram(uint32_t select_start);
 	void mips3drc_set_options(uint32_t options);
 	void mips3drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
-	void burn_cycles(int32_t cycles);
 
 protected:
 	// device-level overrides
@@ -324,7 +323,6 @@ protected:
 	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual void execute_burn(int32_t cycles) override { m_totalcycles += cycles; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -976,11 +974,11 @@ COMPILER-SPECIFIC OPTIONS
 #define MIPS3DRC_STRICT_COP0        0x0002          /* validate all COP0 instructions */
 #define MIPS3DRC_STRICT_COP1        0x0004          /* validate all COP1 instructions */
 #define MIPS3DRC_STRICT_COP2        0x0008          /* validate all COP2 instructions */
-#define MIPS3DRC_FLUSH_PC           0x0010          /* flush the PC value before each memory access */
+#define MIPS3DRC_DISABLE_INTRABLOCK 0x0010          /* disable intrablock branching */
 #define MIPS3DRC_CHECK_OVERFLOWS    0x0020          /* actually check overflows on add/sub instructions */
 #define MIPS3DRC_ACCURATE_DIVZERO   0x0040          /* load correct values into HI/LO on integer divide-by-zero */
 
-#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
+#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)
 
 

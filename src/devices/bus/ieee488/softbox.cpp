@@ -376,7 +376,7 @@ void softbox_device::ieee488_ifc(int state)
 //  dbrg_w - baud rate selection
 //-------------------------------------------------
 
-WRITE8_MEMBER( softbox_device::dbrg_w )
+void softbox_device::dbrg_w(uint8_t data)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);

@@ -32,12 +32,12 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 public:
-	DECLARE_READ16_MEMBER( sec_1_r );
-	DECLARE_WRITE16_MEMBER( sec_1_w );
-	DECLARE_READ16_MEMBER( sec_2_r );
-	DECLARE_WRITE16_MEMBER( sec_2_w );
-	DECLARE_READ16_MEMBER( sec_3_r );
-	DECLARE_WRITE16_MEMBER( sec_3_w );
+	uint16_t sec_1_r(offs_t offset);
+	void sec_1_w(offs_t offset, uint16_t data);
+	uint16_t sec_2_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sec_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sec_3_r(offs_t offset);
+	void sec_3_w(offs_t offset, uint16_t data);
 private:
 	uint32_t g3_offset_data_1();
 	uint32_t g3_offset_data_2();

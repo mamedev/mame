@@ -160,8 +160,8 @@ private:
 	uint8_t buckrog_cpu2_command_r();
 	uint8_t buckrog_port_2_r();
 	uint8_t buckrog_port_3_r();
-	DECLARE_WRITE8_MEMBER(turbo_videoram_w);
-	DECLARE_WRITE8_MEMBER(buckrog_bitmap_w);
+	void turbo_videoram_w(offs_t offset, uint8_t data);
+	void buckrog_bitmap_w(offs_t offset, uint8_t data);
 	void turbo_ppi0a_w(uint8_t data);
 	void turbo_ppi0b_w(uint8_t data);
 	void turbo_ppi0c_w(uint8_t data);
@@ -177,9 +177,9 @@ private:
 	void buckrog_ppi0c_w(uint8_t data);
 	void buckrog_ppi1c_w(uint8_t data);
 	uint8_t turbo_analog_r();
-	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
-	DECLARE_READ8_MEMBER(spriteram_r);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
+	void buckrog_i8255_0_w(offs_t offset, uint8_t data);
+	uint8_t spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);

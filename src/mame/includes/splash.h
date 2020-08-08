@@ -71,7 +71,7 @@ protected:
 	int m_sound_irq;
 
 	// common
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -79,17 +79,17 @@ protected:
 
 	// splash specific
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
-	DECLARE_WRITE8_MEMBER(splash_adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(splash_adpcm_control_w);
+	void splash_adpcm_data_w(uint8_t data);
+	void splash_adpcm_control_w(uint8_t data);
 
 	// roldfrog specific
-	DECLARE_READ16_MEMBER(roldfrog_bombs_r);
-	DECLARE_WRITE8_MEMBER(roldfrog_vblank_ack_w);
-	DECLARE_READ8_MEMBER(roldfrog_unk_r);
+	uint16_t roldfrog_bombs_r();
+	void roldfrog_vblank_ack_w(uint8_t data);
+	uint8_t roldfrog_unk_r();
 	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 	//roldfrog and funystrp specific
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	void sound_bank_w(uint8_t data);
 
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
@@ -135,18 +135,18 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ16_MEMBER(spr_read);
-	DECLARE_WRITE16_MEMBER(spr_write);
-	DECLARE_READ8_MEMBER(int_source_r);
-	DECLARE_WRITE8_MEMBER(msm1_data_w);
-	DECLARE_WRITE8_MEMBER(msm1_interrupt_w);
-	DECLARE_WRITE8_MEMBER(msm2_interrupt_w);
-	DECLARE_WRITE8_MEMBER(msm2_data_w);
+	uint16_t spr_read(offs_t offset);
+	void spr_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t int_source_r();
+	void msm1_data_w(uint8_t data);
+	void msm1_interrupt_w(uint8_t data);
+	void msm2_interrupt_w(uint8_t data);
+	void msm2_data_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
+	void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t protection_r(offs_t offset);
+	void eeprom_w(uint8_t data);
 
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

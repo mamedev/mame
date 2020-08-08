@@ -24,25 +24,25 @@ public:
 
 	auto linear_config_changed() { return m_linear_config_changed_cb.bind(); }
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(offs_t offset) override;
+	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03c0_r(offs_t offset) override;
+	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
 
-	DECLARE_READ8_MEMBER(fb_r);
-	DECLARE_WRITE8_MEMBER(fb_w);
-	DECLARE_READ32_MEMBER(s3d_sub_status_r);
-	DECLARE_WRITE32_MEMBER(s3d_sub_control_w);
-	DECLARE_READ32_MEMBER(s3d_func_ctrl_r);
+	uint8_t fb_r(offs_t offset);
+	void fb_w(offs_t offset, uint8_t data);
+	uint32_t s3d_sub_status_r();
+	void s3d_sub_control_w(uint32_t data);
+	uint32_t s3d_func_ctrl_r();
 
-	DECLARE_READ32_MEMBER(s3d_register_r);
-	DECLARE_WRITE32_MEMBER(s3d_register_w);
+	uint32_t s3d_register_r(offs_t offset);
+	void s3d_register_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE32_MEMBER(image_xfer)
+	void image_xfer(uint32_t data)
 	{
 //      if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000080)
 		{

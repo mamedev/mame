@@ -121,7 +121,7 @@ void eolith_state::machine_start()
 	m_led.resolve();
 }
 
-READ32_MEMBER(eolith_state::eolith_custom_r)
+uint32_t eolith_state::eolith_custom_r()
 {
 	/*
 	    bit 3 = eeprom bit
@@ -136,7 +136,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
 	return (m_in0->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
-WRITE32_MEMBER(eolith_state::systemcontrol_w)
+void eolith_state::systemcontrol_w(uint32_t data)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
@@ -148,7 +148,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 }
 
 template<int Player>
-READ32_MEMBER(eolith_state::hidctch3_pen_r)
+uint32_t eolith_state::hidctch3_pen_r()
 {
 	//320 x 240
 	int xpos = m_penxport[Player]->read();

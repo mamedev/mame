@@ -23,11 +23,8 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 {
 	switch (id)
 	{
-	case TIMER_BOOTSTRAP:
-		m_maincpu->set_pc(0xc000);
-		break;
 	case TIMER_TMS5501:
-		m_tms5501->xi7_w((ioport("IN8")->read() & 0x04) ? 1:0);
+		m_tms5501->xi7_w(BIT(m_io_keyboard[8]->read(), 2));
 		timer_set(attotime::from_hz(100), TIMER_TMS5501);
 		break;
 	default:
@@ -41,33 +38,24 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 /* Memory */
 
-WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
+void dai_state::stack_interrupt_circuit_w(uint8_t data)
 {
 	m_tms5501->sens_w(1);
 	m_tms5501->sens_w(0);
 }
 
-void dai_state::dai_update_memory(int dai_rom_bank)
-{
-	membank("bank2")->set_entry(dai_rom_bank);
-}
-
-
-uint8_t dai_state::dai_keyboard_r()
+uint8_t dai_state::keyboard_r()
 {
 	uint8_t data = 0x00;
-	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
-	for (int i = 0; i < 8; i++)
-	{
+	for (u8 i = 0; i < 8; i++)
 		if (m_keyboard_scan_mask & (1 << i))
-			data |= ioport(keynames[i])->read();
-	}
+			data |= m_io_keyboard[i]->read();
 
 	return data;
 }
 
-void dai_state::dai_keyboard_w(uint8_t data)
+void dai_state::keyboard_w(uint8_t data)
 {
 	m_keyboard_scan_mask = data;
 }
@@ -79,16 +67,33 @@ IRQ_CALLBACK_MEMBER(dai_state::int_ack)
 
 void dai_state::machine_start()
 {
-	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
-	timer_set(attotime::zero, TIMER_BOOTSTRAP);
+	membank("bank2")->configure_entries(0, 4, m_rom + 0x2000, 0x1000);
 	timer_set(attotime::from_hz(100), TIMER_TMS5501);
-
-	memset(m_ram->pointer(), 0, m_ram->size());
+	save_item(NAME(m_paddle_select));
+	save_item(NAME(m_paddle_enable));
+	save_item(NAME(m_cassette_motor));
+	save_item(NAME(m_keyboard_scan_mask));
+	save_item(NAME(m_4_colours_palette));
 }
 
 void dai_state::machine_reset()
 {
-	membank("bank1")->set_base(m_ram->pointer());
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xc000, 0xc7ff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x07ff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
 }
 
 /***************************************************************************
@@ -120,13 +125,13 @@ void dai_state::machine_reset()
                 bit 6-7         ROM bank switching
 ***************************************************************************/
 
-READ8_MEMBER(dai_state::dai_io_discrete_devices_r)
+uint8_t dai_state::io_discrete_devices_r(offs_t offset)
 {
-	uint8_t data = 0x00;
+	uint8_t data = 0xff;
 
-	switch(offset & 0x000f) {
-	case 0x00:
-		data = ioport("IN8")->read();
+	switch(offset & 0x0f) {
+	case 0:
+		data = m_io_keyboard[8]->read();
 		data |= 0x08;           // serial ready
 		if (machine().rand()&0x01)
 			data |= 0x40;       // random number generator
@@ -135,42 +140,40 @@ READ8_MEMBER(dai_state::dai_io_discrete_devices_r)
 		break;
 
 	default:
-		data = 0xff;
 		LOG_DAI_PORT_R (offset, data, "discrete devices - unmapped");
-
 		break;
 	}
 	return data;
 }
 
-WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
+void dai_state::io_discrete_devices_w(offs_t offset, uint8_t data)
 {
 	switch(offset & 0x000f) {
 	case 0x04:
 		m_sound->set_volume(offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 0 volume");
-		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - osc. 1 volume");
+		LOG_DAI_PORT_W (offset, BIT(data, 4, 4), "discrete devices - osc. 1 volume");
 		break;
 
 	case 0x05:
 		m_sound->set_volume(offset, data);
 		LOG_DAI_PORT_W (offset, data&0x0f, "discrete devices - osc. 2 volume");
-		LOG_DAI_PORT_W (offset, (data&0xf0)>>4, "discrete devices - noise volume");
+		LOG_DAI_PORT_W (offset, BIT(data, 4, 4), "discrete devices - noise volume");
 		break;
 
 	case 0x06:
-		m_paddle_select = (data&0x06)>>2;
-		m_paddle_enable = (data&0x08)>>3;
-		m_cassette_motor[0] = (data&0x10)>>4;
-		m_cassette_motor[1] = (data&0x20)>>5;
+		m_paddle_select = BIT(data, 1, 2);
+		m_paddle_enable = BIT(data, 3);
+		m_cassette_motor[0] = BIT(data, 4);
+		m_cassette_motor[1] = BIT(data, 5);
 		m_cassette->change_state(m_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_cassette->output((data & 0x01) ? -1.0 : 1.0);
-		dai_update_memory ((data&0xc0)>>6);
-		LOG_DAI_PORT_W (offset, (data&0x06)>>2, "discrete devices - paddle select");
-		LOG_DAI_PORT_W (offset, (data&0x08)>>3, "discrete devices - paddle enable");
-		LOG_DAI_PORT_W (offset, (data&0x10)>>4, "discrete devices - cassette motor 1");
-		LOG_DAI_PORT_W (offset, (data&0x20)>>5, "discrete devices - cassette motor 2");
-		LOG_DAI_PORT_W (offset, (data&0xc0)>>6, "discrete devices - ROM bank");
+		m_cassette->output(BIT(data, 0) ? -1.0 : 1.0);
+		membank("bank2")->set_entry(BIT(data, 6, 2));
+		LOG_DAI_PORT_W (offset, BIT(data, 1, 2), "discrete devices - paddle select");
+		LOG_DAI_PORT_W (offset, BIT(data, 3), "discrete devices - paddle enable");
+		LOG_DAI_PORT_W (offset, BIT(data, 4), "discrete devices - cassette motor 1");
+		LOG_DAI_PORT_W (offset, BIT(data, 5), "discrete devices - cassette motor 2");
+		LOG_DAI_PORT_W (offset, BIT(data, 6, 2), "discrete devices - ROM bank");
 		break;
 
 	default:
@@ -188,14 +191,14 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(dai_state::dai_pit_r)
+uint8_t dai_state::pit_r(offs_t offset)
 {
-	return m_pit->read((offset >> 1) & 3);
+	return m_pit->read(BIT(offset, 1, 2));
 }
 
-WRITE8_MEMBER(dai_state::dai_pit_w)
+void dai_state::pit_w(offs_t offset, uint8_t data)
 {
-	m_pit->write((offset >> 1) & 3, data);
+	m_pit->write(BIT(offset, 1, 2), data);
 }
 
 /***************************************************************************
@@ -204,13 +207,13 @@ WRITE8_MEMBER(dai_state::dai_pit_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(dai_state::dai_amd9511_r)
+uint8_t dai_state::amd9511_r()
 {
-	/* optional and no present at this moment */
+	/* optional and not present at this moment */
 	return 0xff;
 }
 
-WRITE8_MEMBER(dai_state::dai_amd9511_w)
+void dai_state::amd9511_w(offs_t offset, uint8_t data)
 {
 	logerror ("Writing to AMD9511 math chip, %04x, %02x\n", offset, data);
 }

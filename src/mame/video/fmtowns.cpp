@@ -130,24 +130,24 @@ void towns_state::towns_crtc_refresh_mode()
 	m_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
 }
 
-READ8_MEMBER( towns_state::towns_gfx_high_r )
+uint8_t towns_state::towns_gfx_high_r(offs_t offset)
 {
 	return m_towns_gfxvram[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_high_w )
+void towns_state::towns_gfx_high_w(offs_t offset, uint8_t data)
 {
 	u8 mask = m_vram_mask[offset & 3];
 	u8 mem = m_towns_gfxvram[offset];
 	m_towns_gfxvram[offset] = (mem & ~mask) | (data & mask);
 }
 
-READ8_MEMBER( towns_state::towns_gfx_packed_r )
+uint8_t towns_state::towns_gfx_packed_r(offs_t offset)
 {
 	return m_towns_gfxvram[bitswap<19>(offset,2,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,1,0)];
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_packed_w )
+void towns_state::towns_gfx_packed_w(offs_t offset, uint8_t data)
 {
 	u8 mask = m_vram_mask[offset & 3];
 	offset = bitswap<19>(offset,2,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,1,0);
@@ -156,7 +156,7 @@ WRITE8_MEMBER( towns_state::towns_gfx_packed_w )
 }
 
 
-READ8_MEMBER( towns_state::towns_gfx_r )
+uint8_t towns_state::towns_gfx_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -180,7 +180,7 @@ READ8_MEMBER( towns_state::towns_gfx_r )
 	return ret;
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_w )
+void towns_state::towns_gfx_w(offs_t offset, uint8_t data)
 {
 	if(m_towns_mainmem_enable != 0)
 	{
@@ -265,7 +265,7 @@ void towns_state::towns_update_kanji_offset()
 }
 
 
-READ8_MEMBER( towns_state::towns_video_cff80_r )
+uint8_t towns_state::towns_video_cff80_r(offs_t offset)
 {
 	uint8_t const* const ROM = m_user->base();
 
@@ -308,7 +308,7 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 	return 0;
 }
 
-WRITE8_MEMBER( towns_state::towns_video_cff80_w )
+void towns_state::towns_video_cff80_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -318,7 +318,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
 			m_video.towns_vram_wplane = data & 0x0f;
 			m_video.towns_vram_rplane = (data & 0xc0) >> 6;
-			towns_update_video_banks(space);
+			towns_update_video_banks();
 			//logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
 			break;
 		case 0x02:  // display plane (bits 0-2), display page select (bit 4)
@@ -340,29 +340,29 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 			break;
 		case 0x19:  // ANK CG ROM
 			m_towns_ankcg_enable = data & 0x01;
-			towns_update_video_banks(space);
+			towns_update_video_banks();
 			break;
 		default:
 			logerror("VID: write %08x to invalid or unimplemented memory-mapped port %05x\n",data,0xcff80+offset);
 	}
 }
 
-READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
+uint8_t towns_state::towns_video_cff80_mem_r(offs_t offset)
 {
 	if(m_towns_mainmem_enable != 0)
 		return m_ram->pointer()[offset+0xcff80];
 
-	return towns_video_cff80_r(space,offset);
+	return towns_video_cff80_r(offset);
 }
 
-WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
+void towns_state::towns_video_cff80_mem_w(offs_t offset, uint8_t data)
 {
 	if(m_towns_mainmem_enable != 0)
 	{
 		m_ram->pointer()[offset+0xcff80] = data;
 		return;
 	}
-	towns_video_cff80_w(space,offset,data);
+	towns_video_cff80_w(offset,data);
 }
 
 /*
@@ -373,7 +373,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
  *      0x44a = shifter register data (8-bit)
  *
  */
-READ8_MEMBER(towns_state::towns_video_440_r)
+uint8_t towns_state::towns_video_440_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	uint16_t xpos,ypos;
@@ -444,7 +444,7 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_440_w)
+void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -492,7 +492,7 @@ WRITE8_MEMBER(towns_state::towns_video_440_w)
 	}
 }
 
-READ8_MEMBER(towns_state::towns_video_5c8_r)
+uint8_t towns_state::towns_video_5c8_r(offs_t offset)
 {
 	//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
@@ -509,7 +509,7 @@ READ8_MEMBER(towns_state::towns_video_5c8_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_5c8_w)
+void towns_state::towns_video_5c8_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -550,7 +550,7 @@ void towns_state::towns_update_palette()
  * 0xfd92/4/6 - BRG value
  * 0xfd98-9f  - Digital palette registers (FMR-50 compatibility)
  */
-READ8_MEMBER(towns_state::towns_video_fd90_r)
+uint8_t towns_state::towns_video_fd90_r(offs_t offset)
 {
 	uint8_t ret = 0;
 	uint16_t xpos;
@@ -593,7 +593,7 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_fd90_w)
+void towns_state::towns_video_fd90_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -630,20 +630,20 @@ WRITE8_MEMBER(towns_state::towns_video_fd90_w)
 	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
-READ8_MEMBER(towns_state::towns_video_ff81_r)
+uint8_t towns_state::towns_video_ff81_r()
 {
 	return ((m_video.towns_vram_rplane << 6) & 0xc0) | m_video.towns_vram_wplane;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_ff81_w)
+void towns_state::towns_video_ff81_w(uint8_t data)
 {
 	m_video.towns_vram_wplane = data & 0x0f;
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
-	towns_update_video_banks(space);
+	towns_update_video_banks();
 	logerror("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
-READ8_MEMBER(towns_state::towns_video_unknown_r)
+uint8_t towns_state::towns_video_unknown_r()
 {
 	return 0x00;
 }
@@ -658,7 +658,7 @@ READ8_MEMBER(towns_state::towns_video_unknown_r)
  *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
  *    0xca000-0xcafff: JIS code
  */
-READ8_MEMBER(towns_state::towns_spriteram_low_r)
+uint8_t towns_state::towns_spriteram_low_r(offs_t offset)
 {
 	uint8_t* RAM = m_ram->pointer();
 	uint8_t* ROM = m_user->base();
@@ -696,7 +696,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
+void towns_state::towns_spriteram_low_w(offs_t offset, uint8_t data)
 {
 	uint8_t* RAM = m_ram->pointer();
 
@@ -722,12 +722,12 @@ WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_spriteram_r )
+uint8_t towns_state::towns_spriteram_r(offs_t offset)
 {
 	return m_towns_txtvram[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_spriteram_w )
+void towns_state::towns_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_towns_txtvram[offset] = data;
 }

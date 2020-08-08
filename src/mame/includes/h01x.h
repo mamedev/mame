@@ -54,19 +54,19 @@ public:
 
 	uint32_t screen_update_h01x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(mem_0000_r);
-	DECLARE_WRITE8_MEMBER(mem_0000_w);
-	DECLARE_READ8_MEMBER(mem_4000_r);
-	DECLARE_WRITE8_MEMBER(mem_4000_w);
-	DECLARE_READ8_MEMBER(mem_8000_r);
-	DECLARE_WRITE8_MEMBER(mem_8000_w);
-	DECLARE_READ8_MEMBER(mem_c000_r);
-	DECLARE_WRITE8_MEMBER(mem_c000_w);
+	uint8_t mem_0000_r(offs_t offset);
+	void mem_0000_w(uint8_t data);
+	uint8_t mem_4000_r(offs_t offset);
+	void mem_4000_w(offs_t offset, uint8_t data);
+	uint8_t mem_8000_r(offs_t offset);
+	void mem_8000_w(offs_t offset, uint8_t data);
+	uint8_t mem_c000_r(offs_t offset);
+	void mem_c000_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(port_60_w);
-	DECLARE_WRITE8_MEMBER(port_64_w);
-	DECLARE_WRITE8_MEMBER(port_70_w);
-	DECLARE_READ8_MEMBER(port_50_r);
+	void port_60_w(uint8_t data);
+	void port_64_w(uint8_t data);
+	void port_70_w(uint8_t data);
+	uint8_t port_50_r();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

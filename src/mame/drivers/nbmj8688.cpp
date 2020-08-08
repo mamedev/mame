@@ -144,7 +144,7 @@ void nbmj8688_state::bikkuri_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-READ8_MEMBER(nbmj8688_state::ff_r)
+uint8_t nbmj8688_state::ff_r()
 {
 	/* possibly because of a bug, reads from port 0xd0 must return 0xff
 	   otherwise apparel doesn't clear the background when you insert a coin */
@@ -187,7 +187,7 @@ void nbmj8688_state::bikkuri_io_map(address_map &map)
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
 }
 
-WRITE8_MEMBER(nbmj8688_state::barline_output_w)
+void nbmj8688_state::barline_output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
