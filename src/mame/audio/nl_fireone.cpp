@@ -11,7 +11,6 @@
 //
 
 #include "netlist/devices/net_lib.h"
-#include "nl_fireone.h"
 
 //
 // 556 is just two 555s in one package

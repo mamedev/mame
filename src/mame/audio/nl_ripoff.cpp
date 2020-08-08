@@ -22,8 +22,6 @@
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
-#include "nl_ripoff.h"
-
 
 //
 // Optimizations

@@ -12,7 +12,6 @@
 //
 
 #include "netlist/devices/net_lib.h"
-#include "nl_starcrus.h"
 
 //
 // Main netlist
