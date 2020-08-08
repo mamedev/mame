@@ -4,7 +4,7 @@
 
 Videopac 40 cartridge emulation
 
-3KB program ROM + 1KB bankswitched data ROM
+4KB ROM (program ROM is fixed, data ROM is 'bankswitched' via P11)
 
 Used in:
 - #31: Musician

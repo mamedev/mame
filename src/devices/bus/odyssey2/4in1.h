@@ -33,7 +33,7 @@ protected:
 	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset + 0xc00]; }
 
 	virtual void write_p1(u8 data) override { m_control = data; }
-	virtual void write_p2(u8 data) override { m_bank = data & 3; }
+	virtual void write_p2(u8 data) override { m_bank = data; }
 	virtual u8 io_read(offs_t offset) override;
 
 private:
