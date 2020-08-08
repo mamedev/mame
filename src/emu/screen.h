@@ -408,6 +408,7 @@ public:
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
+	int partial_scan_hpos() const { return m_partial_scan_hpos; }
 	bool update_partial(int scanline);
 	void update_now();
 	void reset_partial_updates();
