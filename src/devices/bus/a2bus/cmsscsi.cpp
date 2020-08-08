@@ -4,7 +4,7 @@
 
     cmsscsi.cpp
 
-    Implementation of the CMS Apple II SCSI Card
+    Implementation of the CMS SCSI II Card
 
     Details:
     ROM is $2000 bytes.  The last $800 bytes are 7 slot images at
@@ -38,7 +38,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_CMSSCSI, a2bus_cmsscsi_device, "cmsscsi", "CMS Apple II SCSI Card")
+DEFINE_DEVICE_TYPE(A2BUS_CMSSCSI, a2bus_cmsscsi_device, "cmsscsi", "CMS SCSI II Card")
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
@@ -162,7 +162,7 @@ uint8_t a2bus_cmsscsi_device::read_c0nx(uint8_t offset)
 			return 0;
 
 		default:
-			printf("Read c0n%x (%s)\n", offset, machine().describe_context().c_str());
+			logerror("Read c0n%x (%s)\n", offset, machine().describe_context().c_str());
 			break;
 	}
 

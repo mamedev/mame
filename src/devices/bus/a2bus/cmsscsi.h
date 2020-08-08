@@ -4,7 +4,7 @@
 
     cmsscsi.h
 
-    Implementation of the CMS Apple II SCSI Card
+    Implementation of the CMS SCSI II Card
 
 *********************************************************************/
 
