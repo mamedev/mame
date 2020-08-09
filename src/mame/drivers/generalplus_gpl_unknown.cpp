@@ -4,17 +4,23 @@
 // pcp8718 contains unsp code, but no obvious startup code / vectors, so it's probably booting from another device / bootstrapped
 // these contain the same game selection as the games in unk6502_st2xxx.cpp but on updated hardware
 
+// These use SPI ROMs and unSP2.0 instructions, so will be GeneralPlus branded parts, not SunPlus
+// possibly the framebuffer based video ones rather than the ones with tile layers
+
 #include "emu.h"
 
 #include "screen.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "cpu/unsp/unsp.h"
+
 
 class pcp8718_state : public driver_device
 {
 public:
 	pcp8718_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")
 	{ }
@@ -27,8 +33,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	required_device<unsp_20_device> m_maincpu;
+
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+
+	void map(address_map &map);
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -50,9 +60,17 @@ void pcp8718_state::machine_reset()
 static INPUT_PORTS_START( pcp8718 )
 INPUT_PORTS_END
 
+void pcp8718_state::map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+}
+
+
 void pcp8718_state::pcp8718(machine_config &config)
 {
-	// unknown CPU, unsp based
+
+	UNSP_20(config, m_maincpu, 20000000); // unknown CPU, unsp20 based
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcp8718_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
