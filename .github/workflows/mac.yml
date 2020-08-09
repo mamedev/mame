@@ -44,13 +44,12 @@ jobs:
         name: mame_libretro.zip
         path: .
     - name: Upload to buildbot
-      uses: appleboy/scp-action@master
+      uses: trendyminds/github-actions-rsync@master
       with:
-        host: ${{ secrets.HOST }}
-        port: ${{ secrets.PORT }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        source: mame_libretro.zip
-        target: ${{ secrets.MACOS_X86_64_PATH }}
-        overwrite: true
-        tar_tmp_path: .
+        RSYNC_OPTIONS: -avzr --delete
+        RSYNC_TARGET: ${{ secrets.MACOS_X86_64_PATH }}
+        RSYNC_SOURCE: /mame_libretro.zip
+      env:
+        SSH_PRIVATE_KEY: ${{secrets.KEY}}
+        SSH_USERNAME: ${{secrets.USERNAME}}
+        SSH_HOSTNAME: ${{secrets.HOST}}
