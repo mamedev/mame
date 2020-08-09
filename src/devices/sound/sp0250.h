@@ -38,6 +38,14 @@ private:
 
 	struct
 	{
+		void reset() { z1 = z2 = 0; }
+		int16_t apply(int16_t in)
+		{
+			int16_t z0 = in + ((z1 * F) >> 8) + ((z2 * B) >> 9);
+			z2 = z1;
+			z1 = z0;
+			return z0;
+		}
 		int16_t F, B;
 		int16_t z1, z2;
 	} m_filter[6];

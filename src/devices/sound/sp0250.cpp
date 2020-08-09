@@ -33,6 +33,7 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 7*6*8 = 336 gives a 9.286kHz sample rate and matches the samples from the Sega boards.
 */
 #define CLOCK_DIVIDER (7*6*8)
+//#define CLOCK_DIVIDER (156*2)
 
 DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 
@@ -140,12 +141,11 @@ void sp0250_device::load_values()
 	m_filter[5].F = sp0250_gc(m_fifo[14]);
 	m_fifo_pos = 0;
 	m_drq(ASSERT_LINE);
-
 	m_pcount = 0;
 	m_rcount = 0;
 
 	for (int f = 0; f < 6; f++)
-		m_filter[f].z1 = m_filter[f].z2 = 0;
+		m_filter[f].reset();
 
 	m_playing = 1;
 }
@@ -210,12 +210,7 @@ void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			}
 
 			for (int f = 0; f < 6; f++)
-			{
-				z0 += ((m_filter[f].z1 * m_filter[f].F) >> 8)
-					+ ((m_filter[f].z2 * m_filter[f].B) >> 9);
-				m_filter[f].z2 = m_filter[f].z1;
-				m_filter[f].z1 = z0;
-			}
+				z0 = m_filter[f].apply(z0);
 
 			// Physical resolution is only 7 bits, but heh
 
@@ -238,6 +233,16 @@ void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		{
 			if(m_fifo_pos == 15)
 				load_values();
+			else
+			{
+				// According to http://www.cpcwiki.eu/index.php/SP0256_Measured_Timings
+				// the SP0250 executes "NOPs" with a repeat count of 1 and unchanged
+				// pitch while waiting for input
+				m_repeat = 1;
+				m_pcount = 0;
+				m_rcount = 0;
+				m_playing = 1;
+			}
 		}
 	}
 }
