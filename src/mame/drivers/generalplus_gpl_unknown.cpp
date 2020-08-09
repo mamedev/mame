@@ -7,6 +7,20 @@
 // These use SPI ROMs and unSP2.0 instructions, so will be GeneralPlus branded parts, not SunPlus
 // possibly the framebuffer based video ones rather than the ones with tile layers
 
+/*
+
+for pcp8728 long jumps are done indirect via a call to RAM
+
+990c 20ec       r4 = 20ec
+d9dd            [1d] = r4
+990c 0007       r4 = 0007
+d9de            [1e] = r4
+fe80 28f7       goto 0028f7
+
+this suggests the ROM gets copied to RAM at 0x20000, as all offsets need to be adjusted by that (or the device can see SPI directly at 0x20000)
+
+*/
+
 #include "emu.h"
 
 #include "screen.h"
