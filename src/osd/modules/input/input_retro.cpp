@@ -169,7 +169,7 @@ const char *Buttons_Name[RETRO_MAX_BUTTONS]=
 	"R3",          //15
 };
 
-//    Default : A ->B1 | B ->B2 | X ->B3 | Y ->B4 | L ->B5 | R ->B6
+//    Default : B ->B1 | A ->B2 | Y ->B3 | X ->B4 | L ->B5 | R ->B6
 int Buttons_mapping[]={RETROPAD_A,RETROPAD_B,RETROPAD_X,RETROPAD_Y,RETROPAD_L,RETROPAD_R};
 
 void Input_Binding(running_machine &machine)
@@ -181,10 +181,10 @@ void Input_Binding(running_machine &machine)
    log_cb(RETRO_LOG_INFO, "YEAR: %s\n", machine.system().year);
    log_cb(RETRO_LOG_INFO, "MANUFACTURER: %s\n", machine.system().manufacturer);
 
-   Buttons_mapping[1]=RETROPAD_A;
    Buttons_mapping[0]=RETROPAD_B;
-   Buttons_mapping[3]=RETROPAD_X;
+   Buttons_mapping[1]=RETROPAD_A;
    Buttons_mapping[2]=RETROPAD_Y;
+   Buttons_mapping[3]=RETROPAD_X;
    Buttons_mapping[4]=RETROPAD_L;
    Buttons_mapping[5]=RETROPAD_R;
 
