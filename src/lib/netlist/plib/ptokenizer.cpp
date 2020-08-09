@@ -48,7 +48,7 @@ namespace plib {
 		if (m_px == m_cur_line.end())
 		{
 			//++m_source_location.back();
-			if (m_strm->readline(m_cur_line))
+			if (m_strm->readline_lf(m_cur_line))
 			{
 				m_px = m_cur_line.begin();
 				if (*m_px != '#')
@@ -56,7 +56,6 @@ namespace plib {
 			}
 			else
 				return 0;
-			return '\n';
 		}
 		pstring::value_type c = *(m_px++);
 		return c;
@@ -169,7 +168,7 @@ namespace plib {
 					if (ret.str() == "1")
 						benter = true;
 					if (ret.str() == "2")
-						bexit = false;
+						bexit = true;
 					// FIXME: process flags; actually only 1 (file enter) and 2 (after file exit)
 					ret = get_token_queue();
 				}
@@ -177,7 +176,7 @@ namespace plib {
 					m_source_location.pop_back();
 				if (!benter) // new location!
 					m_source_location.pop_back();
-				m_source_location.emplace_back(plib::source_location(file, lineno));
+				m_source_location.emplace_back(plib::source_location(file, lineno - 1));
 			}
 			else if (ret.is_type(token_type::SOURCELINE))
 			{
