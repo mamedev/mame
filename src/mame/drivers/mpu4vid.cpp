@@ -1175,6 +1175,35 @@ static INPUT_PORTS_START( v4vgpok )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( v4big40 )
+	PORT_INCLUDE( bwbvid )
+
+	PORT_MODIFY("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Swop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start / Deal / Draw")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_CUSTOM)  // Prize Shelf Opto
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_MODIFY("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Cancel/Collect")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Hi/Twist")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Lo/Stick")
+
+	PORT_MODIFY("DIL2")
+	PORT_DIPNAME( 0x80, 0x00, "Clear MPU Memory" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes  ) )
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( v4mdice )
 	PORT_INCLUDE( bwbvid )
@@ -1796,6 +1825,26 @@ static INPUT_PORTS_START( v4timebn )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( v4cybcas )
+	PORT_INCLUDE( bwbvid )
+
+	PORT_MODIFY("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("BLACK2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nehmen")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Halten A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Halten B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Halten C")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Ensatz")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start Super")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start/Risiko")
+INPUT_PORTS_END
+
 
 WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 {
@@ -2125,8 +2174,7 @@ void mpu4vid_state::vid_oki(machine_config &config)
 	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
 	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
 	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
-	//m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
-	//m_ptm_ic3ss->irq_callback().set(FUNC(mpu4_state::cpu1_ptm_irq));
+	m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 
 	PIA6821(config, m_pia_ic4ss, 0);
 	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
@@ -9033,7 +9081,7 @@ GAME(  1989, v4tetrs1,   v4tetrs,  bwbvid,     v4tetris,   mpu4vid_state, init_b
 // Blox is an later version of Payout Tetris, without Tetris license? (SJM = Stuart McArthur?)
 GAME(  1990, v4blox,     0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (MPU4 Video)",GAME_FLAGS_OK )
 GAME(  1990, v4bloxd,    v4blox,   bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
-// Prize Tetris / Bullion Blox have quite different attract presentaiton to the above
+// Prize Tetris / Bullion Blox have quite different attract presentation to the above
 GAME(  1994, v4pztet,    0,        bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (MPU4 Video)",GAME_FLAGS_OK )
 GAME(  1994, v4pzteta,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  1994, v4pztetb,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Showcase) (MPU4 Video)",GAME_FLAGS_OK ) // screen telling you to exchange tickets for prizes in the 'showcase' during attract
@@ -9251,18 +9299,18 @@ GAME(  1996, v4reno7,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_
 GAME(  1996, v4reno5,    v4reno,   bwbvid_oki,    v4reno,   mpu4vid_state, init_prizeinv,    ROT0, "BWB","Reno Reels (Release 5) (MPU4 Video)",GAME_FLAGS ) // no base ROM
 
 
-GAME(  1996, v4big40,    0,        bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40a,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40b,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40c,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 4) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40d,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40e,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40g,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40h,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40k,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40i,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40j,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 2) (MPU4 Video)",GAME_FLAGS )
-GAME(  1996, v4big40f,   v4big40,  bwbvid_oki_bt471,     bwbvid,   mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key + OCDM) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40,    0,        bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40a,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40b,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40c,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Standard) (set 4) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40d,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40e,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (Arcade Data) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40g,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40h,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Standard) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40k,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40i,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40j,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  1996, v4big40f,   v4big40,  bwbvid_oki_bt471,     v4big40,  mpu4vid_state, init_bwbhack,     ROT0, "BWB","Big 40 Poker (BWB) (S_Site Data + %-Key + OCDM) (MPU4 Video)",GAME_FLAGS )
 
 
 GAME(  1997, v4dbltak,   0,        bwbvid_oki_bt471, v4dbltak,     mpu4vid_state, init_bwbhack,     ROT0, u8"BWB","Double Take (BWB) (Release 4, Arcade Standard, 20p/25p Stake Key, £5/£10/£15 Prize Key) (MPU4 Video)",GAME_FLAGS )
@@ -9430,23 +9478,23 @@ GAME(  199?, v4rencasi,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 /* Uncertain BIOS */
 // has a Barcrest style Characteriser check, not a BWB one?
-GAME(  199?, v4frfact,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacta,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactb,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactc,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactd,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacte,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactf,  v4frfact, crmaze,     crmaze,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfact,   v4bios,   crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacta,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactb,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactc,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactd,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacte,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactf,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BWB video in the BIOS rom tho */
-/* These use the other palette chip (BT471). and have extra RAM.  Cyber Casino also needs a Jackpot link? */
+/* These seem to use the other palette chip (BT471). and use the German BWB bank setup, so may need more work */
 
-GAME(  199?, v4cybcas,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_cybcas,     ROT0, "BWB (Nova license)","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
 
-GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4picdilz,  v4picdil, bwbvid_oki_bt471_german,    bwbvid,     mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4picdilz,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 3) (MPU4 Video)",GAME_FLAGS ) 
 
