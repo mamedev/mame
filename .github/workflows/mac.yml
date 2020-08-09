@@ -46,7 +46,7 @@ jobs:
     - name: Upload to buildbot
       uses: trendyminds/github-actions-rsync@master
       with:
-        RSYNC_OPTIONS: -avzr --delete -p ${{ secrets.PORT }}
+        RSYNC_OPTIONS: -avzr --delete -e 'ssh -p ${{secrets.PORT}}'
         RSYNC_TARGET: ${{ secrets.MACOS_X86_64_PATH }}
         RSYNC_SOURCE: /mame_libretro.zip
       env:
