@@ -29106,6 +29106,7 @@ v4gldrshr
 v4gldrshs
 v4gldrsht
 v4gldrshu
+v4gldrsh3
 v4mate                          // The Mating Game
 v4mated                         //
 v4mazbel                        // Mazooma Belle
@@ -29136,11 +29137,12 @@ v4mdiceu
 v4mdicev
 v4mdicew
 v4mdice5
+v4mdiceger                         // Miami Dice
+v4mdice6
 v4megbuk                        // Megabucks Poker
 v4megbuka
 v4megbukb
 v4megbukc
-v4mdiceger                         // Miami Dice
 v4missis                        // Mississippi Lady
 v4monte                         // Monte Carlo Or Bust
 v4montea
@@ -29202,6 +29204,7 @@ v4monte9m
 v4monte9n
 v4monte9o
 v4montezz
+v4monteger
 v4opt3                          // Option 3
 v4opt3d                         //
 v4ovrmn3                        // Over Moon Pt3
@@ -29209,7 +29212,9 @@ v4ovrmn3a
 v4ovrmn3b
 v4ovrmn3c
 v4ovrmn3d
-v4picdil                        // Piccadilly Nights
+v4picdil                        // Piccadilly Night
+v4picdila
+v4picdilz
 v4psi                           // Prize Space Invaders
 v4psibc                          //
 v4psi14                          //
