@@ -11,6 +11,7 @@
 
 #include "cpu/m6800/m6800.h"
 #include "audio/s11c_bg.h"
+#include "audio/pinsnd88.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
 #include "machine/input_merger.h"
@@ -52,6 +53,7 @@ public:
 		, m_pia30(*this, "pia30")
 		, m_pia34(*this, "pia34")
 		, m_bg(*this, "bg")
+		, m_ps88(*this, "ps88")
 		, m_digits(*this, "digit%u", 0U)
 		, m_swarray(*this, "SW.%u", 0U)
 		{ }
@@ -116,6 +118,7 @@ protected:
 	required_device<pia6821_device> m_pia30;
 	required_device<pia6821_device> m_pia34;
 	optional_device<s11c_bg_device> m_bg;
+	optional_device<pinsnd88_device> m_ps88;
 	output_finder<63> m_digits;
 	required_ioport_array<8> m_swarray;
 

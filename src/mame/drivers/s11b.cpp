@@ -19,7 +19,6 @@
       the ram at 0x780-0x7ff, so it is possible that the protection being
       active prevents the real machine from crashing)
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
-    - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567) which has to be emulated
     - Taxi and Police Force both have issues with the display showing garbage overlaid by the alphanumerics.
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
@@ -32,12 +31,13 @@
     - Cyclone: Nothing, game does not have switches to check for balls in the trough.
     - Earthshaker: "D" "F" "W"
     - Elvira and the Party Monsters: "D" "F" "U"
+    - Jokerz!: "D" "F" "H"
     - Mousin' Around: "D" "F" "H"
     - Police Force: "D" "F"
     - Space Station: "D" "F" "End"
     - Swords of Fury: "D" "F" "H"
     - Taxi: "D" "F"
-    - Transporter the Rescue: "D" "F" "H"
+    - Transporter: the Rescue: "D" "F" "H"
     - Whirlwind: "D" "F" "H"
 */
 
@@ -250,7 +250,7 @@ void s11b_state::init_s11b_invert()
 	m_invert = true;
 }
 
-void s11b_state::s11b(machine_config &config)
+void s11b_state::s11b_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
@@ -310,7 +310,7 @@ void s11b_state::s11b(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
-	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
+
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
@@ -340,13 +340,27 @@ void s11b_state::s11b(machine_config &config)
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
 	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
+}
 
+void s11b_state::s11b(machine_config &config)
+{
+	s11b_base(config);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	/* Add the background music card */
 	SPEAKER(config, "bgspk").front_center();
 	S11_BG(config, m_bg);
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
+}
+
+void s11b_state::s11b_jokerz(machine_config &config)
+{
+	s11b_base(config);
+	m_pia34->ca2_handler().set(m_ps88, FUNC(pinsnd88_device::resetq_w));
+	/* Add the pin sound 88 music card */
+	PINSND88(config, m_ps88);
+	m_ps88->syncq_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 }
 
 /*-----------------------
@@ -1081,8 +1095,8 @@ ROM_START(jokrz_l6)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("jokeru21.l1", 0x18000, 0x8000, CRC(9e2be4f6) SHA1(6e26b55935d0c8138176b54a11c1a9ab58366628))
 	ROM_LOAD("jokeru22.l1", 0x10000, 0x8000, CRC(2f67160c) SHA1(f1e179fde41f9bf8226069c24b0bd5152a13e518))
-	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
-	ROM_LOAD("jokeru5.l2", 0x00000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
+	ROM_REGION(0x40000, "ps88:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("jokeru5.l2", 0x30000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
 	ROM_RELOAD(0x20000,0x10000)
 ROM_END
 
@@ -1093,9 +1107,9 @@ ROM_START(jokrz_l3)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("jokeru21.l1", 0x18000, 0x8000, CRC(9e2be4f6) SHA1(6e26b55935d0c8138176b54a11c1a9ab58366628))
 	ROM_LOAD("jokeru22.l1", 0x10000, 0x8000, CRC(2f67160c) SHA1(f1e179fde41f9bf8226069c24b0bd5152a13e518))
-	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
-	ROM_LOAD("jokeru5.l2", 0x00000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
-	ROM_RELOAD(0x20000, 0x10000)
+	ROM_REGION(0x40000, "ps88:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("jokeru5.l2", 0x30000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
+	ROM_RELOAD(0x20000,0x10000)
 ROM_END
 
 ROM_START(jokrz_g4)
@@ -1105,9 +1119,9 @@ ROM_START(jokrz_g4)
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("jokeru21.l1", 0x18000, 0x8000, CRC(9e2be4f6) SHA1(6e26b55935d0c8138176b54a11c1a9ab58366628))
 	ROM_LOAD("jokeru22.l1", 0x10000, 0x8000, CRC(2f67160c) SHA1(f1e179fde41f9bf8226069c24b0bd5152a13e518))
-	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
-	ROM_LOAD("jokeru5.l2", 0x00000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
-	ROM_RELOAD(0x20000, 0x10000)
+	ROM_REGION(0x40000, "ps88:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("jokeru5.l2", 0x30000, 0x10000, CRC(e9dc0095) SHA1(23a99555e50461ccc8e67de01796642c080294c2))
+	ROM_RELOAD(0x20000,0x10000)
 ROM_END
 
 /*-----------------------
@@ -1555,9 +1569,9 @@ GAME(1989,  eatpm_4g,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11b_inve
 GAME(1989,  eatpm_4u,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Elvira and the Party Monsters (LU-4)",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  eatpm_f1,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Elvira and the Party Monsters (LF-1) French",  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  eatpm_p7,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Elvira and the Party Monsters (PA-7)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  jokrz_l6,       0,          s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (L-6)",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  jokrz_l3,       jokrz_l6,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (L-3)",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  jokrz_g4,       jokrz_l6,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (G-4)",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  jokrz_l6,       0,     s11b_jokerz, s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (L-6)",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  jokrz_l3,    jokrz_l6, s11b_jokerz, s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (L-3)",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  jokrz_g4,    jokrz_l6, s11b_jokerz, s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Jokerz! (G-4)",                                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mousn_l4,       0,          s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Mousin' Around! (LA-4)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mousn_l1,       mousn_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Mousin' Around! (LA-1)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  mousn_lu,       mousn_l4,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Bally",    "Mousin' Around! (LU-1)",                       MACHINE_IS_SKELETON_MECHANICAL)

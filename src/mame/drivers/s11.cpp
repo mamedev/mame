@@ -344,12 +344,16 @@ void s11_state::pia34_pb_w(uint8_t data)
 {
 	if(m_bg)
 		m_bg->data_w(data);
+	else if (m_ps88)
+		m_ps88->data_w(data);
 }
 
 WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
 {
 	if(m_bg)
 		m_bg->ctrl_w(state); // MCB2 through CPU interface
+	else if (m_ps88)
+		m_ps88->strobe_w(state);
 }
 
 void s11_state::bank_w(uint8_t data)

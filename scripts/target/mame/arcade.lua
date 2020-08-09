@@ -4629,6 +4629,8 @@ files {
 	MAME_DIR .. "src/mame/includes/s11b.h",
 	MAME_DIR .. "src/mame/drivers/s11c.cpp",
 	MAME_DIR .. "src/mame/includes/s11c.h",
+	MAME_DIR .. "src/mame/audio/pinsnd88.cpp",
+	MAME_DIR .. "src/mame/audio/pinsnd88.h",
 	MAME_DIR .. "src/mame/audio/s11c_bg.cpp",
 	MAME_DIR .. "src/mame/audio/s11c_bg.h",
 	MAME_DIR .. "src/mame/drivers/s3.cpp",
