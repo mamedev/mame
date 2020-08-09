@@ -189,13 +189,17 @@ void Input_Binding(running_machine &machine)
    Buttons_mapping[5]=RETROPAD_R;
 
    if (
+         !core_stricmp(machine.system().name, "rabbit")    ||
+         !core_stricmp(machine.system().parent, "rabbit")  ||
          !core_stricmp(machine.system().name, "tekken")    ||
          !core_stricmp(machine.system().parent, "tekken")  ||
          !core_stricmp(machine.system().name, "tekken2")   ||
-         !core_stricmp(machine.system().parent, "tekken2")
+         !core_stricmp(machine.system().parent, "tekken2")   ||
+         !core_stricmp(machine.system().name, "vf")   ||
+         !core_stricmp(machine.system().parent, "vf")
       )
    {
-      /* Tekken 1/2 */
+      /* Tekken 1/2/Virtua Fighter/Rabbit*/
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
@@ -206,13 +210,19 @@ void Input_Binding(running_machine &machine)
 
    }
    else if (
+              !core_stricmp(machine.system().name, "jojo")    ||
+              !core_stricmp(machine.system().parent, "jojo")  ||
+              !core_stricmp(machine.system().name, "jojoba")    ||
+              !core_stricmp(machine.system().parent, "jojoba")  ||
               !core_stricmp(machine.system().name, "souledge")    ||
               !core_stricmp(machine.system().parent, "souledge")  ||
               !core_stricmp(machine.system().name, "soulclbr")    ||
-              !core_stricmp(machine.system().parent, "soulclbr")
+              !core_stricmp(machine.system().parent, "soulclbr")    ||
+              !core_stricmp(machine.system().name, "svg")    ||
+              !core_stricmp(machine.system().parent, "svg")
            )
    {
-      /* Soul Edge/Soul Calibur */
+      /* Soul Edge/Soul Calibur/JoJo/SVG */
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
@@ -231,21 +241,6 @@ void Input_Binding(running_machine &machine)
       Buttons_mapping[0]=RETROPAD_B;
       Buttons_mapping[1]=RETROPAD_Y;
       Buttons_mapping[2]=RETROPAD_X;
-      Buttons_mapping[3]=RETROPAD_A;
-      Buttons_mapping[4]=RETROPAD_L;
-      Buttons_mapping[5]=RETROPAD_R;
-
-   }
-   else if (
-              !core_stricmp(machine.system().name, "vf") ||
-              !core_stricmp(machine.system().parent, "vf")
-           )
-   {
-      /* Virtua Fighter */
-
-      Buttons_mapping[0]=RETROPAD_Y;
-      Buttons_mapping[1]=RETROPAD_X;
-      Buttons_mapping[2]=RETROPAD_B;
       Buttons_mapping[3]=RETROPAD_A;
       Buttons_mapping[4]=RETROPAD_L;
       Buttons_mapping[5]=RETROPAD_R;
@@ -282,8 +277,8 @@ void Input_Binding(running_machine &machine)
 
    }
    else if (
-              (!core_stricmp(machine.system().name, "dstlk")) ||
-              (!core_stricmp(machine.system().parent, "dstlk")) ||
+              !core_stricmp(machine.system().name, "dstlk") ||
+              !core_stricmp(machine.system().parent, "dstlk") ||
               !core_stricmp(machine.system().name, "hsf2") ||
               !core_stricmp(machine.system().parent, "hsf2") ||
               !core_stricmp(machine.system().name, "msh") ||
@@ -294,6 +289,8 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "mvsc") ||
               !core_stricmp(machine.system().name, "nwarr") ||
               !core_stricmp(machine.system().parent, "nwarr") ||
+              !core_stricmp(machine.system().name, "redearth") ||
+              !core_stricmp(machine.system().parent, "redearth") ||
               !core_stricmp(machine.system().name, "rvschool") ||
               !core_stricmp(machine.system().parent, "rvschool") ||
               !core_stricmp(machine.system().name, "sf2") ||
@@ -324,12 +321,14 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "sfiii3") ||
               !core_stricmp(machine.system().name, "sftm") ||
               !core_stricmp(machine.system().parent, "sftm") ||
+              !core_stricmp(machine.system().name, "sfz2al") ||
+              !core_stricmp(machine.system().parent, "sfz2al") ||
               !core_stricmp(machine.system().name, "ssf2") ||
               !core_stricmp(machine.system().parent, "ssf2") ||
               !core_stricmp(machine.system().name, "ssf2t") ||
               !core_stricmp(machine.system().parent, "ssf2t") ||
-              !core_stricmp(machine.system().name, "starglad") ||
-              !core_stricmp(machine.system().parent, "starglad") ||
+              !core_stricmp(machine.system().name, "vhunt2") ||
+              !core_stricmp(machine.system().parent, "vhunt2") ||
               !core_stricmp(machine.system().name, "vsav") ||
               !core_stricmp(machine.system().parent, "vsav") ||
               !core_stricmp(machine.system().name, "vsav2") ||
@@ -337,10 +336,27 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().name, "xmcota") ||
               !core_stricmp(machine.system().parent, "xmcota") ||
               !core_stricmp(machine.system().name, "xmvsf") ||
-              !core_stricmp(machine.system().parent, "xmvsf")
+              !core_stricmp(machine.system().parent, "xmvsf") ||
+              
+              !core_stricmp(machine.system().name, "astrass") ||
+              !core_stricmp(machine.system().parent, "astrass") ||
+              !core_stricmp(machine.system().name, "brival") ||
+              !core_stricmp(machine.system().parent, "brival") ||
+              !core_stricmp(machine.system().name, "btlkroad") ||
+              !core_stricmp(machine.system().parent, "btlkroad") ||
+              !core_stricmp(machine.system().name, "dragoona") ||
+              !core_stricmp(machine.system().parent, "dragoona") ||
+              !core_stricmp(machine.system().name, "fghthist") ||
+              !core_stricmp(machine.system().parent, "fghthist") ||
+              !core_stricmp(machine.system().name, "fgtlayer") ||
+              !core_stricmp(machine.system().parent, "fgtlayer") ||
+              !core_stricmp(machine.system().name, "groovef") ||
+              !core_stricmp(machine.system().parent, "groovef") ||
+              !core_stricmp(machine.system().name, "kaiserkn") ||
+              !core_stricmp(machine.system().parent, "kaiserkn")
            )
    {
-      /* Capcom CPS-1 and CPS-2 6-button fighting games */
+      /* 6-button fighting games (Mainly Capcom (CPS-1, CPS-2, CPS-3, ZN-1, ZN-2) + Others)*/
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
