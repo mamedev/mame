@@ -2,6 +2,9 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+The general method of loading a tape is to type I, press Return, select Play. When it's finished, type G and press Return to run it.
+
 -->
 <softwarelist name="mikro80" description="Mikro-80 cassettes">
 
@@ -9,6 +12,7 @@ license:CC0
 		<description>Mikro-80 BASIC</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="I, Play, G" />
 		<part name="cass1" interface="mikro80_cass">
 			<dataarea name="cass" size="6665">
 				<rom name="mikro-80 basic (1984)(-).rk8" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d"/>
@@ -18,8 +22,10 @@ license:CC0
 
 	<software name="basica" cloneof="basic">
 		<description>Mikro-80 BASIC (Alt)</description>
+		<!-- This loads ok, and signs on as RADIO86-RK basic, then immediately exits back to the monitor -->
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="I, Play, G" />
 		<part name="cass1" interface="mikro80_cass">
 			<dataarea name="cass" size="6665">
 				<rom name="mikro-80 basic (1984)(-)[a].rk8" size="6665" crc="751a4063" sha1="67fb4fbaefbcbe774413c79e4fecc4626f5a3d76"/>
@@ -29,9 +35,13 @@ license:CC0
 
 	<software name="proverki">
 		<description>Programma Proverki</description>
+		<!-- This does a checksum of a section of RAM, and compares to internal values. It should only be used after loading "basic" above -->
+		<!-- If successful, you get a message in Russian, "END OF WORK. TO RETURN TO THE MONITOR PRESS ANY KEY" -->
+		<!-- In case a failure, you'll get a list of bad blocks -->
+		<!-- Testing method: Start mikro80 in the debugger. Load basic. Load proverki. In the debugger, pc=2800, g -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="I, Play, G. See notes in mikro80.xml" />
 		<part name="cass1" interface="mikro80_cass">
 			<dataarea name="cass" size="217">
 				<rom name="programma proverki (19xx)(-).rk8" size="217" crc="d4718cad" sha1="03f466d6ebd7b6c1ffea766461bb8cb13466f085"/>

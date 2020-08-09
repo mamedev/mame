@@ -18,11 +18,6 @@
 class mikro80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RESET
-	};
-
 	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_aram(*this, "attrram")
