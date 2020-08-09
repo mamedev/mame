@@ -2,8 +2,9 @@
 // copyright-holders: Jonathan Gevaryahu
 /*
  * pinsnd88.h - D-12338-567 Williams Pin Sound '88 board (M68B09E + YM2151 + DAC, two channels)
+ * PCB solder side trace P/N: 5766-12342-00 REV -
  *
- * Used only by the Williams System 11B game "Jokerz"
+ * Used only by the Williams System 11B pinball game "Jokerz!"
  *
  * The interface connector for this board is a 20 pin header J1 with the following pinout:
  *
@@ -13,17 +14,18 @@
  *        PB2 |  5   6 | PB3
  *        PB4 |  7   8 | PB5
  *        PB6 |  9  10 | PB7
- *         NC | 11  12 | NC? [/SYNC_PULSE]
+ *         NC | 11  12 | NC [/SYNC_PULSE] (normal system 11 bg sound board uses this pin)
  *    /STROBE | 13  14 | NC [/RESET_S11]
- *         NC | 15  16 | NC [/SYNC_PULSE ALT]
+ *         NC | 15  16 | /SYNC_PULSE_ALT
  *         NC | 17  18 | /RESET
  *         NC | 19  20 | NC
  *            +--------+
  *
  * Technically:
- * CB1 Pin 13 is 'strobe in' and is asserted low to write to the sound board
- * CB2 Pin 12 is 'strobe out' and is asserted low to indicate the sound board
- * has written and needs the mainboard to read its bus
+ * Pin 13 is 'strobe in' and is asserted low to write to the sound board
+ * Pin 12 is 'sync out' and is asserted low to indicate the sound board
+ * has done some action. Unlike the D-11581 sound board, this board cannot
+ * write response data back to the host device.
  *
  * The actual full pinout of the connector, from the System 11 end is:
  *        +--------+
@@ -55,18 +57,29 @@
  *
  * D-12338 Jumpers:
  * W1 : enables the 8MHz clock to the divider to the 68B09E. present.
- * W2 : enables /SYNC PULSE on J1 P16. absent.
- * W3 : enables /SYNC PULSE on J1 P12 (as the usual S11 BG sound board does). absent?
+ * W2 : enables /SYNC PULSE on J1 P16. present, despite being missing on the schematics.
+ * W3 : enables /SYNC PULSE on J1 P12 (as the usual S11 BG sound board does). absent.
  * W4 : enables /RESET from J1 P18 (under cpu control, as the usual S11 BG sound board does). present.
  * W5 : enables /RESET from J1 P14 (this makes the board reset on S11 power up reset only). absent.
  * W6 : enables the 3.579545MHz clock to the YM2151. present.
- * W7 : ties J4 pin 1 and 2 to GND. present.
+ * W7 : ties J4 pin 1 and 2 to GND. absent, despite being present on the schematics.
+ * W8 : ties J4 pin 5-through-inductor and the final audio power amp + pins to +12v. absent, as power is presuambly delivered in through J4 pin 5 instead.
+
+ * see https://a.allegroimg.com/s1024/0c2cfa/0433164f4bfa94aa99cec60874f5 re: W2 being connected on the real board. (also see undumped REV1 rom)
+ * see https://a.allegroimg.com/s1024/0c3dce/74cdfa004e1dbac943986a94999b re: W8 being absent
+ * see https://a.allegroimg.com/s1024/0c2979/0ffe7737466bb0ee363d4e127e33 re: W8 being absent
+
+ * NOTE: The Jokerz! pinball cabinet is known to have some significant issues with hum in the audio,
+ * Williams released a service bulletin which involved modifying the power pins on the CVSD chip
+ * on the System 11B Mainboard, but even that didn't completely fix it. The exact cause of this
+ * issue is not entirely clear at this point.
+
 
  * TODO: the 'reset twice on reset' thing seems necessary or else tempo is horrendously screwed up. why?
  * TODO: the 'treat reading the analog control port as if it is connected to the input latch and clear the input semaphore' seems necessary for sound to work. why? It doesn't match the schematics...
 
 
- * NOTE: The Pin Sound '88 board used by jokerz can handle up to two 27c010
+ * NOTE: The Pin Sound '88 board used by Jokerz! can handle up to two 27c010
  * EPROMs, but it only ever shipped with a single 27512 EPROM.
  * Because of the way that the 27512 sits in the lower 28 pins of the 32 pin socket,
  * this makes the mapping a little odd.
@@ -98,7 +111,7 @@ DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '8
 
 pinsnd88_device::pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,PINSND88,tag,owner,clock)
-	, device_mixer_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this, 2) // 2 channels
 	, m_cpu(*this, "cpu")
 	, m_dac(*this, "dac")
 	, m_ym2151(*this, "ym2151")
@@ -207,22 +220,20 @@ void pinsnd88_device::device_add_mconfig(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(50));
 
 	// TODO: analog filters and "volume" controls for the two channels
-	SPEAKER(config, "cabinet").front_floor(); // the cabinet speaker is aimed down underneath the pinball table itself
-	SPEAKER(config, "backbox").front_center(); // the backbox speakers are roughly level with the user, but farther in front of them than the cabinet
 	AD7224(config, m_dac, 0);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-	m_dac->add_route(ALL_OUTPUTS, "cabinet", 0.33/2); // 470K
-	m_dac->add_route(ALL_OUTPUTS, "backbox", 0.47/2); // 330K
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, AUTO_ALLOC_INPUT, 0); // 470K
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
 
 	GENERIC_LATCH_8(config, m_inputlatch);
 	m_inputlatch->data_pending_callback().set_inputline(m_cpu, M6809_IRQ_LINE);
 
 	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
 	m_ym2151->irq_handler().set_inputline(m_cpu, M6809_FIRQ_LINE); // IRQ is not true state, but neither is the M6809_FIRQ_LINE so we're fine.
-	m_ym2151->add_route(0, "cabinet", 0.47/2); // 330K
-	m_ym2151->add_route(1, "backbox", 0.47/2); // 330K
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.59/2.0, AUTO_ALLOC_INPUT, 0); // 330K
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
 }
 
 void pinsnd88_device::device_start()

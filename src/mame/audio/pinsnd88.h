@@ -12,7 +12,6 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
-#include "speaker.h"
 #include "sound/ym2151.h"
 #include "sound/dac.h"
 
@@ -38,7 +37,7 @@ public:
 	void pinsnd88_map(address_map &map);
 
 protected:
-	// constructor with overridable type for subclass
+	// constructor with overridable type for subclass, in case we want to put NARC's sound board in here eventually
 	//pinsnd88_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// overrides
