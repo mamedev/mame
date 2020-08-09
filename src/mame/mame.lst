@@ -3302,11 +3302,6 @@ mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
 mechattu1                       // A8002 'MA' (c) 1989
 
-@source:bbl380.cpp
-bbl380
-ragc153
-dphh8630
-
 @source:bcs3.cpp
 bcs3                            //
 bcs3a                           //
@@ -14776,6 +14771,11 @@ superbwl                        // (c) 1982 Greyhound Electronics
 suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
+
+@source:generalplus_gpl_unknown.cpp
+pcp8718
+pcp8728
+unkunsp
 
 @source:generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -40770,11 +40770,13 @@ uts20                           //
 @source:unixpc.cpp
 3b1                             // 3B1 "Unix PC"
 
+@source:unk6502_st2xxx.cpp
+bbl380
+ragc153
+dphh8630
+
 @source:unkhorse.cpp
 unkhorse                        //
-
-@source:unkmandd.cpp
-unkmandd
 
 @source:unkpoker.cpp
 unkpoker                         //

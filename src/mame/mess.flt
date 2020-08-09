@@ -107,7 +107,6 @@ basic52.cpp
 basssta.cpp
 bbc.cpp
 bbcbc.cpp
-bbl380.cpp
 bcs3.cpp
 bebox.cpp
 bert.cpp
@@ -330,6 +329,7 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+generalplus_gpl_unknown.cpp
 generalplus_gpl16250.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
@@ -1036,7 +1036,7 @@ unior.cpp
 unistar.cpp
 univac.cpp
 unixpc.cpp
-unkmandd.cpp
+unk6502_st2xxx.cpp
 ut88.cpp
 uzebox.cpp
 v100.cpp

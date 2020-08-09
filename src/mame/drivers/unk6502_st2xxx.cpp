@@ -1,8 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// unknown 6502 based handhelds, possibly ST2205U architecture
+
 // the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
 // https://www.youtube.com/watch?v=NacY2WHd-CY
+
+// these games were ported to unSP hardware at some point, see generaplus_gpl_unknown.cpp
 
 // BIOS calls are made very frequently to the undumped firmware.
 // The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from Flash and executing it from RAM.
@@ -142,4 +146,5 @@ void bbl380_state::init_ragc153()
 
 CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
 CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IS_SKELETON )
-CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "<unknown>", "Digital Pocket Hand Held System Model: 8630 - 230-in-1", MACHINE_IS_SKELETON )
+CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "PCP", "PCP 8630 - 230-in-1 - Digital Pocket Hand Held System", MACHINE_IS_SKELETON ) // PCP isn't mentioned on packaging
+
