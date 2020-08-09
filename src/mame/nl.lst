@@ -49,6 +49,15 @@ warrior                         // (c) 1979 Vectorbeam
 wotw                            // (c) 1981
 wotwc                           // (c) 1981
 
+@source:carpolo.cpp
+carpolo                         // (c) 1977
+
+@source:starfire.cpp
+fireone                         // (c) 1979 Exidy
+starfir2                        // (c) 1979 Exidy
+starfire                        // Exidy [1979?]
+starfirea                       // Exidy [1979?]
+
 @source:galaxian.cpp
 600                             // GX353 (c) 1981 Konami
 amidar                          // GX337 (c) 1982 Konami

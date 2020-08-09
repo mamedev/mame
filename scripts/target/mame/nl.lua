@@ -80,7 +80,10 @@ MACHINES["AY31015"] = true
 MACHINES["KB3600"] = true
 MACHINES["COM8116"] = true
 
+MACHINES["TTL7474"] = true
 MACHINES["TTL74145"] = true
+MACHINES["TTL74148"] = true
+MACHINES["TTL74153"] = true
 MACHINES["TTL74259"] = true
 MACHINES["6522VIA"] = true
 
@@ -187,12 +190,13 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
-  MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
-  MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
-  MAME_DIR .. "src/mame/includes/mw8080bw.h",
-  MAME_DIR .. "src/mame/audio/mw8080bw.h",
-  MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
-  MAME_DIR .. "src/mame/video/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/includes/mw8080bw.h",
+	MAME_DIR .. "src/mame/audio/mw8080bw.h",
+	MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/video/mw8080bw.cpp",
+
 	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
 	MAME_DIR .. "src/mame/audio/nl_280zzzap.cpp",
@@ -291,6 +295,19 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_tp1983.h",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.h",
+	
+	MAME_DIR .. "src/mame/audio/nl_carpolo.h",
+	MAME_DIR .. "src/mame/audio/nl_carpolo.cpp",
+	MAME_DIR .. "src/mame/drivers/carpolo.cpp",
+	MAME_DIR .. "src/mame/includes/carpolo.h",
+	MAME_DIR .. "src/mame/machine/carpolo.cpp",
+	MAME_DIR .. "src/mame/video/carpolo.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_fireone.h",
+	MAME_DIR .. "src/mame/audio/nl_fireone.cpp",
+	MAME_DIR .. "src/mame/drivers/starfire.cpp",
+	MAME_DIR .. "src/mame/includes/starfire.h",
+	MAME_DIR .. "src/mame/video/starfire.cpp",
 
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",
