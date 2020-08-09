@@ -8964,6 +8964,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitd2us" cloneof="aitd2">
+		<description>Alone in the Dark 2 (USA)</description>
+		<year>1994</year>
+		<publisher>I·Motion</publisher>
+		<info name="developer" value="Infogrames" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="3b785f3b" sha1="e1a3743725394545fcc06c3e8291968461782c32"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="b9202a73" sha1="661a943bc7e1d4609f9ce932f4128a149d0ce105"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="cc584179" sha1="e600d6479f9bedfc895527b14f2341ba2ab1008c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="4f33d82f" sha1="321c23775b437e94cb8fe836bb25572a630b0665"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="ef75d09f" sha1="9d82237451ebdfe70359be84a93c3a2856e3870a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="f3e11e88" sha1="b6f7b89ea1b9babf941056a23f7be2c9d3c83cf0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="bef5bb00" sha1="05042ab1d9a3197069381095549781a3908c45de"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="2b82a8f4" sha1="2f1343a5d7636e10858cdc8623fb0d46bde2706c"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 (USA) [I-Motion] [1994] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="45d8eaa3" sha1="029691f33419c1a5c690ebf98ce813761e39831c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -11866,11 +11918,11 @@ license:CC0
 	</software>
 
 	<software name="lslvga">
-		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (VGA release)</description>
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (3.5", VGA release, v2.1)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
-		<info name="version" value="2.1" />
+		<info name="version" value="2.1, July 4, 1991" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [3.5HD] [Disk 1 of 3] (Startup Disk).img" size="1474560" crc="c8caf78b" sha1="88eb7c5442fba643acc15daccebda62a6b5d6aa5"/>
@@ -11888,12 +11940,58 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lslega" cloneof="lslvga">
-		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (EGA release)</description>
+	<software name="lslvgaa" cloneof="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (3.5", VGA release, v2.0)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
-		<info name="version" value="2.0" />
+		<info name="version" value="2.0, June 26, 1991" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) (v2.0) [Sierra] [1991] [3.5HD] [Disk 1 of 3] (Startup Disk).img" size="1474560" crc="41a3b667" sha1="1ace473185189cd1aca13702975d0fa006cc3c80"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) (v2.0) [Sierra] [1991] [3.5HD] [Disk 2 of 3] (Disk 1).img" size="1474560" crc="bd041272" sha1="05d0764b2311f8f0a72d16aecc03415d79ebf430"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 1 (VGA release) (v2.0) [Sierra] [1991] [3.5HD] [Disk 3 of 3] (Disk 2).img" size="1474560" crc="7bcfd73f" sha1="798c2b094f240ff3c52564c1a52fb2b33a9c2dbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lslvga525" cloneof="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (5.25", VGA release, v2.1)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.1, July 4, 1991" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [5.25HD] [Disk 1 of 3] (Startup Disk).img" size="1228800" crc="d2c8ff1d" sha1="595a07c61e5156a1e89349b6671bbc83395da3fe"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [5.25HD] [Disk 2 of 3] (Disk 1).img" size="1228800" crc="823fe8c1" sha1="b513f7a0dee3a726569342c8ee785a8434a4565f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Leisure Suit Larry 1 (VGA release) [Sierra] [1991] [5.25HD] [Disk 3 of 3] (Disk 2).img" size="1228800" crc="f852defb" sha1="cc2999277aaad66e01de94db3e314b9d7dfee0f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lslega" cloneof="lslvga">
+		<description>Leisure Suit Larry 1: In the Land of the Lounge Lizards (EGA release, v2.0)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="2.0, July 4, 1991" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Leisure Suit Larry 1 (EGA release) [Sierra] [1991] [3.5DD] [Disk 1 of 4] (Startup Disk).img" size="737280" crc="58f85d3d" sha1="e893f0463faa25daaf6c3d6904ff8165254137c2"/>
