@@ -44,14 +44,16 @@ jobs:
         name: mame_libretro.zip
         path: .
     - name: Upload to buildbot
-      uses: trendyminds/github-actions-rsync@master
-      with:
-        RSYNC_OPTIONS: -avzr --delete -e 'ssh -p ${{secrets.PORT}}'
-        RSYNC_TARGET: ${{ secrets.MACOS_X86_64_PATH }}
-        RSYNC_SOURCE: /mame_libretro.zip
+      id: deploy
+      uses: Pendect/action-rsyncer@v1.1.0
       env:
-        SSH_PRIVATE_KEY: ${{secrets.KEY}}
-        SSH_USERNAME: ${{secrets.USERNAME}}
-        SSH_HOSTNAME: ${{secrets.HOST}}
+        DEPLOY_KEY: ${{ secrets.KEY }}
+      with:
+        flags: '-avzr --delete'
+        options: ''
+        ssh_options: '-p ${{ secrets.PORT }}'
+        src: /mame_libretro.zip
+        dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.MACOS_X86_64_PATH }}'
+
 
 
