@@ -202,7 +202,7 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 #if (USE_CURRENT_SOURCE)
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.I").set_mult_offset(5e-8 / 16384.0, 0);
 #else
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.IN").set_mult_offset(5.0 / 32767.0, 0);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.IN").set_mult_offset(1.0 / 32767.0, 0);
 #endif
 	NETLIST_LOGIC_INPUT(config, m_control_d3, "I_CONTROL_D3.IN", 0);
 

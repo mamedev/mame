@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define USE_CURRENT_SOURCE (1)
+#define USE_CURRENT_SOURCE (0)
 
 NETLIST_EXTERNAL(segaspeech)
 
