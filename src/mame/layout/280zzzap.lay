@@ -91,6 +91,34 @@ license:CC0
 		</bezel>
 	</view>
 
+	<view name="Widescreen Color Overlay + Shifter-R">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<overlay name="overlay" element="overlay">
+			<bounds x="0" y="0" width="640" height="480" />
+		</overlay>
+
+		<bezel element="shifter" inputtag="IN0" inputmask="0x10">
+			<bounds x="648" y="414" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
+
+	<view name="Widescreen Color Overlay + Shifter-L">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<overlay name="overlay" element="overlay">
+			<bounds x="0" y="0" width="640" height="480" />
+		</overlay>
+
+		<bezel element="shifter" inputtag="IN0" inputmask="0x10">
+			<bounds x="-40" y="414" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
+
 	<view name="Color Overlay">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />

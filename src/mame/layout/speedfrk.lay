@@ -108,4 +108,22 @@ license:CC0
 			<color alpha="0.6" />
 		</element>
 	</view>
+	<view name="Widescreen Shifter-R">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<element ref="shifter" inputtag="GEAR" inputmask="0x0f" inputraw="1">
+			<bounds x="648" y="414" width="64" height="64" />
+			<color alpha="0.65" />
+		</element>
+	</view>
+	<view name="Widescreen Shifter-L">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<element ref="shifter" inputtag="GEAR" inputmask="0x0f" inputraw="1">
+			<bounds x="-72" y="414" width="64" height="64" />
+			<color alpha="0.65" />
+		</element>
+	</view>
 </mamelayout>
