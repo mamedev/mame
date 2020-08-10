@@ -3,6 +3,16 @@
 #include "netlist/devices/net_lib.h"
 
 /* ----------------------------------------------------------------------------
+ *  External declarations
+ * ---------------------------------------------------------------------------*/
+
+NETLIST_EXTERNAL(cd4xxx_lib)
+NETLIST_EXTERNAL(opamp_lib)
+NETLIST_EXTERNAL(otheric_lib)
+NETLIST_EXTERNAL(ttl74xx_lib)
+NETLIST_EXTERNAL(roms_lib)
+
+/* ----------------------------------------------------------------------------
  *  Diode Models
  * ---------------------------------------------------------------------------*/
 
@@ -107,11 +117,11 @@ NETLIST_START(base_lib)
 	LOCAL_SOURCE(mosfet_models)
 	LOCAL_SOURCE(family_models)
 
-	LOCAL_SOURCE(ttl74xx_lib)
-	LOCAL_SOURCE(cd4xxx_lib)
-	LOCAL_SOURCE(opamp_lib)
-	LOCAL_SOURCE(otheric_lib)
-	LOCAL_SOURCE(roms_lib)
+	EXTERNAL_SOURCE(ttl74xx_lib)
+	EXTERNAL_SOURCE(cd4xxx_lib)
+	EXTERNAL_SOURCE(opamp_lib)
+	EXTERNAL_SOURCE(otheric_lib)
+	EXTERNAL_SOURCE(roms_lib)
 
 	INCLUDE(diode_models)
 	INCLUDE(bjt_models)

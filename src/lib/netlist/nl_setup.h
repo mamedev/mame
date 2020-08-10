@@ -83,6 +83,9 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define LOCAL_SOURCE(name)                                                     \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
+#define EXTERNAL_SOURCE(name)                                                  \
+		setup.register_source_proc(# name, &NETLIST_NAME(name));
+
 // FIXME: Need to pass in parameter definition
 #define LOCAL_LIB_ENTRY_1(name)                                                \
 		LOCAL_SOURCE(name)                                                     \
@@ -230,6 +233,7 @@ namespace netlist
 
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
+		bool parse_tokens(const parser_t::token_store &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)

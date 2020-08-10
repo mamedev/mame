@@ -29,11 +29,6 @@
 #endif
 
 NETLIST_EXTERNAL(base_lib)
-NETLIST_EXTERNAL(cd4xxx_lib)
-NETLIST_EXTERNAL(opamp_lib)
-NETLIST_EXTERNAL(otheric_lib)
-NETLIST_EXTERNAL(ttl74xx_lib)
-NETLIST_EXTERNAL(roms_lib)
 
 #if NL_AUTO_DEVICES
 #include "nld_devinc.h"

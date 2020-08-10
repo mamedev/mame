@@ -47,6 +47,8 @@ parser_t::parser_t(nlparse_t &setup)
 	m_tok_SUBMODEL = m_tokenizer.register_token("SUBMODEL");
 	m_tok_NETLIST_START = m_tokenizer.register_token("NETLIST_START");
 	m_tok_NETLIST_END = m_tokenizer.register_token("NETLIST_END");
+	m_tok_NETLIST_EXTERNAL = m_tokenizer.register_token("NETLIST_EXTERNAL");
+	m_tok_EXTERNAL_SOURCE = m_tokenizer.register_token("EXTERNAL_SOURCE");
 	m_tok_TRUTHTABLE_START = m_tokenizer.register_token("TRUTHTABLE_START");
 	m_tok_TRUTHTABLE_END = m_tokenizer.register_token("TRUTHTABLE_END");
 	m_tok_TT_HEAD = m_tokenizer.register_token("TT_HEAD");
@@ -75,7 +77,7 @@ void parser_t::parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tok
 	m_tokenizer.append_to_store(&u8reader, tokstor);
 }
 
-bool parser_t::parse(token_store &tokstor, const pstring &nlname)
+bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 {
 	set_token_source(&tokstor);
 
@@ -134,6 +136,14 @@ bool parser_t::parse(token_store &tokstor, const pstring &nlname)
 			m_cur_local->push_back(token_t(m_tok_paren_right));
 			in_nl = true;
 		}
+		else if (token.is(m_tok_NETLIST_EXTERNAL))
+		{
+			if (in_nl)
+				error (MF_UNEXPECTED_NETLIST_EXTERNAL());
+			require_token(m_tok_paren_left);
+			token_t name = get_token();
+			require_token(m_tok_paren_right);
+		}
 		else if (!in_nl)
 		{
 			if (!token.is(m_tok_static))
@@ -179,13 +189,17 @@ void parser_t::parse_netlist(const pstring &nlname)
 			net_include();
 		else if (token.is(m_tok_LOCAL_SOURCE))
 			net_local_source();
+		else if (token.is(m_tok_EXTERNAL_SOURCE))
+			net_external_source();
 		else if (token.is(m_tok_TRUTHTABLE_START))
 			net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
 		{
 			require_token(m_tok_paren_left);
+			pstring name(get_identifier());
+			register_local_as_source(name);
 			// FIXME: Need to pass in parameter definition FIXME: get line number right
-			m_setup.register_lib_entry(get_identifier(), "", plib::source_location("parser: " + nlname, 1));
+			m_setup.register_lib_entry(name, "", plib::source_location("parser: " + nlname, 1));
 			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_NET_REGISTER_DEV))
@@ -315,6 +329,28 @@ void parser_t::net_include()
 }
 
 void parser_t::net_local_source()
+{
+	// This directive is only for hardcoded netlists. Ignore it here.
+	require_token(m_tok_paren_left);
+	pstring name(get_identifier());
+	require_token(m_tok_paren_right);
+
+	register_local_as_source(name);
+}
+
+void parser_t::register_local_as_source(const pstring &name)
+{
+	auto p = m_local.find(name);
+	if (p != m_local.end())
+	{
+		printf("found %s\n", name.c_str());
+		m_setup.register_source<source_token_t>(name, p->second);
+	}
+	else
+		printf("argh %s\n", name.c_str());
+}
+
+void parser_t::net_external_source()
 {
 	// This directive is only for hardcoded netlists. Ignore it here.
 	require_token(m_tok_paren_left);

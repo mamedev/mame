@@ -144,17 +144,18 @@ namespace netlist
 		NETLIST_NAME(base_lib)(m_setup->parser());
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
-#if 0
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
+#if 1
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
+		m_setup->parser().include("base_lib");
 #else
 		pstring dir = "src/lib/netlist/macro/";
 		//m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
-		m_setup->parser().register_source<source_file_t>(dir + "nlm_base.cpp");
-		m_setup->parser().register_source<source_file_t>(dir + "nlm_opamp.cpp");
-		m_setup->parser().register_source<source_file_t>(dir + "nlm_roms.cpp");
-		m_setup->parser().register_source<source_file_t>(dir + "nlm_cd4xxx.cpp");
-		m_setup->parser().register_source<source_file_t>(dir + "nlm_other.cpp");
-		m_setup->parser().register_source<source_file_t>(dir + "nlm_ttl74xx.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_base_lib.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_opamp_lib.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_roms_lib.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_cd4xxx_lib.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_otheric_lib.cpp");
+		m_setup->parser().register_source<source_file_t>(dir + "nlm_ttl74xx_lib.cpp");
 		m_setup->parser().include("base_lib");
 #endif
 #endif
