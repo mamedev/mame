@@ -14,9 +14,6 @@
 //       but seems to make no audible difference, either in the
 //       simulation or in recordings. Disabling it gives a nice speedup.
 //
-//    * The "flutter" on the SKITTER sound is either not as pronounced
-//       or simply faster than the recordings.
-//
 //    * Torpedo sounds don't retrigger until they're complete. This means
 //       you can fire several times before the next firing sound triggers.
 //       In recordings of games this doesn't appear to be the case.
@@ -30,12 +27,12 @@
 // Optimizations
 //
 
+#define UNDERCLOCK_NOISE_GEN (1)
 #define HLE_BACKGROUND_VCO (1)
 #define HLE_TORPEDO1_VCO (1)
 #define HLE_TORPEDO2_VCO (1)
 #define HLE_SKITTER_VCO (1)
-#define USE_AFUNC_MIXING (1)
-#define ENABLE_FRONTIERS (0)
+#define ENABLE_FRONTIERS (1)
 
 
 
@@ -481,6 +478,9 @@ NETLIST_START(zektor)
 	NET_C(U3.4, I_VM12)
 
 	MM5837_DIP(U4)			// Noise Generator
+#if (UNDERCLOCK_NOISE_GEN)
+	PARAM(U4.FREQ, 24000)
+#endif
 
 	LM555_DIP(U5)			// Timer
 
@@ -1190,20 +1190,8 @@ NETLIST_START(zektor)
 	NET_C(SKITTER, R6.1)
 	NET_C(BUFFER, R8.1)
 	NET_C(C44.2, R9.1)
-#if (USE_AFUNC_MIXING)
-	// This prevents the individual sound nets from combining
-	// at the mixing resistors.
-	AFUNC(MIXFUNC, 5, "(A0/10+A1/220+A2/220+A3/10+A4/33)*4")
-	NET_C(MIXFUNC.A0, R10.2)
-	NET_C(MIXFUNC.A1, R7.2)
-	NET_C(MIXFUNC.A2, R6.2)
-	NET_C(MIXFUNC.A3, R8.2)
-	NET_C(MIXFUNC.A4, R9.2)
-	ALIAS(OUTPUT, MIXFUNC.Q)
-#else
 	NET_C(R10.2, R7.2, R6.2, R8.2, R9.2)
-	ALIAS(OUTPUT, R8.2)
-#endif
+	ALIAS(OUTPUT, R9.2)
 
 	//
 	// Unconnected inputs
@@ -1220,6 +1208,11 @@ NETLIST_START(zektor)
 
 
 #if (ENABLE_FRONTIERS)
+#define RXX 384
+	OPTIMIZE_FRONTIER(R10.1, RES_K(10), RXX)
+	OPTIMIZE_FRONTIER(R7.1, RES_K(220), RXX)
+	OPTIMIZE_FRONTIER(R6.1, RES_K(220), RXX)
+	OPTIMIZE_FRONTIER(R8.1, RES_K(10), RXX)
 #endif
 
 NETLIST_END()
