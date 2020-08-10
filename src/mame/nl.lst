@@ -474,6 +474,8 @@ wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
 
+@source:starcrus.cpp
+starcrus
 
 @source:testpat.cpp
 tp1983

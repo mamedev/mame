@@ -309,6 +309,12 @@ files{
 	MAME_DIR .. "src/mame/includes/starfire.h",
 	MAME_DIR .. "src/mame/video/starfire.cpp",
 
+	MAME_DIR .. "src/mame/audio/nl_starcrus.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starcrus.h",
+	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
+	MAME_DIR .. "src/mame/includes/starcrus.h",
+	MAME_DIR .. "src/mame/video/starcrus.cpp",
+
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",
 	MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
