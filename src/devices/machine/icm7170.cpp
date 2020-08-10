@@ -10,7 +10,7 @@
 #include "icm7170.h"
 #include "coreutil.h"
 
-#define VERBOSE (1)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ICM7170, icm7170_device, "icm7170", "Intersil/Renesas ICM7170 Real Time Clock")
@@ -73,7 +73,8 @@ icm7170_device::icm7170_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, ICM7170, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
-		m_out_irq_cb(*this)
+		m_out_irq_cb(*this),
+		m_out_irq_state(false)
 {
 }
 
@@ -87,9 +88,13 @@ void icm7170_device::device_start()
 	m_out_irq_cb.resolve_safe();
 
 	m_timer = timer_alloc(ICM7170_TIMER_ID);
-	m_timer->adjust(attotime::never);
+
+	// TODO: frequency should be based on input clock and divisor
+	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_timer->enable(false);
 
 	save_item(NAME(m_regs));
+	save_item(NAME(m_out_irq_state));
 }
 
 //-------------------------------------------------
@@ -109,6 +114,93 @@ void icm7170_device::device_reset()
 
 void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	// advance hundredths
+	m_irq_status |= IRQ_BIT_100TH_SECOND;
+	if (m_regs[REG_CNT_100TH_SEC]++ == 99)
+	{
+		m_regs[REG_CNT_100TH_SEC] = 0;
+
+		if (m_regs[REG_COMMAND] & CMD_REG_24_HOUR)
+			LOG("device_timer %02d-%02d-%02d %02d:%02d:%02d\n",
+				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
+				m_regs[REG_CNT_HOURS], m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS]);
+		else
+			LOG("device_timer %02d-%02d-%02d %02d:%02d:%02d %s\n",
+				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
+				m_regs[REG_CNT_HOURS] & 0xf, m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS],
+				(m_regs[REG_CNT_HOURS] & 0x80) ? "pm" : "am");
+
+		// advance seconds
+		m_irq_status |= IRQ_BIT_SECOND;
+		if (m_regs[REG_CNT_SECONDS]++ == 59)
+		{
+			m_regs[REG_CNT_SECONDS] = 0;
+
+			// advance minutes
+			m_irq_status |= IRQ_BIT_MINUTE;
+			if (m_regs[REG_CNT_MINUTES]++ == 59)
+			{
+				m_regs[REG_CNT_MINUTES] = 0;
+
+				// invert am/pm bit at 12:00
+				if (!(m_regs[REG_COMMAND] & CMD_REG_24_HOUR) && (m_regs[REG_CNT_HOURS] & 0xf) == 11)
+					m_regs[REG_CNT_HOURS] ^= 0x80;
+
+				// advance hours
+				m_irq_status |= IRQ_BIT_HOUR;
+				if (((m_regs[REG_COMMAND] & CMD_REG_24_HOUR) && (m_regs[REG_CNT_HOURS] == 23))
+				|| (!(m_regs[REG_COMMAND] & CMD_REG_24_HOUR) && (m_regs[REG_CNT_HOURS] & 0xf) == 12))
+				{
+					if (m_regs[REG_COMMAND] & CMD_REG_24_HOUR)
+						m_regs[REG_CNT_HOURS] = 0;
+					else
+						m_regs[REG_CNT_HOURS] = (m_regs[REG_CNT_HOURS] & 0x80) | 1;
+
+					// advance days
+					m_irq_status |= IRQ_BIT_DAY;
+					if (m_regs[REG_CNT_DAY]++ == gregorian_days_in_month(m_regs[REG_CNT_MONTH] & 0xf, (m_regs[REG_CNT_YEAR] & 0x7f) + 2000))
+					{
+						m_regs[REG_CNT_DAY] = 1;
+
+						// advance months
+						if (m_regs[REG_CNT_MONTH]++ == 12)
+						{
+							m_regs[REG_CNT_MONTH] = 1;
+
+							// advance years
+							if (m_regs[REG_CNT_YEAR]++ == 99)
+								m_regs[REG_CNT_YEAR] = 0;
+						}
+					}
+
+					// advance day of week
+					if (m_regs[REG_CNT_DAY_OF_WEEK]++ == 6)
+						m_regs[REG_CNT_DAY_OF_WEEK] = 0;
+				}
+				else
+					m_regs[REG_CNT_HOURS]++;
+			}
+		}
+	}
+
+	// check tenths interrupt
+	if (!(m_regs[REG_CNT_100TH_SEC] % 10))
+		m_irq_status |= IRQ_BIT_10TH_SECOND;
+
+	// check alarm
+	if (m_irq_mask & IRQ_BIT_ALARM)
+		if (BIT(m_regs[REG_RAM_YEAR], 7) || !((m_regs[REG_RAM_YEAR] ^ m_regs[REG_CNT_YEAR]) & 0x7f))
+			if (BIT(m_regs[REG_RAM_MONTH], 7) || !((m_regs[REG_RAM_MONTH] ^ m_regs[REG_CNT_MONTH]) & 0xf))
+				if (BIT(m_regs[REG_RAM_DAY], 7) || !((m_regs[REG_RAM_DAY] ^ m_regs[REG_CNT_DAY]) & 0x1f))
+					if (BIT(m_regs[REG_RAM_HOURS], 6)
+					|| ((m_regs[REG_COMMAND] & CMD_REG_24_HOUR) && !((m_regs[REG_RAM_HOURS] ^ m_regs[REG_CNT_HOURS]) & 0x1f))
+					|| (!(m_regs[REG_COMMAND] & CMD_REG_24_HOUR) && !((m_regs[REG_RAM_HOURS] ^ m_regs[REG_CNT_HOURS]) & 0x8f)))
+						if (BIT(m_regs[REG_RAM_MINUTES], 7) || !((m_regs[REG_RAM_MINUTES] ^ m_regs[REG_CNT_MINUTES]) & 0x3f))
+							if (BIT(m_regs[REG_RAM_SECONDS], 7) || !((m_regs[REG_RAM_SECONDS] ^ m_regs[REG_CNT_SECONDS]) & 0x3f))
+								if (BIT(m_regs[REG_RAM_100TH_SEC], 7) || !((m_regs[REG_RAM_100TH_SEC] ^ m_regs[REG_CNT_100TH_SEC]) & 0x7f))
+									m_irq_status |= IRQ_BIT_ALARM;
+
+	recalc_irqs();
 }
 
 
@@ -124,9 +216,29 @@ void icm7170_device::rtc_clock_updated(int year, int month, int day, int day_of_
 		m_regs[REG_CNT_MONTH] = month;
 		m_regs[REG_CNT_DAY] = day;
 		m_regs[REG_CNT_DAY_OF_WEEK] = day_of_week;
-		m_regs[REG_CNT_HOURS] = hour;
+		if (!(m_regs[REG_COMMAND] & CMD_REG_24_HOUR))
+		{
+			// transform hours from 0..23 to 1..12
+			m_regs[REG_CNT_HOURS] = (hour > 12) ? hour - 12 : hour ? hour : 1;
+
+			// set am/pm bit
+			if (hour > 11)
+				m_regs[REG_CNT_HOURS] |= 0x80;
+		}
+		else
+			m_regs[REG_CNT_HOURS] = hour;
 		m_regs[REG_CNT_MINUTES] = minute;
 		m_regs[REG_CNT_SECONDS] = second;
+
+		if (m_regs[REG_COMMAND] & CMD_REG_24_HOUR)
+			LOG("rtc_clock_updated %02d-%02d-%02d %02d:%02d:%02d\n",
+				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
+				m_regs[REG_CNT_HOURS], m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS]);
+		else
+			LOG("rtc_clock_updated %02d-%02d-%02d %02d:%02d:%02d %s\n",
+				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
+				m_regs[REG_CNT_HOURS] & 0xf, m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS],
+				(m_regs[REG_CNT_HOURS] & 0x80) ? "pm" : "am");
 	}
 }
 
@@ -166,11 +278,13 @@ void icm7170_device::nvram_write(emu_file &file)
 // non-inherited device functions
 uint8_t icm7170_device::read(offs_t offset)
 {
-	uint8_t data =  m_regs[offset & 0x1f];
+	uint8_t data = m_regs[offset & 0x1f];
 
 	if ((offset & 0x1f) == REG_INT_STATUS_AND_MASK)
 	{
 		data = m_irq_status;
+		m_irq_status = 0;
+		recalc_irqs();
 	}
 
 	LOG("ICM7170 Register %d Read %02x\n", offset, data);
@@ -180,6 +294,7 @@ uint8_t icm7170_device::read(offs_t offset)
 
 void icm7170_device::write(offs_t offset, uint8_t data)
 {
+	// TODO: unused register bits should be masked
 	switch (offset & 0x1f)
 	{
 		case REG_INT_STATUS_AND_MASK:
@@ -187,6 +302,10 @@ void icm7170_device::write(offs_t offset, uint8_t data)
 			LOG("ICM7170 IRQ Mask Write %02x\n", data);
 			recalc_irqs();
 			break;
+
+		case REG_COMMAND:
+			m_timer->enable(data & CMD_REG_RUN);
+			// fall through
 
 		default:
 			m_regs[offset & 0x1f] = data;
@@ -197,5 +316,16 @@ void icm7170_device::write(offs_t offset, uint8_t data)
 
 void icm7170_device::recalc_irqs()
 {
+	if (m_irq_status & m_irq_mask & ~IRQ_BIT_GLOBAL)
+		m_irq_status |= IRQ_BIT_GLOBAL;
+	else
+		m_irq_status &= ~IRQ_BIT_GLOBAL;
+
+	bool const irq_state = (m_regs[REG_COMMAND] & CMD_REG_IRQ_ENABLE) && (m_irq_status & IRQ_BIT_GLOBAL);
+	if (m_out_irq_state != irq_state)
+	{
+		m_out_irq_state = irq_state;
+		m_out_irq_cb(m_out_irq_state);
+	}
 }
 

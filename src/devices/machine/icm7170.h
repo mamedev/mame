@@ -75,6 +75,7 @@ private:
 	void recalc_irqs();
 
 	devcb_write_line m_out_irq_cb;
+	bool m_out_irq_state;
 
 	uint8_t m_regs[0x20];
 	uint8_t m_irq_mask, m_irq_status;
