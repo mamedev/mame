@@ -564,7 +564,7 @@ static NETLIST_START(LM3900)
 NETLIST_END()
 #endif
 
-NETLIST_START(OPAMP_lib)
+NETLIST_START(opamp_lib)
 	LOCAL_LIB_ENTRY(opamp_layout_4_4_11)
 	LOCAL_LIB_ENTRY(opamp_layout_2_8_4)
 	LOCAL_LIB_ENTRY(opamp_layout_2_13_9_4)

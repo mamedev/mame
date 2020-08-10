@@ -28,12 +28,12 @@
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
 
-NETLIST_EXTERNAL(base)
-NETLIST_EXTERNAL(CD4XXX_lib)
-NETLIST_EXTERNAL(OPAMP_lib)
+NETLIST_EXTERNAL(base_lib)
+NETLIST_EXTERNAL(cd4xxx_lib)
+NETLIST_EXTERNAL(opamp_lib)
 NETLIST_EXTERNAL(otheric_lib)
-NETLIST_EXTERNAL(TTL74XX_lib)
-NETLIST_EXTERNAL(ROMS_lib)
+NETLIST_EXTERNAL(ttl74xx_lib)
+NETLIST_EXTERNAL(roms_lib)
 
 #if NL_AUTO_DEVICES
 #include "nld_devinc.h"
@@ -104,12 +104,11 @@ NETLIST_EXTERNAL(ROMS_lib)
 
 #include "nld_log.h"
 
-#include "netlist/macro/nlm_cd4xxx.h"
-#include "netlist/macro/nlm_mc3340.h"
-#include "netlist/macro/nlm_opamp.h"
-#include "netlist/macro/nlm_other.h"
-#include "netlist/macro/nlm_roms.h"
-#include "netlist/macro/nlm_ttl74xx.h"
+#include "../macro/nlm_cd4xxx_lib.h"
+#include "../macro/nlm_opamp_lib.h"
+#include "../macro/nlm_otheric_lib.h"
+#include "../macro/nlm_roms_lib.h"
+#include "../macro/nlm_ttl74xx_lib.h"
 
 #include "netlist/analog/nld_bjt.h"
 #include "netlist/analog/nld_fourterm.h"

@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
+#include "macro/nlm_base_lib.h"
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
@@ -13,7 +14,6 @@
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h" // netlist_params
-#include "macro/nlm_base.h"
 #include "nl_base.h"
 
 #include "nl_errstr.h"
@@ -141,7 +141,7 @@ namespace netlist
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
 		m_setup->parser().add_include<plib::psource_str_t>("netlist/devices/net_lib.h", content);
 #if 1
-		NETLIST_NAME(base)(m_setup->parser());
+		NETLIST_NAME(base_lib)(m_setup->parser());
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
 #if 0
@@ -155,7 +155,7 @@ namespace netlist
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_cd4xxx.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_other.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_ttl74xx.cpp");
-		m_setup->parser().include("base");
+		m_setup->parser().include("base_lib");
 #endif
 #endif
 	}

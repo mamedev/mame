@@ -11,6 +11,8 @@
 #include "nltypes.h" // for setup_t
 #include "plib/ptokenizer.h"
 
+#include <unordered_map>
+
 namespace netlist
 {
 	class parser_t : public plib::ptoken_reader
@@ -75,6 +77,9 @@ namespace netlist
 
 		plib::ptokenizer m_tokenizer;
 		nlparse_t &m_setup;
+
+		std::unordered_map<pstring, token_store> m_local;
+		token_store *m_cur_local;
 };
 
 } // namespace netlist

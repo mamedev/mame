@@ -209,12 +209,12 @@ NLOBJS := \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
 	$(NLOBJ)/devices/nlid_truthtable.o \
-	$(NLOBJ)/macro/nlm_base.o \
-	$(NLOBJ)/macro/nlm_cd4xxx.o \
-	$(NLOBJ)/macro/nlm_opamp.o \
-	$(NLOBJ)/macro/nlm_other.o \
-	$(NLOBJ)/macro/nlm_roms.o \
-	$(NLOBJ)/macro/nlm_ttl74xx.o \
+	$(NLOBJ)/macro/nlm_base_lib.o \
+	$(NLOBJ)/macro/nlm_cd4xxx_lib.o \
+	$(NLOBJ)/macro/nlm_opamp_lib.o \
+	$(NLOBJ)/macro/nlm_otheric_lib.o \
+	$(NLOBJ)/macro/nlm_roms_lib.o \
+	$(NLOBJ)/macro/nlm_ttl74xx_lib.o \
 
 TESTOBJS := \
 	$(TESTOBJ)/test_pfunction.o \

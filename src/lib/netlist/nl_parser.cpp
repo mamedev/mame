@@ -21,6 +21,7 @@ void parser_t::verror(const pstring &msg)
 
 parser_t::parser_t(nlparse_t &setup)
 	: m_setup(setup)
+	, m_cur_local(nullptr)
 {
 	m_tokenizer.identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-$@")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
@@ -82,6 +83,8 @@ bool parser_t::parse(token_store &tokstor, const pstring &nlname)
 
 	while (true)
 	{
+		// FIXME: line numbers in cached local netlists are wrong
+		//        need to process raw tokens here.
 		token_t token = get_token();
 		if (token.is_type(token_type::ENDOFFILE))
 		{
@@ -98,6 +101,11 @@ bool parser_t::parse(token_store &tokstor, const pstring &nlname)
 				in_nl = false;
 			}
 			require_token(m_tok_paren_right);
+
+			m_cur_local->push_back(token);
+			m_cur_local->push_back(token_t(m_tok_paren_left));
+			m_cur_local->push_back(token_t(m_tok_paren_right));
+
 		}
 		else if (token.is(m_tok_NETLIST_START))
 		{
@@ -112,12 +120,28 @@ bool parser_t::parse(token_store &tokstor, const pstring &nlname)
 				return true;
 			}
 
+			// create a new cached local store
+			m_local.emplace(name.str(), token_store());
+			m_cur_local = &m_local[name.str()];
+			m_cur_local->push_back(token_t(token_type::LINEMARKER));
+			auto sl = sourceloc();
+			auto num = plib::pfmt("{1}")(sl.line());
+			m_cur_local->push_back(token_t(token_type::NUMBER, num));
+			m_cur_local->push_back(token_t(token_type::STRING, sl.file_name()));
+			m_cur_local->push_back(token_t(m_tok_NETLIST_START));
+			m_cur_local->push_back(token_t(m_tok_paren_left));
+			m_cur_local->push_back(name);
+			m_cur_local->push_back(token_t(m_tok_paren_right));
 			in_nl = true;
 		}
 		else if (!in_nl)
 		{
 			if (!token.is(m_tok_static))
 				error(MF_EXPECTED_NETLIST_START_1(token.str()));
+		}
+		else
+		{
+			m_cur_local->push_back(token);
 		}
 	}
 }

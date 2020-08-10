@@ -57,6 +57,9 @@
 #define LM747A_DIP(name)                                                       \
 		NET_REGISTER_DEV(LM747A_DIP, name)
 
+#define MC3340_DIP(name)                                                       \
+		NET_REGISTER_DEV(MC3340_DIP, name)
+
 #endif // NL_AUTO_DEVICES
 
 /* ----------------------------------------------------------------------------
