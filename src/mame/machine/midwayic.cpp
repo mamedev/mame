@@ -227,8 +227,8 @@ void midway_serial_pic_device::write(u8 data)
  *  PORTB - 8bit data out
  *  PORTC bit 7 - access clock in
  *  PORTC bit 6 - status out
- *  PORTC bit 2 - in/out, unknown
- *  PORTC bit 1 - out, unknown
+ *  PORTC bit 2 - in/out (optional) MK41T56N RTC/NVRAM Data
+ *  PORTC bit 1 - out (optional) MK41T56N RTC/NVRAM Clock
  *
  *************************************/
 
@@ -290,14 +290,14 @@ u8 midway_serial_pic_emu_device::read_c()
 {
 	u8 data = 0;
 	data |= m_clk << 7;
-	// bit 2 function is not known
+	// bit 2 RTC Data
 	return data;
 }
 
 void midway_serial_pic_emu_device::write_c(u8 data)
 {
 	m_status = BIT(data, 6);
-	// function of bits 1 and 2 is not known
+	// bits 1 and 2 is RTC Clock and Data
 //  printf("%s: write_c %02x\n", machine().describe_context().c_str(), data);
 }
 
