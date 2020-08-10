@@ -18,6 +18,7 @@ d9de            [1e] = r4
 fe80 28f7       goto 0028f7
 
 this suggests the ROM gets copied to RAM at 0x20000, as all offsets need to be adjusted by that (or the device can see SPI directly at 0x20000)
+this is logical for unSP2.0 based devices as the CS area typically starts at 0x20000 with everything below that being internal space for internal RAM/ROM/peripherals
 
 */
 
@@ -67,18 +68,31 @@ void pcp8718_state::machine_start()
 {
 }
 
-void pcp8718_state::machine_reset()
-{
-}
-
 static INPUT_PORTS_START( pcp8718 )
 INPUT_PORTS_END
 
 void pcp8718_state::map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();
+	// there are calls to 01xxx and 02xxx regions
+	// (RAM populated by internal ROM?, TODO: check to make sure code copied there isn't from SPI ROM like the GPL16250 bootstrap
+	//  does from NAND, it doesn't seem to have a header in the same format at least)
+	map(0x000000, 0x006fff).ram();
+
+	// registers at 7xxx are similar to GPL16250, but not identical? (different video system?)
+
+	// there are calls to 0x0f000 (internal ROM?)
+	map(0x008000, 0x00ffff).rom().region("maincpu", 0x00000);
+
+	// seems to have same memory config registers etc. as GPL16250 so CS Space starts at 0x020000 and the 'bank' is likely at 0x200000 too
+	map(0x020000, 0x3fffff).rom().region("spi", 0x00000);
 }
 
+void pcp8718_state::machine_reset()
+{
+	// this looks like it might actually be part of the IRQ handler (increase counter at 00 at the very start) rather than where we should end up after startup
+	m_maincpu->set_state_int(UNSP_PC, 0x0042);
+	m_maincpu->set_state_int(UNSP_SR, 0x0002);
+}
 
 void pcp8718_state::pcp8718(machine_config &config)
 {
@@ -99,16 +113,25 @@ void pcp8718_state::pcp8718(machine_config &config)
 
 ROM_START( pcp8718 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x10000, NO_DUMP ) // exact size unknown
+
+	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "8718_en25f32.bin", 0x000000, 0x400000, CRC(cc138db4) SHA1(379af3d94ae840f52c06416d6cf32e25923af5ae) ) // dump needs verifying, dumper mentioned it was possibly bad (unit failed in process)
 ROM_END
 
 ROM_START( pcp8728 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x10000, NO_DUMP ) // exact size unknown
+
+	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "pcp 8728 788 in 1.bin", 0x000000, 0x400000, CRC(60115f21) SHA1(e15c39f11e442a76fae3823b6d510178f6166926) )
 ROM_END
 
 ROM_START( unkunsp )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x10000, NO_DUMP ) // exact size unknown
+
+	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
