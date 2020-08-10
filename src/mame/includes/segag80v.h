@@ -20,16 +20,16 @@
 #define CPU_CLOCK           8000000     /* not used when video boards are connected */
 #define VIDEO_CLOCK         15468480
 
-class segag80v_state : public segag80snd_common
+class segag80v_state : public driver_device
 {
 public:
-	segag80v_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segag80snd_common(mconfig, type, tag),
+	segag80v_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_vectorram(*this, "vectorram"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
-		m_speech(*this, "segaspeech"),
+		m_speech(*this, "speech"),
 		m_usb(*this, "usbsnd"),
 		m_g80_audio(*this, "g80sound"),
 		m_aysnd(*this, "aysnd"),
@@ -98,7 +98,7 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	optional_device<samples_device> m_samples;
-	optional_device<speech_sound_device> m_speech;
+	optional_device<sega_speech_device> m_speech;
 	optional_device<usb_sound_device> m_usb;
 	optional_device<segag80_audio_device> m_g80_audio;
 	optional_device<ay8912_device> m_aysnd;

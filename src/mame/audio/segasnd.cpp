@@ -15,6 +15,7 @@
 #include "includes/segag80r.h"
 #include "includes/segag80v.h"
 
+NETLIST_EXTERNAL(segaspeech);
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -32,19 +33,18 @@
     SPEECH BOARD
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SEGASPEECH, speech_sound_device, "sega_speech_sound", "Sega Speech Sound Board")
+DEFINE_DEVICE_TYPE(SEGA_SPEECH_BOARD, sega_speech_device, "sega_speech_device", "Sega Speech Sound Board")
 
-#define SEGASPEECH_REGION "speech"
-
-speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SEGASPEECH, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_int_cb(*this),
-		m_speech(*this, SEGASPEECH_REGION),
-		m_drq(0),
-		m_latch(0),
-		m_t0(0),
-		m_p2(0)
+sega_speech_device::sega_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SEGA_SPEECH_BOARD, tag, owner, clock),
+	device_mixer_interface(mconfig, *this),
+	m_speech(*this, "data"),
+	m_cpu(*this, "cpu"),
+	m_control_d3(*this, "sound_nl:cin1"),
+	m_drq(0),
+	m_latch(0),
+	m_t0(0),
+	m_p2(0)
 {
 }
 
@@ -52,10 +52,8 @@ speech_sound_device::speech_sound_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void speech_sound_device::device_start()
+void sega_speech_device::device_start()
 {
-	m_int_cb.resolve();
-
 	save_item(NAME(m_latch));
 	save_item(NAME(m_t0));
 	save_item(NAME(m_p2));
@@ -69,35 +67,34 @@ void speech_sound_device::device_start()
  *
  *************************************/
 
-
-
-READ_LINE_MEMBER( speech_sound_device::t0_r )
+READ_LINE_MEMBER( sega_speech_device::t0_r )
 {
 	return m_t0;
 }
 
-READ_LINE_MEMBER( speech_sound_device::t1_r )
+READ_LINE_MEMBER( sega_speech_device::t1_r )
 {
+//printf("%s: t1_r=%d\n", machine().scheduler().time().as_string(), m_drq);
 	return m_drq;
 }
 
-uint8_t speech_sound_device::p1_r()
+uint8_t sega_speech_device::p1_r()
 {
 	return m_latch & 0x7f;
 }
 
-uint8_t speech_sound_device::rom_r(offs_t offset)
+uint8_t sega_speech_device::rom_r(offs_t offset)
 {
 	return m_speech->base()[0x100 * (m_p2 & 0x3f) + offset];
 }
 
-void speech_sound_device::p1_w(uint8_t data)
+void sega_speech_device::p1_w(uint8_t data)
 {
 	if (!(data & 0x80))
 		m_t0 = 0;
 }
 
-void speech_sound_device::p2_w(uint8_t data)
+void sega_speech_device::p2_w(uint8_t data)
 {
 	m_p2 = data;
 }
@@ -110,8 +107,9 @@ void speech_sound_device::p2_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(speech_sound_device::drq_w)
+WRITE_LINE_MEMBER(sega_speech_device::drq_w)
 {
+//printf("%s: DRQ=%d\n", machine().scheduler().time().as_string(), state);
 	m_drq = (state == ASSERT_LINE);
 }
 
@@ -123,7 +121,7 @@ WRITE_LINE_MEMBER(speech_sound_device::drq_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
+TIMER_CALLBACK_MEMBER( sega_speech_device::delayed_speech_w )
 {
 	int data = param;
 	u8 old = m_latch;
@@ -132,7 +130,7 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 	m_latch = data;
 
 	/* the high bit goes directly to the INT line */
-	m_int_cb((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_cpu->set_input_line(INPUT_LINE_IRQ0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* a clock on the high bit clocks a 1 into T0 */
 	if (!(old & 0x80) && (data & 0x80))
@@ -140,36 +138,19 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 }
 
 
-void speech_sound_device::data_w(uint8_t data)
+void sega_speech_device::data_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_speech_device::delayed_speech_w), this), data);
 }
 
 
-void speech_sound_device::control_w(uint8_t data)
+void sega_speech_device::control_w(uint8_t data)
 {
 	LOG("Speech control = %X\n", data);
+printf("Speech control = %02X\n", data);
+	m_control_d3->write(BIT(data, 3));
 }
 
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void speech_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-}
-
-/*************************************
- *
- *  Speech board functions
- *
- *************************************/
-
-WRITE_LINE_MEMBER(segag80snd_common::segaspeech_int_w)
-{
-	m_audiocpu->set_input_line(0, state);
-}
 
 /*************************************
  *
@@ -177,16 +158,16 @@ WRITE_LINE_MEMBER(segag80snd_common::segaspeech_int_w)
  *
  *************************************/
 
-void segag80snd_common::speech_map(address_map &map)
+void sega_speech_device::speech_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).rom();
 }
 
 
-void segag80snd_common::speech_portmap(address_map &map)
+void sega_speech_device::speech_portmap(address_map &map)
 {
-	map(0x00, 0xff).r("segaspeech", FUNC(speech_sound_device::rom_r));
-	map(0x00, 0xff).w("speech", FUNC(sp0250_device::write));
+	map(0x00, 0xff).r(FUNC(sega_speech_device::rom_r));
+	map(0x00, 0xff).w("sp0250", FUNC(sp0250_device::write));
 }
 
 
@@ -196,21 +177,30 @@ void segag80snd_common::speech_portmap(address_map &map)
  *
  *************************************/
 
-void segag80snd_common::sega_speech_board(machine_config &config)
+void sega_speech_device::device_add_mconfig(machine_config &config)
 {
-	/* CPU for the speech board */
-	i8035_device &audiocpu(I8035(config, m_audiocpu, SPEECH_MASTER_CLOCK));        /* divide by 15 in CPU */
-	audiocpu.set_addrmap(AS_PROGRAM, &segag80snd_common::speech_map);
-	audiocpu.set_addrmap(AS_IO, &segag80snd_common::speech_portmap);
-	audiocpu.p1_in_cb().set("segaspeech", FUNC(speech_sound_device::p1_r));
-	audiocpu.p1_out_cb().set("segaspeech", FUNC(speech_sound_device::p1_w));
-	audiocpu.p2_out_cb().set("segaspeech", FUNC(speech_sound_device::p2_w));
-	audiocpu.t0_in_cb().set("segaspeech", FUNC(speech_sound_device::t0_r));
-	audiocpu.t1_in_cb().set("segaspeech", FUNC(speech_sound_device::t1_r));
+	// CPU for the speech board
+	i8035_device &audiocpu(I8035(config, "cpu", SPEECH_MASTER_CLOCK));    // divide by 15 in CPU
+	audiocpu.set_addrmap(AS_PROGRAM, &sega_speech_device::speech_map);
+	audiocpu.set_addrmap(AS_IO, &sega_speech_device::speech_portmap);
+	audiocpu.p1_in_cb().set(FUNC(sega_speech_device::p1_r));
+	audiocpu.p1_out_cb().set(FUNC(sega_speech_device::p1_w));
+	audiocpu.p2_out_cb().set(FUNC(sega_speech_device::p2_w));
+	audiocpu.t0_in_cb().set(FUNC(sega_speech_device::t0_r));
+	audiocpu.t1_in_cb().set(FUNC(sega_speech_device::t1_r));
 
-	/* sound hardware */
-	SEGASPEECH(config, "segaspeech", 0).int_cb().set(FUNC(segag80snd_common::segaspeech_int_w));
-	sp0250_device &speech(SP0250(config, "speech", SPEECH_MASTER_CLOCK));
-	speech.drq().set("segaspeech", FUNC(speech_sound_device::drq_w));
-	speech.add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// speech chip
+	sp0250_device &speech(SP0250(config, "sp0250", SPEECH_MASTER_CLOCK));
+	speech.drq().set(FUNC(sega_speech_device::drq_w));
+	speech.add_route(ALL_OUTPUTS, "sound_nl", 1.0, 0);
+
+	// netlist filtering
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(segaspeech))
+		.add_route(ALL_OUTPUTS, *this, 1.0);
+
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.I").set_mult_offset(5e-8 / 16384.0, 0);
+	NETLIST_LOGIC_INPUT(config, m_control_d3, "I_CONTROL_D3.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(7500.0, 0.0);
 }

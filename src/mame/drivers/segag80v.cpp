@@ -900,14 +900,14 @@ void segag80v_state::spacfury(machine_config &config)
 {
 	g80v_base(config);
 	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	sega_speech_board(config);
+	SEGA_SPEECH_BOARD(config, m_speech, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
 	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	sega_speech_board(config);
+	SEGA_SPEECH_BOARD(config, m_speech, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::tacscan(machine_config &config)
@@ -918,8 +918,9 @@ void segag80v_state::tacscan(machine_config &config)
 
 void segag80v_state::startrek(machine_config &config)
 {
-	tacscan(config);
-	sega_speech_board(config);
+	g80v_base(config);
+	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGA_SPEECH_BOARD(config, m_speech, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -1056,18 +1057,20 @@ ROM_START( spacfury ) // Revision C
 	ROM_LOAD( "967c.prom-u8",    0x4000, 0x0800, CRC(330f0751) SHA1(07ae52fdbfa2cc326f88dc76c3dc8e145b592863) )
 	ROM_LOAD( "968c.prom-u9",    0x4800, 0x0800, CRC(8366eadb) SHA1(8e4cb30a730237da2e933370faf5eaa1a41cacbf) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808c.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "970c.speech-u6",  0x0000, 0x1000, CRC(979d8535) SHA1(1ed097e563319ca6d2b7df9875ce7ee921eae468) )
 	ROM_LOAD( "971c.speech-u5",  0x1000, 0x1000, CRC(022dbd32) SHA1(4e0504b5ccc28094078912673c49571cf83804ab) )
 	ROM_LOAD( "972c.speech-u4",  0x2000, 0x1000, CRC(fad9346d) SHA1(784e5ab0fb00235cfd733c502baf23960923504f) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
 	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 ROM_START( spacfurya ) // Revision A
@@ -1083,18 +1086,20 @@ ROM_START( spacfurya ) // Revision A
 	ROM_LOAD( "967a.prom-u8",    0x4000, 0x0800, CRC(d60f667d) SHA1(821271ec1918e22ed29a5b1f4b0182765ef5ba10) )
 	ROM_LOAD( "968a.prom-u9",    0x4800, 0x0800, CRC(aea85b6a) SHA1(8778ff0be34cd4fd5b8f6f76c64bfca68d4d240e) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "970.speech-u6",   0x0000, 0x1000, CRC(f3b47b36) SHA1(6ae0b627349664140a7f70799645b368e452d69c) )
 	ROM_LOAD( "971.speech-u5",   0x1000, 0x1000, CRC(e72bbe88) SHA1(efadf8aa448c289cf4d0cf1831255b9ac60820f2) )
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
 	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 ROM_START( spacfuryb ) // Revision B
@@ -1110,18 +1115,20 @@ ROM_START( spacfuryb ) // Revision B
 	ROM_LOAD( "967b.prom-u8",    0x4000, 0x0800, CRC(82b5768d) SHA1(823d8c0a537bad62e8186f88f8d02a0f3dc6da0f) )
 	ROM_LOAD( "968b.prom-u9",    0x4800, 0x0800, CRC(fea68f02) SHA1(83bef40dfaac014b7929239d81075335ff8fd506) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "970.speech-u6",   0x0000, 0x1000, CRC(f3b47b36) SHA1(6ae0b627349664140a7f70799645b368e452d69c) )
 	ROM_LOAD( "971.speech-u5",   0x1000, 0x1000, CRC(e72bbe88) SHA1(efadf8aa448c289cf4d0cf1831255b9ac60820f2) )
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
 	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 
@@ -1150,18 +1157,20 @@ ROM_START( zektor )
 	ROM_LOAD( "1605.prom-u20",   0xa000, 0x0800, CRC(e27d7144) SHA1(5b82fda797d86e11882d1f9738a59092c5e3e7d8) )
 	ROM_LOAD( "1606.prom-u21",   0xa800, 0x0800, CRC(7965f636) SHA1(5c8720beedab4979a813ce7f0e8961c863973ff7) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "1607.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "1608.speech-u6",  0x0000, 0x1000, CRC(637e2b13) SHA1(8a470f9a8a722f7ced340c4d32b4cf6f05b3e848) )
 	ROM_LOAD( "1609.speech-u5",  0x1000, 0x1000, CRC(675ee8e5) SHA1(e314482028b8925ad02e833a1d22224533d0a683) )
 	ROM_LOAD( "1610.speech-u4",  0x2000, 0x1000, CRC(2915c7bd) SHA1(3ed98747b5237aa1b3bab6866292370dc2c7655a) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
 	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 
@@ -1223,17 +1232,19 @@ ROM_START( startrek )
 	ROM_LOAD( "1869.prom-u22",   0xb000, 0x0800, CRC(e5663070) SHA1(735944c2b924964f72f3bb3d251a35ea2aef3d15) )
 	ROM_LOAD( "1870.prom-u23",   0xb800, 0x0800, CRC(4340616d) SHA1(e93686a29377933332523425532d102e30211111) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "1670.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "6331.speech-u30", 0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "1871.speech-u6",  0x0000, 0x1000, CRC(03713920) SHA1(25a0158cab9983248e91133f96d1849c9e9bcbd2) )
 	ROM_LOAD( "1872.speech-u5",  0x1000, 0x1000, CRC(ebb5c3a9) SHA1(533b6f0499b311f561cf7aba14a7f48ca7c47321) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "s-c.xyt-u39",     0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
 	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
-	ROM_LOAD( "6331.speech-u30", 0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) // speech board addressing
 ROM_END
 
 
@@ -1280,8 +1291,8 @@ void segag80v_state::init_spacfury()
 	m_decrypt = segag80_security(64);
 
 	// configure sound
-	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(sega_speech_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 }
 
@@ -1294,8 +1305,8 @@ void segag80v_state::init_zektor()
 	m_decrypt = segag80_security(82);
 
 	// configure sound
-	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(sega_speech_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
 	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write_ay)));
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
@@ -1333,8 +1344,8 @@ void segag80v_state::init_startrek()
 	m_decrypt = segag80_security(64);
 
 	// configure sound
-	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(sega_speech_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
 
 	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
 	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
