@@ -11,9 +11,12 @@
 #pragma once
 
 #include "machine/netlist.h"
+#include "machine/pit8253.h"
 #include "netlist/nl_setup.h"
 #include "audio/nl_fireone.h"
-#include "sound/samples.h"
+#include "audio/nl_starfire.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 
 
@@ -65,6 +68,7 @@ protected:
 
 	virtual uint8_t input_r(offs_t offset) = 0;
 	virtual void sound_w(offs_t offset, uint8_t data) = 0;
+	virtual void music_w(offs_t offset, uint8_t data) { };
 
 	void scratch_w(offs_t offset, uint8_t data);
 	uint8_t scratch_r(offs_t offset);
@@ -83,11 +87,19 @@ class starfire_state : public starfire_base_state
 public:
 	starfire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: starfire_base_state(mconfig, type, tag)
-		, m_samples(*this, "samples")
+		, m_dac(*this, "dac") // just to have a sound device
 		, m_nmi(*this, "NMI")
-		, m_stick2(*this, "STICK2")
+		, m_stickz(*this, "STICKZ")
 		, m_stickx(*this, "STICKX")
 		, m_sticky(*this, "STICKY")
+		, m_sound_size(*this, "sound_nl:size")
+		, m_sound_explosion(*this, "sound_nl:sexplo")
+		, m_sound_tie(*this, "sound_nl:stie")
+		, m_sound_laser(*this, "sound_nl:slaser")
+		, m_sound_track(*this, "sound_nl:track")
+		, m_sound_lock(*this, "sound_nl:lock")
+		, m_sound_scanner(*this, "sound_nl:scanner")
+		, m_sound_overheat(*this, "sound_nl:oheat")
 	{ }
 
 	void starfire(machine_config &config);
@@ -96,9 +108,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<samples_device> m_samples;
+	required_device<dac_word_interface> m_dac;
+
 	required_ioport m_nmi;
-	required_ioport m_stick2;
+	required_ioport m_stickz;
 	required_ioport m_stickx;
 	required_ioport m_sticky;
 
@@ -107,7 +120,21 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 
-	uint8_t m_prev_sound;
+	NETDEV_ANALOG_CALLBACK_MEMBER(tieon1_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(laseron1_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(sound_out_cb);
+
+	uint8_t m_sound_tie_on;
+	uint8_t m_sound_laser_on;
+
+	required_device<netlist_mame_logic_input_device> m_sound_size;
+	required_device<netlist_mame_logic_input_device> m_sound_explosion;
+	required_device<netlist_mame_logic_input_device> m_sound_tie;
+	required_device<netlist_mame_logic_input_device> m_sound_laser;
+	required_device<netlist_mame_logic_input_device> m_sound_track;
+	required_device<netlist_mame_logic_input_device> m_sound_lock;
+	required_device<netlist_mame_logic_input_device> m_sound_scanner;
+	required_device<netlist_mame_logic_input_device> m_sound_overheat;
 };
 
 class fireone_state : public starfire_base_state
@@ -115,6 +142,7 @@ class fireone_state : public starfire_base_state
 public:
 	fireone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: starfire_base_state(mconfig, type, tag)
+		, m_pit(*this, "pit")
 		, m_controls(*this, "P%u", 1U)
 		, m_sound_left_partial_hit(*this, "sound_nl:lshpht")
 		, m_sound_right_partial_hit(*this, "sound_nl:rshpht")
@@ -124,8 +152,14 @@ public:
 		, m_sound_right_boom(*this, "sound_nl:rboom")
 		, m_sound_torpedo_collision(*this, "sound_nl:torpcoll")
 		, m_sound_submarine_engine(*this, "sound_nl:subeng")
+		, m_sound_alert(*this, "sound_nl:alert")
 		, m_sound_sonar_enable(*this, "sound_nl:sonar_enable")
 		, m_sound_sonar_sync(*this, "sound_nl:sonar_sync")
+		, m_sound_off_left(*this, "sound_nl:lsound_off")
+		, m_sound_off_right(*this, "sound_nl:rsound_off")
+		, m_music_a(*this, "sound_nl:music_a")
+		, m_music_b(*this, "sound_nl:music_b")
+		, m_music_c(*this, "sound_nl:music_c")
 	{ }
 
 	void fireone(machine_config &config);
@@ -134,10 +168,16 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	required_device<pit8253_device> m_pit;
 	required_ioport_array<2> m_controls;
+
+	DECLARE_WRITE_LINE_MEMBER(music_a_out_cb);
+	DECLARE_WRITE_LINE_MEMBER(music_b_out_cb);
+	DECLARE_WRITE_LINE_MEMBER(music_c_out_cb);
 
 	virtual uint8_t input_r(offs_t offset) override;
 	virtual void sound_w(offs_t offset, uint8_t data) override;
+	virtual void music_w(offs_t offset, uint8_t data) override;
 
 	uint8_t m_player_select;
 
@@ -151,8 +191,14 @@ private:
 	required_device<netlist_mame_logic_input_device> m_sound_right_boom;
 	required_device<netlist_mame_logic_input_device> m_sound_torpedo_collision;
 	required_device<netlist_mame_logic_input_device> m_sound_submarine_engine;
+	required_device<netlist_mame_logic_input_device> m_sound_alert;
 	required_device<netlist_mame_logic_input_device> m_sound_sonar_enable;
 	required_device<netlist_mame_logic_input_device> m_sound_sonar_sync;
+	required_device<netlist_mame_logic_input_device> m_sound_off_left;
+	required_device<netlist_mame_logic_input_device> m_sound_off_right;
+	required_device<netlist_mame_logic_input_device> m_music_a;
+	required_device<netlist_mame_logic_input_device> m_music_b;
+	required_device<netlist_mame_logic_input_device> m_music_c;
 };
 
 #endif // MAME_INCLUDES_STARFIRE_H

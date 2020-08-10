@@ -296,6 +296,12 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.h",
 	
+	MAME_DIR .. "src/mame/audio/nl_starcrus.h",
+	MAME_DIR .. "src/mame/audio/nl_starcrus.cpp",
+	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
+	MAME_DIR .. "src/mame/includes/starcrus.h",
+	MAME_DIR .. "src/mame/video/starcrus.cpp",
+
 	MAME_DIR .. "src/mame/audio/nl_carpolo.h",
 	MAME_DIR .. "src/mame/audio/nl_carpolo.cpp",
 	MAME_DIR .. "src/mame/drivers/carpolo.cpp",
@@ -305,6 +311,8 @@ files{
 
 	MAME_DIR .. "src/mame/audio/nl_fireone.h",
 	MAME_DIR .. "src/mame/audio/nl_fireone.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starfire.h",
+	MAME_DIR .. "src/mame/audio/nl_starfire.cpp",
 	MAME_DIR .. "src/mame/drivers/starfire.cpp",
 	MAME_DIR .. "src/mame/includes/starfire.h",
 	MAME_DIR .. "src/mame/video/starfire.cpp",
