@@ -36,6 +36,7 @@ public:
 	pcp8718_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainram(*this, "mainram"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")
 	{ }
@@ -49,11 +50,14 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<unsp_20_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_mainram;
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
 	void map(address_map &map);
+
+	uint16_t simulate_28f7_r();
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -76,7 +80,7 @@ void pcp8718_state::map(address_map &map)
 	// there are calls to 01xxx and 02xxx regions
 	// (RAM populated by internal ROM?, TODO: check to make sure code copied there isn't from SPI ROM like the GPL16250 bootstrap
 	//  does from NAND, it doesn't seem to have a header in the same format at least)
-	map(0x000000, 0x006fff).ram();
+	map(0x000000, 0x006fff).ram().share("mainram");
 
 	// registers at 7xxx are similar to GPL16250, but not identical? (different video system?)
 
@@ -87,11 +91,45 @@ void pcp8718_state::map(address_map &map)
 	map(0x020000, 0x3fffff).rom().region("spi", 0x00000);
 }
 
+uint16_t pcp8718_state::simulate_28f7_r()
+{
+	// jumps to 28f7 act as a long jump to the address stored in 1d/1e
+	// (or possibly a data copy + execute??)
+
+	if (!machine().side_effects_disabled())
+	{
+		uint16_t pc = m_maincpu->state_int(UNSP_PC);
+		uint16_t sr = m_maincpu->state_int(UNSP_SR);
+
+		int realpc = (pc | (sr << 16)) & 0x003fffff;
+		if (realpc == 0x28f7)
+		{
+			address_space& mem = m_maincpu->space(AS_PROGRAM);
+			int newpc = mem.read_word(0x001d);
+			int newds = mem.read_word(0x001e);
+
+			sr &= 0xfff0;
+			sr |= (newds & 0x003f);
+
+			m_maincpu->set_state_int(UNSP_PC, newpc);
+			m_maincpu->set_state_int(UNSP_SR, sr);
+		}
+	}
+	return m_mainram[0x28f7];
+}
+
+
+
+
 void pcp8718_state::machine_reset()
 {
 	// this looks like it might actually be part of the IRQ handler (increase counter at 00 at the very start) rather than where we should end up after startup
+	// it also looks like (from the pc = 2xxx opcodes) that maybe this code should be being executed in RAM as those don't give correct offsets in the data segment.
 	m_maincpu->set_state_int(UNSP_PC, 0x0042);
 	m_maincpu->set_state_int(UNSP_SR, 0x0002);
+
+	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
+	ROM[0x7000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
 
 	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
 	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
@@ -99,8 +137,10 @@ void pcp8718_state::machine_reset()
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
 	mem.write_word(0x2a46, 0x9a90); // retf from RAM call (unknown purpose)
 
-	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
-	ROM[0x7000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
+	mem.write_word(0x28f7, 0xf165); // goto to RAM, for long jump / call (simulated),  could also be 'copy code at this address into RAM to execute'
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::simulate_28f7_r)));
+
 }
 
 void pcp8718_state::pcp8718(machine_config &config)
