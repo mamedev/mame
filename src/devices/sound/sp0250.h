@@ -7,10 +7,6 @@
 
 class sp0250_device : public device_t, public device_sound_interface
 {
-	// output DAC uses PWM at 7 bits of resolution
-	static const int DAC_RESOLUTION = 7;
-	static const int PWM_STEPS = 1 << DAC_RESOLUTION;
-
 public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -30,6 +26,7 @@ private:
 	// internal state
 	uint8_t m_pwm_index;
 	uint8_t m_pwm_count;
+	uint32_t m_pwm_counts;
 	int16_t m_amp;
 	uint8_t m_pitch;
 	uint8_t m_repeat;
