@@ -52,7 +52,7 @@ jobs:
         flags: '-avzr --delete --inplace'
         options: ''
         ssh_options: '-p ${{ secrets.PORT }}'
-        src: /mame_libretro.zip
+        src: mame_libretro.zip
         dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.MACOS_X86_64_PATH }}'
 
 
