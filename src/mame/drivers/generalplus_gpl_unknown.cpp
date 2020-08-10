@@ -92,6 +92,15 @@ void pcp8718_state::machine_reset()
 	// this looks like it might actually be part of the IRQ handler (increase counter at 00 at the very start) rather than where we should end up after startup
 	m_maincpu->set_state_int(UNSP_PC, 0x0042);
 	m_maincpu->set_state_int(UNSP_SR, 0x0002);
+
+	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
+	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
+
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	mem.write_word(0x2a46, 0x9a90); // retf from RAM call (unknown purpose)
+
+	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
+	ROM[0x7000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
 }
 
 void pcp8718_state::pcp8718(machine_config &config)
