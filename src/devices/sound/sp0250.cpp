@@ -40,12 +40,13 @@ DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SP0250, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	m_pwm_index(0),
+	m_pwm_count(0),
 	m_amp(0),
 	m_pitch(0),
 	m_repeat(0),
 	m_pcount(0),
 	m_rcount(0),
-	m_playing(0),
 	m_RNG(0),
 	m_stream(nullptr),
 	m_voiced(0),
@@ -81,14 +82,13 @@ void sp0250_device::device_start()
 		m_tick_timer->adjust(attotime::from_hz(clock()) * CLOCK_DIVIDER, 0, attotime::from_hz(clock()) * CLOCK_DIVIDER);
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() * PWM_STEPS / CLOCK_DIVIDER);
 
 	save_item(NAME(m_amp));
 	save_item(NAME(m_pitch));
 	save_item(NAME(m_repeat));
 	save_item(NAME(m_pcount));
 	save_item(NAME(m_rcount));
-	save_item(NAME(m_playing));
 	save_item(NAME(m_RNG));
 	save_item(NAME(m_voiced));
 	save_item(NAME(m_fifo));
@@ -146,8 +146,6 @@ void sp0250_device::load_values()
 
 	for (int f = 0; f < 6; f++)
 		m_filter[f].reset();
-
-	m_playing = 1;
 }
 
 TIMER_CALLBACK_MEMBER( sp0250_device::timer_tick )
@@ -175,6 +173,59 @@ uint8_t sp0250_device::drq_r()
 	return (m_fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;
 }
 
+void sp0250_device::next()
+{
+	if (m_rcount >= m_repeat)
+	{
+		if (m_fifo_pos == 15)
+			load_values();
+		else
+		{
+			// According to http://www.cpcwiki.eu/index.php/SP0256_Measured_Timings
+			// the SP0250 executes "NOPs" with a repeat count of 1 and unchanged
+			// pitch while waiting for input
+			m_repeat = 1;
+			m_pcount = 0;
+			m_rcount = 0;
+		}
+	}
+
+	int16_t z0;
+	if (m_voiced)
+	{
+		if(!m_pcount)
+			z0 = m_amp;
+		else
+			z0 = 0;
+	}
+	else
+	{
+		// Borrowing the ay noise generation LFSR
+		if(m_RNG & 1)
+		{
+			z0 = m_amp;
+			m_RNG ^= 0x24000;
+		}
+		else
+			z0 = -m_amp;
+
+		m_RNG >>= 1;
+	}
+
+	for (int f = 0; f < 6; f++)
+		z0 = m_filter[f].apply(z0);
+
+	// maximum value is +/-0xf80, effectively 13 bits
+	m_pwm_count = PWM_STEPS/2 + (z0 >> (13 - DAC_RESOLUTION));
+
+	m_pcount++;
+	if (m_pcount >= m_pitch)
+	{
+		m_pcount = 0;
+		m_rcount++;
+	}
+}
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -182,67 +233,38 @@ uint8_t sp0250_device::drq_r()
 void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
-	for (int i = 0; i < samples; i++)
+	while (samples != 0)
 	{
-		if (m_playing)
+		// see where we're at in the current PWM cycle
+		uint8_t index = m_pwm_index % PWM_STEPS;
+
+		// at index 0, step the system along
+		if (index == 0)
+			next();
+
+		// determine the value to fill and the number of samples remaining
+		// until it changes
+		stream_sample_t value;
+		int remaining;
+		if (index < m_pwm_count)
 		{
-			int16_t z0;
-
-			if (m_voiced)
-			{
-				if(!m_pcount)
-					z0 = m_amp;
-				else
-					z0 = 0;
-			}
-			else
-			{
-				// Borrowing the ay noise generation LFSR
-				if(m_RNG & 1)
-				{
-					z0 = m_amp;
-					m_RNG ^= 0x24000;
-				}
-				else
-					z0 = -m_amp;
-
-				m_RNG >>= 1;
-			}
-
-			for (int f = 0; f < 6; f++)
-				z0 = m_filter[f].apply(z0);
-
-			// Physical resolution is only 7 bits, but heh
-
-			// max amplitude is 0x0f80 so we have margin to push up the output
-			output[i] = z0 << 3;
-
-			m_pcount++;
-			if (m_pcount >= m_pitch)
-			{
-				m_pcount = 0;
-				m_rcount++;
-				if (m_rcount >= m_repeat)
-					m_playing = 0;
-			}
+			value = 32767;
+			remaining = m_pwm_count - index;
 		}
 		else
-			output[i] = 0;
-
-		if (!m_playing)
 		{
-			if(m_fifo_pos == 15)
-				load_values();
-			else
-			{
-				// According to http://www.cpcwiki.eu/index.php/SP0256_Measured_Timings
-				// the SP0250 executes "NOPs" with a repeat count of 1 and unchanged
-				// pitch while waiting for input
-				m_repeat = 1;
-				m_pcount = 0;
-				m_rcount = 0;
-				m_playing = 1;
-			}
+			value = 0;
+			remaining = PWM_STEPS - index;
 		}
+
+		// clamp to the number of samples requested and advance the counters
+		if (remaining > samples)
+			remaining = samples;
+		m_pwm_index += remaining;
+		samples -= remaining;
+
+		// fill the output
+		while (remaining-- != 0)
+			*output++ = value;
 	}
 }
