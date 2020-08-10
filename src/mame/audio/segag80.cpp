@@ -165,7 +165,7 @@ zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device, "spcfury_audio", "Space Fury Sound Board")
 
 spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: segag80_audio_device(mconfig, SPACE_FURY_AUDIO, tag, owner, clock, 0xc7, 0x3f, false, NETLIST_NAME(spacfury), 15000.0)
+	: segag80_audio_device(mconfig, SPACE_FURY_AUDIO, tag, owner, clock, 0xc7, 0x3f, false, NETLIST_NAME(spacfury), 60000.0)
 {
 }
 
