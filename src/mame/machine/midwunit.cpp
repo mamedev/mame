@@ -82,6 +82,7 @@ void midwunit_state::midwunit_io_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 			/* bit 5 (active low) reset security chip */
 			if (m_midway_serial_pic) m_midway_serial_pic->reset_w(newword & 0x20);
+			if (m_midway_serial_pic_emu) m_midway_serial_pic_emu->reset_w(newword & 0x20);
 			break;
 
 		case 3:
@@ -122,6 +123,7 @@ uint16_t midwunit_state::midwunit_io_r(offs_t offset)
 		{
 			int picret = 0;
 			if (m_midway_serial_pic) picret = m_midway_serial_pic->status_r();
+			if (m_midway_serial_pic_emu) picret = m_midway_serial_pic_emu->status_r();
 
 			return (picret << 12) | midwunit_sound_state_r();
 		}
@@ -340,6 +342,7 @@ uint16_t midwunit_state::midwunit_security_r()
 {
 	uint16_t picret = 0;
 	if (m_midway_serial_pic) picret = m_midway_serial_pic->read();
+	if (m_midway_serial_pic_emu) picret = m_midway_serial_pic_emu->read();
 	return picret;
 }
 
@@ -349,6 +352,7 @@ void midwunit_state::midwunit_security_w(offs_t offset, uint16_t data, uint16_t 
 	if (offset == 0 && ACCESSING_BITS_0_7)
 	{
 		if (m_midway_serial_pic) m_midway_serial_pic->write(data);
+		if (m_midway_serial_pic_emu) m_midway_serial_pic_emu->write(data);
 	}
 }
 
