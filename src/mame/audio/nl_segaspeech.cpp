@@ -13,7 +13,7 @@
 //
 
 #include "netlist/devices/net_lib.h"
-
+#include "nl_segaspeech.h"
 
 //
 // Optimizations
@@ -32,8 +32,12 @@ NETLIST_START(segaspeech)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
+#if (USE_CURRENT_SOURCE)
 	CS(I_SP0250, 0) // Fed through stream ...
 	NET_C(I_SP0250.1, I_V5)
+#else
+	ANALOG_INPUT(I_SP0250, 0)
+#endif
 
 	TTL_INPUT(I_CONTROL_D3, 0)
 	NET_C(I_CONTROL_D3.GND, GND)
@@ -70,7 +74,11 @@ NETLIST_START(segaspeech)
 	NET_C(U12.7, I_VM5)		// VEE
 	NET_C(U12.8, GND)
 
+#if (USE_CURRENT_SOURCE)
 	NET_C(I_SP0250.2, R17.2, C9.1)
+#else
+	NET_C(I_SP0250, R17.2, C9.1)
+#endif
 	NET_C(R17.1, I_V5)
 	NET_C(C9.2, R18.1)
 	NET_C(R18.2, R19.2, C10.1, U8.2)

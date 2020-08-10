@@ -14,8 +14,7 @@
 #include "sound/sp0250.h"
 #include "includes/segag80r.h"
 #include "includes/segag80v.h"
-
-NETLIST_EXTERNAL(segaspeech);
+#include "audio/nl_segaspeech.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -192,6 +191,7 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 	// speech chip
 	sp0250_device &speech(SP0250(config, "sp0250", SPEECH_MASTER_CLOCK));
 	speech.drq().set(FUNC(sega_speech_device::drq_w));
+//	speech.add_route(ALL_OUTPUTS, *this, 1.0, 0);
 	speech.add_route(ALL_OUTPUTS, "sound_nl", 1.0, 0);
 
 	// netlist filtering
@@ -199,7 +199,11 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 		.set_source(NETLIST_NAME(segaspeech))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
+#if (USE_CURRENT_SOURCE)
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.I").set_mult_offset(5e-8 / 16384.0, 0);
+#else
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.IN").set_mult_offset(5.0 / 32767.0, 0);
+#endif
 	NETLIST_LOGIC_INPUT(config, m_control_d3, "I_CONTROL_D3.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(7500.0, 0.0);
