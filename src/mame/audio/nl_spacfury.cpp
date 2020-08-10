@@ -8,7 +8,12 @@
 //
 // Known problems/issues:
 //
-//    * WIP.
+//    * Works pretty well. All sounds trigger.
+//
+//    * Very challenging to get running at speed. We have to use
+//       the "slow" CA3080 model for the star spin sound, which
+//       creates a giant net that dominates time and is sensitive
+//       to cheats to reduce timesteps, etc
 //
 
 #include "netlist/devices/net_lib.h"
@@ -20,7 +25,11 @@
 //
 
 #define HLE_SHOOT_VCO (1)
+#define SPLIT_SHARED_OSCILLATORS (1)
+#define ENABLE_SPIN_VCO_FRONTIER (1)
+#define ENABLE_NOISE_FRONTIERS (1)
 #define ENABLE_FRONTIERS (1)
+#define UNDERCLOCK_NOISE_GEN (1 && ENABLE_NOISE_FRONTIERS)
 
 
 
@@ -33,6 +42,9 @@
 
 
 
+//
+// Local models
+//
 
 #define D_1N914(name) DIODE(name, "1N914")
 #define D_1N4002(name) DIODE(name, "D(IS=65.4p RS=42.2m BV=100 IBV=5.00u CJO=14.8p M=0.333 N=1.36 TT=2.88u)")
@@ -44,17 +56,21 @@
 #define Q_2N4403(name) QBJT_EB(name, "PNP(Is=650.6E-18 Xti=3 Eg=1.11 Vaf=115.7 Bf=216.2 Ne=1.829 Ise=58.72f Ikf=1.079 Xtb=1.5 Br=3.578 Nc=2 Isc=0 Ikr=0 Rc=.715 Cjc=14.76p Mjc=.5383 Vjc=.75 Fc=.5 Cje=19.82p Mje=.3357 Vje=.75 Tr=111.6n Tf=603.7p Itf=.65 Vtf=5 Xtf=1.7 Rb=10)")
 
 // JFET transistors not supported, but this should do the trick
-#define Q_2N4093(name) MOSFET(name, "NMOS(VTO=-1.0)")
+//#define Q_2N4093(name) MOSFET(name, "NMOS(VTO=-1.0)")
+#define Q_2N4093(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")
 
 #define LM555_DIP NE555_DIP
 #define LM566_DIP NE566_DIP
 
 #define TTL_74LS00_DIP TTL_7400_DIP
 
+
+
 //
 // DIP mappings use the submodels below for CA3080
 //
-#define CA3080_DIP(name) SUBMODEL(_CA3080_FAST_DIP, name)
+#define CA3080_FAST_DIP(name) SUBMODEL(_CA3080_FAST_DIP, name)
+#define CA3080_SLOW_DIP(name) SUBMODEL(_CA3080_SLOW_DIP, name)
 static NETLIST_START(_CA3080_FAST_DIP)
 	ALIAS(2, F.A0) // -
 	ALIAS(3, F.A1) // +
@@ -77,6 +93,54 @@ static NETLIST_START(_CA3080_FAST_DIP)
 	NET_C(F.Q, VO.IP)
 NETLIST_END()
 
+static NETLIST_START(_CA3080_SLOW_DIP)
+//
+// These items are common to several models
+//
+#define CA3080_D(name) DIODE(name, "D(IS=2p RS=5 BV=40 CJO=3p TT=6n)")
+#define CA3080_NPN(name) QBJT_EB(name, "NPN(IS=21.48f XTI=3 EG=1.11 VAF=80 BF=550 ISE=50f NE=1.5 IKF=10m XTB=1.5 BR=.1 ISC=10f NC=2 IKR=3m RC=10 CJC=800f MJC=.3333 VJC=.75 FC=.5 CJE=1.3p MJE=.3333 VJE=.75 TR=30n TF=400P ITF=30m XTF=1 VTF=10 CJS=5.8P MJS=.3333 VJS=.75)")
+#define CA3080_PNP(name) QBJT_EB(name, "PNP(IS=50f XTI=3 EG=1.11 VAF=80 BF=100 ISE=130f NE=1.5 IKF=1m XTB=1.5 BR=1 ISC=0 NC=2 IKR=0 RC=0 CJC=4p MJC=.3333 VJC=.75 FC=.5 CJE=1.4p MJE=.3333 VJE=.75 TR=500n TF=23n ITF=.1 XTF=1 VTF=10 CJS=5.5P MJS=.3333 VJS=.75)")
+
+	CA3080_D(D1)
+	CA3080_D(D2)
+	CA3080_NPN(Q1)
+	CA3080_PNP(Q2)
+	CA3080_PNP(Q3)
+	CA3080_NPN(Q4)
+	CA3080_NPN(Q5)
+	CA3080_PNP(Q6)
+	CA3080_PNP(Q7)
+	CA3080_PNP(Q8)
+	CA3080_PNP(Q9)
+	CA3080_NPN(Q10)
+	CA3080_NPN(Q11)
+	CA3080_NPN(Q12)
+	CA3080_NPN(Q13)
+	CA3080_PNP(Q14)
+	CA3080_PNP(Q15)
+
+	ALIAS(2, Q10.B)     // N1
+	ALIAS(3, Q5.B)      // N28
+	ALIAS(4, Q1.E)      // N13
+	ALIAS(5, Q1.B)      // N11
+	ALIAS(6, Q6.C)      // N30
+	ALIAS(7, Q8.E)      // N8
+	NET_C(Q8.E, Q9.E, Q14.E, Q15.E)     // N8
+	NET_C(Q1.B, Q1.C, Q4.B)             // N11
+	NET_C(Q1.E, Q4.E, Q11.E, Q12.E)     // N13
+	NET_C(Q6.C, Q7.C, Q13.C)            // N30
+	NET_C(Q3.B, Q10.C, Q14.C, D1.A)     // N1N13
+	NET_C(Q2.E, Q14.B, Q15.C, Q15.B)    // N1N15
+	NET_C(Q2.B, Q3.E, D1.K)             // N1N17
+	NET_C(Q2.C, Q3.C, Q11.C, Q13.B)     // N1N22
+	NET_C(Q5.C, Q6.B, Q9.C, D2.A)       // N1N32
+	NET_C(Q6.E, Q7.B, D2.K)             // N1N34
+	NET_C(Q7.E, Q8.C, Q8.B, Q9.B)       // N1N36
+	NET_C(Q4.C, Q5.E, Q10.E)            // N1N52
+	NET_C(Q11.B, Q12.C, Q12.B, Q13.E)   // N1N44
+NETLIST_END()
+
+
 
 //
 // Main netlist
@@ -86,9 +150,14 @@ NETLIST_START(spacfury)
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-5)
+	// subtle but noticeable effect where the spin "whoosh" is missing
+	// some upper harmonics at 4e-5; however, this is the most demanding
+	// solver in the system and it keeps jumping around as I tweak things
+//	PARAM(Solver.Solver_21.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
 	LOCAL_SOURCE(_CA3080_FAST_DIP)
+	LOCAL_SOURCE(_CA3080_SLOW_DIP)
 
 	TTL_INPUT(I_LO_D0, 0)
 	ALIAS(I_CRAFTS_SCALE, I_LO_D0)
@@ -410,7 +479,7 @@ NETLIST_START(spacfury)
 	NET_C(U6.7, GND)
 	NET_C(U6.14, I_V12)
 
-	CA3080_DIP(U7)			// Op. Amp.
+	CA3080_SLOW_DIP(U7)			// Op. Amp.
 	NET_C(U7.4, I_VM12)
 	NET_C(U7.7, I_V12)
 
@@ -419,6 +488,18 @@ NETLIST_START(spacfury)
 	NET_C(U8.4, I_VM12)
 
 	MM5837_DIP(U9)			// Noise Generator
+#if (UNDERCLOCK_NOISE_GEN)
+	// officially runs at 48-112kHz, but little noticeable difference
+	// in exchange for a big performance boost
+	PARAM(U9.FREQ, 24000)
+
+	// the NOISE_B signal can run even lower, so use a second
+	// MM5837 instance at a lower frequency to drive it; this
+	// second instance doesn't really exist, it just allows us
+	// a bit more performance
+	MM5837_DIP(U9B)			// Noise Generator
+	PARAM(U9B.FREQ, 12000)
+#endif
 
 	TL082_DIP(U10)			// Op. Amp.
 	NET_C(U10.8, I_V12)
@@ -428,7 +509,7 @@ NETLIST_START(spacfury)
 	NET_C(U11.7, GND)
 	NET_C(U11.14, I_V12)
 
-	CA3080_DIP(U12)			// Op. Amp.
+	CA3080_SLOW_DIP(U12)			// Op. Amp.
 	NET_C(U12.4, I_VM12)
 	NET_C(U12.7, I_V12)
 
@@ -516,7 +597,7 @@ NETLIST_START(spacfury)
 
 	// Pairs of CD4069 are used together with resistors and capacitors
 	// to create oscillators. The formula for the frequency is
-	// 1/(1.39*R*C). The following are simulated here:
+	// 1/1.39*R*C. The following are simulated here:
 	//
 	// #1: R35=680K, C12=0.01uF,  Freq=105.80Hz
 	// #2:  R6=680K, C11=0.01uF,  Freq=105.80Hz
@@ -528,19 +609,19 @@ NETLIST_START(spacfury)
 	CLOCK(O1CLK, 105.8)
 	NET_C(O1CLK.GND, GND)
 	NET_C(O1CLK.VCC, I_V12)
-	NET_C(O1CLK.Q, R56.1, R55.2)
+	NET_C(O1CLK.Q, R56.1)
 	NET_C(GND, R35.1, R35.2, C12.1, C12.2, U3.5, U3.9)
 
 	CLOCK(O2CLK, 105.7)
 	NET_C(O2CLK.GND, GND)
 	NET_C(O2CLK.VCC, I_V12)
-	NET_C(O2CLK.Q, R54.1, R53.2)
+	NET_C(O2CLK.Q, R54.1)
 	NET_C(GND, R6.1, R6.2, C11.1, C11.2, U3.1, U3.3)
 
 	CLOCK(O3CLK, 105.9)
 	NET_C(O3CLK.GND, GND)
 	NET_C(O3CLK.VCC, I_V12)
-	NET_C(O3CLK.Q, R58.1, R57.2)
+	NET_C(O3CLK.Q, R58.1)
 	NET_C(GND, R7.1, R7.2, C13.1, C13.2, U3.13, U3.11)
 
 	NET_C(I_MOVING, U31.13)
@@ -560,10 +641,41 @@ NETLIST_START(spacfury)
 	// Sheet 7, 2nd from top (Star Spin/Partial Warship)
 	//
 
+#if (SPLIT_SHARED_OSCILLATORS)
+
+	// In the schematics, the below oscillators are shared; however,
+	// connecting them also brings the two nets together, so we just
+	// duplicate the clocks here to help keep the very expensive net
+	// below more isolated.
+
+	CLOCK(O1CLKA, 105.8)
+	NET_C(O1CLKA.GND, GND)
+	NET_C(O1CLKA.VCC, I_V12)
+	NET_C(O1CLKA.Q, R55.2)
+
+	CLOCK(O2CLKB, 105.7)
+	NET_C(O2CLKB.GND, GND)
+	NET_C(O2CLKB.VCC, I_V12)
+	NET_C(O2CLKB.Q, R53.2)
+
+	CLOCK(O3CLKC, 105.9)
+	NET_C(O3CLKC.GND, GND)
+	NET_C(O3CLKC.VCC, I_V12)
+	NET_C(O3CLKC.Q, R57.2)
+
+#else
+
+	NET_C(O1CLK.Q, R55.2)
+	NET_C(O2CLK.Q, R53.2)
+	NET_C(O3CLK.Q, R57.2)
+
+#endif
+
 	NET_C(I_STAR_SPIN, U31.3, U31.1)
 	NET_C(U31.2, R148.1)
-	NET_C(R148.2, C32.2, R62.2, U13.5)
 	NET_C(C32.1, I_V12, R62.1, R72.1)
+
+	NET_C(R148.2, C32.2, R62.2, U13.5)
 	NET_C(R72.2, R90.2, R91.1, D6.A)
 	NET_C(R90.1, GND)
 	NET_C(U13.6, U13.7, D5.A)
@@ -571,7 +683,17 @@ NETLIST_START(spacfury)
 	NET_C(R94.2, R108.2, U16.5)
 	NET_C(R108.1, GND)
 	NET_C(R92.2, U16.6, R107.1, C47.1)
+
+#if (ENABLE_SPIN_VCO_FRONTIER)
+	// split the envelope VCO from the rest of the circuit
+	// to break up a giant net into 2 smaller ones
+	NET_C(C47.2, U16.7, U16.2, TESTFUNC.A0)
+	AFUNC(TESTFUNC, 1, "A0")
+	NET_C(TESTFUNC.Q, R89.1, R88.1)
+#else
 	NET_C(C47.2, U16.7, U16.2, R89.1, R88.1)
+#endif
+
 	NET_C(U16.3, R93.1, R91.2)
 	NET_C(R93.2, U16.1, D10.A)
 	NET_C(D10.K, R106.2)
@@ -589,7 +711,7 @@ NETLIST_START(spacfury)
 	NET_C(C26.1, U8.2, U7.6)
 	NET_C(U8.3, GND)
 	NET_C(U31.4, C34.1)
-	ALIAS(NOISE_A, C34.1)
+	NET_C(NOISE_A, C34.1)
 	NET_C(C34.2, R64.1)
 	NET_C(U8.5, R49.2, R50.1)
 	NET_C(R49.1, GND)
@@ -629,7 +751,7 @@ NETLIST_START(spacfury)
 	NET_C(C50.2, GND)
 	NET_C(R86.2, U14.6, R85.1)
 	NET_C(R87.2, U14.5, D8.K, Q8.D)
-	ALIAS(NOISE_B, Q8.G)
+	NET_C(NOISE_B, Q8.G)
 	NET_C(Q8.S, GND)
 	NET_C(D8.A, GND)
 	NET_C(R85.2, R71.1, U14.7)
@@ -648,10 +770,47 @@ NETLIST_START(spacfury)
 	NET_C(U9.1, GND)
 	NET_C(U9.4, I_V12)
 	NET_C(U9.2, I_VM12)
-	NET_C(U9.3, R52.1, C28.2)
-	NET_C(C28.1, R14.2, NOISE_B)
+	NET_C(C28.1, R14.2)
+
+#if (UNDERCLOCK_NOISE_GEN)
+
+	NET_C(U9B.1, GND)
+	NET_C(U9B.4, I_V12)
+	NET_C(U9B.2, I_VM12)
+	NET_C(U9B.3, C28.2)
+	// Yes - AFuncs are frontiers as well
+	AFUNC(NOISE_B_FUNC, 1, "A0")
+	NET_C(R14.2, NOISE_B_FUNC.A0)
+	ALIAS(NOISE_B, NOISE_B_FUNC.Q)
 	NET_C(R14.1, GND)
-	NET_C(R52.2, NOISE_A)
+	// Yes - AFuncs are frontiers as well
+	AFUNC(NOISE_A_FUNC, 1, "A0")
+	NET_C(U9.3, NOISE_A_FUNC.A0)
+	NET_C(R52.1, NOISE_A_FUNC.Q)
+	ALIAS(NOISE_A, R52.2)
+
+#else
+
+#if (ENABLE_NOISE_FRONTIERS)
+	// Yes - AFuncs are frontiers as well
+	AFUNC(NOISE_B_FUNC, 1, "A0")
+	NET_C(R14.2, NOISE_B_FUNC.A0)
+	ALIAS(NOISE_B, NOISE_B_FUNC.Q)
+#else
+	ALIAS(NOISE_B, R14.2)
+#endif
+	NET_C(R14.1, GND)
+#if (ENABLE_NOISE_FRONTIERS)
+	// Yes - AFuncs are frontiers as well
+	AFUNC(NOISE_A_FUNC, 1, "A0")
+	NET_C(U9.3, NOISE_A_FUNC.A0, C28.2)
+	NET_C(R52.1, NOISE_A_FUNC.Q)
+#else
+	NET_C(U9.3, R52.1, C28.2)
+#endif
+	ALIAS(NOISE_A, R52.2)
+
+#endif
 
 	NET_C(I_SMALL_EXPL, U26.13)
 	NET_C(U26.12, R32.2, U6.2)
@@ -908,6 +1067,7 @@ NETLIST_START(spacfury)
 	NET_C(FIREBALL_SUM, R24.1)
 	NET_C(STAR_SPIN_PARTIAL_WARSHIP_SUM, R20.1)
 	NET_C(PSG_SUM, R18.1)
+
 	NET_C(R25.2, R21.2, R23.2, R19.2, R26.2, R22.2, R27.2, R24.2, R20.2, R18.2)
 	ALIAS(OUTPUT, R18.2)
 
@@ -922,10 +1082,19 @@ NETLIST_START(spacfury)
 	// Unconnected outputs
 	//
 
-
 #if (ENABLE_FRONTIERS)
-	OPTIMIZE_FRONTIER(R29.1, RES_M(1), 50)
-	OPTIMIZE_FRONTIER(R30.2, RES_M(1), 50)
+#define RXX 384
+	OPTIMIZE_FRONTIER(C36.1, RES_K(3.9), RXX)
+	OPTIMIZE_FRONTIER(C44.1, RES_K(4.7), RXX)
+	OPTIMIZE_FRONTIER(R25.1, RES_K(47), RXX)
+	OPTIMIZE_FRONTIER(R21.1, RES_K(47), RXX)
+	OPTIMIZE_FRONTIER(R23.1, RES_K(82), RXX)
+	OPTIMIZE_FRONTIER(R19.1, RES_K(470), RXX)
+	OPTIMIZE_FRONTIER(R26.1, 100, RXX)
+	OPTIMIZE_FRONTIER(R22.1, RES_K(3.9), RXX)
+	OPTIMIZE_FRONTIER(R27.1, RES_K(100), RXX)
+	OPTIMIZE_FRONTIER(R24.1, RES_K(4.7), RXX)
+	OPTIMIZE_FRONTIER(R20.1, RES_K(22), RXX)
 #endif
 
 NETLIST_END()
