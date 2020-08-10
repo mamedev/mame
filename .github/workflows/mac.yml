@@ -49,7 +49,7 @@ jobs:
       env:
         DEPLOY_KEY: ${{ secrets.KEY }}
       with:
-        flags: '-avzr --delete --inplace'
+        flags: '-azr --delete -vvv'
         options: ''
         ssh_options: '-p ${{ secrets.PORT }}'
         src: mame_libretro.zip
