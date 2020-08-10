@@ -304,6 +304,8 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_segas16b.h",
 	MAME_DIR .. "src/mame/audio/nl_segausb.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segausb.h",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.h",
 	MAME_DIR .. "src/mame/machine/315_5195.cpp",
 	MAME_DIR .. "src/mame/machine/315_5195.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",

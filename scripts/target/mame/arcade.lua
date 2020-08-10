@@ -3639,6 +3639,8 @@ files {
 	MAME_DIR .. "src/mame/audio/segausb.h",
 	MAME_DIR .. "src/mame/audio/nl_segausb.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segausb.h",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.h",
 	MAME_DIR .. "src/mame/video/segaic16.cpp",
 	MAME_DIR .. "src/mame/video/segaic16.h",
 	MAME_DIR .. "src/mame/video/segaic16_road.cpp",
