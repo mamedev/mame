@@ -9487,12 +9487,12 @@ GAME(  199?, v4frfacte,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4f
 GAME(  199?, v4frfactf,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
-/* All contain BWB video in the BIOS rom tho */
+/* All contain BWB video in the BIOS rom tho, Cyber Casino also needs a Jackpot link? */
 /* These seem to use the other palette chip (BT471). and use the German BWB bank setup, so may need more work */
 
-GAME(  199?, v4cybcas,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_cybcas,     ROT0, "Nova","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4cybcas,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_cybcas,     ROT0, "BWB (Nova license)","Cyber Casino (Nova, German) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_bwbhack,    ROT0, "Nova","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
+GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
 
 GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS ) 
 GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS ) 
