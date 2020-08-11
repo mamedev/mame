@@ -25,6 +25,7 @@ class segag80v_state : public driver_device
 public:
 	segag80v_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_mainrom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vectorram(*this, "vectorram"),
 		m_maincpu(*this, "maincpu"),
@@ -95,6 +96,7 @@ public:
 	}
 
 private:
+	required_memory_region m_mainrom;
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_vectorram;
 
@@ -129,7 +131,8 @@ private:
 	int m_min_y;
 	attotime m_draw_end_time;
 
-	u8 g80v_opcode_r(offs_t offset);
+	u8 opcode_r(offs_t offset);
+	u8 mainrom_r(offs_t offset);
 	void mainram_w(offs_t offset, u8 data);
 	void vectorram_w(offs_t offset, u8 data);
 	u8 mangled_ports_r(offs_t offset);

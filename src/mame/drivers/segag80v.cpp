@@ -144,6 +144,9 @@
 #include "speaker.h"
 
 
+static constexpr int WAIT_STATES = 3;
+
+
 /*************************************
  *
  *  Machine setup and config
@@ -181,8 +184,18 @@ void segag80v_state::machine_start()
  *
  *************************************/
 
-u8 segag80v_state::g80v_opcode_r(offs_t offset)
+u8 segag80v_state::mainrom_r(offs_t offset)
 {
+	// all memory accesses incur a multi-cycle WAIT on the Z80
+	m_maincpu->adjust_icount(-WAIT_STATES);
+	return m_mainrom->base()[offset];
+}
+
+u8 segag80v_state::opcode_r(offs_t offset)
+{
+	// all memory accesses incur a multi-cycle WAIT on the Z80
+	m_maincpu->adjust_icount(-WAIT_STATES);
+
 	// opcodes themselves are not scrambled
 	u8 op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
@@ -207,16 +220,22 @@ offs_t segag80v_state::decrypt_offset(offs_t offset)
 
 void segag80v_state::mainram_w(offs_t offset, u8 data)
 {
+	// all memory accesses incur a multi-cycle WAIT on the Z80
+	m_maincpu->adjust_icount(-WAIT_STATES);
 	m_mainram[decrypt_offset(offset)] = data;
 }
 
 void segag80v_state::usb_ram_w(offs_t offset, u8 data)
 {
+	// all memory accesses incur a multi-cycle WAIT on the Z80
+	m_maincpu->adjust_icount(-WAIT_STATES);
 	m_usb->ram_w(decrypt_offset(offset), data);
 }
 
 void segag80v_state::vectorram_w(offs_t offset, u8 data)
 {
+	// all memory accesses incur a multi-cycle WAIT on the Z80
+	m_maincpu->adjust_icount(-WAIT_STATES);
 	m_vectorram[decrypt_offset(offset)] = data;
 }
 
@@ -460,15 +479,14 @@ WRITE_LINE_MEMBER(segag80v_state::irq_ack_w)
 // complete memory map derived from schematics
 void segag80v_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom();     // CPU board ROM
-	map(0x0800, 0xbfff).rom();     // PROM board ROM area
+	map(0x0000, 0xbfff).rom().r(FUNC(segag80v_state::mainrom_r)); // CPU board ROM 000-7FF; PROM board above
 	map(0xc800, 0xcfff).ram().w(FUNC(segag80v_state::mainram_w)).share("mainram");
 	map(0xe000, 0xefff).ram().w(FUNC(segag80v_state::vectorram_w)).share("vectorram");
 }
 
 void segag80v_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(segag80v_state::g80v_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(segag80v_state::opcode_r));
 }
 
 
