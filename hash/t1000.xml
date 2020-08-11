@@ -58,6 +58,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="msdos33sl2" cloneof="msdos33t">
+		<description>MS-DOS (Version 3.30, Tandy version 3.30.22) (Tandy 1000 SL/2)</description>
+		<year>1989</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Microsoft" />
+		<info name="serial" value="250-1402" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="dos33_1000sl2.img" size="737280" crc="e164a194" sha1="ff5e98c3e6fdd30ad4006d2800248d05b7c4dd41"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Apps -->
 	<software name="deskmate">
 		<description>DeskMate (Tandy 1000)</description>
@@ -84,6 +97,30 @@ license:CC0
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="3kdm2dk2.img" size="368640" crc="16837ecf" sha1="4f5242aaf00e52b3c9d1350fb8fcbaf7f683293e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deskmate3" supported="no">
+		<description>DeskMate 3 (Tandy 1000 SL/2)</description>
+		<year>1989</year>
+		<publisher>Tandy</publisher>
+		<info name="usage" value="Requires the built-in DeskMate in the SL/2 system ROM"/>
+		<info name="version" value="03.03.01" />
+		<info name="serial" value="250-1402" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="deskmate1_1000sl2.img" size="737280" crc="45774fc8" sha1="49b70d5b913d7904aa67f36b9b9c2455b49c3950"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="deskmate2_1000sl2.img" size="737280" crc="c6ab33e5" sha1="38f98049a617fac59443ec49c2247bbde8cf558d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="deskmate3_1000sl2.img" size="737280" crc="181d99cd" sha1="74c12996d5c871ba7ba69af1d4a213a83593b7ff"/>
 			</dataarea>
 		</part>
 	</software>
