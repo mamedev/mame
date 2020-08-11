@@ -5,9 +5,6 @@
 Atari Destroyer Driver
 
 TODO:
-- discrete sound
-- accurate implementation of scanline counter as documented in schematics,
-  generate irqs from there, and refresh rate 15750/262 (~60.1) instead of 60
 - missing language roms means DIP switches related to these do not function
 
 ***************************************************************************/
@@ -15,6 +12,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "emupal.h"
 #include "screen.h"
@@ -77,6 +75,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(dial_callback);
 	TIMER_CALLBACK_MEMBER(frame_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_irq);
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -228,6 +227,13 @@ TIMER_CALLBACK_MEMBER(destroyr_state::frame_callback)
 }
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(destroyr_state::scanline_irq)
+{
+	// 16V clocks LS74 flip-flop with D = 32V and /Q output connected to /IRQ on 6800
+	m_maincpu->set_input_line(M6800_IRQ_LINE, BIT(param, 5) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 void destroyr_state::machine_reset()
 {
 	m_frame_timer->adjust(m_screen->time_until_pos(0));
@@ -267,7 +273,7 @@ void destroyr_state::cursor_load_w(uint8_t data)
 
 void destroyr_state::interrupt_ack_w(uint8_t data)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -483,9 +489,10 @@ void destroyr_state::machine_start()
 void destroyr_state::destroyr(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(12'096'000) / 16);
+	M6800(config, m_maincpu, 12.096_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &destroyr_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(destroyr_state::irq0_line_assert), attotime::from_hz(4*60));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(destroyr_state::scanline_irq), m_screen, 16, 32);
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // F8
 	outlatch.q_out_cb<0>().set_output("led0").invert(); // LED 1
@@ -501,9 +508,7 @@ void destroyr_state::destroyr(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 262);
-	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 263, 0, 240);
 	m_screen->set_screen_update(FUNC(destroyr_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -550,7 +555,7 @@ ROM_START( destroyr )
 	ROM_REGION( 0x0020, "gfx4", 0 )     /* waves */
 	ROM_LOAD( "030136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
 
-	ROM_REGION( 0x0100, "user1", 0 )    /* sync (used for vsync/vblank signals, not hooked up yet) */
+	ROM_REGION( 0x0100, "syncprom", 0 )    /* used for vsync/vblank signals */
 	ROM_LOAD( "030131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
@@ -576,7 +581,7 @@ ROM_START( destroyr1 )
 	ROM_REGION( 0x0020, "gfx4", 0 )     /* waves */
 	ROM_LOAD( "030136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
 
-	ROM_REGION( 0x0100, "user1", 0 )    /* sync (used for vsync/vblank signals, not hooked up yet) */
+	ROM_REGION( 0x0100, "syncprom", 0 )    /* used for vsync/vblank signals */
 	ROM_LOAD( "030131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
