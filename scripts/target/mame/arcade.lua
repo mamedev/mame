@@ -1200,6 +1200,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/cybstorm.cpp",
 	MAME_DIR .. "src/mame/includes/cybstorm.h",
 	MAME_DIR .. "src/mame/video/cybstorm.cpp",
+	MAME_DIR .. "src/mame/audio/nl_destroyr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_destroyr.h",
 	MAME_DIR .. "src/mame/drivers/destroyr.cpp",
 	MAME_DIR .. "src/mame/drivers/dragrace.cpp",
 	MAME_DIR .. "src/mame/includes/dragrace.h",

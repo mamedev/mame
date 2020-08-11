@@ -161,6 +161,10 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_flyball.h",
 	MAME_DIR .. "src/mame/drivers/flyball.cpp",
 	
+	MAME_DIR .. "src/mame/audio/nl_destroyr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_destroyr.h",
+	MAME_DIR .. "src/mame/drivers/destroyr.cpp",
+
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",

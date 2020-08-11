@@ -18,6 +18,11 @@ TODO:
 #include "machine/watchdog.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
+#include "machine/netlist.h"
+
+#include "netlist/nl_setup.h"
+#include "audio/nl_destroyr.h"
 
 #include "destroyr.lh"
 
@@ -25,27 +30,40 @@ TODO:
 class destroyr_state : public driver_device
 {
 public:
-	destroyr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_watchdog(*this, "watchdog"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_alpha_num_ram(*this, "alpha_nuram"),
-		m_major_obj_ram(*this, "major_obj_ram"),
-		m_minor_obj_ram(*this, "minor_obj_ram")
+	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_watchdog(*this, "watchdog")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_inputs(*this, "IN%u", 0U)
+		, m_paddle(*this, "PADDLE")
+		, m_alpha_num_ram(*this, "alpha_nuram")
+		, m_major_obj_ram(*this, "major_obj_ram")
+		, m_minor_obj_ram(*this, "minor_obj_ram")
+		, m_sound_motor_speed(*this, "sound_nl:motor_speed")
+		, m_sound_noise(*this, "sound_nl:noise")
+		, m_sound_attract(*this, "sound_nl:attract")
+		, m_sound_songate(*this, "sound_nl:songate")
+		, m_sound_launch(*this, "sound_nl:launch")
+		, m_sound_explo(*this, "sound_nl:explo")
+		, m_sound_sonlat(*this, "sound_nl:sonlat")
+		, m_sound_hexplo(*this, "sound_nl:hexplo")
+		, m_sound_lexplo(*this, "sound_nl:lexplo")
 	{ }
 
 	void destroyr(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	enum
-	{
-		TIMER_DESTROYR_DIAL,
-		TIMER_DESTROYR_FRAME
-	};
+	static const device_timer_id TIMER_DIAL = 0;
+	static const device_timer_id TIMER_FRAME = 1;
+
+	void main_map(address_map &map);
 
 	void misc_w(uint8_t data);
 	void cursor_load_w(uint8_t data);
@@ -53,17 +71,12 @@ private:
 	uint8_t input_r(offs_t offset);
 	uint8_t scanline_r();
 
-	void destroyr_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(dial_callback);
 	TIMER_CALLBACK_MEMBER(frame_callback);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void destroyr_map(address_map &map);
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -71,11 +84,24 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport_array<3> m_inputs;
+	required_ioport m_paddle;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_alpha_num_ram;
 	required_shared_ptr<uint8_t> m_major_obj_ram;
 	required_shared_ptr<uint8_t> m_minor_obj_ram;
+
+	/* audio triggers */
+	required_device<netlist_mame_logic_input_device> m_sound_motor_speed;
+	required_device<netlist_mame_logic_input_device> m_sound_noise;
+	required_device<netlist_mame_logic_input_device> m_sound_attract;
+	required_device<netlist_mame_logic_input_device> m_sound_songate;
+	required_device<netlist_mame_logic_input_device> m_sound_launch;
+	required_device<netlist_mame_logic_input_device> m_sound_explo;
+	required_device<netlist_mame_logic_input_device> m_sound_sonlat;
+	required_device<netlist_mame_logic_input_device> m_sound_hexplo;
+	required_device<netlist_mame_logic_input_device> m_sound_lexplo;
 
 	/* video-related */
 	int            m_cursor;
@@ -85,8 +111,6 @@ private:
 	int            m_potmask[2];
 	int            m_potsense[2];
 	int            m_attract;
-	int            m_motor_speed;
-	int            m_noise;
 	emu_timer      *m_dial_timer;
 	emu_timer      *m_frame_timer;
 };
@@ -94,12 +118,10 @@ private:
 
 uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-
 	bitmap.fill(0, cliprect);
 
 	/* draw major objects */
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		int attr = m_major_obj_ram[2 * i + 0] ^ 0xff;
 		int horz = m_major_obj_ram[2 * i + 1];
@@ -123,9 +145,9 @@ uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	}
 
 	/* draw alpha numerics */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		for (j = 0; j < 32; j++)
+		for (int j = 0; j < 32; j++)
 		{
 			int num = m_alpha_num_ram[32 * i + j];
 
@@ -134,7 +156,7 @@ uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	}
 
 	/* draw minor objects */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		int num = i << 4 | (m_minor_obj_ram[i + 0] & 0xf);
 		int horz = 256 - m_minor_obj_ram[i + 2];
@@ -144,13 +166,13 @@ uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	}
 
 	/* draw waves */
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		if (i & 4)
 			bitmap.pix16(m_cursor ^ 0xff, i) = 7;
@@ -163,10 +185,10 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	case TIMER_DESTROYR_DIAL:
+	case TIMER_DIAL:
 		dial_callback(ptr, param);
 		break;
-	case TIMER_DESTROYR_FRAME:
+	case TIMER_FRAME:
 		frame_callback(ptr, param);
 		break;
 	default:
@@ -201,7 +223,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::frame_callback)
 	m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	m_dial_timer->adjust(m_screen->time_until_pos(ioport("PADDLE")->read()));
+	m_dial_timer->adjust(m_screen->time_until_pos(m_paddle->read()));
 	m_frame_timer->adjust(m_screen->time_until_pos(0));
 }
 
@@ -217,20 +239,19 @@ void destroyr_state::machine_reset()
 	m_potsense[0] = 0;
 	m_potsense[1] = 0;
 	m_attract = 0;
-	m_motor_speed = 0;
-	m_noise = 0;
 }
 
 
 void destroyr_state::misc_w(uint8_t data)
 {
 	/* bits 0 to 2 connect to the sound circuits */
-	m_attract = data & 0x01;
-	m_noise = data & 0x02;
-	m_motor_speed = data & 0x04;
-	m_potmask[0] = data & 0x08;
-	m_wavemod = data & 0x10;
-	m_potmask[1] = data & 0x20;
+	m_attract = BIT(data, 0);
+	m_sound_attract->write(m_attract);
+	m_sound_noise->write(BIT(data, 1));
+	m_sound_motor_speed->write(BIT(data, 2));
+	m_potmask[0] = BIT(data, 3);
+	m_wavemod = BIT(data, 4);
+	m_potmask[1] = BIT(data, 5);
 
 	machine().bookkeeping().coin_lockout_w(0, !m_attract);
 	machine().bookkeeping().coin_lockout_w(1, !m_attract);
@@ -254,18 +275,14 @@ uint8_t destroyr_state::input_r(offs_t offset)
 {
 	if (offset & 1)
 	{
-		return ioport("IN1")->read();
+		return m_inputs[1]->read();
 	}
 
 	else
 	{
-		uint8_t ret = ioport("IN0")->read();
-
-		if (m_potsense[0] && m_potmask[0])
-			ret |= 4;
-		if (m_potsense[1] && m_potmask[1])
-			ret |= 8;
-
+		uint8_t ret = m_inputs[0]->read();
+		ret |= (m_potsense[0] && m_potmask[0]) ? (1 << 2) : 0;
+		ret |= (m_potsense[1] && m_potmask[1]) ? (1 << 3) : 0;
 		return ret;
 	}
 }
@@ -277,7 +294,7 @@ uint8_t destroyr_state::scanline_r()
 }
 
 
-void destroyr_state::destroyr_map(address_map &map)
+void destroyr_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).mirror(0xf00).ram();
@@ -438,7 +455,7 @@ static GFXDECODE_START( gfx_destroyr )
 GFXDECODE_END
 
 
-void destroyr_state::destroyr_palette(palette_device &palette) const
+void destroyr_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   // major objects
 	palette.set_pen_color(1, rgb_t(0x50, 0x50, 0x50));
@@ -453,14 +470,12 @@ void destroyr_state::destroyr_palette(palette_device &palette) const
 
 void destroyr_state::machine_start()
 {
-	m_dial_timer = timer_alloc(TIMER_DESTROYR_DIAL);
-	m_frame_timer = timer_alloc(TIMER_DESTROYR_FRAME);
+	m_dial_timer = timer_alloc(TIMER_DIAL);
+	m_frame_timer = timer_alloc(TIMER_FRAME);
 
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_wavemod));
 	save_item(NAME(m_attract));
-	save_item(NAME(m_motor_speed));
-	save_item(NAME(m_noise));
 	save_item(NAME(m_potmask));
 	save_item(NAME(m_potsense));
 }
@@ -469,18 +484,18 @@ void destroyr_state::destroyr(machine_config &config)
 {
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(12'096'000) / 16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &destroyr_state::destroyr_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &destroyr_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(destroyr_state::irq0_line_assert), attotime::from_hz(4*60));
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // F8
 	outlatch.q_out_cb<0>().set_output("led0").invert(); // LED 1
 	outlatch.q_out_cb<1>().set_output("led1").invert(); // LED 2 (no second LED present on cab)
-	// Q2 => songate
-	// Q3 => launch
-	// Q4 => explosion
-	// Q5 => sonar
-	// Q6 => high explosion
-	// Q7 => low explosion
+	outlatch.q_out_cb<2>().set(m_sound_songate, FUNC(netlist_mame_logic_input_device::write));
+	outlatch.q_out_cb<3>().set(m_sound_launch, FUNC(netlist_mame_logic_input_device::write));
+	outlatch.q_out_cb<4>().set(m_sound_explo, FUNC(netlist_mame_logic_input_device::write));
+	outlatch.q_out_cb<5>().set(m_sound_sonlat, FUNC(netlist_mame_logic_input_device::write));
+	outlatch.q_out_cb<6>().set(m_sound_hexplo, FUNC(netlist_mame_logic_input_device::write));
+	outlatch.q_out_cb<7>().set(m_sound_lexplo, FUNC(netlist_mame_logic_input_device::write));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -493,9 +508,26 @@ void destroyr_state::destroyr(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_destroyr);
-	PALETTE(config, m_palette, FUNC(destroyr_state::destroyr_palette), 8);
+	PALETTE(config, m_palette, FUNC(destroyr_state::palette_init), 8);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(destroyr))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:motor_speed", "MOTOR_SPEED.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise", "NOISE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:attract", "ATTRACT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:songate", "SONGATE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:launch", "LAUNCH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:explo", "EXPLO.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:sonlat", "SONLAT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:hexplo", "HE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lexplo", "LE.IN", 0);
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0, 0.0);
 }
 
 
@@ -549,5 +581,5 @@ ROM_START( destroyr1 )
 ROM_END
 
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
