@@ -19,11 +19,14 @@ jobs:
     steps:    
     - name: Install Android NDK
       run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${ANDROID_NDK_VERSION}"
-    - uses: actions/checkout@v2
-    - run: make -f Makefile.libretro platform=android -j8
-    # - run: strip -s mame_libretro_android.so
-    - run: zip -9 mame_libretro_android.so.zip mame_libretro_android.so
-    - name: Upload MAME core
+    - name: Checkout source
+      uses: actions/checkout@v2
+    - name: Build libretro mame core
+      run: |
+        make -f Makefile.libretro platform=android -j8
+        ${ANDROID_NDK_ARM}/arm-linux-androideabi/bin/strip -s mame_libretro_android.so
+        zip -9 mame_libretro_android.so.zip mame_libretro_android.so
+    - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
