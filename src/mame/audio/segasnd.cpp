@@ -39,7 +39,9 @@ sega_speech_device::sega_speech_device(const machine_config &mconfig, const char
 	device_mixer_interface(mconfig, *this),
 	m_speech(*this, "data"),
 	m_cpu(*this, "cpu"),
+#if (USE_NL_FILTERING)
 	m_control_d3(*this, "sound_nl:cin1"),
+#endif
 	m_drq(0),
 	m_latch(0),
 	m_t0(0),
@@ -147,7 +149,9 @@ void sega_speech_device::control_w(uint8_t data)
 {
 	LOG("Speech control = %X\n", data);
 printf("Speech control = %02X\n", data);
+#if (USE_NL_FILTERING)
 	m_control_d3->write(BIT(data, 3));
+#endif
 }
 
 
@@ -190,9 +194,9 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 
 	// speech chip
 	sp0250_device &speech(SP0250(config, "sp0250", SPEECH_MASTER_CLOCK));
-	speech.set_pwm_mode();
 	speech.drq().set(FUNC(sega_speech_device::drq_w));
-//	speech.add_route(ALL_OUTPUTS, *this, 1.0);
+#if (USE_NL_FILTERING)
+	speech.set_pwm_mode();
 	speech.add_route(ALL_OUTPUTS, "sound_nl", 1.0, 0);
 
 	// netlist filtering
@@ -204,4 +208,7 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, m_control_d3, "I_CONTROL_D3.IN", 0);
 
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(750.0, 0.0);
+#else
+	speech.add_route(ALL_OUTPUTS, *this, 1.0);
+#endif
 }

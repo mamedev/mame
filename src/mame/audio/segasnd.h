@@ -10,6 +10,8 @@
 
 #pragma once
 
+#define USE_NL_FILTERING (1)
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/netlist.h"
 #include "machine/timer.h"
@@ -46,7 +48,9 @@ private:
 
 	required_memory_region m_speech;
 	required_device<cpu_device> m_cpu;
+#if (USE_NL_FILTERING)
 	required_device<netlist_mame_logic_input_device> m_control_d3;
+#endif
 
 	// internal state
 	u8 m_drq;
