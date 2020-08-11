@@ -53,7 +53,8 @@ public:
 		m_scrambled_write_pc(0),
 		m_decrypt(nullptr),
 		m_min_x(0),
-		m_min_y(0)
+		m_min_y(0),
+		m_draw_end_time(attotime::zero)
 	{ }
 
 	void g80v_base(machine_config &config);
@@ -71,6 +72,7 @@ public:
 	void init_spacfury();
 
 	DECLARE_READ_LINE_MEMBER(elim4_joint_coin_r);
+	DECLARE_READ_LINE_MEMBER(draw_r);
 	DECLARE_WRITE_LINE_MEMBER(service_switch_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
 
@@ -125,6 +127,7 @@ private:
 	segag80_decrypt_func m_decrypt;
 	int m_min_x;
 	int m_min_y;
+	attotime m_draw_end_time;
 
 	u8 g80v_opcode_r(offs_t offset);
 	void mainram_w(offs_t offset, u8 data);
@@ -145,7 +148,7 @@ private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline bool adjust_xy(int rawx, int rawy, int *outx, int *outy);
+	inline bool adjust_xy(int rawx, int rawy, int &outx, int &outy);
 	void sega_generate_vector_list();
 	offs_t decrypt_offset(offs_t offset);
 	inline u8 demangle(u8 d7d6, u8 d5d4, u8 d3d2, u8 d1d0);

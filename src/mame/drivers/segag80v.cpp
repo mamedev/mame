@@ -228,30 +228,49 @@ void segag80v_state::vectorram_w(offs_t offset, u8 data)
  *
  *************************************/
 
-inline u8 segag80v_state::demangle(u8 d7d6, u8 d5d4, u8 d3d2, u8 d1d0)
-{
-	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
-			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
-			((d3d2 << 3) & 0x08) | ((d3d2 >> 2) & 0x04) |
-			((d1d0 << 1) & 0x02) | ((d1d0 >> 4) & 0x01);
-}
-
+//
+// I/O port mapping
+//
+//        +--------------- Offset-----------------+
+//        |    0    |    1    |    2    |    3    |
+//   +----+---------+---------+---------+---------+
+//   | D7 |  COINA  |   n/c   |   n/c   |   n/c   |
+//   | D6 |  COINB  |  P1.13  |  P1.14  |   n/c   |
+//   | D5 | SERVICE |  P1.15  |  P1.16  |  P1.17  |
+//   | D4 |  P1.18  |  P1.19  |  P1.20  |  P1.21  |
+//   | D3 |  SW1.8  |  SW1.7  |  SW1.6  |  SW1.5  |
+//   | D2 |  SW1.4  |  SW1.3  |  SW1.2  |  SW1.1  |
+//   | D1 |  SW2.8  |  SW2.7  |  SW2.6  |  SW2.5  |
+//   | D0 |  SW2.4  |  SW2.3  |  SW2.2  |  SW2.1  |
+//   +----+---------+---------+---------+---------+
+//
+//   Notes:
+//      COINA, COINB are gated to be impulses, and signal an INT
+//      SERVICE is gated to be an impulse, but does not signal
+//      P1.13 = DRAW signal from XY board
+//
+// The input ports are mapped to how the schematics show them, so
+// to achieve the matrix above, they must be demangled.
+//
 
 u8 segag80v_state::mangled_ports_r(offs_t offset)
 {
-	// The input ports are odd. Neighboring lines are read via a mux chip
-	// one bit at a time. This means that one bank of DIP switches will be
-	// read as two bits from each of 4 ports. For this reason, the input
-	// ports have been organized logically, and are demangled at runtime.
-	// 4 input ports each provide 8 bits of information.
 	u8 d7d6 = m_d7d6->read();
 	u8 d5d4 = m_d5d4->read();
 	u8 d3d2 = m_d3d2->read();
 	u8 d1d0 = m_d1d0->read();
-	int shift = offset & 3;
-	u8 result = demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
-static u8 last;
-if (shift == 3 && ((last ^ result) & 0x20)) { last = result; printf("%s: read = %02X\n", machine().scheduler().time().as_string(), result); }
+
+	offset &= 3;
+	u8 result =
+		(BIT(d7d6, offset + 0) << 7) |
+		(BIT(d7d6, offset + 4) << 6) |
+		(BIT(d5d4, offset + 0) << 5) |
+		(BIT(d5d4, offset + 4) << 4) |
+		(BIT(d3d2, offset + 0) << 3) |
+		(BIT(d3d2, offset + 4) << 2) |
+		(BIT(d1d0, offset + 0) << 1) |
+		(BIT(d1d0, offset + 4) << 0);
+
 	return result;
 }
 
@@ -375,6 +394,11 @@ void segag80v_state::unknown_w(u8 data)
 		osd_printf_debug("%04X:unknown_w = %02X\n", m_maincpu->pc(), data);
 }
 
+READ_LINE_MEMBER(segag80v_state::draw_r)
+{
+	return (machine().scheduler().time() < m_draw_end_time);
+}
+
 
 
 /*************************************
@@ -401,7 +425,7 @@ void segag80v_state::update_int()
 	//        - COINB impulse, clocks an LS74, cleared by INTCL signal
 	//        - SERVICE impulse
 	//    * /EDGINT signal from vector board, clocks an LS74, cleared by INTCL signal
-	//        - signal comes from 15468480 crystal, divided by 6, and then by 63368
+	//        - signal comes from 15468480 crystal, divided by 3, and then by 0x1f788
 	//    * /INT signal from ???
 	//
 
@@ -472,12 +496,12 @@ void segag80v_state::main_portmap(address_map &map)
 
 static INPUT_PORTS_START( g80v_generic )
 	PORT_START("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<0>)  // P1.5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<0>) // P1.5
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<1>)  // P1.8
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.13
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<1>) // P1.8
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(segag80v_state, draw_r)   // P1.13
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.14
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 
@@ -878,7 +902,7 @@ void segag80v_state::g80v_base(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(double(VIDEO_CLOCK)/6/63368);
+	m_screen->set_refresh_hz(40);
 	m_screen->set_size(400, 300);
 	m_screen->set_visarea(512, 1536, 640-32, 1408+32);
 	m_screen->set_screen_update(FUNC(segag80v_state::screen_update_segag80v));
@@ -906,7 +930,7 @@ void segag80v_state::spacfury(machine_config &config)
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
-	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 0.7);
 	SEGA_SPEECH_BOARD(config, m_speech, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
