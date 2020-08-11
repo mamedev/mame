@@ -4383,6 +4383,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/krokha.cpp",
 	MAME_DIR .. "src/mame/drivers/kron.cpp",
 	MAME_DIR .. "src/mame/drivers/lee1214.cpp",
+	MAME_DIR .. "src/mame/drivers/lee1220.cpp",
 	MAME_DIR .. "src/mame/drivers/learnwin.cpp",
 	MAME_DIR .. "src/mame/drivers/lft.cpp",
 	MAME_DIR .. "src/mame/drivers/lg-dvd.cpp",
