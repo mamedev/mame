@@ -9831,19 +9831,19 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ファーサイドムーン 地球防衛軍２" />
 		<info name="release" value="198912xx" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="fsmoon_a.d88" size="1281968" crc="2ae11d3d" sha1="a073d584a5878c321232870265407211ada3ab7b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="fsmoon_b.d88" size="1281968" crc="35cfd3f6" sha1="fbb5d6b5fde402a6ee7c5b7a2ee28400a5fc9ebb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="fsmoon_c.d88" size="1281968" crc="c665c4bc" sha1="61ae5578512429235f3c96d83487af93a481a6da" offset="0" />
 			</dataarea>
@@ -18483,7 +18483,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>スペクトラムホロバイトジャパン (Spectrum HoloByte Japan)</publisher>
 		<info name="alt_title" value="Ｆ－１１７Ａ ナイトホーク" />
 		<info name="release" value="19950715" />
+		<info name="usage" value="Requires HDD installation and a manual-based copy protection check. Run INSTALL.BAT from DOS." />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="f117a_1.hdm" size="1261568" crc="32871147" sha1="e7a4201b4f25f6dd86c3a09e4bdae8ecea4868fd" offset="0" />
 			</dataarea>
@@ -18508,14 +18510,60 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
 		<info name="alt_title" value="Ｆ－１４ フリートディフェンダー" />
 		<info name="release" value="19950223" />
+		<info name="usage" value="Requires HDD installation and a PC-9821 computer. Run INSTALL.EXE from DOS." />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="main.fdi" size="1265664" crc="2fde239e" sha1="4bcc668fc283cb5cfc666e57cf3123eb70f7fa03" offset="0" />
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f-14 fleet defender (disk a).hdm" size="1261568" crc="d6dd831b" sha1="86074cdfa1da60a798570b2a99466e354cbb981e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f-14 fleet defender (disk b).hdm" size="1261568" crc="f6b21969" sha1="ee3eab667c64e8f12f13d294cdf3dd046630da3a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f-14 fleet defender (disk c).hdm" size="1261568" crc="71198865" sha1="c592d76349574b2a3f33af6a471e7cba9af64e08" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f-14 fleet defender (disk d).hdm" size="1261568" crc="5594025a" sha1="d016b72f48642c74b3fafdcddd7cc6815d2de6fe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f-14 fleet defender (disk e).hdm" size="1261568" crc="15ed1186" sha1="71067a76b17f451698322c7d9cb2056d272e04be" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f-14 fleet defender (disk f).hdm" size="1261568" crc="6ca575d1" sha1="71a01332a03165b62fc5df012f902684c0bebbd6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="f15se2">
+	<software name="f15se">
+		<description>F-15 Strike Eagle</description>
+		<year>1989</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="Ｆ－１５ ストライクイーグル" />
+		<info name="release" value="198905xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="f-15 strike eagle.hdm" size="1261568" crc="7a4d0eac" sha1="c843bdbfdb5aa2982df79909fd8dd863098c7a05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Graphical glitches -->
+	<software name="f15se2" supported="partial">
 		<description>F-15 Strike Eagle II</description>
 		<year>1990</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
@@ -18535,13 +18583,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-<!-- for pc9821? 256 colors? -->
-	<software name="f15se256">
+	<!-- Graphical glitches -->
+	<software name="f15se256" supported="partial">
 		<description>F-15 Strike Eagle II 256</description>
 		<year>1993</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
 		<info name="alt_title" value="Ｆ－１５ ストライクイーグル２ ２５６" />
 		<info name="release" value="19931112" />
+		<info name="usage" value="Requires a PC-9821 computer" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -18569,6 +18618,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<!-- Any answer will pass the manual protection check. Probably cracked. -->
 	<software name="f19sf">
 		<description>F-19 Stealth Fighter</description>
 		<year>1992</year>
@@ -18583,7 +18633,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="f29ret">
-		<description>F29 Retaliator</description>
+		<description>F29 Retaliator (1992-10-15)</description>
 		<year>1992</year>
 		<publisher>イマジニア (Imagineer)</publisher>
 		<info name="alt_title" value="Ｆ２９ リタリエイター" />
@@ -18602,8 +18652,49 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="faara">
-		<description>Faara no Toki Kekkai</description>
+	<software name="f29reto" cloneof="f29ret">
+		<description>F29 Retaliator (1992-10-10)</description>
+		<year>1992</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<info name="alt_title" value="Ｆ２９ リタリエイター" />
+		<info name="release" value="19921030" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f29 retaliator (disk 1).hdm" size="1261568" crc="ad51c929" sha1="a0aec807ab38e5e58abbb29ac74a6fba6487d04d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f29 retaliator (disk 2).hdm" size="1261568" crc="97674e37" sha1="9723d2b23744fb10ae8a4a3babd7a358c2c9a9ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Disk I/O Error -->
+	<software name="faires" supported="no">
+		<description>Fairie's Residence</description>
+		<year>1984</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="フェアリーズレジデンス" />
+		<info name="release" value="198412xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="697008">
+				<rom name="fairie's residence (disk a).d88" size="697008" crc="7fb640bd" sha1="b3b63fcb0e6bf2a3cc076a59c4183b8dcd65cdc9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="697008">
+				<rom name="fairie's residence (disk b).d88" size="697008" crc="5832b2ec" sha1="740e97d1501240c495611617c04119299317398b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falla">
+		<description>Falla no Jikekkai</description>
 		<year>1991</year>
 		<publisher>ハートソフト (Heart Soft)</publisher>
 		<info name="alt_title" value="ファーラの時結界" />
@@ -18622,7 +18713,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="fairytal">
+	<!-- Black screen on boot -->
+	<software name="fairytal" supported="no">
 		<description>Fairytale</description>
 		<year>1987</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -18668,6 +18760,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>きんぷくりん (Kinpukurin)</publisher>
 		<info name="alt_title" value="ファルアディア" />
 		<info name="release" value="19940428" />
+		<info name="usage" value="The first time playing the game insert a blank disk on drive B: to create the user disk, otherwise the intro will just loop endlessly" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -18684,12 +18777,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="414ac632" sha1="f9ca271e5af3d6725678732b49bbdf9de322f55b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="b155e1e3" sha1="f64ebb69f8ad7b897309a6fed76a4277a6eb582d" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -18714,26 +18801,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="falcomcga" cloneof="falcomcg">
-		<description>Falcom Character CG (Alt Format)</description>
-		<year>1990</year>
-		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="ファルコムキャラクターＣＧ" />
-		<info name="release" value="19901208" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="falcomcharacg_sys.d88" size="1281968" crc="4b3cb685" sha1="a363b982f269e495eabf38d57a082a94afd65a7b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="falcomcharacg_dat.d88" size="1281968" crc="f5550b93" sha1="71fc84bff8ea2b723c23c571d6f62cc1371aa9a8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fall">
 		<description>Fall</description>
 		<year>1991</year>
@@ -18754,7 +18821,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="fantsian">
+	<!-- Fatal error: Incorrect layout on track 1 head 0, expected_size=100000, current_size=103104 -->
+	<software name="fantsian" supported="no">
 		<description>Fantasian</description>
 		<year>1985</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -18762,6 +18830,51 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="716304">
 				<rom name="fantax.d88" size="716304" crc="14d34022" sha1="9d9848259529f93c28326ed83e1bf034f2465c50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Black screen on boot -->
+	<software name="farce" supported="no">
+		<description>Farce - Yuuwaku Hakusho</description>
+		<year>1994</year>
+		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<info name="alt_title" value="ファルス 誘惑白書" />
+		<info name="release" value="19941213" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farce - yuuwaku hakusho (disk a).hdm" size="1261568" crc="56ef00e6" sha1="8ab6551ab7ee782902983d8f0502b6b568dc1296" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farce - yuuwaku hakusho (disk b).hdm" size="1261568" crc="d82638bc" sha1="bc3ad6e47a16dcae46a58cfadd7a37d6a2b1d391" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farce - yuuwaku hakusho (disk c).hdm" size="1261568" crc="5404654d" sha1="02c4094bb2cb5bd71d3ba9028f773c24cfdb4717" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farce - yuuwaku hakusho (disk d).hdm" size="1261568" crc="2bf8cdce" sha1="a2ffdf28d8665463ae79dec8ba7ae70396014e6d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farce - yuuwaku hakusho (disk e).hdm" size="1261568" crc="24fbe49b" sha1="07b40fb8dbf29e41f33e2b993127a8b62cec224b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farce - yuuwaku hakusho (disk f).hdm" size="1261568" crc="650b3b9f" sha1="2c62986ca3274295fcdfc4829b5bfd185473114e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18798,7 +18911,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="farland4">
+	<!-- Doesn't recognize disk changes -->
+	<software name="farland4" supported="no">
 		<description>Farland Story - Hakugin no Tsubasa</description>
 		<year>1994</year>
 		<publisher>テイジイエル (TGL)</publisher>
@@ -18836,22 +18950,172 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="fechi">
-		<description>Fechi</description>
+	<!-- Some graphical glitches during cutscenes, otherwise ok -->
+	<software name="farland6" supported="partial">
+		<description>Farland Story - Kamigami no Isan</description>
+		<year>1995</year>
+		<publisher>テイジイエル (TGL)</publisher>
+		<info name="alt_title" value="ファーランドストーリー 神々の遺産" />
+		<info name="release" value="19950721" />
+		<info name="usage" value="Requires HDD installation. Run SETUP.EXE from DOS (the installer doesn't work correctly with large hard drives)." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - kamigami no isan (disk a).hdm" size="1261568" crc="29d98cdc" sha1="65415810d1cf5582c3bb2835e1299bd83e39fb0b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - kamigami no isan (disk b).hdm" size="1261568" crc="c955f681" sha1="d686aad451d92b8d56e01bb311d2d395e2a3e223" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - kamigami no isan (disk c).hdm" size="1261568" crc="199663a4" sha1="2147b15c27211ce65ba48b8e2f543f22ca81fb4f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - kamigami no isan (disk d).hdm" size="1261568" crc="0794497f" sha1="6bad957d0532e2e6bbe34af21c96a25db78e1ba6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - kamigami no isan (disk e).hdm" size="1261568" crc="4e15472c" sha1="590e045ee97eb2f9775c041a694ae1263d24cca9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farland7">
+		<description>Farland Story - Juuou no Akashi</description>
+		<year>1995</year>
+		<publisher>テイジイエル (TGL)</publisher>
+		<info name="alt_title" value="ファーランドストーリー 獣王の証" />
+		<info name="release" value="19951110" />
+		<info name="usage" value="Requires HDD installation, and the game manual to pass the protection check. Run SETUP.EXE from DOS (the installer doesn't work correctly with large hard drives)." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk a) [alt 1].hdm" size="1261568" crc="b1ff8b82" sha1="30f3306449688e476a488dc984b2008608367e89" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk b).hdm" size="1261568" crc="a4af9652" sha1="166f5694b9c13a467b3cc3442eef42d570fa5bc4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk c).hdm" size="1261568" crc="c12d5776" sha1="e5ba7a79f56a09e3001a701d27c1e76c7909c501" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk d).hdm" size="1261568" crc="64562c6a" sha1="3590661999505cb6668546eb79a526ee496d103b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk e).hdm" size="1261568" crc="90461d9f" sha1="bf4adeda5c7111dfba6237f04a4700f221c6da99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farland7c" cloneof="farland7">
+		<description>Farland Story - Juuou no Akashi (cracked)</description>
+		<year>1995</year>
+		<publisher>テイジイエル (TGL)</publisher>
+		<info name="alt_title" value="ファーランドストーリー 獣王の証" />
+		<info name="release" value="19951110" />
+		<info name="usage" value="Requires HDD installation. Run SETUP.EXE from DOS (the installer doesn't work correctly with large hard drives)." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk a).hdm" size="1261568" crc="5724df87" sha1="f8f1dd4d87146932663a71bd973e98e44a3aca59" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk b).hdm" size="1261568" crc="a4af9652" sha1="166f5694b9c13a467b3cc3442eef42d570fa5bc4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk c).hdm" size="1261568" crc="c12d5776" sha1="e5ba7a79f56a09e3001a701d27c1e76c7909c501" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk d).hdm" size="1261568" crc="64562c6a" sha1="3590661999505cb6668546eb79a526ee496d103b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="farland story - juuou no akashi (disk e).hdm" size="1261568" crc="90461d9f" sha1="bf4adeda5c7111dfba6237f04a4700f221c6da99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feti">
+		<description>Feti</description>
 		<year>1994</year>
 		<publisher>Cat's Pro.</publisher>
 		<info name="alt_title" value="ふぇち" />
 		<info name="release" value="19940318" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="fechi_1.fdi" size="1265664" crc="d77ef2aa" sha1="362dc44bd145879de77c20c4ad05d101a5141e84" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="feti (fetish) (disk 1).hdm" size="1261568" crc="ed8606b0" sha1="d33c06cd8287a25941c508d3edbfc66e2e637875 " offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="fechi_2.fdi" size="1265664" crc="a0802ee0" sha1="c2970c7becd550ac5c8867492d73a31d6ace8d0f" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="feti (fetish) (disk 2).hdm" size="1261568" crc="7f1fc198" sha1="24bccbdfe7f32d2230e5c9942ac748caebf9b48a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fermion">
+		<description>Fermion - Mirai kara no Houmonsha</description>
+		<year>1995</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="フェルミオン ～未来からの訪問者～" />
+		<info name="release" value="19951222" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fermion (disk a).hdm" size="1261568" crc="847badeb" sha1="b5af3375766b6a685c5f51bd7d1289f0d0fd38ad" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fermion (disk b).hdm" size="1261568" crc="13b70644" sha1="8a62c5191d1f093793e75e29d0595427bfa0caf8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fermion (disk c).hdm" size="1261568" crc="c4cf042b" sha1="6d252df7645d9357a9d2d258fa983382583d9d2e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fermion (disk d).hdm" size="1261568" crc="313e6603" sha1="b5e38ad283b79cff0605152f3de6f53e0baf8379" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18915,44 +19179,110 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="filsnown">
+	<!-- The only difference between these sets is in the volume serial number of the disks; in this one it's zero, the other one has an actual number -->
+	<software name="figure">
+		<description>Figure - Ubawareta Houkago</description>
+		<year>1995</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="フィギュア ～奪われた放課後～" />
+		<info name="release" value="19950929" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure (disk 1).hdm" size="1261568" crc="c7503855" sha1="c0dbd5e7b1f67dc65fe108d67475419fe379c917" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure (disk 2).hdm" size="1261568" crc="7402405b" sha1="ef277171c244c23532cfb8de269c85ac7b0e6a4b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure (disk 3).hdm" size="1261568" crc="c14bd4cc" sha1="91831385fd9638085311fe9eec3552bb8adaa7ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure (disk 4).hdm" size="1261568" crc="0444396e" sha1="4eae28aa9b56a8511bf678173b77706024c7a6b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="figurea" cloneof="figure">
+		<description>Figure - Ubawareta Houkago (Alt)</description>
+		<year>1995</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="フィギュア ～奪われた放課後～" />
+		<info name="release" value="19950929" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure [set 1] (disk 1).hdm" size="1261568" crc="3d5601c9" sha1="e6601517ba487515a6d7bdc7b9a18bd96990f41f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure [set 1] (disk 2).hdm" size="1261568" crc="9aff78b5" sha1="a85eac75035db2feb1f3da793ac3e1b60d4f13a7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure [set 1] (disk 3).hdm" size="1261568" crc="75033fdd" sha1="cf36ad4a8153a7da7d6983fe37c09d49de57d48a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="figure [set 1] (disk 4).hdm" size="1261568" crc="3b74417e" sha1="506f2db1a36e1cc665cb71fbd7f7c08dd16bed88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't recognize disk changes -->
+	<software name="filsnown" supported="no">
 		<description>Filsnown - Hikari to Toki</description>
 		<year>1995</year>
 		<publisher>リーフ (Leaf)</publisher>
 		<info name="alt_title" value="フィルスノーン ～光と刻～" />
 		<info name="release" value="19950803" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="1.fdi" size="1265664" crc="93c18ffe" sha1="76c90f9712f4ddc91089a178ba8dffc205efd67b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="8dff4a64" sha1="9d14c73ff0cabffad54469defefbcf738ef04536" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="5c9cff13" sha1="60a5fa6afc4a4d392c744b357d3890b692d16a50" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="be2b3426" sha1="9d8730684f188292bf787f4dbf732c8216d42793" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="5.fdi" size="1265664" crc="2120b61d" sha1="475f0daef5b69d92b38491a7a06c08904ae8d020" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disk F"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="6.fdi" size="1265664" crc="aa63c1f9" sha1="d34da3a478270ca5530d1701928ee13e43572e79" offset="0" />
 			</dataarea>
@@ -18983,10 +19313,137 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="fbreak_3.fdi" size="1265664" crc="f14185c3" sha1="87b2ddc3cad821b6fff10f362eb3ae895965c5db" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk"/>
+	</software>
+
+	<software name="fhold">
+		<description>Finish Hold</description>
+		<year>1995</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="フィニッシュホールド" />
+		<info name="release" value="19950623" />
+		<info name="usage" value="Requires HDD installation, and the game manual to pass the protection check. Run INST.EXE from DOS." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold (disk 1) [original uncracked].hdm" size="1261568" crc="14678832" sha1="1840e364c904976194e31035e79af55e121c8c95" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold (disk 2).hdm" size="1261568" crc="3a09986a" sha1="0126941025b30050893498d0d49e85c6c2b28555" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The cracked version of the installer hangs when it asks for disk 2. Doesn't happen in other emulators. -->
+	<software name="fholdc" cloneof="fhold" supported="no">
+		<description>Finish Hold (cracked)</description>
+		<year>1995</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="フィニッシュホールド" />
+		<info name="release" value="19950623" />
+		<info name="usage" value="Requires HDD installation. Run INST.EXE from DOS." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="a73f9ba6" sha1="f55ba756a9a80d13d6ab73a1ae626872e61b4024" offset="0" status="baddump" />
+				<rom name="finish hold (disk 1).hdm" size="1261568" crc="b3a8b987" sha1="23f0a099dc74b04da24d834412d941713c9a8cfc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="finish hold (disk 2).hdm" size="1261568" crc="3a09986a" sha1="0126941025b30050893498d0d49e85c6c2b28555" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fholdwz">
+		<description>Finish Hold Hissatsuwaza Zukan</description>
+		<year>1995</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="フィニッシュホールド (必殺技図鑑)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold (waza zukan).hdm" size="1261568" crc="42d1c241" sha1="bc0779e814012c5f0192762fbbb39360c9f8f81d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fh2tag">
+		<description>Finish Hold 2 - Tag</description>
+		<year>1996</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="フィニッシュホールド２ ＴＡＧ" />
+		<info name="release" value="19960322" />
+		<info name="usage" value="Requires HDD installation, and the game manual to pass the protection check. Run INST.EXE from DOS." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 1) [original uncracked].hdm" size="1261568" crc="4028b59a" sha1="76b210c388be69485f2e9ad7177be742296fe927" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 2).hdm" size="1261568" crc="59cf90b0" sha1="d84eb589f9a32bbe090ba995f323e1cd45abb6d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 3).hdm" size="1261568" crc="a02b330c" sha1="d27def0f225d7ce1340659bd3ce45635d9636a6c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 4).hdm" size="1261568" crc="c2be825d" sha1="5e35138538c2c84fe0dd4f7204aa9e2a722ec87a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 5).hdm" size="1261568" crc="9006c491" sha1="cbdd23431ddff2be1552529f45da76b50e350738" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fh2tagc" cloneof="fh2tag">
+		<description>Finish Hold 2 - Tag (cracked)</description>
+		<year>1996</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="フィニッシュホールド２ ＴＡＧ" />
+		<info name="release" value="19960322" />
+		<info name="usage" value="Requires HDD installation. Run INST.EXE from DOS." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 1).hdm" size="1261568" crc="70c04605" sha1="9bb9cbf7aab1acfb8924d658494c297ec7a79667" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 2).hdm" size="1261568" crc="59cf90b0" sha1="d84eb589f9a32bbe090ba995f323e1cd45abb6d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 3).hdm" size="1261568" crc="a02b330c" sha1="d27def0f225d7ce1340659bd3ce45635d9636a6c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 4).hdm" size="1261568" crc="c2be825d" sha1="5e35138538c2c84fe0dd4f7204aa9e2a722ec87a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="finish hold 2 tag (disk 5).hdm" size="1261568" crc="9006c491" sha1="cbdd23431ddff2be1552529f45da76b50e350738" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19036,6 +19493,78 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="fknight">
+		<description>Fantasy Knight</description>
+		<year>1988</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="ファンタジーナイト 復刻版" />
+		<info name="release" value="198805xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="fantasy knight (system disk).d88" size="1086448" crc="68dea35f" sha1="49fa3d579191bc766a6dca5da0cbec0dd0dee795" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size="1103920">
+				<rom name="fantasy knight (data disk).d88" size="1103920" crc="1f372632" sha1="8998526c9f9727a13daa7187dda0a53a4b0c5fc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fknightf">
+		<description>Fantasy Knight Fukkokuban</description>
+		<year>1991</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="ファンタジーナイト 復刻版" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="fantasy knight (fukkokuban).d88" size="1086448" crc="b01b3f22" sha1="6d934135fbeb6a4dc417cfd95862a69fb992ff21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fqueen">
+		<description>First Queen</description>
+		<year>1988</year>
+		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<info name="alt_title" value="ファーストクィーン" />
+		<info name="release" value="198812xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1089776">
+				<rom name="first queen [set 1] (disk a).d88" size="1089776" crc="40bd4430" sha1="5b56441d55f8d134fe5fa9975eeda7578f268c6b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1089504">
+				<rom name="first queen [set 1] (disk b).d88" size="1089504" crc="0e27e90a" sha1="e4347ac15fd27aa88bbfb5131a58de612f7c7bda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fqueena" cloneof="fqueen">
+		<description>First Queen (Alt)</description>
+		<year>1988</year>
+		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<info name="alt_title" value="ファーストクィーン" />
+		<info name="release" value="198812xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1103920">
+				<rom name="first queen [set 2] (disk a).d88" size="1103920" crc="986676da" sha1="ebaa8fa1df201706e6e093832691ed711cae5a59" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1103920">
+				<rom name="first queen [set 2] (disk b).d88" size="1103920" crc="4b300313" sha1="eeba1aa3de509779e707ad35475194ed85b3f132" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fqueen2">
 		<description>First Queen II - Sabaku no Joou</description>
 		<year>1990</year>
@@ -19043,45 +19572,71 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ファーストクィーン２ 砂漠の女王" />
 		<info name="release" value="19901217" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk"/>
+			<dataarea name="flop" size="1089776">
+				<rom name="firstq2o.d88" size="1089776" crc="fa39b8d1" sha1="ab371a6b458d02f6c68cffd23dabd8442514088d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1089776">
 				<rom name="firstq2a.d88" size="1089776" crc="485b32f3" sha1="6cb5e8115b0b7805a9767a8704b01641ce4b2042" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1089776">
 				<rom name="firstq2b.d88" size="1089776" crc="15a66a75" sha1="ac0d9908e0925e4f971cda688ed98da17973fa0a" offset="0" />
 			</dataarea>
 		</part>
+	</software>
+
+	<software name="fqueen3">
+		<description>First Queen III</description>
+		<year>1993</year>
+		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<info name="alt_title" value="ファーストクィーン３" />
+		<info name="release" value="19930702" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="first queen iii (opening disk).hdm" size="1261568" crc="25eed8c3" sha1="00372b0bead44bd86c46c6157cfabb6b7384e968" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="first queen iii (system disk).hdm" size="1261568" crc="7ceb63be" sha1="3d2f63af3a5f6c20e735ea9fcc49061a2e366065" offset="0" />
+			</dataarea>
+		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Opening"/>
-			<dataarea name="flop" size="1089776">
-				<rom name="firstq2o.d88" size="1089776" crc="fa39b8d1" sha1="ab371a6b458d02f6c68cffd23dabd8442514088d" offset="0" />
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="first queen iii (data disk).hdm" size="1261568" crc="e5469a51" sha1="b1298b6ab31a7e30909a4b9b806c841e1a870489" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="fqueen4">
-		<description>First Queen IV</description>
+		<description>First Queen IV - Varcia Senki</description>
 		<year>1994</year>
 		<publisher>呉ソフトウエア工房  (KSK)</publisher>
-		<info name="alt_title" value="ファーストクィーン４ バルシア戦記 ~ First Queen 4 Barushia Senki" />
+		<info name="alt_title" value="ファーストクィーン４ バルシア戦記" />
 		<info name="release" value="19940610" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="fq4_1.fdi" size="1265664" crc="317b0371" sha1="ed7ba7be4cd55c5411a3110678c0a43c77239375" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="fq4_2.fdi" size="1265664" crc="e69beff1" sha1="34da123eb3136e9e9ec64407764cff5f37d1b655" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="fq4_3.fdi" size="1265664" crc="63ba9797" sha1="727533e4c51ed2941b06c7b9691be95e60506b29" offset="0" />
 			</dataarea>
@@ -19223,7 +19778,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="flhawaii">
+	<!-- Fatal error: Incorrect layout on track 48 head 0, expected_size=100000, current_size=325920 -->
+	<software name="flhawaii" supported="no">
 		<description>Flight in Hawaii</description>
 		<year>1986</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -19235,12 +19791,26 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="flixmix">
+		<description>FlixMix</description>
+		<year>1995</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="フリックスミックス" />
+		<info name="usage" value="Requires a PC-9821 computer, the GDC Clock DIP switch set to 5 MHz, and HDD installation. Run INSTALL.EXE from DOS." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="flix mix (gdc 5mhz).hdm" size="1261568" crc="ba7952f1" sha1="9fed734c8617fc99967dfd36c7ebf472084ce5cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flopbnk3">
 		<description>Floppy Bunko 03 - Bishoujo Graphic Data Shuu Vol. 01</description>
 		<year>1992</year>
 		<publisher>エファット (EFAT)</publisher>
 		<info name="alt_title" value="フロッピー文庫０３ 美少女グラフィックデータ集　Ｖｏｌ．１" />
 		<info name="release" value="19920726" />
+		<info name="usage" value="Run CG98.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="vol1.d88" size="1281968" crc="be20da72" sha1="e777514a56468e86c859350bc3166bd40e70d609" offset="0" />
@@ -19254,6 +19824,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>エファット (EFAT)</publisher>
 		<info name="alt_title" value="フロッピー文庫０４ 美少女グラフィックデータ集　Ｖｏｌ．２" />
 		<info name="release" value="19920726" />
+		<info name="usage" value="Run CG98.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="vol2.d88" size="1281968" crc="6427826f" sha1="35c06ecaefea02e6fb53baf0115fa0dd52222882" offset="0" />
@@ -19267,6 +19838,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アーカムプロダクツ (Arkham Products)</publisher>
 		<info name="alt_title" value="フロッピー文庫０５ マンガ家ＳＬＧ" />
 		<info name="release" value="19920826" />
+		<info name="usage" value="Run AUTOEXEC.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="floppy bunko 05 - manga-ka slg.fdi" size="1265664" crc="775535ef" sha1="a050f5493e3bd6ceef2f7fb4d1dc0569e0bc2f49" offset="0" />
@@ -19280,9 +19852,28 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>エファット (EFAT)</publisher>
 		<info name="alt_title" value="フロッピー文庫０６ 美少女グラフィックデータ集　Ｖｏｌ．３" />
 		<info name="release" value="19920826" />
+		<info name="usage" value="Run CG98.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="vol3.d88" size="1281968" crc="ace7e787" sha1="50bf4aaebb23bd0ab83203bfde81db450507ac0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopbnk9">
+		<description>Floppy Bunko 09 - Bishoujo Graphic Data Shuu Vol. 04</description>
+		<year>1992</year>
+		<publisher>エファット (EFAT)</publisher>
+		<info name="alt_title" value="フロッピー文庫０９ 美少女グラフィックデータ集　Ｖｏｌ．４" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="floppy bunko 9 - bishoujo graphic data shuu vol. 4 (boot disk).hdm" size="1261568" crc="c74a8613" sha1="b6a066ba92329ba776854ffe64bdbf3c811d8385" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="floppy bunko 9 - bishoujo graphic data shuu vol. 4.hdm" size="1261568" crc="df76a942" sha1="6ecae78b63002a929e9d2ed9bfbf2f15505aefd8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19293,6 +19884,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アーカムプロダクツ (Arkham Products)</publisher>
 		<info name="alt_title" value="フロッピー文庫１１ リスナーズクラブ０９９０Ｖｏｌ．２" />
 		<info name="release" value="19921026" />
+		<info name="usage" value="Run AUTOEXEC.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -19307,6 +19899,202 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<!-- These seem to be fonts for something called Just Window, no way to test them. Are the disk labels correct? -->
+	<software name="fontwave">
+		<description>FontWave</description>
+		<year>1994</year>
+		<publisher>アルプス電気 (Alps Electric)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Master Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 01).hdm" size="1261568" crc="62abd55d" sha1="b1ca7fdf67fb1f8ea68116fbc61c85aa7094bc9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Sirius M (Disk 1)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 02).hdm" size="1261568" crc="bcb7e45a" sha1="ec9f09044550b1f0ca771bb2cdc8252bc9760af9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Sirius M (Disk 2)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 03).hdm" size="1261568" crc="8a60ced9" sha1="46523f63d935f9373ea54a424a38b5214f42c960" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Sirius M (Disk 3)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 04).hdm" size="1261568" crc="da345534" sha1="20b64af65e2f7f3ca8f8d757a86706e4d5a199d8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Gothic B (Disk 1)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 05).hdm" size="1261568" crc="f3d77634" sha1="4facbe35da9fc0e9186e2bae51c83e4dc5147f71" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Gothic B (Disk 2)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 06).hdm" size="1261568" crc="ed031a95" sha1="74a47be36f928d00c5ae929673cbbf2d5745b592" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Gothic B (Disk 3)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 07).hdm" size="1261568" crc="8c961bc4" sha1="0b4b818a234e5d2d953d8919e67c25b5b013bccb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Hagoromo M (Disk 1)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 08).hdm" size="1261568" crc="5e8ca302" sha1="763d4994701c9da6c0a9ba2f18c7f8c65f386733" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Hagoromo M (Disk 2)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 09).hdm" size="1261568" crc="2f73664d" sha1="b54519381c238a464618a09102de8aa9ec4db994" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Hagoromo M (Disk 3)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 10).hdm" size="1261568" crc="3b01154c" sha1="3a0f68d1c787967a4824218dfd6e50a4a6294516" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Hagoromo M (Disk 4)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 11).hdm" size="1261568" crc="f02d9e95" sha1="e58eba2099b5d28782ab15d1c825a24ec94cae9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Ryobi Hagoromo M (Disk 5)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fontwave (disk 12).hdm" size="1261568" crc="cf9c6ecb" sha1="6c54faef209b47cd61c9bae871183cbceb528a7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourflsh">
+		<description>Four Flush</description>
+		<year>1993</year>
+		<publisher>アグミックス (Agumix)</publisher>
+		<info name="alt_title" value="フォア フラッシュ" />
+		<info name="release" value="19930429" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="four flush (disk a).hdm" size="1261568" crc="3f575b7d" sha1="096a1d584b0dd5ac87b0b664bbebd5ab94410cde" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="four flush (disk b).hdm" size="1261568" crc="8d963ed4" sha1="29db622d38ddaaa5360b183c6a49c3f937ad052f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="four flush (disk c).hdm" size="1261568" crc="9ae28489" sha1="7f7e82f49ae14fb02e2a7de79600d13824cbfd37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The cracked version has a 1-byte difference in the file A0_000.SO3, but both seem to work. Maybe there's a manual check later in the game? -->
+	<software name="frontier">
+		<description>Frontier</description>
+		<year>1995</year>
+		<publisher>フロンティア (Frontier)</publisher>
+		<info name="alt_title" value="フロンティア" />
+		<info name="release" value="19950825" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="frontier (disk a) [alt 1] [original uncracked].hdm" size="1261568" crc="d4d2b814" sha1="c7d7d155523c56afb97ed0c9fda7d8faa55cacaf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="frontier (disk b).hdm" size="1261568" crc="b1df5015" sha1="4b7a668931328c3cd4777a2420a7dd65a79261cf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="frontier (disk c).hdm" size="1261568" crc="89631d5b" sha1="b7458bbd615c092a8e142e82bd8705a595370f90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frontierc" cloneof="frontier">
+		<description>Frontier (cracked)</description>
+		<year>1995</year>
+		<publisher>フロンティア (Frontier)</publisher>
+		<info name="alt_title" value="フロンティア" />
+		<info name="release" value="19950825" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="frontier (disk a).hdm" size="1261568" crc="246f318e" sha1="44e5d413ff817f2bf5ac60d45115cf1cfbd1af2e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="frontier (disk b).hdm" size="1261568" crc="b1df5015" sha1="4b7a668931328c3cd4777a2420a7dd65a79261cf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="frontier (disk c).hdm" size="1261568" crc="89631d5b" sha1="b7458bbd615c092a8e142e82bd8705a595370f90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fsdolly">
+		<description>Foresight Dolly</description>
+		<year>1994</year>
+		<publisher>ライトスタッフ (Right Stuff)</publisher>
+		<info name="alt_title" value="フォーサイト・ドリィ" />
+		<info name="release" value="19941111" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="foresight dolly (disk a).hdm" size="1261568" crc="4a131cda" sha1="f2710908c13f513a9f83e2e347ceb801d8c3e090" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="foresight dolly (disk b).hdm" size="1261568" crc="902f6c7a" sha1="65f383628a8deaa5509e06f6fdd34b2c70cfe819" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="foresight dolly (disk c).hdm" size="1261568" crc="350dfa82" sha1="346bd2968a61719f40ef4260c140af2b28eb2daf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="foresight dolly (disk d).hdm" size="1261568" crc="5a3e8022" sha1="bea6a62ee37204a3cb065b9c16a34d0e9310e0da" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="foresight dolly (disk e).hdm" size="1261568" crc="f9fbde90" sha1="f46cf73a4332ab49a040c386c72cec98dfb82010" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="foxy">
 		<description>Foxy</description>
 		<year>1990</year>
@@ -19314,13 +20102,13 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="フォクシー" />
 		<info name="release" value="19900216" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="foxy_01.fdi" size="1265664" crc="296d450c" sha1="4048648f39c8ae65bf4fa9f325e48e3d9dce8641" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="foxy_02.fdi" size="1265664" crc="fab2bdef" sha1="a89bf2839ec09490aa671bb5f0f4a34e10b83303" offset="0" />
 			</dataarea>
@@ -19429,6 +20217,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>きんぷくりん (Kinpukurin)</publisher>
 		<info name="alt_title" value="フリーウィル Ｋｎｉｇｈｔ ｏｆ Ａｒｇｅｎｔ" />
 		<info name="release" value="19920821" />
+		<info name="usage" value="The first time playing the game insert a blank disk on drive B: to create the user disk, otherwise the intro will just loop endlessly" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Master Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -19447,15 +20236,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="disk_b.fdi" size="1265664" crc="d121a389" sha1="9f7419c9579e63fc3e53f76687ad68a335845c8f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="User Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="user.fdi" size="1265664" crc="13eb620b" sha1="d485796811232814aef6f724cc0cd62ef7904db3" offset="0" status="baddump" />
-			</dataarea>
-		</part>
 	</software>
 
-	<software name="frontier">
+	<software name="frontunv">
 		<description>Frontier Universe</description>
 		<year>1993</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -19499,7 +20282,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="funny">
+	<!-- Address 20 line error -->
+	<software name="funny" supported="no">
 		<description>Funny</description>
 		<year>19??</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -19678,6 +20462,26 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="furinkaz">
+		<description>Fuurin Kazan</description>
+		<year>1992</year>
+		<publisher>ソフトプラン (Soft Plan)</publisher>
+		<info name="alt_title" value="風林火山" />
+		<info name="release" value="19920502" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="fuurin kazan (disk 1).d88" size="1086448" crc="71fcc26b" sha1="f9b2ab08b165fccade24513fd82610de044de489" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="fuurin kazan (disk 2).d88" size="1086448" crc="9451abb3" sha1="0c709265aaa78bfe3a15ba99d074a4a02c07e5c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nadia">
 		<description>Fushigi no Umi no Nadia</description>
 		<year>1992</year>
@@ -19752,9 +20556,42 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="フューチャーウォーズ ～時の冒険者～" />
 		<info name="release" value="19910624" />
+		<info name="usage" value="Run FW.EXE from DOS. Requires the game manual to pass the copy protection check." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="futurews.d88" size="1281968" crc="92d9780b" sha1="d9b7ff3c1aafb7e3a4c7673e3ce947bf1fc1c401" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzlemon">
+		<description>Fuzoroi no Lemon</description>
+		<year>1994</year>
+		<publisher>ボンびいボンボン！ (Bonbee Bonbon!)</publisher>
+		<info name="alt_title" value="不揃いのレモン" />
+		<info name="release" value="19940121" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fuzoroi no lemon (disk a).hdm" size="1261568" crc="79ec12ad" sha1="fbacf38f0245e90cc318769f6fbbb2b7b1276bf6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fuzoroi no lemon (disk b).hdm" size="1261568" crc="b7b2c558" sha1="48a698f5c5b7fd199ba0f9fde3bc88fcdb2ba1c0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fuzoroi no lemon (disk c).hdm" size="1261568" crc="6231140d" sha1="657e7f3603e97d1538f2a0998336919426933b22" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="fuzoroi no lemon (disk d).hdm" size="1261568" crc="7d8db270" sha1="9a3cc3694b716bdb62a7964b777666339eec3af1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21350,7 +22187,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	<software name="groupx">
 		<description>Group X</description>
 		<year>1991</year>
-		<publisher>コムパック (Compaq)</publisher>
+		<publisher>コムパック (Compac)</publisher>
 		<info name="alt_title" value="グループ・エックス" />
 		<info name="release" value="199105xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -35037,7 +35874,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="prodmang">
 		<description>Production Manager</description>
 		<year>1988</year>
-		<publisher>コムパック (Compaq)</publisher>
+		<publisher>コムパック (Compac)</publisher>
 		<info name="alt_title" value="プロダクションマネージャー" />
 		<info name="release" value="198812xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -37420,7 +38257,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<software name="felis">
 		<description>Sailor Fuku Senshi Felis</description>
-		<year>1990?</year>
+		<year>1990</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
 		<info name="alt_title" value="セーラー服戦士フェリス" />
 		<part name="flop1" interface="floppy_5_25">
@@ -44195,106 +45032,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="宇宙快盗ファニーＢｅｅ" />
 		<info name="release" value="19940810" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_1.fdi" size="1265664" crc="05036c46" sha1="fef6d757d0a49c2951c06f51adc7eba5f14f1503" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_2.fdi" size="1265664" crc="80b8c996" sha1="02ef9f1b240cd2b81ad8b72dfa6f6ce4135e21a9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_3.fdi" size="1265664" crc="0ab3b4cb" sha1="260d59072051a6f9510d3b215d89e73d0dcb55a3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_4.fdi" size="1265664" crc="bd312a44" sha1="1d98e620f8c777998f3ba610b6e05a44f1eca0d1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_5.fdi" size="1265664" crc="0ce793e7" sha1="2493ce9d20e030d3a7e4208f489b83ca6f653ea1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_6.fdi" size="1265664" crc="3d58640b" sha1="3164a0b653d8a1c288174b4d035b16247a0dc3e7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_7.fdi" size="1265664" crc="ddf4f953" sha1="c3c9e36fffbc14ae3e8e1aba7988979929bc8a0a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="funnybeea" cloneof="funnybee">
-		<description>Uchuu Kaitou Funny Bee (Alt)</description>
-		<year>1994</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="宇宙快盗ファニーＢｅｅ" />
-		<info name="release" value="19940810" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-a.fdi" size="1265664" crc="2b0b5a4d" sha1="431ce9750268d0ef65e8ed8cb8f81cbe01b98bae" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-b.fdi" size="1265664" crc="85804a9a" sha1="4883bff26453775a469e825227200a6700db40d7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-c.fdi" size="1265664" crc="7ebb6c6f" sha1="2892ac2762b822b0ebe0e82daf6a233fb37fdb1e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-d.fdi" size="1265664" crc="904a8326" sha1="50e18d1582bc2b5de5faff6f0679c523575b24ec" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-e.fdi" size="1265664" crc="9acaf716" sha1="f9bc43c7335d213ae30554921ebd96bd49c584e5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-f.fdi" size="1265664" crc="5a8a4665" sha1="afcbc99e1c7394021dce692922525eb4fefd445c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="bee-g.fdi" size="1265664" crc="715ed3e3" sha1="ec5cf7f03e0ec12c9d4fce4c4465c006439dfbb1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="funnybeeb" cloneof="funnybee">
-		<description>Uchuu Kaitou Funny Bee (Alt Format)</description>
-		<year>1994</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="宇宙快盗ファニーＢｅｅ" />
-		<info name="release" value="19940810" />
-		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="diska.hdm" size="1261568" crc="f5c61e10" sha1="2d67763dda145ce543301bba812c9926b9e4dd07" offset="0" />
@@ -49837,10 +50574,11 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="f1datad" supported="no">
+	<software name="f1datad">
 		<description>F-1 Databox (Demo)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>リード・レックス (Reed Rex)</publisher>
+		<info name="usage" value="Run DB.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="f-1databox_demo.hdm" size="1261568" crc="cac82d7a" sha1="dff76eee8d41322d58736efa885ad4849ff64cff" offset="0" />
@@ -49848,19 +50586,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="fknight" supported="no">
-		<description>Fantasy Knight</description>
-		<year>1988</year>
-		<publisher>システムソフト (SystemSoft)</publisher>
-		<info name="alt_title" value="ファンタジーナイト" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1089808">
-				<rom name="fantasy.nfd" size="1089808" crc="8357b005" sha1="6b733497e4f8aca422109d77c9dda43f583c41b7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="farland2" supported="no">
+	<software name="farland2">
 		<description>Farland Story Denki - Arc Ou no Ensei</description>
 		<year>1994</year>
 		<publisher>テイジイエル (TGL)</publisher>
@@ -49892,27 +50618,27 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="feedgyak" supported="no">
-		<description>Feed no Gyakushuu - Backlash of Feed (1993)(Kamejima)(Disk 1 of 2)</description>
+	<software name="feedgyak">
+		<description>Feed no Gyakushuu - Backlash of Feed</description>
 		<year>1993</year>
 		<publisher>亀島産業 (Kamejima Sangyou)</publisher>
 		<info name="alt_title" value="フィードの逆襲" />
 		<info name="release" value="19930220" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1020924">
 				<rom name="backlash of feed (1993)(kamejima)(disk 1 of 2).fdd" size="1020924" crc="706efbbe" sha1="51d1b9e5022761a7068bcd06edce6ec2cbf2d210" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1166332">
 				<rom name="backlash of feed (1993)(kamejima)(disk 2 of 2).fdd" size="1166332" crc="81a41874" sha1="d50ecebaa1c583fe681e506dc3723f60b5a6d118" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="file0" supported="no">
+	<software name="file0">
 		<description>File:0 - Ghost Killer Kamimura Rei</description>
 		<year>1996</year>
 		<publisher>コロッサス (Colossus)</publisher>
@@ -49938,6 +50664,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- Black screen on boot -->
 	<software name="flashb" supported="no">
 		<description>Flashback</description>
 		<year>1994</year>
@@ -49945,19 +50672,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="フラッシュバック" />
 		<info name="release" value="19940422" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="flashback_1.nfd" size="1329680" crc="bb415b0a" sha1="b42641e175060840c0df43e2319bc4ea75d29d89" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="flashback_2.nfd" size="1329680" crc="63240e74" sha1="6e925e1a57e8910b9324ed98f273475bb9fadc91" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="flashback_3.nfd" size="1329680" crc="0d370e26" sha1="2655bb815b92e98d496e03c2fd6723d01db04897" offset="0" />
 			</dataarea>
@@ -51861,7 +52588,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="freelncd" supported="no">
+	<software name="freelncd">
 		<description>Lotus Freelance (Demo)</description>
 		<year>19??</year>
 		<publisher>Lotus</publisher>
@@ -52392,7 +53119,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="cessna" supported="no">
 		<description>Nihon Juudan Cessna Flight</description>
 		<year>1988</year>
-		<publisher>コムパック (Compaq)</publisher>
+		<publisher>コムパック (Compac)</publisher>
 		<info name="alt_title" value="日本縦断セスナ・フライト" />
 		<info name="release" value="198806xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -57009,7 +57736,6 @@ SPACE EMPIRE
 			</dataarea>
 		</part>
 	</software>
-
 	<!-- Disk changes don't work -->
 	<software name="elle" supported="no">
 		<description>Elle</description>
@@ -57339,6 +58065,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
+	<!-- Doesn't recognize disk changes -->
 	<software name="farland3" supported="no">
 		<description>Farland Story - Tenshi no Namida</description>
 		<year>1994</year>
@@ -57377,12 +58104,13 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="farland5" supported="no">
+	<software name="farland5">
 		<description>Farland Story - Daichi no Kizuna</description>
 		<year>1994</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<info name="alt_title" value="ファーランドストーリー 大地の絆" />
 		<info name="release" value="19950317" />
+		<info name="usage" value="Requires entering the game's barcode as a form of copy protection" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1307644">
@@ -57421,58 +58149,60 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="file" supported="no">
-		<description>FILE - Kokubou Soushou Jouhoukyoku Jouhou Rouei Taisakubu Josei Jinmonin</description>
+	<software name="file">
+		<description>FILE - Kokubou Soushou Jouhoukyoku Jouhou Rouei Taisakubu Josei Jinmon'in</description>
 		<year>1994</year>
 		<publisher>メイビーソフト (May-Be Soft)</publisher>
 		<info name="alt_title" value="ＦＩＬＥ 国防総省　情報局　情報漏洩対策部女性尋問員" />
 		<info name="release" value="19941130" />
+		<info name="usage" value="Run INSTALL.EXE to copy the system files" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1068028">
 				<rom name="file (1994)(may-be)(disk 1 of 3).fdd" size="1068028" crc="48c5d2f0" sha1="51bea568280c54943cec72b746631dffcbe8e1cb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1288188">
 				<rom name="file (1994)(may-be)(disk 2 of 3).fdd" size="1288188" crc="cd4b7ed9" sha1="67fdb6315796bbed7d480c91118dc68ac353d6ef" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1292284">
 				<rom name="file (1994)(may-be)(disk 3 of 3).fdd" size="1292284" crc="ae9d5eff" sha1="a2dabf216604b9a11ff4dcae5f914d5297b4fc9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="foreign" supported="no">
+	<!-- Runs only on 286-class and older machines (e.g. PC-9801F, PC-9801UX), otherwise gives a "Packed file is corrupt" error. -->
+	<software name="foreign" supported="partial">
 		<description>Foreigner</description>
 		<year>1991</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="フォリナー" />
 		<info name="release" value="19911125" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1308668">
 				<rom name="foreigner (19xx)(communication group plum)(disk 1 of 4).fdd" size="1308668" crc="5589c8ec" sha1="bcb116d3408a8212c32bf792894750d68f246bae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1310716">
 				<rom name="foreigner (19xx)(communication group plum)(disk 2 of 4).fdd" size="1310716" crc="53a11b79" sha1="488305da3ee97d7bfb3a43136e6a5a57135fec8b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1298428">
 				<rom name="foreigner (19xx)(communication group plum)(disk 3 of 4).fdd" size="1298428" crc="801367ae" sha1="96e60a1e1606bd6c1e35a7f8e62fa772d0f9df52" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1308668">
 				<rom name="foreigner (19xx)(communication group plum)(disk 4 of 4).fdd" size="1308668" crc="08eb640e" sha1="28c7aee53e97e784c0214c56139e01f0b7def832" offset="0" />
 			</dataarea>
@@ -64108,6 +64838,7 @@ SPACE EMPIRE
 		<description>Free Soft Library - CG Collection 1</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
+		<info name="usage" value="Run START.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -64126,6 +64857,7 @@ SPACE EMPIRE
 		<description>Free Soft Library - CG Collection 2</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
+		<info name="usage" value="Run START.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -64144,6 +64876,7 @@ SPACE EMPIRE
 		<description>Free Soft Library - Fantastic Windows</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
+		<info name="usage" value="Run INST.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -64162,6 +64895,7 @@ SPACE EMPIRE
 		<description>Free Soft Library - Keiba Collection</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
+		<info name="usage" value="Run any of the BAT files from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="free_software_library_horse_racing_collection.fdi" size="1265664" crc="96e76cbc" sha1="9ccdc5e06f9158717ddeea281b06b4180099bc0a" offset="0" />
@@ -64337,7 +65071,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="f1grandp">
+	<!-- Fatal error: Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648 -->
+	<software name="f1grandp" supported="no">
 		<description>F1 Grandprix</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -65922,6 +66657,7 @@ doujin?!?
 		<year>1995?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="ソフトさーくる　クレージュ ~ Soft Circle Courreges" />
+		<info name="usage" value="Run FAFM.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -65936,9 +66672,10 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="fnereid">
-		<description>Fervent Nereid - She's So Unusual (1995)(New York Spirits - Rapcat)</description>
-		<year>19??</year>
+	<!-- Disk I/O error -->
+	<software name="fnereid" supported="no">
+		<description>Fervent Nereid - She's So Unusual</description>
+		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="NYS &amp; Rapcat" />
 		<part name="flop1" interface="floppy_5_25">
@@ -65948,7 +66685,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="firstfa5">
+	<!-- This probably requires 3.5" floppy emulation -->
+	<software name="firstfa5" supported="no">
 		<description>First Fantazy 5</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -66157,10 +66895,11 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="fantgrl1" supported="no">
+	<software name="fantgrl1">
 		<description>Kazuma CG Collection - Fantastic Girls Vol.1</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="Monitor Heaven" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="fantastic_girls_vol1.hdm" size="1261568" crc="f6f70f1d" sha1="1c47f012fcadaaaab9465a44e4559322e6013cb0" offset="0" />
