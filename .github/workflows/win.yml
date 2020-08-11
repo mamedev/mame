@@ -28,4 +28,33 @@ jobs:
         title: Windows x86_64
         files: |
           mame_libretro.zip
+    - name: Save core for upload job
+      uses: actions/upload-artifact@v2
+      with:
+        name: mame_libretro.zip
+        path: mame_libretro.zip
+  
+  uploadToBB:
+    name: Upload core to buildbot
+    runs-on: ubuntu-latest
+    needs: Windows
+    
+    steps:
+    - name: Recover core from artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: mame_libretro.zip
+        path: .
+    - name: Upload to buildbot
+      id: deploy
+      uses: Pendect/action-rsyncer@v1.1.0
+      env:
+        DEPLOY_KEY: ${{ secrets.KEY }}
+      with:
+        flags: '-vazr --delete'
+        options: ''
+        ssh_options: '-p ${{ secrets.PORT }}'
+        src: mame_libretro.zip
+        dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.WINDOWS_X86_64_PATH }}'
+
 
