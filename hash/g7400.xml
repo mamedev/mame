@@ -46,9 +46,10 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		<publisher>Philips</publisher>
 		<info name="serial" value="58"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom12" />
-			<dataarea name="rom" size="12288">
-				<rom name="air battle (europe).bin" size="12288" crc="d94d4109" sha1="66837bbd0b9df12c89215f533a1ec8b5a42d5610"/>
+			<feature name="slot" value="o2_rally" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="air battle (europe).bin" offset="0x0000" size="0x3000" crc="d94d4109" sha1="66837bbd0b9df12c89215f533a1ec8b5a42d5610"/>
+				<rom                                offset="0x1000" size="0x3000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,9 +222,9 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		<publisher>Philips</publisher>
 		<info name="serial" value="59"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom16" />
-			<dataarea name="rom" size="16384">
-				<rom name="helicopter rescue (europe).bin" size="16384" crc="c4134df8" sha1="7369a2d3fb81ddc4c8086bbcd245c11ea7aaa331"/>
+			<feature name="slot" value="o2_rally" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="helicopter rescue (europe).bin" size="0x4000" crc="c4134df8" sha1="7369a2d3fb81ddc4c8086bbcd245c11ea7aaa331"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,9 +295,10 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		<publisher>Philips</publisher>
 		<info name="serial" value="55"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom12" />
-			<dataarea name="rom" size="12288">
-				<rom name="neutron star (europe).bin" size="12288" crc="be11157c" sha1="fde3e0791b9cbef91a8462764ebf09a457ffe038"/>
+			<feature name="slot" value="o2_rally" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="neutron star (europe).bin" offset="0x0000" size="0x3000" crc="be11157c" sha1="fde3e0791b9cbef91a8462764ebf09a457ffe038"/>
+				<rom                                  offset="0x1000" size="0x3000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -405,9 +407,9 @@ adds 16K RAM and 16K ROM, that plugs into the G7000.
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom16" />
-			<dataarea name="rom" size="16384">
-				<rom name="trans american rally (europe).bin" size="16384" crc="0d2d721d" sha1="be8a9f2aa66acb4f5e288d1a77afada9565b530a"/>
+			<feature name="slot" value="o2_rally" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="trans american rally (europe).bin" size="0x4000" crc="0d2d721d" sha1="be8a9f2aa66acb4f5e288d1a77afada9565b530a"/>
 			</dataarea>
 		</part>
 	</software>

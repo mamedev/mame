@@ -20,6 +20,7 @@ enum
 	O2_ROM12,
 	O2_ROM16,
 	O2_4IN1,
+	O2_RALLY,
 	O2_CHESS,
 	O2_VOICE
 };
