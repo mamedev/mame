@@ -1120,6 +1120,10 @@ void netlist_mame_device::device_start()
 
 #if NETLIST_CREATE_CSV
 	std::string name = machine().system().name;
+	name += tag();
+	for (int index = 0; index < name.size(); index++)
+		if (name[index] == ':')
+			name[index] = '_';
 	name += ".csv";
 	m_csv_file = fopen(name.c_str(), "wb");
 #endif
