@@ -38,15 +38,15 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 	m_pwm_index(PWM_CLOCKS),
 	m_pwm_count(0),
 	m_pwm_counts(0),
-	m_amp(0),
-	m_pitch(0),
-	m_repeat(0),
-	m_pcount(0),
-	m_rcount(0),
-	m_RNG(0),
-	m_stream(nullptr),
 	m_voiced(0),
+	m_amp(0),
+	m_lfsr(0x7fff),
+	m_pitch(0),
+	m_pcount(0),
+	m_repeat(0),
+	m_rcount(0),
 	m_fifo_pos(0),
+	m_stream(nullptr),
 	m_drq(*this)
 {
 	for (auto & elem : m_fifo)
@@ -69,8 +69,6 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 
 void sp0250_device::device_start()
 {
-	m_RNG = 1;
-
 	// output PWM data at the ROMCLOCK frequency
 	int sample_rate = clock() / 2;
 	int frame_rate = sample_rate / (4 * PWM_CLOCKS);
@@ -85,23 +83,39 @@ void sp0250_device::device_start()
 	if (!m_drq.isnull())
 	{
 		m_drq(ASSERT_LINE);
-		m_tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
 		attotime period = attotime::from_hz(frame_rate);
-		m_tick_timer->adjust(period, 0, period);
+		timer_alloc()->adjust(period, 0, period);
 	}
 
+	// PWM state
 	save_item(NAME(m_pwm_index));
 	save_item(NAME(m_pwm_count));
 	save_item(NAME(m_pwm_counts));
-	save_item(NAME(m_amp));
-	save_item(NAME(m_pitch));
-	save_item(NAME(m_repeat));
-	save_item(NAME(m_pcount));
-	save_item(NAME(m_rcount));
-	save_item(NAME(m_RNG));
+
+	// LPC state
 	save_item(NAME(m_voiced));
+	save_item(NAME(m_amp));
+	save_item(NAME(m_lfsr));
+	save_item(NAME(m_pitch));
+	save_item(NAME(m_pcount));
+	save_item(NAME(m_repeat));
+	save_item(NAME(m_rcount));
+	for (int index = 0; index < 6; index++)
+	{
+		save_item(NAME(m_filter[index].F), index);
+		save_item(NAME(m_filter[index].B), index);
+		save_item(NAME(m_filter[index].z1), index);
+		save_item(NAME(m_filter[index].z2), index);
+	}
+
+	// FIFO state
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_pos));
+}
+
+void sp0250_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_stream->update();
 }
 
 static uint16_t sp0250_ga(uint8_t v)
@@ -157,11 +171,6 @@ void sp0250_device::load_values()
 		m_filter[f].reset();
 }
 
-TIMER_CALLBACK_MEMBER( sp0250_device::timer_tick )
-{
-	m_stream->update();
-}
-
 void sp0250_device::write(uint8_t data)
 {
 	m_stream->update();
@@ -201,24 +210,14 @@ int8_t sp0250_device::next()
 
 	int16_t z0;
 	if (m_voiced)
-	{
-		if(!m_pcount)
-			z0 = m_amp;
-		else
-			z0 = 0;
-	}
+		z0 = (m_pcount == 0) ? m_amp : 0;
 	else
 	{
-		// Borrowing the ay noise generation LFSR
-		if(m_RNG & 1)
-		{
-			z0 = m_amp;
-			m_RNG ^= 0x24000;
-		}
-		else
-			z0 = -m_amp;
+		z0 = (m_lfsr & 1) ? m_amp : -m_amp;
 
-		m_RNG >>= 1;
+		// 15-bit LFSR algorithm verified by dump from actual hardware
+		m_lfsr ^= (m_lfsr ^ (m_lfsr >> 1)) << 15;
+		m_lfsr >>= 1;
 	}
 
 	for (int f = 0; f < 6; f++)
