@@ -12,7 +12,7 @@
 
 #include "audio/segag80.h"
 #include "audio/segag80r.h"
-#include "audio/segasnd.h"
+#include "audio/segaspeech.h"
 #include "audio/segausb.h"
 #include "machine/i8255.h"
 #include "machine/segag80.h"

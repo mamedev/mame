@@ -2,14 +2,14 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    segasnd.cpp
+    segaspeech.cpp
 
-    Sound boards for early Sega G-80 based games.
+    Sega Speech board for early G-80 games.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "segasnd.h"
+#include "segaspeech.h"
 
 #include "sound/sp0250.h"
 #include "includes/segag80r.h"

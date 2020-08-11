@@ -6,7 +6,7 @@
 
 *************************************************************************/
 
-#include "audio/segasnd.h"
+#include "audio/segaspeech.h"
 #include "audio/segausb.h"
 #include "audio/segag80.h"
 #include "cpu/z80/z80.h"
