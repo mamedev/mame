@@ -17,12 +17,6 @@
 DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341")
 
 
-static constexpr uint8_t bgr2rgb[8] =
-{
-	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
-};
-
-
 ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9340_1, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
@@ -64,9 +58,10 @@ void ef9340_1_device::device_start()
 	save_item(NAME(m_ef9340.Y0));
 	save_item(NAME(m_ef9340.R));
 	save_item(NAME(m_ef9340.M));
-	save_pointer(NAME(m_ef934x_ram_a), 1024);
-	save_pointer(NAME(m_ef934x_ram_b), 1024);
-	save_pointer(NAME(m_ef934x_ext_char_ram), 1024);
+
+	save_item(NAME(m_ef934x_ram_a));
+	save_item(NAME(m_ef934x_ram_b));
+	save_item(NAME(m_ef934x_ext_char_ram));
 }
 
 
@@ -279,6 +274,11 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 
 void ef9340_1_device::ef9340_scanline(int vpos)
 {
+	static const uint8_t bgr2rgb[8] =
+	{
+		0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
+	};
+
 	if ( vpos < m_ef9340.max_vpos )
 	{
 		int y = vpos - 0;
@@ -287,18 +287,15 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		if ( y < 10 )
 		{
 			// Service row
-
 			if ( m_ef9340.R & 0x08 )
 			{
 				// Service row is enabled
-
 				y_row = 31;
 				slice = y;
 			}
 			else
 			{
 				// Service row is disabled
-
 				for ( int i = 0; i < 40 * 8; i++ )
 				{
 					m_tmp_bitmap.pix16(vpos, 0 + i ) = 24;

@@ -264,8 +264,10 @@ const double XTAL::known_xtals[] = {
 	 17'430'000, /* 17.43_MHz_XTAL         Videx Videoterm */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
 	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
-	 17'734'470, /* 17.73447_MHz_XTAL      (~4x PAL subcarrier) */
-	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
+	 17'734'470, /* 17.73447_MHz_XTAL      4x PAL subcarrier */
+	 17'734'472, /* 17.734472_MHz_XTAL     4x PAL subcarrier - All of these exist, exact 4x PAL is actually 17'734'475 */
+	 17'734'475, /* 17.734475_MHz_XTAL     4x PAL subcarrier - " */
+	 17'734'476, /* 17.734476_MHz_XTAL     4x PAL subcarrier - " */
 	 17'812'000, /* 17.812_MHz_XTAL        Videopac C52 */
 	 17'971'200, /* 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III */
 	 18'000'000, /* 18_MHz_XTAL            S.A.R, Ikari Warriors 3 */
