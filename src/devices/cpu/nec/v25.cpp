@@ -35,6 +35,9 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "v25.h"
+#include "necdasm.h"
+
 #include "debugger.h"
 
 typedef uint8_t BOOLEAN;
@@ -42,9 +45,8 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "v25.h"
-#include "v25priv.h"
-#include "necdasm.h"
+#include "v25priv.ipp"
+
 
 DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")

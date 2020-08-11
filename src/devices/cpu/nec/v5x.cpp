@@ -30,7 +30,7 @@
 #include "emu.h"
 #include "v5x.h"
 
-#include "necpriv.h"
+#include "necpriv.ipp"
 
 #define VERBOSE 0
 #include "logmacro.h"

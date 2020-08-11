@@ -107,6 +107,7 @@
 #include "emu.h"
 #include "nec.h"
 #include "necdasm.h"
+
 #include "debugger.h"
 
 typedef uint8_t BOOLEAN;
@@ -114,7 +115,7 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "necpriv.h"
+#include "necpriv.ipp"
 
 DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "NEC V20")
 DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "NEC V30")
