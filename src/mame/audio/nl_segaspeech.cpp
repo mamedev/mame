@@ -35,18 +35,51 @@ NETLIST_START(segaspeech)
 	TTL_INPUT(I_SP0250, 0)
 	PARAM(I_SP0250.MODEL, "74XXOC")
 	NET_C(I_SP0250.GND, GND)
-	NET_C(I_SP0250.VCC, I_VSP)
+	NET_C(I_SP0250.VCC, I_V5)
 	ALIAS(I_SPEECH, I_SP0250.Q)
 
-	TTL_INPUT(I_CONTROL_D3, 0)
-	NET_C(I_CONTROL_D3.GND, GND)
-	NET_C(I_CONTROL_D3.VCC, I_V5)
-
-	ANALOG_INPUT(I_VSP, 5)
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_VM5, -5)
 
-#if 1
+	//
+	// There are two schematic drawings of the speech board
+	// that show fairly different outputs from the SP0250.
+	// Both have their problems.
+	// 
+	// The simpler one is included in the Astro Blaster and
+	// Space Fury manuals. This is largely correct, except
+	// that it is believed (not verified) that R20 should be
+	// 4.7K instead of 470 Ohms. This schematic does not show
+	// the CD4053 mixer.
+	//
+	// The more complex schematic is included in the G-80
+	// schematics package, and in the Star Trek and Zektor
+	// manuals. It has several significant errors (all verified
+	// from a working PCB):
+	//
+	//    1. U8 pins 2 and 3 are swapped
+	//    2. The connection from R20 to GND should be removed
+	//        (this also disconnected C50 and R21 from GND)
+	//    3. R13 should be 220k, not 22k
+	//
+	// With the fixes above, the output sections of the two
+	// schematics line up, minus the mixing section, which is
+	// only shown on the more complex schematic.
+	//
+	// The mixing section is trivial, with 3 bits from a control
+	// port controlling three switches in the CD4053. Bit 3
+	// enables/disables speech. Bit 4 enables/disables an
+	// unconnected source. And bit 5 enables/disables incoming
+	// external sound. The incoming sound is also routed through
+	// a pot to enable control over the relative volume.
+	//
+	// For purposes of this netlist, and since it runs at high
+	// speeds, we tap the speech output before it hits the
+	// CD4053 and manually manage the speech output.
+	//
+	// Since we use MAME to manage the mixing, the control bits
+	// are managed directly there, rather than in this netlist.
+	//
 
 	//
 	// This represents the schematic drawing from Astro Blaster
@@ -56,7 +89,7 @@ NETLIST_START(segaspeech)
 	RES(R17, RES_K(10))
 	RES(R18, RES_K(22))
 	RES(R19, RES_K(250))
-	RES(R20, 470)
+	RES(R20, RES_K(4.7))	// schematic shows 470Ohm, but a real PCB had 4.7k here
 	RES(R21, RES_K(10))
 
 	CAP(C9, CAP_U(0.1))
@@ -77,68 +110,10 @@ NETLIST_START(segaspeech)
 	NET_C(U8.6, R21.1, C50.1)
 	ALIAS(OUTPUT, U8.6)
 
-#else
-
 	//
-	// This represents the schematic drawing from the G-80
-	// manual, Star Trek, and Zektor. There is a lightly
-	// used control register, but the wiring in the schematic
-	// seems to be wrong and produces distorted results.
+	// In the more complex case, this would feed into a
+	// CD4053 for switching. We rely on this being managed
+	// at the driver level.
 	//
-	RES(R14, RES_K(22))
-	RES(R17, RES_K(10))
-	RES(R18, RES_K(22))
-	RES(R19, RES_K(270))
-	RES(R20, RES_K(4.7))
-	RES(R21, RES_K(10))
-	RES(R22, RES_K(22))
-	RES(R30, RES_K(68))
-
-	CAP(C2, CAP_U(4.7))
-	CAP(C9, CAP_U(0.1))
-	CAP(C10, CAP_U(0.047))
-	CAP(C50, CAP_U(0.003))
-
-	TL081_DIP(U8)			// Op. Amp.
-	NET_C(U8.7, I_V5)
-	NET_C(U8.4, I_VM5)
-
-	TL082_DIP(U11)			// Op. Amp.
-	NET_C(U11.8, I_V5)
-	NET_C(U11.4, I_VM5)
-
-	CD4053_DIP(U12)			// 3x analog demuxer
-	NET_C(U12.16, I_V5)
-	NET_C(U12.6, GND)		// INH
-	NET_C(U12.7, I_VM5)		// VEE
-	NET_C(U12.8, GND)
-
-	NET_C(I_SPEECH, R17.2, C9.1)
-	NET_C(R17.1, I_V5)
-	NET_C(C9.2, R18.1)
-	NET_C(R18.2, R19.2, C10.1, U8.2)
-	NET_C(R19.1, C10.2, GND, R20.1, R21.1, C50.1)
-	NET_C(R20.2, U8.3)
-	NET_C(U8.6, R21.2, C50.2, R22.1)
-
-	NET_C(U12.14, R22.2)
-	NET_C(U12.11, I_CONTROL_D3)
-	NET_C(U12.13, R14.1)
-	NET_C(R14.2, R30.1, U11.2)
-	NET_C(U11.3, GND)
-	NET_C(U11.1, C2.2, R30.2)
-	ALIAS(OUTPUT, C2.1)
-
-	RES(ROUT, RES_M(1))
-	NET_C(C2.1, ROUT.1)
-	NET_C(ROUT.2, GND)
-
-	//
-	// Unconnected inputs
-	//
-
-	NET_C(GND, U11.5, U11.6)
-	NET_C(GND, U12.1, U12.2, U12.3, U12.5, U12.9, U12.10, U12.12)
-#endif
 
 NETLIST_END()

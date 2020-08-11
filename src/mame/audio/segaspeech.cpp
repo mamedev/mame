@@ -39,9 +39,6 @@ sega_speech_device::sega_speech_device(const machine_config &mconfig, const char
 	device_mixer_interface(mconfig, *this),
 	m_speech(*this, "data"),
 	m_cpu(*this, "cpu"),
-#if (USE_NL_FILTERING)
-	m_control_d3(*this, "sound_nl:cin1"),
-#endif
 	m_drq(0),
 	m_latch(0),
 	m_t0(0),
@@ -147,11 +144,18 @@ void sega_speech_device::data_w(uint8_t data)
 
 void sega_speech_device::control_w(uint8_t data)
 {
+	// bit 3 controls channel #1 of a CD4053 to enable/disable
+	// speech output
+	this->set_input_gain(0, BIT(data, 3) ? 1.0 : 0.0);
+
+	// bit 4 controls channel #2, but the source is unconnected
+
+	// bit 5 controls channel #3, which comes from off-board
+	// and has a pot to control the incoming volume; at least on
+	// Star Trek, this is the audio from the Universal Sound Board
+	this->set_input_gain(1, BIT(data, 5) ? 1.0 : 0.0);
+
 	LOG("Speech control = %X\n", data);
-printf("Speech control = %02X\n", data);
-#if (USE_NL_FILTERING)
-	m_control_d3->write(BIT(data, 3));
-#endif
 }
 
 
@@ -205,9 +209,8 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.IN").set_mult_offset(1.0 / 32767.0, 0);
-	NETLIST_LOGIC_INPUT(config, m_control_d3, "I_CONTROL_D3.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(7500.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(75000.0, 0.0);
 #else
 	speech.add_route(ALL_OUTPUTS, *this, 1.0);
 #endif

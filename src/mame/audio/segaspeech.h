@@ -16,8 +16,6 @@
 #include "machine/netlist.h"
 #include "machine/timer.h"
 
-#define SEGA_SPEECH_REGION "segaspeech:speech"
-
 class sega_speech_device : public device_t, public device_mixer_interface
 {
 public:
@@ -48,9 +46,6 @@ private:
 
 	required_memory_region m_speech;
 	required_device<cpu_device> m_cpu;
-#if (USE_NL_FILTERING)
-	required_device<netlist_mame_logic_input_device> m_control_d3;
-#endif
 
 	// internal state
 	u8 m_drq;
