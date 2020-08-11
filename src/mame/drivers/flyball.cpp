@@ -11,9 +11,6 @@ Etched in copper on top of board:
     MADE IN USA
     PAT NO 3793483
 
-TODO:
-- accurate video timing
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -495,9 +492,7 @@ void flyball_state::flyball(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 262);
-	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(flyball_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
