@@ -5,8 +5,6 @@
 
 #pragma once
 
-#define USE_CURRENT_SOURCE (0)
-
 NETLIST_EXTERNAL(segaspeech)
 
 #endif // MAME_AUDIO_NL_SEGASPEECH_H
