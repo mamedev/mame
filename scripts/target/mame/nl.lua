@@ -157,6 +157,10 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.cpp",
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.h",
 
+	MAME_DIR .. "src/mame/audio/nl_flyball.cpp",
+	MAME_DIR .. "src/mame/audio/nl_flyball.h",
+	MAME_DIR .. "src/mame/drivers/flyball.cpp",
+	
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",

@@ -58,6 +58,9 @@ starfir2                        // (c) 1979 Exidy
 starfire                        // Exidy [1979?]
 starfirea                       // Exidy [1979?]
 
+@source:flyball.cpp
+flyball
+
 @source:galaxian.cpp
 600                             // GX353 (c) 1981 Konami
 amidar                          // GX337 (c) 1982 Konami

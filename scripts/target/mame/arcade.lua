@@ -1213,6 +1213,8 @@ files {
 	MAME_DIR .. "src/mame/includes/firetrk.h",
 	MAME_DIR .. "src/mame/audio/firetrk.cpp",
 	MAME_DIR .. "src/mame/video/firetrk.cpp",
+	MAME_DIR .. "src/mame/audio/nl_flyball.cpp",
+	MAME_DIR .. "src/mame/audio/nl_flyball.h",
 	MAME_DIR .. "src/mame/drivers/flyball.cpp",
 	MAME_DIR .. "src/mame/drivers/foodf.cpp",
 	MAME_DIR .. "src/mame/includes/foodf.h",
