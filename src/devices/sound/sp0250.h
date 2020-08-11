@@ -11,6 +11,7 @@ public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto drq() { return m_drq.bind(); }
+	void set_pwm_mode() { m_pwm_mode = true; }
 
 	void write(uint8_t data);
 	uint8_t drq_r();
@@ -24,6 +25,7 @@ protected:
 
 private:
 	// internal state
+	bool m_pwm_mode;
 	uint8_t m_pwm_index;
 	uint8_t m_pwm_count;
 	uint32_t m_pwm_counts;
@@ -39,7 +41,9 @@ private:
 	int m_fifo_pos;
 	devcb_write_line m_drq;
 
-	void next();
+	int8_t next();
+	void load_values();
+	TIMER_CALLBACK_MEMBER( timer_tick );
 
 	struct
 	{
@@ -55,8 +59,6 @@ private:
 		int16_t z1, z2;
 	} m_filter[6];
 
-	void load_values();
-	TIMER_CALLBACK_MEMBER( timer_tick );
 	emu_timer * m_tick_timer;
 };
 

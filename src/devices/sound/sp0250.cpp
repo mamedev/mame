@@ -34,6 +34,7 @@ DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SP0250, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	m_pwm_mode(false),
 	m_pwm_index(PWM_CLOCKS),
 	m_pwm_count(0),
 	m_pwm_counts(0),
@@ -72,7 +73,11 @@ void sp0250_device::device_start()
 
 	// output PWM data at the ROMCLOCK frequency
 	int sample_rate = clock() / 2;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
+	int frame_rate = sample_rate / (4 * PWM_CLOCKS);
+	if (!m_pwm_mode)
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, frame_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
 
 	// if a DRQ callback is offered, run a timer at the frame rate
 	// to ensure the DRQ gets picked up in a timely manner
@@ -81,7 +86,7 @@ void sp0250_device::device_start()
 	{
 		m_drq(ASSERT_LINE);
 		m_tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
-		attotime period = attotime::from_hz(sample_rate) * (PWM_CLOCKS * 4);
+		attotime period = attotime::from_hz(frame_rate);
 		m_tick_timer->adjust(period, 0, period);
 	}
 
@@ -177,7 +182,7 @@ uint8_t sp0250_device::drq_r()
 	return (m_fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;
 }
 
-void sp0250_device::next()
+int8_t sp0250_device::next()
 {
 	if (m_rcount >= m_repeat)
 	{
@@ -219,11 +224,14 @@ void sp0250_device::next()
 	for (int f = 0; f < 6; f++)
 		z0 = m_filter[f].apply(z0);
 
-	// maximum value is effectively 13 bits
-	// reduce to 7 bits
+	// maximum amp value is effectively 13 bits
+	// reduce to 7 bits; due to filter effects it
+	// may occasionally clip
 	int dac = z0 >> 6;
-//	if (dac < -64) { dac = -64; printf("Clipped lo\n"); }
-//	if (dac >  63) { dac =  63; printf("Clipped hi\n"); }
+	if (dac < -64)
+		dac = -64;
+	if (dac > 63)
+		dac = 63;
 
 	// PWM is divided into 4x 5-bit sections; the lower
 	// bits of the original 7-bit value are added to only
@@ -243,11 +251,10 @@ void sp0250_device::next()
 	//    DAC  61 -> 33,32,32,32
 	//    DAC  62 -> 33,32,33,32
 	//    DAC  63 -> 33,33,33,32
-	dac += 68;
-	m_pwm_counts = (((dac + 3) >> 2) << 0) +
-	               (((dac + 1) >> 2) << 8) +
-				   (((dac + 2) >> 2) << 16) +
-				   (((dac + 0) >> 2) << 24);
+	m_pwm_counts = (((dac + 68 + 3) >> 2) << 0) +
+	               (((dac + 68 + 1) >> 2) << 8) +
+				   (((dac + 68 + 2) >> 2) << 16) +
+				   (((dac + 68 + 0) >> 2) << 24);
 
 	m_pcount++;
 	if (m_pcount >= m_pitch)
@@ -255,6 +262,7 @@ void sp0250_device::next()
 		m_pcount = 0;
 		m_rcount++;
 	}
+	return dac;
 }
 
 //-------------------------------------------------
@@ -264,41 +272,49 @@ void sp0250_device::next()
 void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
-	while (samples != 0)
+	if (!m_pwm_mode)
 	{
-		// see where we're at in the current PWM cycle
-		if (m_pwm_index >= PWM_CLOCKS)
+		while (samples-- != 0)
+			*output++ = next() << 8;
+	}
+	else
+	{
+		while (samples != 0)
 		{
-			m_pwm_index = 0;
-			if (m_pwm_counts == 0)
-				next();
-			m_pwm_count = m_pwm_counts & 0xff;
-			m_pwm_counts >>= 8;
-		}
+			// see where we're at in the current PWM cycle
+			if (m_pwm_index >= PWM_CLOCKS)
+			{
+				m_pwm_index = 0;
+				if (m_pwm_counts == 0)
+					next();
+				m_pwm_count = m_pwm_counts & 0xff;
+				m_pwm_counts >>= 8;
+			}
 
-		// determine the value to fill and the number of samples remaining
-		// until it changes
-		stream_sample_t value;
-		int remaining;
-		if (m_pwm_index < m_pwm_count)
-		{
-			value = 32767;
-			remaining = m_pwm_count - m_pwm_index;
-		}
-		else
-		{
-			value = 0;
-			remaining = PWM_CLOCKS - m_pwm_index;
-		}
+			// determine the value to fill and the number of samples remaining
+			// until it changes
+			stream_sample_t value;
+			int remaining;
+			if (m_pwm_index < m_pwm_count)
+			{
+				value = 32767;
+				remaining = m_pwm_count - m_pwm_index;
+			}
+			else
+			{
+				value = 0;
+				remaining = PWM_CLOCKS - m_pwm_index;
+			}
 
-		// clamp to the number of samples requested and advance the counters
-		if (remaining > samples)
-			remaining = samples;
-		m_pwm_index += remaining;
-		samples -= remaining;
+			// clamp to the number of samples requested and advance the counters
+			if (remaining > samples)
+				remaining = samples;
+			m_pwm_index += remaining;
+			samples -= remaining;
 
-		// fill the output
-		while (remaining-- != 0)
-			*output++ = value;
+			// fill the output
+			while (remaining-- != 0)
+				*output++ = value;
+		}
 	}
 }
