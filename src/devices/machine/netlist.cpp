@@ -893,7 +893,7 @@ void netlist_mame_stream_output_device::device_reset()
 void netlist_mame_stream_output_device::sound_update_fill(std::size_t samples, stream_sample_t *target)
 {
 	if (samples < m_buffer.size())
-		throw emu_fatalerror("sound %s: samples %d less bufsize %d\n", name(), samples, m_buffer.size());
+		osd_printf_warning("sound %s: samples %d less bufsize %d\n", name(), samples, m_buffer.size());
 
 	std::copy(m_buffer.begin(), m_buffer.end(), target);
 	std::size_t pos = m_buffer.size();
