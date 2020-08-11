@@ -114,10 +114,9 @@ struct o2_slot
 static const o2_slot slot_list[] =
 {
 	{ O2_STD,      "o2_rom" },
-	{ O2_ROM12,    "o2_rom12" },
-	{ O2_ROM16,    "o2_rom16" },
 	{ O2_4IN1,     "o2_4in1" },
 	{ O2_RALLY,    "o2_rally" },
+	{ O2_KTAA,     "o2_ktaa" },
 	{ O2_CHESS,    "o2_chess" },
 	{ O2_VOICE,    "o2_voice" }
 };
@@ -161,20 +160,14 @@ image_init_result o2_cart_slot_device::call_load()
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (!loaded_through_softlist())
-		{
-			m_type = O2_STD;
-			if (size == 12288)
-				m_type = O2_ROM12;
-			if (size == 16384)
-				m_type = O2_ROM16;
-		}
-		else
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
 				m_type = o2_get_pcb_id(pcb_name);
 		}
+		else
+			m_type = (size == 16384) ? O2_RALLY : O2_STD;
 
 		m_cart->cart_init();
 
@@ -195,13 +188,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 	{
 		const char *slot_string;
 		uint32_t size = hook.image_file()->size();
-		int type = O2_STD;
-
-		if (size == 12288)
-			type = O2_ROM12;
-		if (size == 16384)
-			type = O2_ROM16;
-
+		int type = (size == 16384) ? O2_RALLY : O2_STD;
 		slot_string = o2_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
@@ -254,16 +241,16 @@ uint8_t o2_cart_slot_device::io_read(offs_t offset)
 #include "bus/odyssey2/rom.h"
 #include "bus/odyssey2/4in1.h"
 #include "bus/odyssey2/rally.h"
+#include "bus/odyssey2/ktaa.h"
 #include "bus/odyssey2/chess.h"
 #include "bus/odyssey2/voice.h"
 
 void o2_cart(device_slot_interface &device)
 {
 	device.option_add_internal("o2_rom",    O2_ROM_STD);
-	device.option_add_internal("o2_rom12",  O2_ROM_12K);
-	device.option_add_internal("o2_rom16",  O2_ROM_16K);
 	device.option_add_internal("o2_4in1",   O2_ROM_4IN1);
 	device.option_add_internal("o2_rally",  O2_ROM_RALLY);
+	device.option_add_internal("o2_ktaa",   O2_ROM_KTAA);
 	device.option_add_internal("o2_chess",  O2_ROM_CHESS);
 	device.option_add_internal("o2_voice",  O2_ROM_VOICE);
 }

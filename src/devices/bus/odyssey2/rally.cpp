@@ -25,7 +25,8 @@ DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Odyssey 2 Videopa
 //-------------------------------------------------
 
 o2_rally_device::o2_rally_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	o2_rom_device(mconfig, O2_ROM_RALLY, tag, owner, clock)
+	device_t(mconfig, O2_ROM_RALLY, tag, owner, clock),
+	device_o2_cart_interface(mconfig, *this)
 { }
 
 void o2_rally_device::device_start()

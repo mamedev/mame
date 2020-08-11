@@ -12,13 +12,13 @@
 #pragma once
 
 #include "slot.h"
-#include "rom.h"
 #include "sound/sp0256.h"
 
 
 // ======================> o2_voice_device
 
-class o2_voice_device : public o2_rom_device
+class o2_voice_device : public device_t,
+						public device_o2_cart_interface
 {
 public:
 	// construction/destruction

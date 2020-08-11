@@ -12,12 +12,12 @@
 #pragma once
 
 #include "slot.h"
-#include "rom.h"
 
 
 // ======================> o2_rally_device
 
-class o2_rally_device : public o2_rom_device
+class o2_rally_device : public device_t,
+						public device_o2_cart_interface
 {
 public:
 	// construction/destruction

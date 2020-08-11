@@ -12,14 +12,14 @@
 #pragma once
 
 #include "slot.h"
-#include "rom.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 
 
 // ======================> o2_chess_device
 
-class o2_chess_device : public o2_rom_device
+class o2_chess_device : public device_t,
+						public device_o2_cart_interface
 {
 public:
 	// construction/destruction

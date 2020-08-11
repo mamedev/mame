@@ -1851,7 +1851,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Soeren Gust" />
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom12" />
+			<feature name="slot" value="o2_ktaa" />
 			<dataarea name="rom" size="12288">
 				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" offset="0" />
 			</dataarea>
