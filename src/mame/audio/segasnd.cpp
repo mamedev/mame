@@ -196,12 +196,12 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 	speech.add_route(ALL_OUTPUTS, "sound_nl", 1.0, 0);
 
 	// netlist filtering
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", SPEECH_MASTER_CLOCK/2)
 		.set_source(NETLIST_NAME(segaspeech))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
 	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "I_SP0250.IN").set_mult_offset(1.0 / 32767.0, 0);
 	NETLIST_LOGIC_INPUT(config, m_control_d3, "I_CONTROL_D3.IN", 0);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(7500.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(750.0, 0.0);
 }
