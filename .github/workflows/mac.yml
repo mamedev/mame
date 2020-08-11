@@ -16,7 +16,7 @@ jobs:
     - name: Build libretro mame core
       run: |
         make -f Makefile.libretro -j8
-        zip -9 mame_libretro.zip mame_libretro.dylib
+        zip -9 mame_libretro.dylib.zip mame_libretro.dylib
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -25,12 +25,12 @@ jobs:
         prerelease: false
         title: macOS x86_64
         files: |
-          mame_libretro.zip
+           mame_libretro.dylib.zip
     - name: Save core for upload job
       uses: actions/upload-artifact@v2
       with:
-        name: mame_libretro.zip
-        path: mame_libretro.zip
+        name: mame_libretro.dylib.zip
+        path: mame_libretro.dylib.zip
 
   uploadToBB:
     name: Upload core to buildbot
@@ -41,7 +41,7 @@ jobs:
     - name: Recover core from artifacts
       uses: actions/download-artifact@v2
       with:
-        name: mame_libretro.zip
+        name: mame_libretro.dylib.zip
         path: .
     - name: Upload to buildbot
       id: deploy
@@ -52,7 +52,7 @@ jobs:
         flags: '-vazr --delete'
         options: ''
         ssh_options: '-p ${{ secrets.PORT }}'
-        src: mame_libretro.zip
+        src: mame_libretro.dylib.zip
         dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.MACOS_X86_64_PATH }}'
 
 

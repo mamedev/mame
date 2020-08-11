@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - run: msys2do make -f Makefile.libretro -j8
     - run: strip.exe -s mame_libretro.dll
-    - run: msys2do zip -9 mame_libretro.zip mame_libretro.dll
+    - run: msys2do zip -9 mame_libretro.dll.zip mame_libretro.dll
     - name: Upload MAME core
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -27,12 +27,12 @@ jobs:
         prerelease: false
         title: Windows x86_64
         files: |
-          mame_libretro.zip
+          mame_libretro.dll.zip
     - name: Save core for upload job
       uses: actions/upload-artifact@v2
       with:
-        name: mame_libretro.zip
-        path: mame_libretro.zip
+        name: mame_libretro.dll.zip
+        path: mame_libretro.dll.zip
   
   uploadToBB:
     name: Upload core to buildbot
@@ -43,7 +43,7 @@ jobs:
     - name: Recover core from artifacts
       uses: actions/download-artifact@v2
       with:
-        name: mame_libretro.zip
+        name: mame_libretro.dll.zip
         path: .
     - name: Upload to buildbot
       id: deploy
@@ -54,7 +54,7 @@ jobs:
         flags: '-vazr --delete'
         options: ''
         ssh_options: '-p ${{ secrets.PORT }}'
-        src: mame_libretro.zip
+        src: mame_libretro.dll.zip
         dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.WINDOWS_X86_64_PATH }}'
 
 

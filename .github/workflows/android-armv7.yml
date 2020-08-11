@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
     - run: make -f Makefile.libretro platform=android -j8
     # - run: strip -s mame_libretro_android.so
-    - run: zip -9 mame_libretro.zip mame_libretro_android.so
+    - run: zip -9 mame_libretro_android.so.zip mame_libretro_android.so
     - name: Upload MAME core
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -31,12 +31,12 @@ jobs:
         prerelease: false
         title: Android ARMv7
         files: |
-          mame_libretro.zip
+          mame_libretro_android.so.zip
     - name: Save core for upload job
       uses: actions/upload-artifact@v2
       with:
-        name: mame_libretro.zip
-        path: mame_libretro.zip
+        name: mame_libretro_android.so.zip
+        path: mame_libretro_android.so.zip
   
   uploadToBB:
     name: Upload core to buildbot
@@ -47,7 +47,7 @@ jobs:
     - name: Recover core from artifacts
       uses: actions/download-artifact@v2
       with:
-        name: mame_libretro.zip
+        name: mame_libretro_android.so.zip
         path: .
     - name: Upload to buildbot
       id: deploy
@@ -58,5 +58,5 @@ jobs:
         flags: '-vazr --delete'
         options: ''
         ssh_options: '-p ${{ secrets.PORT }}'
-        src: mame_libretro.zip
+        src: mame_libretro_android.so.zip
         dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.ANDROID_ARMEABI_V7A_PATH }}'
