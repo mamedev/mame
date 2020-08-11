@@ -2240,6 +2240,9 @@ ROM_START( gauntleg )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+
+	ROM_REGION( 0x1000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "322_gauntlet.u37", 0x0000, 0x1000, CRC(a038c4a0) SHA1(fb103eaae6c8370c654dc8b97529bc553efcc170) )
 ROM_END
 
 
@@ -2265,6 +2268,9 @@ ROM_START( gauntleg12 )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+
+	ROM_REGION( 0x1000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "322_gauntlet.u37", 0x0000, 0x1000, CRC(a038c4a0) SHA1(fb103eaae6c8370c654dc8b97529bc553efcc170) )
 ROM_END
 
 
@@ -2280,6 +2286,9 @@ ROM_START( gauntdl )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+
+	ROM_REGION( 0x1000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "346_gauntlet-dl.u37", 0x0000, 0x1000, CRC(dfa42d4d) SHA1(3529433759f55d240e4f6c6e8d17311a877387b4) )
 ROM_END
 
 
@@ -2295,6 +2304,9 @@ ROM_START( gauntdl24 )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+
+	ROM_REGION( 0x1000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "346_gauntlet-dl.u37", 0x0000, 0x1000, CRC(dfa42d4d) SHA1(3529433759f55d240e4f6c6e8d17311a877387b4) )
 ROM_END
 
 
