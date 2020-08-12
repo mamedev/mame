@@ -24,7 +24,7 @@ jobs:
     - name: Build libretro mame core
       run: |
         make -f Makefile.libretro platform=android -j8
-        ${ANDROID_NDK_ARM}/arm-linux-androideabi/bin/strip -s mame_libretro_android.so
+        /usr/local/lib/android/sdk/ndk/${ANDROID_NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/arm-linux-androideabi/bin/strip -s mame_libretro_android.so
         zip -9 mame_libretro_android.so.zip mame_libretro_android.so
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
