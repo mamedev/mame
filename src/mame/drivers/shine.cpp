@@ -40,7 +40,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
 		, m_irqs(*this, "irqs")
-		, m_y(*this, "Y%u", 0)
+		, m_y(*this, "Y%u", 0U)
 		, m_video_ram(*this, "video_ram")
 	{ }
 
@@ -70,7 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* keyboard state */
-	int m_keylatch;
+	u8 m_keylatch;
 };
 
 
@@ -258,6 +258,7 @@ void shine_state::shine(machine_config &config)
 	m_via[0]->readpa_handler().set(FUNC(shine_state::via0_pa_r));
 	m_via[0]->writepb_handler().set(FUNC(shine_state::via0_pb_w));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	m_via[0]->cb2_handler().set([this] (bool state) { m_speaker->level_w(state); });
 
 	VIA6522(config, m_via[1], 1000000);
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
@@ -286,4 +287,4 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                  FULLNAME    FLAGS */
-COMP( 1983, shine,  0,      0,      shine,    shine,  shine_state,  empty_init,  "Lorenzon Elettronica",  "Shine/1",  MACHINE_NOT_WORKING )
+COMP( 1983, shine,  0,      0,      shine,    shine,  shine_state,  empty_init,  "Lorenzon Elettronica",  "Shine/1", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
