@@ -25,7 +25,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
   *RX118 Shirayuki-hime Monogatari / しらゆきひめ物語
   *RX119 Nontan to Issho Anime Stamp / ノンタンといっしょ アニメスタンプ
    RX120 Manfī no Fushigi na Bōken / マンフィーのふしぎなぼうけん
-  *RX121 Hello Kitty no Eikawa / ハローキティの英会話
+  *RX121 Hello Kitty no Eikaiwa / ハローキティの英会話
   *RX122 Son Gokū no Bōken / そんごくうの冒険
   *RX123 Paint Ehon: Cinderella Monogatari / ペイント絵本シンデレラ物語
    RX124 Chibimaruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
@@ -87,14 +87,14 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 	</software>
 
 	<software name="hkittye" supported="no">
-		<description>Hello Kitty no Eikawa</description>
+		<description>Hello Kitty no Eikaiwa</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="RX121"/>
 		<info name="alt_title" value="ハローキティの英会話"/>
 		<part name="cart" interface="picno_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="RX121 - Hello Kitty no Eikawa.bin" size="524288" crc="30308638" sha1="a29d726ecb73262dd8e3fdabb35670bdf2c5ce1d" />
+				<rom name="RX121 - Hello Kitty no Eikaiwa.bin" size="524288" crc="30308638" sha1="a29d726ecb73262dd8e3fdabb35670bdf2c5ce1d" />
 			</dataarea>
 		</part>
 	</software>
