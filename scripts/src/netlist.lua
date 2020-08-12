@@ -54,6 +54,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/core/base_objects.h",
 		MAME_DIR .. "src/lib/netlist/core/core_device.h",
 		MAME_DIR .. "src/lib/netlist/core/device.h",
+		MAME_DIR .. "src/lib/netlist/core/device_macros.h",
+		MAME_DIR .. "src/lib/netlist/core/devices.h",
 		MAME_DIR .. "src/lib/netlist/core/exec.h",
 		MAME_DIR .. "src/lib/netlist/core/logic_family.h",
 		MAME_DIR .. "src/lib/netlist/core/logic.h",

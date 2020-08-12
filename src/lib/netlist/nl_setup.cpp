@@ -5,7 +5,6 @@
 #include "analog/nld_twoterm.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
-#include "devices/nlid_system.h"
 #include "devices/nlid_truthtable.h"
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -13,6 +12,7 @@
 #include "nl_setup.h"
 #include "plib/penum.h"
 #include "plib/putil.h"
+#include "plib/pstonum.h"
 
 #include "solver/nld_solver.h"
 
@@ -1764,7 +1764,6 @@ bool source_token_t::parse(nlparse_t &setup, const pstring &name)
 	if (name == m_name)
 	{
 		auto ret = setup.parse_tokens(m_store, name);
-		printf("parsed tokens: %s %d\n", name.c_str(), (int) ret);
 		return ret;
 	}
 

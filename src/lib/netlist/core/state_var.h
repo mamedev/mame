@@ -169,5 +169,12 @@ namespace netlist
 
 } // namespace netlist
 
+namespace plib
+{
+	template<typename X>
+	struct ptype_traits<netlist::state_var<X>> : ptype_traits<X>
+	{
+	};
+} // namespace plib
 
 #endif // NL_CORE_STATE_VAR_H_

@@ -308,7 +308,8 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes"
 
 clang-libc:
 	#clang-11 currently broken
