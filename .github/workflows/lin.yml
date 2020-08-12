@@ -11,12 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
-    - run: sudo apt install build-essential mesa-common-dev binutils
-    - run: make -f Makefile.libretro -j8
-    - run: strip -s mame_libretro.so
-    - run: zip -9 mame_libretro.so.zip mame_libretro.so
-    - name: Upload MAME core
+    - name: Install needed packages
+      run: sudo apt install build-essential mesa-common-dev binutils
+    - name: Checkout source
+      uses: actions/checkout@v2
+    - name: Build libretro mame core
+      run: |
+        make -f Makefile.libretro -j8
+        strip -s mame_libretro.so
+        zip -9 mame_libretro.so.zip mame_libretro.so
+    - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
