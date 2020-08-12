@@ -33874,6 +33874,7 @@ dmnfrntb                        //
 dmnfrntpcb                      //
 drgw2                           // (c) 1997 Dragon World 2
 drgw2c                          //
+drgw2c101                       //
 drgw2hk                         //
 drgw2j                          //
 drgw3                           // (c) 1998 Dragon World 3
@@ -33885,6 +33886,7 @@ dw2v100x                        //
 dwex                            // (c) 2000 Dragon World 3 EX V100
 dwex101cn                       // (c) 2001 Dragon World 3 EX V101CN
 dwpc                            // (c) 2001 Dragon World Pretty Chance
+dwpc101j                        //
 espgal                          // (c) 2003 Espgaluda
 espgalbl                        //
 happy6                          // (c) 2004 Happy 6
@@ -33920,6 +33922,7 @@ kov2106                         //
 kov2p                           // (c) 2000 Knights of Valor 2 Nine Dragons
 kov2p200                        //
 kov2p202                        //
+kov2p203                        //
 kov2p204                        //
 kovlsjb                         // bootleg
 kovlsjba                        // bootleg
@@ -33950,8 +33953,10 @@ olds100                         //
 olds100a                        //
 olds103t                        //
 oldsplus                        // (c) 2004 Oriental Legend Super Plus
+oldsplusa                       //
 orlegend                        // (c) 1997 Oriental Legend
 orlegend105k                    //
+orlegend105t                    //
 orlegend111c                    //
 orlegend111k                    //
 orlegend111t                    //
@@ -33965,6 +33970,7 @@ photoy2k102                     //
 photoy2k103j                    // (c) 1999 Photo Y2k
 photoy2k104                     //
 puzlstar                        // (c) 1999 Puzzle Star
+puzlstara                       //
 puzzli2                         // (c) 1999 Puzzli 2
 puzzli2s                        // (c) 2001 Puzzli 2 Super
 py2k2                           // (c) 2001 Photo Y2K2 (M101XX)
