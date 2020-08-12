@@ -14,7 +14,8 @@ Hardware notes:
 
 TODO:
 - lots of unacknowledged writes to latch 1, probably harmless
-- add cassette i/o
+- cassette data saved from MAME can be loaded fine, but other WAVs can't, even
+  when they are good quality, maybe a filter on the data input?
 
 ******************************************************************************/
 
@@ -66,6 +67,17 @@ u8 o2_homecomp_device::internal_io_r(offs_t offset)
 	{
 		// d0: latch 0 status
 		data |= m_latch[0]->pending_r() ^ 1;
+
+		if (m_cass->is_playing() && m_cass->motor_on())
+		{
+			// d6: cass clock
+			// d7: cass data
+			double level = m_cass->input();
+			if (level > 0.04)
+				data |= 0xc0;
+			else if (level < -0.04)
+				data |= 0x80;
+		}
 	}
 
 	return data;
@@ -76,6 +88,20 @@ void o2_homecomp_device::internal_io_w(offs_t offset, u8 data)
 	// A7: output latch
 	if (~offset & 0x80)
 		m_latch[0]->write(data);
+
+	// A6: other i/o
+	if (~offset & 0x40)
+	{
+		// d7: cass remote control (also with data)
+		m_cass->set_motor((data & 0x81) ? 1 : 0);
+
+		// d0: cass data
+		// d1: cass clock
+		double level = 0.0;
+		if (data & 1)
+			level = (data & 2) ? 0.8 : -0.8;
+		m_cass->output(level);
+	}
 }
 
 void o2_homecomp_device::homecomp_mem(address_map &map)
@@ -107,7 +133,7 @@ void o2_homecomp_device::device_add_mconfig(machine_config &config)
 
 	// cassette
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
 	SPEAKER(config, "cass_output").front_center(); // on data recorder
 	m_cass->add_route(ALL_OUTPUTS, "cass_output", 0.05);
 }
