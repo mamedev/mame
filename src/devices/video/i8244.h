@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, hap
 /***************************************************************************
 
     Intel 8244 (NTSC)/8245 (PAL) Graphics and sound chip
@@ -31,7 +31,7 @@ public:
 
 	// configuration helpers
 	auto irq_cb() { return m_irq_func.bind(); }
-	auto postprocess_cb() { return m_postprocess_func.bind(); }
+	i8244_device &set_screen_size(int width, int height, int cropx, int cropy);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -40,17 +40,6 @@ public:
 	void i8244_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
-
-	// Global constants
-	static constexpr int START_ACTIVE_SCAN = 42;
-	static constexpr int BORDER_SIZE       = 10;
-	static constexpr int END_ACTIVE_SCAN   = 42 + 10 + 320 + 10;
-	static constexpr int START_Y           = 1;
-	static constexpr int SCREEN_HEIGHT     = 243;
-	static constexpr int LINE_CLOCKS       = 455;
-	static constexpr int LINES             = 262;
 
 protected:
 	union vdc_t {
@@ -97,53 +86,68 @@ protected:
 		} s;
 	};
 
-	i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int lines);
+	i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	void render_scanline(int vpos);
+	virtual void set_default_params();
+
+	//void render_scanline(int vpos);
 	int get_y_beam();
 	int get_x_beam();
 	offs_t fix_register_mirrors( offs_t offset );
-	bool unused_register( offs_t offset );
-
-	// Local constants
-	static constexpr uint8_t VDC_CONTROL_REG_STROBE_XY = 0x02;
+	bool invalid_register( offs_t offset, bool rw );
 
 	/* timers */
-	static constexpr device_timer_id TIMER_LINE = 0;
-	static constexpr device_timer_id TIMER_HBLANK = 1;
+	static constexpr device_timer_id TIMER_VBLANK_START = 0;
+	static constexpr device_timer_id TIMER_HBLANK_START = 1;
 
 	// callbacks
 	devcb_write_line m_irq_func;
-	devcb_write16 m_postprocess_func;
 
 	required_region_ptr<uint8_t> m_charset;
 
-	bitmap_ind16 m_tmp_bitmap;
-	emu_timer *m_line_timer;
 	emu_timer *m_hblank_timer;
+	emu_timer *m_vblank_timer;
 	sound_stream *m_stream;
 
-	int m_start_vpos;
-	int m_start_vblank;
-	int m_screen_lines;
+	void sound_update();
+
+	int m_htotal;
+	int m_vtotal;
+	int m_width;
+	int m_height;
+	int m_cropx;
+	int m_cropy;
+
+	int m_vblank_start;
+	int m_vblank_end;
+	int m_hblank_start;
+	int m_hblank_end;
+	int m_bgate_start;
 
 	vdc_t m_vdc;
-	uint16_t m_sh_count;
-	uint8_t m_x_beam_pos;
-	uint8_t m_y_beam_pos;
-	uint8_t m_control_status;
-	uint8_t m_collision_status;
-	int m_iff;
+
+	uint8_t m_x_beam_pos = 0;
+	uint8_t m_y_beam_pos = 0;
+	uint8_t m_y_latch = 0;
+	uint8_t m_control_status = 0;
+	uint8_t m_collision_status = 0;
+	bool m_pos_hold = false;
+	bool m_y_hold = false;
+
+	bool m_sh_written = false;
+	bool m_sh_pending = false;
+	u8 m_sh_prescaler = 0 ;
+	int m_sh_output = 0;
+	u8 m_sh_duty = 0;
 };
 
 
@@ -153,7 +157,8 @@ public:
 	// construction/destruction
 	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static constexpr int LINES = 312;
+protected:
+	virtual void set_default_params() override;
 };
 
 
