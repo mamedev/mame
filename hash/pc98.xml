@@ -31709,6 +31709,37 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="nirvana">
+		<description>Nirvana - Zeta II (cracked)</description>
+		<year>1994</year>
+		<publisher>トンキンハウス (Tonkin House)</publisher>
+		<info name="developer" value="Will" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="system.fdi" size="1265664" crc="e4ae0682" sha1="ddab9087e441add7a02e9a401114e015c073945c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data 1.fdi" size="1265664" crc="df974fce" sha1="cbb26eec0c3b7feceaec75333b91cf9ad09dffa0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data 2.fdi" size="1265664" crc="79ab7c32" sha1="ef9dd33cb0b3e1969aa3fcf9fa7edbc07d3b9cee" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data 3.fdi" size="1265664" crc="00f9ad98" sha1="aee242f3a7d401bb1ceb357d06e288e99e3ecfd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nobunaga">
 		<description>Nobunaga no Yabou</description>
 		<year>1983</year>
