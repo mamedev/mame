@@ -48,7 +48,8 @@ DE-0087A-0 (bottom side)
 Notes:
       6502 Clock - 441.458333kHz [10.595/24]
   AY3-8910 Clock - 1.324375MHz [10.595/8] (both)
-          MK4118 - MOSTEK MK4118 1kx8 SRAM
+          MK4118 - MOSTEK MK4118 1kx8 SRAM (also seen 6116 and M58725 on other
+                   PCBs which are both 2kx8 SRAM)
           DSW1/2 - 8-position DIP Switch
          TA75558 - Toshiba TA75558 Dual Operational Amplifier
           C1181H - NEC uPC1181H Power AMP
@@ -572,11 +573,11 @@ ROM_START( progolfa )
 	ROM_LOAD( "g2-m.a6",      0xd000, 0x1000, CRC(fafec36e) SHA1(70880d6f9b11505d466f36c12a43361ee2639fed) )
 	ROM_LOAD( "g1-m.a8",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.a9",      0xf000, 0x1000, CRC(a03c533f) SHA1(2e0006be40e32b64b1490bd339d9fc9302eee7c4) )
-	// the following single byte patch gets the ball position to be correct like in the parent. TODO: verify g3-m.a4 dump
+	// the following single byte patch gets the ball position to be correct like in the parent. g3-m.a4 dump has been verified on multiple PCBs
 	// ROM_FILL( 0xc14b, 0x01, 0xf0) // from: EB 07    sbc #$07 to: F0 07    beq $c154
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "g5-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
+	ROM_LOAD( "g6-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_LOAD( "g7-m.a8",      0x0000, 0x1000, CRC(16b42975) SHA1(29268a8a660781ff0de77b3b1bfc16edff7be134) )
@@ -592,5 +593,5 @@ ROM_END
 
 // this uses DECO222 style encryption
 GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, empty_init, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-// this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-7 style)
+// this uses DECO CPU-6 as custom module CPU
 GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, empty_init, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
