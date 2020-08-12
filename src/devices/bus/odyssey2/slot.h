@@ -21,6 +21,7 @@ enum
 	O2_RALLY,
 	O2_KTAA,
 	O2_CHESS,
+	O2_HOMECOMP,
 	O2_VOICE
 };
 

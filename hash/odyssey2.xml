@@ -551,8 +551,8 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
 			<dataarea name="rom" size="0x2800">
-				<rom name="z80_c7010.bin" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" offset="0" />
-				<rom name="vp_c7010.bin" size="0x800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0x2000" />
+				<rom name="z80_c7010.bin" offset="0x0000" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" />
+				<rom name="vp_c7010.bin"  offset="0x2000" size="0x0800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" />
 			</dataarea>
 		</part>
 	</software>

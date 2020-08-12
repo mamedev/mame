@@ -118,6 +118,7 @@ static const o2_slot slot_list[] =
 	{ O2_RALLY,    "o2_rally" },
 	{ O2_KTAA,     "o2_ktaa" },
 	{ O2_CHESS,    "o2_chess" },
+	{ O2_HOMECOMP, "o2_homecomp" },
 	{ O2_VOICE,    "o2_voice" }
 };
 
@@ -243,14 +244,16 @@ uint8_t o2_cart_slot_device::io_read(offs_t offset)
 #include "bus/odyssey2/rally.h"
 #include "bus/odyssey2/ktaa.h"
 #include "bus/odyssey2/chess.h"
+#include "bus/odyssey2/homecomp.h"
 #include "bus/odyssey2/voice.h"
 
 void o2_cart(device_slot_interface &device)
 {
-	device.option_add_internal("o2_rom",    O2_ROM_STD);
-	device.option_add_internal("o2_4in1",   O2_ROM_4IN1);
-	device.option_add_internal("o2_rally",  O2_ROM_RALLY);
-	device.option_add_internal("o2_ktaa",   O2_ROM_KTAA);
-	device.option_add_internal("o2_chess",  O2_ROM_CHESS);
-	device.option_add_internal("o2_voice",  O2_ROM_VOICE);
+	device.option_add_internal("o2_rom",      O2_ROM_STD);
+	device.option_add_internal("o2_4in1",     O2_ROM_4IN1);
+	device.option_add_internal("o2_rally",    O2_ROM_RALLY);
+	device.option_add_internal("o2_ktaa",     O2_ROM_KTAA);
+	device.option_add_internal("o2_chess",    O2_ROM_CHESS);
+	device.option_add_internal("o2_homecomp", O2_ROM_HOMECOMP);
+	device.option_add_internal("o2_voice",    O2_ROM_VOICE);
 }

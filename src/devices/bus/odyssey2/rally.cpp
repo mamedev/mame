@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /******************************************************************************
 
-Videopac 55/58/59/60 cartridge emulation
+Videopac+ 55/58/59/60 cartridge emulation
 
 Bankswitched ROM via latch, either 16KB/2*8KB, or 4KB+8KB.
 
@@ -12,12 +12,14 @@ Used in:
 - #59: Helicopter Rescue
 - #60: Trans American Rally
 
+#55 and #58 also work on the G7000.
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "rally.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Odyssey 2 Videopac 60")
+DEFINE_DEVICE_TYPE(O2_ROM_RALLY, o2_rally_device, "o2_rally", "Odyssey 2 Videopac+ 60")
 
 
 //-------------------------------------------------
