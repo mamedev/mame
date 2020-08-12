@@ -128,8 +128,8 @@ ifeq ($(platform),win)
 	endif
 endif
 ifeq ($(platform),android)
-	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm-3.5/prebuilt/linux-x86_64
-	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64
+	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm/prebuilt/linux-x86_64
+	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
 	ANDROID_NDK_ROOT ?= /opt/ndk
 	PLATFLAGS += TARGETOS="android-arm" gcc="android-arm"
 	PLATFLAGS +=  ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
