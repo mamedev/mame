@@ -39,12 +39,16 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/uml.h",
 		MAME_DIR .. "src/devices/cpu/x86log.cpp",
 		MAME_DIR .. "src/devices/cpu/x86log.h",
-		MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
-		MAME_DIR .. "src/devices/cpu/drcbex86.h",
-		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
-		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
 	}
+	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+		files {
+			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbex64.h",
+			MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbex86.h",
+		}
+	end
 end
 
 --------------------------------------------------

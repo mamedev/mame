@@ -24,19 +24,19 @@ jobs:
     - os: osx
       osx_image: xcode11.6
       compiler: clang
-      env: SUBTARGET=tiny   MAME=mametiny64
+      env: SUBTARGET=ci   MAME=mameci64
     - os: linux
       arch: amd64
       compiler: gcc
-      env: SUBTARGET=tiny   MAME=mametiny64
+      env: SUBTARGET=ci   MAME=mameci64
     - os: linux
       arch: arm64
       compiler: gcc
-      env: SUBTARGET=tiny   MAME=mametiny
+      env: SUBTARGET=ci   MAME=mameci
     - os: linux
       arch: s390x
       compiler: gcc
-      env: SUBTARGET=tiny   MAME=mametiny64
+      env: SUBTARGET=ci   MAME=mameci64
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then
