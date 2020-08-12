@@ -131,6 +131,12 @@ ROM_START( dphh8630 )
 	ROM_LOAD( "bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269) )
 ROM_END
 
+ROM_START( dgun2953 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dgun2953_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
+	ROM_LOAD( "dg160_25x32v_ef3016.bin", 0x000000, 0x400000, CRC(2e993bac) SHA1(4b310e326a47df1980aeef38aa9a59018d7fe76f) )
+ROM_END
+
 
 
 void bbl380_state::init_ragc153()
@@ -147,4 +153,5 @@ void bbl380_state::init_ragc153()
 CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
 CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IS_SKELETON )
 CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "PCP", "PCP 8630 - 230-in-1 - Digital Pocket Hand Held System", MACHINE_IS_SKELETON ) // PCP isn't mentioned on packaging
+CONS( 200?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IS_SKELETON )
 
