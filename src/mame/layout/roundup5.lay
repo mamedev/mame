@@ -55,9 +55,7 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-
-<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
-
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
@@ -66,11 +64,27 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-
-<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
-
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
+		</bezel>
+	</view>
+	<view name="Widescreen Shifter-L">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
+			<bounds x="-40" y="414" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
+	<view name="Widescreen Shifter-R">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
+			<bounds x="648" y="414" width="32" height="64" />
+			<color alpha="0.65" />
 		</bezel>
 	</view>
 </mamelayout>
