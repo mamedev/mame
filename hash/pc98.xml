@@ -19497,7 +19497,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Fantasy Knight</description>
 		<year>1988</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
-		<info name="alt_title" value="ファンタジーナイト 復刻版" />
+		<info name="alt_title" value="ファンタジーナイト" />
 		<info name="release" value="198805xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
