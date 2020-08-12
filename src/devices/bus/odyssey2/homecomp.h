@@ -55,7 +55,6 @@ private:
 	void homecomp_mem(address_map &map);
 
 	u8 m_control = 0;
-	u8 m_ioctrl = 0;
 };
 
 // device type definition
