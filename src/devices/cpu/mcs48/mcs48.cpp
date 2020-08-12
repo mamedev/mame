@@ -517,9 +517,10 @@ void mcs48_cpu_device::execute_call(uint16_t address)
 
 void mcs48_cpu_device::execute_jcc(uint8_t result)
 {
+	uint16_t pch = m_pc & 0xf00;
 	uint8_t offset = argument_fetch();
 	if (result != 0)
-		m_pc = ((m_pc - 1) & 0xf00) | offset;
+		m_pc = pch | offset;
 }
 
 
@@ -582,7 +583,7 @@ void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 OPHANDLER( illegal )
 {
 	burn_cycles(1);
-	logerror("MCS-48 PC:%04X - Illegal opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
+	logerror("MCS-48 PC:%04X - Illegal opcode = %02x\n", m_prevpc, program_r(m_prevpc));
 }
 
 OPHANDLER( add_a_r0 )       { burn_cycles(1); execute_add(R0); }
