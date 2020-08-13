@@ -343,7 +343,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			}
 			else
 			{
-				// Alphannumeric
+				// Alphanumeric
 				if ( b & 0x80 )
 				{
 					if ( b & 0x60 )
@@ -371,6 +371,10 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 					fg = bgr2rgb[ a & 0x07 ];
 				}
 			}
+
+			// Cursor is enabled
+			if ( m_ef9340.R & 0x10 && x == m_ef9340.X && y_row == m_ef9340.Y )
+				char_data ^= 0xff;
 
 			for ( int i = 0; i < 8; i++ )
 			{
