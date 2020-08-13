@@ -395,24 +395,23 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 
 void seicross_state::no_nvram(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'432'000) / 6);   /* D780C, 3.072 MHz? */
+	// Basic machine hardware
+	Z80(config, m_maincpu, XTAL(18'432'000) / 6);   // D780C, 3.072 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &seicross_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &seicross_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(seicross_state::vblank_irq));
 
-	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   /* ??? */
+	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   // ???
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 
-	config.set_maximum_quantum(attotime::from_hz(1200));  /* 20 CPU slices per frame - a high value to ensure proper */
-						/* synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(1200)); // 20 CPU slices per frame, a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* frames per second, vblank duration */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration */);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(seicross_state::screen_update));
@@ -421,7 +420,7 @@ void seicross_state::no_nvram(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicross);
 	PALETTE(config, m_palette, FUNC(seicross_state::seicross_palette), 64);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
@@ -440,7 +439,7 @@ void seicross_state::nvram(machine_config &config)
 {
 	no_nvram(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_nvram_map);
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(seicross_state::nvram_init));
@@ -452,6 +451,11 @@ void seicross_state::friskytb(machine_config &config)
 	m_mcu->set_addrmap(AS_OPCODES, &seicross_state::decrypted_opcodes_map);
 }
 
+void seicross_state::sectznt(machine_config &config)
+{
+	no_nvram(config);
+	m_mcu->set_addrmap(AS_OPCODES, &seicross_state::decrypted_opcodes_map);
+}
 
 /***************************************************************************
 
@@ -654,10 +658,36 @@ ROM_START( sectrzon )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
+ROM_START( sectrzont )
+	ROM_REGION( 0x7800, "maincpu", 0 )
+	ROM_LOAD( "czt_1.bin", 0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
+	ROM_LOAD( "czt_2.bin", 0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
+	ROM_LOAD( "czt_3.bin", 0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
+	ROM_LOAD( "czt_4.bin", 0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
+	ROM_LOAD( "czt_5.bin", 0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
+	ROM_LOAD( "czt_6.bin", 0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
+	ROM_LOAD( "czt_7.bin", 0x6000, 0x1000, CRC(7b34dc1c) SHA1(fb163a908c991cd214e0d2d685e74563a460a929) )
+	ROM_LOAD( "czt_8.bin", 0x7000, 0x0800, CRC(673a20e7) SHA1(66be7581323dceddb594eed53dd3abc62b450327) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                    0x0800)
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "czt_11.bin", 0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
+	ROM_LOAD( "czt_12.bin", 0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
+	ROM_LOAD( "czt_9.bin",  0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
+	ROM_LOAD( "czt_10.bin", 0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "czt_2_82s123.bin", 0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
+	ROM_LOAD( "czt_1_82s123.bin", 0x0020, 0x0020, CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "czt_pal16h2cn.bin", 0x0000, 0x0044, CRC(7edec1ed) SHA1(1b28cb250875f14a76d84bfc0b23ee02b1862c2c) )
+ROM_END
+
 void seicross_state::init_friskytb()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	// this code is in ROM 6.3h, maps to MCU at dxxx
+	// This code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{
 		m_decrypted_opcodes[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
@@ -665,11 +695,12 @@ void seicross_state::init_friskytb()
 }
 
 
-GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, init_friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
-GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 1)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 2)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, init_friskytb, ROT0,  "Nichibutsu",         "Frisky Tom (set 3, encrypted)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // Protection MCU runs encrypted opcodes
+GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA",     "Radical Radial (US)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",      "Radical Radial (Japan)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, init_friskytb, ROT90, "Nichibutsu / Alice", "Sector Zone (set 2, encrypted, Tecfri hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // MCU HD46802P
