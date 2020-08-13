@@ -657,6 +657,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
+	SOFTWARE_LIST(config, "g7400_list").set_compatible("g7400");
 }
 
 void odyssey2_state::videopac(machine_config &config)

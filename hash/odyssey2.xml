@@ -4,6 +4,8 @@
 license:CC0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
+See g7400.xml for G7400 cartridges that can also be run on G7000/O2.
+When adding new sets, avoid naming conflicts between odyssey2.xml and g7400.xml.
 
 TODO:
 add first release date were applicable
@@ -401,7 +403,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="loony" cloneof="balao">
+	<software name="loonyp" cloneof="balao">
 		<description>Loony Balloon (Euro, Prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -528,7 +530,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="neutron" cloneof="buraco">
+	<software name="neutronp" cloneof="buraco">
 		<description>Neutron Star (Euro, Prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
