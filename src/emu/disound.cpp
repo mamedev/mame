@@ -395,32 +395,6 @@ device_mixer_interface::~device_mixer_interface()
 
 
 //-------------------------------------------------
-//  input_to_stream_input - convert a device's
-//  input index to a stream and the input index
-//  on that stream
-//-------------------------------------------------
-
-sound_stream *device_mixer_interface::input_to_stream_input(int inputnum, int &stream_inputnum) const
-{
-	assert(inputnum >= 0);
-
-	// scan the list looking for streams owned by this device
-	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
-		{
-			if (inputnum < m_auto_allocated_inputs)
-			{
-				stream_inputnum = inputnum;
-				return stream.get();
-			}
-			inputnum -= m_auto_allocated_inputs;
-		}
-
-	// not found
-	return nullptr;
-}
-
-//-------------------------------------------------
 //  interface_pre_start - perform startup prior
 //  to the device startup
 //-------------------------------------------------

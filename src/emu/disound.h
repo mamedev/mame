@@ -81,7 +81,7 @@ public:
 	// helpers
 	int inputs() const;
 	int outputs() const;
-	virtual sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const;
+	sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const;
 	sound_stream *output_to_stream_output(int outputnum, int &stream_outputnum) const;
 	float input_gain(int inputnum) const;
 	float output_gain(int outputnum) const;
@@ -119,9 +119,6 @@ public:
 	// construction/destruction
 	device_mixer_interface(const machine_config &mconfig, device_t &device, int outputs = 1);
 	virtual ~device_mixer_interface();
-
-	// helpers
-	virtual sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const override;
 
 protected:
 	// optional operation overrides
