@@ -189,17 +189,27 @@ void Input_Binding(running_machine &machine)
    Buttons_mapping[5]=RETROPAD_R;
 
    if (
+         !core_stricmp(machine.system().name, "bloodwar")    ||
+         !core_stricmp(machine.system().parent, "bloodwar")  ||
+         !core_stricmp(machine.system().name, "daraku")    ||
+         !core_stricmp(machine.system().parent, "daraku")  ||
+         !core_stricmp(machine.system().name, "drgnmst")   ||
+         !core_stricmp(machine.system().parent, "drgnmst")   ||
          !core_stricmp(machine.system().name, "rabbit")    ||
          !core_stricmp(machine.system().parent, "rabbit")  ||
+         !core_stricmp(machine.system().name, "shogwarr")   ||
+         !core_stricmp(machine.system().parent, "shogwarr")   ||
          !core_stricmp(machine.system().name, "tekken")    ||
          !core_stricmp(machine.system().parent, "tekken")  ||
          !core_stricmp(machine.system().name, "tekken2")   ||
          !core_stricmp(machine.system().parent, "tekken2")   ||
+         !core_stricmp(machine.system().name, "tkdensho")   ||
+         !core_stricmp(machine.system().parent, "tkdensho")   ||
          !core_stricmp(machine.system().name, "vf")   ||
          !core_stricmp(machine.system().parent, "vf")
       )
    {
-      /* Tekken 1/2/Virtua Fighter/Rabbit*/
+      /* Tekken 1/2/Virtua Fighter/Etc.*/
 
       Buttons_mapping[0]=RETROPAD_Y;
       Buttons_mapping[1]=RETROPAD_X;
@@ -344,12 +354,18 @@ void Input_Binding(running_machine &machine)
               !core_stricmp(machine.system().parent, "brival") ||
               !core_stricmp(machine.system().name, "btlkroad") ||
               !core_stricmp(machine.system().parent, "btlkroad") ||
+              !core_stricmp(machine.system().name, "dankuga") ||
+              !core_stricmp(machine.system().parent, "dankuga") ||
               !core_stricmp(machine.system().name, "dragoona") ||
               !core_stricmp(machine.system().parent, "dragoona") ||
+              !core_stricmp(machine.system().name, "ffreveng") ||
+              !core_stricmp(machine.system().parent, "ffreveng") ||
               !core_stricmp(machine.system().name, "fghthist") ||
               !core_stricmp(machine.system().parent, "fghthist") ||
               !core_stricmp(machine.system().name, "fgtlayer") ||
               !core_stricmp(machine.system().parent, "fgtlayer") ||
+              !core_stricmp(machine.system().name, "gaxeduel") ||
+              !core_stricmp(machine.system().parent, "gaxeduel") ||
               !core_stricmp(machine.system().name, "groovef") ||
               !core_stricmp(machine.system().parent, "groovef") ||
               !core_stricmp(machine.system().name, "kaiserkn") ||
