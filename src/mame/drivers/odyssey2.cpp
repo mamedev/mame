@@ -45,10 +45,10 @@ TODO:
   be correct(see backgamm)
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
-- add 824x vs ef934x collision detection
+- add 824x vs ef934x collision detection, rally needs it?
 - g7400 probably has different video timing too (not same as g7000)
-- g7400 graphics problems, some of them severe, eg. rally (for homecomp, enter
-  command TX 1,0,0 to see the text)
+- g7400 graphics problems, mostly due to missing features in ef934x, some of them
+  more severe (eg. motocras, rally)
 - g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
 
 ***************************************************************************/
