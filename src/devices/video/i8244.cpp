@@ -58,6 +58,7 @@ void i8244_device::set_default_params()
 
 void i8245_device::set_default_params()
 {
+	// this timing is partially derived externally, 8245 on the PAL console is set to slave mode in vblank (M/S pin)
 	m_htotal = 456;
 	m_vtotal = 313;
 	m_vblank_start = 242;
@@ -389,6 +390,8 @@ void i8244_device::write(offs_t offset, uint8_t data)
 				m_y_beam_pos = get_y_beam();
 				m_pos_hold = true;
 			}
+			// note: manual talks about a hblank interrupt on d0, and a sound interrupt on d2,
+			// but tests done on 8244 reveal no such features
 			break;
 
 		case 0xa7: case 0xa8: case 0xa9:

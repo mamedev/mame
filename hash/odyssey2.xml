@@ -3,6 +3,8 @@
 <!--
 license:CC0
 
+The softwarelist is sorted alphabetically per title, not counting clone sets.
+
 TODO:
 add first release date were applicable
 add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
@@ -120,6 +122,17 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="voice">
+		<description>The Voice</description>
+		<year>1979?</year>
+		<publisher>Magnavox</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_voice" />
+			<dataarea name="rom" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="typetell">
 		<description>Type &amp; Tell! (USA)</description>
 		<year>1982</year>
@@ -137,19 +150,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 
 
 <!-- Educational -->
-
-	<software name="number">
-		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AC9413 (USA) ~ 13 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="i've got your number (usa, europe).bin" size="2048" crc="1c8368e7" sha1="498cb0882d8a692042889e83775a83cf267a1837" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="2mthecho">
 		<description>Mathematician/Echo (Euro) ~ Math-a-Magic!/Echo! (USA)</description>
@@ -213,6 +213,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="nimble numbers ned (usa).bin" size="4096" crc="cf2f8e7a" sha1="01dd021a1bcdafb58cb2bcca051934f05e978c53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="number">
+		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9413 (USA) ~ 13 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="i've got your number (usa, europe).bin" size="2048" crc="1c8368e7" sha1="498cb0882d8a692042889e83775a83cf267a1837" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -296,40 +309,15 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="alieninv">
-		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
-		<year>1980</year>
-		<publisher>Magnavox</publisher>
-		<info name="serial" value="AA9428 (USA) ~ 22 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="alien invaders - plus (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alpine">
-		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
-		<year>1979</year>
+	<software name="2lbsprmd">
+		<description>A Labyrinth Game/Supermind (Euro)</description>
+		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="AK9418 (USA) ~ 25 (Euro)"/>
+		<info name="serial" value="32"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="alpine skiing (usa, europe).bin" size="2048" crc="4663c4b6" sha1="9e7e16744b44fa83fa14c211b2365cf04604e06e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ski" cloneof="alpine">
-		<description>Ski (Fra)</description>
-		<year>1979</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="ski (france).bin" size="2048" crc="e129490d" sha1="a6e07b727b4f48d13ce21442911995eb46b99c5d" offset="0" />
+				<rom name="a labyrinth game - supermind (europe).bin" size="2048" crc="d158eeba" sha1="85c567c8f38239350a5d04f8cfd9dd7872f448c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -361,6 +349,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="football">
+		<description>American Football (Euro) ~ Football! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9402 (USA) ~ 3 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="football (usa, europe).bin" size="2048" crc="f9084aa3" sha1="364504ffce1108bcf09a5cc784f7ea2cf141f7b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="timelord">
 		<description>Attack of the Timelord! (USA)</description><!-- possibly also "Terrahawks (Euro)[Videopac 51]"? -->
 		<year>1983</year>
@@ -388,6 +389,54 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="balao">
+		<description>Balão Travesso! (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="balao travesso (brazil).bin" size="4096" crc="5b6e741a" sha1="73bf363400fece63d1a10b6b8cd9413612a1a126" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loony" cloneof="balao">
+		<description>Loony Balloon (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="loony balloon (europe) (proto).bin" size="4096" crc="ca23f40c" sha1="3cb324b047cbac8ec4381150b1c2aee98573841b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battle">
+		<description>Barão Vermelho! (Bra)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="air battle (brazil).bin" size="8192" crc="4103ee95" sha1="b6842b9264b722e2b39c8647b7963e513a0cde16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baron" cloneof="battle">
+		<description>Red Baron (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="red baron (europe) (proto).bin" size="8192" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baseball">
 		<description>Baseball (Euro) ~ Baseball! (USA)</description>
 		<year>1980</year>
@@ -401,6 +450,59 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="pachinko">
+		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AA9425 (USA) ~ 26 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="pachinko (usa, europe).bin" size="2048" crc="239df97d" sha1="ffd525d5c6023409afdcdb2afbda227bc4568304" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlef">
+		<description>Battlefield (Euro) ~ War of Nerves! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9417 (USA) ~ 30 (Euro)"/>
+		<info name="programmer" value="Ed Averett" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="war of nerves (usa, europe).bin" size="2048" crc="58fa6766" sha1="e56b674c832e5a7cad977cc76779548fdd2f338e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsvsblck">
+		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9401 (USA) ~ 5 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="las vegas blackjack (usa, europe).bin" size="2048" crc="6f66b1f7" sha1="3e10fc687b1d07612305f680f24590f99842e62b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackjck" cloneof="lsvsblck">
+		<description>Blackjack (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="blackjack (france).bin" size="2048" crc="6381e402" sha1="9ec331ce8e50ef60de93e615c18327f08b4a24fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blobbers">
 		<description>Blobbers (Euro)</description>
 		<year>1983</year>
@@ -410,59 +512,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="blobbers (europe).bin" size="8192" crc="9d72d4e9" sha1="cae4e1f3ee090ec423aff89102f359b9e14dba41" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2blckbrk">
-		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
-		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
-				</dataarea>
-		</part>
-	</software>
-
-	<software name="magique" cloneof="2blckbrk">
-		<description>Le Mûr Magique (Fra)</description>
-		<year>1981</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="mur magique, le (france).bin" size="2048" crc="d38153f6" sha1="ff0ebe9efc275011a0534fd98ca1f4112dae3dab" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2bwlbskt">
-		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
-		<year>1978</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
-		<info name="serial" value="AJ9404 (USA) ~ 6 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="bowling - basketball (usa, europe).bin" size="2048" crc="084ee035" sha1="2630c304b6beb0f8021578277be68e837202895d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2qllbskt" cloneof="2bwlbskt">
-		<description>Jeu de Quilles/Basketball (Fra)</description>
-		<year>1978</year>
-		<publisher>Radiola</publisher>
-		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="jeu de quilles - basketball (france).bin" size="2048" crc="a7e97958" sha1="30cbbec570fa0872c13e89ddc312b2f74e3749fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -487,31 +536,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="neutron star (europe) (proto).bin" size="8192" crc="d03efa86" sha1="0a91bdb293f52ac37414a63f71d90c6338a4a91a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="casino">
-		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
-		<year>1980</year>
-		<publisher>Magnavox</publisher>
-		<info name="serial" value="AA9426 (USA) ~ 23 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="casino slot machine (usa, europe).bin" size="2048" crc="bb6e7135" sha1="052bc62eb03e2673a802bab866dd0ab3c39fd584" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lasvegas" cloneof="casino">
-		<description>Las Vegas (Fra)</description>
-		<year>1980</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="las vegas (france).bin" size="2048" crc="a0620082" sha1="b83463b7c40367d4310f142fa15d06d12061f3be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -697,6 +721,45 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="kckrazy">
+		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9442 (USA) ~ 44 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="k.c.'s krazy chase (usa, europe).bin" size="4096" crc="a6909a8b" sha1="3391e48c0048a2f588d8238bb202e2ec346a6ad4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2blckbrk">
+		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
+		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
+				</dataarea>
+		</part>
+	</software>
+
+	<software name="magique" cloneof="2blckbrk">
+		<description>Le Mûr Magique (Fra)</description>
+		<year>1981</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="mur magique, le (france).bin" size="2048" crc="d38153f6" sha1="ff0ebe9efc275011a0534fd98ca1f4112dae3dab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demon">
 		<description>Demon Attack (Euro, USA)</description>
 		<year>1983</year>
@@ -739,6 +802,60 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="billiard">
+		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9424 (USA) ~ 35 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="pocket billiards (usa, europe).bin" size="2048" crc="24d53e2c" sha1="8abd1057202ebac12acf3822ed4d965bba02b7de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="billamer" cloneof="billiard">
+		<description>Billard Américain (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="billiard americain (france).bin" size="2048" crc="a674ea27" sha1="283ae5fa1d6e89a5ac921c7f2e21a89a67dd138c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2hckyscr">
+		<description>Electronic Ice Hockey/Electronic Soccer (Euro) ~ Hockey!/Soccer! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Move joystick when game is on screen." />
+		<info name="serial" value="AK9420 (USA) ~ 36 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="hockey - soccer (usa, europe).bin" size="2048" crc="39989464" sha1="f39c9801984f97d5a685a4b7a1accd0164a49b43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2fblhcky" cloneof="2hckyscr">
+		<description>Football Electronique/Hockey Electronique (Fra)</description>
+		<year>1981</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Move joystick when game is on screen." />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="football electronique - hockey electronique (france).bin" size="2048" crc="f00f9dba" sha1="d7593ade4d60a6e314e4f18711e8ea59e3c8c3ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="soccer">
 		<description>Electronic Table Football (Euro) ~ Electronic Table Soccer (USA)</description>
 		<year>1980</year>
@@ -752,15 +869,54 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="football">
-		<description>American Football (Euro) ~ Football! (USA)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AJ9402 (USA) ~ 3 (Euro)"/>
+	<software name="volley">
+		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett" />
+		<info name="serial" value="AA9422 (USA) ~ 28 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="football (usa, europe).bin" size="2048" crc="f9084aa3" sha1="364504ffce1108bcf09a5cc784f7ea2cf141f7b8" offset="0" />
+				<rom name="volleyball (usa, europe).bin" size="2048" crc="d3b09fec" sha1="830c9b3628f2e9c4f8c882024dd912b9d7610765" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volleyf" cloneof="volley">
+		<description>Volleyball (Fra)</description>
+		<year>1979</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="volleyball electronique (france).bin" size="2048" crc="551e38a2" sha1="9ea8d921ca03699f74e53e25b139632391838c7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipper">
+		<description>Flipper Game (Euro) ~ Thunderball! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="serial" value="AK9415 (USA) ~ 24 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="thunderball (usa, europe).bin" size="2048" crc="2c9d1715" sha1="d0070e12d6b0f406dab6e1fa550ab01509c9362e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipperf" cloneof="flipper">
+		<description>Flipper (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="billard electrique (france).bin" size="2048" crc="54bf4750" sha1="d12a242d273c4f4417806c3bcd868a9a0f553854" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -831,31 +987,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="gtwallst">
-		<description>The Great Wall Street Fortune Hunt (Euro, USA)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="the great wall street fortune hunt (usa, europe).bin" size="4096" crc="881ceae4" sha1="d54b1d5667bf90368dddab55a91955b1789f177c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wallst" cloneof="gtwallst">
-		<description>Wall Street (Bra)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="wall street (brazil).bin" size="4096" crc="228842df" sha1="af9db337a2edbb3fe79a3d50f1b4ec1b007f4a52" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gunfight">
 		<description>Gunfighter (Euro)</description>
 		<year>1980</year>
@@ -878,33 +1009,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="showdown in 2100 a.d. (usa).bin" size="2048" crc="9487c920" sha1="7163c3e0d0e926287df670bfa5d5d5c42b5b3cf6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2hckyscr">
-		<description>Electronic Ice Hockey/Electronic Soccer (Euro) ~ Hockey!/Soccer! (USA)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Move joystick when game is on screen." />
-		<info name="serial" value="AK9420 (USA) ~ 36 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="hockey - soccer (usa, europe).bin" size="2048" crc="39989464" sha1="f39c9801984f97d5a685a4b7a1accd0164a49b43" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2fblhcky" cloneof="2hckyscr">
-		<description>Football Electronique/Hockey Electronique (Fra)</description>
-		<year>1981</year>
-		<publisher>Radiola</publisher>
-		<info name="usage" value="Move joystick when game is on screen." />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="football electronique - hockey electronique (france).bin" size="2048" crc="f00f9dba" sha1="d7593ade4d60a6e314e4f18711e8ea59e3c8c3ad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -963,19 +1067,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="kckrazy">
-		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
-		<year>1982</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AC9442 (USA) ~ 44 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="k.c.'s krazy chase (usa, europe).bin" size="4096" crc="a6909a8b" sha1="3391e48c0048a2f588d8238bb202e2ec346a6ad4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bees">
 		<description>Killer Bees! (USA)</description><!-- also "Killer Bees (Euro)[Videopac 52]"? -->
 		<year>1983</year>
@@ -990,40 +1081,27 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="2lbsprmd">
-		<description>A Labyrinth Game/Supermind (Euro)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="32"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="a labyrinth game - supermind (europe).bin" size="2048" crc="d158eeba" sha1="85c567c8f38239350a5d04f8cfd9dd7872f448c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsvsblck">
-		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
+	<software name="casino">
+		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
 		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AJ9401 (USA) ~ 5 (Euro)"/>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9426 (USA) ~ 23 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="las vegas blackjack (usa, europe).bin" size="2048" crc="6f66b1f7" sha1="3e10fc687b1d07612305f680f24590f99842e62b" offset="0" />
+				<rom name="casino slot machine (usa, europe).bin" size="2048" crc="bb6e7135" sha1="052bc62eb03e2673a802bab866dd0ab3c39fd584" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="blackjck" cloneof="lsvsblck">
-		<description>Blackjack (Fra)</description>
+	<software name="lasvegas" cloneof="casino">
+		<description>Las Vegas (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="blackjack (france).bin" size="2048" crc="6381e402" sha1="9ec331ce8e50ef60de93e615c18327f08b4a24fb" offset="0" />
+				<rom name="las vegas (france).bin" size="2048" crc="a0620082" sha1="b83463b7c40367d4310f142fa15d06d12061f3be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1066,30 +1144,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="balao">
-		<description>Balão Travesso! (Bra)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="balao travesso (brazil).bin" size="4096" crc="5b6e741a" sha1="73bf363400fece63d1a10b6b8cd9413612a1a126" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="loony" cloneof="balao">
-		<description>Loony Balloon (Euro, Prototype)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="loony balloon (europe) (proto).bin" size="4096" crc="ca23f40c" sha1="3cb324b047cbac8ec4381150b1c2aee98573841b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="martian">
 		<description>Martian Threat (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1099,34 +1153,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="martian threat (europe) (proto).bin" size="8192" crc="39e31bf0" sha1="4266ca9aa34ace118edd8153e2847cfa94a9a2f0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="3prspclg">
-		<description>Pairs/Space Rendezvous/Logic (Euro)</description>
-		<year>1978</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Press 1 for Pairs 1 player, press 2 for Pairs 2 players, press 3 for Space Rendezvous, press 4 for Logic" />
-		<info name="serial" value="2"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="pairs - space rendezvous - logic (europe).bin" size="2048" crc="a69c2c93" sha1="7ea8e5ff3b9f86914774de2aa6f7a4652adcf47a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="3mkrbzlg" cloneof="3prspclg">
-		<description>Matchmaker!/Buzzword!/Logix! (USA)</description>
-		<year>1978</year>
-		<publisher>Magnavox</publisher>
-		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
-		<info name="serial" value="AJ9407"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="matchmaker - buzzword - logix (usa).bin" size="2048" crc="bbf276a0" sha1="908387d2446f4c62019017fe262b412dfa040d10" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1154,31 +1180,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="monkeyshines (usa, europe).bin" size="4096" crc="fee664f3" sha1="6d6659539934255711357537d4fa6e969c3c4754" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mousing">
-		<description>The Mousing Cat (Euro)</description>
-		<year>1982</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="47"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="the mousing cat (europe).bin" size="4096" crc="f390bfec" sha1="f9727e6c5a941518187c08e5f5d104460ac3b3e3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chat" cloneof="mousing">
-		<description>Chat et Souris (Fra)</description>
-		<year>1983</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="chat et souris (france).bin" size="4096" crc="61a350e6" sha1="afa67f2110647753de9dfacb268d96e75d6d8657" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1211,18 +1212,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="phantom">
-		<description>Phantom House (Euro, Prototype)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="phantom house (europe)(proto).bin" size="8192" crc="313547eb" sha1="3cc218587116eb105e95ffce9eb1b5e268258d4a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="2wrldrsc">
 		<description>Out of this World!/Helicopter Rescue! (USA)</description>
 		<year>1979</year>
@@ -1237,16 +1226,42 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="pachinko">
-		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
-		<year>1981</year>
+	<software name="3prspclg">
+		<description>Pairs/Space Rendezvous/Logic (Euro)</description>
+		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AA9425 (USA) ~ 26 (Euro)"/>
+		<info name="usage" value="Press 1 for Pairs 1 player, press 2 for Pairs 2 players, press 3 for Space Rendezvous, press 4 for Logic" />
+		<info name="serial" value="2"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="pachinko (usa, europe).bin" size="2048" crc="239df97d" sha1="ffd525d5c6023409afdcdb2afbda227bc4568304" offset="0" />
+				<rom name="pairs - space rendezvous - logic (europe).bin" size="2048" crc="a69c2c93" sha1="7ea8e5ff3b9f86914774de2aa6f7a4652adcf47a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3mkrbzlg" cloneof="3prspclg">
+		<description>Matchmaker!/Buzzword!/Logix! (USA)</description>
+		<year>1978</year>
+		<publisher>Magnavox</publisher>
+		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
+		<info name="serial" value="AJ9407"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="matchmaker - buzzword - logix (usa).bin" size="2048" crc="bbf276a0" sha1="908387d2446f4c62019017fe262b412dfa040d10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantom">
+		<description>Phantom House (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="phantom house (europe)(proto).bin" size="8192" crc="313547eb" sha1="3cc218587116eb105e95ffce9eb1b5e268258d4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1285,33 +1300,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="playtag (europe) (proto).bin" size="4096" crc="a29f0fd4" sha1="759dc0efb9dbf64034d9fd78c12207206b173c0c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="billiard">
-		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
-		<year>1978</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AC9424 (USA) ~ 35 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="pocket billiards (usa, europe).bin" size="2048" crc="24d53e2c" sha1="8abd1057202ebac12acf3822ed4d965bba02b7de" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="billamer" cloneof="billiard">
-		<description>Billard Américain (Fra)</description>
-		<year>1978</year>
-		<publisher>Radiola</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="billiard americain (france).bin" size="2048" crc="a674ea27" sha1="283ae5fa1d6e89a5ac921c7f2e21a89a67dd138c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1396,26 +1384,29 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="battle">
-		<description>Barão Vermelho! (Bra)</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
+	<software name="3rcsocpt">
+		<description>Race/Spin-Out/Cryptogram (Euro) ~ Speedway/Spin-Out/Crypto-logic (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
+		<info name="serial" value="AC9400 (USA) ~ 1 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="air battle (brazil).bin" size="8192" crc="4103ee95" sha1="b6842b9264b722e2b39c8647b7963e513a0cde16" offset="0" />
+			<dataarea name="rom" size="2048">
+				<rom name="speedway - spin-out - crypto-logic (usa, europe).bin" size="2048" crc="4eda4917" sha1="29d078f587be2afa4612800c64a5af72705e5681" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="baron" cloneof="battle">
-		<description>Red Baron (Euro, Prototype)</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
+	<software name="3csaucpt" cloneof="3rcsocpt">
+		<description>Course de Voitures/Autodrome/Cryptogramme (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="red baron (europe) (proto).bin" size="8192" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" offset="0" />
+			<dataarea name="rom" size="2048">
+				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="2048" crc="3b24e1ee" sha1="9e44ca9fc9e5def58c61b24274f0cbfb57d559ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1488,18 +1479,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="syracuse">
-		<description>Syracuse (Fra)</description>
-		<year>1981</year>
-		<publisher>Jopac</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="syracuse (france).bin" size="4096" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pharaohs">
 		<description>Secret of the Pharaohs (Euro)</description>
 		<year>1981</year>
@@ -1538,29 +1517,40 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="3rcsocpt">
-		<description>Race/Spin-Out/Cryptogram (Euro) ~ Speedway/Spin-Out/Crypto-logic (USA)</description>
-		<year>1978</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
-		<info name="serial" value="AC9400 (USA) ~ 1 (Euro)"/>
+	<software name="alpine">
+		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9418 (USA) ~ 25 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="speedway - spin-out - crypto-logic (usa, europe).bin" size="2048" crc="4eda4917" sha1="29d078f587be2afa4612800c64a5af72705e5681" offset="0" />
+				<rom name="alpine skiing (usa, europe).bin" size="2048" crc="4663c4b6" sha1="9e7e16744b44fa83fa14c211b2365cf04604e06e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="3csaucpt" cloneof="3rcsocpt">
-		<description>Course de Voitures/Autodrome/Cryptogramme (Fra)</description>
-		<year>1978</year>
+	<software name="ski" cloneof="alpine">
+		<description>Ski (Fra)</description>
+		<year>1979</year>
 		<publisher>Radiola</publisher>
-		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="2048" crc="3b24e1ee" sha1="9e44ca9fc9e5def58c61b24274f0cbfb57d559ee" offset="0" />
+				<rom name="ski (france).bin" size="2048" crc="e129490d" sha1="a6e07b727b4f48d13ce21442911995eb46b99c5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv">
+		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
+		<year>1980</year>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9428 (USA) ~ 22 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="alien invaders - plus (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1655,6 +1645,18 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="syracuse">
+		<description>Syracuse (Fra)</description>
+		<year>1981</year>
+		<publisher>Jopac</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="syracuse (france).bin" size="4096" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moneyrun">
 		<description>Take the Money and Run (Euro) ~ Take the Money and Run! (USA)</description>
 		<year>1978</year>
@@ -1682,27 +1684,79 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="flipper">
-		<description>Flipper Game (Euro) ~ Thunderball! (USA)</description>
-		<year>1979</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="serial" value="AK9415 (USA) ~ 24 (Euro)"/>
+	<software name="gtwallst">
+		<description>The Great Wall Street Fortune Hunt (Euro, USA)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="thunderball (usa, europe).bin" size="2048" crc="2c9d1715" sha1="d0070e12d6b0f406dab6e1fa550ab01509c9362e" offset="0" />
+			<dataarea name="rom" size="4096">
+				<rom name="the great wall street fortune hunt (usa, europe).bin" size="4096" crc="881ceae4" sha1="d54b1d5667bf90368dddab55a91955b1789f177c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="flipperf">
-		<description>Flipper (Fra)</description>
-		<year>1980</year>
+	<software name="wallst" cloneof="gtwallst">
+		<description>Wall Street (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="wall street (brazil).bin" size="4096" crc="228842df" sha1="af9db337a2edbb3fe79a3d50f1b4ec1b007f4a52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousing">
+		<description>The Mousing Cat (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="47"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="the mousing cat (europe).bin" size="4096" crc="f390bfec" sha1="f9727e6c5a941518187c08e5f5d104460ac3b3e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chat" cloneof="mousing">
+		<description>Chat et Souris (Fra)</description>
+		<year>1983</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="chat et souris (france).bin" size="4096" crc="61a350e6" sha1="afa67f2110647753de9dfacb268d96e75d6d8657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2bwlbskt">
+		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
+		<info name="serial" value="AJ9404 (USA) ~ 6 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="billard electrique (france).bin" size="2048" crc="54bf4750" sha1="d12a242d273c4f4417806c3bcd868a9a0f553854" offset="0" />
+				<rom name="bowling - basketball (usa, europe).bin" size="2048" crc="084ee035" sha1="2630c304b6beb0f8021578277be68e837202895d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2qllbskt" cloneof="2bwlbskt">
+		<description>Jeu de Quilles/Basketball (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="jeu de quilles - basketball (france).bin" size="2048" crc="a7e97958" sha1="30cbbec570fa0872c13e89ddc312b2f74e3749fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1748,47 +1802,9 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
-	<software name="volley">
-		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
-		<year>1979</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="AA9422 (USA) ~ 28 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="volleyball (usa, europe).bin" size="2048" crc="d3b09fec" sha1="830c9b3628f2e9c4f8c882024dd912b9d7610765" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
-	<software name="volleyf" cloneof="volley">
-		<description>Volleyball (Fra)</description>
-		<year>1979</year>
-		<publisher>Radiola</publisher>
-		<info name="programmer" value="Ed Averett" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="volleyball electronique (france).bin" size="2048" crc="551e38a2" sha1="9ea8d921ca03699f74e53e25b139632391838c7d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
-	<software name="battlef">
-		<description>Battlefield (Euro) ~ War of Nerves! (USA)</description>
-		<year>1979</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AK9417 (USA) ~ 30 (Euro)"/>
-		<info name="programmer" value="Ed Averett" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="war of nerves (usa, europe).bin" size="2048" crc="58fa6766" sha1="e56b674c832e5a7cad977cc76779548fdd2f338e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
+<!-- Homebrew -->
 
 	<software name="amok">
 		<description>AMOK!</description>
@@ -1906,18 +1922,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="ppp.bin" size="8192" crc="72674adb" sha1="13d5af4dfb100724b8ca42d65cd1849e470784cd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="voice">
-		<description>The Voice</description>
-		<year>1979?</year>
-		<publisher>Magnavox</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_voice" />
-			<dataarea name="rom" size="2048">
 			</dataarea>
 		</part>
 	</software>
