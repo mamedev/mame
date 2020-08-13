@@ -45,10 +45,10 @@ TODO:
   be correct(see backgamm)
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
-- add 824x vs ef934x collision detection, rally needs it?
+- add 824x vs ef934x collision detection, none of the games use it
+- g7400 rally doesn't work, car keeps exploding
 - g7400 probably has different video timing too (not same as g7000)
-- g7400 graphics problems, mostly due to missing features in ef934x, some of them
-  more severe (eg. motocras, rally)
+- g7400 graphics problems, mostly due to missing features in ef934x
 - g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
 
 ***************************************************************************/
@@ -489,8 +489,6 @@ uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_i8244->screen_update(screen, bitmap, cliprect);
-
 	u8 lum = ~m_p1 >> 4 & 0x08;
 	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
@@ -500,7 +498,12 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// apply external LUM setting
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		rectangle clip = cliprect;
+		clip.min_y = clip.max_y = y;
+
+		m_i8244->screen_update(screen, bitmap, clip);
+
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			uint16_t d = bitmap.pix16(y, x);
 
@@ -610,9 +613,9 @@ void g7400_state::i8243_p4_w(uint8_t data)
 	// "port 4"
 	m_screen->update_now();
 	logerror("setting ef-port4 to %02x\n", data);
-	m_ic674_decode[4] = BIT(data,0);
+	m_ic674_decode[1] = BIT(data,0);
 	m_ic674_decode[5] = BIT(data,1);
-	m_ic674_decode[6] = BIT(data,2);
+	m_ic674_decode[3] = BIT(data,2);
 	m_ic674_decode[7] = BIT(data,3);
 }
 
@@ -623,9 +626,9 @@ void g7400_state::i8243_p5_w(uint8_t data)
 	m_screen->update_now();
 	logerror("setting ef-port5 to %02x\n", data);
 	m_ic674_decode[0] = BIT(data,0);
-	m_ic674_decode[1] = BIT(data,1);
+	m_ic674_decode[4] = BIT(data,1);
 	m_ic674_decode[2] = BIT(data,2);
-	m_ic674_decode[3] = BIT(data,3);
+	m_ic674_decode[6] = BIT(data,3);
 }
 
 
@@ -634,9 +637,9 @@ void g7400_state::i8243_p6_w(uint8_t data)
 	// "port 6"
 	m_screen->update_now();
 	logerror("setting vdc-port6 to %02x\n", data);
-	m_ic678_decode[4] = BIT(data,0);
+	m_ic678_decode[1] = BIT(data,0);
 	m_ic678_decode[5] = BIT(data,1);
-	m_ic678_decode[6] = BIT(data,2);
+	m_ic678_decode[3] = BIT(data,2);
 	m_ic678_decode[7] = BIT(data,3);
 }
 
@@ -647,9 +650,9 @@ void g7400_state::i8243_p7_w(uint8_t data)
 	m_screen->update_now();
 	logerror("setting vdc-port7 to %02x\n", data);
 	m_ic678_decode[0] = BIT(data,0);
-	m_ic678_decode[1] = BIT(data,1);
+	m_ic678_decode[4] = BIT(data,1);
 	m_ic678_decode[2] = BIT(data,2);
-	m_ic678_decode[3] = BIT(data,3);
+	m_ic678_decode[6] = BIT(data,3);
 }
 
 

@@ -35,6 +35,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
+
 	int vblank();
 	int hblank();
 	void i8244_palette(palette_device &palette) const;
@@ -134,6 +135,7 @@ protected:
 	int m_bgate_start;
 
 	vdc_t m_vdc;
+	uint8_t m_collision_map[0x200];
 
 	uint8_t m_x_beam_pos = 0;
 	uint8_t m_y_beam_pos = 0;

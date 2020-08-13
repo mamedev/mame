@@ -276,7 +276,10 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
 	};
 
-	if ( vpos < m_ef9340.max_vpos )
+	for ( int i = 0; i < 40 * 8; i++ )
+		m_tmp_bitmap.pix16(vpos, i) = 0;
+
+	if ( m_ef9340.R & 0x01 && vpos < m_ef9340.max_vpos )
 	{
 		int y = vpos - 0;
 		int y_row, slice;
@@ -295,10 +298,6 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			else
 			{
 				// Service row is disabled
-				for ( int i = 0; i < 40 * 8; i++ )
-				{
-					m_tmp_bitmap.pix16(vpos, 0 + i ) = 0;
-				}
 				return;
 			}
 		}
