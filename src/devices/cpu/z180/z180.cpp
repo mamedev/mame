@@ -1786,9 +1786,7 @@ void z180_device::device_start()
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_int_pending));
-	save_item(NAME(m_timer_cnt));
-	save_item(NAME(m_dma0_cnt));
-	save_item(NAME(m_dma1_cnt));
+	save_item(NAME(m_frc_prescale));
 	save_item(NAME(m_after_EI));
 
 	save_item(NAME(m_read_tcr_tmdr));
@@ -1906,9 +1904,8 @@ void z180_device::device_reset()
 		m_int_pending[i] = 0;
 	}
 
-	m_timer_cnt = 0;
-	m_dma0_cnt = 0;
-	m_dma1_cnt = 0;
+	m_frc = 0xff;
+	m_frc_prescale = 0;
 
 	/* reset io registers */
 	m_asci_cntla[0] = (m_asci_cntla[0] & Z180_CNTLA0_MPBR_EFR) | Z180_CNTLA0_RTS0;
@@ -1949,52 +1946,42 @@ void z8s180_device::device_reset()
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
 void z180_device::clock_timers()
 {
-	m_timer_cnt++;
-	if (m_timer_cnt >= 20)
+	/* Programmable Reload Timer 0 */
+	if(m_tcr & Z180_TCR_TDE0)
 	{
-		m_timer_cnt = 0;
-		/* Programmable Reload Timer 0 */
-		if(m_tcr & Z180_TCR_TDE0)
+		if(m_tmdr_value[0] == 0)
 		{
-			if(m_tmdr_value[0] == 0)
-			{
-				m_tmdr_value[0] = m_rldr[0].w;
-				m_tcr |= Z180_TCR_TIF0;
-			}
-			else
-				m_tmdr_value[0]--;
+			m_tmdr_value[0] = m_rldr[0].w;
+			m_tcr |= Z180_TCR_TIF0;
 		}
+		else
+			m_tmdr_value[0]--;
+	}
 
-		/* Programmable Reload Timer 1 */
-		if(m_tcr & Z180_TCR_TDE1)
+	/* Programmable Reload Timer 1 */
+	if(m_tcr & Z180_TCR_TDE1)
+	{
+		if(m_tmdr_value[1] == 0)
 		{
-			if(m_tmdr_value[1] == 0)
-			{
-				m_tmdr_value[1] = m_rldr[1].w;
-				m_tcr |= Z180_TCR_TIF1;
-			}
-			else
-				m_tmdr_value[1]--;
+			m_tmdr_value[1] = m_rldr[1].w;
+			m_tcr |= Z180_TCR_TIF1;
 		}
+		else
+			m_tmdr_value[1]--;
+	}
 
-		if((m_tcr & Z180_TCR_TIE0) && (m_tcr & Z180_TCR_TIF0))
-		{
-			// check if we can take the interrupt
-			if(m_IFF1 && !m_after_EI)
-			{
-				m_int_pending[Z180_INT_PRT0] = 1;
-			}
-		}
+	if((m_tcr & Z180_TCR_TIE0) && (m_tcr & Z180_TCR_TIF0))
+	{
+		// check if we can take the interrupt
+		if(m_IFF1 && !m_after_EI)
+			m_int_pending[Z180_INT_PRT0] = 1;
+	}
 
-		if((m_tcr & Z180_TCR_TIE1) && (m_tcr & Z180_TCR_TIF1))
-		{
-			// check if we can take the interrupt
-			if(m_IFF1 && !m_after_EI)
-			{
-				m_int_pending[Z180_INT_PRT1] = 1;
-			}
-		}
-
+	if((m_tcr & Z180_TCR_TIE1) && (m_tcr & Z180_TCR_TIF1))
+	{
+		// check if we can take the interrupt
+		if(m_IFF1 && !m_after_EI)
+			m_int_pending[Z180_INT_PRT1] = 1;
 	}
 }
 
@@ -2035,7 +2022,17 @@ void z180_device::handle_io_timers(int cycles)
 {
 	while (cycles-- > 0)
 	{
-		clock_timers();
+		// FRC counts down by 1 every 10 cycles
+		m_frc_prescale++;
+		if (m_frc_prescale >= 10)
+		{
+			m_frc_prescale = 0;
+			m_frc--;
+
+			// Programmable reload timers are clocked once every 20 cycles
+			if ((m_frc & 1) == 0)
+				clock_timers();
+		}
 	}
 }
 
@@ -2096,7 +2093,6 @@ again:
 				if (!m_HALT)
 				{
 					m_R++;
-					m_frc++;   /* Added FRC counting, not implemented yet */
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
@@ -2155,7 +2151,6 @@ again:
 			if (!m_HALT)
 			{
 				m_R++;
-				m_frc++;   /* Added FRC counting, not implemented yet */
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;
