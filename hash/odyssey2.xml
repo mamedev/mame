@@ -7,6 +7,9 @@ The softwarelist is sorted alphabetically per title, not counting clone sets.
 See g7400.xml for G7400 cartridges that can also be run on G7000/O2.
 When adding new sets, avoid naming conflicts between odyssey2.xml and g7400.xml.
 
+This list does not include ROM hacks, but those can still be loaded with -cart.
+WIP beta homebrews are also not included.
+
 TODO:
 add first release date were applicable
 add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
@@ -435,6 +438,18 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="red baron (europe) (proto).bin" size="8192" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barona" cloneof="battle">
+		<description>Red Baron (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="red baron (europe) (proto) (alt).bin" size="8192" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1924,6 +1939,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="ppp.bin" size="8192" crc="72674adb" sha1="13d5af4dfb100724b8ca42d65cd1849e470784cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="route66">
+		<description>Route 66</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Rafael Cardoso, René van den Enden" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="new_route66.bin" size="2048" crc="abe9b016" sha1="21f0210ec8c25a37cc728aba195bad9cad904061" offset="0" />
 			</dataarea>
 		</part>
 	</software>
