@@ -289,7 +289,7 @@ TIMER_CALLBACK_MEMBER(st2204_device::dac_interrupt)
 void st2204_device::update_dac_timer()
 {
 	// TODO: this should be calculated from registers! (all gameking games set the same values?)
-	m_dactimer->adjust(attotime::from_hz(8000));
+	m_dactimer->adjust(attotime::from_hz(6000000/128/6));
 }
 
 void st2204_device::timer_start_from_tclk(int t)
