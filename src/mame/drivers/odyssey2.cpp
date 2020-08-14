@@ -45,10 +45,6 @@ TODO:
   be correct(see backgamm)
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
-- g7400 rally doesn't work, car keeps exploding, it is related to ef9341_read:
-  If you invert the returned RAM value, the USA map looks better. If you always
-  return 0, the game can be played but the car is invincible
-- g7400 flashp doesn't work, also related to ef9341_read?
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 graphics problems, mostly due to missing features in ef934x
 

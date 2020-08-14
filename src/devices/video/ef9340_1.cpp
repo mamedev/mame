@@ -6,7 +6,6 @@ Thomson EF9340 + EF9341 teletext graphics chips with 1KB external character ram.
 
 TODO:
 - busy state (right now it is immediate)
-- read slice
 - character blinking mode
 - character underline mode
 - character width/height doubling
@@ -203,20 +202,9 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 					ef9340_inc_c();
 					break;
 
-				case 0x20:  /* Read */
-					m_ef9341.TA = m_ef934x_ram_a[addr];
-					m_ef9341.TB = m_ef934x_ram_b[addr];
-					ef9340_inc_c();
-					break;
-
 				case 0x40:  /* Write without increment */
 					m_ef934x_ram_a[addr] = m_ef9341.TA;
 					m_ef934x_ram_b[addr] = m_ef9341.TB;
-					break;
-
-				case 0x60:  /* Read without increment */
-					m_ef9341.TA = m_ef934x_ram_a[addr];
-					m_ef9341.TB = m_ef934x_ram_b[addr];
 					break;
 
 				case 0x80:  /* Write slice */
@@ -235,10 +223,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 					}
 					break;
 
-				case 0xA0:  /* Read slice */
-					fatalerror("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
-
-				default:    /* Illegal */
+				default:    /* Illegal or Read command */
 					break;
 			}
 			m_ef9341.busy = false;
@@ -272,7 +257,44 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 	{
 		if ( b )
 		{
+			uint16_t addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+
 			data = m_ef9341.TB;
+			m_ef9341.busy = true;
+			switch ( m_ef9340.M & 0xE0 )
+			{
+				case 0x20:  /* Read */
+					m_ef9341.TA = m_ef934x_ram_a[addr];
+					m_ef9341.TB = m_ef934x_ram_b[addr];
+					ef9340_inc_c();
+					break;
+
+				case 0x60:  /* Read without increment */
+					m_ef9341.TA = m_ef934x_ram_a[addr];
+					m_ef9341.TB = m_ef934x_ram_b[addr];
+					break;
+
+				case 0xA0:  /* Read slice */
+					{
+						uint8_t a = m_ef934x_ram_a[addr];
+						uint8_t b = m_ef934x_ram_b[addr];
+						uint8_t slice = ( m_ef9340.M & 0x0f ) % 10;
+
+						if ( b >= 0xa0 )
+						{
+							m_ef9341.TA = bitswap<8>(m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ],0,1,2,3,4,5,6,7);
+							m_ef9341.TB = 0;
+						}
+
+						// Increment slice number
+						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
+					}
+					break;
+
+				default:    /* Illegal or Write command */
+					break;
+			}
+			m_ef9341.busy = false;
 		}
 		else
 		{
