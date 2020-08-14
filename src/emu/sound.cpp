@@ -132,7 +132,7 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up)
 
 	// if the time is before the start, fail
 	if (time.seconds() + 1 < m_end_second || (time.seconds() + 1 == m_end_second && sample < m_end_sample))
-		throw emu_fatalerror("Attempt to create an out-of-bounds stream_buffer_view");
+		throw emu_fatalerror("Attempt to create an out-of-bounds view");
 
 	return clamp_index(sample);
 }
@@ -153,7 +153,6 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
 	m_pending_sample_rate(SAMPLE_RATE_INVALID),
-	m_internal(false),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous(sample_rate == SAMPLE_RATE_SYNCHRONOUS),
@@ -183,7 +182,6 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
 	m_pending_sample_rate(SAMPLE_RATE_INVALID),
-	m_internal(false),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous(sample_rate == SAMPLE_RATE_SYNCHRONOUS),
@@ -215,31 +213,35 @@ void sound_stream::init_common(int inputs, int outputs, int sample_rate)
 	auto &save = m_device.machine().save();
 	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
-	// save the gain of each input
+	// selet the appropriate resampler callback
 	stream_update_ex_delegate resampler_cb;
 	switch (m_resampler_type)
 	{
+		case RESAMPLER_NONE:
+			break;
+
 		default:
 		case RESAMPLER_DEFAULT:
 			resampler_cb = stream_update_ex_delegate(&sound_stream::resampler_default, this);
 			break;
 	}
+
+	// initialize all inputs
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
 		stream_output *resampler = nullptr;
 		if (!resampler_cb.isnull())
 		{
-			sound_stream *resampler_stream = m_device.machine().sound().stream_alloc(m_device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, resampler_cb, RESAMPLER_NONE);
-			resampler_stream->m_internal = true;
-			resampler = &resampler_stream->m_output[0];
+			m_resampler_list.push_back(std::make_unique<sound_stream>(m_device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, resampler_cb, RESAMPLER_NONE));
+			resampler = &m_resampler_list.back()->m_output[0];
 		}
 
 		// add the new input
 		m_input[inputnum].init(*this, inputnum, state_tag.c_str(), resampler);
 	}
 
-	// save the gain of each output
+	// initialize all outputs
 	for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
 		m_output[outputnum].init(*this, outputnum, state_tag.c_str());
 
@@ -381,7 +383,13 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 void sound_stream::update()
 {
-	update_view(m_output[0].end_time(), m_device.machine().time());
+	attotime start = m_output[0].end_time();
+	attotime end = m_device.machine().time();
+
+	// ignore any update requests if we're already up to date
+	if (start >= end)
+		return;
+	update_view(start, end);
 }
 
 
@@ -394,7 +402,6 @@ void sound_stream::update()
 
 read_stream_view sound_stream::update_view(attotime start, attotime end, u32 outputnum)
 {
-// happens when running starcas
 	sound_assert(start <= end);
 	sound_assert(outputnum < m_output.size());
 
@@ -624,7 +631,7 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 		{
 			stream_sample_t *dest = inputptr[inputnum];
 			for (int index = 0; index < cursamples; index++)
-				dest[index] = stream_sample_t(inputs[inputnum].get(baseindex + index) * stream_buffer_view::sample_t(32768.0));
+				dest[index] = stream_sample_t(inputs[inputnum].get(baseindex + index) * stream_buffer::sample_t(32768.0));
 		}
 
 		// run the callback
@@ -635,7 +642,7 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 		{
 			stream_sample_t *src = outputptr[outputnum];
 			for (int index = 0; index < cursamples; index++)
-				outputs[outputnum].put(baseindex + index, stream_buffer_view::sample_t(src[index]) * stream_buffer_view::sample_t(1.0 / 32768.0));
+				outputs[outputnum].put(baseindex + index, stream_buffer::sample_t(src[index]) * stream_buffer::sample_t(1.0 / 32768.0));
 		}
 	}
 }

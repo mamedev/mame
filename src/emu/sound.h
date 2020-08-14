@@ -6,6 +6,39 @@
 
     Core sound interface functions and definitions.
 
+****************************************************************************
+
+	In MAME, sound is represented as a graph of sound "streams". Each
+	stream has a fixed number of inputs and outputs, and is responsible
+	for producing sound on demand.
+
+	The graph is driven from the outputs, which are speaker devices.
+	These devices are updated on a regular basis (~50 times per second),
+	and when an update occurs, the graph is walked from the speaker
+	through each input, until all connected streams are up to date.
+
+	Individual streams can also be updated manually. This is important
+	for sound chips and CPU-driven devices, who should force any
+	affected streams to update prior to making changes.
+
+	Sound streams are *not* part of the device execution model. This is
+	very important to understand. If the process of producing the ouput
+	stream affects state that might be consumed by an executing device
+	(e.g., a CPU), then care must be taken to ensure that the stream is
+	updated frequently enough
+
+	The model for timing sound samples is very important and explained
+	here. Each stream source has a clock (aka sample rate). Each clock
+	edge represents a sample that is held for the duration of one clock
+	period. This model has interesting effects:
+
+	For example, if you have a 10Hz clock, and call stream.update() at
+	t=0.91, it will compute 10 samples (for clock edges 0.0, 0.1, 0.2,
+	..., 0.7, 0.8, and 0.9). And then if you ask the stream what its
+	current end time is (via stream.sample_time()), it will say t=1.0,
+	which is in the future, because it knows it will hold that last
+	sample until 1.0s.
+
 ***************************************************************************/
 
 #pragma once
@@ -51,7 +84,7 @@ enum resampler_type : u8
 
 class stream_buffer
 {
-	friend class stream_buffer_view;
+	friend class read_stream_view;
 
 public:
 	using sample_t = float;
@@ -85,26 +118,6 @@ public:
 	sample_t get(s32 index) const { return m_buffer[clamp_index(index)]; }
 	void put(s32 index, sample_t data) { m_buffer[clamp_index(index)] = data; }
 
-	// return a stream_buffer_view covering the current end to the given time
-	template<typename _Class>
-	_Class view(attotime newend, bool round_end_up, sample_t gain = sample_t(1.0))
-	{
-		u32 start_sample = m_end_sample;
-		u32 end_sample = time_to_buffer_index(newend, round_end_up);
-		return _Class(this, start_sample, end_sample, gain);
-	}
-
-	// return a stream_buffer_view covering the given time period
-	template<typename _Class>
-	_Class view(attotime start, attotime end, bool round_end_up, float gain)
-	{
-		// map both times to buffer index; do the end first since it
-		// will auto-expand and may affect whether the start is valid
-		u32 end_sample = time_to_buffer_index(end, round_end_up);
-		u32 start_sample = time_to_buffer_index(start, false);
-		return _Class(this, start_sample, end_sample, gain);
-	}
-
 private:
 	// clamp an index to the size of the buffer; allows for indexing +/- one
 	// buffers' worth of range
@@ -133,22 +146,30 @@ private:
 };
 
 
-// ======================> stream_buffer_view
+// ======================> read_stream_view
 
-class stream_buffer_view
+class read_stream_view
 {
-	friend class read_stream_view;
 	friend class write_stream_view;
 
 public:
 	using sample_t = stream_buffer::sample_t;
 
 	// constructor
-	stream_buffer_view(stream_buffer *buffer, s32 start = 0, s32 end = 0, sample_t gain = 1.0f) :
+	read_stream_view() :
+		m_buffer(nullptr),
+		m_start(0),
+		m_end(0),
+		m_gain(1.0)
+	{
+	}
+
+	// constructor
+	read_stream_view(stream_buffer *buffer, s32 start, s32 end, sample_t gain) :
 		m_buffer(buffer),
-		m_gain(gain),
 		m_start(start),
-		m_end(end)
+		m_end(end),
+		m_gain(gain)
 	{
 		// ensure that end is always greater than start; we'll
 		// wrap to the buffer length as needed
@@ -156,19 +177,35 @@ public:
 			m_end += buffer->sample_rate();
 	}
 
+	// return a read_stream_view covering the given time period
+	read_stream_view(stream_buffer &buffer, attotime start, attotime end, sample_t gain) :
+		m_buffer(&buffer),
+		m_start(0),
+		m_end(buffer.time_to_buffer_index(end, true)),
+		m_gain(gain)
+	{
+		// it's important to compute the end first, since it could invalidate the start
+		m_start = buffer.time_to_buffer_index(start, false);
+
+		// ensure that end is always greater than start; we'll
+		// wrap to the buffer length as needed
+		if (m_end < m_start)
+			m_end += buffer.sample_rate();
+	}
+
 	// copy constructor
-	stream_buffer_view(stream_buffer_view const &src) :
-		stream_buffer_view(src.m_buffer, src.m_gain, src.m_start, src.m_end)
+	read_stream_view(read_stream_view const &src) :
+		read_stream_view(src.m_buffer, src.m_start, src.m_end, src.m_gain)
 	{
 	}
 
 	// copy assignment
-	stream_buffer_view &operator=(stream_buffer_view const &rhs)
+	read_stream_view &operator=(read_stream_view const &rhs)
 	{
 		m_buffer = rhs.m_buffer;
-		m_gain = rhs.m_gain;
 		m_start = rhs.m_start;
 		m_end = rhs.m_end;
+		m_gain = rhs.m_gain;
 		return *this;
 	}
 
@@ -190,45 +227,11 @@ public:
 	attotime end_time() const { return m_buffer->index_time(m_end); }
 
 	// set the start time
-	stream_buffer_view &set_start(attotime start) { m_start = m_buffer->time_to_buffer_index(start); return *this; }
+	read_stream_view &set_start(attotime start) { m_start = m_buffer->time_to_buffer_index(start); return *this; }
 
 	// set the gain
-	stream_buffer_view &set_gain(float gain) { m_gain = gain; return *this; }
-	stream_buffer_view &apply_gain(float gain) { m_gain *= gain; return *this; }
-
-//private:
-	// internal state
-	stream_buffer *m_buffer;
-	sample_t m_gain;
-	s32 m_start;
-	s32 m_end;
-};
-
-
-// ======================> read_stream_view
-
-class read_stream_view : public stream_buffer_view
-{
-public:
-	// constructor
-	read_stream_view(stream_buffer *buffer = nullptr, s32 start = 0, s32 end = 0, sample_t gain = 1.0f) :
-		stream_buffer_view(buffer, start, end, gain)
-	{
-	}
-
-	// converter from generic
-	read_stream_view(stream_buffer_view const &src) :
-		read_stream_view(src.m_buffer, src.m_start, src.m_end, src.m_gain)
-	{
-	}
-
-	// safely fetch a raw sample from the buffer, relative to the view start
-	sample_t getraw(s32 index) const
-	{
-		if (u32(index) >= samples())
-			return 0;
-		return m_buffer->get(m_start + index);
-	}
+	read_stream_view &set_gain(float gain) { m_gain = gain; return *this; }
+	read_stream_view &apply_gain(float gain) { m_gain *= gain; return *this; }
 
 	// safely fetch a gain-scaled sample from the buffer
 	sample_t get(s32 index) const
@@ -237,23 +240,45 @@ public:
 			return 0;
 		return m_buffer->get(m_start + index) * m_gain;
 	}
+
+	// safely fetch a raw sample from the buffer, relative to the view start; if you
+	// use this, you need to apply the gain yourself for correctness
+	sample_t getraw(s32 index) const
+	{
+		if (u32(index) >= samples())
+			return 0;
+		return m_buffer->get(m_start + index);
+	}
+
+//protected:
+	// internal state
+	stream_buffer *m_buffer;
+	s32 m_start;
+	s32 m_end;
+	sample_t m_gain;
 };
 
 
 // ======================> write_stream_view
 
-class write_stream_view : public stream_buffer_view
+class write_stream_view : public read_stream_view
 {
 public:
 	// constructor
-	write_stream_view(stream_buffer *buffer = nullptr, s32 start = 0, s32 end = 0, sample_t gain = 1.0f) :
-		stream_buffer_view(buffer, start, end, gain)
+	write_stream_view(stream_buffer *buffer = nullptr, s32 start = 0, s32 end = 0) :
+		read_stream_view(buffer, start, end, sample_t(1.0))
 	{
 	}
 
-	// converter from generic
-	write_stream_view(stream_buffer_view const &src) :
-		write_stream_view(src.m_buffer, src.m_start, src.m_end, src.m_gain)
+	// return a write_stream_view covering the given time period
+	write_stream_view(stream_buffer &buffer, attotime start, attotime end) :
+		read_stream_view(buffer, start, end, sample_t(1.0))
+	{
+	}
+
+	// converter from read
+	write_stream_view(read_stream_view &src) :
+		read_stream_view(src.m_buffer, src.m_start, src.m_end, sample_t(1.0))
 	{
 	}
 
@@ -340,7 +365,7 @@ class sound_stream
 		void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate); }
 
 		// return an output view
-		write_stream_view view(attotime start, attotime end) { return m_buffer.view<write_stream_view>(start, end, false, m_gain); }
+		write_stream_view view(attotime start, attotime end) { return write_stream_view(m_buffer, start, end); }
 
 		// resync the buffer to the given end time
 		void set_end_time(attotime end) { m_buffer.set_end_time(end); }
@@ -383,7 +408,7 @@ class sound_stream
 
 		// connect the source
 		void set_source(stream_output *source);
-			
+
 		// handle a changing sample rate
 		void sample_rate_changed(u32 rate);
 
@@ -395,6 +420,7 @@ class sound_stream
 		sound_stream *m_owner;                 // reference to the owning stream
 		stream_output *m_native_source;        // pointer to the native sound_output
 		stream_output *m_resampler_source;     // pointer to the resampled output; changed dynamically
+		std::unique_ptr<sound_stream> m_resampler; // the resampler stream, if needed
 		u32 m_index;                           // index of ourself
 		float m_gain;                          // gain to apply to this input
 		float m_user_gain;                     // user-controlled gain to apply to this input
@@ -424,7 +450,6 @@ public:
 	float user_gain(int inputnum) const;
 	float input_gain(int inputnum) const;
 	float output_gain(int outputnum) const;
-	bool internal() const { return m_internal; }
 	bool synchronous() const { return m_synchronous; }
 	bool input_adaptive() const { return m_input_adaptive || m_synchronous; }
 	bool output_adaptive() const { return m_output_adaptive; }
@@ -459,7 +484,6 @@ private:
 	// general information
 	u32 m_sample_rate;                             // current live sample rate
 	u32 m_pending_sample_rate;                     // pending sample rate for dynamic changes
-	bool m_internal;                               // internal stream, not visible to outside folks
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
@@ -470,6 +494,7 @@ private:
 	std::vector<stream_input> m_input;             // list of streams we directly depend upon
 	std::vector<stream_sample_t *> m_input_array;  // array of inputs for passing to the callback
 	std::vector<read_stream_view> m_input_view;    // array of output views for passing to the callback
+	std::vector<std::unique_ptr<sound_stream>> m_resampler_list; // internal list of resamplers
 
 	// output information
 	std::vector<stream_output> m_output;            // list of streams which directly depend upon us
