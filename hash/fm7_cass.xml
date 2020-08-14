@@ -970,6 +970,18 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="inoue">
+		<description>Inoue's Dragon Slayer</description>
+		<year>1985</year>
+		<publisher>Tadanobu Inoue</publisher>
+		<info name="alt_title" value="井上のドラスレ"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="1270216">
+				<rom name="inoue.t77" size="1270216" crc="571b270e" sha1="1176818e42976a04ec6800c91ac97b6f0f6ffb37"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ixion">
 		<description>Ixion</description>

@@ -75,6 +75,10 @@ namespace plib {
 			: m_type(type), m_id(token_id_t::npos), m_token(str)
 			{
 			}
+			token_t(const token_id_t &id)
+			: m_type(token_type::TOKEN), m_id(id.id()), m_token(id.name())
+			{
+			}
 			token_t(const token_id_t &id, const pstring &str)
 			: m_type(token_type::TOKEN), m_id(id.id()), m_token(str)
 			{
@@ -220,6 +224,7 @@ namespace plib {
 
 		void error(const perrmsg &errs);
 
+		plib::source_location sourceloc() { return m_source_location.back(); }
 	protected:
 		virtual void verror(const pstring &msg) = 0;
 

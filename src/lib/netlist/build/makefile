@@ -209,12 +209,12 @@ NLOBJS := \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
 	$(NLOBJ)/devices/nlid_truthtable.o \
-	$(NLOBJ)/macro/nlm_base.o \
-	$(NLOBJ)/macro/nlm_cd4xxx.o \
-	$(NLOBJ)/macro/nlm_opamp.o \
-	$(NLOBJ)/macro/nlm_other.o \
-	$(NLOBJ)/macro/nlm_roms.o \
-	$(NLOBJ)/macro/nlm_ttl74xx.o \
+	$(NLOBJ)/macro/nlm_base_lib.o \
+	$(NLOBJ)/macro/nlm_cd4xxx_lib.o \
+	$(NLOBJ)/macro/nlm_opamp_lib.o \
+	$(NLOBJ)/macro/nlm_otheric_lib.o \
+	$(NLOBJ)/macro/nlm_roms_lib.o \
+	$(NLOBJ)/macro/nlm_ttl74xx_lib.o \
 
 TESTOBJS := \
 	$(TESTOBJ)/test_pfunction.o \
@@ -308,7 +308,8 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes"
 
 clang-libc:
 	#clang-11 currently broken

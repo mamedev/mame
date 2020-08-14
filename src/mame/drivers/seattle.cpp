@@ -2299,6 +2299,9 @@ ROM_START( mace )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1, Labeled as Version 1.0
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "314_mace.u96", 0x0000, 0x2000, CRC(65943e82) SHA1(984a1938f43671fc8f6394677396451dab7f042b) )
 ROM_END
 
 
@@ -2313,6 +2316,9 @@ ROM_START( macea )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "314_mace.u96", 0x0000, 0x2000, CRC(65943e82) SHA1(984a1938f43671fc8f6394677396451dab7f042b) )
 ROM_END
 
 
@@ -2546,6 +2552,9 @@ ROM_START( blitz99 )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
 	DISK_IMAGE( "blitz99", 0, SHA1(19877e26ffce81dd525031e9e2b4f83ff982e2d9) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
 ROM_END
 
 ROM_START( blitz99a )
@@ -2562,6 +2571,9 @@ ROM_START( blitz99a )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.30
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
 ROM_END
 
 
@@ -2590,6 +2602,9 @@ ROM_START( carnevil )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07
 	DISK_IMAGE( "carnevil", 0, SHA1(5cffb0de63ad36eb01c5951bab04d3f8a9e23e16) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "486_carnevil.u96", 0x0000, 0x2000, CRC(40eea9d4) SHA1(60a5f5c4de716722fa2ff55dccfc5fbbd7cd02e1) )
 ROM_END
 
 
@@ -2604,6 +2619,9 @@ ROM_START( carnevil1 )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41
 	DISK_IMAGE( "carnevi1", 0, BAD_DUMP SHA1(94532727512280930a100fe473bf3a938fe2d44f) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "486_carnevil.u96", 0x0000, 0x2000, CRC(40eea9d4) SHA1(60a5f5c4de716722fa2ff55dccfc5fbbd7cd02e1) )
 ROM_END
 
 

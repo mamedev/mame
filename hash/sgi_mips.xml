@@ -1387,6 +1387,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ido_5_2">
+		<description>IRIS Development Option 5.2</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0129-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="iris_development_option_5_2" sha1="b011702ba853d744e047dcf28091a75a06fcf972" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ido_5_3">
 		<description>IRIS Development Option 5.3</description>
 		<year>1994</year> <!-- 11/94 -->
@@ -1409,6 +1422,19 @@ license:CC0
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="iris_development_option_6_2" sha1="eabaa5238a3515f1c71d693efc2781b4d1675cf9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_4_0_1">
+		<description>FORTRAN 77 Compiler 4.0.1</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0132-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_4_0_1" sha1="1d214d44deb8d68833e334628e333a54f7ce7c04" />
 			</diskarea>
 		</part>
 	</software>
@@ -1842,6 +1868,32 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_4_97" sha1="b33cc43486fe375d126b8e39178f69072b0310d3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_11_93">
+		<description>Support Advantage Int'l 11/93</description>
+		<year>1993</year> <!-- 11/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4015-001"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="support_advantage_intl_11_93.chd" sha1="36324701f84531b965046a17ed7aebfa4e8bf7ca" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_3_94">
+		<description>Support Advantage Int'l 3/94</description>
+		<year>1994</year> <!-- 3/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4015-002"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="support_advantage_intl_3_94.chd" sha1="3079331e1f47f6d9537d1a1dcda9c00ad3a6b0af" />
 			</diskarea>
 		</part>
 	</software>
@@ -2377,6 +2429,19 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="irix_5_2_for_indy_r4600sc_xz_and_presenter" sha1="5f81496d2291e80d8d0bd5b0c470725fc6214ab4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_patches">
+		<description>IRIX 5.2 Patches</description>
+		<year>1994</year> <!-- 06/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0290-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_5_2_patches" sha1="fb7e6b45f0cc96d40f9e2634882345f4846bfb60" />
 			</diskarea>
 		</part>
 	</software>

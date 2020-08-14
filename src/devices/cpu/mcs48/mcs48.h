@@ -260,7 +260,7 @@ protected:
 	void execute_jcc(uint8_t result);
 	uint8_t p2_mask();
 	void expander_operation(expander_op operation, uint8_t port);
-	int check_irqs();
+	void check_irqs();
 	void burn_cycles(int count);
 
 	void illegal();

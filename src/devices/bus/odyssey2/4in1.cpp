@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /******************************************************************************
 
-Videopac 40 cartridge emulation
+Videopac 31/40 cartridge emulation
 
 4KB ROM (program ROM is fixed, data ROM is 'bankswitched' via P11)
 
@@ -15,16 +15,16 @@ Used in:
 #include "emu.h"
 #include "4in1.h"
 
+DEFINE_DEVICE_TYPE(O2_ROM_4IN1, o2_4in1_device, "o2_4in1", "Odyssey 2 Videopac 40")
+
 
 //-------------------------------------------------
 //  o2_4in1_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(O2_ROM_4IN1, o2_4in1_device, "o2_4in1", "Odyssey 2 Videopac 40")
-
-
 o2_4in1_device::o2_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	o2_rom_device(mconfig, O2_ROM_4IN1, tag, owner, clock)
+	device_t(mconfig, O2_ROM_4IN1, tag, owner, clock),
+	device_o2_cart_interface(mconfig, *this)
 { }
 
 void o2_4in1_device::device_start()
@@ -36,7 +36,7 @@ void o2_4in1_device::device_start()
 void o2_4in1_device::cart_init()
 {
 	if (m_rom_size != 0x1000)
-		fatalerror("o2_4in1_device: Wrong ROM region size\n");
+		fatalerror("o2_4in1_device: ROM size must be 4KB\n");
 }
 
 

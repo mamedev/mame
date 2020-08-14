@@ -3,6 +3,16 @@
 #include "netlist/devices/net_lib.h"
 
 /* ----------------------------------------------------------------------------
+ *  External declarations
+ * ---------------------------------------------------------------------------*/
+
+NETLIST_EXTERNAL(cd4xxx_lib)
+NETLIST_EXTERNAL(opamp_lib)
+NETLIST_EXTERNAL(otheric_lib)
+NETLIST_EXTERNAL(ttl74xx_lib)
+NETLIST_EXTERNAL(roms_lib)
+
+/* ----------------------------------------------------------------------------
  *  Diode Models
  * ---------------------------------------------------------------------------*/
 
@@ -98,7 +108,7 @@ NETLIST_END()
  *  Always included
  * ---------------------------------------------------------------------------*/
 
-NETLIST_START(base)
+NETLIST_START(base_lib)
 	NET_REGISTER_DEV(GNDA, GND)
 	NET_REGISTER_DEV(PARAMETER, NETLIST)
 
@@ -107,21 +117,22 @@ NETLIST_START(base)
 	LOCAL_SOURCE(mosfet_models)
 	LOCAL_SOURCE(family_models)
 
-	LOCAL_SOURCE(TTL74XX_lib)
-	LOCAL_SOURCE(CD4XXX_lib)
-	LOCAL_SOURCE(OPAMP_lib)
-	LOCAL_SOURCE(otheric_lib)
-	LOCAL_SOURCE(ROMS_lib)
+	EXTERNAL_SOURCE(ttl74xx_lib)
+	EXTERNAL_SOURCE(cd4xxx_lib)
+	EXTERNAL_SOURCE(opamp_lib)
+	EXTERNAL_SOURCE(otheric_lib)
+	EXTERNAL_SOURCE(roms_lib)
 
 	INCLUDE(diode_models)
 	INCLUDE(bjt_models)
 	INCLUDE(mosfet_models)
 	INCLUDE(family_models)
-	INCLUDE(TTL74XX_lib)
-	INCLUDE(CD4XXX_lib)
-	INCLUDE(OPAMP_lib)
+
+	INCLUDE(ttl74xx_lib)
+	INCLUDE(cd4xxx_lib)
+	INCLUDE(opamp_lib)
 	INCLUDE(otheric_lib)
-	INCLUDE(ROMS_lib)
+	INCLUDE(roms_lib)
 
 NETLIST_END()
 

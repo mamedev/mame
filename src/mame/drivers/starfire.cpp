@@ -43,11 +43,8 @@
 
 Notes:
 
-starfira has one less rom in total than starfire but everything passes as
- ok in the rom test so its probably just an earlier revision or something
-
-fireone currently lacks the "alert" sound effect due to missing netlist
-support for the 8038 function generator IC.
+starfira has one less ROM in total than starfire, but everything passes as
+ OK in the ROM test, so it's probably just an earlier revision.
 
 ***************************************************************************/
 
@@ -55,9 +52,7 @@ support for the 8038 function generator IC.
 #include "includes/starfire.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/samples.h"
 #include "speaker.h"
-
 
 /*************************************
  *
@@ -74,8 +69,9 @@ void starfire_base_state::scratch_w(offs_t offset, uint8_t data)
 		{
 			case 0: m_vidctrl = data; break;
 			case 1: m_vidctrl1 = data; break;
-			case 2: sound_w(0, data); break;
-			case 3: sound_w(1, data); break;
+			case 2:
+			case 3: sound_w(offset & 1, data); break;
+			case 7: music_w((offset >> 10) & 3, data); break;
 			default: break;
 		}
 	}
@@ -107,30 +103,15 @@ uint8_t starfire_base_state::scratch_r(offs_t offset)
 
 void starfire_state::sound_w(offs_t offset, uint8_t data)
 {
-	// starfire sound samples (preliminary)
-	uint8_t rise = data & ~m_prev_sound;
-	m_prev_sound = data;
-
-	// d0: rumble
-	if (BIT(rise, 0)) m_samples->start(0, 0, true);
-	if (BIT(~data, 0)) m_samples->stop(0);
-
-	// d1: explosion
-	// d2: tie weapon
-	// d3: laser
-	if (BIT(rise, 1)) m_samples->start(1, 1);
-	if (BIT(rise, 2)) m_samples->start(2, 2);
-	if (BIT(rise, 3)) m_samples->start(3, 3);
-
-	// these are from the same generator (called "computer" in schematics)
-	// d4: track
-	// d5: lock
-	// d6: scanner
-	// d7: overheat
-	if (BIT(rise, 7)) m_samples->start(4, 7);
-	else if (BIT(rise, 6)) m_samples->start(4, 6);
-	else if (BIT(rise, 5)) m_samples->start(4, 5);
-	else if (BIT(rise, 4)) m_samples->start(4, 4);
+	m_sound_size->write(BIT(data, 0));
+	m_sound_explosion->write(BIT(data, 1));
+	m_sound_tie->write(BIT(data, 2));
+	m_sound_laser->write(BIT(data, 3));
+	m_sound_track->write(BIT(data, 4));
+	m_sound_lock->write(BIT(data, 5));
+	m_sound_scanner->write(BIT(data, 6));
+	m_sound_overheat->write(BIT(data, 7));
+	synchronize();
 }
 
 void fireone_state::sound_w(offs_t offset, uint8_t data)
@@ -141,6 +122,11 @@ void fireone_state::sound_w(offs_t offset, uint8_t data)
 		m_sound_left_partial_hit->write(BIT(data, 1));
 		m_sound_left_boom->write(BIT(data, 2));
 		m_player_select = BIT(~data, 3);
+		m_pit->write_gate0(BIT(data, 4));
+		m_pit->write_gate1(BIT(data, 5));
+		m_pit->write_gate2(BIT(data, 6));
+		m_sound_off_left->write(BIT(data, 7));  // HACK: There's only one SOUND_OFF signal, but it splits into the left and right mixer stages.
+		m_sound_off_right->write(BIT(data, 7)); // Having the left and right halves split provides a better opportunity for frontier isolation.
 	}
 	else
 	{
@@ -149,31 +135,58 @@ void fireone_state::sound_w(offs_t offset, uint8_t data)
 		m_sound_right_boom->write(BIT(data, 2));
 		m_sound_torpedo_collision->write(BIT(data, 3));
 		m_sound_submarine_engine->write(BIT(data, 4));
+		m_sound_alert->write(BIT(data, 5));
 		m_sound_sonar_sync->write(BIT(data, 6));
 		m_sound_sonar_enable->write(BIT(~data, 7));
 	}
 }
 
+void fireone_state::music_w(offs_t offset, uint8_t data)
+{
+	m_pit->write(offset, data);
+}
+
+WRITE_LINE_MEMBER(fireone_state::music_a_out_cb)
+{
+	m_music_a->write(state);
+}
+
+WRITE_LINE_MEMBER(fireone_state::music_b_out_cb)
+{
+	m_music_b->write(state);
+}
+
+WRITE_LINE_MEMBER(fireone_state::music_c_out_cb)
+{
+	m_music_c->write(state);
+}
 
 uint8_t starfire_state::input_r(offs_t offset)
 {
 	switch (offset & 15)
 	{
 		case 0: return m_dsw->read();
-		case 1:
-		{
-			// d3 and d4 come from the audio circuit, how does it work exactly?
-			// tie_on sounds ok, but laser_on sounds buggy
-			const uint8_t tie_on = m_samples->playing(2) ? 0x00 : 0x08;
-			const uint8_t laser_on = m_samples->playing(3) ? 0x00 : 0x10;
-			const uint8_t input = m_system->read() & 0xe7;
-			return input | tie_on | laser_on | 0x10; // disable laser_on for now
-		}
-		case 5: return m_stick2->read();
+		case 1: return (m_system->read() & 0xe7) | m_sound_tie_on | m_sound_laser_on;
+		case 5: return m_stickz->read();
 		case 6: return m_stickx->read();
 		case 7: return m_sticky->read();
 		default: return 0xff;
 	}
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::tieon1_cb)
+{
+	m_sound_tie_on = (data > 2.5) ? 0x00 : 0x08;
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::laseron1_cb)
+{
+	m_sound_laser_on = (data > 2.5) ? 0x00 : 0x10;
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::sound_out_cb)
+{
+	m_dac->write(std::round(8192.0 * data));
 }
 
 uint8_t fireone_state::input_r(offs_t offset)
@@ -275,6 +288,27 @@ static INPUT_PORTS_START( starfire )
 	PORT_CONFNAME( 0x01, 0x01, "Jumper J6/4G: Enable NMI" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_START("POT_TRACK")
+	PORT_ADJUSTER( 50, "Tracking Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "trackvol")
+
+	PORT_START("POT_LASER")
+	PORT_ADJUSTER( 50, "Laser Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "laservol")
+
+	PORT_START("POT_TIE")
+	PORT_ADJUSTER( 50, "Enemy Shot Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "enemyvol")
+
+	PORT_START("POT_SIZE")
+	PORT_ADJUSTER( 50, "'Size' Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "sizevol")
+
+	PORT_START("POT_EXPLO")
+	PORT_ADJUSTER( 50, "Explosion Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "explovol")
+
+	PORT_START("POT_LOH")
+	PORT_ADJUSTER( 50, "Lock/Scan/Overheat Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "lohvol")
+
+	PORT_START("POT_MAIN")
+	PORT_ADJUSTER( 50, "Main Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "mainvol")
 INPUT_PORTS_END
 
 
@@ -337,39 +371,29 @@ INPUT_PORTS_END
 
 void starfire_state::machine_start()
 {
-	/* register for state saving */
-	save_item(NAME(m_prev_sound));
+	save_item(NAME(m_sound_tie_on));
+	save_item(NAME(m_sound_laser_on));
 }
 
 void starfire_state::machine_reset()
 {
-	m_prev_sound = 0;
+	m_sound_tie_on = 0x08;
+	m_sound_laser_on = 0x10;
 }
 
 void fireone_state::machine_start()
 {
-	/* register for state saving */
 	save_item(NAME(m_player_select));
+
+	m_pit->set_clockin(0, STARFIRE_CPU_CLOCK.dvalue());
+	m_pit->set_clockin(1, STARFIRE_CPU_CLOCK.dvalue());
+	m_pit->set_clockin(2, STARFIRE_CPU_CLOCK.dvalue());
 }
 
 void fireone_state::machine_reset()
 {
 	m_player_select = 0;
 }
-
-static const char *const starfire_sample_names[] =
-{
-	"*starfire",
-	"size",
-	"explosion",
-	"tie",
-	"laser",
-	"track",
-	"lock",
-	"scanner",
-	"overheat",
-	nullptr
-};
 
 INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 {
@@ -400,6 +424,11 @@ void fireone_state::fireone(machine_config &config)
 	base_config(config);
 	m_maincpu->set_vblank_int("screen", FUNC(fireone_state::vblank_int));
 
+	PIT8253(config, m_pit);
+	m_pit->out_handler<0>().set(FUNC(fireone_state::music_a_out_cb));
+	m_pit->out_handler<1>().set(FUNC(fireone_state::music_b_out_cb));
+	m_pit->out_handler<2>().set(FUNC(fireone_state::music_c_out_cb));
+
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -412,7 +441,8 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ltorp", "LTORP.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:lshpht", "LSHPHT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:lboom", "LBOOM.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:sound_off", "SOUND_OFF.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lsound_off", "SOUND_OFF_L.IN", 0); // HACK: Split the SOUND OFF into left/right halves for better netlist isolation.
+	NETLIST_LOGIC_INPUT(config, "sound_nl:rsound_off", "SOUND_OFF_R.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:rtorp", "RTORP.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:rshpht", "RSHPHT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:rboom", "RBOOM.IN", 0);
@@ -421,6 +451,9 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:alert", "ALERT.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_enable", "SONAR_ENABLE.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_sync", "SONAR_SYNC.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music_a", "MUSIC_A.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music_b", "MUSIC_B.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music_c", "MUSIC_C.IN", 0);
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_l", "R64.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_r", "R65.DIAL");
 
@@ -436,10 +469,33 @@ void starfire_state::starfire(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(starfire_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_CPU(config, "sound_nl", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(starfire));
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:size", "SIZE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:sexplo", "SEXPLO.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:stie", "STIE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:slaser", "SLASER.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:track", "TRACK.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lock", "LOCK.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:scanner", "SCANNER.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:oheat", "OHEAT.IN", 0);
+
+	NETLIST_ANALOG_INPUT(config, "sound_nl:trackvol", "R16.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:laservol", "R18.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:enemyvol", "R17.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:sizevol", "R19.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:explovol", "R20.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:lohvol", "R15.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:mainvol", "R21.DIAL");
+
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:tieon1", 0).set_params("TIEON1", FUNC(starfire_state::tieon1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:laseron1", 0).set_params("LASERON1", FUNC(starfire_state::laseron1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:output", 0).set_params("OUTPUT", FUNC(starfire_state::sound_out_cb));
+
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // Not actually a DAC, just here to receive output.
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -535,7 +591,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire 2", MACHINE_SUPPORTS_SAVE )

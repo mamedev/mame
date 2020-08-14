@@ -127,6 +127,8 @@ files{
 	MAME_DIR .. "src/mame/audio/exidy440.h",
 	MAME_DIR .. "src/mame/audio/nl_fireone.h",
 	MAME_DIR .. "src/mame/audio/nl_fireone.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starfire.h",
+	MAME_DIR .. "src/mame/audio/nl_starfire.cpp",
 	MAME_DIR .. "src/mame/drivers/starfire.cpp",
 	MAME_DIR .. "src/mame/includes/starfire.h",
 	MAME_DIR .. "src/mame/video/starfire.cpp",

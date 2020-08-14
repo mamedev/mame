@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /**********************************************************************
 
-    Videopac 40 cartridge emulation
+    Videopac 31/40 cartridge emulation
 
 **********************************************************************/
 
@@ -12,12 +12,12 @@
 #pragma once
 
 #include "slot.h"
-#include "rom.h"
 
 
 // ======================> o2_4in1_device
 
-class o2_4in1_device : public o2_rom_device
+class o2_4in1_device : public device_t,
+						public device_o2_cart_interface
 {
 public:
 	// construction/destruction

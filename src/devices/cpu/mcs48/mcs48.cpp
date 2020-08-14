@@ -430,7 +430,7 @@ void mcs48_cpu_device::pull_pc_psw()
 	uint8_t sp = (m_psw - 1) & 0x07;
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
-	m_psw = ((m_pc >> 8) & 0xf0) | 0x08 | sp;
+	m_psw = ((m_pc >> 8) & 0xf0) | sp;
 	m_pc &= 0xfff;
 	update_regptr();
 }
@@ -447,7 +447,7 @@ void mcs48_cpu_device::pull_pc()
 	m_pc = ram_r(8 + 2*sp);
 	m_pc |= ram_r(9 + 2*sp) << 8;
 	m_pc &= 0xfff;
-	m_psw = (m_psw & 0xf0) | 0x08 | sp;
+	m_psw = (m_psw & 0xf0) | sp;
 }
 
 
@@ -517,9 +517,10 @@ void mcs48_cpu_device::execute_call(uint16_t address)
 
 void mcs48_cpu_device::execute_jcc(uint8_t result)
 {
+	uint16_t pch = m_pc & 0xf00;
 	uint8_t offset = argument_fetch();
 	if (result != 0)
-		m_pc = ((m_pc - 1) & 0xf00) | offset;
+		m_pc = pch | offset;
 }
 
 
@@ -582,7 +583,7 @@ void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 OPHANDLER( illegal )
 {
 	burn_cycles(1);
-	logerror("MCS-48 PC:%04X - Illegal opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
+	logerror("MCS-48 PC:%04X - Illegal opcode = %02x\n", m_prevpc, program_r(m_prevpc));
 }
 
 OPHANDLER( add_a_r0 )       { burn_cycles(1); execute_add(R0); }
@@ -663,8 +664,6 @@ OPHANDLER( da_a )
 		m_a += 0x60;
 		m_psw |= C_FLAG;
 	}
-	else
-		m_psw &= ~C_FLAG;
 }
 
 OPHANDLER( dec_a )          { burn_cycles(1); m_a--; }
@@ -768,7 +767,7 @@ OPHANDLER( jmp_7 )          { burn_cycles(2); execute_jmp(argument_fetch() | 0x7
 OPHANDLER( jmpp_xa )        { burn_cycles(2); m_pc &= 0xf00; m_pc |= program_r(m_pc | m_a); }
 
 OPHANDLER( mov_a_n )        { burn_cycles(2); m_a = argument_fetch(); }
-OPHANDLER( mov_a_psw )      { burn_cycles(1); m_a = m_psw; }
+OPHANDLER( mov_a_psw )      { burn_cycles(1); m_a = m_psw | 0x08; }
 OPHANDLER( mov_a_r0 )       { burn_cycles(1); m_a = R0; }
 OPHANDLER( mov_a_r1 )       { burn_cycles(1); m_a = R1; }
 OPHANDLER( mov_a_r2 )       { burn_cycles(1); m_a = R2; }
@@ -1187,7 +1186,7 @@ void mcs48_cpu_device::device_reset()
 {
 	/* confirmed from reset description */
 	m_pc = 0;
-	m_psw = (m_psw & (C_FLAG | A_FLAG)) | 0x08;
+	m_psw = m_psw & (C_FLAG | A_FLAG);
 	m_a11 = 0x000;
 	m_dbbo = 0xff;
 	bus_w(0xff);
@@ -1219,15 +1218,16 @@ void mcs48_cpu_device::device_reset()
     check_irqs - check for and process IRQs
 -------------------------------------------------*/
 
-int mcs48_cpu_device::check_irqs()
+void mcs48_cpu_device::check_irqs()
 {
 	/* if something is in progress, we do nothing */
 	if (m_irq_in_progress)
-		return 0;
+		return;
 
 	/* external interrupts take priority */
-	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
+	else if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
+		burn_cycles(2);
 		m_irq_in_progress = true;
 
 		/* transfer to location 0x03 */
@@ -1236,12 +1236,12 @@ int mcs48_cpu_device::check_irqs()
 
 		/* indicate we took the external IRQ */
 		standard_irq_callback(0);
-		return 2;
 	}
 
 	/* timer overflow interrupts follow */
-	if (m_timer_overflow && m_tirq_enabled)
+	else if (m_timer_overflow && m_tirq_enabled)
 	{
+		burn_cycles(2);
 		m_irq_in_progress = true;
 
 		/* transfer to location 0x07 */
@@ -1250,9 +1250,7 @@ int mcs48_cpu_device::check_irqs()
 
 		/* timer overflow flip-flop is reset once taken */
 		m_timer_overflow = false;
-		return 2;
 	}
-	return 0;
 }
 
 
@@ -1266,7 +1264,7 @@ void mcs48_cpu_device::burn_cycles(int count)
 	if (count == 0)
 		return;
 
-	int timerover = false;
+	bool timerover = false;
 
 	/* if the timer is enabled, accumulate prescaler cycles */
 	if (m_timecount_enabled & TIMER_ENABLED)
@@ -1284,7 +1282,10 @@ void mcs48_cpu_device::burn_cycles(int count)
 		{
 			m_t1_history = (m_t1_history << 1) | (test_r(1) & 1);
 			if ((m_t1_history & 3) == 2)
-				timerover = (++m_timer == 0);
+			{
+				if (++m_timer == 0)
+					timerover = true;
+			}
 		}
 
 	/* if timer counter was disabled, adjust icount here (otherwise count is 0) */
@@ -1322,7 +1323,7 @@ void mcs48_cpu_device::execute_run()
 		(this->*m_opcode_table[opcode])();
 
 		// check interrupts
-		burn_cycles(check_irqs());
+		check_irqs();
 
 	} while (m_icount > 0);
 }

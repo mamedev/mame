@@ -21,29 +21,6 @@ namespace netlist
 namespace devices
 {
 	// -----------------------------------------------------------------------------
-	// netlistparams
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(netlistparams)
-	{
-		NETLIB_CONSTRUCTOR(netlistparams)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
-		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
-		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
-		{
-		}
-		//NETLIB_RESETI() {}
-		//NETLIB_UPDATE_PARAMI() { }
-	public:
-		param_logic_t m_use_deactivate;
-		param_num_t<unsigned>   m_startup_strategy;
-		param_num_t<unsigned>   m_mos_capmodel;
-		//! How many times do we try to resolve links (connections)
-		param_num_t<unsigned>   m_max_link_loops;
-	};
-
-	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
 
@@ -300,50 +277,6 @@ namespace devices
 		param_fp_t m_IN;
 	};
 
-	// -----------------------------------------------------------------------------
-	// nld_gnd
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(gnd)
-	{
-		NETLIB_CONSTRUCTOR(gnd)
-		, m_Q(*this, "Q")
-		{
-		}
-
-		NETLIB_UPDATE_PARAMI()
-		{
-			m_Q.push(nlconst::zero());
-		}
-
-		//NETLIB_RESETI() {}
-	protected:
-		analog_output_t m_Q;
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_nc_pin
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(nc_pin)
-	{
-	public:
-		NETLIB_CONSTRUCTOR(nc_pin)
-		, m_I(*this, "I", NETLIB_DELEGATE(noop))
-		{
-		}
-
-	protected:
-		//NETLIB_RESETI() {}
-
-	private:
-		NETLIB_HANDLERI(noop)
-		{
-		}
-
-		analog_input_t m_I;
-
-	};
 
 	// -----------------------------------------------------------------------------
 	// nld_frontier

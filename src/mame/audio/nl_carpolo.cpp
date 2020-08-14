@@ -12,7 +12,6 @@
 //
 
 #include "netlist/devices/net_lib.h"
-#include "nl_carpolo.h"
 
 #define HLE_NOISE (1)
 

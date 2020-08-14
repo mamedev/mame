@@ -69,4 +69,40 @@ license:CC0
 			<color alpha="0.6" />
 		</bezel>
 	</view>
+	<view name="Widescreen Shifter-R">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<bezel element="shifter" inputtag="TILT" inputmask="0x04">
+			<bounds x="496" y="574" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
+	<view name="Widescreen Shifter-L">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<bezel element="shifter" inputtag="TILT" inputmask="0x04">
+			<bounds x="-48" y="574" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
+	<view name="Vertical Widescreen Shifter-R">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<bezel element="shifter" inputtag="TILT" inputmask="0x04">
+			<bounds x="446" y="648" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
+	<view name="Vertical Widescreen Shifter-L">
+		<screen index="0">
+			<bounds x="0" y="0" width="480" height="640" />
+		</screen>
+		<bezel element="shifter" inputtag="TILT" inputmask="0x04">
+			<bounds x="2" y="648" width="32" height="64" />
+			<color alpha="0.65" />
+		</bezel>
+	</view>
 </mamelayout>

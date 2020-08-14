@@ -26,7 +26,6 @@
  */
 
 #include "nld_tms4800.h"
-#include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 
 namespace netlist

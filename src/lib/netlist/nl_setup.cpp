@@ -5,7 +5,6 @@
 #include "analog/nld_twoterm.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
-#include "devices/nlid_system.h"
 #include "devices/nlid_truthtable.h"
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -13,6 +12,7 @@
 #include "nl_setup.h"
 #include "plib/penum.h"
 #include "plib/putil.h"
+#include "plib/pstonum.h"
 
 #include "solver/nld_solver.h"
 
@@ -352,8 +352,15 @@ namespace netlist
 		return false;
 	}
 
+	bool nlparse_t::parse_tokens(const parser_t::token_store &tokens, const pstring &name)
+	{
+		parser_t parser(*this);
+		return parser.parse(tokens, name);
+	}
+
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
+#if 0
 		auto key = istrm.filename();
 
 		if (m_source_cache.find(key) != m_source_cache.end())
@@ -374,6 +381,18 @@ namespace netlist
 			parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), key), st);
 			return parser.parse(st, name);
 		}
+#else
+		plib::ppreprocessor y(m_includes, &m_defines);
+		y.process(std::move(istrm), istrm.filename());
+
+		auto abc = std::make_unique<std::stringstream>();
+		plib::copystream(*abc, y);
+
+		parser_t::token_store st;
+		parser_t parser(*this);
+		parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), istrm.filename()), st);
+		return parser.parse(st, name);
+#endif
 	}
 
 	void nlparse_t::add_define(const pstring &defstr)
@@ -1712,8 +1731,10 @@ source_file_t::stream_ptr source_pattern_t::stream(const pstring &name)
 {
 	pstring filename = plib::pfmt(m_pattern)(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
+	printf("checking <%s> %s\n", name.c_str(), filename.c_str());
 	if (f->is_open())
 	{
+		printf("found\n");
 		return stream_ptr(std::move(f), filename);
 	}
 	else
@@ -1733,6 +1754,23 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 }
 
 source_proc_t::stream_ptr source_proc_t::stream(const pstring &name)
+{
+	plib::unused_var(name);
+	return stream_ptr();
+}
+
+bool source_token_t::parse(nlparse_t &setup, const pstring &name)
+{
+	if (name == m_name)
+	{
+		auto ret = setup.parse_tokens(m_store, name);
+		return ret;
+	}
+
+	return false;
+}
+
+source_proc_t::stream_ptr source_token_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return stream_ptr();

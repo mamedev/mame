@@ -3302,11 +3302,6 @@ mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
 mechattu1                       // A8002 'MA' (c) 1989
 
-@source:bbl380.cpp
-bbl380
-ragc153
-dphh8630
-
 @source:bcs3.cpp
 bcs3                            //
 bcs3a                           //
@@ -14777,6 +14772,11 @@ suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
+@source:generalplus_gpl_unknown.cpp
+pcp8718
+pcp8728
+unkunsp
+
 @source:generalplus_gpl16250_mobigo.cpp
 mobigo
 mobigos
@@ -19296,6 +19296,9 @@ spielmast                       // Yuvo
 
 @source:lee1214.cpp
 lee1214d                        //
+
+@source:lee1220.cpp
+lee1220                         //
 
 @source:legionna.cpp
 cupsoc                          // (c) 1992 Seibu
@@ -29106,6 +29109,7 @@ v4gldrshr
 v4gldrshs
 v4gldrsht
 v4gldrshu
+v4gldrsh3
 v4mate                          // The Mating Game
 v4mated                         //
 v4mazbel                        // Mazooma Belle
@@ -29136,11 +29140,12 @@ v4mdiceu
 v4mdicev
 v4mdicew
 v4mdice5
+v4mdiceger                         // Miami Dice
+v4mdice6
 v4megbuk                        // Megabucks Poker
 v4megbuka
 v4megbukb
 v4megbukc
-v4mdiceger                         // Miami Dice
 v4missis                        // Mississippi Lady
 v4monte                         // Monte Carlo Or Bust
 v4montea
@@ -29202,6 +29207,7 @@ v4monte9m
 v4monte9n
 v4monte9o
 v4montezz
+v4monteger
 v4opt3                          // Option 3
 v4opt3d                         //
 v4ovrmn3                        // Over Moon Pt3
@@ -29209,7 +29215,9 @@ v4ovrmn3a
 v4ovrmn3b
 v4ovrmn3c
 v4ovrmn3d
-v4picdil                        // Piccadilly Nights
+v4picdil                        // Piccadilly Night
+v4picdila
+v4picdilz
 v4psi                           // Prize Space Invaders
 v4psibc                          //
 v4psi14                          //
@@ -32141,6 +32149,7 @@ majgnc
 sudopptv
 zudugo
 ablping
+protpp
 vgpocket
 vgpmini
 sy889
@@ -33865,6 +33874,7 @@ dmnfrntb                        //
 dmnfrntpcb                      //
 drgw2                           // (c) 1997 Dragon World 2
 drgw2c                          //
+drgw2c101                       //
 drgw2hk                         //
 drgw2j                          //
 drgw3                           // (c) 1998 Dragon World 3
@@ -33876,6 +33886,7 @@ dw2v100x                        //
 dwex                            // (c) 2000 Dragon World 3 EX V100
 dwex101cn                       // (c) 2001 Dragon World 3 EX V101CN
 dwpc                            // (c) 2001 Dragon World Pretty Chance
+dwpc101j                        //
 espgal                          // (c) 2003 Espgaluda
 espgalbl                        //
 happy6                          // (c) 2004 Happy 6
@@ -33911,6 +33922,7 @@ kov2106                         //
 kov2p                           // (c) 2000 Knights of Valor 2 Nine Dragons
 kov2p200                        //
 kov2p202                        //
+kov2p203                        //
 kov2p204                        //
 kovlsjb                         // bootleg
 kovlsjba                        // bootleg
@@ -33941,8 +33953,10 @@ olds100                         //
 olds100a                        //
 olds103t                        //
 oldsplus                        // (c) 2004 Oriental Legend Super Plus
+oldsplusa                       //
 orlegend                        // (c) 1997 Oriental Legend
 orlegend105k                    //
+orlegend105t                    //
 orlegend111c                    //
 orlegend111k                    //
 orlegend111t                    //
@@ -33951,11 +33965,13 @@ orlegendca                      //
 orlegende                       //
 pgm                             // Base Unit
 pgm3in1                         // (c) 2004 Photo Y2K2 3-in-1
+pgm3in1c100                     //
 photoy2k                        // (c) 1999 Photo Y2k
 photoy2k102                     //
 photoy2k103j                    // (c) 1999 Photo Y2k
 photoy2k104                     //
 puzlstar                        // (c) 1999 Puzzle Star
+puzlstara                       //
 puzzli2                         // (c) 1999 Puzzli 2
 puzzli2s                        // (c) 2001 Puzzli 2 Super
 py2k2                           // (c) 2001 Photo Y2K2 (M101XX)
@@ -33967,6 +33983,7 @@ theglad                         // (c) 2003 The Gladiator
 theglad100                      //
 theglad101                      //
 thegladpcb                      //
+thegladpcba                     //
 
 @source:pgm2.cpp
 ddpdojt                         // (c) 2010
@@ -40765,11 +40782,14 @@ uts20                           //
 @source:unixpc.cpp
 3b1                             // 3B1 "Unix PC"
 
+@source:unk6502_st2xxx.cpp
+bbl380
+ragc153
+dphh8630
+dgun2953
+
 @source:unkhorse.cpp
 unkhorse                        //
-
-@source:unkmandd.cpp
-unkmandd
 
 @source:unkpoker.cpp
 unkpoker                         //

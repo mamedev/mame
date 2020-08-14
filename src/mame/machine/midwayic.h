@@ -66,6 +66,11 @@ public:
 	// construction/destruction
 	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	u8 read();
+	void write(u8 data);
+	u8 status_r();
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
+
 protected:
 	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -74,12 +79,15 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t read_a();
-	uint8_t read_b();
-	uint8_t read_c();
-	void write_a(uint8_t data);
-	void write_b(uint8_t data);
-	void write_c(uint8_t data);
+	required_device<pic16c57_device> m_pic;
+
+	u8 read_c();
+	void write_c(u8 data);
+
+	u8 m_command;
+	u8 m_data_out;
+	u8 m_clk;
+	u8 m_status;
 };
 
 

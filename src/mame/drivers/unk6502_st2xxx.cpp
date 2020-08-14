@@ -1,14 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// unknown 6502 based handhelds, possibly ST2205U architecture
+
 // the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
 // https://www.youtube.com/watch?v=NacY2WHd-CY
 
+// these games were ported to unSP hardware at some point, see generaplus_gpl_unknown.cpp
+
 // BIOS calls are made very frequently to the undumped firmware.
-// The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from Flash and executing it from RAM.
+// The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from Flash and executing it from RAM at $0300.
 // A variant of this call ($60d2 in bbl380, $60e3 in ragc153 & dphh8630) is invoked with jsr.
 // For these calls, a 24-bit starting address is specified in $82:$81:$80, and the length in bytes is twice the number specified in $84:$83.
 // ST2205U cannot execute code directly from Flash, but has a built-in DMA-compatible NAND interface on Port F ($05).
+// The XOR used on ragc153 & dphh8630 is likely performed by the DMA controller.
+// $6003 performs a table lookup, depositing a sequence of data at $008e.
+// $6000 generates some duration of delay based on the X register.
+// One other BIOS call ($6975 in bbl380, $69d2 in ragc153) has an unknown purpose.
 
 #include "emu.h"
 
@@ -127,6 +135,12 @@ ROM_START( dphh8630 )
 	ROM_LOAD( "bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269) )
 ROM_END
 
+ROM_START( dgun2953 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dgun2953_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
+	ROM_LOAD( "dg160_25x32v_ef3016.bin", 0x000000, 0x400000, CRC(2e993bac) SHA1(4b310e326a47df1980aeef38aa9a59018d7fe76f) )
+ROM_END
+
 
 
 void bbl380_state::init_ragc153()
@@ -142,4 +156,6 @@ void bbl380_state::init_ragc153()
 
 CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
 CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IS_SKELETON )
-CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "<unknown>", "Digital Pocket Hand Held System Model: 8630 - 230-in-1", MACHINE_IS_SKELETON )
+CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "PCP", "PCP 8630 - 230-in-1 - Digital Pocket Hand Held System", MACHINE_IS_SKELETON ) // PCP isn't mentioned on packaging
+CONS( 200?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IS_SKELETON )
+

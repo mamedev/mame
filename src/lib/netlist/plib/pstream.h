@@ -74,6 +74,13 @@ public:
 
 	bool eof() const { return m_strm->eof(); }
 
+	/// \brief Read a line of UTF8 characters from the stream.
+	///
+	/// The line will not contain a trailing linefeed
+	///
+	/// \param line pstring reference to the result
+	/// \returns Returns false if at end of file
+	///
 	bool readline(pstring &line)
 	{
 		putf8string::code_t c = 0;
@@ -89,6 +96,35 @@ public:
 				break;
 			if (c != 13) // ignore CR
 				m_linebuf += putf8string(1, c);
+			if (!this->readcode(c))
+				break;
+		}
+		line = m_linebuf;
+		return true;
+	}
+
+	/// \brief Read a line of UTF8 characters from the stream including trailing linefeed.
+	///
+	/// The line will contain the trailing linefeed
+	///
+	/// \param line pstring reference to the result
+	/// \returns Returns false if at end of file
+	///
+	bool readline_lf(pstring &line)
+	{
+		putf8string::code_t c = 0;
+		m_linebuf = putf8string("");
+		if (!this->readcode(c))
+		{
+			line = "";
+			return false;
+		}
+		while (true)
+		{
+			if (c != 13) // ignore CR
+				m_linebuf += putf8string(1, c);
+			if (c == 10)
+				break;
 			if (!this->readcode(c))
 				break;
 		}

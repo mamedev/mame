@@ -27,7 +27,7 @@
  *  External declarations
  * ---------------------------------------------------------------------------*/
 
-NETLIST_EXTERNAL(base)
+NETLIST_EXTERNAL(base_lib)
 
 #endif
 

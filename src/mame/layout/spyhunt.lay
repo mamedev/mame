@@ -284,7 +284,7 @@ license:CC0
 
 		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
 			<bounds x="446" y="667" width="32" height="64" />
-			<color alpha="0.6" />
+			<color alpha="0.65" />
 		</bezel>
 	</view>
 
@@ -311,7 +311,7 @@ license:CC0
 
 		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
 			<bounds x="2" y="667" width="32" height="64" />
-			<color alpha="0.6" />
+			<color alpha="0.65" />
 		</bezel>
 	</view>
 

@@ -1036,7 +1036,7 @@ Core Search Path Options
     The default is ``.`` (that is, in the current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -homepath c:\mame\lua
 
@@ -1051,7 +1051,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -rompath c:\mame\roms;c:\roms\another
 
@@ -1066,7 +1066,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -hashpath c:\mame\hash;c:\roms\softlists
 
@@ -1081,7 +1081,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -samplepath c:\mame\samples;c:\roms\samples
 
@@ -1096,7 +1096,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -artpath c:\mame\artwork;c:\emu\shared-artwork
 
@@ -1111,7 +1111,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
 
@@ -1140,7 +1140,7 @@ Core Search Path Options
     directory ``ini`` in the current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -inipath c:\users\thisuser\documents\mameini
 
@@ -1155,7 +1155,7 @@ Core Search Path Options
     The default is ``.`` (that is, search in the current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -fontpath c:\mame\;c:\emu\artwork\mamefonts
 
@@ -1170,7 +1170,7 @@ Core Search Path Options
     current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -cheatpath c:\mame\cheat;c:\emu\cheats
 
@@ -1185,7 +1185,7 @@ Core Search Path Options
     current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
 
@@ -1199,7 +1199,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -pluginspath c:\mame\plugins;c:\emu\lua
 
@@ -1214,7 +1214,7 @@ Core Search Path Options
     current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -languagepath c:\mame\language;c:\emu\mame-languages
 
@@ -1228,7 +1228,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -swpath c:\mame\software;c:\emu\mydisks
 
@@ -1251,7 +1251,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -cfg_directory c:\mame\cfg
 
@@ -1269,7 +1269,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -nvram_directory c:\mame\nvram
 
@@ -1286,7 +1286,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -input_directory c:\mame\inp
 
@@ -1303,7 +1303,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -state_directory c:\mame\sta
 
@@ -1319,7 +1319,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -snapshot_directory c:\mame\snap
 
@@ -1338,7 +1338,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -diff_directory c:\mame\diff
 
@@ -1355,7 +1355,7 @@ Core Output Directory Options
     created automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -comment_directory c:\mame\comments
 
@@ -1380,7 +1380,7 @@ Core State/Playback Options
     command.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -norewind
 
@@ -1395,7 +1395,7 @@ Core State/Playback Options
     clamped to 0.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -rewind_capacity 30
 
@@ -1407,7 +1407,7 @@ Core State/Playback Options
     in the specified <slot> to be loaded.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -state 1
 
@@ -1423,7 +1423,7 @@ Core State/Playback Options
     The default is OFF (**-noautosave**).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -autosave
 
@@ -1438,7 +1438,7 @@ Core State/Playback Options
     The default is ``NULL`` (no playback).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -playback worldrecord
 
@@ -1458,7 +1458,7 @@ Core State/Playback Options
     The default is OFF (**-noexit_after_playback**).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -playback worldrecord -exit_after_playback
 
@@ -1473,7 +1473,7 @@ Core State/Playback Options
     The default is ``NULL`` (no recording).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -record worldrecord
 
@@ -1494,7 +1494,7 @@ Core State/Playback Options
     By default, no timecode file is saved.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -record worldrecord -record_timecode
 
@@ -1511,7 +1511,7 @@ Core State/Playback Options
     The default is ``NULL`` (no recording).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -mngwrite pacman-video
 
@@ -1531,7 +1531,7 @@ Core State/Playback Options
     The default is ``NULL`` (no recording).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -playback worldrecord -exit_after_playback -aviwrite worldrecord
 
@@ -1547,7 +1547,7 @@ Core State/Playback Options
 .. _mame-commandline-snapname:
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -wavewrite pacsounds
 
@@ -1572,21 +1572,21 @@ Core State/Playback Options
     with the media switch you want to use.
 
     Example 1:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 robby -snapname foo\%g%i
 
         Snapshots will be saved as ``snaps\foo\robby0000.png``, ``snaps\foo\robby0001.png`` and so on.
 
     Example 2:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 nes -cart robby -snapname %g\%d_cart
 
         Snapshots will be saved as ``snaps\nes\robby.png``.
 
     Example 3:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 c64 -flop1 robby -snapname %g\%d_flop1/%i
 
@@ -1671,19 +1671,19 @@ Core State/Playback Options
     ``[media]`` with the media switch you want to use.
 
     Example 1:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 robby -statename foo\%g
             All save states will be stored inside sta\foo\robby\
 
     Example 2:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 nes -cart robby -statename %g/%d_cart
             All save states will be stored inside sta\nes\robby\
 
     Example 3:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 c64 -flop1 robby -statename %g/%d_flop1
             All save states will be stored inside sta\c64\robby\
@@ -2180,6 +2180,7 @@ Core Video Options
     The default is OFF (**-nosyncrefresh**).
 
 .. _mame-commandline-prescale:
+
     Example:
         .. code-block:: bash
 
@@ -2890,7 +2891,7 @@ Core Sound Options
 
     The default is ``1``.
 
-    | For PortAudio, see :ref:`mame-commandline-pa-latency`.
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-pa-latency>`.
     | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
     | CoreAudio calculates audio_latency as 25ms steps.
@@ -3743,6 +3744,7 @@ Core Misc Options
     The default is (**-noui_mouse**).
 
 .. _mame-commandline-language:
+
     Example:
         .. code-block:: bash
 
