@@ -13,6 +13,9 @@
 #pragma once
 
 #include "st2xxx.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 class st2204_device : public st2xxx_device
 {
@@ -32,6 +35,7 @@ public:
 
 protected:
 	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -75,6 +79,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(t0_interrupt);
 	TIMER_CALLBACK_MEMBER(t1_interrupt);
+	TIMER_CALLBACK_MEMBER(dac_interrupt);
 	void timer_start_from_tclk(int t);
 	void t1_start_from_oscx();
 	u8 t0m_r();
@@ -110,11 +115,15 @@ private:
 	u8 m_tcntr[2];
 	u8 m_tload[2];
 	emu_timer *m_timer[2];
+	emu_timer *m_dactimer;
 	u16 m_psg[2];
 	u8 m_psgc;
 	u16 m_dms;
 	u16 m_dmd;
 	u8 m_dcnth;
+
+	void update_dac_timer();
+	required_device<dac_8bit_r2r_twos_complement_device> m_dac;
 };
 
 class st2202_device : public st2204_device

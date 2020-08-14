@@ -51,6 +51,7 @@ st2204_device::st2204_device(const machine_config &mconfig, device_type type, co
 	, m_dms(0)
 	, m_dmd(0)
 	, m_dcnth(0)
+	, m_dac(*this, "dac")
 {
 }
 
@@ -82,6 +83,8 @@ void st2204_device::device_start()
 
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t0_interrupt), this));
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t1_interrupt), this));
+
+	m_dactimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::dac_interrupt), this));
 
 	save_item(NAME(m_tmode));
 	save_item(NAME(m_tcntr));
@@ -152,6 +155,8 @@ void st2204_device::device_reset()
 	m_tload[0] = m_tload[1] = 0;
 	m_timer[0]->adjust(attotime::never);
 	m_timer[1]->adjust(attotime::never);
+
+	update_dac_timer();
 
 	m_psg[0] = m_psg[1] = 0;
 	m_psgc = 0;
@@ -272,6 +277,19 @@ TIMER_CALLBACK_MEMBER(st2204_device::t1_interrupt)
 		m_timer[1]->adjust(cycles_to_attotime((256 - m_tcntr[1]) * tclk_pres_div(m_tmode[1] & 0x07)));
 	else if ((m_tmode[1] & 0x07) < 3)
 		t1_start_from_oscx();
+}
+
+TIMER_CALLBACK_MEMBER(st2204_device::dac_interrupt)
+{
+	m_ireq |= 0x002;
+	update_irq_state();
+	update_dac_timer();
+}
+
+void st2204_device::update_dac_timer()
+{
+	// TODO: this should be calculated from registers! (all gameking games set the same values?)
+	m_dactimer->adjust(attotime::from_hz(8000));
 }
 
 void st2204_device::timer_start_from_tclk(int t)
@@ -418,7 +436,7 @@ void st2204_device::psgc_w(u8 data)
 
 void st2204_device::dac_w(u8 data)
 {
-	// TODO
+	m_dac->write(data);
 }
 
 unsigned st2204_device::st2xxx_lfr_clocks() const
@@ -596,3 +614,14 @@ void st2204_device::int_map(address_map &map)
 	map(0x002b, 0x002b).r(FUNC(st2204_device::dmdh_r));
 	map(0x0080, 0x287f).ram(); // 2800-287F possibly not present in earlier versions
 }
+
+void st2204_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "speaker").front_center();
+
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(0, "speaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
