@@ -3052,6 +3052,8 @@ ROM_END
 //
 //  CPU/Video/Sound Board: 171-5335
 //  ROM Board:             171-5336
+//  Sega game ID: 837-5934
+//     ROM board: 837-5935
 //
 ROM_START( quartet2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
