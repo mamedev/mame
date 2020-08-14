@@ -12,6 +12,9 @@
 
 #include "screen.h"
 
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341")
@@ -46,10 +49,26 @@ void ef9340_1_device::device_start()
 	m_line_timer = timer_alloc(TIMER_LINE);
 	m_line_timer->adjust( screen().time_until_pos(0, 0), 0,  screen().scan_period() );
 
+	// zerofill
+	m_ef9341.TA = 0;
+	m_ef9341.TB = 0;
+	m_ef9341.busy = 0;
+
+	m_ef9340.X = 0;
+	m_ef9340.Y = 0;
+	m_ef9340.Y0 = 0;
+	m_ef9340.R = 0;
+	m_ef9340.M = 0;
+
+	memset(m_ef934x_ram_a, 0, sizeof(m_ef934x_ram_a));
+	memset(m_ef934x_ram_b, 0, sizeof(m_ef934x_ram_b));
+	memset(m_ef934x_ram_b, 0, sizeof(m_ef934x_ext_char_ram));
+
 	// register our state
 	save_item(NAME(m_ef9341.TA));
 	save_item(NAME(m_ef9341.TB));
 	save_item(NAME(m_ef9341.busy));
+
 	save_item(NAME(m_ef9340.X));
 	save_item(NAME(m_ef9340.Y));
 	save_item(NAME(m_ef9340.Y0));
@@ -59,23 +78,6 @@ void ef9340_1_device::device_start()
 	save_item(NAME(m_ef934x_ram_a));
 	save_item(NAME(m_ef934x_ram_b));
 	save_item(NAME(m_ef934x_ext_char_ram));
-}
-
-
-void ef9340_1_device::device_reset()
-{
-	memset(m_ef934x_ram_a, 0, sizeof(m_ef934x_ram_a));
-	memset(m_ef934x_ram_b, 0, sizeof(m_ef934x_ram_b));
-
-	m_ef9340.X = 0;
-	m_ef9340.Y = 0;
-	m_ef9340.Y0 = 0;
-	m_ef9340.R = 0;
-	m_ef9340.M = 0;
-	m_ef9340.max_vpos = 210;
-	m_ef9341.TA = 0;
-	m_ef9341.TB = 0;
-	m_ef9341.busy = 0;
 }
 
 
@@ -135,7 +137,7 @@ uint16_t ef9340_1_device::external_chargen_address(uint8_t b, uint8_t slice)
 
 void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 {
-	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
+	LOG("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
 	if ( command )
 	{
@@ -163,7 +165,6 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 				break;
 			case 0xA0:  /* Load R */
 				m_ef9340.R = m_ef9341.TA;
-				m_ef9340.max_vpos = ( m_ef9340.R & 0x40 ) ? 250 : 210;
 				break;
 			case 0xC0:  /* Load Y0 */
 				m_ef9340.Y0 = m_ef9341.TA & 0x3F;
@@ -225,8 +226,10 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 					break;
 
 				case 0xA0:  /* Read slice */
-				default:
-					fatalerror/*logerror*/("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
+					fatalerror("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
+
+				default:    /* Illegal */
+					break;
 			}
 			m_ef9341.busy = 0;
 		}
@@ -242,7 +245,8 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 {
 	uint8_t   data;
 
-	logerror("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
+	LOG("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
+
 	if ( command )
 	{
 		if ( b )
@@ -279,7 +283,9 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 	for ( int i = 0; i < 40 * 8; i++ )
 		m_tmp_bitmap.pix16(vpos, i) = 0;
 
-	if ( m_ef9340.R & 0x01 && vpos < m_ef9340.max_vpos )
+	int max_vpos = ( m_ef9340.R & 0x40 ) ? 250 : 210;
+
+	if ( m_ef9340.R & 0x01 && vpos < max_vpos )
 	{
 		int y = vpos - 0;
 		int y_row, slice;

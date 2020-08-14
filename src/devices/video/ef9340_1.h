@@ -35,7 +35,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -70,7 +69,6 @@ protected:
 		uint8_t   Y0;
 		uint8_t   R;
 		uint8_t   M;
-		int     max_vpos;
 	} m_ef9340;
 
 	uint8_t   m_ef934x_ram_a[1024];

@@ -49,7 +49,6 @@ TODO:
 - g7400 rally doesn't work, car keeps exploding
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 graphics problems, mostly due to missing features in ef934x
-- g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
 
 ***************************************************************************/
 
@@ -105,7 +104,6 @@ protected:
 	void odyssey2_mem(address_map &map);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	/* constants */
 	static const uint8_t P1_BANK_LO_BIT          = 0x01;
@@ -152,7 +150,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void p2_write(uint8_t data);
 	uint8_t io_read(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
@@ -395,11 +392,6 @@ void odyssey2_state::machine_start()
 }
 
 
-void odyssey2_state::machine_reset()
-{
-}
-
-
 void g7400_state::machine_start()
 {
 	odyssey2_state::machine_start();
@@ -411,17 +403,6 @@ void g7400_state::machine_start()
 	save_item(NAME(m_ic678_decode));
 }
 
-
-void g7400_state::machine_reset()
-{
-	odyssey2_state::machine_reset();
-
-	for ( int i = 0; i < 8; i++ )
-	{
-		m_ic674_decode[i] = 0;
-		m_ic678_decode[i] = 0;
-	}
-}
 
 /****** External RAM ******************************/
 
@@ -456,8 +437,14 @@ uint8_t g7400_state::io_read(offs_t offset)
 {
 	u8 data = odyssey2_state::io_read(offset);
 
-	if (!(m_p1 & P1_VPP_ENABLE) && offset & 4)
-		data &= m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
+	if (!(m_p1 & P1_VPP_ENABLE))
+	{
+		// A2 to R/W pin
+		if (offset & 4)
+			data &= m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
+		else
+			m_ef9340_1->ef9341_write( offset & 0x02, offset & 0x01, data );
+	}
 
 	return data;
 }
@@ -600,7 +587,6 @@ uint8_t odyssey2_state::bus_read()
 
 void odyssey2_state::bus_write(uint8_t data)
 {
-	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }
 
 
@@ -612,7 +598,6 @@ void g7400_state::i8243_p4_w(uint8_t data)
 {
 	// "port 4"
 	m_screen->update_now();
-	logerror("setting ef-port4 to %02x\n", data);
 	m_ic674_decode[1] = BIT(data,0);
 	m_ic674_decode[5] = BIT(data,1);
 	m_ic674_decode[3] = BIT(data,2);
@@ -624,7 +609,6 @@ void g7400_state::i8243_p5_w(uint8_t data)
 {
 	// "port 5"
 	m_screen->update_now();
-	logerror("setting ef-port5 to %02x\n", data);
 	m_ic674_decode[0] = BIT(data,0);
 	m_ic674_decode[4] = BIT(data,1);
 	m_ic674_decode[2] = BIT(data,2);
@@ -636,7 +620,6 @@ void g7400_state::i8243_p6_w(uint8_t data)
 {
 	// "port 6"
 	m_screen->update_now();
-	logerror("setting vdc-port6 to %02x\n", data);
 	m_ic678_decode[1] = BIT(data,0);
 	m_ic678_decode[5] = BIT(data,1);
 	m_ic678_decode[3] = BIT(data,2);
@@ -648,7 +631,6 @@ void g7400_state::i8243_p7_w(uint8_t data)
 {
 	// "port 7"
 	m_screen->update_now();
-	logerror("setting vdc-port7 to %02x\n", data);
 	m_ic678_decode[0] = BIT(data,0);
 	m_ic678_decode[4] = BIT(data,1);
 	m_ic678_decode[2] = BIT(data,2);

@@ -1088,7 +1088,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 	</software>
 
 	<software name="bees">
-		<description>Killer Bees! (USA)</description><!-- also "Killer Bees (Euro)[Videopac 52]"? -->
+		<description>Killer Bees! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Robert S. Harris" />
