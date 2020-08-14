@@ -5220,6 +5220,8 @@ static INPUT_PORTS_START( madshark )
 	PORT_CONFNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
 	PORT_CONFSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
+	// TODO: pinpoint for what market is the Chinese title for
+	// (Is our current romset even suited for this setting to properly work? It still says Mad Shark during attract)
 	PORT_CONFNAME( 0x0080, 0x0000, "Title Language" )       // Changes title graphics only
 	PORT_CONFSETTING(      0x0000, "English" )              // Mad Shark - title used in most of the world, including Japan
 	PORT_CONFSETTING(      0x0080, "Traditional Chinese" )  // 最強鮫 - presumably for Taiwan (Zuìqiáng Jiāo) or Hong Kong (Zeoi Koeng Gaau)
