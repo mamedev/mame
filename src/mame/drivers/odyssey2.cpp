@@ -22,7 +22,7 @@ Odyssey 2/Videopac hardware notes:
 Videopac+ G7400 hardware notes:
 - same base hardware
 - Intel 8243 I/O expander
-- EF9340 + EF9341 graphics chips
+- EF9340 + EF9341 graphics chips + 6KB VRAM(3*2128, only 4KB used)
 - larger keyboard
 
 XTAL notes (differs per model):
@@ -46,7 +46,10 @@ TODO:
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
 - add 824x vs ef934x collision detection, none of the games use it
-- g7400 rally doesn't work, car keeps exploding
+- g7400 rally doesn't work, car keeps exploding, it is related to ef9341_read:
+  If you invert the returned RAM value, the USA map looks better. If you always
+  return 0, the game can be played but the car is invincible
+- g7400 flashp doesn't work, also related to ef9341_read?
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 graphics problems, mostly due to missing features in ef934x
 
