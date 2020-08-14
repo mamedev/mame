@@ -469,6 +469,24 @@ int i8244_device::hblank()
 }
 
 
+void i8244_device::write_cx(int x, bool cx)
+{
+	if (cx)
+	{
+		// Check if we collide with an already drawn source object
+		if ( m_vdc.s.collision & m_collision_map[x] )
+		{
+			m_collision_status |= 0x40;
+		}
+		// Check if an already drawn object would collide with us
+		if ( m_vdc.s.collision & 0x40 )
+		{
+			m_collision_status |= m_collision_map[x];
+		}
+	}
+}
+
+
 uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Some local constants for this method

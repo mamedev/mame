@@ -45,7 +45,6 @@ TODO:
   be correct(see backgamm)
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
-- add 824x vs ef934x collision detection, none of the games use it
 - g7400 rally doesn't work, car keeps exploding, it is related to ef9341_read:
   If you invert the returned RAM value, the USA map looks better. If you always
   return 0, the game can be played but the car is invincible
@@ -502,7 +501,7 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				// Use EF934x input
 				d = ef934x_bitmap->pix16( y - yoffs, x - xoffs ) & 0x07;
 
-				if ( ! m_ic674_decode[ d & 0x07 ] )
+				if ( ! m_ic674_decode[ d ] )
 				{
 					d |= 0x08;
 				}
@@ -511,6 +510,13 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				// Use i8245 input
 				d |= lum;
+
+				// I outputs to CX
+				if (x >= xoffs && x < (320 + xoffs) && y >= yoffs)
+				{
+					bool cx = !m_ic674_decode[ef934x_bitmap->pix16(y - yoffs, x - xoffs) & 0x07];
+					m_i8244->write_cx(x, cx);
+				}
 			}
 			bitmap.pix16(y, x) = d;
 		}
