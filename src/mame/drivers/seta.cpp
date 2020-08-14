@@ -5220,8 +5220,8 @@ static INPUT_PORTS_START( madshark )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, "Title Language" )
-	PORT_DIPSETTING(      0x0080, "English" )
-	PORT_DIPSETTING(      0x0000, "Traditional Chinese" )
+	PORT_DIPSETTING(      0x0080, "Traditional Chinese" )
+	PORT_DIPSETTING(      0x0000, "English" )
 
 	PORT_START("DSW") //2 DSWs
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
