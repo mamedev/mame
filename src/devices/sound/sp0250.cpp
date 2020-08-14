@@ -80,7 +80,7 @@ void sp0250_device::device_start()
 		m_tick_timer->adjust(attotime::from_hz(clock()) * CLOCK_DIVIDER, 0, attotime::from_hz(clock()) * CLOCK_DIVIDER);
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
+	m_stream = stream_alloc(0, 1, clock() / CLOCK_DIVIDER);
 
 	save_item(NAME(m_amp));
 	save_item(NAME(m_pitch));

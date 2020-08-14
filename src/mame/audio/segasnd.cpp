@@ -291,7 +291,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 void usb_sound_device::device_start()
 {
 	/* create a sound stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE);
 
 	/* initialize state */
 	m_noise_shift = 0x15555;

@@ -212,7 +212,7 @@ void scsp_device::device_start()
 	m_main_irq_cb.resolve_safe();
 
 	// Stereo output with EXTS0,1 Input (External digital audio output)
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 512);
+	m_stream = stream_alloc(2, 2, clock() / 512);
 
 	for (int slot = 0; slot < 32; slot++)
 	{

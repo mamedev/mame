@@ -87,7 +87,7 @@ void y8950_device::device_start()
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(m_chip, &y8950_device::static_read_byte, &y8950_device::static_write_byte);
 
-	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
+	m_stream = stream_alloc(0,1,rate);
 	/* port and keyboard handler */
 	y8950_set_port_handler(m_chip, &y8950_device::static_port_handler_w, &y8950_device::static_port_handler_r, this);
 	y8950_set_keyboard_handler(m_chip, &y8950_device::static_keyboard_handler_w, &y8950_device::static_keyboard_handler_r, this);

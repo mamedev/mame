@@ -81,7 +81,7 @@ void ymf262_device::device_start()
 	if (!m_chip)
 		throw emu_fatalerror("ymf262_device(%s): Error creating YMF262 chip", tag());
 
-	m_stream = machine().sound().stream_alloc(*this,0,4,rate);
+	m_stream = stream_alloc(0,4,rate);
 
 	/* YMF262 setup */
 	ymf262_set_timer_handler (m_chip, &ymf262_device::static_timer_handler, this);

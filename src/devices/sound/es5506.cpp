@@ -246,7 +246,7 @@ void es5506_device::device_start()
 		channels = m_channels;
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc(0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
 	m_region_base[0] = m_region_base[1] = m_region_base[2] = m_region_base[3] = nullptr;
@@ -380,7 +380,7 @@ void es5505_device::device_start()
 		channels = m_channels;
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc(0, 2 * channels, clock() / (16*32));
 
 	/* initialize the regions */
 	if (m_region0)

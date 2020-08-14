@@ -115,7 +115,7 @@ void hc55516_device::start_common(uint8_t _shiftreg_mask, int _active_clock_hi)
 	m_last_clock_state = 0;
 
 	/* create the stream */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
+	m_channel = stream_alloc(0, 1, SAMPLE_RATE);
 
 	save_item(NAME(m_last_clock_state));
 	save_item(NAME(m_digit));

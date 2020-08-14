@@ -61,7 +61,7 @@ void mb87419_mb87420_device::device_start()
 	m_clock = clock() / 2;
 	m_rate = m_clock / 512; // usually 32 KHz
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc(0, 2, m_rate);
 
 	logerror("Roland PCM: Clock %u, Rate %u\n", m_clock, m_rate);
 }

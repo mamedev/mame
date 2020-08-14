@@ -160,7 +160,7 @@ void s_dsp_device::device_start()
 	space().cache(m_cache);
 	space().specific(m_data);
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock() / 64);
+	m_channel = stream_alloc(0, 2, clock() / 64);
 
 	state_register();
 }

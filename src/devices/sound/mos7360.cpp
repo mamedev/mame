@@ -297,7 +297,7 @@ void mos7360_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// buffer for fastest played sample for 5 second so we have enough data for min 5 second
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;

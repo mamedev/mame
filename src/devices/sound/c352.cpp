@@ -358,14 +358,14 @@ void c352_device::device_clock_changed()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(m_sample_rate_base);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+		m_stream = stream_alloc(0, 4, m_sample_rate_base);
 }
 
 void c352_device::device_start()
 {
 	m_sample_rate_base = clock() / m_divider;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+	m_stream = stream_alloc(0, 4, m_sample_rate_base);
 
 	// generate mulaw table (Output similar to namco's VC emulator)
 	int j = 0;

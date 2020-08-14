@@ -203,7 +203,7 @@ void s2636_device::device_start()
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intack));
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 	save_item(NAME(m_sample_cnt));
 	save_item(NAME(m_sound_lvl));
 

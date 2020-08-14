@@ -112,7 +112,7 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 void okim9810_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc(0, 2, clock());
 
 	// save state stuff
 	save_item(NAME(m_TMP_register));

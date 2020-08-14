@@ -199,7 +199,7 @@ void mos6581_device::device_start()
 	m_read_poty.resolve_safe(0xff);
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// initialize SID engine
 	m_token->device = this;

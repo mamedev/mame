@@ -63,7 +63,7 @@ flower_sound_device::flower_sound_device(const machine_config &mconfig, const ch
 void flower_sound_device::device_start()
 {
 	m_iospace = &space(AS_IO);
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock()/2);
+	m_stream = stream_alloc(0, 1, clock()/2);
 
 	m_mixer_buffer = make_unique_clear<short[]>(clock()/2);
 	make_mixer_table(MAX_VOICES, defgain);

@@ -77,7 +77,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 void ymz770_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sclock);
+	m_stream = stream_alloc(0, 2, m_sclock);
 
 	for (auto & channel : m_channels)
 	{

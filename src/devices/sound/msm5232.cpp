@@ -34,7 +34,7 @@ void msm5232_device::device_start()
 
 	init(clock(), rate);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
+	m_stream = stream_alloc(0, 11, rate);
 
 	/* register with the save state system */
 	save_item(NAME(m_EN_out16));

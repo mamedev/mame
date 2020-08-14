@@ -62,7 +62,7 @@ asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t 
 void asc_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
+	m_stream = stream_alloc(0, 2, 22257);
 
 	memset(m_regs, 0, sizeof(m_regs));
 

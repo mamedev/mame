@@ -172,7 +172,7 @@ void lynx_sound_device::init()
 
 void lynx_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_mixer_channel = stream_alloc(0, 1, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
 	m_timer_delegate.resolve();
 	init();
@@ -182,7 +182,7 @@ void lynx_sound_device::device_start()
 
 void lynx2_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
 	m_timer_delegate.resolve();
 	init();

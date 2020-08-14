@@ -99,9 +99,9 @@ void namco_audio_device::device_start()
 
 	/* get stream channels */
 	if (m_stereo)
-		m_stream = machine().sound().stream_alloc(*this, 0, 2, 192000);
+		m_stream = stream_alloc(0, 2, 192000);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, 192000);
+		m_stream = stream_alloc(0, 1, 192000);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = true;

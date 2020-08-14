@@ -1009,7 +1009,7 @@ void ymf278b_device::device_start()
 		m_slots[i].num = i;
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 6, m_rate);
+	m_stream = stream_alloc(0, 6, m_rate);
 	m_mix_buffer.resize(m_rate*4,0);
 
 	// rate tables

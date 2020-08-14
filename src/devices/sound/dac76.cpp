@@ -51,7 +51,7 @@ dac76_device::dac76_device(const machine_config &mconfig, const char *tag, devic
 void dac76_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate() * 8);
+	m_stream = stream_alloc(0, 1, machine().sample_rate() * 8);
 
 	// register for save states
 	save_item(NAME(m_chord));

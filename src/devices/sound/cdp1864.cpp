@@ -119,7 +119,7 @@ void cdp1864_device::device_start()
 	initialize_palette();
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// allocate timers
 	m_int_timer = timer_alloc(TIMER_INT);

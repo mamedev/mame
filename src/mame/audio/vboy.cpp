@@ -209,7 +209,7 @@ void vboysnd_device::device_start()
 {
 	uint32_t rate = clock() / 120;
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
+	m_stream = stream_alloc(0, 2, rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);

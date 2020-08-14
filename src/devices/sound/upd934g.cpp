@@ -49,7 +49,7 @@ upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, d
 void upd934g_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, 20000);
+	m_stream = stream_alloc(0, 4, 20000);
 
 	// resolve callbacks
 	m_data_cb.resolve_safe(0);

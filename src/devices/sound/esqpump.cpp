@@ -32,7 +32,7 @@ void esq_5505_5510_pump_device::device_start()
 {
 	logerror("Clock = %d\n", clock());
 
-	m_stream = machine().sound().stream_alloc(*this, 8, 2, clock());
+	m_stream = stream_alloc(8, 2, clock());
 	m_timer = timer_alloc(0);
 	m_timer->enable(false);
 

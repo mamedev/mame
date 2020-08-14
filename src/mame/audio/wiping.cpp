@@ -42,7 +42,7 @@ void wiping_sound_device::device_start()
 	wp_sound_channel *voice;
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock()/2);
+	m_stream = stream_alloc(0, 1, clock()/2);
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer   = make_unique_clear<short[]>(clock()/2);

@@ -86,7 +86,7 @@ void k007232_device::device_start()
 	for (auto & elem : m_wreg)
 		elem = 0;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/128);
+	m_stream = stream_alloc(0, 2, clock()/128);
 
 	save_item(STRUCT_MEMBER(m_channel, vol));
 	save_item(STRUCT_MEMBER(m_channel, addr));

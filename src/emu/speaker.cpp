@@ -74,7 +74,6 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 		std::fill_n(leftmix, samples_this_update, 0);
 		std::fill_n(rightmix, samples_this_update, 0);
 	}
-	assert(samples_this_update == stream_buf.samples());
 
 	// track maximum sample value for each 0.1s bucket
 	if (machine().options().speaker_report() != 0)

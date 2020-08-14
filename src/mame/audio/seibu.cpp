@@ -385,7 +385,7 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 void seibu_adpcm_device::device_start()
 {
 	m_playing = 0;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = stream_alloc(0, 1, clock());
 	m_adpcm.reset();
 
 	save_item(NAME(m_current));

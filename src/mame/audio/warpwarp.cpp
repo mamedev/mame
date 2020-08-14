@@ -52,7 +52,7 @@ void warpwarp_sound_device::device_start()
 
 	m_clock_16h = clock() / 3 / 2 / 16;
 	m_clock_1v = clock() / 3 / 2 / 384;
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, m_clock_16h);
+	m_channel = stream_alloc(0, 1, m_clock_16h);
 
 	m_sound_volume_timer = timer_alloc(TIMER_SOUND_VOLUME_DECAY);
 	m_music_volume_timer = timer_alloc(TIMER_MUSIC_VOLUME_DECAY);

@@ -565,7 +565,7 @@ void ymz280b_device::device_start()
 	}
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, INTERNAL_SAMPLE_RATE);
+	m_stream = stream_alloc(0, 2, INTERNAL_SAMPLE_RATE);
 
 	/* allocate memory */
 	assert(MAX_SAMPLE_CHUNK < 0x10000);

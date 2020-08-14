@@ -109,7 +109,7 @@ void ym3526_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this,0,1,rate);
+		m_stream = stream_alloc(0,1,rate);
 }
 
 //-------------------------------------------------

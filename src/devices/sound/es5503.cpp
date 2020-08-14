@@ -224,7 +224,7 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
 	output_rate = (clock() / 8) / (2 + oscsenabled);
-	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate);
+	m_stream = stream_alloc(0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;

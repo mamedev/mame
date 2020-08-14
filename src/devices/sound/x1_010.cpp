@@ -119,7 +119,7 @@ void x1_010_device::device_start()
 	LOG_SOUND("masterclock = %d rate = %d\n", clock(), m_rate);
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc(0, 2, m_rate);
 
 	m_reg = make_unique_clear<u8[]>(0x2000);
 	m_HI_WORD_BUF = make_unique_clear<u8[]>(0x2000);

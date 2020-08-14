@@ -1048,7 +1048,7 @@ void tms5110_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
 	m_romclk_hack_timer = timer_alloc(0);

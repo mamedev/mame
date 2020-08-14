@@ -120,7 +120,7 @@ void es1373_device::device_start()
 	add_map(0x40, M_IO, FUNC(es1373_device::map));
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100/2);
+	m_stream = stream_alloc(0, 2, 44100/2);
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));

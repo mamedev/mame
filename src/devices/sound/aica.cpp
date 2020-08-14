@@ -1418,7 +1418,7 @@ void aica_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate);
+	m_stream = stream_alloc(2, 2, (int)m_rate);
 
 	// save state
 	save_item(NAME(m_udata.data));

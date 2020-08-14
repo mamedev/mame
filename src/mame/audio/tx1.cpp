@@ -111,7 +111,7 @@ void tx1_sound_device::device_start()
 
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << TX1_FRAC) / (double)machine().sample_rate();
 
 	/* Compute the engine resistor weights */
@@ -662,7 +662,7 @@ void buggyboy_sound_device::device_start()
 		m_eng_voltages[i] = combine_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << 24) / (double)machine().sample_rate();
 }
 

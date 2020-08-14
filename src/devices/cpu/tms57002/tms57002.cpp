@@ -981,8 +981,8 @@ void tms57002_device::device_start()
 	state_add(TMS57002_HOST3, "HOST3",  host[3]);
 
 	set_icountptr(icount);
-
-	stream_alloc(4, 4, STREAM_SYNC);
+// fixme
+//	stream_alloc(4, 4, STREAM_SYNC);
 
 	save_item(NAME(macc));
 	save_item(NAME(macc_read));

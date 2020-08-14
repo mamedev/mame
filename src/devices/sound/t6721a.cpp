@@ -56,7 +56,7 @@ void t6721a_device::device_start()
 	m_write_apd.resolve_safe();
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 }
 
 

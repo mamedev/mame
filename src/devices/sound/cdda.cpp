@@ -31,7 +31,7 @@ void cdda_device::device_start()
 	/* allocate an audio cache */
 	m_audio_cache = std::make_unique<uint8_t[]>(CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc(0, 2, clock());
 
 	m_audio_playing = 0;
 	m_audio_pause = 0;

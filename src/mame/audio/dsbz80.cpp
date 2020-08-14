@@ -85,7 +85,7 @@ void dsbz80_device::device_start()
 	m_rxd_handler.resolve_safe();
 	uint8_t *rom_base = machine().root_device().memregion("mpeg")->base();
 	decoder = new mpeg_audio(rom_base, mpeg_audio::L2, false, 0);
-	machine().sound().stream_alloc(*this, 0, 2, 32000);
+	stream_alloc(0, 2, 32000);
 }
 
 //-------------------------------------------------

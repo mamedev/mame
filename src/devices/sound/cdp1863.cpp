@@ -64,7 +64,7 @@ cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, d
 void cdp1863_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// register for state saving
 	save_item(NAME(m_clock1));

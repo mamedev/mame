@@ -172,7 +172,7 @@ void huc6230_device::device_start()
 
 	m_vca_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 6);
+	m_stream = stream_alloc(2, 2, clock() / 6);
 	m_adpcm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(huc6230_device::adpcm_timer),this));
 
 	for (int i = 0; i < 2; i++)

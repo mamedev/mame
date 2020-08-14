@@ -622,7 +622,7 @@ void mos6560_device::sound_start()
 {
 	int i;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;

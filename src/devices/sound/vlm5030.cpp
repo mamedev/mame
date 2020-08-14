@@ -214,7 +214,7 @@ void vlm5030_device::device_start()
 	device_reset();
 	m_phase = PH_IDLE;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440);
+	m_channel = stream_alloc(0, 1, clock() / 440);
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_pin_BSY));

@@ -479,7 +479,7 @@ void multipcm_device::device_start()
 	const float clock_divider = 180.0f;
 	m_rate = (float)clock() / clock_divider;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc(0, 2, m_rate);
 
 	// Volume + pan table
 	m_left_pan_table = make_unique_clear<int32_t[]>(0x800);
