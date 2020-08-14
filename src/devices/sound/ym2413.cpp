@@ -1511,7 +1511,7 @@ void ym2413_device::device_start()
 {
 	int rate = clock()/72;
 
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+	m_stream = stream_alloc(0,2,rate);
 
 	for (int x=0; x<TL_RES_LEN; x++)
 	{

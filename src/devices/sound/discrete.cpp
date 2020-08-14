@@ -988,7 +988,7 @@ void discrete_sound_device::device_start()
 		fatalerror("init_nodes() - Couldn't find an output node\n");
 
 	/* initialize the stream(s) */
-	m_stream = machine().sound().stream_alloc(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
+	m_stream = stream_alloc(m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
 
 	/* Finalize stream_input_nodes */
 	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)

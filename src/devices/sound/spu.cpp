@@ -444,7 +444,7 @@ struct spu_device::voiceinfo
 //
 //
 
-class stream_buffer
+class spu_stream_buffer
 {
 public:
 	struct stream_marker
@@ -466,7 +466,7 @@ public:
 	stream_marker *marker_head,
 								*marker_tail;
 
-	stream_buffer(const unsigned int _sector_size,
+	spu_stream_buffer(const unsigned int _sector_size,
 								const unsigned int _num_sectors)
 		:   head(0),
 			tail(0),
@@ -481,7 +481,7 @@ public:
 		memset(&buffer[0], 0, buffer_size);
 	}
 
-	~stream_buffer()
+	~spu_stream_buffer()
 	{
 		flush_all();
 	}
@@ -969,8 +969,8 @@ void spu_device::device_start()
 	voice=new voiceinfo [24];
 	spu_ram=new unsigned char [spu_ram_size];
 
-	xa_buffer=new stream_buffer(xa_sector_size,xa_buffer_sectors);
-	cdda_buffer=new stream_buffer(cdda_sector_size,cdda_buffer_sectors);
+	xa_buffer=new spu_stream_buffer(xa_sector_size,xa_buffer_sectors);
+	cdda_buffer=new spu_stream_buffer(cdda_sector_size,cdda_buffer_sectors);
 
 	init_stream();
 

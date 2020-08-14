@@ -72,7 +72,12 @@ device_sound_interface &device_sound_interface::add_route(u32 output, device_t &
 
 sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate)
 {
-	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate);
+	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this));
+}
+
+sound_stream &device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate)
+{
+	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this));
 }
 
 
@@ -86,7 +91,7 @@ int device_sound_interface::inputs() const
 	// scan the list counting streams we own and summing their inputs
 	int inputs = 0;
 	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
+		if (&stream->device() == &device() && !stream->internal())
 			inputs += stream->input_count();
 	return inputs;
 }
@@ -102,7 +107,7 @@ int device_sound_interface::outputs() const
 	// scan the list counting streams we own and summing their outputs
 	int outputs = 0;
 	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
+		if (&stream->device() == &device() && !stream->internal())
 			outputs += stream->output_count();
 	return outputs;
 }
@@ -120,7 +125,7 @@ sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &s
 
 	// scan the list looking for streams owned by this device
 	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
+		if (&stream->device() == &device() && !stream->internal())
 		{
 			if (inputnum < stream->input_count())
 			{
@@ -147,7 +152,7 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 
 	// scan the list looking for streams owned by this device
 	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
+		if (&stream->device() == &device() && !stream->internal())
 		{
 			if (outputnum < stream->output_count())
 			{
@@ -213,7 +218,7 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 	if (outputnum == ALL_OUTPUTS)
 	{
 		for (auto &stream : device().machine().sound().streams())
-			if (&stream->device() == &device())
+			if (&stream->device() == &device() && !stream->internal())
 				for (int num = 0; num < stream->output_count(); num++)
 					stream->set_output_gain(num, gain);
 	}
@@ -238,7 +243,7 @@ int device_sound_interface::inputnum_from_device(device_t &source_device, int ou
 {
 	int overall = 0;
 	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
+		if (&stream->device() == &device() && !stream->internal())
 			for (int inputnum = 0; inputnum < stream->input_count(); inputnum++, overall++)
 				if (stream->input_source_device(inputnum) == &source_device && stream->input_source_outputnum(inputnum) == outputnum)
 					return overall;
@@ -368,6 +373,22 @@ void device_sound_interface::interface_pre_reset()
 }
 
 
+//-------------------------------------------------
+//  sound_stream_update - default implementation
+//  that should be overridden
+//-------------------------------------------------
+
+void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sample_t** inputs, stream_sample_t** outputs, int samples)
+{
+	throw emu_fatalerror("sound_stream_update called but not overridden by owning class");
+}
+
+void device_sound_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+{
+	throw emu_fatalerror("sound_stream_update_ex called but not overridden by owning class");
+}
+
+
 
 //**************************************************************************
 //  SIMPLE DERIVED MIXER INTERFACE
@@ -393,32 +414,6 @@ device_mixer_interface::~device_mixer_interface()
 {
 }
 
-
-//-------------------------------------------------
-//  input_to_stream_input - convert a device's
-//  input index to a stream and the input index
-//  on that stream
-//-------------------------------------------------
-
-sound_stream *device_mixer_interface::input_to_stream_input(int inputnum, int &stream_inputnum) const
-{
-	assert(inputnum >= 0);
-
-	// scan the list looking for streams owned by this device
-	for (auto &stream : device().machine().sound().streams())
-		if (&stream->device() == &device())
-		{
-			if (inputnum < m_auto_allocated_inputs)
-			{
-				stream_inputnum = inputnum;
-				return stream.get();
-			}
-			inputnum -= m_auto_allocated_inputs;
-		}
-
-	// not found
-	return nullptr;
-}
 
 //-------------------------------------------------
 //  interface_pre_start - perform startup prior
@@ -456,8 +451,11 @@ void device_mixer_interface::interface_pre_start()
 		}
 	}
 
+	// keep a small buffer handy for tracking cleared buffers
+	m_output_clear.resize(m_outputs);
+
 	// allocate the mixer stream
-	m_mixer_stream = stream_alloc(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate());
+	m_mixer_stream = &stream_alloc_ex(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate());
 }
 
 
@@ -469,9 +467,8 @@ void device_mixer_interface::interface_pre_start()
 
 void device_mixer_interface::interface_post_load()
 {
-	// Beware that there's not going to be a mixer stream if there was
-	// no inputs
-	if (m_mixer_stream)
+	// mixer stream could be null if no inputs were specified
+	if (m_mixer_stream != nullptr)
 		m_mixer_stream->set_sample_rate(device().machine().sample_rate());
 
 	// call our parent
@@ -480,21 +477,179 @@ void device_mixer_interface::interface_post_load()
 
 
 //-------------------------------------------------
-//  mixer_update - mix all inputs to one output
+//  sound_stream_update_ex - mix all inputs to one
+//  output
 //-------------------------------------------------
 
-void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
 {
-	// clear output buffers
-	for (int output = 0; output < m_outputs; output++)
-		std::fill_n(outputs[output], samples, 0);
+	// reset the clear flags
+	std::fill(std::begin(m_output_clear), std::end(m_output_clear), false);
 
-	// loop over samples
-	const u8 *outmap = &m_outputmap[0];
-	for (int pos = 0; pos < samples; pos++)
+	// loop over inputs
+	for (int inputnum = 0; inputnum < m_auto_allocated_inputs; inputnum++)
 	{
-		// for each input, add it to the appropriate output
-		for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
-			outputs[outmap[inp]][pos] += inputs[inp][pos];
+		auto &input = inputs[inputnum];
+		int outputnum = m_outputmap[inputnum];
+		auto &output = outputs[outputnum];
+
+		// either store or accumulate
+		if (!m_output_clear[outputnum])
+			output.copy(input);
+		else
+			output.add(input);
+
+		m_output_clear[outputnum] = true;
 	}
+
+	// clear anything unused
+	for (int outputnum = 0; outputnum < m_outputs; outputnum++)
+		if (!m_output_clear[outputnum])
+			outputs[outputnum].clear();
+}
+
+
+
+//**************************************************************************
+//  RESAMPLER INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  resampler_device - constructor
+//-------------------------------------------------
+
+resampler_device::resampler_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_sound_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  ~resampler_device - destructor
+//-------------------------------------------------
+
+resampler_device::~resampler_device()
+{
+}
+
+
+//-------------------------------------------------
+//  interface_pre_start - perform startup prior
+//  to the device startup
+//-------------------------------------------------
+
+void resampler_device::device_start()
+{
+	// allocate the mixing stream
+	stream_alloc_ex(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update_ex - stream callback
+//  handler for resampling an input stream to the
+//  target sample rate of the output
+//-------------------------------------------------
+
+void resampler_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+{
+	sound_assert(inputs.size() == 1);
+	sound_assert(outputs.size() == 1);
+
+	auto &input = inputs[0];
+	auto &output = outputs[0];
+
+	// if we have equal sample rates, we just need to copy
+	auto numsamples = output.samples();
+	if (input.sample_rate() == output.sample_rate())
+	{
+		output.copy(input);
+		return;
+	}
+
+	// compute the stepping value and the inverse
+	float step = float(input.sample_rate()) / float(output.sample_rate());
+	float stepinv = 1.0f / step;
+	printf("(resample: %d->%d; %d source samples available)\n", input.sample_rate(), output.sample_rate(), input.samples());
+
+	// determine the latency we need to introduce, in input samples:
+	//    1 input sample for undersampled inputs
+	//    1 + step input samples for oversampled inputs
+	s64 latency_samples = 1 + ((step < 1.0f) ? 0 : s32(step));
+	attotime latency = attotime(0, latency_samples * input.sample_period_attoseconds());
+
+	// clamp the latency to the start (only relevant at the beginning)
+	s32 dstindex = 0;
+	attotime output_start = output.start_time();
+	while (latency > output_start && dstindex < numsamples)
+	{
+		output.put(dstindex++, 0);
+		output_start += attotime(0, output.sample_period_attoseconds());
+	}
+
+	// now rebase our input buffer around the adjusted start time
+	input.set_start(output_start - latency);
+
+	// compute the fractional input start position
+	attotime delta = output_start - (input.start_time() + latency);
+	sound_assert(delta.seconds() == 0);
+	float srcpos = float(double(delta.attoseconds()) / double(input.sample_period_attoseconds()));
+	sound_assert(srcpos <= 1.0f);
+
+	// input is undersampled: point sample except where our sample period covers a boundary
+	s32 srcindex = 0;
+	if (step < 1.0f)
+	{
+		while (dstindex < numsamples)
+		{
+			// fill in with point samples until we hit a boundary
+			float nextpos;
+			while ((nextpos = srcpos + step) < 1.0f && dstindex < numsamples)
+			{
+				output.put(dstindex++, input.get(srcindex));
+				srcpos = nextpos;
+			}
+
+			// if we're done, we're done
+			if (dstindex >= numsamples)
+				break;
+
+			// blend between the two samples accordingly
+			float sample = input.get(srcindex) * (1.0f - srcpos) + input.get(++srcindex) * (nextpos - 1.0f);
+			output.put(dstindex++, sample * stepinv);
+
+			// advance
+			srcpos = nextpos - 1.0f;
+			sound_assert(srcindex <= input.samples());
+		}
+	}
+
+	// input is oversampled: sum the energy
+	else
+	{
+		while (dstindex < numsamples)
+		{
+			// compute the partial first sample and advance
+			float scale = 1.0f - srcpos;
+			float sample = input.get(srcindex++) * scale;
+
+			// add in complete samples until we only have a fraction left
+			float remaining = step - scale;
+			while (remaining >= 1.0f)
+			{
+				sample += input.get(srcindex++);
+				remaining -= 1.0f;
+			}
+
+			// add in the final partial sample
+			sample += input.get(srcindex) * remaining;
+			output.put(dstindex++, sample * stepinv);
+
+			// our position is now the remainder
+			srcpos = remaining;
+			sound_assert(srcindex <= input.samples());
+		}
+	}
+	printf("(resample: final source index = %d/%d)\n", srcindex, input.samples());
 }

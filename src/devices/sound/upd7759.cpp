@@ -210,7 +210,7 @@ upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, 
 void upd775x_device::device_start()
 {
 	// allocate a stream channel
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4);
+	m_channel = &stream_alloc_ex(0, 1, clock()/4);
 
 	// compute the stepping rate based on the chip's clock speed
 	m_step = 4 * FRAC_ONE;
@@ -712,21 +712,21 @@ READ_LINE_MEMBER( upd775x_device::busy_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd775x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd775x_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
 {
+	constexpr stream_buffer::sample_t sample_scale = 128.0 / 32768.0;
+	stream_buffer::sample_t sample = stream_buffer::sample_t(m_sample) * sample_scale;
 	int32_t clocks_left = m_clocks_left;
-	int16_t sample = m_sample;
 	uint32_t step = m_step;
 	uint32_t pos = m_pos;
-	stream_sample_t *buffer = outputs[0];
 
 	/* loop until done */
+	u32 index = 0;
 	if (m_state != STATE_IDLE)
-		while (samples != 0)
+		for ( ; index < outputs[0].samples(); index++)
 		{
 			/* store the current sample */
-			*buffer++ = sample << 7;
-			samples--;
+			outputs[0].put(index, sample);
 
 			/* advance by the number of clocks/output sample */
 			pos += step;
@@ -752,14 +752,14 @@ void upd775x_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 					/* reimport the variables that we cached */
 					clocks_left = m_clocks_left;
-					sample = m_sample;
+					sample = stream_buffer::sample_t(m_sample) * sample_scale;
 				}
 			}
 		}
 
 	/* if we got out early, just zap the rest of the buffer */
-	if (samples != 0)
-		memset(buffer, 0, samples * sizeof(*buffer));
+	for (; index < outputs[0].samples(); index++)
+		outputs[0].put(index, 0);
 
 	/* flush the state back */
 	m_clocks_left = clocks_left;

@@ -34,6 +34,9 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class read_stream_view;
+class write_stream_view;
+
 
 // ======================> device_sound_interface
 
@@ -73,15 +76,17 @@ public:
 	device_sound_interface &reset_routes() { m_route_list.clear(); return *this; }
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time);
 
 	// stream creation
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
+	sound_stream &stream_alloc_ex(int inputs, int outputs, int sample_rate);
 
 	// helpers
 	int inputs() const;
 	int outputs() const;
-	virtual sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const;
+	sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const;
 	sound_stream *output_to_stream_output(int outputnum, int &stream_outputnum) const;
 	float input_gain(int inputnum) const;
 	float output_gain(int outputnum) const;
@@ -120,25 +125,48 @@ public:
 	device_mixer_interface(const machine_config &mconfig, device_t &device, int outputs = 1);
 	virtual ~device_mixer_interface();
 
-	// helpers
-	virtual sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const override;
-
 protected:
 	// optional operation overrides
 	virtual void interface_pre_start() override;
 	virtual void interface_post_load() override;
 
 	// sound interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time) override;
 
 	// internal state
-	u8                  m_outputs;              // number of outputs
-	std::vector<u8>     m_outputmap;            // map of inputs to outputs
-	sound_stream *      m_mixer_stream;         // mixing stream
+	u8 m_outputs;                           // number of outputs
+	std::vector<u8> m_outputmap;            // map of inputs to outputs
+	std::vector<bool> m_output_clear;		// flag for tracking cleared buffers
+	sound_stream *m_mixer_stream;           // mixing stream
 };
 
 // iterator
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
+
+
+
+// ======================> resampler_device
+
+// device type definition
+DECLARE_DEVICE_TYPE(RESAMPLER, resampler_device)
+
+class resampler_device : public device_t, device_sound_interface
+{
+public:
+	// construction/destruction
+	resampler_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~resampler_device();
+
+protected:
+	// optional operation overrides
+	virtual void device_start() override;
+
+	// sound interface overrides
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time) override;
+};
+
+// speaker device iterator
+using resampler_device_iterator = device_type_iterator<resampler_device>;
 
 
 #endif // MAME_EMU_DISOUND_H

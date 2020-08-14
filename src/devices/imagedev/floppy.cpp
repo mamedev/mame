@@ -1248,7 +1248,7 @@ void floppy_sound_device::device_start()
 	// If we don't have all samples, don't allocate a stream or access sample data.
 	if (m_loaded)
 	{
-		m_sound = machine().sound().stream_alloc(*this, 0, 1, clock()); // per-floppy stream
+		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 	}
 	register_for_save_states();
 }

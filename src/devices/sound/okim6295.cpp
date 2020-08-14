@@ -118,7 +118,7 @@ void okim6295_device::device_start()
 
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
+	m_stream = stream_alloc(0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
 	save_item(NAME(m_pin7_state));

@@ -1350,7 +1350,7 @@ void ay8910_device::device_start()
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a multipler of 2 here. */
-	m_channel = machine().sound().stream_alloc(*this, 0, m_streams, (m_feature & PSG_HAS_EXPANDED_MODE) ? master_clock * 2 : master_clock / 8);
+	m_channel = stream_alloc(0, m_streams, (m_feature & PSG_HAS_EXPANDED_MODE) ? master_clock * 2 : master_clock / 8);
 
 	ay_set_clock(master_clock);
 	ay8910_statesave();

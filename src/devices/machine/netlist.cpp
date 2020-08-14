@@ -1391,7 +1391,7 @@ void netlist_mame_sound_device::device_start()
 
 	/* initialize the stream(s) */
 	m_is_device_call = false;
-	m_stream = machine().sound().stream_alloc(*this, m_in ? m_in->num_channels() : 0, m_out.size(), clock());
+	m_stream = stream_alloc(m_in ? m_in->num_channels() : 0, m_out.size(), clock());
 }
 
 

@@ -7,7 +7,7 @@
 
 // ======================> spu_device
 
-class stream_buffer;
+class spu_stream_buffer;
 class psxcpu_device;
 
 class spu_device : public device_t, public device_sound_interface
@@ -54,8 +54,8 @@ protected:
 	unsigned int taddr;
 	unsigned int sample_t;
 
-	stream_buffer *xa_buffer;
-	stream_buffer *cdda_buffer;
+	spu_stream_buffer *xa_buffer;
+	spu_stream_buffer *cdda_buffer;
 	unsigned int xa_cnt;
 	unsigned int cdda_cnt;
 	unsigned int xa_freq;

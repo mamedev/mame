@@ -98,7 +98,7 @@ void msm5205_device::device_start()
 	compute_tables();
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = stream_alloc(0, 1, clock());
 	m_vck_timer = timer_alloc(TIMER_VCK);
 	m_capture_timer = timer_alloc(TIMER_ADPCM_CAPTURE);
 

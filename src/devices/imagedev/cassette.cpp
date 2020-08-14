@@ -236,7 +236,7 @@ void cassette_image_device::device_start()
 	m_state = m_default_state;
 	m_value = 0;
 
-	machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), machine().sample_rate());
+	stream_alloc(0, (m_stereo? 2:1), machine().sample_rate());
 }
 
 image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)

@@ -1649,7 +1649,7 @@ void tms5220_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_timer_io_ready = timer_alloc(0);
 

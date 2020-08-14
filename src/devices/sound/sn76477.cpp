@@ -203,7 +203,7 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 
 void sn76477_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	if (clock() > 0)
 	{
