@@ -884,7 +884,6 @@ function toolchain(_buildDir, _subDir)
 			"c++_static",
 			"c++abi",
 			"stdc++",
-			"android_support"
 		}
 		buildoptions_c {
 			"-Wno-strict-prototypes",
@@ -930,6 +929,7 @@ function toolchain(_buildDir, _subDir)
 				"-mthumb",
 			}
 			links {
+				"android_support",
 				"unwind",
 				"gcc",
 			}
@@ -949,11 +949,16 @@ function toolchain(_buildDir, _subDir)
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
 			}
 			includedirs {
-				"$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
+				--  LIBRETRO: don't mess with NDK includir order
+				-- "$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
 			}
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
 				"-target aarch64-none-linux-android",
+				"-march=armv8.2-a",
+			}
+			links {
+				"gcc",
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
@@ -961,6 +966,7 @@ function toolchain(_buildDir, _subDir)
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib/crtend_so.o",
 				"-target aarch64-none-linux-android",
+				"-march=armv8.2-a",
 			}
 
 	configuration { "android-x86" }
