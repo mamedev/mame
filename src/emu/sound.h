@@ -27,6 +27,13 @@ constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xfffffffe;
 constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
 constexpr u32 SAMPLE_RATE_SYNCHRONOUS = 0xfffffffc;
 
+enum resampler_type : u8
+{
+	RESAMPLER_NONE = 0,
+	RESAMPLER_DEFAULT
+};
+
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -399,7 +406,7 @@ class sound_stream
 public:
 	// construction/destruction
 	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
-	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, bool resample_inputs = true);
+	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler = RESAMPLER_DEFAULT);
 	void init_common(int inputs, int outputs, int sample_rate);
 
 	// getters
@@ -421,7 +428,7 @@ public:
 	bool synchronous() const { return m_synchronous; }
 	bool input_adaptive() const { return m_input_adaptive || m_synchronous; }
 	bool output_adaptive() const { return m_output_adaptive; }
-	bool resample_inputs() const { return m_resample_inputs; }
+	resampler_type resampler() const { return m_resampler_type; }
 
 	// operations
 	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
@@ -443,7 +450,7 @@ private:
 	void postload();
 	void sync_update(void *, s32);
 	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time);
-	void resampler(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time);
+	void resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time);
 
 	// linking information
 	device_t &m_device;                            // owning device
@@ -456,7 +463,7 @@ private:
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
-	bool m_resample_inputs;                        // true if we should resample our inputs
+	resampler_type m_resampler_type;               // type of resampler to use
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
 	// input information
@@ -517,7 +524,7 @@ public:
 
 	// stream creation
 	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
-	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, bool resample_inputs = true);
+	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler = RESAMPLER_DEFAULT);
 
 	// global controls
 	void start_recording();

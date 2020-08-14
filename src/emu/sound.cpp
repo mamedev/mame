@@ -157,7 +157,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous(sample_rate == SAMPLE_RATE_SYNCHRONOUS),
-	m_resample_inputs(true),
+	m_resampler_type(RESAMPLER_DEFAULT),
 	m_sync_timer(nullptr),
 	m_input(inputs),
 	m_input_array(inputs),
@@ -178,7 +178,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, bool resample_inputs) :
+sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler_type) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
@@ -187,7 +187,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous(sample_rate == SAMPLE_RATE_SYNCHRONOUS),
-	m_resample_inputs(resample_inputs),
+	m_resampler_type(resampler_type),
 	m_sync_timer(nullptr),
 	m_input(inputs),
 	m_input_array(inputs),
@@ -216,14 +216,14 @@ void sound_stream::init_common(int inputs, int outputs, int sample_rate)
 	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
 	// save the gain of each input
-	auto resampler_cb = stream_update_ex_delegate(&sound_stream::resampler, this);
+	auto resampler_cb = stream_update_ex_delegate(&sound_stream::resampler_default, this);
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
 		stream_output *resampler = nullptr;
-		if (resample_inputs())
+		if (m_resampler_type != RESAMPLER_NONE)
 		{
-			sound_stream *resampler_stream = m_device.machine().sound().stream_alloc(m_device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, resampler_cb, false);
+			sound_stream *resampler_stream = m_device.machine().sound().stream_alloc(m_device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, resampler_cb, RESAMPLER_NONE);
 			resampler_stream->m_internal = true;
 			resampler = &resampler_stream->m_output[0];
 		}
@@ -640,7 +640,7 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 //  rate of the output
 //-------------------------------------------------
 
-void sound_stream::resampler(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
 {
 	sound_assert(inputs.size() == 1);
 	sound_assert(outputs.size() == 1);
@@ -982,9 +982,9 @@ sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outp
 }
 
 
-sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, bool resample_inputs)
+sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler)
 {
-	m_stream_list.push_back(std::make_unique<sound_stream>(device, inputs, outputs, sample_rate, callback, resample_inputs));
+	m_stream_list.push_back(std::make_unique<sound_stream>(device, inputs, outputs, sample_rate, callback, resampler));
 	return m_stream_list.back().get();
 }
 

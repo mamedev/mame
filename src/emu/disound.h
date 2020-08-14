@@ -144,29 +144,4 @@ protected:
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
 
 
-
-// ======================> resampler_device
-
-// device type definition
-DECLARE_DEVICE_TYPE(RESAMPLER, resampler_device)
-
-class resampler_device : public device_t, device_sound_interface
-{
-public:
-	// construction/destruction
-	resampler_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~resampler_device();
-
-protected:
-	// optional operation overrides
-	virtual void device_start() override;
-
-	// sound interface overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time) override;
-};
-
-// speaker device iterator
-using resampler_device_iterator = device_type_iterator<resampler_device>;
-
-
 #endif // MAME_EMU_DISOUND_H
