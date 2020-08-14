@@ -36,6 +36,7 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 
 class read_stream_view;
 class write_stream_view;
+enum resampler_type : u8;
 
 
 // ======================> device_sound_interface
@@ -82,6 +83,7 @@ public:
 	// stream creation
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
 	sound_stream &stream_alloc_ex(int inputs, int outputs, int sample_rate);
+	sound_stream &stream_alloc_ex(int inputs, int outputs, int sample_rate, resampler_type resampler);
 
 	// helpers
 	int inputs() const;

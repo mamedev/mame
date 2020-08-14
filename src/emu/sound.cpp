@@ -216,12 +216,19 @@ void sound_stream::init_common(int inputs, int outputs, int sample_rate)
 	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
 	// save the gain of each input
-	auto resampler_cb = stream_update_ex_delegate(&sound_stream::resampler_default, this);
+	stream_update_ex_delegate resampler_cb;
+	switch (m_resampler_type)
+	{
+		default:
+		case RESAMPLER_DEFAULT:
+			resampler_cb = stream_update_ex_delegate(&sound_stream::resampler_default, this);
+			break;
+	}
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
 		stream_output *resampler = nullptr;
-		if (m_resampler_type != RESAMPLER_NONE)
+		if (!resampler_cb.isnull())
 		{
 			sound_stream *resampler_stream = m_device.machine().sound().stream_alloc(m_device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, resampler_cb, RESAMPLER_NONE);
 			resampler_stream->m_internal = true;
