@@ -33965,6 +33965,7 @@ orlegendca                      //
 orlegende                       //
 pgm                             // Base Unit
 pgm3in1                         // (c) 2004 Photo Y2K2 3-in-1
+pgm3in1c100                     //
 photoy2k                        // (c) 1999 Photo Y2k
 photoy2k102                     //
 photoy2k103j                    // (c) 1999 Photo Y2k
@@ -33982,6 +33983,7 @@ theglad                         // (c) 2003 The Gladiator
 theglad100                      //
 theglad101                      //
 thegladpcb                      //
+thegladpcba                     //
 
 @source:pgm2.cpp
 ddpdojt                         // (c) 2010
