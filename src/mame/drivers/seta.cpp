@@ -139,6 +139,7 @@ TODO:
   stage 2: when BOX-MEN gets angry
 - games using 6bpp gfx switch tilemaps color mode. Only blandia uses both, while the other ones use only mode 1, thus mode 0 is untested for them
 
+
 ***************************************************************************/
 
 /***************************************************************************
@@ -5219,12 +5220,9 @@ static INPUT_PORTS_START( madshark )
 	PORT_CONFNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
 	PORT_CONFSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
-	// Following changes the title GFX only
-	// TODO: pinpoint what Saikyou Same is for what market
-	// (Maybe a Yang Cheng release therefore Hong Kong, China or Taiwan?)
-	PORT_CONFNAME( 0x0080, 0x0000, "Title Display" )
-	PORT_CONFSETTING(      0x0000, "Mad Shark" )
-	PORT_CONFSETTING(      0x0080, u8"\u6700\u5f37\u9bab / Saikyou Same" )
+	PORT_CONFNAME( 0x0080, 0x0000, "Title Language" )       // Changes title graphics only
+	PORT_CONFSETTING(      0x0000, "English" )              // Mad Shark - title used in most of the world, including Japan
+	PORT_CONFSETTING(      0x0080, "Traditional Chinese" )  // 最強鮫 - presumably for Taiwan (Zuìqiáng Jiāo) or Hong Kong (Zeoi Koeng Gaau)
 
 	PORT_START("DSW") //2 DSWs
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
