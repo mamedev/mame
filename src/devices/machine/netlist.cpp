@@ -1322,7 +1322,6 @@ netlist_mame_sound_device::netlist_mame_sound_device(const machine_config &mconf
 	, m_cur_time(attotime::zero)
 	, m_sound_clock(clock)
 	, m_attotime_per_clock(attotime::zero)
-	, m_is_device_call(false)
 	, m_last_update_to_current_time(attotime::zero)
 {
 }
@@ -1402,7 +1401,6 @@ void netlist_mame_sound_device::device_start()
 	}
 
 	/* initialize the stream(s) */
-	m_is_device_call = false;
 	m_stream = machine().sound().stream_alloc(*this, m_in ? m_in->num_channels() : 0, m_out.size(), m_sound_clock);
 
 	LOGDEVCALLS("sound device_start exit\n");
@@ -1425,9 +1423,8 @@ void netlist_mame_sound_device::register_stream_output(int channel, netlist_mame
 void netlist_mame_sound_device::update_to_current_time()
 {
 	LOGDEBUG("before update\n");
-	m_is_device_call = true;
+
 	get_stream()->update();
-	m_is_device_call = false;
 
 	if (machine().time() < m_last_update_to_current_time)
 		LOGTIMING("machine.time() decreased 2\n");
@@ -1439,7 +1436,8 @@ void netlist_mame_sound_device::update_to_current_time()
 
 	if (mtime > cur)
 	{
-		LOGTIMING("%f us\n", (mtime - cur).as_double() * 1000000.0);
+		//expected don't log
+		//LOGTIMING("%f us\n", (mtime - cur).as_double() * 1000000.0);
 		netlist().exec().process_queue(mtime - cur);
 	}
 	else if (mtime < cur)
@@ -1448,10 +1446,11 @@ void netlist_mame_sound_device::update_to_current_time()
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	if (machine().time() < m_last_update_to_current_time)
+	const auto mtime = machine().time();
+	if (mtime < m_last_update_to_current_time)
 		LOGTIMING("machine.time() decreased 1\n");
-	m_last_update_to_current_time = machine().time();
-	LOGDEBUG("samples %d %d\n", (int) m_is_device_call, samples);
+	m_last_update_to_current_time = mtime;
+	LOGDEBUG("samples %d\n", samples);
 
 	if (m_in)
 	{
@@ -1460,10 +1459,8 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 	}
 
 	m_cur_time += (samples * m_attotime_per_clock);
-	auto nl_target_time = nltime_from_attotime(m_cur_time);
 
-	if (!m_is_device_call)
-		nl_target_time -= netlist::netlist_time_ext::from_usec(2); // FIXME make adjustment a parameter
+	auto nl_target_time = std::min(nltime_from_attotime(mtime), nltime_from_attotime(m_cur_time));
 
 	auto nltime(netlist().exec().time());
 
