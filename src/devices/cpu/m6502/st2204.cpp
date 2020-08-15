@@ -29,7 +29,7 @@
     by TSMC, and ST2204B, fabricated by Hyundai. A PDF document
     describing the differences between these two was once available.
 
-    Reverse-engineered documentation for SS2204's internal registers:
+    Reverse-engineered documentation for ST2204's internal registers:
     http://blog.kevtris.org/blogfiles/Game%20King%20Inside.txt
 
 **********************************************************************/
@@ -42,12 +42,16 @@ DEFINE_DEVICE_TYPE(ST2204, st2204_device, "st2204", "Sitronix ST2204 Integrated 
 
 st2204_device::st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
 	: st2xxx_device(mconfig, type, tag, owner, clock, map, 26, false) // logical; only 23 address lines are brought out
+	, m_dac_callback(*this)
 	, m_tmode{0}
 	, m_tcntr{0}
 	, m_tload{0}
 	, m_timer{0}
 	, m_psg{0}
 	, m_psgc(0)
+	, m_vol(0)
+	, m_dac(0)
+	, m_psg_timer(nullptr)
 	, m_dms(0)
 	, m_dmd(0)
 	, m_dcnth(0)
@@ -62,6 +66,13 @@ st2204_device::st2204_device(const machine_config &mconfig, const char *tag, dev
 st2202_device::st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: st2204_device(mconfig, ST2202, tag, owner, clock, address_map_constructor(FUNC(st2202_device::int_map), this))
 {
+}
+
+void st2204_device::device_resolve_objects()
+{
+	st2xxx_device::device_resolve_objects();
+
+	m_dac_callback.resolve_safe();
 }
 
 void st2204_device::device_start()
@@ -82,12 +93,15 @@ void st2204_device::device_start()
 
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t0_interrupt), this));
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t1_interrupt), this));
+	m_psg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::psg_interrupt), this));
 
 	save_item(NAME(m_tmode));
 	save_item(NAME(m_tcntr));
 	save_item(NAME(m_tload));
 	save_item(NAME(m_psg));
 	save_item(NAME(m_psgc));
+	save_item(NAME(m_vol));
+	save_item(NAME(m_dac));
 	save_item(NAME(m_dms));
 	save_item(NAME(m_dmd));
 	save_item(NAME(m_dcnth));
@@ -123,6 +137,8 @@ void st2204_device::device_start()
 	state_add(ST_PSG0, "PSG0", m_psg[0]).mask(0xfff);
 	state_add(ST_PSG1, "PSG1", m_psg[1]).mask(0xfff);
 	state_add(ST_PSGC, "PSGC", m_psgc).mask(0x7f);
+	state_add(ST_VOL, "VOL", m_vol);
+	state_add(ST_DAC, "DAC", m_dac);
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); });
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
 	state_add(ST_LSSA, "LSSA", m_lssa);
@@ -155,6 +171,10 @@ void st2204_device::device_reset()
 
 	m_psg[0] = m_psg[1] = 0;
 	m_psgc = 0;
+	m_vol = 0;
+	m_dac = 0;
+	m_psg_timer->enable(false);
+	m_dac_callback(0);
 }
 
 const char *st2204_device::st2xxx_irq_name(int i) const
@@ -403,6 +423,41 @@ void st2204_device::st2xxx_tclk_stop()
 	}
 }
 
+TIMER_CALLBACK_MEMBER(st2204_device::psg_interrupt)
+{
+	m_ireq |= 0x002;
+	update_irq_state();
+
+	psg_timer_reload();
+}
+
+void st2204_device::psg_timer_reload()
+{
+	unsigned count;
+	if (BIT(m_psgc, 0))
+		count = (0x40 - BIT(m_psg[1], 6, 6)) * (0x40 - BIT(m_psg[1], 0, 6)) * 64;
+	else if ((m_psgc & 0x0d) == 0x04)
+		count = 0x1000 - m_psg[1];
+	else
+		return;
+
+	if ((m_psgc & 0x70) == 0x40)
+		m_psg_timer->adjust(cycles_to_attotime(count));
+	else if ((m_psgc & 0x70) == 0x70)
+		m_psg_timer->adjust(attotime::from_ticks(count, 32768));
+	else
+		m_psg_timer->adjust(cycles_to_attotime(count << (BIT(m_psgc, 4, 2) + 1)));
+}
+
+u8 st2204_device::psg_r(offs_t offset)
+{
+	// TODO: instantaneous upcount value
+	if (BIT(offset, 0))
+		return (m_psg[offset >> 1] >> 8) | 0xf0;
+	else
+		return m_psg[offset >> 1] & 0x0ff;
+}
+
 void st2204_device::psg_w(offs_t offset, u8 data)
 {
 	if (BIT(offset, 0))
@@ -411,14 +466,39 @@ void st2204_device::psg_w(offs_t offset, u8 data)
 		m_psg[offset >> 1] = data | (m_psg[offset >> 1] & 0xf00);
 }
 
+u8 st2204_device::psgc_r()
+{
+	return m_psgc | 0x80;
+}
+
 void st2204_device::psgc_w(u8 data)
 {
 	m_psgc = data & 0x7f;
+
+	if (!m_psg_timer->enabled())
+		psg_timer_reload();
+}
+
+u8 st2204_device::vol_r()
+{
+	return m_vol;
+}
+
+void st2204_device::vol_w(u8 data)
+{
+	m_vol = data;
+}
+
+u8 st2204_device::dac_r()
+{
+	return m_dac;
 }
 
 void st2204_device::dac_w(u8 data)
 {
-	// TODO
+	// TODO: emulate PSG/PWM more accurately within device
+	m_dac_callback(data);
+	m_dac = data;
 }
 
 unsigned st2204_device::st2xxx_lfr_clocks() const
@@ -533,6 +613,7 @@ void st2204_device::common_map(address_map &map)
 	map(0x0010, 0x0013).w(FUNC(st2204_device::psg_w));
 	map(0x0014, 0x0014).w(FUNC(st2204_device::dac_w));
 	map(0x0016, 0x0016).w(FUNC(st2204_device::psgc_w));
+	map(0x0017, 0x0017).w(FUNC(st2204_device::vol_w));
 	map(0x0020, 0x0020).rw(FUNC(st2204_device::bten_r), FUNC(st2204_device::bten_w));
 	map(0x0021, 0x0021).rw(FUNC(st2204_device::btsr_r), FUNC(st2204_device::btclr_all_w));
 	map(0x0023, 0x0023).rw(FUNC(st2204_device::prs_r), FUNC(st2204_device::prs_w));
@@ -589,6 +670,11 @@ void st2202_device::int_map(address_map &map)
 void st2204_device::int_map(address_map &map)
 {
 	common_map(map);
+	// PSG registers may or may not be readable on ST2202, but are readable here
+	map(0x0010, 0x0013).r(FUNC(st2204_device::psg_r));
+	map(0x0014, 0x0014).r(FUNC(st2204_device::dac_r));
+	map(0x0016, 0x0016).r(FUNC(st2204_device::psgc_r));
+	map(0x0017, 0x0017).r(FUNC(st2204_device::vol_r));
 	// Source/destination registers are supposedly not readable on ST2202, but may be readable here (count register isn't)
 	map(0x0028, 0x0028).r(FUNC(st2204_device::dmsl_r));
 	map(0x0029, 0x0029).r(FUNC(st2204_device::dmsh_r));
