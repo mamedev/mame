@@ -433,7 +433,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	u32 samples = m_output_view[0].samples();
 	if (samples != 0)
 	{
-printf("%*s%s: update %s-%s samples=%d (%d-%d) @ %dHz\n", indent, "", device().tag(), update_start.as_string(), end.as_string(), samples, m_output_view[0].m_start, m_output_view[0].m_end, m_output_view[0].sample_rate());
+//printf("%*s%s: update %s-%s samples=%d (%d-%d) @ %dHz\n", indent, "", device().tag(), update_start.as_string(), end.as_string(), samples, m_output_view[0].m_start, m_output_view[0].m_end, m_output_view[0].sample_rate());
 indent += 2;
 
 		// ensure all input streams are up to date, and create views for them as well
@@ -753,7 +753,7 @@ void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stre
 			sound_assert(srcindex <= input.samples());
 		}
 	}
-	printf("%*sresample: final source index = %d/%d\n", indent, "", srcindex, input.samples());
+//	printf("%*sresample: final source index = %d/%d\n", indent, "", srcindex, input.samples());
 }
 
 

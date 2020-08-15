@@ -264,7 +264,7 @@ void upd7759_device::device_start()
 	// chip configuration
 	m_sample_offset_shift = 1;
 
-	m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
+	m_timer = timer_alloc(TID_SLAVE_UPDATE);
 
 	m_drqcallback.resolve_safe();
 
@@ -599,24 +599,35 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	switch (id)
 	{
-		case TIMER_SLAVE_UPDATE:
+		case TID_PORT_WRITE:
+			m_fifo_in = param;
+			break;
 
-		/* update the stream */
-		m_channel->update();
+		case TID_RESET_WRITE:
+			internal_reset_w(param);
+			break;
 
-		/* advance the state */
-		advance_state();
+		case TID_START_WRITE:
+			internal_start_w(param);
+			break;
 
-		/* if the DRQ changed, update it */
-		if (DEBUG_STATES)
-			logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
-		if (olddrq != m_drq)
-			m_drqcallback(m_drq);
+		case TID_SLAVE_UPDATE:
+			/* update the stream */
+			m_channel->update();
 
-		/* set a timer to go off when that is done */
-		if (m_state != STATE_IDLE)
-			m_timer->adjust(m_clock_period * m_clocks_left);
-		break;
+			/* advance the state */
+			advance_state();
+
+			/* if the DRQ changed, update it */
+			if (DEBUG_STATES)
+				logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
+			if (olddrq != m_drq)
+				m_drqcallback(m_drq);
+
+			/* set a timer to go off when that is done */
+			if (m_state != STATE_IDLE)
+				m_timer->adjust(m_clock_period * m_clocks_left);
+			break;
 
 		default:
 			throw emu_fatalerror("Unknown id in upd7759_device::device_timer");
@@ -631,6 +642,11 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 WRITE_LINE_MEMBER( upd775x_device::reset_w )
 {
+	synchronize(TID_RESET_WRITE, state);
+}
+
+void upd775x_device::internal_reset_w(int state)
+{
 	/* update the reset value */
 	uint8_t oldreset = m_reset;
 	m_reset = (state != 0);
@@ -643,12 +659,12 @@ WRITE_LINE_MEMBER( upd775x_device::reset_w )
 		device_reset();
 }
 
-WRITE_LINE_MEMBER(upd7759_device::md_w)
+WRITE_LINE_MEMBER( upd775x_device::start_w )
 {
-	m_md = state;
+	synchronize(TID_START_WRITE, state);
 }
 
-WRITE_LINE_MEMBER( upd7759_device::start_w )
+void upd7759_device::internal_start_w(int state)
 {
 	/* update the start value */
 	uint8_t oldstart = m_start;
@@ -671,8 +687,9 @@ WRITE_LINE_MEMBER( upd7759_device::start_w )
 	}
 }
 
-WRITE_LINE_MEMBER( upd7756_device::start_w )
+void upd7756_device::internal_start_w(int state)
 {
+
 	/* update the start value */
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
@@ -694,7 +711,7 @@ WRITE_LINE_MEMBER( upd7756_device::start_w )
 void upd775x_device::port_w(u8 data)
 {
 	/* update the FIFO value */
-	m_fifo_in = data;
+	synchronize(TID_PORT_WRITE, data);
 }
 
 

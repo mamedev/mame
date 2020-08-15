@@ -113,7 +113,6 @@ protected:
 
 	std::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
-	attotime m_cur_time;
 	attotime m_attotime_per_clock;
 private:
 	void save_state();
@@ -237,7 +236,7 @@ public:
 
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	void register_stream_output(int channel, netlist_mame_stream_output_device *so);
@@ -254,6 +253,8 @@ protected:
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
 	nld_sound_in *m_in;
+	std::vector<stream_buffer::sample_t> m_inbuffer;
+	std::vector<stream_buffer::sample_t *> m_inbuffer_ptrs;
 	sound_stream *m_stream;
 	bool m_is_device_call;
 };
@@ -571,7 +572,7 @@ public:
 		m_buffer.clear();
 	}
 
-	void sound_update_fill(std::size_t samples, stream_sample_t *target);
+	void sound_update_fill(write_stream_view &target);
 
 	void set_sample_time(netlist::netlist_time t) { m_sample_time = t; }
 
@@ -586,7 +587,7 @@ private:
 	uint32_t                     m_channel;
 	const char *                 m_out_name;
 
-	std::vector<stream_sample_t> m_buffer;
+	std::vector<stream_buffer::sample_t> m_buffer;
 	double                       m_cur;
 
 	netlist::netlist_time        m_sample_time;
