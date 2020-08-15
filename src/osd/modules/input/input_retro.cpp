@@ -197,6 +197,8 @@ void Input_Binding(running_machine &machine)
          !core_stricmp(machine.system().parent, "daraku")  ||
          !core_stricmp(machine.system().name, "drgnmst")   ||
          !core_stricmp(machine.system().parent, "drgnmst")   ||
+         !core_stricmp(machine.system().name, "primrage")   ||
+         !core_stricmp(machine.system().parent, "primrage")   ||
          !core_stricmp(machine.system().name, "rabbit")    ||
          !core_stricmp(machine.system().parent, "rabbit")  ||
          !core_stricmp(machine.system().name, "shogwarr")   ||
