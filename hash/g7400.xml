@@ -38,11 +38,11 @@ NOTE:
 The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 -->
 
-<softwarelist name="g7400" description="Philips Videopac Plus G7400 cartridges">
+<softwarelist name="g7400" description="Philips Videopac+ cartridges">
 
 <!-- Philips Videopac+ G7400 carts, compatible on G7000 -->
 
-	<software name="airbattl" supported="no">
+	<software name="airbattl">
 		<description>Air Battle (Euro, Plus)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -56,7 +56,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="2bsktbwlpl" supported="no">
+	<software name="2bsktbwlpl">
 		<description>Basket Bowling+ (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Jopac</publisher>
@@ -68,7 +68,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="2bwlbsktpl" cloneof="2bsktbwlpl" supported="no">
+	<software name="2bwlbsktpl" cloneof="2bsktbwlpl">
 		<description>Tenpin Bowling/Basketball (Euro, Plus, Prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -80,7 +80,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="billardpl" supported="no">
+	<software name="billardpl">
 		<description>Billard+ (Fra, Plus)</description>
 		<year>1983</year>
 		<publisher>Jopac</publisher>
@@ -94,7 +94,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="billiardpl" cloneof="billardpl" supported="no">
+	<software name="billiardpl" cloneof="billardpl">
 		<description>Billiard (Euro, Plus, Prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -107,7 +107,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="claypigpl" supported="no">
+	<software name="claypigpl">
 		<description>Clay Pigeon (Euro, Plus, Prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -119,7 +119,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="cosmicpl" supported="no">
+	<software name="cosmicpl">
 		<description>Cosmic Conflict (Euro, Plus)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -131,7 +131,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="demonpl" supported="no">
+	<software name="demonpl">
 		<description>Demon Attack+ (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
@@ -143,7 +143,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="exojet" supported="no">
+	<software name="exojet">
 		<description>Exojet+ (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Jopac</publisher>
@@ -155,7 +155,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="flipperpl" supported="no">
+	<software name="flipperpl">
 		<description>Flipper+ (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Jopac</publisher>
@@ -167,7 +167,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="flipperpla" cloneof="flipperpl" supported="no">
+	<software name="flipperpla" cloneof="flipperpl">
 		<description>Flipper+ (Fra, Plus, Alt?)</description>
 		<year>198?</year>
 		<publisher>Jopac</publisher>
@@ -179,7 +179,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="freedompl" supported="no">
+	<software name="freedompl">
 		<description>Freedom Fighters (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -191,7 +191,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="liberte" cloneof="freedompl" supported="no">
+	<software name="liberte" cloneof="freedompl">
 		<description>Combattants de la Liberté (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
@@ -203,7 +203,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="beespl" supported="no">
+	<software name="beespl">
 		<description>Killer Bees (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -215,7 +215,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="infernal" cloneof="beespl" supported="no">
+	<software name="infernal" cloneof="beespl">
 		<description>La Ruche Infernale (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
@@ -227,7 +227,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="englouti" supported="no">
+	<software name="englouti">
 		<description>Le Tresor Englouti (Fra, Plus)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
@@ -239,7 +239,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="loony" supported="no">
+	<software name="loony">
 		<description>Loony Balloon (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -252,7 +252,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="neutron" supported="no">
+	<software name="neutron">
 		<description>Neutron Star (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -266,7 +266,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="nightmar" supported="no">
+	<software name="nightmar">
 		<description>Nightmare (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -279,7 +279,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="pickaxepl" supported="no">
+	<software name="pickaxepl">
 		<description>Pickaxe Pete (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -291,7 +291,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="3rcsocptpl" supported="no">
+	<software name="3rcsocptpl">
 		<description>Race/Spin-out/Cryptogram (Euro, Plus)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -303,7 +303,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="3csaucptpl" cloneof="3rcsocptpl" supported="no">
+	<software name="3csaucptpl" cloneof="3rcsocptpl">
 		<description>Grand Prix+ (Fra, Plus)</description>
 		<year>1983</year>
 		<publisher>Jopac</publisher>
@@ -315,7 +315,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="satellitpl" supported="no">
+	<software name="satellitpl">
 		<description>Satellite Attack (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -327,7 +327,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="stonepl" supported="no">
+	<software name="stonepl">
 		<description>Stone Sling (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -339,7 +339,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="hawks" supported="no">
+	<software name="hawks">
 		<description>Terrahawks (Euro, Plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -356,7 +356,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 <!-- G7400 exclusives -->
 
 	<!-- possibly only the pal converted dump is available  -->
-	<software name="flashp" supported="no">
+	<software name="flashp">
 		<description>Flashpoint (USA, Prototype, PAL Conversion)</description>
 		<year>2004</year>
 		<publisher>Philips</publisher>
@@ -368,7 +368,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="helicopt" supported="no">
+	<software name="helicopt">
 		<description>Helicopter Rescue (Euro)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -381,7 +381,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="homecomp" supported="no">
+	<software name="homecomp" supported="partial">
 		<description>Home Computer Module (Euro)</description><!-- aka Basic -->
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -395,7 +395,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="motocras" supported="no">
+	<software name="motocras">
 		<description>Moto-Crash (Fra)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
@@ -407,7 +407,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="norseman" supported="no">
+	<software name="norseman">
 		<description>Norseman (Euro)</description>
 		<year>198?</year>
 		<publisher>GST Video</publisher>
@@ -421,7 +421,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="rally" supported="no">
+	<software name="rally">
 		<description>Trans American Rally (Euro)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>

@@ -312,7 +312,7 @@ uint8_t i8244_device::read(offs_t offset)
 			data |= (h >= 225 && h < m_bgate_start && get_y_beam() <= m_vblank_start) ? 1 : 0;
 
 			m_irq_func(CLEAR_LINE);
-			m_control_status &= ~0x88;
+			m_control_status &= ~0xcc;
 
 			break;
 		}
@@ -466,6 +466,34 @@ int i8244_device::hblank()
 		return (h >= start || h < end) ? 1 : 0;
 	else
 		return (h >= start && h < end) ? 1 : 0;
+}
+
+
+void i8244_device::write_cx(int x, bool cx)
+{
+	if (cx)
+	{
+		u8 colx = m_collision_map[x];
+
+		// Check if we collide with an already drawn source object
+		if (colx)
+		{
+			// external overlap interrupt
+			if (m_vdc.s.control & 0x10)
+			{
+				m_irq_func(ASSERT_LINE);
+				m_control_status |= 0x40;
+			}
+
+			if (colx & m_vdc.s.collision)
+				m_collision_status |= 0x40;
+		}
+		// Check if an already drawn object would collide with us
+		if (m_vdc.s.collision & 0x40)
+		{
+			m_collision_status |= colx;
+		}
+	}
 }
 
 

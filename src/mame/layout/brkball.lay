@@ -32,12 +32,6 @@
 		<screen index="1">
 			<bounds x="149" y="0" width="102" height="42"/>
 		</screen>
-		<screen index="1">
-			<bounds x="149" y="0" width="102" height="42"/>
-		</screen>
-		<screen index="1">
-			<bounds x="149" y="0" width="102" height="42"/>
-		</screen>
 	</view>
 	<view name="no led">
 		<screen index="0">

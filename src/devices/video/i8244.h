@@ -35,6 +35,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
+	void write_cx(int x, bool cx); // CX pin on current scanline
 
 	int vblank();
 	int hblank();

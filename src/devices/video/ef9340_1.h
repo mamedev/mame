@@ -59,7 +59,7 @@ protected:
 	{
 		uint8_t   TA;
 		uint8_t   TB;
-		uint8_t   busy;
+		bool      busy;
 	} m_ef9341;
 
 	struct
@@ -71,9 +71,9 @@ protected:
 		uint8_t   M;
 	} m_ef9340;
 
-	uint8_t   m_ef934x_ram_a[1024];
-	uint8_t   m_ef934x_ram_b[1024];
-	uint8_t   m_ef934x_ext_char_ram[2048];   /* The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB. */
+	uint8_t   m_ef934x_ram_a[0x400]; // A10 to GND
+	uint8_t   m_ef934x_ram_b[0x400]; // A10 to GND
+	uint8_t   m_ef934x_ext_char_ram[0x800]; // The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB.
 };
 
 

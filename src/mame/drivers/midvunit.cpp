@@ -280,25 +280,20 @@ void midvunit_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t m
 
 uint32_t midvunit_state::crusnwld_serial_status_r()
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r() << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
 	return in1 | in1 << 16;
 }
 
 
 uint32_t midvunit_state::crusnwld_serial_data_r()
 {
-	return m_midway_serial_pic->read() << 16;
+	return m_midway_serial_pic2->read() << 16;
 }
 
 
 void midvunit_state::crusnwld_serial_data_w(uint32_t data)
 {
-	if ((data & 0xf0000) == 0x10000)
-	{
-		m_midway_serial_pic->reset_w(1);
-		m_midway_serial_pic->reset_w(0);
-	}
-	m_midway_serial_pic->write(data >> 16);
+	m_midway_serial_pic2->write(data >> 16);
 }
 
 
@@ -332,31 +327,6 @@ void midvunit_state::bit_reset_w(uint32_t data)
 	m_bit_index = 0;
 }
 
-
-
-/*************************************
- *
- *  Off Road Challenge PIC access
- *
- *************************************/
-
-uint32_t midvunit_state::offroadc_serial_status_r()
-{
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
-	return in1 | in1 << 16;
-}
-
-
-uint32_t midvunit_state::offroadc_serial_data_r()
-{
-	return m_midway_serial_pic2->read() << 16;
-}
-
-
-void midvunit_state::offroadc_serial_data_w(uint32_t data)
-{
-	m_midway_serial_pic2->write(data >> 16);
-}
 
 uint32_t midvunit_state::midvunit_wheel_board_r()
 {
@@ -1147,8 +1117,9 @@ void midvunit_state::crusnwld(machine_config &config)
 {
 	midvunit(config);
 	/* valid values are 450 or 460 */
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
-	m_midway_serial_pic->set_upper(450);
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	m_midway_serial_pic2->set_upper(450);
+	m_midway_serial_pic2->set_yearoffs(94);
 }
 
 void midvunit_state::offroadc(machine_config &config)
@@ -2005,8 +1976,9 @@ void midvunit_state::init_offroadc()
 	/* control register is different */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32s_delegate(*this, FUNC(midvunit_state::crusnwld_control_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32smo_delegate(*this, FUNC(midvunit_state::offroadc_serial_status_r)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32smo_delegate(*this, FUNC(midvunit_state::offroadc_serial_data_r)), write32smo_delegate(*this, FUNC(midvunit_state::offroadc_serial_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32smo_delegate(*this, FUNC(midvunit_state::crusnwld_serial_status_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x996000, 0x996000, read32smo_delegate(*this, FUNC(midvunit_state::crusnwld_serial_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x996000, 0x996000, write32smo_delegate(*this, FUNC(midvunit_state::crusnwld_serial_data_w)));
 
 	/* speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32sm_delegate(*this, FUNC(midvunit_state::generic_speedup_r)));

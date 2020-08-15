@@ -2,8 +2,15 @@
 // copyright-holders:Wilbert Pol
 /***************************************************************************
 
-    Thomson EF9340 + EF9341 teletext graphics chips with 1KB external
-    character ram.
+Thomson EF9340 + EF9341 teletext graphics chips with 1KB external character ram.
+
+TODO:
+- busy state (right now it is immediate)
+- character blinking mode
+- character underline mode
+- character width/height doubling
+- window boxing/conceal
+- Y zoom
 
 ***************************************************************************/
 
@@ -52,7 +59,7 @@ void ef9340_1_device::device_start()
 	// zerofill
 	m_ef9341.TA = 0;
 	m_ef9341.TB = 0;
-	m_ef9341.busy = 0;
+	m_ef9341.busy = false;
 
 	m_ef9340.X = 0;
 	m_ef9340.Y = 0;
@@ -102,7 +109,7 @@ uint16_t ef9340_1_device::ef9340_get_c_addr(uint8_t x, uint8_t y)
 	{
 		return 0x300 | ( ( y & 0x07 ) << 5 ) | ( y & 0x18 ) | ( x & 0x07 );
 	}
-	return y << 5 | x;
+	return ( y & 0x1f ) << 5 | ( x & 0x1f );
 }
 
 
@@ -144,7 +151,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 		if ( b )
 		{
 			m_ef9341.TB = data;
-			m_ef9341.busy = 0x80;
+			m_ef9341.busy = true;
 			switch( m_ef9341.TB & 0xE0 )
 			{
 			case 0x00:  /* Begin row */
@@ -169,8 +176,10 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 			case 0xC0:  /* Load Y0 */
 				m_ef9340.Y0 = m_ef9341.TA & 0x3F;
 				break;
+			case 0xE0:  /* Not interpreted */
+				break;
 			}
-			m_ef9341.busy = 0;
+			m_ef9341.busy = false;
 		}
 		else
 		{
@@ -184,7 +193,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 			uint16_t addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
 
 			m_ef9341.TB = data;
-			m_ef9341.busy = 0x80;
+			m_ef9341.busy = true;
 			switch ( m_ef9340.M & 0xE0 )
 			{
 				case 0x00:  /* Write */
@@ -193,20 +202,9 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 					ef9340_inc_c();
 					break;
 
-				case 0x20:  /* Read */
-					m_ef9341.TA = m_ef934x_ram_a[addr];
-					m_ef9341.TB = m_ef934x_ram_b[addr];
-					ef9340_inc_c();
-					break;
-
 				case 0x40:  /* Write without increment */
 					m_ef934x_ram_a[addr] = m_ef9341.TA;
 					m_ef934x_ram_b[addr] = m_ef9341.TB;
-					break;
-
-				case 0x60:  /* Read without increment */
-					m_ef9341.TA = m_ef934x_ram_a[addr];
-					m_ef9341.TB = m_ef934x_ram_b[addr];
 					break;
 
 				case 0x80:  /* Write slice */
@@ -225,13 +223,10 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 					}
 					break;
 
-				case 0xA0:  /* Read slice */
-					fatalerror("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
-
-				default:    /* Illegal */
+				default:    /* Illegal or Read command */
 					break;
 			}
-			m_ef9341.busy = 0;
+			m_ef9341.busy = false;
 		}
 		else
 		{
@@ -255,14 +250,51 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 		}
 		else
 		{
-			data = m_ef9341.busy;
+			data = (m_ef9341.busy) ? 0x80 : 0;
 		}
 	}
 	else
 	{
 		if ( b )
 		{
+			uint16_t addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+
 			data = m_ef9341.TB;
+			m_ef9341.busy = true;
+			switch ( m_ef9340.M & 0xE0 )
+			{
+				case 0x20:  /* Read */
+					m_ef9341.TA = m_ef934x_ram_a[addr];
+					m_ef9341.TB = m_ef934x_ram_b[addr];
+					ef9340_inc_c();
+					break;
+
+				case 0x60:  /* Read without increment */
+					m_ef9341.TA = m_ef934x_ram_a[addr];
+					m_ef9341.TB = m_ef934x_ram_b[addr];
+					break;
+
+				case 0xA0:  /* Read slice */
+					{
+						uint8_t a = m_ef934x_ram_a[addr];
+						uint8_t b = m_ef934x_ram_b[addr];
+						uint8_t slice = ( m_ef9340.M & 0x0f ) % 10;
+
+						if ( b >= 0xa0 )
+						{
+							m_ef9341.TA = bitswap<8>(m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ],0,1,2,3,4,5,6,7);
+							m_ef9341.TB = 0;
+						}
+
+						// Increment slice number
+						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
+					}
+					break;
+
+				default:    /* Illegal or Write command */
+					break;
+			}
+			m_ef9341.busy = false;
 		}
 		else
 		{
@@ -283,11 +315,12 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 	for ( int i = 0; i < 40 * 8; i++ )
 		m_tmp_bitmap.pix16(vpos, i) = 0;
 
+	// display automaton active at 40-290, or 32-242
 	int max_vpos = ( m_ef9340.R & 0x40 ) ? 250 : 210;
 
 	if ( m_ef9340.R & 0x01 && vpos < max_vpos )
 	{
-		int y = vpos - 0;
+		int y = vpos;
 		int y_row, slice;
 		uint8_t fg = 0;
 		uint8_t bg = 0;
@@ -310,7 +343,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		else
 		{
 			// Displaying regular row
-			y_row = (y - 10) / 10;
+			y_row = ((m_ef9340.Y0 & 0x1f) + (y - 10) / 10) % 24;
 			slice = (y - 10) % 10;
 		}
 

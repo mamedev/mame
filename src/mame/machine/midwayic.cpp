@@ -107,11 +107,6 @@ void midway_serial_pic_device::generate_serial_data(int upper)
 	m_data[0] = temp & 0xff;
 	m_data[1] = (temp >> 8) & 0xff;
 	m_data[2] = (temp >> 16) & 0xff;
-
-	/* special hack for RevX */
-	m_ormask = 0x80;
-	if (upper == 419)
-		m_ormask = 0x00;
 }
 
 
@@ -130,7 +125,6 @@ void midway_serial_pic_device::serial_register_state()
 	save_item(NAME(m_idx));
 	save_item(NAME(m_status));
 	save_item(NAME(m_bits));
-	save_item(NAME(m_ormask));
 }
 
 DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC, midway_serial_pic_device, "midway_serial_pic_sim", "Midway Serial PIC Simulation")
@@ -152,8 +146,7 @@ midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig
 	m_buff(0),
 	m_idx(0),
 	m_status(0),
-	m_bits(0),
-	m_ormask(0)
+	m_bits(0)
 {
 	memset(m_data,0,sizeof(m_data));
 }
@@ -191,8 +184,11 @@ u8 midway_serial_pic_device::status_r()
 
 u8 midway_serial_pic_device::read()
 {
-	logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
-	m_status = 1;
+	if (!machine().side_effects_disabled())
+	{
+		logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
+		m_status = 1;
+	}
 	return m_buff;
 }
 
@@ -208,9 +204,8 @@ void midway_serial_pic_device::write(u8 data)
 	if (!m_status)
 	{
 		/* the self-test writes 1F, 0F, and expects to read an F in the low 4 bits */
-		/* Cruis'n World expects the high bit to be set as well */
 		if (data & 0x0f)
-			m_buff = m_ormask | data;
+			m_buff = data & 0xf;
 		else
 			m_buff = m_data[m_idx++ % sizeof(m_data)];
 	}
@@ -409,17 +404,20 @@ u8 midway_serial_pic2_device::status_r()
 {
 	uint8_t result = 0;
 
-	/* if we're still holding the data ready bit high, do it */
-	if (m_latch & 0xf00)
+	if (!machine().side_effects_disabled())
 	{
-		if (machine().time() > m_latch_expire_time)
-			m_latch &= 0xff;
-		else
-			m_latch -= 0x100;
-		result = 1;
-	}
+		/* if we're still holding the data ready bit high, do it */
+		if (m_latch & 0xf00)
+		{
+			if (machine().time() > m_latch_expire_time)
+				m_latch &= 0xff;
+			else
+				m_latch -= 0x100;
+			result = 1;
+		}
 
-	logerror("%s:PIC status %d\n", machine().describe_context(), result);
+		logerror("%s:PIC status %d\n", machine().describe_context(), result);
+	}
 	return result;
 }
 
@@ -429,7 +427,8 @@ u8 midway_serial_pic2_device::read()
 	uint8_t result = 0;
 
 	/* PIC data register */
-	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context(), m_index, m_total, m_latch);
+	if (!machine().side_effects_disabled())
+		logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context(), m_index, m_total, m_latch);
 
 	/* return the current result */
 	if (m_latch & 0xf00)
@@ -439,7 +438,8 @@ u8 midway_serial_pic2_device::read()
 	else if (m_index < m_total)
 		result = 0xff;
 
-	logerror("%02X\n", result);
+	if (!machine().side_effects_disabled())
+		logerror("%02X\n", result);
 	return result;
 }
 

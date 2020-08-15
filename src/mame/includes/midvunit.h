@@ -61,7 +61,6 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_palette(*this, "palette"),
 		m_adc(*this, "adc"),
-		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
 		m_ata(*this, "ata"),
@@ -159,9 +158,6 @@ private:
 	void crusnwld_serial_data_w(uint32_t data);
 	uint32_t bit_data_r(offs_t offset);
 	void bit_reset_w(uint32_t data);
-	uint32_t offroadc_serial_status_r();
-	uint32_t offroadc_serial_data_r();
-	void offroadc_serial_data_w(uint32_t data);
 	uint32_t midvplus_misc_r(offs_t offset);
 	void midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void midvplus_xf1_w(uint8_t data);
@@ -184,7 +180,6 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
 	optional_device<adc0844_device> m_adc;
-	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	optional_device<ata_interface_device> m_ata;

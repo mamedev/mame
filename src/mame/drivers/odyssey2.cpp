@@ -22,7 +22,7 @@ Odyssey 2/Videopac hardware notes:
 Videopac+ G7400 hardware notes:
 - same base hardware
 - Intel 8243 I/O expander
-- EF9340 + EF9341 graphics chips
+- EF9340 + EF9341 graphics chips + 6KB VRAM(3*2128, only 4KB used)
 - larger keyboard
 
 XTAL notes (differs per model):
@@ -45,8 +45,6 @@ TODO:
   be correct(see backgamm)
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
-- add 824x vs ef934x collision detection, none of the games use it
-- g7400 rally doesn't work, car keeps exploding
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 graphics problems, mostly due to missing features in ef934x
 
@@ -499,7 +497,7 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				// Use EF934x input
 				d = ef934x_bitmap->pix16( y - yoffs, x - xoffs ) & 0x07;
 
-				if ( ! m_ic674_decode[ d & 0x07 ] )
+				if ( ! m_ic674_decode[ d ] )
 				{
 					d |= 0x08;
 				}
@@ -508,6 +506,13 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				// Use i8245 input
 				d |= lum;
+
+				// I outputs to CX
+				if (x >= xoffs && x < (320 + xoffs) && y >= yoffs)
+				{
+					bool cx = !m_ic674_decode[ef934x_bitmap->pix16(y - yoffs, x - xoffs) & 0x07];
+					m_i8244->write_cx(x, cx);
+				}
 			}
 			bitmap.pix16(y, x) = d;
 		}
