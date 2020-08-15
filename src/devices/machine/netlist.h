@@ -112,8 +112,6 @@ private:
 // netlist_mame_cpu_device
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_cpu_device;
-
 class netlist_disassembler : public util::disasm_interface
 {
 public:
@@ -233,24 +231,23 @@ public:
 	inline sound_stream *get_stream() { return m_stream; }
 	void update_to_current_time();
 
-
-	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual void device_validity_check(validity_checker &valid) const override;
-
 	void register_stream_output(int channel, netlist_mame_stream_output_device *so);
 
 protected:
+
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	//virtual void device_reset() override;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
-	nld_sound_in *m_in;
+	std::map<std::size_t, nld_sound_in *> m_in;
 	sound_stream *m_stream;
 	attotime m_cur_time;
 	uint32_t m_sound_clock;
