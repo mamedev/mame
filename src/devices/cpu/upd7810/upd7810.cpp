@@ -1511,10 +1511,10 @@ void upd7810_device::handle_timers(int cycles)
 			switch (m_adout)
 			{
 				// volfied code checks bit 0x80, old code set bit 0x01, TODO: verify which bits are set on real hw
-				case 0: CR0 = m_tmpcr ? 0xff:0x00; break;
-				case 1: CR1 = m_tmpcr ? 0xff:0x00; break;
-				case 2: CR2 = m_tmpcr ? 0xff:0x00; break;
-				case 3: CR3 = m_tmpcr ? 0xff:0x00; break;
+				case 0: CR0 = m_tmpcr; break;
+				case 1: CR1 = m_tmpcr; break;
+				case 2: CR2 = m_tmpcr; break;
+				case 3: CR3 = m_tmpcr; break;
 			}
 			m_adout = (m_adout + 1) & 0x03;
 			if (m_adout == 0)
@@ -1545,16 +1545,17 @@ void upd7810_device::handle_timers(int cycles)
 			m_adcnt -= m_adtot;
 			switch (m_adout)
 			{
-				case 0: CR0 = m_tmpcr ? 0xff:0x00; break;
-				case 1: CR1 = m_tmpcr ? 0xff:0x00; break;
-				case 2: CR2 = m_tmpcr ? 0xff:0x00; break;
-				case 3: CR3 = m_tmpcr ? 0xff:0x00; break;
+				case 0: CR0 = m_tmpcr; break;
+				case 1: CR1 = m_tmpcr; break;
+				case 2: CR2 = m_tmpcr; break;
+				case 3: CR3 = m_tmpcr; break;
 			}
-			m_adin  = (m_adin  + 1) & 0x07;
+			m_adin  = (m_adin  + 1) & 0x03;  // should loop from 0 to 3 for AN0-AN3 or AN4-AN7
 			m_adout = (m_adout + 1) & 0x03;
 			if (m_adout == 0)
 				IRR |= INTFAD;
 			m_shdone = 0;
+
 		}
 	}
 
