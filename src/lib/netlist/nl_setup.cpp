@@ -87,8 +87,8 @@ namespace netlist
 		pstring key = build_fqn(name);
 		if (device_exists(key))
 		{
-			log().fatal(MF_DEVICE_ALREADY_EXISTS_1(name));
-			throw nl_exception(MF_DEVICE_ALREADY_EXISTS_1(name));
+			log().fatal(MF_DEVICE_ALREADY_EXISTS_1(key));
+			throw nl_exception(MF_DEVICE_ALREADY_EXISTS_1(key));
 		}
 
 		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(), {key, f});
@@ -332,8 +332,8 @@ namespace netlist
 	{
 		if (!m_abstract.m_alias.insert({alias, out}).second)
 		{
-			log().fatal(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
-			throw nl_exception(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
+			log().fatal(MF_ALIAS_ALREAD_EXISTS_1(alias));
+			throw nl_exception(MF_ALIAS_ALREAD_EXISTS_1(alias));
 		}
 	}
 
