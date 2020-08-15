@@ -343,11 +343,10 @@ void parser_t::register_local_as_source(const pstring &name)
 	auto p = m_local.find(name);
 	if (p != m_local.end())
 	{
-		printf("found %s\n", name.c_str());
 		m_setup.register_source<source_token_t>(name, p->second);
 	}
 	else
-		printf("argh %s\n", name.c_str());
+		error(MF_LOCAL_SOURCE_NOT_FOUND_1(name));
 }
 
 void parser_t::net_external_source()
