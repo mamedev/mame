@@ -163,7 +163,8 @@ namespace netlist
 						if (m_buffers[i] == nullptr)
 							break; // stop, called outside of stream_update
 						const nl_fptype v = m_buffers[i][m_pos];
-						m_params[i]->set(v * m_param_mults[i]() + m_param_offsets[i]());
+						//m_params[i]->set(v * m_param_mults[i]() + m_param_offsets[i]());
+						m_params_setter[i](i, v * m_param_mults[i]() + m_param_offsets[i]());
 					}
 				}
 				else
@@ -194,9 +195,12 @@ namespace netlist
 						if (i != m_num_channels)
 							state().log().fatal("sound input numbering has to be sequential!");
 						m_num_channels++;
-						m_params[i] = dynamic_cast<param_fp_t *>(
-							&state().setup().find_param(m_param_names[i]()).param()
-						);
+						param_t *p = &state().setup().find_param(m_param_names[i]()).param();
+						m_params[i] = p;
+						if (dynamic_cast<param_fp_t *>(p) != nullptr)
+							m_params_setter[i] = setter_t(&NETLIB_NAME(buffered_param_setter)::setter<param_fp_t>, this);
+						else if (dynamic_cast<param_logic_t *>(p) != nullptr)
+							m_params_setter[i] = setter_t(&NETLIB_NAME(buffered_param_setter)::setter<param_logic_t>, this);
 					}
 				}
 			}
@@ -215,6 +219,14 @@ namespace netlist
 			int num_channels() { return m_num_channels; }
 
 		private:
+			using setter_t = plib::pmfp<void, std::size_t, nl_fptype>;
+
+			template <typename S>
+			void setter(std::size_t idx, nl_fptype v)
+			{
+				static_cast<S *>(m_params[idx])->set(v);
+			}
+
 			netlist_time m_sample_time;
 
 			logic_input_t m_feedback;
@@ -227,7 +239,8 @@ namespace netlist
 			object_array_t<param_str_t, MAX_INPUT_CHANNELS> m_param_names;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_mults;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_offsets;
-			std::array<param_fp_t *, MAX_INPUT_CHANNELS>    m_params;
+			std::array<param_t *, MAX_INPUT_CHANNELS>       m_params;
+			std::array<setter_t, MAX_INPUT_CHANNELS>        m_params_setter;
 			std::array<T *, MAX_INPUT_CHANNELS>             m_buffers;
 		};
 

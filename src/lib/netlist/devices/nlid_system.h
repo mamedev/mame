@@ -386,8 +386,10 @@ namespace devices
 		NETLIB_CONSTRUCTOR(function)
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
+		, m_thresh(*this, "THRESH", nlconst::zero())
 		, m_Q(*this, "Q")
 		, m_compiled(*this, "m_compiled")
+		, m_last(*this, "m_last")
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
@@ -412,18 +414,25 @@ namespace devices
 			{
 				m_vals[i] = (*m_I[i])();
 			}
-			m_Q.push(m_compiled->evaluate(m_vals));
+			auto result = m_compiled->evaluate(m_vals);
+			if (plib::abs(m_last - result) >= m_thresh)
+			{
+				m_Q.push(result);
+				m_last = result;
+			}
 		}
 
 	private:
 		using pf_type = plib::pfunction<nl_fptype>;
 		param_int_t m_N;
 		param_str_t m_func;
+		param_fp_t m_thresh;
 		analog_output_t m_Q;
 		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
 		pf_type::values_container m_vals;
 		state_var<pf_type> m_compiled;
+		state_var<nl_fptype> m_last;
 
 	};
 

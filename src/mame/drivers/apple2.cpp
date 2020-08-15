@@ -1408,6 +1408,7 @@ void apple2_state::apple2_common(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple2_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void apple2_state::apple2(machine_config &config)

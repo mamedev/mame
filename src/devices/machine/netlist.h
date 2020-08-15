@@ -75,24 +75,7 @@ public:
 	netlist::setup_t &setup();
 	netlist_mame_t &netlist() noexcept { return *m_netlist; }
 
-	void update_icount(netlist::netlist_time_ext time) noexcept;
-	void check_mame_abort_slice() noexcept;
-
 	static void register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name);
-
-	int m_icount;
-
-	static constexpr const unsigned MDIV_SHIFT = 16;
-
-	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
-	{
-		return (m_div * c).shr(MDIV_SHIFT);
-	}
-
-	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
-	{
-		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
-	}
 
 protected:
 
@@ -109,19 +92,15 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_pre_save() override;
-	virtual void device_clock_changed() override;
+	//virtual void device_clock_changed() override;
+
+	void device_start_common();
+	void save_state();
 
 	std::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
-	attotime m_attotime_per_clock;
 private:
-	void save_state();
-
 	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
-
-	netlist::netlist_time_ext    m_div;
-	netlist::netlist_time_ext    m_rem;
-	netlist::netlist_time_ext    m_old;
 
 	std::unique_ptr<netlist_mame_t> m_netlist;
 
@@ -155,6 +134,8 @@ class netlist_mame_cpu_device : public netlist_mame_device,
 								public device_memory_interface
 {
 public:
+	static constexpr const unsigned MDIV_SHIFT = 16;
+
 	// construction/destruction
 	netlist_mame_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -178,12 +159,26 @@ public:
 		return *this;
 	}
 
+	void update_icount(netlist::netlist_time_ext time) noexcept;
+	void check_mame_abort_slice() noexcept;
+
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
+	{
+		return (m_div * c).shr(MDIV_SHIFT);
+	}
+
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
+	{
+		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
+	}
+
 protected:
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
@@ -203,6 +198,10 @@ protected:
 	address_space_config m_program_config;
 
 private:
+	int m_icount;
+	netlist::netlist_time_ext    m_div;
+	netlist::netlist_time_ext    m_rem;
+	netlist::netlist_time_ext    m_old;
 	offs_t m_genPC;
 };
 
@@ -248,7 +247,6 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_clock_changed() override;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
@@ -256,7 +254,10 @@ private:
 	std::vector<stream_buffer::sample_t> m_inbuffer;
 	std::vector<stream_buffer::sample_t *> m_inbuffer_ptrs;
 	sound_stream *m_stream;
-	bool m_is_device_call;
+	attotime m_cur_time;
+	uint32_t m_sound_clock;
+	attotime m_attotime_per_clock;
+	attotime m_last_update_to_current_time;
 };
 
 // ----------------------------------------------------------------------------------------

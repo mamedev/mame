@@ -11828,6 +11828,7 @@ batmanf3                        //
 bay_d300                        //
 bay_d400                        //
 bay_e400                        //
+bay_f201                        //
 baywatch                        //
 bmf_at                          //
 bmf_be                          //
@@ -33965,6 +33966,7 @@ orlegendca                      //
 orlegende                       //
 pgm                             // Base Unit
 pgm3in1                         // (c) 2004 Photo Y2K2 3-in-1
+pgm3in1c100                     //
 photoy2k                        // (c) 1999 Photo Y2k
 photoy2k102                     //
 photoy2k103j                    // (c) 1999 Photo Y2k
@@ -33982,6 +33984,7 @@ theglad                         // (c) 2003 The Gladiator
 theglad100                      //
 theglad101                      //
 thegladpcb                      //
+thegladpcba                     //
 
 @source:pgm2.cpp
 ddpdojt                         // (c) 2010
@@ -36932,6 +36935,7 @@ friskytb                        // (c) 1981
 radrad                          // (c) 1982 Nichibutsu USA
 radradj                         // (c) 1982 Logitec Corp
 sectrzon                        // (c) 1984 + Alice
+sectrzont                       // (c) 1984 + Alice (on Tecfri PCB)
 seicross                        // (c) 1984 + Alice
 seicrossa                       // (c) 1984 + Alice
 

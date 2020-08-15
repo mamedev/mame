@@ -51,7 +51,6 @@ private:
 	uint8_t   m_idx;
 	uint8_t   m_status;
 	uint8_t   m_bits;
-	uint8_t   m_ormask;
 };
 
 

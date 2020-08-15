@@ -664,8 +664,6 @@ OPHANDLER( da_a )
 		m_a += 0x60;
 		m_psw |= C_FLAG;
 	}
-	else
-		m_psw &= ~C_FLAG;
 }
 
 OPHANDLER( dec_a )          { burn_cycles(1); m_a--; }

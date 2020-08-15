@@ -22,7 +22,7 @@ Odyssey 2/Videopac hardware notes:
 Videopac+ G7400 hardware notes:
 - same base hardware
 - Intel 8243 I/O expander
-- EF9340 + EF9341 graphics chips
+- EF9340 + EF9341 graphics chips + 6KB VRAM(3*2128, only 4KB used)
 - larger keyboard
 
 XTAL notes (differs per model):
@@ -45,11 +45,8 @@ TODO:
   be correct(see backgamm)
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
-- add 824x vs ef934x collision detection
 - g7400 probably has different video timing too (not same as g7000)
-- g7400 graphics problems, some of them severe, eg. rally (for homecomp, enter
-  command TX 1,0,0 to see the text)
-- g7400 EF9341 R/W is connected to CPU A2, what happens if it is disobeyed?
+- g7400 graphics problems, mostly due to missing features in ef934x
 
 ***************************************************************************/
 
@@ -105,7 +102,6 @@ protected:
 	void odyssey2_mem(address_map &map);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	/* constants */
 	static const uint8_t P1_BANK_LO_BIT          = 0x01;
@@ -152,7 +148,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void p2_write(uint8_t data);
 	uint8_t io_read(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
@@ -279,43 +274,73 @@ static INPUT_PORTS_START( g7400 )
 	PORT_INCLUDE( odyssey2 )
 
 	PORT_MODIFY("KEY.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0\t#") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1\t!") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2\t\"") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"3\t£") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4\t$") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5\t%") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6\t&") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7\t'") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0  #") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('#')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1  !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2  \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"3  £") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(0xa3)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4  $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5  %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6  &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7  '") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_MODIFY("KEY.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8\t(") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9\t)") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8  (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9  )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 
 	PORT_MODIFY("KEY.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"+\t\u2191") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"+  \u2191") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+') PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+
+	PORT_MODIFY("KEY.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+
+	PORT_MODIFY("KEY.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 
 	PORT_MODIFY("KEY.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"-\t\u2193") PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"×\t\u2196") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"÷\t\u2190") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('/')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"=\t\u2192") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear\t;") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(8)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter\t_") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"-  \u2193") PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"×  \u2196") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(0xd7) PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"÷  \u2190") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(0xf7) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"=  \u2192") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y / Yes") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N / No") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear  ;") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(8) PORT_CHAR(';')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter  _") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(10) PORT_CHAR('_')
 
 	PORT_MODIFY("KEY.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ret") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(10)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":\t*") PORT_CODE(KEYCODE_COLON) PORT_CHAR(':')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("|\t@") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('|')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("]\t[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"¨\t^") PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",\t/") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<\t>") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ret") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":  *") PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("|  @") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('|') PORT_CHAR('@')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("]  [") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('[')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"¨  ^") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0xa8) PORT_CHAR('^')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",  /") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('/')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<  >") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('<') PORT_CHAR('>')
 
 	PORT_MODIFY("KEY.7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cntl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -365,11 +390,6 @@ void odyssey2_state::machine_start()
 }
 
 
-void odyssey2_state::machine_reset()
-{
-}
-
-
 void g7400_state::machine_start()
 {
 	odyssey2_state::machine_start();
@@ -381,17 +401,6 @@ void g7400_state::machine_start()
 	save_item(NAME(m_ic678_decode));
 }
 
-
-void g7400_state::machine_reset()
-{
-	odyssey2_state::machine_reset();
-
-	for ( int i = 0; i < 8; i++ )
-	{
-		m_ic674_decode[i] = 0;
-		m_ic678_decode[i] = 0;
-	}
-}
 
 /****** External RAM ******************************/
 
@@ -426,8 +435,14 @@ uint8_t g7400_state::io_read(offs_t offset)
 {
 	u8 data = odyssey2_state::io_read(offset);
 
-	if (!(m_p1 & P1_VPP_ENABLE) && offset & 4)
-		data &= m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
+	if (!(m_p1 & P1_VPP_ENABLE))
+	{
+		// A2 to R/W pin
+		if (offset & 4)
+			data &= m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
+		else
+			m_ef9340_1->ef9341_write( offset & 0x02, offset & 0x01, data );
+	}
 
 	return data;
 }
@@ -459,8 +474,6 @@ uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_i8244->screen_update(screen, bitmap, cliprect);
-
 	u8 lum = ~m_p1 >> 4 & 0x08;
 	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
@@ -470,7 +483,12 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// apply external LUM setting
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		rectangle clip = cliprect;
+		clip.min_y = clip.max_y = y;
+
+		m_i8244->screen_update(screen, bitmap, clip);
+
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			uint16_t d = bitmap.pix16(y, x);
 
@@ -479,7 +497,7 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				// Use EF934x input
 				d = ef934x_bitmap->pix16( y - yoffs, x - xoffs ) & 0x07;
 
-				if ( ! m_ic674_decode[ d & 0x07 ] )
+				if ( ! m_ic674_decode[ d ] )
 				{
 					d |= 0x08;
 				}
@@ -488,6 +506,13 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				// Use i8245 input
 				d |= lum;
+
+				// I outputs to CX
+				if (x >= xoffs && x < (320 + xoffs) && y >= yoffs)
+				{
+					bool cx = !m_ic674_decode[ef934x_bitmap->pix16(y - yoffs, x - xoffs) & 0x07];
+					m_i8244->write_cx(x, cx);
+				}
 			}
 			bitmap.pix16(y, x) = d;
 		}
@@ -567,7 +592,6 @@ uint8_t odyssey2_state::bus_read()
 
 void odyssey2_state::bus_write(uint8_t data)
 {
-	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }
 
 
@@ -579,10 +603,9 @@ void g7400_state::i8243_p4_w(uint8_t data)
 {
 	// "port 4"
 	m_screen->update_now();
-	logerror("setting ef-port4 to %02x\n", data);
-	m_ic674_decode[4] = BIT(data,0);
+	m_ic674_decode[1] = BIT(data,0);
 	m_ic674_decode[5] = BIT(data,1);
-	m_ic674_decode[6] = BIT(data,2);
+	m_ic674_decode[3] = BIT(data,2);
 	m_ic674_decode[7] = BIT(data,3);
 }
 
@@ -591,11 +614,10 @@ void g7400_state::i8243_p5_w(uint8_t data)
 {
 	// "port 5"
 	m_screen->update_now();
-	logerror("setting ef-port5 to %02x\n", data);
 	m_ic674_decode[0] = BIT(data,0);
-	m_ic674_decode[1] = BIT(data,1);
+	m_ic674_decode[4] = BIT(data,1);
 	m_ic674_decode[2] = BIT(data,2);
-	m_ic674_decode[3] = BIT(data,3);
+	m_ic674_decode[6] = BIT(data,3);
 }
 
 
@@ -603,10 +625,9 @@ void g7400_state::i8243_p6_w(uint8_t data)
 {
 	// "port 6"
 	m_screen->update_now();
-	logerror("setting vdc-port6 to %02x\n", data);
-	m_ic678_decode[4] = BIT(data,0);
+	m_ic678_decode[1] = BIT(data,0);
 	m_ic678_decode[5] = BIT(data,1);
-	m_ic678_decode[6] = BIT(data,2);
+	m_ic678_decode[3] = BIT(data,2);
 	m_ic678_decode[7] = BIT(data,3);
 }
 
@@ -615,11 +636,10 @@ void g7400_state::i8243_p7_w(uint8_t data)
 {
 	// "port 7"
 	m_screen->update_now();
-	logerror("setting vdc-port7 to %02x\n", data);
 	m_ic678_decode[0] = BIT(data,0);
-	m_ic678_decode[1] = BIT(data,1);
+	m_ic678_decode[4] = BIT(data,1);
 	m_ic678_decode[2] = BIT(data,2);
-	m_ic678_decode[3] = BIT(data,3);
+	m_ic678_decode[6] = BIT(data,3);
 }
 
 
@@ -657,6 +677,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
+	SOFTWARE_LIST(config, "g7400_list").set_compatible("g7400");
 }
 
 void odyssey2_state::videopac(machine_config &config)

@@ -35,12 +35,15 @@
 #define LOG_GENERAL     (1U << 0)
 #define LOG_DEV_CALLS   (1U << 1)
 #define LOG_DEBUG       (1U << 2)
+#define LOG_TIMING      (1U << 3)
 
 //#define LOG_MASK (LOG_GENERAL | LOG_DEV_CALLS | LOG_DEBUG)
+//#define LOG_MASK        (LOG_TIMING)
 #define LOG_MASK        (0)
 
 #define LOGDEVCALLS(...) LOGMASKED(LOG_DEV_CALLS, __VA_ARGS__)
 #define LOGDEBUG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+#define LOGTIMING(...) LOGMASKED(LOG_TIMING, __VA_ARGS__)
 
 #define LOG_OUTPUT_FUNC printf
 
@@ -894,9 +897,6 @@ netlist_mame_device::netlist_mame_device(const machine_config &mconfig, const ch
 
 netlist_mame_device::netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_icount(0)
-	, m_attotime_per_clock(attotime::zero)
-	, m_old(netlist::netlist_time_ext::zero())
 	, m_setup_func(nullptr)
 	, m_device_reset_called(false)
 {
@@ -1014,13 +1014,8 @@ void netlist_mame_device::device_validity_check(validity_checker &valid) const
 }
 
 
-void netlist_mame_device::device_start()
+void netlist_mame_device::device_start_common()
 {
-	LOGDEVCALLS("device_start entry\n");
-	m_attotime_per_clock = attotime(0, m_attoseconds_per_clock);
-
-	save_item(NAME(m_attotime_per_clock));
-
 	m_netlist = std::make_unique<netlist_mame_t>(*this, "netlist");
 	if (!machine().options().verbose())
 	{
@@ -1031,28 +1026,19 @@ void netlist_mame_device::device_start()
 	common_dev_start(m_netlist.get());
 	m_netlist->setup().prepare_to_run();
 
-	// FIXME: use save_helper
-	m_netlist->save(*this, m_rem, pstring(this->name()), "m_rem");
-	m_netlist->save(*this, m_div, pstring(this->name()), "m_div");
-	m_netlist->save(*this, m_old, pstring(this->name()), "m_old");
-
-	save_state();
-
-	m_old = netlist::netlist_time_ext::zero();
-	m_rem = netlist::netlist_time_ext::zero();
 
 	m_device_reset_called = false;
-
-	LOGDEVCALLS("device_start exit\n");
 }
 
-void netlist_mame_device::device_clock_changed()
+
+void netlist_mame_device::device_start()
 {
-	m_div = static_cast<netlist::netlist_time_ext>(
-		(netlist::netlist_time_ext::resolution() << MDIV_SHIFT) / clock());
-	//printf("m_div %d\n", (int) m_div.as_raw());
-	netlist().log().debug("Setting clock {1} and divisor {2}\n", clock(), m_div.as_double());
-	m_attotime_per_clock = attotime(0, m_attoseconds_per_clock);
+	LOGDEVCALLS("device_start entry\n");
+
+	device_start_common();
+	save_state();
+
+	LOGDEVCALLS("device_start exit\n");
 }
 
 
@@ -1094,7 +1080,7 @@ void netlist_mame_device::device_pre_save()
 	netlist().run_state_manager().pre_save();
 }
 
-void netlist_mame_device::update_icount(netlist::netlist_time_ext time) noexcept
+void netlist_mame_cpu_device::update_icount(netlist::netlist_time_ext time) noexcept
 {
 	const netlist::netlist_time_ext delta = (time - m_old).shl(MDIV_SHIFT) + m_rem;
 	const uint64_t d = delta / m_div;
@@ -1104,7 +1090,7 @@ void netlist_mame_device::update_icount(netlist::netlist_time_ext time) noexcept
 	m_icount -= d;
 }
 
-void netlist_mame_device::check_mame_abort_slice() noexcept
+void netlist_mame_cpu_device::check_mame_abort_slice() noexcept
 {
 	if (m_icount <= 0)
 		netlist().exec().abort_current_queue_slice();
@@ -1159,6 +1145,8 @@ netlist_mame_cpu_device::netlist_mame_cpu_device(const machine_config &mconfig, 
 	, device_disasm_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12) // Interface is needed to keep debugger happy
+	, m_icount(0)
+	, m_old(netlist::netlist_time_ext::zero())
 	, m_genPC(0)
 {
 }
@@ -1195,9 +1183,18 @@ private:
 
 void netlist_mame_cpu_device::device_start()
 {
-	netlist_mame_device::device_start();
+	LOGDEVCALLS("device_start entry\n");
 
-	// State support
+	device_start_common();
+	// FIXME: use save_helper
+	netlist().save(*this, m_rem, pstring(this->name()), "m_rem");
+	netlist().save(*this, m_div, pstring(this->name()), "m_div");
+	netlist().save(*this, m_old, pstring(this->name()), "m_old");
+
+	m_old = netlist::netlist_time_ext::zero();
+	m_rem = netlist::netlist_time_ext::zero();
+
+	save_state();
 
 	state_add(STATE_GENPC, "GENPC", m_genPC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_genPC).noshow();
@@ -1227,8 +1224,17 @@ void netlist_mame_cpu_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
+
+	LOGDEVCALLS("device_start exit\n");
 }
 
+void netlist_mame_cpu_device::device_clock_changed()
+{
+	m_div = static_cast<netlist::netlist_time_ext>(
+		(netlist::netlist_time_ext::resolution() << MDIV_SHIFT) / clock());
+	//printf("m_div %d\n", (int) m_div.as_raw());
+	netlist().log().debug("Setting clock {1} and divisor {2}\n", clock(), m_div.as_double());
+}
 
 void netlist_mame_cpu_device::nl_register_devices(netlist::nlparse_t &parser) const
 {
@@ -1299,11 +1305,14 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_sound_device::netlist_mame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: netlist_mame_device(mconfig, NETLIST_SOUND, tag, owner, clock)
+	: netlist_mame_device(mconfig, NETLIST_SOUND, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_in(nullptr)
 	, m_stream(nullptr)
-	, m_is_device_call(false)
+	, m_cur_time(attotime::zero)
+	, m_sound_clock(clock)
+	, m_attotime_per_clock(attotime::zero)
+	, m_last_update_to_current_time(attotime::zero)
 {
 }
 
@@ -1339,23 +1348,29 @@ void netlist_mame_sound_device::device_reset()
 
 void netlist_mame_sound_device::device_start()
 {
-	netlist_mame_device::device_start();
-
 	LOGDEVCALLS("sound device_start\n");
+
+	m_attotime_per_clock = attotime::from_hz(m_sound_clock);
+
+	save_item(NAME(m_cur_time));
+	save_item(NAME(m_attotime_per_clock));
+
+	device_start_common();
+	save_state();
+
+	m_cur_time = attotime::zero;
 
 	// Configure outputs
 
 	if (m_out.size() == 0)
 		fatalerror("No output devices");
 
-	//m_num_outputs = outdevs.size();
-
 	/* resort channels */
 	for (auto &outdev : m_out)
 	{
 		if (outdev.first < 0 || outdev.first >= m_out.size())
 			fatalerror("illegal channel number %d", outdev.first);
-		outdev.second->set_sample_time(netlist::netlist_time::from_hz(clock()));
+		outdev.second->set_sample_time(netlist::netlist_time::from_hz(m_sound_clock));
 		outdev.second->buffer_reset(netlist::netlist_time_ext::zero());
 	}
 
@@ -1371,13 +1386,15 @@ void netlist_mame_sound_device::device_start()
 	if (indevs.size() == 1)
 	{
 		m_in = indevs[0];
-		const auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(clocks_to_attotime(1)).as_raw()));
+		const auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(m_attotime_per_clock).as_raw()));
 		m_in->resolve_params(sample_time);
 	}
 
 	/* initialize the stream(s) */
 	m_is_device_call = false;
-	m_stream = &stream_alloc_ex(m_in ? m_in->num_channels() : 0, m_out.size(), clock());
+	m_stream = &stream_alloc_ex(m_in ? m_in->num_channels() : 0, m_out.size(), m_sound_clock);
+
+	LOGDEVCALLS("sound device_start exit\n");
 }
 
 
@@ -1394,41 +1411,28 @@ void netlist_mame_sound_device::register_stream_output(int channel, netlist_mame
 	m_out[channel] = so;
 }
 
-void netlist_mame_sound_device::device_clock_changed()
-{
-	netlist_mame_device::device_clock_changed();
-
-	for (auto &e : m_out)
-	{
-		e.second->set_sample_time(nltime_from_clocks(1));
-	}
-}
-
-static attotime last;
-
 void netlist_mame_sound_device::update_to_current_time()
 {
 	LOGDEBUG("before update\n");
-	m_is_device_call = true;
+
 	get_stream()->update();
-	m_is_device_call = false;
 
-	if (machine().time() < last)
-		LOGDEBUG("machine.time() decreased 2\n");
+	if (machine().time() < m_last_update_to_current_time)
+		LOGTIMING("machine.time() decreased 2\n");
 
-	last = machine().time();
+	m_last_update_to_current_time = machine().time();
 
 	const auto mtime = nltime_from_attotime(machine().time());
 	const auto cur(netlist().exec().time());
 
 	if (mtime > cur)
 	{
-		if ((mtime - cur) >= nltime_from_clocks(1))
-			LOGDEBUG("%f us\n", (mtime - cur).as_double() * 1000000.0);
+		//expected don't log
+		//LOGTIMING("%f us\n", (mtime - cur).as_double() * 1000000.0);
 		netlist().exec().process_queue(mtime - cur);
 	}
 	else if (mtime < cur)
-		LOGDEBUG("%s : %f ns before machine time\n", this->name(), (cur - mtime).as_double() * 1000000000.0);
+		LOGTIMING("%s : %f us before machine time\n", this->name(), (cur - mtime).as_double() * 1000000.0);
 }
 
 void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
@@ -1468,9 +1472,6 @@ void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std
 	// however, the sample value is the value at the START of that last sample,
 	// so subtract one sample period so that we only process up to the minimum
 	auto nl_target_time = nltime_from_attotime(outputs[0].end_time() - attotime(0, outputs[0].sample_period_attoseconds()));
-
-//	if (!m_is_device_call)
-//		nl_target_time -= netlist::netlist_time_ext::from_usec(2); // FIXME make adjustment a parameter
 
 	auto nltime(netlist().exec().time());
 	if (nltime < nl_target_time)

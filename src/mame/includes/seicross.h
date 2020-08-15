@@ -33,6 +33,7 @@ public:
 	void no_nvram(machine_config &config);
 	void friskytb(machine_config &config);
 	void nvram(machine_config &config);
+	void sectznt(machine_config &config);
 
 	void init_friskytb();
 

@@ -35,7 +35,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -60,8 +59,9 @@ protected:
 	{
 		uint8_t   TA;
 		uint8_t   TB;
-		uint8_t   busy;
+		bool      busy;
 	} m_ef9341;
+
 	struct
 	{
 		uint8_t   X;
@@ -69,11 +69,11 @@ protected:
 		uint8_t   Y0;
 		uint8_t   R;
 		uint8_t   M;
-		int     max_vpos;
 	} m_ef9340;
-	uint8_t   m_ef934x_ram_a[1024];
-	uint8_t   m_ef934x_ram_b[1024];
-	uint8_t   m_ef934x_ext_char_ram[2048];   /* The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB. */
+
+	uint8_t   m_ef934x_ram_a[0x400]; // A10 to GND
+	uint8_t   m_ef934x_ram_b[0x400]; // A10 to GND
+	uint8_t   m_ef934x_ext_char_ram[0x800]; // The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB.
 };
 
 

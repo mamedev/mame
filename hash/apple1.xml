@@ -2,6 +2,24 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+To load and run a tape:
+Some programs run from the monitor prompt, while Basic programs must be loaded in the monitor and run from Basic.
+Monitor programs:
+1. Type C100R, press <Enter>. This gives the prompt A9*.
+2. Now enter the load instructions as per the usage, e.g E000.EFFFR but don't press <Enter> yet.
+3. Start the tape via the Tab menu Tape Control (NOT by pressing F2), wait for the leader tone then press <Enter>.
+4. When it's finished you are back to the \ prompt.
+5. Enter the "enter at" information, press <Return> to run the program.
+
+Basic programs:
+1. You must already have loaded and run Basic. Do a soft reset (Scroll-Lock then F3) to get back to the monitor.
+2. Now enter the load instructions as per the usage, e.g 4A.00FFR300.FFFR but don't press <Enter> yet.
+3. Start the tape via the Tab menu Tape Control (NOT by pressing F2), wait for the leader tone then press <Enter>.
+4. When it's finished you are back to the \ prompt.
+5. Go back to Basic by typing E2B3R <Enter>
+6. Now you can LIST or RUN the program.
+
 -->
 
 <softwarelist name="apple1" description="Apple 1 cassettes">
