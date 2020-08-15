@@ -11,7 +11,14 @@
         * Revolution X
 
     Known bugs:
-        * none at this time
+        * POST test ends with "CUSTOM CHIP U76 BAD" message,
+          however this is caused by fully clipped blitter DMA request:
+             DMA command 8003: (bpp=0 skip=0 xflip=0 yflip=0 preskip=0 postskip=0)
+             offset=00000000 pos=(0,257) w=448 h=1 clip=(0,0)-(511,0)
+             palette=0505 color=0000 lskip=00 rskip=00 xstep=0100 ystep=0100 test=0000 config=0010
+          it is not clear if it's due to DMA emulation flaws (unemulated command bit 6 - clipping mode, 0=offset??? method),
+          or if some protection device may modify routine code in the RAM (unlikely).
+          set BP 20D31340 to see check routine (notice: 20D31550: MOVE   A14,@C08000E0h,0 have no effect because of FS0 selected).
 
 ***************************************************************************
 
@@ -338,7 +345,7 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "revx.54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
-	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, CRC(eb8a8649) SHA1(a1e1d0b7a5e9802e8f889eb7e719259656dc8133) )
+	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, BAD_DUMP CRC(eb8a8649) SHA1(a1e1d0b7a5e9802e8f889eb7e719259656dc8133) ) // garbage, useless
 
 	ROM_REGION( 0x1000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "revx.120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )
@@ -405,7 +412,7 @@ ROM_START( revxp5 )
 	ROM_LOAD32_BYTE( "revx_p5.54",  0x00003, 0x80000, CRC(fd684c31) SHA1(db3453792e4d9fc375297d030f0b3f9cc3cad925) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
-	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, CRC(eb8a8649) SHA1(a1e1d0b7a5e9802e8f889eb7e719259656dc8133) )
+	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, BAD_DUMP CRC(eb8a8649) SHA1(a1e1d0b7a5e9802e8f889eb7e719259656dc8133) ) // garbage, useless
 
 	ROM_REGION( 0x1000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "revx.120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )
