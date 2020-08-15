@@ -68,6 +68,10 @@ public:
 		: vsmile_base_state(mconfig, type, tag)
 		, m_ctrl(*this, "ctrl%u", 1U)
 		, m_dsw_region(*this, "REGION")
+		, m_redled(*this, "redled%u", 1U)
+		, m_yellowled(*this, "yellowled%u", 1U)
+		, m_blueled(*this, "blueled%u", 1U)
+		, m_greenled(*this, "greenled%u", 1U)
 	{ }
 
 	void vsmile(machine_config &config);
@@ -109,6 +113,11 @@ private:
 
 	required_device_array<vsmile_ctrl_port_device, 2> m_ctrl;
 	required_ioport m_dsw_region;
+
+	output_finder<2> m_redled;
+	output_finder<2> m_yellowled;
+	output_finder<2> m_blueled;
+	output_finder<2> m_greenled;
 
 	bool m_ctrl_rts[2];
 	bool m_ctrl_select[2];
