@@ -343,7 +343,7 @@ void upd7810_device::DIV_C()
 /* 48 40: 0100 1000 0100 0000 */
 void upd7810_device::SKIT_NMI()
 {
-	if (IRR & INTNMI)
+	if (IRR & INTNMI || m_nmi)
 		PSW |= SK;
 	IRR &= ~INTNMI;
 }
@@ -487,7 +487,7 @@ void upd7810_device::SKIT_SB()
 /* 48 60: 0100 1000 0110 0000 */
 void upd7810_device::SKNIT_NMI()
 {
-	if (0 == (IRR & INTNMI))
+	if (0 == (IRR & INTNMI) || !m_nmi)
 		PSW |= SK;
 	IRR &= ~INTNMI;
 }
