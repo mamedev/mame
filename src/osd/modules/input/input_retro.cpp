@@ -189,6 +189,8 @@ void Input_Binding(running_machine &machine)
    Buttons_mapping[5]=RETROPAD_R;
 
    if (
+         !core_stricmp(machine.system().name, "avengrgs")    ||
+         !core_stricmp(machine.system().parent, "avengrgs")  ||
          !core_stricmp(machine.system().name, "bloodwar")    ||
          !core_stricmp(machine.system().parent, "bloodwar")  ||
          !core_stricmp(machine.system().name, "daraku")    ||
