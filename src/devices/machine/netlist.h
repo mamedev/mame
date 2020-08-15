@@ -255,7 +255,6 @@ private:
 	attotime m_cur_time;
 	uint32_t m_sound_clock;
 	attotime m_attotime_per_clock;
-	bool m_is_device_call;
 	attotime m_last_update_to_current_time;
 };
 
