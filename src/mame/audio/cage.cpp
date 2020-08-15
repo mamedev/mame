@@ -163,6 +163,7 @@ void atari_cage_device::device_start()
 	save_item(NAME(m_timer_enabled));
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_control));
+	save_item(NAME(m_tms32031_io_regs));
 }
 
 
