@@ -59,7 +59,7 @@ PAL colours leave a lot to be desired
 The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 -->
 
-<softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
+<softwarelist name="odyssey2" description="Magnavox Odyssey 2 / Philips Videopac cartridges">
 
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
 
@@ -371,7 +371,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 	</software>
 
 	<software name="timelord">
-		<description>Attack of the Timelord! (USA)</description><!-- possibly also "Terrahawks (Euro)[Videopac 51]"? -->
+		<description>Attack of the Timelord! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9445"/>
