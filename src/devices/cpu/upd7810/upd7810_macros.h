@@ -79,10 +79,7 @@
 #define MKH     m_mkh
 #define ZCM     m_zcm
 
-#define CR0     m_cr0
-#define CR1     m_cr1
-#define CR2     m_cr2
-#define CR3     m_cr3
+#define CR      m_cr
 #define RXB     m_rxb
 #define TXB     m_txb
 
