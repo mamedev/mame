@@ -388,7 +388,7 @@ void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sa
 	throw emu_fatalerror("sound_stream_update called but not overridden by owning class");
 }
 
-void device_sound_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+void device_sound_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	throw emu_fatalerror("sound_stream_update_ex called but not overridden by owning class");
 }
@@ -486,7 +486,7 @@ void device_mixer_interface::interface_post_load()
 //  output
 //-------------------------------------------------
 
-void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the clear flags
 	std::fill(std::begin(m_output_clear), std::end(m_output_clear), false);

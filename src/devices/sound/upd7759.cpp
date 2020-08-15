@@ -712,7 +712,7 @@ READ_LINE_MEMBER( upd775x_device::busy_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd775x_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+void upd775x_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	constexpr stream_buffer::sample_t sample_scale = 128.0 / 32768.0;
 	stream_buffer::sample_t sample = stream_buffer::sample_t(m_sample) * sample_scale;

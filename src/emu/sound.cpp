@@ -442,7 +442,7 @@ indent += 2;
 				m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 
 		// if we have an extended callback, that's all we need
-		m_callback_ex(*this, m_input_view, m_output_view, end);
+		m_callback_ex(*this, m_input_view, m_output_view);
 indent -= 2;
 	}
 	g_profiler.stop();
@@ -603,7 +603,7 @@ void sound_stream::postload()
 //  traditional callback
 //-------------------------------------------------
 
-void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	// temporary buffer to hold stream_sample_t inputs and outputs
 	stream_sample_t temp_buffer[1024];
@@ -654,7 +654,7 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 //  rate of the output
 //-------------------------------------------------
 
-void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)
+void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	sound_assert(inputs.size() == 1);
 	sound_assert(outputs.size() == 1);
@@ -673,7 +673,7 @@ void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stre
 	// compute the stepping value and the inverse
 	float step = float(input.sample_rate()) / float(output.sample_rate());
 	float stepinv = 1.0f / step;
-printf("%*sresample: %d->%d; %d source samples available\n", indent, "", input.sample_rate(), output.sample_rate(), input.samples());
+//printf("%*sresample: %d->%d; %d source samples available\n", indent, "", input.sample_rate(), output.sample_rate(), input.samples());
 
 	// determine the latency we need to introduce, in input samples:
 	//    1 input sample for undersampled inputs

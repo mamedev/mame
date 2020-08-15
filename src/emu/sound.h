@@ -327,7 +327,7 @@ public:
 // ======================> stream_update_delegate/stream_update_ex_delegate
 
 using stream_update_delegate = delegate<void (sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)>;
-using stream_update_ex_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time)>;
+using stream_update_ex_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)>;
 
 
 // ======================> sound_stream
@@ -474,8 +474,8 @@ private:
 	void sample_rate_changed();
 	void postload();
 	void sync_update(void *, s32);
-	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time);
-	void resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs, attotime end_time);
+	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
+	void resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
 
 	// linking information
 	device_t &m_device;                            // owning device
