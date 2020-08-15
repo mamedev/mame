@@ -2843,6 +2843,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/seattle.cpp",
 	MAME_DIR .. "src/mame/drivers/sspeedr.cpp",
 	MAME_DIR .. "src/mame/includes/sspeedr.h",
+	MAME_DIR .. "src/mame/audio/nl_sspeedr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_sspeedr.h",
 	MAME_DIR .. "src/mame/video/sspeedr.cpp",
 	MAME_DIR .. "src/mame/drivers/starrider.cpp",
 	MAME_DIR .. "src/mame/drivers/tmaster.cpp",
