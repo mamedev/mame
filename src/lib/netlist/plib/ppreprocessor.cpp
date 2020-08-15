@@ -502,12 +502,16 @@ namespace plib {
 				else
 					m_elif |= (1 << m_if_level);
 			}
-			else if (lti[0] == "#else")
+			else if (lti[0] == "#else") // basically #elif (1)
 			{
 				if (!(m_if_seen & (1 << m_if_level)))
 					error("#else without #if");
-				m_if_flag ^= (1 << m_if_level);
-				m_elif &= ~(1 << m_if_level);
+
+				if (m_elif & (1 << m_if_level)) // elif disabled
+					m_if_flag |= (1 << m_if_level);
+				else
+					m_if_flag &= ~(1 << m_if_level);
+				m_elif |= (1 << m_if_level);
 			}
 			else if (lti[0] == "#elif")
 			{
@@ -516,7 +520,7 @@ namespace plib {
 
 				//if ((m_if_flag & (1 << m_if_level)) == 0)
 				//	m_if_flag ^= (1 << m_if_level);
-				if (m_elif & (1 << m_if_level))
+				if (m_elif & (1 << m_if_level)) // elif disabled
 					m_if_flag |= (1 << m_if_level);
 				else
 					m_if_flag &= ~(1 << m_if_level);
@@ -532,7 +536,7 @@ namespace plib {
 					if (val == 0)
 						m_if_flag |= (1 << m_if_level);
 					else
-						m_elif |= ~(1 << m_if_level);
+						m_elif |= (1 << m_if_level);
 				}
 			}
 			else if (lti[0] == "#endif")
