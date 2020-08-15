@@ -12,6 +12,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "machine/vic_pl192.h"
 #include "screen.h"
 
@@ -103,7 +104,7 @@ void iphone2g_spi_device::device_start()
 
 void iphone2g_spi_device::device_reset()
 {
-	cmd = ctrl= status = tx_data = 0;
+	cmd = ctrl = status = tx_data = 0;
 }
 
 DEFINE_DEVICE_TYPE(IPHONE2G_SPI, iphone2g_spi_device, "iphone2g_spi", "iPhone 2G SPI controller")
@@ -129,11 +130,10 @@ public:
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 
 	void map(address_map &map);
-	void timer_map(address_map &map);
 
 protected:
 	iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
+	
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -143,31 +143,42 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	static constexpr device_timer_id TIMER_TICK = 0;
+	static constexpr device_timer_id TIMER_SEND_IRQ = 0;
 
 	address_space_config m_mmio_config;
 
 	devcb_write_line m_out_irq_func;
-
-	struct timer
-	{
-		u16 config;
-		u8 state;
-		u32 count_buffer[2], count;
-	} timers[7];
-
-	u64 ticks;
+	
+	// helpers
+	void update_count();
+	
+	u16 config;
+	u8 state;
+	u32 count_buffer[2], count;
 };
 
 DECLARE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device)
 
 void iphone2g_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_out_irq_func(1);
+	if(config & 0x7000) m_out_irq_func(1);
+}
+
+void iphone2g_timer_device::update_count()
+{
+	count = count_buffer[0] & 0xffffff; //TODO: HACK
+	timer_set(attotime::from_ticks(count, 412'000'000), TIMER_SEND_IRQ);
 }
 
 void iphone2g_timer_device::map(address_map &map)
 {
+	map(0x00, 0x01).lrw16(NAME([this](offs_t offset){ return config; }), NAME([this](offs_t offset, u16 data){ config = data; })).umask32(0x0000ffff);
+	map(0x04, 0x04).lrw8(NAME([this](offs_t offset){ return state; }), NAME([this](offs_t offset, u16 data){
+	 	state = data & 1;
+	 	if(data & 2) update_count();
+	 })).umask32(0x000000ff);
+	map(0x08, 0x0b).lw32(NAME([this](offs_t offset, u32 data){ count_buffer[0] = data; }));
+	map(0x0c, 0x0f).lw32(NAME([this](offs_t offset, u32 data){ count_buffer[1] = data; }));
 }
 
 device_memory_interface::space_config_vector iphone2g_timer_device::memory_space_config() const
@@ -185,13 +196,18 @@ void iphone2g_timer_device::device_resolve_objects()
 
 void iphone2g_timer_device::device_start()
 {
+	save_item(NAME(config));
+	save_item(NAME(state));
+	save_item(NAME(count));
 }
 
 void iphone2g_timer_device::device_reset()
 {
+	count = 0;
+	state = 0;
 }
 
-DEFINE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device, "iphone2g_timer", "iPhone 2G timers")
+DEFINE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device, "iphone2g_timer", "iPhone 2G timer")
 
 iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -203,6 +219,105 @@ iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, devi
 
 iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: iphone2g_timer_device(mconfig, IPHONE2G_TIMER, tag, owner, clock)
+{
+}
+
+class iphone2g_timers_device : public device_t, public device_memory_interface
+{
+public:
+	iphone2g_timers_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
+
+	auto out_irq_cb() { return m_out_irq_func.bind(); }
+
+	void map(address_map &map);
+
+protected:
+	iphone2g_timers_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual space_config_vector memory_space_config() const override;
+
+private:
+	address_space_config m_mmio_config;
+
+	devcb_write_line m_out_irq_func;
+	required_device_array<iphone2g_timer_device, 7> m_timers;
+
+	u64 ticks;
+};
+
+DECLARE_DEVICE_TYPE(IPHONE2G_TIMERS, iphone2g_timers_device)
+
+void iphone2g_timers_device::map(address_map &map)
+{
+	map(0x00000, 0x00017).m(m_timers[0], FUNC(iphone2g_timer_device::map));
+	map(0x00020, 0x00037).m(m_timers[1], FUNC(iphone2g_timer_device::map));
+	map(0x00040, 0x00057).m(m_timers[2], FUNC(iphone2g_timer_device::map));
+	map(0x00060, 0x00077).m(m_timers[3], FUNC(iphone2g_timer_device::map));
+	map(0x000a0, 0x000b7).m(m_timers[4], FUNC(iphone2g_timer_device::map));
+	map(0x000c0, 0x000d7).m(m_timers[5], FUNC(iphone2g_timer_device::map));
+	map(0x000e0, 0x000f7).m(m_timers[6], FUNC(iphone2g_timer_device::map));
+	map(0x000f8, 0x000fb).lrw32(NAME([this](offs_t offset){ return 0xffffffff; }), NAME([this](offs_t offset, u32 data){ m_out_irq_func(0); }));
+}
+
+device_memory_interface::space_config_vector iphone2g_timers_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_mmio_config)
+	};
+}
+
+void iphone2g_timers_device::device_resolve_objects()
+{
+	// resolve callbacks
+	m_out_irq_func.resolve_safe();
+}
+
+void iphone2g_timers_device::device_start()
+{
+}
+
+void iphone2g_timers_device::device_reset()
+{
+}
+
+void iphone2g_timers_device::device_add_mconfig(machine_config &config)
+{
+	IPHONE2G_TIMER(config, m_timers[0], 0);
+	IPHONE2G_TIMER(config, m_timers[1], 0);
+	IPHONE2G_TIMER(config, m_timers[2], 0);
+	IPHONE2G_TIMER(config, m_timers[3], 0);
+	IPHONE2G_TIMER(config, m_timers[4], 0);
+	IPHONE2G_TIMER(config, m_timers[5], 0);
+	IPHONE2G_TIMER(config, m_timers[6], 0);
+	INPUT_MERGER_ANY_HIGH(config, "timerirq").output_handler().set([this](int state){ if(state) m_out_irq_func(1); });
+	m_timers[0]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_timers[1]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<1>));
+	m_timers[2]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<2>));
+	m_timers[3]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<3>));
+	m_timers[4]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<4>));
+	m_timers[5]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<5>));
+	m_timers[6]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<6>));
+}
+
+DEFINE_DEVICE_TYPE(IPHONE2G_TIMERS, iphone2g_timers_device, "iphone2g_timers", "iPhone 2G timers")
+
+iphone2g_timers_device::iphone2g_timers_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_mmio_config("mmio", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_out_irq_func(*this)
+	, m_timers(*this, {"timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6"})
+{
+}
+
+iphone2g_timers_device::iphone2g_timers_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: iphone2g_timers_device(mconfig, IPHONE2G_TIMERS, tag, owner, clock)
 {
 }
 
@@ -234,7 +349,7 @@ private:
 	required_device<vic_pl192_device> m_vic0;
 	required_device<vic_pl192_device> m_vic1;
 	required_device_array<iphone2g_spi_device, 3> m_spi;
-	required_device<iphone2g_timer_device> m_timers;
+	required_device<iphone2g_timers_device> m_timers;
 	optional_shared_ptr<uint32_t> m_ram;
 	required_region_ptr<uint32_t> m_bios;
 	required_device<screen_device> m_screen;
@@ -272,6 +387,7 @@ void iphone2g_state::mem_map(address_map &map)
 	map(0x3c500000, 0x3c500fff).r(FUNC(iphone2g_state::clock1_r)).nopw();
 	map(0x3ce00000, 0x3ce000ff).m(m_spi[1], FUNC(iphone2g_spi_device::map));
 	map(0x3d200000, 0x3d2000ff).m(m_spi[2], FUNC(iphone2g_spi_device::map));
+	map(0x3e200000, 0x3e21ffff).m(m_timers, FUNC(iphone2g_timers_device::map));
 }
 
 void iphone2g_state::machine_start()
@@ -302,7 +418,7 @@ void iphone2g_state::iphone2g(machine_config &config)
 	IPHONE2G_SPI(config, m_spi[2], XTAL(12'000'000));
 	m_spi[2]->out_irq_cb().set(m_vic0, FUNC(vic_pl192_device::irq_w<0x0b>));
 
-	IPHONE2G_TIMER(config, m_timers, XTAL(12'000'000));
+	IPHONE2G_TIMERS(config, m_timers, XTAL(12'000'000));
 	m_timers->out_irq_cb().set(m_vic0, FUNC(vic_pl192_device::irq_w<0x07>));
 
 	PL192_VIC(config, m_vic1);
