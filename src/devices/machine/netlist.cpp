@@ -1349,12 +1349,6 @@ void netlist_mame_sound_device::device_validity_check(validity_checker &valid) c
 	}
 }
 
-
-void netlist_mame_sound_device::device_reset()
-{
-	netlist_mame_device::device_reset();
-}
-
 void netlist_mame_sound_device::device_start()
 {
 	LOGDEVCALLS("sound device_start\n");

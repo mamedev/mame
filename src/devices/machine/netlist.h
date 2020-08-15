@@ -108,23 +108,6 @@ private:
 	bool m_device_reset_called;
 };
 
-// ----------------------------------------------------------------------------------------
-// netlist_mame_cpu_device
-// ----------------------------------------------------------------------------------------
-
-class netlist_disassembler : public util::disasm_interface
-{
-public:
-	netlist_disassembler(netlist_mame_cpu_device *dev);
-	virtual ~netlist_disassembler() = default;
-
-	virtual u32 opcode_alignment() const override;
-	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
-
-private:
-	netlist_mame_cpu_device *m_dev;
-};
-
 class netlist_mame_cpu_device : public netlist_mame_device,
 								public device_execute_interface,
 								public device_state_interface,
@@ -201,6 +184,23 @@ private:
 	netlist::netlist_time_ext    m_rem;
 	netlist::netlist_time_ext    m_old;
 	offs_t m_genPC;
+};
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_cpu_device
+// ----------------------------------------------------------------------------------------
+
+class netlist_disassembler : public util::disasm_interface
+{
+public:
+	netlist_disassembler(netlist_mame_cpu_device *dev);
+	virtual ~netlist_disassembler() = default;
+
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	netlist_mame_cpu_device *m_dev;
 };
 
 // ----------------------------------------------------------------------------------------
