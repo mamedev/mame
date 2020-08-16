@@ -35,7 +35,7 @@ ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag,
 
 ROM_START( ef9340_1 )
 	ROM_REGION( 0xA00, "ef9340_1", 0 )
-	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0A00, CRC(d557a7bf) SHA1(d100b0f6a0d5a2d540844bf362788659ed9a6eb4) )
+	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0a00, BAD_DUMP CRC(8de85988) SHA1(f8e3892234da6626eb4302e171179ada5a51fca8) ) // taken from datasheet
 ROM_END
 
 
@@ -230,7 +230,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 
 						if ( b >= 0xa0 )
 						{
-							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = bitswap<8>(m_ef9341.TA,0,1,2,3,4,5,6,7);
+							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = m_ef9341.TA;
 						}
 
 						// Increment slice number
@@ -297,7 +297,7 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 
 						if ( b >= 0xa0 )
 						{
-							m_ef9341.TA = bitswap<8>(m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ],0,1,2,3,4,5,6,7);
+							m_ef9341.TA = m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ];
 							m_ef9341.TB = 0;
 						}
 
@@ -450,9 +450,9 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 
 			for ( int i = 0; i < 8; i++ )
 			{
-				uint16_t d = blank ? 0 : (char_data & 0x80) ? fg : bg;
+				uint16_t d = blank ? 0 : (char_data & 1) ? fg : bg;
 				m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + x*8 + i ) = d | 8;
-				char_data <<= 1;
+				char_data >>= 1;
 			}
 		}
 	}
