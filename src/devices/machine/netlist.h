@@ -108,25 +108,6 @@ private:
 	bool m_device_reset_called;
 };
 
-// ----------------------------------------------------------------------------------------
-// netlist_mame_cpu_device
-// ----------------------------------------------------------------------------------------
-
-class netlist_mame_cpu_device;
-
-class netlist_disassembler : public util::disasm_interface
-{
-public:
-	netlist_disassembler(netlist_mame_cpu_device *dev);
-	virtual ~netlist_disassembler() = default;
-
-	virtual u32 opcode_alignment() const override;
-	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
-
-private:
-	netlist_mame_cpu_device *m_dev;
-};
-
 class netlist_mame_cpu_device : public netlist_mame_device,
 								public device_execute_interface,
 								public device_state_interface,
@@ -206,6 +187,23 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
+// netlist_mame_cpu_device
+// ----------------------------------------------------------------------------------------
+
+class netlist_disassembler : public util::disasm_interface
+{
+public:
+	netlist_disassembler(netlist_mame_cpu_device *dev);
+	virtual ~netlist_disassembler() = default;
+
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	netlist_mame_cpu_device *m_dev;
+};
+
+// ----------------------------------------------------------------------------------------
 // netlist_mame_sound_device
 // ----------------------------------------------------------------------------------------
 
@@ -233,26 +231,25 @@ public:
 	inline sound_stream *get_stream() { return m_stream; }
 	void update_to_current_time();
 
-
-	// device_sound_interface overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
-	virtual void device_validity_check(validity_checker &valid) const override;
-
 	void register_stream_output(int channel, netlist_mame_stream_output_device *so);
 
 protected:
+
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_sound_interface overrides
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	//virtual void device_reset() override;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
-	nld_sound_in *m_in;
+	std::map<std::size_t, nld_sound_in *> m_in;
 	std::vector<stream_buffer::sample_t> m_inbuffer;
-	std::vector<stream_buffer::sample_t *> m_inbuffer_ptrs;
+	std::vector<stream_buffer::sample_t *> m_inbuffer_ptr;
 	sound_stream *m_stream;
 	attotime m_cur_time;
 	uint32_t m_sound_clock;

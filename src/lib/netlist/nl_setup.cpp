@@ -1731,10 +1731,8 @@ source_file_t::stream_ptr source_pattern_t::stream(const pstring &name)
 {
 	pstring filename = plib::pfmt(m_pattern)(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
-	printf("checking <%s> %s\n", name.c_str(), filename.c_str());
 	if (f->is_open())
 	{
-		printf("found\n");
 		return stream_ptr(std::move(f), filename);
 	}
 	else

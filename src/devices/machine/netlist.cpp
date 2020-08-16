@@ -333,7 +333,7 @@ netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const ps
 // sound_in
 // ----------------------------------------------------------------------------------------
 
-using sound_in_type = netlist::interface::NETLIB_NAME(buffered_param_setter)<stream_buffer::sample_t, 16>;
+using sound_in_type = netlist::interface::NETLIB_NAME(buffered_param_setter)<stream_sample_t *>;
 
 class NETLIB_NAME(sound_in) : public sound_in_type
 {
@@ -750,15 +750,13 @@ void netlist_mame_stream_input_device::device_start()
 
 void netlist_mame_stream_input_device::custom_netlist_additions(netlist::nlparse_t &parser)
 {
-	if (!parser.device_exists("STREAM_INPUT"))
-		parser.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
+	pstring name = plib::pfmt("STREAM_INPUT_{}")(m_channel);
+	parser.register_dev("NETDEV_SOUND_IN", name);
 
-	pstring sparam = plib::pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
-	parser.register_param(sparam, pstring(m_param_name));
-	sparam = plib::pfmt("STREAM_INPUT.MULT{1}")(m_channel);
-	parser.register_param_val(sparam, m_mult);
-	sparam = plib::pfmt("STREAM_INPUT.OFFSET{1}")(m_channel);
-	parser.register_param_val(sparam, m_offset);
+	parser.register_param(name + ".CHAN", pstring(m_param_name));
+	parser.register_param_val(name + ".MULT", m_mult);
+	parser.register_param_val(name + ".OFFSET", m_offset);
+	parser.register_param_val(name + ".ID", m_channel);
 }
 
 
@@ -1307,7 +1305,6 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 netlist_mame_sound_device::netlist_mame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: netlist_mame_device(mconfig, NETLIST_SOUND, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
-	, m_in(nullptr)
 	, m_stream(nullptr)
 	, m_cur_time(attotime::zero)
 	, m_sound_clock(clock)
@@ -1322,7 +1319,7 @@ void netlist_mame_sound_device::device_validity_check(validity_checker &valid) c
 	auto lnetlist = base_validity_check(valid);
 	if (lnetlist)
 	{
-		/*Ok - do some more checks */
+		/* Ok - do some more checks */
 		if (m_out.size() == 0)
 			osd_printf_error("No output devices\n");
 		else
@@ -1330,20 +1327,16 @@ void netlist_mame_sound_device::device_validity_check(validity_checker &valid) c
 			for (auto &outdev : m_out)
 			{
 				if (outdev.first < 0 || outdev.first >= m_out.size())
-					osd_printf_error("illegal channel number %d\n", outdev.first);
+					osd_printf_error("illegal output channel number %d\n", outdev.first);
 			}
 		}
 		std::vector<nld_sound_in *> indevs = lnetlist->get_device_list<nld_sound_in>();
-		if (indevs.size() > 1)
-			osd_printf_error("A maximum of one input device is allowed but found %d!\n", (int)indevs.size());
+		for (auto &e : indevs)
+		{
+			if (e->id() >= indevs.size())
+				osd_printf_error("illegal input channel number %d\n", e->id());
+		}
 	}
-
-}
-
-
-void netlist_mame_sound_device::device_reset()
-{
-	netlist_mame_device::device_reset();
 }
 
 void netlist_mame_sound_device::device_start()
@@ -1369,30 +1362,30 @@ void netlist_mame_sound_device::device_start()
 	for (auto &outdev : m_out)
 	{
 		if (outdev.first < 0 || outdev.first >= m_out.size())
-			fatalerror("illegal channel number %d", outdev.first);
+			fatalerror("illegal output channel number %d", outdev.first);
 		outdev.second->set_sample_time(netlist::netlist_time::from_hz(m_sound_clock));
 		outdev.second->buffer_reset(netlist::netlist_time_ext::zero());
 	}
 
 	// Configure inputs
-	// FIXME: The limitation to one input device seems artificial.
-	//        We should allow multiple devices with one channel each.
 
-	m_in = nullptr;
+	m_in.clear();
 
 	std::vector<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
-	if (indevs.size() > 1)
-		fatalerror("A maximum of one input device is allowed!");
-	if (indevs.size() == 1)
+	for (auto &e : indevs)
 	{
-		m_in = indevs[0];
+		m_in.emplace(e->id(), e);
 		const auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(m_attotime_per_clock).as_raw()));
-		m_in->resolve_params(sample_time);
+		e->resolve_params(sample_time);
 	}
-
+	for (auto &e : m_in)
+	{
+		if (e.first < 0 || e.first >= m_in.size())
+			fatalerror("illegal input channel number %d", e.first);
+	}
 	/* initialize the stream(s) */
 	m_is_device_call = false;
-	m_stream = &stream_alloc_ex(m_in ? m_in->num_channels() : 0, m_out.size(), m_sound_clock);
+	m_stream = &stream_alloc_ex(m_in.size, m_out.size(), m_sound_clock);
 
 	LOGDEVCALLS("sound device_start exit\n");
 }
@@ -1463,6 +1456,18 @@ void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std
 		attotime sample_period = attotime(0, inputs[0].sample_period_attoseconds());
 		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(sample_period).as_raw()));
 		m_in->buffer_reset(sample_time, samples, &m_inbuffer_ptrs[0]);
+/*
+	const auto mtime = machine().time();
+	if (mtime < m_last_update_to_current_time)
+		LOGTIMING("machine.time() decreased 1\n");
+	m_last_update_to_current_time = mtime;
+	LOGDEBUG("samples %d\n", samples);
+
+	for (auto &e : m_in)
+	{
+		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(m_attotime_per_clock).as_raw()));
+		e.second->buffer_reset(sample_time, samples, &inputs[e.first]);
+*/
 	}
 
 	int samples = outputs[0].samples();
