@@ -30,6 +30,9 @@
 #define PROM_74S287_DIP(name)                                                  \
 		NET_REGISTER_DEV(PROM_74S287_DIP, name)
 
+#define PROM_MK28000_DIP(name)                                                 \
+		NET_REGISTER_DEV(PROM_MK28000_DIP, name)
+
 #define EPROM_2716_DIP(name)                                                   \
 		NET_REGISTER_DEV(EPROM_2716_DIP, name)
 

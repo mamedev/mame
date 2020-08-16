@@ -418,6 +418,9 @@
 #define TTL_9316_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_9316_DIP, name)
 
+#define TTL_9321_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_9321_DIP, name)
+
 #define TTL_9322_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_9322_DIP, name)
 

@@ -1138,6 +1138,8 @@ files {
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.h",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
+	MAME_DIR .. "src/mame/machine/nl_tank.cpp",
+	MAME_DIR .. "src/mame/machine/nl_tank.h",
 	MAME_DIR .. "src/mame/drivers/atetris.cpp",
 	MAME_DIR .. "src/mame/includes/atetris.h",
 	MAME_DIR .. "src/mame/video/atetris.cpp",
