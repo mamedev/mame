@@ -92,7 +92,7 @@ a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
-	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rombank(0)
+	m_scsibus(*this, SCSI_BUS_TAG), m_rom(*this, SCSI_ROM_REGION), m_rombank(0)
 {
 }
 
@@ -107,8 +107,6 @@ a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, const 
 
 void a2bus_cmsscsi_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(SCSI_ROM_REGION).c_str())->base();
-
 	memset(m_ram, 0, 2048);
 
 	save_item(NAME(m_ram));

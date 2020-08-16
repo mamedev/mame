@@ -13121,14 +13121,15 @@ license:CC0
 	</software>
 
 	<software name="rotd">
-		<description>Rise of the Dragon</description>
+		<description>Rise of the Dragon (3.5")</description>
 		<year>1990</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="434e737c" sha1="bccd718c8c2a3a26c1f8624e7f85b7eec7648b91"/>
+				<!-- has a deleted configuration file -->
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="434e737c" sha1="bccd718c8c2a3a26c1f8624e7f85b7eec7648b91" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -13154,6 +13155,48 @@ license:CC0
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="2fcf9807" sha1="33d1c3803fdaf451cfce89df63c844adf02c2c08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rotd525" cloneof="rotd">
+		<description>Rise of the Dragon (5.25")</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk1.img" size="1228800" crc="f477ffe2" sha1="c23e8979ccbf883a9f95692df0cf798c2d0fdbd4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk2.img" size="1228800" crc="5e323c4b" sha1="b06751ad2c29e4c5f2b866a328c0c0f14513bc96"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk3.img" size="1228800" crc="76ae2ac5" sha1="c3f8bb7cd7c79b5cba933be89a0b620e24ea4946"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk4.img" size="1228800" crc="e239ce0d" sha1="0e1bd087da699a70c37905a51b8efc28bcbb2cc8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk5.img" size="1228800" crc="d9a5a5b3" sha1="012f6c1751dff63189fc68fc271a739ed99006a8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk6.img" size="1228800" crc="4fde8b01" sha1="ee80c6097620326f87402e7a341a1d87c63b733a"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk7.img" size="1228800" crc="dc023701" sha1="7bf8ab14b4c000598ed77f3eb3d465c9ca4f405e"/>
 			</dataarea>
 		</part>
 	</software>
