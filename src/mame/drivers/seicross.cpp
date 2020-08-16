@@ -1,34 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
-Seicross memory map (preliminary)
 driver by Nicola Salmoria
+
+Seicross memory map (preliminary)
+
 0000-77ff ROM
 7800-7fff RAM
 9000-93ff videoram
 9c00-9fff colorram
+
 Read:
 A000      Joystick + Players start button
 A800      player #2 controls + coin + ?
 B000      test switches
 B800      watchdog reset
+
 Write:
 8820-887f Sprite ram
 9800-981f Scroll control
 9880-989f ? (always 0?)
+
 I/O ports:
 0         8910 control
 1         8910 write
 4         8910 read
+
 There is a microcontroller on the board. Nichibutsu custom part marked
 NSC81050-102  8127 E37 and labeled No. 00363.  It's a 40-pin IC at location 4F
 on the (Seicross-) board. Looks like it is linked to the dips (and those are
 on a very small daughterboard).
+
 Differences in new/old version of Frisky Tom
 - The lady wears bikini in new version
 - Game config is backed up by 4.5v battery in old version
 - Old version uses larger board
+
 This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
+
 ***************************************************************************/
 
 #include "emu.h"

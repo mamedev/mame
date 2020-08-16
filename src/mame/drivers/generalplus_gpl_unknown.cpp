@@ -24,10 +24,11 @@ this is logical for unSP2.0 based devices as the CS area typically starts at 0x2
 
 #include "emu.h"
 
-#include "screen.h"
-#include "emupal.h"
-#include "speaker.h"
 #include "cpu/unsp/unsp.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pcp8718_state : public driver_device
