@@ -91,7 +91,7 @@ void pc_lpt_device::data_w(uint8_t data)
 
 uint8_t pc_lpt_device::status_r()
 {
-	return m_cent_status_in->read() ^ STATUS_BUSY;
+	return m_cent_status_in->read() ^ (STATUS_BUSY | STATUS_ACK) ;
 }
 
 uint8_t pc_lpt_device::control_r()
