@@ -48,9 +48,9 @@ protected:
 
 	required_device<ncr5380n_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;
+	required_region_ptr<u8> m_rom;
 
 private:
-	uint8_t *m_rom;
 	uint8_t m_ram[8192];  // 8 banks of 1024 bytes
 	int m_rambank, m_rombank;
 	uint8_t m_drq;

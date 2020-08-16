@@ -48,9 +48,9 @@ protected:
 
 	required_device<ncr5380n_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;
+	required_region_ptr<u8> m_rom;
 
 private:
-	uint8_t *m_rom;
 	uint8_t m_ram[2048];    // 2K SRAM chip on the card, only 128 bytes are used?
 	int m_rombank;
 };
