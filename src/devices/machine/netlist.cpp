@@ -333,7 +333,7 @@ netlist_data_memregions_t::stream_ptr netlist_data_memregions_t::stream(const ps
 // sound_in
 // ----------------------------------------------------------------------------------------
 
-using sound_in_type = netlist::interface::NETLIB_NAME(buffered_param_setter)<stream_sample_t *>;
+using sound_in_type = netlist::interface::NETLIB_NAME(buffered_param_setter)<netlist_mame_sound_input_buffer>;
 
 class NETLIB_NAME(sound_in) : public sound_in_type
 {
@@ -1383,9 +1383,10 @@ void netlist_mame_sound_device::device_start()
 		if (e.first < 0 || e.first >= m_in.size())
 			fatalerror("illegal input channel number %d", e.first);
 	}
+	m_inbuffer.resize(m_in.size());
+
 	/* initialize the stream(s) */
-	m_is_device_call = false;
-	m_stream = &stream_alloc_ex(m_in.size, m_out.size(), m_sound_clock);
+	m_stream = &stream_alloc_ex(m_in.size(), m_out.size(), m_sound_clock, RESAMPLER_NONE);
 
 	LOGDEVCALLS("sound device_start exit\n");
 }
@@ -1430,48 +1431,16 @@ void netlist_mame_sound_device::update_to_current_time()
 
 void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
-	if (m_in)
-	{
-		// fatal error for now; eventually we need multiple input buffers
-		// so that each can have their own sample rate
-		for (int inputnum = 1; inputnum < inputs.size(); inputnum++)
-			if (inputs[inputnum].sample_rate() != inputs[0].sample_rate())
-				fatalerror("Mismatched input sample rates!");
-
-		int samples = inputs[0].samples();
-		int newsize = samples * inputs.size();
-		m_inbuffer.resize(newsize);
-		m_inbuffer_ptrs.resize(inputs.size());
-
-		int bufindex = 0;
-		for (int inputnum = 0; inputnum < inputs.size(); inputnum++)
-		{
-			auto &input = inputs[inputnum];
-
-			m_inbuffer_ptrs[inputnum] = &m_inbuffer[bufindex];
-			for (int sampindex = 0; sampindex < samples; sampindex++)
-				m_inbuffer[bufindex++] = input.get(sampindex);
-		}
-
-		attotime sample_period = attotime(0, inputs[0].sample_period_attoseconds());
-		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(sample_period).as_raw()));
-		m_in->buffer_reset(sample_time, samples, &m_inbuffer_ptrs[0]);
-/*
-	const auto mtime = machine().time();
-	if (mtime < m_last_update_to_current_time)
-		LOGTIMING("machine.time() decreased 1\n");
-	m_last_update_to_current_time = mtime;
-	LOGDEBUG("samples %d\n", samples);
-
 	for (auto &e : m_in)
 	{
-		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(m_attotime_per_clock).as_raw()));
-		e.second->buffer_reset(sample_time, samples, &inputs[e.first]);
-*/
+		auto clock_period = attotime(0, inputs[e.first].sample_period_attoseconds());
+		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(clock_period).as_raw()));
+		m_inbuffer[e.first] = netlist_mame_sound_input_buffer(inputs[e.first]);
+		e.second->buffer_reset(sample_time, m_inbuffer[e.first].samples(), &m_inbuffer[e.first]);
 	}
 
 	int samples = outputs[0].samples();
-	LOGDEBUG("samples %d %d\n", (int) m_is_device_call, samples);
+	LOGDEBUG("samples %d\n", samples);
 
 	// end_time() is the time at the END of the last sample we're generating
 	// however, the sample value is the value at the START of that last sample,

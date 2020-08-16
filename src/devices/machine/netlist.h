@@ -204,6 +204,22 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
+// netlist_mame_sound_input_buffer
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_sound_input_buffer : public read_stream_view
+{
+public:
+	netlist_mame_sound_input_buffer() :
+		read_stream_view() { }
+
+	netlist_mame_sound_input_buffer(read_stream_view &src) :
+		read_stream_view(src) { }
+
+	stream_buffer::sample_t operator[](std::size_t index) { return get(index); }
+};
+
+// ----------------------------------------------------------------------------------------
 // netlist_mame_sound_device
 // ----------------------------------------------------------------------------------------
 
@@ -248,8 +264,7 @@ protected:
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
 	std::map<std::size_t, nld_sound_in *> m_in;
-	std::vector<stream_buffer::sample_t> m_inbuffer;
-	std::vector<stream_buffer::sample_t *> m_inbuffer_ptr;
+	std::vector<netlist_mame_sound_input_buffer> m_inbuffer;
 	sound_stream *m_stream;
 	attotime m_cur_time;
 	uint32_t m_sound_clock;
