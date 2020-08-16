@@ -9265,6 +9265,54 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bchess4k">
+		<description>Battle Chess 4000</description>
+		<year>1992</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Interplay" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Startup Disk].img" size="1474560" crc="4459e4be" sha1="64d4cbd12a1e9f1ab7cb924a6a72885127fc2199"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 1 of 7].img" size="1474560" crc="6f3ff014" sha1="2b76b901ee55a153d78a2b0e00a62d8dc634676d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 2 of 7].img" size="1474560" crc="b1d2fe82" sha1="3869c0d5fd8f67bc5ebf0729fda6030204a1dc33"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 3 of 7].img" size="1474560" crc="114f15d8" sha1="07522fca5afe22a863d24443c418a2186d368cf0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 4 of 7].img" size="1474560" crc="e54cc2ce" sha1="94f18ce53853784094f5d53bf2e427a5bc37899b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 5 of 7].img" size="1474560" crc="8a8fbde2" sha1="44ee2e4160bbac6a69b361d963670f6d3754c916"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 6 of 7].img" size="1474560" crc="10fed963" sha1="e87fc11274cc28af8bc7a0376fb6e0775d04c020"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 7 of 7].img" size="1474560" crc="b1649f1b" sha1="e84cdf93446c3695357502482875e6265309af1f"/>
+			</dataarea>
+		</part>
+	</software>	
+
 	<software name="steelsky">
 		<description>Beneath a Steel Sky (Euro)</description>
 		<year>1994</year>
@@ -13164,6 +13212,7 @@ license:CC0
 		<year>1990</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
+			<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="disk1.img" size="1228800" crc="f477ffe2" sha1="c23e8979ccbf883a9f95692df0cf798c2d0fdbd4"/>
@@ -14148,12 +14197,34 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="ufoeu">
-		<description>UFO - Enemy Unknown</description>
+		<description>UFO - Enemy Unknown (Euro)</description>
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<!-- mpscopy.exe file version: MicroProse Software Unpacker - by Brian Reynolds - Version 1.07 - Lib 4.02 -->
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Euro) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="40995e21" sha1="2ddd9337d9cec4ae53777c26832b34bb2bbc3fd6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Euro) [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="a6b9f216" sha1="d37bc1db505bff0894f34c921f602fadf75cd425"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Euro) [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="4fd5b5ec" sha1="3ff806afdfc1af6f7f5d3d8d61250895c4f17be3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufoeua" cloneof="ufoeu">
+		<description>UFO - Enemy Unknown (Euro)(alt)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- mpscopy.exe file version: MicroProse Software Unpacker - F-15 Strike Eagle 3 - Version 1.08 - Lib 4.02 -->
 			<dataarea name="flop" size = "1474560">
 				<rom name="UFO - Enemy Unknown (Europe) (Disk 1).img" size="1474560" crc="5eaa25eb" sha1="fc40d21299238bfad9e5884f58507d7237c44517"/>
 			</dataarea>
@@ -14187,6 +14258,27 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="bb4c55f2" sha1="fea81ce17b795d33c004ae8fee26b66227a9f6ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xcomufod" cloneof="ufoeu">
+		<description>X-COM - UFO Defense (USA)</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Xcom Ufo Defense (USA) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="286b3afa" sha1="937264378c4766dcb8c6fc0ccbc607a8fe334f39"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Xcom Ufo Defense (USA) [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="8b4d94e9" sha1="a15b733b48f787d26851338d989fe30b5a87c46c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Xcom Ufo Defense (USA) [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="def6ee35" sha1="83873634bd12db244b7533f594be52cfc59df8f2"/>
 			</dataarea>
 		</part>
 	</software>
