@@ -10190,7 +10190,7 @@ static void nl_gcr_450d2a81bd0b282c_36_double_double(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// tank
+// gamemachine
 static void nl_gcr_491f95430bfdfd05_19_double_double(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -24030,7 +24030,7 @@ static void nl_gcr_7aee4423e3fdbfda_128_double_double(double * __restrict V, con
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// rebound
+// cheekyms
 static void nl_gcr_7c86a9bc1c6aef4c_7_double_double(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -59195,7 +59195,7 @@ const plib::dynlib_static_sym nl_static_solver_syms[] = {
 	{"nl_gcr_43f7ff9bc651cc7a_198_double_double", reinterpret_cast<void *>(&nl_gcr_43f7ff9bc651cc7a_198_double_double)},
 // tank
 	{"nl_gcr_450d2a81bd0b282c_36_double_double", reinterpret_cast<void *>(&nl_gcr_450d2a81bd0b282c_36_double_double)},
-// tank
+// gamemachine
 	{"nl_gcr_491f95430bfdfd05_19_double_double", reinterpret_cast<void *>(&nl_gcr_491f95430bfdfd05_19_double_double)},
 // ripoff
 	{"nl_gcr_4b5ecfbb8f9fa97b_29_double_double", reinterpret_cast<void *>(&nl_gcr_4b5ecfbb8f9fa97b_29_double_double)},
@@ -59269,7 +59269,7 @@ const plib::dynlib_static_sym nl_static_solver_syms[] = {
 	{"nl_gcr_7a42b97d838ca073_7_double_double", reinterpret_cast<void *>(&nl_gcr_7a42b97d838ca073_7_double_double)},
 // fireone
 	{"nl_gcr_7aee4423e3fdbfda_128_double_double", reinterpret_cast<void *>(&nl_gcr_7aee4423e3fdbfda_128_double_double)},
-// rebound
+// cheekyms
 	{"nl_gcr_7c86a9bc1c6aef4c_7_double_double", reinterpret_cast<void *>(&nl_gcr_7c86a9bc1c6aef4c_7_double_double)},
 // solarq
 	{"nl_gcr_7caaa135bff3d9f3_15_double_double", reinterpret_cast<void *>(&nl_gcr_7caaa135bff3d9f3_15_double_double)},
