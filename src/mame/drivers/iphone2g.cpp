@@ -295,8 +295,14 @@ void iphone2g_timers_device::device_add_mconfig(machine_config &config)
 	for(int i = 0; i < 6; i++)
 	{
 		IPHONE2G_TIMER(config, m_timers[i], 0);
-		m_timers[i]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<i>));
 	}
+	m_timers[0]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_timers[1]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<1>));
+	m_timers[2]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<2>));
+	m_timers[3]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<3>));
+	m_timers[4]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<4>));
+	m_timers[5]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<5>));
+	m_timers[6]->out_irq_cb().set("timerirq", FUNC(input_merger_any_high_device::in_w<6>));
 }
 
 DEFINE_DEVICE_TYPE(IPHONE2G_TIMERS, iphone2g_timers_device, "iphone2g_timers", "iPhone 2G timers")
