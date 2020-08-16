@@ -30050,6 +30050,7 @@ mrdoy                           // 8201 (c) 1982
 mrdu                            // bootleg
 mrlo                            // bootleg
 mrdofabr                        // bootleg (Fabremar)
+mrdobl                          // bootleg
 yankeedo                        // bootleg
 
 @source:mrflea.cpp
