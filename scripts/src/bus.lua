@@ -2388,6 +2388,8 @@ if (BUSES["A2GAMEIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2gameio/joyport.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/paddles.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/paddles.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/gizmo.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/gizmo.h",
 	}
 end
 
