@@ -34,15 +34,18 @@ XTAL notes (differs per model):
 
 TODO:
 - verify odyssey3 cpu/video clocks
+- odyssey sets 210 line mode in plus graphics, which cuts off the bottom part
+  of the screen
 - backgamm doesn't draw all the sprites, what causes it? It doesn't seem like
   it's a 824x bug since it does properly write data in the partial screen updates
-- 824x screen resolution is not strictly defined
-- 824x on the real console, overlapping characters on eachother will cause glitches
-  (it is used to an advantage in some as-of-yet undumped homebrews)
+- 824x screen resolution is not strictly defined, height(243) is correct, but
+  horizontal overscan differs depending on monitor/tv?
+- 824x on the real console, overlapping characters on eachother will cause
+  glitches (it is used to an advantage in some as-of-yet undumped homebrews)
 - 8244(NTSC) is not supposed to show characters near the upper border, but
   hiding them will cause bugs in some Euro games
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
-  be correct(see backgamm)
+  be correct
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is it due to PAL video timing? The game does mid-scanline updates
 - g7400 probably has different video timing too (not same as g7000)
@@ -92,8 +95,8 @@ protected:
 	required_device<o2_cart_slot_device> m_cart;
 
 	uint8_t m_ram[0x80];
-	uint8_t m_p1;
-	uint8_t m_p2;
+	uint8_t m_p1 = 0xff;
+	uint8_t m_p2 = 0xff;
 
 	DECLARE_READ_LINE_MEMBER(t1_read);
 	void odyssey2_palette(palette_device &palette) const;
@@ -102,16 +105,6 @@ protected:
 	void odyssey2_mem(address_map &map);
 
 	virtual void machine_start() override;
-
-	/* constants */
-	static const uint8_t P1_BANK_LO_BIT          = 0x01;
-	static const uint8_t P1_BANK_HI_BIT          = 0x02;
-	static const uint8_t P1_KEYBOARD_SCAN_ENABLE = 0x04; /* active low */
-	static const uint8_t P1_VDC_ENABLE           = 0x08; /* active low */
-	static const uint8_t P1_EXT_RAM_ENABLE       = 0x10; /* active low */
-	static const uint8_t P1_VPP_ENABLE           = 0x20; /* active low */
-	static const uint8_t P1_VDC_COPY_MODE_ENABLE = 0x40;
-	static const uint8_t P2_KEYBOARD_SELECT_MASK = 0x07; /* select row to scan */
 
 	required_ioport_array<8> m_keyboard;
 	required_ioport_array<2> m_joysticks;
@@ -141,25 +134,25 @@ public:
 	void g7400(machine_config &config);
 	void odyssey3(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
 	void p2_write(uint8_t data);
+	uint8_t io_vpp(offs_t offset, uint8_t data);
 	uint8_t io_read(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
-	void i8243_p4_w(uint8_t data);
-	void i8243_p5_w(uint8_t data);
-	void i8243_p6_w(uint8_t data);
-	void i8243_p7_w(uint8_t data);
+	template<int P> void i8243_port_w(uint8_t data);
 
 	void g7400_io(address_map &map);
 
-	uint8_t m_ic674_decode[8];
-	uint8_t m_ic678_decode[8];
+	uint8_t m_mix_in = 0xff;
+	uint8_t m_mix_out = 0xff;
 };
 
 
@@ -251,20 +244,20 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("JOY.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)         PORT_PLAYER(2)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)     PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)   PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)   PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)         PORT_PLAYER(2)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("JOY.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)   PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)         PORT_PLAYER(1)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)     PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT)  PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)   PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)   PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)         PORT_PLAYER(1)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, odyssey2_state, reset_button, 0)
@@ -354,22 +347,22 @@ constexpr rgb_t odyssey2_colors[] =
 {
 	// Background,Grid Dim
 	{ 0x00, 0x00, 0x00 },   /* Black */                                         // i r g b
-	{ 0x1a, 0x37, 0xbe },   /* Blue           - Calibrated To Real VideoPac */  // i r g B
-	{ 0x00, 0x6d, 0x07 },   /* Green          - Calibrated To Real VideoPac */  // i r G b
-	{ 0x2a, 0xaa, 0xbe },   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
 	{ 0x79, 0x00, 0x00 },   /* Red            - Calibrated To Real VideoPac */  // i R g b
-	{ 0x94, 0x30, 0x9f },   /* Violet         - Calibrated To Real VideoPac */  // i R g B
+	{ 0x00, 0x6d, 0x07 },   /* Green          - Calibrated To Real VideoPac */  // i r G b
 	{ 0x77, 0x67, 0x0b },   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
+	{ 0x1a, 0x37, 0xbe },   /* Blue           - Calibrated To Real VideoPac */  // i r g B
+	{ 0x94, 0x30, 0x9f },   /* Violet         - Calibrated To Real VideoPac */  // i R g B
+	{ 0x2a, 0xaa, 0xbe },   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
 	{ 0xce, 0xce, 0xce },   /* Lt Grey */                                       // i R G B
 
 	// Background,Grid Bright
 	{ 0x67, 0x67, 0x67 },   /* Grey           - Calibrated To Real VideoPac */  // I R g B
-	{ 0x5c, 0x80, 0xf6 },   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
-	{ 0x56, 0xc4, 0x69 },   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
-	{ 0x77, 0xe6, 0xeb },   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
 	{ 0xc7, 0x51, 0x51 },   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b
-	{ 0xdc, 0x84, 0xe8 },   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
+	{ 0x56, 0xc4, 0x69 },   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
 	{ 0xc6, 0xb8, 0x6a },   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
+	{ 0x5c, 0x80, 0xf6 },   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
+	{ 0xdc, 0x84, 0xe8 },   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
+	{ 0x77, 0xe6, 0xeb },   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
 	{ 0xff, 0xff, 0xff }    /* White */                                         // I R G B
 };
 
@@ -394,11 +387,8 @@ void g7400_state::machine_start()
 {
 	odyssey2_state::machine_start();
 
-	memset(m_ic674_decode, 0, sizeof(m_ic674_decode));
-	memset(m_ic678_decode, 0, sizeof(m_ic678_decode));
-
-	save_item(NAME(m_ic674_decode));
-	save_item(NAME(m_ic678_decode));
+	save_item(NAME(m_mix_in));
+	save_item(NAME(m_mix_out));
 }
 
 
@@ -407,10 +397,10 @@ void g7400_state::machine_start()
 uint8_t odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
-	if (!(m_p1 & P1_EXT_RAM_ENABLE) && ~offset & 0x80)
+	if (!(m_p1 & 0x10) && ~offset & 0x80)
 		data &= m_ram[offset];
 
-	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
+	if ((m_p1 & 0x48) == 0)
 		data &= m_i8244->read(offset);
 
 	return data;
@@ -419,23 +409,21 @@ uint8_t odyssey2_state::io_read(offs_t offset)
 
 void odyssey2_state::io_write(offs_t offset, uint8_t data)
 {
-	if (!(m_p1 & P1_VDC_COPY_MODE_ENABLE))
+	if (!(m_p1 & 0x40))
 	{
 		m_cart->io_write(offset, data);
-		if (!(m_p1 & P1_EXT_RAM_ENABLE) && ~offset & 0x80)
+		if (!(m_p1 & 0x10) && ~offset & 0x80)
 			m_ram[offset] = data;
 	}
 
-	if (!(m_p1 & P1_VDC_ENABLE))
+	if (!(m_p1 & 0x08))
 		m_i8244->write(offset, data);
 }
 
 
-uint8_t g7400_state::io_read(offs_t offset)
+uint8_t g7400_state::io_vpp(offs_t offset, uint8_t data)
 {
-	u8 data = odyssey2_state::io_read(offset);
-
-	if (!(m_p1 & P1_VPP_ENABLE))
+	if (!(m_p1 & 0x20))
 	{
 		// A2 to R/W pin
 		if (offset & 4)
@@ -448,12 +436,17 @@ uint8_t g7400_state::io_read(offs_t offset)
 }
 
 
+uint8_t g7400_state::io_read(offs_t offset)
+{
+	u8 data = odyssey2_state::io_read(offset);
+	return io_vpp(offset, data);
+}
+
+
 void g7400_state::io_write(offs_t offset, uint8_t data)
 {
 	odyssey2_state::io_write(offset, data);
-
-	if (!(m_p1 & P1_VPP_ENABLE) && ~offset & 4)
-		m_ef9340_1->ef9341_write( offset & 0x02, offset & 0x01, data );
+	io_vpp(offset, data);
 }
 
 
@@ -477,9 +470,6 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	u8 lum = ~m_p1 >> 4 & 0x08;
 	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
-	const int xoffs = 15;
-	const int yoffs = 5;
-
 	// apply external LUM setting
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -491,30 +481,22 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			uint16_t d = bitmap.pix16(y, x);
+			uint16_t e = ef934x_bitmap->pix16(y, x);
 
-			if ( ( ! m_ic678_decode[ d & 0x07 ] ) && x >= xoffs && x < (320 + xoffs) && y >= yoffs )
+			// I outputs to CX
+			bool i2 = !BIT(m_mix_out, e & 0x07);
+			m_i8244->write_cx(x, i2);
+
+			if (m_mix_in == 0xff || ((e & 0x08) && BIT(m_mix_in, d & 0x07)))
 			{
-				// Use EF934x input
-				d = ef934x_bitmap->pix16( y - yoffs, x - xoffs ) & 0x07;
-
-				if ( ! m_ic674_decode[ d ] )
-				{
-					d |= 0x08;
-				}
+				// Use i8245 input
+				bitmap.pix16(y, x) |= lum;
 			}
 			else
 			{
-				// Use i8245 input
-				d |= lum;
-
-				// I outputs to CX
-				if (x >= xoffs && x < (320 + xoffs) && y >= yoffs)
-				{
-					bool cx = !m_ic674_decode[ef934x_bitmap->pix16(y - yoffs, x - xoffs) & 0x07];
-					m_i8244->write_cx(x, cx);
-				}
+				// Use EF934x input
+				bitmap.pix16(y, x) = i2 ? e | 0x08 : e & 0x07;
 			}
-			bitmap.pix16(y, x) = d;
 		}
 	}
 
@@ -549,10 +531,10 @@ uint8_t odyssey2_state::p2_read()
 {
 	u8 data = 0xff;
 
-	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
+	if (!(m_p1 & 0x04))
 	{
 		// 74148 priority encoder, GS to P24, outputs to P25-P27
-		u8 inp = count_leading_zeros(m_keyboard[m_p2 & P2_KEYBOARD_SELECT_MASK]->read()) - 24;
+		u8 inp = count_leading_zeros(m_keyboard[m_p2 & 0x07]->read()) - 24;
 		if (inp < 8)
 			data &= inp << 5 | 0xf;
 	}
@@ -579,11 +561,11 @@ uint8_t odyssey2_state::bus_read()
 {
 	u8 data = 0xff;
 
-	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
+	if (!(m_p1 & 0x04))
 	{
-		u8 sel = m_p2 & P2_KEYBOARD_SELECT_MASK;
+		u8 sel = m_p2 & 0x07;
 		if (sel < 2)
-			data &= m_joysticks[sel]->read();
+			data &= ~m_joysticks[sel]->read();
 	}
 
 	return data;
@@ -595,51 +577,24 @@ void odyssey2_state::bus_write(uint8_t data)
 }
 
 
-/*
-    i8243 in the g7400
-*/
-
-void g7400_state::i8243_p4_w(uint8_t data)
+template<int P>
+void g7400_state::i8243_port_w(uint8_t data)
 {
-	// "port 4"
+	// P4,P5: color mix out (IC674)
+	// P6,P7: color mix in (IC678)
+	u8 mask = 0xf;
+	if (~P & 1)
+	{
+		data <<= 4;
+		mask <<= 4;
+	}
+
 	m_screen->update_now();
-	m_ic674_decode[1] = BIT(data,0);
-	m_ic674_decode[5] = BIT(data,1);
-	m_ic674_decode[3] = BIT(data,2);
-	m_ic674_decode[7] = BIT(data,3);
-}
 
-
-void g7400_state::i8243_p5_w(uint8_t data)
-{
-	// "port 5"
-	m_screen->update_now();
-	m_ic674_decode[0] = BIT(data,0);
-	m_ic674_decode[4] = BIT(data,1);
-	m_ic674_decode[2] = BIT(data,2);
-	m_ic674_decode[6] = BIT(data,3);
-}
-
-
-void g7400_state::i8243_p6_w(uint8_t data)
-{
-	// "port 6"
-	m_screen->update_now();
-	m_ic678_decode[1] = BIT(data,0);
-	m_ic678_decode[5] = BIT(data,1);
-	m_ic678_decode[3] = BIT(data,2);
-	m_ic678_decode[7] = BIT(data,3);
-}
-
-
-void g7400_state::i8243_p7_w(uint8_t data)
-{
-	// "port 7"
-	m_screen->update_now();
-	m_ic678_decode[0] = BIT(data,0);
-	m_ic678_decode[4] = BIT(data,1);
-	m_ic678_decode[2] = BIT(data,2);
-	m_ic678_decode[6] = BIT(data,3);
+	if (P & 2)
+		m_mix_in = (m_mix_in & ~mask) | (data & mask);
+	else
+		m_mix_out = (m_mix_out & ~mask) | (data & mask);
 }
 
 
@@ -670,7 +625,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	I8244(config, m_i8244, XTAL(7'159'090) / 2);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(344, 242, 0, 0);
+	m_i8244->set_screen_size(356, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
@@ -687,7 +642,7 @@ void odyssey2_state::videopac(machine_config &config)
 	// PAL video chip
 	I8245(config.replace(), m_i8244, XTAL(17'734'476) / 5);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(344, 242, 0, 0);
+	m_i8244->set_screen_size(356, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
@@ -729,17 +684,18 @@ void g7400_state::g7400(machine_config &config)
 	PALETTE(config, "palette", m_i8244, FUNC(i8244_device::i8244_palette), 16);
 
 	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
-	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_p5_w));
-	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
-	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
+	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_port_w<3>));
 
 	EF9340_1(config, m_ef9340_1, XTAL(8'867'000)/5 * 2, "screen");
+	m_ef9340_1->set_offsets(15, 5);
 
 	SPEAKER(config, "mono").front_center();
 	I8245(config, m_i8244, XTAL(8'867'000)/5 * 2);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(320, 240, 15, 5);
+	m_i8244->set_screen_size(356, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
@@ -756,7 +712,7 @@ void g7400_state::odyssey3(machine_config &config)
 	// NTSC video chip
 	I8244(config.replace(), m_i8244, XTAL(7'159'090) / 2);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(320, 240, 15, 5);
+	m_i8244->set_screen_size(356, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
