@@ -30,7 +30,6 @@ namespace netlist
 {
 	namespace devices
 	{
-	#if !(NL_USE_TRUTHTABLE_7448)
 	NETLIB_OBJECT(7448)
 	{
 		NETLIB_CONSTRUCTOR(7448)
@@ -136,9 +135,6 @@ namespace netlist
 	};
 
 	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
-
-	#endif
-
 
 	} //namespace devices
 } // namespace netlist
