@@ -1,0 +1,15 @@
+TARGET = libtfe.a
+OBJECTS = $(OBJECTS1) $(TFEOBJ) $(ATOBJ) $(PCAPOBJ)
+CC = gcc
+CCOPTS = -O2 -Wall -fomit-frame-pointer -std=gnu99
+CPPOPTS = -O2 -Wall -fomit-frame-pointer -std=gnu99
+OPTS = -DGSPORT_LITTLE_ENDIAN -DDOS_TFE=1 -DHAVE_TFE -DHAVE_ATBRIDGE -DTOGGLE_STATUS
+SUFFIX =
+LDFLAGS =
+LDOPTS =
+LD = ar
+EXTRA_LIBS = -ldl -lpcap
+EXTRA_SPECIALS =
+
+AS = cc
+PERL = perl

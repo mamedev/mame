@@ -218,6 +218,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_HTTP,                                       "0",         OPTION_BOOLEAN,    "enable HTTP server" },
 	{ OPTION_HTTP_PORT,                                  "8080",      OPTION_INTEGER,    "HTTP server port" },
 	{ OPTION_HTTP_ROOT,                                  "web",       OPTION_STRING,     "HTTP server document root" },
+	{ OPTION_UTHERNET_INTF,                              nullptr,     OPTION_STRING,     "Underlying interface for Uthernet" },
 
 	{ nullptr }
 };

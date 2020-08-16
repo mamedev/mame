@@ -170,6 +170,7 @@
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 #define OPTION_NVRAM_SAVE           "nvram_save"
+#define OPTION_UTHERNET_INTF        "uthernet_intf"
 
 // core comm options
 #define OPTION_COMM_LOCAL_HOST      "comm_localhost"

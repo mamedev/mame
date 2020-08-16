@@ -310,7 +310,10 @@ end
 		"bx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
-
+	links {
+		ext_lib("tfe"),
+		"pcap"
+	}
 	override_resources = false;
 
 	maintargetosdoptions(_target,_subtarget)
