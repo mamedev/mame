@@ -156,6 +156,8 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.cpp",
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.h",
+	MAME_DIR .. "src/mame/machine/nl_tank.cpp",
+	MAME_DIR .. "src/mame/machine/nl_tank.h",
 
 	MAME_DIR .. "src/mame/audio/nl_flyball.cpp",
 	MAME_DIR .. "src/mame/audio/nl_flyball.h",

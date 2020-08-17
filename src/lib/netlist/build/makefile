@@ -189,10 +189,12 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74377.o \
 	$(NLOBJ)/devices/nld_74393.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
+	$(NLOBJ)/devices/nld_8277.o \
 	$(NLOBJ)/devices/nld_82S16.o \
 	$(NLOBJ)/devices/nld_82S115.o \
 	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9316.o \
+	$(NLOBJ)/devices/nld_9321.o \
 	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
 	$(NLOBJ)/devices/nld_dm9314.o \

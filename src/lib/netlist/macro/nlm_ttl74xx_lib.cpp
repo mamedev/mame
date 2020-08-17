@@ -2846,6 +2846,32 @@ static NETLIST_START(TTL_9322_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: TTL_9321_DIP
+//- Title: DM9321/DM8321 Dual 4-Line to 1-Line Data Selectors/Multiplexers
+//- Pinalias: AE,AA0,AA1,AD0,AD1,AD2,AD3,GND,BD3,BD2,BD1,BD0,BA1,BA0,BE,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//-
+static NETLIST_START(TTL_9321_DIP)
+	TTL_9321_GATE(A)
+	TTL_9321_GATE(B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(      /*        +--------------+        */
+		     A.E, /*     /E |1     ++    16| VCC    */ A.VCC,
+		    A.A0, /*     A0 |2           15| /E     */ B.E,
+		    A.A1, /*     A1 |3           14| A0     */ B.A0,
+		    A.D0, /*    /D0 |4    9322   13| A1     */ B.A1,
+		    A.D1, /*    /D1 |5           12| /D0    */ B.D0,
+		    A.D2, /*    /D2 |6           11| /D1    */ B.D1,
+		    A.D3, /*    /D3 |7           10| /D2    */ B.D2,
+		   A.GND, /*    GND |8            9| /D3    */ B.D3
+			      /*        +--------------+        */
+	)
+NETLIST_END()
+
 //- Identifier: TTL_9602_DIP
 //- Title: DM9602/DM6802 Dual Retriggerable, Resettable One Shots
 //- Description: These dual resettable, retriggerable one shots have two
@@ -3496,5 +3522,6 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_9312_DIP)
 	LOCAL_LIB_ENTRY(TTL_9310_DIP)
 	LOCAL_LIB_ENTRY(TTL_9316_DIP)
+	LOCAL_LIB_ENTRY(TTL_9321_DIP)
 	LOCAL_LIB_ENTRY(TTL_9322_DIP)
 NETLIST_END()

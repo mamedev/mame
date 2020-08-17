@@ -31,7 +31,7 @@ public:
 
 	// configuration helpers
 	auto irq_cb() { return m_irq_func.bind(); }
-	i8244_device &set_screen_size(int width, int height, int cropx, int cropy);
+	i8244_device &set_screen_size(int width, int height, int cropx = 0, int cropy = 0);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

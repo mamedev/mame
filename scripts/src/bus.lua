@@ -331,12 +331,14 @@ if (BUSES["BBC_FDC"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.h",
-		MAME_DIR .. "src/devices/bus/bbc/fdc/microware.cpp",
-		MAME_DIR .. "src/devices/bus/bbc/fdc/microware.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/kenda.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/kenda.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/solidisk.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/solidisk.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/udm.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/udm.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.h",
 	}
@@ -2386,6 +2388,8 @@ if (BUSES["A2GAMEIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2gameio/joyport.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/paddles.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/paddles.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/gizmo.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/gizmo.h",
 	}
 end
 

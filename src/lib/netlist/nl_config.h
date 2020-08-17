@@ -223,11 +223,11 @@ namespace netlist
 
 		/// \brief Maximum queue size
 		///
-		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
+		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 1024>; // NOLINT
 
 		/// \brief Maximum queue size for solvers
 		///
-		using MAX_SOLVER_QUEUE_SIZE = std::integral_constant<std::size_t, 64>; // NOLINT
+		using MAX_SOLVER_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
 
 		using use_float_matrix = std::integral_constant<bool, NL_USE_FLOAT_MATRIX>;
 		using use_long_double_matrix = std::integral_constant<bool, NL_USE_LONG_DOUBLE_MATRIX>;

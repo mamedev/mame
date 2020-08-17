@@ -329,7 +329,7 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
-	if (newval)
+	if (!newval)
 	{
 		if (m_via6522_1) m_via6522_1->reset();
 		if (m_adlc) m_adlc->reset();
@@ -2930,7 +2930,7 @@ COMP ( 1987, daisy,    bbcm,   0,     daisy,    bbcm,   bbcm_state,  init_bbc,  
 COMP ( 1986, bbcmc,    0,      bbcm,  bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,  0,     bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1987, pro128s,  bbcmc,  0,     pro128s,  bbcm,   bbcm_state,  init_bbc,  "Olivetti",        "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500",                       MACHINE_NOT_WORKING)
+COMP ( 1988, autoc15,  bbcmc,  0,     autoc15,  autoc,  bbcm_state,  init_bbc,  "Autocue Ltd.",    "Autocue 1500 Telepromter",           MACHINE_NOT_WORKING)
 COMP ( 1988, discmon,  bbcm,   0,     discmon,  bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmonitor A-01",           MACHINE_NOT_WORKING)
 COMP ( 1988, discmate, bbcm,   0,     discmate, bbcm,   bbcm_state,  init_bbc,  "Arbiter Leisure", "Arbiter Discmate A-02",              MACHINE_NOT_WORKING)
 //COMP ( 1988, discmast, bbcm,   0,     discmast, bbcm,   bbcm_state,  init_bbc, "Arbiter Leisure", "Arbiter Discmaster A-03",            MACHINE_NOT_WORKING)

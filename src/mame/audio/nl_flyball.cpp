@@ -58,7 +58,7 @@ NETLIST_START(flyball)
 	RES(R76, RES_K(100)) // RES., CARBON, 5%, 1/4W, 100K
 	RES(R77, 820)  // RES., CARBON, 5%, 1/4W, 820
 	RES(R78, RES_K(100)) // RES., CARBON, 5%, 1/4W, 100K
-	RES(R79, RES_K(820)) // RES., CARBON, 5%, 1/4W, 820K
+	RES(R79, RES_K(1)) // RES., CARBON, 5%, 1/4W, 820K // Verified as 1K on a real board
 	RES(R80, RES_K(330))  // RES., CARBON, 5%, 1/4W, 330 // (330 on parts list, but 330K on schematic, 330 does not work in the netlist)
 	RES(R87, RES_K(1)) // RES., CARBON, 5%, 1/4W, 1K
 	RES(R88, RES_K(3.3)) // RES., CARBON, 5%, 1/4W, 3.3K
@@ -68,7 +68,8 @@ NETLIST_START(flyball)
 	RES(R92, RES_K(10)) // RES., CARBON, 5%, 1/4W, 10K
 	POT(R95, RES_K(10)) // TRIMPOT, 10K
 	RES(R96, RES_K(47)) // RES., CARBON, 5%, 1/4W, 47K
-	RES(R97, RES_K(10)) // RES., CARBON, 5%, 1/4W, 10K
+	RES(R97A, RES_K(10)) // RES., CARBON, 5%, 1/4W, 10K
+	RES(R97B, RES_K(24.4)) // RES., CARBON, 5%, 1/4W, 10K // Verified to exist on a real board
 	RES(R98, RES_K(10)) // RES., CARBON, 5%, 1/4W, 10K
 	RES(R99, RES_K(33)) // RES., CARBON, 5%, 1/4W, 33K
 
@@ -152,10 +153,10 @@ NETLIST_START(flyball)
 	NET_C(IC_D8.6, R87.1)
 	NET_C(R87.2, C80.1)
 	NET_C(C80.2, IC_A8.1)
-	NET_C(CROWD_VL.Q, R97.2)
+	NET_C(CROWD_VL.Q, R97A.2, R97B.2)
 	NET_C(CROWD_ON.Q, R98.2)
 	NET_C(CROWD_SL.Q, R99.2)
-	NET_C(R97.1, R98.1, R99.1, C49.1, IC_A8.2)
+	NET_C(R97A.1, R97B.1, R98.1, R99.1, C49.1, IC_A8.2)
 	NET_C(GND, C49.2)
 	NET_C(IC_A8.7, R96.1)
 

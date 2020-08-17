@@ -55,6 +55,7 @@ class a2bus_agat7flop_device: public a2bus_floppy_device
 public:
 	a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -63,6 +64,7 @@ class a2bus_agat9flop_device: public a2bus_floppy_device
 public:
 	a2bus_agat9flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

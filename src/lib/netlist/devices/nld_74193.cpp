@@ -166,7 +166,7 @@ namespace netlist
 		NETLIB_SUB(74193) A;
 	};
 
-	NETLIB_DEVICE_IMPL(74193,    "TTL_74193", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74193,     "TTL_74193", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74193_dip, "TTL_74193_DIP", "")
 
 	} //namespace devices
