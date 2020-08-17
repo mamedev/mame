@@ -70,8 +70,10 @@
 #include "emu.h"
 #include "saa1099.h"
 
-#define LEFT    0x00
-#define RIGHT   0x01
+static constexpr int clock_divider = 256;
+
+static constexpr int LEFT   = 0x00;
+static constexpr int RIGHT  = 0x01;
 
 static constexpr u16 amplitude_lookup[16] = {
 		0*32767/16,  1*32767/16,  2*32767/16,   3*32767/16,
@@ -123,7 +125,6 @@ static constexpr u8 envelope[8][64] = {
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15 }
 };
 
-
 // device type definition
 DEFINE_DEVICE_TYPE(SAA1099, saa1099_device, "saa1099", "Philips SAA1099")
 
@@ -149,7 +150,6 @@ saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, d
 	, m_all_ch_enable(false)
 	, m_sync_state(false)
 	, m_selected_reg(0)
-	, m_sample_rate(0.0)
 {
 }
 
@@ -160,11 +160,8 @@ saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, d
 
 void saa1099_device::device_start()
 {
-	/* copy global parameters */
-	m_sample_rate = clock() / 256;
-
 	/* for each chip allocate one stream */
-	m_stream = stream_alloc(0, 2, m_sample_rate);
+	m_stream = stream_alloc(0, 2, clock()/clock_divider);
 
 	save_item(NAME(m_noise_params));
 	save_item(NAME(m_env_enable));
@@ -184,7 +181,6 @@ void saa1099_device::device_start()
 	save_item(STRUCT_MEMBER(m_channels, amplitude));
 	save_item(STRUCT_MEMBER(m_channels, envelope));
 	save_item(STRUCT_MEMBER(m_channels, counter));
-	save_item(STRUCT_MEMBER(m_channels, freq));
 	save_item(STRUCT_MEMBER(m_channels, level));
 
 	save_item(STRUCT_MEMBER(m_noise, counter));
@@ -199,9 +195,7 @@ void saa1099_device::device_start()
 
 void saa1099_device::device_clock_changed()
 {
-	m_sample_rate = clock() / 256;
-
-	m_stream->set_sample_rate(m_sample_rate);
+	m_stream->set_sample_rate(clock()/clock_divider);
 }
 
 
@@ -225,10 +219,10 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	{
 		switch (m_noise_params[ch])
 		{
-		case 0: m_noise[ch].freq = clock()/256.0 * 2; break;
-		case 1: m_noise[ch].freq = clock()/512.0 * 2; break;
-		case 2: m_noise[ch].freq = clock()/1024.0 * 2; break;
-		case 3: m_noise[ch].freq = m_channels[ch * 3].freq;   break; // todo: this case will be clock()/[ch*3's octave divisor, 0 is = 256*2, higher numbers are higher] * 2 if the tone generator phase reset bit (0x1c bit 1) is set.
+		case 0:
+		case 1:
+		case 2: m_noise[ch].freq = 256 << m_noise_params[ch]; break;
+		case 3: m_noise[ch].freq = m_channels[ch * 3].freq(); break; // todo: this case will be clock()/[ch*3's octave divisor, 0 is = 256*2, higher numbers are higher] * 2 if the tone generator phase reset bit (0x1c bit 1) is set.
 		}
 	}
 
@@ -240,19 +234,11 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* for each channel */
 		for (ch = 0; ch < 6; ch++)
 		{
-			if (m_channels[ch].freq == 0.0)
-				m_channels[ch].freq = (double)((2 * clock() / 512) << m_channels[ch].octave) /
-					(511.0 - (double)m_channels[ch].frequency);
-
 			/* check the actual position in the square wave */
-			m_channels[ch].counter -= m_channels[ch].freq;
-			while (m_channels[ch].counter < 0)
+			while (m_channels[ch].counter <= 0)
 			{
 				/* calculate new frequency now after the half wave is updated */
-				m_channels[ch].freq = (double)((2 * clock() / 512) << m_channels[ch].octave) /
-					(511.0 - (double)m_channels[ch].frequency);
-
-				m_channels[ch].counter += m_sample_rate;
+				m_channels[ch].counter += m_channels[ch].freq();
 				m_channels[ch].level ^= 1;
 
 				/* eventually clock the envelope counters */
@@ -261,27 +247,25 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				if (ch == 4 && m_env_clock[1] == 0)
 					envelope_w(1);
 			}
+			m_channels[ch].counter -= clock_divider;
 
 			// if the noise is enabled
+			u8 level = 0;
 			if (m_channels[ch].noise_enable)
 			{
 				// if the noise level is high (noise 0: chan 0-2, noise 1: chan 3-5)
-				if (m_noise[ch/3].level & 1)
-				{
-					// subtract to avoid overflows, also use only half amplitude
-					output_l -= m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16 / 2;
-					output_r -= m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16 / 2;
-				}
+				level ^= m_noise[ch/3].level & 1;
 			}
 			// if the square wave is enabled
 			if (m_channels[ch].freq_enable)
 			{
 				// if the channel level is high
-				if (m_channels[ch].level & 1)
-				{
-					output_l += m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16;
-					output_r += m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16;
-				}
+				level ^= m_channels[ch].level & 1;
+			}
+			if (level)
+			{
+				output_l += m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16;
+				output_r += m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16;
 			}
 		}
 
@@ -290,15 +274,15 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* update the state of the noise generator
 			 * polynomial is x^18 + x^11 + x (i.e. 0x20400) and is a plain XOR, initial state is probably all 1s
 			 * see http://www.vogons.org/viewtopic.php?f=9&t=51695 */
-			m_noise[ch].counter -= m_noise[ch].freq;
-			while (m_noise[ch].counter < 0)
+			while (m_noise[ch].counter <= 0)
 			{
-				m_noise[ch].counter += m_sample_rate;
+				m_noise[ch].counter += m_noise[ch].freq; // clock / ((511 - frequency) * 2^(8 - octave)) or clock / 2^(8 + noise period)
 				if( ((m_noise[ch].level & 0x20000) == 0) != ((m_noise[ch].level & 0x0400) == 0) )
 					m_noise[ch].level = (m_noise[ch].level << 1) | 1;
 				else
 					m_noise[ch].level <<= 1;
 			}
+			m_noise[ch].counter -= clock_divider;
 		}
 		/* write sound data to the buffer */
 		outputs[LEFT][j] = output_l / 6;
@@ -434,7 +418,7 @@ void saa1099_device::data_w(u8 data)
 			for (int i = 0; i < 6; i++)
 			{
 				m_channels[i].level = 0;
-				m_channels[i].counter = 0.0;
+				m_channels[i].counter = m_channels[i].freq();
 			}
 		}
 		break;

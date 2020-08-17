@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cpu/ccpu/ccpu.h"
+#include "audio/cinemat.h"
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -25,7 +26,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ay1(*this, "ay1")
 		, m_outlatch(*this, "outlatch")
-		, m_samples(*this, "samples")
 		, m_vector(*this, "vector")
 		, m_screen(*this, "screen")
 		, m_rambase(*this, "rambase")
@@ -42,7 +42,6 @@ public:
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
 	required_device<ls259_device> m_outlatch;
-	optional_device<samples_device> m_samples;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
 	optional_shared_ptr<uint16_t> m_rambase;
@@ -57,11 +56,6 @@ public:
 	output_finder<> m_led;
 	output_finder<10> m_pressed;
 
-	uint32_t m_current_shift;
-	uint32_t m_last_shift;
-	uint32_t m_last_shift2;
-	uint32_t m_current_pitch;
-	uint32_t m_last_frame;
 	uint8_t m_coin_detected;
 	uint8_t m_coin_last_reset;
 	uint8_t m_mux_select;
@@ -97,52 +91,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void sound_start() override;
-	virtual void sound_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(spacewar_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(spacewar_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(spacewar_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(spacewar_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(spacewar_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(barrier_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(barrier_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(barrier_sound2_w);
 	DECLARE_WRITE_LINE_MEMBER(speedfrk_start_led_w);
-	DECLARE_WRITE_LINE_MEMBER(speedfrk_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(speedfrk_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(starhawk_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(starhawk_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(starhawk_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(starhawk_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(starhawk_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(starhawk_sound7_w);
-	DECLARE_WRITE_LINE_MEMBER(tailg_sound_w);
-	DECLARE_WRITE_LINE_MEMBER(warrior_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(warrior_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(warrior_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(warrior_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(warrior_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(armora_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(armora_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(armora_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(armora_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(armora_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(ripoff_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(ripoff_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(ripoff_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(ripoff_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(ripoff_sound7_w);
-	DECLARE_WRITE_LINE_MEMBER(starcas_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(starcas_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(starcas_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(starcas_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(starcas_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(wotw_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(wotw_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(wotw_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(wotw_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(wotw_sound4_w);
 
 	void cinemat_nojmi_4k(machine_config &config);
 	void cinemat_jmi_4k(machine_config &config);
@@ -150,17 +100,6 @@ protected:
 	void cinemat_jmi_8k(machine_config &config);
 	void cinemat_jmi_16k(machine_config &config);
 	void cinemat_jmi_32k(machine_config &config);
-
-	void spacewar_sound(machine_config &config);
-	void barrier_sound(machine_config &config);
-	void speedfrk_sound(machine_config &config);
-	void starhawk_sound(machine_config &config);
-	void tailg_sound(machine_config &config);
-	void warrior_sound(machine_config &config);
-	void armora_sound(machine_config &config);
-	void ripoff_sound(machine_config &config);
-	void starcas_sound(machine_config &config);
-	void wotw_sound(machine_config &config);
 
 	void program_map_4k(address_map &map);
 	void program_map_8k(address_map &map);
@@ -183,14 +122,6 @@ public:
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
 	uint8_t sundance_inputs_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound4_w);
-	DECLARE_WRITE_LINE_MEMBER(sundance_sound7_w);
-
-	void sundance_sound(machine_config &config);
 };
 
 
@@ -205,15 +136,6 @@ public:
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
-	DECLARE_WRITE_LINE_MEMBER(solarq_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(solarq_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(solarq_sound4_w);
-
-	void solarq_sound(machine_config &config);
-
-private:
-	float m_target_volume;
-	float m_current_volume;
 };
 
 
@@ -230,13 +152,6 @@ public:
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;
 	uint8_t boxingb_dial_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound0_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound1_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound2_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound3_w);
-	DECLARE_WRITE_LINE_MEMBER(boxingb_sound4_w);
-
-	void boxingb_sound(machine_config &config);
 };
 
 

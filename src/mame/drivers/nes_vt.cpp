@@ -176,6 +176,24 @@ public:
 	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
 };
 
+class nes_vt_waixing_alt_duetpp_state : public nes_vt_waixing_alt_state
+{
+public:
+	nes_vt_waixing_alt_duetpp_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_waixing_alt_state(mconfig, type, tag)
+	{ }
+
+	void nes_vt_waixing_alt_4mb_duetpp(machine_config& config);
+
+private:
+	uint8_t in1_r() override
+	{
+		uint8_t i = machine().rand() & 0x18;
+		uint8_t ret = m_io1->read() & ~0x18;
+		return i | ret;
+	}
+};
+
 
 class nes_vt_timetp36_state : public nes_vt_state
 {
@@ -356,6 +374,8 @@ public:
 		m_ablpinb_in0_val(0),
 		m_plunger(*this, "PLUNGER")
 	{ }
+
+	void nes_vt_waixing_alt_4mb_duetpp(machine_config& config);
 
 protected:
 	virtual void machine_start() override;
@@ -760,15 +780,6 @@ void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(nes_vt_base_state::extrain_3_r));
 }
 
-
-
-void nes_vt_sudoku_state::nes_vt_sudoku_512kb(machine_config &config)
-{
-	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::vt_external_space_map_512kbyte);
-}
-
 void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -880,6 +891,19 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
+
+void nes_vt_waixing_alt_duetpp_state::nes_vt_waixing_alt_4mb_duetpp(machine_config& config)
+{
+	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
+	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
+	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+
+	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+}
+
 
 void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 {
@@ -1364,9 +1388,45 @@ static INPUT_PORTS_START( ablpinb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("NUDGE" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sudoku )
-	PORT_INCLUDE(nes_vt)
+
+static INPUT_PORTS_START( duetpp )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_DIPNAME( 0x0001, 0x0000, "P2:0001" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_DIPNAME( 0x0002, 0x0000, "P2:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0000, "P2:0004" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_DIPNAME( 0x0008, 0x0000, "P2:0008" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0008, "0008" )
+	PORT_DIPNAME( 0x0010, 0x0000, "P2:0010" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_DIPNAME( 0x0020, 0x0000, "P2:0020" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0020, "0020" )
+	PORT_DIPNAME( 0x0040, 0x0000, "P2:0040" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0040, "0040" )
+	PORT_DIPNAME( 0x0080, 0x0000, "P2:0080" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0080, "0080" )
 INPUT_PORTS_END
+
 
 // the test mode shows 2 gamepads, however this is not the control scheme the game uses
 // there is a reset button too but it doesn't seem to be a software switch
@@ -1447,42 +1507,6 @@ static INPUT_PORTS_START( timetp36 )
 INPUT_PORTS_END
 
 
-void nes_vt_sudoku_state::init_sudoku()
-{
-	u8 *src = memregion("mainrom")->base();
-	int len = memregion("mainrom")->bytes();
-
-	std::vector<u8> buffer(len);
-	{
-		for (int i = 0; i < len; i += 8)
-		{
-			buffer[i+0] = src[i+5];
-			buffer[i+1] = src[i+4];
-			buffer[i+2] = src[i+7];
-			buffer[i+3] = src[i+6];
-			buffer[i+4] = src[i+1];
-			buffer[i+5] = src[i+0];
-			buffer[i+6] = src[i+3];
-			buffer[i+7] = src[i+2];
-		}
-
-		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}
-
-	if (0)
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, len, 1, fp);
-			fclose(fp);
-		}
-	}
-}
-
 
 
 ROM_START( vdogdeme )
@@ -1521,9 +1545,9 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
-ROM_START( papsudok )
-	ROM_REGION( 0x80000, "mainrom", 0 )
-	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
+ROM_START( sudopptv )
+	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
 ROM_END
 
 ROM_START( mc_dgear )
@@ -1596,6 +1620,18 @@ ROM_START( lxcmc250 )
 	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
 ROM_END
 
+ROM_START( lxccminn )
+	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
+	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
+	ROM_IGNORE(0x4000000)
+ROM_END
+
+ROM_START( lxccplan )
+	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
+	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
+	ROM_IGNORE(0x4000000)
+ROM_END
+
 ROM_START( red5mam )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(0c0a0ecd) SHA1(2dfd8437de17fc9975698f1933dd81fbac78466d) )
@@ -1635,6 +1671,11 @@ ROM_END
 ROM_START( silv35 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "silverlit35.bin", 0x00000, 0x400000, CRC(7540e350) SHA1(a0cb456136560fa4d8a365dd44d815ec0e9fc2e7) )
+ROM_END
+
+ROM_START( duetpp )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "gamesporzduetpingpong.bin", 0x00000, 0x400000, CRC(96af199b) SHA1(c14ff15683545c1edf03376cebcee7ac408da733) )
 ROM_END
 
 ROM_START( lpgm240 )
@@ -1794,10 +1835,6 @@ ROM_START( majgnc )
 	ROM_LOAD( "majescogoldennuggetcasino_st29w800at_002000d7.bin", 0x00000, 0x100000, CRC(1a156a9d) SHA1(08be4079dd68c9cf05bb92e11a3da4f092d7cfea) )
 ROM_END
 
-ROM_START( sudopptv )
-	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
-ROM_END
 
 ROM_START( zudugo )
 	ROM_REGION( 0x400000, "mainrom", ROMREGION_ERASEFF )
@@ -1957,10 +1994,9 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init
 // 050329 (29th March 2005) date on PCB
 CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission?
+CONS( 200?, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_NOT_WORKING )
 
-// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
-// Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku_512kb, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
 
 
 // should be VT03 based
@@ -1985,7 +2021,7 @@ CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
 // silver 'N64' type controller design
-CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
+CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
  // needs PCM samples, Y button is not mapped (not used by any of the games?)
 CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2016,6 +2052,10 @@ CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 CONS( 200?, lxcmcysp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
+CONS( 200?, lxccminn,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxccplan,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+
+
 // GB-NO13-Main-VT389-2 on PCBs
 CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
 CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
@@ -2028,12 +2068,9 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
     Lexibook Compact Cyber Arcade - Paw Patrol
     Lexibook Compact Cyber Arcade - Barbie
     Lexibook Compact Cyber Arcade - Finding Dory
-    Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
     Lexibook Compact Cyber Arcade - PJ Masks
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
-    Lexibook Console Colour - Minnie Mouse
-    Lexibook Console Colour - Disney's Planes
     Lexibook Console Colour - Barbie
 
     (units for use with TV)
@@ -2041,6 +2078,13 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
     Lexibook Retro TV Game Console (300 Games) - PJ Masks
 
     (more?)
+
+    There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
+    Spiderman
+    Frozen
+    (generic)
+    it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
+
 */
 
 // intial code isn't valid? scrambled?

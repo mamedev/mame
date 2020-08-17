@@ -560,8 +560,6 @@ void validity_checker::validate_rgb()
 	    scale2_add_and_clamp(const rgbaint_t&, const rgbaint_t&, const rgbaint_t&)
 	    scale_add_and_clamp(const rgbaint_t&, const rgbaint_t&);
 	    scale_imm_add_and_clamp(const s32, const rgbaint_t&);
-	    static bilinear_filter(u32, u32, u32, u32, u8, u8)
-	    bilinear_filter_rgbaint(u32, u32, u32, u32, u8, u8)
 	*/
 
 	auto random_i32_nolimit = [this]
@@ -1392,6 +1390,62 @@ void validity_checker::validate_rgb()
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.cmplt_imm_rgba(actual_a + 1, std::numeric_limits<s32>::min(), std::numeric_limits<s32>::max(), actual_b);
 	check_expected("rgbaint_t::cmplt_imm_rgba");
+
+	// test bilinear_filter and bilinear_filter_rgbaint
+	// SSE implementation carries more internal precision between the bilinear stages
+#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
+	const int first_shift = 1;
+#else
+	const int first_shift = 8;
+#endif
+	for (int index = 0; index < 1000; index++)
+	{
+		u8 u, v;
+		rgbaint_t rgb_point[4];
+		u32 top_row, bottom_row;
+
+		for (int i = 0; i < 4; i++)
+		{
+			rgb_point[i].set(random_u32());
+		}
+
+		switch (index)
+		{
+			case 0: u = 0; v = 0; break;
+			case 1: u = 255; v = 255; break;
+			case 2: u = 0; v = 255; break;
+			case 3: u = 255; v = 0; break;
+			case 4: u = 128; v = 128; break;
+			case 5: u = 63; v = 32; break;
+			default:
+				u = random_u32() & 0xff;
+				v = random_u32() & 0xff;
+				break;
+		}
+
+		top_row = (rgb_point[0].get_a() * (256 - u) + rgb_point[1].get_a() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_a() * (256 - u) + rgb_point[3].get_a() * u) >> first_shift;
+		expected_a = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		top_row = (rgb_point[0].get_r() * (256 - u) + rgb_point[1].get_r() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_r() * (256 - u) + rgb_point[3].get_r() * u) >> first_shift;
+		expected_r = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		top_row = (rgb_point[0].get_g() * (256 - u) + rgb_point[1].get_g() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_g() * (256 - u) + rgb_point[3].get_g() * u) >> first_shift;
+		expected_g = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		top_row = (rgb_point[0].get_b() * (256 - u) + rgb_point[1].get_b() * u) >> first_shift;
+		bottom_row = (rgb_point[2].get_b() * (256 - u) + rgb_point[3].get_b() * u) >> first_shift;
+		expected_b = (top_row * (256 - v) + bottom_row * v) >> (16 - first_shift);
+
+		imm = rgbaint_t::bilinear_filter(rgb_point[0].to_rgba(), rgb_point[1].to_rgba(), rgb_point[2].to_rgba(), rgb_point[3].to_rgba(), u, v);
+		rgb.set(imm);
+		check_expected("rgbaint_t::bilinear_filter");
+
+		rgb.bilinear_filter_rgbaint(rgb_point[0].to_rgba(), rgb_point[1].to_rgba(), rgb_point[2].to_rgba(), rgb_point[3].to_rgba(), u, v);
+		check_expected("rgbaint_t::bilinear_filter_rgbaint");
+	}
 }
 
 

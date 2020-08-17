@@ -84,7 +84,7 @@ public:
 	void rtype(machine_config &config);
 	void imgfightb(machine_config &config);
 	void lohtb(machine_config &config);
-	void imgfightj(machine_config &config);
+	void imgfight(machine_config &config);
 	void mrheli(machine_config &config);
 	void nspiritj(machine_config &config);
 
@@ -94,7 +94,6 @@ public:
 	void init_m72_8751();
 	void init_dbreedm72();
 	void init_nspirit();
-	void init_imgfight();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -172,7 +171,6 @@ private:
 	// game specific
 	void bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void imgfight_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -192,7 +190,7 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_VIDEO_START(m72);
-	DECLARE_VIDEO_START(imgfightj);
+	DECLARE_VIDEO_START(imgfight);
 	DECLARE_VIDEO_START(mrheli);
 	DECLARE_VIDEO_START(nspiritj);
 	DECLARE_VIDEO_START(xmultipl);

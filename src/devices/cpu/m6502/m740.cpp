@@ -52,6 +52,7 @@ void m740_device::device_reset()
 	m_irq_vector = 0xfffc;
 	apu_irq_state = false;
 	irq_taken = false;
+	nmi_pending = false;
 	v_state = false;
 	sync = false;
 	inhibit_interrupts = false;

@@ -1982,37 +1982,37 @@ void itech8_state::gtg2(machine_config &config)
 
 ROM_START( wfortune )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wofpgm", 0x00000, 0x10000, CRC(bd984654) SHA1(8e16d2feb26e9a6f86c4a36bf0f03db80ded03f6) )
+	ROM_LOAD( "wofpgm.u5", 0x00000, 0x10000, CRC(bd984654) SHA1(8e16d2feb26e9a6f86c4a36bf0f03db80ded03f6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "wofsnd", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
+	ROM_LOAD( "wof_snd-wof.u27", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "wofgrom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
-	ROM_LOAD( "wofgrom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
-	ROM_LOAD( "wofgrom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
-	ROM_LOAD( "wofgrom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
+	ROM_LOAD( "grom0-wof.grom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
+	ROM_LOAD( "grom1-wof.grom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
+	ROM_LOAD( "grom2-wof.grom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
+	ROM_LOAD( "grom3-wof.grom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "wofsbom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) )
+	ROM_LOAD( "wof_vr-sbom0.srom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) ) /* Labeled as WOF VR-SBOM0  (yes it's actually "SBOM0") */
 ROM_END
 
 
 ROM_START( wfortunea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wofpgmr1.bin", 0x00000, 0x10000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) )
+	ROM_LOAD( "wof-pgm_r1.u5", 0x00000, 0x10000, CRC(c3d3eb21) SHA1(21137663afd19fba875e188640f0347fc8c5dcf0) ) /* Labeled as WOF-PGM R1 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "wofsnd", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
+	ROM_LOAD( "wof_snd-wof.u27", 0x08000, 0x8000, CRC(0a6aa5dc) SHA1(42eef40a4300d6d16d9e2af678432a02be05f104) )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "wofgrom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
-	ROM_LOAD( "wofgrom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
-	ROM_LOAD( "wofgrom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
-	ROM_LOAD( "wofgrom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
+	ROM_LOAD( "grom0-wof.grom0", 0x00000, 0x10000, CRC(9a157b2c) SHA1(c349b41ba00cf6e2fec32872627c8cfdd8b5c1b9) )
+	ROM_LOAD( "grom1-wof.grom1", 0x10000, 0x10000, CRC(5064739b) SHA1(424e3f94333f8ca21ac39b64b684cf6b487164d3) )
+	ROM_LOAD( "grom2-wof.grom2", 0x20000, 0x10000, CRC(3d393b2b) SHA1(2c94d2dab7369c099c470cf96391b033f39add78) )
+	ROM_LOAD( "grom3-wof.grom3", 0x30000, 0x10000, CRC(117a2ce9) SHA1(8d601c1cf9f783a42617f13c6862a5835553ac4f) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "wofsbom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) )
+	ROM_LOAD( "wof_vr-sbom0.srom0", 0x00000, 0x20000, CRC(5c28c3fe) SHA1(eba64ede749fb26f9926f644d66860b54b4c76e7) ) /* Labeled as WOF VR-SBOM0  (yes it's actually "SBOM0") */
 ROM_END
 
 
@@ -2742,7 +2742,7 @@ void itech8_state::init_neckneck()
 
 /* Wheel of Fortune-style PCB */
 GAME( 1989, wfortune,   0,         wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
-GAME( 1989, wfortunea,  wfortune,  wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
+GAME( 1989, wfortunea,  wfortune,  wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 ) /* prgram ROM label states "R1" */
 
 /* Grudge Match-style PCB */
 GAME( 1989, grmatch,    0,         grmatch,           grmatch,  grmatch_state, empty_init,   ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )

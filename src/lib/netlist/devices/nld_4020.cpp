@@ -16,11 +16,11 @@ namespace netlist
 	NETLIB_OBJECT(CD4020_sub)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
-		, m_IP(*this, "IP")
+		, m_IP(*this, "IP", NETLIB_DELEGATE(ip))
 		, m_Q(*this, {"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"})
 		, m_cnt(*this, "m_cnt", 0)
-		, m_supply(*this, "VDD", "VSS")
+		, m_supply(*this)
 		{
 		}
 
@@ -30,7 +30,12 @@ namespace netlist
 			m_cnt = 0;
 		}
 
-		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(ip)
+		{
+			++m_cnt;
+			m_cnt &= 0x3fff;
+			update_outputs(m_cnt);
+		}
 
 	public:
 		void update_outputs(const unsigned cnt) noexcept
@@ -60,7 +65,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4020, "CD4XXX")
 		, m_sub(*this, "sub")
-		, m_RESET(*this, "RESET")
+		, m_RESET(*this, "RESET", NETLIB_DELEGATE(inputs))
 		{
 			register_subalias("IP", m_sub.m_IP);
 			register_subalias("Q1", m_sub.m_Q[0]);
@@ -78,35 +83,30 @@ namespace netlist
 			register_subalias("VDD", "sub.VDD");
 			register_subalias("VSS", "sub.VSS");
 		}
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI();
+
+		//NETLIB_RESETI() {}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			if (m_RESET())
+			{
+				m_sub.m_cnt = 0;
+				m_sub.m_IP.inactivate();
+				/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
+				m_sub.m_Q[0].push(0, reset_time);
+				for (std::size_t i=3; i<14; i++)
+					m_sub.m_Q[i].push(0, reset_time);
+			}
+			else
+				m_sub.m_IP.activate_hl();
+		}
 
 	private:
 		NETLIB_SUB(CD4020_sub) m_sub;
 		logic_input_t m_RESET;
 	};
 
-	NETLIB_UPDATE(CD4020_sub)
-	{
-		++m_cnt;
-		m_cnt &= 0x3fff;
-		update_outputs(m_cnt);
-	}
 
-	NETLIB_UPDATE(CD4020)
-	{
-		if (m_RESET())
-		{
-			m_sub.m_cnt = 0;
-			m_sub.m_IP.inactivate();
-			/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-			m_sub.m_Q[0].push(0, reset_time);
-			for (std::size_t i=3; i<14; i++)
-				m_sub.m_Q[i].push(0, reset_time);
-		}
-		else
-			m_sub.m_IP.activate_hl();
-	}
 
 	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "")
 	NETLIB_DEVICE_IMPL_ALIAS(CD4020_WI, CD4020, "CD4020_WI", "+IP,+RESET,+VDD,+VSS")

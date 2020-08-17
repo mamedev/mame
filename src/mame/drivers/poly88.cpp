@@ -221,5 +221,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                FULLNAME     FLAGS
-COMP( 1976, poly88,   0,      0,      poly88,   poly88, poly88_state, empty_init,  "PolyMorphic Systems", "Poly-88",   0 )
-COMP( 1977, poly8813, poly88, 0,      poly8813, poly88, poly88_state, empty_init,  "PolyMorphic Systems", "Poly-8813", MACHINE_NOT_WORKING )
+COMP( 1976, poly88,   0,      0,      poly88,   poly88, poly88_state, empty_init,  "PolyMorphic Systems", "Poly-88",   MACHINE_SUPPORTS_SAVE )
+COMP( 1977, poly8813, poly88, 0,      poly8813, poly88, poly88_state, empty_init,  "PolyMorphic Systems", "Poly-8813", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

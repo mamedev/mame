@@ -14,6 +14,11 @@
     - DRAM, DMA, MIDI interface is unimplemented
     - Verify interrupt, envelope, timer period
     - Verify unemulated registers
+
+    Changelog:
+
+    25th july 2020 [cam900]:
+    - Improve envelope behavior, Improve debugging registers, Fix ramping
 */
 
 #include "emu.h"
@@ -77,7 +82,7 @@ void ics2115_device::device_start()
 
 	//u-Law table as per MIL-STD-188-113
 	u16 lut[8];
-	u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
+	const u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
 	for (int i = 0; i < 256; i++)
@@ -101,11 +106,14 @@ void ics2115_device::device_start()
 	save_item(NAME(m_irq_on));
 	save_item(NAME(m_active_osc));
 	save_item(NAME(m_vmode));
+	save_item(NAME(m_regs));
+	save_item(STRUCT_MEMBER(m_voice, regs));
 
 	for (int i = 0; i < 32; i++)
 	{
 		save_item(NAME(m_voice[i].osc_conf.value), i);
-		save_item(NAME(m_voice[i].state.value), i);
+		save_item(NAME(m_voice[i].state.on), i);
+		save_item(NAME(m_voice[i].state.ramp), i);
 		save_item(NAME(m_voice[i].vol_ctrl.value), i);
 		save_item(NAME(m_voice[i].osc.left), i);
 		save_item(NAME(m_voice[i].osc.acc), i);
@@ -165,7 +173,8 @@ void ics2115_device::device_reset()
 		elem.vol.pan = 0x7f;
 		elem.vol_ctrl.value = 1;
 		elem.vol.mode = 0;
-		elem.state.value = 0;
+		elem.state.on = false;
+		elem.state.ramp = 0;
 	}
 }
 
@@ -233,14 +242,7 @@ int ics2115_device::ics2115_voice::update_volume_envelope()
 			vol.acc = vol.start - vol.left;
 	}
 	else
-	{
-		state.bitflags.on = false;
 		vol_ctrl.bitflags.done = true;
-		if (vol_ctrl.bitflags.invert)
-			vol.acc = vol.end;
-		else
-			vol.acc = vol.start;
-	}
 
 	return ret;
 }
@@ -303,7 +305,7 @@ int ics2115_device::ics2115_voice::update_oscillator()
 	}
 	else
 	{
-		state.bitflags.on = false;
+		state.on = false;
 		osc_conf.bitflags.stop = true;
 		if (!osc_conf.bitflags.invert)
 			osc.acc = osc.end;
@@ -316,11 +318,11 @@ int ics2115_device::ics2115_voice::update_oscillator()
 //TODO: proper interpolation for 8-bit samples (looping)
 stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 {
-	u32 curaddr = voice.osc.acc >> 12;
+	const u32 curaddr = voice.osc.acc >> 12;
 	u32 nextaddr;
 
-	if (voice.state.bitflags.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
-			(voice.osc.left < (voice.osc.fc <<2)))
+	if (voice.state.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
+			(voice.osc.left < (voice.osc.fc << 2)))
 	{
 		//logerror("C?[%x:%x]", voice.osc.left, voice.osc.acc);
 		nextaddr = voice.osc.start >> 12;
@@ -348,55 +350,53 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 
 	//linear interpolation as in US patent 6,246,774 B1, column 2 row 59
 	//LEN=1, BLEN=0, DIR=0, start+end interpolation
-	s32 sample, diff;
-	u16 fract;
-	diff = sample2 - sample1;
-	fract = (voice.osc.acc >> 3) & 0x1ff;
+	const s32 diff = sample2 - sample1;
+	const u16 fract = (voice.osc.acc >> 3) & 0x1ff;
 
 	//no need for interpolation since it's around 1 note a cycle?
 	//if (!fract)
 	//    return sample1;
 
-	sample = (((s32)sample1 << 9) + diff * fract) >> 9;
+	const s32 sample = (((s32)sample1 << 9) + diff * fract) >> 9;
 	//sample = sample1;
 	return sample;
 }
 
 bool ics2115_device::ics2115_voice::playing()
 {
-	return state.bitflags.on && !((vol_ctrl.bitflags.done || vol_ctrl.bitflags.stop) && osc_conf.bitflags.stop);
+	return state.on && !(osc_conf.bitflags.stop);
 }
 
 void ics2115_device::ics2115_voice::update_ramp()
 {
 	//slow attack
-	if (state.bitflags.on && !osc_conf.bitflags.stop)
+	if (state.on && !osc_conf.bitflags.stop)
 	{
-		if (state.bitflags.ramp < 0x40)
-			state.bitflags.ramp += 0x1;
+		if (state.ramp < 0x40)
+			state.ramp += 0x1;
 		else
-			state.bitflags.ramp = 0x40;
+			state.ramp = 0x40;
 	}
 	//slow release
 	else
 	{
-		if (state.bitflags.ramp)
-			state.bitflags.ramp -= 0x1;
+		if (state.ramp)
+			state.ramp -= 0x1;
 	}
 }
 
 int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples)
 {
 	bool irq_invalid = false;
-	u16 fine = 1 << (3*(voice.vol.incr >> 6));
+	const u16 fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3f)<< (10 - fine);
 
 	for (int i = 0; i < samples; i++)
 	{
-		u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		u32 volume = (m_volume[volacc >> 4] * voice.state.bitflags.ramp) >> 6;
-		u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
+		const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
+		const u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
+		const u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
@@ -494,7 +494,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //Helper Function (Reads off current register)
 u16 ics2115_device::reg_read()
 {
-	u16 ret;
+	u16 ret = 0;
 	ics2115_voice& voice = m_voice[m_osc_select];
 
 	switch (m_reg_select)
@@ -669,6 +669,10 @@ u16 ics2115_device::reg_read()
 void ics2115_device::reg_write(u16 data, u16 mem_mask)
 {
 	ics2115_voice& voice = m_voice[m_osc_select];
+	if (m_reg_select < 0x20)
+		COMBINE_DATA(&voice.regs[m_reg_select]);
+	else if (m_reg_select >= 0x40 && m_reg_select < 0x80)
+		COMBINE_DATA(&m_regs[m_reg_select - 0x40]);
 
 	switch (m_reg_select)
 	{
@@ -796,6 +800,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			{
 				data >>= 8;
 				voice.osc.ctl = data;
+				voice.state.on = !voice.osc.ctl; // some early PGM games need this
 				if (!data)
 					keyon();
 				//guessing here
@@ -810,10 +815,9 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 #endif
 					if (!m_vmode)
 					{
+						//try to key it off as well!
 						voice.osc_conf.bitflags.stop = true;
 						voice.vol_ctrl.bitflags.stop = true;
-						//try to key it off as well!
-						voice.state.bitflags.on = false;
 					}
 				}
 #ifdef ICS2115_DEBUG
@@ -1012,9 +1016,8 @@ void ics2115_device::keyon()
 		return;
 #endif
 	//set initial condition (may need to invert?) -- does NOT work since these are set to zero even
-	m_voice[m_osc_select].state.bitflags.on = true;
 	//no ramp up...
-	m_voice[m_osc_select].state.bitflags.ramp = 0x40;
+	m_voice[m_osc_select].state.ramp = 0x40;
 
 #ifdef ICS2115_DEBUG
 	logerror("[%02d vs:%04x ve:%04x va:%04x vi:%02x vc:%02x os:%06x oe:%06x oa:%06x of:%04x SA:%02x oc:%02x][%04x]\n", m_osc_select,

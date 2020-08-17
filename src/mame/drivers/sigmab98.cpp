@@ -38,7 +38,7 @@ Dumped games:                           ROMs:    Video:
 
 Sammy Kids Medal Series
 
-CPU     :   Kawasaki KL5C80A120FP (Z80 Compatible High Speed Microcontroller)
+CPU     :   Kawasaki KL5C80A12CFP (Z80 Compatible High Speed Microcontroller)
 Video   :   TAXAN KY-3211
 Sound   :   OKI M9810B
 NVRAM   :   93C46 and battery backed RAM
@@ -113,6 +113,7 @@ Notes:
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "cpu/z80/kl5c80a12.h"
 #include "cpu/z80/z80.h"
 #include "machine/74165.h"
 #include "machine/eepromser.h"
@@ -129,42 +130,77 @@ Notes:
 #include "speaker.h"
 
 
-class sigmab98_state : public driver_device
+class sigmab98_base_state : public driver_device
 {
 public:
-	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		// Required devices
-		m_maincpu(*this,"maincpu"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode"),
-		// Optional devices
-		m_buffered_spriteram(*this, "spriteram"),
-		m_nvramdev(*this, "nvram"),
-		m_eeprom(*this, "eeprom"),
-		m_hopper(*this, "hopper"),
-		m_hopper_small(*this, "hopper_small"),
-		m_hopper_large(*this, "hopper_large"),
-		// Shared pointers
-		m_nvram(*this, "nvram"),
-		m_spriteram(*this, "spriteram"),
-		m_vregs(*this, "vregs"),
-		m_vtable(*this, "vtable"),
-		m_leds(*this, "led%u", 0U)
+	sigmab98_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_buffered_spriteram(*this, "spriteram")
+		, m_spriteram(*this, "spriteram")
+		, m_vregs(*this, "vregs")
+		, m_vtable(*this, "vtable")
+		, m_new_sprite_chip(false)
+		, m_vblank(0)
+	{ }
+
+protected:
+	virtual void video_start() override;
+
+	// TODO: unify these handlers
+	void vregs_w(offs_t offset, uint8_t data);
+	uint8_t vregs_r(offs_t offset);
+	uint8_t d013_r();
+	uint8_t d021_r();
+	void vblank_w(uint8_t data);
+	uint8_t vblank_r();
+	uint8_t haekaka_vblank_r();
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
+
+	// Required devices
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	// Optional devices
+	optional_device<buffered_spriteram8_device> m_buffered_spriteram;   // not on sammymdl?
+
+	// Shared pointers
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_vregs;
+	required_shared_ptr<uint8_t> m_vtable;
+
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
+
+	bool m_new_sprite_chip; // KY-10510 has a slightly different sprite format than KY-3211
+
+	uint8_t m_vblank;
+};
+
+
+class sigmab98_state : public sigmab98_base_state
+{
+public:
+	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sigmab98_base_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_nvramdev(*this, "nvram")
+		, m_eeprom(*this, "eeprom")
+		, m_hopper(*this, "hopper")
+		, m_nvram(*this, "nvram")
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void sigmab98(machine_config &config);
-	void pyenaget(machine_config &config);
 	void dodghero(machine_config &config);
 	void dashhero(machine_config &config);
 	void gegege(machine_config &config);
-	void haekaka(machine_config &config);
-	void gocowboy(machine_config &config);
-	void tdoboon(machine_config &config);
-	void animalc(machine_config &config);
-	void sammymdl(machine_config &config);
-	void itazuram(machine_config &config);
 
 	void init_dodghero();
 	void init_b3rinsya();
@@ -172,13 +208,7 @@ public:
 	void init_dashhero();
 	void init_gegege();
 	void init_pepsiman();
-	void init_itazuram();
-	void init_animalc();
 	void init_ucytokyu();
-	void init_haekaka();
-	void init_gocowboy();
-
-	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	void gegege_regs_w(offs_t offset, uint8_t data);
@@ -194,122 +224,37 @@ protected:
 	void dashhero_regs2_w(offs_t offset, uint8_t data);
 	uint8_t dashhero_regs2_r(offs_t offset);
 
-	void vregs_w(offs_t offset, uint8_t data);
-	uint8_t vregs_r(offs_t offset);
-	uint8_t d013_r();
-	uint8_t d021_r();
-
 	void c4_w(uint8_t data);
 	void c6_w(uint8_t data);
 	void c8_w(uint8_t data);
 
-	void animalc_rombank_w(offs_t offset, uint8_t data);
-	uint8_t animalc_rombank_r(offs_t offset);
-	void animalc_rambank_w(offs_t offset, uint8_t data);
-	uint8_t animalc_rambank_r(offs_t offset);
-
-	uint8_t unk_34_r();
-	void vblank_w(uint8_t data);
-	uint8_t vblank_r();
-	uint8_t sammymdl_coin_counter_r();
-	void sammymdl_coin_counter_w(uint8_t data);
-	uint8_t sammymdl_leds_r();
-	void sammymdl_leds_w(uint8_t data);
-	void sammymdl_hopper_w(uint8_t data);
-	uint8_t sammymdl_coin_hopper_r();
-
-	void gocowboy_rombank_w(offs_t offset, uint8_t data);
-	uint8_t gocowboy_rombank_r(offs_t offset);
-	void gocowboy_rambank_w(offs_t offset, uint8_t data);
-	uint8_t gocowboy_rambank_r(offs_t offset);
-	void gocowboy_4400_w(offs_t offset, uint8_t data);
-	uint8_t gocowboy_4400_r(offs_t offset);
-	void gocowboy_dc00_w(offs_t offset, uint8_t data);
-	uint8_t gocowboy_dc00_r(offs_t offset);
-	void gocowboy_leds_w(uint8_t data);
-
-	void haekaka_rombank_w(offs_t offset, uint8_t data);
-	uint8_t haekaka_rombank_r(offs_t offset);
-	void haekaka_rambank_w(offs_t offset, uint8_t data);
-	uint8_t haekaka_rambank_r(offs_t offset);
-	uint8_t haekaka_vblank_r();
-	uint8_t haekaka_b000_r(offs_t offset);
-	void haekaka_b000_w(offs_t offset, uint8_t data);
-	void haekaka_leds_w(uint8_t data);
-	void haekaka_coin_counter_w(uint8_t data);
-
-	void itazuram_rombank_w(offs_t offset, uint8_t data);
-	uint8_t itazuram_rombank_r(offs_t offset);
-	void itazuram_rambank_w(offs_t offset, uint8_t data);
-	uint8_t itazuram_rambank_r(offs_t offset);
-	void itazuram_nvram_palette_w(offs_t offset, uint8_t data);
-	void itazuram_palette_w(offs_t offset, uint8_t data);
-	uint8_t itazuram_palette_r(offs_t offset);
-
-	void tdoboon_rombank_w(offs_t offset, uint8_t data);
-	uint8_t tdoboon_rombank_r(offs_t offset);
-	void tdoboon_rambank_w(offs_t offset, uint8_t data);
-	uint8_t tdoboon_rambank_r(offs_t offset);
-	uint8_t tdoboon_c000_r(offs_t offset);
-	void tdoboon_c000_w(offs_t offset, uint8_t data);
-
 	void show_outputs();
-	void show_3_outputs();
 	void eeprom_w(uint8_t data);
-	uint8_t sammymdl_eeprom_r();
-	void sammymdl_eeprom_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(sigmab98);
-	DECLARE_MACHINE_RESET(sammymdl);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 
-	void animalc_io(address_map &map);
-	void animalc_map(address_map &map);
 	void dashhero_io_map(address_map &map);
 	void dodghero_io_map(address_map &map);
 	void dodghero_mem_map(address_map &map);
 	void gegege_io_map(address_map &map);
 	void gegege_mem_map(address_map &map);
-	void gocowboy_io(address_map &map);
-	void gocowboy_map(address_map &map);
-	void haekaka_io(address_map &map);
-	void haekaka_map(address_map &map);
-	void itazuram_io(address_map &map);
-	void itazuram_map(address_map &map);
-	void pyenaget_io(address_map &map);
-	void tdoboon_io(address_map &map);
-	void tdoboon_map(address_map &map);
 
 	virtual void machine_start() override { m_leds.resolve(); }
-	virtual void video_start() override;
 
 	// Required devices
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
+
 	// Optional devices
-	optional_device<buffered_spriteram8_device> m_buffered_spriteram;   // not on sammymdl?
 	optional_device<nvram_device> m_nvramdev; // battery backed RAM (should be required, but dashhero breaks with it)
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<ticket_dispenser_device> m_hopper;
-	optional_device<ticket_dispenser_device> m_hopper_small;
-	optional_device<ticket_dispenser_device> m_hopper_large;
+
 	// Shared pointers
 	required_shared_ptr<uint8_t> m_nvram;
-	optional_shared_ptr<uint8_t> m_spriteram; // optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<uint8_t> m_vregs;     // optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<uint8_t> m_vtable;    // optional as some games allocate it themselves (due to banking)
-	output_finder<8> m_leds;
 
-	std::vector<uint8_t> m_paletteram;
-
-	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
-	bool new_sprite_chip; // KY-10510 has a slightly different sprite format than KY-3211
+	output_finder<4> m_leds;
 
 	uint8_t m_reg;
 	uint8_t m_rombank;
@@ -324,23 +269,25 @@ protected:
 	uint8_t m_c4;
 	uint8_t m_c6;
 	uint8_t m_c8;
-	uint8_t m_vblank;
-	uint8_t m_out[3];
 };
 
 
 class lufykzku_state : public sigmab98_state
 {
 public:
-	lufykzku_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sigmab98_state(mconfig, type, tag),
-		m_watchdog(*this, "watchdog_mb3773"),
-		m_dsw_shifter(*this, "ttl165_%u", 1U),
-		m_dsw_bit(0)
+	lufykzku_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sigmab98_state(mconfig, type, tag)
+		, m_watchdog(*this, "watchdog_mb3773")
+		, m_dsw_shifter(*this, "ttl165_%u", 1U)
+		, m_dsw_bit(0)
 	{
-		new_sprite_chip = true;
+		m_new_sprite_chip = true;
 	}
 
+	void init_lufykzku();
+	void lufykzku(machine_config &config);
+
+private:
 	required_device<mb3773_device> m_watchdog;
 	required_device_array<ttl165_device, 2> m_dsw_shifter;
 
@@ -356,13 +303,91 @@ public:
 	void lufykzku_watchdog_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(lufykzku);
-	void init_lufykzku();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
 
-	void lufykzku(machine_config &config);
 	void lufykzku_io_map(address_map &map);
 	void lufykzku_mem_map(address_map &map);
+};
+
+
+class sammymdl_state : public sigmab98_base_state
+{
+public:
+	sammymdl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sigmab98_base_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_eeprom(*this, "eeprom")
+		, m_hopper(*this, "hopper")
+		, m_hopper_small(*this, "hopper_small")
+		, m_hopper_large(*this, "hopper_large")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	void haekaka(machine_config &config);
+	void gocowboy(machine_config &config);
+	void tdoboon(machine_config &config);
+	void animalc(machine_config &config);
+	void sammymdl(machine_config &config);
+	void itazuram(machine_config &config);
+	void pyenaget(machine_config &config);
+
+	void init_itazuram();
+	void init_animalc();
+	void init_haekaka();
+	void init_gocowboy();
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
+
+	uint8_t unk_34_r();
+	uint8_t coin_counter_r();
+	void coin_counter_w(uint8_t data);
+	uint8_t leds_r();
+	void leds_w(uint8_t data);
+	void hopper_w(uint8_t data);
+	uint8_t coin_hopper_r();
+
+	void gocowboy_leds_w(uint8_t data);
+
+	void haekaka_leds_w(uint8_t data);
+	void haekaka_coin_counter_w(uint8_t data);
+
+	void show_3_outputs();
+	uint8_t eeprom_r();
+	void eeprom_w(uint8_t data);
+
+	void animalc_io(address_map &map);
+	void animalc_map(address_map &map);
+	void gocowboy_io(address_map &map);
+	void gocowboy_map(address_map &map);
+	void haekaka_io(address_map &map);
+	void haekaka_map(address_map &map);
+	void itazuram_io(address_map &map);
+	void itazuram_map(address_map &map);
+	void pyenaget_io(address_map &map);
+	void tdoboon_io(address_map &map);
+	void tdoboon_map(address_map &map);
+
+	// Required devices
+	required_device<kl5c80a12_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+
+	// Optional devices
+	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_hopper_small;
+	optional_device<ticket_dispenser_device> m_hopper_large;
+
+	output_finder<8> m_leds;
+
+	uint8_t m_vblank_vector;
+	uint8_t m_timer0_vector;
+	uint8_t m_timer1_vector;
+
+	uint8_t m_out[3];
 };
 
 
@@ -372,7 +397,7 @@ public:
 
 ***************************************************************************/
 
-void sigmab98_state::video_start()
+void sigmab98_base_state::video_start()
 {
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 }
@@ -424,22 +449,22 @@ inline int integer_part(int x)
 	return (x + 0x8000) >> 16;
 }
 
-void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
+void sigmab98_base_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
 {
 	uint8_t *end      =   (m_buffered_spriteram ? m_buffered_spriteram->buffer() : m_spriteram) - 0x10;
 	uint8_t *s        =   end + 0x1000;
 
 	for ( ; s != end; s -= 0x10 )
 	{
-		if ( (s[ 0x01 ] & (new_sprite_chip ? 0x0c : 0x04)) == 0)
+		if ( (s[ 0x01 ] & (m_new_sprite_chip ? 0x0c : 0x04)) == 0)
 			continue;
 
 		if ( ((1 << (s[ 0x01 ] & 0x03)) & pri_mask) == 0 )
 			continue;
 
-		int color   =   s[ 0x00 ] & (new_sprite_chip ? 0xff : 0xf);
+		int color   =   s[ 0x00 ] & (m_new_sprite_chip ? 0xff : 0xf);
 
-		int gfx     =   (s[ 0x01 ] & (new_sprite_chip ? 0x08 : 0x40)) ? 1 : 0;
+		int gfx     =   (s[ 0x01 ] & (m_new_sprite_chip ? 0x08 : 0x40)) ? 1 : 0;
 		int code    =   s[ 0x02 ] * 256 + s[ 0x03 ];
 
 		int nx      =   ((s[ 0x04 ] & 0xf8) >> 3) + 1;
@@ -459,8 +484,8 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		dsty = (dsty  & 0x01ff) - (dsty  & 0x0200);
 
 		// Flipping
-		int x0, x1, dx, flipx = new_sprite_chip ? s[ 0x04 ] & 0x04 : s[ 0x01 ] & 0x10;
-		int y0, y1, dy, flipy = new_sprite_chip ? s[ 0x06 ] & 0x04 : s[ 0x01 ] & 0x08;
+		int x0, x1, dx, flipx = m_new_sprite_chip ? s[ 0x04 ] & 0x04 : s[ 0x01 ] & 0x10;
+		int y0, y1, dy, flipy = m_new_sprite_chip ? s[ 0x06 ] & 0x04 : s[ 0x01 ] & 0x08;
 
 		if ( flipx )    {   x0 = nx - 1;    x1 = -1;    dx = -1;    }
 		else            {   x0 = 0;         x1 = nx;    dx = +1;    }
@@ -599,7 +624,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sigmab98_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -656,7 +681,7 @@ uint32_t sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-void sigmab98_state::vregs_w(offs_t offset, uint8_t data)
+void sigmab98_base_state::vregs_w(offs_t offset, uint8_t data)
 {
 	m_vregs[offset] = data;
 
@@ -677,7 +702,7 @@ void sigmab98_state::vregs_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t sigmab98_state::vregs_r(offs_t offset)
+uint8_t sigmab98_base_state::vregs_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -688,7 +713,7 @@ uint8_t sigmab98_state::vregs_r(offs_t offset)
 	}
 }
 
-uint8_t sigmab98_state::d013_r()
+uint8_t sigmab98_base_state::d013_r()
 {
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must be set (sprite buffered? triggered by pulsing bit 3 of port C6?)
@@ -696,7 +721,7 @@ uint8_t sigmab98_state::d013_r()
 	return (m_screen->vblank() ? 0x20 : 0x01) | 0x04;
 //  return machine().rand();
 }
-uint8_t sigmab98_state::d021_r()
+uint8_t sigmab98_base_state::d021_r()
 {
 	// bit 5 must be 0?
 	return 0;
@@ -1278,107 +1303,12 @@ void lufykzku_state::lufykzku_io_map(address_map &map)
                                  Animal Catch
 ***************************************************************************/
 
-// rombank
-void sigmab98_state::animalc_rombank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	uint8_t *rom = memregion("maincpu")->base();
-	switch ( m_reg )
-	{
-		case 0x0f:
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x10:  membank("rombank")->set_base(rom + 0x400 + 0x4000); break;
-				case 0x14:  membank("rombank")->set_base(rom + 0x400 + 0x8000); break;
-				case 0x18:  membank("rombank")->set_base(rom + 0x400 + 0xc000); break;
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-uint8_t sigmab98_state::animalc_rombank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x0f:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
-}
-
-// rambank
-void sigmab98_state::animalc_rambank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	int bank = 0;
-	switch ( m_reg2 )
-	{
-		case 0x1f:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x58:  bank = 0;   break;
-				case 0x62:  bank = 1;   break;
-				case 0x63:  bank = 2;   break;
-				case 0x64:  bank = 3;   break;
-				case 0x65:  bank = 4;   break;
-				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
-					return;
-			}
-			membank("rambank")->set_entry(bank);
-			if ( (bank == 1) || (bank == 2) || (bank == 3) )
-				membank("sprbank")->set_entry(bank-1);
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-uint8_t sigmab98_state::animalc_rambank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x1f:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
-
-uint8_t sigmab98_state::sammymdl_eeprom_r()
+uint8_t sammymdl_state::eeprom_r()
 {
 	return m_eeprom->do_read() ? 0x80 : 0;
 }
 
-void sigmab98_state::sammymdl_eeprom_w(uint8_t data)
+void sammymdl_state::eeprom_w(uint8_t data)
 {
 	// latch the bit
 	m_eeprom->di_write((data & 0x40) >> 6);
@@ -1393,25 +1323,25 @@ void sigmab98_state::sammymdl_eeprom_w(uint8_t data)
 		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);
 }
 
-uint8_t sigmab98_state::unk_34_r()
+uint8_t sammymdl_state::unk_34_r()
 {
 	// mask 0x01?
 	return 0x01;
 }
 
-uint8_t sigmab98_state::vblank_r()
+uint8_t sigmab98_base_state::vblank_r()
 {
 	// mask 0x04 must be set before writing sprite list
 	// mask 0x10 must be set or irq/00 hangs?
 	return  m_vblank | 0x14;
 }
 
-void sigmab98_state::vblank_w(uint8_t data)
+void sigmab98_base_state::vblank_w(uint8_t data)
 {
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
 
-WRITE_LINE_MEMBER(sigmab98_state::screen_vblank_sammymdl)
+WRITE_LINE_MEMBER(sigmab98_base_state::screen_vblank_sammymdl)
 {
 	// rising edge
 	if (state)
@@ -1420,18 +1350,18 @@ WRITE_LINE_MEMBER(sigmab98_state::screen_vblank_sammymdl)
 	}
 }
 
-void sigmab98_state::show_3_outputs()
+void sammymdl_state::show_3_outputs()
 {
 #ifdef MAME_DEBUG
 	popmessage("COIN: %02X  LED: %02X  HOP: %02X", m_out[0], m_out[1], m_out[2]);
 #endif
 }
 // Port 31
-uint8_t sigmab98_state::sammymdl_coin_counter_r()
+uint8_t sammymdl_state::coin_counter_r()
 {
 	return m_out[0];
 }
-void sigmab98_state::sammymdl_coin_counter_w(uint8_t data)
+void sammymdl_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,   data  & 0x01 );  // coin1 in
 	machine().bookkeeping().coin_counter_w(1,   data  & 0x02 );  // coin2 in
@@ -1448,11 +1378,11 @@ void sigmab98_state::sammymdl_coin_counter_w(uint8_t data)
 }
 
 // Port 32
-uint8_t sigmab98_state::sammymdl_leds_r()
+uint8_t sammymdl_state::leds_r()
 {
 	return m_out[1];
 }
-void sigmab98_state::sammymdl_leds_w(uint8_t data)
+void sammymdl_state::leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);   // button
 
@@ -1463,7 +1393,7 @@ void sigmab98_state::sammymdl_leds_w(uint8_t data)
 // Port b0
 // 02 hopper enable?
 // 01 hopper motor on (active low)?
-void sigmab98_state::sammymdl_hopper_w(uint8_t data)
+void sammymdl_state::hopper_w(uint8_t data)
 {
 	m_hopper->motor_w((!(data & 0x01) && (data & 0x02)) ? 0 : 1);
 
@@ -1471,7 +1401,7 @@ void sigmab98_state::sammymdl_hopper_w(uint8_t data)
 	show_3_outputs();
 }
 
-uint8_t sigmab98_state::sammymdl_coin_hopper_r()
+uint8_t sammymdl_state::coin_hopper_r()
 {
 	uint8_t ret = ioport("COIN")->read();
 
@@ -1481,42 +1411,33 @@ uint8_t sigmab98_state::sammymdl_coin_hopper_r()
 	return ret;
 }
 
-void sigmab98_state::animalc_map(address_map &map)
+void sammymdl_state::animalc_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x8000, 0x8fff).bankrw("rambank").share("nvram");
-
-	map(0x9000, 0x9fff).ram();
-	map(0xa000, 0xafff).ram();
-	map(0xb000, 0xbfff).bankrw("sprbank");
-
-	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd800, 0xd87f).ram().share("vtable");
-
-	map(0xe000, 0xe021).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
-	map(0xe011, 0xe011).nopw();  // IRQ Enable? Screen disable?
-	map(0xe013, 0xe013).rw(FUNC(sigmab98_state::vblank_r), FUNC(sigmab98_state::vblank_w));    // IRQ Ack?
-
-	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+	map(0x00000, 0x0ffff).rom().region("mainbios", 0);
+	map(0x10000, 0x2ffff).rom().region("maincpu", 0x400);
+	map(0x60000, 0x63fff).ram().share("nvram");
+	map(0x6a000, 0x6ffff).ram();
+	map(0x70000, 0x70fff).ram().share("spriteram");
+	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x72800, 0x7287f).ram().share("vtable");
+	map(0x73000, 0x73021).rw(FUNC(sammymdl_state::vregs_r), FUNC(sammymdl_state::vregs_w)).share("vregs");
+	map(0x73011, 0x73011).nopw();  // IRQ Enable? Screen disable?
+	map(0x73013, 0x73013).rw(FUNC(sammymdl_state::vblank_r), FUNC(sammymdl_state::vblank_w));    // IRQ Ack?
 }
 
-void sigmab98_state::animalc_io(address_map &map)
+void sammymdl_state::animalc_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).rw(FUNC(sigmab98_state::animalc_rombank_r), FUNC(sigmab98_state::animalc_rombank_w));
-	map(0x04, 0x05).rw(FUNC(sigmab98_state::animalc_rambank_r), FUNC(sigmab98_state::animalc_rambank_w));
-
-	map(0x2c, 0x2c).rw(FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
-	map(0x2e, 0x2e).r(FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x2c, 0x2c).rw(FUNC(sammymdl_state::eeprom_r), FUNC(sammymdl_state::eeprom_w));
+	map(0x2e, 0x2e).r(FUNC(sammymdl_state::coin_hopper_r));
 	map(0x30, 0x30).portr("BUTTON");
-	map(0x31, 0x31).rw(FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
-	map(0x32, 0x32).rw(FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::sammymdl_leds_w));
-	map(0x34, 0x34).r(FUNC(sigmab98_state::unk_34_r));
+	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::coin_counter_w));
+	map(0x32, 0x32).rw(FUNC(sammymdl_state::leds_r), FUNC(sammymdl_state::leds_w));
+	map(0x34, 0x34).r(FUNC(sammymdl_state::unk_34_r));
 	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
 	map(0x91, 0x91).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
-	map(0xb0, 0xb0).w(FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xb0, 0xb0).w(FUNC(sammymdl_state::hopper_w));
 	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
 }
 
@@ -1524,267 +1445,18 @@ void sigmab98_state::animalc_io(address_map &map)
                                Go Go Cowboy
 ***************************************************************************/
 
-// rombank
-void sigmab98_state::gocowboy_rombank_w(offs_t offset, uint8_t data)
+void sammymdl_state::gocowboy_map(address_map &map)
 {
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	switch ( m_reg )
-	{
-		case 0x50: // 4400
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x13: // (17800) ROM
-				case 0x15: // (19800) ROM
-					break;
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		case 0x90: // 4400
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x0f: // (13c00) ROM
-					break;
-				case 0x17: // (1bc00) ROM
-					break;
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		case 0xd0: // 4400
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x0f: // (14000) ROM
-					break;
-
-				case 0x5b: // (60000) clears 4400-c3ff
-					break;
-
-				case 0x5d: // (62000) copies 1404 bytes: 4400 <-> e6c6
-					break;
-
-				case 0x6b: // (70000) SPRITERAM + (72000) PALETTERAM + (72800) VTABLE + (73000) VREGS
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-
-uint8_t sigmab98_state::gocowboy_rombank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x50:
-		case 0x90:
-		case 0xd0:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
-}
-
-uint8_t sigmab98_state::gocowboy_4400_r(offs_t offset)
-{
-	switch (m_rombank)
-	{
-		// ROM
-		case 0x0f:
-			return memregion("maincpu")->base()[offset + 0x3800 + (m_reg >> 6) * 0x400];
-			break;
-
-		case 0x13:
-			return memregion("maincpu")->base()[offset + 0x7c00];
-			break;
-
-		case 0x15:
-			return memregion("maincpu")->base()[offset + 0x9c00];
-			break;
-
-		case 0x17:
-			return memregion("maincpu")->base()[offset + 0xc000];
-			break;
-
-		case 0x5b: // (60000) clears 4400-c3ff
-			return m_nvram[offset];
-			break;
-
-		case 0x5d: // (62000) copies 1404 bytes: 4400 <-> e6c6
-			if (offset + 0x2000 < 0x80000)
-				return m_nvram[offset + 0x2000];
-			break;
-
-		case 0x6b: // (70000) SPRITERAM + (72000) PALETTERAM + (72800) VTABLE + (73000) VREGS
-			if (offset < 0x1000)
-				return m_spriteram[offset];
-			else if ((offset >= 0x2000) && (offset < 0x2200))
-				return m_paletteram[offset - 0x2000];
-			else if ((offset >= 0x2800) && (offset < 0x2880))
-				return m_vtable[offset - 0x2800];
-			else if (offset >= 0x3000 && offset <= 0x3021)
-				return vregs_r(offset - 0x3000);
-			break;
-	}
-
-	logerror("%s: unknown read from %02x with rombank = %02x\n", machine().describe_context(), offset+0x4400, m_rombank);
-	return 0x00;
-}
-
-void sigmab98_state::gocowboy_4400_w(offs_t offset, uint8_t data)
-{
-	switch (m_rombank)
-	{
-		case 0x5b: // (60000) clears 4400-c3ff
-			m_nvram[offset] = data;
-			return;
-
-		case 0x5d: // (62000) copies 1404 bytes: 4400 <-> e6c6
-			if (offset + 0x2000 < 0x80000)
-			{
-				m_nvram[offset + 0x2000] = data;
-				return;
-			}
-			break;
-
-		case 0x6b: // (70000) SPRITERAM + (72000) PALETTERAM + (72800) VTABLE + (73000) VREGS
-			if (offset < 0x1000)
-			{
-				m_spriteram[offset] = data;
-				return;
-			}
-			else if ((offset >= 0x2000) && (offset < 0x2200))
-			{
-				m_palette->write8(offset-0x2000, data);
-				return;
-			}
-			else if ((offset >= 0x2800) && (offset < 0x2880))
-			{
-				m_vtable[offset-0x2800] = data;
-				return;
-			}
-			else if (offset >= 0x3000 && offset <= 0x3021)
-			{
-				vregs_w(offset - 0x3000, data);
-				return;
-			}
-			break;
-	}
-
-	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset + 0x4400, data, m_rombank);
-}
-
-// rambank
-void sigmab98_state::gocowboy_rambank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0x76: // dc00
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x52: // (60000) NVRAM
-					break;
-
-				case 0x64: // (72000) PALETTERAM
-					break;
-
-				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
-					return;
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-
-uint8_t sigmab98_state::gocowboy_rambank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x76:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
-uint8_t sigmab98_state::gocowboy_dc00_r(offs_t offset)
-{
-	switch (m_rambank)
-	{
-		case 0x52: // (60000) NVRAM
-			return m_nvram[offset];
-
-		case 0x64: // (72000) PALETTERAM
-			return m_paletteram[offset];
-	}
-
-	logerror("%s: unknown read from %02x with rombank = %02x\n", machine().describe_context(), offset + 0xdc00, m_rambank);
-	return 0;
-}
-
-void sigmab98_state::gocowboy_dc00_w(offs_t offset, uint8_t data)
-{
-	switch (m_rambank)
-	{
-		case 0x52: // (60000) NVRAM
-			m_nvram[offset] = data;
-			return;
-
-		case 0x64: // (72000) PALETTERAM
-			m_palette->write8(offset, data);
-			return;
-	}
-
-	logerror("%s: unknown write to %02x = %02x with rambank = %02x\n", machine().describe_context(), offset + 0xdc00, data, m_rambank);
-}
-
-void sigmab98_state::gocowboy_map(address_map &map)
-{
-	map(0x0000, 0x43ff).rom();
-
-	map(0x4400, 0xdbff).rw(FUNC(sigmab98_state::gocowboy_4400_r), FUNC(sigmab98_state::gocowboy_4400_w));    // SPRITERAM + PALETTERAM + VTABLE + VREGS | NVRAM
-
-	map(0xdc00, 0xfbff).rw(FUNC(sigmab98_state::gocowboy_dc00_r), FUNC(sigmab98_state::gocowboy_dc00_w)).share("nvram");  // PALETTERAM | NVRAM
-
-	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+	map(0x00000, 0x3ffff).rom().region("mainbios", 0);
+	map(0x60000, 0x67fff).ram().share("nvram");
+	map(0x70000, 0x70fff).ram().share("spriteram");
+	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x72800, 0x7287f).ram().share("vtable");
+	map(0x73000, 0x73021).rw(FUNC(sammymdl_state::vregs_r), FUNC(sammymdl_state::vregs_w)).share("vregs");
 }
 
 
-void sigmab98_state::gocowboy_leds_w(uint8_t data)
+void sammymdl_state::gocowboy_leds_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);   // button
 	m_leds[1] = BIT(data, 1);   // coin lockout? (after coining up, but not for service coin)
@@ -1800,17 +1472,14 @@ void sigmab98_state::gocowboy_leds_w(uint8_t data)
 	show_3_outputs();
 }
 
-void sigmab98_state::gocowboy_io(address_map &map)
+void sammymdl_state::gocowboy_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).rw(FUNC(sigmab98_state::gocowboy_rombank_r), FUNC(sigmab98_state::gocowboy_rombank_w));
-	map(0x04, 0x05).rw(FUNC(sigmab98_state::gocowboy_rambank_r), FUNC(sigmab98_state::gocowboy_rambank_w));
-
-	map(0x2c, 0x2c).rw(FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
-	map(0x2e, 0x2e).r(FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x2c, 0x2c).rw(FUNC(sammymdl_state::eeprom_r), FUNC(sammymdl_state::eeprom_w));
+	map(0x2e, 0x2e).r(FUNC(sammymdl_state::coin_hopper_r));
 	map(0x30, 0x30).portr("BUTTON");
-	map(0x31, 0x31).rw(FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
-	map(0x32, 0x32).rw(FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::gocowboy_leds_w));
+	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::coin_counter_w));
+	map(0x32, 0x32).rw(FUNC(sammymdl_state::leds_r), FUNC(sammymdl_state::gocowboy_leds_w));
 	map(0x90, 0x90).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write));
 	map(0x91, 0x91).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
@@ -1822,196 +1491,12 @@ void sigmab98_state::gocowboy_io(address_map &map)
                              Hae Hae Ka Ka Ka
 ***************************************************************************/
 
-// rombank
-void sigmab98_state::haekaka_rombank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	switch ( m_reg )
-	{
-		case 0x2b:
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x10:  // ROM
-				case 0x11:
-				case 0x12:
-				case 0x13:
-				case 0x14:
-				case 0x15:
-				case 0x16:
-				case 0x17:
-				case 0x18:
-				case 0x19:
-				case 0x1a:
-				case 0x1b:
-				case 0x1c:
-				case 0x1d:
-				case 0x1e:
-				case 0x1f:
-
-				case 0x65:  // SPRITERAM
-				case 0x67:  // PALETTERAM + VTABLE + VREGS
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-uint8_t sigmab98_state::haekaka_rombank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x2b:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
-}
-
-// rambank
-void sigmab98_state::haekaka_rambank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0x33:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x53:
-					break;
-
-				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-uint8_t sigmab98_state::haekaka_rambank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x33:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
-uint8_t sigmab98_state::haekaka_vblank_r()
+uint8_t sigmab98_base_state::haekaka_vblank_r()
 {
 	return m_screen->vblank() ? 0 : 0x1c;
 }
 
-uint8_t sigmab98_state::haekaka_b000_r(offs_t offset)
-{
-	switch (m_rombank)
-	{
-		case 0x10:  // ROM
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-			return memregion("maincpu")->base()[offset + 0xb400 + 0x1000 * (m_rombank-0x10)];
-
-		case 0x65:  // SPRITERAM
-			if (offset < 0x1000)
-				return m_spriteram[offset];
-
-		case 0x67:  // PALETTERAM + VTABLE + VREGS
-			if (offset < 0x200)
-				return m_paletteram[offset];
-			else if ((offset >= 0x800) && (offset < 0x880))
-			{
-				return m_vtable[offset-0x800];
-			}
-			else if (offset >= (0xc000-0xb000) && offset <= (0xc021-0xb000))
-			{
-				if (offset == (0xc013-0xb000))
-					return haekaka_vblank_r();
-				return vregs_r(offset-(0xc000-0xb000));
-			}
-			break;
-	}
-
-	logerror("%s: unknown read from %02x with rombank = %02x\n", machine().describe_context(), offset+0xb000, m_rombank);
-	return 0x00;
-}
-
-void sigmab98_state::haekaka_b000_w(offs_t offset, uint8_t data)
-{
-	switch (m_rombank)
-	{
-		case 0x65:  // SPRITERAM
-			if (offset < 0x1000)
-			{
-				m_spriteram[offset] = data;
-				return;
-			}
-			break;
-
-		case 0x67:  // PALETTERAM + VTABLE + VREGS
-			if (offset < 0x200)
-			{
-				m_palette->write8(offset, data);
-				return;
-			}
-			else if ((offset >= 0x800) && (offset < 0x880))
-			{
-				m_vtable[offset-0x800] = data;
-				return;
-			}
-			else if (offset >= (0xc000-0xb000) && offset <= (0xc021-0xb000))
-			{
-				vregs_w(offset-(0xc000-0xb000), data);
-				return;
-			}
-			break;
-	}
-
-	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset+0xb000, data, m_rombank);
-}
-
-void sigmab98_state::haekaka_leds_w(uint8_t data)
+void sammymdl_state::haekaka_leds_w(uint8_t data)
 {
 	// All used
 	m_leds[0] = BIT(data, 0);
@@ -2027,7 +1512,7 @@ void sigmab98_state::haekaka_leds_w(uint8_t data)
 	show_3_outputs();
 }
 
-void sigmab98_state::haekaka_coin_counter_w(uint8_t data)
+void sammymdl_state::haekaka_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,   data & 0x01 );   // medal out
 //                                 data & 0x02 ?
@@ -2038,29 +1523,30 @@ void sigmab98_state::haekaka_coin_counter_w(uint8_t data)
 	show_3_outputs();
 }
 
-void sigmab98_state::haekaka_map(address_map &map)
+void sammymdl_state::haekaka_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0xb000, 0xcfff).rw(FUNC(sigmab98_state::haekaka_b000_r), FUNC(sigmab98_state::haekaka_b000_w));
-	map(0xd000, 0xefff).ram().share("nvram");
-	map(0xfe00, 0xffff).ram();   // High speed internal RAM
+	map(0x00000, 0x0ffff).rom().region("mainbios", 0);
+	map(0x10000, 0x2ffff).rom().region("maincpu", 0x400);
+	map(0x60000, 0x61fff).ram().share("nvram");
+	map(0x70000, 0x70fff).ram().share("spriteram");
+	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x72800, 0x7287f).ram().share("vtable");
+	map(0x73000, 0x73021).rw(FUNC(sammymdl_state::vregs_r), FUNC(sammymdl_state::vregs_w)).share("vregs");
+	map(0x73013, 0x73013).r(FUNC(sammymdl_state::haekaka_vblank_r));
 }
 
-void sigmab98_state::haekaka_io(address_map &map)
+void sammymdl_state::haekaka_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).rw(FUNC(sigmab98_state::haekaka_rombank_r), FUNC(sigmab98_state::haekaka_rombank_w));
-	map(0x04, 0x05).rw(FUNC(sigmab98_state::haekaka_rambank_r), FUNC(sigmab98_state::haekaka_rambank_w));
-
-	map(0x2c, 0x2c).rw(FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
-	map(0x2e, 0x2e).r(FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x2c, 0x2c).rw(FUNC(sammymdl_state::eeprom_r), FUNC(sammymdl_state::eeprom_w));
+	map(0x2e, 0x2e).r(FUNC(sammymdl_state::coin_hopper_r));
 	map(0x30, 0x30).portr("BUTTON");
-	map(0x31, 0x31).rw(FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::haekaka_coin_counter_w));
-	map(0x32, 0x32).rw(FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::haekaka_leds_w));
+	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::haekaka_coin_counter_w));
+	map(0x32, 0x32).rw(FUNC(sammymdl_state::leds_r), FUNC(sammymdl_state::haekaka_leds_w));
 	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
 	map(0x91, 0x91).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
-	map(0xb0, 0xb0).w(FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xb0, 0xb0).w(FUNC(sammymdl_state::hopper_w));
 	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
 }
 
@@ -2068,248 +1554,31 @@ void sigmab98_state::haekaka_io(address_map &map)
                               Itazura Monkey
 ***************************************************************************/
 
-// rombank
-void sigmab98_state::itazuram_rombank_w(offs_t offset, uint8_t data)
+void sammymdl_state::itazuram_map(address_map &map)
 {
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	uint8_t *rom = memregion("maincpu")->base();
-	switch ( m_reg )
-	{
-		case 0x0d:
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x11:  // 3800 IS ROM
-					membank("rombank0")->set_base(rom + 0x4c00);
-					membank("rombank1")->set_base(rom + 0x5c00);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		case 0x4d:
-			m_rombank = data;
-			switch (data)
-			{
-//              case 0x0f:  // demo mode, after title
-
-				case 0x14:  // 3800 IS ROM
-					membank("rombank0")->set_base(rom + 0x8000);
-					membank("rombank1")->set_base(rom + 0x9000);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		case 0x8d:
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x0f:  // 3800 IS ROM
-					membank("rombank0")->set_base(rom + 0x3400);
-					membank("rombank1")->set_base(rom + 0x4400);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
-					break;
-
-				case 0x12:  // 3800 IS ROM
-					membank("rombank0")->set_base(rom + 0x6400);
-					membank("rombank1")->set_base(rom + 0x7400);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
-					break;
-
-				// used in test mode (code at 2cc4):
-//              case 0x5c:  membank("rombank")->set_base(rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
-
-				case 0x5e:  // 3800 IS RAM! (1404 bytes)
-					membank("rombank0")->set_base(m_spriteram + 0x1000*1);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*1);
-					membank("rombank1")->set_base(m_spriteram + 0x1000*2);
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*2);
-					break;
-
-				case 0x6c:  // 3800 IS RAM! (1000 bytes) - SPRITERAM
-					membank("rombank0")->set_base(m_spriteram);
-					membank("sprbank0")->set_base(m_spriteram);
-//                  membank("sprbank1")->set_base(m_spriteram + 0x1000*4);    // scratch
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		case 0xcd:
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x14:  // 3800 IS ROM
-					membank("rombank0")->set_base(rom + 0x8800);
-					membank("rombank1")->set_base(rom + 0x9800);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
-					break;
-
-				case 0x16:  // 3800 IS ROM
-					membank("rombank0")->set_base(rom + 0xa800);
-					membank("rombank1")->set_base(rom + 0xb800);
-					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-uint8_t sigmab98_state::itazuram_rombank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		// FIXME: different registers
-		case 0x0d:
-		case 0x4d:
-		case 0x8d:
-		case 0xcd:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
+	map(0x00000, 0x0ffff).rom().region("mainbios", 0);
+	map(0x10000, 0x2ffff).rom().region("maincpu", 0x400);
+	map(0x60000, 0x63fff).ram().share("nvram");
+	map(0x70000, 0x70fff).ram().share("spriteram");
+	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x72800, 0x7287f).ram().share("vtable");
+	map(0x73000, 0x73021).rw(FUNC(sammymdl_state::vregs_r), FUNC(sammymdl_state::vregs_w)).share("vregs");
+	map(0x73011, 0x73011).nopw();  // IRQ Enable? Screen disable?
+	map(0x73013, 0x73013).r(FUNC(sammymdl_state::haekaka_vblank_r)).nopw();  // IRQ Ack?
 }
 
-// rambank
-void sigmab98_state::itazuram_rambank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0x76:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x52:  membank("palbank")->set_base(m_nvram);          break;
-				case 0x64:  membank("palbank")->set_base(&m_paletteram[0]); break;
-				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
-					return;
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-
-uint8_t sigmab98_state::itazuram_rambank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x76:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
-void sigmab98_state::itazuram_nvram_palette_w(offs_t offset, uint8_t data)
-{
-	if (m_rambank == 0x64)
-	{
-		m_palette->write8(offset, data);
-	}
-	else if (m_rambank == 0x52)
-	{
-		m_nvram[offset] = data;
-	}
-	else
-	{
-		logerror("%s: itazuram_nvram_palette_w offset = %03x with unknown bank = %02x\n", machine().describe_context(), offset, m_rambank);
-	}
-}
-
-void sigmab98_state::itazuram_palette_w(offs_t offset, uint8_t data)
-{
-	if (m_rombank == 0x6c)
-	{
-		if (offset < 0x200)
-			m_palette->write8(offset, data);
-	}
-	else
-	{
-		logerror("%s: itazuram_palette_w offset = %03x with unknown bank = %02x\n", machine().describe_context(), offset, m_rombank);
-	}
-}
-
-uint8_t sigmab98_state::itazuram_palette_r(offs_t offset)
-{
-	return m_paletteram[offset];
-}
-
-void sigmab98_state::itazuram_map(address_map &map)
-{
-	map(0x0000, 0x37ff).rom();
-	map(0x3800, 0x47ff).bankr("rombank0").bankw("sprbank0");
-	map(0x4800, 0x57ff).bankr("rombank1").bankw("sprbank1");
-
-	map(0x5800, 0x59ff).rw(FUNC(sigmab98_state::itazuram_palette_r), FUNC(sigmab98_state::itazuram_palette_w));
-	map(0x6000, 0x607f).ram().share("vtable");
-
-	map(0x6800, 0x6821).rw(FUNC(sigmab98_state::vregs_r), FUNC(sigmab98_state::vregs_w)).share("vregs");
-	map(0x6811, 0x6811).nopw();  // IRQ Enable? Screen disable?
-	map(0x6813, 0x6813).nopw();  // IRQ Ack?
-	map(0xdc00, 0xfdff).bankr("palbank").w(FUNC(sigmab98_state::itazuram_nvram_palette_w)).share("nvram");    // nvram | paletteram
-
-	map(0xfe00, 0xffff).ram();   // High speed internal RAM
-}
-
-void sigmab98_state::itazuram_io(address_map &map)
+void sammymdl_state::itazuram_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).rw(FUNC(sigmab98_state::itazuram_rombank_r), FUNC(sigmab98_state::itazuram_rombank_w));
-	map(0x04, 0x05).rw(FUNC(sigmab98_state::itazuram_rambank_r), FUNC(sigmab98_state::itazuram_rambank_w));
-
-	map(0x2c, 0x2c).rw(FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
-	map(0x2e, 0x2e).r(FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x2c, 0x2c).rw(FUNC(sammymdl_state::eeprom_r), FUNC(sammymdl_state::eeprom_w));
+	map(0x2e, 0x2e).r(FUNC(sammymdl_state::coin_hopper_r));
 	map(0x30, 0x30).portr("BUTTON");
-	map(0x31, 0x31).rw(FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
-	map(0x32, 0x32).rw(FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::sammymdl_leds_w));
+	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::coin_counter_w));
+	map(0x32, 0x32).rw(FUNC(sammymdl_state::leds_r), FUNC(sammymdl_state::leds_w));
 	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
 	map(0x91, 0x91).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
-	map(0xb0, 0xb0).w(FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xb0, 0xb0).w(FUNC(sammymdl_state::hopper_w));
 	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
 }
 
@@ -2317,231 +1586,40 @@ void sigmab98_state::itazuram_io(address_map &map)
                              Pye-nage Taikai
 ***************************************************************************/
 
-void sigmab98_state::pyenaget_io(address_map &map)
+void sammymdl_state::pyenaget_io(address_map &map)
 {
 	haekaka_io(map);
-	map(0x31, 0x31).rw(FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
+	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::coin_counter_w));
 }
 
 /***************************************************************************
                              Taihou de Doboon
 ***************************************************************************/
 
-// rombank
-void sigmab98_state::tdoboon_rombank_w(offs_t offset, uint8_t data)
+void sammymdl_state::tdoboon_map(address_map &map)
 {
-	if (offset == 0)
-	{
-		m_reg = data;
-		return;
-	}
-
-	switch ( m_reg )
-	{
-		case 0x2f:
-			m_rombank = data;
-			switch (data)
-			{
-				case 0x10:  // ROM
-				case 0x11:
-				case 0x12:
-				case 0x13:
-				case 0x14:
-				case 0x15:
-				case 0x16:
-				case 0x17:
-				case 0x18:
-				case 0x19:
-				case 0x1a:
-				case 0x1b:
-				case 0x1c:
-				case 0x1d:
-				case 0x1e:
-				case 0x1f:
-
-				case 0x64:  // SPRITERAM
-				case 0x66:  // PALETTERAM + VTABLE
-				case 0x67:  // VREGS
-					break;
-
-				default:
-					logerror("%s: unknown rom bank = %02x, reg = %02x\n", machine().describe_context(), data, m_reg);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
-	}
-}
-uint8_t sigmab98_state::tdoboon_rombank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg;
-
-	switch ( m_reg )
-	{
-		case 0x2f:
-			return m_rombank;
-
-		default:
-			logerror("%s: unknown reg read: %02x\n", machine().describe_context(), m_reg);
-			return 0x00;
-	}
+	map(0x00000, 0x0ffff).rom().region("mainbios", 0);
+	map(0x10000, 0x2ffff).rom().region("maincpu", 0x400);
+	map(0x60000, 0x61fff).ram().share("nvram");
+	map(0x70000, 0x70fff).ram().share("spriteram");
+	map(0x72000, 0x721ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x72800, 0x7287f).ram().share("vtable");
+	map(0x73000, 0x73021).rw(FUNC(sammymdl_state::vregs_r), FUNC(sammymdl_state::vregs_w)).share("vregs");
+	map(0x73013, 0x73013).r(FUNC(sammymdl_state::haekaka_vblank_r));
 }
 
-// rambank
-void sigmab98_state::tdoboon_rambank_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
-	{
-		m_reg2 = data;
-		return;
-	}
-
-	switch ( m_reg2 )
-	{
-		case 0x33:
-			m_rambank = data;
-			switch (data)
-			{
-				case 0x53:
-					break;
-
-				default:
-					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
-			}
-			break;
-
-		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
-	}
-}
-uint8_t sigmab98_state::tdoboon_rambank_r(offs_t offset)
-{
-	if (offset == 0)
-		return m_reg2;
-
-	switch ( m_reg2 )
-	{
-		case 0x33:
-			return m_rambank;
-
-		default:
-			logerror("%s: unknown reg2 read: %02x\n", machine().describe_context(), m_reg2);
-			return 0x00;
-	}
-}
-
-uint8_t sigmab98_state::tdoboon_c000_r(offs_t offset)
-{
-	switch (m_rombank)
-	{
-		case 0x10:  // ROM
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-			return memregion("maincpu")->base()[offset + 0xc400 + 0x1000 * (m_rombank-0x10)];
-
-		case 0x64:  // SPRITERAM
-			if (offset < 0x1000)
-				return m_spriteram[offset];
-			break;
-
-		case 0x66:  // PALETTERAM + VTABLE
-			if (offset < 0x200)
-				return m_paletteram[offset];
-			else if ((offset >= 0x800) && (offset < 0x880))
-			{
-				return m_vtable[offset-0x800];
-			}
-			break;
-
-		case 0x67:  // VREGS
-			if (offset >= (0xc000-0xc000) && offset <= (0xc021-0xc000))
-			{
-				if (offset == (0xc013-0xc000))
-					return haekaka_vblank_r();
-				return vregs_r(offset-(0xc000-0xc000));
-			}
-			break;
-	}
-
-	logerror("%s: unknown read from %02x with rombank = %02x\n", machine().describe_context(), offset+0xc000, m_rombank);
-	return 0x00;
-}
-
-void sigmab98_state::tdoboon_c000_w(offs_t offset, uint8_t data)
-{
-	switch (m_rombank)
-	{
-		case 0x64:  // SPRITERAM
-			if (offset < 0x1000)
-			{
-				m_spriteram[offset] = data;
-				return;
-			}
-			break;
-
-		case 0x66:  // PALETTERAM + VTABLE
-			if (offset < 0x200)
-			{
-				m_palette->write8(offset, data);
-				return;
-			}
-			else if ((offset >= 0x800) && (offset < 0x880))
-			{
-				m_vtable[offset-0x800] = data;
-				return;
-			}
-			break;
-
-		case 0x67:  // VREGS
-			if (offset >= (0xc000-0xc000) && offset <= (0xc021-0xc000))
-			{
-				vregs_w(offset-(0xc000-0xc000), data);
-				return;
-			}
-			break;
-	}
-
-	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset+0xc000, data, m_rombank);
-}
-
-void sigmab98_state::tdoboon_map(address_map &map)
-{
-	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).rw(FUNC(sigmab98_state::tdoboon_c000_r), FUNC(sigmab98_state::tdoboon_c000_w));
-	map(0xd000, 0xefff).ram().share("nvram");
-	map(0xfe00, 0xffff).ram();   // High speed internal RAM
-}
-
-void sigmab98_state::tdoboon_io(address_map &map)
+void sammymdl_state::tdoboon_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).rw(FUNC(sigmab98_state::tdoboon_rombank_r), FUNC(sigmab98_state::tdoboon_rombank_w));
-	map(0x04, 0x05).rw(FUNC(sigmab98_state::tdoboon_rambank_r), FUNC(sigmab98_state::tdoboon_rambank_w));
-
-	map(0x2c, 0x2c).rw(FUNC(sigmab98_state::sammymdl_eeprom_r), FUNC(sigmab98_state::sammymdl_eeprom_w));
-	map(0x2e, 0x2e).r(FUNC(sigmab98_state::sammymdl_coin_hopper_r));
+	map(0x2c, 0x2c).rw(FUNC(sammymdl_state::eeprom_r), FUNC(sammymdl_state::eeprom_w));
+	map(0x2e, 0x2e).r(FUNC(sammymdl_state::coin_hopper_r));
 	map(0x30, 0x30).portr("BUTTON");
-	map(0x31, 0x31).rw(FUNC(sigmab98_state::sammymdl_coin_counter_r), FUNC(sigmab98_state::sammymdl_coin_counter_w));
-	map(0x32, 0x32).rw(FUNC(sigmab98_state::sammymdl_leds_r), FUNC(sigmab98_state::sammymdl_leds_w));
+	map(0x31, 0x31).rw(FUNC(sammymdl_state::coin_counter_r), FUNC(sammymdl_state::coin_counter_w));
+	map(0x32, 0x32).rw(FUNC(sammymdl_state::leds_r), FUNC(sammymdl_state::leds_w));
 	map(0x90, 0x90).w("oki", FUNC(okim9810_device::write));
 	map(0x91, 0x91).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x92, 0x92).r("oki", FUNC(okim9810_device::read));
-	map(0xb0, 0xb0).w(FUNC(sigmab98_state::sammymdl_hopper_w));
+	map(0xb0, 0xb0).w(FUNC(sammymdl_state::hopper_w));
 	map(0xc0, 0xc0).w("watchdog", FUNC(watchdog_timer_device::reset_w));  // 1
 }
 
@@ -2861,7 +1939,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
 	m_screen->set_visarea(0,0x140-1, 0,0xf0-1);
-	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update_sigmab98));
+	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
@@ -2958,7 +2036,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
 	m_screen->set_visarea(0,0x140-1, 0,0xf0-1);
-	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update_sigmab98));
+	m_screen->set_screen_update(FUNC(lufykzku_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lufykzku);
@@ -2980,12 +2058,7 @@ void lufykzku_state::lufykzku(machine_config &config)
                              Sammy Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
-{
-	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_state::sammymdl_irq)
 {
 	int scanline = param;
 
@@ -2999,15 +2072,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80
 }
 
-void sigmab98_state::sammymdl(machine_config &config)
+void sammymdl_state::sammymdl(machine_config &config)
 {
-	Z80(config, m_maincpu, XTAL(20'000'000) / 2);    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::animalc_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::animalc_io);
+	KL5C80A12(config, m_maincpu, XTAL(20'000'000));    // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::animalc_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::animalc_io);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(sigmab98_state::sammymdl_irq), "screen", 0, 1);
-
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
+	TIMER(config, "scantimer").configure_scanline(FUNC(sammymdl_state::sammymdl_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	EEPROM_93C46_8BIT(config, "eeprom");
@@ -3022,8 +2093,8 @@ void sigmab98_state::sammymdl(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
 	m_screen->set_visarea(0, 0x140-1, 0, 0xf0-1);
-	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update_sigmab98));
-	m_screen->screen_vblank().set(FUNC(sigmab98_state::screen_vblank_sammymdl));
+	m_screen->set_screen_update(FUNC(sammymdl_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(sammymdl_state::screen_vblank_sammymdl));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
@@ -3041,56 +2112,56 @@ void sigmab98_state::sammymdl(machine_config &config)
 	oki.add_route(1, "rspeaker", 0.80);
 }
 
-void sigmab98_state::animalc(machine_config &config)
+void sammymdl_state::animalc(machine_config &config)
 {
 	sammymdl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::animalc_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::animalc_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::animalc_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::animalc_io);
 }
 
-void sigmab98_state::gocowboy(machine_config &config)
+void sammymdl_state::gocowboy(machine_config &config)
 {
 	sammymdl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gocowboy_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gocowboy_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::gocowboy_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::gocowboy_io);
 
 	config.device_remove("hopper");
 	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 }
 
-void sigmab98_state::haekaka(machine_config &config)
+void sammymdl_state::haekaka(machine_config &config)
 {
 	sammymdl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::haekaka_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::haekaka_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::haekaka_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::haekaka_io);
 }
 
-void sigmab98_state::itazuram(machine_config &config)
+void sammymdl_state::itazuram(machine_config &config)
 {
 	sammymdl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::itazuram_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::itazuram_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::itazuram_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::itazuram_io);
 }
 
-void sigmab98_state::pyenaget(machine_config &config)
+void sammymdl_state::pyenaget(machine_config &config)
 {
 	sammymdl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::haekaka_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::pyenaget_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::haekaka_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::pyenaget_io);
 }
 
-void sigmab98_state::tdoboon(machine_config &config)
+void sammymdl_state::tdoboon(machine_config &config)
 {
 	sammymdl(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::tdoboon_map);
-	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::tdoboon_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sammymdl_state::tdoboon_map);
+	m_maincpu->set_addrmap(AS_IO, &sammymdl_state::tdoboon_io);
 
 	m_screen->set_visarea(0,0x140-1, 0+4,0xf0+4-1);
 }
@@ -3520,15 +2591,16 @@ void lufykzku_state::init_lufykzku()
 
   CPU:
 
-    KAWASAKI KL5C80A120FP (@U1) - Z80 Compatible High Speed Microcontroller
+    KAWASAKI KL5C80A12CFP (@U1) - Z80 Compatible High Speed Microcontroller
     XTAL 20 MHz  (@X1)
     MX29F040TC-12 VM1211L01 (@U2) - 4M-bit [512kx8] CMOS Equal Sector Flash Memory
     BSI BS62LV256SC-70      (@U4) - Very Low Power/Voltage CMOS SRAM 32K X 8 bit
+    (or Toshiba TC55257DFL-70L)
 
   Video:
 
-    TAXAN KY-3211 ? (@U17)
-    M548262-60 (@U18) - 262144-Word x 8-Bit Multiport DRAM
+    TAXAN KY-3211 (@U17)
+    OKI M548262-60 (@U18) - 262144-Word x 8-Bit Multiport DRAM
     XTAL 27 MHz (@X3)
 
   Sound:
@@ -3541,13 +2613,18 @@ void lufykzku_state::init_lufykzku()
   Other:
 
     Xilinx XC9536 VM1212F01 (@U5) - In-System Programmable CPLD
-    MX29F0??C (@U3) - Empty 32 Pin ROM Socket
+    MX29F0?TC (@U3) - Empty 32 Pin DIP Socket
     M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
-    M93C46MN6T (@U11?) - Serial EEPROM
+    M93C46MN6T (@U6) - Serial EEPROM
+    RTC8564 (@U7) - not populated
+    SN75C1168 (@U10) - Dual RS-422 Transceiver
     Cell Battery (@BAT)
     25 Pin Edge Connector
     56 Pin Cartridge Connector
-    6 Pin Connector
+    6 Pin Connector - +5V (1), GND (2), TCLK (3), TDO (4), TDI (5), TMS (6)
+
+  On Go Go Cowboy, U2 and U10 are unpopulated, but U3 is occupied by a
+  ST M27C4001-10F1 EPROM.
 
 ***************************************************************************/
 
@@ -3562,7 +2639,7 @@ ROM_START( sammymdl )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "mainbios", 0x000000, 0x0000, 0x40000 )
+	ROM_COPY( "mainbios", 0x00fc00, 0x0000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -3590,18 +2667,20 @@ ROM_START( animalc )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )   // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
-void sigmab98_state::init_animalc()
+void sammymdl_state::init_animalc()
 {
-	// RAM banks
-	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x1000 * 5);
-	membank("rambank")->configure_entry(0, m_nvram);
-	membank("rambank")->configure_entries(1, 4, bankedram, 0x1000);
-	membank("rambank")->set_entry(0);
+	uint8_t *rom = memregion("mainbios")->base();
 
-	m_spriteram.allocate(0x1000 * 5);
-	memset(m_spriteram, 0, 0x1000 * 5);
-	membank("sprbank")->configure_entries(0, 5, m_spriteram, 0x1000);
-	membank("sprbank")->set_entry(0);
+	// video timing loops
+	rom[0x015d9] = 0x00;
+	rom[0x015da] = 0x00;
+	rom[0x01605] = 0x00;
+	rom[0x01606] = 0x00;
+	rom[0x01750] = 0x00;
+	rom[0x01751] = 0x00;
+
+	// force jump out of BIOS loop
+	rom[0x005ac] = 0xc3;
 
 	m_vblank_vector = 0x00; // increment counter
 	m_timer0_vector = 0x1c; // read hopper state
@@ -3633,9 +2712,6 @@ ROM_START( gocowboy )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "em702l01.u021", 0x000000, 0x200000, CRC(4c4289fe) SHA1(517b5a1e9d91e7ed322b4792d863e7abda835d4a) )
 
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "mainbios", 0x00fc00, 0x00000, 0x40000 )
-
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "em701l01.u016", 0x000000, 0x200000, CRC(c1f07320) SHA1(734717140e66ddcf0bded1489156c51cdaf1b50c) )
 
@@ -3646,29 +2722,8 @@ ROM_START( gocowboy )
 	ROM_LOAD( "vm1212f01.u5.jed", 0x0000, 0x5cde, CRC(b86a1825) SHA1(cc2e633fb8a24cfc93291a778b0964089f6b8ac7) )
 ROM_END
 
-void sigmab98_state::init_gocowboy()
+void sammymdl_state::init_gocowboy()
 {
-	// RAM banks
-	m_paletteram.resize(0x200);
-	memset(&m_paletteram[0], 0, 0x200);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
-	m_nvram.allocate(0x8000);
-	memset(m_nvram, 0, 0x8000);
-	m_nvramdev->set_base(m_nvram, 0x8000);
-
-	m_spriteram.allocate(0x1000);
-	memset(m_spriteram, 0, 0x1000);
-
-	m_vregs.allocate(0x22);
-	memset(m_vregs, 0, 0x22);
-
-	m_vtable.allocate(0x80);
-	memset(m_vtable, 0, 0x80);
-
-	m_rombank = 0x6b;
-	m_rambank = 0x52;
-
 	m_vblank_vector = 0x00;
 	m_timer0_vector = 0x02;
 	m_timer1_vector = 0x16;
@@ -3696,25 +2751,12 @@ ROM_START( itazuram )
 	ROM_LOAD( "vx2001l01.u016", 0x00000, 0x200000, CRC(9ee95222) SHA1(7154d43ef312a48a882207ca37e1c61e8b215a9b) )
 ROM_END
 
-void sigmab98_state::init_itazuram()
+void sammymdl_state::init_itazuram()
 {
-	// ROM banks
-	uint8_t *rom = memregion("maincpu")->base();
-	membank("rombank0")->set_base(rom + 0x3400);
-	membank("rombank1")->set_base(rom + 0x4400);
-	m_rombank = 0x0f;
+	uint8_t *rom = memregion("mainbios")->base();
 
-	// RAM banks
-	m_paletteram.resize(0x3000);
-	memset(&m_paletteram[0], 0, 0x3000);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	membank("palbank")->set_base(&m_paletteram[0]);
-	m_rambank = 0x64;
-
-	m_spriteram.allocate(0x1000 * 5);
-	memset(m_spriteram, 0, 0x1000 * 5);
-	membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
-	membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
+	// force jump out of BIOS loop
+	rom[0x005ac] = 0xc3;
 
 	m_vblank_vector = 0x00;
 	m_timer0_vector = 0x02;
@@ -3815,24 +2857,12 @@ ROM_START( haekaka )
 	ROM_LOAD( "em4207l01.u016", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
 ROM_END
 
-void sigmab98_state::init_haekaka()
+void sammymdl_state::init_haekaka()
 {
-	// RAM banks
-	m_paletteram.resize(0x200);
-	memset(&m_paletteram[0], 0, 0x200);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	uint8_t *rom = memregion("mainbios")->base();
 
-	m_spriteram.allocate(0x1000);
-	memset(m_spriteram, 0, 0x1000);
-
-	m_vregs.allocate(0x22);
-	memset(m_vregs, 0, 0x22);
-
-	m_vtable.allocate(0x80);
-	memset(m_vtable, 0, 0x80);
-
-	m_rombank = 0x65;
-	m_rambank = 0x53;
+	// force jump out of BIOS loop
+	rom[0x005ac] = 0xc3;
 
 	m_vblank_vector = 0x04;
 	m_timer0_vector = 0x1a;
@@ -3857,10 +2887,10 @@ GAME( 2000, dashhero, 0,        dashhero, sigma_1b, sigmab98_state, init_dashher
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sigmab98_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System Bios",         MACHINE_IS_BIOS_ROOT )
-GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sigmab98_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
-GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, init_itazuram, ROT0, "Sammy",             "Itazura Monkey",                       0 )
-GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, init_haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
-GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sigmab98_state, init_haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
-GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sigmab98_state, init_haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
-GAME( 2003, gocowboy, sammymdl, gocowboy, gocowboy, sigmab98_state, init_gocowboy, ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System Bios",         MACHINE_IS_BIOS_ROOT )
+GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
+GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sammymdl_state, init_itazuram, ROT0, "Sammy",             "Itazura Monkey",                       0 )
+GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
+GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
+GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
+GAME( 2003, gocowboy, 0,        gocowboy, gocowboy, sammymdl_state, init_gocowboy, ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )

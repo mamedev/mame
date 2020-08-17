@@ -334,8 +334,12 @@ ROM_END
 ROM_START( mrrack )
 	// 68340 main MCU
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "mr_r_ec51_lo_1.50.u36", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca) )
-	ROM_LOAD16_BYTE( "mr_r_9dac_up_1.50.u35", 0x000000, 0x080000, CRC(71511692) SHA1(54744f16f1db1ac5abb2f70b6e04aebf1e0e029d) )
+	ROM_SYSTEM_BIOS(0, "v153", "Version 1.53")
+	ROMX_LOAD( "ensoniq_mr_rack_1.53_lo_46a3.u36", 0x000001, 0x080000, CRC(0dba5bef) SHA1(6f64ec7547ea1fc72b42e2679379cd63cbbfc25e), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD( "ensoniq_mr_rack_1.53_hi_f320.u35", 0x000000, 0x080000, CRC(cb045660) SHA1(53d0f27e9f897c979c26a365bdfaf8911fb6f4d4), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS(1, "v150", "Version 1.50")
+	ROMX_LOAD( "mr_r_ec51_lo_1.50.u36", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD( "mr_r_9dac_up_1.50.u35", 0x000000, 0x080000, CRC(71511692) SHA1(54744f16f1db1ac5abb2f70b6e04aebf1e0e029d), ROM_BIOS(1) | ROM_SKIP(1) )
 
 	// 68705 display/front panel MCU
 	ROM_REGION(0x2000, "mcu", 0)

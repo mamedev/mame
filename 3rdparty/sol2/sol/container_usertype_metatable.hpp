@@ -273,7 +273,7 @@ namespace sol {
 			auto& src = get_src(L);
 			using std::begin;
 			stack::push(L, pairs_next_call);
-			stack::push<user<iter>>(L, src, begin(src));
+			stack::push_specific<user<iter>>(L, src, begin(src));
 			stack::push(L, 1);
 			return 3;
 		}
@@ -296,7 +296,7 @@ namespace sol {
 			auto& src = get_src(L);
 			using std::begin;
 			stack::push(L, pairs_next_call);
-			stack::push<user<iter>>(L, src, begin(src));
+			stack::push_specific<user<iter>>(L, src, begin(src));
 			stack::push(L, 0);
 			return 3;
 		}

@@ -644,7 +644,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 /* Maximum size of Q Sound Z80 region */
 #define QSOUND_SIZE 0x50000
 
-/* Maximum 680000 code size */
+/* Maximum 68000 code size */
 #undef  CODE_SIZE
 #define CODE_SIZE   0x0400000
 

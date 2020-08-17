@@ -284,6 +284,15 @@
 
 #endif
 
+#define TTL_74121_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74121_DIP, name)
+
+#define TTL_74123_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74123_DIP, name)
+
+#define TTL_9602_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_9602_DIP, name)
+
 #define TTL_74125_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74125_DIP, name)
 
@@ -292,6 +301,9 @@
 
 #define TTL_74156_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74156_DIP, name)
+
+#define TTL_74157_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74157_DIP, name)
 
 #define TTL_74260_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_74260_GATE, name)

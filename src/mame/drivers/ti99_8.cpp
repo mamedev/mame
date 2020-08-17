@@ -752,7 +752,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);;
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	using namespace bus::ti99::internal;

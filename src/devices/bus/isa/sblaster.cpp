@@ -1171,13 +1171,13 @@ void isa8_sblaster1_0_device::device_add_mconfig(machine_config &config)
 	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 3.0);
 	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 3.0);
 
-	SAA1099(config, m_saa1099_1, 7159090);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_1->add_route(0, "lspeaker", 0.5);
+	m_saa1099_1->add_route(1, "rspeaker", 0.5);
 
-	SAA1099(config, m_saa1099_2, 7159090);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_2->add_route(0, "lspeaker", 0.5);
+	m_saa1099_2->add_route(1, "rspeaker", 0.5);
 }
 
 void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)

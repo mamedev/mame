@@ -109,9 +109,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	void cmd_w(uint8_t data);;
+	void cmd_w(uint8_t data);
 	uint8_t status_r();
-	void clridx_w(uint8_t data);;
+	void clridx_w(uint8_t data);
 
 	void cpu_map(address_map &map);
 

@@ -489,7 +489,7 @@ namespace sol {
 				const char* gcmetakey = &usertype_traits<T>::gc_table()[0];
 				// Make sure userdata's memory is properly in lua first,
 				// otherwise all the light userdata we make later will become invalid
-				stack::push<user<umt_t>>(L, metatable_key, uniquegcmetakey, std::move(umx));
+				stack::push_specific<user<umt_t>>(L, metatable_key, uniquegcmetakey, std::move(umx));
 				// Create the top level thing that will act as our deleter later on
 				stack_reference umt(L, -1);
 				stack::set_field<true>(L, gcmetakey, umt);

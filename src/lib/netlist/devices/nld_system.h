@@ -40,8 +40,9 @@
 		NET_REGISTER_DEV(CLOCK, name)                                           \
 		PARAM(name.FREQ, freq)
 
-#define VARCLOCK(name, func)                                                    \
+#define VARCLOCK(name, n, func)                                                 \
 		NET_REGISTER_DEV(VARCLOCK, name)                                        \
+		PARAM(name.N, n)                                                        \
 		PARAM(name.FUNC, func)
 
 #define EXTCLOCK(name, freq, pattern)                                           \

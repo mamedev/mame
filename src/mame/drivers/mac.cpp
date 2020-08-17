@@ -47,6 +47,7 @@
 
 #include "emu.h"
 #include "includes/mac.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
@@ -929,17 +930,6 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, bool super_wo
 	m_scc->intrq_callback().set(FUNC(mac_state::set_scc_interrupt));
 }
 
-void mac_state::add_mackbd(machine_config &config)
-{
-#ifdef MAC_USE_EMULATED_KBD
-	MACKBD(config, m_mackbd, 0);
-	m_mackbd->dataout_handler().set(m_via, FUNC(via6522_device::write_cb2));
-	m_mackbd->clkout_handler().set(FUNC(mac_state::mac_kbd_clk_in));
-#else
-	MACKBD(config, m_mackbd, 0);
-#endif
-}
-
 void mac_state::add_scsi(machine_config &config, bool cdrom)
 {
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
@@ -1067,7 +1057,6 @@ void mac_state::mac512ke_base(machine_config &config)
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_via_out_cb2));
 	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
 	RAM(config, m_ram);
@@ -1077,7 +1066,6 @@ void mac_state::mac512ke_base(machine_config &config)
 void mac_state::mac512ke(machine_config &config)
 {
 	mac512ke_base(config);
-	add_mackbd(config);
 }
 
 void mac_state::add_macplus_additions(machine_config &config)
@@ -1135,7 +1123,6 @@ void mac_state::macplus(machine_config &config)
 {
 	mac512ke_base(config);
 	add_macplus_additions(config);
-	add_mackbd(config);
 }
 
 void mac_state::macse(machine_config &config)
@@ -1195,7 +1182,6 @@ void mac_state::macprtb(machine_config &config)
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_pmu));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a_pmu));
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_pmu));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_via_out_cb2));
 	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
 	RAM(config, m_ram);

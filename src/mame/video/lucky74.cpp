@@ -82,7 +82,7 @@
                                            _
 
 
-    Regarding the abobe diagram, there are 2 different states controlled by both 06B53P.
+    Regarding the above diagram, there are 2 different states controlled by both 06B53P.
     Each state arrange a different palette that will be assigned to each graphics bank.
 
     As we can see here, same pin of different PROMs are connected together in parallel.
@@ -100,32 +100,32 @@
 #include "includes/lucky74.h"
 
 
-void lucky74_state::lucky74_fg_videoram_w(offs_t offset, uint8_t data)
+void lucky74_state::fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void lucky74_state::lucky74_fg_colorram_w(offs_t offset, uint8_t data)
+void lucky74_state::fg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void lucky74_state::lucky74_bg_videoram_w(offs_t offset, uint8_t data)
+void lucky74_state::bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void lucky74_state::lucky74_bg_colorram_w(offs_t offset, uint8_t data)
+void lucky74_state::bg_colorram_w(offs_t offset, uint8_t data)
 {
 	m_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-void lucky74_state::lucky74_palette(palette_device &palette) const
+void lucky74_state::palette(palette_device &palette) const
 {
 	// There are 2 states (see the technical notes).
 	// We're constructing a double-sized palette with one half for each state.
@@ -233,7 +233,7 @@ void lucky74_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-uint32_t lucky74_state::screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lucky74_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

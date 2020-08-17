@@ -82,6 +82,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 		, m_ppi0(*this, "ppi8255_0")
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
@@ -121,12 +123,13 @@ private:
 	u8 m_sn_we;
 	u16 m_i_videoram;
 	bool m_keyb_press_flag;
-	bool m_upper_sw, m_lower_sw;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
+	required_memory_bank    m_bank2;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
@@ -202,10 +205,10 @@ void mycom_state::port00_w(u8 data)
 {
 	switch(data)
 	{
-		case 0x00: m_lower_sw = 1; break;   // rom
-		case 0x01: m_lower_sw = 0; break;   // ram
-		case 0x02: m_upper_sw = 1; break;   // rom
-		case 0x03: m_upper_sw = 0; break;   // ram
+		case 0x00: m_bank1->set_entry(1); break;   // rom
+		case 0x01: m_bank1->set_entry(0); break;   // ram
+		case 0x02: m_bank2->set_entry(1); break;   // rom
+		case 0x03: m_bank2->set_entry(0); break;   // ram
 	}
 }
 
@@ -223,8 +226,8 @@ void mycom_state::mycom_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x0fff).lr8(NAME([this] (offs_t offset) { if(m_lower_sw) return m_rom[offset]; else return m_ram[offset]; }));
-	map(0xc000, 0xffff).lr8(NAME([this] (offs_t offset) { if(m_upper_sw) return m_rom[offset]; else return m_ram[offset | 0xc000]; }));
+	map(0x0000, 0x0fff).bankr("bank1");
+	map(0xc000, 0xffff).bankr("bank2");
 }
 
 void mycom_state::mycom_io(address_map &map)
@@ -492,19 +495,21 @@ void mycom_state::machine_start()
 {
 	m_vram = make_unique_clear<u8[]>(0x0800);
 	save_pointer(NAME(m_vram), 0x0800);
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
+	m_bank2->configure_entry(0, m_ram+0xc000);
+	m_bank2->configure_entry(1, m_rom);
 	save_item(NAME(m_port0a));
 	save_item(NAME(m_i_videoram));
 	save_item(NAME(m_keyb_press));
 	save_item(NAME(m_keyb_press_flag));
 	save_item(NAME(m_sn_we));
-	save_item(NAME(m_upper_sw));
-	save_item(NAME(m_lower_sw));
 }
 
 void mycom_state::machine_reset()
 {
-	m_lower_sw = 1;
-	m_upper_sw = 1;
+	m_bank1->set_entry(1);
+	m_bank2->set_entry(1);
 	m_port0a = 0;
 }
 

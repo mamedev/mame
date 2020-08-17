@@ -13,13 +13,10 @@
 #include "includes/radio86.h"
 
 #include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
-#include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 #include "formats/rk_cas.h"
@@ -45,21 +42,22 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
-	void apogee_mem(address_map &map);
+	void mem_map(address_map &map);
+	void machine_reset() override;
+	void machine_start() override;
 };
 
 
 /* Address maps */
-void apogee_state::apogee_mem(address_map &map)
+void apogee_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0xebff).ram();  // RAM
-	map(0xec00, 0xec03).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).mirror(0x00fc);
-	map(0xed00, 0xed03).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
-	//map(0xee00, 0xee03).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
-	map(0xef00, 0xef01).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
-	map(0xf000, 0xf0ff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf000, 0xffff).rom();  // System ROM
+	map(0x0000, 0xebff).ram().share("mainram");
+	map(0xec00, 0xec03).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).mirror(0x00fc);
+	map(0xed00, 0xed03).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
+	//map(0xee00, 0xee03).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
+	map(0xef00, 0xef01).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
+	map(0xf000, 0xf0ff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom().region("maincpu",0);  // System ROM
 }
 
 /* Input ports */
@@ -175,23 +173,50 @@ WRITE_LINE_MEMBER(apogee_state::pit8253_out2_changed)
 	m_speaker->level_w(m_out0+m_out1+m_out2);
 }
 
+void apogee_state::machine_reset()
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x0fff, m_rom+0x0800);   // do it here for F3
+	m_rom_shadow_tap = program.install_read_tap(0xf000, 0xffff, "rom_shadow_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
+
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram);
+		}
+
+		// return the original data
+		return data;
+	});
+}
+
+void apogee_state::machine_start()
+{
+	save_item(NAME(m_tape_value));
+	save_item(NAME(m_out0));
+	save_item(NAME(m_out1));
+	save_item(NAME(m_out2));
+}
+
 I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint8_t const *const charmap = &m_charmap[(gpa & 1) * 0x400];
+	uint8_t const *const charmap = &m_chargen[(gpa & 1) * 0x400];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp) {
+	if (vsp)
 		pixels = 0;
-	}
-	if (lten) {
+
+	if (lten)
 		pixels = 0xff;
-	}
-	if (rvv) {
+
+	if (rvv)
 		pixels ^= 0xff;
-	}
-	for(int i=0;i<6;i++) {
+
+	for(int i=0;i<6;i++)
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
-	}
 }
 
 /* F4 Character Displayer */
@@ -209,7 +234,7 @@ static const gfx_layout apogee_charlayout =
 };
 
 static GFXDECODE_START( gfx_apogee )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, apogee_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, apogee_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -218,32 +243,32 @@ void apogee_state::apogee(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apogee_state::apogee_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apogee_state::mem_map);
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
-	pit8253.set_clk<0>(XTAL(16'000'000)/9);
-	pit8253.out_handler<0>().set(FUNC(apogee_state::pit8253_out0_changed));
-	pit8253.set_clk<1>(XTAL(16'000'000)/9);
-	pit8253.out_handler<1>().set(FUNC(apogee_state::pit8253_out1_changed));
-	pit8253.set_clk<2>(XTAL(16'000'000)/9);
-	pit8253.out_handler<2>().set(FUNC(apogee_state::pit8253_out2_changed));
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(XTAL(16'000'000)/9);
+	pit.out_handler<0>().set(FUNC(apogee_state::pit8253_out0_changed));
+	pit.set_clk<1>(XTAL(16'000'000)/9);
+	pit.out_handler<1>().set(FUNC(apogee_state::pit8253_out1_changed));
+	pit.set_clk<2>(XTAL(16'000'000)/9);
+	pit.out_handler<2>().set(FUNC(apogee_state::pit8253_out2_changed));
 
-	I8255(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
-	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255(config, m_ppi1);
+	m_ppi1->out_pa_callback().set(FUNC(apogee_state::radio86_8255_porta_w2));
+	m_ppi1->in_pb_callback().set(FUNC(apogee_state::radio86_8255_portb_r2));
+	m_ppi1->in_pc_callback().set(FUNC(apogee_state::radio86_8255_portc_r2));
+	m_ppi1->out_pc_callback().set(FUNC(apogee_state::radio86_8255_portc_w2));
 
-	//I8255(config, "ppi8255_2");
+	//I8255(config, m_ppi2);
 
-	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	i8275_device &i8275(I8275(config, "crtc", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);
 	i8275.set_display_callback(FUNC(apogee_state::display_pixels));
-	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
+	i8275.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(78*6, 30*10);
 	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
@@ -256,12 +281,12 @@ void apogee_state::apogee(machine_config &config)
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
-	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
-	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
-	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
-	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
-	m_dma8257->set_reverse_rw_mode(1);
+	I8257(config, m_dma, XTAL(16'000'000) / 9);
+	m_dma->out_hrq_cb().set(FUNC(apogee_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(apogee_state::memory_read_byte));
+	m_dma->out_memw_cb().set(FUNC(apogee_state::memory_write_byte));
+	m_dma->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dma->set_reverse_rw_mode(1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
@@ -274,13 +299,14 @@ void apogee_state::apogee(machine_config &config)
 
 /* ROM definition */
 ROM_START( apogee )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "apogee.rom", 0xf000, 0x1000, CRC(a47383a7) SHA1(6a868371c7980f92c2fc9ced921517209f197375))
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "apogee.rom", 0x0000, 0x1000, CRC(a47383a7) SHA1(6a868371c7980f92c2fc9ced921517209f197375))
+
+	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD ("apogee.fnt", 0x0000, 0x0800, CRC(fe5867f0) SHA1(82c5aca63ada5e4533eb0516384aaa7b77a1f8e2))
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT          COMPANY      FULLNAME        FLAGS
-COMP( 1989, apogee, radio86, 0,      apogee,  apogee, apogee_state, init_radio86, "Zavod BRA", "Apogee BK-01", 0 )
+COMP( 1989, apogee, radio86, 0,      apogee,  apogee, apogee_state, init_radio86, "Zavod BRA", "Apogee BK-01", MACHINE_SUPPORTS_SAVE )

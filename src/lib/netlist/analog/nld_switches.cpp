@@ -29,32 +29,22 @@ namespace netlist
 			register_subalias("2", m_R.N());
 		}
 
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
-		NETLIB_UPDATE_PARAMI();
+		NETLIB_RESETI()
+		{
+			m_R.set_R(R_OFF);
+		}
+		NETLIB_UPDATE_PARAMI()
+		{
+			m_R.change_state([this]()
+			{
+				m_R.set_R(m_POS() ? R_ON : R_OFF);
+			});
+		}
 
 	private:
 		analog::NETLIB_SUB(R_base) m_R;
 		param_logic_t              m_POS;
 	};
-
-
-	NETLIB_RESET(switch1)
-	{
-		m_R.set_R(R_OFF);
-	}
-
-	NETLIB_UPDATE(switch1)
-	{
-	}
-
-	NETLIB_UPDATE_PARAM(switch1)
-	{
-		m_R.change_state([this]()
-		{
-			m_R.set_R(m_POS() ? R_ON : R_OFF);
-		});
-	}
 
 // ----------------------------------------------------------------------------------------
 // SWITCH2
@@ -76,7 +66,6 @@ namespace netlist
 		}
 
 		NETLIB_RESETI();
-		NETLIB_UPDATEI();
 		NETLIB_UPDATE_PARAMI();
 
 	private:
@@ -91,6 +80,7 @@ namespace netlist
 		m_R2.set_R(R_OFF);
 	}
 
+#ifdef FIXMELATER
 	NETLIB_UPDATE(switch2)
 	{
 		if (!m_POS())
@@ -104,7 +94,7 @@ namespace netlist
 			m_R2.set_R(R_ON);
 		}
 	}
-
+#endif
 	NETLIB_UPDATE_PARAM(switch2)
 	{
 		// R1 and R2 are connected. However this net may be a rail net.

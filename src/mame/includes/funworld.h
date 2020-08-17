@@ -43,6 +43,7 @@ public:
 	void init_dino4();
 	void init_ctunk();
 	void init_jolycdig();
+	void init_impera16();
 
 protected:
 	void funworld_videoram_w(offs_t offset, uint8_t data);

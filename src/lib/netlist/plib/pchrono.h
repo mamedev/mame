@@ -217,6 +217,12 @@ namespace plib {
 					/ narrow_cast<S>(T::per_second()); }
 
 			guard_t guard() noexcept { return guard_t(*this); }
+
+			// pause must be followed by cont(inue)
+			void pause() noexcept { m_time += T::stop(); }
+			void cont() noexcept { m_time -= T::start(); }
+
+
 		private:
 			type m_time;
 			ctype m_count;

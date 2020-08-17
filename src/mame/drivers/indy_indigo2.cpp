@@ -95,7 +95,6 @@ public:
 		, m_hpc3(*this, "hpc3")
 		, m_ioc2(*this, "ioc2")
 		, m_rtc(*this, "rtc")
-		, m_softlist(*this, "softlist")
 		, m_vino(*this, "vino")
 		, m_dmsd(*this, "dmsd")
 		, m_gio64(*this, "gio64")
@@ -145,7 +144,6 @@ protected:
 	required_device<hpc3_device> m_hpc3;
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
-	required_device<software_list_device> m_softlist;
 	optional_device<vino_device> m_vino;
 	optional_device<saa7191_device> m_dmsd;
 	optional_device<gio64_device> m_gio64;
@@ -383,7 +381,8 @@ void ip24_state::ip24_base(machine_config &config)
 	SGI_HAL2(config, m_hal2);
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	SOFTWARE_LIST(config, m_softlist).set_original("sgi_mips");
+	SOFTWARE_LIST(config, "sgi_mips").set_original("sgi_mips");
+	SOFTWARE_LIST(config, "sgi_mips_hdd").set_original("sgi_mips_hdd");
 }
 
 void ip24_state::ip24(machine_config &config)

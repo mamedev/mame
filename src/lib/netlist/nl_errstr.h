@@ -14,8 +14,7 @@ namespace netlist
 {
 
 	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-	static constexpr const char sPowerGND[] = "GND"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-	static constexpr const char sPowerVCC[] = "VCC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+	static constexpr const char sHINT_NC[] = ".HINT_NC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 
 	// nl_base.cpp
 
@@ -26,7 +25,6 @@ namespace netlist
 	PERRMSGV(MF_REMOVE_TERMINAL_1_FROM_NET_2,       2, "Can not remove terminal {1} from net {2}.")
 	PERRMSGV(MF_UNKNOWN_PARAM_TYPE,                 1, "Can not determine param_type for {1}")
 	PERRMSGV(MF_ERROR_CONNECTING_1_TO_2,            2, "Error connecting {1} to {2}")
-	PERRMSGV(MF_NO_SOLVER,                          0, "No solver found for this netlist although analog elements are present")
 	PERRMSGV(ME_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
 	PERRMSGV(MW_ROM_NOT_FOUND,                      1, "Rom {1} not found")
 
@@ -56,6 +54,8 @@ namespace netlist
 	PERRMSGV(MF_UNABLE_TO_PARSE_MODEL_1,            1, "Unable to parse model: {1}")
 	PERRMSGV(MF_MODEL_ALREADY_EXISTS_1,             1, "Model already exists: {1}")
 	PERRMSGV(MF_DEVICE_ALREADY_EXISTS_1,            1, "Device already exists: {1}")
+	PERRMSGV(MF_UNUSED_HINT_1,                      1, "Error hint {1} is not used")
+	PERRMSGV(MF_ADDING_HINT_1,                      1, "Error adding hint {1} to hint list")
 	PERRMSGV(MF_ADDING_ALI1_TO_ALIAS_LIST,          1, "Error adding alias {1} to alias list")
 	PERRMSGV(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1, 1,"You must pass an equal number of pins to DIPPINS {1}")
 	PERRMSGV(MF_PARAM_COUNT_MISMATCH_2,             2, "Parameter count mismatch for {1} - only found {2}")
@@ -89,7 +89,10 @@ namespace netlist
 
 	PERRMSGV(MI_OVERWRITING_PARAM_1_OLD_2_NEW_3,    3, "Overwriting {1} old <{2}> new <{3}>")
 	PERRMSGV(MW_CONNECTING_1_TO_ITSELF,             1, "Connecting net {1} to itself.")
-	PERRMSGV(MW_CONNECTING_1_TO_2_SAME_NET,         3, "Connecting terminals {1} and {2} which are already both on net {3}")
+	PERRMSGV(MI_CONNECTING_1_TO_2_SAME_NET,         3, "Connecting terminals {1} and {2} which are already both on net {3}. "
+		"It is ok if you read this warning and it relates to pin which is connected internally to GND and the schematics "
+		"show an external connection as well. Onde example is the CD4538. In other cases this warning may indicate "
+		"an error in your netlist.")
 	PERRMSGV(ME_NC_PIN_1_WITH_CONNECTIONS,          1, "Found NC (not connected) terminal {1} with connections")
 	PERRMSGV(MI_ANALOG_OUTPUT_1_WITHOUT_CONNECTIONS,1, "Found analog output {1} without connections")
 	PERRMSGV(MI_LOGIC_OUTPUT_1_WITHOUT_CONNECTIONS, 1, "Found logic output {1} without connections")
@@ -116,6 +119,9 @@ namespace netlist
 	PERRMSGV(ME_UNKNOWN_PARAMETER,                  1, "Unknown parameter {1}")
 	PERRMSGV(MF_ERRORS_FOUND,                       1, "Counted {1} errors which need to be fixed")
 
+	PERRMSGV(MF_NO_SOLVER,                          0, "No solver found for this netlist although analog elements are present")
+	PERRMSGV(MF_DELEGATE_NOT_SET_1,                 1, "delegate not set for terminal {1}")
+
 	// nlid_proxy.cpp
 
 	PERRMSGV(MF_NO_POWER_TERMINALS_ON_DEVICE_2,     2, "D/A Proxy {1}: Found no valid combination of power terminals on device {2}")
@@ -127,7 +133,8 @@ namespace netlist
 	PERRMSGV(MF_UNHANDLED_ELEMENT_1_FOUND,          1, "setup_base:unhandled element <{1}> found")
 	PERRMSGV(MF_FOUND_TERM_WITH_MISSING_OTHERNET,   1, "found term with missing othernet {1}")
 
-	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,     1, "NEWTON_LOOPS exceeded on net {1}... reschedule")
+	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3, 3, "NEWTON_LOOPS exceeded resolution invoked {1} times on net {2} at {3} us")
+	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2,     2, "NEWTON_LOOPS exceeded resolution failed on net {1} ... reschedule  at {2} us")
 
 	// nld_solver.cpp
 

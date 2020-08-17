@@ -436,6 +436,7 @@ void hyprduel_state::i4220_config(machine_config &config)
 {
 	I4220(config, m_vdp, XTAL(26'666'000));
 	m_vdp->blit_irq_cb().set(FUNC(hyprduel_state::vdp_blit_end_w));
+	m_vdp->set_spriteram_buffered(true); // sprites are 1 frame delayed
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);

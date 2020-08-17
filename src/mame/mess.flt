@@ -96,6 +96,7 @@ attache.cpp
 aussiebyte.cpp
 ave_arb.cpp
 avigo.cpp
+avrmax.cpp
 ax20.cpp
 b16.cpp
 b2m.cpp
@@ -190,7 +191,6 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
-craft.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -257,6 +257,7 @@ emate.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
+emu68k.cpp
 enmirage.cpp
 ep64.cpp
 epic14e.cpp
@@ -276,6 +277,8 @@ eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
+exorciser.cpp
+exorterm.cpp
 exp85.cpp
 facit4440.cpp
 falco5220.cpp
@@ -460,7 +463,9 @@ k8915.cpp
 kawai_k1.cpp
 kawai_k4.cpp
 kawai_k5.cpp
+kawai_ksp10.cpp
 kawai_r100.cpp
+kawai_sx240.cpp
 kaypro.cpp
 kc.cpp
 kdt6.cpp
@@ -471,6 +476,7 @@ korgdss1.cpp
 korgdvp1.cpp
 korgdw8k.cpp
 korgm1.cpp
+korgws.cpp
 korgz3.cpp
 kramermc.cpp
 krokha.cpp
@@ -488,6 +494,9 @@ leapster.cpp
 learnwin.cpp
 lee1214.cpp
 lft.cpp
+lft_chiptune.cpp
+lft_craft.cpp
+lft_phasor.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp
@@ -531,6 +540,7 @@ mekd2.cpp
 mekd3.cpp
 mekd4.cpp
 mekd5.cpp
+mephisto_academy.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
@@ -552,6 +562,7 @@ micro20.cpp
 microb.cpp
 microdec.cpp
 microkit.cpp
+microkorg.cpp
 micromon.cpp
 micronic.cpp
 microtan.cpp
@@ -582,6 +593,7 @@ mmd2.cpp
 mod8.cpp
 modellot.cpp
 molecular.cpp
+monkey_king_3b.cpp
 monon_color.cpp
 monty.cpp
 mpc3000.cpp
@@ -629,6 +641,7 @@ nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
+news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
 next.cpp
@@ -640,6 +653,7 @@ notetaker.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
+novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
@@ -810,11 +824,13 @@ rzone.cpp
 sacstate.cpp
 sag.cpp
 sage2.cpp
+saitek_ccompan.cpp
 saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_exchess.cpp
+saitek_intchess.cpp
 saitek_leonardo.cpp
 saitek_mark5.cpp
 saitek_minichess.cpp

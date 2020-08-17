@@ -61,11 +61,13 @@
 
 #include <zlib.h>
 
+#include <algorithm>
+#include <iterator>
 #include <list>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
-#include <queue>
 
 #define AS_IO16             1
 
@@ -3935,12 +3937,12 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_vsu_vue[1]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SAA1099(config, m_saa1099[0], 0);
-	m_saa1099[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_saa1099[0]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_saa1099[0]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_saa1099[0]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	SAA1099(config, m_saa1099[1], 0);
-	m_saa1099[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_saa1099[1]->add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_saa1099[1]->add_route(0, m_mixer, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_saa1099[1]->add_route(1, m_mixer, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	ES5503(config, m_es5503[0], 0);
 	m_es5503[0]->set_channels(2);
@@ -3956,12 +3958,14 @@ void vgmplay_state::vgmplay(machine_config &config)
 
 	ES5505(config, m_es5505[0], 0);
 	// TODO m_es5505[0]->set_addrmap(0, &vgmplay_state::es5505_map<0>);
+	// TODO m_es5505[0]->set_addrmap(1, &vgmplay_state::es5505_map<0>);
 	m_es5505[0]->set_channels(1);
 	m_es5505[0]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
 	m_es5505[0]->add_route(1, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	ES5505(config, m_es5505[1], 0);
 	// TODO m_es5505[1]->set_addrmap(0, &vgmplay_state::es5505_map<1>);
+	// TODO m_es5505[1]->set_addrmap(1, &vgmplay_state::es5505_map<1>);
 	m_es5505[1]->set_channels(1);
 	m_es5505[1]->add_route(0, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0);
 	m_es5505[1]->add_route(1, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1);

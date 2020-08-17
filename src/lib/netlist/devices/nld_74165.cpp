@@ -15,11 +15,11 @@ namespace netlist
 	NETLIB_OBJECT(74165)
 	{
 		NETLIB_CONSTRUCTOR(74165)
-		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" })
-		, m_SER(*this, "SER")
-		, m_SH_LDQ(*this, "SH_LDQ")
-		, m_CLK(*this, "CLK")
-		, m_CLKINH(*this, "CLKINH")
+		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" }, NETLIB_DELEGATE(inputs))
+		, m_SER(*this, "SER", NETLIB_DELEGATE(inputs))
+		, m_SH_LDQ(*this, "SH_LDQ", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
+		, m_CLKINH(*this, "CLKINH", NETLIB_DELEGATE(inputs))
 		, m_QH(*this, "QH")
 		, m_QHQ(*this, "QHQ")
 		, m_shifter(*this, "m_shifter", 0)
@@ -33,7 +33,38 @@ namespace netlist
 			m_shifter = 0;
 			m_last_CLK = 0;
 		}
-		NETLIB_UPDATEI();
+
+		NETLIB_HANDLERI(inputs)
+		{
+			{
+				netlist_sig_t old_qh = m_QH.net().Q();
+				netlist_sig_t qh = 0;
+
+				if (!m_SH_LDQ())
+				{
+					m_shifter = 0;
+					for (std::size_t i=0; i<8; i++)
+						m_shifter |= (m_DATA[i]() << i);
+				}
+				else if (!m_CLK() || m_CLKINH())
+				{
+					// FIXME: qh is overwritten below?
+					qh = old_qh;
+				}
+				else if (!m_last_CLK)
+				{
+					unsigned high_bit = m_SER() ? 0x80 : 0;
+					m_shifter = high_bit | (m_shifter >> 1);
+				}
+
+				qh = m_shifter & 1;
+
+				m_last_CLK = m_CLK();
+
+				m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
+			}
+
+		}
 
 		friend class NETLIB_NAME(74165_dip);
 	private:
@@ -73,42 +104,12 @@ namespace netlist
 			register_subalias("15", A.m_CLKINH);
 			register_subalias("16", "A.VCC");
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(74165) A;
 	};
 
 	// FIXME: Timing
-	NETLIB_UPDATE(74165)
-	{
-		netlist_sig_t old_qh = m_QH.net().Q();
-		netlist_sig_t qh = 0;
-
-		if (!m_SH_LDQ())
-		{
-			m_shifter = 0;
-			for (std::size_t i=0; i<8; i++)
-				m_shifter |= (m_DATA[i]() << i);
-		}
-		else if (!m_CLK() || m_CLKINH())
-		{
-			// FIXME: qh is overwritten below?
-			qh = old_qh;
-		}
-		else if (!m_last_CLK)
-		{
-			unsigned high_bit = m_SER() ? 0x80 : 0;
-			m_shifter = high_bit | (m_shifter >> 1);
-		}
-
-		qh = m_shifter & 1;
-
-		m_last_CLK = m_CLK();
-
-		m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
-	}
-
 	NETLIB_DEVICE_IMPL(74165, "TTL_74165", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74165_dip, "TTL_74165_DIP", "")
 

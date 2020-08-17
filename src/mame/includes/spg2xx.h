@@ -34,12 +34,14 @@ public:
 	{ }
 
 	void spg2xx_base(machine_config &config);
+	void spg2xx(machine_config &config);
+	void spg2xx_pal(machine_config &config);
+
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
 	void rad_sktv(machine_config &config);
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
-	void spg2xx(machine_config &config);
 	void comil(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
@@ -218,11 +220,28 @@ protected:
 
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
-private:
 	required_memory_bank m_upperbank;
+
+private:
 
 	void mem_map_upperbank(address_map& map);
 };
+
+class spg2xx_game_senwfit_state : public spg2xx_game_gssytts_state
+{
+public:
+	spg2xx_game_senwfit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_gssytts_state(mconfig, type, tag)
+	{ }
+
+	void init_senwfit();
+protected:
+
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+private:
+};
+
 
 class spg2xx_game_senspeed_state : public spg2xx_game_state
 {

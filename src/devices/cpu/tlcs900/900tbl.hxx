@@ -2569,7 +2569,7 @@ void tlcs900_device::op_LINK()
 
 void tlcs900_device::op_MAX()
 {
-	m_sr.b.h |= 0x04;
+	m_sr.b.h |= 0x08;
 }
 
 

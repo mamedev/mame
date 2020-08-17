@@ -1770,9 +1770,6 @@ void hng64_state::machine_start()
 	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
 	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
-	m_comm_rom = memregion("user2")->base();
-	m_comm_ram = std::make_unique<uint8_t[]>(0x10000);
-
 	for (int i = 0; i < 0x38 / 4; i++)
 	{
 		m_videoregs[i] = 0xdeadbeef;

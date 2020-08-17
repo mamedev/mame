@@ -9,12 +9,10 @@
 /// \file pstream.h
 ///
 
-#include "palloc.h"
 #include "pconfig.h"
-#include "pexception.h"
 #include "pfmtlog.h"
+#include "pgsl.h"
 #include "pstring.h"
-#include "pstrutil.h"
 
 #include <array>
 #include <fstream>
@@ -27,8 +25,29 @@
 
 namespace plib {
 
+	/// \brief wrapper around isteam read
+	///
+	template <typename S, typename T>
+	static inline S & istream_read(S &is, T * data, size_t len)
+	{
+		using ct = typename S::char_type;
+		static_assert((sizeof(T) % sizeof(ct)) == 0, "istream_read sizeof issue");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		return is.read(reinterpret_cast<ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
+	}
+
+	/// \brief wrapper around osteam write
+	///
+	template <typename S, typename T>
+	static inline S & ostream_write(S &os, const T * data, size_t len)
+	{
+		using ct = typename S::char_type;
+		static_assert((sizeof(T) % sizeof(ct)) == 0, "ostream_write sizeof issue");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		return os.write(reinterpret_cast<const ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
+	}
+
 ///
-/// \brief: putf8reader_t: reader on top of istream.
 ///
 /// putf8reader_t digests linux & dos/windows text files
 ///
@@ -91,6 +110,7 @@ public:
 		m_strm->read(&b[0], 1);
 		if (m_strm->eof())
 			return false;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		const std::size_t l = putf8string::traits_type::codelen(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		for (std::size_t i = 1; i < l; i++)
 		{
@@ -98,6 +118,7 @@ public:
 			if (m_strm->eof())
 				return false;
 		}
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		c = putf8string::traits_type::code(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		return true;
 	}
@@ -134,7 +155,8 @@ public:
 	{
 		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
 		const putf8string conv_utf8(text);
-		m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str())));
+		//m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str()  )));
+		ostream_write(*m_strm, conv_utf8.c_str(), string_info<pstring>::mem_size(conv_utf8));
 	}
 
 	void write(const pstring::value_type c) const
@@ -143,6 +165,7 @@ public:
 		write(t);
 	}
 
+	void flush() { m_strm->flush(); }
 private:
 	std::ostream *m_strm;
 };
@@ -188,23 +211,23 @@ public:
 	template <typename T>
 	void write(const T &val)
 	{
-		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(&val), sizeof(T));
+		ostream_write(m_strm, &val, 1);
 	}
 
 	void write(const pstring &s)
 	{
-		const auto *const sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
-		const auto sl(static_cast<std::streamsize>(std::char_traits<std::ostream::char_type>::length(sm)));
+		const auto *sm = s.c_str();
+		const auto sl(std::char_traits<pstring::mem_t>::length(sm));
 		write(sl);
-		m_strm.write(sm, sl);
+		ostream_write(m_strm, sm, sl);
 	}
 
 	template <typename T>
 	void write(const std::vector<T> &val)
 	{
-		const auto sz(static_cast<std::streamsize>(val.size()));
+		const auto sz(val.size());
 		write(sz);
-		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * gsl::narrow<std::streamsize>(sizeof(T)));
+		ostream_write(m_strm, val.data(), sz);
 	}
 
 private:
@@ -225,7 +248,7 @@ public:
 	template <typename T>
 	void read(T &val)
 	{
-		m_strm.read(reinterpret_cast<std::istream::char_type *>(&val), gsl::narrow<std::streamsize>(sizeof(T)));
+		istream_read(m_strm, &val, 1);
 	}
 
 	void read( pstring &s)
@@ -244,7 +267,7 @@ public:
 		std::size_t sz = 0;
 		read(sz);
 		val.resize(sz);
-		m_strm.read(reinterpret_cast<std::istream::char_type *>(val.data()), gsl::narrow<std::streamsize>(sizeof(T) * sz));
+		istream_read(m_strm, val.data(), sz);
 	}
 
 private:

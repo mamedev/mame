@@ -168,6 +168,7 @@ public:
 	ccs300_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ccs_state(mconfig, type, tag)
 		, m_ram1(*this, "mainram")
+		, m_bank1(*this, "bank1")
 	{ }
 
 	void ccs300(machine_config &config);
@@ -178,8 +179,8 @@ private:
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
 	void port40_w(u8 data);
-	bool m_rom_in_map;
 	required_shared_ptr<u8> m_ram1;
+	required_memory_bank    m_bank1;
 };
 
 u8 ccs_state::memory_read(offs_t offset)
@@ -251,7 +252,7 @@ void ccs_state::ccs2422_io(address_map &map)
 void ccs300_state::ccs300_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x07ff).lr8(NAME([this] (offs_t offset) { if (m_rom_in_map) return m_rom[offset]; else return m_ram1[offset]; } ));
+	map(0x0000, 0x07ff).bankr("bank1");
 }
 
 void ccs300_state::ccs300_io(address_map &map)
@@ -965,17 +966,18 @@ void ccs_state::machine_reset()
 
 void ccs300_state::port40_w(u8 data)
 {
-	m_rom_in_map = !BIT(data, 0);
+	m_bank1->set_entry(BIT(~data, 0));
 }
 
 void ccs300_state::machine_reset()
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 }
 
 void ccs300_state::machine_start()
 {
-	save_item(NAME(m_rom_in_map));
+	m_bank1->configure_entry(0, m_ram1);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_ss));
 	save_item(NAME(m_dden));
 	save_item(NAME(m_dsize));

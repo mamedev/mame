@@ -29,6 +29,7 @@ public:
 		, m_config_port(*this, "CNF")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_p_chargen(*this, "chargen")
 		, m_maincpu(*this, "maincpu")
 		, m_dma(*this, "dma")
@@ -94,6 +95,7 @@ private:
 
 	required_region_ptr<u8>             m_rom;
 	required_shared_ptr<u8>             m_ram;
+	required_memory_bank                m_bank1;
 	required_region_ptr<uint8_t>        m_p_chargen;
 
 	required_device<cpu_device>         m_maincpu;
@@ -124,7 +126,6 @@ private:
 	int     m_printer_select;
 
 	uint8_t m_term_data;
-	bool m_rom_in_map;
 };
 
 #endif // MAME_INCLUDES_ZORBA_H

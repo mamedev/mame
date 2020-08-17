@@ -62,20 +62,25 @@ void startouch_state::europl01(machine_config &config)
 }
 
 ROM_START(europl01)
+
+	// Sleic used different motherboards for this machine. By now, we're adding the all the known BIOSes here
 	ROM_REGION(0x20000, "mb_bios", 0)
-	ROM_LOAD( "award_pci-pnp_586_222951562_v4.51pg.u2", 0x00000, 0x20000, CRC(5bb1bcbc) SHA1(6e2a7b5b3fc892ed20d0b12a1a533231c8953177) )
+	ROM_SYSTEM_BIOS(0, "soyo_m5eh_aw4_52", "Soyo M5EH with Award 4.51pg BIOS")     // Soyo M5EH V1.2 (1MB cache)
+	ROMX_LOAD("award_pci-pnp_586_222951562_v4.51pg.u2", 0x00000, 0x20000, CRC(5bb1bcbc) SHA1(6e2a7b5b3fc892ed20d0b12a1a533231c8953177), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "bst_m5atd_aw4_52", "Biostar M5ATD with Award 4.51pg BIOS") // Biostar M5ATD V1.2 (ALi M5819P + ALi M1543 B1 + ALi M1531 B1 + UMC UM61L6464F-6)
+	ROMX_LOAD("award_pci_pnp_586_w29c011a.u11",         0x00000, 0x20000, CRC(1ec5749b) SHA1(3dd1dac852b00c8108aaf9c89f47ae1922d645f0), ROM_BIOS(1))
 
 	ROM_REGION(0x8000, "vga_bios", 0)
-	ROM_LOAD( "s3_86c775-86c785_video_bios_v1.01.04.u5", 0x0000, 0x8000, CRC(e718418f) SHA1(1288ce51bb732a346eb7c61d5bdf80ea22454d45) )
+	ROM_LOAD("s3_86c775-86c785_video_bios_v1.01.04.u5", 0x0000, 0x8000, CRC(e718418f) SHA1(1288ce51bb732a346eb7c61d5bdf80ea22454d45))
 
 	ROM_REGION(0x20000, "hd_firmware", 0)
-	ROM_LOAD( "jk200-35.bin", 0x00000, 0x20000, CRC(601fa709) SHA1(13ded4826a64209faac8bc81708172b81195ab96) )
+	ROM_LOAD("jk200-35.bin", 0x00000, 0x20000, CRC(601fa709) SHA1(13ded4826a64209faac8bc81708172b81195ab96))
 
 	ROM_REGION(0x66da4, "dongle", 0)
-	ROM_LOAD( "9b91f19d.hsp", 0x00000, 0x66da4, CRC(0cf78908) SHA1(c596f415accd6b91be85ea8c1b89ea380d0dc6c8) )
+	ROM_LOAD("9b91f19d.hsp", 0x00000, 0x66da4, CRC(0cf78908) SHA1(c596f415accd6b91be85ea8c1b89ea380d0dc6c8))
 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE( "sleic-petaco_startouch_2001_v2.0", 0, SHA1(3164a5786d6b9bb0dd9910b4d27a77a6b746dedf) ) // labeled startouch_2001 but when run game title is EuroPlay 2001
+	DISK_IMAGE("sleic-petaco_startouch_2001_v2.0", 0, SHA1(3164a5786d6b9bb0dd9910b4d27a77a6b746dedf)) // labeled startouch_2001 but when run game title is EuroPlay 2001
 ROM_END
 
 

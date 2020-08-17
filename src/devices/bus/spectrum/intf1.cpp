@@ -156,12 +156,6 @@ uint8_t spectrum_intf1_device::mreq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_intf1_device::mreq_w(offs_t offset, uint8_t data)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
-}
-
 uint8_t spectrum_intf1_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;

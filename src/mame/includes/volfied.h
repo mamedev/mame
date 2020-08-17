@@ -42,10 +42,10 @@ protected:
 
 private:
 	uint16_t video_ram_r(offs_t offset);
-	void video_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);;
-	void video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);;
+	void video_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t video_ctrl_r();
-	void video_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);;
+	void video_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void counters_w(uint8_t data);
 	void volfied_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

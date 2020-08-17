@@ -4860,7 +4860,7 @@ GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     gdfs_state, init_ssv,     
 
 // Ultra X Weapon: "developed by Seta" in ending screen
 GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
-GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
+GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, init_ssv_irq1,      ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (Gamest review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 
 GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, init_ssv,           ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

@@ -1,10 +1,10 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 #include "netlist/plib/pstring.h"
-//#include "netlist/nl_setup.h"
 #include "netlist/plib/pmain.h"
 #include "netlist/plib/ppmf.h"
 #include "netlist/plib/pstream.h"
+#include "netlist/plib/pstrutil.h"
 
 #include <cstdio>
 
@@ -76,9 +76,7 @@ public:
 	template <typename T>
 	void write(const T &val)
 	{
-		static_assert(sizeof(std::ostream::char_type) == 1, "char_type size must be 1");
-		const auto *ptr(reinterpret_cast<const std::ostream::char_type *>(&val));
-		m_f.write(ptr, sizeof(T));
+		plib::ostream_write(m_f, &val, 1);
 	}
 
 	template <typename T>

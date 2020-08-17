@@ -6057,7 +6057,7 @@ UPL-90062
 |SBS-G_03.IC194                                                    10MHz  |
 |-------------------------------------------------------------------------|
 Notes:
-      680000 @ 10.0MHz
+      68000 @ 10.0MHz
       YM2203 @ 1.5MHz [12/8]
       M6295 @ 4.0MHz [12/3], pin 7 HIGH
       VSync 60Hz
@@ -8567,7 +8567,7 @@ GAME( 1992, gunnailp,   gunnail,  gunnail,      gunnail,      nmk16_state, init_
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
 GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
-GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (GAMEST review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
+GAME( 1993, macross2g,  macross2, macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (Gamest review build)", MACHINE_NO_COCKTAIL ) // Service switch pauses game
 GAME( 1993, macross2k,  macross2, macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Macross II (Korea)", MACHINE_NO_COCKTAIL ) // Title screen only shows Macross II
 
 GAME( 1993, tdragon2,   0,        tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", MACHINE_NO_COCKTAIL )

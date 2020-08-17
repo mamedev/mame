@@ -27,16 +27,16 @@ static NETLIST_START(MC14584B_DIP)
 	MC14584B_GATE(E)
 	MC14584B_GATE(F)
 
-	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
-	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, F.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS, E.VSS, F.VSS)
 	DIPPINS(  /*       +--------------+      */
-		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.A,  /*    A1 |1     ++    14| VDD  */ A.VDD,
 		A.Q,  /*    Y1 |2           13| A6   */ F.A,
 		B.A,  /*    A2 |3           12| Y6   */ F.Q,
 		B.Q,  /*    Y2 |4  MC14584B 11| A5   */ E.A,
 		C.A,  /*    A3 |5           10| Y5   */ E.Q,
 		C.Q,  /*    Y3 |6            9| A4   */ D.A,
-		A.GND,/*   GND |7            8| Y4   */ D.Q
+		A.VSS,/*   VSS |7            8| Y4   */ D.Q
 			  /*       +--------------+      */
 	)
 NETLIST_END()

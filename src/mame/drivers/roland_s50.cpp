@@ -36,7 +36,6 @@ public:
 	}
 
 	void s50(machine_config &config);
-	void s550(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -44,7 +43,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(vdp_timer);
 
 	void p2_w(u8 data);
-	void ioga_out_w(u8 data);
 	u8 floppy_status_r();
 	u8 floppy_unknown_r();
 	u16 key_r(offs_t offset);
@@ -54,9 +52,10 @@ protected:
 	void vram_map(address_map &map);
 
 private:
+	void ioga_out_w(u8 data);
+
 	void mem_map(address_map &map);
-	void s50_io_map(address_map &map);
-	void s550_io_map(address_map &map);
+	void io_map(address_map &map);
 
 protected:
 	required_device<i8x9x_device> m_maincpu;
@@ -67,6 +66,27 @@ protected:
 	optional_device<tms3556_device> m_vdp;
 	//required_device<sa16_device> m_wave;
 	optional_device<mb63h149_device> m_keyscan;
+};
+
+class roland_s550_state : public roland_s50_state
+{
+public:
+	roland_s550_state(const machine_config &mconfig, device_type type, const char *tag)
+		: roland_s50_state(mconfig, type, tag)
+		, m_lowmem(*this, "lowmem")
+	{
+	}
+
+	void s550(machine_config &config);
+
+private:
+	void sram_bank_w(u8 data);
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+	void lowmem_map(address_map &map);
+
+	required_device<address_map_bank_device> m_lowmem;
 };
 
 class roland_w30_state : public roland_s50_state
@@ -132,6 +152,12 @@ void roland_s50_state::ioga_out_w(u8 data)
 	m_sram->set_bank(BIT(data, 6, 2));
 }
 
+void roland_s550_state::sram_bank_w(u8 data)
+{
+	m_sram->set_bank(BIT(data, 0, 2));
+	m_lowmem->set_bank(BIT(data, 2, 3));
+}
+
 u8 roland_w30_state::psram_bank_r()
 {
 	return m_psram_bank;
@@ -178,7 +204,7 @@ void roland_s50_state::mem_map(address_map &map)
 	map(0xc000, 0xffff).m(m_io, FUNC(address_map_bank_device::amap16));
 }
 
-void roland_s50_state::s50_io_map(address_map &map)
+void roland_s50_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0000).w(FUNC(roland_s50_state::ioga_out_w));
 	map(0x0200, 0x0200).r(FUNC(roland_s50_state::floppy_status_r));
@@ -191,16 +217,25 @@ void roland_s50_state::s50_io_map(address_map &map)
 	map(0x4000, 0x4fff).mirror(0x3000).rw(FUNC(roland_s50_state::key_r), FUNC(roland_s50_state::key_w));
 }
 
-void roland_s50_state::s550_io_map(address_map &map)
+void roland_s550_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(FUNC(roland_s50_state::ioga_out_w));
-	map(0x0200, 0x0200).r(FUNC(roland_s50_state::floppy_status_r));
-	map(0x0300, 0x0300).r(FUNC(roland_s50_state::floppy_unknown_r));
+	map(0x0000, 0x1fff).m(m_lowmem, FUNC(address_map_bank_device::amap16));
+	map(0x2000, 0x3fff).rom().region("program", 0x2000);
+	map(0x4000, 0x7fff).ram().share("common");
+	map(0x8000, 0xbfff).m(m_sram, FUNC(address_map_bank_device::amap16));
+	map(0xc000, 0xffff).m(m_io, FUNC(address_map_bank_device::amap16));
+}
+
+void roland_s550_state::io_map(address_map &map)
+{
+	map(0x0200, 0x0200).r(FUNC(roland_s550_state::floppy_status_r));
+	map(0x0300, 0x0300).r(FUNC(roland_s550_state::floppy_unknown_r));
 	map(0x0800, 0x0807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0x1000, 0x1000).r(m_vdp, FUNC(tms3556_device::vram_r));
 	map(0x1002, 0x1002).rw(m_vdp, FUNC(tms3556_device::initptr_r), FUNC(tms3556_device::vram_w));
 	map(0x1004, 0x1004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
 	//map(0x1800, 0x181f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
+	map(0x2000, 0x2000).w(FUNC(roland_s550_state::sram_bank_w));
 	map(0x2800, 0x281f).w("outas", FUNC(bu3905_device::write)).umask16(0x00ff);
 	//map(0x3800, 0x381f).rw(m_scsic, FUNC(mb89352_device::read), FUNC(mb89352_device::write)).umask16(0x00ff);
 	//map(0x0000, 0x3fff).rw(m_wave, FUNC(rf5c16_device::read), FUNC(rf5c16_device::write)).umask16(0xff00);
@@ -238,6 +273,12 @@ void roland_s50_state::sram_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("common");
 	map(0x4000, 0xffff).ram();
+}
+
+void roland_s550_state::lowmem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("program", 0);
+	map(0x2000, 0xffff).ram();
 }
 
 void roland_w30_state::psram1_map(address_map &map)
@@ -295,7 +336,7 @@ void roland_s50_state::s50(machine_config &config)
 	m_io->set_data_width(16);
 	m_io->set_addr_width(15);
 	m_io->set_stride(0x4000);
-	m_io->set_addrmap(0, &roland_s50_state::s50_io_map);
+	m_io->set_addrmap(0, &roland_s50_state::io_map);
 
 	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
 	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
@@ -331,11 +372,19 @@ void roland_s50_state::s50(machine_config &config)
 	//m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 }
 
-void roland_s50_state::s550(machine_config &config)
+void roland_s550_state::s550(machine_config &config)
 {
 	s50(config);
 
-	m_io->set_addrmap(0, &roland_s50_state::s550_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s550_state::mem_map);
+	m_io->set_addrmap(0, &roland_s550_state::io_map);
+
+	ADDRESS_MAP_BANK(config, m_lowmem);
+	m_lowmem->set_endianness(ENDIANNESS_LITTLE);
+	m_lowmem->set_data_width(16);
+	m_lowmem->set_addr_width(16);
+	m_lowmem->set_stride(0x2000);
+	m_lowmem->set_addrmap(0, &roland_s550_state::lowmem_map);
 
 	//UPD7537(config.device_replace(), "fipcpu", 400_kHz_XTAL);
 
@@ -478,7 +527,7 @@ ROM_START(s330)
 ROM_END
 #endif
 
-SYST(1987, s50,  0,   0, s50,  s50,  roland_s50_state, empty_init, "Roland", "S-50 Digital Sampling Keyboard", MACHINE_IS_SKELETON)
-SYST(1987, s550, s50, 0, s550, s550, roland_s50_state, empty_init, "Roland", "S-550 Digital Sampler", MACHINE_IS_SKELETON)
-SYST(1988, w30,  0,   0, w30,  w30,  roland_w30_state, empty_init, "Roland", "W-30 Music Workstation", MACHINE_IS_SKELETON)
+SYST(1987, s50,  0,   0, s50,  s50,  roland_s50_state,  empty_init, "Roland", "S-50 Digital Sampling Keyboard", MACHINE_IS_SKELETON)
+SYST(1987, s550, s50, 0, s550, s550, roland_s550_state, empty_init, "Roland", "S-550 Digital Sampler", MACHINE_IS_SKELETON)
+SYST(1988, w30,  0,   0, w30,  w30,  roland_w30_state,  empty_init, "Roland", "W-30 Music Workstation", MACHINE_IS_SKELETON)
 //SYST(1988, s330, w30, 0, s330, s330, roland_w30_state, empty_init, "Roland", "S-330 Digital Sampler", MACHINE_IS_SKELETON)

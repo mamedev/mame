@@ -19,6 +19,9 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100, bbc_tube_zep100_device, "bbc_tube_zep100", "Torch Z80 Communicator")
+DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100L, bbc_tube_zep100l_device, "bbc_tube_zep100l", "Torch Z80 Communicator (Model B)")
+DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100W, bbc_tube_zep100w_device, "bbc_tube_zep100w", "Torch Z80 Communicator (Model B+)")
+DEFINE_DEVICE_TYPE(BBC_TUBE_ZEP100M, bbc_tube_zep100m_device, "bbc_tube_zep100m", "Torch Z80 Communicator (Master)")
 
 
 //-------------------------------------------------
@@ -61,6 +64,35 @@ ROM_START( tube_zep100 )
 	ROMX_LOAD("cccp094.rom", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61), ROM_BIOS(2))
 ROM_END
 
+ROM_START( tube_zep100l )
+	ROM_REGION(0x4000, "exp_rom", 0)
+	ROM_SYSTEM_BIOS(0, "mcp121", "MCP v1.21 (ABL)") // 1985
+	ROMX_LOAD("mcp121abl.rom", 0x0000, 0x4000, CRC(216f1074) SHA1(ec3d285f757b1b35bd0cc65155048a55cc1146ed), ROM_BIOS(0))
+
+	ROM_REGION(0x2000, "rom", 0)
+	ROM_LOAD("cccp102.rom", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d))
+ROM_END
+
+ROM_START( tube_zep100w )
+	ROM_REGION(0x4000, "exp_rom", 0)
+	ROM_SYSTEM_BIOS(0, "mcp122", "MCP v1.22 (ABW)") // 1986
+	ROMX_LOAD("mcp122abw.rom", 0x0000, 0x4000, CRC(7124e9a6) SHA1(39cdd4367bfb2c8d6599b4a4420e6d311f8acaa9), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "mcp121", "MCP v1.21 (ABW)") // 1985
+	ROMX_LOAD("mcp121abw.rom", 0x0000, 0x4000, CRC(5e4a4a56) SHA1(27172e29f1020147c7ae52111b4234ee4a22e627), ROM_BIOS(1))
+
+	ROM_REGION(0x2000, "rom", 0)
+	ROM_LOAD("cccp102.rom", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d))
+ROM_END
+
+ROM_START( tube_zep100m )
+	ROM_REGION(0x4000, "exp_rom", 0)
+	ROM_SYSTEM_BIOS(0, "mcp122", "MCP v1.22 (ABM)") // 1986
+	ROMX_LOAD("mcp122abm.rom", 0x0000, 0x4000, CRC(596be795) SHA1(35843ace281494ab40463a69a263244d0cb0ecd6), ROM_BIOS(0))
+
+	ROM_REGION(0x2000, "rom", 0)
+	ROM_LOAD("cccp102.rom", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d))
+ROM_END
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -82,9 +114,6 @@ void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(bbc_tube_zep100_device::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(bbc_tube_zep100_device::ppi_pc_w));
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
-
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_torch").set_original("bbc_flop_torch").set_filter("Z80");
 }
@@ -96,6 +125,21 @@ void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *bbc_tube_zep100_device::device_rom_region() const
 {
 	return ROM_NAME( tube_zep100 );
+}
+
+const tiny_rom_entry *bbc_tube_zep100l_device::device_rom_region() const
+{
+	return ROM_NAME( tube_zep100l );
+}
+
+const tiny_rom_entry *bbc_tube_zep100w_device::device_rom_region() const
+{
+	return ROM_NAME( tube_zep100w );
+}
+
+const tiny_rom_entry *bbc_tube_zep100m_device::device_rom_region() const
+{
+	return ROM_NAME( tube_zep100m );
 }
 
 //**************************************************************************
@@ -113,7 +157,6 @@ bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, de
 	, m_z80(*this, "z80")
 	, m_via(*this, "via")
 	, m_ppi(*this, "ppi")
-	, m_ram(*this, "ram")
 	, m_rom(*this, "rom")
 	, m_port_b(0)
 {
@@ -124,12 +167,32 @@ bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, co
 {
 }
 
+bbc_tube_zep100l_device::bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100L, tag, owner, clock)
+{
+}
+
+bbc_tube_zep100w_device::bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100W, tag, owner, clock)
+{
+}
+
+bbc_tube_zep100m_device::bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100M, tag, owner, clock)
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bbc_tube_zep100_device::device_start()
 {
+	m_ram = std::make_unique<uint8_t[]>(0x10000);
+	memset(m_ram.get(), 0xff, 0x10000);
+
+	/* register for save states */
+	save_pointer(NAME(m_ram), 0x10000);
 }
 
 //-------------------------------------------------
@@ -167,14 +230,14 @@ uint8_t bbc_tube_zep100_device::mem_r(offs_t offset)
 	if (m_rom_enabled)
 		data = m_rom->base()[offset];
 	else
-		data = m_ram->pointer()[offset];
+		data = m_ram[offset];
 
 	return data;
 }
 
 void bbc_tube_zep100_device::mem_w(offs_t offset, uint8_t data)
 {
-	m_ram->pointer()[offset] = data;
+	m_ram[offset] = data;
 }
 
 

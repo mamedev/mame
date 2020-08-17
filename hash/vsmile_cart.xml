@@ -18,12 +18,12 @@ Language:
 ********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
 ********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
 ********7 = Spain             (Green labels on back)
+********8 = China
 *******10 = Korea
 *******13 = Denmark           Distributed by the company 'Top Toy A/S'
 *******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
 *******?? = Finland
-*******?? = China
 
 
 Addons (w/ yellow Smartridges)
@@ -53,7 +53,7 @@ Addons (w/ yellow Smartridges)
 |   XX   | 80-067022(SP)     | V.Smile Estudio de Arte (yellow)                                           |
 |        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |
 |        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
-|        |          (CN)     | 智乐学习通小画室                                                            |
+|        | 80-067058(CN)     | 智乐学习通小画室                                                            |
 +========+===================+============================================================================+
 |        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
@@ -146,8 +146,8 @@ Regular game cartridges
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
 |   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB)                          |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent blue cart, no # on label)                         |
+|        | 80-092008(CN)     | 英语乐园                                                                                        |
 |        |          (KOR)    | Alphabet Park Adventure - 알파벳 공원 대탐험                                                     |
-|        |          (CN)     | 英语乐园                                                                                        |
 +========+===================+================================================================================================+
 |        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                       |
 |        | 80-092023(UK)     | The Adventures of Little Red Riding Hood (no # on label, but box says 'colours')               |
@@ -172,6 +172,7 @@ Regular game cartridges
 |   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (rev. 105                                        |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
 |   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)                            |
+|        | 80-092068(CN)     | 小熊维尼                                                                                        |
 |   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (rev. 122, 092067-1 on PCB)                   |
 |   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                     |
 |   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                      |
@@ -179,7 +180,6 @@ Regular game cartridges
 |        |          (NO)     | Ole Brumm - Honningjakten                                                                      |
 |        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                  |
 |        |          (KOR)    | Winnie The Pooh: The Honey Hunt - 푸우와 함께하는 꿀사냥놀이                                      |
-|        |          (CN)     | 小熊维尼                                                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                    |
@@ -189,12 +189,12 @@ Regular game cartridges
 |   XX   | 80-092085(FR)     | Mickey - Mickey à la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
 |   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB)                            |
+|        | 80-092088(CN)     | 米奇魔幻历险记                                                                                   |
 |        |          (DK)     | Mickey                                                                                         |
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                            |
 |        |          (NO)     | Mickey                                                                                         |
 |        |          (FI)     | Mickey                                                                                         |
 |        |          (KOR)    | Mickey Mouse - Mickey's Magical Adventure - 미키마우스의 신비한 마술여행                           |
-|        |          (CN)     | 米奇魔幻历险记                                                                                   |
 +========+===================+================================================================================================+
 |   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                          |
 |   XX   | 80-092101(IT)     | Il Re Leone - La Grande Avventura di Simba                                                     |
@@ -204,12 +204,12 @@ Regular game cartridges
 |   XX   | 80-092105(FR)     | Le Roi Lion - Simba Découvre la Jungle                                                         |
 |        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                                        |
 |   XX   | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba (no # on label, 92187 on PCB)                          |
+|        | 80-092108(CN)     | 狮子王辛巴成长历险记                                                                              |
 |        |          (KOR)    | The Lion King - Simba's Big Adventure                                                          |
 |   XX   | 80-092113(DK)     | Løvernes Konge - Simbas store eventyr                                                          |
 |   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                                             |
 |        |          (NO)     | Løvenes konge - Simbas store eventyr                                                           |
 |        |          (FI)     | Leijona kuningas - Simban suuri seikkailu                                                      |
-|        |          (CN)     | 狮子王辛巴成长历险记                                                                              |
 +========+===================+================================================================================================+
 |        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                  |
 |   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                      |
@@ -219,12 +219,12 @@ Regular game cartridges
 |   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                 |
 |        | 80-092126(PT)     |                                                                                                |
 |   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label)                                     |
+|        | 80-092128(CN)     | 美人鱼梦幻之旅                                                                                   |
 |   XX   | 80-092133(DK)     | Den Lille Havfrue - Ariels majestætiske rejse!                                                 |
 |   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                              |
 |        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                |
 |        |          (FI)     | Pieni Merenneito - Arielin majesteettinen matka                                                |
 |        |          (KOR)    | The Little Mermaid - Ariel's Majestic Journey - 인어공주의 신나는 탐험여행                        |
-|        |          (CN)     | 美人鱼梦幻之旅                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                         |
 |   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (rev. 101)                                              |
@@ -263,7 +263,7 @@ Regular game cartridges
 |        | 80-092180(US)     | Care Bears - A Lesson in Caring                                                                |
 |        | 80-092183(UK)     | Care Bears - A Lesson in Caring                                                                |
 |        | 80-092184(GE)     | Gluecksbarchis  <- existence not proven                                                        |
-|        | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
+|   XX   | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
 |   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB)                                             |
 +========+===================+================================================================================================+
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
@@ -283,11 +283,11 @@ Regular game cartridges
 |   XX   | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                               |
 |   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label)                                 |
+|        | 80-092228(CN)     | 玩具总动员 2 - 营救胡迪                                                                           |
 |        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                            |
 |   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                          |
 |        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                           |
 |        |          (FI)     | Toy Story 2                                                                                    |
-|        |          (CN)     | 玩具总动员 2 - 营救胡迪                                                                           |
 +========+===================+================================================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                         |
 |   XX   | 80-092251(IT)     | Cenerentola - I desideri magici di Cenerentola                                                 |
@@ -307,11 +307,11 @@ Regular game cartridges
 |   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
 |   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 122, white/light pink cart label background)
 |   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 222, no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
+|        | 80-092248(CN)     | 仙蒂                                                                                            |
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
 |        |          (FI)     | Cinderella - Tuhkimon Taikatoiveet                                                             |
-|        |          (CN)     | 仙蒂                                                                                            |
 +========+===================+================================================================================================+
 |        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                          |
 |   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                         |
@@ -375,7 +375,7 @@ Regular game cartridges
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                              |
 |   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label)                                     |
-|        |          (CN)     | 我的外星人同学                                                                                   |
+|        | 80-092368(CN)     | 我的外星人同学                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe                                                              |
 |        | 80-092383(UK)     | Barney - The Land of Make Believe                                                              |
@@ -398,7 +398,7 @@ Regular game cartridges
 |        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                   |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms (rev. 1)                                          |
-|        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
+|   XX   | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
 |   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)                    |
 +========+===================+================================================================================================+
 |        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
@@ -414,7 +414,7 @@ Regular game cartridges
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
 |   XX   | 80-092485(FR)     | The Batman - Panique à Gotham City                                                             |
 |   XX   | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                            |
-|        |          (CN)     | 蝙蝠侠 - 拯救城市                                                                                |
+|   XX   | 80-092488(CN)     | 蝙蝠侠 - 拯救城市                                                                                |
 +========+===================+================================================================================================+
 |        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                    |
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                            |
@@ -424,8 +424,8 @@ Regular game cartridges
 |   XX   | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
 |   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label)                                              |
+|        | 80-092508(CN)     | 数学快车                                                                                        |
 |        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
-|        |          (CN)     | 数学快车                                                                                        |
 +========+===================+================================================================================================+
 |        | 80-092520(US)     | Spider-Man & Friends - Doc Ock's Challenge                                                     |
 |   XX   | 80-092531(IT)     | Spider-Man & Friends - La Sfida del Dottor Ock                                                 |
@@ -468,7 +468,7 @@ Regular game cartridges
 |   XX   | 80-092644(GE)     | Superman - Der Superheld                                                                       |
 |   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                                    |
 |   XX   | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
-|        |          (CN)     | 超人 - 超级英雄                                                                                  |
+|        | 80-092648(CN)     | 超人 - 超级英雄                                                                                  |
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
 |   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (rev. 201)                                                |
@@ -480,12 +480,12 @@ Regular game cartridges
 |   XX   | 80-092665-105(FR) | Cars - Quatre Roues (rev. 105)                                                                 |
 |        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                          |
 |   XX   | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
+|        | 80-092668(CN)     | 汽车总动员                                                                                      |
 |   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                 |
 |   XX   | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping                                                                |
 |        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                                             |
 |        |          (NO)     | Biler - Full gass i Radiator By                                                                |
 |        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä                                                             |
-|        |          (CN)     | 汽车总动员                                                                                      |
 +========+===================+================================================================================================+
 |        | 80-092680(US)     | <Unknown>                                                                                      |
 |        | 80-092800(US)     | <Unknown>                                                                                      |
@@ -506,11 +506,11 @@ Regular game cartridges
 |   XX   | 80-092844(GE)     | Wall-E                                                                                         |
 |   XX   | 80-092845(FR)     | Wall-E                                                                                         |
 |   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label)                                                               |
+|   XX   | 80-092848(CN)     | 瓦力                                                                                           |
 |        |          (DK)     | Wall-E                                                                                         |
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
 |        |          (NO)     | Wall-E                                                                                         |
 |        |          (FI)     | Wall-E                                                                                         |
-|        |          (CN)     | 瓦力                                                                                           |
 +========+===================+================================================================================================+
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure                                                 |
 |   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure (alt)                                           |
@@ -976,6 +976,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="batmang">
+		<description>The Batman - Rettung von Gotham City (Germany)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092484(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="8388608" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanf" cloneof="batmanuk">
 		<description>The Batman - Panique à Gotham City (France)</description>
 		<year>2006</year> <!-- (s06) -->
@@ -1006,19 +1023,17 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="batmang">
-		<description>The Batman - Rettung von Gotham City (Germany)</description>
+	<software name="batmancn" cloneof="batmanuk">
+		<description>Bianfuxia - Zhengjiu Chengshi (China)</description>
 		<year>2006</year> <!-- (s06) -->
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092484(GER)" />
+		<info name="serial" value="80-092488(CN)" />
+		<info name="alt_title" value="蝙蝠侠 - 拯救城市"/>
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="8388608" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
+				<rom name="Batman - Gotham City Rescue (CN).bin" size="8388608" crc="1b8f118a" sha1="b921dfe8fdb8694f11b575a18b529e2d9de66160" />
 			</dataarea>
 		</part>
 	</software>
@@ -1074,8 +1089,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="bobbdayuk" cloneof="bobbday" supported="no">
+	<software name="bobbdayuk" cloneof="bobbday">
 		<description>Bob The Builder - Bob's Busy Day (UK)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -1189,7 +1203,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="carebears"> <!-- Will be clone of "carebear" once found and dumped. -->
+	<software name="carebearf"> <!-- Will be clone of "carebear" once found and dumped. -->
+		<description>Les Bisounours - Le monde merveilleux des Bisounours (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092185(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92185 - LesBisounours (FR).bin" size="8388608" crc="7de5716b" sha1="463fb552790ce25cdd4adecb8218ba3766446efa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carebears" cloneof="carebearf"> <!-- Will be clone of "carebear" once found and dumped. -->
 		<description>Osos Amorosos - Una Lección de Amor (Spain)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1206,8 +1235,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="carsr201" supported="no">
+	<software name="carsr201">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, rev. 201)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1287,8 +1315,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="carsfr105" cloneof="carsr201" supported="no">
+	<software name="carsfr105" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Quatre Roues (France, rev. 105)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1398,8 +1425,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlair1" cloneof="cinderla" supported="no">
+	<software name="cinderlair1" cloneof="cinderla">
 		<description>Disney Cenerentola - I desideri magici di Cenerentola (Italy, rev. 1)</description>
 		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -1459,8 +1485,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlafr105" cloneof="cinderla" supported="no">
+	<software name="cinderlafr105" cloneof="cinderla">
 		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (France, rev. 105)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1475,8 +1500,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlafr205" cloneof="cinderla" supported="no">
+	<software name="cinderlafr205" cloneof="cinderla">
 		<description>Walt Disney Cendrillon - Le rêve enchanté de Cendrillon (France, rev. 205)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1508,8 +1532,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="cinderlasr122" cloneof="cinderla" supported="no">
+	<software name="cinderlasr122" cloneof="cinderla">
 		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spain, rev. 122)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1628,8 +1651,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorar201" supported="no">
+	<software name="dorar201">
 		<description>Nickelodeon Dora the Explorer - Dora's Fix-it Adventure (USA, rev. 201)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1662,8 +1684,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorauk" cloneof="dorar201" supported="no">
+	<software name="dorauk" cloneof="dorar201">
 		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1697,8 +1718,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorafr105" cloneof="dorar201" supported="no">
+	<software name="dorafr105" cloneof="dorar201">
 		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (France, rev. 105)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1713,8 +1733,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="dorasr222" cloneof="dorar201" supported="no">
+	<software name="dorasr222" cloneof="dorar201">
 		<description>Nick Jr. Dora La Exploradora - La Aventura arregla-todo de Dora (Spain, rev. 222)</description>
 		<year>2007</year> <!-- 2009 on cart -->
 		<publisher>VTech</publisher>
@@ -1933,8 +1952,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="godiegor2" supported="no">
+	<software name="godiegor2">
 		<description>Nick Jr. Go Diego Go! - Save the Animal Familes! (USA, rev. 2?)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1949,8 +1967,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="godiegof" cloneof="godiegor2" supported="no">
+	<software name="godiegof" cloneof="godiegor2">
 		<description>Nickelodeon Go Diego! - À la rescousse des animaux! (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2017,8 +2034,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ltleinstnr5" supported="no">
+	<software name="ltleinstnr5">
 		<description>Disney's Little Einsteins (USA, rev. 5?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2050,8 +2066,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ltleinstnf" cloneof="ltleinstnr5" supported="no">
+	<software name="ltleinstnf" cloneof="ltleinstnr5">
 		<description>Disney - Les petits Einsteins - Le bal du soulier de verre (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2066,8 +2081,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ltleinstns" cloneof="ltleinstnr5" supported="no">
+	<software name="ltleinstn" cloneof="ltleinstnr5">
 		<description>Disney's Little Einsteins (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2246,8 +2260,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="kungfupf" cloneof="kungfupuk" supported="no">
+	<software name="kungfupf" cloneof="kungfupuk">
 		<description>Kung Fu Panda - La Mission de Po (France)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -2262,8 +2275,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="kungfups" cloneof="kungfupuk" supported="no">
+	<software name="kungfups" cloneof="kungfupuk">
 		<description>Kung Fu Panda - Aventura en el Valle de la Paz (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -2329,8 +2341,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mannyf" supported="no">
+	<software name="mannyf">
 		<description>Disney Manny et ses outils (France)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2340,7 +2351,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
-				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="8388608" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" />
+				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="8388608" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2389,8 +2400,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- UNSP: illegal ALU optype 07 at 2a0001 -->
-	<software name="mickymagf" cloneof="mickymag" supported="no">
+	<software name="mickymagf" cloneof="mickymag">
 		<description>Disney Mickey - Mickey à la Recherche De Pluto (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -2456,8 +2466,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mickeychf" cloneof="mickeychgr3" supported="no">
+	<software name="mickeychf" cloneof="mickeychgr3">
 		<description>Disney La Maison De Mickey (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2472,8 +2481,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mickeychs" cloneof="mickeychgr3" supported="no">
+	<software name="mickeychs" cloneof="mickeychgr3">
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2541,8 +2549,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="monstalnf" cloneof="monstalng" supported="no">
+	<software name="monstalnf" cloneof="monstalng">
 		<description>DreamWorks Monstres contre Aliens (France)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -2557,8 +2564,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="monstalns" cloneof="monstalng" supported="no">
+	<software name="monstalns" cloneof="monstalng">
 		<description>DreamWorks Monstruos contra Alienígenas (Spain)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2592,8 +2598,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="mypuppys" cloneof="mypuppyg" supported="no">
+	<software name="mypuppys" cloneof="mypuppyg">
 		<description>Dakota y su mascota (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2692,8 +2697,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="noddyfr105" cloneof="noddy" supported="no">
+	<software name="noddyfr105" cloneof="noddy">
 		<description>Oui-Oui - Détective d'un Jour (France, rev. 105)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2810,8 +2814,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="upfr005" supported="no">
+	<software name="upfr005">
 		<description>Disney/Pixar Là-Haut (France, rev. 005)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2839,8 +2842,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, shows a "Please, connect the controller" message on screen. -->
-	<software name="upsr022" cloneof="upgr004" supported="no">
+	<software name="upsr022" cloneof="upgr004">
 		<description>Disney/Pixar Up (Spain, rev. 022)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -2874,8 +2876,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="partyprkg" cloneof="partyprk" supported="no">
+	<software name="partyprkg" cloneof="partyprk">
 		<description>Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspaß (Germany)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2892,8 +2893,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="partyprkf" cloneof="partyprk" supported="no">
+	<software name="partyprkf" cloneof="partyprk">
 		<description>Cranium - Le Parc D'Attractions (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2908,8 +2908,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="partyprks" cloneof="partyprk" supported="no">
+	<software name="partyprks" cloneof="partyprk">
 		<description>Cranium - Parque de Atracciones de Cranium (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -2938,8 +2937,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ratatnl" supported="no">
+	<software name="ratatnl">
 		<description>Disney/Pixar Ratatouille - Remy's Nieuwe Recepten (Netherlands)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2973,8 +2971,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ratatf" supported="no">
+	<software name="ratatf">
 		<description>Disney/Pixar Ratatouille - Les nouvelles recettes de Rémy (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -2989,8 +2986,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="ratats" cloneof="ratatg" supported="no">
+	<software name="ratats" cloneof="ratatg">
 		<description>Disney/Pixar Ratatouille - Las recetas del Remy (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3007,8 +3003,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydor301" supported="no">
+	<software name="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (USA, rev. 301)</description>
 		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
@@ -3070,8 +3065,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydouk" cloneof="scoobydor301" supported="no">
+	<software name="scoobydouk" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (UK)</description>
 		<year>2007</year> <!-- (s07) -->
 		<publisher>VTech</publisher>
@@ -3084,8 +3078,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydoukr1" cloneof="scoobydor301" supported="no">
+	<software name="scoobydoukr1" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Funland Frenzy (UK, rev. 1?)</description>
 		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
@@ -3115,8 +3108,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydof" cloneof="scoobydor301" supported="no">
+	<software name="scoobydof" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Panique à Funland (France)</description>
 		<year>2004</year> <!-- (s04) -->
 		<publisher>VTech</publisher>
@@ -3133,8 +3125,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="scoobydofr105" cloneof="scoobydor301" supported="no">
+	<software name="scoobydofr105" cloneof="scoobydor301">
 		<description>Scooby-Doo! - Panique à Funland (France, rev. 105)</description>
 		<year>2007</year> <!-- (s07) -->
 		<publisher>VTech</publisher>
@@ -3149,8 +3140,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Does not boot, just shows a black screen -->
-	<software name="scoobydos" cloneof="scoobydor301" supported="no">
+	<software name="scoobydos" cloneof="scoobydor301">
 		<description>Scooby-Doo - Misterio en el Parque (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -3235,8 +3225,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="erniebrtf" cloneof="erniebrtg" supported="no">
+	<software name="erniebrtf" cloneof="erniebrtg">
 		<description>Les aventures de imagniares d'Ernest et Bart (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -3285,8 +3274,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3a" cloneof="shrek3" supported="no">
+	<software name="shrek3a" cloneof="shrek3">
 		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA, alt)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3320,8 +3308,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3uk" cloneof="shrek3" supported="no">
+	<software name="shrek3uk" cloneof="shrek3">
 		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (UK)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3352,8 +3339,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3f" cloneof="shrek3" supported="no">
+	<software name="shrek3f" cloneof="shrek3">
 		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3368,8 +3354,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="shrek3fr105" cloneof="shrek3" supported="no">
+	<software name="shrek3fr105" cloneof="shrek3">
 		<description>DreamWorks Shrek Le Troisième - L'aventure d'Arthur (France, rev. 105)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -3594,8 +3579,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermisr101" supported="no">
+	<software name="spidermisr101">
 		<description>Marvel Spider-Man &amp; Friends - Secret Missions (USA, rev. 101)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3660,8 +3644,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermisfr105" cloneof="spidermisr101" supported="no">
+	<software name="spidermisfr105" cloneof="spidermisr101">
 		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, rev. 105)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -3676,8 +3659,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermisfr305" cloneof="spidermisr101" supported="no">
+	<software name="spidermisfr305" cloneof="spidermisr101">
 		<description>Marvel Spider-Man &amp; ses amis - Missions secrètes (France, rev. 305)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -3709,8 +3691,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="spidermissr222" cloneof="spidermisr101" supported="no">
+	<software name="spidermissr222" cloneof="spidermisr101">
 		<description>Spider-Man y Amigos - Misiones Secretas (Spain, rev. 222)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -3789,6 +3770,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongebf" cloneof="spongeb">
+		<description>Nickelodeon Bob L'éponge - Une journée dans la vie d'une éponge (France)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092445(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92445 - BobEponge (FR).bin" size="8388608" crc="0434bd33" sha1="64cd5ef60474da4304966a03e5c3c9a34417642b" />
 			</dataarea>
 		</part>
 	</software>
@@ -3924,8 +3919,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="thomasukr1" cloneof="thomas" supported="no">
+	<software name="thomasukr1" cloneof="thomas">
 		<description>Thomas &amp; Friends - Engines Working Together (UK, rev. 1?)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -4147,7 +4141,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Fatal error: UNSP: illegal ALU optype 05 at 0001 -->
+	<!-- Fatal error: UNSP: unknown opcode e50b at e9a7 -->
 	<software name="toystor3i" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Italy)</description>
 		<year>2010</year>
@@ -4163,8 +4157,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wallei" supported="no">
+	<software name="wallei">
 		<description>Disney/Pixar Wall-E (Italy)</description>
 		<year>2009</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -4196,8 +4189,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wallef" cloneof="wallei" supported="no">
+	<software name="wallef" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (France)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -4212,8 +4204,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="walles" cloneof="wallei" supported="no">
+	<software name="walles" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (Spain)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -4229,6 +4220,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="wallecn" cloneof="wallei">
+		<description>Disney/Pixar Wall-E (China)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092848(CN)" />
+		<info name="alt_title" value="Disney/Pixar 瓦力"/>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Wall-E_52-092848_CN).bin" size="8388608" crc="7008c01f" sha1="504d2cfab90f63ae95bf6cb2806932ca5009e2ba" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="wallesw" cloneof="wallei">
 		<description>Disney/Pixar Wall-E (Sweden)</description>
@@ -4278,8 +4285,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="poohnlr123" cloneof="pooh" supported="no">
+	<software name="poohnlr123" cloneof="pooh">
 		<description>Disney's Winnie de Poeh - De wonderwereld van Poeh (Netherlands)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -4381,10 +4387,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
 	<!-- Cart labeled as "Disney My Friends Tigger and Pooh - En Busca de la Miel",
 	         but game on screen title is "Disney Winnie the Pooh - En Busca de la Miel". -->
-	<software name="poohsr122" cloneof="pooh" supported="no">
+	<software name="poohsr122" cloneof="pooh">
 		<description>Disney Winnie the Pooh - En Busca de la Miel (Spain, rev. 122)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -4452,8 +4457,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="redhoodf" cloneof="redhoodg" supported="no">
+	<software name="redhoodf" cloneof="redhoodg">
 		<description>Les aventures du Petit Chaperon Rouge (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4502,8 +4506,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Crashes MAME -->
-	<software name="techart" supported="no">
+	<software name="techart">
 		<description>V.Smile Art Studio (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4523,7 +4526,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="techartg" cloneof="techart" supported="no">
+	<software name="techartg" cloneof="techart">
 		<description>V.Smile Zeichenatelier (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4543,7 +4546,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="techartf" cloneof="techart" supported="no">
+	<software name="techartf" cloneof="techart">
 		<description>V.Smile Studio De Dessin (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4581,8 +4584,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Crashes MAME -->
-	<software name="techarts" cloneof="techart" supported="no">
+	<software name="techarts" cloneof="techart">
 		<description>V.Smile Estudio De Arte (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -4651,8 +4653,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
-	<software name="wwavesg" supported="no"> <!-- Will be clone of "wwaves" once found and dumped. -->
+	<software name="wwavesg"> <!-- Will be clone of "wwaves" once found and dumped. -->
 		<description>Dolphis Wasser-abenteuer (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>

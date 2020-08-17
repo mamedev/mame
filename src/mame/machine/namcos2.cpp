@@ -80,13 +80,12 @@ void namcos2_state::machine_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_pointer(NAME(m_eeprom), 0x2000);
+	save_item(NAME(m_sendval));
 }
 
 void namcos2_state::machine_reset()
 {
-//  address_space &space = m_maincpu->space(AS_PROGRAM);
-//  address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
-
 	/* Initialise the bank select in the sound CPU */
 	m_audiobank->set_entry(0); /* Page in bank 0 */
 
@@ -203,7 +202,7 @@ uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 
 	case NAMCOS2_STEEL_GUNNER_2:
-		switch( offset )
+		switch(offset)
 		{
 			case 4: return 0x15a;
 		}
@@ -360,20 +359,19 @@ uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 
 void namcos2_state::namcos2_68k_key_w(offs_t offset, uint16_t data)
 {
-	int gametype = m_gametype;
-	if( gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
+	if( m_gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
 	{
 		if (data == 0x615E) m_sendval = 1;
 	}
-	if( gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
+	if( m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
 	{
 		if (data == 0x13EC) m_sendval = 1;
 	}
-	if( gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
+	if( m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
 	{
 		if (data == 0x13EC) m_sendval = 1;
 	}
-	if( gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
+	if( m_gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
 	{
 		if (data == 0x1001) m_sendval = 0;
 	}

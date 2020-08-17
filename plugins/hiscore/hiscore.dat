@@ -5455,9 +5455,9 @@ fantsia2n:
 
 
 galsnew:
-galsnewa:
 galsnewj:
 galsnewk:
+galsnewu:
 @:maincpu,program,c825b6,64,30,31
 
 
@@ -7063,7 +7063,7 @@ hcastlek:
 
 ;@s:headonb.cpp
 
-headonb:
+foolrace:
 @:maincpu,program,ff06,4,00,00
 
 
@@ -7161,7 +7161,7 @@ hvyunitu:
 
 roadf:
 roadf2:
-roadf3:
+roadfh:
 @:maincpu,program,3bd0,10a,01,01
 @:maincpu,program,3066,3,01,00
 
@@ -8747,8 +8747,8 @@ megaphx:
 ;@s:megasys1.cpp
 
 ;** top score updates when first game starts **
-lordofkb:
 lordofk:
+lordofkb:
 @:maincpu,program,f8921,97,00,4e
 @:maincpu,program,f8875,f,00,00
 @:maincpu,program,f887b,1,02,02
@@ -18090,9 +18090,9 @@ xmen6p:
 xmen6pu:
 xmena:
 xmenaa:
-xmenu:
 xmenj:
 xmenja:
+xmenu:
 @:maincpu,program,113300,168,00,10
 
 

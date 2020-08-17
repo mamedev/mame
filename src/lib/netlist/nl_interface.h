@@ -12,6 +12,7 @@
 
 #include "nl_base.h"
 #include "nl_setup.h"
+#include "core/setup.h"
 
 #include <memory>
 #include <array>
@@ -50,13 +51,11 @@ namespace netlist
 		///
 
 		template <typename FUNC>
-		class NETLIB_NAME(analog_callback) : public device_t
+		NETLIB_OBJECT(analog_callback)
 		{
 		public:
-			NETLIB_NAME(analog_callback)(netlist_state_t &anetlist,
-				const pstring &name, nl_fptype threshold, FUNC &&func)
-				: device_t(anetlist, name)
-				, m_in(*this, "IN")
+			NETLIB_CONSTRUCTOR_EX(analog_callback, nl_fptype threshold, FUNC &&func)
+				, m_in(*this, "IN", NETLIB_DELEGATE(in))
 				, m_threshold(threshold)
 				, m_last(*this, "m_last", 0)
 				, m_func(func)
@@ -68,7 +67,7 @@ namespace netlist
 				m_last = 0.0;
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(in)
 			{
 				const nl_fptype cur = m_in();
 				if (plib::abs(cur - m_last) > m_threshold)
@@ -98,17 +97,16 @@ namespace netlist
 		/// analog callback device instead.
 
 		template <typename FUNC>
-		class NETLIB_NAME(logic_callback) : public device_t
+		NETLIB_OBJECT(logic_callback)
 		{
 		public:
-			NETLIB_NAME(logic_callback)(netlist_state_t &anetlist, const pstring &name, FUNC &&func)
-				: device_t(anetlist, name)
-				, m_in(*this, "IN")
+			NETLIB_CONSTRUCTOR_EX(logic_callback, FUNC &&func)
+				, m_in(*this, "IN", NETLIB_DELEGATE(in))
 				, m_func(func)
 			{
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(in)
 			{
 				const netlist_sig_t cur = m_in();
 				m_func(*this, cur);
@@ -129,16 +127,15 @@ namespace netlist
 		/// \tparam N Maximum number of supported buffers
 		///
 		template <typename T, std::size_t N>
-		class NETLIB_NAME(buffered_param_setter) : public device_t
+		NETLIB_OBJECT(buffered_param_setter)
 		{
 		public:
 
 			static const int MAX_INPUT_CHANNELS = N;
 
-			NETLIB_NAME(buffered_param_setter)(netlist_state_t &anetlist, const pstring &name)
-			: device_t(anetlist, name)
+			NETLIB_CONSTRUCTOR(buffered_param_setter)
 			, m_sample_time(netlist_time::zero())
-			, m_feedback(*this, "FB") // clock part
+			, m_feedback(*this, "FB", NETLIB_DELEGATE(feedback)) // clock part
 			, m_Q(*this, "Q")
 			, m_pos(0)
 			, m_samples(0)
@@ -148,17 +145,16 @@ namespace netlist
 			, m_param_offsets(*this, 0, "OFFSET{}", 0.0)
 			{
 				connect(m_feedback, m_Q);
+				for (auto & elem : m_buffers)
+					elem = nullptr;
 			}
 
 		protected:
 			NETLIB_RESETI()
 			{
-				m_pos = 0;
-				for (auto & elem : m_buffers)
-					elem = nullptr;
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(feedback)
 			{
 				if (m_pos < m_samples)
 				{
@@ -231,8 +227,8 @@ namespace netlist
 			object_array_t<param_str_t, MAX_INPUT_CHANNELS> m_param_names;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_mults;
 			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_offsets;
-			std::array<param_fp_t *, MAX_INPUT_CHANNELS>             m_params;
-			std::array<T *, MAX_INPUT_CHANNELS>                               m_buffers;
+			std::array<param_fp_t *, MAX_INPUT_CHANNELS>    m_params;
+			std::array<T *, MAX_INPUT_CHANNELS>             m_buffers;
 		};
 
 	} // namespace interface

@@ -28,7 +28,6 @@
 #include "k051649.h"
 #include <algorithm>
 
-#define FREQ_BITS   16
 #define DEF_GAIN    8
 
 void k051649_device::scc_map(address_map &map)
@@ -56,7 +55,6 @@ k051649_device::k051649_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K051649, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_mclock(0)
 	, m_rate(0)
 	, m_mixer_table(nullptr)
 	, m_mixer_lookup(nullptr)
@@ -74,7 +72,6 @@ void k051649_device::device_start()
 	// get stream channels
 	m_rate = clock()/16;
 	m_stream = stream_alloc(0, 1, m_rate);
-	m_mclock = clock();
 
 	// allocate a buffer to mix into - 1 second's worth should be more than enough
 	m_mixer_buffer.resize(2 * m_rate);
@@ -83,14 +80,12 @@ void k051649_device::device_start()
 	make_mixer_table(5);
 
 	// save states
-	for (int voice = 0; voice < 5; voice++)
-	{
-		save_item(NAME(m_channel_list[voice].counter), voice);
-		save_item(NAME(m_channel_list[voice].frequency), voice);
-		save_item(NAME(m_channel_list[voice].volume), voice);
-		save_item(NAME(m_channel_list[voice].key), voice);
-		save_item(NAME(m_channel_list[voice].waveram), voice);
-	}
+	save_item(STRUCT_MEMBER(m_channel_list, counter));
+	save_item(STRUCT_MEMBER(m_channel_list, clock));
+	save_item(STRUCT_MEMBER(m_channel_list, frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, key));
+	save_item(STRUCT_MEMBER(m_channel_list, waveram));
 	save_item(NAME(m_test));
 }
 
@@ -107,6 +102,7 @@ void k051649_device::device_reset()
 		voice.frequency = 0;
 		voice.volume = 0xf;
 		voice.counter = 0;
+		voice.clock = 0;
 		voice.key = false;
 	}
 
@@ -134,7 +130,6 @@ void k051649_device::device_clock_changed()
 {
 	const u32 old_rate = m_rate;
 	m_rate = clock()/16;
-	m_mclock = clock();
 
 	if (old_rate < m_rate)
 	{
@@ -159,19 +154,25 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		if (voice.frequency > 8)
 		{
 			const int v = voice.volume * voice.key;
-			int c = voice.counter;
-			const int step = ((s64(m_mclock) << FREQ_BITS) / float((voice.frequency + 1) * 16 * (m_rate / 32))) + 0.5f;
+			int a = voice.counter;
+			int c = voice.clock;
+			const int step = voice.frequency;
 
 			// add our contribution
 			for (int i = 0; i < samples; i++)
 			{
-				c += step;
-				const int offs = (c >> FREQ_BITS) & 0x1f;
-				m_mixer_buffer[i] += (voice.waveram[offs] * v) >> 3;
+				c += 32;
+				while (c > step)
+				{
+					a = (a + 1) & 0x1f;
+					c -= step+1;
+				}
+				m_mixer_buffer[i] += (voice.waveram[a] * v) >> 3;
 			}
 
 			// update the counter for this voice
-			voice.counter = c;
+			voice.counter = a;
+			voice.clock = c;
 		}
 	}
 
@@ -212,9 +213,9 @@ u8 k051649_device::k051649_waveform_r(offs_t offset)
 		m_stream->update();
 
 		if (offset >= 0x60)
-			offset += (m_channel_list[3 + (m_test >> 6 & 1)].counter >> FREQ_BITS);
+			offset += m_channel_list[3 + (m_test >> 6 & 1)].counter;
 		else if (m_test & 0x40)
-			offset += (m_channel_list[offset >> 5].counter >> FREQ_BITS);
+			offset += m_channel_list[offset >> 5].counter;
 	}
 	return m_channel_list[offset >> 5].waveram[offset & 0x1f];
 }
@@ -237,7 +238,7 @@ u8 k051649_device::k052539_waveform_r(offs_t offset)
 	if (m_test & 0x40)
 	{
 		m_stream->update();
-		offset += (m_channel_list[offset >> 5].counter >> FREQ_BITS);
+		offset += m_channel_list[offset >> 5].counter;
 	}
 	return m_channel_list[offset >> 5].waveram[offset & 0x1f];
 }
@@ -259,9 +260,13 @@ void k051649_device::k051649_frequency_w(offs_t offset, u8 data)
 
 	// test-register bit 5 resets the internal counter
 	if (m_test & 0x20)
-		m_channel_list[offset].counter = ~0;
+	{
+		m_channel_list[offset].counter = 0;
+		m_channel_list[offset].clock = 0;
+	}
+	// TODO: correct?
 	else if (m_channel_list[offset].frequency < 9)
-		m_channel_list[offset].counter |= ((1 << FREQ_BITS) - 1);
+		m_channel_list[offset].clock = 0;
 
 	// update frequency
 	if (freq_hi)

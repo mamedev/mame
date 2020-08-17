@@ -2,39 +2,34 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /******************************************************************************
 
-        LLC1 driver by Miodrag Milanovic
+LLC1 driver by Miodrag Milanovic
 
-        17/04/2009 Preliminary driver.
+2009-04-17 Preliminary driver.
 
-        July 2012, updates by Robbbert
+2012-07-?? Updates by Robbbert
 
-        Very little info available on these computers.
+Handy addresses: (Press X then the 4 digits then Enter)
+  0800 = BASIC cold start
+  0803 = BASIC warm start
+  13BE = display Monitor logo
+This machine has an 8-digit LED display with hex keyboard,
+and also a 64x16 monochrome screen with full keyboard.
+The monitor uses the hex keyboard, while Basic uses the full keyboard.
+Monitor output is on the digits, but the single-step command displays
+a running register dump on the main screen.
+There are no storage facilities, and no sound.
+BASIC is integer only (-32768 to 32767), about 6k of space, and all
+input is to be in uppercase. It does have minimal string capability,
+but there is no $ sign, so how to create a string variable is unknown.
+To exit back to the monitor, type BYE.
+The user instructions of the monitor (in German) are here:
+http://www.jens-mueller.org/jkcemu/llc1.html
 
-        LLC1:
-        Handy addresses (set the pc register in the debugger, because the
-        monitor's Go command has problems):
-        0800 = BASIC cold start
-        0803 = BASIC warm start
-        13BE = display Monitor logo
-        This machine has an 8-digit LED display with hex keyboard,
-        and also a 64x16 monochrome screen with full keyboard.
-        The monitor uses the hex keyboard, while Basic uses the full keyboard.
-        Monitor output is on the digits, but the single-step command displays
-        a running register dump on the main screen.
-        There are no storage facilities, and no sound.
-        BASIC is integer only (-32768 to 32767), about 6k of space, and all
-        input is to be in uppercase. It does have minimal string capability,
-        but there is no $ sign, so how to create a string variable is unknown.
-        To exit back to the monitor, type BYE.
-        The user instructions of the monitor (in German) are here:
-        http://www.jens-mueller.org/jkcemu/llc1.html
+ToDo:
+- Get good dump of monitor rom, has one known bad byte, possibly more.
+- In Basic, when it first scrolls, the start of the line shifts a character
+  to the right. Unknown if a bug or a bad byte. (patched)
 
-        ToDo:
-        - LLC1: Get good dump of monitor rom, has a number of bad bytes
-        - LLC1: In Basic, pressing enter several times causes the start
-          of the line to be shifted 1 or 2 characters to the right.
-        - LLC1: Go command crashes
-        - Lots of other things
 
 *******************************************************************************/
 
@@ -57,32 +52,33 @@ public:
 	llc1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ctc(*this, "ctc")
 		, m_p_chargen(*this, "chargen")
 		, m_vram(*this, "videoram")
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void llc1(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(z3_button);
 
 private:
 	void machine_start() override;
 	void machine_reset() override;
 	void kbd_put(u8 data);
-	u8 llc1_port1_a_r();
-	u8 llc1_port2_a_r();
-	u8 llc1_port2_b_r();
-	void llc1_port1_a_w(u8 data);
-	void llc1_port1_b_w(u8 data);
-	u32 screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 port1a_r();
+	u8 port2a_r();
+	u8 port2b_r();
+	void port1a_w(u8 data);
+	void port1b_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_term_status;
-	u8 m_llc1_key;
 	u8 m_porta;
 	u8 m_term_data;
 	required_device<z80_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_vram;
 	output_finder<8> m_digits;
@@ -102,41 +98,46 @@ void llc1_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xEC, 0xEF).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xF4, 0xF7).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xF8, 0xFB).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xEC, 0xEF).rw("pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xF4, 0xF7).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xF8, 0xFB).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 /* Input ports */
 static INPUT_PORTS_START( llc1 )
 	PORT_START("X4") // out F4,BF
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
 	PORT_START("X5") // out F4,DF
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M (Mem)") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ST (Start)") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('^')
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // resets
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M (Mem)") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ST (Start)") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('^') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DF (Reset)") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
 	PORT_START("X6") // out F4,EF
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ES (Step)") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DL (Go)") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HP (BP)") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ES (Step)") PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DL (Go)") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HP (BP)") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHANGED_MEMBER(DEVICE_SELF, llc1_state, z3_button, 0)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // does nothing
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(llc1_state::z3_button)
+{
+	m_ctc->trg3(newval);
+}
 
 void llc1_state::kbd_put(u8 data)
 {
@@ -156,32 +157,28 @@ void llc1_state::kbd_put(u8 data)
 		m_term_data = 0;
 
 	if (m_term_data)
-		m_term_status = 0xff;
+		m_term_data |= 0x80;
 }
 
 // LLC1 BASIC keyboard
-u8 llc1_state::llc1_port2_b_r()
+u8 llc1_state::port2b_r()
 {
-	u8 retVal = 0;
-
-	if (m_term_status)
+	if (BIT(m_term_data, 7))
 	{
-		retVal = m_term_status;
-		m_term_status = 0;
+		m_term_data &= 0x7f;
+		return 0xff;
 	}
 	else
-		retVal = m_term_data;
-
-	return retVal;
+		return m_term_data;
 }
 
-u8 llc1_state::llc1_port2_a_r()
+u8 llc1_state::port2a_r()
 {
 	return 0;
 }
 
 // LLC1 Monitor keyboard
-u8 llc1_state::llc1_port1_a_r()
+u8 llc1_state::port1a_r()
 {
 	u8 data = 0;
 	if (!BIT(m_porta, 4))
@@ -193,29 +190,15 @@ u8 llc1_state::llc1_port1_a_r()
 	if (data & 0xf0)
 		data = (data >> 4) | 0x80;
 
-	data |= (m_porta & 0x70);
-
-	// do not repeat key
-	if (data & 15)
-	{
-		if (data == m_llc1_key)
-			data &= 0x70;
-		else
-			m_llc1_key = data;
-	}
-	else
-	if ((data & 0x70) == (m_llc1_key & 0x70))
-		m_llc1_key = 0;
-
 	return data;
 }
 
-void llc1_state::llc1_port1_a_w(u8 data)
+void llc1_state::port1a_w(u8 data)
 {
 	m_porta = data;
 }
 
-void llc1_state::llc1_port1_b_w(u8 data)
+void llc1_state::port1b_w(u8 data)
 {
 	static u8 count = 0, digit = 0;
 
@@ -242,21 +225,17 @@ void llc1_state::llc1_port1_b_w(u8 data)
 
 void llc1_state::machine_reset()
 {
-	m_term_status = 0;
-	m_llc1_key = 0;
+	m_term_data = 0;
 }
 
 void llc1_state::machine_start()
 {
 	m_digits.resolve();
-
-	save_item(NAME(m_term_status));
-	save_item(NAME(m_llc1_key));
 	save_item(NAME(m_porta));
 	save_item(NAME(m_term_data));
 }
 
-u32 llc1_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 llc1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 y,ra,chr,gfx,inv;
 	u16 sy=0,ma=0,x;
@@ -291,14 +270,15 @@ u32 llc1_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-static const z80_daisy_config llc1_daisy_chain[] =
+static const z80_daisy_config daisy_chain[] =
 {
-	{ "z80ctc" },
+	{ "pio2" },
+	{ "ctc" },
 	{ nullptr }
 };
 
 /* F4 Character Displayer */
-static const gfx_layout llc1_charlayout =
+static const gfx_layout charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
 	128,                    /* 128 characters */
@@ -312,15 +292,15 @@ static const gfx_layout llc1_charlayout =
 };
 
 static GFXDECODE_START( gfx_llc1 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, llc1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Machine driver */
 void llc1_state::llc1(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(3'000'000));
-	m_maincpu->set_daisy_config(llc1_daisy_chain);
+	Z80(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_daisy_config(daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &llc1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &llc1_state::io_map);
 
@@ -330,29 +310,29 @@ void llc1_state::llc1(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 16*8);
 	screen.set_visarea(0, 64*8-1, 0, 16*8-1);
-	screen.set_screen_update(FUNC(llc1_state::screen_update_llc1));
+	screen.set_screen_update(FUNC(llc1_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_llc1);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	config.set_default_layout(layout_llc1);
 
-	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
-	pio1.in_pa_callback().set(FUNC(llc1_state::llc1_port1_a_r));
-	pio1.out_pa_callback().set(FUNC(llc1_state::llc1_port1_a_w));
-	pio1.out_pb_callback().set(FUNC(llc1_state::llc1_port1_b_w));
+	z80pio_device& pio1(Z80PIO(config, "pio1", XTAL(2'000'000)));
+	pio1.in_pa_callback().set(FUNC(llc1_state::port1a_r));
+	pio1.out_pa_callback().set(FUNC(llc1_state::port1a_w));
+	pio1.out_pb_callback().set(FUNC(llc1_state::port1b_w));
 
-	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
-	pio2.in_pa_callback().set(FUNC(llc1_state::llc1_port2_a_r));
-	pio2.in_pb_callback().set(FUNC(llc1_state::llc1_port2_b_r));
+	z80pio_device& pio2(Z80PIO(config, "pio2", XTAL(2'000'000)));
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio2.in_pa_callback().set(FUNC(llc1_state::port2a_r));
+	pio2.in_pb_callback().set(FUNC(llc1_state::port2b_r));
 
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(3'000'000)));
-	// timer 0 irq does digit display, and timer 3 irq does scan of the
-	// monitor keyboard.
-	// No idea how the CTC is connected, so guessed.
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
-	ctc.zc_callback<1>().set("z80ctc", FUNC(z80ctc_device::trg3));
+	Z80CTC(config, m_ctc, XTAL(2'000'000));
+	// timer 0 irq does digit display
+	// timer 3 is kicked off by a key press, and scans the monitor keyboard.
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(llc1_state::kbd_put));
@@ -367,8 +347,8 @@ ROM_START( llc1 )
 	ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0d9d4039) SHA1(b515e385af57f4faf3a9f7b4a1edd59a1c1ea260) )
 	ROM_LOAD( "llc1_tb2.bin", 0x0c00, 0x0400, CRC(28bfea2a) SHA1(a68a8b87bfc931627ddd8d124b153e511477fbaf) )
 	ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(fe5e3132) SHA1(cc3b191e41f5772a4b86b8eb0ebe6fce67872df6) )
-	ROM_FILL(0x23b, 1, 0x00) // don't reboot when typing into the monitor
-	ROM_FILL(0x2dc, 1, 0x0f) // fix display of AF in the reg command
+	ROM_FILL(0x02dc, 1, 0x0f) // fix display of AF in the reg command (confirmed from monitor listing)
+	ROM_FILL(0x1361, 1, 0x40) // fix scrolling in Basic
 
 	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD ("llc1_zg.bin",  0x0000, 0x0400, CRC(fa2cd659) SHA1(1fa5f9992f35929f656c4ce55ed6980c5da1772b) )
@@ -378,4 +358,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY  FULLNAME  FLAGS */
-COMP( 1984, llc1, 0,      0,      llc1,    llc1,  llc1_state, empty_init, "SCCH",  "LLC-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, llc1, 0,      0,      llc1,    llc1,  llc1_state, empty_init, "SCCH",  "LLC-1",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

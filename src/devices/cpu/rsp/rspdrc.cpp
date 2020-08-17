@@ -142,7 +142,7 @@ inline void rsp_device::ccfunc_read32()
 
 static void cfunc_read32(void *param)
 {
-	((rsp_device *)param)->ccfunc_read32();;
+	((rsp_device *)param)->ccfunc_read32();
 }
 
 inline void rsp_device::ccfunc_write8()
@@ -152,7 +152,7 @@ inline void rsp_device::ccfunc_write8()
 
 static void cfunc_write8(void *param)
 {
-	((rsp_device *)param)->ccfunc_write8();;
+	((rsp_device *)param)->ccfunc_write8();
 }
 
 inline void rsp_device::ccfunc_write16()
@@ -162,7 +162,7 @@ inline void rsp_device::ccfunc_write16()
 
 static void cfunc_write16(void *param)
 {
-	((rsp_device *)param)->ccfunc_write16();;
+	((rsp_device *)param)->ccfunc_write16();
 }
 
 inline void rsp_device::ccfunc_write32()
@@ -172,7 +172,7 @@ inline void rsp_device::ccfunc_write32()
 
 static void cfunc_write32(void *param)
 {
-	((rsp_device *)param)->ccfunc_write32();;
+	((rsp_device *)param)->ccfunc_write32();
 }
 
 /*****************************************************************************/

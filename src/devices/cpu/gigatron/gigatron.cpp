@@ -24,7 +24,6 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 #define C  0x10
 #endif
 
-
 #define gigatron_readop(A) m_program->read_word(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
 #define gigatron_readmem8(A) m_data->read_byte(A)
@@ -52,7 +51,8 @@ void gigatron_cpu_device::execute_run()
 		debugger_instruction_hook(m_pc);
 
 		opcode = gigatron_readop(m_pc);
-		m_pc = m_npc++;
+		m_pc = m_npc;
+		m_npc = (m_pc + 1) & m_romMask;
 
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
@@ -89,19 +89,6 @@ void gigatron_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	init();
-}
-
-void gigatron_cpu_device::init()
-{
-	m_ac = 0;
-	m_x = 0;
-	m_y = 0;
-	m_pc = 0;
-	m_npc = (m_pc + 1);
-	m_ppc = 0;
-	m_inReg = 0xFF;
-
 	state_add(GTRON_PC,        "PC",        m_pc);
 	state_add(GTRON_NPC,       "NPC",       m_npc);
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -109,6 +96,9 @@ void gigatron_cpu_device::init()
 	state_add(GTRON_AC,        "AC",        m_ac);
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
+	state_add(GTRON_IREG,      "IREG",      m_inReg);
+	state_add(GTRON_OUTX,      "OUTX",      m_outx);
+	state_add(GTRON_OUT,       "OUT",       m_out);
 
 	set_icountptr(m_icount);
 
@@ -119,8 +109,27 @@ void gigatron_cpu_device::init()
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_inReg));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_outx));
+	save_item(NAME(m_out));
 
 	m_outx_cb.resolve_safe();
+	m_out_cb.resolve_safe();
+	m_ir_cb.resolve_safe(0);
+
+	reset_cpu();
+}
+
+void gigatron_cpu_device::reset_cpu()
+{
+	m_ac = 0;
+	m_x = 0;
+	m_y = 0;
+	m_pc = 0;
+	m_npc = (m_pc + 1) & m_romMask;
+	m_ppc = 0;
+	m_inReg = 0xff;
+	m_outx = 0;
+	m_out = 0;
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
@@ -131,29 +140,29 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 	uint16_t base = m_pc & 0xff00;
 	switch (mode)
 	{
-	case 0:
+	case 0: //jmp
 		c = true;
 		base = m_y << 8;
 		break;
-	case 1:
+	case 1: //bgt
 		c = (ac2 > ZERO);
 		break;
-	case 2:
+	case 2: //blt
 		c = (ac2 < ZERO);
 		break;
-	case 3:
+	case 3: //bne
 		c = (ac2 != ZERO);
 		break;
-	case 4:
+	case 4: //beq
 		c = (ac2 == ZERO);
 		break;
-	case 5:
+	case 5: //bge
 		c = (ac2 >= ZERO);
 		break;
-	case 6:
+	case 6: //ble
 		c = (ac2 <= ZERO);
 		break;
-	case 7:
+	case 7: //bra
 		c = true;
 		break;
 	}
@@ -218,8 +227,15 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 	case 6:
 	case 7:
 		uint16_t rising = ~(m_out & b);
+		m_out = b;
+		m_out_cb(0, m_out, 0xff);
+
+		// rising edge of out[6] registers outx from ac
 		if (rising & 0x40)
+		{
 			m_outx = m_ac;
+			m_outx_cb(0, m_outx, 0xff);
+		}
 		break;
 	}
 }
@@ -271,6 +287,9 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 	case 0:
 		b = d;
 		break;
+	case 1:
+		b = 0;
+		break;
 	case 2:
 		b = m_ac;
 		break;
@@ -287,7 +306,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 
 	switch (mode)
 	{
-	case 4:
+	case 4: // XXX not clear whether x++ mode takes priority
 		m_x = b;
 		break;
 	case 5:
@@ -298,6 +317,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 
 void gigatron_cpu_device::device_reset()
 {
+	reset_cpu();
 }
 
 void gigatron_cpu_device::execute_set_input(int irqline, int state)
@@ -314,9 +334,12 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
 	, m_ramMask(0x7fff)
+	, m_romMask(0xffff)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 	, m_outx_cb(*this)
+	, m_out_cb(*this)
+	, m_ir_cb(*this)
 {
 }
 

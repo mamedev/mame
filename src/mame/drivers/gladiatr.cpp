@@ -610,7 +610,7 @@ void ppking_state::ppking_qxcomu_w(u8 data)
 MACHINE_RESET_MEMBER(ppking_state, ppking)
 {
 	// yes, it expects to read DSW1 without sending commands first ...
-	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
+	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 	m_mcu[0].rst = 0;
 	m_mcu[0].state = 0;
 }

@@ -392,7 +392,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 	{
 		case 0: /* 7seg LEDs on PCB */
 		case 1:
-			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
+			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
 			break;
 
 		case 2: /* Parallel data register */

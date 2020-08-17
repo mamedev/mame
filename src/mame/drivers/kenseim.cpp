@@ -395,7 +395,7 @@ READ_LINE_MEMBER(kenseim_state::cmd_req_r)
 
 READ_LINE_MEMBER(kenseim_state::cmd_LVm_r)
 {
-	return m_to_68k_cmd_LVm;;
+	return m_to_68k_cmd_LVm;
 }
 
 /* 68k side COMMS writes */

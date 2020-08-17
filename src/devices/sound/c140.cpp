@@ -206,7 +206,7 @@ void c140_device::device_clock_changed()
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer_left = std::make_unique<s16[]>(m_sample_rate);
-	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);;
+	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);
 }
 
 

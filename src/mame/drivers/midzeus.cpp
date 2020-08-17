@@ -27,17 +27,27 @@ The Grid         v1.2   10/18/2000
 **************************************************************************/
 
 #include "emu.h"
+#include "audio/dcs.h"
+
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+
 #include "includes/midzeus.h"
 
-#include "audio/dcs.h"
+#include "machine/ibm21s850.h"
 #include "machine/nvram.h"
+#include "machine/tsb12lv01a.h"
 
 #include "crusnexo.lh"
 
-#define LOG_FW        (0)
+#define LOG_FIREWIRE    (1 << 1)
+#define LOG_DISK        (1 << 2)
+#define LOG_DISK_JR     (1 << 3)
+#define LOG_UNKNOWN     (1 << 4)
+
+#define VERBOSE (LOG_FIREWIRE)
+#include "logmacro.h"
 
 #define CPU_CLOCK       XTAL(60'000'000)
 
@@ -52,6 +62,8 @@ public:
 	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midzeus_state(mconfig, type, tag)
 		, m_zeus(*this, "zeus2")
+		, m_fw_link(*this, "fw_link")
+		, m_fw_phy(*this, "fw_phy")
 		, m_leds(*this, "led%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -64,21 +76,51 @@ public:
 	void init_thegrid();
 
 private:
+	virtual void machine_start() override
+	{
+		midzeus_state::machine_start();
+
+		m_leds.resolve();
+		m_lamps.resolve();
+
+		save_item(NAME(m_disk_asic));
+		save_item(NAME(m_fw_int_enable));
+		save_item(NAME(m_fw_int));
+	}
+
+	virtual void machine_reset() override
+	{
+		midzeus_state::machine_reset();
+
+		memset(m_disk_asic, 0x0, 0x10 * 4);
+		m_fw_int_enable = 0;
+		m_fw_int = 0;
+	}
+
+	virtual void video_start() override {}
+
+	void zeus2_map(address_map &map);
+
+	uint32_t disk_asic_r(offs_t offset);
+	void disk_asic_w(offs_t offset, uint32_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(firewire_irq);
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
+
 	uint32_t zeus2_timekeeper_r(offs_t offset);
 	void zeus2_timekeeper_w(offs_t offset, uint32_t data);
 	uint32_t crusnexo_leds_r(offs_t offset);
 	void crusnexo_leds_w(offs_t offset, uint32_t data);
-	void zeus2_map(address_map &map);
 
-	virtual void machine_start() override
-	{
-		MACHINE_START_CALL_MEMBER(midzeus);
-		m_leds.resolve();
-		m_lamps.resolve();
-	}
+	void update_firewire_irq();
+
+	uint32_t    m_disk_asic[0x10];
+	int         m_fw_int_enable;
+	int         m_fw_int;
 
 	required_device<zeus2_device> m_zeus;
+	required_device<tsb12lv01a_device> m_fw_link;
+	required_device<ibm21s851_device> m_fw_phy;
 	output_finder<32> m_leds;
 	output_finder<8> m_lamps;
 };
@@ -91,37 +133,38 @@ private:
  *
  *************************************/
 
-MACHINE_START_MEMBER(midzeus_state,midzeus)
+void midzeus_state::machine_start()
 {
 	m_digits.resolve();
 
-	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
-	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
-	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+	m_gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+	m_gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
 
 	m_display_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::display_irq_off), this));
 
-	save_item(NAME(gun_control));
-	save_item(NAME(gun_irq_state));
-	save_item(NAME(gun_x));
-	save_item(NAME(gun_y));
-	save_item(NAME(crusnexo_leds_select));
-	save_item(NAME(keypad_select));
+	save_item(NAME(m_crusnexo_leds_select));
+	save_item(NAME(m_disk_asic_jr));
+	save_item(NAME(m_cmos_protected));
+	save_item(NAME(m_gun_control));
+	save_item(NAME(m_gun_irq_state));
+	save_item(NAME(m_gun_x));
+	save_item(NAME(m_gun_y));
+	save_item(NAME(m_keypad_select));
 }
 
 
-MACHINE_RESET_MEMBER(midzeus_state,midzeus)
+void midzeus_state::machine_reset()
 {
 	memcpy(m_ram_base, memregion("user1")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
 
-	cmos_protected = true;
-	memset(disk_asic_jr, 0x0, 0x10 * 4);
-	disk_asic_jr[6] = 0xa0; // Rev3 Athens
-	memset(disk_asic, 0x0, 0x10 * 4);
+	m_cmos_protected = true;
+	memset(m_disk_asic_jr, 0x0, 0x10 * 4);
+	m_disk_asic_jr[6] = 0xa0; // Rev3 Athens
 }
 
 
@@ -134,18 +177,18 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 
 TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
 	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
 }
 
 WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
 {
-	m_maincpu->set_input_line(2, ASSERT_LINE);
+	m_maincpu->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
 }
 
 
@@ -157,11 +200,11 @@ WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
 
 void midzeus_state::cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (disk_asic_jr[2] && !cmos_protected)
+	if (m_disk_asic_jr[2] && !m_cmos_protected)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", m_maincpu->pc(), disk_asic_jr[2], cmos_protected);
-	cmos_protected = true;
+		logerror("%06X:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", m_maincpu->pc(), m_disk_asic_jr[2], m_cmos_protected);
+	m_cmos_protected = true;
 }
 
 
@@ -173,7 +216,7 @@ uint32_t midzeus_state::cmos_r(offs_t offset)
 
 void midzeus_state::cmos_protect_w(uint32_t data)
 {
-	cmos_protected = false;
+	m_cmos_protected = false;
 }
 
 
@@ -192,11 +235,11 @@ uint32_t midzeus2_state::zeus2_timekeeper_r(offs_t offset)
 
 void midzeus2_state::zeus2_timekeeper_w(offs_t offset, uint32_t data)
 {
-	if (disk_asic_jr[2] && !cmos_protected)
+	if (m_disk_asic_jr[2] && !m_cmos_protected)
 		m_m48t35->write(offset, data);
 	else
-		logerror("%s:zeus2_timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), disk_asic_jr[2], cmos_protected);
-	cmos_protected = true;
+		logerror("%s:zeus2_timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), m_disk_asic_jr[2], m_cmos_protected);
+	m_cmos_protected = true;
 }
 
 
@@ -208,10 +251,10 @@ uint32_t midzeus_state::zpram_r(offs_t offset)
 
 void midzeus_state::zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (disk_asic_jr[2])
+	if (m_disk_asic_jr[2])
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:zpram_w with disk_asic_jr[2] = %d\n", m_maincpu->pc(), disk_asic_jr[2]);
+		logerror("%06X:zpram_w with disk_asic_jr[2] = %d\n", m_maincpu->pc(), m_disk_asic_jr[2]);
 }
 
 
@@ -221,9 +264,10 @@ void midzeus_state::zpram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 *  Disk ASIC registers
 *
 *************************************/
-uint32_t midzeus_state::disk_asic_r(offs_t offset)
+
+uint32_t midzeus2_state::disk_asic_r(offs_t offset)
 {
-	uint32_t retVal = disk_asic[offset];
+	uint32_t retVal = m_disk_asic[offset];
 	switch (offset)
 	{
 		// Sys Control
@@ -232,37 +276,43 @@ uint32_t midzeus_state::disk_asic_r(offs_t offset)
 		// Bit 15:8 Version
 		case 0:
 			retVal = (retVal & 0xffff00ff) | 0x3300;
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC System Control Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Interrupt Status / Control
 		// 0x004: IFIFO Interrupt
 		// 0x200: Firewire
 		case 1:
-			retVal = 0x0;
+			retVal = (m_fw_int << 9);
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Interrupt Status/Ctrl Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Test
 		case 2:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Test(?) Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Wait State Config
 		case 3:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Wait State Config Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// IDE Config
 		case 4:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC IDE Config Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// PSRAM Config
 		case 5:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC PSRAM Config Read: %08x\n", machine().describe_context(), retVal);
 			break;
 		// Unknown
 		default:
-			logerror("%06X:disk_asic_r(%X) Unknown\n", m_maincpu->pc(), offset);
+			LOGMASKED(LOG_DISK | LOG_UNKNOWN, "%s: Disk ASIC Unknown Read: %08x\n", machine().describe_context(), offset);
 			break;
 	}
 	return retVal;
 }
 
 
-void midzeus_state::disk_asic_w(offs_t offset, uint32_t data)
+void midzeus2_state::disk_asic_w(offs_t offset, uint32_t data)
 {
-	disk_asic[offset] = data;
+	m_disk_asic[offset] = data;
 
 	switch (offset)
 	{
@@ -270,27 +320,35 @@ void midzeus_state::disk_asic_w(offs_t offset, uint32_t data)
 		// Bit 0: zeus reset
 		// Bit 3: io reset
 		case 0:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC System Control Write: %08x\n", machine().describe_context(), data);
 			break;
 		// Interrupt Status / Control
 		// 0x004: IFIFO Interrupt
 		// 0x200: Enable Firewire interrupt
 		case 1:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Interrupt Status/Ctrl Write: %08x\n", machine().describe_context(), data);
+			m_fw_int_enable = BIT(data, 9);
+			update_firewire_irq();
 			break;
 		// Test
 		case 2:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Test(?) Write: %08x\n", machine().describe_context(), data);
 			break;
 		// Wait State Config
 		case 3:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC Wait State Config Write: %08x\n", machine().describe_context(), data);
 			break;
 		// IDE Config
 		case 4:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC IDE Config Write: %08x\n", machine().describe_context(), data);
 			break;
 		// PSRAM Config
 		case 5:
+			LOGMASKED(LOG_DISK, "%s: Disk ASIC PSRAM Config Write: %08x\n", machine().describe_context(), data);
 			break;
 		// Unknown
 		default:
-			logerror("%06X:disk_asic_w(%X)=%08X Unknown\n", m_maincpu->pc(), offset, data);
+			LOGMASKED(LOG_DISK | LOG_UNKNOWN, "%s: Disk ASIC Unknown Write: %08x = %08x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
@@ -302,7 +360,7 @@ void midzeus_state::disk_asic_w(offs_t offset, uint32_t data)
  *************************************/
 uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 {
-	uint32_t retVal = disk_asic_jr[offset];
+	uint32_t retVal = m_disk_asic_jr[offset];
 	switch (offset)
 	{
 		// miscellaneous hw wait states
@@ -311,16 +369,16 @@ uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 		/* CMOS/ZPRAM write enable; only low bit is used */
 		case 2:
 			break;
-			//  return disk_asic_jr[offset] | ~1;
+			//  return m_disk_asic_jr[offset] | ~1;
 
 		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
 		case 3:
 			break;
-		//  return disk_asic_jr[offset] | ~1;
+		//  return m_disk_asic_jr[offset] | ~1;
 
 		/* ROM bank selection on Zeus 2; two bits are used */
 		case 5:
-		//  return disk_asic_jr[offset] | ~3;
+		//  return m_disk_asic_jr[offset] | ~3;
 
 		/* disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
 		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
@@ -343,8 +401,8 @@ uint32_t midzeus_state::disk_asic_jr_r(offs_t offset)
 
 void midzeus_state::disk_asic_jr_w(offs_t offset, uint32_t data)
 {
-	//uint32_t oldval = disk_asic_jr[offset];
-	disk_asic_jr[offset] = data;
+	//uint32_t oldval = m_disk_asic_jr[offset];
+	m_disk_asic_jr[offset] = data;
 
 	switch (offset)
 	{
@@ -376,7 +434,7 @@ void midzeus_state::disk_asic_jr_w(offs_t offset, uint32_t data)
 
 		/* ROM bank selection on Zeus 2 */
 		case 5:
-			membank("bank1")->set_entry(disk_asic_jr[offset] & 3);
+			membank("bank1")->set_entry(m_disk_asic_jr[offset] & 3);
 			break;
 
 		/* zeus2 ws; 0=zeus access 1 wait state, 2=unlock ROMs; crusnexo/thegrid write 1 at startup */
@@ -436,18 +494,18 @@ void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
 
 			/* selection bits 4-6 select the 3 7-segment LEDs */
 			for (bit = 4; bit < 7; bit++)
-				if ((crusnexo_leds_select & (1 << bit)) == 0)
+				if ((m_crusnexo_leds_select & (1 << bit)) == 0)
 					m_digits[bit] = ~data & 0xff;
 
 			/* selection bits 0-2 select the tachometer LEDs */
 			for (bit = 0; bit < 3; bit++)
-				if ((crusnexo_leds_select & (1 << bit)) == 0)
+				if ((m_crusnexo_leds_select & (1 << bit)) == 0)
 					for (led = 0; led < 8; led++)
 						m_leds[bit * 8 + led] = BIT(~data, led);
 			break;
 
 		case 3: /* selects which set of LEDs we are addressing */
-			crusnexo_leds_select = data;
+			m_crusnexo_leds_select = data;
 			break;
 	}
 }
@@ -462,75 +520,17 @@ void midzeus2_state::crusnexo_leds_w(offs_t offset, uint32_t data)
  *
  *************************************/
 
-uint32_t midzeus_state::firewire_r(offs_t offset)
+WRITE_LINE_MEMBER(midzeus2_state::firewire_irq)
 {
-	uint32_t retVal = 0;
-	if (offset < 0x40)
-		retVal = m_firewire[offset / 4];
-
-	switch (offset) {
-	case 0:
-		// Version
-		retVal = 0x30313042;
-		break;
-	case 0x0c:
-		// Interrupt
-		retVal = 0xf4000000;// &m_firewire[0x10 / 4];
-		break;
-	case 0x30:
-		// Asynchronous Transmit FIFO Status
-		// 8:0 space available
-		retVal = 0x1ff;
-		break;
-	case 0x3c:
-		// General Rx FIFO Status
-		// 0x80000000 = Empty
-		// 0x40000000 = Control Data
-		// 0x20000000 = Packet Complete
-		retVal = 0x80000000;
-		break;
-	case 0xc0:
-		// General Rx FIFO
-		retVal = 0x0;
-		break;
-	}
-	if LOG_FW logerror("%06X:firewire_r(%02X)=%08X\n", m_maincpu->pc(), offset, retVal);
-	return retVal;
+	m_fw_int = state;
+	update_firewire_irq();
 }
 
-void midzeus_state::firewire_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midzeus2_state::update_firewire_irq()
 {
-	// 0x08 // Control
-	// Bit 0: Flush bad packets from Rx FIFO
-	// Bit 6: IRP2En
-	// Bit 7: IRP1En
-	// Bit 8: TrgEn
-	// Bit 20: Reset Rx
-	// Bit 21: Reset Tx
-	// Bit 22: Enable Acknowledge
-	// Bit 23: Iso Rx Enable
-	// Bit 24: Iso Rx Enable
-	// Bit 25: Async Rx Enable
-	// Bit 26: Async Tx Enable
-	// Bit 30: Rx Self ID packets
-	// Bit 31: Rx Packets addressed to phy
-	// 0x00200000 Reset Tx
-	// 0x00100000 Reset Rx
-	// 0x1c // FIFO Control
-	// Bit 0:8: ITF Size
-	// Bit 9:17: ATF Size
-	// Bit 18:26 Trigger Size
-	// Bit 29: Clear GRF
-	// Bit 32: Clear ATF
-	// 0x20 // Diagnostics
-	// Bit 31: Enable Snooping
-
-	if (offset < 0x40)
-		COMBINE_DATA(&m_firewire[offset / 4]);
-	if LOG_FW logerror("%06X:firewire_w(%02X) = %08X\n", m_maincpu->pc(),  offset, data);
+	LOGMASKED(LOG_FIREWIRE, "%ssserting FW IRQ\n", (m_fw_int_enable && m_fw_int) ? "A" : "Dea");
+	m_maincpu->set_input_line(TMS3203X_IRQ3, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
 }
-
-
 
 /*************************************
  *
@@ -545,7 +545,7 @@ uint32_t midzeus_state::tms32031_control_r(offs_t offset)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		int32_t result = (timer[which]->elapsed() * 10000000).as_double();
+		int32_t result = (m_timer[which]->elapsed() * 10000000).as_double();
 		return result;
 	}
 
@@ -570,7 +570,7 @@ void midzeus_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t me
 	{
 		int which = (offset >> 4) & 1;
 		if (data & 0x40)
-			timer[which]->adjust(attotime::never);
+			m_timer[which]->adjust(attotime::never);
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
@@ -594,14 +594,14 @@ CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 void midzeus_state::keypad_select_w(offs_t offset, uint32_t data)
 {
 	if (offset == 1)
-		keypad_select = data;
+		m_keypad_select = data;
 }
 
 
 CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
 	uint32_t bits = m_io_keypad->read();
-	uint8_t select = keypad_select;
+	uint8_t select = m_keypad_select;
 	while ((select & 1) != 0)
 	{
 		select >>= 1;
@@ -656,10 +656,10 @@ void midzeus_state::analog_w(uint32_t data)
 void midzeus_state::update_gun_irq()
 {
 	/* low 2 bits of gun_control seem to enable IRQs */
-	if (gun_irq_state & gun_control & 0x03)
-		m_maincpu->set_input_line(3, ASSERT_LINE);
+	if (m_gun_irq_state & m_gun_control & 0x03)
+		m_maincpu->set_input_line(TMS3203X_IRQ3, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(3, CLEAR_LINE);
+		m_maincpu->set_input_line(TMS3203X_IRQ3, CLEAR_LINE);
 }
 
 
@@ -669,37 +669,37 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 	int beamy = m_screen->vpos();
 
 	/* set the appropriate IRQ in the internal gun control and update */
-	gun_irq_state |= 0x01 << player;
+	m_gun_irq_state |= 0x01 << player;
 	update_gun_irq();
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= m_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		gun_timer[player]->adjust(m_screen->time_until_pos(beamy, std::max(0, gun_x[player] - BEAM_DX)), player);
+	if (beamy <= m_screen->visible_area().max_y && beamy <= m_gun_y[player] + BEAM_DY)
+		m_gun_timer[player]->adjust(m_screen->time_until_pos(beamy, std::max(0, m_gun_x[player] - BEAM_DX)), player);
 }
 
 
 void midzeus_state::invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t old_control = gun_control;
+	uint32_t old_control = m_gun_control;
 	int player;
 
-	COMBINE_DATA(&gun_control);
+	COMBINE_DATA(&m_gun_control);
 
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
-	gun_irq_state &= ~((gun_control >> 2) & 3);
+	m_gun_irq_state &= ~((m_gun_control >> 2) & 3);
 	update_gun_irq();
 
 	for (player = 0; player < 2; player++)
 	{
 		uint8_t pmask = 0x04 << player;
-		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
+		if (((old_control ^ m_gun_control) & pmask) != 0 && (m_gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
-			gun_x[player] = m_io_gun_x[player]->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
-			gun_y[player] = m_io_gun_y[player]->read() * visarea.height() / 255 + visarea.min_y;
-			gun_timer[player]->adjust(m_screen->time_until_pos(std::max(0, gun_y[player] - BEAM_DY), std::max(0, gun_x[player] - BEAM_DX)), player);
+			m_gun_x[player] = m_io_gun_x[player]->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
+			m_gun_y[player] = m_io_gun_y[player]->read() * visarea.height() / 255 + visarea.min_y;
+			m_gun_timer[player]->adjust(m_screen->time_until_pos(std::max(0, m_gun_y[player] - BEAM_DY), std::max(0, m_gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -714,8 +714,8 @@ uint32_t midzeus_state::invasn_gun_r()
 
 	for (player = 0; player < 2; player++)
 	{
-		int diffx = beamx - gun_x[player];
-		int diffy = beamy - gun_y[player];
+		int diffx = beamx - m_gun_x[player];
+		int diffy = beamy - m_gun_y[player];
 		if (diffx >= -BEAM_DX && diffx <= BEAM_DX && diffy >= -BEAM_DY && diffy <= BEAM_DY)
 			result ^= 0x1000 << player;
 	}
@@ -753,7 +753,8 @@ void midzeus2_state::zeus2_map(address_map &map)
 	map(0x400000, 0x43ffff).ram();
 	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32031_control_r), FUNC(midzeus2_state::tms32031_control_w)).share("tms32031_ctl");
 	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
-	map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
+	map(0x8a0000, 0x8a00cf).rw(m_fw_link, FUNC(tsb12lv01a_device::read), FUNC(tsb12lv01a_device::write));
+	//map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus2_state::disk_asic_jr_r), FUNC(midzeus2_state::disk_asic_jr_w));
 	map(0x900000, 0x91ffff).rw(FUNC(midzeus2_state::zpram_r), FUNC(midzeus2_state::zpram_w)).share("nvram").mirror(0x020000);
 	map(0x990000, 0x99000f).rw("ioasic", FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
@@ -1266,8 +1267,6 @@ void midzeus_state::midzeus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus_state::display_irq));
 
-	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
-	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
@@ -1275,10 +1274,8 @@ void midzeus_state::midzeus(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
-	m_screen->set_screen_update(FUNC(midzeus_state::screen_update_midzeus));
+	m_screen->set_screen_update(FUNC(midzeus_state::screen_update));
 	m_screen->set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
 	/* sound hardware */
 	DCS2_AUDIO_2104(config, "dcs", 0);
@@ -1309,7 +1306,6 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus2_state::display_irq));
 
-	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
@@ -1325,10 +1321,19 @@ void midzeus2_state::midzeus2(machine_config &config)
 
 	M48T35(config, m_m48t35, 0);
 
+	/* I/O hardware */
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
+
+	IBM21S851(config, m_fw_phy, 0);
+	m_fw_phy->reset_cb().set(m_fw_link, FUNC(tsb12lv01a_device::phy_reset_w));
+
+	TSB12LV01A(config, m_fw_link, 0);
+	m_fw_link->int_cb().set(FUNC(midzeus2_state::firewire_irq));
+	m_fw_link->phy_read().set(m_fw_phy, FUNC(ibm21s851_device::read));
+	m_fw_link->phy_write().set(m_fw_phy, FUNC(ibm21s851_device::write));
 }
 
 void midzeus2_state::crusnexo(machine_config &config)

@@ -77,7 +77,7 @@ void tulip1_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0xdffff).noprw();
-	map(0xe0000, 0xe0fff).ram().share("vram");;
+	map(0xe0000, 0xe0fff).ram().share("vram");
 	map(0xfe000, 0xfffff).rom().region("bios", 0);
 }
 

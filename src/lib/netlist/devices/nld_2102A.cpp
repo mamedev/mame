@@ -18,10 +18,10 @@ namespace netlist
 	NETLIB_OBJECT(2102A)
 	{
 		NETLIB_CONSTRUCTOR(2102A)
-		, m_A(*this, {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" })
-		, m_CEQ(*this, "CEQ")
-		, m_RWQ(*this, "RWQ")
-		, m_DI(*this, "DI")
+		, m_A(*this, {"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9" }, NETLIB_DELEGATE(inputs))
+		, m_CEQ(*this, "CEQ", NETLIB_DELEGATE(inputs))
+		, m_RWQ(*this, "RWQ", NETLIB_DELEGATE(inputs))
+		, m_DI(*this, "DI", NETLIB_DELEGATE(inputs))
 		, m_DO(*this, "DO")
 		, m_ram(*this, "m_ram", 0)
 		, m_RAM(*this, "m_RAM", &m_ram[0])
@@ -29,8 +29,36 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_RESETI()
+		{
+			m_RAM.set(&m_ram[0]);
+			for (std::size_t i=0; i<128; i++)
+				m_ram[i] = 0;
+		}
+
+		NETLIB_HANDLERI(inputs)
+		{
+			netlist_time max_delay = NLTIME_FROM_NS(350);
+
+			if (!m_CEQ())
+			{
+				unsigned a = 0;
+				for (std::size_t i=0; i<10; i++)
+				{
+					a |= (m_A[i]() << i);
+				}
+				const unsigned byte = ADDR2BYTE(a);
+				const unsigned bit = ADDR2BIT(a);
+
+				if (!m_RWQ())
+				{
+					m_ram[byte] &= ~(static_cast<uint8_t>(1)      << bit);
+					m_ram[byte] |=  (static_cast<uint8_t>(m_DI()) << bit);
+				}
+
+				m_DO.push((m_ram[byte] >> bit) & 1, max_delay);
+			}
+		}
 
 		friend class NETLIB_NAME(2102A_dip);
 	private:
@@ -72,42 +100,10 @@ namespace netlist
 			register_subalias("9",     "A.GND");
 
 		}
-		NETLIB_RESETI() {}
-		NETLIB_UPDATEI() {}
+		//NETLIB_RESETI() {}
 	private:
 		NETLIB_SUB(2102A) A;
 	};
-
-	NETLIB_UPDATE(2102A)
-	{
-		netlist_time max_delay = NLTIME_FROM_NS(350);
-
-		if (!m_CEQ())
-		{
-			unsigned a = 0;
-			for (std::size_t i=0; i<10; i++)
-			{
-				a |= (m_A[i]() << i);
-			}
-			const unsigned byte = ADDR2BYTE(a);
-			const unsigned bit = ADDR2BIT(a);
-
-			if (!m_RWQ())
-			{
-				m_ram[byte] &= ~(static_cast<uint8_t>(1)      << bit);
-				m_ram[byte] |=  (static_cast<uint8_t>(m_DI()) << bit);
-			}
-
-			m_DO.push((m_ram[byte] >> bit) & 1, max_delay);
-		}
-	}
-
-	NETLIB_RESET(2102A)
-	{
-		m_RAM.set(&m_ram[0]);
-		for (std::size_t i=0; i<128; i++)
-			m_ram[i] = 0;
-	}
 
 	NETLIB_DEVICE_IMPL(2102A,    "RAM_2102A",   "+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(2102A_dip,"RAM_2102A_DIP","")

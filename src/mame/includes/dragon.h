@@ -93,14 +93,17 @@ public:
 	dragon200e_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dragon64_state(mconfig, type, tag)
 		, m_char_rom(*this, "chargen")
+		, m_lk1(*this, "LK1")
 	{
 	}
 
+	uint8_t sam_read(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(char_rom_r);
 
 	void dragon200e(machine_config &config);
 private:
 	required_memory_region m_char_rom;
+	required_ioport m_lk1;
 };
 
 

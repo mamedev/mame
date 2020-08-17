@@ -18,18 +18,51 @@ namespace netlist
 	NETLIB_OBJECT(7450)
 	{
 		NETLIB_CONSTRUCTOR(7450)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		, m_C(*this, "C")
-		, m_D(*this, "D")
+		, m_A(*this, "A", NETLIB_DELEGATE(inputs))
+		, m_B(*this, "B", NETLIB_DELEGATE(inputs))
+		, m_C(*this, "C", NETLIB_DELEGATE(inputs))
+		, m_D(*this, "D", NETLIB_DELEGATE(inputs))
 		, m_Q(*this, "Q")
 		, m_power_pins(*this)
 		{
 		}
+
 		//NETLIB_RESETI();
-		NETLIB_UPDATEI();
 
 	public:
+		NETLIB_HANDLERI(inputs)
+		{
+			m_A.activate();
+			m_B.activate();
+			m_C.activate();
+			m_D.activate();
+			auto t1 = m_A() & m_B();
+			auto t2 = m_C() & m_D();
+
+			uint_fast8_t res = 0;
+			if (t1 ^ 1)
+			{
+				if (t2 ^ 1)
+				{
+					res = 1;
+				}
+				else
+				{
+					m_A.inactivate();
+					m_B.inactivate();
+				}
+			}
+			else
+			{
+				if (t2 ^ 1)
+				{
+					m_C.inactivate();
+					m_D.inactivate();
+				}
+			}
+			m_Q.push(res, times[res]);// ? 22000 : 15000);
+		}
+
 		logic_input_t m_A;
 		logic_input_t m_B;
 		logic_input_t m_C;
@@ -70,39 +103,6 @@ namespace netlist
 		NETLIB_SUB(7450) m_A;
 		NETLIB_SUB(7450) m_B;
 	};
-
-	NETLIB_UPDATE(7450)
-	{
-		m_A.activate();
-		m_B.activate();
-		m_C.activate();
-		m_D.activate();
-		auto t1 = m_A() & m_B();
-		auto t2 = m_C() & m_D();
-
-		uint_fast8_t res = 0;
-		if (t1 ^ 1)
-		{
-			if (t2 ^ 1)
-			{
-				res = 1;
-			}
-			else
-			{
-				m_A.inactivate();
-				m_B.inactivate();
-			}
-		}
-		else
-		{
-			if (t2 ^ 1)
-			{
-				m_C.inactivate();
-				m_D.inactivate();
-			}
-		}
-		m_Q.push(res, times[res]);// ? 22000 : 15000);
-	}
 
 	NETLIB_DEVICE_IMPL(7450,        "TTL_7450_ANDORINVERT", "+A,+B,+C,+D,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7450_dip,    "TTL_7450_DIP", "")

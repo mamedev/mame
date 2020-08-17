@@ -27,13 +27,15 @@ public:
 	pp01_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pit(*this, "pit8253")
+		, m_pit(*this, "pit")
 		, m_ppi1(*this, "ppi1")
 		, m_ppi2(*this, "ppi2")
 		, m_speaker(*this, "speaker")
 		, m_ram(*this, RAM_TAG)
 		, m_uart(*this, "uart")
 		, m_cass(*this, "cassette")
+		, m_bank(*this, "bank%d", 0U)
+		, m_io_keyboard(*this, "LINE%d", 0U)
 	{ }
 
 	void pp01(machine_config &config);
@@ -41,17 +43,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<pit8253_device> m_pit;
-	required_device<i8255_device> m_ppi1;
-	required_device<i8255_device> m_ppi2;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ram_device> m_ram;
-	required_device<i8251_device> m_uart;
-	required_device<cassette_image_device> m_cass;
 	uint8_t m_video_scroll;
 	uint8_t m_memory_block[16];
 	uint8_t m_video_write_mode;
@@ -82,6 +75,17 @@ private:
 	void set_memory(uint8_t block, uint8_t data);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi1;
+	required_device<i8255_device> m_ppi2;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ram_device> m_ram;
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass;
+	required_memory_bank_array<16> m_bank;
+	required_ioport_array<17> m_io_keyboard;
 };
 
 #endif // MAME_INCLUDES_PP01_H

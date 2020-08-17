@@ -119,7 +119,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 		/* falling composite */
 		//LOG("HSYNC down %f %d %f\n", time * 1e6, m_last_x, m_sync_signal);
 	}
-	m_last_sync = newval;
+	m_last_sync_val = newval;
 	m_last_sync_time = time;
 }
 
@@ -237,7 +237,7 @@ void fixedfreq_device::device_start()
 	m_state.start();
 
 	// FIXME: will be done by netlist going forward
-	save_item(NAME(m_state.m_last_sync));
+	save_item(NAME(m_state.m_last_sync_val));
 	save_item(NAME(m_state.m_last_x));
 	save_item(NAME(m_state.m_last_y));
 	save_item(NAME(m_state.m_last_sync_time));

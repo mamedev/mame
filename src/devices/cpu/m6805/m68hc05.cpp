@@ -478,7 +478,7 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_counter));
 	save_item(NAME(m_icr));
 	save_item(NAME(m_ocr));
-	save_item(NAME(m_inhibit_cap));;
+	save_item(NAME(m_inhibit_cap));
 	save_item(NAME(m_inhibit_cmp));
 	save_item(NAME(m_trl_buf));
 	save_item(NAME(m_trl_latched));

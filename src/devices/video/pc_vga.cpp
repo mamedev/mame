@@ -1750,7 +1750,7 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 			break;
 		case 0x05:
 			res  = (vga.gc.shift256 & 1) << 6;
-			res |= (vga.gc.shift_reg & 1) << 5;;
+			res |= (vga.gc.shift_reg & 1) << 5;
 			res |= (vga.gc.host_oe & 1) << 4;
 			res |= (vga.gc.read_mode & 1) << 3;
 			res |= (vga.gc.write_mode & 3);

@@ -50,6 +50,11 @@ public:
 	void kzaurus(machine_config &config);
 	void koropens(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
@@ -95,10 +100,6 @@ private:
 
 	void kzaurus_main(address_map &map);
 	void koropens_main(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	static constexpr int NUM_LAYERS = 4;
 
@@ -325,6 +326,8 @@ INPUT_PORTS_END
 
 void konmedal68k_state::machine_start()
 {
+	save_item(NAME(m_control));
+	save_item(NAME(m_control2));
 }
 
 void konmedal68k_state::machine_reset()
@@ -442,8 +445,22 @@ ROM_START( kattobas )
 	ROM_LOAD( "841-a02-4f.bin", 0x080000, 0x080000, CRC(685c1c10) SHA1(9884940df8c079e8129fc8d870f90e5b7987e6f4) )
 ROM_END
 
-GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( dobouchn )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "640-a05-2n.bin", 0x000000, 0x080000, CRC(7643dbc6) SHA1(3b55a782f04a741088b93954279b35c1c90af622) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )
+	ROM_LOAD( "640-a06-14n.bin", 0x000000, 0x080000, CRC(c6c5016c) SHA1(ad0b5258e2c1d0ba95dfc0d8fc6332b524f2c1e2) )
+	ROM_LOAD( "640-a07-17n.bin", 0x080000, 0x080000, CRC(614fee32) SHA1(080fea72c0417752eb0a0b109b524d87379b2921) )
+
+	ROM_REGION( 0x200000, "ymz", 0 )
+	ROM_LOAD( "640-a01-2f.bin", 0x000000, 0x080000, CRC(326e2844) SHA1(62ce14ffe5d0a35c37c9a5a98c9c3a5df63d4512) )
+	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
+ROM_END
+
+GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, dobouchn, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ymcapsul, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )

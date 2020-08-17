@@ -204,8 +204,8 @@ void dominator_state::dominator(machine_config &config)
 	R65C02(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dominator_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x2000); // from 4020
-	m_maincpu->set_periodic_int(FUNC(dominator_state::nmi_line_pulse), irq_period);
+	const attotime nmi_period = attotime::from_hz(4_MHz_XTAL / 0x2000); // from 4020
+	m_maincpu->set_periodic_int(FUNC(dominator_state::nmi_line_pulse), nmi_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

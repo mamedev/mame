@@ -36,7 +36,7 @@ speaker_device::speaker_device(const machine_config &mconfig, const char *tag, d
 	, m_x(0.0)
 	, m_y(0.0)
 	, m_z(0.0)
-#ifdef MAME_DEBUG
+#if SPEAKER_TRACK_MAX_SAMPLE
 	, m_max_sample(0)
 	, m_clipped_samples(0)
 	, m_total_samples(0)
@@ -51,10 +51,10 @@ speaker_device::speaker_device(const machine_config &mconfig, const char *tag, d
 
 speaker_device::~speaker_device()
 {
-#ifdef MAME_DEBUG
+#if SPEAKER_TRACK_MAX_SAMPLE
 	// log the maximum sample values for all speakers
 	if (m_max_sample > 0)
-		osd_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
+		osd_printf_verbose("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
 #endif
 }
 
@@ -84,18 +84,23 @@ void speaker_device::mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, 
 	}
 	assert(samples_this_update == numsamples);
 
-#ifdef MAME_DEBUG
+#if SPEAKER_TRACK_MAX_SAMPLE
 	// debug version: keep track of the maximum sample
-	for (int sample = 0; sample < samples_this_update; sample++)
-	{
-		if (stream_buf[sample] > m_max_sample)
-			m_max_sample = stream_buf[sample];
-		else if (-stream_buf[sample] > m_max_sample)
-			m_max_sample = -stream_buf[sample];
-		if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
-			m_clipped_samples++;
-		m_total_samples++;
-	}
+	// ignore the first 100k or so samples to avoid biasing in favor
+	// of initial sound glitches
+	if (m_total_samples < 100000)
+		m_total_samples += samples_this_update;
+	else
+		for (int sample = 0; sample < samples_this_update; sample++)
+		{
+			if (stream_buf[sample] > m_max_sample)
+				m_max_sample = stream_buf[sample];
+			else if (-stream_buf[sample] > m_max_sample)
+				m_max_sample = -stream_buf[sample];
+			if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
+				m_clipped_samples++;
+			m_total_samples++;
+		}
 #endif
 
 	// mix if sound is enabled

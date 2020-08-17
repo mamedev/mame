@@ -460,7 +460,12 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 						}
 						ns++;
 					}
-				if(ns != tf.sector_count)
+
+				if(ns > tf.sector_count)
+					goto fail;
+
+				// Be permissive of some missing sectors in later tracks
+				if(ns < tf.sector_count && track < 2)
 					goto fail;
 			}
 		}

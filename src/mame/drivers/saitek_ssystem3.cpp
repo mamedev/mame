@@ -12,7 +12,9 @@ This is their 1st original product. MK II was licensed from Commodore, and
 MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
 with support from David Levy.
 
-Hardware notes: (main unit)
+Hardware notes:
+
+Master Unit:
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
@@ -23,9 +25,9 @@ Hardware notes: (main unit)
 
 Chess Unit:
 - PCB label: Radofin XM-2057-0C
-- Fairchild F6808P CPU @ ?MHz (M6808 compatible)
+- Fairchild F6808P CPU @ ~6MHz (M6808 compatible)
 - Fairchild F6821P PIA
-- C28A97M 4KB ROM(2332), 128x8 RAM(F6810P)
+- 2KB ROM(2316), 128x8 RAM(F6810P)
 - 2*HLCD0438, chessboard LCD
 
 Printer Unit:
@@ -52,7 +54,8 @@ TODO:
   Should be doable to add, but 6522 device doesn't support live clock changes.
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
-- dump/add chessboard lcd and printer unit
+- finish chess unit lcd emulation
+- dump/add printer unit
 - dump/add ssystem3 1980 program revision, were the BTANB fixed?
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
 
@@ -66,11 +69,15 @@ BTANB (ssystem3):
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6800/m6800.h"
 #include "machine/6522via.h"
+#include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/hlcd0438.h"
 #include "video/md4330b.h"
 #include "video/pwm.h"
 
@@ -91,6 +98,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via"),
+		m_pia(*this, "pia"),
 		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -111,6 +119,7 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	optional_device<pia6821_device> m_pia;
 	required_device<md4332b_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -120,15 +129,23 @@ private:
 	// address maps
 	void ssystem3_map(address_map &map);
 	void ssystem4_map(address_map &map);
+	void chessunit_map(address_map &map);
 
 	// I/O handlers
 	void lcd_q_w(u32 data) { m_lcd_q = data; }
-	void nvram_w(offs_t offset, u8 data);
-	u8 nvram_r(offs_t offset);
 	void input_w(u8 data);
 	u8 input_r();
 	void control_w(u8 data);
 	u8 control_r();
+
+	void nvram_w(offs_t offset, u8 data);
+	u8 nvram_r(offs_t offset);
+
+	void pia_a_w(u8 data);
+	u8 pia_a_r();
+	void pia_b_w(u8 data);
+	u8 pia_b_r();
+	void pia_cb2_w(int state);
 
 	u8 m_inp_mux = 0;
 	u8 m_control = 0;
@@ -152,17 +169,7 @@ void ssystem3_state::machine_start()
     I/O
 ******************************************************************************/
 
-void ssystem3_state::nvram_w(offs_t offset, u8 data)
-{
-	// nvram is only d0-d3
-	if (m_inputs[5]->read() & 1)
-		m_nvram[offset] = data & 0x0f;
-}
-
-u8 ssystem3_state::nvram_r(offs_t offset)
-{
-	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
-}
+// Master Unit
 
 void ssystem3_state::input_w(u8 data)
 {
@@ -219,6 +226,8 @@ void ssystem3_state::control_w(u8 data)
 	}
 
 	// PB3: device serial out
+	if (m_inputs[5]->read() & 2)
+		m_pia->ca1_w(BIT(data, 3));
 
 	// PB7: tied to PB6 (pulse timer 2)
 	m_via->write_pb6(BIT(data, 7));
@@ -228,9 +237,53 @@ void ssystem3_state::control_w(u8 data)
 
 u8 ssystem3_state::control_r()
 {
+	u8 data = 0;
+
 	// PB4: device busy
 	// PB5: device attached?
-	return 0xff;
+	//data ^= 0x30;
+
+	return ~data;
+}
+
+
+// PSU
+
+void ssystem3_state::nvram_w(offs_t offset, u8 data)
+{
+	// nvram is only d0-d3
+	if (m_inputs[5]->read() & 1)
+		m_nvram[offset] = data & 0x0f;
+}
+
+u8 ssystem3_state::nvram_r(offs_t offset)
+{
+	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
+}
+
+
+// Chess Unit
+
+void ssystem3_state::pia_a_w(u8 data)
+{
+}
+
+u8 ssystem3_state::pia_a_r()
+{
+	return 0;
+}
+
+void ssystem3_state::pia_b_w(u8 data)
+{
+}
+
+u8 ssystem3_state::pia_b_r()
+{
+	return 0;
+}
+
+void ssystem3_state::pia_cb2_w(int state)
+{
 }
 
 
@@ -255,18 +308,25 @@ void ssystem3_state::ssystem4_map(address_map &map)
 	map(0xd000, 0xffff).rom();
 }
 
+void ssystem3_state::chessunit_map(address_map &map)
+{
+	map(0x3600, 0x367f).ram();
+	map(0x4000, 0x47ff).mirror(0xb800).rom();
+	map(0xa000, 0xa003).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+}
+
 
 
 /******************************************************************************
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( ssystem3 )
+static INPUT_PORTS_START( ssystem4 )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C SQ")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C.Square")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C Board")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C.Board")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -281,7 +341,7 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A) PORT_NAME("A 1 / White")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Time") // spring-loaded
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_CODE(KEYCODE_T) PORT_NAME("Time")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H 8 / Black")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("C 3 / Queen / #50")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B 2 / King / FP")
@@ -295,24 +355,27 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_START("IN.5") // accessories/diodes
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ssystem3 )
+	PORT_INCLUDE( ssystem4 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C SQ")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C Board")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Time") // spring-loaded
+
+	PORT_MODIFY("IN.5") // accessories/diodes
 	PORT_CONFNAME( 0x01, 0x01, "Memory Unit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x02, "Chess Unit" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ssystem4 )
-	PORT_INCLUDE( ssystem3 )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / EP / C.Square")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / MD / C.Board")
-
-	PORT_MODIFY("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_CODE(KEYCODE_T) PORT_NAME("Time")
-
-	PORT_MODIFY("IN.5")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -360,6 +423,19 @@ void ssystem3_state::ssystem3(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
 
+	m6808_cpu_device &subcpu(M6808(config, "subcpu", 6000000)); // LC circuit
+	subcpu.set_addrmap(AS_PROGRAM, &ssystem3_state::chessunit_map);
+
+	config.set_perfect_quantum(m_maincpu);
+
+	PIA6821(config, m_pia, 0);
+	m_pia->irqa_handler().set_inputline("subcpu", INPUT_LINE_NMI);
+	m_pia->writepa_handler().set(FUNC(ssystem3_state::pia_a_w));
+	m_pia->readpa_handler().set(FUNC(ssystem3_state::pia_a_r));
+	m_pia->writepb_handler().set(FUNC(ssystem3_state::pia_b_w));
+	m_pia->readpb_handler().set(FUNC(ssystem3_state::pia_b_r));
+	m_pia->cb2_handler().set(FUNC(ssystem3_state::pia_cb2_w));
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	m_display->set_segmask(0xf, 0x7f); // 7segs are at expected positions
@@ -373,22 +449,25 @@ void ssystem3_state::ssystem3(machine_config &config)
 ******************************************************************************/
 
 ROM_START( ssystem3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("c19081e_ss-3-lrom.u4", 0x8000, 0x1000, CRC(9ea46ed3) SHA1(34eef85b356efbea6ddac1d1705b104fc8e2731a) ) // 2332
 	ROM_LOAD("c19082_ss-3-hrom.u5",  0x9000, 0x1000, CRC(52741e0b) SHA1(2a7b950f9810c5a14a1b9d5e6b2bd93da621662e) ) // "
 
 	// HACK! 6522 ACR register setup
 	ROM_FILL(0x946d, 1, 0xe0) // was 0xe3
 
-	ROM_REGION( 0x100, "nvram", 0 ) // default settings
-	ROM_LOAD( "nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
+	ROM_REGION(0x10000, "subcpu", 0)
+	ROM_LOAD("c28a97m_ss-3l-rom", 0x4000, 0x0800, CRC(bf0b2a84) SHA1(286f56aca2e50b78ac1fae4a89413659aceb71d9) ) // 2316
 
-	ROM_REGION( 53552, "screen", 0)
-	ROM_LOAD( "ssystem3.svg", 0, 53552, CRC(6047f88f) SHA1(2ff9cfce01cd3811a3f46f84b47fdc4ea2cf2ba8) )
+	ROM_REGION(0x100, "nvram", 0) // default settings
+	ROM_LOAD("nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
+
+	ROM_REGION(53552, "screen", 0)
+	ROM_LOAD("ssystem3.svg", 0, 53552, CRC(6047f88f) SHA1(2ff9cfce01cd3811a3f46f84b47fdc4ea2cf2ba8) )
 ROM_END
 
 ROM_START( ssystem4 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // roms in a cartridge
+	ROM_REGION(0x10000, "maincpu", 0) // roms in a cartridge
 	ROM_LOAD("c45021_ss4-lrom", 0xd000, 0x1000, CRC(fc86a4fc) SHA1(ee292925165d4bf7b948c60a81d95f7a4064e797) ) // 2332
 	ROM_LOAD("c45022_ss4-mrom", 0xe000, 0x1000, CRC(c6110af1) SHA1(4b63454a23b2fe6b5c8f3fa6718eb49770cb6907) ) // "
 	ROM_LOAD("c45023_ss4-hrom", 0xf000, 0x1000, CRC(ab4a4343) SHA1(6eeee7168e13dc1115cb5833f1938a8ea8c01d69) ) // "
@@ -396,8 +475,8 @@ ROM_START( ssystem4 )
 	// HACK! 6522 ACR register setup
 	ROM_FILL(0xd05b, 1, 0xe0) // was 0xe3
 
-	ROM_REGION( 53552, "screen", 0) // looks same, but different pinout
-	ROM_LOAD( "ssystem4.svg", 0, 53552, CRC(b69b12e3) SHA1(c2e39d015397d403309f1c23619fe8abc3745d87) )
+	ROM_REGION(53552, "screen", 0) // looks same, but different pinout
+	ROM_LOAD("ssystem4.svg", 0, 53552, CRC(b69b12e3) SHA1(c2e39d015397d403309f1c23619fe8abc3745d87) )
 ROM_END
 
 } // anonymous namespace

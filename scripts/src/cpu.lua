@@ -44,7 +44,6 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
-		MAME_DIR .. "src/devices/cpu/x86emit.h",
 	}
 end
 
@@ -590,6 +589,23 @@ end
 if (CPUS["G65816"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/g65816/g65816ds.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/g65816/g65816ds.h")
+end
+
+--------------------------------------------------
+-- Hitachi H16
+--@src/devices/cpu/h16/hd641016.h,CPUS["H16"] = true
+--------------------------------------------------
+
+if (CPUS["H16"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/h16/hd641016.cpp",
+		MAME_DIR .. "src/devices/cpu/h16/hd641016.h",
+	}
+end
+
+if (CPUS["H16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h16/h16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h16/h16dasm.h")
 end
 
 --------------------------------------------------
@@ -2575,6 +2591,8 @@ if (CPUS["TLCS900"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.h",
 	}
 end
 

@@ -488,6 +488,8 @@ ROM_START( progolf )
 	ROM_LOAD( "gam.k11",      0x0040, 0x0020, CRC(b9665de3) SHA1(4c5aba5f6589f4bce4692c0d5bb2811ab8e14aed) )
 ROM_END
 
+// top board: GGM-Ø2  DE-0087C-0
+// bottom board: GGM-Ø1  DE-0086B-0
 ROM_START( progolfa )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // custom DECO CPU-6 module
 	ROM_LOAD( "g4-m.a3",      0xb000, 0x1000, CRC(015a08d9) SHA1(671d5cd708e098dbda3e495a8b4ce3393c6971da) )
@@ -495,6 +497,8 @@ ROM_START( progolfa )
 	ROM_LOAD( "g2-m.a6",      0xd000, 0x1000, CRC(fafec36e) SHA1(70880d6f9b11505d466f36c12a43361ee2639fed) )
 	ROM_LOAD( "g1-m.a8",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.a9",      0xf000, 0x1000, CRC(a03c533f) SHA1(2e0006be40e32b64b1490bd339d9fc9302eee7c4) )
+	// the following single byte patch gets the ball position to be correct like in the parent. TODO: verify g3-m.a4 dump
+	// ROM_FILL( 0xc14b, 0x01, 0xf0) // from: EB 07    sbc #$07 to: F0 07    beq $c154
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "g5-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )

@@ -19,6 +19,9 @@
 //#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
+#include "netlist/plib/pmempool.h"
+#include "netlist/plib/pdynlib.h"
+#include "netlist/plib/pstonum.h"
 
 #include "debugger.h"
 #include "romload.h"
@@ -63,7 +66,7 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-extern plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::dynlib_static_sym nl_static_solver_syms[];
 
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {
@@ -116,10 +119,10 @@ protected:
 		}
 	}
 
-	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	std::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
 		//return plib::make_unique<plib::dynlib_static>(nullptr);
-		return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nl_static_solver_syms);
+		return std::make_unique<plib::dynlib_static>(nl_static_solver_syms);
 	}
 
 private:
@@ -159,9 +162,9 @@ protected:
 		}
 	}
 
-	netlist::host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
+	std::unique_ptr<plib::dynlib_base> static_solver_lib() const noexcept override
 	{
-		return plib::make_unique<plib::dynlib_static, netlist::host_arena>(nullptr);
+		return std::make_unique<plib::dynlib_static>(nullptr);
 	}
 
 private:
@@ -821,8 +824,10 @@ void netlist_mame_stream_output_device::device_start()
 void netlist_mame_stream_output_device::device_reset()
 {
 	LOGDEVCALLS("reset %s\n", name());
+#if 0
 	m_cur = 0.0;
 	m_last_buffer_time = netlist::netlist_time_ext::zero();
+#endif
 }
 
 void netlist_mame_stream_output_device::sound_update_fill(std::size_t samples, stream_sample_t *target)
@@ -845,7 +850,7 @@ void netlist_mame_stream_output_device::pre_parse_action(netlist::nlparse_t &par
 
 	const auto lambda = [this](auto &in, netlist::nl_fptype val)
 	{
-		this->process(in.exec().time(), val);;
+		this->process(in.exec().time(), val);
 	};
 
 	using lb_t = decltype(lambda);
@@ -903,6 +908,7 @@ netlist_mame_device::netlist_mame_device(const machine_config &mconfig, device_t
 	, m_attotime_per_clock(attotime::zero)
 	, m_old(netlist::netlist_time_ext::zero())
 	, m_setup_func(nullptr)
+	, m_device_reset_called(false)
 {
 }
 
@@ -966,11 +972,11 @@ void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) c
 	}
 }
 
-netlist::host_arena::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
+std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
 {
 	try
 	{
-		auto lnetlist = plib::make_unique<netlist::netlist_state_t, netlist::host_arena>("netlist",
+		auto lnetlist = std::make_unique<netlist::netlist_state_t>("netlist",
 			plib::make_unique<netlist_validate_callbacks_t, netlist::host_arena>());
 		// enable validation mode
 		lnetlist->set_extended_validation(true);
@@ -1002,7 +1008,7 @@ netlist::host_arena::unique_ptr<netlist::netlist_state_t> netlist_mame_device::b
 	{
 		osd_printf_error("%s\n", err.what());
 	}
-	return netlist::host_arena::unique_ptr<netlist::netlist_state_t>(nullptr);
+	return std::unique_ptr<netlist::netlist_state_t>(nullptr);
 }
 
 void netlist_mame_device::device_validity_check(validity_checker &valid) const
@@ -1042,6 +1048,10 @@ void netlist_mame_device::device_start()
 
 	m_old = netlist::netlist_time_ext::zero();
 	m_rem = netlist::netlist_time_ext::zero();
+	m_cur_time = attotime::zero;
+
+	m_device_reset_called = false;
+
 	LOGDEVCALLS("device_start exit\n");
 }
 
@@ -1058,10 +1068,17 @@ void netlist_mame_device::device_clock_changed()
 void netlist_mame_device::device_reset()
 {
 	LOGDEVCALLS("device_reset\n");
-	m_cur_time = attotime::zero;
-	m_old = netlist::netlist_time_ext::zero();
-	m_rem = netlist::netlist_time_ext::zero();
-	netlist().exec().reset();
+	if (!m_device_reset_called)
+	{
+		// netlists don't have a reset line, doing a soft-reset is pointless
+		// the only reason we call these here once after device_start
+		// is that netlist input devices may be started after the netlist device
+		// and because the startup code may trigger actions which need all
+		// devices set up.
+		netlist().free_setup_resources();
+		netlist().exec().reset();
+		m_device_reset_called = true;
+	}
 }
 
 void netlist_mame_device::device_stop()

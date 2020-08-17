@@ -44,6 +44,17 @@
 #define NL_USE_MEMPOOL               (1)
 #endif
 
+/// brief default minimum alignment of mempool_arena
+///
+/// 256 is the best compromise between logic applications like MAME
+/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
+///
+/// Best performance for pong is achieved with a value of 16, but this degrades
+/// kidniki performance by ~10%.
+///
+/// More work is needed here.
+#define NL_MEMPOOL_ALIGN            (16)
+
 /// \brief  Enable queue statistics.
 ///
 /// Queue statistics come at a performance cost. Although
@@ -84,6 +95,20 @@
 
 #ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE
 #define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)
+#endif
+
+/// \brief Use backward Euler integration
+///
+/// This will use backward Euler instead of trapezoidal integration.
+///
+/// FIXME: Longterm this will become a runtime setting. Only the capacitor model
+/// currently has a trapezoidal version and there is no support currently for
+/// variable capacitors.
+/// The change will have impact on timings since trapezoidal improves timing
+/// accuracy.
+
+#ifndef NL_USE_BACKWARD_EULER
+#define NL_USE_BACKWARD_EULER (1)
 #endif
 
 /// \brief  Use the truthtable implementation of 7448 instead of the coded device
@@ -199,6 +224,10 @@ namespace netlist
 		/// \brief Maximum queue size
 		///
 		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
+
+		/// \brief Maximum queue size for solvers
+		///
+		using MAX_SOLVER_QUEUE_SIZE = std::integral_constant<std::size_t, 64>; // NOLINT
 
 		using use_float_matrix = std::integral_constant<bool, NL_USE_FLOAT_MATRIX>;
 		using use_long_double_matrix = std::integral_constant<bool, NL_USE_LONG_DOUBLE_MATRIX>;

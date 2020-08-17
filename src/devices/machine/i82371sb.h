@@ -141,7 +141,7 @@ private:
 
 	// southbridge
 	uint8_t at_page8_r(offs_t offset);
-	void at_page8_w(offs_t offset, uint8_t data);;
+	void at_page8_w(offs_t offset, uint8_t data);
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(iochck_w);

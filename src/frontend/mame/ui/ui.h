@@ -91,6 +91,8 @@ enum
 	SLIDER_ID_BEAM_WIDTH_MAX_LAST   = SLIDER_ID_BEAM_WIDTH_MAX + SLIDER_SCREEN_SPACING,
 	SLIDER_ID_BEAM_INTENSITY,
 	SLIDER_ID_BEAM_INTENSITY_LAST   = SLIDER_ID_BEAM_INTENSITY + SLIDER_SCREEN_SPACING,
+	SLIDER_ID_BEAM_DOT_SIZE,
+	SLIDER_ID_BEAM_DOT_SIZE_LAST    = SLIDER_ID_BEAM_DOT_SIZE + SLIDER_SCREEN_SPACING,
 	SLIDER_ID_CROSSHAIR_SCALE,
 	SLIDER_ID_CROSSHAIR_SCALE_LAST  = SLIDER_ID_CROSSHAIR_SCALE + SLIDER_INPUT_SPACING,
 	SLIDER_ID_CROSSHAIR_OFFSET,
@@ -223,6 +225,7 @@ public:
 	void show_mouse(bool status);
 	virtual bool is_menu_active() override;
 	bool can_paste();
+	bool found_machine_warnings() const { return m_has_warnings; }
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
@@ -261,7 +264,7 @@ private:
 	render_font *           m_font;
 	std::function<uint32_t (render_container &)> m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
-	uint32_t                  m_handler_param;
+	uint32_t                m_handler_param;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
@@ -274,6 +277,7 @@ private:
 	ui_options              m_ui_options;
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
+	bool                    m_has_warnings;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 
@@ -318,6 +322,7 @@ private:
 	int32_t slider_flicker(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	int32_t slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	int32_t slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_beam_dot_size(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	int32_t slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	std::string slider_get_screen_desc(screen_device &screen);
 	#ifdef MAME_DEBUG

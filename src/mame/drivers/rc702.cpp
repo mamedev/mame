@@ -52,6 +52,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_p_chargen(*this, "chargen")
 		, m_ctc1(*this, "ctc1")
 		, m_pio(*this, "pio")
@@ -92,11 +93,11 @@ private:
 	uint16_t m_beepcnt;
 	bool m_eop;
 	bool m_dack1;
-	bool m_rom_in_map;
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -110,8 +111,8 @@ private:
 
 void rc702_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
-	map(0x0800, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x07ff).bankr("bank1");
 }
 
 void rc702_state::io_map(address_map &map)
@@ -124,7 +125,7 @@ void rc702_state::io_map(address_map &map)
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { m_rom_in_map = false; })); // replace roms with ram
+	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { m_bank1->set_entry(0); })); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
@@ -160,7 +161,7 @@ INPUT_PORTS_END
 
 void rc702_state::machine_reset()
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 	m_beepcnt = 0xffff;
 	m_dack1 = 0;
 	m_eop = 0;
@@ -172,13 +173,14 @@ void rc702_state::machine_reset()
 
 void rc702_state::machine_start()
 {
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_q_state));
 	save_item(NAME(m_qbar_state));
 	save_item(NAME(m_drq_state));
 	save_item(NAME(m_beepcnt));
 	save_item(NAME(m_eop));
 	save_item(NAME(m_dack1));
-	save_item(NAME(m_rom_in_map));
 }
 
 WRITE_LINE_MEMBER( rc702_state::q_w )

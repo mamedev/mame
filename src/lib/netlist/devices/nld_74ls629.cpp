@@ -49,7 +49,7 @@ namespace netlist
 	NETLIB_OBJECT(SN74LS629clk)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629clk)
-		, m_FB(*this, "FB")
+		, m_FB(*this, "FB", NETLIB_DELEGATE(fb))
 		, m_Y(*this, "Y")
 		, m_enableq(*this, "m_enableq", 1)
 		, m_out(*this, "m_out", 0)
@@ -65,8 +65,6 @@ namespace netlist
 			m_inc = netlist_time::zero();
 		}
 
-		NETLIB_UPDATEI();
-
 	public:
 		logic_input_t m_FB;
 		logic_output_t m_Y;
@@ -74,6 +72,20 @@ namespace netlist
 		state_var<netlist_sig_t> m_enableq;
 		state_var<netlist_sig_t> m_out;
 		state_var<netlist_time> m_inc;
+	private:
+		NETLIB_HANDLERI(fb)
+		{
+			if (!m_enableq)
+			{
+				m_out = m_out ^ 1;
+				m_Y.push(m_out, m_inc);
+			}
+			else
+			{
+				m_Y.push(1, m_inc);
+			}
+		}
+
 	};
 
 	NETLIB_OBJECT(SN74LS629)
@@ -82,9 +94,9 @@ namespace netlist
 		, m_clock(*this, "OSC")
 		, m_R_FC(*this, "R_FC")
 		, m_R_RNG(*this, "R_RNG")
-		, m_ENQ(*this, "ENQ")
-		, m_RNG(*this, "RNG")
-		, m_FC(*this, "FC")
+		, m_ENQ(*this, "ENQ", NETLIB_DELEGATE(inputs))
+		, m_RNG(*this, "RNG", NETLIB_DELEGATE(inputs))
+		, m_FC(*this, "FC", NETLIB_DELEGATE(inputs))
 		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
 		{
 			register_subalias("GND",    m_R_FC.N());
@@ -102,7 +114,6 @@ namespace netlist
 			m_R_RNG.set_R(nlconst::magic(90000.0));
 			m_clock.reset();
 		}
-		NETLIB_UPDATEI();
 
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -119,6 +130,68 @@ namespace netlist
 		analog_input_t m_FC;
 
 		param_fp_t m_CAP;
+
+	private:
+		NETLIB_HANDLERI(inputs)
+		{
+			{
+				// recompute
+				nl_fptype  v_freq = m_FC();
+				nl_fptype  v_rng = m_RNG();
+
+				/* coefficients */
+				const nl_fptype k1 =  nlconst::magic( 1.9904769024796283E+03);
+				const nl_fptype k2 =  nlconst::magic( 1.2070059213983407E+03);
+				const nl_fptype k3 =  nlconst::magic( 1.3266985579561108E+03);
+				const nl_fptype k4 =  nlconst::magic(-1.5500979825922698E+02);
+				const nl_fptype k5 =  nlconst::magic( 2.8184536266938172E+00);
+				const nl_fptype k6 =  nlconst::magic(-2.3503421582744556E+02);
+				const nl_fptype k7 =  nlconst::magic(-3.3836786704527788E+02);
+				const nl_fptype k8 =  nlconst::magic(-1.3569136703258670E+02);
+				const nl_fptype k9 =  nlconst::magic( 2.9914575453819188E+00);
+				const nl_fptype k10 = nlconst::magic( 1.6855569086173170E+00);
+
+				/* scale due to input resistance */
+
+				/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
+
+				nl_fptype v_freq_2 = v_freq * v_freq;
+				nl_fptype v_freq_3 = v_freq_2 * v_freq;
+				nl_fptype v_freq_4 = v_freq_3 * v_freq;
+				nl_fptype freq = k1;
+				freq += k2 * v_freq;
+				freq += k3 * v_freq_2;
+				freq += k4 * v_freq_3;
+				freq += k5 * v_freq_4;
+				freq += k6 * v_rng;
+				freq += k7 * v_rng * v_freq;
+				freq += k8 * v_rng * v_freq_2;
+				freq += k9 * v_rng * v_freq_3;
+				freq += k10 * v_rng * v_freq_4;
+
+				freq *= nlconst::magic(0.1e-6) / m_CAP();
+
+				// FIXME: we need a possibility to remove entries from queue ...
+				//        or an exact model ...
+				m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
+
+				//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
+			}
+
+			if (!m_clock.m_enableq && m_ENQ())
+			{
+				m_clock.m_enableq = 1;
+				m_clock.m_out = m_clock.m_out ^ 1;
+				m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
+			}
+			else if (m_clock.m_enableq && !m_ENQ())
+			{
+				m_clock.m_enableq = 0;
+				m_clock.m_out = m_clock.m_out ^ 1;
+				m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
+			}
+		}
+
 	};
 
 	NETLIB_OBJECT(SN74LS629_dip)
@@ -144,7 +217,6 @@ namespace netlist
 			register_subalias("14",  m_B.m_RNG);
 		}
 
-		NETLIB_UPDATEI() { }
 
 		NETLIB_RESETI()
 		{
@@ -156,81 +228,6 @@ namespace netlist
 		NETLIB_SUB(SN74LS629) m_A;
 		NETLIB_SUB(SN74LS629) m_B;
 	};
-
-
-	NETLIB_UPDATE(SN74LS629clk)
-	{
-		if (!m_enableq)
-		{
-			m_out = m_out ^ 1;
-			m_Y.push(m_out, m_inc);
-		}
-		else
-		{
-			m_Y.push(1, m_inc);
-		}
-	}
-
-	NETLIB_UPDATE(SN74LS629)
-	{
-		{
-			// recompute
-			nl_fptype  v_freq = m_FC();
-			nl_fptype  v_rng = m_RNG();
-
-			/* coefficients */
-			const nl_fptype k1 =  nlconst::magic( 1.9904769024796283E+03);
-			const nl_fptype k2 =  nlconst::magic( 1.2070059213983407E+03);
-			const nl_fptype k3 =  nlconst::magic( 1.3266985579561108E+03);
-			const nl_fptype k4 =  nlconst::magic(-1.5500979825922698E+02);
-			const nl_fptype k5 =  nlconst::magic( 2.8184536266938172E+00);
-			const nl_fptype k6 =  nlconst::magic(-2.3503421582744556E+02);
-			const nl_fptype k7 =  nlconst::magic(-3.3836786704527788E+02);
-			const nl_fptype k8 =  nlconst::magic(-1.3569136703258670E+02);
-			const nl_fptype k9 =  nlconst::magic( 2.9914575453819188E+00);
-			const nl_fptype k10 = nlconst::magic( 1.6855569086173170E+00);
-
-			/* scale due to input resistance */
-
-			/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
-
-			nl_fptype v_freq_2 = v_freq * v_freq;
-			nl_fptype v_freq_3 = v_freq_2 * v_freq;
-			nl_fptype v_freq_4 = v_freq_3 * v_freq;
-			nl_fptype freq = k1;
-			freq += k2 * v_freq;
-			freq += k3 * v_freq_2;
-			freq += k4 * v_freq_3;
-			freq += k5 * v_freq_4;
-			freq += k6 * v_rng;
-			freq += k7 * v_rng * v_freq;
-			freq += k8 * v_rng * v_freq_2;
-			freq += k9 * v_rng * v_freq_3;
-			freq += k10 * v_rng * v_freq_4;
-
-			freq *= nlconst::magic(0.1e-6) / m_CAP();
-
-			// FIXME: we need a possibility to remove entries from queue ...
-			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
-			//m_clock.update();
-
-			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
-		}
-
-		if (!m_clock.m_enableq && m_ENQ())
-		{
-			m_clock.m_enableq = 1;
-			m_clock.m_out = m_clock.m_out ^ 1;
-			m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
-		}
-		else if (m_clock.m_enableq && !m_ENQ())
-		{
-			m_clock.m_enableq = 0;
-			m_clock.m_out = m_clock.m_out ^ 1;
-			m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
-		}
-	}
 
 	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
 	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")

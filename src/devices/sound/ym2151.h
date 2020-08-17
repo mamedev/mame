@@ -248,8 +248,6 @@ private:
 	*/
 	int32_t       dt1_freq[8*32];         /* 8 DT1 levels, 32 KC values */
 
-	uint32_t      noise_tab[32];          /* 17bit Noise Generator periods */
-
 	// internal state
 	sound_stream *         m_stream;
 	uint8_t                  m_lastreg;

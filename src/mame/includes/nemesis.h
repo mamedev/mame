@@ -139,7 +139,7 @@ private:
 	void nemesis_colorram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_charram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_filter_w(offs_t offset, uint8_t data);
-	void gx400_speech_start_w(uint8_t data);
+	void gx400_speech_w(offs_t offset, uint8_t data);
 	void salamand_speech_start_w(uint8_t data);
 	uint8_t nemesis_portA_r();
 	void city_sound_bank_w(uint8_t data);

@@ -13,8 +13,9 @@
 
 #include "ieee488.h"
 
-#include <vector>
 #include <queue>
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

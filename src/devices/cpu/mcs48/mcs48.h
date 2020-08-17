@@ -511,6 +511,10 @@ protected:
 class i8021_device : public mcs48_cpu_device
 {
 public:
+	// configuration
+	auto p0_in_cb() { return bus_in_cb(); }
+	auto p0_out_cb() { return bus_out_cb(); }
+
 	// construction/destruction
 	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

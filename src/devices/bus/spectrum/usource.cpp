@@ -93,5 +93,10 @@ void spectrum_usource_device::pre_opcode_fetch(offs_t offset)
 
 uint8_t spectrum_usource_device::mreq_r(offs_t offset)
 {
-	return m_rom->base()[offset & 0x1fff];
+	u8 data = 0xff;
+
+	if (m_romcs)
+		data = m_rom->base()[offset & 0x1fff];
+
+	return data;
 }
