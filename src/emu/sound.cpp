@@ -25,7 +25,6 @@
 
 #define VPRINTF(x)      do { if (VERBOSE) osd_printf_debug x; } while (0)
 
-static int indent = 0;
 
 
 //**************************************************************************
@@ -451,7 +450,7 @@ void sound_stream::update()
 //  to the generated samples from the given
 //  output number
 //-------------------------------------------------
-static bool in_sync;
+
 read_stream_view sound_stream::update_view(attotime start, attotime end, u32 outputnum)
 {
 	sound_assert(start <= end);
@@ -484,26 +483,9 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 				m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 
 #if (SOUND_DEBUG)
-		//printf("%*s%s: update %s-%s samples=%d (%d-%d) @ %dHz\n", indent, "", device().tag(), update_start.as_string(), end.as_string(), samples, m_output_view[0].m_start, m_output_view[0].m_end, m_output_view[0].sample_rate());
-		indent += 2;
-
 		// clear each output view to NANs before we call the callback
 		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
 			m_output_view[outindex].clear(NAN);
-
-		if (!in_sync) printf("Update %s for %d samples\n", m_device.tag(), samples);
-
-		if (m_input.size() == 4 && m_output.size() == 4)
-		{
-			for (int index = 0; index < 4; index++)
-			{
-				sound_assert(m_input_view[index].samples() == 1);
-				sound_assert(m_input_view[index].start_time() == m_input_view[0].start_time());
-				sound_assert(m_output_view[index].samples() == 1);
-				sound_assert(m_output_view[index].start_time() == m_output_view[0].start_time());
-				sound_assert(m_input_view[index].start_time() == m_output_view[0].start_time());
-			}
-		}
 #endif
 
 		// if we have an extended callback, that's all we need
@@ -514,8 +496,6 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
 			for (int sampindex = 0; sampindex < m_output_view[outindex].samples(); sampindex++)
 				m_output_view[outindex].get(sampindex);
-
-		indent -= 2;
 #endif
 	}
 	g_profiler.stop();
@@ -532,17 +512,8 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 
 void sound_stream::sync_update(void *, s32)
 {
-	// update to current time
-	in_sync = true;
 	update();
-	in_sync = false;
-
-	// determine when the next edge is and set ourselves to go off them
-	attotime curtime = m_device.machine().time();
-	attotime target = m_output[0].end_time();
-	if (target == curtime)
-		target += attotime(0, sample_period_attoseconds());
-	m_sync_timer->adjust(target - curtime);
+	reprime_sync_timer();
 }
 
 
@@ -645,14 +616,21 @@ void sound_stream::sample_rate_changed()
 
 	// if synchronous, prime the timer
 	if (synchronous())
-	{
-		attotime curtime = m_device.machine().time();
-		attotime target = m_output[0].end_time();
-		if (target == curtime)
-			target += attotime(0, sample_period_attoseconds());
-//		printf("Sync timer @ %s\n", target.as_string());
-		m_sync_timer->adjust(target - curtime);
-	}
+		reprime_sync_timer();
+}
+
+
+//-------------------------------------------------
+//  reprime_sync_timer - set up the next sync
+//  timer to go off just a hair after the end of
+//  the current sample period
+//-------------------------------------------------
+
+void sound_stream::reprime_sync_timer()
+{
+	attotime curtime = m_device.machine().time();
+	attotime target = m_output[0].end_time() + attotime(0, 1);
+	m_sync_timer->adjust(target - curtime);
 }
 
 
@@ -777,7 +755,6 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	// compute the stepping value and the inverse
 	float step = float(input.sample_rate()) / float(output.sample_rate());
 	float stepinv = 1.0f / step;
-printf("%*sresample: %d->%d; %d source samples available\n", indent, "", input.sample_rate(), output.sample_rate(), input.samples());
 
 	// determine the latency we need to introduce, in input samples:
 	//    1 input sample for undersampled inputs
@@ -861,7 +838,6 @@ printf("%*sresample: %d->%d; %d source samples available\n", indent, "", input.s
 			sound_assert(srcindex <= input.samples());
 		}
 	}
-//	printf("%*sresample: final source index = %d/%d\n", indent, "", srcindex, input.samples());
 }
 
 

@@ -499,6 +499,7 @@ private:
 
 	// internal helpers
 	void sample_rate_changed();
+	void reprime_sync_timer();
 	void postload();
 	void sync_update(void *, s32);
 	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
