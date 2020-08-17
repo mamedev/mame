@@ -101,12 +101,12 @@
 #define SC_VBSTART      (SC_VTOTAL)
 #define SC_VBEND        (8)
 
-#define TANK_VIDCLOCK   (14318000)
-#define TANK_HTOTAL     (904)
-#define TANK_VTOTAL     (520)
-#define TANK_HBSTART    (SC_HTOTAL)
+#define TANK_VIDCLOCK   (14318181)
+#define TANK_HTOTAL     (451)
+#define TANK_VTOTAL     (521)
+#define TANK_HBSTART    (TANK_HTOTAL)
 #define TANK_HBEND      (32)
-#define TANK_VBSTART    (SC_VTOTAL)
+#define TANK_VBSTART    (TANK_VTOTAL)
 #define TANK_VBEND      (8)
 
 #define GTRAK10_VIDCLOCK 14318181
@@ -252,12 +252,13 @@ void tank_state::tank(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(TANK_VIDCLOCK);
-	m_video->set_horz_params(TANK_HTOTAL-84,TANK_HTOTAL-64,TANK_HTOTAL-16, TANK_HTOTAL);
-	m_video->set_vert_params(TANK_VTOTAL-21,TANK_VTOTAL-17,TANK_VTOTAL-12, TANK_VTOTAL);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(0.89);
-	m_video->set_gain(0.2);
-	m_video->set_horz_scale(1);
+	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
+	m_video->set_horz_params(TANK_HTOTAL - 32,      TANK_HTOTAL - 32,     TANK_HTOTAL - 31,    TANK_HTOTAL);
+	m_video->set_vert_params(TANK_VTOTAL - 8,       TANK_VTOTAL - 8,      TANK_VTOTAL,         TANK_VTOTAL);
+	m_video->set_fieldcount(2);
+	m_video->set_threshold(1.0);
+	//m_video->set_gain(0.2);
+	//m_video->set_horz_scale(1);
 }
 
 void gtrak10_state::gtrak10(machine_config &config)
