@@ -60,19 +60,19 @@ constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xfffffffe;
 constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
 constexpr u32 SAMPLE_RATE_SYNCHRONOUS = 0xfffffffc;
 
-enum resampler_type : u8
-{
-	RESAMPLER_NONE = 0,
-	RESAMPLER_DEFAULT
-};
-
 
 
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
 
+#define SOUND_DEBUG (1)
+
+#if (SOUND_DEBUG)
 #define sound_assert(x) do { if (!(x)) __debugbreak(); } while (0)
+#else
+#define sound_assert assert
+#endif
 
 
 //**************************************************************************
@@ -114,9 +114,21 @@ public:
 	// set the time (for forced resyncs; generally not used)
 	void set_end_time(attotime time) { m_end_second = time.seconds(); m_end_sample = u32(time.attoseconds() / m_sample_attos); }
 
-	// access to the sample buffer
-	sample_t get(s32 index) const { return m_buffer[clamp_index(index)]; }
-	void put(s32 index, sample_t data) { m_buffer[clamp_index(index)] = data; }
+	// read the sample at the given index (clamped)
+	sample_t get(s32 index) const
+	{
+		sample_t value = m_buffer[clamp_index(index)];
+#if (SOUND_DEBUG)
+		sound_assert(!isnan(value));
+#endif
+		return value;
+	}
+
+	// write the sample at the given index (clamped)
+	void put(s32 index, sample_t data)
+	{
+		m_buffer[clamp_index(index)] = data;
+	}
 
 private:
 	// clamp an index to the size of the buffer; allows for indexing +/- one
@@ -330,6 +342,18 @@ using stream_update_delegate = delegate<void (sound_stream &stream, stream_sampl
 using stream_update_ex_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)>;
 
 
+// ======================> sound_stream_flags
+
+enum sound_stream_flags : u32
+{
+	STREAM_RESAMPLER_MASK = 0x0f,
+		STREAM_RESAMPLER_DEFAULT = 0,
+		STREAM_RESAMPLER_NONE = 1,
+
+	STREAM_SYNCHRONOUS = 0x10,
+};
+
+
 // ======================> sound_stream
 
 class sound_stream
@@ -426,14 +450,13 @@ class sound_stream
 		float m_user_gain;                     // user-controlled gain to apply to this input
 	};
 
-	// constants
-	static constexpr int OUTPUT_BUFFER_UPDATES  = 5;
-
 public:
 	// construction/destruction
-	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
-	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler = RESAMPLER_DEFAULT);
-	void init_common(int inputs, int outputs, int sample_rate);
+	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	virtual ~sound_stream();
+
+	void init_common(int inputs, int outputs, int sample_rate, sound_stream_flags flags);
 
 	// getters
 	sound_stream *next() const { return m_next; }
@@ -453,7 +476,6 @@ public:
 	bool synchronous() const { return m_synchronous; }
 	bool input_adaptive() const { return m_input_adaptive || m_synchronous; }
 	bool output_adaptive() const { return m_output_adaptive; }
-	resampler_type resampler() const { return m_resampler_type; }
 
 	// operations
 	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
@@ -466,6 +488,11 @@ public:
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
 
+	// debugging
+#if (SOUND_DEBUG)
+	void print_graph_recursive(int indent);
+#endif
+
 private:
 	// helpers called by our friends only
 	void apply_sample_rate_changes();
@@ -475,7 +502,6 @@ private:
 	void postload();
 	void sync_update(void *, s32);
 	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
-	void resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
 
 	// linking information
 	device_t &m_device;                            // owning device
@@ -487,7 +513,6 @@ private:
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
-	resampler_type m_resampler_type;               // type of resampler to use
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
 	// input information
@@ -504,6 +529,23 @@ private:
 	// callback information
 	stream_update_delegate m_callback;              // callback function
 	stream_update_ex_delegate m_callback_ex;        // extended callback function
+};
+
+
+// ======================> default_resampler_stream
+
+class default_resampler_stream : public sound_stream
+{
+public:
+	// construction/destruction
+	default_resampler_stream(device_t &device);
+
+	// update handler
+	void resampler_sound_update(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
+
+private:
+	// internal state
+	u32 m_max_latency;
 };
 
 
@@ -549,7 +591,7 @@ public:
 
 	// stream creation
 	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
-	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler = RESAMPLER_DEFAULT);
+	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags resampler = STREAM_RESAMPLER_DEFAULT);
 
 	// global controls
 	void start_recording();

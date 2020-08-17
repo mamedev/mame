@@ -1386,7 +1386,7 @@ void netlist_mame_sound_device::device_start()
 	m_inbuffer.resize(m_in.size());
 
 	/* initialize the stream(s) */
-	m_stream = &stream_alloc_ex(m_in.size(), m_out.size(), m_sound_clock, RESAMPLER_NONE);
+	m_stream = &stream_alloc_ex(m_in.size(), m_out.size(), m_sound_clock, STREAM_RESAMPLER_NONE);
 
 	LOGDEVCALLS("sound device_start exit\n");
 }

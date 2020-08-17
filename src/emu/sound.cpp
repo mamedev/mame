@@ -69,17 +69,68 @@ void stream_buffer::set_sample_rate(u32 rate)
 {
 	sound_assert(rate > 0);
 
-	// ensure the buffer is large enough to hold a full second
+	// skip if nothing is actually changing
+	if (rate == m_sample_rate)
+		return;
+
+	// buffer a short runway of previous samples; in order to support smooth
+	// sample rate changes (needed by, e.g., Q*Bert's Votrax), we buffer a few
+	// samples at the previous rate, and then reconstitute them resampled
+	// (via simple point sampling) at the new rate. The litmus test is the
+	// voice when jumping off the edge in Q*Bert; without this extra effort
+	// it is crackly and/or glitchy at times
+	sample_t buffer[16];
+	for (int index = 0; index < ARRAY_LENGTH(buffer); index++)
+		buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
+
+	// also note the time and rate of these samples (end_time is AFTER the final sample)
+	attotime buffer_period = attotime(0, sample_period_attoseconds());
+	attotime buffer_time = end_time();
+
+	// ensure our buffer is large enough to hold a full second at the new rate
 	if (m_buffer.size() < rate)
 		m_buffer.resize(rate);
 
-	// recompute the end position relative to the new sample rate
-	m_end_sample = (m_sample_rate == 0) ? 0 : (m_end_sample * rate) / m_sample_rate;
+	// set the new rate
 	m_sample_rate = rate;
 	m_sample_attos = (rate == 0) ? ATTOSECONDS_PER_SECOND : ATTOSECONDS_TO_HZ(rate);
 
-	// clear our buffer
-	clear();
+#if (SOUND_DEBUG)
+	// for aggressive debugging, fill the buffer with NANs to catch anyone
+	// reading beyond what we resample below
+	std::fill_n(&m_buffer[0], m_buffer.size(), NAN);
+#endif
+
+	// compute the new end sample index based on the buffer time
+	m_end_sample = time_to_buffer_index(buffer_time);
+
+	// compute the time of the first sample to be backfilled; start one period before
+	attotime backfill_period = attotime(0, sample_period_attoseconds());
+	attotime backfill_time = end_time() - backfill_period;
+
+	// also adjust the buffered sample end time to point to the sample time of the
+	// final sample captured
+	buffer_time -= buffer_period;
+
+	// loop until we run out of buffered data
+	for (int srcindex = 0, dstindex = 0; ; dstindex++)
+	{
+		// if our backfill time is before the current buffered sample time,
+		// back up until we have a sample that covers this time
+		while (backfill_time < buffer_time && srcindex < ARRAY_LENGTH(buffer))
+		{
+			buffer_time -= buffer_period;
+			srcindex++;
+		}
+
+		// stop when we run out of source
+		if (srcindex >= ARRAY_LENGTH(buffer))
+			break;
+
+		// write this sample, and back up to the next sample time
+		put(m_end_sample - 1 - dstindex, buffer[srcindex]);
+		backfill_time -= backfill_period;
+	}
 }
 
 
@@ -148,15 +199,14 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up)
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback) :
+sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
 	m_pending_sample_rate(SAMPLE_RATE_INVALID),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
-	m_synchronous(sample_rate == SAMPLE_RATE_SYNCHRONOUS),
-	m_resampler_type(RESAMPLER_DEFAULT),
+	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
 	m_sync_timer(nullptr),
 	m_input(inputs),
 	m_input_array(inputs),
@@ -168,7 +218,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	m_callback_ex(stream_update_ex_delegate(&sound_stream::oldstyle_callback_ex, this))
 {
 	// common init
-	init_common(inputs, outputs, sample_rate);
+	init_common(inputs, outputs, sample_rate, flags);
 }
 
 
@@ -177,15 +227,14 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler_type) :
+sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
 	m_pending_sample_rate(SAMPLE_RATE_INVALID),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
-	m_synchronous(sample_rate == SAMPLE_RATE_SYNCHRONOUS),
-	m_resampler_type(resampler_type),
+	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
 	m_sync_timer(nullptr),
 	m_input(inputs),
 	m_input_array(inputs),
@@ -196,7 +245,16 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	m_callback_ex(std::move(callback))
 {
 	// common init
-	init_common(inputs, outputs, sample_rate);
+	init_common(inputs, outputs, sample_rate, flags);
+}
+
+
+//-------------------------------------------------
+//  ~sound_stream - destructor
+//-------------------------------------------------
+
+sound_stream::~sound_stream()
+{
 }
 
 
@@ -204,7 +262,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 //  init_common - constructor
 //-------------------------------------------------
 
-void sound_stream::init_common(int inputs, int outputs, int sample_rate)
+void sound_stream::init_common(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
 {
 	sound_assert(outputs > 0);
 
@@ -213,27 +271,21 @@ void sound_stream::init_common(int inputs, int outputs, int sample_rate)
 	auto &save = m_device.machine().save();
 	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
-	// selet the appropriate resampler callback
-	stream_update_ex_delegate resampler_cb;
-	switch (m_resampler_type)
-	{
-		case RESAMPLER_NONE:
-			break;
-
-		default:
-		case RESAMPLER_DEFAULT:
-			resampler_cb = stream_update_ex_delegate(&sound_stream::resampler_default, this);
-			break;
-	}
-
 	// initialize all inputs
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
 		stream_output *resampler = nullptr;
-		if (!resampler_cb.isnull())
+		int resampler_type = flags & STREAM_RESAMPLER_MASK;
+		if (resampler_type != STREAM_RESAMPLER_NONE)
 		{
-			m_resampler_list.push_back(std::make_unique<sound_stream>(m_device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, resampler_cb, RESAMPLER_NONE));
+			switch (resampler_type)
+			{
+				default:
+				case STREAM_RESAMPLER_DEFAULT:
+					m_resampler_list.push_back(std::make_unique<default_resampler_stream>(m_device));
+					break;
+			}
 			resampler = &m_resampler_list.back()->m_output[0];
 		}
 
@@ -399,7 +451,7 @@ void sound_stream::update()
 //  to the generated samples from the given
 //  output number
 //-------------------------------------------------
-
+static bool in_sync;
 read_stream_view sound_stream::update_view(attotime start, attotime end, u32 outputnum)
 {
 	sound_assert(start <= end);
@@ -410,15 +462,6 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 		outputnum = 0;
 	if (start > end)
 		start = end;
-
-	// if we are input-adaptive, update our sample rate based on the first
-	// input (note we presume all inputs are the same)
-	if (input_adaptive() && m_input.size() > 0)
-		set_sample_rate(m_input[0].owner().sample_rate());
-
-	// if synchronous, just return the data
-	if (synchronous())
-		return m_output[outputnum].view(start, end);
 
 	g_profiler.start(PROFILER_SOUND);
 
@@ -433,17 +476,47 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	u32 samples = m_output_view[0].samples();
 	if (samples != 0)
 	{
-//printf("%*s%s: update %s-%s samples=%d (%d-%d) @ %dHz\n", indent, "", device().tag(), update_start.as_string(), end.as_string(), samples, m_output_view[0].m_start, m_output_view[0].m_end, m_output_view[0].sample_rate());
-indent += 2;
+		sound_assert(!synchronous() || samples == 1);
 
 		// ensure all input streams are up to date, and create views for them as well
 		for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 			if (m_input[inputnum].valid())
 				m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 
+#if (SOUND_DEBUG)
+		//printf("%*s%s: update %s-%s samples=%d (%d-%d) @ %dHz\n", indent, "", device().tag(), update_start.as_string(), end.as_string(), samples, m_output_view[0].m_start, m_output_view[0].m_end, m_output_view[0].sample_rate());
+		indent += 2;
+
+		// clear each output view to NANs before we call the callback
+		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
+			m_output_view[outindex].clear(NAN);
+
+		if (!in_sync) printf("Update %s for %d samples\n", m_device.tag(), samples);
+
+		if (m_input.size() == 4 && m_output.size() == 4)
+		{
+			for (int index = 0; index < 4; index++)
+			{
+				sound_assert(m_input_view[index].samples() == 1);
+				sound_assert(m_input_view[index].start_time() == m_input_view[0].start_time());
+				sound_assert(m_output_view[index].samples() == 1);
+				sound_assert(m_output_view[index].start_time() == m_output_view[0].start_time());
+				sound_assert(m_input_view[index].start_time() == m_output_view[0].start_time());
+			}
+		}
+#endif
+
 		// if we have an extended callback, that's all we need
 		m_callback_ex(*this, m_input_view, m_output_view);
-indent -= 2;
+
+#if (SOUND_DEBUG)
+		// make sure everything was overwritten
+		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
+			for (int sampindex = 0; sampindex < m_output_view[outindex].samples(); sampindex++)
+				m_output_view[outindex].get(sampindex);
+
+		indent -= 2;
+#endif
 	}
 	g_profiler.stop();
 
@@ -460,14 +533,16 @@ indent -= 2;
 void sound_stream::sync_update(void *, s32)
 {
 	// update to current time
+	in_sync = true;
 	update();
+	in_sync = false;
 
 	// determine when the next edge is and set ourselves to go off them
-	attoseconds_t attos = sample_period_attoseconds();
-	if (attos != 0)
-		m_sync_timer->adjust(attotime(0, attos - (m_device.machine().time().attoseconds() % attos)));
-	else
-		m_sync_timer->adjust(attotime::never);
+	attotime curtime = m_device.machine().time();
+	attotime target = m_output[0].end_time();
+	if (target == curtime)
+		target += attotime(0, sample_period_attoseconds());
+	m_sync_timer->adjust(target - curtime);
 }
 
 
@@ -530,15 +605,20 @@ void sound_stream::set_output_gain(int outputnum, float gain)
 
 void sound_stream::apply_sample_rate_changes()
 {
-	// skip if nothing to do
-	if (m_pending_sample_rate == SAMPLE_RATE_INVALID)
-		return;
-
-	// update to the new rate and remember the old rate
-	m_sample_rate = m_pending_sample_rate;
+	// grab the new rate and invalidate
+	u32 new_rate = m_pending_sample_rate;
 	m_pending_sample_rate = SAMPLE_RATE_INVALID;
 
-	// recompute all the data
+	// if we're input adaptive, update the sample rate
+	if (input_adaptive() && m_input.size() > 0 && m_input[0].valid())
+		new_rate = m_input[0].source().stream().sample_rate();
+
+	// skip if nothing to do
+	if (new_rate == SAMPLE_RATE_INVALID || new_rate == m_sample_rate)
+		return;
+
+	// update to the new rate and notify everyone
+	m_sample_rate = new_rate;
 	sample_rate_changed();
 }
 
@@ -551,22 +631,11 @@ void sound_stream::apply_sample_rate_changes()
 
 void sound_stream::sample_rate_changed()
 {
-	// if synchronous, compute the sample rate from the inputs
-	if (synchronous())
-	{
-		m_sample_rate = SAMPLE_RATE_INVALID;
-		for (auto &input : m_input)
-			if (m_sample_rate == SAMPLE_RATE_INVALID)
-				m_sample_rate = input.source().stream().sample_rate();
-			else if (m_sample_rate != input.source().stream().sample_rate())
-				throw emu_fatalerror("Incompatible sample rates as input of a synchronous stream: %d and %d\n", m_sample_rate, input.source().stream().sample_rate());
-	}
-
 	// if invalid, just punt
 	if (m_sample_rate == SAMPLE_RATE_INVALID)
 		return;
 
-	// update all input resample buffers, and recompute the maximum latency
+	// update all input buffers
 	for (auto &input : m_input)
 		input.sample_rate_changed(m_sample_rate);
 
@@ -577,11 +646,12 @@ void sound_stream::sample_rate_changed()
 	// if synchronous, prime the timer
 	if (synchronous())
 	{
-		attoseconds_t attos = sample_period_attoseconds();
-		if (attos != 0)
-			m_sync_timer->adjust(attotime(0, attos - (m_device.machine().time().attoseconds() % attos)));
-		else
-			m_sync_timer->adjust(attotime::never);
+		attotime curtime = m_device.machine().time();
+		attotime target = m_output[0].end_time();
+		if (target == curtime)
+			target += attotime(0, sample_period_attoseconds());
+//		printf("Sync timer @ %s\n", target.as_string());
+		m_sync_timer->adjust(target - curtime);
 	}
 }
 
@@ -649,12 +719,46 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 
 
 //-------------------------------------------------
-//  resampler - stream callback handler for
-//  resampling an input stream to the target sample
-//  rate of the output
+//  print_graph_recursive - helper for debugging;
+//  prints info on this stream and then recursively
+//  prints info on all inputs
 //-------------------------------------------------
 
-void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+#if (SOUND_DEBUG)
+void sound_stream::print_graph_recursive(int indent)
+{
+	printf("%*s%s @ %d\n", indent, "", device().tag(), sample_rate());
+	for (int index = 0; index < m_input.size(); index++)
+		if (m_input[index].valid())
+			m_input[index].m_native_source->stream().print_graph_recursive(indent + 2);
+}
+#endif
+
+
+
+//**************************************************************************
+//  RESAMPLER STREAM
+//**************************************************************************
+
+//-------------------------------------------------
+//  default_resampler_stream - derived sound_stream
+//  class that handles resampling
+//-------------------------------------------------
+
+default_resampler_stream::default_resampler_stream(device_t &device) :
+	sound_stream(device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_ex_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_RESAMPLER_NONE),
+	m_max_latency(0)
+{
+}
+
+
+//-------------------------------------------------
+//  resampler_sound_update - stream callback
+//  handler for resampling an input stream to the
+//  target sample rate of the output
+//-------------------------------------------------
+
+void default_resampler_stream::resampler_sound_update(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 	sound_assert(inputs.size() == 1);
 	sound_assert(outputs.size() == 1);
@@ -673,12 +777,16 @@ void sound_stream::resampler_default(sound_stream &stream, std::vector<read_stre
 	// compute the stepping value and the inverse
 	float step = float(input.sample_rate()) / float(output.sample_rate());
 	float stepinv = 1.0f / step;
-//printf("%*sresample: %d->%d; %d source samples available\n", indent, "", input.sample_rate(), output.sample_rate(), input.samples());
+printf("%*sresample: %d->%d; %d source samples available\n", indent, "", input.sample_rate(), output.sample_rate(), input.samples());
 
 	// determine the latency we need to introduce, in input samples:
 	//    1 input sample for undersampled inputs
 	//    1 + step input samples for oversampled inputs
 	s64 latency_samples = 1 + ((step < 1.0f) ? 0 : s32(step));
+	if (latency_samples <= m_max_latency)
+		latency_samples = m_max_latency;
+	else
+		m_max_latency = latency_samples;
 	attotime latency = attotime(0, latency_samples * input.sample_period_attoseconds());
 
 	// clamp the latency to the start (only relevant at the beginning)
@@ -996,9 +1104,9 @@ sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outp
 }
 
 
-sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, resampler_type resampler)
+sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags)
 {
-	m_stream_list.push_back(std::make_unique<sound_stream>(device, inputs, outputs, sample_rate, callback, resampler));
+	m_stream_list.push_back(std::make_unique<sound_stream>(device, inputs, outputs, sample_rate, callback, flags));
 	return m_stream_list.back().get();
 }
 
@@ -1160,6 +1268,18 @@ void sound_manager::update(void *ptr, int param)
 	VPRINTF(("sound_update\n"));
 
 	g_profiler.start(PROFILER_SOUND);
+
+#if (SOUND_DEBUG)
+	// dump the sound graph when we start up
+	if (m_last_update == attotime::zero)
+		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		{
+			int dummy;
+			sound_stream *output = speaker.output_to_stream_output(0, dummy);
+			if (output)
+				output->print_graph_recursive(0);
+		}
+#endif
 
 	// force all the speaker streams to generate the proper number of samples
 	m_samples_this_update = 0;

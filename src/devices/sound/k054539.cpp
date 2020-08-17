@@ -105,7 +105,7 @@ void k054539_device::keyoff(int channel)
 		regs[0x22c] &= ~(1 << channel);
 }
 
-void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k054539_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
 #define VOL_CAP 1.80
 
@@ -118,9 +118,13 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	int16_t *rbase = (int16_t *)ram.get();
 
 	if(!(regs[0x22f] & 1))
+	{
+		outputs[0].clear(0);
+		outputs[1].clear(0);
 		return;
+	}
 
-	for(int sample = 0; sample != samples; sample++) {
+	for(int sample = 0; sample != outputs[0].samples(); sample++) {
 		double lval, rval;
 		if(!(flags & DISABLE_REVERB))
 			lval = rval = rbase[reverb_pos];
@@ -298,8 +302,8 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				}
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0][sample] = int16_t(lval);
-		outputs[1][sample] = int16_t(rval);
+		outputs[0].put(sample, stream_buffer::sample_t(lval) * stream_buffer::sample_t(1.0 / 32768.0));
+		outputs[1].put(sample, stream_buffer::sample_t(rval) * stream_buffer::sample_t(1.0 / 32768.0));
 	}
 }
 
@@ -321,7 +325,7 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram.get(), 0, 0x4000);
 
-	stream = stream_alloc(0, 2, clock() / 384);
+	stream = &stream_alloc_ex(0, 2, clock() / 384);
 
 	save_item(NAME(voltab));
 	save_item(NAME(pantab));

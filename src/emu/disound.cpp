@@ -77,12 +77,12 @@ sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int 
 
 sound_stream &device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate)
 {
-	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), RESAMPLER_DEFAULT);
+	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), STREAM_RESAMPLER_DEFAULT);
 }
 
-sound_stream &device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate, resampler_type resampler)
+sound_stream &device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
 {
-	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), resampler);
+	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), flags);
 }
 
 
@@ -460,7 +460,7 @@ void device_mixer_interface::interface_pre_start()
 	m_output_clear.resize(m_outputs);
 
 	// allocate the mixer stream
-	m_mixer_stream = &stream_alloc_ex(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate(), RESAMPLER_DEFAULT);
+	m_mixer_stream = &stream_alloc_ex(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate(), STREAM_RESAMPLER_DEFAULT);
 }
 
 
