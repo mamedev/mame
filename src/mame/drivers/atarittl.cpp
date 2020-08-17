@@ -251,11 +251,12 @@ void tank_state::tank(machine_config &config)
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of back porch
 	// TODO: The total hblank period is 128, the total hsync period is 32, unknown how to convert this to porches.
 	// TODo: The total vblank period is 80, the total vsync period is 8, unknown how to convert this to porches.
-	m_video->set_horz_params(776,                   0,                    32,                  128);
-	m_video->set_vert_params(432,                   0,                    8,                   80);
+	m_video->set_horz_params(776,                   776,                    808,                   904);
+	m_video->set_vert_params(432,                   432,                    440,                   520);
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
-	//m_video->set_gain(0.2);
+	m_video->set_vsync_threshold(0.368);
+	m_video->set_gain(0.47);
 	//m_video->set_horz_scale(1);
 }
 
