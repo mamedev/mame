@@ -19,7 +19,7 @@ Taito / Midway Super Speed Race driver
 
 
 
-void sspeedr_state::sspeedr_palette(palette_device &palette) const
+void sspeedr_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -39,13 +39,13 @@ void sspeedr_state::sspeedr_palette(palette_device &palette) const
 }
 
 
-void sspeedr_state::sspeedr_int_ack_w(uint8_t data)
+void sspeedr_state::int_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-void sspeedr_state::sspeedr_lamp_w(uint8_t data)
+void sspeedr_state::lamp_w(uint8_t data)
 {
 	output().set_value("lampGO", BIT(data, 0));
 	output().set_value("lampEP", BIT(data, 1));
@@ -53,27 +53,27 @@ void sspeedr_state::sspeedr_lamp_w(uint8_t data)
 }
 
 
-/* uses a 7447A, which is equivalent to an LS47/48 */
+// uses a 7447A, which is equivalent to an LS47/48
 constexpr uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-void sspeedr_state::sspeedr_time_w(offs_t offset, uint8_t data)
+void sspeedr_state::time_w(offs_t offset, uint8_t data)
 {
 	data = data & 15;
 	m_digits[24 + offset] = ls48_map[data];
-	m_led_TIME[offset] = data;
+	m_led_time[offset] = data;
 }
 
 
-void sspeedr_state::sspeedr_score_w(offs_t offset, uint8_t data)
+void sspeedr_state::score_w(offs_t offset, uint8_t data)
 {
 	data = ~data & 15;
 	m_digits[offset] = ls48_map[data];
-	m_led_SCORE[offset] = data;
+	m_led_score[offset] = data;
 }
 
 
-void sspeedr_state::sspeedr_sound1_w(uint8_t data)
+void sspeedr_state::sound1_w(uint8_t data)
 {
 	// **** Output pins from 74174 latch at C2 ****
 
@@ -98,7 +98,7 @@ void sspeedr_state::sspeedr_sound1_w(uint8_t data)
 }
 
 
-void sspeedr_state::sspeedr_sound2_w(uint8_t data)
+void sspeedr_state::sound2_w(uint8_t data)
 {
 	// **** Output pins from 74174 latch at D2 ****
 
@@ -127,39 +127,37 @@ void sspeedr_state::sspeedr_sound2_w(uint8_t data)
 }
 
 
-void sspeedr_state::sspeedr_map(address_map &map)
+void sspeedr_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x21ff).ram();
-	map(0x7f00, 0x7f17).w(FUNC(sspeedr_state::sspeedr_score_w));
+	map(0x7f00, 0x7f17).w(FUNC(sspeedr_state::score_w));
 }
 
 
-void sspeedr_state::sspeedr_io_map(address_map &map)
+void sspeedr_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0");
-	map(0x00, 0x00).w(FUNC(sspeedr_state::sspeedr_sound1_w));
-	map(0x01, 0x01).portr("IN1");
-	map(0x01, 0x01).w(FUNC(sspeedr_state::sspeedr_sound2_w));
-	map(0x02, 0x02).w(FUNC(sspeedr_state::sspeedr_lamp_w));
+	map(0x00, 0x00).portr("IN0").w(FUNC(sspeedr_state::sound1_w));
+	map(0x01, 0x01).portr("IN1").w(FUNC(sspeedr_state::sound2_w));
+	map(0x02, 0x02).w(FUNC(sspeedr_state::lamp_w));
 	map(0x03, 0x03).portr("DSW");
 	map(0x04, 0x04).portr("IN2");
-	map(0x04, 0x05).w(FUNC(sspeedr_state::sspeedr_time_w));
+	map(0x04, 0x05).w(FUNC(sspeedr_state::time_w));
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x10, 0x10).w(FUNC(sspeedr_state::sspeedr_driver_horz_w));
-	map(0x11, 0x11).w(FUNC(sspeedr_state::sspeedr_driver_pic_w));
-	map(0x12, 0x12).w(FUNC(sspeedr_state::sspeedr_driver_horz_2_w));
-	map(0x13, 0x13).w(FUNC(sspeedr_state::sspeedr_drones_horz_w));
-	map(0x14, 0x14).w(FUNC(sspeedr_state::sspeedr_drones_horz_2_w));
-	map(0x15, 0x15).w(FUNC(sspeedr_state::sspeedr_drones_mask_w));
-	map(0x16, 0x16).w(FUNC(sspeedr_state::sspeedr_driver_vert_w));
-	map(0x17, 0x18).w(FUNC(sspeedr_state::sspeedr_track_vert_w));
-	map(0x19, 0x19).w(FUNC(sspeedr_state::sspeedr_track_horz_w));
-	map(0x1a, 0x1a).w(FUNC(sspeedr_state::sspeedr_track_horz_2_w));
-	map(0x1b, 0x1b).w(FUNC(sspeedr_state::sspeedr_track_ice_w));
-	map(0x1c, 0x1e).w(FUNC(sspeedr_state::sspeedr_drones_vert_w));
-	map(0x1f, 0x1f).w(FUNC(sspeedr_state::sspeedr_int_ack_w));
+	map(0x10, 0x10).w(FUNC(sspeedr_state::driver_horz_w));
+	map(0x11, 0x11).w(FUNC(sspeedr_state::driver_pic_w));
+	map(0x12, 0x12).w(FUNC(sspeedr_state::driver_horz_2_w));
+	map(0x13, 0x13).w(FUNC(sspeedr_state::drones_horz_w));
+	map(0x14, 0x14).w(FUNC(sspeedr_state::drones_horz_2_w));
+	map(0x15, 0x15).w(FUNC(sspeedr_state::drones_mask_w));
+	map(0x16, 0x16).w(FUNC(sspeedr_state::driver_vert_w));
+	map(0x17, 0x18).w(FUNC(sspeedr_state::track_vert_w));
+	map(0x19, 0x19).w(FUNC(sspeedr_state::track_horz_w));
+	map(0x1a, 0x1a).w(FUNC(sspeedr_state::track_horz_2_w));
+	map(0x1b, 0x1b).w(FUNC(sspeedr_state::track_ice_w));
+	map(0x1c, 0x1e).w(FUNC(sspeedr_state::drones_vert_w));
+	map(0x1f, 0x1f).w(FUNC(sspeedr_state::int_ack_w));
 }
 
 
@@ -182,8 +180,8 @@ static INPUT_PORTS_START( sspeedr )
 	PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(64) PORT_REMAP_TABLE(sspeedr_controller_table) PORT_WRAPS PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
 	PORT_START("IN1")
-	/* The gas pedal is adjusted physically so the encoder is at position 2 when the pedal is not pressed. */
-	/* It also only uses half of the encoder. */
+	// The gas pedal is adjusted physically so the encoder is at position 2 when the pedal is not pressed.
+	// It also only uses half of the encoder.
 	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(30) PORT_REMAP_TABLE(sspeedr_controller_table + 2) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
 	PORT_START("DSW")
@@ -237,17 +235,17 @@ static const gfx_layout car_layout =
 
 
 static GFXDECODE_START( gfx_sspeedr )
-	GFXDECODE_ENTRY( "gfx1", 0, car_layout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 1 )
+	GFXDECODE_ENTRY( "driver", 0, car_layout, 0, 1 )
+	GFXDECODE_ENTRY( "drone", 0, car_layout, 0, 1 )
 GFXDECODE_END
 
 
 void sspeedr_state::sspeedr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(19'968'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sspeedr_state::sspeedr_map);
-	m_maincpu->set_addrmap(AS_IO, &sspeedr_state::sspeedr_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sspeedr_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &sspeedr_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sspeedr_state::irq0_line_assert));
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -258,12 +256,12 @@ void sspeedr_state::sspeedr(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16 * 1000000 / 15680));
 	screen.set_size(376, 256);
 	screen.set_visarea(0, 375, 0, 247);
-	screen.set_screen_update(FUNC(sspeedr_state::screen_update_sspeedr));
-	screen.screen_vblank().set(FUNC(sspeedr_state::screen_vblank_sspeedr));
+	screen.set_screen_update(FUNC(sspeedr_state::screen_update));
+	screen.screen_vblank().set(FUNC(sspeedr_state::screen_vblank));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sspeedr);
-	PALETTE(config, m_palette, FUNC(sspeedr_state::sspeedr_palette), 16);
+	PALETTE(config, m_palette, FUNC(sspeedr_state::palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -299,15 +297,15 @@ ROM_START( sspeedr )
 	ROM_LOAD( "ssr0000.pgm", 0x0000, 0x0800, CRC(bfc7069a) SHA1(2f7aa3d3c7cfd804ba4b625c6a8338534a204855) )
 	ROM_LOAD( "ssr0800.pgm", 0x0800, 0x0800, CRC(ec46b59a) SHA1(d5727efecb32ad3d034b885e4a57d7373368ca9e) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 ) /* driver */
+	ROM_REGION( 0x0800, "driver", 0 )
 	ROM_LOAD( "ssrm762a.f3", 0x0000, 0x0800, CRC(de4653a9) SHA1(a6bbffb7eb60581eee43c74d20ca00b50c9a6e07) )
 
-	ROM_REGION( 0x0800, "gfx2", 0 ) /* drone */
+	ROM_REGION( 0x0800, "drone", 0 )
 	ROM_LOAD( "ssrm762b.j3", 0x0000, 0x0800, CRC(ef6a1cd6) SHA1(77c31f14783e5ba90849bdc930b099c8360aeba7) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 ) /* track */
+	ROM_REGION( 0x0800, "track", 0 )
 	ROM_LOAD( "ssrm762c.l3", 0x0000, 0x0800, CRC(ebaad3ee) SHA1(54ac994b505d20c75cf07a4f68da12360ee00153) )
 ROM_END
 
 
-GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", 0, layout_sspeedr )
+GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", MACHINE_SUPPORTS_SAVE, layout_sspeedr )
