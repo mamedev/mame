@@ -33870,20 +33870,20 @@ ddpdojblk                       //
 ddpdojblka                      //
 ddpdojblkbl                     //
 dmnfrnt                         // (c) 2002 Demon Front
-dmnfrnta                        //
-dmnfrntb                        //
+dmnfrnt103                      //
+dmnfrnt102                      //
 dmnfrntpcb                      //
 drgw2                           // (c) 1997 Dragon World 2
-drgw2c                          //
-drgw2c101                       //
-drgw2hk                         //
-drgw2j                          //
+drgw2100x                       //
+drgw2101c                       //
+drgw2100c                       //
+drgw2100hk                      //
+drgw2100j                       //
 drgw3                           // (c) 1998 Dragon World 3
 drgw3100                        //
 drgw3103                        //
 drgw3105                        //
 dw2001                          // (c) 2001 Dragon World 2001
-dw2v100x                        //
 dwex                            // (c) 2000 Dragon World 3 EX V100
 dwex101cn                       // (c) 2001 Dragon World 3 EX V101CN
 dwpc                            // (c) 2001 Dragon World Pretty Chance
@@ -33893,6 +33893,7 @@ espgalbl                        //
 happy6                          // (c) 2004 Happy 6
 happy6101                       //
 happy6100hk                     //
+happy6100cn                     //
 ket                             // (c) 2002 Ketsui
 ket1                            //
 keta                            //
@@ -33941,20 +33942,20 @@ kovsh101                        //
 kovsh102                        //
 kovsh103                        //
 kovshp                          // (c) 2004 Knights of Valor Superheroes PLUS
-kovshpa                         //
+kovshp100                       //
 kovshxas                        // bootleg
 kovytzy                         // (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
 martmast                        // (c) 2001 Martial Masters
-martmastc                       //
-martmastc103                    //
-martmastc102                    //
+martmast104c                    //
+martmast103c                    //
+martmast102c                    //
 martmasttw                      //
 olds                            // (c) 1999 Oriental Legend Super / Special
 olds100                         //
 olds100a                        //
 olds103t                        //
 oldsplus                        // (c) 2004 Oriental Legend Super Plus
-oldsplusa                       //
+oldsplus203                     //
 orlegend                        // (c) 1997 Oriental Legend
 orlegend105k                    //
 orlegend105t                    //
@@ -33968,7 +33969,7 @@ pgm                             // Base Unit
 pgm3in1                         // (c) 2004 Photo Y2K2 3-in-1
 pgm3in1c100                     //
 photoy2k                        // (c) 1999 Photo Y2k
-photoy2k102                     //
+photoy2k102j                    //
 photoy2k103j                    // (c) 1999 Photo Y2k
 photoy2k104                     //
 puzlstar                        // (c) 1999 Puzzle Star
