@@ -17164,6 +17164,27 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mcortr14">
+		<description>MECC-A157 Oregon Trail (Version 1.4) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2014-07-19"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a157 the oregon trail v1.4 (logo crack) side a.dsk" size="143360" crc="6332b2c7" sha1="52c7a6cc3939ab6ff3e0063f87eac4d4d466d85a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a157 the oregon trail v1.4 (logo crack) side b.dsk" size="143360" crc="37cad616" sha1="e26e2e67f9891a6835c0d93e07a12b7e2d9691c7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcrtutr2">
 		<description>MicroTutor II - Prefixes, Suffixes, Capitalization (cleanly cracked)</description>
 		<year>1982</year>
@@ -35140,7 +35161,7 @@ license:CC0
 		<!-- Press open-apple during boot to read a message from the
 		programmer. -->
 
-		<part name="flop0" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="sega - buck rogers - planet of zoom (logo crack).dsk" size="143360" crc="49bc53af" sha1="a565aefbdaa2b94a4c5a18ec5ddd801abfe78827" />
 			</dataarea>
