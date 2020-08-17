@@ -18410,9 +18410,14 @@ j_unk                           //
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
 monoplcl                        // Monopoly Classic (JPM)
+monoplcld                       //
 monopldx                        // Monopoly Deluxe (JPM)
+monopldx1                       // Monopoly Deluxe (JPM)
+monopldxd                       //
 monopoly                        // Monopoly (JPM)
-monopolya                       // Monopoly (JPM)
+monopolyd                       // Monopoly (JPM)
+monopoly4                       // Monopoly (JPM)
+monopoly3                       // Monopoly (JPM)
 
 @source:jpmsys5sw.cpp
 j5ar80                          // Around The World In Eighty Days (JPM)
