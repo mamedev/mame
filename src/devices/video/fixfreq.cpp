@@ -75,30 +75,31 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	if (!last_vsync && m_sig_vsync)
 	{
 		LOG("VSYNC UP %f %d\n", m_last_x, m_last_y);
-		m_intf.vsync_end_cb(time - m_last_vsync_time);
-		//auto d=time - m_last_vsync_time;
-		//printf("%f\n", 1.0 / d);
-		m_last_vsync_time = time;
-		// FIXME: this is wrong: we need to count lines with half-scanline width
-		//        to determine the field.
-		m_sig_field = last_comp;   /* force false-progressive */
-		m_sig_field = (m_sig_field ^ 1) ^ last_comp;   /* if there is no field switch, auto switch */
-		m_last_y = 0; //m_desc.vbackporch_width();
+		const int has_fields = (m_desc.m_fieldcount > 1) ? 1: 0;
 
-		// discharge
-		//m_vsync_filter = 0.0;
+		// FIXME: add modes: true interlaced, overlayed, false progressive (see popeye video)
+		if (has_fields)
+		{
+			const auto avg_line_dur = (time - m_last_field_time) * m_desc.m_fieldcount / (m_last_y + 1);
+			m_last_field_time = time;
+			m_sig_field = avg_line_dur * 0.75 > m_last_line_duration;
+		}
+		if (!has_fields || (m_sig_field == 0))
+		{
+			m_intf.vsync_end_cb(time - m_last_vsync_time);
+			m_last_vsync_time = time;
+		}
+		m_last_y = 0; //m_desc.vbackporch_width();
 	}
 	else if (last_vsync && !m_sig_vsync)
 	{
 		LOG("VSYNC DOWN %f %d\n", m_last_x, m_last_y);
-		//LOG("Field: %d\n", m_sig_field);
 	}
 
 	if (!last_comp && m_sig_composite)
 	{
 		if (m_sig_vsync)
 			LOG("Hsync in vsync\n");
-		/* TODO - time since last hsync and field detection */
 		//LOG("HSYNC up %d\n", m_last_x);
 		// FIXME: pixels > 50 filters some spurious hysnc on line 23/24 in breakout
 		//        The hsync signal transition from high to low is 7 pixels too
@@ -110,9 +111,11 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 			m_last_y += m_desc.m_fieldcount;
 			m_last_x = 0;
 			m_line_time = time + 1.0 / m_desc.hsync_filter_timeconst();
+
+			m_last_line_duration = time - m_last_hsync_time;
+			m_last_hsync_time = time;
+
 		}
-		//if (!m_sig_vsync && (m_last_x < m_desc.m_hscale * 100))
-		//  printf("HSYNC up %d %f\n", m_last_y, m_last_x);
 	}
 	else if (last_comp && !m_sig_composite)
 	{
@@ -244,6 +247,8 @@ void fixedfreq_device::device_start()
 	save_item(NAME(m_state.m_line_time));
 	save_item(NAME(m_state.m_last_hsync_time));
 	save_item(NAME(m_state.m_last_vsync_time));
+	save_item(NAME(m_state.m_last_line_duration));
+	save_item(NAME(m_state.m_last_field_time));
 
 	/* sync separator */
 	save_item(NAME(m_state.m_vsync_filter));
