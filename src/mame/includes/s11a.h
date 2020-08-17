@@ -18,7 +18,7 @@ public:
 		: s11_state(mconfig, type, tag)
 	{ }
 
-	void s11a_common(machine_config &config);
+	void s11a_base(machine_config &config);
 	void s11a(machine_config &config);
 	void s11a_obg(machine_config &config);
 
@@ -28,9 +28,6 @@ public:
 
 private:
 	DECLARE_MACHINE_RESET(s11a);
-
-	void s11a_audio_map(address_map &map);
-	void s11a_main_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_S11A_H

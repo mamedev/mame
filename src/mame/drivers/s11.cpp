@@ -467,9 +467,9 @@ void s11_state::s11(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6808_IRQ_LINE);
 
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.5);
@@ -478,7 +478,7 @@ void s11_state::s11(machine_config &config)
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
-	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->writepb_handler().set(m_dac, FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
@@ -488,10 +488,10 @@ void s11_state::s11(machine_config &config)
 void s11_state::s11_bgs(machine_config &config)
 {
 	s11(config);
-	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	/* Add the background sound card */
 	SPEAKER(config, "bgspk").front_center();
 	S11_BGS(config, m_bg);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11_bgs_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 	m_bg->add_route(ALL_OUTPUTS, "bgspk", 0.5);
@@ -500,10 +500,10 @@ void s11_state::s11_bgs(machine_config &config)
 void s11_state::s11_bgm(machine_config &config)
 {
 	s11(config);
-	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	/* Add the background music card */
 	SPEAKER(config, "bgspk").front_center();
 	S11_BGM(config, m_bg);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11_bgm_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
