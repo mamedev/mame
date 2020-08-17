@@ -102,12 +102,8 @@
 #define SC_VBEND        (8)
 
 #define TANK_VIDCLOCK   (14318181)
-#define TANK_HTOTAL     (451)
-#define TANK_VTOTAL     (521)
-#define TANK_HBSTART    (TANK_HTOTAL)
-#define TANK_HBEND      (32)
-#define TANK_VBSTART    (TANK_VTOTAL)
-#define TANK_VBEND      (8)
+#define TANK_HTOTAL     (952)
+#define TANK_VTOTAL     (262)
 
 #define GTRAK10_VIDCLOCK 14318181
 #define GTRAK10_HTOTAL 451
@@ -252,9 +248,11 @@ void tank_state::tank(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(TANK_VIDCLOCK);
-	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
-	m_video->set_horz_params(TANK_HTOTAL - 32,      TANK_HTOTAL - 32,     TANK_HTOTAL - 31,    TANK_HTOTAL);
-	m_video->set_vert_params(TANK_VTOTAL - 8,       TANK_VTOTAL - 8,      TANK_VTOTAL,         TANK_VTOTAL);
+	//                    Length of active video,   end of front-porch,   end of sync signal,  end of back porch
+	// TODO: The total hblank period is 128, the total hsync period is 32, unknown how to convert this to porches.
+	// TODo: The total vblank period is 80, the total vsync period is 8, unknown how to convert this to porches.
+	m_video->set_horz_params(776,                   0,                    32,                  128);
+	m_video->set_vert_params(432,                   0,                    8,                   80);
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
 	//m_video->set_gain(0.2);
