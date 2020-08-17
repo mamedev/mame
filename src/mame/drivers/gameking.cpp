@@ -6,14 +6,14 @@
 
   Thanks to Deathadder, Judge, Porchy, Klaus Sommer, James Brolly & Brian Provinciano
 
-  hopefully my work (reverse engineerung, cartridge+bios backup, emulation) will be honored in future
+  hopefully my work (reverse engineering, cartridge+bios backup, emulation) will be honored in future
   and my name will not be removed entirely, especially by simple code rewrites of working emulation
 
   flashcard, handheld, programmer, assembler ready to do some test on real hardware
 
   todo:
   !back up gameking3 bios so emulation of gameking3 gets possible; my gameking bios backup solution should work
-  (improove emulation)
+  (improve emulation)
   (add audio)
 
   use gameking3 cartridge to get illegal cartridge scroller
