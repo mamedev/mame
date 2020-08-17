@@ -57,7 +57,7 @@ namespace netlist
 
 	public:
 		state_var<bool> m_enable;
-		state_var<uint8_t> m_o;
+		state_var<uint32_t> m_o;
 		object_array_t<logic_input_t, 2> m_A;
 		object_array_t<logic_output_t, 4> m_D;
 		logic_input_t m_E;
