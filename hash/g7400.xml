@@ -4,7 +4,8 @@
 license:CC0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
-When adding new sets, avoid naming conflicts between g7400.xml and odyssey2.xml.
+When adding new sets, avoid naming conflicts between g7400.xml and odyssey2.xml,
+games that have prototypes or older sets in odyssey2.xml are marked "Plus" here.
 
 Most of these were normal Videopac G7000 carts with enhanced graphics for the
 Videopac Plus G7400 and the unreleased Odyssey³ Command Center
@@ -119,6 +120,18 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
+	<software name="claypigpla" cloneof="claypigpl">
+		<description>Clay Pigeon (Euro, Plus, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="clay pigeon (europe, alt).bin" size="8192" crc="7c989567" sha1="431547d04d5c57b0730b1136f8e68b0ac44b755f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmicpl">
 		<description>Cosmic Conflict (Euro, Plus)</description>
 		<year>1983</year>
@@ -144,7 +157,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 	</software>
 
 	<software name="exojet">
-		<description>Exojet+ (Fra, Plus)</description>
+		<description>Exojet+ (Fra)</description>
 		<year>198?</year>
 		<publisher>Jopac</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -168,9 +181,9 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 	</software>
 
 	<software name="flipperpla" cloneof="flipperpl">
-		<description>Flipper+ (Fra, Plus, Alt?)</description>
+		<description>Flipper Game (Euro, Plus, Prototype)</description>
 		<year>198?</year>
-		<publisher>Jopac</publisher>
+		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -228,7 +241,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 	</software>
 
 	<software name="englouti">
-		<description>Le Tresor Englouti (Fra, Plus)</description>
+		<description>Le Tresor Englouti (Fra)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">

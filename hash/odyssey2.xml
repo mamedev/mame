@@ -36,7 +36,6 @@ Back Gammon
 Freedom Fighters
 K.C.'s Crazy Chase
 Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
-Power Lords
 Handicap I (?)
 Frogger
 Robot City
@@ -452,7 +451,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="red baron (europe) (proto) (alt).bin" size="8192" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" offset="0" />
+				<rom name="red baron (europe, proto, alt).bin" size="8192" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1364,6 +1363,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="powerlrda" cloneof="powerlrd">
+		<description>Power Lords (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="power lords (europe) (proto).bin" size="4096" crc="bbeb1bd2" sha1="d6b2c274082a42634d08f514cf0fa30c5360a462" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qbert">
 		<description>Q*bert (Euro)</description>
 		<year>1983</year>
@@ -1583,6 +1595,18 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="spider-man (europe) (proto).bin" size="8192" crc="35ace4e8" sha1="4b1d675cb1fbf72ed35681e2b2e6e99fed7154cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidera" cloneof="spider">
+		<description>Spider-Man (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="spider-man (europe, proto, alt).bin" size="8192" crc="3e5f71f3" sha1="69661c91c984aa26bb971e989fe3aaca93ab718c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
