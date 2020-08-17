@@ -673,6 +673,31 @@ ROM_START( sectrzont )
 	ROM_LOAD( "czt_pal16h2cn.bin", 0x0000, 0x0044, CRC(7edec1ed) SHA1(1b28cb250875f14a76d84bfc0b23ee02b1862c2c) )
 ROM_END
 
+ROM_START( sectrzona ) // This and set seicross seem bug-fixed versions, where the attract mode works. In the other sets during attract the player only goes straight until he crashes
+	ROM_REGION( 0x7800, "maincpu", 0 )
+	ROM_LOAD( "sz1.3a",         0x0000, 0x1000, CRC(f6c3aeca) SHA1(d57019e80f7e3d47ca74f54604e92d40ba9819fc) )
+	ROM_LOAD( "sz2.3c",         0x1000, 0x1000, CRC(f167f10e) SHA1(d23043afe0f7a06fbec92b333d6db172523faf27) )
+	ROM_LOAD( "sz3.3d",         0x2000, 0x1000, CRC(ceb3c8f4) SHA1(e49f834637b4addcf362cd010e31802c3e145cbe) )
+	ROM_LOAD( "sz4.3e",         0x3000, 0x1000, CRC(3112af59) SHA1(3d4e5a74a13bdeaf07f059f8c3a0d2ca8cbb3d32) )
+	ROM_LOAD( "sz5.3fg",        0x4000, 0x1000, CRC(b494a993) SHA1(ed60cbaef2ac780c11426d29a612d34e76b29a0e) )
+	ROM_LOAD( "sz6.3h",         0x5000, 0x1000, CRC(09d5b9da) SHA1(636a8d4717df4ed1fc02fa83782fa8d96b88f969) )
+	ROM_LOAD( "sz7.3i",         0x6000, 0x1000, CRC(13052b03) SHA1(2866f2533a788f734310a74789f762f3fa17a57a) )
+	ROM_LOAD( "sz8.3j",         0x7000, 0x0800, CRC(019f9651) SHA1(2b030e7823b277fb6e3f37753a4d52d277e0e079) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "sz11.7k",      0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
+	ROM_LOAD( "sz12.7m",      0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
+	ROM_LOAD( "sz9.7j",       0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
+	ROM_LOAD( "sz10.7h",      0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
+
+	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "sz73.10c",     0x0000, 0x0020, BAD_DUMP CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
+	ROM_LOAD( "sz74.10b",     0x0020, 0x0020, BAD_DUMP CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
+
+	ROM_REGION( 0x0100, "plds", 0 ) // not dumped for this set
+	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, BAD_DUMP CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
+ROM_END
+
 
 GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 1)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 2)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -683,3 +708,4 @@ GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,
 GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2, Tecfri hardware)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 3)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
