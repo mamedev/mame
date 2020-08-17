@@ -31,7 +31,7 @@ namespace netlist
 			, m_enable_hi(*this, "m_enable_hi", false)
 			, m_latched_rom(*this, "m_latched_rom", 0)
 			, m_A(*this, 1, "A{}", NETLIB_DELEGATE(addr))
-			, m_ARQ(*this, "ARQ", NETLIB_DELEGATE(arq))
+			, m_ARQ(*this, "ARQ", NETLIB_DELEGATE(addr))
 			, m_OE1(*this, "OE1", NETLIB_DELEGATE(oe1))
 			, m_OE2(*this, "OE2", NETLIB_DELEGATE(oe2))
 			, m_O(*this, 1, "O{}", 0)
@@ -41,14 +41,6 @@ namespace netlist
 			}
 
 		private:
-			inline NETLIB_HANDLERI(arq)
-			{
-				if (m_ARQ() == 0)
-				{
-					m_latched_rom = m_ROM[m_A()];
-				}
-			}
-
 			inline NETLIB_HANDLERI(oe1)
 			{
 				m_enable_lo = m_OE1();
@@ -73,6 +65,11 @@ namespace netlist
 
 			inline NETLIB_HANDLERI(addr)
 			{
+				if (!m_ARQ())
+				{
+					uint16_t addr = m_A();
+					m_latched_rom = m_ROM[addr];
+				}
 				uint8_t o = (m_enable_hi || m_enable_lo) ? m_latched_rom : 0;
 				for (std::size_t i=0; i<4; i++)
 				{

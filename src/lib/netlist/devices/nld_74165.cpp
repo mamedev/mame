@@ -56,7 +56,6 @@ namespace netlist
 		NETLIB_HANDLERI(inputs)
 		{
 			{
-				netlist_sig_t old_qh = m_QH.net().Q();
 				netlist_sig_t qh = 0;
 
 				if (!m_SH_LDQ())
@@ -65,12 +64,7 @@ namespace netlist
 					for (std::size_t i=0; i<8; i++)
 						m_shifter |= (m_DATA[i]() << i);
 				}
-				else if (!m_CLK() || m_CLKINH())
-				{
-					// FIXME: qh is overwritten below?
-					qh = old_qh;
-				}
-				else if (!m_last_CLK)
+				else if (m_CLK() && !m_last_CLK && !m_CLKINH())
 				{
 					unsigned high_bit = m_SER() ? 0x80 : 0;
 					m_shifter = high_bit | (m_shifter >> 1);
@@ -81,6 +75,7 @@ namespace netlist
 				m_last_CLK = m_CLK();
 
 				m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
+				m_QHQ.push(1 - qh, NLTIME_FROM_NS(20)); // FIXME: Timing
 			}
 
 		}
