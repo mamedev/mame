@@ -26,6 +26,8 @@ public:
 
 	// configuration helpers
 	ef9340_1_device &set_offsets(int x, int y) { m_offset_x = x; m_offset_y = y; return *this; } // when used with overlay chip
+	auto write_exram() { return m_write_exram.bind(); } // ADR0-ADR3 in a0-a3, B in a4-a11, A in a12-a19
+	auto read_exram() { return m_read_exram.bind(); } // "
 
 	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -43,9 +45,6 @@ protected:
 
 	inline uint16_t ef9340_get_c_addr(uint8_t x, uint8_t y);
 	inline void ef9340_inc_c();
-
-	// Calculate the external chargen address for a character and slice
-	inline uint16_t external_chargen_address(uint8_t b, uint8_t slice);
 
 	void ef9340_scanline(int vpos);
 
@@ -79,11 +78,14 @@ protected:
 		uint8_t M;
 		bool blink;
 		int blink_prescaler;
+		bool h_parity;
 	} m_ef9340;
 
 	uint8_t m_ram_a[0x400];
 	uint8_t m_ram_b[0x400];
-	uint8_t   m_ef934x_ext_char_ram[0x800]; // The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB.
+
+	devcb_write8 m_write_exram;
+	devcb_read8 m_read_exram;
 };
 
 

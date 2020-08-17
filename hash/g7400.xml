@@ -368,7 +368,7 @@ The C7420 Home Computer Module contains a Z80, 16K RAM and 16K ROM.
 		</part>
 	</software>
 
-	<software name="helicopt">
+	<software name="helicopt" supported="partial">
 		<description>Helicopter Rescue (Euro)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
