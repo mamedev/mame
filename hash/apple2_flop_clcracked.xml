@@ -17140,12 +17140,15 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcorgtrl">
+	<software name="mcorgtrl" supported="no">
 		<description>MECC-A157 Oregon Trail (Version 1.1) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2019-05-29"/>
 		<!-- No compatibility data known at this time. -->
+		<!-- As of 8/16/2020 changed to not working; this disk image looks like
+		it may be bad. I've gotten in touch with 4am to investigate as the disk
+		image doesn't seem to work on multiple Apple emulators. - FH -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
