@@ -212,6 +212,13 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_280zzzap.cpp",
 	MAME_DIR .. "src/mame/audio/nl_280zzzap.h",
 
+	MAME_DIR .. "src/mame/drivers/sspeedr.cpp",
+	MAME_DIR .. "src/mame/includes/sspeedr.h",
+	MAME_DIR .. "src/mame/video/sspeedr.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_sspeedr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_sspeedr.h",
+
 	MAME_DIR .. "src/mame/audio/cheekyms.cpp",
 	MAME_DIR .. "src/mame/audio/cheekyms.h",
 	MAME_DIR .. "src/mame/audio/nl_cheekyms.cpp",

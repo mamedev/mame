@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "machine/netlist.h"
 
 class sspeedr_state : public driver_device
 {
@@ -16,6 +17,17 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_digits(*this, "digit%u", 0U)
+		, m_pedal_bit0(*this, "sound_nl:pedal_bit0")
+		, m_pedal_bit1(*this, "sound_nl:pedal_bit1")
+		, m_pedal_bit2(*this, "sound_nl:pedal_bit2")
+		, m_pedal_bit3(*this, "sound_nl:pedal_bit3")
+		, m_hi_shift(*this, "sound_nl:hi_shift")
+		, m_lo_shift(*this, "sound_nl:lo_shift")
+		, m_boom(*this, "sound_nl:boom")
+		, m_engine_sound_off(*this, "sound_nl:engine_sound_off")
+		, m_noise_cr_1(*this, "sound_nl:noise_cr_1")
+		, m_noise_cr_2(*this, "sound_nl:noise_cr_2")
+		, m_silence(*this, "sound_nl:silence")
 	{ }
 
 	void sspeedr(machine_config &config);
@@ -25,7 +37,8 @@ private:
 	void sspeedr_lamp_w(uint8_t data);
 	void sspeedr_time_w(offs_t offset, uint8_t data);
 	void sspeedr_score_w(offs_t offset, uint8_t data);
-	void sspeedr_sound_w(uint8_t data);
+	void sspeedr_sound1_w(uint8_t data);
+	void sspeedr_sound2_w(uint8_t data);
 	void sspeedr_driver_horz_w(uint8_t data);
 	void sspeedr_driver_horz_2_w(uint8_t data);
 	void sspeedr_driver_vert_w(uint8_t data);
@@ -65,6 +78,17 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<26> m_digits;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit0;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit1;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit2;
+	required_device<netlist_mame_logic_input_device> m_pedal_bit3;
+	required_device<netlist_mame_logic_input_device> m_hi_shift;
+	required_device<netlist_mame_logic_input_device> m_lo_shift;
+	required_device<netlist_mame_logic_input_device> m_boom;
+	required_device<netlist_mame_logic_input_device> m_engine_sound_off;
+	required_device<netlist_mame_logic_input_device> m_noise_cr_1;
+	required_device<netlist_mame_logic_input_device> m_noise_cr_2;
+	required_device<netlist_mame_logic_input_device> m_silence;
 };
 
 #endif // MAME_INCLUDES_SSPEEDR_H

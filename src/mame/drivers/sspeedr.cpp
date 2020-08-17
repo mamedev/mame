@@ -2,12 +2,14 @@
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
-Taito Super Speed Race driver
+Taito / Midway Super Speed Race driver
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/sspeedr.h"
+#include "audio/nl_sspeedr.h"
+#include "speaker.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
@@ -71,9 +73,57 @@ void sspeedr_state::sspeedr_score_w(offs_t offset, uint8_t data)
 }
 
 
-void sspeedr_state::sspeedr_sound_w(uint8_t data)
+void sspeedr_state::sspeedr_sound1_w(uint8_t data)
 {
-	/* not implemented */
+	// **** Output pins from 74174 latch at C2 ****
+
+	// Bits 0-3 (PEDAL_BIT0 to PEDAL_BIT3): accelerator pedal position
+	// Sets the frequency and volume of the engine sound oscillators.
+	m_pedal_bit0->write_line(BIT(data, 0));
+	m_pedal_bit1->write_line(BIT(data, 1));
+	m_pedal_bit2->write_line(BIT(data, 2));
+	m_pedal_bit3->write_line(BIT(data, 3));
+
+	// Bit 4 (HI SHIFT): set when gearshift is in high gear
+	// Modifies the engine sound to be lower pitched at a given speed and
+	// to change more slowly.
+	m_hi_shift->write_line(BIT(data, 4));
+
+	// Bit 5 (LO SHIFT): set when gearshift is in low gear
+	// Modifies the engine sound to be higher pitched at a given speed and
+	// to change faster.
+	m_lo_shift->write_line(BIT(data, 5));
+
+	// Bits 6-7 (D6, D7): not connected.
+}
+
+
+void sspeedr_state::sspeedr_sound2_w(uint8_t data)
+{
+	// **** Output pins from 74174 latch at D2 ****
+
+	// Bit 0 (BOOM): Set to activate boom sound for a crash. Cleared to
+	// terminate boom.
+	m_boom->write_line(BIT(data, 0));
+
+	// Bit 1 (ENGINE SOUND OFF): Set to turn *off* engine sound.
+	// Used in a crash.
+	m_engine_sound_off->write_line(BIT(data, 1));
+
+	// Bit 2 (NOISE CR 1): tire squealing sound
+	// Set to activate "tire squeal" noise from noise generator.
+	m_noise_cr_1->write_line(BIT(data, 2));
+
+	// Bit 3 (NOISE CR 2): secondary crash noise
+	// Set to activate high-pitched screeching hiss that accompanies BOOM
+	// when the the car crashes. In Super Speed Race, the BOOM and NOISE
+	// CR 2 effects play simultaneously.
+	m_noise_cr_2->write_line(BIT(data, 3));
+
+	// Bit 4 (SILENCE): mute all sound when game is not running.
+	m_silence->write_line(BIT(data, 4));
+
+	// Bits 5-7 (D5, D6, D7): not connected.
 }
 
 
@@ -89,8 +139,9 @@ void sspeedr_state::sspeedr_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
+	map(0x00, 0x00).w(FUNC(sspeedr_state::sspeedr_sound1_w));
 	map(0x01, 0x01).portr("IN1");
-	map(0x00, 0x01).w(FUNC(sspeedr_state::sspeedr_sound_w));
+	map(0x01, 0x01).w(FUNC(sspeedr_state::sspeedr_sound2_w));
 	map(0x02, 0x02).w(FUNC(sspeedr_state::sspeedr_lamp_w));
 	map(0x03, 0x03).portr("DSW");
 	map(0x04, 0x04).portr("IN2");
@@ -159,6 +210,9 @@ static INPUT_PORTS_START( sspeedr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shifter") PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("POT_MASTER_VOL")
+	PORT_ADJUSTER( 50, "Pot: Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_master_vol")
 INPUT_PORTS_END
 
 
@@ -212,6 +266,31 @@ void sspeedr_state::sspeedr(machine_config &config)
 	PALETTE(config, m_palette, FUNC(sspeedr_state::sspeedr_palette), 16);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(sspeedr))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit0", "I_PEDAL_BIT0", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit1", "I_PEDAL_BIT1", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit2", "I_PEDAL_BIT2", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit3", "I_PEDAL_BIT3", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift", "I_HI_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off",
+			    "I_ENGINE_SOUND_OFF", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:silence", "I_SILENCE", 0);
+
+	// Audio output is from an LM3900 op-amp whose output has a
+	// peak-to-peak range of about 12 volts, centered on 6 volts.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 6.0, -32767.0);
+
+	// Netlist volume-potentiometer interface
+	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");
 }
 
 
@@ -231,4 +310,4 @@ ROM_START( sspeedr )
 ROM_END
 
 
-GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", MACHINE_NO_SOUND, layout_sspeedr )
+GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", 0, layout_sspeedr )
