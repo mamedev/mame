@@ -27,7 +27,7 @@ public:
 	// device type constructor
 	cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	static constexpr feature_type unemulated_features() { return feature::SOUND; }
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	// callback configuration
 	auto txd_callback() { return m_txd_callback.bind(); }
