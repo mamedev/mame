@@ -416,7 +416,7 @@ void mcs48_cpu_device::push_pc_psw()
 	uint8_t sp = m_psw & 0x07;
 	ram_w(8 + 2*sp, m_pc);
 	ram_w(9 + 2*sp, ((m_pc >> 8) & 0x0f) | (m_psw & 0xf0));
-	m_psw = (m_psw & 0xf8) | ((sp + 1) & 0x07);
+	m_psw = (m_psw & 0xf0) | ((sp + 1) & 0x07);
 }
 
 

@@ -390,6 +390,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="48"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643" offset="0" />
 			</dataarea>
@@ -529,6 +530,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="56"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="blobbers (europe).bin" size="8192" crc="9d72d4e9" sha1="cae4e1f3ee090ec423aff89102f359b9e14dba41" offset="0" />
 			</dataarea>
@@ -763,7 +765,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
@@ -1647,6 +1649,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="50"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="4096">
 				<rom name="super bee (europe).bin" size="4096" crc="9585d511" sha1="dfcfd9c019773e703aa130bc55f5b2f972ece8f0" offset="0" />
 			</dataarea>
@@ -1659,6 +1662,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="4096">
 				<rom name="super bee (brazil).bin" size="4096" crc="02743352" sha1="98c1f3a9726fe1ba880d43f0ba004821c4cbec6c" offset="0" />
 			</dataarea>
@@ -1813,6 +1817,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="49"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="turtles (europe).bin" size="8192" crc="1c750349" sha1="1fdca749675f62212d0b79c5f0911bcabc4e4e11" offset="0" />
 			</dataarea>
@@ -1827,6 +1832,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="AC9446"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="turtles (usa).bin" size="8192" crc="9e42e766" sha1="ee456305397ecbd54fffa0bb7a894f53976d2a7c" offset="0" />
 			</dataarea>
@@ -1912,6 +1918,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="programmer" value="Soeren Gust" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_ktaa" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="12288">
 				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" offset="0" />
 			</dataarea>

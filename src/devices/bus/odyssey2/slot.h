@@ -43,15 +43,13 @@ public:
 	virtual void io_write(offs_t offset, uint8_t data) { }
 	virtual uint8_t io_read(offs_t offset) { return 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
+	virtual int b_read() { return -1; }
 
 	virtual void cart_init() { } // called after loading ROM
 
 	void rom_alloc(uint32_t size, const char *tag);
-	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
-	uint8_t* get_ram_base() { return &m_ram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
-	uint32_t get_ram_size() { return m_ram.size(); }
 
 protected:
 	device_o2_cart_interface(const machine_config &mconfig, device_t &device);
@@ -59,7 +57,6 @@ protected:
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
-	std::vector<uint8_t> m_ram;
 };
 
 
@@ -108,6 +105,7 @@ public:
 	void io_write(offs_t offset, uint8_t data);
 	uint8_t io_read(offs_t offset);
 	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
+	int b_read();
 
 	void write_p1(uint8_t data) { if (m_cart) m_cart->write_p1(data); }
 	void write_p2(uint8_t data) { if (m_cart) m_cart->write_p2(data); }
@@ -121,6 +119,7 @@ protected:
 
 	int m_type;
 	device_o2_cart_interface* m_cart;
+	int m_b;
 };
 
 // device type definition

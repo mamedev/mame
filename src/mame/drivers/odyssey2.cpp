@@ -36,7 +36,7 @@ TODO:
 - backgamm doesn't draw all the sprites, what causes it? It doesn't seem like
   it's a 824x bug since it does properly write data in the partial screen updates
 - 824x screen resolution is not strictly defined, height(243) is correct, but
-  horizontal overscan differs depending on monitor/tv?
+  horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping characters on eachother will cause
   glitches (it is used to an advantage in some as-of-yet undumped homebrews)
 - 8244(NTSC) is not supposed to show characters near the upper border, but
@@ -44,19 +44,20 @@ TODO:
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
   be correct
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
-  or is it due to PAL video timing? The game does mid-scanline updates
+  or is PAL detection going wrong? The game does mid-scanline updates
 - g7400 helicopt sometimes locks up at the sea level, timing related?
 - g7400 probably has different video timing too (not same as g7000)
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
-  reason they shouldn't work is probably because they write to P2
+  caused by bus conflict or because they write to P2?
 - verify odyssey3 cpu/video clocks
 - odyssey3 keyboard layout is not the same as g7400, but there is no software
   to test the scancodes
 
 BTANB:
 - a lot of PAL games have problems on NTSC (the other way around, not so much)
-- g7400 games don't look correct on odyssey3: ef934x graphics are placed lower
-- Blackjack (Videopac 5) does not work on G7400
+- g7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
+  placed lower on odyssey3
+- Blackjack (Videopac 5) does not work on G7400, caused by a removed BIOS routine
 
 Plenty games have minor bugs not worth mentioning here.
 
@@ -254,14 +255,18 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
-			uint16_t d = bitmap.pix16(y, x);
+			uint16_t d = bitmap.pix16(y, x) & 7;
 			uint16_t e = ef934x_bitmap->pix16(y, x);
 
-			// I outputs to CX
-			bool i2 = !BIT(m_mix_ef934x, e & 0x07);
+			// i8244 decoder enable is masked with cartridge pin B
+			bool en = (e & 8) || !m_cart->b_read();
+			e &= 7;
+
+			// ef934x decoder output is tied to CX
+			bool i2 = !BIT(m_mix_ef934x, e);
 			m_i8244->write_cx(x, i2);
 
-			if (m_mix_i8244 == 0xff || ((e & 0x08) && BIT(m_mix_i8244, d & 0x07)))
+			if (en && BIT(m_mix_i8244, d))
 			{
 				// Use i8245 input
 				bitmap.pix16(y, x) |= lum;
@@ -269,7 +274,7 @@ uint32_t g7400_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			else
 			{
 				// Use EF934x input
-				bitmap.pix16(y, x) = i2 ? e | 0x08 : e & 0x07;
+				bitmap.pix16(y, x) = e | (i2 ? 8 : 0);
 			}
 		}
 	}
@@ -666,7 +671,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 
 	I8244(config, m_i8244, XTAL(7'159'090) / 2);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(356, 243);
+	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
@@ -685,7 +690,7 @@ void odyssey2_state::videopac(machine_config &config)
 	// PAL video chip
 	I8245(config.replace(), m_i8244, XTAL(17'734'476) / 5);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(356, 243);
+	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
@@ -739,7 +744,7 @@ void g7400_state::g7400(machine_config &config)
 
 	I8245(config, m_i8244, XTAL(8'867'000)/5 * 2);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(356, 243);
+	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
@@ -758,7 +763,7 @@ void g7400_state::odyssey3(machine_config &config)
 	// NTSC video chip
 	I8244(config.replace(), m_i8244, XTAL(7'159'090) / 2);
 	m_i8244->set_screen("screen");
-	m_i8244->set_screen_size(356, 243);
+	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
