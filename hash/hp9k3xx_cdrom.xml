@@ -73,7 +73,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hpux_9_0_laserrom">
+	<software name="hpux_9_0_laserom">
 		<description>HP LaserROM HP-UX Release 9.0</description>
 		<year>1995</year> <!-- 02/95 -->
 		<publisher>Hewlett-Packard</publisher>
