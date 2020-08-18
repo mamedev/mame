@@ -153,7 +153,6 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 	*/
 
 	uint8_t header[0x16] = { 0 };
-	void *ptr;
 
 	image.fread(header, 0x16);
 
@@ -163,17 +162,28 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 
 	if (LOG)
 	{
-		header[16] = 0;
-		logerror("ATM filename: %s\n", header);
+		char pgmname[17];
+		for (u8 i = 0; i < 16; i++)
+			pgmname[i] = header[i];
+		pgmname[16] = 0;
+		logerror("ATM filename: %s\n", pgmname);
 		logerror("ATM start address: %04x\n", start_address);
 		logerror("ATM run address: %04x\n", run_address);
 		logerror("ATM size: %04x\n", size);
 	}
 
-	ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(start_address);
+	void *ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(start_address);
 	image.fread(ptr, size);
 
-	m_maincpu->set_pc(run_address);
+	if (run_address == 0xc2b2)
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		u16 end_address = start_address + size;
+		space.write_byte(13, end_address);
+		space.write_byte(14, end_address >> 8);
+	}
+	else
+		m_maincpu->set_state_int(M6502_PC, run_address);   // if not basic, autostart program (set_pc doesn't work)
 
 	return image_init_result::PASS;
 }
@@ -752,7 +762,7 @@ void atom_state::atom(machine_config &config)
 	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
 
-	QUICKLOAD(config, "quickload", "atm", attotime::from_seconds(3)).set_load_callback(FUNC(atom_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "atm", attotime::from_seconds(2)).set_load_callback(FUNC(atom_state::quickload_cb));
 
 	/* utility rom slot */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "atom_cart", "bin,rom").set_device_load(FUNC(atom_state::cart_load));
