@@ -6,8 +6,8 @@ on:
       - master
 
 env:
-  SUBTARGET: ci
-  MAME: mameci64
+  SUBTARGET: tiny
+  MAME: mametiny64
 
 jobs:
   Linux:
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAME: mameci
+      MAME: mametiny
       ANDROID_NDK_VERSION: "21.3.6528147"
       ANDROID_NDK_ROOT:    ${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}
       ANDROID_NDK_LLVM:    ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64
