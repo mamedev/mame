@@ -26,11 +26,11 @@
     CONSTANTS
 ***************************************************************************/
 
-#define USB_MASTER_CLOCK    XTAL(6'000'000)
+#define USB_MASTER_CLOCK    6000000
 #define USB_2MHZ_CLOCK      (USB_MASTER_CLOCK/3)
 #define USB_PCS_CLOCK       (USB_2MHZ_CLOCK/2)
 #define USB_GOS_CLOCK       (USB_2MHZ_CLOCK/16/4)
-
+#define MM5837_CLOCK        100000
 
 
 /***************************************************************************
@@ -42,8 +42,17 @@ DEFINE_DEVICE_TYPE(SEGAUSB, usb_sound_device, "segausb", "Sega Universal Sound B
 usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
+		m_in_latch(0),
+		m_out_latch(0),
+		m_last_p2_value(0),
+		m_program_ram(*this, "pgmram"),
+		m_work_ram(*this, "workram"),
+		m_work_ram_bank(0),
+		m_t1_clock(0),
+		m_t1_clock_mask(0),
 		m_ourcpu(*this, "ourcpu"),
 		m_maincpu(*this, finder_base::DUMMY_TAG),
+#if (ENABLE_SEGAUSB_NETLIST)
 		m_pit(*this, "pit_%u", 0),
 		m_nl_dac0(*this, "sound_nl:dac0_%u", 0),
 		m_nl_sel0(*this, "sound_nl:sel0"),
@@ -54,15 +63,13 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 		m_nl_dac2(*this, "sound_nl:dac2_%u", 0),
 		m_nl_sel2(*this, "sound_nl:sel2"),
 		m_nl_pit2_out(*this, "sound_nl:pit2_out%u", 0),
-		m_in_latch(0),
-		m_out_latch(0),
-		m_last_p2_value(0),
-		m_program_ram(*this, "pgmram"),
-		m_work_ram(*this, "workram"),
-		m_work_ram_bank(0),
-		m_t1_clock(0),
-		m_t1_clock_mask(0),
 		m_gos_clock(0)
+#else
+		m_stream(nullptr),
+		m_noise_shift(0),
+		m_noise_state(0),
+		m_noise_subcount(0)
+#endif
 {
 }
 
@@ -77,21 +84,95 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 
 void usb_sound_device::device_start()
 {
-	for (int index = 0; index < 3; index++)
-	{
-		m_pit[index]->write_gate0(1);
-		m_pit[index]->write_gate1(1);
-		m_pit[index]->write_gate2(1);
-	}
-
 	// register for save states
 	save_item(NAME(m_in_latch));
 	save_item(NAME(m_out_latch));
 	save_item(NAME(m_last_p2_value));
 	save_item(NAME(m_work_ram_bank));
 	save_item(NAME(m_t1_clock));
+
+#if (ENABLE_SEGAUSB_NETLIST)
+
+	for (int index = 0; index < 3; index++)
+	{
+		m_pit[index]->write_gate0(1);
+		m_pit[index]->write_gate1(1);
+		m_pit[index]->write_gate2(1);
+	}
 	save_item(NAME(m_gos_clock));
+
+#else
+
+	m_stream = stream_alloc(0, 1, USB_2MHZ_CLOCK);
+
+	m_noise_shift = 0x15555;
+
+	for (timer8253 &group : m_timer_group)
+	{
+		group.chan_filter[0].configure(10e3, 1e-6);
+		group.chan_filter[1].configure(10e3, 1e-6);
+		group.gate1.configure(100e3, 0.01e-6);
+		group.gate2.configure(2 * 100e3, 0.01e-6);
+	}
+
+	g80_filter_state temp;
+	temp.configure(100e3, 0.01e-6);
+	m_gate_rc1_exp[0] = temp.exponent;
+	temp.configure(1e3, 0.01e-6);
+	m_gate_rc1_exp[1] = temp.exponent;
+	temp.configure(2 * 100e3, 0.01e-6);
+	m_gate_rc2_exp[0] = temp.exponent;
+	temp.configure(2 * 1e3, 0.01e-6);
+	m_gate_rc2_exp[1] = temp.exponent;
+
+	m_noise_filters[0].configure(2.7e3 + 2.7e3, 1.0e-6);
+	m_noise_filters[1].configure(2.7e3 + 1e3, 0.30e-6);
+	m_noise_filters[2].configure(2.7e3 + 270, 0.15e-6);
+	m_noise_filters[3].configure(2.7e3 + 0, 0.082e-6);
+	m_noise_filters[4].configure(33e3, 0.1e-6);
+
+	m_final_filter.configure(100e3, 4.7e-6);
+
+	for (int tgroup = 0; tgroup < 3; tgroup++)
+	{
+		timer8253 &group = m_timer_group[tgroup];
+		for (int tchan = 0; tchan < 3; tchan++)
+		{
+			timer8253::channel &channel = group.chan[tchan];
+			save_item(NAME(channel.holding), tgroup * 3 + tchan);
+			save_item(NAME(channel.latchmode), tgroup * 3 + tchan);
+			save_item(NAME(channel.latchtoggle), tgroup * 3 + tchan);
+			save_item(NAME(channel.clockmode), tgroup * 3 + tchan);
+			save_item(NAME(channel.bcdmode), tgroup * 3 + tchan);
+			save_item(NAME(channel.output), tgroup * 3 + tchan);
+			save_item(NAME(channel.lastgate), tgroup * 3 + tchan);
+			save_item(NAME(channel.gate), tgroup * 3 + tchan);
+			save_item(NAME(channel.subcount), tgroup * 3 + tchan);
+			save_item(NAME(channel.count), tgroup * 3 + tchan);
+			save_item(NAME(channel.remain), tgroup * 3 + tchan);
+		}
+		save_item(NAME(group.env), tgroup);
+		save_item(NAME(group.chan_filter[0].capval), tgroup);
+		save_item(NAME(group.chan_filter[1].capval), tgroup);
+		save_item(NAME(group.gate1.capval), tgroup);
+		save_item(NAME(group.gate2.capval), tgroup);
+		save_item(NAME(group.config), tgroup);
+	}
+
+	save_item(NAME(m_timer_mode));
+	save_item(NAME(m_noise_shift));
+	save_item(NAME(m_noise_state));
+	save_item(NAME(m_noise_subcount));
+	save_item(NAME(m_final_filter.capval));
+	save_item(NAME(m_noise_filters[0].capval));
+	save_item(NAME(m_noise_filters[1].capval));
+	save_item(NAME(m_noise_filters[2].capval));
+	save_item(NAME(m_noise_filters[3].capval));
+	save_item(NAME(m_noise_filters[4].capval));
+
+#endif
 }
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -236,6 +317,296 @@ READ_LINE_MEMBER( usb_sound_device::t1_r )
 
 /*************************************
  *
+ *  Sound generation
+ *
+ *************************************/
+
+#if (!ENABLE_SEGAUSB_NETLIST)
+
+inline void usb_sound_device::g80_filter_state::configure(double r, double c)
+{
+	capval = 0.0;
+	exponent = 1.0 - std::exp(-1.0 / (r * c * USB_2MHZ_CLOCK));
+}
+
+inline void usb_sound_device::timer8253::channel::clock()
+{
+	u8 const old_lastgate = lastgate;
+
+	// update the gate
+	lastgate = gate;
+
+	// if we're holding, skip
+	if (holding)
+		return;
+
+	// switch off the clock mode
+	switch (clockmode)
+	{
+		// oneshot; waits for trigger to restart
+		case 1:
+			if (!old_lastgate && gate)
+			{
+				output = 0;
+				remain = count;
+			}
+			else
+			{
+				if (--remain == 0)
+					output = 1;
+			}
+			break;
+
+		// square wave: counts down by 2 and toggles output
+		case 3:
+			remain = (remain - 1) & ~1;
+			if (remain == 0)
+			{
+				output ^= 1;
+				remain = count;
+			}
+			break;
+	}
+}
+
+
+/*************************************
+ *
+ *  USB timer and envelope controls
+ *
+ *************************************/
+
+void usb_sound_device::timer_w(int which, u8 offset, u8 data)
+{
+	timer8253 &group = m_timer_group[which];
+
+	m_stream->update();
+
+	// switch off the offset
+	switch (offset)
+	{
+		case 0:
+		case 1:
+		case 2:
+		{
+			timer8253::channel &ch = group.chan[offset];
+			bool was_holding = ch.holding;
+
+			// based on the latching mode
+			switch (ch.latchmode)
+			{
+				case 1: // low word only
+					ch.count = data;
+					ch.holding = false;
+					break;
+
+				case 2: // high word only
+					ch.count = data << 8;
+					ch.holding = false;
+					break;
+
+				case 3: // low word followed by high word
+					if (ch.latchtoggle == 0)
+					{
+						ch.count = (ch.count & 0xff00) | (data & 0x00ff);
+						ch.latchtoggle = 1;
+					}
+					else
+					{
+						ch.count = (ch.count & 0x00ff) | (data << 8);
+						ch.holding = false;
+						ch.latchtoggle = 0;
+					}
+					break;
+			}
+
+			// if we're not holding, load the initial count for some modes
+			if (was_holding && !ch.holding)
+				ch.remain = 1;
+			break;
+		}
+
+		case 3:
+			// break out the components
+			if (((data & 0xc0) >> 6) < 3)
+			{
+				timer8253::channel &ch = group.chan[(data & 0xc0) >> 6];
+
+				// extract the bits
+				ch.holding = true;
+				ch.latchmode = (data >> 4) & 3;
+				ch.clockmode = (data >> 1) & 7;
+				ch.bcdmode = (data >> 0) & 1;
+				ch.latchtoggle = 0;
+				ch.output = (ch.clockmode == 1);
+			}
+			break;
+	}
+}
+
+
+void usb_sound_device::env_w(int which, u8 offset, u8 data)
+{
+	timer8253 &group = m_timer_group[which];
+
+	m_stream->update();
+
+	if (offset < 3)
+		group.env[offset] = double(data);
+	else
+		group.config = data & 1;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *dest = outputs[0];
+
+	// iterate over samples
+	while (samples--)
+	{
+		/*----------------
+		    Noise Source
+		  ----------------
+
+		                 RC
+		   MM5837 ---> FILTER ---> CR FILTER ---> 3.2x AMP ---> NOISE
+		               LADDER
+		*/
+
+		// update the noise source
+		if (m_noise_subcount-- == 0)
+		{
+			m_noise_shift = (m_noise_shift << 1) | (((m_noise_shift >> 13) ^ (m_noise_shift >> 16)) & 1);
+			m_noise_state = (m_noise_shift >> 16) & 1;
+			m_noise_subcount += USB_2MHZ_CLOCK / MM5837_CLOCK;
+		}
+
+		// update the filtered noise value -- this is just an approximation to the pink noise filter
+		// being applied on the PCB, but it sounds pretty close
+		m_noise_filters[0].capval = 0.99765 * m_noise_filters[0].capval + m_noise_state * 0.0990460;
+		m_noise_filters[1].capval = 0.96300 * m_noise_filters[1].capval + m_noise_state * 0.2965164;
+		m_noise_filters[2].capval = 0.57000 * m_noise_filters[2].capval + m_noise_state * 1.0526913;
+		double noiseval = m_noise_filters[0].capval + m_noise_filters[1].capval + m_noise_filters[2].capval + m_noise_state * 0.1848;
+
+		// final output goes through a CR filter; the scaling factor is arbitrary to get the noise to the
+		// correct relative volume
+		noiseval = m_noise_filters[4].step_cr(noiseval);
+		noiseval *= 0.075;
+
+		// there are 3 identical groups of circuits, each with its own 8253
+		double sample = 0;
+		for (int groupnum = 0; groupnum < 3; groupnum++)
+		{
+			timer8253 &group = m_timer_group[groupnum];
+
+			/*-------------
+			    Channel 0
+			  -------------
+
+			    8253        CR                   AD7524
+			    OUT0 ---> FILTER ---> BUFFER--->  VRef  ---> 100k ---> mix
+			*/
+
+			// channel 0 clocks with the PCS clock
+			if (group.chan[0].subcount-- == 0)
+			{
+				group.chan[0].subcount += USB_2MHZ_CLOCK / USB_PCS_CLOCK;
+				group.chan[0].gate = 1;
+				group.chan[0].clock();
+			}
+
+			// channel 0 is mixed in with a resistance of 100k
+			double chan0 = group.chan_filter[0].step_cr(group.chan[0].output) * group.env[0] * (1.0/100.0);
+
+			/*-------------
+			    Channel 1
+			  -------------
+
+			    8253        CR                   AD7524
+			    OUT1 ---> FILTER ---> BUFFER--->  VRef  ---> 100k ---> mix
+			*/
+
+			// channel 1 clocks with the PCS clock
+			if (group.chan[1].subcount-- == 0)
+			{
+				group.chan[1].subcount += USB_2MHZ_CLOCK / USB_PCS_CLOCK;
+				group.chan[1].gate = 1;
+				group.chan[1].clock();
+			}
+
+			// channel 1 is mixed in with a resistance of 100k
+			double chan1 = group.chan_filter[1].step_cr(group.chan[1].output) * group.env[1] * (1.0/100.0);
+
+			/*-------------
+			    Channel 2
+			  -------------
+
+			  If timer_mode == 0:
+
+			               SWITCHED                                  AD7524
+			    NOISE --->    RC   ---> 1.56x AMP ---> INVERTER --->  VRef ---> 33k ---> mix
+			                FILTERS
+
+			  If timer mode == 1:
+
+			                             AD7524                                    SWITCHED
+			    NOISE ---> INVERTER --->  VRef ---> 33k ---> mix ---> INVERTER --->   RC   ---> 1.56x AMP ---> finalmix
+			                                                                        FILTERS
+			*/
+
+			// channel 2 clocks with the 2MHZ clock and triggers with the GOS clock
+			if (group.chan[2].subcount-- == 0)
+			{
+				group.chan[2].subcount += USB_2MHZ_CLOCK / USB_GOS_CLOCK / 2;
+				group.chan[2].gate = !group.chan[2].gate;
+			}
+			group.chan[2].clock();
+
+			// the exponents for the gate filters are determined by channel 2's output
+			group.gate1.exponent = m_gate_rc1_exp[group.chan[2].output];
+			group.gate2.exponent = m_gate_rc2_exp[group.chan[2].output];
+
+			// based on the envelope mode, we do one of two things with source 2
+			double chan2, mix;
+			if (group.config == 0)
+			{
+				chan2 = group.gate2.step_rc(group.gate1.step_rc(noiseval)) * -1.56 * group.env[2] * (1.0/33.0);
+				mix = chan0 + chan1 + chan2;
+			}
+			else
+			{
+				chan2 = -noiseval * group.env[2] * (1.0/33.0);
+				mix = chan0 + chan1 + chan2;
+				mix = group.gate2.step_rc(group.gate1.step_rc(-mix)) * 1.56;
+			}
+
+			// accumulate the sample
+			sample += mix;
+		}
+
+		/*-------------
+		    Final mix
+		  -------------
+
+		  INPUTS
+		  EQUAL ---> 1.2x INVERTER ---> CR FILTER ---> out
+		  WEIGHT
+
+		*/
+		*dest++ = 4000 * m_final_filter.step_cr(sample);
+	}
+}
+
+#endif
+
+
+
+/*************************************
+ *
  *  USB work RAM access
  *
  *************************************/
@@ -253,12 +624,16 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 	m_work_ram[offset] = data;
 
 	// writes to the low 32 bytes go to various controls
+#if (ENABLE_USB_NETLIST)
+
 	switch (offset)
 	{
 		case 0x00:  // 8253 U41
 		case 0x01:  // 8253 U41
 		case 0x02:  // 8253 U41
 		case 0x03:  // 8253 U41
+			if ((offset & 3) != 3)
+				printf("%s: 2.%d count=%d\n", machine().scheduler().time().as_string(), offset & 3, data);
 			m_pit[0]->write(offset & 3, data);
 			break;
 
@@ -276,6 +651,8 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x09:  // 8253 U42
 		case 0x0a:  // 8253 U42
 		case 0x0b:  // 8253 U42
+			if ((offset & 3) != 3)
+				printf("%s: 2.%d count=%d\n", machine().scheduler().time().as_string(), offset & 3, data);
 			m_pit[1]->write(offset & 3, data);
 			break;
 
@@ -285,7 +662,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 			m_nl_dac1[offset & 3]->write(double(data) / 255.0);
 			break;
 
-		case 0x0f:  // ENV0 U2B
+		case 0x0f:  // ENV1 U2B
 			m_nl_sel1->write(data & 1);
 			break;
 
@@ -293,8 +670,8 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x11:  // 8253 U43
 		case 0x12:  // 8253 U43
 		case 0x13:  // 8253 U43
-//			if ((offset & 3) == 2)
-//				printf("%s: 2.2 count=%d\n", machine().scheduler().time().as_string(), data);
+			if ((offset & 3) != 3)
+				printf("%s: 2.%d count=%d\n", machine().scheduler().time().as_string(), offset & 3, data);
 			m_pit[2]->write(offset & 3, data);
 			break;
 
@@ -304,10 +681,41 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 			m_nl_dac2[offset & 3]->write(double(data) / 255.0);
 			break;
 
-		case 0x17:  // ENV0 U38B
+		case 0x17:  // ENV2 U38B
 			m_nl_sel2->write(data & 1);
 			break;
 	}
+
+#else
+
+	switch (offset & ~3)
+	{
+		case 0x00:  // CTC0
+			timer_w(0, offset & 3, data);
+			break;
+
+		case 0x04:  // ENV0
+			env_w(0, offset & 3, data);
+			break;
+
+		case 0x08:  // CTC1
+			timer_w(1, offset & 3, data);
+			break;
+
+		case 0x0c:  // ENV1
+			env_w(1, offset & 3, data);
+			break;
+
+		case 0x10:  // CTC2
+			timer_w(2, offset & 3, data);
+			break;
+
+		case 0x14:  // ENV2
+			env_w(2, offset & 3, data);
+			break;
+	}
+
+#endif
 }
 
 
@@ -333,8 +741,14 @@ void usb_sound_device::usb_portmap(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
+#if (ENABLE_SEGAUSB_NETLIST)
+
 TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::gos_timer )
 {
+	// technically we should clock at 2x and toggle between states
+	// however, in practice this is just used to trigger a oneshot
+	// so we can halve the high frequency rate and just toggle both
+	// ways to initiate the countdown
 	m_pit[0]->write_gate2(0);
 	m_pit[1]->write_gate2(0);
 	m_pit[2]->write_gate2(0);
@@ -342,6 +756,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::gos_timer )
 	m_pit[1]->write_gate2(1);
 	m_pit[2]->write_gate2(1);
 }
+
+#endif
 
 
 void usb_sound_device::device_add_mconfig(machine_config &config)
@@ -358,6 +774,8 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "usb_timer", 0).configure_periodic(
 			FUNC(usb_sound_device::increment_t1_clock_timer_cb),
 			attotime::from_hz(USB_2MHZ_CLOCK / 256));
+
+#if (ENABLE_SEGAUSB_NETLIST)
 
 	TIMER(config, "gos_timer", 0).configure_periodic(
 			FUNC(usb_sound_device::gos_timer), attotime::from_hz(USB_GOS_CLOCK));
@@ -415,6 +833,8 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	m_pit[2]->out_handler<0>().set(m_nl_pit2_out[0], FUNC(netlist_mame_logic_input_device::write_line));
 	m_pit[2]->out_handler<1>().set(m_nl_pit2_out[1], FUNC(netlist_mame_logic_input_device::write_line));
 	m_pit[2]->out_handler<2>().set(m_nl_pit2_out[2], FUNC(netlist_mame_logic_input_device::write_line));
+
+#endif
 }
 
 
@@ -434,6 +854,6 @@ void usb_rom_sound_device::device_add_mconfig(machine_config &config)
 {
 	usb_sound_device::device_add_mconfig(config);
 
-	/* CPU for the usb board */
+	// CPU for the usb board
 	m_ourcpu->set_addrmap(AS_PROGRAM, &usb_rom_sound_device::usb_map_rom);
 }
