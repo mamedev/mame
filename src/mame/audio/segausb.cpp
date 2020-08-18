@@ -597,7 +597,7 @@ void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 		  WEIGHT
 
 		*/
-		*dest++ = 4000 * m_final_filter.step_cr(sample);
+		*dest++ = 3000 * m_final_filter.step_cr(sample);
 	}
 }
 
