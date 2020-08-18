@@ -144,7 +144,10 @@
 #include "speaker.h"
 
 
-static constexpr int WAIT_STATES = 3;
+// Unsure whether this should be 2 or 3. It depends on how many rising clock
+// edges MEMRQ is held for, plus 1 additional cycle. Going to 3 creates
+// noticeable slowdowns in Space Fury.
+static constexpr int WAIT_STATES = 2;
 
 
 /*************************************
