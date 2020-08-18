@@ -75,7 +75,7 @@ namespace netlist
 				m_last_CLK = m_CLK();
 
 				m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
-				m_QHQ.push(1 - qh, NLTIME_FROM_NS(20)); // FIXME: Timing
+				m_QHQ.push(qh ? 0 : 1, NLTIME_FROM_NS(20)); // FIXME: Timing
 			}
 
 		}

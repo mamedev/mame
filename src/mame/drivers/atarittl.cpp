@@ -241,23 +241,21 @@ void tank_state::tank(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:p2rdown", "P2_RIGHT_DOWN.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1fire",  "P1_FIRE.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p2fire",  "P2_FIRE.POS", 0);
-	NETLIST_LOGIC_INPUT(config, "maincpu:coin1", "COIN1.POS", 0);
-	NETLIST_LOGIC_INPUT(config, "maincpu:coin2", "COIN2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin1",   "COIN1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin2",   "COIN2.POS", 0);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(TANK_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of back porch
-	// TODO: The total hblank period is 128, the total hsync period is 32, unknown how to convert this to porches.
-	// TODo: The total vblank period is 80, the total vsync period is 8, unknown how to convert this to porches.
-	m_video->set_horz_params(776,                   776,                    808,                   904);
-	m_video->set_vert_params(432,                   432,                    440,                   520);
+	m_video->set_horz_params(776,                   776,                  808,                 904);
+	m_video->set_vert_params(512,                   512,                  520,                 520);
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
-	m_video->set_vsync_threshold(0.368);
+	m_video->set_vsync_threshold(0.3);
 	m_video->set_gain(0.47);
-	//m_video->set_horz_scale(1);
+	m_video->set_horz_scale(3);
 }
 
 void gtrak10_state::gtrak10(machine_config &config)
