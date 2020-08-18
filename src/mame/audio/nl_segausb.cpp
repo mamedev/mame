@@ -25,6 +25,7 @@
 
 #define USE_AFUNC_MIXING (1)
 #define ENABLE_NOISE_FRONTIERS (1)
+#define UNDERCLOCK_NOISE_GEN (1)
 #define ENABLE_FRONTIERS (0)
 
 
@@ -329,6 +330,11 @@ NETLIST_START(segausb)
 	MM5837_DIP(U60)
 	NET_C(U60.2, I_VM12)
 	NET_C(U60.4, I_V12)
+#if (UNDERCLOCK_NOISE_GEN)
+	// officially runs at 48-112kHz, but little noticeable difference
+	// in exchange for a big performance boost
+	PARAM(U60.FREQ, 24000)
+#endif
 
 	//
 	// Sheet 6, noise source
@@ -428,6 +434,7 @@ NETLIST_START(segausb)
 	NET_C(U5.5, GND)
 	NET_C(R15.1, U5.7)
 	AFUNC(DAC_U14, 2, "A0*A1")
+	PARAM(DAC_U14.THRESH, 1e-5)
 	NET_C(DAC_U14.A0, U5.7)
 	NET_C(DAC_U14.A1, I_U14_DAC)
 	NET_C(DAC_U14.Q, R14.2)
@@ -505,6 +512,7 @@ NETLIST_START(segausb)
 	NET_C(U17.5, GND)
 	NET_C(R36.1, U17.7)
 	AFUNC(DAC_U24, 2, "A0*A1")
+	PARAM(DAC_U24.THRESH, 1e-5)
 	NET_C(DAC_U24.A0, U17.7)
 	NET_C(DAC_U24.A1, I_U24_DAC)
 	NET_C(DAC_U24.Q, R37.2)
@@ -582,6 +590,7 @@ NETLIST_START(segausb)
 	NET_C(U22.5, GND)
 	NET_C(R45.1, U22.7)
 	AFUNC(DAC_U29, 2, "A0*A1")
+	PARAM(DAC_U29.THRESH, 1e-5)
 	NET_C(DAC_U29.A0, U22.7)
 	NET_C(DAC_U29.A1, I_U29_DAC)
 	NET_C(DAC_U29.Q, R44.2)
