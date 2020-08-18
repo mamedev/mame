@@ -5,8 +5,6 @@
 
 #pragma once
 
-#define SEGAUSB_FAKE_8253 (0)
-
 NETLIST_EXTERNAL(segausb)
 
 #endif // MAME_AUDIO_NL_SEGAUSB_H
