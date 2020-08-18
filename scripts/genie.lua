@@ -1062,8 +1062,8 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "pnacl") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
-			if (version < 30400) then
-				print("Clang version 3.4 or later needed")
+			if (version < 50000) then
+				print("Clang version 5.0 or later needed")
 				os.exit(-1)
 			end
 			buildoptions {
@@ -1072,28 +1072,24 @@ end
 				"-Wno-unused-value",
 				"-Wno-constant-logical-operand",
 				"-fdiagnostics-show-note-include-stack",
+				"-Wno-unknown-warning-option",
+				"-Wno-extern-c-compat",
+				"-Wno-unknown-attributes",
+				"-Wno-ignored-qualifiers"
 			}
-			if (version >= 30500) then
-				buildoptions {
-					"-Wno-unknown-warning-option",
-					"-Wno-extern-c-compat",
-					"-Wno-unknown-attributes",
-					"-Wno-ignored-qualifiers"
-				}
-			end
 			if (version >= 60000) then
 				buildoptions {
 					"-Wno-pragma-pack" -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
 				}
 			end
-			if ((version < 60000) or (_OPTIONS["targetos"]=="macosx" and (version <= 90000))) then
+			if (version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx') then -- TODO when Xcode includes clang 10, update this to detect the vanity version number
 				buildoptions {
-					"-Wno-missing-braces" -- std::array brace initialization not fixed until 6.0.0 (https://reviews.llvm.org/rC314838)
+					"-Wno-xor-used-as-pow " -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 				}
 			end
-			if (_OPTIONS["targetos"]=="macosx" and (version < 80000)) then
-				defines {
-					"TARGET_OS_OSX=1",
+			if (version < 60000) or ((_OPTIONS["targetos"] == "macosx") and (version <= 90000)) then
+				buildoptions {
+					"-Wno-missing-braces" -- std::array brace initialization not fixed until 6.0.0 (https://reviews.llvm.org/rC314838)
 				}
 			end
 		else

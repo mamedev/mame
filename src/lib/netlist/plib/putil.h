@@ -177,7 +177,7 @@ namespace plib
 
 			bool empty() { return m_strm == nullptr; }
 
-			// FIXME: workaround input conext should accept stream_ptr
+			// FIXME: workaround input context should accept stream_ptr
 
 			std::unique_ptr<std::istream> release_stream() { return std::move(m_strm); }
 		private:

@@ -7,6 +7,34 @@
  *
  * - STRB and EN
  * - Timing
+ *
+ *  SN7497: Synchronous 6-Bit Binary Rate Multiplier
+ *
+ *          +--------------+
+ *       B1 |1           16| VCC
+ *       B4 |2           15| B3
+ *       B5 |3           14| B2
+ *       B0 |4    7497   13| CLR
+ *        Z |5           12| UNITY/CAS
+ *        Y |6           11| ENin (EN)
+ *    ENout |7           10| STRB
+ *      GND |8            9| CLK
+ *          +--------------+
+ *
+ *  Naming conventions follow TI datasheet
+ *
+ *  The counter is enabled when the clear, strobe, and enable inputs are low.
+ *
+ *  When the rate input is binary 0 (all rate inputs low), Z remains high [and Y low].
+ *
+ *  The unity/cascade input, when connected to the clock input, passes
+ *    clock frequency (inverted) to the Y output when the rate input/decoding
+ *    gates are inhibited by the strobe.
+ *
+ *  When CLR is H, states of CLK and STRB can affect Y and Z.  Default are
+ *    Y L, Z H, ENout H.
+ *
+ *  Unity/cascade is used to inhibit output Y (UNITY L -> Y H)
  */
 
 #include "nld_7497.h"
@@ -102,8 +130,6 @@ namespace netlist
 			clk_strb();
 		}
 
-		friend class NETLIB_NAME(7497_dip);
-
 		object_array_t<logic_input_t, 6> m_B;
 		logic_input_t m_CLK;
 		logic_input_t m_STRBQ;
@@ -141,37 +167,7 @@ namespace netlist
 		}
 	};
 
-	NETLIB_OBJECT(7497_dip)
-	{
-		NETLIB_CONSTRUCTOR(7497_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_B[4]);  // B0
-			register_subalias("2", A.m_B[1]);  // B4
-			register_subalias("3", A.m_B[0]);  // B5
-			register_subalias("4", A.m_B[5]);  // B0
-			register_subalias("5", A.m_ZQ);
-			register_subalias("6", A.m_Y);
-			register_subalias("7", A.m_ENOUTQ);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9", A.m_CLK);
-			register_subalias("10", A.m_STRBQ);
-			register_subalias("11", A.m_UNITYQ);
-			register_subalias("12", A.m_ENQ);
-			register_subalias("13", A.m_CLR);
-			register_subalias("14", A.m_B[3]); // B2
-			register_subalias("15", A.m_B[2]); // B3
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(7497) A;
-	};
-
-
 	NETLIB_DEVICE_IMPL(7497,      "TTL_7497", "+CLK,+STRBQ,+ENQ,+UNITYQ,+CLR,+B0,+B1,+B2,+B3,+B4,+B5,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7497_dip,  "TTL_7497_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

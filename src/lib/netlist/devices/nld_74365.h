@@ -1,27 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/*
- * nld_74365.h
- *
- *  SN74365: Hex Bus Driver with 3-State Outputs
- *
- *          +--------------+
- *      G1Q |1     ++    16| VCC
- *       A1 |2           15| G2Q
- *       Y1 |3           14| A6
- *       A2 |4    74365  13| Y6
- *       Y2 |5           12| A5
- *       A3 |6           11| Y5
- *       Y3 |7           10| A4
- *      GND |8            9| Y4
- *          +--------------+
- *
- *  Naming conventions follow Texas Instruments datasheet
- *
- *  Note: Currently the netlist system does not support proper tristate output, so this
- *        is not a "real" bus driver, it simply outputs 0 if the chip is not enabled.
- */
-
 #ifndef NLD_74365_H_
 #define NLD_74365_H_
 

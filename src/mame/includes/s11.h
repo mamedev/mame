@@ -11,6 +11,7 @@
 
 #include "cpu/m6800/m6800.h"
 #include "audio/s11c_bg.h"
+#include "audio/pinsnd88.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
 #include "machine/input_merger.h"
@@ -43,8 +44,8 @@ public:
 		, m_piairq(*this, "piairq")
 		, m_audiocpu(*this, "audiocpu")
 		, m_audioirq(*this, "audioirq")
-		, m_bgcpu(*this, "bgcpu")
 		, m_hc55516(*this, "hc55516")
+		, m_dac(*this, "dac")
 		, m_pias(*this, "pias")
 		, m_pia21(*this, "pia21")
 		, m_pia24(*this, "pia24")
@@ -52,14 +53,15 @@ public:
 		, m_pia2c(*this, "pia2c")
 		, m_pia30(*this, "pia30")
 		, m_pia34(*this, "pia34")
-		, m_pia40(*this, "pia40")
-		, m_ym2151(*this, "ym2151")
-		, m_bg(*this, "bgm")
+		, m_bg(*this, "bg")
+		, m_ps88(*this, "ps88")
 		, m_digits(*this, "digit%u", 0U)
 		, m_swarray(*this, "SW.%u", 0U)
 		{ }
 
 	void s11(machine_config &config);
+	void s11_bgs(machine_config &config);
+	void s11_bgm(machine_config &config);
 
 	void init_s11();
 
@@ -81,8 +83,6 @@ public:
 	void pia34_pa_w(uint8_t data);
 	void pia34_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
-	void pia40_pb_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
@@ -92,7 +92,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_irq);
 
@@ -100,20 +99,21 @@ public:
 	void switch_w(uint8_t data);
 	uint8_t pia28_w7_r();
 
+	void s11_main_map(address_map &map);
+	void s11_audio_map(address_map &map);
+
 protected:
 	DECLARE_MACHINE_RESET(s11);
-	void s11_audio_map(address_map &map);
-	void s11_bg_map(address_map &map);
-	void s11_main_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<input_merger_device> m_piairq;
+	// the following devices are optional because certain board variants (i.e. system 11c) do not have the audio section on the mainboard populated
 	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<input_merger_device> m_audioirq;
-	optional_device<cpu_device> m_bgcpu;
 	optional_device<hc55516_device> m_hc55516;
+	optional_device<mc1408_device> m_dac;
 	optional_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
@@ -121,9 +121,8 @@ protected:
 	required_device<pia6821_device> m_pia2c;
 	required_device<pia6821_device> m_pia30;
 	required_device<pia6821_device> m_pia34;
-	optional_device<pia6821_device> m_pia40;
-	optional_device<ym2151_device> m_ym2151;
 	optional_device<s11c_bg_device> m_bg;
+	optional_device<pinsnd88_device> m_ps88;
 	output_finder<63> m_digits;
 	required_ioport_array<8> m_swarray;
 

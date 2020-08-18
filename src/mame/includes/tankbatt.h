@@ -6,7 +6,11 @@
 #pragma once
 
 #include "machine/timer.h"
-#include "sound/samples.h"
+#include "machine/netlist.h"
+
+#include "netlist/nl_setup.h"
+#include "audio/nl_tankbatt.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -16,23 +20,39 @@ public:
 	tankbatt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_bulletsram(*this, "bulletsram"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_player_input(*this, "P%u", 1U),
+		m_dips(*this, "DSW"),
+		m_sound_s1(*this, "sound_nl:s1"),
+		m_sound_s2(*this, "sound_nl:s2"),
+		m_sound_off(*this, "sound_nl:off"),
+		m_sound_engine_hi(*this, "sound_nl:engine_hi"),
+		m_sound_shoot(*this, "sound_nl:shoot"),
+		m_sound_hit(*this, "sound_nl:hit")
 	{ }
 
 	void tankbatt(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_bulletsram;
 	required_shared_ptr<uint8_t> m_videoram;
+
+	required_ioport_array<2> m_player_input;
+	required_ioport m_dips;
+
+	required_device<netlist_mame_logic_input_device> m_sound_s1;
+	required_device<netlist_mame_logic_input_device> m_sound_s2;
+	required_device<netlist_mame_logic_input_device> m_sound_off;
+	required_device<netlist_mame_logic_input_device> m_sound_engine_hi;
+	required_device<netlist_mame_logic_input_device> m_sound_shoot;
+	required_device<netlist_mame_logic_input_device> m_sound_hit;
 
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
@@ -40,13 +60,9 @@ private:
 	uint8_t in0_r(offs_t offset);
 	uint8_t in1_r(offs_t offset);
 	uint8_t dsw_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(sound_off_w);
-	DECLARE_WRITE_LINE_MEMBER(sh_expl_w);
-	DECLARE_WRITE_LINE_MEMBER(sh_engine_w);
-	DECLARE_WRITE_LINE_MEMBER(sh_fire_w);
 	void intack_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(coincounter_w);
-	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
+	void coincounter_w(int state);
+	void coinlockout_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);

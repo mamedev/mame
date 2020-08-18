@@ -37481,4 +37481,359 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mulwn114">
+		<description>Multiplication: Whole Numbers Steps 1-14 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="multiplication- whole numbers steps 1-14 (4am crack).dsk" size="143360" crc="e4ecf98d" sha1="a1c5beb24921793055f8932c8d821ab0f335e001"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laguillo">
+		<description>La Guillotine (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-07-24"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="la guillotine (4am crack).dsk" size="143360" crc="2b389d84" sha1="a11eb5ccaf44997776faf8404b412b87bf9856d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corrtoro">
+		<description>La Corrida de Toros (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2020-07-24"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="la corrida de toros (4am crack).dsk" size="143360" crc="3a941200" sha1="c9d98bfcc2878a5fd991ab372627deb929e3d3ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdd1sm">
+		<description>Math Demo Disk #1: Secondary Mathematics (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-07-26"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math demo disk #1- secondary mathematics (4am crack).dsk" size="143360" crc="3bd5e0b8" sha1="46141c42ee3c640c7f1d50cfd8f7b2e28f2017bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdd2geig">
+		<description>Math Demo Disk #2: Graphing Equations and Interpreting Graphs (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math demo disk #2- graphing equations and interpreting graphs (4am crack).dsk" size="143360" crc="3670cfab" sha1="5a22a0033cafbc54e6927853b792339a83145a12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdd3psm">
+		<description>Math Demo Disk #3: Postsecondary Mathematics (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math demo disk #3- postsecondary mathematics (4am crack).dsk" size="143360" crc="0a2696bd" sha1="688e8283d2efea83874abe7c6d297b0871ae9b99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mseleml">
+		<description>Math Skills: Elementary Level (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math skills- elementary level (4am crack).dsk" size="143360" crc="8959752d" sha1="89d2e59a23636de848f0abca5fe0fe579ae38973"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msjrhigh">
+		<description>Math Skills: Junior High Level (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math skills- junior high level (4am crack).dsk" size="143360" crc="dadb8d31" sha1="2fb6e5f2aa81885d5193946e44228c46f2964b22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gifpalg">
+		<description>Graphing is Fun: Pie and Line Graphs (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Aquarius People Materials</publisher>
+		<info name="release" value="2020-08-01"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="graphing is fun pie and line graphs (4am crack).dsk" size="143360" crc="1f3bed11" sha1="62cb669c99db7bd5d632c86847bd7e22c78a071e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addfs921">
+		<description>Addition: Fractions Steps 9-21 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition- fractions steps 9-21 (4am crack).dsk" size="143360" crc="db4691b9" sha1="0babf87ee4e70dc9b8cd86a98c0c15a0258b3d19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subwn117">
+		<description>Subtraction: Whole Numbers Steps 1-17 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="subtraction- whole numbers steps 1-17 (4am crack).dsk" size="143360" crc="44e5f768" sha1="7feb38fd65b46bdefe3863953209fc82d51a14ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subfs111">
+		<description>Subtraction: Fractions Steps 1-11 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-07-22"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="subtraction- fractions steps 1-11 (4am crack).dsk" size="143360" crc="243c79ee" sha1="83cb304e32b1c53b2ff58302eeba104b92615c95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungeon">
+		<description>Dungeon! (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>TSR Hobbies</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dungeon (4am crack).dsk" size="143360" crc="96b24763" sha1="917d23cfd331ec13aa6e97e17823abfb7e5df9cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thesmino">
+		<description>Theseus and the Minotaur (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>TSR Hobbies</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="theseus and the minotaur (4am crack).dsk" size="143360" crc="d951a87a" sha1="8f317e8406d9931e5776cdf0a5c54c904affb754"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dawnpatr">
+		<description>Dawn Patrol (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>TSR Hobbies</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dawn patrol (4am crack).dsk" size="143360" crc="31066d6a" sha1="e268102ad3bc91837c791a9a90aa0a8d66c4b544"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conceptr">
+		<description>Conceptor (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Mentor Learning Systems</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conceptor (4am crack) side a.dsk" size="143360" crc="87502ff2" sha1="d8ba21f1ceb0c04952919c223deca7e1415c117e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="conceptor (4am crack) side b.dsk" size="143360" crc="47a2b340" sha1="b8fd53a5ed08f0937c9897f1bfbf22f9f511b7fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epyx3pck">
+		<description>Epyx 3-Pack (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="epyx 3-pack (4am crack).dsk" size="143360" crc="a48d559a" sha1="02c425fb01810a847e0567f10b9d5081fce90e68"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trlltlr2">
+		<description>Troll's Tale (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="troll's tale rev. 2 (4am and san inc crack).dsk" size="143360" crc="bef3e3cc" sha1="dc761551f75be849088da5fbdcc795a4e41c9f9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nytcrswd">
+		<description>Daily Computer Crosswords from The New York Times (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Evolving Technology Company</publisher>
+		<info name="release" value="2020-08-08"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="daily computer crosswords from the new york times (4am crack).dsk" size="143360" crc="2c91cf83" sha1="bf1d8a7bab18a9340eb3358cd6722631d03886f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uboatcmd">
+		<description>U-Boat Command (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2020-08-09"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="u-boat command (4am crack).dsk" size="143360" crc="c134e816" sha1="cdf9e04801e96e9d5aa7dbd6a785a0e822ec262b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcrocfct">
+		<description>MECC-A308 Rocket Factory (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2020-08-09"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a308 rocket factory v1.0 (4am crack).dsk" size="143360" crc="a791cb46" sha1="56009fa88b3f7839db8ba93c2bb4a9c09a5fc234"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sa2gramr">
+		<description>Spanish Achievement II: Grammar (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2020-08-05"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="spanish achievement ii (4am crack).dsk" size="143360" crc="f3859731" sha1="dcc487aebc6bb7abe2edd81a4440207464b54576"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slvwrdp1">
+		<description>Solving Word Problems 1 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Aquarius People Materials</publisher>
+		<info name="release" value="2020-08-05"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="solving word problems 1 (4am crack).dsk" size="143360" crc="dee630b8" sha1="9f5a5a3c84174e9d0f239e0ca1aec83c18b30a19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slvwrdp2">
+		<description>Solving Word Problems II (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Aquarius People Materials</publisher>
+		<info name="release" value="2020-08-05"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="solving word problems ii (4am crack).dsk" size="143360" crc="d69453ca" sha1="af182c47a5cc9226250cd7e492a57e1cd5bc3a4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdfrc120">
+		<description>Multiplication/Division Fractions: Steps 1-20 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-08-06"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="multiplication-division- fractions steps 1-20 (4am crack).dsk" size="143360" crc="14e84966" sha1="43d9a7202f0ff68291c1f60c9ffb97a62f15c6d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divwn119">
+		<description>Division: Whole Numbers Steps 1-19 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-08-06"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="division- whole numbers steps 1-19 (4am crack).dsk" size="143360" crc="0c47657f" sha1="e14d4d453a79ad7de56d47b0c8e66d3b547fe2df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prccs15">
+		<description>Percent Concepts Steps 1-5 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-08-06"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="percent concepts steps 1-5 (4am crack).dsk" size="143360" crc="279880dd" sha1="3f2cff480f3936a12253f944579458fedd02dfe0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prccs710">
+		<description>Percent Steps 7-10 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-08-06"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="percent steps 7-10 (4am crack).dsk" size="143360" crc="52c83a46" sha1="91cde89c53dc0c1f27ceebfaeb04c6bcf7dd31ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decs710">
+		<description>Decimals Steps 7-10 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Instructional/Communications Technology</publisher>
+		<info name="release" value="2020-08-06"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="decimals steps 7-10 (4am crack).dsk" size="143360" crc="3794b3a2" sha1="64edcc54676688674276c419e6d56ed29666b4d0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

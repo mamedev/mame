@@ -1729,16 +1729,25 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help(const char *exename)
 {
-	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
-	osd_printf_info("This software reproduces, more or less faithfully, the behaviour of a wide range\n"
-					"of machines. But hardware is useless without software, so images of the ROMs and\n"
-					"other media which run on that hardware are also required.\n\n");
-	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
-	osd_printf_info("\n\n"
-			"        %s -showusage    for a list of options\n"
-			"        %s -showconfig   to show your current %s.ini\n"
-			"        %s -listmedia    for a full list of supported media\n"
-			"        %s -createconfig to create a %s.ini\n\n"
-			"For usage instructions, please visit https://docs.mamedev.org \n",exename,
-			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
+	osd_printf_info(
+			"%3$s v%2$s\n"
+			"%5$s\n"
+			"\n"
+			"This software reproduces, more or less faithfully, the behaviour of a wide range\n"
+			"of machines. But hardware is useless without software, so images of the ROMs and\n"
+			"other media which run on that hardware are also required.\n"
+			"\n"
+			"Usage:  %1$s [machine] [media] [software] [options]\n"
+			"\n"
+			"        %1$s -showusage    for a list of options\n"
+			"        %1$s -showconfig   to show current configuration in %4$s.ini format\n"
+			"        %1$s -listmedia    for a full list of supported media\n"
+			"        %1$s -createconfig to create a %4$s.ini file\n"
+			"\n"
+			"For usage instructions, please visit https://docs.mamedev.org/\n",
+			exename,
+			build_version,
+			emulator_info::get_appname(),
+			emulator_info::get_configname(),
+			emulator_info::get_copyright_info());
 }

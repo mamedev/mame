@@ -954,7 +954,13 @@ ROM_START( vigilantd ) // Japan Rev D
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
 ROM_END
 
-ROM_START( vigilantbl ) /* Bootleg */
+/* Bootleg
+   "JB 306" silkscreen part# on bottom board, "VT-20" sticker on top board.
+   The various Nanao custom chips are implemented with standard ttl, makes the bottom board considerably larger.
+   The 3 additional proms are part of the KNA6074601 custom chip implementation.
+   The differing pal has some unused pins repurposed as part of the KNA6032701 custom chip implementation.
+   The board-board connectors are 2x 50-pin vs the 2x 60-pin used on original game. */
+ROM_START( vigilantbl )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "g07_c03.bin",  0x00000, 0x08000, CRC(9dcca081) SHA1(6d086b70e6bf1fbafa746ef5c82334645f199be9) )
 	ROM_LOAD( "j07_c04.bin",  0x10000, 0x10000, CRC(e0159105) SHA1(da6d74ec075863c67c0ce21b07a54029d138f688) )
@@ -985,10 +991,16 @@ ROM_START( vigilantbl ) /* Bootleg */
 	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "d04_c01.bin",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
-	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - not convinced these exist in this form on bootleg */
-	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_REGION( 0x0600, "plds", 0 ) /* 3x pal16l8 */
+	ROM_LOAD( "p09_16l8.bin", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )  // == official set ic90
+	ROM_LOAD( "m05_16l8.bin", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )  // == official set ic38
+	ROM_LOAD( "b01_16l8.bin", 0x0400, 0x0104, CRC(1beae498) SHA1(031c2f589eb715dc3909614bab8d89994f69be80) )
+
+	ROM_REGION( 0x0400, "proms", 0 ) /* 4x 82s129 */
+	ROM_LOAD( "a07_129.bin",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == official set ic52
+	ROM_LOAD( "t10_129a.bin", 0x0100, 0x0100, CRC(1513df33) SHA1(7ab5066e3b5eb47fc4d5498b168929a9ade9bb7c) )
+	ROM_LOAD( "u10_129b.bin", 0x0200, 0x0100, CRC(06661d00) SHA1(aa12a31751cad355ad545d92485432d6be12b45e) )
+	ROM_LOAD( "v10_129c.bin", 0x0300, 0x0100, CRC(3f186bc8) SHA1(e5270fbc16c5844294cf20b42e57f4edaabbe629) )
 ROM_END
 
 

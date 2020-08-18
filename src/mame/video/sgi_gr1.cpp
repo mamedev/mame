@@ -217,6 +217,7 @@ void sgi_gr1_device::device_reset()
 	m_dr4 = DR4_MEGOPT;
 
 	m_fifo.clear();
+	m_int_fifo_cb(CLEAR_LINE);
 }
 
 u8 sgi_gr1_device::dr0_r()

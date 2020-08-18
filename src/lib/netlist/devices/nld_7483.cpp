@@ -1,7 +1,26 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_7483.c
+ * nld_7483.cpp
+ *
+ *  DM7483: 4-Bit Binary Adder with Fast Carry
+ *
+ *          +--------------+
+ *       A4 |1     ++    16| B4
+ *       S3 |2           15| S4
+ *       A3 |3           14| C4
+ *       B3 |4    7483   13| C0
+ *      VCC |5           12| GND
+ *       S2 |6           11| B1
+ *       B2 |7           10| A1
+ *       A2 |8            9| S1
+ *          +--------------+
+ *
+ *          S = (A + B + C0) & 0x0f
+ *
+ *          C4 = (A + B + C) > 15 ? 1 : 0
+ *
+ *  Naming conventions follow Fairchild Semiconductor datasheet
  *
  */
 
@@ -40,7 +59,6 @@ namespace netlist
 			m_lastr = 0;
 		}
 
-		friend class NETLIB_NAME(7483_dip);
 	private:
 		NETLIB_HANDLERI(c0)
 		{
@@ -92,36 +110,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(7483_dip)
-	{
-		NETLIB_CONSTRUCTOR(7483_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_A4);
-			register_subalias("2", A.m_S3);
-			register_subalias("3", A.m_A3);
-			register_subalias("4", A.m_B3);
-			register_subalias("5", "A.VCC");
-			register_subalias("6", A.m_S2);
-			register_subalias("7", A.m_B2);
-			register_subalias("8", A.m_A2);
-
-			register_subalias("9", A.m_S1);
-			register_subalias("10", A.m_A1);
-			register_subalias("11", A.m_B1);
-			register_subalias("12", "A.GND");
-			register_subalias("13", A.m_C0);
-			register_subalias("14", A.m_C4);
-			register_subalias("15", A.m_S4);
-			register_subalias("16", A.m_B4);
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(7483) A;
-	};
-
 	NETLIB_DEVICE_IMPL(7483, "TTL_7483", "+A1,+A2,+A3,+A4,+B1,+B2,+B3,+B4,+C0,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7483_dip, "TTL_7483_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

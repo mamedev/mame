@@ -1,7 +1,18 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_MM5837.c
+ * nld_MM5837.cpp
+ *
+ *  MM5837: Digital noise source
+ *
+ *          +--------+
+ *      VDD |1  ++  8| NC
+ *      VGG |2      7| NC
+ *      OUT |3      6| NC
+ *      VSS |4      5| NC
+ *          +--------+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
  *
  */
 

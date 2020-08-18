@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "kc82.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 //-------------------------------------------------
 //  kc82_device - constructor
@@ -123,6 +126,16 @@ void kc82_device::mmu_remap_pages()
 		{
 			--n;
 			base = u32(m_mmu_a[n]) << 10;
+		}
+		if (m_mmu_base[i] != base)
+		{
+			u32 old_mapping = ((i << 10) + base) & 0xffc00;
+			u32 new_mapping = ((i << 10) + m_mmu_base[i]) & 0xffc00;
+			LOG("%s: MMU: %04X-%04XH => %05X-%05XH (was %05X-%05XH)\n",
+				machine().describe_context(),
+				i << 10, (i << 10) | 0x3ff,
+				old_mapping, old_mapping | 0x3ff,
+				new_mapping, new_mapping | 0x3ff);
 		}
 		m_mmu_base[i] = base;
 	}

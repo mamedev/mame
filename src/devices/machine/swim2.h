@@ -5,13 +5,13 @@
     Apple SWIM2 floppy disk controller
 
 *********************************************************************/
-
-#pragma once
-
 #ifndef MAME_MACHINE_SWIM2_H
 #define MAME_MACHINE_SWIM2_H
 
+#pragma once
+
 #include "applefdintf.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

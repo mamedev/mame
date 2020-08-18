@@ -10,10 +10,11 @@
 
 #include "plib/palloc.h"
 #include "plib/pstring.h"
-#include "plib/ptokenizer.h"
 #include "plib/ptypes.h"
 
 #include <memory>
+
+#include "../plib/ptokenizer.h"
 
 // -------------------------------------------------
 //  convert - convert a spice netlist
@@ -212,10 +213,15 @@ public:
 
 	nl_convert_eagle_t() = default;
 
-	class tokenizer : public plib::ptokenizer
+	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
 	{
 	public:
-		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm);
+		using token_t = ptokenizer::token_t;
+		using token_type = ptokenizer::token_type;
+		using token_id_t = ptokenizer::token_id_t;
+		using token_store = ptokenizer::token_store;
+
+		tokenizer(nl_convert_eagle_t &convert);
 
 		token_id_t m_tok_ADD;       // NOLINT
 		token_id_t m_tok_VALUE;     // NOLINT
@@ -244,10 +250,14 @@ public:
 
 	nl_convert_rinf_t() = default;
 
-	class tokenizer : public plib::ptokenizer
+	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
 	{
 	public:
-		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm);
+		using token_t = ptokenizer::token_t;
+		using token_type = ptokenizer::token_type;
+		using token_id_t = ptokenizer::token_id_t;
+		using token_store = ptokenizer::token_store;
+		tokenizer(nl_convert_rinf_t &convert);
 
 		token_id_t m_tok_HEA; // NOLINT
 		token_id_t m_tok_APP; // NOLINT

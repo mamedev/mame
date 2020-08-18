@@ -23,7 +23,6 @@ namespace netlist
 	{
 
 		NETLIB_DEVICE_IMPL(74163,     "TTL_74163",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
-		NETLIB_DEVICE_IMPL(74163_dip, "TTL_74163_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

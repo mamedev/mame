@@ -16,6 +16,7 @@ public:
 	void init_ddp2();
 	void init_dw2001();
 	void init_dwpc();
+	void init_dwpc101j();
 
 	void pgm_arm_type2(machine_config &config);
 	void pgm_arm_type2_22m(machine_config &config);

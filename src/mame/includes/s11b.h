@@ -18,7 +18,9 @@ public:
 		: s11a_state(mconfig, type, tag)
 	{ }
 
+	void s11b_base(machine_config &config);
 	void s11b(machine_config &config);
+	void s11b_jokerz(machine_config &config);
 
 	void init_s11b();
 	void init_s11b_invert();
@@ -33,9 +35,6 @@ protected:
 
 private:
 	DECLARE_MACHINE_RESET(s11b);
-
-	void s11b_audio_map(address_map &map);
-	void s11b_main_map(address_map &map);
 
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
 };

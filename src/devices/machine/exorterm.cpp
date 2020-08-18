@@ -761,11 +761,8 @@ void exorterm155_device::device_start()
 	save_item(NAME(m_kbd_start_holdoff));
 
 	// Keyboard
-
-	if (!m_kbd_scan_timer)
-		m_kbd_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_scan_row), this));
-	if (!m_kbd_repeat_timer)
-		m_kbd_repeat_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_repeat), this));
+	m_kbd_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_scan_row), this));
+	m_kbd_repeat_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_repeat), this));
 	kbd_reset_state();
 	kbd_repeat_stop();
 
@@ -775,6 +772,9 @@ void exorterm155_device::device_start()
 	save_item(NAME(m_kbd_repeat_row));
 	save_item(NAME(m_kbd_repeat_column));
 	save_item(NAME(m_kbd_last_modifiers));
+
+	m_dsr = 1;
+	m_ring = 0;
 }
 
 void exorterm155_device::device_reset()
@@ -792,9 +792,6 @@ void exorterm155_device::device_reset()
 	m_inv_video = 0;
 	m_special_char_disp = 0;
 	m_sys_timer_count = 0;
-
-	m_dsr = 1;
-	m_ring = 0;
 
 	m_beeper->set_state(0);
 
@@ -819,7 +816,7 @@ ROM_START( exorterm155 )
 	ROM_LOAD("51aw1018b24.bin", 0xd800, 0x0800, CRC(18a0ed66) SHA1(5fa6e4b3c27969c1d7e27c79fc2993e4cc9262cf))
 
 	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD("chargen.rom", 0x0000, 0x0800, CRC(0087cbad) SHA1(a6d3dd0512db4c459944c60d728536755a570964))
+	ROM_LOAD("chargen.rom", 0x0000, 0x0800, CRC(0087cbad) SHA1(a6d3dd0512db4c459944c60d728536755a570964) BAD_DUMP) // constructed from an apparently similar published Motorola character set
 
 ROM_END
 

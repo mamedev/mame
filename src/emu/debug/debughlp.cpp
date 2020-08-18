@@ -112,10 +112,10 @@ static const help_item static_help_list[] =
 		"  f[ind] <address>,<length>[,<data>[,...]] -- search program memory for data\n"
 		"  f[ind]d <address>,<length>[,<data>[,...]] -- search data memory for data\n"
 		"  f[ind]i <address>,<length>[,<data>[,...]] -- search I/O memory for data\n"
-		"  dump <filename>,<address>,<length>[,<size>[,<ascii>[,<CPU>]]] -- dump program memory as text\n"
-		"  dumpd <filename>,<address>,<length>[,<size>[,<ascii>[,<CPU>]]] -- dump data memory as text\n"
-		"  dumpi <filename>,<address>,<length>[,<size>[,<ascii>[,<CPU>]]] -- dump I/O memory as text\n"
-		"  dumpo <filename>,<address>,<length>[,<size>[,<ascii>[,<CPU>]]] -- dump opcodes memory as text\n"
+		"  dump <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump program memory as text\n"
+		"  dumpd <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump data memory as text\n"
+		"  dumpi <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump I/O memory as text\n"
+		"  dumpo <filename>,<address>,<length>[,<size>[,<ascii>[,<rowsize>[,<CPU>]]]] -- dump opcodes memory as text\n"
 		"  save <filename>,<address>,<length>[,<CPU>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<CPU>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<CPU>] -- save binary I/O memory to the given file\n"
@@ -601,6 +601,23 @@ static const help_item static_help_list[] =
 		"find 0,8000,\"AAR\",d.0,\"BEN\",w.0\n"
 		"  Searches the address range 0000-7fff for the string \"AAR\" followed by a dword-sized 0 "
 		"followed by the string \"BEN\", followed by a word-sized 0.\n"
+	},
+	{
+		"fill",
+		"\n"
+		"  fill[{d|i}] <address>,<length>[,<data>[,...]]\n"
+		"\n"
+		"The fill/filld/filli commands overwrite a block of memory with copies of the specified "
+		"sequence of data. 'fill' will fill program space memory, while 'filld' will fill data space "
+		"memory and 'filli' will fill I/O space memory. <address> indicates the address to begin "
+		"writing, and <length> indicates how much memory to fill. <data> can either be a quoted "
+		"string or a numeric value or expression. Non-string data is written by default in the "
+		"native word size of the CPU. To override the data size for non-strings, you can prefix "
+		"the value with b. to force byte-sized fill, w. for word-sized fill, d. for dword-sized, "
+		"and q. for qword-sized. Overrides are remembered, so if you want to fill with a series of "
+		"words, you need only to prefix the first value with a w. Note also that you can intermix "
+		"sizes in order to perform more complex fills. The fill operation may be truncated if a page "
+		"fault occurs or if part of the sequence or string would fall beyond <address>+<length>-1.\n"
 	},
 	{
 		"dump",

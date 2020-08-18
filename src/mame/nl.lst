@@ -49,6 +49,18 @@ warrior                         // (c) 1979 Vectorbeam
 wotw                            // (c) 1981
 wotwc                           // (c) 1981
 
+@source:carpolo.cpp
+carpolo                         // (c) 1977
+
+@source:starfire.cpp
+fireone                         // (c) 1979 Exidy
+starfir2                        // (c) 1979 Exidy
+starfire                        // Exidy [1979?]
+starfirea                       // Exidy [1979?]
+
+@source:flyball.cpp
+flyball
+
 @source:galaxian.cpp
 600                             // GX353 (c) 1981 Konami
 amidar                          // GX337 (c) 1982 Konami
@@ -306,6 +318,7 @@ masao                           // bootleg
 gunfight                        // 597 [1975] Dave Nutting Associates / Midway
 gunfighto                       // 597 [1975] Dave Nutting Associates / Midway
 280zzzap                        // 610 [1976] Dave Nutting Associates / Midway
+lagunar                         // 622 [1977] Midway
 
 @source:palestra.cpp
 palestra
@@ -508,6 +521,11 @@ wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
 
+@source:sspeedr.cpp
+sspeedr                         // Midway
+
+@source:starcrus.cpp
+starcrus
 
 @source:testpat.cpp
 tp1983

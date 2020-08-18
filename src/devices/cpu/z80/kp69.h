@@ -18,12 +18,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class kp69_device : public device_t, public device_z80daisy_interface
+class kp69_base_device : public device_t, public device_z80daisy_interface
 {
 public:
-	// construction/destruction
-	kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
 	// callback to CPU
 	auto int_callback() { return m_int_callback.bind(); }
 
@@ -32,12 +29,6 @@ public:
 	u8 isrh_r();
 	u8 imrl_r();
 	u8 imrh_r();
-
-	// write handlers
-	void lerl_pgrl_w(u8 data);
-	void lerh_pgrh_w(u8 data);
-	void imrl_w(u8 data);
-	void ivr_imrh_w(u8 data);
 
 	// interrupt inputs
 	template <int N> DECLARE_WRITE_LINE_MEMBER(ir_w)
@@ -49,6 +40,9 @@ public:
 	void add_to_state(device_state_interface &state, int index);
 
 protected:
+	// construction/destruction
+	kp69_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -59,7 +53,6 @@ protected:
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 
-private:
 	// internal helpers
 	bool int_active() const;
 	void set_int(bool active);
@@ -79,11 +72,31 @@ private:
 	u16 m_isr;
 	bool m_illegal_state;
 	u8 m_ivr;
-	bool m_ivr_written;
 	u16 m_imr;
 	u16 m_ler;
 	u16 m_pgr;
 	bool m_int_active;
+};
+
+class kp69_device : public kp69_base_device
+{
+public:
+	// device type constructor
+	kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	// write handlers
+	void lerl_pgrl_w(u8 data);
+	void lerh_pgrh_w(u8 data);
+	void imrl_w(u8 data);
+	void ivr_imrh_w(u8 data);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	bool m_ivr_written;
 };
 
 // device type declaration

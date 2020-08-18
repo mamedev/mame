@@ -49,7 +49,7 @@ void epic12_device::device_start()
 	m_clip = m_bitmaps->cliprect();
 	m_clip.set(0, 0x2000 - 1, 0, 0x1000 - 1);
 
-#ifdef DEBUG_VRAM_VIEWER
+#if DEBUG_VRAM_VIEWER
 	m_debug_vram_view_en = false;
 	m_prev_screen_width = m_curr_screen_width = screen().width();
 	m_prev_screen_height = m_curr_screen_height = screen().height();
@@ -140,6 +140,23 @@ inline u16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
 	return data;
 }
 
+/*
+	Upload command
+	This command uploads gfx data to VRAM, from Main CPU RAM.
+
+	Offset Bits              Description
+	       fedcba98 76543210
+	00     0010---- -------- 0x2 for upload
+	       ----0000 00000000 Fixed for upload?
+	02     00000000 00000000 ""
+	04     10011001 10011001 ""
+	06     10011001 10011001 ""
+	08     ---xxxxx xxxxxxxx Destination X start position
+	0a     ----xxxx xxxxxxxx Destination Y start position
+	0c     ---xxxxx xxxxxxxx Source Width
+	0e     ----xxxx xxxxxxxx Source Height
+	10...10 + (Width * Height * 2) Source GFX data (ARGB1555 format)
+*/
 
 inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *addr)
 {
@@ -300,6 +317,41 @@ const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
 	epic12_device::draw_sprite_f1_ti0_tr0_s0_d7, epic12_device::draw_sprite_f1_ti0_tr0_s1_d7, epic12_device::draw_sprite_f1_ti0_tr0_s2_d7, epic12_device::draw_sprite_f1_ti0_tr0_s3_d7, epic12_device::draw_sprite_f1_ti0_tr0_s4_d7, epic12_device::draw_sprite_f1_ti0_tr0_s5_d7, epic12_device::draw_sprite_f1_ti0_tr0_s6_d7, epic12_device::draw_sprite_f1_ti0_tr0_s7_d7,
 };
 
+
+/*
+	Draw command
+	This command draws gfx data.
+
+	Offset Bits              Description
+	       fedcba98 76543210
+	00     0001---- -------- 0x1 for draw
+	       ----x--- -------- Flip X
+	       -----x-- -------- Flip Y
+	       ------x- -------- Enable Blending
+	       -------x -------- Enable Transparent
+	       -------- -xxx---- Source Blending mode
+	       -------- -----xxx Destination Blending mode
+	02     xxxxxxxx -------- Source Alpha value
+	       -------- xxxxxxxx Destination Alpha value
+	04     ---xxxxx xxxxxxxx Source X start position
+	06     ----xxxx xxxxxxxx Source Y start position
+	08     sxxxxxxx xxxxxxxx Destination X start position
+	0a     sxxxxxxx xxxxxxxx Destination Y start position
+	0c     ---xxxxx xxxxxxxx Source Width
+	0e     ----xxxx xxxxxxxx Source Height
+	10     -------- xxxxxxxx Source Red multiplication (0x80 = 100%)
+	12     xxxxxxxx -------- Source Green multiplication (0x80 = 100%)
+	       -------- xxxxxxxx Source Blue multiplication (0x80 = 100%)
+
+	Blending mode (description from ibara test mode)
+	000 +alpha
+	001 +source
+	010 +destination
+	100 -alpha
+	101 -source
+	110 -destination
+	others are reserved/disable?
+*/
 
 inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *addr)
 {
@@ -534,6 +586,7 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 
 	while (1)
 	{
+		// request commands from main CPU RAM
 		const u16 data = COPY_NEXT_WORD(space, &addr);
 
 		switch (data & 0xf000)
@@ -576,6 +629,7 @@ void epic12_device::gfx_exec(void)
 
 	while (1)
 	{
+		// request commands from main CPU RAM
 		const u16 data = READ_NEXT_WORD(&addr);
 
 		switch (data & 0xf000)
@@ -618,6 +672,7 @@ void epic12_device::gfx_exec_unsafe(void)
 
 	while (1)
 	{
+		// request commands from main CPU RAM
 		const u16 data = READ_NEXT_WORD(&addr);
 
 		switch (data & 0xf000)
@@ -714,7 +769,7 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 			}
 
 			m_gfx_addr_shadowcopy = m_gfx_addr;
-			m_gfx_scroll_0_x_shadowcopy =  m_gfx_scroll_0_x;
+			m_gfx_scroll_0_x_shadowcopy = m_gfx_scroll_0_x;
 			m_gfx_scroll_0_y_shadowcopy = m_gfx_scroll_0_y;
 			m_gfx_scroll_1_x_shadowcopy = m_gfx_scroll_1_x;
 			m_gfx_scroll_1_y_shadowcopy = m_gfx_scroll_1_y;
@@ -782,7 +837,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-#ifdef DEBUG_VRAM_VIEWER
+#if DEBUG_VRAM_VIEWER
 	int curr_width = m_curr_screen_width;
 	int curr_height = m_curr_screen_height;
 	rectangle curr_visarea = m_curr_screen_visarea;
@@ -809,7 +864,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	//printf("SCREEN UPDATE\n %d %d %d %d\n", scroll_0_x, scroll_0_y, scroll_1_x, scroll_1_y);
 
-#ifdef DEBUG_VRAM_VIEWER
+#if DEBUG_VRAM_VIEWER
 	if (m_debug_vram_view_en)
 		copybitmap(bitmap, *m_bitmaps, 0, 0, 0, 0, cliprect);
 	else

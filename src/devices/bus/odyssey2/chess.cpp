@@ -9,24 +9,22 @@ Hardware notes:
 - NSC800 (Z80-compatible) @ 4.43MHz
 - 8KB ROM, 2KB RAM
 
-Service manual with schematics is available.
-
 ******************************************************************************/
 
 #include "emu.h"
 #include "chess.h"
+
+DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac C7010")
 
 
 //-------------------------------------------------
 //  o2_chess_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac Chess Module")
-
-
 o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	o2_rom_device(mconfig, O2_ROM_CHESS, tag, owner, clock),
-	m_cpu(*this, "subcpu"),
+	device_t(mconfig, O2_ROM_CHESS, tag, owner, clock),
+	device_o2_cart_interface(mconfig, *this),
+	m_maincpu(*this, "maincpu"),
 	m_latch(*this, "latch%u", 0)
 { }
 
@@ -65,9 +63,10 @@ void o2_chess_device::chess_io(address_map &map)
 
 void o2_chess_device::device_add_mconfig(machine_config &config)
 {
-	NSC800(config, m_cpu, 4.433619_MHz_XTAL);
-	m_cpu->set_addrmap(AS_PROGRAM, &o2_chess_device::chess_mem);
-	m_cpu->set_addrmap(AS_IO, &o2_chess_device::chess_io);
+	// basic machine hardware
+	NSC800(config, m_maincpu, 4.433619_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &o2_chess_device::chess_mem);
+	m_maincpu->set_addrmap(AS_IO, &o2_chess_device::chess_io);
 
 	GENERIC_LATCH_8(config, m_latch[0]);
 	GENERIC_LATCH_8(config, m_latch[1]);
@@ -78,18 +77,18 @@ void o2_chess_device::device_add_mconfig(machine_config &config)
 //  mapper specific handlers
 //-------------------------------------------------
 
-void o2_chess_device::write_bank(int bank)
+void o2_chess_device::write_p1(u8 data)
 {
-	// P10: must be low to access latches
 	// P11: reset
-	m_cpu->set_input_line(INPUT_LINE_RESET, (bank & 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
-	m_control = bank;
+	// P10,P14: must be low to access latches
+	m_control = data;
 }
 
 u8 o2_chess_device::io_read(offs_t offset)
 {
-	if (offset & 0x80 && offset & 0x20 && ~m_control & 1)
+	if ((offset & 0xa0) == 0xa0 && (m_control & 0x11) == 0)
 		return m_latch[0]->read();
 	else
 		return 0xff;
@@ -97,6 +96,6 @@ u8 o2_chess_device::io_read(offs_t offset)
 
 void o2_chess_device::io_write(offs_t offset, u8 data)
 {
-	if (offset & 0x80 && ~m_control & 1)
+	if (offset & 0x80 && (m_control & 0x11) == 0)
 		m_latch[1]->write(data);
 }

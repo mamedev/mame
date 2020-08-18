@@ -3,6 +3,26 @@
 /*
  * nld_82S115.cpp
  *
+ *  82S115: 4K-bit TTL bipolar PROM (512 x 8)
+ *
+ *          +--------------+
+ *       A3 |1     ++    24| VCC
+ *       A4 |2           23| A2
+ *       A5 |3           22| A1
+ *       A6 |4   82S115  21| A0
+ *       A7 |5           20| CE1Q
+ *       A8 |6           19| CE2
+ *       O1 |7           18| STROBE
+ *       O2 |8           17| O8
+ *       O3 |9           16| O7
+ *       O4 |10          15| O6
+ *      FE2 |11          14| O5
+ *      GND |12          13| FE1
+ *          +--------------+
+ *
+ *
+ *  Naming conventions follow Signetics datasheet
+ *
  */
 
 #include "nld_82S115.h"

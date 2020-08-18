@@ -10,6 +10,8 @@
 
 #include "base_objects.h"
 #include "state_var.h"
+#include "core_device.h"
+#include "exec.h"
 
 #include "../nltypes.h"
 #include "../plib/plists.h"
@@ -43,6 +45,12 @@ namespace netlist
 
 			virtual void reset() noexcept;
 
+			// -----------------------------------------------------------------------------
+			// Hot section
+			//
+			// Any changes below will impact performance.
+			// -----------------------------------------------------------------------------
+
 			void toggle_new_Q() noexcept { m_new_Q = (m_cur_Q ^ 1);   }
 
 			void toggle_and_push_to_queue(const netlist_time &delay) noexcept
@@ -51,11 +59,42 @@ namespace netlist
 				push_to_queue(delay);
 			}
 
-			void push_to_queue(const netlist_time &delay) noexcept;
+			void push_to_queue(const netlist_time &delay) noexcept
+			{
+				if (has_connections())
+				{
+					if (!!is_queued())
+						exec().qremove(this);
+
+					const auto nst(exec().time() + delay);
+					m_next_scheduled_time = nst;
+
+					if (!m_list_active.empty())
+					{
+						m_in_queue = queue_status::QUEUED;
+						exec().qpush(nst, this);
+					}
+					else
+					{
+						m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
+						update_inputs();
+					}
+				}
+			}
 			NVCC_CONSTEXPR bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
-			inline void update_devs() noexcept;
+			inline void update_devs() noexcept
+			{
+				nl_assert(this->is_rail_net());
+
+				m_in_queue = queue_status::DELIVERED; // mark as taken ...
+				if (m_new_Q ^ m_cur_Q)
+				{
+					process<KEEP_STATS>((m_new_Q << core_terminal_t::INP_LH_SHIFT)
+						| (m_cur_Q << core_terminal_t::INP_HL_SHIFT), m_new_Q);
+				}
+			}
 
 			netlist_time_ext next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
@@ -65,10 +104,47 @@ namespace netlist
 
 			bool has_connections() const noexcept { return !m_core_terms.empty(); }
 
-			void add_to_active_list(core_terminal_t &term) noexcept;
-			void remove_from_active_list(core_terminal_t &term) noexcept;
+			void add_to_active_list(core_terminal_t &term) noexcept
+			{
+				if (!m_list_active.empty())
+				{
+					term.set_copied_input(m_cur_Q);
+					m_list_active.push_front(&term);
+				}
+				else
+				{
+					m_list_active.push_front(&term);
+					railterminal().device().do_inc_active();
+					if (m_in_queue == queue_status::DELAYED_DUE_TO_INACTIVE)
+					{
+						if (m_next_scheduled_time > exec().time())
+						{
+							m_in_queue = queue_status::QUEUED;     // pending
+							exec().qpush(m_next_scheduled_time, this);
+						}
+						else
+						{
+							m_in_queue = queue_status::DELIVERED;
+							m_cur_Q = m_new_Q;
+						}
+						update_inputs();
+					}
+					else
+						term.set_copied_input(m_cur_Q);
+				}
+			}
 
-			// setup stuff
+			void remove_from_active_list(core_terminal_t &term) noexcept
+			{
+				gsl_Expects(!m_list_active.empty());
+				m_list_active.remove(&term);
+				if (m_list_active.empty())
+					railterminal().device().do_dec_active();
+			}
+
+			// -----------------------------------------------------------------------------
+			// setup stuff - cold
+			// -----------------------------------------------------------------------------
 
 			bool is_logic() const noexcept;
 			bool is_analog() const noexcept;
@@ -135,8 +211,39 @@ namespace netlist
 			plib::linkedlist_t<core_terminal_t> m_list_active;
 			std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
+			// -----------------------------------------------------------------------------
+			// Very hot
+			// -----------------------------------------------------------------------------
+
 			template <bool KEEP_STATS, typename T, typename S>
-			void process(T mask, const S &sig) noexcept;
+			void process(T mask, const S &sig) noexcept
+			{
+				m_cur_Q = sig;
+
+				if (KEEP_STATS)
+				{
+					for (auto & p : m_list_active)
+					{
+						p.set_copied_input(sig);
+						auto *stats(p.device().stats());
+						stats->m_stat_call_count.inc();
+						if ((p.terminal_state() & mask))
+						{
+							auto g(stats->m_stat_total_time.guard());
+							p.run_delegate();
+						}
+					}
+				}
+				else
+				{
+					for (auto &p : m_list_active)
+					{
+						p.set_copied_input(sig);
+						if ((p.terminal_state() & mask) != 0)
+							p.run_delegate();
+					}
+				}
+			}
 		};
 	} // namespace detail
 

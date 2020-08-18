@@ -747,10 +747,10 @@ void zzzap_state::io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x02, 0x02).w("soundboard", FUNC(zzzap_audio_device::p1_w));
+	map(0x02, 0x02).w("soundboard", FUNC(zzzap_common_audio_device::p1_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w("soundboard", FUNC(zzzap_audio_device::p2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(zzzap_common_audio_device::p2_w));
 	map(0x07, 0x07).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -824,7 +824,7 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-void zzzap_state::zzzap(machine_config &config)
+void zzzap_state::zzzap_common(machine_config &config)
 {
 	mw8080bw_root(config);
 
@@ -836,8 +836,25 @@ void zzzap_state::zzzap(machine_config &config)
 	/* add shifter */
 	MB14241(config, m_mb14241);
 
+	/* audio hardware handled by specific machine */
+}
+
+
+void zzzap_state::zzzap(machine_config &config)
+{
+	zzzap_common(config);
+
 	/* audio hardware */
 	ZZZAP_AUDIO(config, "soundboard");
+}
+
+
+void zzzap_state::lagunar(machine_config &config)
+{
+	zzzap_common(config);
+
+	/* audio hardware */
+	LAGUNAR_AUDIO(config, "soundboard");
 }
 
 
@@ -3094,14 +3111,14 @@ ROM_END
 /* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
 /* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, desertgu,   0,        desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, roadrunm,   desertgu, desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 619 */ GAME(  1977, dplay,      0,        dplay,    dplay,    dplay_state,    empty_init, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL( 1977, lagunar,    0,        zzzap,    lagunar,  zzzap_state, empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
+/* 622 */ GAMEL( 1977, lagunar,    0,        lagunar,  lagunar,  zzzap_state,    empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_SUPPORTS_SAVE, layout_lagunar )
 /* 623 */ GAME(  1977, gmissile,   0,        gmissile, gmissile, boothill_state, empty_init, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 626 */ GAME(  1977, m4,         0,        m4,       m4,       boothill_state, empty_init, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )

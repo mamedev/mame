@@ -656,18 +656,13 @@ void midwunit_state::wunit_picsim(machine_config &config)
 {
 	wunit(config);
 	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
-	m_midway_serial_pic->set_upper(528); // this is actually a generic code all games check for in addition to their own game specific code!
+	m_midway_serial_pic->set_upper(528); // this is actually development PIC code, all games check for in addition to their own game specific code!
 }
 
 void midwunit_state::wunit_picemu(machine_config &config)
 {
 	wunit(config);
 	MIDWAY_SERIAL_PIC_EMU(config, m_midway_serial_pic_emu, 0);
-
-	// todo, REMOVE once the emulated PIC above works!
-	// this just allows it to fall through to the simulation for now
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
-	m_midway_serial_pic->set_upper(528);
 }
 
 

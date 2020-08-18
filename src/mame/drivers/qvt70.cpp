@@ -2,9 +2,9 @@
 // copyright-holders: Dirk Best
 /****************************************************************************
 
-    Qume QVT-70 terminal
+    Qume QVT-70/QVT-82 terminal
 
-    Hardware:
+    QVT-70:
     - Z80 (Z8040008VSC)
     - Z80 DART (Z0847006PSC)
     - QUME 303489-01 QFP144
@@ -21,6 +21,16 @@
     - 78 hz with 16x13 characters
     - 64 background/foreground colors
     - 80/132 columns
+
+    QVT-82:
+	- Z80 (Z0840008PSC)
+	- Z80 DART (Z0847006PSC)
+	- QUME 303489-01 QFP144
+	- ROM 64k * 2
+	- RAM 8k UM6264AK-10L (above Z80) + 8k UM6264K-70L * 3 (below Z80)
+	- DS1231
+	- 54.2857MHz XTAL
+	- Battery
 
 ****************************************************************************/
 
@@ -331,12 +341,13 @@ void qvt70_state::unk_60_w(uint8_t data)
 
 void qvt70_state::rombank_w(uint8_t data)
 {
-//  logerror("rombank_w: %02x\n", data);
+	if (data & ~0x19)
+		logerror("rombank_w: %02x\n", data);
 
-	// 765----- unknown
-	// ---43--- bankswitching
-	// -----21- unknown
-	// -------0 bankswitching
+	// 765-----  unknown
+	// ---43---  bankswitching
+	// -----21-  unknown
+	// -------0  bankswitching
 
 	switch (data & 0x19)
 	{
@@ -407,4 +418,11 @@ ROM_START( qvt70 )
 	ROM_LOAD( "251513-04_revj.u12", 0x20000, 0x10000, CRC(3960bbd5) SHA1(9db306cef09be21ff43c081ebe11e9b46f617861) ) // 251513-04  C/S:18D0  95' REV.J (checksum matches)
 ROM_END
 
+ROM_START( qvt82 )
+	ROM_REGION(0x30000, "maincpu", 0)
+	ROM_LOAD( "304229-02d_revd.u6", 0x00000, 0x10000, CRC(597431df) SHA1(10c4669b759dd7cfd6746e54dc12807197cf841a) ) // 304229-02D  QVT-82 REV. D  U6 (BF7F) (checksum matches)
+	ROM_LOAD( "304229-01d_revd.u5", 0x20000, 0x10000, CRC(9ebd09b6) SHA1(ef9f002016d05b770e7b66d15f05fc286bd022d9) ) // 304229-01D  QVT-82 REV. D  U5 (462B) (checksum matches)
+ROM_END
+
 COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-70", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, qvt82, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-82", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

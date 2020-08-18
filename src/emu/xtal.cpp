@@ -90,7 +90,8 @@ const double XTAL::known_xtals[] = {
 	  3'120'000, /* 3.12_MHz_XTAL          SP0250 clock on Gottlieb games */
 	  3'276'800, /* 3.2768_MHz_XTAL        SP0256 clock in Speech Synthesis for Dragon 32 */
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
-	  3'546'800, /* 3.5468_MHz_XTAL        Atari 400 PAL, Philips G7200 */
+	  3'546'800, /* 3.5468_MHz_XTAL        Atari 400 PAL */
+	  3'547'000, /* 3.547_MHz_XTAL         Philips G7200, Philips C7240 */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */
 	  3'579'000, /* 3.579_MHz_XTAL         BeebOPL */
@@ -143,6 +144,7 @@ const double XTAL::known_xtals[] = {
 	  8'467'200, /* 8.4672_MHz_XTAL        Subsino's Ying Hua Lian */
 	  8'664'000, /* 8.664_MHz_XTAL         Touchmaster */
 	  8'700'000, /* 8.7_MHz_XTAL           Tandberg TDV 2324 */
+	  8'867'000, /* 8.867_MHz_XTAL         Philips G7400 (~2x PAL subcarrier) */
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
@@ -263,8 +265,11 @@ const double XTAL::known_xtals[] = {
 	 17'430'000, /* 17.43_MHz_XTAL         Videx Videoterm */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
 	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
-	 17'734'470, /* 17.73447_MHz_XTAL      (~4x PAL subcarrier) */
-	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
+	 17'734'470, /* 17.73447_MHz_XTAL      4x PAL subcarrier */
+	 17'734'472, /* 17.734472_MHz_XTAL     4x PAL subcarrier - All of these exist, exact 4x PAL is actually 17'734'475 */
+	 17'734'475, /* 17.734475_MHz_XTAL     4x PAL subcarrier - " */
+	 17'734'476, /* 17.734476_MHz_XTAL     4x PAL subcarrier - " */
+	 17'812'000, /* 17.812_MHz_XTAL        Videopac C52 */
 	 17'971'200, /* 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III */
 	 18'000'000, /* 18_MHz_XTAL            S.A.R, Ikari Warriors 3 */
 	 18'414'000, /* 18.414_MHz_XTAL        Ann Arbor Ambassador */

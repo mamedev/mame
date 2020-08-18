@@ -5,7 +5,6 @@
 #include "analog/nld_twoterm.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
-#include "devices/nlid_system.h"
 #include "devices/nlid_truthtable.h"
 #include "nl_base.h"
 #include "nl_factory.h"
@@ -13,8 +12,11 @@
 #include "nl_setup.h"
 #include "plib/penum.h"
 #include "plib/putil.h"
+#include "plib/pstonum.h"
 
 #include "solver/nld_solver.h"
+
+#include <sstream>
 
 namespace netlist
 {
@@ -85,8 +87,8 @@ namespace netlist
 		pstring key = build_fqn(name);
 		if (device_exists(key))
 		{
-			log().fatal(MF_DEVICE_ALREADY_EXISTS_1(name));
-			throw nl_exception(MF_DEVICE_ALREADY_EXISTS_1(name));
+			log().fatal(MF_DEVICE_ALREADY_EXISTS_1(key));
+			throw nl_exception(MF_DEVICE_ALREADY_EXISTS_1(key));
 		}
 
 		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(), {key, f});
@@ -330,8 +332,8 @@ namespace netlist
 	{
 		if (!m_abstract.m_alias.insert({alias, out}).second)
 		{
-			log().fatal(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
-			throw nl_exception(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
+			log().fatal(MF_ALIAS_ALREAD_EXISTS_1(alias));
+			throw nl_exception(MF_ALIAS_ALREAD_EXISTS_1(alias));
 		}
 	}
 
@@ -350,12 +352,47 @@ namespace netlist
 		return false;
 	}
 
+	bool nlparse_t::parse_tokens(const parser_t::token_store &tokens, const pstring &name)
+	{
+		parser_t parser(*this);
+		return parser.parse(tokens, name);
+	}
+
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
-		auto y = std::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
-		y->process(std::move(istrm), "<stream>");
-		return parser_t(std::move(y), *this).parse(name);
-		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
+#if 0
+		auto key = istrm.filename();
+
+		if (m_source_cache.find(key) != m_source_cache.end())
+		{
+			return parser_t(*this).parse(m_source_cache[key], name);
+		}
+		else
+		{
+			//printf("searching %s\n", name.c_str());
+			plib::ppreprocessor y(m_includes, &m_defines);
+			y.process(std::move(istrm), istrm.filename());
+
+			auto abc = std::make_unique<std::stringstream>();
+			plib::copystream(*abc, y);
+
+			parser_t::token_store &st = m_source_cache[key];
+			parser_t parser(*this);
+			parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), key), st);
+			return parser.parse(st, name);
+		}
+#else
+		plib::ppreprocessor y(m_includes, &m_defines);
+		y.process(std::move(istrm), istrm.filename());
+
+		auto abc = std::make_unique<std::stringstream>();
+		plib::copystream(*abc, y);
+
+		parser_t::token_store st;
+		parser_t parser(*this);
+		parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), istrm.filename()), st);
+		return parser.parse(st, name);
+#endif
 	}
 
 	void nlparse_t::add_define(const pstring &defstr)
@@ -1692,6 +1729,19 @@ source_file_t::stream_ptr source_file_t::stream(const pstring &name)
 		return stream_ptr();
 }
 
+source_file_t::stream_ptr source_pattern_t::stream(const pstring &name)
+{
+	pstring filename = plib::pfmt(m_pattern)(name);
+	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
+	if (f->is_open())
+	{
+		return stream_ptr(std::move(f), filename);
+	}
+	else
+		return stream_ptr();
+}
+
+
 bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 {
 	if (name == m_setup_func_name)
@@ -1704,6 +1754,23 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 }
 
 source_proc_t::stream_ptr source_proc_t::stream(const pstring &name)
+{
+	plib::unused_var(name);
+	return stream_ptr();
+}
+
+bool source_token_t::parse(nlparse_t &setup, const pstring &name)
+{
+	if (name == m_name)
+	{
+		auto ret = setup.parse_tokens(m_store, name);
+		return ret;
+	}
+
+	return false;
+}
+
+source_proc_t::stream_ptr source_token_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return stream_ptr();

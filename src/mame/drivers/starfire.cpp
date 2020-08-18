@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Dan Boris, Olivier Galibert, Aaron Giles
+// copyright-holders:Dan Boris, Olivier Galibert, Aaron Giles, Ryan Holtz
 /***************************************************************************
 
     Star Fire/Fire One system
 
     driver by Daniel Boris, Olivier Galibert, Aaron Giles
+
+    netlist audio by Ryan Holtz
 
 ****************************************************************************
 
@@ -41,8 +43,8 @@
 
 Notes:
 
-starfira has one less rom in total than starfire but everything passes as
- ok in the rom test so its probably just an earlier revision or something
+starfira has one less ROM in total than starfire, but everything passes as
+ OK in the ROM test, so it's probably just an earlier revision.
 
 ***************************************************************************/
 
@@ -50,9 +52,7 @@ starfira has one less rom in total than starfire but everything passes as
 #include "includes/starfire.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/samples.h"
 #include "speaker.h"
-
 
 /*************************************
  *
@@ -60,35 +60,37 @@ starfira has one less rom in total than starfire but everything passes as
  *
  *************************************/
 
-void starfire_state::starfire_scratch_w(offs_t offset, uint8_t data)
+void starfire_base_state::scratch_w(offs_t offset, uint8_t data)
 {
-	/* A12 and A3 select video control registers */
+	/* A12 and A3 select video control registers, only the low 4 addresses have an effect */
 	if ((offset & 0x1008) == 0x1000)
 	{
 		switch (offset & 7)
 		{
-			case 0: m_starfire_vidctrl = data; break;
-			case 1: m_starfire_vidctrl1 = data; break;
-			case 2: m_io2_write(data); break;
+			case 0: m_vidctrl = data; break;
+			case 1: m_vidctrl1 = data; break;
+			case 2:
+			case 3: sound_w(offset & 1, data); break;
+			case 7: music_w((offset >> 10) & 3, data); break;
 			default: break;
 		}
 	}
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
-	m_starfire_videoram[offset] = data;
+	m_videoram[offset] = data;
 }
 
 
-uint8_t starfire_state::starfire_scratch_r(offs_t offset)
+uint8_t starfire_base_state::scratch_r(offs_t offset)
 {
 	/* A11 selects input ports */
 	if (offset & 0x800)
-		return m_input_read(offset);
+		return input_r(offset);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
-	return m_starfire_videoram[offset];
+	return m_videoram[offset];
 }
 
 
@@ -99,65 +101,97 @@ uint8_t starfire_state::starfire_scratch_r(offs_t offset)
  *
  *************************************/
 
-void starfire_state::starfire_sound_w(uint8_t data)
+void starfire_state::sound_w(offs_t offset, uint8_t data)
 {
-	// starfire sound samples (preliminary)
-	uint8_t rise = data & ~m_prev_sound;
-	m_prev_sound = data;
-
-	// d0: rumble
-	if (rise & 1) m_samples->start(0, 0, true);
-	if (~data & 1) m_samples->stop(0);
-
-	// d1: explosion
-	// d2: tie weapon
-	// d3: laser
-	if (rise & 2) m_samples->start(1, 1);
-	if (rise & 4) m_samples->start(2, 2);
-	if (rise & 8) m_samples->start(3, 3);
-
-	// these are from the same generator (called "computer" in schematics)
-	// d4: track
-	// d5: lock
-	// d6: scanner
-	// d7: overheat
-	if (rise & 0x80) m_samples->start(4, 7);
-	else if (rise & 0x40) m_samples->start(4, 6);
-	else if (rise & 0x20) m_samples->start(4, 5);
-	else if (rise & 0x10) m_samples->start(4, 4);
+	m_sound_size->write(BIT(data, 0));
+	m_sound_explosion->write(BIT(data, 1));
+	m_sound_tie->write(BIT(data, 2));
+	m_sound_laser->write(BIT(data, 3));
+	m_sound_track->write(BIT(data, 4));
+	m_sound_lock->write(BIT(data, 5));
+	m_sound_scanner->write(BIT(data, 6));
+	m_sound_overheat->write(BIT(data, 7));
+	synchronize();
 }
 
-void starfire_state::fireone_sound_w(uint8_t data)
+void fireone_state::sound_w(offs_t offset, uint8_t data)
 {
-	// TODO: sound
-	m_fireone_select = (data & 0x8) ? 0 : 1;
+	if (offset == 0)
+	{
+		m_sound_left_torpedo->write(BIT(data, 0));
+		m_sound_left_partial_hit->write(BIT(data, 1));
+		m_sound_left_boom->write(BIT(data, 2));
+		m_player_select = BIT(~data, 3);
+		m_pit->write_gate0(BIT(data, 4));
+		m_pit->write_gate1(BIT(data, 5));
+		m_pit->write_gate2(BIT(data, 6));
+		m_sound_off_left->write(BIT(data, 7));  // HACK: There's only one SOUND_OFF signal, but it splits into the left and right mixer stages.
+		m_sound_off_right->write(BIT(data, 7)); // Having the left and right halves split provides a better opportunity for frontier isolation.
+	}
+	else
+	{
+		m_sound_right_torpedo->write(BIT(data, 0));
+		m_sound_right_partial_hit->write(BIT(data, 1));
+		m_sound_right_boom->write(BIT(data, 2));
+		m_sound_torpedo_collision->write(BIT(data, 3));
+		m_sound_submarine_engine->write(BIT(data, 4));
+		m_sound_alert->write(BIT(data, 5));
+		m_sound_sonar_sync->write(BIT(data, 6));
+		m_sound_sonar_enable->write(BIT(~data, 7));
+	}
 }
 
+void fireone_state::music_w(offs_t offset, uint8_t data)
+{
+	m_pit->write(offset, data);
+}
 
-uint8_t starfire_state::starfire_input_r(offs_t offset)
+WRITE_LINE_MEMBER(fireone_state::music_a_out_cb)
+{
+	m_music_a->write(state);
+}
+
+WRITE_LINE_MEMBER(fireone_state::music_b_out_cb)
+{
+	m_music_b->write(state);
+}
+
+WRITE_LINE_MEMBER(fireone_state::music_c_out_cb)
+{
+	m_music_c->write(state);
+}
+
+uint8_t starfire_state::input_r(offs_t offset)
 {
 	switch (offset & 15)
 	{
-		case 0: return ioport("DSW")->read();
-		case 1:
-		{
-			// d3 and d4 come from the audio circuit, how does it work exactly?
-			// tie_on sounds ok, but laser_on sounds buggy
-			uint8_t tie_on = m_samples->playing(2) ? 0x00 : 0x08;
-			uint8_t laser_on = m_samples->playing(3) ? 0x00 : 0x10;
-			uint8_t input = ioport("SYSTEM")->read() & 0xe7;
-			return input | tie_on | laser_on | 0x10; // disable laser_on for now
-		}
-		case 5: return ioport("STICKZ")->read();
-		case 6: return ioport("STICKX")->read();
-		case 7: return ioport("STICKY")->read();
+		case 0: return m_dsw->read();
+		case 1: return (m_system->read() & 0xe7) | m_sound_tie_on | m_sound_laser_on;
+		case 5: return m_stickz->read();
+		case 6: return m_stickx->read();
+		case 7: return m_sticky->read();
 		default: return 0xff;
 	}
 }
 
-uint8_t starfire_state::fireone_input_r(offs_t offset)
+NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::tieon1_cb)
 {
-	static const uint8_t fireone_paddle_map[64] =
+	m_sound_tie_on = (data > 2.5) ? 0x00 : 0x08;
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::laseron1_cb)
+{
+	m_sound_laser_on = (data > 2.5) ? 0x00 : 0x10;
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::sound_out_cb)
+{
+	m_dac->write(std::round(8192.0 * data));
+}
+
+uint8_t fireone_state::input_r(offs_t offset)
+{
+	static const uint8_t s_paddle_map[64] =
 	{
 		0x00,0x01,0x03,0x02,0x06,0x07,0x05,0x04,
 		0x0c,0x0d,0x0f,0x0e,0x0a,0x0b,0x09,0x08,
@@ -171,12 +205,14 @@ uint8_t starfire_state::fireone_input_r(offs_t offset)
 
 	switch (offset & 15)
 	{
-		case 0: return ioport("DSW")->read();
-		case 1: return ioport("SYSTEM")->read();
+		case 0:
+			return m_dsw->read();
+		case 1:
+			return m_system->read();
 		case 2:
 		{
-			uint8_t input = m_fireone_select ? ioport("P1")->read() : ioport("P2")->read();
-			return (input & 0xc0) | fireone_paddle_map[input & 0x3f];
+			const uint8_t input = m_controls[m_player_select]->read();
+			return (input & 0xc0) | s_paddle_map[input & 0x3f];
 		}
 		default: return 0xff;
 	}
@@ -190,12 +226,12 @@ uint8_t starfire_state::fireone_input_r(offs_t offset)
  *
  *************************************/
 
-void starfire_state::main_map(address_map &map)
+void starfire_base_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).rw(FUNC(starfire_state::starfire_scratch_r), FUNC(starfire_state::starfire_scratch_w));
-	map(0xa000, 0xbfff).rw(FUNC(starfire_state::starfire_colorram_r), FUNC(starfire_state::starfire_colorram_w)).share("colorram");
-	map(0xc000, 0xffff).rw(FUNC(starfire_state::starfire_videoram_r), FUNC(starfire_state::starfire_videoram_w)).share("videoram");
+	map(0x8000, 0x9fff).rw(FUNC(starfire_base_state::scratch_r), FUNC(starfire_base_state::scratch_w));
+	map(0xa000, 0xbfff).rw(FUNC(starfire_base_state::colorram_r), FUNC(starfire_base_state::colorram_w)).share("colorram");
+	map(0xc000, 0xffff).rw(FUNC(starfire_base_state::videoram_r), FUNC(starfire_base_state::videoram_w)).share("videoram");
 }
 
 
@@ -233,8 +269,8 @@ static INPUT_PORTS_START( starfire )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) // (audio) TIE ON, see starfire_input_r
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) // (audio) LASER ON, see starfire_input_r
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) // (audio) TIE ON, see input_r
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) // (audio) LASER ON, see input_r
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // SLAM/STATIC
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -252,6 +288,27 @@ static INPUT_PORTS_START( starfire )
 	PORT_CONFNAME( 0x01, 0x01, "Jumper J6/4G: Enable NMI" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_START("POT_TRACK")
+	PORT_ADJUSTER( 50, "Tracking Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "trackvol")
+
+	PORT_START("POT_LASER")
+	PORT_ADJUSTER( 50, "Laser Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "laservol")
+
+	PORT_START("POT_TIE")
+	PORT_ADJUSTER( 50, "Enemy Shot Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "enemyvol")
+
+	PORT_START("POT_SIZE")
+	PORT_ADJUSTER( 50, "'Size' Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "sizevol")
+
+	PORT_START("POT_EXPLO")
+	PORT_ADJUSTER( 50, "Explosion Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "explovol")
+
+	PORT_START("POT_LOH")
+	PORT_ADJUSTER( 50, "Lock/Scan/Overheat Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "lohvol")
+
+	PORT_START("POT_MAIN")
+	PORT_ADJUSTER( 50, "Main Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "mainvol")
 INPUT_PORTS_END
 
 
@@ -296,6 +353,12 @@ static INPUT_PORTS_START( fireone )
 	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("POT_L")
+	PORT_ADJUSTER( 50, "Mixer Volume (L)" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "volume_l")
+
+	PORT_START("POT_R")
+	PORT_ADJUSTER( 50, "Mixer Volume (R)" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "volume_r")
 INPUT_PORTS_END
 
 
@@ -306,51 +369,133 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const char *const starfire_sample_names[] =
+void starfire_state::machine_start()
 {
-	"*starfire",
-	"size",
-	"explosion",
-	"tie",
-	"laser",
-	"track",
-	"lock",
-	"scanner",
-	"overheat",
-	nullptr
-};
+	save_item(NAME(m_sound_tie_on));
+	save_item(NAME(m_sound_laser_on));
+}
+
+void starfire_state::machine_reset()
+{
+	m_sound_tie_on = 0x08;
+	m_sound_laser_on = 0x10;
+}
+
+void fireone_state::machine_start()
+{
+	save_item(NAME(m_player_select));
+
+	m_pit->set_clockin(0, STARFIRE_CPU_CLOCK.dvalue());
+	m_pit->set_clockin(1, STARFIRE_CPU_CLOCK.dvalue());
+	m_pit->set_clockin(2, STARFIRE_CPU_CLOCK.dvalue());
+}
+
+void fireone_state::machine_reset()
+{
+	m_player_select = 0;
+}
 
 INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 {
 	// starfire has a jumper for disabling NMI, used to do a complete RAM test
-	if (m_nmi.read_safe(0x01))
+	if (m_nmi->read())
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void starfire_state::fireone(machine_config &config)
+INTERRUPT_GEN_MEMBER(fireone_state::vblank_int)
+{
+	device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+void starfire_base_state::base_config(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, STARFIRE_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &starfire_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(starfire_state::vblank_int));
+	m_maincpu->set_addrmap(AS_PROGRAM, &starfire_base_state::main_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART);
-	m_screen->set_screen_update(FUNC(starfire_state::screen_update_starfire));
+	m_screen->set_screen_update(FUNC(starfire_base_state::screen_update));
+}
+
+void fireone_state::fireone(machine_config &config)
+{
+	base_config(config);
+	m_maincpu->set_vblank_int("screen", FUNC(fireone_state::vblank_int));
+
+	PIT8253(config, m_pit);
+	m_pit->out_handler<0>().set(FUNC(fireone_state::music_a_out_cb));
+	m_pit->out_handler<1>().set(FUNC(fireone_state::music_b_out_cb));
+	m_pit->out_handler<2>().set(FUNC(fireone_state::music_c_out_cb));
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(fireone))
+		.add_route(0, "lspeaker", 1.0)
+		.add_route(1, "rspeaker", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:ltorp", "LTORP.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lshpht", "LSHPHT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lboom", "LBOOM.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lsound_off", "SOUND_OFF_L.IN", 0); // HACK: Split the SOUND OFF into left/right halves for better netlist isolation.
+	NETLIST_LOGIC_INPUT(config, "sound_nl:rsound_off", "SOUND_OFF_R.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:rtorp", "RTORP.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:rshpht", "RSHPHT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:rboom", "RBOOM.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:torpcoll", "TORPCOLL.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:subeng", "SUBENG.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:alert", "ALERT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_enable", "SONAR_ENABLE.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:sonar_sync", "SONAR_SYNC.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music_a", "MUSIC_A.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music_b", "MUSIC_B.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music_c", "MUSIC_C.IN", 0);
+	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_l", "R64.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_r", "R65.DIAL");
+
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(100000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(100000.0, 0.0);
 }
 
 void starfire_state::starfire(machine_config &config)
 {
-	fireone(config);
+	base_config(config);
+	m_maincpu->set_vblank_int("screen", FUNC(starfire_state::vblank_int));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(starfire_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_CPU(config, "sound_nl", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(starfire));
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:size", "SIZE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:sexplo", "SEXPLO.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:stie", "STIE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:slaser", "SLASER.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:track", "TRACK.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:lock", "LOCK.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:scanner", "SCANNER.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:oheat", "OHEAT.IN", 0);
+
+	NETLIST_ANALOG_INPUT(config, "sound_nl:trackvol", "R16.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:laservol", "R18.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:enemyvol", "R17.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:sizevol", "R19.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:explovol", "R20.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:lohvol", "R15.DIAL");
+	NETLIST_ANALOG_INPUT(config, "sound_nl:mainvol", "R21.DIAL");
+
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:tieon1", 0).set_params("TIEON1", FUNC(starfire_state::tieon1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:laseron1", 0).set_params("LASERON1", FUNC(starfire_state::laseron1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:output", 0).set_params("OUTPUT", FUNC(starfire_state::sound_out_cb));
+
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // Not actually a DAC, just here to receive output.
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -440,41 +585,13 @@ ROM_START( starfir2 )
 	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) ) /* BPROM type is N82S123 */
 ROM_END
 
-
-
-/*************************************
- *
- *  Driver init
- *
- *************************************/
-
-void starfire_state::init_starfire()
-{
-	m_input_read = read8sm_delegate(*this, FUNC(starfire_state::starfire_input_r));
-	m_io2_write = write8smo_delegate(*this, FUNC(starfire_state::starfire_sound_w));
-
-	/* register for state saving */
-	save_item(NAME(m_prev_sound));
-}
-
-void starfire_state::init_fireone()
-{
-	m_input_read = read8sm_delegate(*this, FUNC(starfire_state::fireone_input_r));
-	m_io2_write = write8smo_delegate(*this, FUNC(starfire_state::fireone_sound_w));
-
-	/* register for state saving */
-	save_item(NAME(m_fireone_select));
-}
-
-
-
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, init_starfire, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, init_starfire, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        fireone,  fireone,  starfire_state, init_fireone,  ROT0, "Exidy", "Fire One", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, init_starfire, ROT0, "Exidy", "Star Fire 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        fireone,  fireone,  fireone_state,  empty_init, ROT0, "Exidy", "Fire One", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, empty_init, ROT0, "Exidy", "Star Fire 2", MACHINE_SUPPORTS_SAVE )

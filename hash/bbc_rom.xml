@@ -2534,7 +2534,7 @@ license:CC0
 	<software name="database100" cloneof="database">
 		<description>Database 1.00</description>
 		<year>1984</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Database-1.10.rom" size="8192" crc="db803935" sha1="160f97616a410ff2baccbd343552dfc022117904"/>
@@ -2545,7 +2545,7 @@ license:CC0
 	<software name="database">
 		<description>Database 1.20</description>
 		<year>1984</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Database-1.20.rom" size="8192" crc="d16db46c" sha1="3b3eec4dea6b2962511471f6487fa02336e504f7"/>
@@ -2567,7 +2567,7 @@ license:CC0
 	<software name="datagem">
 		<description>DataGem 1.02F</description>
 		<year>1985</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DataGem-1.02F.rom" size="16384" crc="bfb21e7e" sha1="043f372195f25acb3e55b042a8d8e9f3f4e3806f"/>
@@ -2578,7 +2578,7 @@ license:CC0
 	<software name="datascrib101" cloneof="datascrib">
 		<description>Data Scribe 1.01</description>
 		<year>1984</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DataScribe-1.01.rom" size="16384" crc="4f1e9dd2" sha1="ea6d5b7773ed0dbe97a68c212c3c574eb239c76a"/>
@@ -2589,7 +2589,7 @@ license:CC0
 	<software name="datascrib120" cloneof="datascrib">
 		<description>Data Scribe 1.20</description>
 		<year>1985</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DataScribe-1.20.rom" size="16384" crc="5ad8feda" sha1="9a7b39385a2d3d03119c1304eff11a05d5b87546"/>
@@ -2600,7 +2600,7 @@ license:CC0
 	<software name="datascrib">
 		<description>Data Scribe 1.31</description>
 		<year>1985</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DataScribe-1.31.rom" size="16384" crc="aceec462" sha1="6cf5a5c990b61c42edcc3ac8f30f3e5fed829ab2"/>
@@ -2611,7 +2611,7 @@ license:CC0
 	<software name="datastag">
 		<description>DataStag 1.0</description>
 		<year>1985</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DataStag-1.0.rom" size="16384" crc="b6304221" sha1="6b6da0fc1da67c6d2a6a6c338df644ed85a39d9d"/>
@@ -2619,12 +2619,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ddfs090">
+	<software name="ddfs090" cloneof="ddfs310">
 		<description>Microware DDFS 0.90</description>
 		<year>1984</year>
 		<publisher>Microware</publisher>
 		<info name="usage" value="Requires Microware DDFS FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="udm"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Microware-DDFS-0.90.rom" size="16384" crc="700d50e5" sha1="6834e46cb15354003d553e6c2bdb4ed76b47a465"/>
@@ -2632,12 +2633,27 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ddfs200">
+	<software name="ddfs098" cloneof="ddfs310">
+		<description>UDM DDFS 0.98</description>
+		<year>1985</year>
+		<publisher>United Disk Memories</publisher>
+		<info name="usage" value="Requires UDM DDFS FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="udm"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="UDM-DDFS-0.98.rom" size="16384" crc="2119f9ad" sha1="bfb9404b34de3b489db73d886300f37081db2482"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddfs200" cloneof="ddfs310">
 		<description>UDM DDFS 2.00</description>
 		<year>1985</year>
-		<publisher>UDM</publisher>
-		<info name="usage" value="Requires Microware DDFS FDC" />
+		<publisher>United Disk Memories</publisher>
+		<info name="usage" value="Requires UDM DDFS FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="udm"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="UDM-DDFS-2.00.rom" size="16384" crc="1b4708a2" sha1="0f37bcc73a758657cfe58c19f0cc92be9107e767"/>
@@ -2645,12 +2661,27 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ddos300">
+	<software name="ddfs310">
+		<description>UDM DDFS 3.10</description>
+		<year>1985</year>
+		<publisher>United Disk Memories</publisher>
+		<info name="usage" value="Requires UDM DDFS FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="udm"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="UDM-DDFS-3.10.rom" size="16384" crc="55851c2d" sha1="c5b6557fa4dbfa651c8ecc5b1da93b615c3aa905"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddos300" cloneof="ddos305">
 		<description>Opus DDOS 3.00</description>
 		<year>1984</year>
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 8272 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus8272"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.00.rom" size="16384" crc="1b5fa131" sha1="6b4e0363a9d39807973a2ef0871a78b287cea27e"/>
@@ -2664,6 +2695,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 8272 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus8272"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.05.rom" size="16384" crc="43c75fa4" sha1="0b7194a234c2316ba825e878e3f69928bf3bb595"/>
@@ -2677,6 +2709,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 2791 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus2791"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-EDOS-0.4.rom" size="16384" crc="1d8a3860" sha1="05f461464707b4ca24636c9e726af561f227ccdb"/>
@@ -2690,6 +2723,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 2791 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus2791"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.12.rom" size="16384" crc="b2c393be" sha1="6accaa0b13b0b939c86674cddd7bee1aea2f66cb"/>
@@ -2703,6 +2737,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 2791 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus2791"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.15.rom" size="16384" crc="5f06701c" sha1="9e250dc7ddcde35b19e8f29f2cfe95a79f46d473"/>
@@ -2716,6 +2751,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 2791 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus2791"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.16.rom" size="16384" crc="268ebc0d" sha1="e608f6e40a5579147cc631f351aae275fdabec5b"/>
@@ -2729,6 +2765,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 2793 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus2793"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.35.rom" size="16384" crc="e33167fb" sha1="42fbc9932db2087708da41cb1ffa94358683cf7a"/>
@@ -2742,6 +2779,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus 2793 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus2793"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.36.rom" size="16384" crc="2f400f69" sha1="a6a57bb907d6b9bd351029fb0471a3a9c343da24"/>
@@ -2755,6 +2793,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus D-DOS(B) 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus1770"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.45.rom" size="16384" crc="c0163b95" sha1="1c5a68e08abbb7ffe663151c59088f750d2287a9"/>
@@ -2768,6 +2807,7 @@ license:CC0
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus D-DOS(B) 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="opus1770"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Opus-DDOS-3.46.rom" size="16384" crc="bf9c35cf" sha1="a1ad3e9acbd15400e7da1e50bc6673835cde1fe7"/>
@@ -3218,6 +3258,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="DMON-A1.14.rom" size="8192" crc="f5a80ce0" sha1="dbf41482917707d16f1bb847b76e8f71f755df1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmter54" supported="no">
+		<description>Terminal for Rank-Cintel/BBC Slide File</description>
+		<year>1987</year>
+		<publisher>BBC Television Centre</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DMTER54-1.3.rom" size="8192" crc="8490766e" sha1="19d274791e1c5f5103d0268dc1747338f041e387"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4883,6 +4934,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="kenda">
+		<description>Kenda Professional DMFS with PADS 1.02</description>
+		<year>1985</year>
+		<publisher>Kenda Electronic Systems</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="kenda"/>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="dfse00" />
+			<dataarea name="rom" size="8192">
+				<rom name="Kenda-1.02.rom" size="8192" crc="430b911c" sha1="594ae1d1aeaa20a1d5d1c64cd94d43926dda4029"/>
+			</dataarea>
+			<dataarea name="ram" size="2048" />
+		</part>
+	</software>
+
 	<software name="kermit102" cloneof="kermit">
 		<description>Kermit 1.02</description>
 		<year>1985</year>
@@ -5096,6 +5162,8 @@ license:CC0
 		<year>198?</year>
 		<publisher>Computer Village</publisher>
 		<info name="usage" value="Requires Computer Village 1797 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="cv1797"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="LVL-Dos-0.91.rom" size="8192" crc="69d7653a" sha1="9cd39d011290b97d5ba05b6c745689a8553be5fc"/>
@@ -5216,6 +5284,18 @@ license:CC0
 			<feature name="slot" value="cciword" />
 			<dataarea name="rom" size="32768">
 				<rom name="MasterROM-1.03.rom" size="32768" crc="b5592ef3" sha1="97b405c6b5490b62335b839b725a640f88f69924"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="master104" cloneof="master">
+		<description>Master ROM 1.04</description>
+		<year>1991</year>
+		<publisher>Beebugsoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="cciword" />
+			<dataarea name="rom" size="32768">
+				<rom name="MasterROM-1.04.rom" size="32768" crc="2eb2c934" sha1="325960b91b3367526cb51b5880b5d5fb5a10aa1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5689,7 +5769,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>MRM Software</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<feature name="slot" value="mrme00" />
+			<feature name="slot" value="dfse00" />
 			<dataarea name="rom" size="8192">
 				<rom name="MRM-E00-DFS-1.20.rom" size="8192" crc="944958b6" sha1="0db7be4deb303af2400f9af20a9a7211dcbaeae5"/>
 			</dataarea>
@@ -6687,6 +6767,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Gnomic</publisher>
 		<info name="usage" value="Requires Cumana QFS 8877A FDC" />
+		<sharedfeat name="fdc_default" value="cumana1"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="QFS-1.01.rom" size="16384" crc="3ce2af39" sha1="0eea54d3433ec3aaf32e2c43cd9469d5f5be06be"/>
@@ -6699,6 +6780,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Gnomic</publisher>
 		<info name="usage" value="Requires Cumana QFS 8877A FDC" />
+		<sharedfeat name="fdc_default" value="cumana1"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="QFS-1.02.rom" size="16384" crc="083a9285" sha1="4bf31a420a9d752285b088ee4f08a64563527662"/>
@@ -6711,6 +6793,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>Gnomic</publisher>
 		<info name="usage" value="Requires Cumana QFS Issue 2 8877A FDC" />
+		<sharedfeat name="fdc_default" value="cumana2"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="QFS-2.00.rom" size="16384" crc="5863962a" sha1="0dced741482321938842746ee47090ae443d7ad5"/>
@@ -7262,7 +7345,7 @@ license:CC0
 	<software name="scribe110" cloneof="scribe">
 		<description>Scribe 1.10</description>
 		<year>1983</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Scribe-1.10.rom" size="8192" crc="cb45b756" sha1="3117c082337e7877c411d3faccc902c99b26e3ad"/>
@@ -7273,7 +7356,7 @@ license:CC0
 	<software name="scribe">
 		<description>Scribe 1.30</description>
 		<year>1984</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Scribe-1.30.rom" size="8192" crc="555d63c5" sha1="161346230eeb00904819091bdaaef7dc01995832"/>
@@ -7284,7 +7367,7 @@ license:CC0
 	<software name="scribchec">
 		<description>ScribeChec 1.10</description>
 		<year>1985</year>
-		<publisher>Merlin</publisher>
+		<publisher>Merlin Computer Products</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ScribeChec-1.10.rom" size="16384" crc="a0035210" sha1="a7333e003b31dafdfef78ce11b18aab2cb9f9433"/>
@@ -7318,9 +7401,15 @@ license:CC0
 		<description>SEHK Terminal 2.00</description>
 		<year>1987</year>
 		<publisher>Nippon Business Machines</publisher>
+		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="SEHKTerminal-2.00.rom" size="16384" crc="d6014fcf" sha1="6fa6463e611274f78d320e86cfbed6808b327113"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="SEHK_CC2-2.00.rom" size="16384" crc="af952d2e" sha1="0da6a0a3acfe2b084f0eaf7ca2d68fcc14759c61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7329,9 +7418,15 @@ license:CC0
 		<description>SEHK Terminal 4.01</description>
 		<year>1989</year>
 		<publisher>Nippon Business Machines</publisher>
+		<sharedfeat name="compatibility" value="B,M"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="SEHKTerminal-4.01.rom" size="16384" crc="b4f9c59c" sha1="b74dcf2eb10874ae4bf7477ce32d67a15272a176"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="SEHK_CC1-3.00.rom" size="16384" crc="5d5fafc3" sha1="ec1e93d5490f9f5e2eac5096f9f9e40aa48bffc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8360,12 +8455,45 @@ license:CC0
 	</software>
 
 	<software name="suprvisr">
-		<description>Supervisor</description>
+		<description>Supervisor 1</description>
 		<year>1985</year>
-		<publisher>Micropulse</publisher>
+		<publisher>Northern Computers</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Supervisor-1.00.rom" size="8192" crc="d8a326f5" sha1="a9da6867e780fc72e42f1216c398ef5329fabe4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprvisr2f">
+		<description>Supervisor 2 - DFS</description>
+		<year>1987</year>
+		<publisher>Northern Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Supervisor-2.10F.rom" size="16384" crc="05937ce8" sha1="cb874c958285d4ac4b22eda5050c57b5b49aab34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprvisr3f">
+		<description>Supervisor 3 - Floppy</description>
+		<year>1986</year>
+		<publisher>Northern Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Supervisor-3.03F.rom" size="16384" crc="7a6e81d1" sha1="e1e00b339cc6dbe3b64ebd6ca7343dd40a697d3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprvisr3w">
+		<description>Supervisor 3 - Winchester</description>
+		<year>1986</year>
+		<publisher>Northern Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Supervisor-3.03W.rom" size="16384" crc="fd8759ac" sha1="34c1737dc7849b3044211ab1f3f3c52f5c3b92a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9317,6 +9445,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="videorom" supported="no">
+		<description>VideoROM: Videodisc Player Control Software</description>
+		<year>1988</year>
+		<publisher>The Soft Option</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="VideoROM-X3.1.rom" size="16384" crc="e2089d1c" sha1="32c3aed1e8dc44997a7b567da012b85687062193"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="viditel">
 		<description>Viditel</description>
 		<year>198?</year>
@@ -9624,6 +9764,7 @@ license:CC0
 		<publisher>Watford Electronics</publisher>
 		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="weddb2"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Watford-DDFS-1.40.rom" size="16384" crc="6c6eef94" sha1="d86b26a6fe7b3532e7bd3c6f3e8e503edac3811c"/>
@@ -9637,6 +9778,7 @@ license:CC0
 		<publisher>Watford Electronics</publisher>
 		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="weddb2"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Watford-DDFS-1.50.rom" size="16384" crc="d2fff497" sha1="7693f14aeed26c34b2342c3487ed4b9ad233e279"/>
@@ -9650,6 +9792,7 @@ license:CC0
 		<publisher>Watford Electronics</publisher>
 		<info name="usage" value="Requires Watford Electronics DDB2 1772 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="weddb2"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Watford-DDFS-1.53.rom" size="16384" crc="e1be4ee4" sha1="6719dc958f2631e6dc8f045429797b289bfe649a"/>
@@ -9663,6 +9806,7 @@ license:CC0
 		<publisher>Watford Electronics</publisher>
 		<info name="usage" value="Requires Watford Electronics DDB3 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="weddb3"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Watford-DDFS-1.54T.rom" size="16384" crc="6504c1ed" sha1="618b7a1551f91e2b18608428b9e581f3d920d4b5"/>

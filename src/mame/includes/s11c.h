@@ -24,10 +24,6 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-
-private:
-
-	void s11c_main_map(address_map &map);
 };
 
 

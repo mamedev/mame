@@ -3,6 +3,34 @@
 /*
  * nld_74174.cpp
  *
+ *  DM74174: Hex D Flip-Flops with Clear
+ *
+ *          +--------------+
+ *      CLR |1     ++    16| VCC
+ *       Q1 |2           15| Q6
+ *       D1 |3           14| D6
+ *       D2 |4   74174   13| D5
+ *       Q2 |5           12| Q5
+ *       D3 |6           11| D4
+ *       Q3 |7           10| Q4
+ *      GND |8            9| CLK
+ *          +--------------+
+ *
+ *          +-----+-----+---++---+-----+
+ *          | CLR | CLK | D || Q | QQ  |
+ *          +=====+=====+===++===+=====+
+ *          |  0  |  X  | X || 0 |  1  |
+ *          |  1  |  R  | 1 || 1 |  0  |
+ *          |  1  |  R  | 0 || 0 |  1  |
+ *          |  1  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+---++---+-----+
+ *
+ *   Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -> 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
  */
 
 #include "nld_74174.h"
@@ -12,14 +40,14 @@ namespace netlist
 {
 namespace devices
 {
-	NETLIB_OBJECT(74174)
+	NETLIB_OBJECT(74174_GATE)
 	{
-		NETLIB_CONSTRUCTOR(74174)
+		NETLIB_CONSTRUCTOR(74174_GATE)
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
-		, m_Q(*this, {"Q1", "Q2", "Q3", "Q4", "Q5", "Q6"})
+		, m_Q(*this, "Q")
 		, m_clrq(*this, "m_clr", 0)
 		, m_data(*this, "m_data", 0)
-		, m_D(*this, {"D1", "D2", "D3", "D4", "D5", "D6"}, NETLIB_DELEGATE(other))
+		, m_D(*this, "D", NETLIB_DELEGATE(other))
 		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(other))
 		, m_power_pins(*this)
 		{
@@ -34,18 +62,11 @@ namespace devices
 
 		NETLIB_HANDLERI(other)
 		{
-			uint_fast8_t d = 0;
-			for (std::size_t i=0; i<6; i++)
-			{
-				d |= (m_D[i]() << i);
-			}
+			netlist_sig_t d = m_D();
 			m_clrq = m_CLRQ();
 			if (!m_clrq)
 			{
-				for (std::size_t i=0; i<6; i++)
-				{
-					m_Q[i].push(0, NLTIME_FROM_NS(40));
-				}
+				m_Q.push(0, NLTIME_FROM_NS(40));
 				m_data = 0;
 			} else if (d != m_data)
 			{
@@ -54,68 +75,95 @@ namespace devices
 			}
 		}
 
+	private:
 		NETLIB_HANDLERI(clk)
 		{
 			if (m_clrq)
 			{
-				for (std::size_t i=0; i<6; i++)
-				{
-					netlist_sig_t d = (m_data >> i) & 1;
-					m_Q[i].push(d, NLTIME_FROM_NS(25));
-				}
+				m_Q.push(m_data, NLTIME_FROM_NS(25));
 				m_CLK.inactivate();
 			}
 		}
 
-		friend class NETLIB_NAME(74174_dip);
-	private:
 		logic_input_t m_CLK;
-		object_array_t<logic_output_t, 6> m_Q;
+		logic_output_t m_Q;
 
 		state_var<netlist_sig_t> m_clrq;
-		state_var<unsigned>      m_data;
+		state_var<netlist_sig_t> m_data;
 
-		object_array_t<logic_input_t, 6> m_D;
+		logic_input_t m_D;
 		logic_input_t m_CLRQ;
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74174_dip)
+	NETLIB_OBJECT(74174)
 	{
-		NETLIB_CONSTRUCTOR(74174_dip)
+		NETLIB_CONSTRUCTOR(74174)
 		, A(*this, "A")
+		, B(*this, "B")
+		, C(*this, "C")
+		, D(*this, "D")
+		, E(*this, "E")
+		, F(*this, "F")
 		{
-			register_subalias("1",  A.m_CLRQ);
-			register_subalias("9",  A.m_CLK);
+			register_subalias("CLRQ", "A.CLRQ");
+			connect("A.CLRQ", "B.CLRQ");
+			connect("A.CLRQ", "C.CLRQ");
+			connect("A.CLRQ", "D.CLRQ");
+			connect("A.CLRQ", "E.CLRQ");
+			connect("A.CLRQ", "F.CLRQ");
 
-			register_subalias("3",  A.m_D[0]);
-			register_subalias("2",  A.m_Q[0]);
+			register_subalias("CLK", "A.CLK");
+			connect("A.CLK", "B.CLK");
+			connect("A.CLK", "C.CLK");
+			connect("A.CLK", "D.CLK");
+			connect("A.CLK", "E.CLK");
+			connect("A.CLK", "F.CLK");
 
-			register_subalias("4",  A.m_D[1]);
-			register_subalias("5",  A.m_Q[1]);
+			register_subalias("D1", "A.D");
+			register_subalias("Q1", "A.Q");
 
-			register_subalias("6",  A.m_D[2]);
-			register_subalias("7",  A.m_Q[2]);
+			register_subalias("D2", "B.D");
+			register_subalias("Q2", "B.Q");
 
-			register_subalias("11", A.m_D[3]);
-			register_subalias("10", A.m_Q[3]);
+			register_subalias("D3", "C.D");
+			register_subalias("Q3", "C.Q");
 
-			register_subalias("13", A.m_D[4]);
-			register_subalias("12", A.m_Q[4]);
+			register_subalias("D4", "D.D");
+			register_subalias("Q4", "D.Q");
 
-			register_subalias("14", A.m_D[5]);
-			register_subalias("15", A.m_Q[5]);
+			register_subalias("D5", "E.D");
+			register_subalias("Q5", "E.Q");
 
-			register_subalias("8", "A.GND");
-			register_subalias("16", "A.VCC");
+			register_subalias("D6", "F.D");
+			register_subalias("Q6", "F.Q");
+
+			register_subalias("GND", "A.GND");
+			connect("A.GND", "B.GND");
+			connect("A.GND", "C.GND");
+			connect("A.GND", "D.GND");
+			connect("A.GND", "E.GND");
+			connect("A.GND", "F.GND");
+
+			register_subalias("VCC", "A.VCC");
+			connect("A.VCC", "B.VCC");
+			connect("A.VCC", "C.VCC");
+			connect("A.VCC", "D.VCC");
+			connect("A.VCC", "E.VCC");
+			connect("A.VCC", "F.VCC");
 		}
 		//NETLIB_RESETI() {}
 	private:
-		NETLIB_SUB(74174) A;
+		NETLIB_SUB(74174_GATE) A;
+		NETLIB_SUB(74174_GATE) B;
+		NETLIB_SUB(74174_GATE) C;
+		NETLIB_SUB(74174_GATE) D;
+		NETLIB_SUB(74174_GATE) E;
+		NETLIB_SUB(74174_GATE) F;
 	};
 
-	NETLIB_DEVICE_IMPL(74174,   "TTL_74174", "+CLK,+D1,+D2,+D3,+D4,+D5,+D6,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74174_dip,"TTL_74174_DIP",          "")
+	NETLIB_DEVICE_IMPL(74174_GATE, "TTL_74174_GATE", "")
+	NETLIB_DEVICE_IMPL(74174,      "TTL_74174", "+CLK,+D1,+D2,+D3,+D4,+D5,+D6,+CLRQ,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

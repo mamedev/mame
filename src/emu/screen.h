@@ -398,6 +398,7 @@ public:
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
+	attotime pixel_period() const { return attotime(0, m_pixeltime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
 	u64 frame_number() const { return m_frame_number; }
 
@@ -407,6 +408,7 @@ public:
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
+	int partial_scan_hpos() const { return m_partial_scan_hpos; }
 	bool update_partial(int scanline);
 	void update_now();
 	void reset_partial_updates();

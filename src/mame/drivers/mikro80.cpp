@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/***************************************************************************
+/*****************************************************************************************
 
 MIKRO80 driver by Miodrag Milanovic
 
 2008-03-10 Preliminary driver.
 
 
-ToDo:
-- Cassette save produces incorrect signal - need schematic of CMT.
-- Kristall doesn't seem to have any tape load/save facility?
+Cassette:
+* Mikro80: loads software items, but not its own saves
+* Radio99: can load its own saves; can load radio86 tapes, can load ut88 tapes.
+* Kristall2: can load its own saves; can load radio86 tapes; can load radio99 tapes.
 
-****************************************************************************/
+
+ToDo:
+- Cassette - need schematic of CMT.
+
+*****************************************************************************************/
 
 
 #include "emu.h"
@@ -21,7 +26,6 @@ ToDo:
 #include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 /* Address maps */
@@ -45,6 +49,7 @@ void mikro80_state::kristall_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x03).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x02, 0x02).w(FUNC(mikro80_state::portc_w));
 	// map(0x20, 0x23).  init byte 8B, so possibly another ppi with reversed offset like mikro80
 }
 
@@ -54,7 +59,8 @@ void mikro80_state::radio99_io(address_map &map)
 	map(0x01, 0x01).rw(FUNC(mikro80_state::tape_r), FUNC(mikro80_state::tape_w));
 	// no init byte, so ppi has been replaced by ordinary latches
 	map(0x04, 0x04).w(FUNC(mikro80_state::sound_w));
-	map(0x05, 0x05).rw(FUNC(mikro80_state::portc_r), FUNC(mikro80_state::portc_w));
+	//map(0x05, 0x05).rw(FUNC(mikro80_state::portc_r), FUNC(mikro80_state::portc_w));
+	map(0x05, 0x05).r(FUNC(mikro80_state::portc_r)).nopw();
 	map(0x06, 0x06).r(FUNC(mikro80_state::portb_r));
 	map(0x07, 0x07).w(FUNC(mikro80_state::porta_w));
 }
@@ -254,6 +260,7 @@ void mikro80_state::kristall(machine_config &config)
 {
 	mikro80(config);
 	m_maincpu->set_addrmap(AS_IO, &mikro80_state::kristall_io);
+	m_ppi->in_pc_callback().set(FUNC(mikro80_state::kristall2_portc_r));
 }
 
 

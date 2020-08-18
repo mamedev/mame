@@ -79,6 +79,7 @@
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2scsi.h"
 #include "bus/a2bus/a2hsscsi.h"
+#include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2videoterm.h"
@@ -106,6 +107,7 @@
 //#include "bus/a2bus/pc_xporter.h"
 #include "bus/a2bus/byte8251.h"
 //#include "bus/a2bus/hostram.h"
+//#include "bus/a2bus/ramfast.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4566,6 +4568,8 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 //  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
+//	device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
+	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4615,8 +4619,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
-	APPLE2_COMMON(config, m_a2common, A2GS_14M);
-	m_a2common->set_GS_cputag(m_maincpu);
+	APPLE2_COMMON(config, m_a2common, A2GS_14M).set_GS_cputag(m_maincpu);
 
 //  APPLE2_HOST(config, m_a2host, A2GS_14M);
 //  m_a2host->set_cputag(m_maincpu);

@@ -64,6 +64,8 @@ void renegade_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(256, 0);
+	m_fg_tilemap->set_scrolldy(10, 10);
+	m_bg_tilemap->set_scrolldy(10, 10);
 
 	save_item(NAME(m_scrollx));
 }
@@ -75,8 +77,8 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	while (source < finish)
 	{
-		// 224 matches reference (stage 1 boss in kuniokun is aligned with the train door)
-		int sy = 224 - source[0];
+		// reference: stage 1 boss in kuniokun is aligned with the train door
+		int sy = 234 - source[0];
 
 		//if (sy >= 0)
 		{
@@ -96,7 +98,7 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (flip_screen())
 			{
 				sx = 240 - sx;
-				sy = 224 - sy;
+				sy = 260 - sy;
 				xflip = !xflip;
 			}
 

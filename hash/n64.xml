@@ -262,6 +262,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="64で発見!!たまごっち みんなでたまごっちワールド"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NTWJ-0]" /> <!-- MX23L9602-35 -->
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="64 de hakken tamagotchi - minna de tamagotchi world (japan).bin" size="12582912" crc="c6400938" sha1="538ae3f3354c3fb96926d759e81cf64b827f2782" />
 			</dataarea>
@@ -1298,6 +1302,10 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19970321"/>
 		<info name="alt_title" value="ブラストドーザー"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1 [NUS-NBCJ-0]" /> <!-- MX823L6402-35 -->
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="blastdozer (japan).bin" size="8388608" crc="4605759e" sha1="68c6d95af29c647b64d5dad90c02980b772d5faf" />
 			</dataarea>
@@ -3353,6 +3361,10 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19961129"/>
 		<info name="alt_title" value="栄光のセントアンドリュース"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1 [NUS-NSTJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="eikou no saint andrews (japan).bin" size="8388608" crc="ce55bb19" sha1="1a313d3b4b11a16b8280b0139a15e47791c8080a" />
 			</dataarea>
@@ -4965,6 +4977,10 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19971218"/>
 		<info name="alt_title" value="ハイパーオリンピック イン ナガノ64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NH5J-0]" /> <!-- MX23L9602-35 -->
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="hyper olympics in nagano 64 (japan).bin" size="12582912" crc="f7c2bb67" sha1="51ea8af6b29fc99a9c61dd2242c3732b6cdf43dc" />
 			</dataarea>
@@ -5574,6 +5590,10 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19970314"/>
 		<info name="alt_title" value="実況パワフルプロ野球4"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NP4J-1]" /> <!-- MX23L9602-35 -->
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="jikkyou powerful pro yakyuu 4 (japan) (rev a).bin" size="12582912" crc="435126ae" sha1="44287562745c42662b61224ebfd9b483867eafee" />
 			</dataarea>
@@ -5638,6 +5658,12 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="実況パワフルプロ野球5"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NJ5J-0]" />
+			<feature name="u2" value="U2 [LH52V246AD]" />
+			<feature name="u3" value="U3 [BU9803A]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 5 (japan).bin" size="16777216" crc="94fa55ff" sha1="7822e0015e716ae540e95f50c32558eaa7865174" />
 			</dataarea>
@@ -5772,6 +5798,10 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19970918"/>
 		<info name="alt_title" value="実況ワールドサッカー3"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NJ3J-1]" /> <!-- MX23L6402-35 -->
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="jikkyou world soccer 3 (japan).bin" size="8388608" crc="8755de1f" sha1="e1c73256a92e98bcb79d2d4c56efce77f0ff158b" />
 			</dataarea>
@@ -6896,6 +6926,10 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="release" value="19981218"/>
 		<info name="alt_title" value="マリオパーティ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-CLBJ-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
 				<rom name="mario party (japan).bin" size="33554432" crc="7d387e37" sha1="82d03c229f37b7e8af72f4ee867022e4fa0f1f99" />
 			</dataarea>
@@ -8660,6 +8694,13 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="release" value="19990714"/>
 		<info name="alt_title" value="オウガバトル 64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-04B-01" />
+			<feature name="u1" value="U1 [NUS-NOBJ-1 02]" /> <!-- MX23L25603-35A -->
+			<feature name="u2" value="U2 [NUS-NOBJ-0 12]" /> <!-- MX23L6403-35A -->
+			<feature name="u3" value="U3 [LH52V246AN]" />
+			<feature name="u4" value="U4 BU9803 [LV2416]" />
+			<feature name="u5" value="U5 CIC-NUS [CIC6102A]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="41943040">
 				<rom name="ogre battle 64 - person of lordly caliber (japan) (rev a).bin" size="41943040" crc="d52f01fd" sha1="771bb04c814fdb741351b37bc4ca2db00f3d2a43" />
 			</dataarea>
@@ -10534,6 +10575,10 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19960623"/>
 		<info name="alt_title" value="最強羽生将棋"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1 [NUS-NCHJ-0]" /> <!-- MX23L6402-35 -->
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="saikyou habu shougi (japan).bin" size="8388608" crc="e8d0810b" sha1="8a06e7a7d15e5586ff5ce5fed235e0357096c827" />
 			</dataarea>

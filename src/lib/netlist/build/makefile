@@ -189,10 +189,12 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74377.o \
 	$(NLOBJ)/devices/nld_74393.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
+	$(NLOBJ)/devices/nld_8277.o \
 	$(NLOBJ)/devices/nld_82S16.o \
 	$(NLOBJ)/devices/nld_82S115.o \
 	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9316.o \
+	$(NLOBJ)/devices/nld_9321.o \
 	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
 	$(NLOBJ)/devices/nld_dm9314.o \
@@ -209,12 +211,12 @@ NLOBJS := \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
 	$(NLOBJ)/devices/nlid_truthtable.o \
-	$(NLOBJ)/macro/nlm_base.o \
-	$(NLOBJ)/macro/nlm_cd4xxx.o \
-	$(NLOBJ)/macro/nlm_opamp.o \
-	$(NLOBJ)/macro/nlm_other.o \
-	$(NLOBJ)/macro/nlm_roms.o \
-	$(NLOBJ)/macro/nlm_ttl74xx.o \
+	$(NLOBJ)/macro/nlm_base_lib.o \
+	$(NLOBJ)/macro/nlm_cd4xxx_lib.o \
+	$(NLOBJ)/macro/nlm_opamp_lib.o \
+	$(NLOBJ)/macro/nlm_otheric_lib.o \
+	$(NLOBJ)/macro/nlm_roms_lib.o \
+	$(NLOBJ)/macro/nlm_ttl74xx_lib.o \
 
 TESTOBJS := \
 	$(TESTOBJ)/test_pfunction.o \
@@ -251,7 +253,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc native maketree $(DEPEND) depend runtests
+.PHONY: all gcc9 clang clang-5 mingw doc man native maketree $(DEPEND) depend runtests
 
 #-------------------------------------------------
 # all
@@ -308,7 +310,8 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code"
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes"
 
 clang-libc:
 	#clang-11 currently broken
@@ -361,8 +364,13 @@ mingw:
 #     LDEXTRAFLAGS = -municode
 #
 
+man: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
+	@mkdir -p man
+	@mkdir -p html
+	help2man --include=nltool.help2man --no-info ./nltool$(EXESUFFIX) > man/nltool.1
+	groff -mandoc -Thtml man/nltool.1 > html/nltool.html
 
-doc: nltool$(EXESUFFIX)
+doc: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 

@@ -251,15 +251,15 @@ void copsnrob_state::machine_reset()
 void copsnrob_state::copsnrob(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 14318180/16);      /* 894886.25 kHz */
+	M6502(config, m_maincpu, 14.318181_MHz_XTAL / 16);      /* 894886.25 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &copsnrob_state::main_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 457, 0, 256, 261, 0, 200);
+	// H RESET (synchronous) = 256H & 8H & 64H & 128H
+	// V RESET (synchronous) = 256V & 4V
+	// H BLANK signal should begin at 304, but 256H gates all relevant graphics
 	m_screen->set_screen_update(FUNC(copsnrob_state::screen_update_copsnrob));
 	m_screen->set_palette(m_palette);
 
@@ -299,12 +299,12 @@ ROM_START( copsnrob )
 	ROM_REGION( 0x0100, "gfx3", 0 )
 	ROM_LOAD( "5770.m2",      0x0000, 0x0100, CRC(b00bbe77) SHA1(3fd6113aa3a572ec9f5ff248ba1bf53fc9225dfb) )
 
-	ROM_REGION( 0x0260, "proms", 0 )     /* misc. PROMs (timing?) */
-	ROM_LOAD( "5765.h8",      0x0000, 0x0020, CRC(6cd58931) SHA1(a90ae8ddffdfc33f60cb9ff8f42f9155c2b09ca1) )
-	ROM_LOAD( "5766.k8",      0x0020, 0x0020, CRC(e63edf4f) SHA1(1dc8691dde033062491b03d4c926047229c45a14) )
-	ROM_LOAD( "5767.j8",      0x0040, 0x0020, CRC(381b5ae4) SHA1(91cd237878c0e092197e3025c2498b8f26f90109) )
-	ROM_LOAD( "5768.n4",      0x0060, 0x0100, CRC(cb7fc836) SHA1(dc115c8dcee9298623f1e91add2dc17d0ed870e4) )
-	ROM_LOAD( "5769.d5",      0x0160, 0x0100, CRC(75081a5a) SHA1(c7d60fc4c44cf9c160b874de92d37600c079e7b6) )
+	ROM_REGION( 0x0260, "proms", 0 )     /* misc. PROMs */
+	ROM_LOAD( "5765.h8",      0x0000, 0x0020, CRC(6cd58931) SHA1(a90ae8ddffdfc33f60cb9ff8f42f9155c2b09ca1) ) // "µp Enable"
+	ROM_LOAD( "5766.k8",      0x0020, 0x0020, CRC(e63edf4f) SHA1(1dc8691dde033062491b03d4c926047229c45a14) ) // "Enable A"
+	ROM_LOAD( "5767.j8",      0x0040, 0x0020, CRC(381b5ae4) SHA1(91cd237878c0e092197e3025c2498b8f26f90109) ) // "Enable B"
+	ROM_LOAD( "5768.n4",      0x0060, 0x0100, CRC(cb7fc836) SHA1(dc115c8dcee9298623f1e91add2dc17d0ed870e4) ) // horizontal timing
+	ROM_LOAD( "5769.d5",      0x0160, 0x0100, CRC(75081a5a) SHA1(c7d60fc4c44cf9c160b874de92d37600c079e7b6) ) // vertical timing
 ROM_END
 
 

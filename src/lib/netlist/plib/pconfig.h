@@ -41,7 +41,11 @@
 /// Set this to one if you want to use aligned storage optimizations.
 ///
 #ifndef PUSE_ALIGNED_OPTIMIZATIONS
+#if defined(__EMSCRIPTEN__)
+#define PUSE_ALIGNED_OPTIMIZATIONS (0)
+#else
 #define PUSE_ALIGNED_OPTIMIZATIONS (1)
+#endif
 #endif
 
 /// \brief Use aligned allocations.

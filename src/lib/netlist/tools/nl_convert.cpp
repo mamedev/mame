@@ -731,8 +731,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 //    Eagle converter
 // -------------------------------------------------
 
-nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm)
-	: plib::ptokenizer(std::move(strm))
+nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert)
+	: plib::ptokenizer()
 	, m_convert(convert)
 {
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
@@ -759,8 +759,13 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg)
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
 
-	tokenizer tok(*this, plib::putf8_reader(std::make_unique<std::istringstream>(contents)));
-	tok.stream().stream().imbue(std::locale::classic());
+	tokenizer tok(*this);
+
+	tokenizer::token_store tokstor;
+	plib::putf8_reader u8reader(std::make_unique<std::istringstream>(contents));
+
+	tok.append_to_store(&u8reader, tokstor);
+	tok.set_token_source(&tokstor);
 
 	out("NETLIST_START(dummy)\n");
 	add_term("GND", "GND");
@@ -869,8 +874,8 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 //    RINF converter
 // -------------------------------------------------
 
-nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm)
-	: plib::ptokenizer(std::move(strm))
+nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert)
+	: plib::ptokenizer()
 	, m_convert(convert)
 {
 	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")
@@ -906,8 +911,14 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg)
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
-	tokenizer tok(*this, plib::putf8_reader(std::make_unique<std::istringstream>(contents)));
-	tok.stream().stream().imbue(std::locale::classic());
+	tokenizer tok(*this);
+
+	tokenizer::token_store tokstor;
+	plib::putf8_reader u8reader(std::make_unique<std::istringstream>(contents));
+
+	tok.append_to_store(&u8reader, tokstor);
+	tok.set_token_source(&tokstor);
+
 	auto lm = read_lib_map(s_lib_map);
 
 	out("NETLIST_START(dummy)\n");
@@ -1009,7 +1020,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			if (token.is(tok.m_tok_TER))
 			{
 				token = tok.get_token();
-				while (token.is_type(plib::ptokenizer::token_type::IDENTIFIER))
+				while (token.is_type(plib::ptoken_reader::token_type::IDENTIFIER))
 				{
 					pin = tok.get_identifier_or_number();
 					add_term(net, token.str() + "." + pin);

@@ -107,7 +107,7 @@ void vtech2_state::m_map350(address_map &map)
 	map(0x00000, 0x03fff).rom().region("maincpu", 0);
 	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
 	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
-	map(0x0c000, 0x0ffff).ram().share(m_videoram);
+	map(0x0c000, 0x0ffff).ram().share(m_vram);
 	map(0x10000, 0x13fff).noprw();
 	map(0x14000, 0x17fff).noprw();
 	map(0x18000, 0x1bfff).noprw();
@@ -129,7 +129,7 @@ void vtech2_state::m_map500(address_map &map)
 	map(0x10000, 0x13fff).ram();
 	map(0x14000, 0x17fff).ram();
 	map(0x18000, 0x1bfff).ram();
-	map(0x1c000, 0x1ffff).ram().share(m_videoram);
+	map(0x1c000, 0x1ffff).ram().share(m_vram);
 	map(0x20000, 0x23fff).noprw(); // TODO: 64k ram expansion pak
 	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
 	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
@@ -147,7 +147,7 @@ void vtech2_state::m_map700(address_map &map)
 	map(0x10000, 0x13fff).ram();
 	map(0x14000, 0x17fff).ram();
 	map(0x18000, 0x1bfff).ram();
-	map(0x1c000, 0x1ffff).ram().share(m_videoram);
+	map(0x1c000, 0x1ffff).ram().share(m_vram);
 	map(0x20000, 0x23fff).ram();
 	map(0x24000, 0x27fff).ram();
 	map(0x28000, 0x2bfff).ram();
@@ -471,11 +471,6 @@ void vtech2_state::vtech2_palette(palette_device &palette) const
 		palette.set_pen_indirect(512 + i, i);
 }
 
-INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
-{
-	m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 static const floppy_interface vtech2_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_SSDD_40,
@@ -489,7 +484,7 @@ void vtech2_state::laser350(machine_config &config)
 	Z80(config, m_maincpu, 3694700);        /* 3.694700 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vtech2_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::vtech2_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::irq0_line_hold));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -503,7 +498,7 @@ void vtech2_state::laser350(machine_config &config)
 	screen.set_vblank_time(0);
 	screen.set_size(88*8, 24*8+32);
 	screen.set_visarea(0*8, 88*8-1, 0*8, 24*8+32-1);
-	screen.set_screen_update(FUNC(vtech2_state::screen_update_laser));
+	screen.set_screen_update(FUNC(vtech2_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vtech2);
@@ -556,8 +551,10 @@ void vtech2_state::laser700(machine_config &config)
 ROM_START(laser350)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
+
 	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
@@ -567,8 +564,10 @@ ROM_START(laser500) // based on the picture at http://www.8bit-museum.de/hardwar
 // There should be two roms, one 0x2000 long for the font at u10, and one longer one for the os rom at u6.
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
+
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) ) // label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
+
 	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
@@ -576,8 +575,10 @@ ROM_END
 ROM_START(laser700)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
+
 	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
@@ -590,6 +591,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY             FULLNAME      FLAGS
-COMP( 1985, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
-COMP( 1985, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
-COMP( 1985, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)
+COMP( 1985, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , MACHINE_SUPPORTS_SAVE )
+COMP( 1985, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , MACHINE_SUPPORTS_SAVE )
+COMP( 1985, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , MACHINE_SUPPORTS_SAVE )

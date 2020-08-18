@@ -6157,6 +6157,52 @@ ROM_START( ringdesth )
 	ROM_LOAD( "ringdesth.key", 0x000000, 0x000014, CRC(ffb8d049) SHA1(c6d111412c3960b24a1be5c49fe4ec4d17324e06) )
 ROM_END
 
+/*
+About the Ring of Destruction: Slammasters II (Brazil 940902) below:
+
+Only ROM smbb.03b is different then the above Hispanic (ringdesth) set, while ROMs 04 through 08 match.  ROM smbb.03b has 3 bytes changed:
+   0x00C1 == 0A  (vs 05 for smbh.03b), this is the region byte.
+   0x1D20 == 6D  (vs 6E for smbh.03b), this is a checksum byte.
+   0x1D24 == 73  (vs 66 for smbh.03b), this is a checksum byte.
+
+It also uses the ringdesth key for decryption.  For all intents and purposes, this set is a factory region hack which has been verified on multiple boards.
+*/
+ROM_START( ringdestb )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "smbb.03b", 0x000000, 0x80000, CRC(234eebcc) SHA1(61ae407d0b2fb6e685231849f4db7ddf249466d1) ) /* all hand written labels */
+	ROM_LOAD16_WORD_SWAP( "smbb.04b", 0x080000, 0x80000, CRC(9950a23a) SHA1(5afd12ae7f3e7283ba42f844f2ee5a96875dc74e) )
+	ROM_LOAD16_WORD_SWAP( "smbb.05b", 0x100000, 0x80000, CRC(41e0b3fc) SHA1(67fea6e194650c2a45cc0408ab1b0c2743ec6efa) )
+	ROM_LOAD16_WORD_SWAP( "smbb.06b", 0x180000, 0x80000, CRC(89c80007) SHA1(4c85aa5b224fdbb64f719a7b8b5b2e7413107c70) )
+	ROM_LOAD16_WORD_SWAP( "smbb.07b", 0x200000, 0x80000, CRC(b9a11577) SHA1(e9b58ef8acd1fedd3c9e0a3489593c7e931106c0) )
+	ROM_LOAD16_WORD_SWAP( "smbb.08b", 0x280000, 0x80000, CRC(f931b76b) SHA1(0b7e8d1278dcba89f0063bd09cda96d6ae1bc282) )
+
+	ROM_REGION( 0x1200000, "gfx", 0 )
+	ROM_LOAD64_WORD( "smb.13m",   0x0000000, 0x200000, CRC(d9b2d1de) SHA1(e8658983070dadcd1300a680a42c8431579e2b4f) )
+	ROM_LOAD64_WORD( "smb.15m",   0x0000002, 0x200000, CRC(9a766d92) SHA1(afdf88afbec527268d63c11ea32f861b52e11489) )
+	ROM_LOAD64_WORD( "smb.17m",   0x0000004, 0x200000, CRC(51800f0f) SHA1(9526cd69a23340a81841271b51de03d9bf2b979f) )
+	ROM_LOAD64_WORD( "smb.19m",   0x0000006, 0x200000, CRC(35757e96) SHA1(c915f3b9e4fdec3defc7eecb2c1f7377e6072228) )
+	ROM_LOAD64_WORD( "smb.14m",   0x0800000, 0x200000, CRC(e5bfd0e7) SHA1(327e626df4c2152f921f15535c01dda6c4437527) )
+	ROM_LOAD64_WORD( "smb.16m",   0x0800002, 0x200000, CRC(c56c0866) SHA1(1e2218e852ae72a9a95861dd37129fe78d4b1329) )
+	ROM_LOAD64_WORD( "smb.18m",   0x0800004, 0x200000, CRC(4ded3910) SHA1(d883541ce4d83f4e7ab095f2ef273408d9911f9a) )
+	ROM_LOAD64_WORD( "smb.20m",   0x0800006, 0x200000, CRC(26ea1ec5) SHA1(22be249b1f73272feacf4026f09fc877f5d86353) )
+	ROM_LOAD64_WORD( "smb.21m",   0x1000000, 0x080000, CRC(0a08c5fc) SHA1(ff3fad4fbc98e3013291c7ba7ee5e057a2628b36) )
+	ROM_LOAD64_WORD( "smb.23m",   0x1000002, 0x080000, CRC(0911b6c4) SHA1(e7a7061b192658724d98cae8693f63dd5bc40c00) )
+	ROM_LOAD64_WORD( "smb.25m",   0x1000004, 0x080000, CRC(82d6c4ec) SHA1(ed8ed02a00f59a048b9891ec2a77720bb6a5e03d) )
+	ROM_LOAD64_WORD( "smb.27m",   0x1000006, 0x080000, CRC(9b48678b) SHA1(4fa300d356c538947983ae85bb5c5cfd1fb835e7) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "smb.01",   0x00000, 0x08000, CRC(0abc229a) SHA1(967f574e6358dfc1b01e6a4a4df1a8f34eb3d814) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "smb.02",   0x28000, 0x20000, CRC(d051679a) SHA1(583c2521a30db1740d95dd94a38751fbeff3aae5) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "smb.11m",   0x000000, 0x200000, CRC(c56935f9) SHA1(ca1705e48e31ddc13505e6297bceca2bec1bb209) )
+	ROM_LOAD16_WORD_SWAP( "smb.12m",   0x200000, 0x200000, CRC(955b0782) SHA1(ee09500e7b44e923126533613bfe26cdabc7ab5f) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "ringdesth.key", 0x000000, 0x000014, CRC(ffb8d049) SHA1(c6d111412c3960b24a1be5c49fe4ec4d17324e06) ) /* Brazilian set, but still uses the Hispanic key */
+ROM_END
+
 ROM_START( mmancp2u )
 	ROM_REGION(CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rcmu.03b", 0x000000, 0x80000, CRC(c39f037f) SHA1(eefc5aa0fde322c6f895a37399424060c702a459) )
@@ -10146,6 +10192,7 @@ GAME( 1994, vampjr1,    dstlk,    cps2, cps2_2p6b, cps2_state, init_cps2,     RO
 GAME( 1994, ringdest,   0,        cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Euro 940902)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ringdesta,  ringdest, cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Asia 940831)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, ringdesth,  ringdest, cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Hispanic 940902)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ringdestb,  ringdest, cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Brazil 940902)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, smbomb,     ringdest, cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940831)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, smbombr1,   ringdest, cps2, cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940808)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwar,     0,        cps2, cps2_3p3b, cps2_state, init_cps2,     ROT0,   "Capcom", "Armored Warriors (Euro 941024)", MACHINE_SUPPORTS_SAVE )

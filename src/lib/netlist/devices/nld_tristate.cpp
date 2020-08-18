@@ -3,6 +3,8 @@
 /*
  * nld_tristate.cpp
  *
+ *  tristate: Hack to merge two tri-stated outputs together
+ *
  */
 
 #include "nld_tristate.h"

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
+<<<<<<< HEAD
 /*
  * nld_4316.h
  *
@@ -21,6 +22,8 @@
  *  Naming conventions follow Texas Instruments datasheet
  *
  */
+=======
+>>>>>>> master
 
 #ifndef NLD_4316_H_
 #define NLD_4316_H_

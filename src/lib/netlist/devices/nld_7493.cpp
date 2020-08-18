@@ -3,6 +3,55 @@
 /*
  * nld_7493.cpp
  *
+ *  DM7493: Binary Counters
+ *
+ *          +--------------+
+ *        B |1     ++    14| A
+ *      R01 |2           13| NC
+ *      R02 |3           12| QA
+ *       NC |4    7493   11| QD
+ *      VCC |5           10| GND
+ *       NC |6            9| QB
+ *       NC |7            8| QC
+ *          +--------------+
+ *
+ *          Counter Sequence
+ *
+ *          +-------++----+----+----+----+
+ *          | COUNT || QD | QC | QB | QA |
+ *          +=======++====+====+====+====+
+ *          |    0  ||  0 |  0 |  0 |  0 |
+ *          |    1  ||  0 |  0 |  0 |  1 |
+ *          |    2  ||  0 |  0 |  1 |  0 |
+ *          |    3  ||  0 |  0 |  1 |  1 |
+ *          |    4  ||  0 |  1 |  0 |  0 |
+ *          |    5  ||  0 |  1 |  0 |  1 |
+ *          |    6  ||  0 |  1 |  1 |  0 |
+ *          |    7  ||  0 |  1 |  1 |  1 |
+ *          |    8  ||  1 |  0 |  0 |  0 |
+ *          |    9  ||  1 |  0 |  0 |  1 |
+ *          |   10  ||  1 |  0 |  1 |  0 |
+ *          |   11  ||  1 |  0 |  1 |  1 |
+ *          |   12  ||  1 |  1 |  0 |  0 |
+ *          |   13  ||  1 |  1 |  0 |  1 |
+ *          |   14  ||  1 |  1 |  1 |  0 |
+ *          |   15  ||  1 |  1 |  1 |  1 |
+ *          +-------++----+----+----+----+
+ *
+ *          Note C Output QA is connected to input B
+ *
+ *          Reset Count Function table
+ *
+ *          +-----+-----++----+----+----+----+
+ *          | R01 | R02 || QD | QC | QB | QA |
+ *          +=====+=====++====+====+====+====+
+ *          |  1  |  1  ||  0 |  0 |  0 |  0 |
+ *          |  0  |  X  ||       COUNT       |
+ *          |  X  |  0  ||       COUNT       |
+ *          +-----+-----++----+----+----+----+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
  */
 
 #include "nld_7493.h"
@@ -149,35 +198,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(7493_dip)
-	{
-		NETLIB_CONSTRUCTOR(7493_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", "A.CLKB");
-			register_subalias("2", "A.R1");
-			register_subalias("3", "A.R2");
-
-			// register_subalias("4", ); --> NC
-			register_subalias("5", "A.VCC");
-			// register_subalias("6", ); --> NC
-			// register_subalias("7", ); --> NC
-
-			register_subalias("8", "A.QC");
-			register_subalias("9", "A.QB");
-			register_subalias("10", "A.GND");
-			register_subalias("11", "A.QD");
-			register_subalias("12", "A.QA");
-			// register_subalias("13", ); -. NC
-			register_subalias("14", "A.CLKA");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(7493) A;
-	};
-
 	NETLIB_DEVICE_IMPL(7493,        "TTL_7493", "+CLKA,+CLKB,+R1,+R2,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7493_dip,    "TTL_7493_DIP", "")
 
 	} // namespace devices
 } // namespace netlist
