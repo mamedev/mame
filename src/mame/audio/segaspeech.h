@@ -10,7 +10,7 @@
 
 #pragma once
 
-#define USE_NL_FILTERING (1)
+#define ENABLE_NETLIST_FILTERING (0)
 
 #include "cpu/mcs48/mcs48.h"
 #include "machine/netlist.h"

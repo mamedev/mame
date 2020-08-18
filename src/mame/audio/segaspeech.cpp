@@ -199,7 +199,7 @@ void sega_speech_device::device_add_mconfig(machine_config &config)
 	// speech chip
 	sp0250_device &speech(SP0250(config, "sp0250", SPEECH_MASTER_CLOCK));
 	speech.drq().set(FUNC(sega_speech_device::drq_w));
-#if (USE_NL_FILTERING)
+#if (ENABLE_NETLIST_FILTERING)
 	speech.set_pwm_mode();
 	speech.add_route(ALL_OUTPUTS, "sound_nl", 1.0, 0);
 
