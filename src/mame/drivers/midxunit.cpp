@@ -12,13 +12,18 @@
 
     Known bugs:
         * POST test ends with "CUSTOM CHIP U76 BAD" message,
-          however this is caused by fully clipped blitter DMA request:
-             DMA command 8003: (bpp=0 skip=0 xflip=0 yflip=0 preskip=0 postskip=0)
-             offset=00000000 pos=(0,257) w=448 h=1 clip=(0,0)-(511,0)
-             palette=0505 color=0000 lskip=00 rskip=00 xstep=0100 ystep=0100 test=0000 config=0010
-          it is not clear if it's due to DMA emulation flaws (unemulated command bit 6 - clipping mode, 0=offset??? method),
-          or if some protection device may modify routine code in the RAM (unlikely).
-          set BP 20D31340 to see check routine (notice: 20D31550: MOVE   A14,@C08000E0h,0 have no effect because of FS0 selected).
+          However, this is caused by failed blitter DMA test, it's buggy code:
+            20D31460: MOVI   100000h,A14		; control register value, set H-clip access
+            20D31490: MOVE   A14,@C08000E0h,1	; 32bit write control reg
+            20D314C0: MOVI   1FF0000h,A14		; H-clip range value 0-511
+            20D314F0: MOVE   A14,@C08000C0h,1	; 32bit write H-clip reg
+            20D31520: MOVI   300000h,A14		; control register value, set V-clip access
+            20D31550: MOVE   A14,@C08000E0h,0	; 16bit(!!) write, upper word ignored in MAME, control reg still set to H-clip access
+            20D31580: MOVI   1FF0000h,A14		; V-clip range value 0-511
+            20D315B0: MOVE   A14,@C08000C0h,1	; 32bit write, in MAME write goes to H-clip registers
+          in result of not set V-clip range in MAME the whole DMA request is clipped.
+          It is possible X-unit DMA registers block C08000xxh access is 32-bit only (/CAS0-3 lines ignored), so any write access always update whole 32bits.
+          At the moment TMS34020 incorrectly emulated as 16bit wide data bus CPU, so we can't properly handle this issue.
 
 ***************************************************************************
 

@@ -267,6 +267,8 @@ void midxunit_state::machine_reset()
 	m_dcs->reset_w(0);
 	m_dcs->reset_w(1);
 
+	m_security_bits = 0;
+
 	/* reset I/O shuffling */
 	for (int i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
@@ -290,14 +292,22 @@ uint16_t midxunit_state::midxunit_security_r()
 void midxunit_state::midxunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_security_bits = data & 0x0f;
+	{
+		m_security_bits &= ~0xf;
+		m_security_bits |= data & 0xf;
+		m_midway_serial_pic->write(m_security_bits ^ 0x10);
+	}
 }
 
 
 void midxunit_state::midxunit_security_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		m_midway_serial_pic->write(((~data & 2) << 3) | m_security_bits);
+	{
+		m_security_bits &= ~0x10;
+		m_security_bits |= BIT(data, 1) << 4;
+		m_midway_serial_pic->write(m_security_bits ^ 0x10);
+	}
 }
 
 
