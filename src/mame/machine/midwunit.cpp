@@ -7,10 +7,6 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/m6809/m6809.h"
-#include "audio/dcs.h"
-#include "includes/midtunit.h"
 #include "includes/midwunit.h"
 
 #define LOG_UNKNOWN (1 << 0)
@@ -165,7 +161,7 @@ void midwunit_state::machine_start()
 /********************** Mortal Kombat 3 **********************/
 
 
-void midwunit_state::umk3_palette_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void midwunit_state::umk3_palette_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    UMK3 uses a circular buffer to hold pending palette changes; the buffer holds 17 entries
@@ -186,7 +182,7 @@ void midwunit_state::umk3_palette_hack_w(address_space &space, offs_t offset, ui
 	    without significantly impacting the rest of the system.
 	*/
 	COMBINE_DATA(&m_umk3_palette[offset]);
-	space.device().execute().adjust_icount(-100);
+	m_maincpu->adjust_icount(-100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", m_umk3_palette[3], m_umk3_palette[2], m_umk3_palette[1], m_umk3_palette[0]); */
 }
 
@@ -214,14 +210,14 @@ void midwunit_state::init_mk3r10()
 void midwunit_state::init_umk3()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16s_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
 void midwunit_state::init_umk3r11()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16s_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
