@@ -330,7 +330,6 @@ gamepock.cpp
 gb.cpp
 gba.cpp
 generalplus_gpl_unknown.cpp
-generalplus_gpl16250.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp
@@ -507,7 +506,6 @@ lms46.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
-lx_jg7425.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
@@ -784,8 +782,6 @@ qvt70.cpp
 qx10.cpp
 r9751.cpp
 radio86.cpp
-rad_eu3a05.cpp
-rad_eu3a14.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
@@ -1061,7 +1057,6 @@ vic10.cpp
 vic20.cpp
 victor9k.cpp
 vidbrain.cpp
-vii.cpp
 vip.cpp
 vis.cpp
 vixen.cpp
