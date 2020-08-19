@@ -862,7 +862,7 @@ void segag80r_state::astrob(machine_config &config)
 
 	/* sound boards */
 	ASTRO_BLASTER_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0);
-	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -1735,12 +1735,12 @@ void segag80r_state::init_sindbadm()
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
 /* basic G-80 system with: CPU board, PROM board, Video I board, custom sound boards */
-GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
-GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)", 0 )
+GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", 0 )
+GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", 0 )
+GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", 0 )
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", 0 | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 
 

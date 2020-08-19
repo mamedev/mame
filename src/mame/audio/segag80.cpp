@@ -180,6 +180,6 @@ spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device, "astrob_audio", "Astro Blaster Sound Board")
 
 astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: segag80_audio_device(mconfig, ASTRO_BLASTER_AUDIO, tag, owner, clock, 0xff, 0xff, false, NETLIST_NAME(astrob), 20000.0)
+	: segag80_audio_device(mconfig, ASTRO_BLASTER_AUDIO, tag, owner, clock, 0xff, 0xff, false, NETLIST_NAME(astrob), 25000.0)
 {
 }
