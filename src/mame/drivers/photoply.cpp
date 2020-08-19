@@ -346,16 +346,16 @@ ROM_START(photoply99sp)
 	ROM_REGION(0x20000, "bios", 0)  // Motherboard BIOS
 	ROM_LOAD("funworld_1999_award_v4.51g.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // Award Modular BIOS v4.51G, AT29C010A
 
-        /* Multifunction board with a ESS AudioDrive chip ISA Sound + I/O (PP2000/CI-8000)
-           ESS AudioDrve ES1868F
-           NEC D71055L-10 Parallel Interface Unit
-           Winbond W83877AF
-           Xtal 24.000 MHz (near W83877AF and D71055L-10)
-           Xtal 14.31818 MHz (near ES1868F)
-           Atmel 93C46 Serial EEPROM
-           PALCE16V8H (UNDUMPED)
-           PALCE16V8H (UNDUMPED)
-           8 Dips */
+	/* Multifunction board with a ESS AudioDrive chip ISA Sound + I/O (PP2000/CI-8000)
+	   ESS AudioDrve ES1868F
+	   NEC D71055L-10 Parallel Interface Unit
+	   Winbond W83877AF
+	   Xtal 24.000 MHz (near W83877AF and D71055L-10)
+	   Xtal 14.31818 MHz (near ES1868F)
+	   Atmel 93C46 Serial EEPROM
+	   PALCE16V8H (UNDUMPED)
+	   PALCE16V8H (UNDUMPED)
+	   8 Dips */
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 )
 	ROM_LOAD("enhanced_bios_1.06.u13", 0x0000, 0x8000, CRC(d05e9d20) SHA1(854501b7b3bf988b10516109d058f7ca2aa07d3e) ) // Centos Combo I/O ROM BIOS for CI-8000/PP2000 v1.06, W27E257
 
