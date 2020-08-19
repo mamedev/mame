@@ -143,6 +143,11 @@ private:
 	void diskseq_y_w(uint16_t data);
 	void diskseq_tick();
 
+	void advance_line_count();
+	void toggle_line_clock();
+	void process_sample();
+	void process_byte_from_disc(uint8_t data_byte);
+
 	required_device<m68000_base_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia;
 	required_device<input_merger_device> m_p_int;
@@ -171,6 +176,7 @@ private:
 	uint8_t m_fdd_ctrl;
 	uint8_t m_fdd_port1;
 	uint8_t m_fdd_track;
+	uint8_t m_fdd_side;
 	fdc_pll_t m_fdd_pll;
 
 	required_device<floppy_connector> m_floppy0;
@@ -232,7 +238,8 @@ private:
 	uint8_t m_diskseq_ed_cnt;           // ED
 	uint8_t m_diskseq_head_cnt;         // EC
 	uint16_t m_diskseq_cyl_from_cpu;    // AE/BH
-	uint16_t m_diskseq_cmd_from_cpu;    // DD/CC
+	uint16_t m_diskseq_cmd_word_from_cpu; // DD/CC
+	uint8_t m_diskseq_cmd;
 	uint8_t m_diskseq_cyl_to_ctrl;
 	uint8_t m_diskseq_cmd_to_ctrl;
 	uint8_t m_diskseq_status_in;        // CG
@@ -253,6 +260,9 @@ private:
 	uint16_t m_cursor_size_y;
 
 	// Brush Address Card
+	uint8_t m_line_clock;
+	uint16_t m_line_count;
+	uint16_t m_line_length;
 	uint16_t m_brush_addr_func;
 	uint8_t m_bif;
 	uint8_t m_bixos;
@@ -303,6 +313,9 @@ private:
 	uint8_t *m_filter_mult;
 	uint8_t m_filter_acbc[16];
 	uint8_t m_filter_abbb[16];
+	uint8_t m_incoming_lum;
+	uint8_t m_incoming_chr;
+	bool m_buffer_lum;
 
 	// Size Card
 	required_device<am2901b_device> m_size_yl;
@@ -488,7 +501,8 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_ed_cnt));
 	save_item(NAME(m_diskseq_head_cnt));
 	save_item(NAME(m_diskseq_cyl_from_cpu));
-	save_item(NAME(m_diskseq_cmd_from_cpu));
+	save_item(NAME(m_diskseq_cmd_word_from_cpu));
+	save_item(NAME(m_diskseq_cmd));
 	save_item(NAME(m_diskseq_cyl_to_ctrl));
 	save_item(NAME(m_diskseq_cmd_to_ctrl));
 	save_item(NAME(m_diskseq_status_in));
@@ -506,6 +520,7 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_fdd_ctrl));
 	save_item(NAME(m_fdd_port1));
 	save_item(NAME(m_fdd_track));
+	save_item(NAME(m_fdd_side));
 
 	// Disc Data Buffer Card
 	save_item(NAME(m_diskbuf_ram_addr));
@@ -519,6 +534,9 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_cursor_size_y));
 
 	// Brush Address Card
+	save_item(NAME(m_line_clock));
+	save_item(NAME(m_line_count));
+	save_item(NAME(m_line_length));
 	save_item(NAME(m_brush_addr_func));
 	save_item(NAME(m_bif));
 	save_item(NAME(m_bixos));
@@ -585,6 +603,9 @@ void dpb7000_state::machine_start()
 	m_filter_mult = m_filter_multprom->base();
 	save_item(NAME(m_filter_acbc));
 	save_item(NAME(m_filter_abbb));
+	save_item(NAME(m_incoming_lum));
+	save_item(NAME(m_incoming_chr));
+	save_item(NAME(m_buffer_lum));
 
 	m_yuv_lut = std::make_unique<uint32_t[]>(0x1000000);
 	for (uint16_t u = 0; u < 256; u++)
@@ -623,11 +644,12 @@ void dpb7000_state::machine_reset()
 	m_diskseq_ed_cnt = 0;
 	m_diskseq_head_cnt = 0;
 	m_diskseq_cyl_from_cpu = 0;
-	m_diskseq_cmd_from_cpu = 0;
+	m_diskseq_cmd_word_from_cpu = 0;
+	m_diskseq_cmd = 0;
 	m_diskseq_cyl_to_ctrl = 0;
 	m_diskseq_cmd_to_ctrl = 0;
 	m_diskseq_status_in = 0;
-	m_diskseq_status_out = 0xff;
+	m_diskseq_status_out = 0xf9;
 	memset(m_diskseq_ucode_latch, 0, 7);
 	memset(m_diskseq_cc_inputs, 0, 4);
 	m_diskseq_cyl_read_pending = false;
@@ -641,6 +663,7 @@ void dpb7000_state::machine_reset()
 	m_fdd_ctrl = 0;
 	m_fdd_port1 = 0;
 	m_fdd_track = 20;
+	m_fdd_side = 0;
 	m_fdd_pll.set_clock(attotime::from_hz(1000000));
 	m_fdd_pll.reset(machine().time());
 	m_floppy = nullptr;
@@ -657,6 +680,9 @@ void dpb7000_state::machine_reset()
 	m_cursor_size_y = 0;
 
 	// Brush Address Card
+	m_line_clock = 0;
+	m_line_count = 0;
+	m_line_length = 0;
 	m_brush_addr_func = 0;
 	m_bif = 0;
 	m_bixos = 0;
@@ -708,6 +734,9 @@ void dpb7000_state::machine_reset()
 	// Filter Card
 	memset(m_filter_acbc, 0, 16);
 	memset(m_filter_abbb, 0, 16);
+	m_incoming_lum = 0;
+	m_incoming_chr = 0;
+	m_buffer_lum = true;
 
 	// Size Card
 	m_size_h = 0;
@@ -812,9 +841,9 @@ void dpb7000_state::diskseq_y_w(uint16_t data)
 
 	m_diskseq_cc_inputs[2] |= BIT(m_diskseq_status_in, DSEQ_STATUS_RAM_ADDR_OVFLO_BIT);
 	// C17..C19 tied low
-	m_diskseq_cc_inputs[2] |= ~(m_diskseq_cmd_from_cpu & 0xf) << 4;
+	m_diskseq_cc_inputs[2] |= ~(m_diskseq_cmd_word_from_cpu & 0xf) << 4;
 
-	m_diskseq_cc_inputs[3] = ~(m_diskseq_cmd_from_cpu >> 4) & 0xff;
+	m_diskseq_cc_inputs[3] = ~(m_diskseq_cmd_word_from_cpu >> 4) & 0xff;
 
 	// S15, S16: Select which bank of 8 lines is treated as /CC input to Am2910
 	const uint8_t fx_bank_sel = (BIT(m_diskseq_ucode_latch[2], 0) << 1) | BIT(m_diskseq_ucode_latch[1], 7);
@@ -981,7 +1010,7 @@ uint16_t dpb7000_state::cpu_ctrlbus_r()
 		ret = m_diskseq_status_out;
 		//req_b_w(0);
 		break;
-	case 0x7:
+	case 7:
 		ret = m_diskbuf_ram[m_diskbuf_ram_addr];
 		LOGMASKED(LOG_CTRLBUS, "%s: CPU read from Control Bus, Disc Data Buffer Card RAM read: %04x = %02x\n", machine().describe_context(), m_diskbuf_ram_addr, ret);
 		m_diskbuf_ram_addr++;
@@ -1097,6 +1126,8 @@ void dpb7000_state::handle_command(uint16_t data)
 	case 1: // Brush Store Read
 		break;
 	case 2: // Brush Store Write
+		m_bxlen_counter = m_bxlen;
+		m_bylen_counter = m_bylen;
 		break;
 	case 3: // Framestore Read
 		break;
@@ -1216,6 +1247,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 			uint16_t old_cyl = m_diskseq_cyl_from_cpu;
 			m_diskseq_cyl_from_cpu = data & 0x3ff;
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Cylinder Number: %04x\n", machine().describe_context(), m_diskseq_cyl_from_cpu);
+			//printf("Cylinder %d\n", m_diskseq_cyl_from_cpu);
 			if (old_cyl != m_diskseq_cyl_from_cpu && m_diskseq_cyl_from_cpu < 78 && m_floppy != nullptr)
 			{
 				if (m_diskseq_cyl_from_cpu < old_cyl)
@@ -1248,87 +1280,76 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 		}
 		else if (hi_nybble == 2)
 		{
-			m_diskseq_cmd_from_cpu = data & 0xfff;
+			m_diskseq_cmd_word_from_cpu = data & 0xfff;
+			m_diskseq_cmd = (data >> 8) & 0xf;
 			req_b_w(0); // Flag ourselves as in-use
 			LOGMASKED(LOG_CTRLBUS, "%s: CPU write to Control Bus, Disk Sequencer Card, Command: %x (%04x)\n", machine().describe_context(), (data >> 8) & 0xf, data);
 			LOGMASKED(LOG_CTRLBUS, "%s                                                    Head: %x\n", machine().describe_context(), data & 0xf);
 			LOGMASKED(LOG_CTRLBUS, "%s                                                   Drive: %x\n", machine().describe_context(), (data >> 5) & 7);
-			switch ((data >> 8) & 0xf)
+			switch (m_diskseq_cmd)
 			{
 			case 1:
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Unknown command nybble 1\n", machine().describe_context());
+			case 5:
+			case 9:
+			case 13:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: No command\n", machine().describe_context());
 				req_b_w(1);
 				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
 				break;
 			case 0:
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read (floppy?) track to RAM buffer?\n", machine().describe_context());
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track to buffer RAM\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
 					m_diskseq_cyl_read_pending = true;
+					m_fdd_side = 0;
+				}
+				break;
+			case 2:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read track, stride 2, to buffer RAM\n", machine().describe_context());
+				if (!BIT(m_diskseq_status_out, 3))
+				{
+					m_diskseq_cyl_read_pending = true;
+					m_fdd_side = 0;
+				}
+				break;
+			case 4:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read Track\n", machine().describe_context());
+				if (!BIT(m_diskseq_status_out, 3))
+				{
+					m_line_count = 0;
+					m_line_clock = 0;
+					m_diskseq_cyl_read_pending = true;
+					m_fdd_side = 0;
 				}
 				break;
 			case 6:
-			case 4:
-			{
-				//req_b_w(1);
-				m_diskseq_cyl_read_pending = true;
-				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: %s track read to Brush Store (ignored for now)\n", machine().describe_context(),
-					((data >> 8) & 0xf) == 6 ? "Initiate" : "Continue");
-				/*if (((data >> 8) & 0xf) == 6)
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Read Track\n", machine().describe_context());
+				if (!BIT(m_diskseq_status_out, 3))
 				{
-				    m_size_h = 0;
-				    m_size_v = 0;
+					m_diskseq_cyl_read_pending = true;
+					m_fdd_side = 0;
 				}
-				uint16_t disc_buffer_addr = 0;
-				uint16_t bx = m_bxlen_counter - m_bxlen;
-				uint16_t by = m_bylen_counter - m_bylen;
-				while (m_diskbuf_data_count > 0 && m_bylen_counter < 0x1000)
-				{
-				    uint8_t hv = (m_size_h << 4) | m_size_v;
-				    uint8_t hv_permuted = bitswap<8>(hv,4,6,0,2,5,7,1,3);
-
-				    if (BIT(m_brush_addr_func, 7)) // Luma Enable
-				    {
-				        //printf("%02x ", m_diskbuf_ram[disc_buffer_addr]);
-				        m_brushstore_lum[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
-				    }
-
-				    disc_buffer_addr++;
-				    m_diskbuf_data_count--;
-
-				    if (BIT(m_brush_addr_func, 8)) // Chroma Enable
-				    {
-				        m_brushstore_chr[by * 256 + hv_permuted] = m_diskbuf_ram[disc_buffer_addr];
-				    }
-
-				    disc_buffer_addr++;
-				    m_diskbuf_data_count--;
-
-				    m_size_h++;
-				    if (m_size_h == 16)
-				    {
-				        m_size_h = 0;
-				        m_size_v++;
-				        if (m_size_v == 16)
-				        {
-				            m_size_v = 0;
-				        }
-				    }
-
-				    bx++;
-				    m_bxlen_counter++;
-				    if (m_bxlen_counter == 0x1000)
-				    {
-				        bx = 0;
-				        by++;
-				        m_bxlen_counter = m_bxlen;
-				        m_bylen_counter++;
-				        //printf("\n");
-				    }
-				}*/
-				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
 				break;
-			}
+			case 8:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track from Buffer RAM (not yet implemented)\n", machine().describe_context());
+				req_b_w(1);
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
+			case 10:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track, stride 2, from Buffer RAM (not yet implemented)\n", machine().describe_context());
+				req_b_w(1);
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
+			case 12:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Write Track (not yet implemented)\n", machine().describe_context());
+				req_b_w(1);
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
+			case 14:
+				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Write Track (not yet implemented)\n", machine().describe_context());
+				req_b_w(1);
+				//m_diskseq_complete_clk->adjust(attotime::from_msec(1));
+				break;
 			default:
 				LOGMASKED(LOG_CTRLBUS, "%s: Unknown Disk Sequencer Card command.\n", machine().describe_context());
 				m_diskseq_complete_clk->adjust(attotime::from_msec(1));
@@ -1528,82 +1549,183 @@ uint8_t dpb7000_state::fdd_ctrl_r()
 	return ret;
 }
 
+void dpb7000_state::advance_line_count()
+{
+	m_bxlen_counter = m_bxlen;
+	m_bylen_counter++;
+	if (m_bylen_counter == 0x1000)
+	{
+		m_diskseq_cyl_read_pending = false;
+	}
+
+	m_line_length = 0;
+	m_line_count++;
+
+	toggle_line_clock();
+}
+
+void dpb7000_state::toggle_line_clock()
+{
+	m_line_clock ^= 1;
+}
+
+void dpb7000_state::process_sample()
+{
+	const uint16_t x = (m_bxlen_counter - m_bxlen) ^ 7;
+	const uint16_t y = (m_bylen_counter - m_bylen) ^ 7;
+	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count);
+	if (BIT(m_brush_addr_func, 7))
+		m_brushstore_lum[y * 256 + x] = m_incoming_lum;
+	if (BIT(m_brush_addr_func, 8))
+		m_brushstore_chr[y * 256 + x] = m_incoming_chr;
+
+	m_bxlen_counter++;
+	if (m_bxlen_counter == 0x1000)
+	{
+		advance_line_count();
+	}
+}
+
+void dpb7000_state::process_byte_from_disc(uint8_t data_byte)
+{
+	if (m_buffer_lum)
+	{
+		m_incoming_lum = data_byte;
+	}
+	else
+	{
+		m_incoming_chr = data_byte;
+		process_sample();
+	}
+
+	m_buffer_lum = !m_buffer_lum;
+	m_line_length++;
+	if (m_line_length == 0x300)
+	{
+		advance_line_count();
+	}
+}
+
 void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 {
-	if (!state && m_diskseq_cyl_read_pending && m_floppy)
+	if (!state && m_diskseq_cyl_read_pending && m_floppy && m_fdd_side < 2)
 	{
+		//printf("Cylinder read is pending, index just passed by, we have a floppy. Let's go.\n");
 		m_fdd_pll.read_reset(machine().time());
 
 		static const uint16_t PREGAP_MARK = 0xaaaa;
 		static const uint16_t SYNC_MARK = 0x9125;
 
-		m_floppy->ss_w(0);
+		m_floppy->ss_w(m_fdd_side);
 
-		for (int side = 0; side < 2; side++)
+		bool seen_pregap = false;
+		bool in_track = false;
+		int curr_bit = -1;
+		uint16_t curr_window = 0;
+		uint16_t bit_idx = 0;
+
+		//printf("Side %d, not seen pregap, not in the track, no current bit, no current window, no bit index.\n", m_fdd_side);
+		attotime tm = machine().time();
+		attotime limit = machine().time() + attotime::from_ticks(1, 6); // One revolution at 360rpm on a Shugart SA850
+		do
 		{
-			bool seen_pregap = false;
-			bool in_track = false;
-			int curr_bit = -1;
-			uint16_t curr_window = 0;
-			uint16_t bit_idx = 0;
-
-			attotime tm = machine().time();
-			attotime limit = machine().time() + attotime::from_ticks(1, 6); // One revolution at 360rpm on a Shugart SA850
-			do
+			curr_bit = m_fdd_pll.get_next_bit(tm, m_floppy, limit);
+			if (curr_bit < 0)
 			{
-				curr_bit = m_fdd_pll.get_next_bit(tm, m_floppy, limit);
-				if (curr_bit < 0)
-				{
-					LOGMASKED(LOG_FDC_MECH, "Warning: Unable to retrieve full track %d side %d!\n", m_floppy->get_cyl(), side);
-				}
-				else
-				{
-					curr_window <<= 1;
-					curr_window |= curr_bit;
-					bit_idx++;
-					//if ((bit_idx % 8) == 0)
-					//{
-					//  printf("%02x ", (uint8_t)curr_window);
-					//}
+				LOGMASKED(LOG_FDC_MECH, "Warning: Unable to retrieve full track %d side %d, curr_bit returned -1\n", m_floppy->get_cyl(), m_fdd_side);
+			}
+			else
+			{
+				curr_window <<= 1;
+				curr_window |= curr_bit;
+				bit_idx++;
 
-					if (!seen_pregap && curr_window == PREGAP_MARK)
+				if (!seen_pregap && curr_window == PREGAP_MARK)
+				{
+					seen_pregap = true;
+					//printf("\nFound pregap area.\n");
+					bit_idx = 0;
+					curr_window = 0;
+				}
+				else if (seen_pregap && !in_track && curr_window == SYNC_MARK)
+				{
+					in_track = true;
+					//printf("\nOh hi, mark.\n");
+					bit_idx = 0;
+					curr_window = 0;
+				}
+				else if (seen_pregap && in_track && bit_idx == 16)
+				{
+					uint8_t data_byte = (uint8_t)bitswap<16>((uint16_t)curr_window, 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+					//printf("%02x ", data_byte);
+					switch (m_diskseq_cmd)
 					{
-						seen_pregap = true;
-						//printf("\nFound pregap area.\n");
-						bit_idx = 0;
-						curr_window = 0;
-					}
-					else if (seen_pregap && !in_track && curr_window == SYNC_MARK)
-					{
-						in_track = true;
-						//printf("\nOh hi, mark.\n");
-						bit_idx = 0;
-						curr_window = 0;
-					}
-					else if (seen_pregap && in_track && bit_idx == 16)
-					{
-						uint8_t data_byte = (uint8_t)bitswap<16>((uint16_t)curr_window, 15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
-						m_diskbuf_ram[m_diskbuf_ram_addr] = data_byte;
-						m_diskbuf_ram_addr++;
-						if (m_diskbuf_ram_addr >= 0x2700 && side == 0)
+					case 4: // Read Track
+					case 6: // Disc Clear, Read Track
+						process_byte_from_disc(data_byte);
+						if (!m_diskseq_cyl_read_pending)
 						{
-							// If we've read the side 0 portion of the cylinder, yield out and begin processing side 1
+							curr_bit = -1;
+							m_fdd_side = 2;
+							//printf("\nThe whole world has betrayed me!\n");
+						}
+						else if (m_fdd_side == 0 && m_line_count == 13)
+						{
 							curr_bit = -1;
 							m_floppy->ss_w(1);
+							m_fdd_side++;
 							//printf("\nCatch you on the flip side!\n");
 						}
-						else if(m_diskbuf_ram_addr >= 0x4b00 && side == 1)
+						else if (m_fdd_side == 1 && m_line_count == 25)
+						{
+							curr_bit = -1;
+							m_fdd_side++;
+							//printf("\nYou're my favorite customer.\n");
+						}
+						break;
+					case 0: // Read Track to Buffer RAM
+					case 2: // Read Track, stride 2, to Buffer RAM
+						if (BIT(m_diskseq_cmd, 1))
+						{
+							if (!BIT(m_diskbuf_ram_addr, 0))
+							{
+								m_diskbuf_ram[m_diskbuf_ram_addr >> 1] = data_byte;
+							}
+							m_diskbuf_ram_addr++;
+						}
+						else
+						{
+							m_diskbuf_ram[m_diskbuf_ram_addr] = data_byte;
+							m_diskbuf_ram_addr++;
+						}
+
+						if (m_diskbuf_ram_addr >= 0x2700 && m_fdd_side == 0)
+						{
+							// If we've read the side 0 portion of the cylinder, yield out and wait for the next index pulse
+							curr_bit = -1;
+							m_floppy->ss_w(1);
+							m_fdd_side++;
+							//printf("\nCatch you on the flip side!\n");
+						}
+						else if(m_diskbuf_ram_addr >= 0x4800 && m_fdd_side == 1)
 						{
 							// If we've read the side 1 portion of the cylinder, yield out, we're done
 							curr_bit = -1;
+							m_fdd_side++;
 							//printf("\nYou're my favorite customer.\n");
 						}
-						bit_idx = 0;
-						curr_window = 0;
+						break;
 					}
+					bit_idx = 0;
+					curr_window = 0;
 				}
-			} while (curr_bit != -1);
-		}
+			}
+		} while (curr_bit != -1);
+		//printf("\n");
+	}
+
+	if (m_fdd_side == 2)
+	{
 		m_diskseq_cyl_read_pending = false;
 		req_b_w(1);
 	}
@@ -1642,7 +1764,7 @@ void dpb7000_state::fddcpu_p1_w(uint8_t data)
 
 		if (m_fdd_track == 0)
 		{
-			m_fdd_ctrl |= 0x04;
+			m_fdd_ctrl |= 0x04; // On Cylinder
 		}
 		else
 		{
@@ -1654,10 +1776,11 @@ void dpb7000_state::fddcpu_p1_w(uint8_t data)
 		m_fdd_ctrl &= ~0x04;
 	}
 
+	// C5 D READY
 	if (BIT(m_fdd_port1, 7))
-		m_diskseq_status_out &= ~0x08;
+		m_diskseq_status_out &= ~(1 << 3);
 	else
-		m_diskseq_status_out |= 0x08;
+		m_diskseq_status_out |= (1 << 3);
 }
 
 void dpb7000_state::fddcpu_p2_w(uint8_t data)
@@ -1731,7 +1854,7 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 			uint8_t *src_lum = &m_brushstore_lum[(py - 512) * 256];
 			uint8_t *src_chr = &m_brushstore_chr[(py - 512) * 256];
 			uint32_t *dst = &bitmap.pix32(py);
-			for (int px = 0; px < 256; px++)
+			for (int px = 0; px < 256; px += 2)
 			{
 				const uint32_t u = *src_chr++ << 16;
 				const uint32_t v = *src_chr++ << 8;
