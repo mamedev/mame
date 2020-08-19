@@ -55,7 +55,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_spirom(*this, "spi")
 	{ }
 
 	void pcp8718(machine_config &config);
@@ -75,6 +76,11 @@ private:
 	required_device<screen_device> m_screen;
 
 	void map(address_map &map);
+
+	uint16_t simulate_f000_r();
+
+	required_region_ptr<uint16_t> m_spirom;
+
 
 };
 
@@ -111,7 +117,38 @@ void pcp8718_state::map(address_map &map)
 
 
 
+uint16_t pcp8718_state::simulate_f000_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		uint16_t pc = m_maincpu->state_int(UNSP_PC);
+		uint16_t sr = m_maincpu->state_int(UNSP_SR);
 
+		int realpc = (pc | (sr << 16)) & 0x003fffff;
+		if (realpc == 0xf000)
+		{
+			address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+			uint32_t source = (mem.read_word(0x001e) << 16) | mem.read_word(0x001d);
+
+			if (source >= 0x20000)
+			{
+				uint16_t data = m_spirom[(source - 0x20000)];
+				uint16_t data2 = m_spirom[(source - 0x20000) + 1];
+
+				logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
+
+				mem.write_word(0x0004, data);
+				mem.write_word(0x0005, data2);
+			}
+			else
+			{
+				logerror("call to 0xf000 - invalid source %08x\n", source);
+			}
+		}
+	}
+	return 0x9a90; // retf
+}
 
 void pcp8718_state::machine_reset()
 {
@@ -120,11 +157,13 @@ void pcp8718_state::machine_reset()
 	m_maincpu->set_state_int(UNSP_PC, 0x4000);
 	m_maincpu->set_state_int(UNSP_SR, 0x0000);
 
-	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
-	ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
+	//uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
+	//ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
 
 	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
 	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read16smo_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
 }
 
