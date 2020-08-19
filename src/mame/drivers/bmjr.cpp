@@ -6,10 +6,10 @@
 
     preliminary driver by Angelo Salese
 
+    To enter the monitor: MON
+    To quit: E
+
     TODO:
-    - for whatever reason, BASIC won't work if you try to use it directly,
-      it does if you enter into MON first then exit (with E)
-    - tape hook-up doesn't work yet (shouldn't be hard to fix)
     - Break key is unemulated (tied with the NMI)
 
 ****************************************************************************/
