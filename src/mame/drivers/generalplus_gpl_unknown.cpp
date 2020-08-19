@@ -77,11 +77,11 @@ private:
 
 	void map(address_map &map);
 
-	uint16_t simulate_f000_r();
+	uint16_t simulate_f000_r(offs_t offset);
 
 	required_region_ptr<uint16_t> m_spirom;
 
-
+	uint16_t unk_7abf_r();
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -99,12 +99,21 @@ void pcp8718_state::machine_start()
 static INPUT_PORTS_START( pcp8718 )
 INPUT_PORTS_END
 
+uint16_t pcp8718_state::unk_7abf_r()
+{
+	return 0x0001;
+}
+
 void pcp8718_state::map(address_map &map)
 {
 	// there are calls to 01xxx and 02xxx regions
 	// (RAM populated by internal ROM?, TODO: check to make sure code copied there isn't from SPI ROM like the GPL16250 bootstrap
 	//  does from NAND, it doesn't seem to have a header in the same format at least)
-	map(0x000000, 0x0077ff).ram().share("mainram");
+	map(0x000000, 0x006fff).ram().share("mainram");
+	map(0x007000, 0x0077ff).ram(); // might be registers, but the call stubs for RAM calls explicitly use addresses in here for private stack so that previous snippets can be restored?
+
+	map(0x007abf, 0x007abf).r(FUNC(pcp8718_state::unk_7abf_r));
+	
 
 	// registers at 7xxx are similar to GPL16250, but not identical? (different video system?)
 
@@ -117,34 +126,42 @@ void pcp8718_state::map(address_map &map)
 
 
 
-uint16_t pcp8718_state::simulate_f000_r()
+uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		uint16_t pc = m_maincpu->state_int(UNSP_PC);
-		uint16_t sr = m_maincpu->state_int(UNSP_SR);
-
-		int realpc = (pc | (sr << 16)) & 0x003fffff;
-		if (realpc == 0xf000)
+		if ((offset+0xf000) == 0xf000)
 		{
-			address_space& mem = m_maincpu->space(AS_PROGRAM);
 
-			uint32_t source = (mem.read_word(0x001e) << 16) | mem.read_word(0x001d);
+			uint16_t pc = m_maincpu->state_int(UNSP_PC);
+			uint16_t sr = m_maincpu->state_int(UNSP_SR);
 
-			if (source >= 0x20000)
+			int realpc = (pc | (sr << 16)) & 0x003fffff;
+			if (realpc == 0xf000)
 			{
-				uint16_t data = m_spirom[(source - 0x20000)];
-				uint16_t data2 = m_spirom[(source - 0x20000) + 1];
+				address_space& mem = m_maincpu->space(AS_PROGRAM);
 
-				logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
+				uint32_t source = (mem.read_word(0x001e) << 16) | mem.read_word(0x001d);
 
-				mem.write_word(0x0004, data);
-				mem.write_word(0x0005, data2);
+				if (source >= 0x20000)
+				{
+					uint16_t data = m_spirom[(source - 0x20000)];
+					uint16_t data2 = m_spirom[(source - 0x20000) + 1];
+
+					logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
+
+					mem.write_word(0x0004, data);
+					mem.write_word(0x0005, data2);
+				}
+				else
+				{
+					logerror("call to 0xf000 - invalid source %08x\n", source);
+				}
 			}
-			else
-			{
-				logerror("call to 0xf000 - invalid source %08x\n", source);
-			}
+		}
+		else
+		{
+			fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
 		}
 	}
 	return 0x9a90; // retf
@@ -163,7 +180,7 @@ void pcp8718_state::machine_reset()
 	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
 	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read16smo_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
 }
 
