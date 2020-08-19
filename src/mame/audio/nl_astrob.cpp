@@ -72,9 +72,9 @@ NETLIST_START(astrob)
 #if 1
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4e-5)
 #if (SIMPLIFY_SONAR)
-	PARAM(Solver.Solver_52.DYNAMIC_MIN_TIMESTEP, 7e-6)	// gets rid of NR loops failure
+	PARAM(Solver.Solver_54.DYNAMIC_MIN_TIMESTEP, 7e-6)	// gets rid of NR loops failure
 #else
 	PARAM(Solver.Solver_40.DYNAMIC_MIN_TIMESTEP, 7e-6)	// gets rid of NR loops failure
 #endif
@@ -82,7 +82,7 @@ NETLIST_START(astrob)
 	SOLVER(Solver, 48000)
 #endif
 
-	// Overwrite model - the default model uses minimum datasheet 
+	// Overwrite model - the default model uses minimum datasheet
 	// specifications for 5V. These are for 10V and thus closer to the
 	// 12V used in this circuit.
 	NET_MODEL("CD4XXX FAMILY(TYPE=CMOS IVL=0.3 IVH=0.7 OVL=0.05 OVH=0.05 ORL=384 ORH=384)")
@@ -988,11 +988,11 @@ NETLIST_START(astrob)
 	NET_C(LASER_2, R103.1)
 	NET_C(SONAR, R120.1)
 	NET_C(C55.2, R121.2, R122.2, R118.2, R119.2, R102.2, R103.2, R120.2)
-//	AFUNC(MUTEFUNC, 2, "if(A0>2.5,0,A1)")
-//	NET_C(MUTEFUNC.A0, I_MUTE)
-//	NET_C(MUTEFUNC.A1, R121.2)
-//	ALIAS(OUTPUT, MUTEFUNC.Q)
-	ALIAS(OUTPUT, C55.2)
+	AFUNC(MUTEFUNC, 2, "if(A0>2.5,0,A1)")
+	NET_C(MUTEFUNC.A0, I_MUTE)
+	NET_C(MUTEFUNC.A1, R121.2)
+	ALIAS(OUTPUT, MUTEFUNC.Q)
+//	ALIAS(OUTPUT, C55.2)
 
 	//
 	// Sheet 8, middle-top (INVADER_1)
@@ -1152,16 +1152,10 @@ NETLIST_START(astrob)
 	OPTIMIZE_FRONTIER(INVADER_2, RES_M(1), RXX)
 	OPTIMIZE_FRONTIER(INVADER_3, RES_M(1), RXX)
 	OPTIMIZE_FRONTIER(INVADER_4, RES_M(1), RXX)
-//	OPTIMIZE_FRONTIER(ASTROIDS, RES_K(10), RXX)
-//	OPTIMIZE_FRONTIER(EXPLOSIONS, RES_K(4.7), RXX)
-//	OPTIMIZE_FRONTIER(BONUS, RES_K(470), RXX) -- maybe?
-//	OPTIMIZE_FRONTIER(REFILL, RES_K(470), RXX)
-//	OPTIMIZE_FRONTIER(LASER_1, RES_K(470), RXX)
-//	OPTIMIZE_FRONTIER(LASER_2, RES_M(1), RXX)
-//	OPTIMIZE_FRONTIER(SONAR, RES_K(220), RXX)
 
-	OPTIMIZE_FRONTIER(C60.1, RES_M(1), RXX)	// this is a big one
-	OPTIMIZE_FRONTIER(C61.1, RES_M(1), RXX)
+	OPTIMIZE_FRONTIER(C50.1, RES_M(10), RXX)
+	OPTIMIZE_FRONTIER(C60.1, RES_M(10), RXX)	// this is a big one
+	OPTIMIZE_FRONTIER(C61.1, RES_M(10), RXX)
 #endif
 
 NETLIST_END()
