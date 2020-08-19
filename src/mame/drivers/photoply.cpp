@@ -366,10 +366,10 @@ ROM_START(photoply99sp)
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
 	/* The PhotoPlay 1999 parallel port dongle contains, under expoxy resin:
-           Atmel AT89C2051 MCU (2KBytes internal ROM, UNDUMPED)
-           Xtal 11.05MHz
-           24C08W6 SEEPROM
-           HC132 */
+	   Atmel AT89C2051 MCU (2KBytes internal ROM, UNDUMPED)
+	   Xtal 11.05MHz
+	   24C08W6 SEEPROM
+	   HC132 */
 	ROM_REGION(0xC00, "dongle", 0)
 	ROM_SYSTEM_BIOS(0, "pp_99_dongle_r3",  "Parallel port dongle Rev. 3")
 	ROMX_LOAD("dongle_photoply_1999_sp_r3_mcu.bin",         0x000, 0x800, NO_DUMP,                                                      ROM_BIOS(0)) // AT89C2051
