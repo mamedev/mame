@@ -363,7 +363,7 @@ ROM_START(microtouch)
 	ROM_SYSTEM_BIOS(1, "microtouch_5_5", "MicroTouch Rev.5.5") // "Kahuna", daughterboard integrated on monitor
 	ROMX_LOAD("microtouch_5603920_rev_5.5.u1", 0x0000, 0x08000, CRC(5cc164e7) SHA1(753277ce54e8be1b759c37ae760fe4a6846d1fae), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "microtouch_2_2", "MicroTouch Rev.2.2") // "Excalibur, ISA card
-	ROMX_LOAD("microtouch_5604340_rev_2.2.u1", 0x0000, 0x08000, CRC(110f312f) SHA1(5a60d7d1f8a0b3898aabcabe43dc51e9f90306f7), ROM_BIOS(2)) // 27c512
+	ROMX_LOAD("microtouch_5604340_rev_2.2.u1", 0x0000, 0x10000, CRC(110f312f) SHA1(5a60d7d1f8a0b3898aabcabe43dc51e9f90306f7), ROM_BIOS(2)) // 27c512
 ROM_END
 
 static INPUT_PORTS_START(microtouch)
