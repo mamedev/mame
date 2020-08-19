@@ -386,7 +386,7 @@ ROM_START(photoply99sp)
 
 	// Quantum Fireball EX3.2A
 	// C/H/S: 3.2 - 6256/16/63
-        // PhotoPlay label: 09.02.1999
+	// PhotoPlay label: 09.02.1999
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay99sp", 0, BAD_DUMP SHA1(887e5b8c931d6122a1c3a8eda5cb919eb162eced) ) // From an operated HDD. A clean one must be recreated from the CDs
 ROM_END
