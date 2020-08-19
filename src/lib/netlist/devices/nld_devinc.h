@@ -1206,15 +1206,13 @@
 #define TTL_74126_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74126_DIP, __VA_ARGS__)
 
-<<<<<<< HEAD
 // usage       : TTL_74139_DIP(name)
 #define TTL_74139_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74139_DIP, __VA_ARGS__)
-=======
+
 // usage       : TTL_74153_DIP(name)
 #define TTL_74153_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74153_DIP, __VA_ARGS__)
->>>>>>> master
 
 // usage       : TTL_74155_DIP(name)
 #define TTL_74155_DIP(...)                                             \
