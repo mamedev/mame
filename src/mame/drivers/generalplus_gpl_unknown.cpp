@@ -79,7 +79,7 @@ private:
 
 	uint16_t simulate_f000_r(offs_t offset);
 
-	required_region_ptr<uint16_t> m_spirom;
+	required_region_ptr<uint8_t> m_spirom;
 
 	uint16_t unk_7abf_r();
 };
@@ -119,9 +119,6 @@ void pcp8718_state::map(address_map &map)
 
 	// there are calls to 0x0f000 (internal ROM?)
 	map(0x00f000, 0x00ffff).rom().region("maincpu", 0x00000);
-
-	// seems to have same memory config registers etc. as GPL16250 so CS Space starts at 0x020000 and the 'bank' is likely at 0x200000 too
-	map(0x020000, 0x3fffff).rom().region("spi", 0x00000);
 }
 
 
@@ -145,8 +142,8 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 				if (source >= 0x20000)
 				{
-					uint16_t data = m_spirom[(source - 0x20000)];
-					uint16_t data2 = m_spirom[(source - 0x20000) + 1];
+					uint16_t data = m_spirom[((source - 0x20000)*2)+0] | (m_spirom[((source - 0x20000)*2)+1] << 8);
+					uint16_t data2 = m_spirom[((source - 0x20000)*2)+2] | (m_spirom[((source - 0x20000)*2)+3] << 8);
 
 					logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
 
@@ -208,34 +205,34 @@ ROM_START( pcp8718 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	//ROM_LOAD16_WORD_SWAP( "8718_en25f32.bin", 0x000000, 0x400000, CRC(cc138db4) SHA1(379af3d94ae840f52c06416d6cf32e25923af5ae) ) // bad dump, some blocks are corrupt
-	ROM_LOAD16_WORD_SWAP( "eyecare_25q32av1g_ef4016.bin", 0x000000, 0x400000, CRC(58415e10) SHA1(b1adcc03f2ad8d741544204671677740e904ce1a) )
+	ROM_LOAD( "eyecare_25q32av1g_ef4016.bin", 0x000000, 0x400000, CRC(58415e10) SHA1(b1adcc03f2ad8d741544204671677740e904ce1a) )
 ROM_END
 
 ROM_START( pcp8728 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "pcp 8728 788 in 1.bin", 0x000000, 0x400000, CRC(60115f21) SHA1(e15c39f11e442a76fae3823b6d510178f6166926) )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "pcp 8728 788 in 1.bin", 0x000000, 0x400000, CRC(60115f21) SHA1(e15c39f11e442a76fae3823b6d510178f6166926) )
 ROM_END
 
 ROM_START( unkunsp )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
 
 void pcp8718_state::spi_init()
 {
-	uint16_t* rom = (uint16_t*)memregion("spi")->base();
+	uint8_t* rom = memregion("spi")->base();
 
-	uint32_t start = rom[0] | rom[1] << 16;
-	uint32_t end =   rom[2] | rom[1] << 16;
+	uint32_t start = rom[0] | (rom[1] << 8) | (rom[2] << 16) | (rom[3] << 24);
+	uint32_t end =   rom[4] | (rom[5] << 8) | (rom[2] << 16) | (rom[3] << 24);
 
 
 	logerror("start: %08x\n", start);
@@ -253,9 +250,9 @@ void pcp8718_state::spi_init()
 		start -= 0x20000;
 		end -= 0x20000;
 
-		for (int i = start; i <= end; i++)
+		for (int i = start*2; i <= end*2; i+=2)
 		{
-			uint16_t dat = rom[i];
+			uint16_t dat = rom[i] | (rom[i+1] << 8);
 			m_mainram[writebase++] = dat;
 		}
 	}
