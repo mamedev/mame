@@ -8,7 +8,16 @@
 //
 // Known problems/issues:
 //
-//    * WIP.
+//    * All sounds work under the right conditions.
+//
+//    * SONAR and BONUS sounds fail to trigger after the first
+//       few seconds. For some reason the triggering via CD4011
+//       never actually fires the one-shot that controls the
+//       duration of the sound.
+//
+//    * Performance is poor, primarily due to the SONAR sound
+//       and its connection to the mixing net. All attempts at
+//       separating the two have ended in failure so far.
 //
 
 #include "netlist/devices/net_lib.h"
@@ -19,7 +28,11 @@
 // Optimizations
 //
 
+#define HLE_LASER_1_VCO (1)
+#define HLE_LASER_2_VCO (1)
+#define SIMPLIFY_SONAR (0)
 #define ENABLE_FRONTIERS (0)
+#define UNDERCLOCK_NOISE_GEN (1)
 
 
 
@@ -58,11 +71,14 @@ NETLIST_START(astrob)
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
+#if (SIMPLIFY_SONAR)
+	PARAM(Solver.Solver_52.DYNAMIC_MIN_TIMESTEP, 7e-6)	// gets rid of NR loops failure
+#else
+	PARAM(Solver.Solver_40.DYNAMIC_MIN_TIMESTEP, 7e-6)	// gets rid of NR loops failure
+#endif
 #else
 	SOLVER(Solver, 48000)
 #endif
-
-//	LOCAL_SOURCE(_CA3080_FAST_DIP)
 
 	TTL_INPUT(I_LO_D0, 0)
 	NET_C(I_LO_D0, U31.1)
@@ -129,7 +145,12 @@ NETLIST_START(astrob)
 	RES(R2, RES_K(1.5))
 	RES(R3, RES_K(330))
 	RES(R4, RES_K(10))
+#if (SIMPLIFY_SONAR)
+	// use less resistance to account for only emulating 1/4 identical circuits
+	RES(R5, RES_K(17))
+#else
 	RES(R5, RES_K(68))
+#endif
 	RES(R6, RES_K(68))
 	RES(R7, RES_K(22))
 	RES(R8, RES_K(18))
@@ -160,11 +181,11 @@ NETLIST_START(astrob)
 	RES(R33, RES_K(39))
 	RES(R34, RES_K(4.7))
 	RES(R35, RES_K(4.7))
-	RES(R36, RES_K(100))
-	RES(R37, RES_K(1.5))
-	RES(R38, RES_K(330))
-	RES(R39, RES_K(10))
-	RES(R40, RES_K(68))
+	RES(R36, RES_K(100.1))	// part of SONAR circuit that relies on subtle part differences
+	RES(R37, RES_K(1.51))	// part of SONAR circuit that relies on subtle part differences
+	RES(R38, RES_K(330.1))	// part of SONAR circuit that relies on subtle part differences
+	RES(R39, RES_K(10.1))	// part of SONAR circuit that relies on subtle part differences
+	RES(R40, RES_K(68.1))	// part of SONAR circuit that relies on subtle part differences
 	RES(R41, RES_K(10))
 	RES(R42, RES_K(100))
 	RES(R43, RES_K(470))
@@ -186,11 +207,11 @@ NETLIST_START(astrob)
 	RES(R59, RES_K(100))
 	RES(R60, RES_K(10))
 	RES(R61, RES_K(100))
-	RES(R62, RES_K(100))
-	RES(R63, RES_K(1.5))
-	RES(R64, RES_K(330))
-	RES(R65, RES_K(10))
-	RES(R66, RES_K(68))
+	RES(R62, RES_K(99.9))	// part of SONAR circuit that relies on subtle part differences
+	RES(R63, RES_K(1.49))	// part of SONAR circuit that relies on subtle part differences
+	RES(R64, RES_K(329.9))	// part of SONAR circuit that relies on subtle part differences
+	RES(R65, RES_K(9.9))	// part of SONAR circuit that relies on subtle part differences
+	RES(R66, RES_K(67.9))	// part of SONAR circuit that relies on subtle part differences
 	RES(R67, RES_K(10))
 	RES(R68, RES_K(82))
 	RES(R69, RES_K(470))
@@ -215,11 +236,11 @@ NETLIST_START(astrob)
 	RES(R88, RES_K(100))
 	RES(R89, RES_K(10))
 	RES(R90, RES_K(100))
-	RES(R91, RES_K(100))
-	RES(R92, RES_K(1.5))
-	RES(R93, RES_K(330))
-	RES(R94, RES_K(10))
-	RES(R95, RES_K(68))
+	RES(R91, RES_K(100.2))	// part of SONAR circuit that relies on subtle part differences
+	RES(R92, RES_K(1.52))	// part of SONAR circuit that relies on subtle part differences
+	RES(R93, RES_K(330.2))	// part of SONAR circuit that relies on subtle part differences
+	RES(R94, RES_K(10.2))	// part of SONAR circuit that relies on subtle part differences
+	RES(R95, RES_K(68.2))	// part of SONAR circuit that relies on subtle part differences
 	RES(R96, RES_K(10))
 	RES(R97, RES_K(4.7))
 	RES(R98, RES_M(1))
@@ -461,6 +482,11 @@ NETLIST_START(astrob)
 	NET_C(U7.11, I_VM12)
 
 	MM5837_DIP(U8)			// Noise Generator
+#if (UNDERCLOCK_NOISE_GEN)
+	// officially runs at 48-112kHz, but little noticeable difference
+	// in exchange for a big performance boost
+	PARAM(U8.FREQ, 24000)
+#endif
 
 	CD4011_DIP(U9)			// Quad 2-Input NAND Gates
 	NET_C(U9.7, GND)
@@ -579,6 +605,26 @@ NETLIST_START(astrob)
 	NET_C(C1.2, R3.1, U1.6)
 	NET_C(U1.5, GND)
 
+#if (SIMPLIFY_SONAR)
+	// sonar has 4 identical circuits; reduce the net size
+	// by only emulating one and multiplying it by 4
+	NET_C(U1.9, U1.10, U1.12, U1.13, GND)
+	NET_C(R36.1, R36.2, R37.1, R37.2, R38.1, R38.2, R39.1, R39.2, R40.1, R40.2, GND)
+	NET_C(C16.1, C16.2, C17.1, C17.2, GND)
+	NET_C(D4.A, D4.K, GND)
+
+	NET_C(U2.2, U2.3, U2.5, U2.6, GND)
+	NET_C(R62.1, R62.2, R63.1, R63.2, R64.1, R64.2, R65.1, R65.2, R66.1, R66.2, GND)
+	NET_C(C24.1, C24.2, C25.1, C25.2, GND)
+	NET_C(D6.A, D6.K, GND)
+
+	NET_C(U2.9, U2.10, U2.12, U2.13, GND)
+	NET_C(R91.1, R91.2, R92.1, R92.2, R93.1, R93.2, R94.1, R94.2, R95.1, R95.2, GND)
+	NET_C(C40.1, C40.2, C41.1, C41.2, GND)
+	NET_C(D10.A, D10.K, GND)
+
+	NET_C(R5.1, R114.1, Q3.B)
+#else
 	NET_C(U1.12, GND)
 	NET_C(U1.13, D4.A, R39.1)
 	NET_C(U1.14, D4.K, R36.1)
@@ -590,7 +636,7 @@ NETLIST_START(astrob)
 
 	NET_C(U2.3, GND)
 	NET_C(U2.2, D6.A, R65.1)
-	NET_C(U2.4, D6.K, R62.1)
+	NET_C(U2.14, D6.K, R62.1)
 	NET_C(R62.2, R63.2, C24.1, C25.1)
 	NET_C(R63.1, GND)
 	NET_C(R65.2, R64.2, U2.7, C25.2, R66.2)
@@ -607,10 +653,13 @@ NETLIST_START(astrob)
 	NET_C(U2.10, GND)
 
 	NET_C(R5.1, R40.1, R114.1, Q3.B, R95.1, R66.1)
+#endif
+
 	NET_C(R114.2, GND)
 	NET_C(Q3.E, Q2.E, Q1.C)
 	NET_C(Q1.B, R108.2, C47.2, R117.2)
-	NET_C(C47.1, I_V12, R108.1, R109.1)
+	NET_C(C47.1, R108.1, I_V12)
+	NET_C(I_V12, R109.1)
 	NET_C(R109.2, Q1.E)
 	NET_C(R117.1, D2.A)
 	NET_C(D2.K, U11.4, C4.2)
@@ -655,9 +704,29 @@ NETLIST_START(astrob)
 	NET_C(C57.1, Q10.C, C65.1, U24.1, GND)
 	NET_C(R107.2, Q10.B, R134.1)
 	NET_C(Q10.E, U24.5)
-	NET_C(U24.2, U24.6, R140.1, C65.2)
-	NET_C(R140.2, U24.7, R139.1)
+#if (HLE_LASER_1_VCO)
+	//
+	//    R2 = 0.98461: HP = (0.00000524285*A0) + 0.00000563193
+	//    R2 = 0.99441: HP = (0.000000368659*A0*A0) + (0.00000116694*A0) + 0.0000155514
+	//    R2 = 0.99797: HP = (0.000000154808*A0*A0*A0) - (0.00000213809*A0*A0) + (0.0000138122*A0) - 0.00000398935
+	//    R2 = 0.99877: HP = (-0.0000000527853*A0*A0*A0*A0) + (0.00000128033*A0*A0*A0) - (0.0000107258*A0*A0) + (0.0000413916*A0) - 0.0000352437
+	//    R2 = 0.99943: HP = (0.0000000343262*A0*A0*A0*A0*A0) - (0.00000096054*A0*A0*A0*A0) + (0.0000105481*A0*A0*A0) - (0.0000561978*A0*A0) + (0.000148191*A0) - 0.000131018
+	//
+	VARCLOCK(LASER1CLK, 1, "max(0.000001,min(0.1,(0.0000000343262*A0*A0*A0*A0*A0) - (0.00000096054*A0*A0*A0*A0) + (0.0000105481*A0*A0*A0) - (0.0000561978*A0*A0) + (0.000148191*A0) - 0.000131018))")
+	NET_C(LASER1CLK.GND, GND)
+	NET_C(LASER1CLK.VCC, I_V12)
+    NET_C(LASER1CLK.A0, Q10.E)
+    NET_C(LASER1CLK.Q, LASER1ENV.A1)
+	AFUNC(LASER1ENV, 2, "if(A0>6,A1,0)")
+	NET_C(LASER1ENV.A0, U25.10)
+	NET_C(LASER1ENV.Q, U19.1)
+	NET_C(U24.3, GND)
+	NET_C(U24.2, U24.6, R140.1, C65.2, GND)
+#else
 	NET_C(U24.3, U19.1)
+	NET_C(U24.2, U24.6, R140.1, C65.2)
+#endif
+	NET_C(R140.2, U24.7, R139.1)
 	NET_C(C56.2, GND)
 	NET_C(U19.12, R132.1)
 	NET_C(U19.11, R131.1)
@@ -687,9 +756,29 @@ NETLIST_START(astrob)
 	NET_C(C53.1, Q9.C, C68.1, U20.1, GND)
 	NET_C(R133.2, Q9.B, R106.1)
 	NET_C(Q9.E, U20.5)
-	NET_C(U20.2, U20.6, R137.1, C68.2)
-	NET_C(R137.2, U20.7, R145.1)
+#if (HLE_LASER_2_VCO)
+	//
+	//    R2 = 0.98942: HP = (0.00000251528*A0) + 0.00000244265
+	//    R2 = 0.99596: HP = (0.000000160852*A0*A0) + (0.000000694298*A0) + 0.00000690896
+	//    R2 = 0.99821: HP = (0.000000068284*A0*A0*A0) - (0.000000949931*A0*A0) + (0.00000630369*A0) - 0.00000175548
+	//    R2 = 0.99896: HP = (-0.0000000291178*A0*A0*A0*A0) + (0.000000689145*A0*A0*A0) - (0.00000568073*A0*A0) + (0.0000214603*A0) - 0.0000188875
+	//    R2 = 0.99937: HP = (0.0000000153499*A0*A0*A0*A0*A0) - (0.000000433800*A0*A0*A0*A0) + (0.00000480504*A0*A0*A0) - (0.0000257871*A0*A0) + (0.000068467*A0) - 0.0000608574
+	//
+	VARCLOCK(LASER2CLK, 1, "max(0.000001,min(0.1,(0.0000000153499*A0*A0*A0*A0*A0) - (0.000000433800*A0*A0*A0*A0) + (0.00000480504*A0*A0*A0) - (0.0000257871*A0*A0) + (0.000068467*A0) - 0.0000608574))")
+	NET_C(LASER2CLK.GND, GND)
+	NET_C(LASER2CLK.VCC, I_V12)
+    NET_C(LASER2CLK.A0, Q9.E)
+    NET_C(LASER2CLK.Q, LASER2ENV.A1)
+	AFUNC(LASER2ENV, 2, "if(A0>6,A1,0)")
+	NET_C(LASER2ENV.A0, U25.11)
+	NET_C(LASER2ENV.Q, U14.1)
+	NET_C(U20.3, GND)
+	NET_C(U20.2, U20.6, R137.1, C68.2, GND)
+#else
 	NET_C(U20.3, U14.1)
+	NET_C(U20.2, U20.6, R137.1, C68.2)
+#endif
+	NET_C(R137.2, U20.7, R145.1)
 	NET_C(C62.2, GND)
 	NET_C(U14.12, R125.1)
 	NET_C(U14.11, R126.1)
@@ -820,14 +909,14 @@ NETLIST_START(astrob)
 	NET_C(C80.2, GND)
 	NET_C(R180.2, U16.9, R179.1)
 	NET_C(R179.2, U16.8, R177.1)
-	NET_C(R181.2, U16.10, Q6.S, D26.K)
+	NET_C(R181.2, U16.10, Q6.D, D26.K)	// D and S swapped on schematics???
 	NET_C(Q6.G, C72.2, R151.2, Q5.G)
 	NET_C(R151.1, GND)
 	NET_C(C72.1, U8.3)
 	NET_C(U8.4, I_V12)
 	NET_C(U8.2, I_VM12)
 	NET_C(U8.1, GND)
-	NET_C(Q6.D, D26.A, GND)
+	NET_C(Q6.S, D26.A, GND)
 	NET_C(D29.A, D24.K, C69.1)
 	NET_C(C69.2, GND)
 	NET_C(R183.1, R186.2, U27.4, U27.8, U27.9, D28.K)
@@ -864,8 +953,8 @@ NETLIST_START(astrob)
 	NET_C(I_ASTROIDS, R97.1, R174.1, R175.1)
 	NET_C(R97.2, I_V12)
 	NET_C(R174.2, U16.13, R173.1)
-	NET_C(R175.2, U16.12, Q5.S, D25.K)
-	NET_C(D25.A, Q5.D, GND)
+	NET_C(R175.2, U16.12, Q5.D, D25.K)	// D and S swapped on schematics???
+	NET_C(D25.A, Q5.S, GND)
 	NET_C(R173.2, U16.14, R172.1)
 	NET_C(R172.2, R150.1, C70.1)
 	NET_C(C70.2, U7.9, U7.8, R136.1)
@@ -891,31 +980,12 @@ NETLIST_START(astrob)
 	NET_C(LASER_1, R102.1)
 	NET_C(LASER_2, R103.1)
 	NET_C(SONAR, R120.1)
-#if 0
-	AFUNC(MIXFUNC, 9, "if(A0>2.5,0,A1+A2/10+A3/4.7+A4/470+A5/470+A6/470+A7/1000+A8/220-12)")
-	NET_C(MIXFUNC.A0, I_MUTE)
-	NET_C(MIXFUNC.A1, C55.2)
-	NET_C(MIXFUNC.A2, R121.2)
-	NET_C(MIXFUNC.A3, R122.2)
-	NET_C(MIXFUNC.A4, R118.2)
-	NET_C(MIXFUNC.A5, R119.2)
-	NET_C(MIXFUNC.A6, R102.2)
-	NET_C(MIXFUNC.A7, R103.2)
-	NET_C(MIXFUNC.A8, R120.2)
-	RES(ROUT, RES_K(1))
-	NET_C(MIXFUNC.Q, ROUT.1)
-	NET_C(GND, ROUT.2)
-	ALIAS(OUTPUT, ROUT.1)
-#else
-	NET_C(C55.2, /*R121.2,*/ /*R122.2,*/ R118.2, R119.2, R102.2, R103.2, R120.2)
-	NET_C(R121.2, GND) // ASTEROIDS
-	NET_C(R122.2, GND) // EXPLOSIONS
+	NET_C(C55.2, R121.2, R122.2, R118.2, R119.2, R102.2, R103.2, R120.2)
 //	AFUNC(MUTEFUNC, 2, "if(A0>2.5,0,A1)")
 //	NET_C(MUTEFUNC.A0, I_MUTE)
 //	NET_C(MUTEFUNC.A1, R121.2)
 //	ALIAS(OUTPUT, MUTEFUNC.Q)
-	ALIAS(OUTPUT, R120.2)
-#endif
+	ALIAS(OUTPUT, R102.2)
 
 	//
 	// Sheet 8, middle-top (INVADER_1)
@@ -1001,7 +1071,9 @@ NETLIST_START(astrob)
 	//
 
 	NET_C(I_BONUS, R45.1, U10.6)
-	NET_C(R45.2, R44.2, R77.2, C34.1, R74.2, U6.4, U6.8, C33.1, I_V12)
+	NET_C(C34.1, R77.2, I_V12)
+	NET_C(R45.2, R44.2, R74.2, U6.4, U6.8, C33.1, I_V12)
+
 	NET_C(R44.1, U10.5, C19.1)
 #if (ADD_CLIPPING_DIODES)
 	// fast retriggering relies on clipping diodes which
@@ -1067,7 +1139,6 @@ NETLIST_START(astrob)
 	// Unconnected outputs
 	//
 
-
 #if (ENABLE_FRONTIERS)
 #define RXX 192
 	OPTIMIZE_FRONTIER(INVADER_1, RES_M(1), RXX)
@@ -1075,12 +1146,12 @@ NETLIST_START(astrob)
 	OPTIMIZE_FRONTIER(INVADER_3, RES_M(1), RXX)
 	OPTIMIZE_FRONTIER(INVADER_4, RES_M(1), RXX)
 //	OPTIMIZE_FRONTIER(ASTROIDS, RES_K(10), RXX)
-	OPTIMIZE_FRONTIER(EXPLOSIONS, RES_K(4.7), RXX)
-	OPTIMIZE_FRONTIER(BONUS, RES_K(470), RXX)
-	OPTIMIZE_FRONTIER(REFILL, RES_K(470), RXX)
-	OPTIMIZE_FRONTIER(LASER_1, RES_K(470), RXX)
-	OPTIMIZE_FRONTIER(LASER_2, RES_M(1), RXX)
-	OPTIMIZE_FRONTIER(SONAR, RES_K(220), RXX)
+//	OPTIMIZE_FRONTIER(EXPLOSIONS, RES_K(4.7), RXX)
+//	OPTIMIZE_FRONTIER(BONUS, RES_K(470), RXX) -- maybe?
+//	OPTIMIZE_FRONTIER(REFILL, RES_K(470), RXX)
+//	OPTIMIZE_FRONTIER(LASER_1, RES_K(470), RXX)
+//	OPTIMIZE_FRONTIER(LASER_2, RES_M(1), RXX)
+//	OPTIMIZE_FRONTIER(SONAR, RES_K(220), RXX)
 #endif
 
 NETLIST_END()
