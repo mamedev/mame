@@ -30,8 +30,8 @@
 
 #define HLE_LASER_1_VCO (1)
 #define HLE_LASER_2_VCO (1)
-#define SIMPLIFY_SONAR (0)
-#define ENABLE_FRONTIERS (0)
+#define SIMPLIFY_SONAR (1)
+#define ENABLE_FRONTIERS (1)
 #define UNDERCLOCK_NOISE_GEN (1)
 
 
@@ -60,6 +60,8 @@
 
 #define TTL_74LS00_DIP TTL_7400_DIP
 #define TTL_74LS04_DIP TTL_7404_DIP
+
+
 
 //
 // Main netlist
@@ -485,7 +487,7 @@ NETLIST_START(astrob)
 #if (UNDERCLOCK_NOISE_GEN)
 	// officially runs at 48-112kHz, but little noticeable difference
 	// in exchange for a big performance boost
-	PARAM(U8.FREQ, 24000)
+	PARAM(U8.FREQ, 12000)
 #endif
 
 	CD4011_DIP(U9)			// Quad 2-Input NAND Gates
@@ -985,7 +987,7 @@ NETLIST_START(astrob)
 //	NET_C(MUTEFUNC.A0, I_MUTE)
 //	NET_C(MUTEFUNC.A1, R121.2)
 //	ALIAS(OUTPUT, MUTEFUNC.Q)
-	ALIAS(OUTPUT, R102.2)
+	ALIAS(OUTPUT, C55.2)
 
 	//
 	// Sheet 8, middle-top (INVADER_1)
@@ -1152,6 +1154,9 @@ NETLIST_START(astrob)
 //	OPTIMIZE_FRONTIER(LASER_1, RES_K(470), RXX)
 //	OPTIMIZE_FRONTIER(LASER_2, RES_M(1), RXX)
 //	OPTIMIZE_FRONTIER(SONAR, RES_K(220), RXX)
+
+	OPTIMIZE_FRONTIER(C60.1, RES_M(1), RXX)	// this is a big one
+	OPTIMIZE_FRONTIER(C61.1, RES_M(1), RXX)
 #endif
 
 NETLIST_END()
