@@ -75,6 +75,8 @@ private:
 	void m_map500(address_map &map);
 	void m_map700(address_map &map);
 
+	void init_waitstates();
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
