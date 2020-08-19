@@ -320,6 +320,9 @@ gunfighto                       // 597 [1975] Dave Nutting Associates / Midway
 280zzzap                        // 610 [1976] Dave Nutting Associates / Midway
 lagunar                         // 622 [1977] Midway
 
+@source:nitedrvr.cpp
+nitedrvr                        //
+
 @source:palestra.cpp
 palestra
 

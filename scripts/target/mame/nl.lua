@@ -167,6 +167,13 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_destroyr.h",
 	MAME_DIR .. "src/mame/drivers/destroyr.cpp",
 
+	MAME_DIR .. "src/mame/drivers/nitedrvr.cpp",
+	MAME_DIR .. "src/mame/includes/nitedrvr.h",
+	MAME_DIR .. "src/mame/machine/nitedrvr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_nitedrvr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_nitedrvr.h",
+	MAME_DIR .. "src/mame/video/nitedrvr.cpp",
+
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
