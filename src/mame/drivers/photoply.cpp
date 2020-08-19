@@ -8,8 +8,8 @@ Preliminary driver by Angelo Salese
 
 TODO:
 - BIOS CMOS doesn't save at all (needed for setting up the Hard Disk);
-- DISK BOOT FAILURE after eeprom checking (many unknown IDE cs1 reads/writes);
-- partition boot sector is missing from the CHD dump, protection?
+- DISK BOOT FAILURE after EEPROM checking (many unknown IDE cs1 reads/writes);
+- Partition boot sector is missing from the CHD dump, protection?
 - Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro (after fiddling with CMOS settings anyway)
 - VGA BIOS reports being a Cirrus Logic GD5436 / 5446, it is unknown what exactly this game uses.
 - PCI hookups (no idea about what this uses), and improve/device-ify SiS85C49x;
@@ -296,14 +296,14 @@ static const gfx_layout CGA_charlayout =
 };
 
 static GFXDECODE_START( gfx_photoply )
-	GFXDECODE_ENTRY( "video_bios", 0x6000+0xa5*8+7, CGA_charlayout,              0, 256 )
+	GFXDECODE_ENTRY( "video_bios", 0x6000+0xa5*8+7, CGA_charlayout, 0, 256 )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
 void photoply_state::photoply(machine_config &config)
 {
-	/* basic machine hardware */
-	I486DX4(config, m_maincpu, 75000000); /* I486DX4, 75 or 100 Mhz */
+	// Basic machine hardware
+	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &photoply_state::photoply_map);
 	m_maincpu->set_addrmap(AS_IO, &photoply_state::photoply_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -334,28 +334,28 @@ void photoply_state::photoply(machine_config &config)
 
 
 ROM_START(photoply)
-	ROM_REGION(0x20000, "bios", 0)  /* motherboard bios */
-	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
+	ROM_REGION(0x20000, "bios", 0)  // Motherboard BIOS
+	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // Award Modular BIOS v4.51G
 
-	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
-	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip,  M27128A
+	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) ) // Centos Combo I/O ROM BIOS for CI-8000/PP2000 v1.06
 //  ROM_RELOAD(                   0x004000, 0x4000 )
 //  ROM_RELOAD(                   0x008000, 0x4000 )
 //  ROM_RELOAD(                   0x00c000, 0x4000 )
 
 	ROM_REGION(0x8000, "video_bios", 0 )
-	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
+	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) ) //  Cirrus Logic/Quadtel CL-GD5436/46 PCI VGA BIOS v1.25 
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 
-// bios not provided, might be different
+// BIOS not provided, might be different
 ROM_START(photoply2k4)
-	ROM_REGION(0x20000, "bios", 0)  /* motherboard bios */
+	ROM_REGION(0x20000, "bios", 0)  // motherboard BIOS
 	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
 
-	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip,  M27128A
 	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, BAD_DUMP CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
 //  ROM_RELOAD(                   0x004000, 0x4000 )
 //  ROM_RELOAD(                   0x008000, 0x4000 )
@@ -371,5 +371,4 @@ ROM_END
 
 
 GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-
+GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
