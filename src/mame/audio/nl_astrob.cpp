@@ -82,6 +82,11 @@ NETLIST_START(astrob)
 	SOLVER(Solver, 48000)
 #endif
 
+	// Overwrite model - the default model uses minimum datasheet 
+	// specifications for 5V. These are for 10V and thus closer to the
+	// 12V used in this circuit.
+	NET_MODEL("CD4XXX FAMILY(TYPE=CMOS IVL=0.3 IVH=0.7 OVL=0.05 OVH=0.05 ORL=384 ORH=384)")
+
 	TTL_INPUT(I_LO_D0, 0)
 	NET_C(I_LO_D0, U31.1)
 	ALIAS(I_INVADER_1, U31.2)
