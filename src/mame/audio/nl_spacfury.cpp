@@ -156,6 +156,11 @@ NETLIST_START(spacfury)
 	// solver in the system and it keeps jumping around as I tweak things
 //	PARAM(Solver.Solver_21.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
+	// Overwrite model - the default model uses minimum datasheet
+	// specifications for 5V. These are for 10V and thus closer to the
+	// 12V used in this circuit.
+	NET_MODEL("CD4XXX FAMILY(TYPE=CMOS IVL=0.3 IVH=0.7 OVL=0.05 OVH=0.05 ORL=384 ORH=384)")
+
 	LOCAL_SOURCE(_CA3080_FAST_DIP)
 	LOCAL_SOURCE(_CA3080_SLOW_DIP)
 
