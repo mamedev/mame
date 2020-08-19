@@ -5,7 +5,7 @@
 
 #define LOG_DATA    (1U << 1)
 
-#define VERBOSE (LOG_DATA)
+//#define VERBOSE (LOG_DATA)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -38,7 +38,7 @@ bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, 
 	: device_t(mconfig, BACTA_DATALOGGER, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_rxd_handler(*this),
-	m_last_input(0),
+	m_last_input(-1),
 	m_output_char(0)
 {
 }
@@ -68,10 +68,11 @@ void bacta_datalogger_device::tx_queue()
 {
 	if (is_transmit_register_empty())
 	{
-		if (m_output_char != 0)
+		if (m_output_char != -1)
 		{
+			set_tra_rate(1200);
 			transmit_register_setup(m_output_char);
-			m_output_char = 0;
+			m_output_char = -1;
 		}
 	}
 }
@@ -83,6 +84,8 @@ void bacta_datalogger_device::tra_callback()
 
 void bacta_datalogger_device::tra_complete()
 {
+	// Shut down transmitter until there's a character
+	set_tra_rate(attotime::never);
 	tx_queue();
 }
 
@@ -92,19 +95,18 @@ void bacta_datalogger_device::rcv_complete()
 
 	receive_register_extract();
 
-	data = get_received_char();
-	if (data > 0x7f)
-	{
-		data &= ~0x80;
-		LOGDATA("Retransmission of %x\n",data);
-		if ( data == m_last_input)
-		{
-			return;
-		}
-	}		
-	
+	data = get_received_char();	
 	if (data != 0x00)
 	{
+		if (data > 0x80)
+		{
+			data &= ~0x80;
+			LOGDATA("Retransmission of %x\n",data);
+			if ( data == m_last_input)
+			{
+				return;
+			}
+		}		
 		m_last_input = data;
 		switch (data)
 		{
