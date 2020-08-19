@@ -797,13 +797,11 @@ void i8244_device::sound_update()
 
 		u32 signal = m_vdc.s.shift3 | (m_vdc.s.shift2 << 8) | (m_vdc.s.shift1 << 16);
 		m_sh_output = signal & 1;
+		int feedback = m_sh_output;
 		signal >>= 1;
 
-		bool noise_enabled = bool(m_vdc.s.sound & 0x10);
-		int feedback = m_sh_output;
-
 		/* Noise tap is on bits 0 and 5 and fed back to bit 15 */
-		if (noise_enabled)
+		if (m_vdc.s.sound & 0x10)
 		{
 			feedback ^= signal >> 4 & 1; // pre-shift bit 5
 			signal = (signal & ~0x8000) | (feedback << 15);

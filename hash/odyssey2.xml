@@ -1178,6 +1178,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="martiana" cloneof="martian">
+		<description>Martian Threat (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jake Dowding?" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="martian threat (europe, proto, alt).bin" size="8192" crc="335481f1" sha1="d6a3f2def966b798099dbf3c754ab12f69bb4ee8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2missprg">
 		<description>Missão Impossível/Viagem Programada (Bra)</description><!-- limited release -->
 		<year>198?</year>

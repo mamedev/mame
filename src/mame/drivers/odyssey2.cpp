@@ -33,8 +33,8 @@ XTAL notes (differs per model):
 - G7400: 5.911MHz + 8.867MHz
 
 TODO:
-- backgamm doesn't draw all the sprites, what causes it? It doesn't seem like
-  it's a 824x bug since it does properly write data in the partial screen updates
+- backgamm doesn't draw all the chars/sprites, it does multiple screen updates
+  and writes to the ptr/color registers, but does not increment the Y regs
 - 824x screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping characters on eachother will cause
@@ -52,6 +52,10 @@ TODO:
 - verify odyssey3 cpu/video clocks
 - odyssey3 keyboard layout is not the same as g7400, but there is no software
   to test the scancodes
+- partial screen updates aren't shown when using MAME's debugger, this is caused
+  by a forced full screen update and a reset_partial_updates in emu/video.cpp.
+  For the same reason, collision detection also won't work properly when stepping
+  through the debugger
 
 BTANB:
 - a lot of PAL games have problems on NTSC (the other way around, not so much)
@@ -679,8 +683,8 @@ void odyssey2_state::odyssey2(machine_config &config)
 
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2");
-	SOFTWARE_LIST(config, "g7400_list").set_compatible("g7400");
+	SOFTWARE_LIST(config, "cart_list").set_original("odyssey2").set_filter("O2");
+	SOFTWARE_LIST(config, "g7400_list").set_compatible("g7400").set_filter("O2");
 }
 
 void odyssey2_state::videopac(machine_config &config)
@@ -695,6 +699,9 @@ void odyssey2_state::videopac(machine_config &config)
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	m_maincpu->set_clock(XTAL(17'734'476) / 3);
+
+	subdevice<software_list_device>("cart_list")->set_filter("VP");
+	subdevice<software_list_device>("g7400_list")->set_filter("VP");
 }
 
 void odyssey2_state::videopacf(machine_config &config)
@@ -752,8 +759,8 @@ void g7400_state::g7400(machine_config &config)
 
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("g7400");
-	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2");
+	SOFTWARE_LIST(config, "cart_list").set_original("g7400").set_filter("VPP");
+	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2").set_filter("VPP");
 }
 
 void g7400_state::odyssey3(machine_config &config)
@@ -774,6 +781,9 @@ void g7400_state::odyssey3(machine_config &config)
 
 	// same color encoder as O2 (no RGB port)
 	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
+
+	subdevice<software_list_device>("cart_list")->set_filter("O3");
+	subdevice<software_list_device>("ody2_list")->set_filter("O3");
 }
 
 
