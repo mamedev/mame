@@ -2792,7 +2792,7 @@ ROM_START( loht )
 	ROM_RELOAD(                         0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "tom_c-pr-b.ic1", 0x00000, 0x01000, BAD_DUMP CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // from bootleg, but works - need to verify dump - Should be TOM C-PR-B ??
+	ROM_LOAD( "tom_c-pr-b.ic1", 0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "tom_m53.ic53", 0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  /* sprites */
@@ -3019,7 +3019,7 @@ ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1
 	ROM_RELOAD(                  0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // unprotected?? - works for original loht (World) set
+	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // unprotected?? == tom_c-pr-b.ic1 from loht (World) set
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "i-8.8",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
