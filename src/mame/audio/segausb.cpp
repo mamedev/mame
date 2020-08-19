@@ -624,7 +624,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 	m_work_ram[offset] = data;
 
 	// writes to the low 32 bytes go to various controls
-#if (ENABLE_USB_NETLIST)
+#if (ENABLE_SEGAUSB_NETLIST)
 
 	switch (offset)
 	{
