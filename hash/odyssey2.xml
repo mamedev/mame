@@ -11,51 +11,50 @@ This list does not include ROM hacks, but those can still be loaded with -cart.
 WIP beta homebrews are also not included.
 
 TODO:
-add first release date were applicable
-add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
-add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
-add ntsc pal compatibility (<sharedfeat name="compatibility" value="NTSC,PAL"/>)
-add rom names from pcbs (lack of)
-add serials for radiola and jopacs
+- add first release date were applicable
+- add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
+- add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
+- add compatibility flags (<sharedfeat name="compatibility" value="O2,VP,VPP,O3"/>),
+  but it's not user-friendly since MAME refuses to load an incompatible game at all,
+  while on the real console you can still play them (just with more glitches)
+- add rom names from pcbs (lack of)
+- add serials for radiola and jopacs
 
 Undumped:
-Spaans          (spanish to dutch translator)
-Crazy Horses
-Service Test Cartridge
+- Spaans          (spanish to dutch translator)
+- Crazy Horses
+- Service Test Cartridge
 
 Protos:
-Bastion         youtube.com/watch?v=cFdmgs4r7_E
-Catburglar      youtube.com/watch?v=DDsWDFxy0oE
-Himalaya        youtube.com/watch?v=L_lvOs6EnA4
-SoundTool       youtube.com/watch?v=7JYn6B7rxqw
-Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
+- Bastion         youtube.com/watch?v=cFdmgs4r7_E
+- Catburglar      youtube.com/watch?v=DDsWDFxy0oE
+- Himalaya        youtube.com/watch?v=L_lvOs6EnA4
+- SoundTool       youtube.com/watch?v=7JYn6B7rxqw
+- Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
 
 http://www.ozyr.com/rene/PICS/protos.jpg
-Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
-Back Gammon
-Freedom Fighters
-K.C.'s Crazy Chase
-Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
-Handicap I (?)
-Frogger
-Robot City
-Requins (Shark Hunter?)
-K.C. Munchkin! (looks more like Pacman)
-Pick Axe Pete
+- Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
+- Back Gammon
+- Freedom Fighters
+- K.C.'s Crazy Chase
+- Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
+- Handicap I (?)
+- Frogger
+- Robot City
+- Requins (Shark Hunter?)
+- K.C. Munchkin! (looks more like Pacman)
+- Pick Axe Pete
 
 Unreleased, possibly no prototypes exist:
-A Turma da Mônica [Mônica's Gang]
-Pink Panther
-Clean Up Yer Act (programmed by Robert S. Harris, never completed)
-Star Wars (GST Video)
-Moonsweeper (Imagic)
-Fathom (Imagic)
+- A Turma da Mônica [Mônica's Gang]
+- Pink Panther
+- Clean Up Yer Act (programmed by Robert S. Harris, never completed)
+- Star Wars (GST Video)
+- Moonsweeper (Imagic)
+- Fathom (Imagic)
 
 misc. homebrew cartridges
 
-NOTE:
-PAL colours leave a lot to be desired
-The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 -->
 
 <softwarelist name="odyssey2" description="Magnavox Odyssey 2 / Philips Videopac cartridges">
@@ -596,7 +595,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
 			<dataarea name="rom" size="0x2800">
-				<rom name="z80_c7010.bin" offset="0x0000" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" />
+				<rom name="z80_c7010.bin" offset="0x0000" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" /> <!-- NSC800 CPU on module with its own ROM/RAM -->
 				<rom name="vp_c7010.bin"  offset="0x2000" size="0x0800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" />
 			</dataarea>
 		</part>
@@ -800,7 +799,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
 		<info name="serial" value="16"/>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -814,7 +812,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1901,7 +1898,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1915,7 +1911,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
