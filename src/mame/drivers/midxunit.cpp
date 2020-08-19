@@ -143,7 +143,7 @@ void midxunit_state::main_map(address_map &map)
 	map(0x60c00060, 0x60c0007f).portr("DSW");
 	map(0x60c00080, 0x60c000df).w(FUNC(midxunit_state::midxunit_io_w));
 	map(0x60c000e0, 0x60c000ff).rw(FUNC(midxunit_state::midxunit_security_r), FUNC(midxunit_state::midxunit_security_w));
-	map(0x80800000, 0x80800007).rw("adc", FUNC(adc0848_device::read), FUNC(adc0848_device::write));
+	map(0x80800000, 0x8080001f).rw("adc", FUNC(adc0848_device::read), FUNC(adc0848_device::write)).umask32(0x000000ff);
 	map(0x80c00000, 0x80c000ff).rw(FUNC(midxunit_state::midxunit_uart_r), FUNC(midxunit_state::midxunit_uart_w)).umask32(0x000000ff);
 	map(0xa0440000, 0xa047ffff).rw(FUNC(midxunit_state::midxunit_cmos_r), FUNC(midxunit_state::midxunit_cmos_w)).umask32(0x000000ff);
 	map(0xa0800000, 0xa08fffff).rw(m_video, FUNC(midxunit_video_device::midxunit_paletteram_r), FUNC(midxunit_video_device::midxunit_paletteram_w)).share("palette");
