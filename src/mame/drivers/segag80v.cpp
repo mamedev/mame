@@ -187,18 +187,8 @@ void segag80v_state::machine_start()
  *
  *************************************/
 
-u8 segag80v_state::mainrom_r(offs_t offset)
-{
-	// all memory accesses incur a multi-cycle WAIT on the Z80
-	m_maincpu->adjust_icount(-WAIT_STATES);
-	return m_mainrom->base()[offset];
-}
-
 u8 segag80v_state::opcode_r(offs_t offset)
 {
-	// all memory accesses incur a multi-cycle WAIT on the Z80
-	m_maincpu->adjust_icount(-WAIT_STATES);
-
 	// opcodes themselves are not scrambled
 	u8 op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
@@ -223,22 +213,16 @@ offs_t segag80v_state::decrypt_offset(offs_t offset)
 
 void segag80v_state::mainram_w(offs_t offset, u8 data)
 {
-	// all memory accesses incur a multi-cycle WAIT on the Z80
-	m_maincpu->adjust_icount(-WAIT_STATES);
 	m_mainram[decrypt_offset(offset)] = data;
 }
 
 void segag80v_state::usb_ram_w(offs_t offset, u8 data)
 {
-	// all memory accesses incur a multi-cycle WAIT on the Z80
-	m_maincpu->adjust_icount(-WAIT_STATES);
 	m_usb->ram_w(decrypt_offset(offset), data);
 }
 
 void segag80v_state::vectorram_w(offs_t offset, u8 data)
 {
-	// all memory accesses incur a multi-cycle WAIT on the Z80
-	m_maincpu->adjust_icount(-WAIT_STATES);
 	m_vectorram[decrypt_offset(offset)] = data;
 }
 
@@ -482,7 +466,8 @@ WRITE_LINE_MEMBER(segag80v_state::irq_ack_w)
 // complete memory map derived from schematics
 void segag80v_state::main_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom().r(FUNC(segag80v_state::mainrom_r)); // CPU board ROM 000-7FF; PROM board above
+	map(0x0000, 0x07ff).rom();     // CPU board ROM
+	map(0x0800, 0xbfff).rom();     // PROM board ROM area
 	map(0xc800, 0xcfff).ram().w(FUNC(segag80v_state::mainram_w)).share("mainram");
 	map(0xe000, 0xefff).ram().w(FUNC(segag80v_state::vectorram_w)).share("vectorram");
 }
@@ -1300,8 +1285,36 @@ ROM_END
  *
  *************************************/
 
+void segag80v_state::init_waitstates()
+{
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
+	address_space &opspace = m_maincpu->space(AS_OPCODES);
+
+	pgmspace.install_read_tap(0x0000, 0xffff, "program_waitstate_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+	pgmspace.install_write_tap(0x0000, 0xffff, "program_waitstate_w",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+
+	opspace.install_read_tap(0x0000, 0xffff, "opcodes_waitstate_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+}
+
 void segag80v_state::init_elim2()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	// configure security
@@ -1314,6 +1327,8 @@ void segag80v_state::init_elim2()
 
 void segag80v_state::init_elim4()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	// configure security
@@ -1330,6 +1345,8 @@ void segag80v_state::init_elim4()
 
 void segag80v_state::init_spacfury()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	// configure security
@@ -1344,6 +1361,8 @@ void segag80v_state::init_spacfury()
 
 void segag80v_state::init_zektor()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	// configure security
@@ -1363,6 +1382,8 @@ void segag80v_state::init_zektor()
 
 void segag80v_state::init_tacscan()
 {
+	init_waitstates();
+
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1382,6 +1403,8 @@ void segag80v_state::init_tacscan()
 
 void segag80v_state::init_startrek()
 {
+	init_waitstates();
+
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 

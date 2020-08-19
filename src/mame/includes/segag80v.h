@@ -65,6 +65,7 @@ public:
 	void zektor(machine_config &config);
 	void spacfury(machine_config &config);
 
+	void init_waitstates();
 	void init_zektor();
 	void init_startrek();
 	void init_elim4();

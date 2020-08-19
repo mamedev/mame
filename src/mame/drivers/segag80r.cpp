@@ -136,6 +136,11 @@
 #define VBEND               (0)
 #define VBSTART             (224)
 
+// Unsure whether this should be 2 or 3. It depends on how many rising clock
+// edges MEMRQ is held for, plus 1 additional cycle. Going to 3 creates
+// noticeable slowdowns in Space Fury.
+static constexpr int WAIT_STATES = 2;
+
 
 
 /*************************************
@@ -1538,8 +1543,36 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
  *
  *************************************/
 
+void segag80r_state::init_waitstates()
+{
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
+	address_space &opspace = m_maincpu->space(AS_OPCODES);
+
+	pgmspace.install_read_tap(0x0000, 0xffff, "program_waitstate_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+	pgmspace.install_write_tap(0x0000, 0xffff, "program_waitstate_w",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+
+	opspace.install_read_tap(0x0000, 0xffff, "opcodes_waitstate_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+}
+
 void segag80r_state::init_astrob()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure the 315-0062 security chip */
@@ -1559,6 +1592,8 @@ void segag80r_state::init_astrob()
 
 void segag80r_state::init_005()
 {
+	init_waitstates();
+
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
 
@@ -1575,6 +1610,8 @@ void segag80r_state::init_005()
 
 void segag80r_state::init_spaceod()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure the 315-0063 security chip */
@@ -1599,6 +1636,8 @@ void segag80r_state::init_spaceod()
 
 void segag80r_state::init_monsterb()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1620,6 +1659,8 @@ void segag80r_state::init_monsterb()
 
 void segag80r_state::init_monster2()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1642,6 +1683,8 @@ void segag80r_state::init_monster2()
 
 void segag80r_state::init_pignewt()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1666,6 +1709,8 @@ void segag80r_state::init_pignewt()
 
 void segag80r_state::init_sindbadm()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 

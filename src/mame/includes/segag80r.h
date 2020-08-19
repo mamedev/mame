@@ -60,6 +60,7 @@ public:
 	void spaceod_sound_board(machine_config &config);
 	void monsterb_sound_board(machine_config &config);
 
+	void init_waitstates();
 	void init_spaceod();
 	void init_sindbadm();
 	void init_pignewt();
