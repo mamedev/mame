@@ -36,6 +36,11 @@ Calls:
 
 0xf000 - copy dword from SPI using provided pointer
 
+
+use 'go 2938' to get to the inline code these load on the fly
+
+the first piece of code copied appears to attempt to checksum the internal BIOS!
+
 */
 
 #include "emu.h"
