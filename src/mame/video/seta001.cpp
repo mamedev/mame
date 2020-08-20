@@ -27,7 +27,7 @@
 	TODO:
 	use getter callbacks in drivers for spriterams rather than allocating memory
 	here, then we won't have to allocate extra memory for seta.cpp games which
-	appear to have 0x800 bytes of RAM that isn't connceted to the sprite chip
+	appear to have 0x800 bytes of RAM that isn't connected to the sprite chip
 	between the banks.
 
 	*/
