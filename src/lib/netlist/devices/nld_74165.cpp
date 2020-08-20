@@ -31,56 +31,61 @@ namespace netlist
 {
 	namespace devices
 	{
+
 	NETLIB_OBJECT(74165)
 	{
 		NETLIB_CONSTRUCTOR(74165)
 		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" }, NETLIB_DELEGATE(inputs))
-		, m_SER(*this, "SER", NETLIB_DELEGATE(inputs))
+		, m_SER(*this, "SER", NETLIB_DELEGATE(noop))
 		, m_SH_LDQ(*this, "SH_LDQ", NETLIB_DELEGATE(inputs))
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_CLKINH(*this, "CLKINH", NETLIB_DELEGATE(inputs))
 		, m_QH(*this, "QH")
 		, m_QHQ(*this, "QHQ")
 		, m_shifter(*this, "m_shifter", 0)
-		, m_last_CLK(*this, "m_last_CLK", 0)
 		, m_power_pins(*this)
 		{
 		}
 
 		NETLIB_RESETI()
 		{
+			m_CLK.set_state(logic_t::STATE_INP_LH);
 			m_shifter = 0;
-			m_last_CLK = 0;
+		}
+
+		NETLIB_HANDLERI(noop)
+		{
+		}
+
+		NETLIB_HANDLERI(clk)
+		{
+			unsigned high_bit = m_SER() ? 0x80 : 0;
+			m_shifter = high_bit | (m_shifter >> 1);
+
+			const auto qh = m_shifter & 1;
+
+			m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
+			m_QHQ.push(qh ^ 1, NLTIME_FROM_NS(20)); // FIXME: Timing
 		}
 
 		NETLIB_HANDLERI(inputs)
 		{
+			if (!m_SH_LDQ())
 			{
-				netlist_sig_t qh = 0;
-
-				if (!m_SH_LDQ())
-				{
-					m_shifter = 0;
-					for (std::size_t i=0; i<8; i++)
-						m_shifter |= (m_DATA[i]() << i);
-				}
-				else if (m_CLK() && !m_last_CLK && !m_CLKINH())
-				{
-					unsigned high_bit = m_SER() ? 0x80 : 0;
-					m_shifter = high_bit | (m_shifter >> 1);
-				}
-
-				qh = m_shifter & 1;
-
-				m_last_CLK = m_CLK();
+				m_shifter = 0;
+				for (std::size_t i=0; i<8; i++)
+					m_shifter |= (m_DATA[i]() << i);
+				const auto qh = m_shifter & 1;
 
 				m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
-				m_QHQ.push(qh ? 0 : 1, NLTIME_FROM_NS(20)); // FIXME: Timing
+				m_QHQ.push(qh ^ 1, NLTIME_FROM_NS(20)); // FIXME: Timing
 			}
-
+			if (!m_SH_LDQ() || m_CLKINH())
+				m_CLK.inactivate();
+			else
+				m_CLK.activate_lh();
 		}
 
-		friend class NETLIB_NAME(74165_dip);
 	private:
 		object_array_t<logic_input_t, 8> m_DATA;
 		logic_input_t m_SER;
@@ -91,7 +96,6 @@ namespace netlist
 		logic_output_t m_QHQ;
 
 		state_var<unsigned> m_shifter;
-		state_var<unsigned> m_last_CLK;
 		nld_power_pins m_power_pins;
 	};
 
