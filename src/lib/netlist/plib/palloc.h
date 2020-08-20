@@ -419,7 +419,7 @@ namespace plib {
 		#if (PUSE_ALIGNED_ALLOCATION)
 		#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 			return _aligned_malloc(size, alignment);
-		#elif defined(__APPLE__)
+		#elif defined(__APPLE__) || defined(__ANDROID__)
 			void* p;
 			if (::posix_memalign(&p, alignment, size) != 0) {
 				p = nullptr;
