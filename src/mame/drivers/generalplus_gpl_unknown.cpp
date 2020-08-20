@@ -32,11 +32,37 @@ call.  Sound is almost certainly handled in the same way.
 There is a missing internal ROM that acts as bootstrap and provides some basic functions.  It is at least 0x1000
 words in size, with the lowest call being to 0xf000.  It is potentially larger than this.
 
-Calls:
+The internal ROM will also need to provide trampolining for the interrupts, there is a single pointer near the
+start of the SPI ROM '02000A: 0041 0002' which points to 20041 (assuming you map the SPI ROM base as word address
+0x20000, so that the calls to get code align with ROM addresses)
+
+The function pointed to for the interrupt has the same form of the other functions that get loaded into RAM via
+calls to functions in the RAM area.
+
+--------------------------------------------------------
+
+BIOS (internal ROM) calls:
 
 0xf000 - copy dword from SPI using provided pointer
 
-0xf58f - unknown, soon after startup
+0xf56f - unknown, after some time, done with PC = f56f, only in one place
+
+0xf58f - unknown, soon after startup (only 1 call)
+
+00f7a0 - unknown - 3 calls
+
+0xf931 - unknown, just one call
+
+00fa1d - unknown, just one call
+
+0xfb26 - unknown, after some time (done with pc = fb26 and calls)
+
+0xfb4f - unknown, just one call
+
+0xfbbf - unknown, 3 calls
+
+
+
 
 use 'go 2938' to get to the inline code these load on the fly
 
@@ -127,6 +153,8 @@ private:
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_mainram[0x12] |= 0x8000; // some code waits on this, what is it?
+	m_mainram[0x09] &= 0xfff0; // should be cleared by IRQ?
 	return 0;
 }
 
@@ -374,6 +402,16 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 			else if (realpc == 0xf58f)
 			{
 				logerror("call to 0xf58f - unknown function\n");
+				return 0x9a90; // retf
+			}
+			else if (realpc == 0xfb26) // done with a call, and also a pc = 
+			{
+				logerror("call to 0xfb26 - unknown function\n");
+				return 0x9a90; // retf
+			}
+			else if (realpc == 0xf56f) // done with o a pc = 
+			{
+				logerror("call to 0xf56f - unknown function\n");
 				return 0x9a90; // retf
 			}
 			else
