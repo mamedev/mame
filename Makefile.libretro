@@ -9,7 +9,7 @@ PTR64 ?= 1
 TARGET ?= mame
 # OS ?= linux
 # TARGETOS ?= linux
-PYTHON_EXECUTABLE ?= python2
+PYTHON_EXECUTABLE ?= python
 REGENIE ?= 1
 GITHUB_REPO ?= https://github.com/libretro/mame/
 
