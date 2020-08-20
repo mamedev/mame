@@ -87,6 +87,7 @@ private:
 	required_region_ptr<uint8_t> m_spirom;
 
 	uint16_t unk_7abf_r();
+	void unk_7868_w(uint16_t data);
 
 	uint16_t spi_misc_control_r();
 	uint16_t spi_rx_fifo_r();
@@ -225,6 +226,12 @@ uint8_t pcp8718_state::spi_process_rx()
 	case SPI_STATE_READING_OR_READY:
 	{
 		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
+
+		// hack internal BIOS checksum check
+		if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
+			if (dat == 0x4e)
+				dat = 0x5e;
+
 		logerror("reading SPI %02x from SPI Address %08x\n", dat, m_spiaddress);
 		m_spiaddress++;
 		return dat;
@@ -284,6 +291,14 @@ void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 
 }
 
+// this is probably 'port b' but when SPI is enabled some points of this can become SPI control pins
+// it's accessed after each large data transfer, probably to reset the SPI into 'ready for command' state?
+void pcp8718_state::unk_7868_w(uint16_t data)
+{
+	logerror("%06x: unk_7868_w %02 (Port B + SPI reset?)x\n", machine().describe_context(), data);
+}
+
+
 void pcp8718_state::spi_control_w(uint16_t data)
 {
 	logerror("%06x: spi_control_w %04x\n", machine().describe_context(), data);
@@ -297,6 +312,8 @@ void pcp8718_state::map(address_map &map)
 	map(0x000000, 0x006fff).ram().share("mainram");
 	map(0x007000, 0x0077ff).ram(); // might be registers, but the call stubs for RAM calls explicitly use addresses in here for private stack so that previous snippets can be restored?
 
+
+	map(0x007868, 0x007868).w(FUNC(pcp8718_state::unk_7868_w));
 
 	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
 	// 7941 SPI Transmit Status
@@ -320,13 +337,12 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if ((offset+0xf000) == 0xf000)
+		uint16_t pc = m_maincpu->state_int(UNSP_PC);
+		uint16_t sr = m_maincpu->state_int(UNSP_SR);
+		int realpc = (pc | (sr << 16)) & 0x003fffff;
+
+		if ((offset + 0xf000) == (realpc))
 		{
-
-			uint16_t pc = m_maincpu->state_int(UNSP_PC);
-			uint16_t sr = m_maincpu->state_int(UNSP_SR);
-
-			int realpc = (pc | (sr << 16)) & 0x003fffff;
 			if (realpc == 0xf000)
 			{
 				address_space& mem = m_maincpu->space(AS_PROGRAM);
@@ -335,26 +351,28 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 				if (source >= 0x20000)
 				{
-					uint16_t data = m_spirom[((source - 0x20000)*2)+0] | (m_spirom[((source - 0x20000)*2)+1] << 8);
-					uint16_t data2 = m_spirom[((source - 0x20000)*2)+2] | (m_spirom[((source - 0x20000)*2)+3] << 8);
+					uint16_t data = m_spirom[((source - 0x20000) * 2) + 0] | (m_spirom[((source - 0x20000) * 2) + 1] << 8);
+					uint16_t data2 = m_spirom[((source - 0x20000) * 2) + 2] | (m_spirom[((source - 0x20000) * 2) + 3] << 8);
 
 					logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
 
 					mem.write_word(0x0004, data);
 					mem.write_word(0x0005, data2);
 				}
-				else
-				{
-					logerror("call to 0xf000 - invalid source %08x\n", source);
-				}
+
+				return 0x9a90; // retf
+			}
+			else
+			{
+				fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
 			}
 		}
 		else
 		{
-			fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
+			logerror("simulate_f000_r reading BIOS area (for checksum?) %04x\n", offset);
 		}
 	}
-	return 0x9a90; // retf
+	return 0x0000;
 }
 
 void pcp8718_state::machine_reset()
