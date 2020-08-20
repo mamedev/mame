@@ -61,8 +61,9 @@ BIOS (internal ROM) calls:
 
 0xfbbf - unknown, 3 calls
 
+code currently goes off the rails after some of these unhandled calls (one to f56f?)
 
-
+--
 
 use 'go 2938' to get to the inline code these load on the fly
 
@@ -409,7 +410,7 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 				logerror("call to 0xfb26 - unknown function\n");
 				return 0x9a90; // retf
 			}
-			else if (realpc == 0xf56f) // done with o a pc = 
+			else if (realpc == 0xf56f) // done with a pc = 
 			{
 				logerror("call to 0xf56f - unknown function\n");
 				return 0x9a90; // retf
