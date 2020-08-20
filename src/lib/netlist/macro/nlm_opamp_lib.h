@@ -63,6 +63,9 @@
 #define MC3340_DIP(name)                                                       \
 		NET_REGISTER_DEV(MC3340_DIP, name)
 
+#define AN6551_SIL(name)                                                       \
+		NET_REGISTER_DEV(AN6551_SIL, name)
+
 #endif // NL_AUTO_DEVICES
 
 /* ----------------------------------------------------------------------------
