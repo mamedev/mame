@@ -88,6 +88,8 @@ private:
 	required_region_ptr<uint8_t> m_spirom;
 
 	uint16_t unk_7abf_r();
+	uint16_t unk_7860_r();
+
 	void unk_7868_w(uint16_t data);
 
 	uint16_t spi_misc_control_r();
@@ -141,6 +143,11 @@ INPUT_PORTS_END
 uint16_t pcp8718_state::unk_7abf_r()
 {
 	return 0x0001;
+}
+
+uint16_t pcp8718_state::unk_7860_r()
+{
+	return machine().rand() & 0x8;
 }
 
 
@@ -313,6 +320,7 @@ void pcp8718_state::map(address_map &map)
 	map(0x000000, 0x006fff).ram().share("mainram");
 	map(0x007000, 0x0077ff).ram(); // might be registers, but the call stubs for RAM calls explicitly use addresses in here for private stack so that previous snippets can be restored?
 
+	map(0x007860, 0x007860).r(FUNC(pcp8718_state::unk_7860_r));
 
 	map(0x007868, 0x007868).w(FUNC(pcp8718_state::unk_7868_w));
 
