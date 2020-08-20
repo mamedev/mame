@@ -392,6 +392,13 @@ ifndef NOASM
 endif
 endif
 
+# ppc has inline assembly support but no DRC
+ifeq ($(findstring ppc,$(UNAME)),ppc)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
 # Autodetect BIGENDIAN
 # MacOSX
 ifndef BIGENDIAN
