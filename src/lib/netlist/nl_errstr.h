@@ -55,7 +55,9 @@ namespace netlist
 	// nl_setup.cpp
 
 	PERRMSGV(MF_UNABLE_TO_PARSE_MODEL_1,            1, "Unable to parse model: {1}")
-	PERRMSGV(MF_MODEL_ALREADY_EXISTS_1,             1, "Model already exists: {1}")
+	// FIXME: Add an directive MODEL_OVERWRITE to netlist language
+	//PERRMSGV(MF_MODEL_ALREADY_EXISTS_1,             1, "Model already exists: {1}")
+	PERRMSGV(MI_MODEL_OVERWRITE_1,                  2, "Model already exists, overwriting {1} with {2}")
 	PERRMSGV(MF_DEVICE_ALREADY_EXISTS_1,            1, "Device already exists: {1}")
 	PERRMSGV(MF_UNUSED_HINT_1,                      1, "Error hint {1} is not used")
 	PERRMSGV(MF_ADDING_HINT_1,                      1, "Error adding hint {1} to hint list")

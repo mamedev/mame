@@ -2,15 +2,13 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    United Disk Memories DDFS FDC
-
-    Microware DDFS FDC
+    Microware / United Disk Memories DDFS FDC
 
 **********************************************************************/
 
 
-#ifndef MAME_BUS_BBC_FDC_MICROWARE_H
-#define MAME_BUS_BBC_FDC_MICROWARE_H
+#ifndef MAME_BUS_BBC_FDC_UDM_H
+#define MAME_BUS_BBC_FDC_UDM_H
 
 #pragma once
 
@@ -24,15 +22,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class bbc_microware_device :
+class bbc_udm_device :
 	public device_t,
 	public device_bbc_fdc_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::DISK; }
-
 	// construction/destruction
-	bbc_microware_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_udm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -48,18 +44,19 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
 	required_device<wd2793_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
-	int m_drive_control;
+	int m_fdc_ie;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(BBC_MICROWARE, bbc_microware_device);
+DECLARE_DEVICE_TYPE(BBC_UDM, bbc_udm_device);
 
 
-#endif /* MAME_BUS_BBC_FDC_MICROWARE_H */
+#endif /* MAME_BUS_BBC_FDC_UDM_H */

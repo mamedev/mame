@@ -237,6 +237,14 @@
 	NET_REGISTER_DEVEXT(EPROM_2716, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_roms.cpp
+// ---------------------------------------------------------------------
+// usage       : PROM_MK28000(name, pOE1, pOE2, pAR, pA0, pA1, pA2, pA3, pA4, pA5, pA6, pA7, pA8, pA9, pA10, pA11)
+// auto connect: VCC, GND
+#define PROM_MK28000(...)                                                \
+	NET_REGISTER_DEVEXT(PROM_MK28000, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_7448.cpp
 // ---------------------------------------------------------------------
 // usage       : TTL_7448(name, pA, pB, pC, pD, pLTQ, pBIQ, pRBIQ)
@@ -569,6 +577,13 @@
 	NET_REGISTER_DEVEXT(TTL_9316, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_9321.cpp
+// ---------------------------------------------------------------------
+// usage: TTL_9321(name, cAE, cA0, cA1, cBE, cB0, cB1)
+#define TTL_9321(...)                                                     \
+	NET_REGISTER_DEVEXT(TTL_9321, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_9322.cpp
 // ---------------------------------------------------------------------
 // usage       : TTL_9322(name, pSELECT, pA1, pB1, pA2, pB2, pA3, pB3, pA4, pB4, pSTROBE)
@@ -660,6 +675,14 @@
 // usage       : CD4538(name)
 #define CD4538(...)                                                    \
 	NET_REGISTER_DEVEXT(CD4538, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_8277.cpp
+// ---------------------------------------------------------------------
+// usage       : TTL_8277(name, pRESET, pCLK, pCLKA, pD0A, pD1A, pDSA, pCLKB, pD0B, pD1B, pDSB)
+// auto connect: VCC, GND
+#define TTL_8277(...)                                                \
+	NET_REGISTER_DEVEXT(TTL_8277, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_schmitt.cpp
@@ -779,6 +802,13 @@
 // usage       : TTL_AM2847_DIP(name)
 #define TTL_AM2847_DIP(...)                                            \
 	NET_REGISTER_DEVEXT(TTL_AM2847_DIP, __VA_ARGS__)
+
+// ---------------------------------------------------------------------
+// Source: src/lib/netlist/devices/nld_8277.cpp
+// ---------------------------------------------------------------------
+// usage       : TTL_8277_DIP(name)
+#define TTL_8277_DIP(...)                                            \
+	NET_REGISTER_DEVEXT(TTL_8277_DIP, __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: src/lib/netlist/devices/nld_mm5837.cpp
@@ -991,6 +1021,10 @@
 #define TTL_74113A_DIP(...)                                            \
 	NET_REGISTER_DEVEXT(TTL_74113A_DIP, __VA_ARGS__)
 
+// usage       : TTL_74139_GATE(name)
+#define TTL_74139_GATE(...)                                            \
+	NET_REGISTER_DEVEXT(TTL_74139_GATE, __VA_ARGS__)
+
 // usage       : TTL_74155A_GATE(name)
 #define TTL_74155A_GATE(...)                                           \
 	NET_REGISTER_DEVEXT(TTL_74155A_GATE, __VA_ARGS__)
@@ -1172,6 +1206,10 @@
 #define TTL_74126_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74126_DIP, __VA_ARGS__)
 
+// usage       : TTL_74139_DIP(name)
+#define TTL_74139_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_74139_DIP, __VA_ARGS__)
+
 // usage       : TTL_74153_DIP(name)
 #define TTL_74153_DIP(...)                                             \
 	NET_REGISTER_DEVEXT(TTL_74153_DIP, __VA_ARGS__)
@@ -1227,6 +1265,10 @@
 // usage       : TTL_9316_DIP(name)
 #define TTL_9316_DIP(...)                                              \
 	NET_REGISTER_DEVEXT(TTL_9316_DIP, __VA_ARGS__)
+
+// usage       : TTL_9321_DIP(name)
+#define TTL_9321_DIP(...)                                             \
+	NET_REGISTER_DEVEXT(TTL_9321_DIP, __VA_ARGS__)
 
 // usage       : TTL_9322_DIP(name)
 #define TTL_9322_DIP(...)                                              \
@@ -1353,6 +1395,10 @@
 #define TL081_DIP(...)                                                 \
 	NET_REGISTER_DEVEXT(TL081_DIP, __VA_ARGS__)
 
+// usage       : TL082_DIP(name)
+#define TL082_DIP(...)                                                 \
+	NET_REGISTER_DEVEXT(TL082_DIP, __VA_ARGS__)
+
 // usage       : TL084_DIP(name)
 #define TL084_DIP(...)                                                 \
 	NET_REGISTER_DEVEXT(TL084_DIP, __VA_ARGS__)
@@ -1433,6 +1479,10 @@
 // usage       : EPROM_2716_DIP(name)
 #define EPROM_2716_DIP(...)                                            \
 	NET_REGISTER_DEVEXT(EPROM_2716_DIP, __VA_ARGS__)
+
+// usage       : PROM_MK28000_DIP(name)
+#define PROM_MK28000_DIP(...)                                            \
+	NET_REGISTER_DEVEXT(PROM_MK28000_DIP, __VA_ARGS__)
 
 // usage       : TTL_82S16_DIP(name)
 #define TTL_82S16_DIP(...)                                             \

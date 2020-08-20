@@ -336,7 +336,6 @@ namespace analog
 		NETLIB_RESETI()
 		{
 			m_cap.setparams(exec().gmin());
-			clear_mat();
 		}
 
 		/// \brief Set capacitance

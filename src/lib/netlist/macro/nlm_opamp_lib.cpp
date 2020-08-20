@@ -314,6 +314,14 @@ static NETLIST_START(TL081_DIP)
 
 NETLIST_END()
 
+static NETLIST_START(TL082_DIP)
+	OPAMP(A, "TL084")
+	OPAMP(B, "TL084")
+
+	INCLUDE(opamp_layout_2_8_4)
+
+NETLIST_END()
+
 static NETLIST_START(TL084_DIP)
 	OPAMP(A, "TL084")
 	OPAMP(B, "TL084")
@@ -398,6 +406,38 @@ static NETLIST_START(LM747A_DIP)
 	INCLUDE(opamp_layout_2_13_9_4)
 	NET_C(A.VCC, B.VCC)
 
+NETLIST_END()
+
+//- Identifier: AN6551_SIL
+//- Title: AN6551 Dual Operational Amplifier
+//- Description: The AN6551 is a dual operational Amplifier with a
+//-   phase compensation circuit built-in. It is suitable for application to
+//-   various electronic circuits such as active filters and
+//-   audio pre-amplifiers
+//-
+//-   Features: Phase compensation circuit, High gain, low noise,
+//-   Output short-circuit protection, Two circuits symmetrically arranged in 9-pin SIL plastic package
+//- Pinalias: VCC,A.OUT,A-,A+,GND,B+,B-,B.OUT,VCC
+//- Package: SIL
+//- NamingConvention: Naming conventions follow Panasonic datasheet
+//- FunctionTable:
+//-   https://datasheetspdf.com/pdf-file/182163/PanasonicSemiconductor/AN6551/1
+//-
+static NETLIST_START(AN6551_SIL)
+	OPAMP(A, "AN6551")
+	OPAMP(B, "AN6551")
+
+	NET_C(A.GND, B.GND)
+
+	ALIAS(1, A.VCC)
+	ALIAS(2, A.OUT)
+	ALIAS(3, A.MINUS)
+	ALIAS(4, A.PLUS)
+	ALIAS(5, A.GND)
+	ALIAS(6, B.PLUS)
+	ALIAS(7, B.MINUS)
+	ALIAS(8, B.OUT)
+	ALIAS(9, B.VCC)
 NETLIST_END()
 
 #if USE_LM3900_MODEL == 0
@@ -587,13 +627,16 @@ NETLIST_START(opamp_lib)
 	// TI and Motorola Datasheets differ - below are Motorola values, SLEW is average of LH and HL
 	NET_MODEL("LM3900      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=2k UGF=4M SLEW=10M RI=10M RO=2k DAB=0.0015)")
 
-#if USE_LM3900_MODEL == 1
+	NET_MODEL("AN6551      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=20 UGF=2M SLEW=1M RI=10M RO=200 DAB=0.0015)")
+
+	#if USE_LM3900_MODEL == 1
 	NET_MODEL("LM3900_NPN1 NPN(IS=1E-14 BF=150 TF=1E-9 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5 IKF=0.002)")
 	NET_MODEL("LM3900_PNP1 PNP(IS=1E-14 BF=40 TF=1E-7 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5)")
 #endif
 	LOCAL_LIB_ENTRY(MB3614_DIP)
 	LOCAL_LIB_ENTRY(MC3340_DIP)
 	LOCAL_LIB_ENTRY(TL081_DIP)
+	LOCAL_LIB_ENTRY(TL082_DIP)
 	LOCAL_LIB_ENTRY(TL084_DIP)
 	LOCAL_LIB_ENTRY(LM324_DIP)
 	LOCAL_LIB_ENTRY(LM358_DIP)
@@ -605,5 +648,6 @@ NETLIST_START(opamp_lib)
 	LOCAL_LIB_ENTRY(LM747_DIP)
 	LOCAL_LIB_ENTRY(LM747A_DIP)
 	LOCAL_LIB_ENTRY(LM3900)
+	LOCAL_LIB_ENTRY(AN6551_SIL)
 
 NETLIST_END()

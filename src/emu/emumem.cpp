@@ -940,6 +940,11 @@ void memory_manager::allocate(device_memory_interface &memory)
 				case 0x0000|0x100|16|(4-1): memory.allocate<address_space_specific<1, 1, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
 				case 0x1000|0x100|16|(4-1): memory.allocate<address_space_specific<1, 1, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
+				case 0x0000|0x000|32|(4+3): memory.allocate<address_space_specific<0, 2,  3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|32|(4+3): memory.allocate<address_space_specific<0, 2,  3, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|32|(4+3): memory.allocate<address_space_specific<1, 2,  3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|32|(4+3): memory.allocate<address_space_specific<1, 2,  3, ENDIANNESS_BIG   >>(*this, spacenum); break;
+
 				case 0x0000|0x000|32|(4-0): memory.allocate<address_space_specific<0, 2,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
 				case 0x1000|0x000|32|(4-0): memory.allocate<address_space_specific<0, 2,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;
 				case 0x0000|0x100|32|(4-0): memory.allocate<address_space_specific<1, 2,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;

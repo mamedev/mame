@@ -9000,21 +9000,21 @@ GAMEL( 1994, v4cmaze3_amld,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init
 
 //Year is a guess, based on the use of the 'Coin Man' logo
 GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2
-GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS )//SWP 0.2D
+GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2D
 
 /* Quiz games - Questions decoded */
 
 GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
-GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS,layout_v4addlad )
+GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 
 GAMEL(  199?, v4strike,   v4bios,   mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
-GAMEL(  199?, v4striked,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS,layout_v4strike )
+GAMEL(  199?, v4striked,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 GAMEL(  199?, v4strike2,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike ) // The '3' is likely a machine type, not a 'version', 68k Pair ROM doesn't change
-GAMEL(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS,layout_v4strike )
+GAMEL(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 
 GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
-GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
+GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 
 /* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
 
@@ -9072,7 +9072,7 @@ GAMEL(  1991, v4psi14,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_p
 GAMEL(  1991, v4psi14a,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB",           u8"Prize Space Invaders (BWB IN2, £20, 50p/30p Play, 14\" Version 1.1, set 2) (MPU4 Video)",GAME_FLAGS,layout_v4psi )
 // these show BWB and Barcrest (older game release 'INV1' but higher version of it)
 GAMEL(  1991, v4psibc,    v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (MPU4 Video)",GAME_FLAGS_OK,layout_v4psi )
-GAMEL(  1991, v4psibcd,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (Datapak) (MPU4 Video)",GAME_FLAGS,layout_v4psi )
+GAMEL(  1991, v4psibcd,   v4psi,    bwbvid,     v4psi,     mpu4vid_state, init_prizeinv,  ROT0, "BWB / Barcrest","Prize Space Invaders (BWB INV1, 50p/30p Play, Version 1.2) (Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_v4psi )
 
 
 // Tetris games, these were all sold as different machines so are not set as clones
@@ -9080,10 +9080,10 @@ GAME(  1989, v4tetrs,    0,        bwbvid,     v4tetris,   mpu4vid_state, init_b
 GAME(  1989, v4tetrs1,   v4tetrs,  bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Tetris Payout (BWB TET1 Version 2.2, set 2) (MPU4 Video)",GAME_FLAGS_OK )
 // Blox is an later version of Payout Tetris, without Tetris license? (SJM = Stuart McArthur?)
 GAME(  1990, v4blox,     0,        bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (MPU4 Video)",GAME_FLAGS_OK )
-GAME(  1990, v4bloxd,    v4blox,   bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1990, v4bloxd,    v4blox,   bwbvid,     v4tetris,   mpu4vid_state, init_bwbhack,     ROT0, "BWB / Barcrest","Blox (SJM BLOX, 50p/20p Play, Version 2.0) (Datapak) (MPU4 Video)",GAME_FLAGS_OK )
 // Prize Tetris / Bullion Blox have quite different attract presentation to the above
 GAME(  1994, v4pztet,    0,        bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (MPU4 Video)",GAME_FLAGS_OK )
-GAME(  1994, v4pzteta,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1994, v4pzteta,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Datapak) (MPU4 Video)",GAME_FLAGS_OK )
 GAME(  1994, v4pztetb,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Showcase) (MPU4 Video)",GAME_FLAGS_OK ) // screen telling you to exchange tickets for prizes in the 'showcase' during attract
 GAME(  1994, v4pztetc,   v4pztet,  bwbvid,     v4pztet,    mpu4vid_state, init_bwbhack,     ROT0, "BWB",           "Prize Tetris (BWB) (Showcase) (Datapak) (MPU4 Video)",GAME_FLAGS )
 // this appears to be a version of Prize Tetris without the Tetris license. These don't have proper alarms, eg coin1 stuck is 'undefined'

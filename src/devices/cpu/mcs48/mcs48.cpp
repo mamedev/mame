@@ -416,7 +416,7 @@ void mcs48_cpu_device::push_pc_psw()
 	uint8_t sp = m_psw & 0x07;
 	ram_w(8 + 2*sp, m_pc);
 	ram_w(9 + 2*sp, ((m_pc >> 8) & 0x0f) | (m_psw & 0xf0));
-	m_psw = (m_psw & 0xf8) | ((sp + 1) & 0x07);
+	m_psw = (m_psw & 0xf0) | ((sp + 1) & 0x07);
 }
 
 
@@ -780,7 +780,7 @@ OPHANDLER( mov_a_xr0 )      { burn_cycles(1); m_a = ram_r(R0); }
 OPHANDLER( mov_a_xr1 )      { burn_cycles(1); m_a = ram_r(R1); }
 OPHANDLER( mov_a_t )        { burn_cycles(1); m_a = m_timer; }
 
-OPHANDLER( mov_psw_a )      { burn_cycles(1); m_psw = m_a; update_regptr(); }
+OPHANDLER( mov_psw_a )      { burn_cycles(1); m_psw = m_a & ~0x08; update_regptr(); }
 OPHANDLER( mov_sts_a )      { burn_cycles(1); m_sts = (m_sts & 0x0f) | (m_a & 0xf0); }
 OPHANDLER( mov_r0_a )       { burn_cycles(1); R0 = m_a; }
 OPHANDLER( mov_r1_a )       { burn_cycles(1); R1 = m_a; }
@@ -1187,6 +1187,7 @@ void mcs48_cpu_device::device_reset()
 	/* confirmed from reset description */
 	m_pc = 0;
 	m_psw = m_psw & (C_FLAG | A_FLAG);
+	update_regptr();
 	m_a11 = 0x000;
 	m_dbbo = 0xff;
 	bus_w(0xff);

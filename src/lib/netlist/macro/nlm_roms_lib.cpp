@@ -355,6 +355,52 @@ static NETLIST_START(PROM_82S115_DIP)
 	)
 NETLIST_END()
 
+//- Identifier:  PROM_MK28000_DIP
+//- Title: MK28000 (2048 x 8 or 4096 x 4) 16384-Bit TTL PROM
+//- Description: This dynamic ROM is organized internally as 2048 x 8 bits,
+//-    but has separate enables for the upper and lower nybbles, permitting
+//-    use as 4096 x 4 as well.
+//.
+//- Pinalias: VCC,A1,A2,A3,A4,A5,A6,A10,GND,A9,A8,A7,ARQ,OE2,A11,O8,O7,O6,O5,O4,O3,O2,O1,OE1
+//- Package: DIP
+//- Param: ROM
+//-    The name of the source to load the rom content from
+//- NamingConvention: Naming conventions follow Mostek datasheet
+//- Limitations:
+//-    None.
+
+static NETLIST_START(PROM_MK28000_DIP)
+
+	PROM_MK28000(A)
+
+	DEFPARAM(ROM, "unknown")
+	PARAM(A.ROM, "$(@.ROM)")
+	ALIAS(1, A.VCC)
+	ALIAS(2, A.A1)
+	ALIAS(3, A.A2)
+	ALIAS(4, A.A3)
+	ALIAS(5, A.A4)
+	ALIAS(6, A.A5)
+	ALIAS(7, A.A6)
+	ALIAS(8, A.A10)
+	ALIAS(9, A.GND)
+	ALIAS(10, A.A9)
+	ALIAS(11, A.A8)
+	ALIAS(12, A.A7)
+	ALIAS(13, A.ARQ)
+	ALIAS(14, A.OE2)
+	ALIAS(15, A.A11)
+	ALIAS(16, A.O8)
+	ALIAS(17, A.O7)
+	ALIAS(18, A.O6)
+	ALIAS(19, A.O5)
+	ALIAS(20, A.O4)
+	ALIAS(21, A.O3)
+	ALIAS(22, A.O2)
+	ALIAS(23, A.O1)
+	ALIAS(24, A.OE1)
+NETLIST_END()
+
 /*  2102: 1024 x 1-bit Static RAM
  *
  *          +--------------+
@@ -394,6 +440,7 @@ NETLIST_START(roms_lib)
 	LOCAL_LIB_ENTRY(EPROM_2716_DIP)
 	LOCAL_LIB_ENTRY(TTL_82S16_DIP)
 	LOCAL_LIB_ENTRY(PROM_82S115_DIP)
+	LOCAL_LIB_ENTRY(PROM_MK28000_DIP)
 	LOCAL_LIB_ENTRY(RAM_2102A_DIP)
 
 	NETLIST_END()

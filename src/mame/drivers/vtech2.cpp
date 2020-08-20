@@ -510,7 +510,7 @@ void vtech2_state::laser350(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech2_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);

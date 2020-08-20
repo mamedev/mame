@@ -27,6 +27,9 @@
 #define TL081_DIP(name)                                                        \
 		NET_REGISTER_DEV(TL081_DIP, name)
 
+#define TL082_DIP(name)                                                        \
+		NET_REGISTER_DEV(TL082_DIP, name)
+
 #define TL084_DIP(name)                                                        \
 		NET_REGISTER_DEV(TL084_DIP, name)
 
@@ -59,6 +62,9 @@
 
 #define MC3340_DIP(name)                                                       \
 		NET_REGISTER_DEV(MC3340_DIP, name)
+
+#define AN6551_SIL(name)                                                       \
+		NET_REGISTER_DEV(AN6551_SIL, name)
 
 #endif // NL_AUTO_DEVICES
 

@@ -55,16 +55,6 @@ void device_o2_cart_interface::rom_alloc(uint32_t size, const char *tag)
 }
 
 
-//-------------------------------------------------
-//  ram_alloc - alloc the space for the ram
-//-------------------------------------------------
-
-void device_o2_cart_interface::ram_alloc(uint32_t size)
-{
-	m_ram.resize(size);
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -78,6 +68,7 @@ o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const ch
 	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
 	, m_type(O2_STD)
 	, m_cart(nullptr)
+	, m_b(0)
 {
 }
 
@@ -156,19 +147,23 @@ image_init_result o2_cart_slot_device::call_load()
 		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size, tag());
 
-		if (!loaded_through_softlist())
-			fread(m_cart->get_rom_base(), size);
-		else
-			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
-
 		if (loaded_through_softlist())
 		{
+			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
+
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
 				m_type = o2_get_pcb_id(pcb_name);
+
+			// Videopac+ determines whether the screen should have a border, with a gate connected
+			// to the cartridge B pin. This way, old Videopac games can still run in full screen.
+			m_b = bool(strtoul(get_feature("b_pin"), nullptr, 0)) ? 1 : 0;
 		}
 		else
+		{
+			fread(m_cart->get_rom_base(), size);
 			m_type = (size == 16384) ? O2_RALLY : O2_STD;
+		}
 
 		m_cart->cart_init();
 
@@ -236,6 +231,18 @@ uint8_t o2_cart_slot_device::io_read(offs_t offset)
 		return m_cart->io_read(offset);
 	else
 		return 0xff;
+}
+
+int o2_cart_slot_device::b_read()
+{
+	if (m_cart)
+	{
+		int b = m_cart->b_read();
+		const bool override = b != -1;
+		return override ? b : m_b;
+	}
+	else
+		return 0;
 }
 
 

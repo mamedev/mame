@@ -2192,7 +2192,7 @@ void hng64_state::hng64_shoot(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some misisng?!)
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some missing?!)
 	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
 }
 

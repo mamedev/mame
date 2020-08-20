@@ -304,12 +304,12 @@ private:
 class zzzap_common_audio_device : public device_t
 {
 public:
-	zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &));
-
 	void p1_w(u8 data);
 	void p2_w(u8 data);
 
 protected:
+	zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &));
+
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;

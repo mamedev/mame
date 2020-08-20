@@ -45,6 +45,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_audioirq(*this, "audioirq")
 		, m_hc55516(*this, "hc55516")
+		, m_dac(*this, "dac")
 		, m_pias(*this, "pias")
 		, m_pia21(*this, "pia21")
 		, m_pia24(*this, "pia24")
@@ -98,18 +99,21 @@ public:
 	void switch_w(uint8_t data);
 	uint8_t pia28_w7_r();
 
+	void s11_main_map(address_map &map);
+	void s11_audio_map(address_map &map);
+
 protected:
 	DECLARE_MACHINE_RESET(s11);
-	void s11_audio_map(address_map &map);
-	void s11_main_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<input_merger_device> m_piairq;
+	// the following devices are optional because certain board variants (i.e. system 11c) do not have the audio section on the mainboard populated
 	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<input_merger_device> m_audioirq;
 	optional_device<hc55516_device> m_hc55516;
+	optional_device<mc1408_device> m_dac;
 	optional_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;

@@ -57,11 +57,23 @@ private:
 void blktiger_ms_state::blktigerm_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	//map(0x8000, 0xbfff).bankr("mainbank");
+	//map(0xc003, 0xc003).r(); // ??
+	//map(0xd800, 0xd800).w(); // bankswitch?
+	map(0xe000, 0xffff).ram();
 }
 
-void blktiger_ms_state::blktigerm_sound_map(address_map &map)
+void blktiger_ms_state::blktigerm_sound_map(address_map &map) // seems similar to toki_ms.cpp and raiden_ms.cpp
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0xc000, 0xc7ff).ram();
+	map(0xc900, 0xc900).noprw(); // what lives here?
+	map(0xdff8, 0xdff8).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xdff0, 0xdfff).nopw(); // what lives here?
+	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
+	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
+	map(0xe008, 0xe009).r("ym1", FUNC(ym2203_device::read));
+	map(0xe00a, 0xe00b).r("ym2", FUNC(ym2203_device::read));
 }
 
 void blktiger_ms_state::machine_start()
@@ -172,4 +184,4 @@ void blktiger_ms_state::init_blktigerm()
 		src[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 10, 8, 6, 4, 0, 2, 7, 3, 1, 9, 11, 5)];
 }
 
-GAME( 1991, blktigerm,  blktiger,  blktigerm,  blktigerm,  blktiger_ms_state, init_blktigerm, ROT0, "bootleg (Gaelco / Ervisa)", "Black Tiger (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, blktigerm,  blktiger,  blktigerm,  blktigerm,  blktiger_ms_state, init_blktigerm, ROT0, "bootleg (Gaelco / Ervisa)", "Black Tiger (Modular System)", MACHINE_IS_SKELETON )

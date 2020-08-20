@@ -423,7 +423,7 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 		</part>
 	</software>
 
-		<software name="peg4001" cloneof="peg400">
+	<software name="peg4001" cloneof="peg400">
 		<description>Pegasus 400 v1.01</description>
 		<year>1987</year>
 		<publisher>Slogger</publisher>
@@ -514,27 +514,40 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 		</part>
 	</software>
 
-	<software name="sndexp" supported="no">
+	<software name="sndexp">
 		<description>Sound Expansion</description>
 		<year>1988</year>
 		<publisher>Project Expansions</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="sndexp" />
 			<dataarea name="rom" size="8192">
-				<rom name="sound_expansion-v1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564"/>
+				<rom name="sound_expansion-1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564"/>
+			</dataarea>
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="sndexp2">
+		<description>Sound Expansion 2.0</description>
+		<year>1988</year>
+		<publisher>Project Expansions</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="sndexp" />
+			<dataarea name="rom" size="8192">
+				<rom name="sound_expansion-2.0.rom" size="8192" crc="8b8a85c3" sha1="a438d19431782142b0c1b591d3c025716014bffc"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
 	</software>
 
 	<software name="sndexp3">
-		<description>Sound Expansion v3</description>
+		<description>Sound Expansion 3.0</description>
 		<year>1989</year>
 		<publisher>Complex Software Systems</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="sndexp3" />
 			<dataarea name="rom" size="16384">
-				<rom name="sound_expansion-v3.00.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32"/>
+				<rom name="sound_expansion-3.0.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32"/>
 			</dataarea>
 			<dataarea name="ram" size="8192" />
 		</part>
@@ -548,6 +561,17 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 			<feature name="slot" value="tube" />
 			<dataarea name="rom" size="8192">
 				<rom name="elk-tube-1.21.rom" size="8192" crc="3f50b365" sha1="33f1ff07ba5feb8f6343de1db0d56f7adb2db856"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upurs" supported="no">
+		<description>UPURS 1.0E</description>
+		<year>2012</year>
+		<publisher>Martin Barr</publisher>
+		<part name="rom" interface="electron_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="upurs-1.0e.rom" size="16384" crc="128ce6bd" sha1="d836275efcd8d35aeb239abe1c71ea6f426dc45c"/>
 			</dataarea>
 		</part>
 	</software>

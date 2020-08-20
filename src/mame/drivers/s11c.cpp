@@ -13,20 +13,6 @@
 #include "s11c.lh"
 
 
-void s11c_state::s11c_main_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).mirror(0x01ff).w(FUNC(s11c_state::sol3_w)); // solenoids
-	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
-	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
-	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
-	map(0x3000, 0x3003).mirror(0x03fc).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
-	map(0x3400, 0x3403).mirror(0x0bfc).rw(m_pia34, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
-	map(0x4000, 0xffff).rom();
-}
-
-
 static INPUT_PORTS_START( s11c )
 	PORT_START("SW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) // always plumb-bob tilt
@@ -135,7 +121,7 @@ void s11c_state::s11c(machine_config &config)
 {
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &s11c_state::s11c_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 
@@ -190,7 +176,6 @@ void s11c_state::s11c(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11b_state::pia34_pb_w));
-	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	m_pia34->cb2_handler().set(FUNC(s11b_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
@@ -202,6 +187,7 @@ void s11c_state::s11c(machine_config &config)
 	/* Add the background music card */
 	SPEAKER(config, "speaker").front_center();
 	S11C_BG(config, m_bg);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
 	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);

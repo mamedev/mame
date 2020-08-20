@@ -1,15 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, hap
 /***************************************************************************
 
-Thomson EF9340 + EF9341 teletext graphics chips with 1KB external character ram.
+Thomson EF9340 + EF9341 teletext graphics, this device is a combination of chips.
+
+Minimal components:
+- Thomson EF9340 "VIN"
+- Thomson EF9341 "GEN"
+- 2*1KB RAM, A for attributes, B for character codes
+
+There's also an optional extended character memory, it can be RAM or ROM.
+This is implemented with a callback. The datasheet explains how to hook up
+1KB RAM, but it's possible to have more.
 
 TODO:
 - busy state (right now it is immediate)
-- character blinking mode
-- character underline mode
-- character width/height doubling
-- window boxing/conceal
+- internal display timing (on g7400, most of it is done externally)
+- read slice from internal ROM
+- window boxing
 - Y zoom
 
 ***************************************************************************/
@@ -30,15 +38,16 @@ DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341
 ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9340_1, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_line_timer(nullptr)
 	, m_charset(*this, "ef9340_1")
+	, m_write_exram(*this)
+	, m_read_exram(*this)
 {
 }
 
 
 ROM_START( ef9340_1 )
 	ROM_REGION( 0xA00, "ef9340_1", 0 )
-	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0A00, CRC(d557a7bf) SHA1(d100b0f6a0d5a2d540844bf362788659ed9a6eb4) )
+	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0a00, BAD_DUMP CRC(8de85988) SHA1(f8e3892234da6626eb4302e171179ada5a51fca8) ) // taken from datasheet
 ROM_END
 
 
@@ -50,11 +59,17 @@ const tiny_rom_entry *ef9340_1_device::device_rom_region() const
 
 void ef9340_1_device::device_start()
 {
+	m_write_exram.resolve_safe();
+	m_read_exram.resolve_safe(0xff);
+
 	// Let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust( screen().time_until_pos(0, 0), 0,  screen().scan_period() );
+	m_line_timer->adjust( screen().time_until_pos(0, 0), 0, screen().scan_period() );
+
+	m_blink_timer = timer_alloc(TIMER_BLINK);
+	m_blink_timer->adjust( screen().time_until_pos(0, 0), 0, screen().frame_period() );
 
 	// zerofill
 	m_ef9341.TA = 0;
@@ -66,10 +81,12 @@ void ef9340_1_device::device_start()
 	m_ef9340.Y0 = 0;
 	m_ef9340.R = 0;
 	m_ef9340.M = 0;
+	m_ef9340.blink = false;
+	m_ef9340.blink_prescaler = 0;
+	m_ef9340.h_parity = false;
 
-	memset(m_ef934x_ram_a, 0, sizeof(m_ef934x_ram_a));
-	memset(m_ef934x_ram_b, 0, sizeof(m_ef934x_ram_b));
-	memset(m_ef934x_ram_b, 0, sizeof(m_ef934x_ext_char_ram));
+	memset(m_ram_a, 0, sizeof(m_ram_a));
+	memset(m_ram_b, 0, sizeof(m_ram_b));
 
 	// register our state
 	save_item(NAME(m_ef9341.TA));
@@ -81,10 +98,12 @@ void ef9340_1_device::device_start()
 	save_item(NAME(m_ef9340.Y0));
 	save_item(NAME(m_ef9340.R));
 	save_item(NAME(m_ef9340.M));
+	save_item(NAME(m_ef9340.blink));
+	save_item(NAME(m_ef9340.blink_prescaler));
+	save_item(NAME(m_ef9340.h_parity));
 
-	save_item(NAME(m_ef934x_ram_a));
-	save_item(NAME(m_ef934x_ram_b));
-	save_item(NAME(m_ef934x_ext_char_ram));
+	save_item(NAME(m_ram_a));
+	save_item(NAME(m_ram_b));
 }
 
 
@@ -94,6 +113,17 @@ void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		case TIMER_LINE:
 			ef9340_scanline(screen().vpos());
+			break;
+
+		case TIMER_BLINK:
+			// blink rate is approximately 0.5s
+			m_ef9340.blink_prescaler = (m_ef9340.blink_prescaler + 1) & 0x1f;
+			if (m_ef9340.R & 0x40 && m_ef9340.blink_prescaler == 24)
+				m_ef9340.blink_prescaler = 0;
+
+			if (m_ef9340.blink_prescaler == 0)
+				m_ef9340.blink = !m_ef9340.blink;
+
 			break;
 	}
 }
@@ -125,20 +155,6 @@ void ef9340_1_device::ef9340_inc_c()
 		}
 		m_ef9340.X = 0;
 	}
-}
-
-
-uint16_t ef9340_1_device::external_chargen_address(uint8_t b, uint8_t slice)
-{
-	uint8_t cc = b & 0x7f;
-
-	if ( slice & 8 )
-	{
-		// 0 0 CCE4 CCE3 CCE2 CCE1 CCE0 CCE6 CCE5 ADR0
-		return ( ( cc << 3 ) & 0xf8 ) | ( ( cc >> 4 ) & 0x06) | ( slice & 0x01 );
-	}
-	// CCE6 CCE5 CCE4 CCE3 CCE2 CCE1 CCE0 ADR2 ADR1 ADR0
-	return  ( cc << 3 ) | ( slice & 0x07 );
 }
 
 
@@ -197,26 +213,24 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 			switch ( m_ef9340.M & 0xE0 )
 			{
 				case 0x00:  /* Write */
-					m_ef934x_ram_a[addr] = m_ef9341.TA;
-					m_ef934x_ram_b[addr] = m_ef9341.TB;
+					m_ram_a[addr] = m_ef9341.TA;
+					m_ram_b[addr] = m_ef9341.TB;
 					ef9340_inc_c();
 					break;
 
 				case 0x40:  /* Write without increment */
-					m_ef934x_ram_a[addr] = m_ef9341.TA;
-					m_ef934x_ram_b[addr] = m_ef9341.TB;
+					m_ram_a[addr] = m_ef9341.TA;
+					m_ram_b[addr] = m_ef9341.TB;
 					break;
 
 				case 0x80:  /* Write slice */
 					{
-						uint8_t a = m_ef934x_ram_a[addr];
-						uint8_t b = m_ef934x_ram_b[addr];
-						uint8_t slice = ( m_ef9340.M & 0x0f ) % 10;
+						uint8_t a = m_ram_a[addr];
+						uint8_t b = m_ram_b[addr];
+						uint8_t slice = m_ef9340.M & 0x0f;
 
-						if ( b >= 0xa0 )
-						{
-							m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ] = bitswap<8>(m_ef9341.TA,0,1,2,3,4,5,6,7);
-						}
+						if (b >= 0xa0)
+							m_write_exram(a << 12 | b << 4 | slice, m_ef9341.TA);
 
 						// Increment slice number
 						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
@@ -264,27 +278,29 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 			switch ( m_ef9340.M & 0xE0 )
 			{
 				case 0x20:  /* Read */
-					m_ef9341.TA = m_ef934x_ram_a[addr];
-					m_ef9341.TB = m_ef934x_ram_b[addr];
+					m_ef9341.TA = m_ram_a[addr];
+					m_ef9341.TB = m_ram_b[addr];
 					ef9340_inc_c();
 					break;
 
 				case 0x60:  /* Read without increment */
-					m_ef9341.TA = m_ef934x_ram_a[addr];
-					m_ef9341.TB = m_ef934x_ram_b[addr];
+					m_ef9341.TA = m_ram_a[addr];
+					m_ef9341.TB = m_ram_b[addr];
 					break;
 
 				case 0xA0:  /* Read slice */
 					{
-						uint8_t a = m_ef934x_ram_a[addr];
-						uint8_t b = m_ef934x_ram_b[addr];
-						uint8_t slice = ( m_ef9340.M & 0x0f ) % 10;
+						uint8_t a = m_ram_a[addr];
+						uint8_t b = m_ram_b[addr];
+						uint8_t slice = m_ef9340.M & 0x0f;
 
-						if ( b >= 0xa0 )
-						{
-							m_ef9341.TA = bitswap<8>(m_ef934x_ext_char_ram[ ( ( a & 0x80 ) << 3 ) | external_chargen_address( b, slice ) ],0,1,2,3,4,5,6,7);
-							m_ef9341.TB = 0;
-						}
+						m_ef9341.TA = 0xff;
+						m_ef9341.TB = 0xff;
+
+						if (b >= 0xa0)
+							m_ef9341.TA = m_read_exram(a << 12 | b << 4 | slice);
+						else
+							logerror("ef9341 read slice from internal\n");
 
 						// Increment slice number
 						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
@@ -307,118 +323,181 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 
 void ef9340_1_device::ef9340_scanline(int vpos)
 {
-	static const uint8_t bgr2rgb[8] =
-	{
-		0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
-	};
-
-	for ( int i = 0; i < 40 * 8; i++ )
+	for (int i = 0; i < m_tmp_bitmap.width(); i++)
 		m_tmp_bitmap.pix16(vpos, i) = 0;
 
-	// display automaton active at 40-290, or 32-242
-	int max_vpos = ( m_ef9340.R & 0x40 ) ? 250 : 210;
+	vpos -= m_offset_y;
+	if (vpos < 0)
+		return;
 
-	if ( m_ef9340.R & 0x01 && vpos < max_vpos )
+	int slice = vpos % 10;
+	bool dh = false;
+	if (vpos == 0)
+		m_ef9340.h_parity = false;
+
+	// display automaton active at 40-290, or 32-242
+	int max_vpos = (m_ef9340.R & 0x40) ? 250 : 210;
+
+	if (m_ef9340.R & 0x01 && vpos < max_vpos)
 	{
-		int y = vpos;
-		int y_row, slice;
+		int y_row = 0;
+		uint16_t char_data = 0x00;
 		uint8_t fg = 0;
 		uint8_t bg = 0;
+		bool underline = false;
+		bool blank = false;
+		bool w_parity = false;
 
-		if ( y < 10 )
+		if ( vpos < 10 )
 		{
 			// Service row
-			if ( m_ef9340.R & 0x08 )
+			if (m_ef9340.R & 0x08)
 			{
 				// Service row is enabled
 				y_row = 31;
-				slice = y;
 			}
 			else
 			{
 				// Service row is disabled
+				for (int i = 0; i < 40 * 8; i++)
+					m_tmp_bitmap.pix16(vpos, i) = 8;
 				return;
 			}
 		}
 		else
 		{
 			// Displaying regular row
-			y_row = ((m_ef9340.Y0 & 0x1f) + (y - 10) / 10) % 24;
-			slice = (y - 10) % 10;
+			y_row = ((m_ef9340.Y0 & 0x1f) + (vpos - 10) / 10) % 24;
 		}
 
-		for ( int x = 0; x < 40; x++ )
+		for (int x = 0; x < 40; x++)
 		{
-			uint16_t addr = ef9340_get_c_addr( x, y_row );
-			uint8_t a = m_ef934x_ram_a[addr];
-			uint8_t b = m_ef934x_ram_b[addr];
-			uint8_t char_data = 0x00;
+			int s = slice;
+			uint16_t addr = ef9340_get_c_addr(x, y_row);
+			uint8_t a = m_ram_a[addr];
+			uint8_t b = m_ram_b[addr];
+			bool blink = m_ef9340.R & 0x80 && m_ef9340.blink;
+			bool cursor = m_ef9340.R & 0x10 && x == m_ef9340.X && y_row == m_ef9340.Y;
+			bool invert = cursor && !blink;
+			bool dw = false;
+			bool del = false;
 
-			if ( a & 0x80 )
+			if (a & 0x80)
 			{
-				// Graphics
-				if ( b & 0x80 )
+				// graphics
+				if ((b & 0xe0) != 0x80)
 				{
-					if ( b & 0x60 )
-					{
-						// Extension
-						char_data = m_ef934x_ext_char_ram[ 0x400 | external_chargen_address( b & 0x7f, slice ) ];
-						fg = bgr2rgb[ a & 0x07 ];
-						bg = bgr2rgb[ ( a >> 4 ) & 0x07 ];
-					}
+					fg = a & 0x07;
+					bg = a >> 4 & 0x07;
+
+					if (b & 0x80)
+						char_data = m_read_exram(a << 12 | b << 4 | s);
 					else
-					{
-						// Illegal
-					}
+						char_data = m_charset[((b | 0x80) * 10) + s];
 				}
+
+				// illegal
 				else
-				{
-					// Normal
-					char_data = m_charset[((b | 0x80) * 10) + slice];
-					fg = bgr2rgb[ a & 0x07 ];
-					bg = bgr2rgb[ ( a >> 4 ) & 0x07 ];
-				}
+					char_data = 0xff;
 			}
 			else
 			{
-				// Alphanumeric
-				if ( b & 0x80 )
+				// alphanumeric
+				if ((b & 0xe0) != 0x80)
 				{
-					if ( b & 0x60 )
+					// double height
+					if (a & 0x10)
 					{
-						// Extension
-						char_data = m_ef934x_ext_char_ram[ external_chargen_address( b & 0x7f, slice ) ];
-						if ( a & 0x40 )
-							char_data ^= 0xff;
-						fg = bgr2rgb[ a & 0x07 ];
+						dh = true;
+						if (m_ef9340.h_parity)
+							s += 10;
+						if (s > 0)
+							s = (s - 1) / 2;
+					}
+
+					fg = a & 0x07;
+					u16 c = 0;
+
+					if (b & 0x80)
+						c = m_read_exram(a << 12 | b << 4 | s);
+					else if (s == 9 && underline)
+						c = 0xff;
+					else
+						c = m_charset[((b & 0x7f) * 10) + s];
+
+					// double width
+					dw = bool(a & 0x20);
+					if (dw)
+					{
+						if (!w_parity)
+							char_data = bitswap<16>(c,7,7,6,6,5,5,4,4,3,3,2,2,1,1,0,0);
 					}
 					else
+						char_data = c;
+
+					// inverted
+					if (a & 0x40)
 					{
-						// DEL
-						char_data = 0xff;
-						fg = bgr2rgb[ a & 0x07 ];
-						bg = bgr2rgb[ ( a >> 4 ) & 0x07 ];
+						invert = !invert;
+						blink = m_ef9340.R & 0x80 && !m_ef9340.blink;
 					}
 				}
+
+				// deliminator
 				else
 				{
-					// Normal
-					char_data = m_charset[((b & 0x7f) * 10) + slice];
-					if ( a & 0x40 )
-						char_data ^= 0xff;
-					fg = bgr2rgb[ a & 0x07 ];
+					fg = a & 0x07;
+					bg = a >> 4 & 0x07;
+					char_data = 0xff;
+
+					del = true;
 				}
 			}
 
-			// Cursor is enabled
-			if ( m_ef9340.R & 0x10 && x == m_ef9340.X && y_row == m_ef9340.Y )
+			// blink character
+			if (blink && !cursor && (b & 0xe0) != 0x80 && ~a & 0x08)
+				char_data &= ~0xff;
+
+			if (invert)
 				char_data ^= 0xff;
 
-			for ( int i = 0; i < 8; i++ )
+			if (dw)
+				w_parity = !w_parity;
+			else
+				w_parity = false;
+
+			for (int i = 0; i < 8; i++)
 			{
-				m_tmp_bitmap.pix16(vpos, 0 + x*8 + i ) = (char_data & 0x80) ? fg : bg;
-				char_data <<= 1;
+				uint16_t d = blank ? 0 : (char_data & 1) ? fg : bg;
+				m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + x*8 + i) = d | 8;
+				char_data >>= 1;
+			}
+
+			if (del)
+			{
+				blank = m_ef9340.R & 0x04 && b & 0x01;
+				underline = bool(b & 0x04);
 			}
 		}
 	}
+
+	// determine next h parity
+	if (vpos >= 10 && slice == 9)
+	{
+		if (dh)
+			m_ef9340.h_parity = !m_ef9340.h_parity;
+		else
+			m_ef9340.h_parity = false;
+	}
+}
+
+
+uint32_t ef9340_1_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// note: palette d3 is transparency (datasheet calls it "I"), this handler masks it off
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			bitmap.pix16(y, x) = m_tmp_bitmap.pix16(y, x) & 7;
+
+	return 0;
 }

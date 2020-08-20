@@ -109,54 +109,71 @@ inline void unsp_device::execute_fxxx_001_group(uint16_t op)
 
 		if (d)
 		{
+			const uint32_t addr = imm16 | (get_ds() << 16);
+			const uint16_t orig = read16(addr);
+
+			// manual seems to indicate that the zero flag always gets changed based on original value
+			// even for opcodes other than tstb
+			m_core->m_r[REG_SR] &= ~UNSP_Z;
+			m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
 			switch (bitop)
 			{
 			case 0x0: // tstb
-				logerror("tstb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				// handled above
 				break;
-
-			case 0x1: // setb
-				logerror("setb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			}
+			case 0x1: // setb    (bkrankp uses this)
+			{
+				write16(addr, orig | (1 << offset));
 				break;
-
+			}
 			case 0x2: // clrb
-				logerror("clrb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(addr, orig & ~(1 << offset));
 				break;
+			}
 
 			case 0x3: // invb
-				logerror("invb ds:[%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(addr, orig ^ (1 << offset));
 				break;
+			}
 			}
 		}
 		else
 		{
+			const uint16_t orig =  read16(imm16);
+
+			// manual seems to indicate that the zero flag always gets changed based on original value
+			// even for opcodes other than tstb
+			m_core->m_r[REG_SR] &= ~UNSP_Z;
+			m_core->m_r[REG_SR] |= BIT(orig, offset) ? 0 : UNSP_Z;
+
 			switch (bitop)
 			{
 			case 0x0: // tstb
-				logerror("tstb [%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				// handled above
 				break;
-
+			}
 			case 0x1: // setb    (bkrankp uses this)
 			{
-				uint16_t temp = read16(imm16);
-				temp |= (1 << offset);
-				write16(imm16, temp);
+				write16(imm16, orig | (1 << offset));
 				break;
 			}
 			case 0x2: // clrb
-				logerror("clrb [%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(imm16, orig & ~(1 << offset));
 				break;
+			}
 
 			case 0x3: // invb
-				logerror("invb [%04x],%d\n", imm16, offset);
-				unimplemented_opcode(op);
+			{
+				write16(imm16, orig ^ (1 << offset));
 				break;
+			}
 			}
 		}
 

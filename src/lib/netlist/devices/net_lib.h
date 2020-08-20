@@ -79,10 +79,12 @@ NETLIST_EXTERNAL(base_lib)
 #include "nld_82S115.h"
 #include "nld_82S16.h"
 #include "nld_9316.h"
+#include "nld_9321.h"
 #include "nld_9322.h"
 #include "nld_tms4800.h"
 
 #include "nld_am2847.h"
+#include "nld_8277.h"
 #include "nld_dm9314.h"
 #include "nld_dm9334.h"
 

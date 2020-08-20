@@ -1,34 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
-Seicross memory map (preliminary)
 driver by Nicola Salmoria
+
+Seicross memory map (preliminary)
+
 0000-77ff ROM
 7800-7fff RAM
 9000-93ff videoram
 9c00-9fff colorram
+
 Read:
 A000      Joystick + Players start button
 A800      player #2 controls + coin + ?
 B000      test switches
 B800      watchdog reset
+
 Write:
 8820-887f Sprite ram
 9800-981f Scroll control
 9880-989f ? (always 0?)
+
 I/O ports:
 0         8910 control
 1         8910 write
 4         8910 read
+
 There is a microcontroller on the board. Nichibutsu custom part marked
 NSC81050-102  8127 E37 and labeled No. 00363.  It's a 40-pin IC at location 4F
 on the (Seicross-) board. Looks like it is linked to the dips (and those are
 on a very small daughterboard).
+
 Differences in new/old version of Frisky Tom
 - The lady wears bikini in new version
 - Game config is backed up by 4.5v battery in old version
 - Old version uses larger board
+
 This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -61,7 +70,7 @@ void seicross_state::machine_start()
 
 void seicross_state::machine_reset()
 {
-	/* start with the protection mcu halted */
+	// start with the protection mcu halted
 	m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
@@ -75,20 +84,20 @@ uint8_t seicross_state::portB_r()
 void seicross_state::portB_w(uint8_t data)
 {
 	//logerror("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
-	/* bit 0 is IRQ enable */
+	// bit 0 is IRQ enable
 	m_irq_mask = data & 1;
 
-	/* bit 1 flips screen */
+	// bit 1 flips screen
 
-	/* bit 2 resets the microcontroller */
+	// bit 2 resets the microcontroller
 	if (((m_portb & 4) == 0) && (data & 4))
 	{
-		/* reset and start the protection mcu */
+		// reset and start the protection mcu
 		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
-	/* other bits unknown */
+	// other bits unknown
 	m_portb = data;
 }
 
@@ -102,13 +111,13 @@ void seicross_state::main_map(address_map &map)
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram().share("share1");
 	map(0x8820, 0x887f).ram().share("spriteram");
-	map(0x9000, 0x93ff).ram().w(FUNC(seicross_state::videoram_w)).share("videoram"); /* video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(seicross_state::videoram_w)).share("videoram");
 	map(0x9800, 0x981f).ram().share("row_scroll");
 	map(0x9880, 0x989f).writeonly().share("spriteram2");
 	map(0x9c00, 0x9fff).ram().w(FUNC(seicross_state::colorram_w)).share("colorram");
-	map(0xa000, 0xa000).portr("IN0");        /* IN0 */
-	map(0xa800, 0xa800).portr("IN1");        /* IN1 */
-	map(0xb000, 0xb000).portr("TEST");       /* test */
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa800, 0xa800).portr("IN1");
+	map(0xb000, 0xb000).portr("TEST");
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -130,24 +139,17 @@ void seicross_state::mcu_nvram_map(address_map &map)
 
 void seicross_state::mcu_no_nvram_map(address_map &map)
 {
-	map(0x1003, 0x1003).portr("DSW1");       /* DSW1 */
-	map(0x1005, 0x1005).portr("DSW2");       /* DSW2 */
-	map(0x1006, 0x1006).portr("DSW3");       /* DSW3 */
+	map(0x1003, 0x1003).portr("DSW1");
+	map(0x1005, 0x1005).portr("DSW2");
+	map(0x1006, 0x1006).portr("DSW3");
 	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
 	map(0xf800, 0xffff).ram().share("share1");
 }
 
-void seicross_state::decrypted_opcodes_map(address_map &map)
-{
-	map(0x8000, 0xf7ff).rom().share("decrypted_opcodes");
-	map(0xf800, 0xffff).ram().share("share1");
-}
-
-
 
 static INPUT_PORTS_START( friskyt )
-	PORT_START("IN0")       /* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -157,7 +159,7 @@ static INPUT_PORTS_START( friskyt )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START("IN1")       /* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -169,18 +171,18 @@ static INPUT_PORTS_START( friskyt )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("TEST")      /* Test */
+	PORT_START("TEST")
 	PORT_DIPNAME( 0x01, 0x00, "Test Mode" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Connection Error" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radrad )
-	PORT_START("IN0")       /* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -190,7 +192,7 @@ static INPUT_PORTS_START( radrad )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START("IN1")       /* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -200,12 +202,12 @@ static INPUT_PORTS_START( radrad )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("TEST")      /* Test */
+	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 
-	PORT_START("DSW1")          /* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -219,7 +221,7 @@ static INPUT_PORTS_START( radrad )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("DSW2")      /* DSW2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
@@ -238,7 +240,7 @@ static INPUT_PORTS_START( radrad )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("DSW3")      /* DSW3 */
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_2C ) )
@@ -260,7 +262,7 @@ static INPUT_PORTS_START( radrad )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( seicross )
-	PORT_START("IN0")       /* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -270,24 +272,24 @@ static INPUT_PORTS_START( seicross )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START("IN1")       /* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("TEST")      /* Test */
+	PORT_START("TEST")
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x02, 0x00, "Connection Error" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 
-	PORT_START("DSW1")      /* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -301,7 +303,7 @@ static INPUT_PORTS_START( seicross )
 	PORT_DIPSETTING(    0x0c, "30000 60000 90000" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("DSW2")      /* DSW2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -315,7 +317,7 @@ static INPUT_PORTS_START( seicross )
 	PORT_DIPSETTING(    0x0c, "5" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("DSW3")      /* DSW3 */
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -328,7 +330,7 @@ static INPUT_PORTS_START( seicross )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("DEBUG")     /* Debug */
+	PORT_START("DEBUG")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x20, 0x20, "Debug Mode" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
@@ -343,25 +345,25 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	2,  /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes are packed in one byte */
+	8,8,    // 8*8 characters
+	512,    // 512 characters
+	2,  // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes are packed in one byte
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8    /* every char takes 16 consecutive bytes */
+	16*8    // every char takes 16 consecutive bytes
 };
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	256,    /* 256 sprites */
-	2,  /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes are packed in one byte */
+	16,16,  // 16*16 sprites
+	256,    // 256 sprites
+	2,  // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes are packed in one byte
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 17*8+0, 17*8+1, 17*8+2, 17*8+3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16 },
-	64*8    /* every sprite takes 64 consecutive bytes */
+	64*8    // every sprite takes 64 consecutive bytes
 };
 
 
@@ -398,7 +400,7 @@ void seicross_state::no_nvram(machine_config &config)
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate - frames per second, vblank duration
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(seicross_state::screen_update));
@@ -435,13 +437,14 @@ void seicross_state::nvram(machine_config &config)
 void seicross_state::friskytb(machine_config &config)
 {
 	nvram(config);
-	m_mcu->set_addrmap(AS_OPCODES, &seicross_state::decrypted_opcodes_map);
+	M6802(config.replace(), m_mcu, XTAL(18'432'000) / 6);   // presumed to be an HD46802P or compatible
+	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_nvram_map);
 }
 
 void seicross_state::sectznt(machine_config &config)
 {
 	no_nvram(config);
-	M6802(config.replace(), m_mcu, XTAL(18'432'000) / 6);   // ???
+	M6802(config.replace(), m_mcu, XTAL(18'432'000) / 6);   // actually HD46802P
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 }
 
@@ -670,23 +673,39 @@ ROM_START( sectrzont )
 	ROM_LOAD( "czt_pal16h2cn.bin", 0x0000, 0x0044, CRC(7edec1ed) SHA1(1b28cb250875f14a76d84bfc0b23ee02b1862c2c) )
 ROM_END
 
-void seicross_state::init_friskytb()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	// This code is in ROM 6.3h, maps to MCU at dxxx
-	for (int i = 0; i < 0x7800; i++)
-	{
-		m_decrypted_opcodes[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 0, 1);
-	}
-}
+ROM_START( sectrzona ) // This and set seicross seem bug-fixed versions, where the attract mode works. In the other sets during attract the player only goes straight until he crashes
+	ROM_REGION( 0x7800, "maincpu", 0 )
+	ROM_LOAD( "sz1.3a",         0x0000, 0x1000, CRC(f6c3aeca) SHA1(d57019e80f7e3d47ca74f54604e92d40ba9819fc) )
+	ROM_LOAD( "sz2.3c",         0x1000, 0x1000, CRC(f167f10e) SHA1(d23043afe0f7a06fbec92b333d6db172523faf27) )
+	ROM_LOAD( "sz3.3d",         0x2000, 0x1000, CRC(ceb3c8f4) SHA1(e49f834637b4addcf362cd010e31802c3e145cbe) )
+	ROM_LOAD( "sz4.3e",         0x3000, 0x1000, CRC(3112af59) SHA1(3d4e5a74a13bdeaf07f059f8c3a0d2ca8cbb3d32) )
+	ROM_LOAD( "sz5.3fg",        0x4000, 0x1000, CRC(b494a993) SHA1(ed60cbaef2ac780c11426d29a612d34e76b29a0e) )
+	ROM_LOAD( "sz6.3h",         0x5000, 0x1000, CRC(09d5b9da) SHA1(636a8d4717df4ed1fc02fa83782fa8d96b88f969) )
+	ROM_LOAD( "sz7.3i",         0x6000, 0x1000, CRC(13052b03) SHA1(2866f2533a788f734310a74789f762f3fa17a57a) )
+	ROM_LOAD( "sz8.3j",         0x7000, 0x0800, CRC(019f9651) SHA1(2b030e7823b277fb6e3f37753a4d52d277e0e079) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "sz11.7k",      0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
+	ROM_LOAD( "sz12.7m",      0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
+	ROM_LOAD( "sz9.7j",       0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
+	ROM_LOAD( "sz10.7h",      0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
+
+	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "sz73.10c",     0x0000, 0x0020, BAD_DUMP CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
+	ROM_LOAD( "sz74.10b",     0x0020, 0x0020, BAD_DUMP CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
+
+	ROM_REGION( 0x0100, "plds", 0 ) // not dumped for this set
+	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, BAD_DUMP CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
+ROM_END
 
 
 GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 1)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 2)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, init_friskytb, ROT0,  "Nichibutsu",         "Frisky Tom (set 3, encrypted)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // Protection MCU runs encrypted opcodes
+GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 3)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA",     "Radical Radial (US)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",      "Radical Radial (Japan)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2, Tecfri hardware)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // MCU HD46802P
+GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2, Tecfri hardware)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 3)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

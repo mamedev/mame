@@ -11,52 +11,129 @@ This list does not include ROM hacks, but those can still be loaded with -cart.
 WIP beta homebrews are also not included.
 
 TODO:
-add first release date were applicable
-add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
-add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
-add ntsc pal compatibility (<sharedfeat name="compatibility" value="NTSC,PAL"/>)
-add rom names from pcbs (lack of)
-add serials for radiola and jopacs
+- add first release date were applicable
+- add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
+- add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
+- add compatibility flags (<sharedfeat name="compatibility" value="O2,VP,VPP,O3"/>),
+  but it's not user-friendly since MAME refuses to load an incompatible game at all,
+  while on the real console you can still play them (just with more glitches)
+- add rom names from pcbs (lack of)
+- add serials for radiola and jopacs
 
 Undumped:
-Spaans          (spanish to dutch translator)
-Crazy Horses
-Service Test Cartridge
+- Spaans          (spanish to dutch translator)
+- Crazy Horses
+- Service Test Cartridge
 
 Protos:
-Bastion         youtube.com/watch?v=cFdmgs4r7_E
-Catburglar      youtube.com/watch?v=DDsWDFxy0oE
-Himalaya        youtube.com/watch?v=L_lvOs6EnA4
-SoundTool       youtube.com/watch?v=7JYn6B7rxqw
-Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
+- Bastion         youtube.com/watch?v=cFdmgs4r7_E
+- Catburglar      youtube.com/watch?v=DDsWDFxy0oE
+- Himalaya        youtube.com/watch?v=L_lvOs6EnA4
+- SoundTool       youtube.com/watch?v=7JYn6B7rxqw
+- Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
 
 http://www.ozyr.com/rene/PICS/protos.jpg
-Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
-Back Gammon
-Freedom Fighters
-K.C.'s Crazy Chase
-Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
-Power Lords
-Handicap I (?)
-Frogger
-Robot City
-Requins (Shark Hunter?)
-K.C. Munchkin! (looks more like Pacman)
-Pick Axe Pete
+- Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
+- Back Gammon
+- Freedom Fighters
+- K.C.'s Crazy Chase
+- Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
+- Handicap I (?)
+- Frogger
+- Robot City
+- Requins (Shark Hunter?)
+- K.C. Munchkin! (looks more like Pacman)
+- Pick Axe Pete
 
 Unreleased, possibly no prototypes exist:
-A Turma da Mônica [Mônica's Gang]
-Pink Panther
-Clean Up Yer Act (programmed by Robert S. Harris, never completed)
-Star Wars (GST Video)
-Moonsweeper (Imagic)
-Fathom (Imagic)
+- A Turma da Mônica [Mônica's Gang]
+- Pink Panther
+- Clean Up Yer Act (programmed by Robert S. Harris, never completed)
+- Star Wars (GST Video)
+- Moonsweeper (Imagic)
+- Fathom (Imagic)
 
 misc. homebrew cartridges
 
-NOTE:
-PAL colours leave a lot to be desired
-The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
+================================================================================
+
+1st-party Philips Videopac games, especially the older ones, didn't prominently
+have the game title on either the box or the cartridge, but simply "Videopac X"
+where X is the game number.
+
+1:  3rcsocpt - Race/Spin-Out/Cryptogram
+2:  3prspclg - Pairs/Space Rendezvous/Logic
+3:  football - American Football
+4:  2armrsub - Air-Sea War/Battle
+5:  lsvsblck - Blackjack
+6:  2bwlbskt - Ten Pin Bowling/Basketball
+7:  2mthecho - Mathematician/Echo
+8:  baseball - Baseball
+9:  compprog - Computer Programmer
+10: golf     - Golf
+11: cosmic   - Cosmic Conflict
+12: moneyrun - Take the Money and Run
+13: number   - Playschool Maths
+14: gunfight - Gunfighter
+15: samurai  - Samurai
+16: 2dpthmrk - Depth Charge/Marksman
+17: chinese  - Chinese Logic
+18: laser    - Laser War
+19: 2bllcrss - Catch the Ball/Noughts and Crosses
+20: stone    - Stone Sling
+21: pharaohs - Secret of the Pharaohs
+22: alieninv - Space Monster
+23: casino   - Las Vegas Gambling
+24: flipper  - Flipper Game
+25: alpine   - Skiing
+26: pachinko - Basket Game
+27: soccer   - Electronic Table Football
+28: volley   - Electronic Volleyball
+29: 2blckbrk - Dam Buster
+30: battlef  - Battlefield
+31: musician - Musician
+32: 2lbsprmd - A Labyrinth Game/Supermind
+33: acrobat/acrobata - Jumping Acrobats
+34: satellit - Satellite Attack
+35: billiard - Electronic Billiards
+36: 2hckyscr - Electronic Ice Hockey/Electronic Soccer
+37: monkey   - Monkeyshines
+38: munchkin - Munchkin
+39: freedom  - Freedom Fighters
+40: 4in1     - 4 in 1 Row
+41: conquest - Conquest of the World
+42: quest    - The Quest for the Rings
+43: pickaxe  - Pickaxe Pete
+44: kckrazy  - Crazy Chase
+45: morse    - Morse
+46: gtwallst - The Great Wall Street Fortune Hunt
+47: mousing  - The Mousing Cat
+48: backgamm - Backgammon
+49: turtles  - Turtles
+50: superbee - Super Bee
+51+:hawks    - Terrahawks
+52+:beespl   - Killer Bees
+53+:nightmar - Nightmare
+54+:loony    - Loony Balloon
+55+:neutron  - Neutron Star
+56‡:norseman - Norseman
+57: blobbers - Blobbers
+58+:airbattl - Air Battle
+59‡:helicopt - Helicopter Rescue
+60‡:rally    - Trans American Rally
+
+A:  newscast - Newscaster
+V:  kndrvrkr - Kinder im Verkehr 1
+C7010: chess - Chess Module
+C7420‡:homecomp - Home Computer Module
+
++: Videopac+ games, compatible with Videopac
+‡: Videopac+ games, not playable on Videopac
+These are in g7400.xml
+
+Official VP+ upgaded versions (simply adds a background picture):
+3rcsocptpl, cosmicpl, stonepl, satellitpl, freedompl, pickaxepl
+
 -->
 
 <softwarelist name="odyssey2" description="Magnavox Odyssey 2 / Philips Videopac cartridges">
@@ -391,6 +468,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="48"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643" offset="0" />
 			</dataarea>
@@ -452,7 +530,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="red baron (europe) (proto) (alt).bin" size="8192" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" offset="0" />
+				<rom name="red baron (europe, proto, alt).bin" size="8192" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -530,6 +608,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="56"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="blobbers (europe).bin" size="8192" crc="9d72d4e9" sha1="cae4e1f3ee090ec423aff89102f359b9e14dba41" offset="0" />
 			</dataarea>
@@ -595,7 +674,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
 			<dataarea name="rom" size="0x2800">
-				<rom name="z80_c7010.bin" offset="0x0000" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" />
+				<rom name="z80_c7010.bin" offset="0x0000" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" /> <!-- NSC800 CPU on module with its own ROM/RAM -->
 				<rom name="vp_c7010.bin"  offset="0x2000" size="0x0800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" />
 			</dataarea>
 		</part>
@@ -764,7 +843,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
@@ -799,7 +878,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
 		<info name="serial" value="16"/>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -813,7 +891,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1177,6 +1254,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="martiana" cloneof="martian">
+		<description>Martian Threat (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jake Dowding?" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="martian threat (europe, proto, alt).bin" size="8192" crc="335481f1" sha1="d6a3f2def966b798099dbf3c754ab12f69bb4ee8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2missprg">
 		<description>Missão Impossível/Viagem Programada (Bra)</description><!-- limited release -->
 		<year>198?</year>
@@ -1364,6 +1454,19 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="powerlrda" cloneof="powerlrd">
+		<description>Power Lords (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="power lords (europe) (proto).bin" size="4096" crc="bbeb1bd2" sha1="d6b2c274082a42634d08f514cf0fa30c5360a462" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qbert">
 		<description>Q*bert (Euro)</description>
 		<year>1983</year>
@@ -1373,20 +1476,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="q-bert (europe).bin" size="8192" crc="202f2749" sha1="80d76d5c56fc716a8f7a55166390658c320e4c34" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="quest">
-		<description>Quest for the Rings (Euro, USA)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1587,6 +1676,18 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="spidera" cloneof="spider">
+		<description>Spider-Man (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="spider-man (europe, proto, alt).bin" size="8192" crc="3e5f71f3" sha1="69661c91c984aa26bb971e989fe3aaca93ab718c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stone">
 		<description>Stone Sling (Euro)</description>
 		<year>1981</year>
@@ -1623,6 +1724,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="50"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="4096">
 				<rom name="super bee (europe).bin" size="4096" crc="9585d511" sha1="dfcfd9c019773e703aa130bc55f5b2f972ece8f0" offset="0" />
 			</dataarea>
@@ -1635,6 +1737,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="4096">
 				<rom name="super bee (brazil).bin" size="4096" crc="02743352" sha1="98c1f3a9726fe1ba880d43f0ba004821c4cbec6c" offset="0" />
 			</dataarea>
@@ -1754,6 +1857,20 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		</part>
 	</software>
 
+	<software name="quest">
+		<description>The Quest for the Rings (Euro, USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2bwlbskt">
 		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
 		<year>1978</year>
@@ -1789,6 +1906,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="49"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="turtles (europe).bin" size="8192" crc="1c750349" sha1="1fdca749675f62212d0b79c5f0911bcabc4e4e11" offset="0" />
 			</dataarea>
@@ -1803,6 +1921,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="serial" value="AC9446"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="turtles (usa).bin" size="8192" crc="9e42e766" sha1="ee456305397ecbd54fffa0bb7a894f53976d2a7c" offset="0" />
 			</dataarea>
@@ -1858,7 +1977,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1872,7 +1990,6 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1888,6 +2005,7 @@ The C7010 Chess Module had a NSC800 CMOS microprocessor, with 2K RAM and 8K ROM.
 		<info name="programmer" value="Soeren Gust" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_ktaa" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="12288">
 				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" offset="0" />
 			</dataarea>

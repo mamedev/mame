@@ -1260,6 +1260,7 @@ bool screen_device::update_partial(int scanline)
 
 	// remember where we left off
 	m_last_partial_scan = scanline + 1;
+	m_partial_scan_hpos = -1;
 	return true;
 }
 
@@ -1292,6 +1293,13 @@ void screen_device::update_now()
 	int current_vpos = vpos();
 	int current_hpos = hpos();
 	rectangle clip = m_visarea;
+
+	// skip if we already rendered this line
+	if (current_vpos < m_last_partial_scan)
+	{
+		LOG_PARTIAL_UPDATES(("skipped because line was already rendered\n"));
+		return;
+	}
 
 	// if beam position is the same, there's nothing to update
 	if (current_vpos == m_last_partial_scan && current_hpos == m_partial_scan_hpos)

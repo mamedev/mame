@@ -34,6 +34,7 @@ public:
 	virtual void io_write(offs_t offset, u8 data) override;
 	virtual u8 io_read(offs_t offset) override { return (m_subslot->exists()) ? m_subslot->io_read(offset) : 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) override;
+	virtual int b_read() override { return (m_subslot->exists()) ? m_subslot->b_read() : -1; }
 
 protected:
 	// device-level overrides

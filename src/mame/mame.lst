@@ -10237,6 +10237,7 @@ outr2stjo                       // 2004.09 Outrun 2 Special Tours (Japan)
 outr2sto                        // 2004.09 Outrun 2 Special Tours
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
 outr2stj                        // 2004.12 Outrun 2 Special Tours (Japan) (Rev A)
+scg05nt                         // 2004.10 Sega Golf Club Network Pro Tour 2005 (Rev C) (GDX-0010C)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 vcop3a                          // 2003.02.26 Virtua Cop 3 (Rev A)
 vcop3                           // 2003.05.21 Virtua Cop 3 (Rev B)
@@ -11013,6 +11014,7 @@ mpang                           // 10/10/2000 (c) 2000 Mitchell (Euro)
 mpangj                          // 11/10/2000 (c) 2000 Mitchell (Japan)
 mpangr1                         // 25/09/2000 (c) 2000 Mitchell (Euro)
 mpangu                          // 10/10/2000 (c) 2000 Mitchell (USA)
+mpanga                          // 10/10/2000 (c) 2000 Mitchell (Asia)
 msh                             // 24/10/1995 (c) 1995 (Euro)
 msha                            // 24/10/1995 (c) 1995 (Asia)
 mshb                            // 17/11/1995 (c) 1995 (Brazil)
@@ -13295,9 +13297,9 @@ targ                            // (c) 1980
 targc                           // (c) 1980
 teetert                         // (c) 1981
 venture                         // (c) 1981
-venture2                        // (c) 1981
-venture2b                       // bootleg
 venture4                        // (c) 1981
+venture5a                       // (c) 1981
+venture5b                       // bootleg
 
 @source:exidy440.cpp
 catch22                         // (c) 1985
@@ -18410,9 +18412,14 @@ j_unk                           //
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
 monoplcl                        // Monopoly Classic (JPM)
+monoplcld                       //
 monopldx                        // Monopoly Deluxe (JPM)
+monopldx1                       // Monopoly Deluxe (JPM)
+monopldxd                       //
 monopoly                        // Monopoly (JPM)
-monopolya                       // Monopoly (JPM)
+monopolyd                       // Monopoly (JPM)
+monopoly4                       // Monopoly (JPM)
+monopoly3                       // Monopoly (JPM)
 
 @source:jpmsys5sw.cpp
 j5ar80                          // Around The World In Eighty Days (JPM)
@@ -30050,6 +30057,7 @@ mrdoy                           // 8201 (c) 1982
 mrdu                            // bootleg
 mrlo                            // bootleg
 mrdofabr                        // bootleg (Fabremar)
+mrdobl                          // bootleg
 yankeedo                        // bootleg
 
 @source:mrflea.cpp
@@ -33870,20 +33878,20 @@ ddpdojblk                       //
 ddpdojblka                      //
 ddpdojblkbl                     //
 dmnfrnt                         // (c) 2002 Demon Front
-dmnfrnta                        //
-dmnfrntb                        //
+dmnfrnt103                      //
+dmnfrnt102                      //
 dmnfrntpcb                      //
 drgw2                           // (c) 1997 Dragon World 2
-drgw2c                          //
-drgw2c101                       //
-drgw2hk                         //
-drgw2j                          //
+drgw2100x                       //
+drgw2101c                       //
+drgw2100c                       //
+drgw2100hk                      //
+drgw2100j                       //
 drgw3                           // (c) 1998 Dragon World 3
 drgw3100                        //
 drgw3103                        //
 drgw3105                        //
 dw2001                          // (c) 2001 Dragon World 2001
-dw2v100x                        //
 dwex                            // (c) 2000 Dragon World 3 EX V100
 dwex101cn                       // (c) 2001 Dragon World 3 EX V101CN
 dwpc                            // (c) 2001 Dragon World Pretty Chance
@@ -33893,6 +33901,7 @@ espgalbl                        //
 happy6                          // (c) 2004 Happy 6
 happy6101                       //
 happy6100hk                     //
+happy6100cn                     //
 ket                             // (c) 2002 Ketsui
 ket1                            //
 keta                            //
@@ -33941,20 +33950,20 @@ kovsh101                        //
 kovsh102                        //
 kovsh103                        //
 kovshp                          // (c) 2004 Knights of Valor Superheroes PLUS
-kovshpa                         //
+kovshp100                       //
 kovshxas                        // bootleg
 kovytzy                         // (c) 1999 Knights of Valour: Yi Tong Zhong Yuan
 martmast                        // (c) 2001 Martial Masters
-martmastc                       //
-martmastc103                    //
-martmastc102                    //
+martmast104c                    //
+martmast103c                    //
+martmast102c                    //
 martmasttw                      //
 olds                            // (c) 1999 Oriental Legend Super / Special
 olds100                         //
 olds100a                        //
 olds103t                        //
 oldsplus                        // (c) 2004 Oriental Legend Super Plus
-oldsplusa                       //
+oldsplus203                     //
 orlegend                        // (c) 1997 Oriental Legend
 orlegend105k                    //
 orlegend105t                    //
@@ -33968,7 +33977,7 @@ pgm                             // Base Unit
 pgm3in1                         // (c) 2004 Photo Y2K2 3-in-1
 pgm3in1c100                     //
 photoy2k                        // (c) 1999 Photo Y2k
-photoy2k102                     //
+photoy2k102j                    //
 photoy2k103j                    // (c) 1999 Photo Y2k
 photoy2k104                     //
 puzlstar                        // (c) 1999 Puzzle Star
@@ -34074,6 +34083,7 @@ brod                            //
 kok                             //
 
 @source:photoply.cpp
+photoply99sp                    // (c) 1999 Funworld
 photoply                        //
 photoply2k4                     //
 
@@ -36935,6 +36945,7 @@ friskytb                        // (c) 1981
 radrad                          // (c) 1982 Nichibutsu USA
 radradj                         // (c) 1982 Logitec Corp
 sectrzon                        // (c) 1984 + Alice
+sectrzona                       // (c) 1984 + Alice
 sectrzont                       // (c) 1984 + Alice (on Tecfri PCB)
 seicross                        // (c) 1984 + Alice
 seicrossa                       // (c) 1984 + Alice

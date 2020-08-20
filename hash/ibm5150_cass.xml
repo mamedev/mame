@@ -5,10 +5,11 @@ license:CC0
 -->
 <softwarelist name="ibm5150_cass" description="IBM PC/XT cassettes">
 
-	<software name="diag">
+	<software name="diag" supported="no"><!-- when the menu should appear, it reboots Basic instead -->
 		<description>IBM Advanced Diagnostics for the IBM PC 5150</description>
 		<year>1982</year>
 		<publisher>IBM</publisher>
+		<info name="usage" value="In ROM BASIC, LOAD&quot;ldcass then RUN" />
 		<part name="cass1" interface="ibm5150_cass">
 			<dataarea name="cass" size="40121900">
 				<rom name="ibm_pc_diagnostics_cassette.wav" size="40121900" crc="59351cf6" sha1="b7f03fadb2ff8c7dfe8dd0ff9b694c1b437e23b1"/>

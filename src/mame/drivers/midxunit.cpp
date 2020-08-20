@@ -10,16 +10,6 @@
     Games supported:
         * Revolution X
 
-    Known bugs:
-        * POST test ends with "CUSTOM CHIP U76 BAD" message,
-          however this is caused by fully clipped blitter DMA request:
-             DMA command 8003: (bpp=0 skip=0 xflip=0 yflip=0 preskip=0 postskip=0)
-             offset=00000000 pos=(0,257) w=448 h=1 clip=(0,0)-(511,0)
-             palette=0505 color=0000 lskip=00 rskip=00 xstep=0100 ystep=0100 test=0000 config=0010
-          it is not clear if it's due to DMA emulation flaws (unemulated command bit 6 - clipping mode, 0=offset??? method),
-          or if some protection device may modify routine code in the RAM (unlikely).
-          set BP 20D31340 to see check routine (notice: 20D31550: MOVE   A14,@C08000E0h,0 have no effect because of FS0 selected).
-
 ***************************************************************************
 
 Revolution X
@@ -126,7 +116,6 @@ ________________________________________________________________
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/tms34010/tms34010.h"
 #include "machine/adc0844.h"
-#include "machine/nvram.h"
 
 #include "screen.h"
 
@@ -154,12 +143,11 @@ void midxunit_state::main_map(address_map &map)
 	map(0x60c00060, 0x60c0007f).portr("DSW");
 	map(0x60c00080, 0x60c000df).w(FUNC(midxunit_state::midxunit_io_w));
 	map(0x60c000e0, 0x60c000ff).rw(FUNC(midxunit_state::midxunit_security_r), FUNC(midxunit_state::midxunit_security_w));
-	map(0x80800000, 0x8080000f).r("adc", FUNC(adc0848_device::read)).umask16(0x00ff).w("adc", FUNC(adc0848_device::write)).umask16(0x00ff);
-	map(0x80800010, 0x8080001f).noprw();
-	map(0x80c00000, 0x80c000ff).rw(FUNC(midxunit_state::midxunit_uart_r), FUNC(midxunit_state::midxunit_uart_w));
-	map(0xa0440000, 0xa047ffff).rw(FUNC(midxunit_state::midxunit_cmos_r), FUNC(midxunit_state::midxunit_cmos_w)).share("nvram");
+	map(0x80800000, 0x8080001f).rw("adc", FUNC(adc0848_device::read), FUNC(adc0848_device::write)).umask32(0x000000ff);
+	map(0x80c00000, 0x80c000ff).rw(FUNC(midxunit_state::midxunit_uart_r), FUNC(midxunit_state::midxunit_uart_w)).umask32(0x000000ff);
+	map(0xa0440000, 0xa047ffff).rw(FUNC(midxunit_state::midxunit_cmos_r), FUNC(midxunit_state::midxunit_cmos_w)).umask32(0x000000ff);
 	map(0xa0800000, 0xa08fffff).rw(m_video, FUNC(midxunit_video_device::midxunit_paletteram_r), FUNC(midxunit_video_device::midxunit_paletteram_w)).share("palette");
-	map(0xc0800000, 0xc08000ff).mirror(0x00400000).rw(m_video, FUNC(midxunit_video_device::midtunit_dma_r), FUNC(midxunit_video_device::midtunit_dma_w));
+	map(0xc0800000, 0xc08000ff).mirror(0x00400000).rw(FUNC(midxunit_state::midxunit_dma_r), FUNC(midxunit_state::midxunit_dma_w));
 	map(0xf8000000, 0xfeffffff).r(m_video, FUNC(midxunit_video_device::midwunit_gfxrom_r));
 	map(0xff000000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -174,38 +162,39 @@ void midxunit_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( revx )
 	PORT_START("IN0")
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000f00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xffffc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_SERVICE_NO_TOGGLE(0x0010, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* coin door */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 ) /* bill validator */
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_SERVICE_NO_TOGGLE(0x00000010, IP_ACTIVE_LOW)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* coin door */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BILL1 ) /* bill validator */
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Flip_Screen ))
@@ -250,6 +239,7 @@ static INPUT_PORTS_START( revx )
 	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
@@ -338,7 +328,7 @@ ROM_START( revx )
 	ROM_LOAD16_BYTE( "revx_snd.8", 0xc00000, 0x80000, CRC(793a7eb5) SHA1(4b1f81b68f95cedf1b356ef362d1eb37acc74b16) )
 	ROM_LOAD16_BYTE( "revx_snd.9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
 
-	ROM_REGION16_LE( 0x200000, "maincpu", 0 )   /* 34020 code */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   /* 34020 code */
 	ROM_LOAD32_BYTE( "revx.51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) )
 	ROM_LOAD32_BYTE( "revx.52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
 	ROM_LOAD32_BYTE( "revx.53",  0x00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
@@ -405,7 +395,7 @@ ROM_START( revxp5 )
 	ROM_LOAD16_BYTE( "revx_snd.8", 0xc00000, 0x80000, CRC(793a7eb5) SHA1(4b1f81b68f95cedf1b356ef362d1eb37acc74b16) )
 	ROM_LOAD16_BYTE( "revx_snd.9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
 
-	ROM_REGION16_LE( 0x200000, "maincpu", 0 )   /* 34020 code */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   /* 34020 code */
 	ROM_LOAD32_BYTE( "revx_p5.51",  0x00000, 0x80000, CRC(f3877eee) SHA1(7a4fdce36edddd35308c107c992ce626a2c9eb8c) )
 	ROM_LOAD32_BYTE( "revx_p5.52",  0x00001, 0x80000, CRC(199a54d8) SHA1(45319437e11176d4926c00c95c372098203a32a3) )
 	ROM_LOAD32_BYTE( "revx_p5.53",  0x00002, 0x80000, CRC(fcfcf72a) SHA1(b471afb416e3d348b046b0b40f497d27b0afa470) )
