@@ -55,6 +55,85 @@ Unreleased, possibly no prototypes exist:
 
 misc. homebrew cartridges
 
+================================================================================
+
+1st-party Philips Videopac games, especially the older ones, didn't prominently
+have the game title on either the box or the cartridge, but simply "Videopac X"
+where X is the game number.
+
+1:  3rcsocpt - Race/Spin-Out/Cryptogram
+2:  3prspclg - Pairs/Space Rendezvous/Logic
+3:  football - American Football
+4:  2armrsub - Air-Sea War/Battle
+5:  lsvsblck - Blackjack
+6:  2bwlbskt - Ten Pin Bowling/Basketball
+7:  2mthecho - Mathematician/Echo
+8:  baseball - Baseball
+9:  compprog - Computer Programmer
+10: golf     - Golf
+11: cosmic   - Cosmic Conflict
+12: moneyrun - Take the Money and Run
+13: number   - Playschool Maths
+14: gunfight - Gunfighter
+15: samurai  - Samurai
+16: 2dpthmrk - Depth Charge/Marksman
+17: chinese  - Chinese Logic
+18: laser    - Laser War
+19: 2bllcrss - Catch the Ball/Noughts and Crosses
+20: stone    - Stone Sling
+21: pharaohs - Secret of the Pharaohs
+22: alieninv - Space Monster
+23: casino   - Las Vegas Gambling
+24: flipper  - Flipper Game
+25: alpine   - Skiing
+26: pachinko - Basket Game
+27: soccer   - Electronic Table Football
+28: volley   - Electronic Volleyball
+29: 2blckbrk - Dam Buster
+30: battlef  - Battlefield
+31: musician - Musician
+32: 2lbsprmd - A Labyrinth Game/Supermind
+33: acrobat/acrobata - Jumping Acrobats
+34: satellit - Satellite Attack
+35: billiard - Electronic Billiards
+36: 2hckyscr - Electronic Ice Hockey/Electronic Soccer
+37: monkey   - Monkeyshines
+38: munchkin - Munchkin
+39: freedom  - Freedom Fighters
+40: 4in1     - 4 in 1 Row
+41: conquest - Conquest of the World
+42: quest    - The Quest for the Rings
+43: pickaxe  - Pickaxe Pete
+44: kckrazy  - Crazy Chase
+45: morse    - Morse
+46: gtwallst - The Great Wall Street Fortune Hunt
+47: mousing  - The Mousing Cat
+48: backgamm - Backgammon
+49: turtles  - Turtles
+50: superbee - Super Bee
+51+:hawks    - Terrahawks
+52+:beespl   - Killer Bees
+53+:nightmar - Nightmare
+54+:loony    - Loony Balloon
+55+:neutron  - Neutron Star
+56‡:norseman - Norseman
+57: blobbers - Blobbers
+58+:airbattl - Air Battle
+59‡:helicopt - Helicopter Rescue
+60‡:rally    - Trans American Rally
+
+A:  newscast - Newscaster
+V:  kndrvrkr - Kinder im Verkehr 1
+C7010: chess - Chess Module
+C7420‡:homecomp - Home Computer Module
+
++: Videopac+ games, compatible with Videopac
+‡: Videopac+ games, not playable on Videopac
+These are in g7400.xml
+
+Official VP+ upgaded versions (simply adds a background picture):
+3rcsocptpl, cosmicpl, stonepl, satellitpl, freedompl, pickaxepl
+
 -->
 
 <softwarelist name="odyssey2" description="Magnavox Odyssey 2 / Philips Videopac cartridges">
@@ -1401,20 +1480,6 @@ misc. homebrew cartridges
 		</part>
 	</software>
 
-	<software name="quest">
-		<description>Quest for the Rings (Euro, USA)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="laquete" cloneof="quest">
 		<description>La Quête des Anneux (Fra)</description>
 		<year>1982</year>
@@ -1788,6 +1853,20 @@ misc. homebrew cartridges
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="chat et souris (france).bin" size="4096" crc="61a350e6" sha1="afa67f2110647753de9dfacb268d96e75d6d8657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest">
+		<description>The Quest for the Rings (Euro, USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -165,19 +165,6 @@ Do Videopac+/Odyssey3 versions exist?:
 		</part>
 	</software>
 
-	<software name="exojet">
-		<description>Exojet+ (Fra)</description>
-		<year>198?</year>
-		<publisher>Jopac</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<feature name="b_pin" value="1" />
-			<dataarea name="rom" size="8192">
-				<rom name="exojet (france).bin" size="8192" crc="cfca6f39" sha1="8aafcd055a2ef45c3d85804c8a3ea04d9a9732ab"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="flipperpl">
 		<description>Flipper+ (Fra, Plus)</description>
 		<year>198?</year>
@@ -252,19 +239,6 @@ Do Videopac+/Odyssey3 versions exist?:
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="la ruche infernale (france).bin" size="8192" crc="20e2f7be" sha1="34f91468bf42b26eb237af342164043c16d173ca"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="englouti">
-		<description>Le Tresor Englouti (Fra)</description>
-		<year>198?</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<feature name="b_pin" value="1" />
-			<dataarea name="rom" size="8192">
-				<rom name="le tresor englouti (france).bin" size="8192" crc="b2f0f0b4" sha1="c0fcaef6a18026e0acc04c3d48443d768043cb03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -392,7 +366,37 @@ Do Videopac+/Odyssey3 versions exist?:
 
 
 
-<!-- G7400 exclusives -->
+<!-- VP+ uniques, completely new games(not a simple upgrade to an VP old release/prototype), still compatible with VP -->
+
+	<software name="exojet">
+		<description>Exojet+ (Fra)</description>
+		<year>198?</year>
+		<publisher>Jopac</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="8192">
+				<rom name="exojet (france).bin" size="8192" crc="cfca6f39" sha1="8aafcd055a2ef45c3d85804c8a3ea04d9a9732ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="englouti">
+		<description>Le Tresor Englouti (Fra)</description>
+		<year>198?</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="8192">
+				<rom name="le tresor englouti (france).bin" size="8192" crc="b2f0f0b4" sha1="c0fcaef6a18026e0acc04c3d48443d768043cb03"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- VP+ exclusives, they won't work on VP -->
 
 	<!-- possibly only the pal converted dump is available  -->
 	<software name="flashp">

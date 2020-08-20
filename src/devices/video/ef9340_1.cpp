@@ -344,7 +344,6 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		uint16_t char_data = 0x00;
 		uint8_t fg = 0;
 		uint8_t bg = 0;
-		bool del = false;
 		bool underline = false;
 		bool blank = false;
 		bool w_parity = false;
@@ -381,6 +380,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			bool cursor = m_ef9340.R & 0x10 && x == m_ef9340.X && y_row == m_ef9340.Y;
 			bool invert = cursor && !blink;
 			bool dw = false;
+			bool del = false;
 
 			if (a & 0x80)
 			{
@@ -477,8 +477,6 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			{
 				blank = m_ef9340.R & 0x04 && b & 0x01;
 				underline = bool(b & 0x04);
-
-				del = false;
 			}
 		}
 	}
