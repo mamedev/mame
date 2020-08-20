@@ -129,8 +129,6 @@ protected:
 	virtual uint8_t io_read(offs_t offset);
 	virtual void io_write(offs_t offset, uint8_t data);
 	uint8_t bus_read();
-	void bus_write(uint8_t data);
-	uint8_t p1_read();
 	void p1_write(uint8_t data);
 	uint8_t p2_read();
 	void p2_write(uint8_t data);
@@ -317,11 +315,6 @@ void odyssey2_state::io_write(offs_t offset, uint8_t data)
 		m_i8244->write(offset, data);
 }
 
-uint8_t odyssey2_state::p1_read()
-{
-	return 0xff;
-}
-
 
 // 8048 ports
 
@@ -368,10 +361,6 @@ uint8_t odyssey2_state::bus_read()
 	}
 
 	return data;
-}
-
-void odyssey2_state::bus_write(uint8_t data)
-{
 }
 
 READ_LINE_MEMBER(odyssey2_state::t1_read)
@@ -656,12 +645,10 @@ void odyssey2_state::odyssey2(machine_config &config)
 	I8048(config, m_maincpu, (XTAL(7'159'090) * 3) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
-	m_maincpu->p1_in_cb().set(FUNC(odyssey2_state::p1_read));
 	m_maincpu->p1_out_cb().set(FUNC(odyssey2_state::p1_write));
 	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
 	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
 	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
-	m_maincpu->bus_out_cb().set(FUNC(odyssey2_state::bus_write));
 	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
@@ -720,12 +707,10 @@ void g7400_state::g7400(machine_config &config)
 	I8048(config, m_maincpu, XTAL(5'911'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &g7400_state::odyssey2_io);
-	m_maincpu->p1_in_cb().set(FUNC(g7400_state::p1_read));
 	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
 	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
 	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
 	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
-	m_maincpu->bus_out_cb().set(FUNC(g7400_state::bus_write));
 	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
