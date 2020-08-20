@@ -45,7 +45,7 @@
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
 
-#define VERBOSE             (LOG_ALL &~ LOG_FDC_CTRL)
+#define VERBOSE             (0)//(LOG_ALL &~ LOG_FDC_CTRL)
 #include "logmacro.h"
 
 class dpb7000_state : public driver_device
@@ -1162,24 +1162,39 @@ void dpb7000_state::handle_command(uint16_t data)
 		{
 			if (!BIT(data, 5 + i) && m_cxpos[i] < 800 && m_cypos[i] < 768)
 			{
-				uint16_t bxlen = (((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
-				uint16_t bylen = (((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
-				for (uint16_t y = m_cypos[i], by = bylen; by != 0x1000 && y < 768; by++, y++)
+				uint16_t bxlen = m_bxlen;//(((m_bxlen << 3) | (m_bixos & 7)) >> (m_bif & 3)) & 0xfff;
+				uint16_t bylen = m_bylen;//(((m_bylen << 3) | (m_biyos & 7)) >> ((m_bif >> 2) & 3)) & 0xfff;
+				for (uint16_t y = m_cypos[i], bly = bylen; bly != 0x1000 && y < 768; bly++, y++)
 				{
 					uint8_t *lum = &m_framestore_lum[i][y * 800];
 					uint8_t *chr = &m_framestore_chr[i][y * 800];
-					for (uint16_t x = m_cxpos[i], bx = bxlen; bx != 0x1000 && x < 800; bx++, x++)
+					for (uint16_t x = m_cxpos[i], blx = bxlen; blx != 0x1000 && x < 800; blx++, x++)
 					{
 						if (BIT(data, 13)) // Fixed Colour Select
 						{
-							uint8_t y = 0x00;
-							uint8_t u = 0x80;
-							uint8_t v = 0x80;
+							uint8_t y = m_bs_y_latch;
+							uint8_t u = m_bs_u_latch;
+							uint8_t v = m_bs_v_latch;
 							if (!BIT(data, 12)) // Brush Zero
 							{
-								y = m_bs_y_latch;
-								u = m_bs_u_latch;
-								v = m_bs_v_latch;
+								y = 0x00;
+								u = 0x80;
+								v = 0x80;
+							}
+							else if (!BIT(data, 9))
+							{
+								uint16_t bx = ((((blx - bxlen) << 3) | (m_bixos & 7)) >> (3 - (m_bif & 3))) & 0xfff;
+								uint16_t by = ((((bly - bylen) << 3) | (m_biyos & 7)) >> ((3 - (m_bif >> 2)) & 3)) & 0xfff;
+
+								// TODO: Actual Brush Processor functionality
+								uint16_t lum_sum = lum[x] + m_brushstore_lum[by * 256 + bx];
+								uint16_t chr_sum = chr[x] + m_brushstore_chr[by * 256 + bx];
+								y = lum_sum > 0xff ? 0xff : (uint16_t)lum_sum;
+								uint8_t chr_clamped = chr_sum > 0xff ? 0xff : (uint16_t)chr_sum;
+								if (m_cxpos[i] & 1)
+									v = chr_clamped;
+								else
+									u = chr_clamped;
 							}
 							lum[x] = y;
 							chr[x] = (m_cxpos[i] & 1) ? v : u;
@@ -1316,6 +1331,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Read Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
+					m_diskbuf_data_count = 0x2700;
 					m_line_count = 0;
 					m_line_clock = 0;
 					m_diskseq_cyl_read_pending = true;
@@ -1326,6 +1342,7 @@ void dpb7000_state::cpu_ctrlbus_w(uint16_t data)
 				LOGMASKED(LOG_CTRLBUS, "%s: Disk Sequencer Card Command: Disc Clear, Read Track\n", machine().describe_context());
 				if (!BIT(m_diskseq_status_out, 3))
 				{
+					m_diskbuf_data_count = 0x2700;
 					m_diskseq_cyl_read_pending = true;
 					m_fdd_side = 0;
 				}
@@ -1517,7 +1534,7 @@ uint16_t dpb7000_state::cpu_sysctrl_r()
 	const uint16_t ctrl = m_sys_ctrl &~ SYSCTRL_AUTO_START;
 	const uint16_t auto_start = m_auto_start->read() ? SYSCTRL_AUTO_START : 0;
 	const uint16_t ret = ctrl | auto_start;
-	LOGMASKED(LOG_SYS_CTRL, "%s: CPU read from System Control: %04x\n", machine().describe_context(), ret);
+	//LOGMASKED(LOG_SYS_CTRL, "%s: CPU read from System Control: %04x\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -1551,16 +1568,8 @@ uint8_t dpb7000_state::fdd_ctrl_r()
 
 void dpb7000_state::advance_line_count()
 {
-	m_bxlen_counter = m_bxlen;
-	m_bylen_counter++;
-	if (m_bylen_counter == 0x1000)
-	{
-		m_diskseq_cyl_read_pending = false;
-	}
-
 	m_line_length = 0;
 	m_line_count++;
-
 	toggle_line_clock();
 }
 
@@ -1571,8 +1580,8 @@ void dpb7000_state::toggle_line_clock()
 
 void dpb7000_state::process_sample()
 {
-	const uint16_t x = (m_bxlen_counter - m_bxlen) ^ 7;
-	const uint16_t y = (m_bylen_counter - m_bylen) ^ 7;
+	const uint16_t x = (m_bxlen_counter - m_bxlen);
+	const uint16_t y = (m_bylen_counter - m_bylen);
 	//printf("Processing sample %d,%d (%04x:%04x, %04x:%04x) LC:%d\n", x, y, m_bxlen_counter, m_bxlen, m_bylen_counter, m_bylen, m_line_count);
 	if (BIT(m_brush_addr_func, 7))
 		m_brushstore_lum[y * 256 + x] = m_incoming_lum;
@@ -1582,7 +1591,12 @@ void dpb7000_state::process_sample()
 	m_bxlen_counter++;
 	if (m_bxlen_counter == 0x1000)
 	{
-		advance_line_count();
+		m_bxlen_counter = m_bxlen;
+		m_bylen_counter++;
+		if (m_bylen_counter == 0x1000)
+		{
+			m_diskseq_cyl_read_pending = false;
+		}
 	}
 }
 
@@ -1662,6 +1676,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 					{
 					case 4: // Read Track
 					case 6: // Disc Clear, Read Track
+						m_diskbuf_data_count--;
 						process_byte_from_disc(data_byte);
 						if (!m_diskseq_cyl_read_pending)
 						{
@@ -1669,14 +1684,15 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 							m_fdd_side = 2;
 							//printf("\nThe whole world has betrayed me!\n");
 						}
-						else if (m_fdd_side == 0 && m_line_count == 13)
+						else if (m_fdd_side == 0 && m_diskbuf_data_count == 0)
 						{
 							curr_bit = -1;
 							m_floppy->ss_w(1);
 							m_fdd_side++;
+							m_diskbuf_data_count = 0x2400;
 							//printf("\nCatch you on the flip side!\n");
 						}
-						else if (m_fdd_side == 1 && m_line_count == 25)
+						else if (m_fdd_side == 1 && m_diskbuf_data_count == 0)
 						{
 							curr_bit = -1;
 							m_fdd_side++;
@@ -1707,7 +1723,7 @@ void dpb7000_state::fdd_index_callback(floppy_image_device *floppy, int state)
 							m_fdd_side++;
 							//printf("\nCatch you on the flip side!\n");
 						}
-						else if(m_diskbuf_ram_addr >= 0x4800 && m_fdd_side == 1)
+						else if(m_diskbuf_ram_addr >= 0x4B00 && m_fdd_side == 1)
 						{
 							// If we've read the side 1 portion of the cylinder, yield out, we're done
 							curr_bit = -1;
