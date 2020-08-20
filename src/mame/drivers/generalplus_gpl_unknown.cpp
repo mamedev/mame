@@ -82,6 +82,38 @@ private:
 	required_region_ptr<uint8_t> m_spirom;
 
 	uint16_t unk_7abf_r();
+
+	uint16_t spi_misc_control_r();
+	uint16_t spi_rx_fifo_r();
+	void spi_tx_fifo_w(uint16_t data);
+
+	void spi_control_w(uint16_t data);
+
+
+	void spi_process_tx_data(uint8_t data);
+	void spi_tx();
+	uint8_t spi_process_rx();
+	uint8_t spi_rx();
+
+	uint8_t m_tx_fifo[6]; // actually 8 bytes? or 8 half-bytes?
+	int m_tx_pos = 0;
+	uint8_t m_rx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
+
+	uint32_t m_spiaddress;
+
+	enum spistate : const int
+	{
+	   SPI_STATE_READING_OR_READY = 0,
+	   SPI_STATE_WAITING_HIGH_ADDR = 1,
+	   SPI_STATE_WAITING_MID_ADDR = 2,
+	   SPI_STATE_WAITING_LOW_ADDR = 3,
+	   // probably not
+	   SPI_STATE_WAITING_DUMMY1_ADDR = 4,
+	   SPI_STATE_WAITING_DUMMY2_ADDR = 5
+	};
+
+	spistate m_spistate;
+
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -104,6 +136,154 @@ uint16_t pcp8718_state::unk_7abf_r()
 	return 0x0001;
 }
 
+
+uint16_t pcp8718_state::spi_misc_control_r()
+{
+	logerror("%06x: spi_misc_control_r\n", machine().describe_context());
+	return 0x0000;
+}
+
+
+uint16_t pcp8718_state::spi_rx_fifo_r()
+{
+	logerror("%06x: spi_rx_fifo_r\n", machine().describe_context());
+
+	// does reading the rx fifo rest the tx fifo? there are dummy writes??
+	m_tx_pos = 0;
+
+	return spi_rx();
+}
+
+void pcp8718_state::spi_process_tx_data(uint8_t data)
+{
+	logerror("transmitting %02x\n", data);
+
+	switch (m_spistate)
+	{
+	case SPI_STATE_READING_OR_READY:
+	{
+		if (data == 0x03)
+		{
+			logerror("set to read mode (need address) %02x\n", data);
+			m_spistate = SPI_STATE_WAITING_HIGH_ADDR;
+		}
+		else
+		{
+			logerror("invalid state request %02x\n", data);
+		}
+		break;
+	}
+
+	case SPI_STATE_WAITING_HIGH_ADDR:
+	{
+		m_spiaddress = (m_spiaddress & 0xff00ffff) | data << 16;
+		logerror("set to high address%02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_WAITING_MID_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_MID_ADDR:
+	{
+		m_spiaddress = (m_spiaddress & 0xffff00ff) | data << 8;
+		logerror("set to mid address%02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_WAITING_LOW_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_LOW_ADDR:
+	{
+		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
+		logerror("set to low address%02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_WAITING_DUMMY1_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_DUMMY1_ADDR:
+	{
+		m_spistate = SPI_STATE_WAITING_DUMMY2_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_DUMMY2_ADDR:
+	{
+		m_spistate = SPI_STATE_READING_OR_READY;
+		break;
+	}
+	}
+}
+
+uint8_t pcp8718_state::spi_process_rx()
+{
+
+	switch (m_spistate)
+	{
+	case SPI_STATE_READING_OR_READY:
+	{
+		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
+		logerror("reading SPI %02x from SPI Address %08x\n", dat, m_spiaddress);
+		m_spiaddress++;
+		return dat;
+	}
+
+	default:
+	{
+		logerror("reading FIFO in unknown state\n");
+		return 0x00;
+	}
+	}
+
+	return 0x00;
+}
+
+void pcp8718_state::spi_tx()
+{
+	spi_process_tx_data(m_tx_fifo[0]);
+
+	m_tx_fifo[0] = m_tx_fifo[1];
+	m_tx_fifo[1] = m_tx_fifo[2];
+	m_tx_fifo[2] = m_tx_fifo[3];
+	m_tx_fifo[3] = m_tx_fifo[4];
+	m_tx_fifo[4] = m_tx_fifo[5];
+	m_tx_fifo[5] = 0x00;
+}
+
+uint8_t pcp8718_state::spi_rx()
+{
+	uint8_t ret = m_rx_fifo[0];
+
+	m_rx_fifo[0] = m_rx_fifo[1];
+	m_rx_fifo[1] = m_rx_fifo[2];
+	m_rx_fifo[2] = m_rx_fifo[3];
+	m_rx_fifo[3] = spi_process_rx();
+
+	return ret;
+}
+
+
+void pcp8718_state::spi_tx_fifo_w(uint16_t data)
+{
+	data &= 0x00ff;
+	logerror("%06x: spi_tx_fifo_w %02x\n", machine().describe_context(), data);
+	m_tx_fifo[m_tx_pos] = data;
+	m_tx_pos++;
+
+	if (m_tx_pos == 6)
+	{
+		//logerror("transmitting %02x %02x %02x %02x %02x %02x\n", m_tx_fifo[0], m_tx_fifo[1], m_tx_fifo[2], m_tx_fifo[3], m_tx_fifo[4], m_tx_fifo[5]);
+		for (int i = 0; i < 6; i++)
+		{
+			spi_tx();
+			m_tx_pos = 0;
+		}
+	}
+
+}
+
+void pcp8718_state::spi_control_w(uint16_t data)
+{
+	logerror("%06x: spi_control_w %04x\n", machine().describe_context(), data);
+}
+
 void pcp8718_state::map(address_map &map)
 {
 	// there are calls to 01xxx and 02xxx regions
@@ -111,6 +291,14 @@ void pcp8718_state::map(address_map &map)
 	//  does from NAND, it doesn't seem to have a header in the same format at least)
 	map(0x000000, 0x006fff).ram().share("mainram");
 	map(0x007000, 0x0077ff).ram(); // might be registers, but the call stubs for RAM calls explicitly use addresses in here for private stack so that previous snippets can be restored?
+
+
+	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
+	// 7941 SPI Transmit Status
+	map(0x007942, 0x007942).w(FUNC(pcp8718_state::spi_tx_fifo_w));
+	// 7943 SPI Receive Status
+	map(0x007944, 0x007944).r(FUNC(pcp8718_state::spi_rx_fifo_r));
+	map(0x007945, 0x007945).r(FUNC(pcp8718_state::spi_misc_control_r));
 
 	map(0x007abf, 0x007abf).r(FUNC(pcp8718_state::unk_7abf_r));
 	
@@ -178,6 +366,9 @@ void pcp8718_state::machine_reset()
 	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
+
+	m_spistate = SPI_STATE_READING_OR_READY;
+	m_spiaddress = 0;
 
 }
 
