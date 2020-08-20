@@ -36,6 +36,7 @@ Calls:
 
 0xf000 - copy dword from SPI using provided pointer
 
+0xf58f - unknown, soon after startup
 
 use 'go 2938' to get to the inline code these load on the fly
 
@@ -295,7 +296,7 @@ void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 // it's accessed after each large data transfer, probably to reset the SPI into 'ready for command' state?
 void pcp8718_state::unk_7868_w(uint16_t data)
 {
-	logerror("%06x: unk_7868_w %02 (Port B + SPI reset?)x\n", machine().describe_context(), data);
+	logerror("%06x: unk_7868_w %02x (Port B + SPI reset?)\n", machine().describe_context(), data);
 }
 
 
@@ -362,10 +363,16 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 				return 0x9a90; // retf
 			}
+			else if (realpc == 0xf58f)
+			{
+				logerror("call to 0xf58f - unknown function\n");
+				return 0x9a90; // retf
+			}
 			else
 			{
 				fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
 			}
+
 		}
 		else
 		{
