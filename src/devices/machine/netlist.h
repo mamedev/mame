@@ -12,8 +12,13 @@
 #define MAME_MACHINE_NETLIST_H
 
 #include <functional>
+#include <deque>
 
 #include "../../lib/netlist/nltypes.h"
+
+#ifndef NETLIST_CREATE_CSV
+#define NETLIST_CREATE_CSV (0)
+#endif
 
 class netlist_mame_stream_output_device;
 class nld_sound_in;
@@ -106,6 +111,25 @@ private:
 
 	func_type m_setup_func;
 	bool m_device_reset_called;
+
+#if NETLIST_CREATE_CSV
+	static constexpr int MAX_BUFFER_ENTRIES = 1000;
+
+public:
+	void log_add(char const* param, double value, bool isfloat);
+	void log_flush(int count = MAX_BUFFER_ENTRIES);
+
+private:
+	struct buffer_entry
+	{
+		attotime time;
+		bool isfloat;
+		double value;
+		char const *string;
+	};
+	std::deque<buffer_entry> m_buffer;
+	FILE* m_csv_file = nullptr;
+#endif
 };
 
 class netlist_mame_cpu_device : public netlist_mame_device,

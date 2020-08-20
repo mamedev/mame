@@ -1822,6 +1822,52 @@ static NETLIST_START(TTL_74126_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: TTL_74139_DIP
+//- Title: 54LS139/DM54LS139/DM74LS139 Decoders/Demultiplexers
+//- Description: These Schottky-clamped circuits are designed to be used in high-performance memory-decoding or data-routing applications, requiring very short propagation delay times.
+//-   In high-performance memory systems these decoders can be used to minimize the effects of system decoding.
+//-   When used with high-speed memories, the delay times of these decoders are usually less than the typical access time of the memory.
+//-   This means that the effective system delay introduced by the decoder is negligible.
+//-   The LS139 comprises two separate two-line-to-four-line decoders in a single package.
+//-   The active-low enable input can be used as a data line in demultiplexing applications.
+//-   All of these decoders/demultiplexers feature fully buffered inputs, presenting only one normalized load to its driving circuit.
+//    All inputs are clamped with high-performance Schottky diodes to suppress line-ringing and simplify system design.
+//- Pinalias: G1,A1,B1,1Y0,1Y1,1Y2,1Y3,GND,2Y3,2Y2,2Y1,2Y0,B2,A2,G2,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   pdf.datasheetcatalog.com/datasheets/166/375388_DS.pdf
+//-
+//-         +---+-------+-------------+
+//-         | E | A0 A1 | O0 O1 O2 O3 |
+//-         +===+=======+=============+
+//-         | 1 |  X  X |  1  1  1  1 |
+//-         | 0 |  0  0 |  0  1  1  1 |
+//-         | 0 |  1  0 |  1  0  1  1 |
+//-         | 0 |  0  1 |  1  1  0  1 |
+//-         | 0 |  1  1 |  1  1  1  0 |
+//-         +---+-------+-------------+
+//-
+static NETLIST_START(TTL_74139_DIP)
+	NET_REGISTER_DEV(TTL_74139_GATE, A)
+	NET_REGISTER_DEV(TTL_74139_GATE, B)
+
+	NET_C(A.VCC, B.VCC)
+	NET_C(A.GND, B.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.E,  /*   /Ea |1     ++    16| VCC  */ A.VCC,
+		A.A,  /*   A0a |2           15| /Eb  */ B.E,
+		A.B,  /*   A1a |3           14| A0b  */ B.A,
+		A.0,  /*  /O0a |4   74139   13| A1b  */ B.B,
+		A.1,  /*  /O1a |5           12| /O0b */ B.0,
+		A.2,  /*  /O2a |6           11| /O1b */ B.1,
+		A.3,  /*  /O3a |7           10| /O2b */ B.2,
+		A.GND,/*   GND |8            9| /O3b */ B.3
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
 //- Identifier: TTL_74153_DIP
 //- Title: 54153/DM54153/DM74153 Dual 4-Line to 1-LineData Selectors/Multiplexers
 //- Description: Each of these data selectors/multiplexers contains inverters and drivers to supply fully complementary, on-chip, binary decoding data selection to the AND-OR-invert gates.
@@ -3205,6 +3251,16 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_END()
 
 
+	TRUTHTABLE_START(TTL_74139_GATE, 3, 4, "")
+		TT_HEAD("E,A,B|0,1,2,3")
+		TT_LINE("1,X,X|1,1,1,1|14")
+		TT_LINE("0,0,0|0,1,1,1|14")
+		TT_LINE("0,0,1|1,0,1,1|14")
+		TT_LINE("0,1,0|1,1,0,1|14")
+		TT_LINE("0,1,1|1,1,1,0|14")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_74155A_GATE, 4, 4, "")
 		TT_HEAD("B,A,G,C|0,1,2,3")
 		TT_LINE("X,X,1,X|1,1,1,1|13,13,13,13")
@@ -3367,6 +3423,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_9602_DIP)
 	LOCAL_LIB_ENTRY(TTL_74125_DIP)
 	LOCAL_LIB_ENTRY(TTL_74126_DIP)
+	LOCAL_LIB_ENTRY(TTL_74139_DIP)
 	LOCAL_LIB_ENTRY(TTL_74153_DIP)
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)
 	LOCAL_LIB_ENTRY(TTL_74156_DIP)

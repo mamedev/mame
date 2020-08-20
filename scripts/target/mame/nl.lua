@@ -58,6 +58,9 @@ SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
 SOUNDS["SN76477"] = true
+SOUNDS["SN76496"] = true
+SOUNDS["SP0250"] = true
+SOUNDS["TMS36XX"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -89,6 +92,7 @@ MACHINES["6522VIA"] = true
 
 MACHINES["6821PIA"] = true
 MACHINES["I8255"] = true
+MACHINES["I8243"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["UPD4701"] = true
@@ -285,11 +289,44 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
 
+	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
+	MAME_DIR .. "src/mame/machine/segacrpt_device.h",
+	MAME_DIR .. "src/mame/drivers/segag80r.cpp",
+	MAME_DIR .. "src/mame/includes/segag80r.h",
+	MAME_DIR .. "src/mame/machine/segag80.cpp",
+	MAME_DIR .. "src/mame/machine/segag80.h",
+	MAME_DIR .. "src/mame/audio/segag80r.cpp",
+	MAME_DIR .. "src/mame/audio/segag80r.h",
+	MAME_DIR .. "src/mame/video/segag80r.cpp",
+	MAME_DIR .. "src/mame/drivers/segag80v.cpp",
+	MAME_DIR .. "src/mame/includes/segag80v.h",
+	MAME_DIR .. "src/mame/audio/segag80.cpp",
+	MAME_DIR .. "src/mame/audio/segag80.h",
+	MAME_DIR .. "src/mame/audio/segaspeech.cpp",
+	MAME_DIR .. "src/mame/audio/segaspeech.h",
+	MAME_DIR .. "src/mame/audio/segausb.cpp",
+	MAME_DIR .. "src/mame/audio/segausb.h",
+	MAME_DIR .. "src/mame/audio/nl_astrob.cpp",
+	MAME_DIR .. "src/mame/audio/nl_astrob.h",
+	MAME_DIR .. "src/mame/audio/nl_elim.cpp",
+	MAME_DIR .. "src/mame/audio/nl_elim.h",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.cpp",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.h",
+	MAME_DIR .. "src/mame/video/segag80v.cpp",
+	MAME_DIR .. "src/mame/drivers/zaxxon.cpp",
+	MAME_DIR .. "src/mame/includes/zaxxon.h",
+	MAME_DIR .. "src/mame/audio/zaxxon.cpp",
+	MAME_DIR .. "src/mame/video/zaxxon.cpp",
+
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",
 	MAME_DIR .. "src/mame/video/segas16b.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segas16b.h",
+	MAME_DIR .. "src/mame/audio/nl_segausb.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segausb.h",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.h",
 	MAME_DIR .. "src/mame/machine/315_5195.cpp",
 	MAME_DIR .. "src/mame/machine/315_5195.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",

@@ -448,7 +448,12 @@ namespace netlist
 		pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
 		pstring def = plib::trim(model_in.substr(pos + 1));
 		if (!m_abstract.m_models.insert({model, def}).second)
-			throw nl_exception(MF_MODEL_ALREADY_EXISTS_1(model_in));
+		{
+			// FIXME: Add an directive MODEL_OVERWRITE to netlist language
+			//throw nl_exception(MF_MODEL_ALREADY_EXISTS_1(model_in));
+			log().info(MI_MODEL_OVERWRITE_1(model, model_in));
+			m_abstract.m_models[model] = def;
+		}
 	}
 
 
@@ -1623,6 +1628,7 @@ void setup_t::prepare_to_run()
 	// resolve inputs
 	resolve_inputs();
 
+#if 0
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
@@ -1638,6 +1644,7 @@ void setup_t::prepare_to_run()
 #endif
 		}
 	}
+#endif
 
 	log().verbose("looking for unused hints ...");
 	for (auto &h : m_abstract.m_hints)
