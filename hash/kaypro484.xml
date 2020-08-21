@@ -8,7 +8,7 @@ license:CC0
 <!-- Operating systems -->
 
 	<software name="cpm22f">
-		<description>CP/M 2.2F (81-292-A)</description>
+		<description>CP/M 2.2F (81-292)</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
