@@ -111,6 +111,10 @@ private:
 	void map(address_map &map);
 
 	uint16_t simulate_f000_r(offs_t offset);
+	uint16_t ramcall_2829_logger_r();
+	uint16_t ramcall_28f7_logger_r();
+	uint16_t ramcall_2079_logger_r();
+
 
 	required_region_ptr<uint8_t> m_spirom;
 
@@ -429,6 +433,39 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 	return 0x0000;
 }
 
+
+uint16_t pcp8718_state::ramcall_2829_logger_r()
+{
+	// this in turn calls 28f7 but has restore logic too
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2829 in RAM (load+call function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
+	}
+	return m_mainram[0x2829];
+}
+
+uint16_t pcp8718_state::ramcall_28f7_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		// no  restore logic?
+		logerror("call to 0x28f7 in RAM (load+GO TO function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
+	}
+	return m_mainram[0x28f7];
+}
+
+uint16_t pcp8718_state::ramcall_2079_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2079 in RAM (maybe drawing related?)\n");
+	}
+	return m_mainram[0x2079];
+}
+
+
+
+
 void pcp8718_state::machine_reset()
 {
 	// this looks like it might actually be part of the IRQ handler (increase counter at 00 at the very start) rather than where we should end up after startup
@@ -444,10 +481,16 @@ void pcp8718_state::machine_reset()
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2829, 0x2829, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2829_logger_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_28f7_logger_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
+
 	m_spistate = SPI_STATE_READING_OR_READY;
 	m_spiaddress = 0;
 
 }
+
 
 void pcp8718_state::pcp8718(machine_config &config)
 {
