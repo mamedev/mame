@@ -100,7 +100,7 @@ WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_status_r()
+uint32_t midxunit_state::midxunit_status_r()
 {
 	/* low bit indicates whether the ADC is done reading the current input */
 	return (m_pic_status << 1) | (m_adc_int ? 1 : 0);
@@ -278,21 +278,21 @@ void midxunit_state::machine_reset()
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_security_r()
+uint32_t midxunit_state::midxunit_security_r()
 {
 	return m_pic_data;
 }
 
-void midxunit_state::midxunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_security_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_pic_command = data & 0x0f;
 }
 
 
-void midxunit_state::midxunit_security_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset == 0 && ACCESSING_BITS_0_7)
+	if (ACCESSING_BITS_0_7)
 		m_pic_clk = BIT(data, 1);
 }
 
