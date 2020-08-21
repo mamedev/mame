@@ -67,7 +67,7 @@ namespace netlist
 			{
 				if (!m_ARQ())
 				{
-					uint16_t addr = m_A();
+					const auto addr = m_A();
 					m_latched_rom = m_ROM[addr];
 				}
 				uint8_t o = (m_enable_hi || m_enable_lo) ? m_latched_rom : 0;
