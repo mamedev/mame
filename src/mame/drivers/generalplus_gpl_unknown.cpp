@@ -135,7 +135,7 @@ private:
 	uint8_t spi_process_rx();
 	uint8_t spi_rx();
 
-	uint8_t m_tx_fifo[6]; // actually 8 bytes? or 8 half-bytes?
+	uint8_t m_tx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
 	int m_tx_pos = 0;
 	uint8_t m_rx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
 
@@ -143,13 +143,15 @@ private:
 
 	enum spistate : const int
 	{
-	   SPI_STATE_READING_OR_READY = 0,
+	   SPI_STATE_READY = 0,
 	   SPI_STATE_WAITING_HIGH_ADDR = 1,
 	   SPI_STATE_WAITING_MID_ADDR = 2,
 	   SPI_STATE_WAITING_LOW_ADDR = 3,
 	   // probably not
 	   SPI_STATE_WAITING_DUMMY1_ADDR = 4,
-	   SPI_STATE_WAITING_DUMMY2_ADDR = 5
+	   SPI_STATE_WAITING_DUMMY2_ADDR = 5,
+	   SPI_STATE_READING = 6
+
 	};
 
 	spistate m_spistate;
@@ -207,7 +209,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 
 	switch (m_spistate)
 	{
-	case SPI_STATE_READING_OR_READY:
+	case SPI_STATE_READY:
 	{
 		if (data == 0x03)
 		{
@@ -241,7 +243,13 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	{
 		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
 		logerror("set to low address%02x address is now %08x\n", data, m_spiaddress);
-		m_spistate = SPI_STATE_WAITING_DUMMY1_ADDR;
+		m_spistate = SPI_STATE_READING;
+		break;
+	}
+
+	case SPI_STATE_READING:
+	{
+		// ignore further writes when read mode set?
 		break;
 	}
 
@@ -253,7 +261,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 
 	case SPI_STATE_WAITING_DUMMY2_ADDR:
 	{
-		m_spistate = SPI_STATE_READING_OR_READY;
+	//	m_spistate = SPI_STATE_READY;
 		break;
 	}
 	}
@@ -264,7 +272,7 @@ uint8_t pcp8718_state::spi_process_rx()
 
 	switch (m_spistate)
 	{
-	case SPI_STATE_READING_OR_READY:
+	case SPI_STATE_READING:
 	{
 		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
 
@@ -295,9 +303,7 @@ void pcp8718_state::spi_tx()
 	m_tx_fifo[0] = m_tx_fifo[1];
 	m_tx_fifo[1] = m_tx_fifo[2];
 	m_tx_fifo[2] = m_tx_fifo[3];
-	m_tx_fifo[3] = m_tx_fifo[4];
-	m_tx_fifo[4] = m_tx_fifo[5];
-	m_tx_fifo[5] = 0x00;
+	m_tx_fifo[3] = 0x00;
 }
 
 uint8_t pcp8718_state::spi_rx()
@@ -320,10 +326,10 @@ void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 	m_tx_fifo[m_tx_pos] = data;
 	m_tx_pos++;
 
-	if (m_tx_pos == 6)
+	if (m_tx_pos == 4)
 	{
 		//logerror("transmitting %02x %02x %02x %02x %02x %02x\n", m_tx_fifo[0], m_tx_fifo[1], m_tx_fifo[2], m_tx_fifo[3], m_tx_fifo[4], m_tx_fifo[5]);
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			spi_tx();
 			m_tx_pos = 0;
@@ -337,6 +343,9 @@ void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 void pcp8718_state::unk_7868_w(uint16_t data)
 {
 	logerror("%06x: unk_7868_w %02x (Port B + SPI reset?)\n", machine().describe_context(), data);
+
+	m_spistate = SPI_STATE_READY;
+
 }
 
 
@@ -486,7 +495,7 @@ void pcp8718_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_28f7_logger_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
 
-	m_spistate = SPI_STATE_READING_OR_READY;
+	m_spistate = SPI_STATE_READY;
 	m_spiaddress = 0;
 
 }
