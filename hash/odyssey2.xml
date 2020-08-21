@@ -680,8 +680,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="chezmxme"><!-- I know it's a clone of something... -->
-		<description>Chez Maxime (Fra)</description>
+	<software name="chezmxme">
+		<description>Chez Maxime (Fra)</description><!-- aka Restaurant -->
 		<year>198?</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">

@@ -442,8 +442,8 @@ Do Videopac+/Odyssey3 versions exist?:
 	</software>
 
 	<software name="motocras">
-		<description>Moto-Crash (Fra)</description>
-		<year>198?</year>
+		<description>Moto-Crash+ (Fra)</description>
+		<year>1984</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />

@@ -44,9 +44,11 @@ TODO:
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
   be correct
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
-  or is PAL detection going wrong? The game does mid-scanline updates
-- g7400 helicopt sometimes locks up at the sea level, timing related?
+  or is PAL detection going wrong? It does look like PAL/NTSC detection is working,
+  see internal RAM $3D d7. So maybe it is due to inaccurate PAL video timing.
+  The game does mid-scanline updates.
 - g7400 probably has different video timing too (not same as g7000)
+- g7400 helicopt sometimes locks up at the sea level, timing related?
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
   caused by bus conflict or because they write to P2?
 - verify odyssey3 cpu/video clocks
@@ -140,10 +142,10 @@ private:
 class g7400_state : public odyssey2_state
 {
 public:
-	g7400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: odyssey2_state(mconfig, type, tag)
-		, m_i8243(*this, "i8243")
-		, m_ef934x(*this, "ef934x")
+	g7400_state(const machine_config &mconfig, device_type type, const char *tag) :
+		odyssey2_state(mconfig, type, tag),
+		m_i8243(*this, "i8243"),
+		m_ef934x(*this, "ef934x")
 	{ }
 
 	void g7400(machine_config &config);
