@@ -113,7 +113,12 @@ private:
 	uint16_t simulate_f000_r(offs_t offset);
 
 	uint16_t ramcall_2060_logger_r();
+	uint16_t ramcall_2189_logger_r();
+
+	uint16_t ramcall_2434_logger_r();
+
 	uint16_t ramcall_2829_logger_r();
+	uint16_t ramcall_287a_logger_r();
 	uint16_t ramcall_28f7_logger_r();
 	uint16_t ramcall_2079_logger_r();
 
@@ -320,6 +325,9 @@ void pcp8718_state::unk_7868_w(uint16_t data)
 {
 	logerror("%06x: unk_7868_w %02x (Port B + SPI reset?)\n", machine().describe_context(), data);
 
+	for (int i = 0; i < 4; i++)
+		m_rx_fifo[i] = 0xff;
+
 	m_spistate = SPI_STATE_READY;
 
 }
@@ -420,12 +428,20 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 uint16_t pcp8718_state::ramcall_2060_logger_r()
 {
-	// this in turn calls 28f7 but has restore logic too
 	if (!machine().side_effects_disabled())
 	{
 		logerror("call to 0x2060 in RAM (set SPI to read mode, set address, do dummy FIFO reads)\n");
 	}
 	return m_mainram[0x2060];
+}
+
+uint16_t pcp8718_state::ramcall_2189_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2189 in RAM (unknown)\n");
+	}
+	return m_mainram[0x2189];
 }
 
 
@@ -437,6 +453,18 @@ uint16_t pcp8718_state::ramcall_2829_logger_r()
 		logerror("call to 0x2829 in RAM (load+call function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
 	}
 	return m_mainram[0x2829];
+}
+
+
+
+
+uint16_t pcp8718_state::ramcall_287a_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x287a in RAM (unknown)\n");
+	}
+	return m_mainram[0x287a];
 }
 
 uint16_t pcp8718_state::ramcall_28f7_logger_r()
@@ -453,11 +481,19 @@ uint16_t pcp8718_state::ramcall_2079_logger_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		logerror("call to 0x2079 in RAM (maybe drawing related?)\n");
+		logerror("call to 0x2079 in RAM (maybe drawing related?)\n"); // called in the 'dummy' loop that doesn't actually draw? and other places? as well as after the actual draw command below in the real loop
 	}
 	return m_mainram[0x2079];
 }
 
+uint16_t pcp8718_state::ramcall_2434_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2434 in RAM (drawing related?)\n"); // [1d] as the tile / sprite number, [1e] as xpos, [1f] as ypos, [20] as 0. [21] as ff in some title drawing calls
+	}
+	return m_mainram[0x2434];
+}
 
 
 
@@ -476,16 +512,19 @@ void pcp8718_state::machine_reset()
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
-
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2060, 0x2060, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2060_logger_r)));
 
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2189, 0x2189, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2189_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2434, 0x2434, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2434_logger_r)));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2829, 0x2829, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2829_logger_r)));
 
-
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x287a, 0x287a, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_287a_logger_r)));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_28f7_logger_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
 
 	m_spistate = SPI_STATE_READY;
 	m_spiaddress = 0;
