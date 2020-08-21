@@ -111,6 +111,8 @@ private:
 	void map(address_map &map);
 
 	uint16_t simulate_f000_r(offs_t offset);
+
+	uint16_t ramcall_2060_logger_r();
 	uint16_t ramcall_2829_logger_r();
 	uint16_t ramcall_28f7_logger_r();
 	uint16_t ramcall_2079_logger_r();
@@ -131,12 +133,9 @@ private:
 
 
 	void spi_process_tx_data(uint8_t data);
-	void spi_tx();
 	uint8_t spi_process_rx();
 	uint8_t spi_rx();
 
-	uint8_t m_tx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
-	int m_tx_pos = 0;
 	uint8_t m_rx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
 
 	uint32_t m_spiaddress;
@@ -196,10 +195,6 @@ uint16_t pcp8718_state::spi_misc_control_r()
 uint16_t pcp8718_state::spi_rx_fifo_r()
 {
 	logerror("%06x: spi_rx_fifo_r\n", machine().describe_context());
-
-	// does reading the rx fifo rest the tx fifo? there are dummy writes??
-	m_tx_pos = 0;
-
 	return spi_rx();
 }
 
@@ -249,7 +244,8 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 
 	case SPI_STATE_READING:
 	{
-		// ignore further writes when read mode set?
+		// writes when in read mode clock in data?
+		logerror("write while in read mode (clock data?)\n", data, m_spiaddress);
 		break;
 	}
 
@@ -296,15 +292,6 @@ uint8_t pcp8718_state::spi_process_rx()
 	return 0x00;
 }
 
-void pcp8718_state::spi_tx()
-{
-	spi_process_tx_data(m_tx_fifo[0]);
-
-	m_tx_fifo[0] = m_tx_fifo[1];
-	m_tx_fifo[1] = m_tx_fifo[2];
-	m_tx_fifo[2] = m_tx_fifo[3];
-	m_tx_fifo[3] = 0x00;
-}
 
 uint8_t pcp8718_state::spi_rx()
 {
@@ -323,19 +310,8 @@ void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 {
 	data &= 0x00ff;
 	logerror("%06x: spi_tx_fifo_w %02x\n", machine().describe_context(), data);
-	m_tx_fifo[m_tx_pos] = data;
-	m_tx_pos++;
 
-	if (m_tx_pos == 4)
-	{
-		//logerror("transmitting %02x %02x %02x %02x %02x %02x\n", m_tx_fifo[0], m_tx_fifo[1], m_tx_fifo[2], m_tx_fifo[3], m_tx_fifo[4], m_tx_fifo[5]);
-		for (int i = 0; i < 4; i++)
-		{
-			spi_tx();
-			m_tx_pos = 0;
-		}
-	}
-
+	spi_process_tx_data(data);
 }
 
 // this is probably 'port b' but when SPI is enabled some points of this can become SPI control pins
@@ -442,6 +418,16 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 	return 0x0000;
 }
 
+uint16_t pcp8718_state::ramcall_2060_logger_r()
+{
+	// this in turn calls 28f7 but has restore logic too
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2060 in RAM (set SPI to read mode, set address, do dummy FIFO reads)\n");
+	}
+	return m_mainram[0x2060];
+}
+
 
 uint16_t pcp8718_state::ramcall_2829_logger_r()
 {
@@ -491,7 +477,13 @@ void pcp8718_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
 
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2060, 0x2060, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2060_logger_r)));
+
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2829, 0x2829, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2829_logger_r)));
+
+
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_28f7_logger_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
 
