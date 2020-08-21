@@ -65,7 +65,7 @@ private:
 	required_device<atari_cage_device> m_cage;
 
 	required_shared_ptr<uint32_t> m_adsp_internal_program_ram;
-	required_shared_ptr<uint16_t> m_gsp_dram;
+	required_shared_ptr<uint32_t> m_gsp_dram;
 	required_shared_ptr<uint32_t> m_gsp_vram;
 };
 
