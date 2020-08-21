@@ -12,10 +12,10 @@
 
 #include "emu.h"
 
-#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
+#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || (_M_IX86_FP >= 2))
 
-#include <emmintrin.h>
 #include "rgbsse.h"
+
 
 /***************************************************************************
     TABLES
