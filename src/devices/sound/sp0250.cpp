@@ -72,10 +72,7 @@ void sp0250_device::device_start()
 	// output PWM data at the ROMCLOCK frequency
 	int sample_rate = clock() / 2;
 	int frame_rate = sample_rate / (4 * PWM_CLOCKS);
-	if (!m_pwm_mode)
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, frame_rate);
-	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
+	m_stream = stream_alloc(0, 1, m_pwm_mode ? sample_rate : frame_rate);
 
 	// if a DRQ callback is offered, run a timer at the frame rate
 	// to ensure the DRQ gets picked up in a timely manner

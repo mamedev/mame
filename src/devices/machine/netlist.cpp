@@ -893,7 +893,7 @@ void netlist_mame_stream_output_device::device_reset()
 void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &target)
 {
 	if (target.samples() < m_buffer.size())
-		osd_printf_warning("sound %s: samples %d less bufsize %d\n", name(), samples, m_buffer.size());
+		osd_printf_warning("sound %s: samples %d less bufsize %d\n", name(), target.samples(), m_buffer.size());
 
 	int sampindex;
 	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
