@@ -273,7 +273,7 @@ uint8_t pcp8718_state::spi_process_rx()
 			if (dat == 0x4e)
 				dat = 0x5e;
 
-		logerror("reading SPI %02x from SPI Address %08x\n", dat, m_spiaddress);
+		logerror("reading SPI %02x from SPI Address %08x (adjusted word offset %08x)\n", dat, m_spiaddress, (m_spiaddress/2)+0x20000);
 		m_spiaddress++;
 		return dat;
 	}
