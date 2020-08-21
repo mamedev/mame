@@ -494,11 +494,14 @@ void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::v
 	// loop over inputs
 	for (int inputnum = 0; inputnum < m_auto_allocated_inputs; inputnum++)
 	{
+		// skip if the gain is 0
 		auto &input = inputs[inputnum];
-		int outputnum = m_outputmap[inputnum];
-		auto &output = outputs[outputnum];
+		if (input.gain() == 0)
+			continue;
 
 		// either store or accumulate
+		int outputnum = m_outputmap[inputnum];
+		auto &output = outputs[outputnum];
 		if (!m_output_clear[outputnum])
 			output.copy(input);
 		else
