@@ -442,9 +442,9 @@ void atronic_state::video_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("vidram");
 
-	map(0xa0000010, 0xa0000017).w(m_ramdac, FUNC(ramdac_device::index_w));
-	map(0xa0000020, 0xa0000027).w(m_ramdac, FUNC(ramdac_device::pal_w));
-	map(0xa0000030, 0xa0000037).w(m_ramdac, FUNC(ramdac_device::mask_w));
+	map(0xa0000000, 0xa000001f).w(m_ramdac, FUNC(ramdac_device::index_w)).umask32(0x00ff0000);
+	map(0xa0000020, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::pal_w)).umask32(0x000000ff);
+	map(0xa0000020, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::mask_w)).umask32(0x00ff0000);
 
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
