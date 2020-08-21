@@ -336,6 +336,23 @@ void photoply_state::photoply_dx4_100(machine_config &config)
 	m_maincpu->set_clock(100000000); // 100MHz
 }
 
+ROM_START(photoply98sp)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_v4.51g.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // Award Modular BIOS v4.51G, AT27C010, Funworld sticker: Sept 1998
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip, Funworld sticker: Sept 1998 
+	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	// Seagate ST31722A
+	// 3303 CYL 1704MB 16 HEADS 63 SECTORS
+	// Funworld label: Feb 1998
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay98sp", 0, BAD_DUMP SHA1(c0d7964edaff6b99184ca64e76c41eaa07abe019) ) // From an operated HDD. A clean one must be recreated from the CDs
+ROM_END
+
 /* Intel A80486DX4100
    4096KB RAM
    SiS 85C496 + 85C497
@@ -343,8 +360,8 @@ void photoply_state::photoply_dx4_100(machine_config &config)
    Winbond W83787IF (near Xtal 24.00 MHz)
    3 x ISA + 2 x PCI */
 ROM_START(photoply99sp)
-	ROM_REGION(0x20000, "bios", 0)  // Motherboard BIOS
-	ROM_LOAD("funworld_1999_award_v4.51g.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // Award Modular BIOS v4.51G, AT29C010A
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_v4.51g.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // Award Modular BIOS v4.51G, AT29C010A
 
 	/* Multifunction board with a ESS AudioDrive chip ISA Sound + I/O (PP2000/CI-8000)
 	   ESS AudioDrve ES1868F
@@ -386,13 +403,13 @@ ROM_START(photoply99sp)
 
 	// Quantum Fireball EX3.2A
 	// C/H/S: 3.2 - 6256/16/63
-	// PhotoPlay label: 09.02.1999
+	// Funworld label: 09.02.1999
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "photoplay99sp", 0, BAD_DUMP SHA1(887e5b8c931d6122a1c3a8eda5cb919eb162eced) ) // From an operated HDD. A clean one must be recreated from the CDs
 ROM_END
 
 ROM_START(photoply)
-	ROM_REGION(0x20000, "bios", 0)  // Motherboard BIOS
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
 	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // Award Modular BIOS v4.51G
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
@@ -410,7 +427,7 @@ ROM_END
 
 // BIOS not provided, might be different
 ROM_START(photoply2k4)
-	ROM_REGION(0x20000, "bios", 0)  // Motherboard BIOS
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
 	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip,  M27128A
@@ -427,7 +444,7 @@ ROM_START(photoply2k4)
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
 
-
+GAME( 1998, photoply98sp, 0,  photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1998 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1999, photoply99sp, 0,  photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 199?, photoply,     0,  photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, photoply2k4,  0,  photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
