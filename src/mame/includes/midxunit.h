@@ -12,7 +12,7 @@
 
 #include "audio/dcs.h"
 #include "cpu/tms34010/tms34010.h"
-#include "machine/midwayic.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/nvram.h"
 #include "video/midtunit.h"
 #include "emupal.h"
@@ -29,7 +29,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxrom(*this, "gfxrom")
 		, m_nvram(*this, "nvram")
-		, m_midway_serial_pic(*this, "serial_pic")
+		, m_pic(*this, "pic")
 		, m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
 		, m_gun_led(*this, "Player%u_Gun_LED", 1U)
 	{ }
@@ -65,16 +65,20 @@ private:
 	required_memory_region m_gfxrom;
 
 	required_device<nvram_device> m_nvram;
-	required_device<midway_serial_pic_device> m_midway_serial_pic;
+	required_device<pic16c57_device> m_pic;
 	output_finder<3> m_gun_recoil;
 	output_finder<3> m_gun_led;
 
 	uint8_t m_cmos_write_enable;
 	uint16_t m_iodata[8];
 	uint8_t m_uart[8];
-	uint8_t m_security_bits;
 	bool m_adc_int;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
+
+	uint8_t m_pic_command;
+	uint8_t m_pic_data;
+	uint8_t m_pic_clk;
+	uint8_t m_pic_status;
 };
 
 #endif // MAME_INCLUDES_MIDXUNIT_H
