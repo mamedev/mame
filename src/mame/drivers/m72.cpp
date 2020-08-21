@@ -3528,8 +3528,8 @@ ROM_START( gallop )
 	ROM_REGION( 0x080000, "sprites", 0 )  // sprites - same data as the cosmccop set
 	ROM_LOAD( "cc-c-00.ic53", 0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )   // == cc-c-00.bin
 	ROM_LOAD( "cc-c-10.ic51", 0x20000, 0x20000, CRC(7eb083ed) SHA1(31fa7d532fd46e861c3d19d5b08661653f685a49) )   // == cc-c-10.bin
-	ROM_LOAD( "cc-c-20.ic49", 0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )   // == cc-c-10.bin
-	ROM_LOAD( "cc-c-30.ic47", 0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )   // == cc-c-10.bin
+	ROM_LOAD( "cc-c-20.ic49", 0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )   // == cc-c-20.bin
+	ROM_LOAD( "cc-c-30.ic47", 0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )   // == cc-c-30.bin
 
 	ROM_REGION( 0x040000, "gfx2", 0 )  // tiles #1 - same data as the cosmccop set split between the 2 tile banks
 	ROM_LOAD( "cc-b-a0.ic21", 0x00000, 0x10000, CRC(a33472bd) SHA1(962047fe3dd1fb996285ecef615a8ebdb529adef) )   // == cc-d-g00.bin [1/2]
