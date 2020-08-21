@@ -226,7 +226,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_HIGH_ADDR:
 	{
 		m_spiaddress = (m_spiaddress & 0xff00ffff) | data << 16;
-		logerror("set to high address%02x address is now %08x\n", data, m_spiaddress);
+		logerror("set to high address %02x address is now %08x\n", data, m_spiaddress);
 		m_spistate = SPI_STATE_WAITING_MID_ADDR;
 		break;
 	}
@@ -234,7 +234,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_MID_ADDR:
 	{
 		m_spiaddress = (m_spiaddress & 0xffff00ff) | data << 8;
-		logerror("set to mid address%02x address is now %08x\n", data, m_spiaddress);
+		logerror("set to mid address %02x address is now %08x\n", data, m_spiaddress);
 		m_spistate = SPI_STATE_WAITING_LOW_ADDR;
 		break;
 	}
@@ -242,7 +242,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_LOW_ADDR:
 	{
 		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
-		logerror("set to low address%02x address is now %08x\n", data, m_spiaddress);
+		logerror("set to low address %02x address is now %08x\n", data, m_spiaddress);
 		m_spistate = SPI_STATE_READING;
 		break;
 	}
