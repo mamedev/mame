@@ -502,7 +502,7 @@ Linking using the LLVM linker
 
 The LLVM linker is generally faster than the GNU linker that GCC uses by
 default.  This is more pronounced on systems with a high overhead for file
-system operations (e.g. Microsoft Window, or when compiling on a disk mounted
+system operations (e.g. Microsoft Windows, or when compiling on a disk mounted
 over a network).  To use the LLVM linker with GCC, ensure the LLVM linker is
 installed and add ``-fuse-ld=lld`` to the linker options (e.g. in the
 **LDFLAGS** environment variable or in the **ARCHOPTS** setting).

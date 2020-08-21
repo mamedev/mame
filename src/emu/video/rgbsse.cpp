@@ -12,7 +12,7 @@
 
 #include "emu.h"
 
-#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || (_M_IX86_FP >= 2))
+#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)))
 
 #include "rgbsse.h"
 
@@ -185,4 +185,4 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 	clamp_to_uint8();
 }
 
-#endif // defined(__SSE2__) || defined(_MSC_VER)
+#endif // (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)))
