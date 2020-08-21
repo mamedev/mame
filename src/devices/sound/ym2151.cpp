@@ -1736,10 +1736,7 @@ void ym2151_device::write(offs_t offset, u8 data)
 	if (offset & 1)
 	{
 		if (!m_reset_active)
-		{
-			m_stream->update();
-			write_reg(m_lastreg, data);
-		}
+			synchronize(TIMER_WRITE, data | (m_lastreg << 8));
 	}
 	else
 		m_lastreg = data;
@@ -1753,12 +1750,12 @@ u8 ym2151_device::status_r()
 
 void ym2151_device::register_w(u8 data)
 {
-	synchronize(TIMER_WRITE, data | (0 << 8));
+	write(0, data);
 }
 
 void ym2151_device::data_w(u8 data)
 {
-	synchronize(TIMER_WRITE, data | (1 << 8));
+	write(1, data);
 }
 
 
@@ -1876,7 +1873,8 @@ void ym2151_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id) {
 	case TIMER_WRITE:
-		write(param >> 8, param & 0xff);
+		m_stream->update();
+		write_reg(param >> 8, param & 0xff);
 		break;
 
 	case TIMER_IRQ_A_OFF: {
