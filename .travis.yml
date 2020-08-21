@@ -43,6 +43,7 @@ jobs:
       env: SUBTARGET=ci   MAME=mameci64
   allow_failures:
     - arch: ppc64le
+  fast_finish: true
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then
