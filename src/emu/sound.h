@@ -89,8 +89,9 @@ class stream_buffer
 public:
 	using sample_t = float;
 
-	// constructor
+	// constructor/destructor
 	stream_buffer(int sample_rate = 48000);
+	~stream_buffer();
 
 	// disable copying of stream_buffers directly
 	stream_buffer(stream_buffer const &src) = delete;
@@ -155,6 +156,17 @@ private:
 	u32 m_sample_rate;
 	attoseconds_t m_sample_attos;
 	std::vector<sample_t> m_buffer;
+
+#if (SOUND_DEBUG)
+public:
+	void open_wav(char const *filename);
+	void flush_wav();
+	void close_wav();
+
+private:
+	struct wav_file *m_wav_file = nullptr;
+	u32 m_last_written = 0;
+#endif
 };
 
 
@@ -183,10 +195,7 @@ public:
 		m_end(end),
 		m_gain(gain)
 	{
-		// ensure that end is always greater than start; we'll
-		// wrap to the buffer length as needed
-		if (m_end < m_start)
-			m_end += buffer->sample_rate();
+		normalize_start_end();
 	}
 
 	// return a read_stream_view covering the given time period
@@ -198,17 +207,14 @@ public:
 	{
 		// it's important to compute the end first, since it could invalidate the start
 		m_start = buffer.time_to_buffer_index(start, false);
-
-		// ensure that end is always greater than start; we'll
-		// wrap to the buffer length as needed
-		if (m_end < m_start)
-			m_end += buffer.sample_rate();
+		normalize_start_end();
 	}
 
 	// copy constructor
 	read_stream_view(read_stream_view const &src) :
 		read_stream_view(src.m_buffer, src.m_start, src.m_end, src.m_gain)
 	{
+		normalize_start_end();
 	}
 
 	// copy assignment
@@ -218,6 +224,7 @@ public:
 		m_start = rhs.m_start;
 		m_end = rhs.m_end;
 		m_gain = rhs.m_gain;
+		normalize_start_end();
 		return *this;
 	}
 
@@ -239,7 +246,12 @@ public:
 	attotime end_time() const { return m_buffer->index_time(m_end); }
 
 	// set the start time
-	read_stream_view &set_start(attotime start) { m_start = m_buffer->time_to_buffer_index(start); return *this; }
+	read_stream_view &set_start(attotime start)
+	{
+		m_start = m_buffer->time_to_buffer_index(start);
+		normalize_start_end();
+		return *this;
+	}
 
 	// set the gain
 	read_stream_view &set_gain(float gain) { m_gain = gain; return *this; }
@@ -263,6 +275,16 @@ public:
 	}
 
 //protected:
+	// normalize start/end
+	void normalize_start_end()
+	{
+		// ensure that end is always greater than start; we'll
+		// wrap to the buffer length as needed
+		if (m_end < m_start && m_buffer != nullptr)
+			m_end += m_buffer->sample_rate();
+		sound_assert(m_end >= m_start);
+	}
+
 	// internal state
 	stream_buffer *m_buffer;
 	s32 m_start;

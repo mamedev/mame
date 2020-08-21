@@ -25,6 +25,8 @@
 
 #define VPRINTF(x)      do { if (VERBOSE) osd_printf_debug x; } while (0)
 
+#define LOG_OUTPUT_WAV  (0)
+
 
 
 //**************************************************************************
@@ -56,6 +58,22 @@ stream_buffer::stream_buffer(int sample_rate) :
 	m_sample_attos((sample_rate == 0) ? ATTOSECONDS_PER_SECOND : ATTOSECONDS_TO_HZ(sample_rate)),
 	m_buffer(sample_rate)
 {
+}
+
+
+//-------------------------------------------------
+//  stream_buffer - destructor
+//-------------------------------------------------
+
+stream_buffer::~stream_buffer()
+{
+#if (SOUND_DEBUG)
+	if (m_wav_file != nullptr)
+	{
+		flush_wav();
+		close_wav();
+	}
+#endif
 }
 
 
@@ -186,6 +204,67 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up)
 
 	return clamp_index(sample);
 }
+
+
+#if (SOUND_DEBUG)
+
+//-------------------------------------------------
+//  open_wav - open a WAV file for logging purposes
+//-------------------------------------------------
+
+void stream_buffer::open_wav(char const *filename)
+{
+	// always open at 48k so that sound programs can handle it
+	// re-sample as needed
+	m_wav_file = wav_open(filename, 48000, 1);
+}
+
+
+//-------------------------------------------------
+//  flush_wav - flush data to the WAV file
+//-------------------------------------------------
+
+void stream_buffer::flush_wav()
+{
+	// skip if no file
+	if (m_wav_file == nullptr)
+		return;
+
+	// grab a view of the data from the last-written point
+	read_stream_view view(this, m_last_written, m_end_sample, 1.0f);
+	m_last_written = m_end_sample;
+
+	// iterate over chunks for conversion
+	s16 buffer[1024];
+	for (int samplebase = 0; samplebase < view.samples(); samplebase += ARRAY_LENGTH(buffer))
+	{
+		// clamp to the buffer size
+		int cursamples = view.samples() - samplebase;
+		if (cursamples > ARRAY_LENGTH(buffer))
+			cursamples = ARRAY_LENGTH(buffer);
+		
+		// convert and fill
+		for (int sampindex = 0; sampindex < cursamples; sampindex++)
+			buffer[sampindex] = s16(view.get(samplebase + sampindex) * 32768.0);
+
+		// write to the WAV
+		wav_add_data_16(m_wav_file, buffer, cursamples);
+	}
+}
+
+
+//-------------------------------------------------
+//  close_wav - close the logging WAV file
+//-------------------------------------------------
+
+void stream_buffer::close_wav()
+{
+	if (m_wav_file != nullptr)
+		wav_close(m_wav_file);
+	m_wav_file = nullptr;
+}
+
+#endif
 
 
 
@@ -466,39 +545,45 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 
 	// reposition our start to coincide with the current buffer end
 	attotime update_start = m_output[outputnum].end_time();
-
-	// create views for all the outputs
-	for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
-		m_output_view[outindex] = m_output[outindex].view(update_start, end);
-
-	// skip if nothing to do
-	u32 samples = m_output_view[0].samples();
-	if (samples != 0)
+	if (update_start <= end)
 	{
-		sound_assert(!synchronous() || samples == 1);
+		// create views for all the outputs
+		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
+			m_output_view[outindex] = m_output[outindex].view(update_start, end);
 
-		// ensure all input streams are up to date, and create views for them as well
-		for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
-			if (m_input[inputnum].valid())
-				m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
+		// skip if nothing to do
+		u32 samples = m_output_view[0].samples();
+		sound_assert(samples >= 0);
+		if (samples != 0)
+		{
+			sound_assert(!synchronous() || samples == 1);
+
+			// ensure all input streams are up to date, and create views for them as well
+			for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
+				if (m_input[inputnum].valid())
+					m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 
 #if (SOUND_DEBUG)
-		// clear each output view to NANs before we call the callback
-		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
-			m_output_view[outindex].clear(NAN);
+			// clear each output view to NANs before we call the callback
+			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
+				m_output_view[outindex].clear(NAN);
 #endif
 
-		// if we have an extended callback, that's all we need
-		m_callback_ex(*this, m_input_view, m_output_view);
+			// if we have an extended callback, that's all we need
+			m_callback_ex(*this, m_input_view, m_output_view);
 
 #if (SOUND_DEBUG)
-		// make sure everything was overwritten
-		for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
-			for (int sampindex = 0; sampindex < m_output_view[outindex].samples(); sampindex++)
-				m_output_view[outindex].get(sampindex);
+			// make sure everything was overwritten
+			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
+				for (int sampindex = 0; sampindex < m_output_view[outindex].samples(); sampindex++)
+					m_output_view[outindex].get(sampindex);
+
+			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
+				m_output[outindex].m_buffer.flush_wav();
 #endif
+		}
+		g_profiler.stop();
 	}
-	g_profiler.stop();
 
 	// return the requested view
 	return read_stream_view(m_output[outputnum].view(start, end));
@@ -973,6 +1058,22 @@ void sound_stream::stream_output::init(sound_stream &stream, u32 index, char con
 	// save our state
 	auto &save = stream.device().machine().save();
 	save.save_item(&stream.device(), "stream.output", tag, index, NAME(m_gain));
+
+#if (LOG_OUTPUT_WAV)
+	std::string filename = stream.device().machine().basename();
+	filename +=	stream.device().tag();
+	for (int index = 0; index < filename.size(); index++)
+		if (filename[index] == ':')
+			filename[index] = '_';
+	if (dynamic_cast<default_resampler_stream *>(&stream) != nullptr)
+		filename += "_resampler";
+	filename += "_OUT_";
+	char buf[10];
+	sprintf(buf, "%d", index);
+	filename += buf;
+	filename += ".wav";
+	m_buffer.open_wav(filename.c_str());
+#endif
 }
 
 
