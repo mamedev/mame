@@ -6,11 +6,8 @@
    By O. Galibert.
 
    Unknown:
-   - Exact clock divider
-   - Exact noise algorithm
    - Exact noise pitch (probably ok)
-   - 7 bits output mapping
-   - Whether the pitch starts counting from 0 or 1
+   - Whether the pitch starts counting from 0 or 1 (guessing 0)
 
    Unimplemented:
    - Direct Data test mode (pin 7)
@@ -256,7 +253,7 @@ int8_t sp0250_device::next()
 				   (((dac + 68 + 0) >> 2) << 24);
 
 	m_pcount++;
-	if (m_pcount >= m_pitch)
+	if (m_pcount == 0 || m_pcount > m_pitch)
 	{
 		m_pcount = 0;
 		m_rcount++;
