@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_ROMBOXP, electron_romboxp_device, "electron_romboxp"
 ROM_START( romboxp )
 	// Bank 12 Expansion module operating system
 	ROM_REGION(0x2000, "exp_rom", 0)
-	ROM_DEFAULT_BIOS("exp100")
+	ROM_DEFAULT_BIOS("exp202")
 	ROM_SYSTEM_BIOS(0, "exp100", "ROMBOX+ Expansion 1.00")
 	ROMX_LOAD("romboxplus.rom", 0x0000, 0x2000, CRC(0520ab6d) SHA1(2f551bea279a64e09fd4d31024799f7459fb9938), ROM_BIOS(0))
 
@@ -63,12 +63,9 @@ ROM_END
 
 static INPUT_PORTS_START( romboxp )
 	PORT_START("OPTION")
-	PORT_CONFNAME(0x01, 0x01, "A1") // not implemented
-	PORT_CONFSETTING(0x00, "RAM")
-	PORT_CONFSETTING(0x01, "ROM")
-	PORT_CONFNAME(0x02, 0x02, "A2")
-	PORT_CONFSETTING(0x00, "ROM 12-15")
-	PORT_CONFSETTING(0x02, "ROM 4-7")
+	PORT_CONFNAME(0x01, 0x01, "Sideways ROM Pages")
+	PORT_CONFSETTING(0x00, "12-15")
+	PORT_CONFSETTING(0x01, "4-7")
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -124,18 +121,18 @@ const tiny_rom_entry *electron_romboxp_device::device_rom_region() const
 //  electron_romboxp_device - constructor
 //-------------------------------------------------
 
-electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ELECTRON_ROMBOXP, tag, owner, clock),
-	device_electron_expansion_interface(mconfig, *this),
-	m_exp_rom(*this, "exp_rom"),
-	m_rom(*this, "rom%u", 1),
-	m_cart(*this, "cart%u", 1),
-	m_centronics(*this, "centronics"),
-	m_cent_data_out(*this, "cent_data_out"),
-	m_option(*this, "OPTION"),
-	m_romsel(0),
-	m_rom_base(0),
-	m_centronics_busy(0)
+electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ELECTRON_ROMBOXP, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_rom(*this, "rom%u", 1)
+	, m_cart(*this, "cart%u", 1)
+	, m_centronics(*this, "centronics")
+	, m_cent_data_out(*this, "cent_data_out")
+	, m_option(*this, "OPTION")
+	, m_romsel(0)
+	, m_rom_base(0)
+	, m_centronics_busy(0)
 {
 }
 
@@ -145,6 +142,12 @@ electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, 
 
 void electron_romboxp_device::device_start()
 {
+	m_ram = make_unique_clear<uint8_t[]>(0x10000);
+	memset(m_ram.get(), 0xff, 0x10000);
+
+	/* register for save states */
+	save_item(NAME(m_romsel));
+	save_pointer(NAME(m_ram), 0x10000);
 }
 
 //-------------------------------------------------
@@ -153,7 +156,7 @@ void electron_romboxp_device::device_start()
 
 void electron_romboxp_device::device_reset()
 {
-	m_rom_base = (m_option->read() & 0x02) ? 4 : 12;
+	m_rom_base = m_option->read() ? 4 : 12;
 }
 
 //-------------------------------------------------
@@ -186,7 +189,10 @@ uint8_t electron_romboxp_device::expbus_r(offs_t offset)
 		case 7:
 			if (m_rom_base == 4)
 			{
-				data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
+				if (m_rom[m_romsel - 4]->exists())
+					data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
+				else
+					data = m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)];
 			}
 			break;
 		case 12:
@@ -199,7 +205,10 @@ uint8_t electron_romboxp_device::expbus_r(offs_t offset)
 		case 15:
 			if (m_rom_base == 12)
 			{
-				data = m_rom[m_romsel - 12]->read_rom(offset & 0x3fff);
+				if (m_rom[m_romsel - 12]->exists())
+					data = m_rom[m_romsel - 12]->read_rom(offset & 0x3fff);
+				else
+					data = m_ram[(m_romsel - 12) << 14 | (offset & 0x3fff)];
 			}
 			break;
 		}
@@ -249,6 +258,26 @@ void electron_romboxp_device::expbus_w(offs_t offset, uint8_t data)
 		case 2:
 		case 3:
 			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			break;
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			if (m_rom_base == 4)
+			{
+				if (!m_rom[m_romsel - 4]->exists())
+					m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)] = data;
+			}
+			break;
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			if (m_rom_base == 12)
+			{
+				if (!m_rom[m_romsel - 12]->exists())
+					m_ram[(m_romsel - 12) << 14 | (offset & 0x3fff)] = data;
+			}
 			break;
 		}
 		break;
