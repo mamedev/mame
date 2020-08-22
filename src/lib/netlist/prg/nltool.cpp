@@ -1055,10 +1055,22 @@ void tool_app_t::create_docheader()
 					auto & pins = d.pinalias;
 					//const int w = 8;
 					poutprefix("///", " {1:10} +--------+", " ");
-					for (std::size_t i=0; i<pins.size()/2; i++)
+					for (std::size_t i=0; i < pins.size() / 2; i++)
 					{
 						poutprefix("///", " {1:10} |{2:-2}    {3:2}| {4:-10}",
 							pins[i], i+1, pins.size()-i, pins[pins.size()-i-1]);
+					}
+					poutprefix("///", " {1:10} +--------+", " ");
+				}
+				else if (d.package == "SIL")
+				{
+					auto & pins = d.pinalias;
+					//const int w = 8;
+					poutprefix("///", " {1:10} +--------+", " ");
+					for (std::size_t i=0; i < pins.size(); i++)
+					{
+						poutprefix("///", " {1:10} |{2:-2}      |",
+							pins[i], i+1);
 					}
 					poutprefix("///", " {1:10} +--------+", " ");
 				}

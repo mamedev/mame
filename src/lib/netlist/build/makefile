@@ -370,7 +370,7 @@ man: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
 	help2man --include=nltool.help2man --no-info ./nltool$(EXESUFFIX) > man/nltool.1
 	groff -mandoc -Thtml man/nltool.1 > html/nltool.html
 
-doc: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
+doc:
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
