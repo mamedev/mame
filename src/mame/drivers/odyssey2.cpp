@@ -31,6 +31,7 @@ XTAL notes (differs per model):
 - C52/N60: 17.812
 - G7200: 5.911MHz + 3.547MHz
 - G7400: 5.911MHz + 8.867MHz
+- JO7400: 5.911MHz + 3.5625MHz
 
 TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
@@ -149,6 +150,7 @@ public:
 	{ }
 
 	void g7400(machine_config &config);
+	void jo7400(machine_config &config);
 	void odyssey3(machine_config &config);
 
 protected:
@@ -644,7 +646,7 @@ INPUT_PORTS_END
 void odyssey2_state::odyssey2(machine_config &config)
 {
 	/* basic machine hardware */
-	I8048(config, m_maincpu, (XTAL(7'159'090) * 3) / 4);
+	I8048(config, m_maincpu, (7.15909_MHz_XTAL * 3) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
 	m_maincpu->p1_out_cb().set(FUNC(odyssey2_state::p1_write));
@@ -662,7 +664,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
-	I8244(config, m_i8244, XTAL(7'159'090) / 2);
+	I8244(config, m_i8244, 7.15909_MHz_XTAL / 2);
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
@@ -681,13 +683,13 @@ void odyssey2_state::videopac(machine_config &config)
 	odyssey2(config);
 
 	// PAL video chip
-	I8245(config.replace(), m_i8244, XTAL(17'734'476) / 5);
+	I8245(config.replace(), m_i8244, 17.734476_MHz_XTAL / 5);
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	m_maincpu->set_clock(XTAL(17'734'476) / 3);
+	m_maincpu->set_clock(17.734476_MHz_XTAL / 3);
 
 	subdevice<software_list_device>("cart_list")->set_filter("VP");
 	subdevice<software_list_device>("g7400_list")->set_filter("VP");
@@ -698,15 +700,15 @@ void odyssey2_state::videopacf(machine_config &config)
 	videopac(config);
 
 	// different master XTAL
-	m_maincpu->set_clock(XTAL(17'812'000) / 3);
-	m_i8244->set_clock(XTAL(17'812'000) / 5);
+	m_maincpu->set_clock(17.812_MHz_XTAL / 3);
+	m_i8244->set_clock(17.812_MHz_XTAL / 5);
 }
 
 
 void g7400_state::g7400(machine_config &config)
 {
 	/* basic machine hardware */
-	I8048(config, m_maincpu, XTAL(5'911'000));
+	I8048(config, m_maincpu, 5.911_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &g7400_state::odyssey2_io);
 	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
@@ -731,12 +733,12 @@ void g7400_state::g7400(machine_config &config)
 	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_port_w<2>));
 	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_port_w<3>));
 
-	EF9340_1(config, m_ef934x, XTAL(8'867'000)/5 * 2, "screen");
+	EF9340_1(config, m_ef934x, (8.867_MHz_XTAL * 2) / 5, "screen");
 	m_ef934x->set_offsets(15, 5);
 	m_ef934x->read_exram().set(FUNC(g7400_state::ef934x_extram_r));
 	m_ef934x->write_exram().set(FUNC(g7400_state::ef934x_extram_w));
 
-	I8245(config, m_i8244, XTAL(8'867'000)/5 * 2);
+	I8245(config, m_i8244, (8.867_MHz_XTAL * 2) / 5);
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
@@ -750,21 +752,30 @@ void g7400_state::g7400(machine_config &config)
 	SOFTWARE_LIST(config, "ody2_list").set_compatible("odyssey2").set_filter("VPP");
 }
 
+void g7400_state::jo7400(machine_config &config)
+{
+	g7400(config);
+
+	// different video clock
+	m_i8244->set_clock(3.5625_MHz_XTAL);
+	m_ef934x->set_clock(3.5625_MHz_XTAL);
+}
+
 void g7400_state::odyssey3(machine_config &config)
 {
 	g7400(config);
 
 	// NTSC video chip
-	I8244(config.replace(), m_i8244, XTAL(7'159'090) / 2);
+	I8244(config.replace(), m_i8244, 7.15909_MHz_XTAL / 2);
 	m_i8244->set_screen("screen");
 	m_i8244->set_screen_size(360, 243);
 	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	m_ef934x->set_clock(XTAL(7'159'090) / 2);
+	m_ef934x->set_clock(7.15909_MHz_XTAL / 2);
 	m_ef934x->set_offsets(15, 15);
 
-	m_maincpu->set_clock((XTAL(7'159'090) * 3) / 4);
+	m_maincpu->set_clock((7.15909_MHz_XTAL * 3) / 4);
 
 	// same color encoder as O2 (no RGB port)
 	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
@@ -824,5 +835,5 @@ COMP( 1978, videopac,  odyssey2, 0, videopac,  odyssey2, odyssey2_state, empty_i
 COMP( 1979, videopacf, odyssey2, 0, videopacf, odyssey2, odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1983, g7400,     0,        0, g7400,     g7400,    g7400_state,    empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, jopac,     g7400,    0, g7400,     g7400,    g7400_state,    empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, jopac,     g7400,    0, jo7400,    g7400,    g7400_state,    empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, odyssey3,  g7400,    0, odyssey3,  g7400,    g7400_state,    empty_init, "Magnavox", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )

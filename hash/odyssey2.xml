@@ -1771,7 +1771,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 	<software name="syracuse">
 		<description>Syracuse (Fra)</description>
 		<year>1981</year>
-		<publisher>Jopac</publisher>
+		<publisher>Brandt</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
