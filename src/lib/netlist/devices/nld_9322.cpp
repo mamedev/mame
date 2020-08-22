@@ -107,7 +107,6 @@ namespace netlist
 
 	};
 
-	NETLIB_DEVICE_IMPL(9322_GATE, "TTL_9322_GATE", "")
 	NETLIB_DEVICE_IMPL(9322,      "TTL_9322",      "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
 
 	} //namespace devices

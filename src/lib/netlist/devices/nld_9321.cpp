@@ -25,11 +25,12 @@ namespace netlist
 {
 	namespace devices
 	{
-	class NETLIB_NAME(9321);
 
-	NETLIB_OBJECT(9321_GATE)
+	// FIXME: m_E should activate deactivate m_A
+
+	NETLIB_OBJECT(9321)
 	{
-		NETLIB_CONSTRUCTOR(9321_GATE)
+		NETLIB_CONSTRUCTOR(9321)
 		, m_enable(*this, "m_enable", true)
 		, m_o(*this, "m_o", 0)
 		, m_A(*this, 0, "A{}", NETLIB_DELEGATE(in))
@@ -64,42 +65,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(9321)
-	{
-		NETLIB_CONSTRUCTOR(9321)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("AE1", m_A.m_E);
-			register_subalias("BE1", m_B.m_E);
-			register_subalias("AA0", m_A.m_A[0]);
-			register_subalias("BA0", m_B.m_A[0]);
-			register_subalias("AA1", m_A.m_A[1]);
-			register_subalias("BA1", m_B.m_A[1]);
-			register_subalias("AD0", m_A.m_D[0]);
-			register_subalias("BD0", m_B.m_D[0]);
-			register_subalias("AD1", m_A.m_D[1]);
-			register_subalias("BD1", m_B.m_D[1]);
-			register_subalias("AD2", m_A.m_D[2]);
-			register_subalias("BD2", m_B.m_D[2]);
-			register_subalias("AD3", m_A.m_D[3]);
-			register_subalias("BD3", m_B.m_D[3]);
-
-			connect("A.VCC", "B.VCC");
-			connect("A.GND", "B.GND");
-
-			register_subalias("GND", "A.GND");
-			register_subalias("VCC", "B.VCC");
-		}
-
-		friend class NETLIB_NAME(9321_dip);
-	private:
-		NETLIB_SUB(9321_GATE) m_A;
-		NETLIB_SUB(9321_GATE) m_B;
-	};
-
-	NETLIB_DEVICE_IMPL(9321_GATE, "TTL_9321_GATE", "")
-	NETLIB_DEVICE_IMPL(9321,      "TTL_9321",      "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(9321, "TTL_9321", "+E,+A0,+A1")
 
 	} //namespace devices
 } // namespace netlist
