@@ -55,7 +55,7 @@ stream_buffer::stream_buffer(int sample_rate) :
 	m_end_second(0),
 	m_end_sample(0),
 	m_sample_rate(sample_rate),
-	m_sample_attos((sample_rate == 0) ? ATTOSECONDS_PER_SECOND : ATTOSECONDS_TO_HZ(sample_rate)),
+	m_sample_attos((sample_rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + sample_rate - 1) / sample_rate)),
 	m_buffer(sample_rate)
 {
 }
@@ -110,7 +110,7 @@ void stream_buffer::set_sample_rate(u32 rate)
 
 	// set the new rate
 	m_sample_rate = rate;
-	m_sample_attos = (rate == 0) ? ATTOSECONDS_PER_SECOND : ATTOSECONDS_TO_HZ(rate);
+	m_sample_attos = (rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + rate - 1) / rate);
 
 #if (SOUND_DEBUG)
 	// for aggressive debugging, fill the buffer with NANs to catch anyone
@@ -663,15 +663,13 @@ void sound_stream::apply_sample_rate_changes()
 {
 	// grab the new rate and invalidate
 	u32 new_rate = m_pending_sample_rate;
+	if (new_rate == SAMPLE_RATE_INVALID)
+		return;
 	m_pending_sample_rate = SAMPLE_RATE_INVALID;
 
 	// if we're input adaptive, update the sample rate
 	if (input_adaptive() && m_input.size() > 0 && m_input[0].valid())
 		new_rate = m_input[0].source().stream().sample_rate();
-
-	// skip if nothing to do
-	if (new_rate == SAMPLE_RATE_INVALID || new_rate == m_sample_rate)
-		return;
 
 	// update to the new rate and notify everyone
 	m_sample_rate = new_rate;
@@ -790,7 +788,7 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent)
 {
-	printf("%*s%s @ %d\n", indent, "", device().tag(), sample_rate());
+	printf("%c %*s%s %s @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", device().name(), device().tag(), sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 			m_input[index].m_native_source->stream().print_graph_recursive(indent + 2);
@@ -994,7 +992,10 @@ void sound_stream::stream_input::sample_rate_changed(u32 sample_rate)
 
 	// if we have a resampler, set it there as well
 	if (m_resampler_source != nullptr)
+	{
 		m_resampler_source->stream().set_sample_rate(sample_rate);
+		m_resampler_source->stream().apply_sample_rate_changes();
+	}
 }
 
 
@@ -1437,5 +1438,3 @@ void sound_manager::samples(s16 *buffer)
 		*buffer++ = m_finalmix[sample];
 	}
 }
-
-

@@ -483,6 +483,7 @@ public:
 	// getters
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
+	char const *name() const { return m_name.c_str(); }
 	int sample_rate() const { return (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate; }
 	attotime sample_time() const;
 	attotime sample_period() const { return attotime(0, sample_period_attoseconds()); }
@@ -531,6 +532,7 @@ private:
 	sound_stream *m_next;                          // next stream in the chain
 
 	// general information
+	std::string m_name;                            // name of this stream
 	u32 m_sample_rate;                             // current live sample rate
 	u32 m_pending_sample_rate;                     // pending sample rate for dynamic changes
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
