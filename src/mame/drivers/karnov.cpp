@@ -766,10 +766,10 @@ void karnov_state::machine_reset()
 void karnov_state::karnov(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);    /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);     /* Accurate */
+	M6502(config, m_audiocpu, 12_MHz_XTAL/8);     /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
@@ -799,10 +799,10 @@ void karnov_state::karnov(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -826,7 +826,7 @@ void karnov_state::chelnov(machine_config &config)
 	karnov(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnov_map);
 
-	I8751(config, m_mcu, 8_MHz_XTAL); // unknown clock
+	I8751(config, m_mcu, 8_MHz_XTAL); // 8.000 MHz OSC next to MCU
 	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
 	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
 	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
@@ -844,7 +844,7 @@ void karnov_state::chelnovjbl(machine_config &config)
 	karnov(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnov_map);
 
-	I8031(config, m_mcu, 8_MHz_XTAL); // unknown clock
+	I8031(config, m_mcu, 8_MHz_XTAL); // info below states 8MHz for MCU
 	m_mcu->set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
 	m_mcu->set_addrmap(AS_IO, &karnov_state::chelnovjbl_mcu_io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(karnov_state::mcubl_p1_w));
@@ -856,10 +856,10 @@ void karnov_state::chelnovjbl(machine_config &config)
 void karnov_state::wndrplnt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10 MHz */
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);   /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);    /* Accurate */
+	M6502(config, m_audiocpu, 12_MHz_XTAL/8);    /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
@@ -889,10 +889,10 @@ void karnov_state::wndrplnt(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1241,7 +1241,8 @@ ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
 	ROM_LOAD( "5.bin",    0x38000, 0x08000, CRC(99cee6cd) SHA1(b2cd0a1aef04fd63ad27ac8a61d17a6bb4c8b600) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) /* Sprites */
-	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad (1st half is 99.996948% match)
+//	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad, 1 byte difference: byte 0x55CC == 0x30 vs 0xF0 in ee12-.f8
+	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )
 	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
 	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
 	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
@@ -1260,7 +1261,6 @@ Other ic: Philips MAB8031AH MCU
 OSC: 20 mhz, 12 mhz,8 mhz (for mcu)
 
 */
-
 
 // same pcb as above?
 // this is a further hacked set of the above, with the copyright messages removed etc. (black screens for several seconds instead)
