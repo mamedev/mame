@@ -78,6 +78,10 @@ namespace netlist
 
 		log_type & log();
 
+		void handler_noop()
+		{
+		}
+
 	public:
 		virtual void timestep(timestep_type ts_type, nl_fptype st) noexcept { plib::unused_var(ts_type, st); }
 		virtual void update_terminals() noexcept { }

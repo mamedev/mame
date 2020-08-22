@@ -332,9 +332,10 @@ namespace netlist
 				std::vector<const nldelegate *> t;
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
+				{
+					n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
 					for (auto & term : n->core_terms())
 					{
-						n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
 						if (!plib::container::contains(t, &term->delegate()))
 						{
 							t.push_back(&term->delegate());
@@ -345,6 +346,7 @@ namespace netlist
 						if (!plib::container::contains(devices_called, dev))
 							devices_called.push_back(dev);
 					}
+				}
 				log().verbose("Devices not yet updated:");
 				for (auto &dev : m_devices)
 					if (!plib::container::contains(devices_called, dev.second.get()))
@@ -747,8 +749,6 @@ namespace netlist
 			nldelegate delegate)
 			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
 	{
-		if (!delegate.is_set())
-			throw nl_exception("delegate not set for {1}", this->name());
 		state().setup().register_term(*this);
 	}
 

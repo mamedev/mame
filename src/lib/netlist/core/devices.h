@@ -138,7 +138,7 @@ namespace netlist
 		{
 		public:
 			NETLIB_CONSTRUCTOR(nc_pin)
-			, m_I(*this, "I", NETLIB_DELEGATE(noop))
+			, m_I(*this, "I", NETLIB_DELEGATE_NOOP())
 			{
 			}
 
@@ -146,10 +146,6 @@ namespace netlist
 			//NETLIB_RESETI() {}
 
 		private:
-			NETLIB_HANDLERI(noop)
-			{
-			}
-
 			analog_input_t m_I;
 
 		};
