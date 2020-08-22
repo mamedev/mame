@@ -32,14 +32,16 @@ notes:
 Sound not working on Return of Lady Frog
 
 TS 2006.12.22:
-- Funny Strip is runing on pSOS RTOS ( http://en.wikipedia.org/wiki/PSOS and http://dr-linux.net/newbase/reference/psosCD/ ) .
-  There's copyright text at $480
+- Funny Strip is running on pSOS RTOS ( http://en.wikipedia.org/wiki/PSOS and http://dr-linux.net/newbase/reference/psosCD/ ) .
+  There's copyright text at $480. In Ring & Ball the copyright text is at 0x7c7a0.
   Also Rebus and TRoLF are running on it (the same internal code structure - traps, interrupt vectors),
   but copyright messages are removed.
 - Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
-  It's not a real protection check i think.
+  It's not a real protection check I think.
+- Ring & Ball is mostly decrypted, currently stops at 'scheda da inizializzare' (board must be initialized). Switching the dip to clear RAM it says
+  'Inizializzazione ok, ver 2.6' (Initialization ok, ver 2.6) then stops. By switching DSW2.8 it's possible to enter test mode.
 
-More notes about Funny Strip protection issues at the bottom of source file (DRIVER INIT)
+More notes about Funny Strip protection issues at the bottom of source file (init_funystrp)
 
 ***************************************************************************/
 
@@ -1051,9 +1053,9 @@ no idea on this one...
 
 ROM_START( ringball )
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code + gfx */
-	// TODO: encrypted, there's a device with scratched part between 68k and roms. u87 looks to have standard 68k vectors with scrambled bits.
-	ROM_LOAD( "u87.bin",      0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
-	ROM_LOAD( "u111.bin",     0x040000, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
+	// TODO: encrypted, there's a device with scratched part between 68k and roms
+	ROM_LOAD16_BYTE( "u87.bin",      0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
+	ROM_LOAD16_BYTE( "u111.bin",     0x000001, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* Z80 code + sound data */
 	ROM_LOAD( "u130.bin",     0x000000, 0x080000, CRC(892202ea) SHA1(10b5933b136a6595f739510d380d12c4cefd9f09) )
@@ -1440,6 +1442,35 @@ void funystrp_state::init_funystrp()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16sm_delegate(*this, FUNC(funystrp_state::protection_r)));
 }
 
+void funystrp_state::init_ringball() // decryption is preliminary, can probably be simplified / rearranged once completely figured out
+{
+	m_bitmap_type = 0;
+	m_sprite_attr2_shift = 0;
+
+	uint16_t *audiorom = (uint16_t *)memregion("audiocpu")->base();
+
+	membank("sound_bank")->configure_entries(0, 16, &audiorom[0x00000], 0x8000);
+
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x2000 / 2; i++)  // believed ok
+		src[i] = bitswap<16>(src[i] ^ 0x85cc, 12, 13, 15, 10, 9, 11, 8, 14, 5, 4, 3, 2, 1, 0, 7, 6);
+
+	for (int i = 0x2000 / 2 ; i < 0x4000 / 2; i++)  // believed ok
+		src[i] = bitswap<16>(src[i] ^ 0xb622,  5, 4, 3, 2, 1, 0, 7, 6, 9, 8, 15, 14, 13, 12, 11, 10);
+
+	for (int i = 0x4000 / 2 ; i < 0x8000 / 2; i++) // probably
+		src[i] = bitswap<16>(src[i] ^ 0xb66d, 8, 9, 10, 11, 12, 13, 14, 15, 1, 0, 2, 3, 4, 5, 6, 7);
+
+	for (int i = 0x8000 / 2; i < 0x10000 / 2; i++)  // believed ok
+		src[i] = bitswap<16>(src[i] ^ 0xc8a6, 1, 3, 0, 5, 7, 9, 11, 13, 15, 14, 12, 8, 10, 6, 4, 2);
+
+	// 0x10000 - 0x61817 is 0xff filled
+
+	for (int i = 0x60000 / 2; i < 0x80000 / 2; i ++) // believed ok for 0x7c000 - 0x80000, probably ok for the rest (test mode doesn't appear otherwise)
+		src[i] ^= 0xffff;
+}
+
 GAME( 1992, splash,   0,        splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, splash10, splash,   splash,   splash,   splash_state,   init_splash10, ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.0 World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, paintlad, splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Painted Lady (Splash) (Ver. 1.3 US)", MACHINE_SUPPORTS_SAVE )
@@ -1449,4 +1480,4 @@ GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state,   init_roldfro
 GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state,   init_rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, ringball, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...
+GAME( 1995, ringball, funystrp, funystrp, funystrp, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring Ball (Ver. 2.6)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...
