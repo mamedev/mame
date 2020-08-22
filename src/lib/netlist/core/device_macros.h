@@ -152,6 +152,7 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 	void NETLIB_NAME(cname) :: timestep(timestep_type ts_type, nl_fptype step) noexcept
 
 #define NETLIB_DELEGATE(name) nldelegate(&this_type :: name, this)
+
 #define NETLIB_DELEGATE_NOOP() nldelegate(&core_device_t::handler_noop, static_cast<core_device_t *>(this))
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override

@@ -66,10 +66,12 @@ namespace netlist
 		};
 
 		stats_t * stats() const noexcept { return m_stats.get(); }
-#if 0
-		virtual void update() noexcept { }
-#endif
+
 		virtual void reset() { }
+
+		void handler_noop()
+		{
+		}
 
 	protected:
 
@@ -77,10 +79,6 @@ namespace netlist
 		virtual void dec_active() noexcept {  }
 
 		log_type & log();
-
-		void handler_noop()
-		{
-		}
 
 	public:
 		virtual void timestep(timestep_type ts_type, nl_fptype st) noexcept { plib::unused_var(ts_type, st); }
