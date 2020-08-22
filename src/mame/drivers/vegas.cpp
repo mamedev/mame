@@ -2657,7 +2657,7 @@ GAME( 1999, roadburn1,  roadburn,  roadburn, roadburn, vegas_state, init_roadbur
 GAME( 1998, nbashowt,   0,         nbashowt, nbashowt, vegas_state, init_nbashowt, ROT0, "Midway Games", "NBA Showtime NBA on NBC (ver 2.0, Apr 25 1999)", MACHINE_SUPPORTS_SAVE )
 // the game select menu shows SportStation for both of these, was there ever a standalone NBA Showtime Gold?
 GAME( 1999, nbanfl,     0,         nbanfl,   nbashowt, vegas_state, init_nbanfl,   ROT0, "Midway Games", "SportStation: NBA Showtime NBA on NBC (ver 2.1, Sep 22 1999) / NFL Blitz 2000 Gold Edition (ver 1.5, Sep 22 1999)", MACHINE_SUPPORTS_SAVE ) // NBA Showtime titlescreen still shows Version 2.0
-GAME( 2000, nbagold,    0,         nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games", "SportStation: NBA Showtime NBA on NBC Gold Edition (Ver 3.0, Feb 18 2000) / NFL Blitz 2000 Gold Edition", MACHINE_SUPPORTS_SAVE ) // boot game dipswitch has no effect, so NFL Blitz 2000 version number not shown
+GAME( 2000, nbagold,    0,         nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games", "SportStation: NBA Showtime NBA on NBC Gold Edition (ver 3.0, Feb 18 2000) / NFL Blitz 2000 Gold Edition", MACHINE_SUPPORTS_SAVE ) // boot game dipswitch has no effect, so NFL Blitz 2000 version number not shown
 
 // Durango + Denver SIO + Voodoo 3
 GAMEL( 1999, sf2049,     0,        sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
