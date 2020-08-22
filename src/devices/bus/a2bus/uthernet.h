@@ -12,6 +12,7 @@
 #define MAME_BUS_A2BUS_UTHERNET_H
 
 #include "a2bus.h"
+#include "machine/cs8900a.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,10 +28,10 @@ public:
 
 protected:
 	a2bus_uthernet_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-//	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
@@ -39,6 +40,8 @@ private:
 
 	bool m_started;
 	std::string m_interface;
+	required_device<cs8900a_device> m_netinf;
+
 };
 
 // device type definition

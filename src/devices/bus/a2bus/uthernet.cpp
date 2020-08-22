@@ -11,9 +11,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "uthernet.h"
-#include "tfe/defc.h"
-#include "tfe/tfe/tfesupp.h" 
-#include "tfe/tfe/protos_tfe.h" 
 
 /***************************************************************************
     PARAMETERS
@@ -38,8 +35,14 @@ a2bus_uthernet_device::a2bus_uthernet_device(const machine_config &mconfig, devi
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_started(false),
-		m_interface(mconfig.options().value(OPTION_UTHERNET_INTF))
+		m_interface(mconfig.options().value(OPTION_UTHERNET_INTF)),
+		m_netinf(*this, "cs8900a")
 {
+}
+
+void a2bus_uthernet_device::device_add_mconfig(machine_config &config)
+{
+	CS8900A(config, m_netinf, 0);
 }
 
 //-------------------------------------------------
@@ -48,20 +51,10 @@ a2bus_uthernet_device::a2bus_uthernet_device(const machine_config &mconfig, devi
 
 void a2bus_uthernet_device::device_start()
 {
-	if (!m_started) {
-	        set_tfe_interface(m_interface.c_str()); //Connect the emulated ethernet device with the selected host adapter
-		tfe_init();
-		m_started = true;
-	}
 }
 
 void a2bus_uthernet_device::device_reset()
 {
-	if (m_started) {
-		tfe_reset();
-	} else {
-		device_start();
-	}
 }
 
 /*-------------------------------------------------
@@ -70,7 +63,7 @@ void a2bus_uthernet_device::device_reset()
 
 uint8_t a2bus_uthernet_device::read_c0nx(uint8_t offset)
 {
-	return tfe_read((word16)offset);
+	return m_netinf->read(offset);
 }
 
 /*-------------------------------------------------
@@ -79,6 +72,6 @@ uint8_t a2bus_uthernet_device::read_c0nx(uint8_t offset)
 
 void a2bus_uthernet_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	tfe_store((word16)offset, data);
+	m_netinf->write(offset,data);
 }
 
