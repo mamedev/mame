@@ -65,7 +65,7 @@ license:CC0
 		<year>1998</year>
 		<publisher>Hewlett-Packard</publisher>
 		<part name="cdrom" interface="cdrom">
-		  <feature name="part_number" value="B6736-87001"/>
+			<feature name="part_number" value="B6736-87001"/>
 			<!-- Origin: archive.org -->
 			<diskarea name="cdrom">
 				<disk name="HP-UX 9.10 Programming Language Tools" sha1="b3b0bd68c8368ba267fd76518592053b99cd23de" />
