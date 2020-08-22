@@ -2336,6 +2336,74 @@ static NETLIST_START(TTL_74174_DIP)
 	)
 NETLIST_END()
 
+//FIXME: add documentation
+static NETLIST_START(TTL_74175_DIP)
+	TTL_74175(A)
+
+	DIPPINS(    /*      +--------------+      */
+	    A.CLRQ, /* CLRQ |1     ++    16| VCC  */ A.VCC,
+	    A.Q1,   /*   Q1 |2           15| Q4   */ A.Q4,
+	    A.Q1Q,  /*  Q1Q |3           14| Q4Q  */ A.Q4Q,
+	    A.D1,   /*   D1 |4   74175   13| D4   */ A.D4,
+	    A.D2,   /*   D2 |5           12| D3   */ A.D3,
+	    A.Q2Q,  /*  Q2Q |6           11| Q3Q  */ A.Q3Q,
+	    A.Q2,   /*   Q2 |7           10| Q3   */ A.Q3,
+	    A.GND,  /*  GND |8            9| CLK  */ A.CLK
+	            /*      +--------------+   */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74192_DIP)
+	TTL_74192(A)
+
+	DIPPINS(    /*      +--------------+        */
+	    A.B,    /*    B |1     ++    16| VCC    */ A.VCC,
+	    A.QB,   /*   QB |2           15| A      */ A.A,
+	    A.QA,   /*   QA |3           14| CLEAR  */ A.CLEAR,
+	    A.CD,   /*   CD |4    74192  13| BORROWQ*/ A.BORROWQ,
+	    A.CU,   /*   CU |5           12| CARRYQ */ A.CARRYQ,
+	    A.QC,   /*   QC |6           11| LOADQ  */ A.LOADQ,
+	    A.QD,   /*   QD |7           10| C      */ A.C,
+	    A.GND,  /*  GND |8            9| D      */ A.D
+	            /*      +--------------+        */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74193_DIP)
+	TTL_74193(A)
+
+	DIPPINS(    /*      +--------------+        */
+	    A.B,    /*    B |1     ++    16| VCC    */ A.VCC,
+	    A.QB,   /*   QB |2           15| A      */ A.A,
+	    A.QA,   /*   QA |3           14| CLEAR  */ A.CLEAR,
+	    A.CD,   /*   CD |4    74192  13| BORROWQ*/ A.BORROWQ,
+	    A.CU,   /*   CU |5           12| CARRYQ */ A.CARRYQ,
+	    A.QC,   /*   QC |6           11| LOADQ  */ A.LOADQ,
+	    A.QD,   /*   QD |7           10| C      */ A.C,
+	    A.GND,  /*  GND |8            9| D      */ A.D
+	            /*      +--------------+        */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74194_DIP)
+	TTL_74194(A)
+
+	DIPPINS(    /*        +--------------+     */
+	    A.CLRQ, /*   CLRQ |1     ++    16| VCC */ A.VCC,
+	    A.SRIN, /*   SRIN |2           15| QA  */ A.QA,
+	    A.A,    /*      A |3           14| QB  */ A.QB,
+	    A.B,    /*      B |4    74194  13| QC  */ A.QC,
+	    A.C,    /*      C |5           12| QD  */ A.QD,
+	    A.D,    /*      D |6           11| CLK */ A.CLK,
+	    A.SLIN, /*   SLIN |7           10| S1  */ A.S1,
+	    A.GND,  /*    GND |8            9| S0  */ A.S0
+	            /*        +--------------+     */
+	)
+NETLIST_END()
+
 //- Identifier: TTL_74260_DIP
 //- Title: DM54LS260/DM74LS260 Dual 5-Input NOR Gate
 //- Description: This device contains two individual five input gates, each of which perform the logic NOR function.
@@ -2430,6 +2498,23 @@ static NETLIST_START(TTL_74279_DIP)
 		  B.Q, /*   2Q |7           10| 3RQ  */ C.R,
 		A.GND, /*  GND |8            9| 3Q   */ C.Q
 			   /*      +--------------+      */
+	)
+NETLIST_END()
+
+// FIXME: Documentation
+static NETLIST_START(TTL_74365_DIP)
+	TTL_74365(A)
+
+	DIPPINS(   /*      +--------------+     */
+	    A.G1Q, /*  G1Q |1     ++    16| VCC */ A.VCC,
+	    A.A1,  /*   A1 |2           15| G2Q */ A.G2Q,
+	    A.Y1,  /*   Y1 |3           14| A6  */ A.A6,
+	    A.A2,  /*   A2 |4    74365  13| Y6  */ A.Y6,
+	    A.Y2,  /*   Y2 |5           12| A5  */ A.A5,
+	    A.A3,  /*   A3 |6           11| Y5  */ A.Y5,
+	    A.Y3,  /*   Y3 |7           10| A4  */ A.A4,
+	    A.GND, /*  GND |8            9| Y4  */ A.Y4
+	           /*      +--------------+     */
 	)
 NETLIST_END()
 
@@ -3314,8 +3399,13 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74165_DIP)
 	LOCAL_LIB_ENTRY(TTL_74166_DIP)
 	LOCAL_LIB_ENTRY(TTL_74174_DIP)
+	LOCAL_LIB_ENTRY(TTL_74175_DIP)
+	LOCAL_LIB_ENTRY(TTL_74192_DIP)
+	LOCAL_LIB_ENTRY(TTL_74193_DIP)
+	LOCAL_LIB_ENTRY(TTL_74194_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
+	LOCAL_LIB_ENTRY(TTL_74365_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)

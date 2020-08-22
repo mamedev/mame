@@ -248,6 +248,18 @@
 #define TTL_74174_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_74174_DIP, name)
 
+#define TTL_74175_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74175_DIP, name)
+
+#define TTL_74192_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74192_DIP, name)
+
+#define TTL_74193_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74193_DIP, name)
+
+#define TTL_74194_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74194_DIP, name)
+
 #define TTL_74260_NOR(...)                                                     \
 	NET_REGISTER_DEVEXT(TTL_74260_NOR, __VA_ARGS__)
 
@@ -256,6 +268,9 @@
 
 #define TTL_74279_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74279_DIP, name)
+
+#define TTL_74365_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74365_DIP, name)
 
 #define TTL_74377_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74377_DIP, name)
