@@ -106,8 +106,6 @@
 
 #include "jvc_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 
 jvc_format::jvc_format()
 {
@@ -136,8 +134,7 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 	header_size = size % 256;
 	uint8_t header[5];
 
-	// if we know that this is a header of a bad size, we can fail
-	// immediately; otherwise read the header
+	// if we know that this is a header of a bad size, we can fail immediately; otherwise read the header
 	if (header_size >= sizeof(header))
 		return false;
 	if (header_size > 0)
@@ -152,7 +149,8 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 	switch (header_size)
 	{
 	case 5:
-		throw emu_fatalerror("jvc_format: sector attribute flag unsupported\n");
+		osd_printf_info("jvc_format: sector attribute flag unsupported\n");
+		return false;
 	case 4: base_sector_id = header[3];
 		// no break
 	case 3: sector_size = 128 << header[2];
@@ -185,7 +183,10 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	// safety check
 	if (sector_count * sector_size > 10000)
-		throw emu_fatalerror("jvc_format: incorrect track layout\n");
+	{
+		osd_printf_error("jvc_format: incorrect track layout\n");
+		return false;
+	}
 
 	int file_offset = header_size;
 
@@ -254,7 +255,10 @@ bool jvc_format::save(io_generic *io, floppy_image *image)
 			for (int i = 0; i < 18; i++)
 			{
 				if (sectors[1 + i].size != 256)
-					throw emu_fatalerror("jvc_format: invalid sector size: %d\n", sectors[1 + i].size);
+				{
+					osd_printf_error("jvc_format: invalid sector size: %d\n", sectors[1 + i].size);
+					return false;
+				}
 
 				io_generic_write(io, sectors[1 + i].data, file_offset, sectors[1 + i].size);
 				file_offset += sectors[1 + i].size;
