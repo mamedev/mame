@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, hap
-/***************************************************************************
+/*******************************************************************************
 
 Driver file to handle emulation of the Magnavox Odyssey 2 (stylized Odyssey²),
 Philips Videopac G7000 and Philips Videopac+ G7400.
@@ -11,7 +11,25 @@ halted due to a hardware defect, wide release continued in 1979.
 
 The 2 joysticks have no clear distinction between player 1 and 2, it differs
 per game. And in MAME it's extra awkward due to the default input mapping
-conflicting with the keyboard.
+conflicting with the keyboard. An easy way to work around this if you're only
+playing 1-player games, is to map both joysticks to the same inputs.
+
+Videopac consoles:
+- Philips Videopac G7000 (Europe, several models)
+- Philips Videopac C52 (France)
+- Philips Odyssey (Brazil)
+- Magnavox Odyssey 2 (US)
+- Radiola Jet 25 (France)
+- Siera Videopac Computer G7000 (France)
+- Schneider Videopac 7000 (Germany)
+- Philips Videopac G7200 (Europe, Videopac with built-in screen)
+- Philips Videojeu N60 (France)
+
+Videopac+ consoles:
+- Philips Videopac+ G7400/G7401 (Europe)
+- Magnavox Odyssey 3 Command Center (US, prototype)
+- Brandt Jopac JO7400 (France)
+- Schneider Videopac 74+ (Germany)
 
 Odyssey 2/Videopac hardware notes:
 - Intel 8048 (1KB internal ROM, 64 bytes internal RAM)
@@ -28,7 +46,7 @@ Videopac+ G7400 hardware notes:
 XTAL notes (differs per model):
 - Odyssey 2: 7.15909MHz
 - G7000: 17.734476MHz
-- C52/N60: 17.812
+- C52/N60: 17.812MHz
 - G7200: 5.911MHz + 3.547MHz
 - G7400: 5.911MHz + 8.867MHz
 - JO7400: 5.911MHz + 3.5625MHz
@@ -65,10 +83,12 @@ BTANB:
 - g7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
   placed lower on odyssey3
 - Blackjack (Videopac 5) does not work on G7400, caused by a removed BIOS routine
+- due to different XTAL ratio on Jopac JO7400, some games that do mid-screen video
+  updates will have glitches on this machine, notably backgamm
 
 Plenty games have minor bugs not worth mentioning here.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
