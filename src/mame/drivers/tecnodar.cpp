@@ -337,7 +337,7 @@ ROM_START(tecnodar)
 	// 2 more ROM sockets are empty
 
 	ROM_REGION(0x117, "plds", 0)
-        ROM_LOAD("gal16v8.bin", 0x000, 0x117, NO_DUMP)
+	ROM_LOAD("gal16v8.bin", 0x000, 0x117, NO_DUMP)
 ROM_END
 
 ROM_START(tecnodargr)
@@ -350,7 +350,7 @@ ROM_START(tecnodargr)
 	// 2 more ROM sockets are empty
 
 	ROM_REGION(0x117, "plds", 0)
-        ROM_LOAD("16as25hb1.bin", 0x000, 0x117, NO_DUMP)
+	ROM_LOAD("16as25hb1.bin", 0x000, 0x117, NO_DUMP)
 ROM_END
 
 
