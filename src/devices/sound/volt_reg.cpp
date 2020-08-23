@@ -32,5 +32,5 @@ void voltage_regulator_device::device_start()
 
 void voltage_regulator_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
 {
-	outputs[0].clear(m_output);
+	outputs[0].fill(m_output);
 }

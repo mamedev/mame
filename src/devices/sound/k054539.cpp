@@ -119,11 +119,12 @@ void k054539_device::sound_stream_update_ex(sound_stream &stream, std::vector<re
 
 	if(!(regs[0x22f] & 1))
 	{
-		outputs[0].clear(0);
-		outputs[1].clear(0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 		return;
 	}
 
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for(int sample = 0; sample != outputs[0].samples(); sample++) {
 		double lval, rval;
 		if(!(flags & DISABLE_REVERB))
@@ -302,8 +303,8 @@ void k054539_device::sound_stream_update_ex(sound_stream &stream, std::vector<re
 				}
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0].put(sample, stream_buffer::sample_t(lval) * stream_buffer::sample_t(1.0 / 32768.0));
-		outputs[1].put(sample, stream_buffer::sample_t(rval) * stream_buffer::sample_t(1.0 / 32768.0));
+		outputs[0].put(sample, stream_buffer::sample_t(lval) * sample_scale);
+		outputs[1].put(sample, stream_buffer::sample_t(rval) * sample_scale);
 	}
 }
 

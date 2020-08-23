@@ -898,8 +898,7 @@ void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &tar
 	int sampindex;
 	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
 		target.put(sampindex, m_buffer[sampindex]);
-	for ( ; sampindex < target.samples(); sampindex++)
-		target.put(sampindex, m_cur);
+	target.fill(m_cur, sampindex);
 }
 
 
@@ -1512,7 +1511,7 @@ void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std
 {
 	for (auto &e : m_in)
 	{
-		auto clock_period = attotime(0, inputs[e.first].sample_period_attoseconds());
+		auto clock_period = inputs[e.first].sample_period();
 		auto sample_time = netlist::netlist_time::from_raw(static_cast<netlist::netlist_time::internal_type>(nltime_from_attotime(clock_period).as_raw()));
 		m_inbuffer[e.first] = netlist_mame_sound_input_buffer(inputs[e.first]);
 		e.second->buffer_reset(sample_time, m_inbuffer[e.first].samples(), &m_inbuffer[e.first]);
@@ -1524,7 +1523,7 @@ void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std
 	// end_time() is the time at the END of the last sample we're generating
 	// however, the sample value is the value at the START of that last sample,
 	// so subtract one sample period so that we only process up to the minimum
-	auto nl_target_time = nltime_from_attotime(outputs[0].end_time() - attotime(0, outputs[0].sample_period_attoseconds()));
+	auto nl_target_time = nltime_from_attotime(outputs[0].end_time() - outputs[0].sample_period());
 
 	auto nltime(netlist().exec().time());
 	if (nltime < nl_target_time)

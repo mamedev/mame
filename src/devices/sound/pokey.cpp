@@ -693,7 +693,7 @@ void pokey_device::sound_stream_update_ex(sound_stream &stream, std::vector<read
 		out *= POKEY_DEFAULT_GAIN;
 		out = (out > 0x7fff) ? 0x7fff : out;
 		stream_buffer::sample_t outsamp = out * stream_buffer::sample_t(1.0 / 32768.0);
-		buffer.clear(outsamp);
+		buffer.fill(outsamp);
 	}
 	else if (m_output_type == RC_LOWPASS)
 	{
@@ -722,7 +722,7 @@ void pokey_device::sound_stream_update_ex(sound_stream &stream, std::vector<read
 		 */
 
 		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0;
-		buffer.clear(V0);
+		buffer.fill(V0);
 	}
 	else if (m_output_type == OPAMP_LOW_PASS)
 	{
@@ -743,7 +743,7 @@ void pokey_device::sound_stream_update_ex(sound_stream &stream, std::vector<read
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
 	{
-		buffer.clear(m_voltab[m_out_raw]);
+		buffer.fill(m_voltab[m_out_raw]);
 	}
 }
 

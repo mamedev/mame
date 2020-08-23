@@ -101,7 +101,7 @@ void stream_buffer::set_sample_rate(u32 rate)
 		buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
 
 	// also note the time and rate of these samples (end_time is AFTER the final sample)
-	attotime buffer_period = attotime(0, sample_period_attoseconds());
+	attotime buffer_period = sample_period();
 	attotime buffer_time = end_time();
 
 	// ensure our buffer is large enough to hold a full second at the new rate
@@ -122,7 +122,7 @@ void stream_buffer::set_sample_rate(u32 rate)
 	m_end_sample = time_to_buffer_index(buffer_time);
 
 	// compute the time of the first sample to be backfilled; start one period before
-	attotime backfill_period = attotime(0, sample_period_attoseconds());
+	attotime backfill_period = sample_period();
 	attotime backfill_time = end_time() - backfill_period;
 
 	// also adjust the buffered sample end time to point to the sample time of the
@@ -148,16 +148,6 @@ void stream_buffer::set_sample_rate(u32 rate)
 		put(m_end_sample - 1 - dstindex, buffer[srcindex]);
 		backfill_time -= backfill_period;
 	}
-}
-
-
-//-------------------------------------------------
-//  clear - clear the buffer
-//-------------------------------------------------
-
-void stream_buffer::clear()
-{
-	std::fill_n(&m_buffer[0], m_buffer.size(), 0);
 }
 
 
@@ -242,7 +232,7 @@ void stream_buffer::flush_wav()
 		int cursamples = view.samples() - samplebase;
 		if (cursamples > ARRAY_LENGTH(buffer))
 			cursamples = ARRAY_LENGTH(buffer);
-		
+
 		// convert and fill
 		for (int sampindex = 0; sampindex < cursamples; sampindex++)
 			buffer[sampindex] = s16(view.get(samplebase + sampindex) * 32768.0);
@@ -343,6 +333,11 @@ sound_stream::~sound_stream()
 void sound_stream::init_common(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
 {
 	sound_assert(outputs > 0);
+
+	// create a name
+	m_name = m_device.name();
+	m_name += " ";
+	m_name += m_device.tag();
 
 	// create a unique tag for saving
 	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
@@ -566,7 +561,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 #if (SOUND_DEBUG)
 			// clear each output view to NANs before we call the callback
 			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
-				m_output_view[outindex].clear(NAN);
+				m_output_view[outindex].fill(NAN);
 #endif
 
 			// if we have an extended callback, that's all we need
@@ -788,10 +783,13 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent)
 {
-	printf("%c %*s%s %s @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", device().name(), device().tag(), sample_rate());
+	printf("%c %*s%s @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", name(), sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
-			m_input[index].m_native_source->stream().print_graph_recursive(indent + 2);
+			if (m_input[index].m_resampler_source != nullptr)
+				m_input[index].m_resampler_source->stream().print_graph_recursive(indent + 2);
+			else
+				m_input[index].m_native_source->stream().print_graph_recursive(indent + 2);
 }
 #endif
 
@@ -810,6 +808,9 @@ default_resampler_stream::default_resampler_stream(device_t &device) :
 	sound_stream(device, 1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_ex_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_RESAMPLER_NONE),
 	m_max_latency(0)
 {
+	// create a name
+	m_name = "Resampler ";
+	m_name += this->device().tag();
 }
 
 
@@ -847,7 +848,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 		latency_samples = m_max_latency;
 	else
 		m_max_latency = latency_samples;
-	attotime latency = attotime(0, latency_samples * input.sample_period_attoseconds());
+	attotime latency = latency_samples * input.sample_period();
 
 	// clamp the latency to the start (only relevant at the beginning)
 	s32 dstindex = 0;
@@ -855,7 +856,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	while (latency > output_start && dstindex < numsamples)
 	{
 		output.put(dstindex++, 0);
-		output_start += attotime(0, output.sample_period_attoseconds());
+		output_start += output.sample_period();
 	}
 
 	// now rebase our input buffer around the adjusted start time

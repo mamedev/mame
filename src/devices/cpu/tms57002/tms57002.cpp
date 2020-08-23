@@ -923,24 +923,17 @@ void tms57002_device::sound_stream_update_ex(sound_stream &stream, std::vector<r
 	assert(inputs[0].samples() == 1);
 	assert(outputs[0].samples() == 1);
 
-	stream_buffer::sample_t ifactor = 32768.0 * ((st0 & ST0_SIM) ? 256.0 : 1.0);
-	si[0] = s32(inputs[0].get(0) * ifactor) & 0xffffff;
-	si[1] = s32(inputs[1].get(0) * ifactor) & 0xffffff;
-	si[2] = s32(inputs[2].get(0) * ifactor) & 0xffffff;
-	si[3] = s32(inputs[3].get(0) * ifactor) & 0xffffff;
+	stream_buffer::sample_t in_scale = 32768.0 * ((st0 & ST0_SIM) ? 256.0 : 1.0);
+	si[0] = s32(inputs[0].get(0) * in_scale) & 0xffffff;
+	si[1] = s32(inputs[1].get(0) * in_scale) & 0xffffff;
+	si[2] = s32(inputs[2].get(0) * in_scale) & 0xffffff;
+	si[3] = s32(inputs[3].get(0) * in_scale) & 0xffffff;
 
-//if (si[0] || si[1] || si[2] || si[3]) __debugbreak();
-
-//if (so[0] || so[1] || so[2] || so[3]) __debugbreak();
-
-	stream_buffer::sample_t ofactor = stream_buffer::sample_t(1.0 / (32768.0 * 65536.0));
-	outputs[0].put(0, stream_buffer::sample_t(s32(so[0] << 8)) * ofactor);
-	outputs[1].put(0, stream_buffer::sample_t(s32(so[1] << 8)) * ofactor);
-	outputs[2].put(0, stream_buffer::sample_t(s32(so[2] << 8)) * ofactor);
-	outputs[3].put(0, stream_buffer::sample_t(s32(so[3] << 8)) * ofactor);
-
-//for (int i = 0; i < 4; i++)
-//	printf("[%d] %9.6f -> %08X ; %08X -> %9.6f\n", i, inputs[i].get(0), si[i], so[i], outputs[i].get(0));
+	stream_buffer::sample_t out_scale = 1.0 / (32768.0 * 65536.0);
+	outputs[0].put(0, stream_buffer::sample_t(s32(so[0] << 8)) * out_scale);
+	outputs[1].put(0, stream_buffer::sample_t(s32(so[1] << 8)) * out_scale);
+	outputs[2].put(0, stream_buffer::sample_t(s32(so[2] << 8)) * out_scale);
+	outputs[3].put(0, stream_buffer::sample_t(s32(so[3] << 8)) * out_scale);
 
 	sync_w(1);
 }

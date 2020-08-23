@@ -367,13 +367,13 @@ void msm5205_device::sound_stream_update_ex(sound_stream &stream, std::vector<re
 	/* if this voice is active */
 	if (m_signal)
 	{
+		constexpr stream_buffer::sample_t sample_scale = 1.0 / double(1 << 12);
 		const int dac_mask = (m_dac_bits >= 12) ? 0 : (1 << (12 - m_dac_bits)) - 1;
-		stream_buffer::sample_t val = stream_buffer::sample_t(m_signal & ~dac_mask) / stream_buffer::sample_t(1 << 12);
-		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
-			output.put(sampindex, val);
+		stream_buffer::sample_t val = stream_buffer::sample_t(m_signal & ~dac_mask) * sample_scale;
+		output.fill(val);
 	}
 	else
-		output.clear(0);
+		output.fill(0);
 }
 
 

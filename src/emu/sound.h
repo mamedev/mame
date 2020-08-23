@@ -101,7 +101,8 @@ public:
 	u32 sample_rate() const { return m_sample_rate; }
 
 	// return the current sample period in attoseconds
-	attoseconds_t sample_period_attoseconds() const { return HZ_TO_ATTOSECONDS(m_sample_rate); }
+	attoseconds_t sample_period_attoseconds() const { return m_sample_attos; }
+	attotime sample_period() const { return attotime(0, m_sample_attos); }
 
 	// return the attotime of the current end of buffer
 	attotime end_time() const { return index_time(m_end_sample); }
@@ -109,11 +110,12 @@ public:
 	// set a new sample rate
 	void set_sample_rate(u32 rate);
 
-	// clear the buffer
-	void clear();
-
 	// set the time (for forced resyncs; generally not used)
-	void set_end_time(attotime time) { m_end_second = time.seconds(); m_end_sample = u32(time.attoseconds() / m_sample_attos); }
+	void set_end_time(attotime time)
+	{
+		m_end_second = time.seconds();
+		m_end_sample = u32(time.attoseconds() / m_sample_attos);
+	}
 
 	// read the sample at the given index (clamped)
 	sample_t get(s32 index) const
@@ -236,6 +238,7 @@ public:
 
 	// return the sample period (in attoseconds) of the data
 	attoseconds_t sample_period_attoseconds() const { return m_buffer->sample_period_attoseconds(); }
+	attotime sample_period() const { return m_buffer->sample_period(); }
 
 	// return the number of samples represented by the buffer
 	u32 samples() const { return m_end - m_start; }
@@ -332,29 +335,38 @@ public:
 			m_buffer->put(m_start + index, m_buffer->get(m_start + index) + sample);
 	}
 
-	// clear the view to the given value
-	void clear(sample_t value = 0)
+	// fill part of the view with the given value
+	void fill(sample_t value, s32 start, s32 count)
 	{
-		s32 count = samples();
+		if (start + count > samples())
+			count = samples() - start;
 		for (s32 index = 0; index < count; index++)
-			put(index, value);
+			put(start + index, value);
 	}
+	void fill(sample_t value, s32 start) { fill(value, start, samples() - start); }
+	void fill(sample_t value) { fill(value, 0, samples()); }
 
 	// copy the view from another view
-	void copy(read_stream_view &src)
+	void copy(read_stream_view &src, s32 start, s32 count)
 	{
-		s32 count = samples();
+		if (start + count > samples())
+			count = samples() - start;
 		for (s32 index = 0; index < count; index++)
-			put(index, src.get(index));
+			put(start + index, src.get(start + index));
 	}
+	void copy(read_stream_view &src, s32 start) { copy(src, start, samples() - start); }
+	void copy(read_stream_view &src) { copy(src, 0, samples()); }
 
 	// add the view from another view to our current values
-	void add(read_stream_view &src)
+	void add(read_stream_view &src, s32 start, s32 count)
 	{
-		s32 count = samples();
+		if (start + count > samples())
+			count = samples() - start;
 		for (s32 index = 0; index < count; index++)
-			add(index, src.get(index));
+			add(start + index, src.get(start + index));
 	}
+	void add(read_stream_view &src, s32 start) { add(src, start, samples() - start); }
+	void add(read_stream_view &src) { add(src, 0, samples()); }
 };
 
 
@@ -516,6 +528,9 @@ public:
 	void print_graph_recursive(int indent);
 #endif
 
+protected:
+	std::string m_name;                            // name of this stream
+
 private:
 	// helpers called by our friends only
 	void apply_sample_rate_changes();
@@ -532,7 +547,6 @@ private:
 	sound_stream *m_next;                          // next stream in the chain
 
 	// general information
-	std::string m_name;                            // name of this stream
 	u32 m_sample_rate;                             // current live sample rate
 	u32 m_pending_sample_rate;                     // pending sample rate for dynamic changes
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
@@ -650,6 +664,10 @@ private:
 	std::vector<stream_buffer::sample_t> m_leftmix;
 	std::vector<stream_buffer::sample_t> m_rightmix;
 	int m_samples_this_update;
+
+	stream_buffer::sample_t m_compressor_thresh;
+	stream_buffer::sample_t m_compressor_scale;
+	int m_compressor_counter;
 
 	u8 m_muted;
 	int m_attenuation;

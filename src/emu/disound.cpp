@@ -513,5 +513,5 @@ void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::v
 	// clear anything unused
 	for (int outputnum = 0; outputnum < m_outputs; outputnum++)
 		if (!m_output_clear[outputnum])
-			outputs[outputnum].clear();
+			outputs[outputnum].fill(0);
 }

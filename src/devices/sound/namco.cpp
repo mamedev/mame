@@ -662,8 +662,8 @@ void namco_audio_device::sound_stream_update_ex(sound_stream &stream, std::vecto
 	if (m_stereo)
 	{
 		/* zap the contents of the buffers */
-		outputs[0].clear(0);
-		outputs[1].clear(0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 
 		/* if no sound, we're done */
 		if (!m_sound_enable)
@@ -770,7 +770,7 @@ void namco_audio_device::sound_stream_update_ex(sound_stream &stream, std::vecto
 
 		auto &buffer = outputs[0];
 		/* zap the contents of the buffer */
-		buffer.clear(0);
+		buffer.fill(0);
 
 		/* if no sound, we're done */
 		if (!m_sound_enable)

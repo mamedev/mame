@@ -1837,12 +1837,12 @@ void ym2151_device::sound_stream_update_ex(sound_stream &stream, std::vector<rea
 {
 	if (m_reset_active)
 	{
-		outputs[0].clear(0);
-		outputs[1].clear(0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 		return;
 	}
 
-	constexpr stream_buffer::sample_t scale = stream_buffer::sample_t(1.0 / 32768.0);
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int sampindex=0; sampindex<outputs[0].samples(); sampindex++)
 	{
 		advance_eg();
@@ -1861,8 +1861,8 @@ void ym2151_device::sound_stream_update_ex(sound_stream &stream, std::vector<rea
 			outr += chanout[ch] & pan[2*ch+1];
 		}
 
-		outputs[0].put(sampindex, stream_buffer::sample_t(outl) * scale);
-		outputs[1].put(sampindex, stream_buffer::sample_t(outr) * scale);
+		outputs[0].put(sampindex, stream_buffer::sample_t(outl) * sample_scale);
+		outputs[1].put(sampindex, stream_buffer::sample_t(outr) * sample_scale);
 
 		advance();
 	}

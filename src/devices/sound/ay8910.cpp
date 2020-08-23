@@ -1092,7 +1092,7 @@ void ay8910_device::sound_stream_update_ex(sound_stream &stream, std::vector<rea
 	if (!m_ready)
 	{
 		for (int chan = 0; chan < m_streams; chan++)
-			outputs[chan].clear(0);
+			outputs[chan].fill(0);
 	}
 
 	/* The 8910 has three outputs, each output is the mix of one of the three */
