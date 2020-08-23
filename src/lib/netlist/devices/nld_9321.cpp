@@ -40,6 +40,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_HANDLERI(in)
 		{
 			m_enable = m_E() ? 0 : 1;
@@ -56,7 +57,6 @@ namespace netlist
 				m_D[i].push((i == m_o && m_enable) ? 0 : 1, NLTIME_FROM_NS(18));
 		}
 
-	public:
 		state_var<bool> m_enable;
 		state_var<uint32_t> m_o;
 		object_array_t<logic_input_t, 2> m_A;

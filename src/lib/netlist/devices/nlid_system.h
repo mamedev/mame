@@ -337,7 +337,6 @@ namespace devices
 
 	NETLIB_OBJECT(frontier)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(frontier)
 		, m_RIN(*this, "m_RIN", NETLIB_DELEGATE(input))
 		, m_ROUT(*this, "m_ROUT", NETLIB_DELEGATE(input))
@@ -356,13 +355,13 @@ namespace devices
 			connect(m_Q, m_ROUT.P());
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
 			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
 		}
 
-	private:
 		NETLIB_HANDLERI(input)
 		{
 			m_Q.push(m_I());
@@ -442,7 +441,6 @@ namespace devices
 
 	NETLIB_OBJECT(sys_dsw1)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(sys_dsw1)
 		, m_RON(*this, "RON", nlconst::one())
 		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
@@ -499,7 +497,6 @@ namespace devices
 
 	NETLIB_OBJECT(sys_dsw2)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(sys_dsw2)
 		, m_R1(*this, "_R1")
 		, m_R2(*this, "_R2")
@@ -515,6 +512,7 @@ namespace devices
 			connect(m_R1.N(), m_R2.P());
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_R1.set_G(m_GOFF());
@@ -523,7 +521,6 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
-	private:
 		NETLIB_HANDLERI(input)
 		{
 			const netlist_sig_t state = m_I();
@@ -568,7 +565,6 @@ namespace devices
 
 	NETLIB_OBJECT(sys_compd)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(sys_compd)
 		, m_IP(*this, "IP", NETLIB_DELEGATE(inputs))
 		, m_IN(*this, "IN", NETLIB_DELEGATE(inputs))
@@ -579,6 +575,7 @@ namespace devices
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_last_state = 0;
@@ -586,7 +583,6 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
-	private:
 		NETLIB_HANDLERI(inputs)
 		{
 			const netlist_sig_t state = (m_IP() > m_IN());

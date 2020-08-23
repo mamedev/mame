@@ -125,6 +125,7 @@ namespace netlist
 			register_subalias("Y", m_clock.m_Y);
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_R_FC.set_R( nlconst::magic(90000.0));
@@ -136,7 +137,6 @@ namespace netlist
 			/* update param may be called from anywhere, update_dev(time) is not a good idea */
 		}
 
-	public:
 		SN74LS629clk m_clock;
 		analog::NETLIB_SUB(R_base) m_R_FC;
 		analog::NETLIB_SUB(R_base) m_R_RNG;
@@ -149,7 +149,6 @@ namespace netlist
 		nld_power_pins m_power_pins;
 		nld_power_pins m_power_pins_osc;
 
-	private:
 		NETLIB_HANDLERI(inputs)
 		{
 			{

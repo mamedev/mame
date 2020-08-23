@@ -79,12 +79,12 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_last_CLK = 0;
 		}
 
-	public:
 		NETLIB_HANDLERI(inputs)
 		{
 			const auto JK = (m_J() << 1) | m_K();
@@ -132,9 +132,7 @@ namespace netlist
 
 	NETLIB_OBJECT_DERIVED(7473A, 7473)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(7473A) { }
-
 	};
 
 	NETLIB_DEVICE_IMPL(7473, "TTL_7473", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
