@@ -11,7 +11,9 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6800/m6800.h"
 #include "cpu/m6800/m6801.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/am25s55x.h"
@@ -20,6 +22,7 @@
 #include "machine/com8116.h"
 #include "machine/fdc_pll.h"
 #include "machine/input_merger.h"
+#include "machine/mc68681.h"
 #include "machine/tdc1008.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -42,10 +45,12 @@
 #define LOG_COMBINER        (1 << 13)
 #define LOG_SIZE_CARD       (1 << 14)
 #define LOG_FILTER_CARD     (1 << 15)
+#define LOG_KEYBC           (1 << 16)
+#define LOG_TDS				(1 << 17)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
 
-#define VERBOSE             (0)//(LOG_ALL &~ LOG_FDC_CTRL)
+#define VERBOSE             (LOG_TDS)
 #include "logmacro.h"
 
 class dpb7000_state : public driver_device
@@ -57,7 +62,7 @@ public:
 		, m_acia(*this, "fd%u", 0U)
 		, m_p_int(*this, "p_int")
 		, m_brg(*this, "brg")
-		, m_rs232(*this, "rs232")
+		, m_rs232(*this, "rs232%u", 0U)
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
 		, m_vdu_ram(*this, "vduram")
@@ -73,6 +78,11 @@ public:
 		, m_fdd_serial(*this, "fddserial")
 		, m_floppy0(*this, "0")
 		, m_floppy(nullptr)
+		, m_keybcpu(*this, "keybcpu")
+		, m_keybc_cols(*this, "KEYB_COL%u", 0U)
+		, m_tds_cpu(*this, "tds")
+		, m_tds_duart(*this, "tds_duart")
+		, m_tds_dips(*this, "TDSDIPS")
 		, m_filter_signalprom(*this, "filter_signalprom")
 		, m_filter_multprom(*this, "filter_multprom")
 		, m_filter_signal(nullptr)
@@ -99,6 +109,8 @@ private:
 
 	void main_map(address_map &map);
 	void fddcpu_map(address_map &map);
+	void keybcpu_map(address_map &map);
+	void tds_cpu_map(address_map &map);
 
 	uint16_t bus_error_r(offs_t offset);
 	void bus_error_w(offs_t offset, uint16_t data);
@@ -152,7 +164,7 @@ private:
 	required_device_array<acia6850_device, 3> m_acia;
 	required_device<input_merger_device> m_p_int;
 	required_device<com8116_device> m_brg;
-	required_device<rs232_port_device> m_rs232;
+	required_device_array<rs232_port_device, 2> m_rs232;
 	required_device<sy6545_1_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_vdu_ram;
@@ -306,6 +318,36 @@ private:
 	uint8_t m_matte_u[2];
 	uint8_t m_matte_v[2];
 
+	// Keyboard
+	required_device<i8039_device> m_keybcpu;
+	required_ioport_array<8> m_keybc_cols;
+	uint8_t keyboard_p1_r();
+	uint8_t keyboard_p2_r();
+	void keyboard_p1_w(uint8_t data);
+	void keyboard_p2_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER(keyboard_t0_r);
+	DECLARE_READ_LINE_MEMBER(keyboard_t1_r);
+	uint8_t m_keybc_latched_bit;
+	uint8_t m_keybc_p1_data;
+	uint8_t m_keybc_tx;
+
+	// TDS Box
+	required_device<m6803_cpu_device> m_tds_cpu;
+	required_device<scn2681_device> m_tds_duart;
+	required_ioport m_tds_dips;
+	uint8_t tds_p1_r();
+	uint8_t tds_p2_r();
+	void tds_p1_w(uint8_t data);
+	void tds_p2_w(uint8_t data);
+	void tds_dac_w(uint8_t data);
+	void tds_convert_w(uint8_t data);
+	uint8_t tds_adc_r();
+	uint8_t tds_pen_switches_r();
+	DECLARE_WRITE_LINE_MEMBER(duart_b_w);
+	uint8_t m_tds_dac_value;
+	uint8_t m_tds_adc_value;
+	uint8_t m_tds_p1_data;
+
 	// Filter Card
 	required_memory_region m_filter_signalprom;
 	required_memory_region m_filter_multprom;
@@ -358,30 +400,135 @@ void dpb7000_state::fddcpu_map(address_map &map)
 	map(0xf800, 0xffff).rom().region("fddprom", 0);
 }
 
+void dpb7000_state::keybcpu_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("keyboard", 0);
+}
+
+void dpb7000_state::tds_cpu_map(address_map &map)
+{
+	map(0x2000, 0x2000).w(FUNC(dpb7000_state::tds_dac_w));
+	map(0x2001, 0x2001).w(FUNC(dpb7000_state::tds_convert_w));
+	map(0x2003, 0x2003).r(FUNC(dpb7000_state::tds_adc_r));
+	map(0x2007, 0x2007).r(FUNC(dpb7000_state::tds_pen_switches_r));
+	map(0x4000, 0x400f).rw(m_tds_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0xe000, 0xffff).rom().region("tds", 0);
+}
+
 static INPUT_PORTS_START( dpb7000 )
+	PORT_START("KEYB_COL0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+
+	PORT_START("KEYB_COL1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \' @") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR('@')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+
+	PORT_START("KEYB_COL2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+
+	PORT_START("KEYB_COL3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". : >") PORT_CODE(KEYCODE_STOP) PORT_CHAR ('.') PORT_CHAR(':') PORT_CHAR('>')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\" = #") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\"') PORT_CHAR('=')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('d')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('-')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // 0x16 - arrow key?
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+
+	PORT_START("KEYB_COL4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('\\')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 \" _") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"') PORT_CHAR('_')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+
+	PORT_START("KEYB_COL5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED) // 0x1b - arrow key?
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEYB_COL6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('|')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('~')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // 0x1a - arrow key?
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('\x19') PORT_CHAR('*')
+
+	PORT_START("KEYB_COL7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // 0x0b
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // 0x09
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) // 0x7f
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('\x08') // 0x08
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) // 0x7f
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) //PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\x0d')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\x0d')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // PORT_NAME("Carriage Return") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('\x0d')
+
+	PORT_START("TDSDIPS")
+	PORT_DIPNAME(0x08, 0x00, "TDS Box Encoding")
+	PORT_DIPSETTING(   0x08, "Binary")
+	PORT_DIPSETTING(   0x00, "ASCII")
+	PORT_DIPNAME(0x10, 0x00, "TDS Box Mode")
+	PORT_DIPSETTING(   0x10, "Normal")
+	PORT_DIPSETTING(   0x00, "Monitor")
+	PORT_DIPNAME(0x40, 0x00, "TDS Box Standard")
+	PORT_DIPSETTING(   0x40, "NTSC")
+	PORT_DIPSETTING(   0x00, "PAL")
+	PORT_BIT(0xa7, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("BAUD")
-	PORT_DIPNAME( 0x0f, 0x0e, "Baud Rate for Terminal")
-	PORT_DIPSETTING(    0x00, "50")
-	PORT_DIPSETTING(    0x01, "75")
-	PORT_DIPSETTING(    0x02, "110")
-	PORT_DIPSETTING(    0x03, "134.5")
-	PORT_DIPSETTING(    0x04, "150")
-	PORT_DIPSETTING(    0x05, "300")
-	PORT_DIPSETTING(    0x06, "600")
-	PORT_DIPSETTING(    0x07, "1200")
-	PORT_DIPSETTING(    0x08, "1800")
-	PORT_DIPSETTING(    0x09, "2000")
-	PORT_DIPSETTING(    0x0a, "2400")
-	PORT_DIPSETTING(    0x0b, "3600")
-	PORT_DIPSETTING(    0x0c, "4800")
-	PORT_DIPSETTING(    0x0e, "9600")
-	PORT_DIPSETTING(    0x0f, "19200")
+	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate for Terminal")
+	PORT_DIPSETTING(   0x00, "50")
+	PORT_DIPSETTING(   0x01, "75")
+	PORT_DIPSETTING(   0x02, "110")
+	PORT_DIPSETTING(   0x03, "134.5")
+	PORT_DIPSETTING(   0x04, "150")
+	PORT_DIPSETTING(   0x05, "300")
+	PORT_DIPSETTING(   0x06, "600")
+	PORT_DIPSETTING(   0x07, "1200")
+	PORT_DIPSETTING(   0x08, "1800")
+	PORT_DIPSETTING(   0x09, "2000")
+	PORT_DIPSETTING(   0x0a, "2400")
+	PORT_DIPSETTING(   0x0b, "3600")
+	PORT_DIPSETTING(   0x0c, "4800")
+	PORT_DIPSETTING(   0x0e, "9600")
+	PORT_DIPSETTING(   0x0f, "19200")
 
 	PORT_START("AUTOSTART")
-	PORT_DIPNAME( 0x0001, 0x0000, "Auto-Start" )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0001, DEF_STR( On ) )
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME(0x0001, 0x0000, "Auto-Start")
+	PORT_DIPSETTING(     0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(     0x0001, DEF_STR( On ))
+	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("CONFIGSW12")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -607,6 +754,15 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_incoming_chr));
 	save_item(NAME(m_buffer_lum));
 
+	// Keyboard
+	save_item(NAME(m_keybc_latched_bit));
+	save_item(NAME(m_keybc_p1_data));
+	save_item(NAME(m_keybc_tx));
+
+	// TDS Box
+	save_item(NAME(m_tds_dac_value));
+	save_item(NAME(m_tds_adc_value));
+
 	m_yuv_lut = std::make_unique<uint32_t[]>(0x1000000);
 	for (uint16_t u = 0; u < 256; u++)
 	{
@@ -632,6 +788,11 @@ void dpb7000_state::machine_reset()
 	m_brg->stt_w(m_baud_dip->read());
 	m_csr = 0;
 	m_sys_ctrl = SYSCTRL_REQ_B_IN;
+	for (int i = 0; i < 3; i++)
+	{
+		m_acia[i]->write_cts(0);
+		m_acia[i]->write_dcd(0);
+	}
 
 	m_field_in_clk->adjust(attotime::from_hz(59.94), 0, attotime::from_hz(59.94));
 	m_field_out_clk->adjust(attotime::from_hz(59.94) + attotime::from_hz(15734.0 / 1.0), 0, attotime::from_hz(59.94));
@@ -741,6 +902,15 @@ void dpb7000_state::machine_reset()
 	// Size Card
 	m_size_h = 0;
 	m_size_v = 0;
+
+	// Keyboard
+	m_keybc_latched_bit = 1;
+	m_keybc_p1_data = 0;
+	m_keybc_tx = 0;
+
+	// TDS Box
+	m_tds_dac_value = 0;
+	m_tds_adc_value = 0;
 }
 
 void dpb7000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1846,6 +2016,117 @@ WRITE_LINE_MEMBER(dpb7000_state::fddcpu_debug_rx)
 	}
 }
 
+uint8_t dpb7000_state::keyboard_p1_r()
+{
+	LOGMASKED(LOG_KEYBC, "%s: Port 1 read\n", machine().describe_context());
+	return 0;
+}
+
+uint8_t dpb7000_state::keyboard_p2_r()
+{
+	LOGMASKED(LOG_KEYBC, "%s: Port 2 read\n", machine().describe_context());
+	return 0;
+}
+
+void dpb7000_state::keyboard_p1_w(uint8_t data)
+{
+	LOGMASKED(LOG_KEYBC, "%s: Port 1 write: %02x\n", machine().describe_context(), data);
+	const uint8_t old_data = m_keybc_p1_data;
+	m_keybc_p1_data = data;
+	const uint8_t col = data & 0x0f;
+	const uint8_t lowered = old_data & ~data;
+	if (BIT(lowered, 7))
+	{
+		m_keybc_latched_bit = BIT(m_keybc_cols[col]->read(), (data >> 4) & 7);
+	}
+	else
+	{
+		m_keybc_latched_bit = 1;
+	}
+}
+
+void dpb7000_state::keyboard_p2_w(uint8_t data)
+{
+	LOGMASKED(LOG_KEYBC, "%s: Port 2 write: %02x\n", machine().describe_context(), data);
+	m_keybc_tx = BIT(~data, 7);
+}
+
+READ_LINE_MEMBER(dpb7000_state::keyboard_t0_r)
+{
+	LOGMASKED(LOG_KEYBC, "%s: T0 read\n", machine().describe_context());
+	return 0;
+}
+
+READ_LINE_MEMBER(dpb7000_state::keyboard_t1_r)
+{
+	uint8_t data = m_keybc_latched_bit;
+	//m_keybc_latched_bit = 0;
+	LOGMASKED(LOG_KEYBC, "%s: T1 read: %d\n", machine().describe_context(), data);
+	return data;
+}
+
+void dpb7000_state::tds_dac_w(uint8_t data)
+{
+	LOGMASKED(LOG_TDS, "%s: TDS DAC Write: %02x\n", machine().describe_context(), data);
+	m_tds_dac_value = data;
+}
+
+void dpb7000_state::tds_convert_w(uint8_t data)
+{
+	LOGMASKED(LOG_TDS, "%s: TDS ADC Convert Start\n", machine().describe_context());
+	m_tds_adc_value = m_tds_dac_value;
+}
+
+uint8_t dpb7000_state::tds_adc_r()
+{
+	LOGMASKED(LOG_TDS, "%s: TDS ADC Read: %02x\n", machine().describe_context(), m_tds_adc_value);
+	return m_tds_adc_value;
+}
+
+uint8_t dpb7000_state::tds_pen_switches_r()
+{
+	uint8_t data = machine().input().code_pressed(KEYCODE_5_PAD) ? machine().rand() : 0;
+	LOGMASKED(LOG_TDS, "%s: TDS Pen Switches Read: %02x\n", machine().describe_context(), data);
+	return data;
+}
+
+WRITE_LINE_MEMBER(dpb7000_state::duart_b_w)
+{
+	//printf("B%d ", state);
+}
+
+uint8_t dpb7000_state::tds_p1_r()
+{
+	const uint8_t latched = m_tds_p1_data & 0x82;
+	const uint8_t adc_not_busy = (1 << 5);
+	uint8_t data = m_tds_dips->read() | adc_not_busy | latched;
+	LOGMASKED(LOG_TDS, "%s: TDS Port 1 Read, %02x\n", machine().describe_context(), data);
+	return data;
+}
+
+uint8_t dpb7000_state::tds_p2_r()
+{
+	uint8_t data = 0x02 | (m_keybc_tx << 3);
+	LOGMASKED(LOG_TDS, "%s: TDS Port 2 Read, %02x\n", machine().describe_context(), data);
+	return data;
+}
+
+void dpb7000_state::tds_p1_w(uint8_t data)
+{
+	LOGMASKED(LOG_TDS, "%s: TDS Port 1 Write = %02x\n", machine().describe_context(), data);
+	const uint8_t old = m_tds_p1_data;
+	m_tds_p1_data = data;
+	if (BIT(old & ~data, 0))
+	{
+		m_tds_duart->reset();
+	}
+}
+
+void dpb7000_state::tds_p2_w(uint8_t data)
+{
+	LOGMASKED(LOG_TDS, "%s: TDS Port 2 Write = %02x\n", machine().describe_context(), data);
+}
+
 template <int StoreNum>
 uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1903,20 +2184,28 @@ void dpb7000_state::dpb7000(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_p_int).output_handler().set_inputline(m_maincpu, 3);
 
 	ACIA6850(config, m_acia[0], 0);
-	m_acia[0]->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
-	m_acia[0]->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
+	m_acia[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
+	m_acia[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set_inputline(m_maincpu, 6);
 
 	ACIA6850(config, m_acia[1], 0);
+	m_acia[1]->txd_handler().set(m_tds_duart, FUNC(scn2681_device::rx_a_w));
 	m_acia[1]->irq_handler().set(m_p_int, FUNC(input_merger_device::in_w<0>));
 
 	ACIA6850(config, m_acia[2], 0);
+	m_acia[2]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
+	m_acia[2]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
 	m_acia[2]->irq_handler().set(m_p_int, FUNC(input_merger_device::in_w<1>));
 
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(m_acia[0], FUNC(acia6850_device::write_rxd));
-	m_rs232->dcd_handler().set(m_acia[0], FUNC(acia6850_device::write_dcd));
-	m_rs232->cts_handler().set(m_acia[0], FUNC(acia6850_device::write_cts));
+	RS232_PORT(config, m_rs232[0], default_rs232_devices, nullptr);
+	m_rs232[0]->rxd_handler().set(m_acia[0], FUNC(acia6850_device::write_rxd));
+	m_rs232[0]->dsr_handler().set(m_acia[0], FUNC(acia6850_device::write_dcd));
+	m_rs232[0]->cts_handler().set(m_acia[0], FUNC(acia6850_device::write_cts));
+
+	RS232_PORT(config, m_rs232[1], default_rs232_devices, nullptr);
+	m_rs232[1]->rxd_handler().set(m_acia[2], FUNC(acia6850_device::write_rxd));
+	m_rs232[1]->dcd_handler().set(m_acia[2], FUNC(acia6850_device::write_dcd));
+	m_rs232[1]->cts_handler().set(m_acia[2], FUNC(acia6850_device::write_cts));
 
 	COM8116(config, m_brg, 5.0688_MHz_XTAL);   // K1355A/B
 	m_brg->ft_handler().set(m_acia[0], FUNC(acia6850_device::write_txc));
@@ -1981,6 +2270,29 @@ void dpb7000_state::dpb7000(machine_config &config)
 	AM2901B(config, m_size_yh);
 	AM2901B(config, m_size_xl);
 	AM2901B(config, m_size_xh);
+
+	// Keyboard
+	I8039(config, m_keybcpu, 4.608_MHz_XTAL);
+	m_keybcpu->set_addrmap(AS_PROGRAM, &dpb7000_state::keybcpu_map);
+	m_keybcpu->p1_in_cb().set(FUNC(dpb7000_state::keyboard_p1_r));
+	m_keybcpu->p2_in_cb().set(FUNC(dpb7000_state::keyboard_p2_r));
+	m_keybcpu->p1_out_cb().set(FUNC(dpb7000_state::keyboard_p1_w));
+	m_keybcpu->p2_out_cb().set(FUNC(dpb7000_state::keyboard_p2_w));
+	m_keybcpu->t0_in_cb().set(FUNC(dpb7000_state::keyboard_t0_r));
+	m_keybcpu->t1_in_cb().set(FUNC(dpb7000_state::keyboard_t1_r));
+
+	// TDS Box
+	M6803(config, m_tds_cpu, 4.9152_MHz_XTAL);
+	m_tds_cpu->set_addrmap(AS_PROGRAM, &dpb7000_state::tds_cpu_map);
+	m_tds_cpu->in_p1_cb().set(FUNC(dpb7000_state::tds_p1_r));
+	m_tds_cpu->out_p1_cb().set(FUNC(dpb7000_state::tds_p1_w));
+	m_tds_cpu->in_p2_cb().set(FUNC(dpb7000_state::tds_p2_r));
+	m_tds_cpu->out_p2_cb().set(FUNC(dpb7000_state::tds_p2_w));
+
+	SCN2681(config, m_tds_duart, 3.6864_MHz_XTAL);
+	m_tds_duart->irq_cb().set_inputline(m_tds_cpu, M6803_IRQ_LINE);
+	m_tds_duart->a_tx_cb().set(m_acia[1], FUNC(acia6850_device::write_rxd));
+	m_tds_duart->b_tx_cb().set(FUNC(dpb7000_state::duart_b_w));
 }
 
 
@@ -2031,10 +2343,10 @@ ROM_START( dpb7000 )
 	ROM_REGION(0x800, "keyboard", 0)
 	ROM_LOAD("etc2716 63b2.bin", 0x000, 0x800, CRC(04614a50) SHA1(e547458f2c9cf29cf52f02b8824b32e5e91807fd))
 
-	ROM_REGION(0x2000, "tablet", 0)
+	ROM_REGION(0x2000, "tds", 0)
 	ROM_LOAD("hn482764g.bin", 0x0000, 0x2000, CRC(3626059c) SHA1(1a4f5c8b337f31c7b2b93096b59234ffbc2f1f00))
 
-	ROM_REGION(0x2000, "tds", 0)
+	ROM_REGION(0x2000, "tablet", 0)
 	ROM_LOAD("nmc27c64q.bin", 0x0000, 0x2000, CRC(a453928f) SHA1(f4a25298fb446f0046c6f9f3ce70e7169dcebd01))
 
 	ROM_REGION(0x200, "brushproc_prom", 0)
