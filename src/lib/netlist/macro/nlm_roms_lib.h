@@ -43,6 +43,9 @@
 #define RAM_2102A_DIP(name)                                                    \
 		NET_REGISTER_DEV(RAM_2102A_DIP, name)
 
+#define ROM_TMS4800_DIP(name)                                                    \
+		NET_REGISTER_DEV(ROM_TMS4800, name)
+
 #endif // NL_AUTO_DEVICES
 
 

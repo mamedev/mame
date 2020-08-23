@@ -2851,6 +2851,23 @@ static NETLIST_START(TTL_9312_DIP)
 	)
 NETLIST_END()
 
+// FIXME: Documenation
+static NETLIST_START(TTL_9314_DIP)
+	TTL_9314(A)
+
+	DIPPINS(   /*       +--------------+     */
+		A.EQ,  /*    /E |1     ++    16| VCC */ A.VCC,
+		A.S0Q, /*   /S0 |2           15| Q0  */ A.Q0,
+		A.D0,  /*    D0 |3           14| /S1 */ A.S1Q,
+		A.D1,  /*    D1 |4   DM9314  13| Q1  */ A.Q1,
+		A.S2Q, /*   /S2 |5           12| Q2  */ A.Q2,
+		A.D2,  /*    D2 |6           11| /S3 */ A.S3Q,
+		A.D3,  /*    D3 |7           10| Q3  */ A.Q3,
+		A.GND, /*   GND |8            9| /MR */ A.MRQ
+		       /*       +--------------+     */
+	)
+NETLIST_END()
+
 //- Identifier: TTL_9316_DIP
 //- Title: DM9316/DM8316 Synchronous 4-Bit Counters
 //- Description: These synchronous, presettable counters feature an
@@ -2969,6 +2986,24 @@ static NETLIST_START(TTL_9321_DIP)
 			A.D3, /*    /D3 |7           10| /D2    */ B.D2,
 		   A.GND, /*    GND |8            9| /D3    */ B.D3
 				  /*        +--------------+        */
+	)
+NETLIST_END()
+
+
+//FIXME: Documenation
+static NETLIST_START(TTL_9334_DIP)
+	TTL_9334(A)
+
+	DIPPINS(/*       +--------------+     */
+		A.A0, /*    A0 |1     ++    16| VCC */ A.VCC,
+		A.A1, /*    A1 |2           15| /C  */ A.CQ,
+		A.A2, /*    A2 |3           14| /E  */ A.EQ,
+		A.Q0, /*    Q0 |4   DM9334  13| D   */ A.D,
+		A.Q1, /*    Q1 |5           12| Q7  */ A.Q7,
+		A.Q2, /*    Q2 |6           11| Q6  */ A.Q6,
+		A.Q3, /*    Q3 |7           10| Q5  */ A.Q5,
+		A.GND,/*   GND |8            9| Q4  */ A.Q4
+		      /*       +--------------+     */
 	)
 NETLIST_END()
 
@@ -3411,9 +3446,11 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
 	LOCAL_LIB_ENTRY(TTL_74393_DIP)
 	LOCAL_LIB_ENTRY(SN74LS629_DIP)
-	LOCAL_LIB_ENTRY(TTL_9312_DIP)
 	LOCAL_LIB_ENTRY(TTL_9310_DIP)
+	LOCAL_LIB_ENTRY(TTL_9312_DIP)
+	LOCAL_LIB_ENTRY(TTL_9314_DIP)
 	LOCAL_LIB_ENTRY(TTL_9316_DIP)
 	LOCAL_LIB_ENTRY(TTL_9321_DIP)
 	LOCAL_LIB_ENTRY(TTL_9322_DIP)
+	LOCAL_LIB_ENTRY(TTL_9334_DIP)
 NETLIST_END()

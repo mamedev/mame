@@ -252,7 +252,6 @@ namespace devices
 		LIB_ENTRY(9322)
 		LIB_ENTRY(9334)
 		LIB_ENTRY(AM2847)
-		// FIXME: duplicate?
 		LIB_ENTRY(CD4006)
 		LIB_ENTRY(CD4013)
 		LIB_ENTRY(CD4017)
@@ -269,14 +268,11 @@ namespace devices
 		LIB_ENTRY(MC1455P)
 		LIB_ENTRY(MC1455P_dip)
 		LIB_ENTRY(TMS4800)
-		LIB_ENTRY(TMS4800_dip)
 		LIB_ENTRY(r2r_dac)
 		LIB_ENTRY(tristate)
 		LIB_ENTRY(tristate3)
 		LIB_ENTRY(8277_dip)
 		LIB_ENTRY(9602)
-		LIB_ENTRY(9314_dip)
-		LIB_ENTRY(9334_dip)
 		LIB_ENTRY(AM2847_dip)
 		LIB_ENTRY(MM5837_dip)
 #endif
