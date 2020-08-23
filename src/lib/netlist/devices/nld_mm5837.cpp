@@ -40,11 +40,11 @@ namespace netlist
 		, m_inc(netlist_time::from_hz(24000 * 2))
 		, m_shift(*this, "m_shift", 0)
 		{
-			connect(m_feedback, m_Q);
+			connect("_FB", "_Q");
 
 			// output
-			connect(m_RV.N(), m_VDD);
-			register_subalias("OUT", m_RV.P());
+			connect("_RV.2", "VDD");
+			register_subalias("OUT", "_RV.1");
 		}
 
 		NETLIB_RESETI()

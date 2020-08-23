@@ -47,10 +47,10 @@ namespace netlist
 		, m_inhibit_state(*this, "m_inhibit_state", false)
 		, m_supply(*this)
 		{
-			connect(m_RX.N(), m_RY.N());
-			register_subalias("X", m_RX.P());
-			register_subalias("Y", m_RY.P());
-			register_subalias("XY", m_RX.N());
+			connect("RX.2", "RY.2");
+			register_subalias("X", "RX.1");
+			register_subalias("Y", "RY.1");
+			register_subalias("XY", "RX.2");
 		}
 
 		NETLIB_RESETI()

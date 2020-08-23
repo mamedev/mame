@@ -76,7 +76,7 @@ namespace netlist
 		, m_out(owner, "m_out", 0)
 		, m_inc(owner, "m_inc", netlist_time::zero())
 		{
-			owner.connect(m_FB, m_Y);
+			owner.connect("FB", "Y");
 		}
 
 	public:
@@ -116,13 +116,11 @@ namespace netlist
 		, m_power_pins(*this)
 		, m_power_pins_osc(*this, "OSCVCC", "OSCGND")
 		{
-			connect(m_power_pins_osc.GND(), m_R_FC.N());
+			connect("OSCGND", "R_FC.2");
 
-			connect(m_FC, m_R_FC.P());
-			connect(m_RNG, m_R_RNG.P());
-			connect(m_R_FC.N(), m_R_RNG.N());
-
-			register_subalias("Y", m_clock.m_Y);
+			connect("FC", "R_FC.1");
+			connect("RNG", "R_RNG.1");
+			connect("R_FC.2", "R_RNG.2");
 		}
 
 	private:

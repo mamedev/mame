@@ -86,16 +86,16 @@ namespace netlist
 		, m_undershoot(*this, "m_undershoot", 0.0)
 		, m_ovlimit(0.0)
 		{
-			register_subalias("GND",  m_R3.N());    // Pin 1
-			register_subalias("CONT", m_R1.N());    // Pin 5
-			register_subalias("DISCH", m_RDIS.P()); // Pin 7
-			register_subalias("VCC",  m_R1.P());    // Pin 8
-			register_subalias("OUT",  m_ROUT.P());  // Pin 3
+			register_subalias("GND",  "R3.2");    // Pin 1
+			register_subalias("CONT", "R1.2");    // Pin 5
+			register_subalias("DISCH", "RDIS.1"); // Pin 7
+			register_subalias("VCC",  "R1.1");    // Pin 8
+			register_subalias("OUT",  "ROUT.1");  // Pin 3
 
-			connect(m_R1.N(), m_R2.P());
-			connect(m_R2.N(), m_R3.P());
-			connect(m_RDIS.N(), m_R3.N());
-			connect(m_OUT, m_ROUT.N());
+			connect("R1.2", "R2.1");
+			connect("R2.2", "R3.1");
+			connect("RDIS.2", "R3.2");
+			connect("_OUT", "ROUT.2");
 		}
 
 		NETLIB_RESETI()

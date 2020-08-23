@@ -122,7 +122,7 @@ namespace netlist
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", terminal_t::OUT_TRISTATE())
 	{
-		register_subalias("Q", m_RN.P());
+		register_subalias("Q", "RN.1");
 
 		log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
 		if (anetlist.is_extended_validation())

@@ -76,18 +76,18 @@ namespace netlist
 		, m_last_CP(*this, "m_last_CP", 0)
 		// FIXME: needs family!
 		{
-			register_subalias("OUTA", m_A.m_OUT);
-			register_subalias("OUTB", m_B.m_OUT);
-			register_subalias("OUTC", m_C.m_OUT);
-			register_subalias("OUTD", m_D.m_OUT);
-			register_subalias("INA", m_A.m_IN);
-			register_subalias("INB", m_B.m_IN);
-			register_subalias("INC", m_C.m_IN);
-			register_subalias("IND", m_D.m_IN);
-			register_subalias("RCA", m_A.m_RC);
-			register_subalias("RCB", m_B.m_RC);
-			register_subalias("RCC", m_C.m_RC);
-			register_subalias("RCD", m_D.m_RC);
+			register_subalias("OUTA", "A.OUT");
+			register_subalias("OUTB", "B.OUT");
+			register_subalias("OUTC", "C.OUT");
+			register_subalias("OUTD", "D.OUT");
+			register_subalias("INA", "A.IN");
+			register_subalias("INB", "B.IN");
+			register_subalias("INC", "C.IN");
+			register_subalias("IND", "D.IN");
+			register_subalias("RCA", "A.RC");
+			register_subalias("RCB", "B.RC");
+			register_subalias("RCC", "C.RC");
+			register_subalias("RCD", "D.RC");
 
 			connect("A.VSS", "B.VSS");
 			connect("A.VSS", "C.VSS");
