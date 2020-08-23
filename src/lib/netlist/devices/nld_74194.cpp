@@ -50,14 +50,13 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_last_CLK = 0;
 			m_last_Q = 0;
 		}
 
-		friend class NETLIB_NAME(74194_dip);
-	private:
 		// FIXME: Timing
 		NETLIB_HANDLERI(inputs)
 		{
