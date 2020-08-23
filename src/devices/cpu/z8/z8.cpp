@@ -15,6 +15,11 @@
     - internal diagnostic ROM in data space (requires high voltage reset)
     - what really happens when register pairs are unaligned?
 
+    Note that A8–A15 outputs are not enabled on Port 0 upon reset, except
+    on some later ROMless versions such as Z8691. This may redirect
+    external memory accesses, including program fetches, to FFxx until
+    P01M is written to. Z8681 is particularly affected by this.
+
 */
 
 #include "emu.h"
@@ -1538,6 +1543,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 {
 	switch ( inputnum )
 	{
+	// IRQ0 input is P32 (also DAV0/RDY0 handshake, not emulated)
 	case INPUT_LINE_IRQ0:
 		if (state != CLEAR_LINE && m_irq_line[0] == CLEAR_LINE)
 			request_interrupt(0);
@@ -1550,6 +1556,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 		break;
 
+	// IRQ1 input is P33
 	case INPUT_LINE_IRQ1:
 		if (state != CLEAR_LINE && m_irq_line[1] == CLEAR_LINE)
 			request_interrupt(1);
@@ -1562,6 +1569,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 		break;
 
+	// IRQ2 input is P31 (also TIN and DAV2/RDY2 handshake, latter not emulated)
 	case INPUT_LINE_IRQ2:
 		if (state != CLEAR_LINE && m_irq_line[2] == CLEAR_LINE)
 			request_interrupt(2);
@@ -1582,6 +1590,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 		break;
 
+	// IRQ3 input is P30 (also serial DI)
 	case INPUT_LINE_IRQ3:
 		if (state != CLEAR_LINE && m_irq_line[3] == CLEAR_LINE && (m_p3m & Z8_P3M_P3_SERIAL) == 0)
 			request_interrupt(3);
