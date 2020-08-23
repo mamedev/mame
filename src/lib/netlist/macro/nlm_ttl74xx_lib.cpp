@@ -3056,6 +3056,40 @@ static NETLIST_START(TTL_9602_DIP)
 	)
 NETLIST_END()
 
+// FIXME: Documentation and naming
+static NETLIST_START(TTL_8277_DIP)
+	TTL_8277(A)
+
+	DIPPINS(     /*       +--------------+      */
+		A.RESET, /* RESET |1     ++    16| VCC  */ A.VCC,
+		A.Q7QA,  /*  /Q7A |2           15| /Q7B */ A.Q7QB,
+		A.Q7A,   /*   Q7A |3           14| Q7B  */ A.Q7B,
+		A.DSA,   /*   DSA |4    8277   13| DSB  */ A.DSB,
+		A.D1A,   /*   D1A |5           12| D1B  */ A.D1B,
+		A.D0A,   /*   D0A |6           11| D0B  */ A.D0B,
+		A.CLKA,  /*  CLKA |7           10| CLKB */ A.CLKB,
+		A.GND,   /*   GND |8            9| CLK  */ A.CLK
+		         /*       +--------------+       */
+	)
+NETLIST_END()
+
+// FIXME: Documentation, add model, seems to be a CMOS device
+static NETLIST_START(TTL_AM2847_DIP)
+	TTL_AM2847(A)
+
+	DIPPINS(    /*       +--------------+      */
+		A.OUTA, /*  OUTA |1     ++    16| VSS  */ A.VSS,
+		A.RCA,  /*   RCA |2           15| IND  */ A.IND,
+		A.INA,  /*   INA |3           14| RCD  */ A.RCD,
+		A.OUTB, /*  OUTB |4   Am2847  13| OUTD */ A.OUTD,
+		A.RCB,  /*   RCB |5           12| VGG  */ A.VGG,
+		A.INB,  /*   INB |6           11| CP   */ A.CP,
+		A.OUTC, /*  OUTC |7           10| INC  */ A.INC,
+		A.VDD,  /*   VDD |8            9| RCC  */ A.RCC
+		        /*       +--------------+      */
+	)
+NETLIST_END()
+
 
 NETLIST_START(ttl74xx_lib)
 	NET_MODEL("DM7414         SCHMITT_TRIGGER(VTP=1.7 VTM=0.9 VI=4.35 RI=6.15k VOH=3.5 ROH=120 VOL=0.1 ROL=37.5 TPLH=15 TPHL=15)")
@@ -3453,4 +3487,6 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_9321_DIP)
 	LOCAL_LIB_ENTRY(TTL_9322_DIP)
 	LOCAL_LIB_ENTRY(TTL_9334_DIP)
+	LOCAL_LIB_ENTRY(TTL_8277_DIP)
+	LOCAL_LIB_ENTRY(TTL_AM2847_DIP)
 NETLIST_END()

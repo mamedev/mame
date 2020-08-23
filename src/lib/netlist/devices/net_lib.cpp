@@ -271,10 +271,8 @@ namespace devices
 		LIB_ENTRY(r2r_dac)
 		LIB_ENTRY(tristate)
 		LIB_ENTRY(tristate3)
-		LIB_ENTRY(8277_dip)
 		LIB_ENTRY(9602)
-		LIB_ENTRY(AM2847_dip)
-		LIB_ENTRY(MM5837_dip)
+		LIB_ENTRY(MM5837)
 #endif
 	}
 

@@ -551,6 +551,24 @@ static NETLIST_START(CD4538_DIP)
 	)
 NETLIST_END()
 
+//FIXME: Documentation
+static NETLIST_START(MM5837_DIP)
+	MM5837(A)
+	NC_PIN(NC)
+
+	// Create a parameter freq for the dip model
+	// The default will be A's FREQ parameter.
+	DEFPARAM(FREQ, "$(@.A.FREQ")
+	PARAM(A.FREQ, "$(@.FREQ)")
+
+	DIPPINS(    /*       +--------+    */
+		A.VDD,  /*   VDD |1  ++  8| NC */ NC.I,
+		A.VGG,  /*   VGG |2      7| NC */ NC.I,
+		A.OUT,  /*   OUT |3      6| NC */ NC.I,
+		A.VSS,  /*   VSS |4      5| NC */ NC.I,
+		        /*       +--------+    */
+	)
+NETLIST_END()
 
 NETLIST_START(cd4xxx_lib)
 
@@ -603,5 +621,7 @@ NETLIST_START(cd4xxx_lib)
 	LOCAL_LIB_ENTRY(CD4016_DIP)
 	LOCAL_LIB_ENTRY(CD4316_DIP)
 	LOCAL_LIB_ENTRY(CD4538_DIP)
+
+	LOCAL_LIB_ENTRY(MM5837_DIP)
 
 NETLIST_END()

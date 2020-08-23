@@ -105,7 +105,6 @@ namespace netlist
 			m_last_CP = 0;
 		}
 
-		friend class NETLIB_NAME(AM2847_dip);
 	private:
 		NETLIB_HANDLERI(cp)
 		{
@@ -128,35 +127,7 @@ namespace netlist
 		state_var<uint32_t> m_last_CP;
 	};
 
-	NETLIB_OBJECT(AM2847_dip)
-	{
-		NETLIB_CONSTRUCTOR(AM2847_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_A.m_OUT);
-			register_subalias("2", A.m_A.m_RC);
-			register_subalias("3", A.m_A.m_IN);
-			register_subalias("4", A.m_B.m_OUT);
-			register_subalias("5", A.m_B.m_RC);
-			register_subalias("6", A.m_B.m_IN);
-			register_subalias("7", A.m_C.m_OUT);
-			register_subalias("8", "A.VDD");
-
-			register_subalias("9",  A.m_C.m_RC);
-			register_subalias("10", A.m_C.m_IN);
-			register_subalias("11", A.m_CP);
-			register_subalias("13", A.m_D.m_OUT);
-			register_subalias("14", A.m_D.m_RC);
-			register_subalias("15", A.m_D.m_IN);
-			register_subalias("16", "A.VSS");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(AM2847) A;
-	};
-
 	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD,@VSS,@VDD")
-	NETLIB_DEVICE_IMPL(AM2847_dip, "TTL_AM2847_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

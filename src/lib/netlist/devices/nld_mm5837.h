@@ -6,7 +6,7 @@
 
 #include "netlist/nl_setup.h"
 
-#define MM5837_DIP(name)                                                        \
-		NET_REGISTER_DEV(MM5837_DIP, name)
+#define MM5837(name)                                                        \
+		NET_REGISTER_DEV(MM5837, name)
 
 #endif /* NLD_MM5837_H_ */
