@@ -186,9 +186,9 @@ void mywicogt_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
-//[:] ':maincpu' (000508): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x  
-//[:] ':maincpu' (000510): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x  
-//[:] ':maincpu' (000518): porta_w 0f00 (0f00) x x x x | 1 1 1 1 | x x x x | x x x x  
+//[:] ':maincpu' (000508): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x
+//[:] ':maincpu' (000510): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x
+//[:] ':maincpu' (000518): porta_w 0f00 (0f00) x x x x | 1 1 1 1 | x x x x | x x x x
 
 	if (m_maincpu->pc() < 0x1000)
 	{
@@ -206,7 +206,7 @@ void mywicogt_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			logerror("changing to bank 0\n");
 		}
 	}
-	
+
 	m_porta_dat = data;
 }
 

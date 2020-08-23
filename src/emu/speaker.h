@@ -83,9 +83,9 @@ protected:
 
 	// internal state
 	static constexpr int BUCKETS_PER_SECOND = 10;
-	std::vector<s32> 	m_max_sample;
-	s32					m_current_max;
-	u32					m_samples_this_bucket;
+	std::vector<s32>    m_max_sample;
+	s32                 m_current_max;
+	u32                 m_samples_this_bucket;
 };
 
 

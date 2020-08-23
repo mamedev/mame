@@ -904,7 +904,7 @@ void segag80v_state::g80v_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &segag80v_state::opcodes_map);
 	m_maincpu->set_addrmap(AS_IO, &segag80v_state::main_portmap);
 	m_maincpu->irqack_cb().set(FUNC(segag80v_state::irq_ack_w));
-//	m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
+//  m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);

@@ -96,14 +96,14 @@ NETLIST_END()
 // once for Zektor
 //
 
-#define VARIANT_ELIMINATOR 	0
-#define VARIANT_ZEKTOR		1
+#define VARIANT_ELIMINATOR  0
+#define VARIANT_ZEKTOR      1
 
-#define SOUND_VARIANT		(VARIANT_ELIMINATOR)
+#define SOUND_VARIANT       (VARIANT_ELIMINATOR)
 #include "nl_elim.cpp"
 
 #undef SOUND_VARIANT
-#define SOUND_VARIANT 		(VARIANT_ZEKTOR)
+#define SOUND_VARIANT       (VARIANT_ZEKTOR)
 #include "nl_elim.cpp"
 
 
@@ -131,7 +131,7 @@ NETLIST_START(zektor)
 
 	LOCAL_SOURCE(_CA3080_FAST_DIP)
 
-//	TTL_INPUT(I_LO_D0, 0)
+//  TTL_INPUT(I_LO_D0, 0)
 	TTL_INPUT(I_LO_D1, 0)
 	ALIAS(I_FIREBALL, I_LO_D1)
 	TTL_INPUT(I_LO_D2, 0)
@@ -193,14 +193,14 @@ NETLIST_START(zektor)
 	//  C46             0.022uF         0.047uF
 	//
 
-//	RES(R1, RES_K(100))		-- part of final amp (not emulated)
-//	RES(R2, RES_M(1))		-- part of final amp (not emulated)
-//	RES(R3, RES_K(22))		-- part of final amp (not emulated)
-//	RES(R4, RES_K(2.2))		-- part of final amp (not emulated)
+//  RES(R1, RES_K(100))     -- part of final amp (not emulated)
+//  RES(R2, RES_M(1))       -- part of final amp (not emulated)
+//  RES(R3, RES_K(22))      -- part of final amp (not emulated)
+//  RES(R4, RES_K(2.2))     -- part of final amp (not emulated)
 #if (SOUND_VARIANT == VARIANT_ELIMINATOR)
-//	RES(R5, RES_K(10)) 		-- part of final amp (not emulated)
+//  RES(R5, RES_K(10))      -- part of final amp (not emulated)
 #else // (SOUND_VARIANT == VARIANT_ZEKTOR)
-//	RES(R5, RES_K(4.7)) 	-- part of final amp (not emulated)
+//  RES(R5, RES_K(4.7))     -- part of final amp (not emulated)
 #endif
 	RES(R6, RES_K(220))
 	RES(R7, RES_K(220))
@@ -211,9 +211,9 @@ NETLIST_START(zektor)
 	RES(R9, RES_K(12))
 #endif
 	RES(R10, RES_K(10))
-//	RES(R11, RES_K(2.2))	-- part of final amp (not emulated)
-//	RES(R12, RES_M(1))		-- part of final amp (not emulated)
-//	RES(R13, RES_K(330))	-- part of final amp (not emulated)
+//  RES(R11, RES_K(2.2))    -- part of final amp (not emulated)
+//  RES(R12, RES_M(1))      -- part of final amp (not emulated)
+//  RES(R13, RES_K(330))    -- part of final amp (not emulated)
 	RES(R14, RES_K(470))
 	RES(R15, RES_K(100))
 	RES(R16, RES_K(100))
@@ -363,10 +363,10 @@ NETLIST_START(zektor)
 	RES(R146, RES_K(22))
 	RES(R147, RES_K(2.2))
 
-//	CAP(C1, CAP_U(4.7))		-- part of final amp (not emulated)
-//	CAP(C2, CAP_U(0.1))
-//	CAP(C3, CAP_U(0.1))
-//	CAP(C4, CAP_U(10))		-- part of final amp (not emulated)
+//  CAP(C1, CAP_U(4.7))     -- part of final amp (not emulated)
+//  CAP(C2, CAP_U(0.1))
+//  CAP(C3, CAP_U(0.1))
+//  CAP(C4, CAP_U(10))      -- part of final amp (not emulated)
 	CAP(C5, CAP_U(0.1))
 	CAP(C6, CAP_U(0.1))
 	CAP(C7, CAP_U(0.001))
@@ -388,17 +388,17 @@ NETLIST_START(zektor)
 	CAP(C19, CAP_U(0.068))
 	CAP(C20, CAP_U(0.068))
 	CAP(C21, CAP_U(2.2))
-//	CAP(C22, CAP_U(0.1))
-//	CAP(C23, CAP_U(0.1))
-//	CAP(C24, CAP_U(0.1))
-//	CAP(C25, CAP_U(0.1))
-//	CAP(C26, CAP_U(0.1))
-//	CAP(C27, CAP_U(0.1))
+//  CAP(C22, CAP_U(0.1))
+//  CAP(C23, CAP_U(0.1))
+//  CAP(C24, CAP_U(0.1))
+//  CAP(C25, CAP_U(0.1))
+//  CAP(C26, CAP_U(0.1))
+//  CAP(C27, CAP_U(0.1))
 	CAP(C28, CAP_U(0.1))
 	CAP(C29, CAP_U(0.1))
 	CAP(C30, CAP_U(0.022))
-//	CAP(C31, CAP_U(0.1))
-//	CAP(C32, CAP_U(0.1))
+//  CAP(C31, CAP_U(0.1))
+//  CAP(C32, CAP_U(0.1))
 	CAP(C33, CAP_U(0.1))
 	CAP(C34, CAP_U(0.1))
 	CAP(C35, CAP_U(1))
@@ -406,8 +406,8 @@ NETLIST_START(zektor)
 	CAP(C37, CAP_U(10))
 	CAP(C38, CAP_U(4.7))
 	CAP(C39, CAP_U(0.1))
-//	CAP(C40, CAP_U(0.1))
-//	CAP(C41, CAP_U(0.1))
+//  CAP(C40, CAP_U(0.1))
+//  CAP(C41, CAP_U(0.1))
 // C42??
 	CAP(C43, CAP_U(0.033))
 	CAP(C44, CAP_U(0.1))
@@ -432,7 +432,7 @@ NETLIST_START(zektor)
 	CAP(C59, CAP_U(0.1))
 	CAP(C60, CAP_U(0.001))
 	CAP(C61, CAP_U(0.068))
-//	CAP(C62, CAP_U(0.1))
+//  CAP(C62, CAP_U(0.1))
 	CAP(C63, CAP_P(100))
 	CAP(C64, CAP_U(0.1))
 	CAP(C65, CAP_U(0.01))
@@ -440,11 +440,11 @@ NETLIST_START(zektor)
 	CAP(C67, CAP_U(0.047))
 	CAP(C68, CAP_U(0.01))
 	CAP(C69, CAP_U(0.1))
-//	CAP(C70, CAP_U(0.1))
-//	CAP(C71, CAP_U(0.1))
-//	CAP(C72, CAP_U(0.1))
-//	CAP(C73, CAP_U(10))
-//	CAP(C74, CAP_U(0.1))
+//  CAP(C70, CAP_U(0.1))
+//  CAP(C71, CAP_U(0.1))
+//  CAP(C72, CAP_U(0.1))
+//  CAP(C73, CAP_U(10))
+//  CAP(C74, CAP_U(0.1))
 	CAP(C75, CAP_U(0.1))
 	CAP(C76, CAP_U(0.1))
 	CAP(C77, CAP_U(0.1))
@@ -458,7 +458,7 @@ NETLIST_START(zektor)
 	D_1N914(D7)
 	D_1N4002(D8)
 
-//	Q_2N4093(Q1) 		-- part of final amp (not emulated)
+//  Q_2N4093(Q1)        -- part of final amp (not emulated)
 	Q_2N4403(Q2)
 	Q_2N4403(Q3)
 	Q_2N4403(Q4)
@@ -470,164 +470,164 @@ NETLIST_START(zektor)
 	Q_2N4403(Q10)
 	Q_2N4403(Q11)
 
-	TL081_DIP(U1)			// Op. Amp.
+	TL081_DIP(U1)           // Op. Amp.
 	NET_C(U1.7, I_V12)
 	NET_C(U1.4, I_VM12)
 
-//	TL082_DIP(U2)			// Op. Amp. -- part of final amp (not emulated)
-//	NET_C(U2.8, I_V12)
-//	NET_C(U2.4, I_VM12)
+//  TL082_DIP(U2)           // Op. Amp. -- part of final amp (not emulated)
+//  NET_C(U2.8, I_V12)
+//  NET_C(U2.4, I_VM12)
 
-	TL081_DIP(U3)			// Op. Amp.
+	TL081_DIP(U3)           // Op. Amp.
 	NET_C(U3.7, I_V12)
 	NET_C(U3.4, I_VM12)
 
-	MM5837_DIP(U4)			// Noise Generator
+	MM5837_DIP(U4)          // Noise Generator
 #if (UNDERCLOCK_NOISE_GEN)
 	PARAM(U4.FREQ, 24000)
 #endif
 
-	LM555_DIP(U5)			// Timer
+	LM555_DIP(U5)           // Timer
 
-	CA3080_DIP(U6)			// Op. Amp.
+	CA3080_DIP(U6)          // Op. Amp.
 	NET_C(U6.4, I_VM12)
 	NET_C(U6.7, I_V12)
 
-	CA3080_DIP(U7)			// Op. Amp.
+	CA3080_DIP(U7)          // Op. Amp.
 	NET_C(U7.4, I_VM12)
 	NET_C(U7.7, I_V12)
 
-	CA3080_DIP(U8)			// Op. Amp.
+	CA3080_DIP(U8)          // Op. Amp.
 	NET_C(U8.4, I_VM12)
 	NET_C(U8.7, I_V12)
 
-	CA3080_DIP(U9)			// Op. Amp.
+	CA3080_DIP(U9)          // Op. Amp.
 	NET_C(U9.4, I_VM12)
 	NET_C(U9.7, I_V12)
 
-	CA3080_DIP(U10)			// Op. Amp.
+	CA3080_DIP(U10)         // Op. Amp.
 	NET_C(U10.4, I_VM12)
 	NET_C(U10.7, I_V12)
 
-	CA3080_DIP(U11)			// Op. Amp.
+	CA3080_DIP(U11)         // Op. Amp.
 	NET_C(U11.4, I_VM12)
 	NET_C(U11.7, I_V12)
 
-	TL081_DIP(U12)			// Op. Amp.
+	TL081_DIP(U12)          // Op. Amp.
 	NET_C(U12.7, I_V12)
 	NET_C(U12.4, I_VM12)
 
-	LM555_DIP(U13)			// Timer
+	LM555_DIP(U13)          // Timer
 
-	CA3080_DIP(U14)			// Op. Amp.
+	CA3080_DIP(U14)         // Op. Amp.
 	NET_C(U14.4, I_VM12)
 	NET_C(U14.7, I_V12)
 
-	CA3080_DIP(U15)			// Op. Amp.
+	CA3080_DIP(U15)         // Op. Amp.
 	NET_C(U15.4, I_VM12)
 	NET_C(U15.7, I_V12)
 
-	TL082_DIP(U16)			// Op. Amp.
+	TL082_DIP(U16)          // Op. Amp.
 	NET_C(U16.8, I_V12)
 	NET_C(U16.4, I_VM12)
 
-	CD4011_DIP(U17)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U17)         // Quad 2-Input NAND Gates
 	NET_C(U17.7, GND)
 	NET_C(U17.14, I_V12)
 
-	CD4011_DIP(U18)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U18)         // Quad 2-Input NAND Gates
 	NET_C(U18.7, GND)
 	NET_C(U18.14, I_V12)
 
-	CD4011_DIP(U19)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U19)         // Quad 2-Input NAND Gates
 	NET_C(U19.7, GND)
 	NET_C(U19.14, I_V12)
 
-	TL082_DIP(U20)			// Op. Amp.
+	TL082_DIP(U20)          // Op. Amp.
 	NET_C(U20.8, I_V12)
 	NET_C(U20.4, I_VM12)
 
-	CD4024_DIP(U21)			// 7-Stage Ripple Binary Counter
+	CD4024_DIP(U21)         // 7-Stage Ripple Binary Counter
 	NET_C(U21.7, GND)
 	NET_C(U21.14, I_V12)
 
-	CD4011_DIP(U22)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U22)         // Quad 2-Input NAND Gates
 	NET_C(U22.7, GND)
 	NET_C(U22.14, I_V12)
 
-	CD4024_DIP(U23)			// 7-Stage Ripple Binary Counter
+	CD4024_DIP(U23)         // 7-Stage Ripple Binary Counter
 	NET_C(U23.7, GND)
 	NET_C(U23.14, I_V12)
 
-	TTL_7406_DIP(U24)		// Hex inverter -- currently using a clone of 7416, no open collector behavior
+	TTL_7406_DIP(U24)       // Hex inverter -- currently using a clone of 7416, no open collector behavior
 	NET_C(U24.7, GND)
 	NET_C(U24.14, I_V5)
 
 #if (!HLE_BACKGROUND_VCO)
-	LM566_DIP(U25)			// Voltage-Controlled Oscillator
+	LM566_DIP(U25)          // Voltage-Controlled Oscillator
 #endif
 
-    TTL_74LS00_DIP(U26)		// Quad 4-Input NAND Gate
-    NET_C(U26.7, GND)
-    NET_C(U26.14, I_V5)
+	TTL_74LS00_DIP(U26)     // Quad 4-Input NAND Gate
+	NET_C(U26.7, GND)
+	NET_C(U26.14, I_V5)
 
-	TTL_7407_DIP(U27)		// Hex Buffers with High Votage Open-Collector Outputs
-    NET_C(U27.7, GND)
-    NET_C(U27.14, I_V5)
+	TTL_7407_DIP(U27)       // Hex Buffers with High Votage Open-Collector Outputs
+	NET_C(U27.7, GND)
+	NET_C(U27.14, I_V5)
 
-	TTL_7407_DIP(U28)		// Hex Buffers with High Votage Open-Collector Outputs
-    NET_C(U28.7, GND)
-    NET_C(U28.14, I_V5)
+	TTL_7407_DIP(U28)       // Hex Buffers with High Votage Open-Collector Outputs
+	NET_C(U28.7, GND)
+	NET_C(U28.14, I_V5)
 
-	TL081_DIP(U29)			// Op. Amp.
+	TL081_DIP(U29)          // Op. Amp.
 	NET_C(U29.7, I_V12)
 	NET_C(U29.4, I_VM12)
 
-//	AY_3_8912_DIP(U30)		// PSG -- emulated by MAME
+//  AY_3_8912_DIP(U30)      // PSG -- emulated by MAME
 
-	CD4069_DIP(U31)			// Hex Inverter
+	CD4069_DIP(U31)         // Hex Inverter
 	NET_C(U31.7, GND)
 	NET_C(U31.14, I_V12)
 
-	CD4069_DIP(U32)			// Hex Inverter
+	CD4069_DIP(U32)         // Hex Inverter
 	NET_C(U32.7, GND)
 	NET_C(U32.14, I_V12)
 
-//	TTL_74LS125_DIP(U33)	// Quad 3-state buffer
-//	NET_C(U33.7, GND)
-//	NET_C(U33.14, I_V5)
+//  TTL_74LS125_DIP(U33)    // Quad 3-state buffer
+//  NET_C(U33.7, GND)
+//  NET_C(U33.14, I_V5)
 
-//	TTL_74LS374_DIP(U34)	// Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
-//	NET_C(U34.10, GND)
-//	NET_C(U34.20, I_V5)
+//  TTL_74LS374_DIP(U34)    // Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
+//  NET_C(U34.10, GND)
+//  NET_C(U34.20, I_V5)
 //
-//	TTL_74LS374_DIP(U35)	// Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
-//	NET_C(U34.10, GND)
-//	NET_C(U34.20, I_V5)
+//  TTL_74LS374_DIP(U35)    // Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
+//  NET_C(U34.10, GND)
+//  NET_C(U34.20, I_V5)
 
 //  TTL_74LS74_DIP(U36)     // Dual D Flip Flop
 //  NET_C(U36.7, GND)
 //  NET_C(U36.14, I_V5)
 
-//	TTL_74LS10_DIP(U37)		// Triple 3-Input NAND Gate
-//	NET_C(U37.7, GND)
-//	NET_C(U37.14, I_V5)
+//  TTL_74LS10_DIP(U37)     // Triple 3-Input NAND Gate
+//  NET_C(U37.7, GND)
+//  NET_C(U37.14, I_V5)
 
-//	TTL_74LS14_DIP(U38)
-//	NET_C(U38.7, GND)
-//	NET_C(U38.14, I_V5)
+//  TTL_74LS14_DIP(U38)
+//  NET_C(U38.7, GND)
+//  NET_C(U38.14, I_V5)
 
-//	TTL_74LS08_DIP(U39)		// Quad 2-Input AND Gates
-//	NET_C(U39.7, GND)
-//	NET_C(U39.14, I_V5)
+//  TTL_74LS08_DIP(U39)     // Quad 2-Input AND Gates
+//  NET_C(U39.7, GND)
+//  NET_C(U39.14, I_V5)
 
-//	TTL_74LS30_DIP(U40)		// 8-Input NAND Gate
-//	NET_C(U40.7, GND)
-//	NET_C(U40.14, I_V5)
+//  TTL_74LS30_DIP(U40)     // 8-Input NAND Gate
+//  NET_C(U40.7, GND)
+//  NET_C(U40.14, I_V5)
 
-//	TTL_74LS14_DIP(U41)
-//	NET_C(U41.7, GND)
-//	NET_C(U41.14, I_V5)
+//  TTL_74LS14_DIP(U41)
+//  NET_C(U41.7, GND)
+//  NET_C(U41.14, I_V5)
 
 	//
 	// Sheet 7, top-left/middle (Thrust)
@@ -817,9 +817,9 @@ NETLIST_START(zektor)
 	VARCLOCK(BGCLK, 1, "max(0.000001,min(0.1,(0.00000748879*A0*A0*A0*A0) - (0.000189174*A0*A0*A0) + (0.00180942*A0*A0) - (0.00759439*A0) + 0.0124560))")
 	NET_C(BGCLK.GND, GND)
 	NET_C(BGCLK.VCC, I_V5)
-    NET_C(BGCLK.A0, U16.1)
-    NET_C(BGCLK.Q, BGENV.A0)
-    NET_C(GND, C57.1, C57.2, C58.1, C58.2)
+	NET_C(BGCLK.A0, U16.1)
+	NET_C(BGCLK.Q, BGENV.A0)
+	NET_C(GND, C57.1, C57.2, C58.1, C58.2)
 	AFUNC(BGENV, 1, "if(A0>2.5,2.5,-2.5)")
 	NET_C(BGENV.Q, R106.1)
 #else
@@ -867,7 +867,7 @@ NETLIST_START(zektor)
 	HINT(U32.6, NC)
 	HINT(U32.8, NC)
 
-	CLOCK(_200HZBCLK, 217.98)	// tweak frequency so this is out of phase
+	CLOCK(_200HZBCLK, 217.98)   // tweak frequency so this is out of phase
 	NET_C(_200HZBCLK.VCC, I_V12)
 	NET_C(_200HZBCLK.GND, GND)
 	NET_C(_200HZB, _200HZBCLK.Q)
@@ -1100,14 +1100,14 @@ NETLIST_START(zektor)
 	VARCLOCK(TORP1CLK, 1, "max(0.000001,min(0.1,(0.00000342725*A0*A0*A0) + (0.000000183693*A0*A0) + (0.000079091*A0) + 0.0000157375))")
 	NET_C(TORP1CLK.GND, GND)
 	NET_C(TORP1CLK.VCC, I_V5)
-    NET_C(TORP1CLK.A0, D2.K)
-    NET_C(TORP1CLK.Q, T1ENV.A0)
+	NET_C(TORP1CLK.A0, D2.K)
+	NET_C(TORP1CLK.Q, T1ENV.A0)
 	AFUNC(T1ENV, 1, "if(A0>2.5,11.1,-11.1)")
 	NET_C(T1ENV.Q, U23.1)
 	NET_C(D2.A, D3.K, R91.1)
 	NET_C(C46.2, R90.1)
 	NET_C(R90.2, R91.2, R146.1)
-    NET_C(GND, U20.3, U20.2)
+	NET_C(GND, U20.3, U20.2)
 #else
 	NET_C(D2.A, D3.K, R91.1, U20.3)
 	NET_C(U20.2, C46.2, R90.1)
@@ -1129,9 +1129,9 @@ NETLIST_START(zektor)
 
 	NET_C(WBN, R36.1)
 #if (DISABLE_TORPEDO2_NOISE)
-	NET_C(R36.2, GND)	// noise source
+	NET_C(R36.2, GND)   // noise source
 #else
-	NET_C(R36.2, D6.A)	// noise source
+	NET_C(R36.2, D6.A)  // noise source
 #endif
 
 #if (HLE_TORPEDO2_VCO)
@@ -1145,14 +1145,14 @@ NETLIST_START(zektor)
 	VARCLOCK(TORP2CLK, 1, "max(0.000001,min(0.1,(0.0000104419*A0*A0*A0) - (0.00000603211*A0*A0) + (0.000109865*A0) + 0.0000082421))")
 	NET_C(TORP2CLK.GND, GND)
 	NET_C(TORP2CLK.VCC, I_V5)
-    NET_C(TORP2CLK.A0, D6.K)
-    NET_C(TORP2CLK.Q, T2ENV.A0)
+	NET_C(TORP2CLK.A0, D6.K)
+	NET_C(TORP2CLK.Q, T2ENV.A0)
 	AFUNC(T2ENV, 1, "if(A0>2.5,11.1,-11.1)")
 	NET_C(T2ENV.Q, U21.1)
 	NET_C(D6.A, D7.K, R93.1)
 	NET_C(C43.2, R94.1)
 	NET_C(R94.2, R93.2, R92.2)
-    NET_C(GND, U20.6, U20.5)
+	NET_C(GND, U20.6, U20.5)
 #else
 	NET_C(D6.A, U20.5, D7.K, R93.1)
 	NET_C(U20.6, C43.2, R94.1)

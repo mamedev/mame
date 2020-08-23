@@ -41,7 +41,7 @@ Notes:
 
     TODO
 
-	- sector length error in read check after format
+    - sector length error in read check after format
 
 */
 
@@ -57,9 +57,9 @@ Notes:
 //**************************************************************************
 
 #define SASIBUS_TAG     "sasi"
-#define DMA_O1 	BIT(m_dma, 0)
-#define DMA_O2 	BIT(m_dma, 1)
-#define DMA_O3 	BIT(m_dma, 2)
+#define DMA_O1  BIT(m_dma, 0)
+#define DMA_O2  BIT(m_dma, 1)
+#define DMA_O3  BIT(m_dma, 2)
 
 
 //**************************************************************************
@@ -228,16 +228,16 @@ void luxor_4105_device::write_dma_register(uint8_t data)
 {
 	/*
 
-		bit     description
+	    bit     description
 
-		0
-		1
-		2
-		3
-		4
-		5       byte interrupt enable?
-		6       DMA/CPU mode (1=DMA, 0=CPU)?
-		7       error interrupt enable?
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       byte interrupt enable?
+	    6       DMA/CPU mode (1=DMA, 0=CPU)?
+	    7       error interrupt enable?
 
 	*/
 
@@ -255,7 +255,7 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 {
 	m_data_out = data;
 
-	if (!m_sasi->io_r()) 
+	if (!m_sasi->io_r())
 	{
 		m_sasi->write(data);
 	}
@@ -355,9 +355,9 @@ uint8_t luxor_4105_device::abcbus_stat()
 		    2       BSY
 		    3       I/O
 		    4       0
-		    5		DMA !O3
+		    5       DMA !O3
 		    6       PREN
-		    7		DMA request
+		    7       DMA request
 
 		*/
 
@@ -365,7 +365,7 @@ uint8_t luxor_4105_device::abcbus_stat()
 		data |= !m_sasi->cd_r() << 1;
 		data |= m_sasi->bsy_r() << 2;
 		data |= !m_sasi->io_r() << 3;
-		
+
 		data |= !DMA_O3 << 5;
 		data |= !m_pren << 6;
 		data |= !m_drq << 7;
@@ -470,7 +470,7 @@ uint8_t luxor_4105_device::abcbus_tren()
 	m_req = m_sasi->req_r();
 	update_ack();
 	update_dma();
-	
+
 	return data;
 }
 

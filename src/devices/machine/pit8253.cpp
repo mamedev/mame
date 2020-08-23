@@ -201,7 +201,7 @@ void pit_counter_device::device_reset()
 
 inline void pit_counter_device::adjust_timer(attotime target)
 {
-//	if (target != m_next_update)
+//  if (target != m_next_update)
 	{
 		m_next_update = target;
 		m_updatetimer->adjust(target - machine().time());

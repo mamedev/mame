@@ -6,8 +6,8 @@
  *
  * TODO:
  * - Rewrite drawing functions by taking scanline renderer into account
- *   * cfr. x1fdemo raster effect on first screen. 
- * - Use mc6845 internal functions instead of breaking encapsulation 
+ *   * cfr. x1fdemo raster effect on first screen.
+ * - Use mc6845 internal functions instead of breaking encapsulation
  *   * annoying due of the double height/width stuff.
  * - Improve border drawing, pinpoint what are the visible limits for a mc6845;
  * - Move X1Turbo features into specific overrides;
@@ -111,12 +111,12 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	    attribute table:
 	    x--- ---- double width
 	    -x-- ---- double height
-	    --x- ---- PCG select 
+	    --x- ---- PCG select
 	    ---x ---- color blinking (if 1 reverses color patterns rather than true blinking)
 	    ---- x--- reverse color
 	    ---- -xxx color pen
-		
-		X1 Turbo can also access an additional Kanji VRAM area
+
+	    X1 Turbo can also access an additional Kanji VRAM area
 	    x--- ---- select Kanji ROM
 	    -x-- ---- Kanji side (0=left, 1=right)
 	    --x- ---- Underline
@@ -257,7 +257,7 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						// reverse attribute
 						if(color & 8)
 							pcg_pen ^= 7;
-						
+
 						// X1Turbo only: the black clip register overrides the pen with black if it's hit
 						if((m_scrn_reg.blackclip & 8) && (color == (m_scrn_reg.blackclip & 7)))
 							pcg_pen = 0;
@@ -361,7 +361,7 @@ void x1_state::draw_gfxbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 					// TODO: not working properly, see top of file
 					if(y*(mc6845_tile_height)+yi < cliprect.min_y || y*(mc6845_tile_height)+yi > cliprect.max_y)
 						continue;
-					
+
 					// TODO: call a fn subset instead of looping for a width/height that is never hit
 					x1_draw_pixel(bitmap, y*(mc6845_tile_height)+yi, x*8+xi, color, 0, 0);
 				}

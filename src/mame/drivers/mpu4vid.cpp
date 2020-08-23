@@ -171,8 +171,8 @@ TODO:
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
         They appear to hang on the handshake with the MPU4 board
       - Layouts needed for the other working games, and DIP switches need checking/altering (no test mode?)
-	  - BWB Vid5 cabinets seem to have the speakers wired the other way according to test (left/right swapped)
-	  - BWB sampled sound seems to not play despite hookup.
+      - BWB Vid5 cabinets seem to have the speakers wired the other way according to test (left/right swapped)
+      - BWB sampled sound seems to not play despite hookup.
  ***********************************************************************************************************/
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -444,7 +444,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 		uint16_t tile = m_vid_mainram[address & 0x7fff];
 		const uint8_t *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
 		int offset = m_gfxdecode->gfx(m_gfx_index+0)->rowbytes() * linecount;
-		
+
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t pen = line[offset + i];
@@ -1477,7 +1477,7 @@ static INPUT_PORTS_START( v4bubbnk )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Swop")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Lo")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_MODIFY("DIL2")
 	PORT_DIPNAME( 0x01, 0x00, "Clear MPU Memory" ) PORT_DIPLOCATION("DIL2:01")
@@ -1516,7 +1516,7 @@ static INPUT_PORTS_START( v4dbltak )
 	// invalid settings
 	PORT_CONFSETTING(    0x00, "Invalid (Not fitted)"  )
 	PORT_CONFSETTING(    0x40, "Invalid" )
-	
+
 	PORT_MODIFY("ORANGE2")
 	PORT_CONFNAME( 0x0f, 0x07, "Jackpot / Prize Key" )
 	PORT_CONFSETTING(    0x08, "5 GBP"  )
@@ -1545,7 +1545,7 @@ static INPUT_PORTS_START( v4dbltak )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_MODIFY("BLACK2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Collect")	
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Collect")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold A")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold B")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold C")
@@ -1622,7 +1622,7 @@ static INPUT_PORTS_START( v4mazbel )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold/Swop")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Hi/Up")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Lo/Down")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_MODIFY("DIL2")
 	PORT_DIPNAME( 0x01, 0x00, "Clear MPU Memory" ) PORT_DIPLOCATION("DIL2:01")
@@ -1662,7 +1662,7 @@ static INPUT_PORTS_START( v4redhtp )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_MODIFY("BLACK2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Collect")	
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Collect")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold A")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold B")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold C")
@@ -1991,9 +1991,9 @@ void mpu4vid_state::mpu4_vid_bt_a00002_w(offs_t offset, uint8_t data)
 {
 	switch (m_bt_which)
 	{
-	case 0:	m_btpal_r[m_bt_palbase] = data;
-	case 1:	m_btpal_g[m_bt_palbase] = data;
-	case 2:	m_btpal_b[m_bt_palbase] = data;
+	case 0: m_btpal_r[m_bt_palbase] = data;
+	case 1: m_btpal_g[m_bt_palbase] = data;
+	case 2: m_btpal_b[m_bt_palbase] = data;
 	}
 
 	m_bt_which++;
@@ -9494,7 +9494,7 @@ GAME(  199?, v4cybcas,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4v
 
 GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Mississippi Lady (Nova, German) (MPU4 Video)",GAME_FLAGS ) // different hardware type? extra ram on mpu4 side?
 
-GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS ) 
-GAME(  199?, v4picdilz,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 3) (MPU4 Video)",GAME_FLAGS ) 
+GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4picdilz,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 3) (MPU4 Video)",GAME_FLAGS )
 

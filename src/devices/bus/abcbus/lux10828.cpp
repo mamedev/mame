@@ -106,8 +106,8 @@ Notes:
         0704: rr   a
         0706: call $073F
 
-		There is an alternate format function in the controller firmware that allows to set a secret byte which is stored in the sector header.
-		Copy protected software checks the secret byte read from the sector header and refuses to start if the disk has not been appropriately formatted.
+        There is an alternate format function in the controller firmware that allows to set a secret byte which is stored in the sector header.
+        Copy protected software checks the secret byte read from the sector header and refuses to start if the disk has not been appropriately formatted.
 
 */
 

@@ -703,7 +703,7 @@ uint8_t abc1600_state::cio_pb_r()
 	    PB7     FINT
 
 	*/
-	
+
 	uint8_t data = 0;
 
 	data |= !m_sysscc << 5;

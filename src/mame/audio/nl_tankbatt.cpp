@@ -26,12 +26,12 @@ NETLIST_START(tankbatt)
 	CLOCK(2V, 4000) // 18.432MHz / (3 * 384 * 2)
 	CLOCK(4V, 2000) // 18.432MHz / (3 * 384 * 4)
 
-	TTL_INPUT(S1, 0)		// active high
-	TTL_INPUT(S2, 0)		// active high
-	TTL_INPUT(OFF, 1)		// active high
-	TTL_INPUT(ENGINE_HI, 0)	// active high
-	TTL_INPUT(SHOOT, 0)		// active high
-	TTL_INPUT(HIT, 0)		// active high
+	TTL_INPUT(S1, 0)        // active high
+	TTL_INPUT(S2, 0)        // active high
+	TTL_INPUT(OFF, 1)       // active high
+	TTL_INPUT(ENGINE_HI, 0) // active high
+	TTL_INPUT(SHOOT, 0)     // active high
+	TTL_INPUT(HIT, 0)       // active high
 
 	RES(R31, 470)
 	RES(R32, 470)

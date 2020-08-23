@@ -6,10 +6,10 @@
 
     Skeleton driver
 
-	The following systems are dumped:
-	- Mortal Kombat 3
-	- 4 Slot board
-	- 4 Slot board with built-in NBA Jam
+    The following systems are dumped:
+    - Mortal Kombat 3
+    - 4 Slot board
+    - 4 Slot board with built-in NBA Jam
 
     Hardware (for the 4 slot switcher):
     - MCS-51 based CPU 44-pin (markings removed)

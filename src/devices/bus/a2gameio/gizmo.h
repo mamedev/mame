@@ -3,7 +3,7 @@
 /*********************************************************************
 
     gizmo.h - HAL Labs Gizmo digital joystick adapter
-	Used by Vindicator and Super Taxman 2.
+    Used by Vindicator and Super Taxman 2.
 
 *********************************************************************/
 

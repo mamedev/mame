@@ -166,7 +166,7 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_flyball.cpp",
 	MAME_DIR .. "src/mame/audio/nl_flyball.h",
 	MAME_DIR .. "src/mame/drivers/flyball.cpp",
-	
+
 	MAME_DIR .. "src/mame/audio/nl_destroyr.cpp",
 	MAME_DIR .. "src/mame/audio/nl_destroyr.h",
 	MAME_DIR .. "src/mame/drivers/destroyr.cpp",
@@ -349,7 +349,7 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_tp1983.h",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.h",
-	
+
 	MAME_DIR .. "src/mame/audio/nl_starcrus.h",
 	MAME_DIR .. "src/mame/audio/nl_starcrus.cpp",
 	MAME_DIR .. "src/mame/drivers/starcrus.cpp",

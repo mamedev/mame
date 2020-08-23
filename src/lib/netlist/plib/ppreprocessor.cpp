@@ -519,7 +519,7 @@ namespace plib {
 					error("#elif without #if");
 
 				//if ((m_if_flag & (1 << m_if_level)) == 0)
-				//	m_if_flag ^= (1 << m_if_level);
+				//  m_if_flag ^= (1 << m_if_level);
 				if (m_elif & (1 << m_if_level)) // elif disabled
 					m_if_flag |= (1 << m_if_level);
 				else

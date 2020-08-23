@@ -70,7 +70,7 @@ static NETLIST_START(CD4006_DIP)
 		   A.D3, /*    D3 |5           10| D3+4 */ A.D3P4,
 		   A.D4, /*    D4 |6            9| D4+5 */ A.D4P5,
 		  A.VSS, /*   VSS |7            8| D4+4 */ A.D4P4
-			     /*       +--------------+      */
+				 /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -95,15 +95,15 @@ NETLIST_END()
 //-     +---+---++---+
 //-
 static NETLIST_START(CD4011_DIP)
-       CD4011_GATE(A)
-       CD4011_GATE(B)
-       CD4011_GATE(C)
-       CD4011_GATE(D)
+	   CD4011_GATE(A)
+	   CD4011_GATE(B)
+	   CD4011_GATE(C)
+	   CD4011_GATE(D)
 
-       NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
-       NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
+	   NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
+	   NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
 
-       DIPPINS(    /*     +--------------+     */
+	   DIPPINS(    /*     +--------------+     */
 			  A.A, /*   A |1     ++    14| VDD */ A.VDD,
 			  A.B, /*   B |2           13| H   */ D.B,
 			  A.Q, /*   J |3           12| G   */ D.A,
@@ -147,14 +147,14 @@ static NETLIST_START(CD4013_DIP)
 	NET_C(A.VSS, B.VSS)
 
 	DIPPINS(     /*         +--------------+        */
-		    A.Q, /*      Q1 |1     ++    14| VDD    */ A.VDD,
+			A.Q, /*      Q1 |1     ++    14| VDD    */ A.VDD,
 		   A.QQ, /*     Q1Q |2           13| Q2     */ B.Q,
 		A.CLOCK, /*  CLOCK1 |3           12| Q2Q    */ B.QQ,
 		A.RESET, /*  RESET1 |4    4013   11| CLOCK2 */ B.CLOCK,
 		 A.DATA, /*   DATA1 |5           10| RESET2 */ B.RESET,
 		  A.SET, /*    SET1 |6            9| DATA2  */ B.DATA,
 		  A.VSS, /*     VSS |7            8| SET2   */ B.SET
-			     /*         +--------------+        */
+				 /*         +--------------+        */
 	)
 NETLIST_END()
 
@@ -547,7 +547,7 @@ static NETLIST_START(CD4538_DIP)
 		   A.Q, /*  3S |6           11| 3Y  */ B.B,
 		  A.QQ, /*  EQ |7           10| 3Z  */ B.Q,
 		 A.VSS, /* GND |8            9| VEE */ B.QQ
-			    /*     +--------------+     */
+				/*     +--------------+     */
 	)
 NETLIST_END()
 

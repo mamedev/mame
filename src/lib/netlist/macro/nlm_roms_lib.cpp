@@ -312,7 +312,7 @@ static NETLIST_START(TTL_82S16_DIP)
 		A.DOUTQ, /*  DOUTQ |6           11| A7    */ A.A7,
 		   A.A4, /*     A4 |7           10| A6    */ A.A6,
 		  A.GND, /*    GND |8            9| A5    */ A.A5
-			     /*        +--------------+       */
+				 /*        +--------------+       */
 	)
 NETLIST_END()
 

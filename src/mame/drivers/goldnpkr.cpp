@@ -487,16 +487,16 @@
 
   Entering the service mode (key 0), you can enter to a submenu for settings pressing
   DEAL (key 2):
-  
-	Win Limit (0-9 the first time, then 3-9)
-	Payout Limit (0-2)
-	Double Odds % (0-9)
-	Payout % (0-9)
-	Hard Setting (0-4)
-	Note Value (fixed in 5)
 
-	Bonus (0 to 10000, step x100)
-	(if you rech 10000, settings exits and go to game. You can't change bonus anymore.
+    Win Limit (0-9 the first time, then 3-9)
+    Payout Limit (0-2)
+    Double Odds % (0-9)
+    Payout % (0-9)
+    Hard Setting (0-4)
+    Note Value (fixed in 5)
+
+    Bonus (0 to 10000, step x100)
+    (if you rech 10000, settings exits and go to game. You can't change bonus anymore.
 
   Use HOLD keys (keys ZXCVB) to navigate through the menu and change
   the values. Press CANCEL to exit the settings menu.
@@ -12177,8 +12177,8 @@ void goldnpkr_state::init_bonuspkr()
 
   The game takes 25 seconds to do all the checks.
 
-  E9F4: jmp $EA56	; infinite loop / dead end.
-  E9F7: jmp $CEC6	; the game continue executing...
+  E9F4: jmp $EA56   ; infinite loop / dead end.
+  E9F7: jmp $CEC6   ; the game continue executing...
 
 */
 

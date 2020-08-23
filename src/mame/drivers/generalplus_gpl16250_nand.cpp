@@ -749,18 +749,18 @@ void generalplus_gpac800_game_state::machine_reset()
 		}
 
 		/* these vectors must either directly point to RAM, or at least redirect there after some code
-		
+
 		   kiugames has the startup code copied to 20xxx which is outside the scope of a 16-bit vector
 		   so these must trampoline (although 20xxx currently isn't handled as RAM, so that needs more
 		   thought anyway
 		*/
 		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
-		
+
 		int addr;
 		addr = (m_vectorbase + 0x0a) & 0x000fffff;
 		internal[0x7f00] = 0xfe80 | (addr >> 16);
 		internal[0x7f01] = (addr & 0xffff);
-	
+
 		addr = (m_vectorbase + 0x0c) & 0x000fffff;
 		internal[0x7f02] = 0xfe80 | (addr >> 16);
 		internal[0x7f03] = (addr & 0xffff);

@@ -429,7 +429,7 @@ void nes_sh6578_state::io_w(uint8_t data)
 void nes_sh6578_abl_wikid_state::io_w(uint8_t data)
 {
 	nes_sh6578_state::io_w(data);
-	
+
 	if (m_isbanked)
 	{
 		m_bank->set_entry((data>>1)&1);

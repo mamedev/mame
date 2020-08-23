@@ -262,7 +262,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 
 	case SPI_STATE_WAITING_DUMMY2_ADDR:
 	{
-	//	m_spistate = SPI_STATE_READY;
+	//  m_spistate = SPI_STATE_READY;
 		break;
 	}
 	}
@@ -358,7 +358,7 @@ void pcp8718_state::map(address_map &map)
 	map(0x007945, 0x007945).r(FUNC(pcp8718_state::spi_misc_control_r));
 
 	map(0x007abf, 0x007abf).r(FUNC(pcp8718_state::unk_7abf_r));
-	
+
 
 	// registers at 7xxx are similar to GPL16250, but not identical? (different video system?)
 
@@ -402,12 +402,12 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 				logerror("call to 0xf58f - unknown function\n");
 				return 0x9a90; // retf
 			}
-			else if (realpc == 0xfb26) // done with a call, and also a pc = 
+			else if (realpc == 0xfb26) // done with a call, and also a pc =
 			{
 				logerror("call to 0xfb26 - unknown function\n");
 				return 0x9a90; // retf
 			}
-			else if (realpc == 0xf56f) // done with a pc = 
+			else if (realpc == 0xf56f) // done with a pc =
 			{
 				logerror("call to 0xf56f - unknown function\n");
 				return 0x9a90; // retf
@@ -505,7 +505,7 @@ void pcp8718_state::machine_reset()
 	m_maincpu->set_state_int(UNSP_SR, 0x0000);
 
 	//uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
-	//ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
+	//ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)
 
 	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
 	m_maincpu->set_state_int(UNSP_SP, 0x5fff);

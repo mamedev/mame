@@ -81,10 +81,10 @@ NETLIST_START(carpolo)
 	ANALOG_INPUT(V5, 5)
 	ALIAS(VCC, V5)
 
-	TTL_INPUT(PL1_CRASH, 1)	// active high
-	TTL_INPUT(PL2_CRASH, 0)	// active high
-	TTL_INPUT(PL3_CRASH, 0)	// active high
-	TTL_INPUT(PL4_CRASH, 0)	// active high
+	TTL_INPUT(PL1_CRASH, 1) // active high
+	TTL_INPUT(PL2_CRASH, 0) // active high
+	TTL_INPUT(PL3_CRASH, 0) // active high
+	TTL_INPUT(PL4_CRASH, 0) // active high
 
 	LOCAL_SOURCE(PLAYER_CRASH)
 
