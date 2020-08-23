@@ -4,8 +4,8 @@
 license:CC0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
-See g7400.xml for G7400 cartridges that can also be run on G7000/O2.
-When adding new sets, avoid naming conflicts between odyssey2.xml and g7400.xml.
+See videopacp.xml for G7400 cartridges that can also be run on G7000/O2.
+When adding new sets, avoid naming conflicts between videopac.xml and videopacp.xml.
 
 This list does not include ROM hacks, but those can still be loaded with -cart.
 WIP beta homebrews are also not included.
@@ -136,7 +136,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 
 -->
 
-<softwarelist name="odyssey2" description="Magnavox Odyssey 2 / Philips Videopac cartridges">
+<softwarelist name="videopac" description="Philips Videopac / Magnavox Odyssey 2 cartridges">
 
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
 
