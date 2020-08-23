@@ -153,6 +153,88 @@ static NETLIST_START(NE566_DIP)
 
 NETLIST_END()
 
+//- Identifier:  NE555_DIP
+//- Title: NE555 PRECISION TIMERS
+//- Description:
+//-   These devices are precision timing circuits capable of producing accurate
+//-   time delays or oscillation. In the time-delay or monostable mode of
+//-   operation, the timed interval is controlled by a single external resistor
+//-   and capacitor network. In the astable mode of operation, the frequency and
+//-   duty cycle can be controlled independently with two external resistors and
+//-   a single external capacitor.
+//-
+//-   The threshold and trigger levels normally are two-thirds and one-third,
+//-   respectively, of V CC. These levels can be altered by use of the
+//-   control-voltage terminal. When the trigger input falls below the trigger
+//-   level, the flip-flop is set and NC – No internal connection the output
+//-   goes high. If the trigger input is above the trigger level and the
+//-   threshold input is above the threshold level, the flip-flop is reset and
+//-   the output is low. The reset (RESET) input can override all other
+//-   inputs and can be used to initiate a new timing cycle. When RESET goes
+//-   low, the flip-flop is reset and the output goes low. When the output is low,
+//-   a low-impedance path is provided between discharge (DISCH) and ground.
+//-
+//-   The output circuit is capable of sinking or sourcing current up to 200 mA.
+//-   Operation is specified for supplies of 5 V to 15 V. With a 5-V supply,
+//-   output levels are compatible with TTL inputs.
+//-
+//-   The NE555 is characterized for operation from 0°C to 70°C. The SA555 is
+//-   characterized for operation from –40°C to 85°C. The SE555 is characterized
+//-   for operation over the full military range of –55°C to 125°C.
+//-
+//- Pinalias: GND,TRIG,OUT,RESET,CONT,THRES,DISCH,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas instrument datasheet
+//- Limitations: Internal resistor network currently fixed to 5k
+//-   If TRIG and TRESH are connected overshoot compensation will be enabled.
+//-   The approach is raw but delivers results (at 5 to 10 steps per discharge/charge)
+//-   within a couple of percent. Please take into account that any datasheet
+//-   formulas are idealistic. Neither capacitor, resistor, internal resistor
+//-   tolerances are taken into account. Nor are ambient temperature and chip
+//-   temperature. Thus the result is considered acceptable.
+//-   The datasheet states a maximum discharge of 200mA, this is not modelled
+//-   Instead an impedance of 1 Ohm is used.
+//-
+//- Example: ne555_astable.c,ne555_example
+//- FunctionTable:
+//-
+//-    |RESET|TRIGGER VOLTAGE|THRESHOLD VOLTAGE|OUTPUT|DISCHARGE SWITCH|
+//-    |:---:|:-------------:|:---------------:|:----:|:--------------:|
+//-    |Low  | Irrelevant    | Irrelevant      |  Low |    On          |
+//-    |High | <1/3 VDD      | Irrelevant      | High |    Off         |
+//-    |High | >1/3 VDD      | >2/3 VDD        | Low  |    On          |
+//-    |High | >1/3 VDD      | <2/3 VDD        | As previously established||
+//-
+static NETLIST_START(NE555_DIP)
+
+	NE555(A)
+
+	ALIAS(1, A.GND)      // Pin 1
+	ALIAS(2, A.TRIG)     // Pin 2
+	ALIAS(3, A.OUT)      // Pin 3
+	ALIAS(4, A.RESET)    // Pin 4
+	ALIAS(5, A.CONT)     // Pin 5
+	ALIAS(6, A.THRESH)   // Pin 6
+	ALIAS(7, A.DISCH)    // Pin 7
+	ALIAS(8, A.VCC)      // Pin 8
+
+NETLIST_END()
+
+static NETLIST_START(MC1455P_DIP)
+
+	MC1455P(A)
+
+	ALIAS(1, A.GND)      // Pin 1
+	ALIAS(2, A.TRIG)     // Pin 2
+	ALIAS(3, A.OUT)      // Pin 3
+	ALIAS(4, A.RESET)    // Pin 4
+	ALIAS(5, A.CONT)     // Pin 5
+	ALIAS(6, A.THRESH)   // Pin 6
+	ALIAS(7, A.DISCH)    // Pin 7
+	ALIAS(8, A.VCC)      // Pin 8
+
+NETLIST_END()
+
 NETLIST_START(otheric_lib)
 	TRUTHTABLE_START(MC14584B_GATE, 1, 1, "")
 		TT_HEAD(" A | Q ")
@@ -164,5 +246,7 @@ NETLIST_START(otheric_lib)
 
 	LOCAL_LIB_ENTRY(MC14584B_DIP)
 	LOCAL_LIB_ENTRY(NE566_DIP)
+	LOCAL_LIB_ENTRY(NE555_DIP)
+	LOCAL_LIB_ENTRY(MC1455P_DIP)
 NETLIST_END()
 
