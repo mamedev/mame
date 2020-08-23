@@ -38,23 +38,20 @@ ROM_START( romboxp )
 	ROM_SYSTEM_BIOS(0, "exp100", "ROMBOX+ Expansion 1.00")
 	ROMX_LOAD("romboxplus.rom", 0x0000, 0x2000, CRC(0520ab6d) SHA1(2f551bea279a64e09fd4d31024799f7459fb9938), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "presap2", "PRES AP2 Support 1.23")
-	ROMX_LOAD("presap2rb_123.rom", 0x0000, 0x2000, CRC(04931d2c) SHA1(84a27fd30adea4e7f7c53e7875f63cf9e6928688), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "exp101", "Slogger Expansion 1.01")
+	ROMX_LOAD("exprom101.rom", 0x0000, 0x2000, CRC(6f854419) SHA1(1f3e7e0c2843e1a364b4b3f96c890fe70ef03200), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "exp101", "Slogger Expansion 1.01")
-	ROMX_LOAD("exprom101.rom", 0x0000, 0x2000, CRC(6f854419) SHA1(1f3e7e0c2843e1a364b4b3f96c890fe70ef03200), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "exp200", "Slogger Expansion 2.00")
+	ROMX_LOAD("elkexp200.rom", 0x0000, 0x2000, CRC(dee02843) SHA1(5c9b940b4ddb46e9a223160310683a32266300c8), ROM_BIOS(2))
 
-	ROM_SYSTEM_BIOS(3, "exp200", "Slogger Expansion 2.00")
-	ROMX_LOAD("elkexp200.rom", 0x0000, 0x2000, CRC(dee02843) SHA1(5c9b940b4ddb46e9a223160310683a32266300c8), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "exp201", "Slogger Expansion 2.01")
+	ROMX_LOAD("elkexp201.rom", 0x0000, 0x2000, CRC(0e896892) SHA1(4e0794f1083fe529b01bd4fa100996a533ed8b10), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "exp201", "Slogger Expansion 2.01")
-	ROMX_LOAD("elkexp201.rom", 0x0000, 0x2000, CRC(0e896892) SHA1(4e0794f1083fe529b01bd4fa100996a533ed8b10), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "exp202", "Slogger Expansion 2.02")
+	ROMX_LOAD("elkexp202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(4))
 
-	ROM_SYSTEM_BIOS(5, "exp202", "Slogger Expansion 2.02")
-	ROMX_LOAD("elkexp202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(5))
-
-	ROM_SYSTEM_BIOS(6, "exp210", "Slogger Expansion 2.10 (dev)")
-	ROMX_LOAD("elkexp210.rom", 0x0000, 0x2000, CRC(12442575) SHA1(eb8609991a9a8fb017b8100bfca4248d65faeea8), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(5, "exp210", "Slogger Expansion 2.10 (dev)")
+	ROMX_LOAD("elkexp210.rom", 0x0000, 0x2000, CRC(12442575) SHA1(eb8609991a9a8fb017b8100bfca4248d65faeea8), ROM_BIOS(5))
 ROM_END
 
 //-------------------------------------------------
@@ -85,7 +82,7 @@ void electron_romboxp_device::device_add_mconfig(machine_config &config)
 {
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(electron_romboxp_device::busy_w));
+	m_centronics->busy_handler().set([this](int state) { m_centronics_busy = state; });
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(latch);
 
@@ -223,7 +220,7 @@ uint8_t electron_romboxp_device::expbus_r(offs_t offset)
 
 			if (offset == 0xfc72)
 			{
-				data &= status_r();
+				data &= (m_centronics_busy << 7) | 0x7f;
 			}
 			break;
 
@@ -292,6 +289,8 @@ void electron_romboxp_device::expbus_w(offs_t offset, uint8_t data)
 			if (offset == 0xfc71)
 			{
 				m_cent_data_out->write(data);
+				m_centronics->write_strobe(0);
+				m_centronics->write_strobe(1);
 			}
 			break;
 
@@ -313,19 +312,6 @@ void electron_romboxp_device::expbus_w(offs_t offset, uint8_t data)
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
-
-uint8_t electron_romboxp_device::status_r()
-{
-	// Status: b7: printer Busy
-	return (m_centronics_busy << 7) | 0x7f;
-}
-
-
-WRITE_LINE_MEMBER(electron_romboxp_device::busy_w)
-{
-	m_centronics_busy = !state;
-}
-
 
 image_init_result electron_romboxp_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
