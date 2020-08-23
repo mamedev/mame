@@ -1760,22 +1760,7 @@ tests: $(REGTESTS)
 # FIXME: make this work with SEPARATE_BIN
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
-ifeq ($(OS),windows)
-	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
-	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
-else
+ifeq (posix,$(SHELLTYPE))
 	$(SILENT) find src -name \*.c -exec ./srcclean {} \; >&2
 	$(SILENT) find src -name \*.cpp -exec ./srcclean {} \; >&2
 	$(SILENT) find src -name \*.h -exec ./srcclean {} \; >&2
@@ -1790,6 +1775,21 @@ else
 	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
 	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
 	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
+else
+	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
 endif
 
 #-------------------------------------------------
