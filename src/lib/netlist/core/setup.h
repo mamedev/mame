@@ -148,7 +148,6 @@ namespace netlist
 		// get family -> truthtable
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
-		// FIXME: return param_ref_t
 		param_ref_t find_param(const pstring &param_in) const;
 		// needed by nltool
 		std::vector<pstring> get_terminals_for_device_name(const pstring &devname) const;
@@ -157,8 +156,6 @@ namespace netlist
 		detail::core_terminal_t *find_terminal(const pstring &terminal_in, detail::terminal_type atype, bool required = true) const;
 		detail::core_terminal_t *find_terminal(const pstring &terminal_in, bool required = true) const;
 		pstring de_alias(const pstring &alias) const;
-		// FIXME: only needed by solver code outside of setup_t
-		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// run preparation
 
@@ -191,6 +188,8 @@ namespace netlist
 		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
 		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
 		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+
+		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// helpers
 		static pstring termtype_as_str(detail::core_terminal_t &in);

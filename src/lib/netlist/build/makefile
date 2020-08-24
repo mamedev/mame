@@ -20,7 +20,10 @@
 #
 #
 
+.DEFAULT_GOAL := all
+
 SRC = ..
+PSRC = $(SRC)/plib
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 
@@ -64,11 +67,20 @@ OBJ = obj/mingw
 EXESUFFIX = .exe
 DOXYGEN = doxygen.exe
 HOSTARCH = WINDOWS
+CEXTRAFLAGS = -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN
+LDEXTRAFLAGS = -Wl,--subsystem,console -municode
+LIBS = $(EXTRALIBS)
+MD = @mkdir.exe
+RM = @rm.exe
+SHELL = sh.exe
 else
 OBJ = obj/nix
 EXESUFFIX :=
 DOXYGEN = @./doxygen
 HOSTARCH = NIX
+LIBS = -lpthread -ldl $(EXTRALIBS)
+MD = @mkdir
+RM = @rm
 endif
 
 PYTHON=@python
@@ -83,12 +95,9 @@ CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../..
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
-LIBS = -lpthread -ldl $(EXTRALIBS)
 
 CC = g++
-LD = @g++
-MD = @mkdir
-RM = @rm
+LD = g++
 CLANG_TIDY = clang-tidy-11
 DEPENDCC=$(CC)
 
@@ -107,7 +116,7 @@ NLOBJ = $(OBJ)
 POBJ = $(OBJ)/plib
 TESTOBJ = $(OBJ)/tests
 
-DEPEND = $(OBJ)/.depend
+DEPEND := $(OBJ)/.depend
 
 OBJDIRS = $(OBJ) \
 			$(OBJ)/analog \
@@ -121,109 +130,43 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
+DEVSOURCES = $(wildcard $(SRC)/devices/*.cpp)
+DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
+DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
+DEVSOURCES += $(SRC)/solver/nld_solver.cpp
+
+TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
+
+CORESOURCES := \
+	$(SRC)/solver/nld_matrix_solver.cpp \
+	$(SRC)/nl_base.cpp \
+	$(SRC)/nl_parser.cpp \
+	$(SRC)/nl_setup.cpp \
+	$(SRC)/nl_factory.cpp \
+	$(SRC)/tools/nl_convert.cpp \
+	$(SRC)/generated/static_solvers.cpp \
+
+MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
+
+PSOURCES := \
+	$(PSRC)/pstring.cpp \
+	$(PSRC)/pdynlib.cpp \
+	$(PSRC)/pexception.cpp \
+	$(PSRC)/pfunction.cpp \
+	$(PSRC)/pfmtlog.cpp \
+	$(PSRC)/pmain.cpp \
+	$(PSRC)/poptions.cpp \
+	$(PSRC)/ppreprocessor.cpp \
+	$(PSRC)/ptokenizer.cpp \
+	$(PSRC)/putil.cpp \
+
+NLOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(CORESOURCES:.cpp=.o))
+NLDEVOBJS = $(patsubst $(SRC)%, $(OBJ)%, $(DEVSOURCES:.cpp=.o))
+TESTOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(TESTSOURCES:.cpp=.o))
+MAINOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(MAINSOURCES:.cpp=.o))
+POBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(PSOURCES:.cpp=.o))
 
 OBJS = $(POBJS) $(NLOBJS) $(NLDEVOBJS) $(TESTOBJS)
-
-POBJS := \
-	$(POBJ)/pstring.o \
-	$(POBJ)/pdynlib.o \
-	$(POBJ)/pexception.o \
-	$(POBJ)/pfunction.o \
-	$(POBJ)/pfmtlog.o \
-	$(POBJ)/poptions.o \
-	$(POBJ)/ppreprocessor.o \
-	$(POBJ)/ptokenizer.o \
-	$(POBJ)/putil.o \
-
-PMAIN := $(POBJ)/pmain.o
-
-NLOBJS := \
-	$(NLOBJ)/solver/nld_matrix_solver.o \
-	$(NLOBJ)/nl_base.o \
-	$(NLOBJ)/nl_parser.o \
-	$(NLOBJ)/nl_setup.o \
-	$(NLOBJ)/nl_factory.o \
-	$(NLOBJ)/tools/nl_convert.o \
-	$(NLOBJ)/generated/static_solvers.o \
-
-NLDEVOBJS := \
-	$(NLOBJ)/solver/nld_solver.o \
-	$(NLOBJ)/analog/nld_bjt.o \
-	$(NLOBJ)/analog/nld_mosfet.o \
-	$(NLOBJ)/analog/nlid_fourterm.o \
-	$(NLOBJ)/analog/nld_switches.o \
-	$(NLOBJ)/analog/nlid_twoterm.o \
-	$(NLOBJ)/analog/nld_opamps.o \
-	$(NLOBJ)/devices/nld_2102A.o \
-	$(NLOBJ)/devices/nld_tms4800.o \
-	$(NLOBJ)/devices/nld_4006.o \
-	$(NLOBJ)/devices/nld_4013.o \
-	$(NLOBJ)/devices/nld_4017.o \
-	$(NLOBJ)/devices/nld_4020.o \
-	$(NLOBJ)/devices/nld_4053.o \
-	$(NLOBJ)/devices/nld_4066.o \
-	$(NLOBJ)/devices/nld_4316.o \
-	$(NLOBJ)/devices/nld_7448.o \
-	$(NLOBJ)/devices/nld_7450.o \
-	$(NLOBJ)/devices/nld_7473.o \
-	$(NLOBJ)/devices/nld_7474.o \
-	$(NLOBJ)/devices/nld_7475.o \
-	$(NLOBJ)/devices/nld_7483.o \
-	$(NLOBJ)/devices/nld_7485.o \
-	$(NLOBJ)/devices/nld_7492.o \
-	$(NLOBJ)/devices/nld_7490.o \
-	$(NLOBJ)/devices/nld_7493.o \
-	$(NLOBJ)/devices/nld_7497.o \
-	$(NLOBJ)/devices/nld_74107.o \
-	$(NLOBJ)/devices/nld_74113.o \
-	$(NLOBJ)/devices/nld_74123.o \
-	$(NLOBJ)/devices/nld_74125.o \
-	$(NLOBJ)/devices/nld_74153.o \
-	$(NLOBJ)/devices/nld_74161.o \
-	$(NLOBJ)/devices/nld_74163.o \
-	$(NLOBJ)/devices/nld_74164.o \
-	$(NLOBJ)/devices/nld_74165.o \
-	$(NLOBJ)/devices/nld_74166.o \
-	$(NLOBJ)/devices/nld_74174.o \
-	$(NLOBJ)/devices/nld_74175.o \
-	$(NLOBJ)/devices/nld_74192.o \
-	$(NLOBJ)/devices/nld_74193.o \
-	$(NLOBJ)/devices/nld_74194.o \
-	$(NLOBJ)/devices/nld_74365.o \
-	$(NLOBJ)/devices/nld_74377.o \
-	$(NLOBJ)/devices/nld_74393.o \
-	$(NLOBJ)/devices/nld_74ls629.o \
-	$(NLOBJ)/devices/nld_8277.o \
-	$(NLOBJ)/devices/nld_82S16.o \
-	$(NLOBJ)/devices/nld_82S115.o \
-	$(NLOBJ)/devices/nld_9310.o \
-	$(NLOBJ)/devices/nld_9316.o \
-	$(NLOBJ)/devices/nld_9321.o \
-	$(NLOBJ)/devices/nld_9322.o \
-	$(NLOBJ)/devices/nld_am2847.o \
-	$(NLOBJ)/devices/nld_dm9314.o \
-	$(NLOBJ)/devices/nld_dm9334.o \
-	$(NLOBJ)/devices/nld_mm5837.o \
-	$(NLOBJ)/devices/nld_ne555.o \
-	$(NLOBJ)/devices/nld_r2r_dac.o \
-	$(NLOBJ)/devices/nld_roms.o \
-	$(NLOBJ)/devices/nld_tristate.o \
-	$(NLOBJ)/devices/nld_schmitt.o \
-	$(NLOBJ)/devices/nld_legacy.o \
-	$(NLOBJ)/devices/net_lib.o \
-	$(NLOBJ)/devices/nld_log.o \
-	$(NLOBJ)/devices/nlid_proxy.o \
-	$(NLOBJ)/devices/nld_system.o \
-	$(NLOBJ)/devices/nlid_truthtable.o \
-	$(NLOBJ)/macro/nlm_base_lib.o \
-	$(NLOBJ)/macro/nlm_cd4xxx_lib.o \
-	$(NLOBJ)/macro/nlm_opamp_lib.o \
-	$(NLOBJ)/macro/nlm_otheric_lib.o \
-	$(NLOBJ)/macro/nlm_roms_lib.o \
-	$(NLOBJ)/macro/nlm_ttl74xx_lib.o \
-
-TESTOBJS := \
-	$(TESTOBJ)/test_pfunction.o \
 
 VSBUILDS = \
 	$(VSBUILD/netlistlib.vcxproj) \
@@ -241,14 +184,17 @@ DOCS = \
 	$(DOC)/structure.dox.h \
 	$(DOC)/test1-50r.svg \
 
-ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
+ALL_OBJS = $(OBJS) $(MAINOBJS)
 
 ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
-ALLSOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
-DEVSOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(NLDEVOBJS:.o=.cpp))
+ALLSOURCES = $(DEVSOURCES) $(CORESOURCES) $(TESTSOURCES) $(MAINSOURCES) $(PSOURCES)
 ALLFILES = $(ALLSOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := all gcc9 clang clang-5 mingw doc native maketree tidy runtests generated manpages
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := \
+	clang clang-5 clang-libc gcc9 mingw native nvcc \
+	clean depend doc generated manpages maketree \
+	runtests tidy
+
 BUILD_DIRS = $(OBJDIRS) man html
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -264,27 +210,26 @@ BUILD_DIRS = $(OBJDIRS) man html
 # all
 #-------------------------------------------------
 
-all: maketree depend $(TARGETS)
+all: maketree generated $(DEPEND) $(TARGETS)
 
 #-------------------------------------------------
 # clean
 #-------------------------------------------------
 
 clean:
-	$(RM) -rf $(OBJS) $(TARGETS) $(OBJ)/prg/nltool.o $(OBJ)/prg/nlwav.o $(DEPEND) doxy/*
+	$(RM) -rf $(OBJS) $(TARGETS) $(MAINOBJS) $(DEPEND) doxy/*
 
 #-------------------------------------------------
 # nltool
 #-------------------------------------------------
 
-nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(PMAIN) $(OBJS)
+nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
-nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
+nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
 	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
-
 
 #-------------------------------------------------
 # directories
@@ -352,14 +297,14 @@ mingw:
 # regression tests
 #-------------------------------------------------
 
-runtests:
+runtests: $(TARGETS)
 	./nltool$(EXESUFFIX) -c tests
 
 #-------------------------------------------------
 # man pages
 #-------------------------------------------------
 
-manpages: maketree man/nltool.1 man/nlwav.1 html/nltool.html html/nlwav.html
+manpages: maketree $(TARGETS) man/nltool.1 man/nlwav.1 html/nltool.html html/nlwav.html
 
 #-------------------------------------------------
 # documentation
@@ -388,16 +333,15 @@ generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
 # depends
 #-------------------------------------------------
 
-.PHONY: $(DEPEND)
-$(DEPEND): maketree $(ALLSOURCES)
+.PHONY: depend
+depend: $(DEPEND)
+
+$(DEPEND): $(OBJ) | $(ALLSOURCES)
 	@echo creating $(DEPEND)
-	@rm -f $(DEPEND)
+	@$(RM) -f $(DEPEND)
 	@for i in $(ALLSOURCES); do \
 		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
 	done
-
-.PHONY: depend
-depend: $(DEPEND)
 
 # Include only if the goal needs it
 ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)

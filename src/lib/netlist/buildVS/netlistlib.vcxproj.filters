@@ -75,21 +75,6 @@
     <ClCompile Include="..\tools\nl_convert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\macro\nlm_cd4xxx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\macro\nlm_ttl74xx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\macro\nlm_other.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\macro\nlm_opamp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\macro\nlm_base.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_74ls629.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -249,9 +234,6 @@
     <ClCompile Include="..\analog\nld_mosfet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_7442.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_7492.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -276,7 +258,34 @@
     <ClCompile Include="..\devices\nld_74377.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\macro\nlm_roms.cpp">
+    <ClCompile Include="..\macro\nlm_base_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\nlm_cd4xxx_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\nlm_opamp_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\nlm_otheric_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\nlm_roms_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\nlm_ttl74xx_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_4017.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_4053.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_8277.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_9321.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -637,9 +646,6 @@
     </ClInclude>
     <ClInclude Include="..\plib\vector_ops.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_7497.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_schmitt.h">
       <Filter>Source Files</Filter>
