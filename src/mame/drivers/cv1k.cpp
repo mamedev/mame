@@ -478,7 +478,7 @@ void cv1k_state::cv1k(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(60); // TODO: 6.4MHz Pixel clock? (12.8MHz / 2)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(0x200, 0x200);
 	screen.set_visarea(0, 0x140-1, 0, 0xf0-1);
