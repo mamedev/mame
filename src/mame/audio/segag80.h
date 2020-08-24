@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/i8255.h"
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
 #include "sound/ay8910.h"
@@ -19,9 +20,8 @@ public:
 	void write_ay(offs_t addr, uint8_t data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	optional_device_array<netlist_mame_logic_input_device, 8> m_lo_input;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_hi_input;
@@ -66,9 +66,39 @@ public:
 };
 
 
+class spaceod_audio_device : public segag80_audio_device
+{
+public:
+	spaceod_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class sega005_audio_device : public device_t, public device_mixer_interface
+{
+public:
+	sega005_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void write(offs_t addr, uint8_t data) { m_ppi->write(addr, data); }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	optional_device_array<netlist_mame_logic_input_device, 8> m_a_input;
+	optional_device_array<netlist_mame_logic_input_device, 8> m_b_input;
+	required_device<i8255_device> m_ppi;
+
+private:
+	void sound_a_w(u8 data);
+	void sound_b_w(u8 data);
+};
+
+
 DECLARE_DEVICE_TYPE(ELIMINATOR_AUDIO, elim_audio_device)
 DECLARE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device)
 DECLARE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device)
 DECLARE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device)
+DECLARE_DEVICE_TYPE(SPACE_ODYSSEY_AUDIO, spaceod_audio_device)
+DECLARE_DEVICE_TYPE(SEGA_005_AUDIO, sega005_audio_device)
 
 #endif // MAME_AUDIO_SEGAG80V_H

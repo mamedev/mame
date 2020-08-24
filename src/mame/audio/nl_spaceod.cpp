@@ -46,29 +46,44 @@
 
 // Totally faking this, no clue
 static NETLIST_START(_MB4391)
-	AFUNC(F1, 5, "((A1-A2)/(A4-A2))*A0")
-	AFUNC(F2, 5, "((A1-A2)/(A4-A2))*A0")
+	RES(RIN1, RES_K(70))
+	RES(RIN2, RES_K(70))
+	ALIAS(VSS, RIN1.1)
+	ALIAS(GND, RIN2.2)
+	NET_C(RIN1.2, RIN2.1)
+	ALIAS(IN, RIN2.1)
 
-	NET_C(F1.Q, R1.1)
-	NET_C(F2.Q, R2.1)
+	RES(ROUT, RES_K(1))
+	ALIAS(OUT, ROUT.2)
 
-	RES(R1, RES_K(1))
-	RES(R2, RES_K(1))
+	AFUNC(FUNC, 5, "(A0-(A2+(A4-A2)/2)) * ((A1-A2)/(A4-A2)) + (A2+(A4-A2)/2)")
+	NET_C(IN, FUNC.A0)
+	ALIAS(CON, FUNC.A1)
+	NET_C(GND, FUNC.A2)
+	ALIAS(R0, FUNC.A3)
+	NET_C(VSS, FUNC.A4)
+	NET_C(FUNC.Q, ROUT.1)
+NETLIST_END()
+
+static NETLIST_START(_MB4391_DIP)
+	SUBMODEL(_MB4391, A)
+	SUBMODEL(_MB4391, B)
 
 	DIPPINS(   /*       +--------------+      */
-		F1.A0, /*   1IN |1     ++    16| 1VSS */ F1.A4,
-		F1.A1, /*  1CON |2           15| 1OUT */ R1.2,
-		F1.A2, /*  1GND |3           14| 1R0  */ F1.A3,
+		 A.IN, /*   1IN |1     ++    16| 1VSS */ A.VSS,
+		A.CON, /*  1CON |2           15| 1OUT */ A.OUT,
+		A.GND, /*  1GND |3           14| 1R0  */ A.R0,
 		 NC.I, /*    NC |4   MB4391  13| NC   */ NC.I,
-		F2.A0, /*   2IN |5           12| 2VSS */ F2.A4,
-		F2.A1, /*  2CON |6           11| 2OUT */ R2.2,
-		F2.A2, /*  2GND |7           10| 2R0  */ F2.A3,
+		 B.IN, /*   2IN |5           12| 2VSS */ B.VSS,
+		B.CON, /*  2CON |6           11| 2OUT */ B.OUT,
+		B.GND, /*  2GND |7           10| 2R0  */ B.R0,
 		 NC.I, /*    NC |8            9| NC   */ NC.I
 			   /*       +--------------+      */
 	)
 NETLIST_END()
 
-#define MB4391_DIP(name) SUBMODEL(_MB4391, name)
+
+#define MB4391_DIP(name) SUBMODEL(_MB4391_DIP, name)
 
 // Clock generator for BBD. Just going to use a CLOCK
 // for this since it's fixed frequency, but documenting
@@ -84,7 +99,7 @@ NETLIST_END()
 
 // 4096-stage delay. Until implemented, just pass in
 // to out and be done with it
-static NETLIST_START(_MN3005)
+static NETLIST_START(_MN3005_DIP)
 	RES(R1, RES_K(1))
 	RES(R2, RES_K(1))
 	NET_C(R1.1, R2.1)
@@ -103,7 +118,7 @@ static NETLIST_START(_MN3005)
 	)
 NETLIST_END()
 
-#define MN3005_DIP(name) SUBMODEL(_MN3005, name)
+#define MN3005_DIP(name) SUBMODEL(_MN3005_DIP, name)
 
 
 //
@@ -117,7 +132,8 @@ NETLIST_START(spaceod)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
 	LOCAL_SOURCE(_MB4391)
-	LOCAL_SOURCE(_MN3005)
+	LOCAL_SOURCE(_MB4391_DIP)
+	LOCAL_SOURCE(_MN3005_DIP)
 
 	TTL_INPUT(I_LO_D0, 0)
 	ALIAS(I_BACK_G, I_LO_D0)
@@ -641,8 +657,12 @@ NETLIST_START(spaceod)
 	NET_C(IC30.14, I_V5)
 
 	TTL_7404_DIP(IC31)		// Inverter -- part number not explicitly given
+	NET_C(IC31.7, GND)
+	NET_C(IC31.14, I_V5)
 
 	TTL_7400_DIP(IC32)		// NAND gate -- part number not explicitly given
+	NET_C(IC32.7, GND)
+	NET_C(IC32.14, I_V5)
 
 	NE555_DIP(IC33)			// Timer
 
@@ -789,7 +809,9 @@ NETLIST_START(spaceod)
 	NET_C(MN3101.GND, GND)
 	NET_C(MN3101.VCC, I_V12)
 	NET_C(MN3101.Q, MN3101_INV.A, IC2.6)
-	TTL_7404_GATE(MN3101_INV)
+	CD4069_GATE(MN3101_INV)
+	NET_C(MN3101_INV.VSS, GND)
+	NET_C(MN3101_INV.VDD, I_V12)
 	NET_C(MN3101_INV.Q, IC2.2)
 	ANALOG_INPUT(I_VM14, -14)
 	NET_C(I_VM14, IC2.8)

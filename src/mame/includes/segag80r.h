@@ -39,9 +39,9 @@ public:
 		m_soundbrd(*this, "soundbrd"),
 		m_samples(*this, "samples"),
 		m_speech(*this, "speech"),
-		m_g80_audio(*this, "g80sound"),
-		m_usbsnd(*this, "usbsnd"),
-		m_005snd(*this, "005"),
+		m_g80_audio(*this, "g80audio"),
+		m_usb_audio(*this, "usbaudio"),
+		m_005_audio(*this, "005audio"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -56,8 +56,6 @@ public:
 	void monster2(machine_config &config);
 	void sega005(machine_config &config);
 	void spaceod(machine_config &config);
-	void sega005_sound_board(machine_config &config);
-	void spaceod_sound_board(machine_config &config);
 	void monsterb_sound_board(machine_config &config);
 
 	void init_waitstates();
@@ -70,14 +68,6 @@ public:
 	void init_astrob();
 
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
-
-	uint8_t m_sound_state[2];
-	uint8_t m_sound_rate;
-	uint16_t m_sound_addr;
-	uint8_t m_sound_data;
-	uint8_t m_square_state;
-	uint8_t m_square_count;
-	inline void sega005_update_sound_data();
 
 private:
 	enum
@@ -96,8 +86,8 @@ private:
 	optional_device<samples_device> m_samples;
 	optional_device<sega_speech_device> m_speech;
 	optional_device<segag80_audio_device> m_g80_audio;
-	optional_device<usb_sound_device> m_usbsnd;
-	optional_device<sega005_sound_device> m_005snd;
+	optional_device<usb_sound_device> m_usb_audio;
+	optional_device<sega005_audio_device> m_005_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -193,32 +183,6 @@ private:
 	emu_timer *m_vblank_latch_clear_timer;
 };
 
-
-/*----------- defined in audio/segag80r.c -----------*/
-
-
-class sega005_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	emu_timer *m_sega005_sound_timer;
-	sound_stream *m_sega005_stream;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
-private:
-	// internal state
-	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
-};
-
-DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
 
 /*----------- defined in video/segag80r.c -----------*/
 

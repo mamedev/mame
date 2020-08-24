@@ -18,6 +18,7 @@
 
 #include "speaker.h"
 
+#if 0
 /*************************************
  *
  *  Constants
@@ -295,9 +296,10 @@ TIMER_CALLBACK_MEMBER( sega005_sound_device::sega005_auto_timer )
 		state->sega005_update_sound_data();
 	}
 }
+#endif
 
 
-
+#if 0
 /*************************************
  *
  *  Space Odyssey sound hardware
@@ -385,6 +387,7 @@ void segag80r_state::spaceod_sound_w(offs_t offset, uint8_t data)
 			break;
 	}
 }
+#endif
 
 
 

@@ -207,7 +207,7 @@ void segag80r_state::vidram_w(offs_t offset, uint8_t data){ segag80r_videoram_w(
 void segag80r_state::monsterb_vidram_w(offs_t offset, uint8_t data){ monsterb_videoram_w(decrypt_offset(offset), data); }
 void segag80r_state::pignewt_vidram_w(offs_t offset, uint8_t data){ pignewt_videoram_w(decrypt_offset(offset), data); }
 void segag80r_state::sindbadm_vidram_w(offs_t offset, uint8_t data){ sindbadm_videoram_w(decrypt_offset(offset), data); }
-void segag80r_state::usb_ram_w(offs_t offset, uint8_t data){ m_usbsnd->ram_w(decrypt_offset(offset), data); }
+void segag80r_state::usb_ram_w(offs_t offset, uint8_t data){ m_usb_audio->ram_w(decrypt_offset(offset), data); }
 
 
 
@@ -365,7 +365,6 @@ void segag80r_state::main_portmap(address_map &map)
 void segag80r_state::main_ppi8255_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0c, 0x0f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xbe, 0xbf).rw(FUNC(segag80r_state::segag80r_video_port_r), FUNC(segag80r_state::segag80r_video_port_w));
 	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80r_state::coin_count_w));
 	map(0xf8, 0xfb).r(FUNC(segag80r_state::mangled_ports_r));
@@ -870,14 +869,11 @@ void segag80r_state::sega005(machine_config &config)
 {
 	g80r_base(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
-
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	sega005_sound_board(config);
+	SEGA_005_AUDIO(config, m_005_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -894,7 +890,7 @@ void segag80r_state::spaceod(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	spaceod_sound_board(config);
+	SPACE_ODYSSEY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -943,7 +939,7 @@ void segag80r_state::pignewt(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	SEGAUSB(config, m_usbsnd, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGAUSB(config, m_usb_audio, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -1247,10 +1243,10 @@ ROM_START( 005 )
 	ROM_LOAD( "5110.prom-u19",     0x9800, 0x0800, CRC(7d26111a) SHA1(a6d3652ae606a5b75026e524c9d6aaa78300741e) )
 	ROM_LOAD( "5111.prom-u20",     0xa000, 0x0800, CRC(a888e175) SHA1(4c0af94441bf51dfc852372a5b90d0830df81363) )
 
-	ROM_REGION( 0x0800, "005", 0 )
+	ROM_REGION( 0x0800, "005audio:sound_nl:epr_1286_sound_16", 0 )
 	ROM_LOAD( "epr-1286.sound-16", 0x0000, 0x0800, CRC(fbe0d501) SHA1(bfa277689790f835d8a43be4beee0581e1096bcc) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_REGION( 0x0020, "005audio:sound_nl:6331_sound_u8", 0 )
 	ROM_LOAD( "6331.sound-u8",     0x0000, 0x0020, BAD_DUMP CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) )  /* missing sound PROM! */
 ROM_END
 
@@ -1594,17 +1590,16 @@ void segag80r_state::init_005()
 {
 	init_waitstates();
 
+	address_space &iospace = m_maincpu->space(AS_IO);
+
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
 
 	/* configure video */
 	m_background_pcb = G80_BACKGROUND_NONE;
 
-	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_addr));
-	save_item(NAME(m_sound_data));
-	save_item(NAME(m_square_state));
-	save_item(NAME(m_square_count));
+	/* install 005 sound board */
+	iospace.install_write_handler(0x0c, 0x0f, write8sm_delegate(*m_005_audio, FUNC(sega005_audio_device::write)));
 }
 
 
@@ -1624,13 +1619,11 @@ void segag80r_state::init_spaceod()
 	iospace.install_readwrite_handler(0x08, 0x0f, read8sm_delegate(*this, FUNC(segag80r_state::spaceod_back_port_r)), write8sm_delegate(*this, FUNC(segag80r_state::spaceod_back_port_w)));
 
 	/* install Space Odyssey sound board */
-	iospace.install_write_handler(0x0e, 0x0f, write8sm_delegate(*this, FUNC(segag80r_state::spaceod_sound_w)));
+	iospace.install_write_handler(0x0e, 0x0f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
 
 	/* install our wacky mangled ports */
 	iospace.install_read_handler(0xf8, 0xfb, read8sm_delegate(*this, FUNC(segag80r_state::spaceod_mangled_ports_r)));
 	iospace.install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(segag80r_state::spaceod_port_fc_r)));
-
-	save_item(NAME(m_sound_state));
 }
 
 
@@ -1651,9 +1644,6 @@ void segag80r_state::init_monsterb()
 	/* install background board handlers */
 	iospace.install_write_handler(0xb8, 0xbd, write8sm_delegate(*this, FUNC(segag80r_state::monsterb_back_port_w)));
 	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::monsterb_vidram_w)));
-
-	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_addr));
 }
 
 
@@ -1675,9 +1665,6 @@ void segag80r_state::init_monster2()
 	iospace.install_write_handler(0xb4, 0xb5, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_back_color_w)));
 	iospace.install_write_handler(0xb8, 0xbd, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_back_port_w)));
 	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
-
-	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_addr));
 }
 
 
@@ -1701,8 +1688,8 @@ void segag80r_state::init_pignewt()
 	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
 
 	/* install Universal sound board */
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usbsnd, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usbsnd, FUNC(usb_sound_device::data_w)));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usbsnd, FUNC(usb_sound_device::ram_r)));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usb_audio, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usb_audio, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usb_audio, FUNC(usb_sound_device::ram_r)));
 	pgmspace.install_write_handler(0xd000, 0xdfff, write8sm_delegate(*this, FUNC(segag80r_state::usb_ram_w)));
 }
 
