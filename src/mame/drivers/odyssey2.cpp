@@ -54,14 +54,20 @@ XTAL notes (differs per model):
 TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
   and writes to the ptr/color registers, but does not increment the Y regs
-- 824x screen resolution is not strictly defined, height(243) is correct, but
+- screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping characters on eachother will cause
   glitches (it is used to an advantage in some as-of-yet undumped homebrews)
 - 8244(NTSC) is not supposed to show characters near the upper border, but
   hiding them will cause bugs in some Euro games
-- 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
-  be correct
+- according to tests, 8244 does not have a sound interrupt, but the Philips
+  service test cartridge for 8245 tests for it and fails if it did not get an irq
+- likewise, 8244 does not have a horizontal interrupt, but does 8245 have it?
+- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but
+  that is inconsistent with the Philips service test cartridge: It reads X, Y, X,
+  then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
+  will also cause video glitches to look different on some games when compared
+  to the real console, for example powerlrd.
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is PAL detection going wrong? It does look like PAL/NTSC detection is working,
   see internal RAM $3D d7. So maybe it is due to inaccurate PAL video timing.
