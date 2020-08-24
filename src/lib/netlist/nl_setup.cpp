@@ -11,8 +11,8 @@
 #include "nl_parser.h"
 #include "nl_setup.h"
 #include "plib/penum.h"
-#include "plib/putil.h"
 #include "plib/pstonum.h"
+#include "plib/putil.h"
 
 #include "solver/nld_solver.h"
 

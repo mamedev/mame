@@ -3,9 +3,9 @@
 
 #include "nl_parser.h"
 #include "nl_base.h"
-#include "nl_setup.h"
 #include "nl_errstr.h"
 #include "nl_factory.h"
+#include "nl_setup.h"
 
 namespace netlist
 {

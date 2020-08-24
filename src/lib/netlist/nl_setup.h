@@ -16,8 +16,8 @@
 #include "plib/putil.h"
 
 #include "nl_config.h"
-#include "nltypes.h"
 #include "nl_parser.h"
+#include "nltypes.h"
 // FIXME: avoid including factory
 //#include "nl_factory.h"
 
