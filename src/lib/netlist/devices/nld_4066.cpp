@@ -82,8 +82,6 @@ namespace netlist
 		nld_power_pins             m_supply;
 	};
 
-
-
 	NETLIB_DEVICE_IMPL(CD4066_GATE,         "CD4066_GATE",            "")
 	} //namespace devices
 } // namespace netlist

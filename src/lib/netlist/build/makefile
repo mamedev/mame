@@ -49,7 +49,7 @@ TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-i
 space :=
 space +=
 TIDY_FLAGS = -p $(OBJ) $(subst $(space),,$(TIDY_FLAGSX))
-TIDY_SOURCES = $(SOURCES)
+TIDY_SOURCES = $(ALLSOURCES)
 
 #TIDY_SOURCES = $(SRC)/devices/nld_7442.cpp $(SRC)/devices/nld_7492.cpp
 
@@ -70,6 +70,8 @@ EXESUFFIX :=
 DOXYGEN = @./doxygen
 HOSTARCH = NIX
 endif
+
+PYTHON=@python
 
 TIDY_DB = $(OBJ)/compile_commands.json
 
@@ -120,7 +122,7 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/generated \
 
 
-OBJS = $(POBJS) $(NLOBJS) $(TESTOBJS)
+OBJS = $(POBJS) $(NLOBJS) $(NLDEVOBJS) $(TESTOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
@@ -136,20 +138,22 @@ POBJS := \
 PMAIN := $(POBJ)/pmain.o
 
 NLOBJS := \
-	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/solver/nld_matrix_solver.o \
 	$(NLOBJ)/nl_base.o \
 	$(NLOBJ)/nl_parser.o \
 	$(NLOBJ)/nl_setup.o \
 	$(NLOBJ)/nl_factory.o \
+	$(NLOBJ)/tools/nl_convert.o \
+	$(NLOBJ)/generated/static_solvers.o \
+
+NLDEVOBJS := \
+	$(NLOBJ)/solver/nld_solver.o \
 	$(NLOBJ)/analog/nld_bjt.o \
 	$(NLOBJ)/analog/nld_mosfet.o \
 	$(NLOBJ)/analog/nlid_fourterm.o \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nlid_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
-	$(NLOBJ)/tools/nl_convert.o \
-	$(NLOBJ)/generated/static_solvers.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4006.o \
@@ -240,11 +244,12 @@ DOCS = \
 ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 
 ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
-SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
-ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
+ALLSOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
+DEVSOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(NLDEVOBJS:.o=.cpp))
+ALLFILES = $(ALLSOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree tidy runtests
-
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := all gcc9 clang clang-5 mingw doc native maketree tidy runtests generated manpages
+BUILD_DIRS = $(OBJDIRS) man html
 
 # git archive HEAD --prefix=project-name-version/ \
 #     --format=zip -o project-name-version.zip
@@ -253,7 +258,7 @@ MAKEFILE_TARGETS_WITHOUT_INCLUDE := gcc9 clang clang-5 mingw doc native maketree
 # PHONY
 #-------------------------------------------------
 
-.PHONY: all gcc9 clang clang-5 mingw doc man native maketree $(DEPEND) depend runtests
+.PHONY: $(MAKEFILE_TARGETS_WITHOUT_INCLUDE)
 
 #-------------------------------------------------
 # all
@@ -285,10 +290,10 @@ nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(PMAIN) $(OBJS)
 # directories
 #-------------------------------------------------
 
-$(sort $(OBJDIRS)):
+$(sort $(BUILD_DIRS)):
 	$(MD) -p $@
 
-maketree: $(sort $(OBJDIRS))
+maketree: $(sort $(BUILD_DIRS))
 
 #-------------------------------------------------
 # Special targets
@@ -338,53 +343,60 @@ nvcc:
 		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
 		DEPENDCC=g++
 
-runtests:
-	./nltool$(EXESUFFIX) -c tests
-
-tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
-
-#
-# Mostly done: -Wno-weak-vtables -Wno-cast-align
-# FIXME:  -Wno-weak-vtables -Wno-weak-template-vtables -Wno-exit-time-destructors
-# FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721
-# FIXME: -Wunreachable-code : False warnings, this a documented clang bug: https://llvm.org/bugs/show_bug.cgi?id=28994
-# -Wweak-template-vtables
-#
-# These have to be given:
-# -Wno-missing-variable-declarations : Device factory code, on purpose
-
 mingw:
 	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 \
 		-DWIN32_LEAN_AND_MEAN" LDEXTRAFLAGS="-Wl,--subsystem,console \
 		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS)
 
-#
-# FIXME: Unicode
-#     CEXTRAFLAGS = -DUNICODE -D_UNICODE -municode
-#     LDEXTRAFLAGS = -municode
-#
+#-------------------------------------------------
+# regression tests
+#-------------------------------------------------
 
-man: nltool$(EXESUFFIX) nlwav$(EXESUFFIX)
-	@mkdir -p man
-	@mkdir -p html
-	help2man --include=nltool.help2man --no-info ./nltool$(EXESUFFIX) > man/nltool.1
-	groff -mandoc -Thtml man/nltool.1 > html/nltool.html
+runtests:
+	./nltool$(EXESUFFIX) -c tests
+
+#-------------------------------------------------
+# man pages
+#-------------------------------------------------
+
+manpages: maketree man/nltool.1 man/nlwav.1 html/nltool.html html/nlwav.html
+
+#-------------------------------------------------
+# documentation
+#-------------------------------------------------
 
 doc:
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
 #-------------------------------------------------
+# generated
+#-------------------------------------------------
+
+../generated/lib_entries.hxx: $(DEVSOURCES)
+	@echo creating $@
+	$(PYTHON) create_lib_entries.py $^ > $@
+
+../generated/nld_devinc.h: $(DEVSOURCES)
+	@echo creating $@
+	$(PYTHON) create_devinc.py $^ > $@
+
+.PHONY: generated
+generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
+
+#-------------------------------------------------
 # depends
 #-------------------------------------------------
 
-$(DEPEND): maketree $(SOURCES)
+.PHONY: $(DEPEND)
+$(DEPEND): maketree $(ALLSOURCES)
 	@echo creating $(DEPEND)
 	@rm -f $(DEPEND)
-	@for i in $(SOURCES); do \
+	@for i in $(ALLSOURCES); do \
 		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
 	done
 
+.PHONY: depend
 depend: $(DEPEND)
 
 # Include only if the goal needs it
@@ -395,14 +407,14 @@ endif
 #-------------------------------------------------
 # clang tidy
 #-------------------------------------------------
+
+tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
+
 tidy: tidy_db
 	@echo running tidy
 	@for i in $(TIDY_SOURCES); do \
 		$(CLANG_TIDY) $$i $(TIDY_FLAGS) -header-filter=.*; \
 	done
-
-tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
-
 
 #-------------------------------------------------
 # generic rules
@@ -431,6 +443,14 @@ $(OBJ)/%.json: $(SRC)/%.cpp
 	@echo   \"command\": \"$(CC) $(CDEFS) $(CFLAGS) -c $< -o dummy.o\", >> $(TIDY_DB)
 	@echo   \"file\": \"$(CURDIR)/$<\" } >> $(TIDY_DB)
 	@echo "," >> $(TIDY_DB)
+
+man/%.1: %$(EXESUFFIX)
+	@echo Building $@...
+	@help2man --include=$*.help2man --no-info ./$< > $@
+
+html/%.html: man/%.1
+	@echo Building $@...
+	@groff -mandoc -Thtml $< > $@
 
 compile_commands_prefix:
 	@echo "[" > $(TIDY_DB)

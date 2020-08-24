@@ -31,7 +31,8 @@
 NETLIST_EXTERNAL(base_lib)
 
 #if NL_AUTO_DEVICES
-#include "nld_devinc.h"
+
+	#include "../generated/nld_devinc.h"
 
 #else
 
