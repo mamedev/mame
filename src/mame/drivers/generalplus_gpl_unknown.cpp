@@ -615,4 +615,4 @@ CONS( 200?, pcp8718,      0,       0,      pcp8718,   pcp8718, pcp8718_state, sp
 CONS( 200?, pcp8728,      0,       0,      pcp8718,   pcp8718, pcp8718_state, spi_init, "PCP", "PCP 8728 - 788 in 1", MACHINE_IS_SKELETON ) // what name was this sold under?
 
 // maybe different hardware, first 0x2000 bytes in ROM is blank, so bootstrap pointers aren't there at least
-CONS( 200?, unkunsp,      0,       0,      pcp8718,   pcp8718, pcp8718_state, empty_init, "<unknown>", "unknown unSP based handheld", MACHINE_IS_SKELETON )
+CONS( 200?, unkunsp,      0,       0,      pcp8718,   pcp8718, pcp8718_state, empty_init, "<unknown>", "unknown unSP-based handheld", MACHINE_IS_SKELETON )
