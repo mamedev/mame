@@ -466,4 +466,34 @@ Do Videopac+/Odyssey3 versions exist?:
 		</part>
 	</software>
 
+
+
+<!-- Odyssey³ prototypes, they won't work properly on European consoles -->
+
+	<software name="baseballpl">
+		<description>Baseball (US, plus, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="8192">
+				<rom name="o3_08.bin" size="8192" crc="0e039f31" sha1="3ae76c107bb26c31d9a27d9484b3c915111e8304" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flashp">
+		<description>Flashpoint (US, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="8192">
+				<rom name="o3_flash.bin" size="8192" crc="e8e985d4" sha1="2fc340ae3dfe656becde77857618e7c4f27d6dfe" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

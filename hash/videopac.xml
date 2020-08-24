@@ -206,6 +206,18 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
+	<software name="testcart">
+		<description>Service Test Cartridge (Europe)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="testcart.bin" size="2048" crc="3fb92bf1" sha1="e5e24c7fcdacde54ea433cb024e89ac0983917b1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="voice">
 		<description>The Voice (US)</description>
 		<year>1979?</year>
