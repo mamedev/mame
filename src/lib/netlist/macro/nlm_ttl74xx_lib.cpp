@@ -437,6 +437,46 @@ static NETLIST_START(TTL_7416_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: TTL_7417_DIP
+//- Title: DM5417/DM7417  Hex Buffers withHigh Voltage Open-Collector Output
+//- Description: This device contains six independent gates each of which performs a buffer function.
+//-   The open-collector outputs re-quire external pull-up resistors for proper logical operation.
+//- Pinalias: A1,Y1,A2,Y2,A3,Y3,GND,Y4,A4,Y5,A5,Y6,A6,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006505.PDF
+//-
+//-         +---++---+
+//-         | A || Y |
+//-         +===++===+
+//-         | 0 || 0 |
+//-         | 1 || 1 |
+//-         +---++---+
+//-
+static NETLIST_START(TTL_7417_DIP)
+	TTL_7417_GATE(A)
+	TTL_7417_GATE(B)
+	TTL_7417_GATE(C)
+	TTL_7417_GATE(D)
+	TTL_7417_GATE(E)
+	TTL_7417_GATE(F)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.Q, /*    Y1 |2           13| A6   */ F.A,
+		  B.A, /*    A2 |3           12| Y6   */ F.Q,
+		  B.Q, /*    Y2 |4    7417   11| A5   */ E.A,
+		  C.A, /*    A3 |5           10| Y5   */ E.Q,
+		  C.Q, /*    Y3 |6            9| A4   */ D.A,
+		A.GND, /*   GND |7            8| Y4   */ D.Q
+			   /*       +--------------+      */
+	)
+NETLIST_END()
+
 //- Identifier: TTL_7420_DIP
 //- Title: 5420/DM5420/DM7420 Dual 4-Input NAND Gates
 //- Description: This device contains two independent gates each of which performs the logic NAND function.
@@ -706,6 +746,46 @@ static NETLIST_START(TTL_7437_DIP)
 		  A.B, /*    B1 |2           13| B4   */ D.B,
 		  A.Q, /*    Y1 |3           12| A4   */ D.A,
 		  B.A, /*    A2 |4    7437   11| Y4   */ D.Q,
+		  B.B, /*    B2 |5           10| B3   */ C.B,
+		  B.Q, /*    Y2 |6            9| A3   */ C.A,
+		A.GND, /*   GND |7            8| Y3   */ C.Q
+			   /*       +--------------+      */
+	)
+NETLIST_END()
+
+//- Identifier: TTL_7438_DIP
+//- Title: DM74LS38 Quad 2-Input NAND Buffer with Open-Collector Outputs
+//- Description: This device contains four independent gates, each of which performs the logic NAND function.
+//-  The open-collector outputs require external pull-up resistors for proper logical operation..
+//- Pinalias: A1,B1,Y1,A2,B2,Y2,GND,Y3,A3,B3,Y4,A4,B4,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheets/70/375632_DS.pdf
+//-
+//-         +---+---++---+
+//-         | A | B || Y |
+//-         +===+===++===+
+//-         | 0 | 0 || 1 |
+//-         | 0 | 1 || 1 |
+//-         | 1 | 0 || 1 |
+//-         | 1 | 1 || 0 |
+//-         +---+---++---+
+//-
+static NETLIST_START(TTL_7438_DIP)
+	TTL_7438_NAND(A)
+	TTL_7438_NAND(B)
+	TTL_7438_NAND(C)
+	TTL_7438_NAND(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	DIPPINS(   /*       +--------------+      */
+		  A.A, /*    A1 |1     ++    14| VCC  */ A.VCC,
+		  A.B, /*    B1 |2           13| B4   */ D.B,
+		  A.Q, /*    Y1 |3           12| A4   */ D.A,
+		  B.A, /*    A2 |4    7438   11| Y4   */ D.Q,
 		  B.B, /*    B2 |5           10| B3   */ C.B,
 		  B.Q, /*    Y2 |6            9| A3   */ C.A,
 		A.GND, /*   GND |7            8| Y3   */ C.Q
@@ -2531,6 +2611,131 @@ static NETLIST_START(TTL_74365_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: TTL_74290_DIP
+//- Title: SN54290/SN74290, SN54LS290/SN74LS290 Decade Counter
+//- Description: The SN54290/SN74290 and SN54LS290/SN74LS290 counters are electrically and functionally identical to the NS5490A/SN7490A and SN54LS90/SN74LS90, respectively.
+//-  Only the arrangement of the terminals has been changed for the '290 and 'LS290.
+//-  Each of these monolithic counters contains four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-five.
+//-  All of these counters have a gated zero reset and also have gated set-to-nine inputs for use in BCD nine's complement applications.
+//-  To use the maximum count length (decade) of these counters, the B input is connected to the QA output.
+//-  The input count pulses are applied to input A and the outputs are as described in the appropriate function table.
+//-  A symmetrical divide-by-ten count can be obtained by connecting the QD output to the A input and applying the input count ot the B input which gives a divide-by-ten square wave at output QA.
+//- Pinalias: R91,NC,R92,QC,QB,NC,GND,QD,QA,CKA,CKB,R01,R02,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- FunctionTable:
+//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/27403/TI/SN74293.html
+//-
+//-               BCD Count Sequence                    BCD Bi-Quinary
+//-         +-------++----+----+----+----+      +-------++----+----+----+----+
+//-         | Count || QD | QC | QB | QA |      | Count || QD | QC | QB | QA |
+//-         +=======++====+====+====+====+      +=======++====+====+====+====+
+//-         |   0   ||  0 |  0 |  0 |  0 |      |   0   ||  0 |  0 |  0 |  0 |
+//-         |   1   ||  0 |  0 |  0 |  1 |      |   1   ||  0 |  0 |  0 |  1 |
+//-         |   2   ||  0 |  0 |  1 |  0 |      |   2   ||  0 |  0 |  1 |  0 |
+//-         |   3   ||  0 |  0 |  1 |  1 |      |   3   ||  0 |  0 |  1 |  1 |
+//-         |   4   ||  0 |  1 |  0 |  0 |      |   4   ||  0 |  1 |  0 |  0 |
+//-         |   5   ||  0 |  1 |  0 |  1 |      |   5   ||  1 |  0 |  0 |  0 |
+//-         |   6   ||  0 |  1 |  1 |  0 |      |   6   ||  1 |  0 |  0 |  1 |
+//-         |   7   ||  0 |  1 |  1 |  1 |      |   7   ||  1 |  0 |  1 |  0 |
+//-         |   8   ||  1 |  0 |  0 |  0 |      |   8   ||  1 |  0 |  1 |  1 |
+//-         |   9   ||  1 |  0 |  0 |  1 |      |   9   ||  1 |  1 |  0 |  0 |
+//-         +-------++----+----+----+----+      +-------++----+----+----+----+
+//-
+//-                   Reset/Count Function Table
+//-         +-----+-----+-----+-----++----+----+----+----+
+//-         | R01 | R02 | R91 | R92 || QD | QC | QB | QA |
+//-         +=====+=====+=====+=====++====+====+====+====+
+//-         |  1  |  1  |  0  |  X  ||  0 |  0 |  0 |  0 |
+//-         |  1  |  1  |  X  |  0  ||  0 |  0 |  0 |  0 |
+//-         |  X  |  X  |  1  |  1  ||  1 |  0 |  0 |  1 |
+//-         |  X  |  0  |  X  |  0  ||       COUNT       |
+//-         |  0  |  X  |  0  |  X  ||       COUNT       |
+//-         |  0  |  X  |  X  |  0  ||       COUNT       |
+//-         |  X  |  0  |  0  |  X  ||       COUNT       |
+//-         +-----+-----+-----+-----++----+----+----+----+
+//-
+static NETLIST_START(TTL_74290_DIP)
+	TTL_7490(A)
+	NC_PIN(NC)
+
+	DIPPINS(   /*     +--------------+     */
+		A.R91, /* R91 |1     ++    14| VCC */ A.VCC,
+		 NC.I, /*  NC |2           13| R02 */ A.R2,
+		A.R92, /* R92 |3           12| R01 */ A.R1,
+		 A.QC, /*  QC |4   74290   11| CKB */ A.B,
+		 A.QB, /*  QB |5           10| CKA */ A.A,
+		 NC.I, /*  NC |6            9| QA  */ A.QA,
+		A.GND, /* GND |7            8| QD  */ A.QD
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
+//- Identifier:  TTL_74293_DIP
+//- Title: SN54293/SN74293, SN54LS293/SN74LS293 Binary Counters
+//- Description: The SN54293/SN74293 and SN54LS293/SN74LS293 counters are electrically and functionally identical to the SN5493A/SN7493A and SN54LS93/SN74LS93, respectively.
+//-   Only the arrangement of the terminals has been changed for the '293 and 'LS293.
+//-   Each of these monolithic counters contains four master-slave flip-flops and additional gating to provide a divide-by-two counter and a three-stage binary counter for which the count cycle length is divide-by-eight.
+//-   All of these counters have a gated zero reset.
+//-   To use the maximum count length (decade or four-bit binary) of these counters, the B input is connected to the QA output.
+//-   The input count pulses are applied to input A and the outputs are as described in the appropriate function table.
+//- Pinalias: B,R01,R02,NC,VCC,NC,NC,QC,QB,GND,QD,QA,NC,A
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas Instruments datasheet
+//- Limitations: Internal resistor network currently fixed to 5k
+//-      more limitations
+//- FunctionTable:
+//-   https://pdf1.alldatasheet.com/datasheet-pdf/view/27403/TI/SN74293.html
+//-
+//-    Counter Sequence
+//-
+//-    | COUNT || QD | QC | QB | QA |
+//-    |------:||:--:|:--:|:--:|:--:|
+//-    |    0  ||  0 |  0 |  0 |  0 |
+//-    |    1  ||  0 |  0 |  0 |  1 |
+//-    |    2  ||  0 |  0 |  1 |  0 |
+//-    |    3  ||  0 |  0 |  1 |  1 |
+//-    |    4  ||  0 |  1 |  0 |  0 |
+//-    |    5  ||  0 |  1 |  0 |  1 |
+//-    |    6  ||  0 |  1 |  1 |  0 |
+//-    |    7  ||  0 |  1 |  1 |  1 |
+//-    |    8  ||  1 |  0 |  0 |  0 |
+//-    |    9  ||  1 |  0 |  0 |  1 |
+//-    |   10  ||  1 |  0 |  1 |  0 |
+//-    |   11  ||  1 |  0 |  1 |  1 |
+//-    |   12  ||  1 |  1 |  0 |  0 |
+//-    |   13  ||  1 |  1 |  0 |  1 |
+//-    |   14  ||  1 |  1 |  1 |  0 |
+//-    |   15  ||  1 |  1 |  1 |  1 |
+//-
+//-    Note C Output QA is connected to input B
+//-
+//-    Reset Count Function table
+//-
+//-    | R01 | R02 | QD | QC | QB | QA |
+//-    |:---:|:---:|:--:|:--:|:--:|:--:|
+//-    |  1  |  1  |  0 |  0 |  0 |  0 |
+//-    |  0  |  X  |       COUNT       ||||
+//-    |  X  |  0  |       COUNT       ||||
+//-
+//-
+
+ static NETLIST_START(TTL_74293_DIP)
+	TTL_7493(A)
+	NC_PIN(NC)
+
+	DIPPINS(   /*     +--------------+     */
+		 NC.I, /*  NC |1     ++    14| VCC */ A.VCC,
+		 NC.I, /*  NC |2           13| R02 */ A.R2,
+		 NC.I, /*  NC |3           12| R01 */ A.R1,
+		 A.QC, /*  QC |4   74293   11| CKB */ A.CLKB,
+		 A.QB, /*  QB |5           10| CKA */ A.CLKA,
+		 NC.I, /*  NC |6            9| QA  */ A.QA,
+		A.GND, /* GND |7            8| QD  */ A.QD
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
 //- Identifier: TTL_74377_DIP
 //- Title: DM54LS377/DM74LS377 Octal D Flip-Flop with Common Enable and Clock
 //- Description: The ’LS377 is an 8-bit register built using advanced low power Schottky technology.
@@ -3203,9 +3408,17 @@ NETLIST_START(ttl74xx_lib)
 	TRUTHTABLE_END()
 
 	TRUTHTABLE_START(TTL_7416_GATE, 1, 1, "")
-		TT_HEAD(" A | Q ")
-		TT_LINE(" 0 | 1 |15")
-		TT_LINE(" 1 | 0 |23")
+		TT_HEAD("A|Q")
+		TT_LINE("0|1|15")
+		TT_LINE("1|0|23")
+		/* Open Collector */
+		TT_FAMILY("74XXOC")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7417_GATE, 1, 1, "")
+		TT_HEAD("A|Q")
+		TT_LINE("0|0|15")
+		TT_LINE("1|1|23")
 		/* Open Collector */
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
@@ -3271,6 +3484,27 @@ NETLIST_START(ttl74xx_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
+	/*  FIXME: Same as 7400, but drains higher output currents.
+	 *         Netlist currently does not model over currents (should it ever?)
+	 */
+
+	TRUTHTABLE_START(TTL_7437_NAND, 2, 1, "+A,+B")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,X|1|22")
+		TT_LINE("X,0|1|22")
+		TT_LINE("1,1|0|15")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_7438_NAND, 2, 1, "+A,+B")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,X|1|22")
+		TT_LINE("X,0|1|22")
+		TT_LINE("1,1|0|15")
+		/* Open Collector */
+		TT_FAMILY("74XXOC")
+	TRUTHTABLE_END()
+
 	TRUTHTABLE_START(TTL_7442, 4, 10, "")
 		TT_HEAD("D,C,B,A|0,1,2,3,4,5,6,7,8,9")
 		TT_LINE("0,0,0,0|0,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
@@ -3285,18 +3519,6 @@ NETLIST_START(ttl74xx_lib)
 		TT_LINE("1,0,0,1|1,1,1,1,1,1,1,1,1,0|30,30,30,30,30,30,30,30,30,30")
 		TT_LINE("1,0,1,X|1,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
 		TT_LINE("1,1,X,X|1,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
-	TRUTHTABLE_END()
-
-	/*  FIXME: Same as 7400, but drains higher output currents.
-	 *         Netlist currently does not model over currents (should it ever?)
-	 */
-
-	TRUTHTABLE_START(TTL_7437_NAND, 2, 1, "+A,+B")
-		TT_HEAD("A,B|Q ")
-		TT_LINE("0,X|1|22")
-		TT_LINE("X,0|1|22")
-		TT_LINE("1,1|0|15")
-		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
 	TRUTHTABLE_START(TTL_7486_XOR, 2, 1, "+A,+B,@VCC,@GND")
@@ -3349,6 +3571,7 @@ NETLIST_START(ttl74xx_lib)
 		TT_LINE("0,1,0,1|1,0,1,1|13,13,13,13")
 		TT_LINE("1,0,0,1|1,1,0,1|13,13,13,13")
 		TT_LINE("1,1,0,1|1,1,1,0|13,13,13,13")
+		/* Open Collector */
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
@@ -3360,6 +3583,7 @@ NETLIST_START(ttl74xx_lib)
 		TT_LINE("0,1,0,0|1,0,1,1|13,13,13,13")
 		TT_LINE("1,0,0,0|1,1,0,1|13,13,13,13")
 		TT_LINE("1,1,0,0|1,1,1,0|13,13,13,13")
+		/* Open Collector */
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
@@ -3439,6 +3663,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_7414_DIP)
 	LOCAL_LIB_ENTRY(TTL_74LS14_DIP)
 	LOCAL_LIB_ENTRY(TTL_7416_DIP)
+	LOCAL_LIB_ENTRY(TTL_7417_DIP)
 	LOCAL_LIB_ENTRY(TTL_7420_DIP)
 	LOCAL_LIB_ENTRY(TTL_7421_DIP)
 	LOCAL_LIB_ENTRY(TTL_7425_DIP)
@@ -3446,6 +3671,7 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_7430_DIP)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
+	LOCAL_LIB_ENTRY(TTL_7438_DIP)
 	LOCAL_LIB_ENTRY(TTL_7442_DIP)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
 	LOCAL_LIB_ENTRY(TTL_7450_DIP)
@@ -3487,6 +3713,8 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74194_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
+	LOCAL_LIB_ENTRY(TTL_74290_DIP)
+	LOCAL_LIB_ENTRY(TTL_74293_DIP)
 	LOCAL_LIB_ENTRY(TTL_74365_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
