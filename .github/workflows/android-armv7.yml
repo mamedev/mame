@@ -26,6 +26,7 @@ jobs:
         make -f Makefile.libretro platform=android -j8
         /usr/local/lib/android/sdk/ndk/${ANDROID_NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/arm-linux-androideabi/bin/strip -s mame_libretro_android.so
         zip -9 mame_libretro_android.so.zip mame_libretro_android.so
+        sha256sum mame_libretro_android.so.zip > mame_libretro_android.so.zip.sha256
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -35,31 +36,9 @@ jobs:
         title: Android ARMv7
         files: |
           mame_libretro_android.so.zip
-    - name: Save core for upload job
+          mame_libretro_android.so.zip.sha256
+    - name: Save artifact
       uses: actions/upload-artifact@v2
       with:
         name: mame_libretro_android.so.zip
         path: mame_libretro_android.so.zip
-  
-  uploadToBB:
-    name: Upload core to buildbot
-    runs-on: ubuntu-latest
-    needs: AndroidARMv7
-    
-    steps:
-    - name: Recover core from artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: mame_libretro_android.so.zip
-        path: .
-    - name: Upload to buildbot
-      id: deploy
-      uses: Pendect/action-rsyncer@v1.1.0
-      env:
-        DEPLOY_KEY: ${{ secrets.KEY }}
-      with:
-        flags: '-vazr --delete'
-        options: ''
-        ssh_options: '-p ${{ secrets.PORT }}'
-        src: mame_libretro_android.so.zip
-        dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.ANDROID_ARMEABI_V7A_PATH }}'

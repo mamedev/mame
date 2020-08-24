@@ -20,6 +20,7 @@ jobs:
         make -f Makefile.libretro -j8
         strip -s mame_libretro.so
         zip -9 mame_libretro.so.zip mame_libretro.so
+        sha256sum mame_libretro.so.zip > mame_libretro.so.zip.sha256
     - name: Create new release
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -29,32 +30,9 @@ jobs:
         title: Linux x86_64
         files: |
           mame_libretro.so.zip
-    - name: Save core for upload job
+          mame_libretro.so.zip.sha256
+    - name: Save artifact
       uses: actions/upload-artifact@v2
       with:
         name: mame_libretro.so.zip
         path: mame_libretro.so.zip
-  
-  uploadToBB:
-    name: Upload core to buildbot
-    runs-on: ubuntu-latest
-    needs: Linux
-    
-    steps:
-    - name: Recover core from artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: mame_libretro.so.zip
-        path: .
-    - name: Upload to buildbot
-      id: deploy
-      uses: Pendect/action-rsyncer@v1.1.0
-      env:
-        DEPLOY_KEY: ${{ secrets.KEY }}
-      with:
-        flags: '-vazr --delete'
-        options: ''
-        ssh_options: '-p ${{ secrets.PORT }}'
-        src: mame_libretro.so.zip
-        dest: '${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.LINUX_X86_64_PATH }}'
-
