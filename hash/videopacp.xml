@@ -368,7 +368,7 @@ Do Videopac+/Odyssey3 versions exist?:
 
 	<software name="exojet">
 		<description>Exojet+ (France)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Brandt</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -381,7 +381,7 @@ Do Videopac+/Odyssey3 versions exist?:
 
 	<software name="englouti">
 		<description>Le Tresor Englouti+ (France)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Brandt</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -440,7 +440,7 @@ Do Videopac+/Odyssey3 versions exist?:
 
 	<software name="norseman">
 		<description>Norseman (Europe)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>GST Video</publisher>
 		<info name="programmer" value="Andy Eltisand Jake Dowding" />
 		<info name="serial" value="57" />
@@ -455,7 +455,7 @@ Do Videopac+/Odyssey3 versions exist?:
 
 	<software name="rally">
 		<description>Trans American Rally (Europe)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rally" />
@@ -468,11 +468,11 @@ Do Videopac+/Odyssey3 versions exist?:
 
 
 
-<!-- Odyssey³ prototypes, they won't work properly on European consoles -->
+<!-- Odyssey³ prototypes, they won't work properly on European VP+ consoles -->
 
 	<software name="baseballpl">
 		<description>Baseball (US, plus, prototype)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -484,8 +484,8 @@ Do Videopac+/Odyssey3 versions exist?:
 	</software>
 
 	<software name="flashp">
-		<description>Flashpoint (US, prototype)</description>
-		<year>198?</year>
+		<description>Flash Point (US, prototype)</description>
+		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
