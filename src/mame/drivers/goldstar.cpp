@@ -11247,7 +11247,7 @@ ROM_END
 
   The EPROMS devices only hold the second half of the needed program and regular tiles data.
   EPROMS are NMC27CP128Q that are sized 0x4000, when the real data should be 0x8000 for each position.
-  
+
   *EDIT*
   Even when the NMC27CP128Q datasheet says that these devices are 128 Kbits (16k x8), we redumped
   them as 27c256, and got perfect complete 32k x8 dumps.
@@ -11259,7 +11259,7 @@ ROM_END
 
 */
 ROM_START( cmasteri )
-	ROM_REGION( 0x10000, "maincpu", 0 )	// 32k x 8 data coming from a real NMC27CP128Q
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 32k x 8 data coming from a real NMC27CP128Q
 	ROM_LOAD( "9.u81",  0x0000,  0x1000, CRC(2738eb55) SHA1(95e420544f36e4ce6358f14fee7a6b7ecd4cc568) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -11269,7 +11269,7 @@ ROM_START( cmasteri )
 	ROM_CONTINUE(0x2000,0x1000)
 	ROM_CONTINUE(0x5000,0x1000)
 
-	ROM_REGION( 0x18000, "gfx1", 0 )	// 32k x 8 data coming from real NMC27CP128Q devices
+	ROM_REGION( 0x18000, "gfx1", 0 )    // 32k x 8 data coming from real NMC27CP128Q devices
 	ROM_LOAD( "7.u16", 0x00000,  0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
 	ROM_LOAD( "6.u11", 0x08000,  0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
 	ROM_LOAD( "5.u4",  0x10000,  0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )

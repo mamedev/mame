@@ -15,12 +15,24 @@
     - internal diagnostic ROM in data space (requires high voltage reset)
     - what really happens when register pairs are unaligned?
 
+    Note that A8–A15 outputs are not enabled on Port 0 upon reset, except
+    on some later ROMless versions such as Z8691. This may redirect
+    external memory accesses, including program fetches, to FFxx until
+    P01M is written to. Z8681 is particularly affected by this.
+
 */
 
 #include "emu.h"
 #include "z8.h"
 #include "z8dasm.h"
 #include "debugger.h"
+
+#define LOG_TIMER       (1 << 1U)
+#define LOG_RECEIVE     (1 << 2U)
+#define LOG_TRANSMIT    (1 << 3U)
+
+#define VERBOSE 0
+#include "logmacro.h"
 
 /***************************************************************************
     CONSTANTS
@@ -497,6 +509,7 @@ void z8_device::sio_receive()
 					// start bit validated
 					m_receive_sr |= 1 << 9;
 					m_receive_parity = false;
+					LOGMASKED(LOG_RECEIVE, "Start bit validated\n");
 				}
 				else
 				{
@@ -519,6 +532,7 @@ void z8_device::sio_receive()
 					request_interrupt(3);
 					m_receive_started = false;
 					m_receive_count = 0;
+					LOGMASKED(LOG_RECEIVE, "Character received: %02X\n", m_receive_buffer);
 				}
 				else
 				{
@@ -528,11 +542,14 @@ void z8_device::sio_receive()
 					// parity replaces received bit 7 if selected
 					if (BIT(m_receive_sr, 1) && (m_p3m & Z8_P3M_PARITY) != 0)
 					{
+						LOGMASKED(LOG_RECEIVE, "%d parity bit shifted in\n", BIT(m_receive_sr, 9));
 						if (m_receive_parity)
 							m_receive_sr |= 1 << 9;
 						else
 							m_receive_sr &= ~(1 << 9);
 					}
+					else
+						LOGMASKED(LOG_RECEIVE, "%d data bit shifted in\n", BIT(m_receive_sr, 9));
 				}
 			}
 		}
@@ -545,6 +562,7 @@ void z8_device::sio_receive()
 			m_receive_sr |= 1 << 9;
 		else if (BIT(m_receive_sr, 8))
 		{
+			LOGMASKED(LOG_RECEIVE, "Start bit noticed\n");
 			m_receive_started = true;
 			m_receive_sr = 0;
 			m_receive_count = 0;
@@ -562,7 +580,10 @@ void z8_device::sio_transmit()
 	{
 		m_transmit_sr >>= 1;
 		if (m_transmit_sr == 0)
+		{
+			LOGMASKED(LOG_TRANSMIT, "Transmit register empty\n");
 			request_interrupt(4);
+		}
 		else
 		{
 			// parity replaces received bit 7 if selected
@@ -572,9 +593,15 @@ void z8_device::sio_transmit()
 					m_transmit_sr |= 1;
 				else
 					m_transmit_sr &= ~1;
+				LOGMASKED(LOG_TRANSMIT, "%d parity bit shifted out\n", BIT(m_transmit_sr, 0));
 			}
-			else if (BIT(m_transmit_sr, 0))
-				m_transmit_parity = !m_transmit_parity;
+			else
+			{
+				LOGMASKED(LOG_TRANSMIT, "%d %s bit shifted out\n", BIT(m_transmit_sr, 0),
+						BIT(m_transmit_sr, 10) ? "start" : m_transmit_sr > 3 ? "data" : "stop");
+				if (BIT(m_transmit_sr, 0))
+					m_transmit_parity = !m_transmit_parity;
+			}
 
 			// serial output
 			p3_update_output();
@@ -589,6 +616,8 @@ uint8_t z8_device::sio_read()
 
 void z8_device::sio_write(uint8_t data)
 {
+	LOGMASKED(LOG_TRANSMIT, "(%04X): Character to transmit: %02X\n", m_ppc, data);
+
 	// overwrite shift register with data + 1 start bit + 2 stop bits
 	m_transmit_sr = (m_transmit_sr & 1) | (uint16_t(data) << 2) | (3 << 10);
 	m_transmit_parity = false;
@@ -722,7 +751,7 @@ void z8_device::tmr_write(uint8_t data)
 		{
 			unsigned prescaler = (m_pre[0] >> 2) ? (m_pre[0] >> 2) : 64;
 			unsigned count = (m_t[0] ? m_t[0] : 256) * prescaler;
-			logerror("(%04X): Load T0 at %.2f Hz\n", m_ppc, clock() / 8.0 / count);
+			LOGMASKED(LOG_TIMER, "(%04X): Load T0 at %.2f Hz\n", m_ppc, clock() / 8.0 / count);
 		}
 
 		if ((data & Z8_TMR_TOUT_MASK) == Z8_TMR_TOUT_T0)
@@ -746,7 +775,7 @@ void z8_device::tmr_write(uint8_t data)
 		{
 			unsigned prescaler = (m_pre[1] >> 2) ? (m_pre[1] >> 2) : 64;
 			unsigned count = (m_t[1] ? m_t[1] : 256) * prescaler;
-			logerror("(%04X): Load T1 at %.2f Hz\n", m_ppc, clock() / 8.0 / count);
+			LOGMASKED(LOG_TIMER, "(%04X): Load T1 at %.2f Hz\n", m_ppc, clock() / 8.0 / count);
 		}
 
 		if ((data & Z8_TMR_TOUT_MASK) == Z8_TMR_TOUT_T1)
@@ -1538,6 +1567,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 {
 	switch ( inputnum )
 	{
+	// IRQ0 input is P32 (also DAV0/RDY0 handshake, not emulated)
 	case INPUT_LINE_IRQ0:
 		if (state != CLEAR_LINE && m_irq_line[0] == CLEAR_LINE)
 			request_interrupt(0);
@@ -1550,6 +1580,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 		break;
 
+	// IRQ1 input is P33
 	case INPUT_LINE_IRQ1:
 		if (state != CLEAR_LINE && m_irq_line[1] == CLEAR_LINE)
 			request_interrupt(1);
@@ -1562,6 +1593,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 		break;
 
+	// IRQ2 input is P31 (also TIN and DAV2/RDY2 handshake, latter not emulated)
 	case INPUT_LINE_IRQ2:
 		if (state != CLEAR_LINE && m_irq_line[2] == CLEAR_LINE)
 			request_interrupt(2);
@@ -1582,6 +1614,7 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 		break;
 
+	// IRQ3 input is P30 (also serial DI)
 	case INPUT_LINE_IRQ3:
 		if (state != CLEAR_LINE && m_irq_line[3] == CLEAR_LINE && (m_p3m & Z8_P3M_P3_SERIAL) == 0)
 			request_interrupt(3);

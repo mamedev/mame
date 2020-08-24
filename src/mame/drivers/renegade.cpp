@@ -195,7 +195,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 void renegade_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
-	
+
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_playing));
@@ -246,7 +246,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 	// nmi  8 lines before vsync
 	if (scanline == 265)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	
+
 	// irq  16 clks per frame: once every 16 lines, but increases to 24 lines during vblank
 	// (lines 16,40,56,72,88,104,120,136,152,168,184,200,216,232,248,264)
 	if (scanline == 0x10 || (scanline > 0x20 && (scanline & 0xf) == 8))

@@ -92,6 +92,7 @@ const double XTAL::known_xtals[] = {
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
 	  3'546'800, /* 3.5468_MHz_XTAL        Atari 400 PAL */
 	  3'547'000, /* 3.547_MHz_XTAL         Philips G7200, Philips C7240 */
+	  3'562'500, /* 3.5625_MHz_XTAL        Jopac JO7400 */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */
 	  3'579'000, /* 3.579_MHz_XTAL         BeebOPL */

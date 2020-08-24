@@ -31,6 +31,8 @@ namespace netlist
 
 	static constexpr const std::array<netlist_time, 2> times = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 
+	// FIXME: timing, see 74107 for example, use template
+
 	NETLIB_OBJECT(7450)
 	{
 		NETLIB_CONSTRUCTOR(7450)
@@ -45,7 +47,7 @@ namespace netlist
 
 		//NETLIB_RESETI();
 
-	public:
+	private:
 		NETLIB_HANDLERI(inputs)
 		{
 			m_A.activate();

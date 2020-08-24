@@ -154,7 +154,7 @@ NETLIST_START(spacfury)
 	// subtle but noticeable effect where the spin "whoosh" is missing
 	// some upper harmonics at 4e-5; however, this is the most demanding
 	// solver in the system and it keeps jumping around as I tweak things
-//	PARAM(Solver.Solver_21.DYNAMIC_MIN_TIMESTEP, 2e-5)
+//  PARAM(Solver.Solver_21.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
 	// Overwrite model - the default model uses minimum datasheet
 	// specifications for 5V. These are for 10V and thus closer to the
@@ -203,10 +203,10 @@ NETLIST_START(spacfury)
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_VM12, -12)
 
-//	RES(R1, RES_K(2.2))		-- part of final amp (not emulated)
-//	RES(R2, RES_K(10))		-- part of final amp (not emulated)
-//	RES(R4, RES_K(330))		-- part of final amp (not emulated)
-//	RES(R5, RES_M(1))		-- part of final amp (not emulated)
+//  RES(R1, RES_K(2.2))     -- part of final amp (not emulated)
+//  RES(R2, RES_K(10))      -- part of final amp (not emulated)
+//  RES(R4, RES_K(330))     -- part of final amp (not emulated)
+//  RES(R5, RES_M(1))       -- part of final amp (not emulated)
 	RES(R6, RES_K(680))
 	RES(R7, RES_K(680))
 	RES(R8, RES_K(10))
@@ -216,7 +216,7 @@ NETLIST_START(spacfury)
 	RES(R12, RES_K(47))
 	RES(R13, RES_K(47))
 	RES(R14, RES_M(1))
-//	RES(R15, RES_K(100))	-- part of final amp (not emulated)
+//  RES(R15, RES_K(100))    -- part of final amp (not emulated)
 	RES(R18, RES_K(10))
 	RES(R19, RES_K(470))
 	RES(R20, RES_K(22))
@@ -349,23 +349,23 @@ NETLIST_START(spacfury)
 	RES(R148, RES_K(10))
 	RES(R149, RES_K(220))
 
-//	CAP(C1, CAP_U(4.7))		-- part of final amp (not emulated)
-//	CAP(C2, CAP_U(0.05))
-//	CAP(C3, CAP_U(0.05))
-//	CAP(C4, CAP_U(10))		-- part of final amp (not emulated)
+//  CAP(C1, CAP_U(4.7))     -- part of final amp (not emulated)
+//  CAP(C2, CAP_U(0.05))
+//  CAP(C3, CAP_U(0.05))
+//  CAP(C4, CAP_U(10))      -- part of final amp (not emulated)
 	CAP(C5, CAP_U(0.01))
 	CAP(C6, CAP_U(0.01))
 	CAP(C7, CAP_U(4.7))
 	CAP(C8, CAP_U(0.047))
-//	CAP(C9, CAP_U(0.05))
-//	CAP(C10, CAP_U(0.05))
+//  CAP(C9, CAP_U(0.05))
+//  CAP(C10, CAP_U(0.05))
 	CAP(C11, CAP_U(0.01))
 	CAP(C12, CAP_U(0.01))
 	CAP(C13, CAP_U(0.01))
 	CAP(C14, CAP_U(0.01))
 	CAP(C15, CAP_U(0.01))
-//	CAP(C16, CAP_U(0.05))
-//	CAP(C17, CAP_U(0.05))
+//  CAP(C16, CAP_U(0.05))
+//  CAP(C17, CAP_U(0.05))
 	CAP(C18, CAP_U(0.01))
 	CAP(C19, CAP_U(0.047))
 	CAP(C20, CAP_U(0.01))
@@ -373,9 +373,9 @@ NETLIST_START(spacfury)
 	CAP(C22, CAP_U(0.05))
 	CAP(C23, CAP_U(0.05))
 	CAP(C24, CAP_U(10))
-//	CAP(C25, CAP_U(0.05))
+//  CAP(C25, CAP_U(0.05))
 	CAP(C26, CAP_U(0.0033))
-//	CAP(C27, CAP_U(0.05))
+//  CAP(C27, CAP_U(0.05))
 	CAP(C28, CAP_U(0.1))
 	CAP(C29, CAP_U(0.001))
 	CAP(C30, CAP_U(0.0022))
@@ -386,15 +386,15 @@ NETLIST_START(spacfury)
 	CAP(C35, CAP_U(0.0033))
 	CAP(C36, CAP_U(4.7))
 	CAP(C37, CAP_U(0.0022))
-//	CAP(C38, CAP_U(0.05))
-//	CAP(C39, CAP_U(0.05))
+//  CAP(C38, CAP_U(0.05))
+//  CAP(C39, CAP_U(0.05))
 	CAP(C40, CAP_U(0.047))
 	CAP(C41, CAP_U(0.0047))
 	CAP(C42, CAP_U(0.01))
 	CAP(C43, CAP_U(0.01))
 	CAP(C44, CAP_U(4.7))
-//	CAP(C45, CAP_U(0.05))
-//	CAP(C46, CAP_U(0.05))
+//  CAP(C45, CAP_U(0.05))
+//  CAP(C46, CAP_U(0.05))
 	CAP(C47, CAP_U(0.047))
 	CAP(C48, CAP_U(4.7))
 	CAP(C49, CAP_U(0.1))
@@ -404,30 +404,30 @@ NETLIST_START(spacfury)
 	CAP(C53, CAP_U(10))
 	CAP(C54, CAP_U(0.1))
 	CAP(C55, CAP_U(100))
-//	CAP(C56, CAP_U(0.05))
+//  CAP(C56, CAP_U(0.05))
 	CAP(C57, CAP_U(4.7))
-//	CAP(C58, CAP_U(0.05))
+//  CAP(C58, CAP_U(0.05))
 	CAP(C59, CAP_U(0.01))
 	CAP(C60, CAP_U(0.01))
 	CAP(C61, CAP_U(0.047))
 	CAP(C62, CAP_U(0.047))
 	CAP(C63, CAP_U(0.05))
 	CAP(C64, CAP_U(0.05))
-//	CAP(C65, CAP_U(0.05))
+//  CAP(C65, CAP_U(0.05))
 	CAP(C66, CAP_U(0.033))
-//	CAP(C67, CAP_U(0.05))
+//  CAP(C67, CAP_U(0.05))
 	CAP(C68, CAP_U(0.1))
 	CAP(C69, CAP_U(0.1))
 	CAP(C70, CAP_U(0.1))
 	CAP(C71, CAP_U(0.047))
 	CAP(C72, CAP_P(100))
 	CAP(C73, CAP_U(0.1))
-//	CAP(C75, CAP_U(10))
-//	CAP(C76, CAP_U(10))
-//	CAP(C77, CAP_U(0.1))
-//	CAP(C78, CAP_U(0.1))
-//	CAP(C79, CAP_U(0.1))
-//	CAP(C80, CAP_U(0.1))
+//  CAP(C75, CAP_U(10))
+//  CAP(C76, CAP_U(10))
+//  CAP(C77, CAP_U(0.1))
+//  CAP(C78, CAP_U(0.1))
+//  CAP(C79, CAP_U(0.1))
+//  CAP(C80, CAP_U(0.1))
 
 	D_1N914(D1)
 	D_1N914(D2)
@@ -446,7 +446,7 @@ NETLIST_START(spacfury)
 	D_1N914(D15)
 	D_1N914(D16)
 
-//	Q_2N4093(Q1)		-- part of final amp (not emulated)
+//  Q_2N4093(Q1)        -- part of final amp (not emulated)
 	Q_2N4093(Q2)
 	Q_2N4093(Q3)
 	Q_2N4403(Q4)
@@ -460,39 +460,39 @@ NETLIST_START(spacfury)
 	Q_2N4401(Q12)
 	Q_2N4403(Q13)
 
-//	TL082_DIP(U1)			// Op. Amp. -- part of final amp (not emulated)
-//	NET_C(U1.8, I_V12)
-//	NET_C(U1.4, I_VM12)
+//  TL082_DIP(U1)           // Op. Amp. -- part of final amp (not emulated)
+//  NET_C(U1.8, I_V12)
+//  NET_C(U1.4, I_VM12)
 
-	TL082_DIP(U2)			// Op. Amp.
+	TL082_DIP(U2)           // Op. Amp.
 	NET_C(U2.8, I_V12)
 	NET_C(U2.4, I_VM12)
 
-	CD4069_DIP(U3)			// Hex Inverter
+	CD4069_DIP(U3)          // Hex Inverter
 	NET_C(U3.7, GND)
 	NET_C(U3.14, I_V12)
 
-	TL082_DIP(U4)			// Op. Amp.
+	TL082_DIP(U4)           // Op. Amp.
 	NET_C(U4.8, I_V12)
 	NET_C(U4.4, I_VM12)
 
-	TL082_DIP(U5)			// Op. Amp.
+	TL082_DIP(U5)           // Op. Amp.
 	NET_C(U5.8, I_V12)
 	NET_C(U5.4, I_VM12)
 
-	CD4011_DIP(U6)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U6)          // Quad 2-Input NAND Gates
 	NET_C(U6.7, GND)
 	NET_C(U6.14, I_V12)
 
-	CA3080_SLOW_DIP(U7)			// Op. Amp.
+	CA3080_SLOW_DIP(U7)         // Op. Amp.
 	NET_C(U7.4, I_VM12)
 	NET_C(U7.7, I_V12)
 
-	TL082_DIP(U8)			// Op. Amp.
+	TL082_DIP(U8)           // Op. Amp.
 	NET_C(U8.8, I_V12)
 	NET_C(U8.4, I_VM12)
 
-	MM5837_DIP(U9)			// Noise Generator
+	MM5837_DIP(U9)          // Noise Generator
 #if (UNDERCLOCK_NOISE_GEN)
 	// officially runs at 48-112kHz, but little noticeable difference
 	// in exchange for a big performance boost
@@ -502,99 +502,99 @@ NETLIST_START(spacfury)
 	// MM5837 instance at a lower frequency to drive it; this
 	// second instance doesn't really exist, it just allows us
 	// a bit more performance
-	MM5837_DIP(U9B)			// Noise Generator
+	MM5837_DIP(U9B)         // Noise Generator
 	PARAM(U9B.FREQ, 12000)
 #endif
 
-	TL082_DIP(U10)			// Op. Amp.
+	TL082_DIP(U10)          // Op. Amp.
 	NET_C(U10.8, I_V12)
 	NET_C(U10.4, I_VM12)
 
-	CD4024_DIP(U11)			// 7-Stage Ripple Binary Counter
+	CD4024_DIP(U11)         // 7-Stage Ripple Binary Counter
 	NET_C(U11.7, GND)
 	NET_C(U11.14, I_V12)
 
-	CA3080_SLOW_DIP(U12)			// Op. Amp.
+	CA3080_SLOW_DIP(U12)            // Op. Amp.
 	NET_C(U12.4, I_VM12)
 	NET_C(U12.7, I_V12)
 
-	TL082_DIP(U13)			// Op. Amp.
+	TL082_DIP(U13)          // Op. Amp.
 	NET_C(U13.8, I_V12)
 	NET_C(U13.4, I_VM12)
 
-	TL082_DIP(U14)			// Op. Amp.
+	TL082_DIP(U14)          // Op. Amp.
 	NET_C(U14.8, I_V12)
 	NET_C(U14.4, I_VM12)
 
-	TL082_DIP(U15)			// Op. Amp.
+	TL082_DIP(U15)          // Op. Amp.
 	NET_C(U15.8, I_V12)
 	NET_C(U15.4, I_VM12)
 
-	TL082_DIP(U16)			// Op. Amp.
+	TL082_DIP(U16)          // Op. Amp.
 	NET_C(U16.8, I_V12)
 	NET_C(U16.4, I_VM12)
 
 	LM555_DIP(U17)
 
-	TL082_DIP(U18)			// Op. Amp.
+	TL082_DIP(U18)          // Op. Amp.
 	NET_C(U18.8, I_V12)
 	NET_C(U18.4, I_VM12)
 
-	CD4069_DIP(U19)			// Hex Inverter
+	CD4069_DIP(U19)         // Hex Inverter
 	NET_C(U19.7, GND)
 	NET_C(U19.14, I_V12)
 
-	CD4011_DIP(U20)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U20)         // Quad 2-Input NAND Gates
 	NET_C(U20.7, GND)
 	NET_C(U20.14, I_V12)
 
-	TL082_DIP(U21)			// Op. Amp.
+	TL082_DIP(U21)          // Op. Amp.
 	NET_C(U21.8, I_V12)
 	NET_C(U21.4, I_VM12)
 
-	CD4011_DIP(U22)			// Quad 2-Input NAND Gates
+	CD4011_DIP(U22)         // Quad 2-Input NAND Gates
 	NET_C(U22.7, GND)
 	NET_C(U22.14, I_V12)
 
-	TL082_DIP(U23)			// Op. Amp.
+	TL082_DIP(U23)          // Op. Amp.
 	NET_C(U23.8, I_V12)
 	NET_C(U23.4, I_VM12)
 
-//	TTL_74LS08_DIP(U25)		// Quad 2-Input AND Gates
-//	NET_C(U25.7, GND)
-//	NET_C(U25.14, I_V5)
+//  TTL_74LS08_DIP(U25)     // Quad 2-Input AND Gates
+//  NET_C(U25.7, GND)
+//  NET_C(U25.14, I_V5)
 
-	TTL_7407_DIP(U26)		// Hex Buffers with High Votage Open-Collector Outputs
-    NET_C(U26.7, GND)
-    NET_C(U26.14, I_V5)
+	TTL_7407_DIP(U26)       // Hex Buffers with High Votage Open-Collector Outputs
+	NET_C(U26.7, GND)
+	NET_C(U26.14, I_V5)
 
-//	TTL_74LS10_DIP(U28)		// Triple 3-Input NAND Gate
-//	NET_C(U28.7, GND)
-//	NET_C(U28.14, I_V5)
+//  TTL_74LS10_DIP(U28)     // Triple 3-Input NAND Gate
+//  NET_C(U28.7, GND)
+//  NET_C(U28.14, I_V5)
 
-//	TTL_74LS14_DIP(U30)
-//	NET_C(U30.7, GND)
-//	NET_C(U30.14, I_V5)
+//  TTL_74LS14_DIP(U30)
+//  NET_C(U30.7, GND)
+//  NET_C(U30.14, I_V5)
 
-	TTL_7406_DIP(U31)		// Hex inverter -- currently using a clone of 7416, no open collector behavior
+	TTL_7406_DIP(U31)       // Hex inverter -- currently using a clone of 7416, no open collector behavior
 	NET_C(U31.7, GND)
 	NET_C(U31.14, I_V5)
 
-//	TTL_74LS374_DIP(U32)	// Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
-//	NET_C(U32.10, GND)
-//	NET_C(U32.20, I_V5)
+//  TTL_74LS374_DIP(U32)    // Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
+//  NET_C(U32.10, GND)
+//  NET_C(U32.20, I_V5)
 //
-//	TTL_74LS374_DIP(U33)	// Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
-//	NET_C(U33.10, GND)
-//	NET_C(U33.20, I_V5)
+//  TTL_74LS374_DIP(U33)    // Octal D-Type Transparent Latches And Edge-Triggered Flip-Flop
+//  NET_C(U33.10, GND)
+//  NET_C(U33.20, I_V5)
 
-//	TTL_74LS30_DIP(U34)		// 8-Input NAND Gate
-//	NET_C(U34.7, GND)
-//	NET_C(U34.14, I_V5)
+//  TTL_74LS30_DIP(U34)     // 8-Input NAND Gate
+//  NET_C(U34.7, GND)
+//  NET_C(U34.14, I_V5)
 
-//	TTL_74LS14_DIP(U35)
-//	NET_C(U35.7, GND)
-//	NET_C(U35.14, I_V5)
+//  TTL_74LS14_DIP(U35)
+//  NET_C(U35.7, GND)
+//  NET_C(U35.14, I_V5)
 
 	//
 	// Sheet 7, top (Moving)
@@ -1009,7 +1009,7 @@ NETLIST_START(spacfury)
 	NET_C(R140.2, D15.K, C68.2)
 	NET_C(C68.1, C66.1, D13.A, GND)
 	NET_C(D15.A, R102.1, D13.K) // and U21.3
-	NET_C(C66.2, R103.1)		// and U21.2
+	NET_C(C66.2, R103.1)        // and U21.2
 	NET_C(R103.2, R102.2, R84.1)// and U21.1
 
 #if (HLE_SHOOT_VCO)
@@ -1023,11 +1023,11 @@ NETLIST_START(spacfury)
 	VARCLOCK(SHOOTCLK, 1, "max(0.000001,min(0.1,(0.0000152345*A0*A0*A0) - (0.0000278973*A0*A0) + (0.000132881*A0) - 0.00000173354))")
 	NET_C(SHOOTCLK.GND, GND)
 	NET_C(SHOOTCLK.VCC, I_V5)
-    NET_C(SHOOTCLK.A0, D15.K)
-    NET_C(SHOOTCLK.Q, SHOOTENV.A0)
+	NET_C(SHOOTCLK.A0, D15.K)
+	NET_C(SHOOTCLK.Q, SHOOTENV.A0)
 	AFUNC(SHOOTENV, 1, "if(A0>2.5,11.1,-11.1)")
 	NET_C(SHOOTENV.Q, U11.1)
-    NET_C(GND, U21.3, U21.2)
+	NET_C(GND, U21.3, U21.2)
 #else
 	NET_C(D15.A, U21.3)
 	NET_C(U21.2, C66.2)

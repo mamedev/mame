@@ -67,9 +67,10 @@ namespace netlist
 				, m_modacc(m_stmodel)
 				, m_last_state(*this, "m_last_var", 1)
 			{
-				register_subalias("Q", m_RVO.P());
+				register_subalias("Q", "RVO.1");
 
-				connect(m_A, m_RVI.P());
+				connect("A", "RVI.1");
+				// FIXME: need a symbolic reference from connect as well
 				connect(m_supply.GND(), m_RVI.N());
 				connect(m_supply.GND(), m_RVO.N());
 			}

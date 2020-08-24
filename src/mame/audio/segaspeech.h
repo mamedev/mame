@@ -21,7 +21,7 @@ class sega_speech_device : public device_t, public device_mixer_interface
 public:
 	sega_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-//	auto int_cb() { return m_int_cb.bind(); }
+//  auto int_cb() { return m_int_cb.bind(); }
 
 	void data_w(uint8_t data);
 	void control_w(uint8_t data);

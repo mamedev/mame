@@ -4,35 +4,40 @@
 
     Irem M92 system games:
 
-    Gunforce (World)                M92-A   (c) 1991 Irem Corp
-    Gunforce (USA)                  M92-A   (c) 1991 Irem America Corp
-    Gunforce (Japan)                M92-A   (c) 1991 Irem Corp
-    Blade Master (World)                    (c) 1991 Irem Corp
-    Cross Blades! (Japan)                   (c) 1991 Irem Corp
-    Lethal Thunder (World)                  (c) 1991 Irem Corp
-    Thunder Blaster (Japan)                 (c) 1991 Irem Corp
-    Undercover Cops (World)                 (c) 1992 Irem Corp
-    Undercover Cops (Japan)                 (c) 1992 Irem Corp
-    Mystic Riders (World)                   (c) 1992 Irem Corp
-    Gun Hohki (Japan)                       (c) 1992 Irem Corp
-    Major Title 2 (World)           M92-F   (c) 1992 Irem Corp
-    Major Title 2 (Japan)           M92-F   (c) 1992 Irem Corp
-    The Irem Skins Game (USA Set 1) M92-F   (c) 1992 Irem America Corp
-    The Irem Skins Game (USA Set 2) M92-F   (c) 1992 Irem America Corp
-    Hook (World)                            (c) 1992 Irem Corp
-    Hook (Japan)                            (c) 1992 Irem Corp
-    Hook (USA)                              (c) 1992 Irem America Corp
-    R-Type Leo (World)                      (c) 1992 Irem Corp
-    R-Type Leo (Japan)                      (c) 1992 Irem Corp
-    In The Hunt (World)             M92-E   (c) 1993 Irem Corp
-    In The Hunt (USA)               M92-E   (c) 1993 Irem Corp
-    Kaitei Daisensou (Japan)        M92-E   (c) 1993 Irem Corp
-    Ninja Baseball Batman (USA)             (c) 1993 Irem America Corp
-    Yakyuu Kakutou League-Man (Japan)       (c) 1993 Irem Corp
-    Perfect Soldiers (Japan)        M92-G   (c) 1993 Irem Corp
-    Dream Soccer 94 (Japan)         M92-G   (c) 1994 Irem Corp
-    Gunforce 2 (US)                 M92-G   (c) 1994 Irem Corp
-    Geostorm (Japan)                M92-G   (c) 1994 Irem Corp
+    Gunforce (World)                                 M92-A   (c) 1991 Irem Corp
+    Gunforce (USA)                                   M92-A   (c) 1991 Irem America Corp
+    Gunforce (Japan)                                 M92-A   (c) 1991 Irem Corp
+    Blade Master (World)                             M92-B   (c) 1991 Irem Corp
+    Cross Blades! (Japan)                            M92-D   (c) 1991 Irem Corp
+    Lethal Thunder (World)                                   (c) 1991 Irem Corp
+    Thunder Blaster (Japan)                          M92-C   (c) 1991 Irem Corp
+    Undercover Cops (World)                          M92-E   (c) 1992 Irem Corp
+    Undercover Cops (US)                             M92-E   (c) 1992 Irem America Corp
+    Undercover Cops (Japan)                          M92-E   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (World)  M92-E   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (US)     M92-E   (c) 1992 Irem America Corp
+    Mystic Riders (World)                                    (c) 1992 Irem Corp
+    Mahou Keibitai Gun Hohki (Japan)                         (c) 1992 Irem Corp
+    Major Title 2 (World)                            M92-F   (c) 1992 Irem Corp
+    Major Title 2 (Japan)                            M92-F   (c) 1992 Irem Corp
+    The Irem Skins Game (USA Set 1)                  M92-F   (c) 1992 Irem America Corp
+    The Irem Skins Game (USA Set 2)                  M92-F   (c) 1992 Irem America Corp
+    Hook (World)                                             (c) 1992 Irem Corp
+    Hook (USA)                                               (c) 1992 Irem America Corp
+    Hook (Japan)                                             (c) 1992 Irem Corp
+    R-Type Leo (World)                                       (c) 1992 Irem Corp
+    R-Type Leo (Japan)                                       (c) 1992 Irem Corp
+    In The Hunt (World)                              M92-E   (c) 1993 Irem Corp
+    In The Hunt (USA)                                M92-E   (c) 1993 Irem Corp
+    Kaitei Daisensou (Japan)                         M92-E   (c) 1993 Irem Corp
+    Ninja Baseball Batman (World)                            (c) 1993 Irem Corp
+    Ninja Baseball Batman (USA)                              (c) 1993 Irem America Corp
+    Yakyuu Kakutou League-Man (Japan)                        (c) 1993 Irem Corp
+    Superior Soldiers (US)                           M92-G   (c) 1993 Irem Corp
+    Perfect Soldiers (Japan)                         M92-G   (c) 1993 Irem Corp
+    Dream Soccer '94 (Japan)                         M92-G   (c) 1994 Irem Corp
+    Gun Force II (US)                                M92-G   (c) 1994 Irem Corp
+    Geo Storm (Japan)                                M92-G   (c) 1994 Irem Corp
 
 System notes:
     Each game has an encrypted sound cpu (see irem_cpu.c), the sound cpu and
@@ -97,7 +102,7 @@ Perfect Soldiers              1993  Rev 3.50 M92
 World PK Soccer               1995  Rev 3.51 M92
 Fire Barrel                   1993  Rev 3.52 M92
 Dream Soccer '94              1994  Rev 3.53 M92
-Gunforce 2                    1994  Rev 3.53 M92
+Gun Force II                  1994  Rev 3.53 M92
 
 Gun Force
 1991, Irem Corp.
@@ -1793,14 +1798,14 @@ ROM_END
 
 ROM_START( uccops )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
-	ROM_LOAD16_BYTE( "uc_l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
-	ROM_LOAD16_BYTE( "uc_h1.ic27", 0x080001, 0x020000, CRC(8d29bcd6) SHA1(470b77d1b8f88824bac294bd12a205a23dad2287) )
-	ROM_LOAD16_BYTE( "uc_l1.ic38", 0x080000, 0x020000, CRC(a8a402d8) SHA1(0b40fb69f0a3e24e6b60117d2d2fd4cc170bc621) )
+	ROM_LOAD16_BYTE( "ucc_e-h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "ucc_e-l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "ucc_h1.ic27",   0x080001, 0x020000, CRC(8d29bcd6) SHA1(470b77d1b8f88824bac294bd12a205a23dad2287) )
+	ROM_LOAD16_BYTE( "ucc_l1.ic38",   0x080000, 0x020000, CRC(a8a402d8) SHA1(0b40fb69f0a3e24e6b60117d2d2fd4cc170bc621) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
-	ROM_LOAD16_BYTE( "uc_sl0.rom", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
+	ROM_LOAD16_BYTE( "ucc_e-sh0.ic30", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
+	ROM_LOAD16_BYTE( "ucc_e-sl0.ic31", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
 	ROM_LOAD( "uc_w38m.rom", 0x000000, 0x080000, CRC(130a40e5) SHA1(f70bad2fe126bb0e451a3fa6100a610928e9a502) )
@@ -1820,14 +1825,14 @@ ROM_END
 
 ROM_START( uccopsu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uc_h0.ic28",   0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
-	ROM_LOAD16_BYTE( "uc_l0.ic39",   0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
-	ROM_LOAD16_BYTE( "uc_h1-g.ic27", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
-	ROM_LOAD16_BYTE( "uc_l1-g.ic38", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
+	ROM_LOAD16_BYTE( "ucc_e-h0.ic28", 0x000001, 0x040000, CRC(240aa5f7) SHA1(8d864bb1377e9f6d266631ed365c5809b9da33f8) )
+	ROM_LOAD16_BYTE( "ucc_e-l0.ic39", 0x000000, 0x040000, CRC(df9a4826) SHA1(298033d97b9587e3548cb3bffa16b7ba9a6ff20d) )
+	ROM_LOAD16_BYTE( "ucc_h1-g.ic27", 0x080001, 0x020000, CRC(6b8ca2de) SHA1(1096b93bbaa4c97d4900e8c083cde99195cad5ba) )
+	ROM_LOAD16_BYTE( "ucc_l1-g.ic38", 0x080000, 0x020000, CRC(2bdec7dd) SHA1(58817099e74fd5bc299b7bc14d83ee75ed200b53) )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE( "uc_sh0.rom", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
-	ROM_LOAD16_BYTE( "uc_sl0.rom", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
+	ROM_LOAD16_BYTE( "ucc_e-sh0.ic30", 0x00001, 0x10000, CRC(df90b198) SHA1(6b334457f06f6b9cfb355ba3d399bebb37b5733e) )
+	ROM_LOAD16_BYTE( "ucc_e-sl0.ic31", 0x00000, 0x10000, CRC(96c11aac) SHA1(16c47b4f97f0532fff30bb163f26d8cf6b923a2e) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
 	ROM_LOAD( "uc_w38m.rom", 0x000000, 0x080000, CRC(130a40e5) SHA1(f70bad2fe126bb0e451a3fa6100a610928e9a502) )

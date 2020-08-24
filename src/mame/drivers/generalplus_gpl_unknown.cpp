@@ -32,10 +32,38 @@ call.  Sound is almost certainly handled in the same way.
 There is a missing internal ROM that acts as bootstrap and provides some basic functions.  It is at least 0x1000
 words in size, with the lowest call being to 0xf000.  It is potentially larger than this.
 
-Calls:
+The internal ROM will also need to provide trampolining for the interrupts, there is a single pointer near the
+start of the SPI ROM '02000A: 0041 0002' which points to 20041 (assuming you map the SPI ROM base as word address
+0x20000, so that the calls to get code align with ROM addresses)
+
+The function pointed to for the interrupt has the same form of the other functions that get loaded into RAM via
+calls to functions in the RAM area.
+
+--------------------------------------------------------
+
+BIOS (internal ROM) calls:
 
 0xf000 - copy dword from SPI using provided pointer
 
+0xf56f - unknown, after some time, done with PC = f56f, only in one place
+
+0xf58f - unknown, soon after startup (only 1 call)
+
+00f7a0 - unknown - 3 calls
+
+0xf931 - unknown, just one call
+
+00fa1d - unknown, just one call
+
+0xfb26 - unknown, after some time (done with pc = fb26 and calls)
+
+0xfb4f - unknown, just one call
+
+0xfbbf - unknown, 3 calls
+
+code currently goes off the rails after some of these unhandled calls (one to f56f?)
+
+--
 
 use 'go 2938' to get to the inline code these load on the fly
 
@@ -84,9 +112,23 @@ private:
 
 	uint16_t simulate_f000_r(offs_t offset);
 
+	uint16_t ramcall_2060_logger_r();
+	uint16_t ramcall_2189_logger_r();
+
+	uint16_t ramcall_2434_logger_r();
+
+	uint16_t ramcall_2829_logger_r();
+	uint16_t ramcall_287a_logger_r();
+	uint16_t ramcall_28f7_logger_r();
+	uint16_t ramcall_2079_logger_r();
+
+
 	required_region_ptr<uint8_t> m_spirom;
 
 	uint16_t unk_7abf_r();
+	uint16_t unk_7860_r();
+
+	void unk_7868_w(uint16_t data);
 
 	uint16_t spi_misc_control_r();
 	uint16_t spi_rx_fifo_r();
@@ -96,25 +138,24 @@ private:
 
 
 	void spi_process_tx_data(uint8_t data);
-	void spi_tx();
 	uint8_t spi_process_rx();
 	uint8_t spi_rx();
 
-	uint8_t m_tx_fifo[6]; // actually 8 bytes? or 8 half-bytes?
-	int m_tx_pos = 0;
 	uint8_t m_rx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
 
 	uint32_t m_spiaddress;
 
 	enum spistate : const int
 	{
-	   SPI_STATE_READING_OR_READY = 0,
+	   SPI_STATE_READY = 0,
 	   SPI_STATE_WAITING_HIGH_ADDR = 1,
 	   SPI_STATE_WAITING_MID_ADDR = 2,
 	   SPI_STATE_WAITING_LOW_ADDR = 3,
 	   // probably not
 	   SPI_STATE_WAITING_DUMMY1_ADDR = 4,
-	   SPI_STATE_WAITING_DUMMY2_ADDR = 5
+	   SPI_STATE_WAITING_DUMMY2_ADDR = 5,
+	   SPI_STATE_READING = 6
+
 	};
 
 	spistate m_spistate;
@@ -123,6 +164,8 @@ private:
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_mainram[0x12] |= 0x8000; // some code waits on this, what is it?
+	m_mainram[0x09] &= 0xfff0; // should be cleared by IRQ?
 	return 0;
 }
 
@@ -141,6 +184,11 @@ uint16_t pcp8718_state::unk_7abf_r()
 	return 0x0001;
 }
 
+uint16_t pcp8718_state::unk_7860_r()
+{
+	return machine().rand() & 0x8;
+}
+
 
 uint16_t pcp8718_state::spi_misc_control_r()
 {
@@ -152,10 +200,6 @@ uint16_t pcp8718_state::spi_misc_control_r()
 uint16_t pcp8718_state::spi_rx_fifo_r()
 {
 	logerror("%06x: spi_rx_fifo_r\n", machine().describe_context());
-
-	// does reading the rx fifo rest the tx fifo? there are dummy writes??
-	m_tx_pos = 0;
-
 	return spi_rx();
 }
 
@@ -165,7 +209,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 
 	switch (m_spistate)
 	{
-	case SPI_STATE_READING_OR_READY:
+	case SPI_STATE_READY:
 	{
 		if (data == 0x03)
 		{
@@ -182,7 +226,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_HIGH_ADDR:
 	{
 		m_spiaddress = (m_spiaddress & 0xff00ffff) | data << 16;
-		logerror("set to high address%02x address is now %08x\n", data, m_spiaddress);
+		logerror("set to high address %02x address is now %08x\n", data, m_spiaddress);
 		m_spistate = SPI_STATE_WAITING_MID_ADDR;
 		break;
 	}
@@ -190,7 +234,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_MID_ADDR:
 	{
 		m_spiaddress = (m_spiaddress & 0xffff00ff) | data << 8;
-		logerror("set to mid address%02x address is now %08x\n", data, m_spiaddress);
+		logerror("set to mid address %02x address is now %08x\n", data, m_spiaddress);
 		m_spistate = SPI_STATE_WAITING_LOW_ADDR;
 		break;
 	}
@@ -198,8 +242,15 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_LOW_ADDR:
 	{
 		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
-		logerror("set to low address%02x address is now %08x\n", data, m_spiaddress);
-		m_spistate = SPI_STATE_WAITING_DUMMY1_ADDR;
+		logerror("set to low address %02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_READING;
+		break;
+	}
+
+	case SPI_STATE_READING:
+	{
+		// writes when in read mode clock in data?
+		logerror("write while in read mode (clock data?)\n", data, m_spiaddress);
 		break;
 	}
 
@@ -211,7 +262,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 
 	case SPI_STATE_WAITING_DUMMY2_ADDR:
 	{
-		m_spistate = SPI_STATE_READING_OR_READY;
+	//  m_spistate = SPI_STATE_READY;
 		break;
 	}
 	}
@@ -222,10 +273,16 @@ uint8_t pcp8718_state::spi_process_rx()
 
 	switch (m_spistate)
 	{
-	case SPI_STATE_READING_OR_READY:
+	case SPI_STATE_READING:
 	{
 		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
-		logerror("reading SPI %02x from SPI Address %08x\n", dat, m_spiaddress);
+
+		// hack internal BIOS checksum check
+		if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
+			if (dat == 0x4e)
+				dat = 0x5e;
+
+		logerror("reading SPI %02x from SPI Address %08x (adjusted word offset %08x)\n", dat, m_spiaddress, (m_spiaddress/2)+0x20000);
 		m_spiaddress++;
 		return dat;
 	}
@@ -240,17 +297,6 @@ uint8_t pcp8718_state::spi_process_rx()
 	return 0x00;
 }
 
-void pcp8718_state::spi_tx()
-{
-	spi_process_tx_data(m_tx_fifo[0]);
-
-	m_tx_fifo[0] = m_tx_fifo[1];
-	m_tx_fifo[1] = m_tx_fifo[2];
-	m_tx_fifo[2] = m_tx_fifo[3];
-	m_tx_fifo[3] = m_tx_fifo[4];
-	m_tx_fifo[4] = m_tx_fifo[5];
-	m_tx_fifo[5] = 0x00;
-}
 
 uint8_t pcp8718_state::spi_rx()
 {
@@ -269,20 +315,23 @@ void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 {
 	data &= 0x00ff;
 	logerror("%06x: spi_tx_fifo_w %02x\n", machine().describe_context(), data);
-	m_tx_fifo[m_tx_pos] = data;
-	m_tx_pos++;
 
-	if (m_tx_pos == 6)
-	{
-		//logerror("transmitting %02x %02x %02x %02x %02x %02x\n", m_tx_fifo[0], m_tx_fifo[1], m_tx_fifo[2], m_tx_fifo[3], m_tx_fifo[4], m_tx_fifo[5]);
-		for (int i = 0; i < 6; i++)
-		{
-			spi_tx();
-			m_tx_pos = 0;
-		}
-	}
+	spi_process_tx_data(data);
+}
+
+// this is probably 'port b' but when SPI is enabled some points of this can become SPI control pins
+// it's accessed after each large data transfer, probably to reset the SPI into 'ready for command' state?
+void pcp8718_state::unk_7868_w(uint16_t data)
+{
+	logerror("%06x: unk_7868_w %02x (Port B + SPI reset?)\n", machine().describe_context(), data);
+
+	for (int i = 0; i < 4; i++)
+		m_rx_fifo[i] = 0xff;
+
+	m_spistate = SPI_STATE_READY;
 
 }
+
 
 void pcp8718_state::spi_control_w(uint16_t data)
 {
@@ -297,6 +346,9 @@ void pcp8718_state::map(address_map &map)
 	map(0x000000, 0x006fff).ram().share("mainram");
 	map(0x007000, 0x0077ff).ram(); // might be registers, but the call stubs for RAM calls explicitly use addresses in here for private stack so that previous snippets can be restored?
 
+	map(0x007860, 0x007860).r(FUNC(pcp8718_state::unk_7860_r));
+
+	map(0x007868, 0x007868).w(FUNC(pcp8718_state::unk_7868_w));
 
 	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
 	// 7941 SPI Transmit Status
@@ -306,7 +358,7 @@ void pcp8718_state::map(address_map &map)
 	map(0x007945, 0x007945).r(FUNC(pcp8718_state::spi_misc_control_r));
 
 	map(0x007abf, 0x007abf).r(FUNC(pcp8718_state::unk_7abf_r));
-	
+
 
 	// registers at 7xxx are similar to GPL16250, but not identical? (different video system?)
 
@@ -320,13 +372,12 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if ((offset+0xf000) == 0xf000)
+		uint16_t pc = m_maincpu->state_int(UNSP_PC);
+		uint16_t sr = m_maincpu->state_int(UNSP_SR);
+		int realpc = (pc | (sr << 16)) & 0x003fffff;
+
+		if ((offset + 0xf000) == (realpc))
 		{
-
-			uint16_t pc = m_maincpu->state_int(UNSP_PC);
-			uint16_t sr = m_maincpu->state_int(UNSP_SR);
-
-			int realpc = (pc | (sr << 16)) & 0x003fffff;
 			if (realpc == 0xf000)
 			{
 				address_space& mem = m_maincpu->space(AS_PROGRAM);
@@ -335,27 +386,116 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 				if (source >= 0x20000)
 				{
-					uint16_t data = m_spirom[((source - 0x20000)*2)+0] | (m_spirom[((source - 0x20000)*2)+1] << 8);
-					uint16_t data2 = m_spirom[((source - 0x20000)*2)+2] | (m_spirom[((source - 0x20000)*2)+3] << 8);
+					uint16_t data = m_spirom[((source - 0x20000) * 2) + 0] | (m_spirom[((source - 0x20000) * 2) + 1] << 8);
+					uint16_t data2 = m_spirom[((source - 0x20000) * 2) + 2] | (m_spirom[((source - 0x20000) * 2) + 3] << 8);
 
 					logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
 
 					mem.write_word(0x0004, data);
 					mem.write_word(0x0005, data2);
 				}
-				else
-				{
-					logerror("call to 0xf000 - invalid source %08x\n", source);
-				}
+
+				return 0x9a90; // retf
 			}
+			else if (realpc == 0xf58f)
+			{
+				logerror("call to 0xf58f - unknown function\n");
+				return 0x9a90; // retf
+			}
+			else if (realpc == 0xfb26) // done with a call, and also a pc =
+			{
+				logerror("call to 0xfb26 - unknown function\n");
+				return 0x9a90; // retf
+			}
+			else if (realpc == 0xf56f) // done with a pc =
+			{
+				logerror("call to 0xf56f - unknown function\n");
+				return 0x9a90; // retf
+			}
+			else
+			{
+				fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
+			}
+
 		}
 		else
 		{
-			fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
+			logerror("simulate_f000_r reading BIOS area (for checksum?) %04x\n", offset);
 		}
 	}
-	return 0x9a90; // retf
+	return 0x0000;
 }
+
+uint16_t pcp8718_state::ramcall_2060_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2060 in RAM (set SPI to read mode, set address, do dummy FIFO reads)\n");
+	}
+	return m_mainram[0x2060];
+}
+
+uint16_t pcp8718_state::ramcall_2189_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2189 in RAM (unknown)\n");
+	}
+	return m_mainram[0x2189];
+}
+
+
+uint16_t pcp8718_state::ramcall_2829_logger_r()
+{
+	// this in turn calls 28f7 but has restore logic too
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2829 in RAM (load+call function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
+	}
+	return m_mainram[0x2829];
+}
+
+
+
+
+uint16_t pcp8718_state::ramcall_287a_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x287a in RAM (unknown)\n");
+	}
+	return m_mainram[0x287a];
+}
+
+uint16_t pcp8718_state::ramcall_28f7_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		// no  restore logic?
+		logerror("call to 0x28f7 in RAM (load+GO TO function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
+	}
+	return m_mainram[0x28f7];
+}
+
+uint16_t pcp8718_state::ramcall_2079_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2079 in RAM (maybe drawing related?)\n"); // called in the 'dummy' loop that doesn't actually draw? and other places? as well as after the actual draw command below in the real loop
+	}
+	return m_mainram[0x2079];
+}
+
+uint16_t pcp8718_state::ramcall_2434_logger_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("call to 0x2434 in RAM (drawing related?)\n"); // [1d] as the tile / sprite number, [1e] as xpos, [1f] as ypos, [20] as 0. [21] as ff in some title drawing calls
+	}
+	return m_mainram[0x2434];
+}
+
+
 
 void pcp8718_state::machine_reset()
 {
@@ -365,17 +505,32 @@ void pcp8718_state::machine_reset()
 	m_maincpu->set_state_int(UNSP_SR, 0x0000);
 
 	//uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
-	//ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)	
+	//ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)
 
 	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
 	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
-	m_spistate = SPI_STATE_READING_OR_READY;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2060, 0x2060, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2060_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2189, 0x2189, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2189_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2434, 0x2434, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2434_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2829, 0x2829, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2829_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x287a, 0x287a, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_287a_logger_r)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_28f7_logger_r)));
+
+	m_spistate = SPI_STATE_READY;
 	m_spiaddress = 0;
 
 }
+
 
 void pcp8718_state::pcp8718(machine_config &config)
 {

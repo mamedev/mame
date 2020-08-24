@@ -312,7 +312,7 @@ static NETLIST_START(TTL_82S16_DIP)
 		A.DOUTQ, /*  DOUTQ |6           11| A7    */ A.A7,
 		   A.A4, /*     A4 |7           10| A6    */ A.A6,
 		  A.GND, /*    GND |8            9| A5    */ A.A5
-			     /*        +--------------+       */
+				 /*        +--------------+       */
 	)
 NETLIST_END()
 
@@ -414,8 +414,7 @@ NETLIST_END()
  *       A0 |8            9| GND
  *          +--------------+
  */
-
- static NETLIST_START(RAM_2102A_DIP)
+static NETLIST_START(RAM_2102A_DIP)
 	RAM_2102A(A)
 
 	DIPPINS(   /*      +--------------+      */
@@ -431,6 +430,27 @@ NETLIST_END()
 	)
 NETLIST_END()
 
+//FIXME: Documentation
+static NETLIST_START(ROM_TMS4800_DIP)
+	ROM_TMS4800(A)
+
+	DIPPINS(   /*       +----------------+     */
+		A.VSS, /*   VSS |1      ++     24| OE1 */ A.OE1,
+		A.A1,  /*    A1 |2             23| O1  */ A.O1,
+		A.A2,  /*    A2 |3             22| O2  */ A.O2,
+		A.A3,  /*    A3 |4   TMS-4800  21| O3  */ A.O3,
+		A.A4,  /*    A4 |5             20| O4  */ A.O4,
+		A.A5,  /*    A5 |6             19| O5  */ A.O5,
+		A.A6,  /*    A6 |7             18| O6  */ A.O6,
+		A.A10, /*   A10 |8             17| O7  */ A.O7,
+		A.VGG, /*   VGG |9             16| O8  */ A.O8,
+		A.A9,  /*    A9 |10            15| A11 */ A.A11,
+		A.A8,  /*    A8 |11            14| OE2 */ A.OE2,
+		A.A7,  /*    A7 |12            13| AR  */ A.AR
+		       /*       +----------------+      */
+	)
+NETLIST_END()
+
 
 NETLIST_START(roms_lib)
 
@@ -442,6 +462,6 @@ NETLIST_START(roms_lib)
 	LOCAL_LIB_ENTRY(PROM_82S115_DIP)
 	LOCAL_LIB_ENTRY(PROM_MK28000_DIP)
 	LOCAL_LIB_ENTRY(RAM_2102A_DIP)
-
+	LOCAL_LIB_ENTRY(ROM_TMS4800_DIP)
 	NETLIST_END()
 

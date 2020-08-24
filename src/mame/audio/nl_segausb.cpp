@@ -42,33 +42,33 @@ NETLIST_START(segausb)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 
-	ANALOG_INPUT(I_U12_DAC, 0)		// AD7524
-	ANALOG_INPUT(I_U13_DAC, 0)		// AD7524
-	ANALOG_INPUT(I_U14_DAC, 0)		// AD7524
-	TTL_INPUT(I_U2B_SEL, 0)			// 74LS74
+	ANALOG_INPUT(I_U12_DAC, 0)      // AD7524
+	ANALOG_INPUT(I_U13_DAC, 0)      // AD7524
+	ANALOG_INPUT(I_U14_DAC, 0)      // AD7524
+	TTL_INPUT(I_U2B_SEL, 0)         // 74LS74
 
-	ANALOG_INPUT(I_U24_DAC, 0)		// AD7524
-	ANALOG_INPUT(I_U25_DAC, 0)		// AD7524
-	ANALOG_INPUT(I_U26_DAC, 0)		// AD7524
-	TTL_INPUT(I_U38B_SEL, 0)		// 74LS74
+	ANALOG_INPUT(I_U24_DAC, 0)      // AD7524
+	ANALOG_INPUT(I_U25_DAC, 0)      // AD7524
+	ANALOG_INPUT(I_U26_DAC, 0)      // AD7524
+	TTL_INPUT(I_U38B_SEL, 0)        // 74LS74
 
-	ANALOG_INPUT(I_U27_DAC, 0)		// AD7524
-	ANALOG_INPUT(I_U28_DAC, 0)		// AD7524
-	ANALOG_INPUT(I_U29_DAC, 0)		// AD7524
-	TTL_INPUT(I_U2A_SEL, 0)			// 74LS74
+	ANALOG_INPUT(I_U27_DAC, 0)      // AD7524
+	ANALOG_INPUT(I_U28_DAC, 0)      // AD7524
+	ANALOG_INPUT(I_U29_DAC, 0)      // AD7524
+	TTL_INPUT(I_U2A_SEL, 0)         // 74LS74
 
 	NET_C(GND, I_U2B_SEL.GND, I_U38B_SEL.GND, I_U2A_SEL.GND)
 	NET_C(I_V5, I_U2B_SEL.VCC, I_U38B_SEL.VCC, I_U2A_SEL.VCC)
 
-	TTL_INPUT(I_U41_OUT0, 0)		// 8253 PIT U41
+	TTL_INPUT(I_U41_OUT0, 0)        // 8253 PIT U41
 	TTL_INPUT(I_U41_OUT1, 0)
 	TTL_INPUT(I_U41_OUT2, 0)
 
-	TTL_INPUT(I_U42_OUT0, 0)		// 8253 PIT U42
+	TTL_INPUT(I_U42_OUT0, 0)        // 8253 PIT U42
 	TTL_INPUT(I_U42_OUT1, 0)
 	TTL_INPUT(I_U42_OUT2, 0)
 
-	TTL_INPUT(I_U43_OUT0, 0)		// 8253 PIT U43
+	TTL_INPUT(I_U43_OUT0, 0)        // 8253 PIT U43
 	TTL_INPUT(I_U43_OUT1, 0)
 	TTL_INPUT(I_U43_OUT2, 0)
 
@@ -142,21 +142,21 @@ NETLIST_START(segausb)
 	RES(R64, RES_K(2.7))
 	RES(R65, RES_K(2.7))
 
-//	CAP(C6, CAP_P(100))
-//	CAP(C7, CAP_P(100))
-//	CAP(C8, CAP_P(100))
+//  CAP(C6, CAP_P(100))
+//  CAP(C7, CAP_P(100))
+//  CAP(C8, CAP_P(100))
 	CAP(C9, CAP_U(0.01))
 	CAP(C13, CAP_U(0.01))
 	CAP(C14, CAP_U(1))
 	CAP(C15, CAP_U(1))
 	CAP(C16, CAP_U(0.01))
 	CAP(C17, CAP_U(0.01))
-//	CAP(C19, CAP_P(100))
-//	CAP(C20, CAP_P(100))
-//	CAP(C21, CAP_P(100))
-//	CAP(C22, CAP_P(100))
-//	CAP(C23, CAP_P(100))
-//	CAP(C24, CAP_P(100))
+//  CAP(C19, CAP_P(100))
+//  CAP(C20, CAP_P(100))
+//  CAP(C21, CAP_P(100))
+//  CAP(C22, CAP_P(100))
+//  CAP(C23, CAP_P(100))
+//  CAP(C24, CAP_P(100))
 	CAP(C25, CAP_U(0.01))
 	CAP(C32, CAP_U(0.01))
 	CAP(C33, CAP_U(1))
@@ -170,143 +170,143 @@ NETLIST_START(segausb)
 	CAP(C55, CAP_U(0.15))
 	CAP(C56, CAP_U(0.15))
 
-//	TL082_DIP(U1)			// Op. Amp.
-//	NET_C(U1.7, I_V12)
-//	NET_C(U1.4, I_VM12)
+//  TL082_DIP(U1)           // Op. Amp.
+//  NET_C(U1.7, I_V12)
+//  NET_C(U1.4, I_VM12)
 
-//	TTL_74LS74(U2)			// Dual D-Type Positive Edge-Triggered Flip-Flop -- not emulated
-//	NET_C(U2.7, GND)
-//	NET_C(U2.14, I_V5)
+//  TTL_74LS74(U2)          // Dual D-Type Positive Edge-Triggered Flip-Flop -- not emulated
+//  NET_C(U2.7, GND)
+//  NET_C(U2.14, I_V5)
 
-	TL082_DIP(U3)			// Op. Amp.
+	TL082_DIP(U3)           // Op. Amp.
 	NET_C(U3.8, I_V12)
 	NET_C(U3.4, I_VM12)
 
-	TL082_DIP(U4)			// Op. Amp.
+	TL082_DIP(U4)           // Op. Amp.
 	NET_C(U4.8, I_V12)
 	NET_C(U4.4, I_VM12)
 
-	TL082_DIP(U5)			// Op. Amp.
+	TL082_DIP(U5)           // Op. Amp.
 	NET_C(U5.8, I_V12)
 	NET_C(U5.4, I_VM12)
 
-	TL082_DIP(U6)			// Op. Amp.
+	TL082_DIP(U6)           // Op. Amp.
 	NET_C(U6.8, I_V12)
 	NET_C(U6.4, I_VM12)
 
-	CD4053_DIP(U7)			// 3x analog demuxer
+	CD4053_DIP(U7)          // 3x analog demuxer
 	NET_C(U7.16, I_V5)
-	NET_C(U7.6, GND)		// INH
-	NET_C(U7.7, I_V12)		// VEE
+	NET_C(U7.6, GND)        // INH
+	NET_C(U7.7, I_V12)      // VEE
 	NET_C(U7.8, GND)
 
-	CD4053_DIP(U8)			// 3x analog demuxer
+	CD4053_DIP(U8)          // 3x analog demuxer
 	NET_C(U8.16, I_V5)
-	NET_C(U8.6, GND)		// INH
-	NET_C(U8.7, I_V12)		// VEE
+	NET_C(U8.6, GND)        // INH
+	NET_C(U8.7, I_V12)      // VEE
 	NET_C(U8.8, GND)
 
-	TL082_DIP(U9)			// Op. Amp.
+	TL082_DIP(U9)           // Op. Amp.
 	NET_C(U9.8, I_V12)
 	NET_C(U9.4, I_VM12)
 
-//	TTL_74LS139_DIP(U10)	// Dual 1-of-4 Decoder -- not emulated
+//  TTL_74LS139_DIP(U10)    // Dual 1-of-4 Decoder -- not emulated
 
-//	TTL_74LS139_DIP(U11)	// Dual 1-of-4 Decoder -- not emulated
+//  TTL_74LS139_DIP(U11)    // Dual 1-of-4 Decoder -- not emulated
 
-//	AD7524_DIP(U12)			// DAC -- not emulated
-//	NET_C(U12.3, GND)
-//	NET_C(U12.14, I_V5)
+//  AD7524_DIP(U12)         // DAC -- not emulated
+//  NET_C(U12.3, GND)
+//  NET_C(U12.14, I_V5)
 
-//	AD7524_DIP(U13)			// DAC -- not emulated
-//	NET_C(U12.3, GND)
-//	NET_C(U12.14, I_V5)
+//  AD7524_DIP(U13)         // DAC -- not emulated
+//  NET_C(U12.3, GND)
+//  NET_C(U12.14, I_V5)
 
-//	AD7524_DIP(U14)			// DAC -- not emulated
-//	NET_C(U12.3, GND)
-//	NET_C(U12.14, I_V5)
+//  AD7524_DIP(U14)         // DAC -- not emulated
+//  NET_C(U12.3, GND)
+//  NET_C(U12.14, I_V5)
 
-	CD4053_DIP(U15)			// 3x analog demuxer
+	CD4053_DIP(U15)         // 3x analog demuxer
 	NET_C(U15.16, I_V5)
-	NET_C(U15.6, GND)		// INH
-	NET_C(U15.7, I_V12)		// VEE
+	NET_C(U15.6, GND)       // INH
+	NET_C(U15.7, I_V12)     // VEE
 	NET_C(U15.8, GND)
 
-	CD4053_DIP(U16)			// 3x analog demuxer
+	CD4053_DIP(U16)         // 3x analog demuxer
 	NET_C(U16.16, I_V5)
-	NET_C(U16.6, GND)		// INH
-	NET_C(U16.7, I_V12)		// VEE
+	NET_C(U16.6, GND)       // INH
+	NET_C(U16.7, I_V12)     // VEE
 	NET_C(U16.8, GND)
 
-	TL082_DIP(U17)			// Op. Amp.
+	TL082_DIP(U17)          // Op. Amp.
 	NET_C(U17.8, I_V12)
 	NET_C(U17.4, I_VM12)
 
-	TL082_DIP(U18)			// Op. Amp.
+	TL082_DIP(U18)          // Op. Amp.
 	NET_C(U18.8, I_V12)
 	NET_C(U18.4, I_VM12)
 
-	TL082_DIP(U19)			// Op. Amp.
+	TL082_DIP(U19)          // Op. Amp.
 	NET_C(U19.8, I_V12)
 	NET_C(U19.4, I_VM12)
 
-	TL082_DIP(U20)			// Op. Amp.
+	TL082_DIP(U20)          // Op. Amp.
 	NET_C(U20.8, I_V12)
 	NET_C(U20.4, I_VM12)
 
-	TL082_DIP(U21)			// Op. Amp.
+	TL082_DIP(U21)          // Op. Amp.
 	NET_C(U21.8, I_V12)
 	NET_C(U21.4, I_VM12)
 
-	TL082_DIP(U22)			// Op. Amp.
+	TL082_DIP(U22)          // Op. Amp.
 	NET_C(U22.8, I_V12)
 	NET_C(U22.4, I_VM12)
 
-	TL082_DIP(U23)			// Op. Amp.
+	TL082_DIP(U23)          // Op. Amp.
 	NET_C(U23.8, I_V12)
 	NET_C(U23.4, I_VM12)
 
-//	AD7524_DIP(U24)			// DAC -- not emulated
-//	NET_C(U24.3, GND)
-//	NET_C(U24.14, I_V5)
+//  AD7524_DIP(U24)         // DAC -- not emulated
+//  NET_C(U24.3, GND)
+//  NET_C(U24.14, I_V5)
 
-//	AD7524_DIP(U25)			// DAC -- not emulated
-//	NET_C(U25.3, GND)
-//	NET_C(U25.14, I_V5)
+//  AD7524_DIP(U25)         // DAC -- not emulated
+//  NET_C(U25.3, GND)
+//  NET_C(U25.14, I_V5)
 
-//	AD7524_DIP(U26)			// DAC -- not emulated
-//	NET_C(U26.3, GND)
-//	NET_C(U26.14, I_V5)
+//  AD7524_DIP(U26)         // DAC -- not emulated
+//  NET_C(U26.3, GND)
+//  NET_C(U26.14, I_V5)
 
-//	AD7524_DIP(U27)			// DAC -- not emulated
-//	NET_C(U27.3, GND)
-//	NET_C(U27.14, I_V5)
+//  AD7524_DIP(U27)         // DAC -- not emulated
+//  NET_C(U27.3, GND)
+//  NET_C(U27.14, I_V5)
 
-//	AD7524_DIP(U28)			// DAC -- not emulated
-//	NET_C(U28.3, GND)
-//	NET_C(U28.14, I_V5)
+//  AD7524_DIP(U28)         // DAC -- not emulated
+//  NET_C(U28.3, GND)
+//  NET_C(U28.14, I_V5)
 
-//	AD7524_DIP(U29)			// DAC -- not emulated
-//	NET_C(U29.3, GND)
-//	NET_C(U29.14, I_V5)
+//  AD7524_DIP(U29)         // DAC -- not emulated
+//  NET_C(U29.3, GND)
+//  NET_C(U29.14, I_V5)
 
-	CD4053_DIP(U30)			// 3x analog demuxer
+	CD4053_DIP(U30)         // 3x analog demuxer
 	NET_C(U30.16, I_V5)
-	NET_C(U30.6, GND)		// INH
-	NET_C(U30.7, I_V12)		// VEE
+	NET_C(U30.6, GND)       // INH
+	NET_C(U30.7, I_V12)     // VEE
 	NET_C(U30.8, GND)
 
-	CD4053_DIP(U31)			// 3x analog demuxer
+	CD4053_DIP(U31)         // 3x analog demuxer
 	NET_C(U31.16, I_V5)
-	NET_C(U31.6, GND)		// INH
-	NET_C(U31.7, I_V12)		// VEE
+	NET_C(U31.6, GND)       // INH
+	NET_C(U31.7, I_V12)     // VEE
 	NET_C(U31.8, GND)
 
-//	TTL_74LS74(U38)			// Dual D-Type Positive Edge-Triggered Flip-Flop -- not emulated
-//	NET_C(U38.7, GND)
-//	NET_C(U38.14, I_V5)
+//  TTL_74LS74(U38)         // Dual D-Type Positive Edge-Triggered Flip-Flop -- not emulated
+//  NET_C(U38.7, GND)
+//  NET_C(U38.14, I_V5)
 
-	TL081_DIP(U49)			// Op. Amp.
+	TL081_DIP(U49)          // Op. Amp.
 	NET_C(U49.7, I_V12)
 	NET_C(U49.4, I_VM12)
 
@@ -533,12 +533,12 @@ NETLIST_START(segausb)
 	NET_C(GND, U15.2, U15.5, U16.2)
 	NET_C(GND, U30.2, U30.5, U31.2)
 /*
-	OPTIMIZE_FRONTIER(R48.1, RES_M(1), 50)
-	OPTIMIZE_FRONTIER(R49.1, RES_M(1), 50)
-	OPTIMIZE_FRONTIER(R18.1, RES_M(1), 50)
-	OPTIMIZE_FRONTIER(R19.1, RES_M(1), 50)
-	OPTIMIZE_FRONTIER(R34.1, RES_M(1), 50)
-	OPTIMIZE_FRONTIER(R35.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R48.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R49.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R18.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R19.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R34.1, RES_M(1), 50)
+    OPTIMIZE_FRONTIER(R35.1, RES_M(1), 50)
 */
 
 NETLIST_END()

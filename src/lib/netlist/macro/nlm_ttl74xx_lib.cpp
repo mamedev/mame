@@ -22,10 +22,10 @@
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7400_DIP)
-	TTL_7400_GATE(A)
-	TTL_7400_GATE(B)
-	TTL_7400_GATE(C)
-	TTL_7400_GATE(D)
+	TTL_7400_NAND(A)
+	TTL_7400_NAND(B)
+	TTL_7400_NAND(C)
+	TTL_7400_NAND(D)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
@@ -61,10 +61,10 @@ NETLIST_END()
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7402_DIP)
-	TTL_7402_GATE(A)
-	TTL_7402_GATE(B)
-	TTL_7402_GATE(C)
-	TTL_7402_GATE(D)
+	TTL_7402_NOR(A)
+	TTL_7402_NOR(B)
+	TTL_7402_NOR(C)
+	TTL_7402_NOR(D)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
@@ -98,12 +98,12 @@ NETLIST_END()
 //-         +---++---+
 //-
 static NETLIST_START(TTL_7404_DIP)
-	TTL_7404_GATE(A)
-	TTL_7404_GATE(B)
-	TTL_7404_GATE(C)
-	TTL_7404_GATE(D)
-	TTL_7404_GATE(E)
-	TTL_7404_GATE(F)
+	TTL_7404_INVERT(A)
+	TTL_7404_INVERT(B)
+	TTL_7404_INVERT(C)
+	TTL_7404_INVERT(D)
+	TTL_7404_INVERT(E)
+	TTL_7404_INVERT(F)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
@@ -221,10 +221,10 @@ NETLIST_END()
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7408_DIP)
-	TTL_7408_GATE(A)
-	TTL_7408_GATE(B)
-	TTL_7408_GATE(C)
-	TTL_7408_GATE(D)
+	TTL_7408_AND(A)
+	TTL_7408_AND(B)
+	TTL_7408_AND(C)
+	TTL_7408_AND(D)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
@@ -260,9 +260,9 @@ NETLIST_END()
 //-         +---+---+---++---+
 //-
 static NETLIST_START(TTL_7410_DIP)
-	TTL_7410_GATE(A)
-	TTL_7410_GATE(B)
-	TTL_7410_GATE(C)
+	TTL_7410_NAND(A)
+	TTL_7410_NAND(B)
+	TTL_7410_NAND(C)
 
 	NET_C(A.VCC, B.VCC, C.VCC)
 	NET_C(A.GND, B.GND, C.GND)
@@ -298,9 +298,9 @@ NETLIST_END()
 //-         +---+---+---++---+
 //-
 static NETLIST_START(TTL_7411_DIP)
-	TTL_7411_GATE(A)
-	TTL_7411_GATE(B)
-	TTL_7411_GATE(C)
+	TTL_7411_AND(A)
+	TTL_7411_AND(B)
+	TTL_7411_AND(C)
 
 	NET_C(A.VCC, B.VCC, C.VCC)
 	NET_C(A.GND, B.GND, C.GND)
@@ -457,8 +457,8 @@ NETLIST_END()
 //-         +---+---+---+---++---+
 //-
 static NETLIST_START(TTL_7420_DIP)
-	TTL_7420_GATE(A)
-	TTL_7420_GATE(B)
+	TTL_7420_NAND(A)
+	TTL_7420_NAND(B)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
@@ -496,8 +496,8 @@ NETLIST_END()
 //-         +---+---+---+---++---+
 //-
 static NETLIST_START(TTL_7421_DIP)
-	TTL_7421_GATE(A)
-	TTL_7421_GATE(B)
+	TTL_7421_AND(A)
+	TTL_7421_AND(B)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
@@ -538,8 +538,8 @@ NETLIST_END()
 //-         +---+---+---+---+---++---+
 //-
 static NETLIST_START(TTL_7425_DIP)
-	TTL_7425_GATE(A)
-	TTL_7425_GATE(B)
+	TTL_7425_NOR(A)
+	TTL_7425_NOR(B)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
@@ -577,9 +577,9 @@ NETLIST_END()
 //-         +---+---+---++---+
 //-
 static NETLIST_START(TTL_7427_DIP)
-	TTL_7427_GATE(A)
-	TTL_7427_GATE(B)
-	TTL_7427_GATE(C)
+	TTL_7427_NOR(A)
+	TTL_7427_NOR(B)
+	TTL_7427_NOR(C)
 
 	NET_C(A.VCC, B.VCC, C.VCC)
 	NET_C(A.GND, B.GND, C.GND)
@@ -619,7 +619,7 @@ NETLIST_END()
 //-         +---+---+---+---+---+---+---+---++---+
 //-
 static NETLIST_START(TTL_7430_DIP)
-	TTL_7430_GATE(A)
+	TTL_7430_NAND(A)
 	NC_PIN(NC)
 
 	DIPPINS(   /*       +--------------+      */
@@ -653,10 +653,10 @@ NETLIST_END()
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7432_DIP)
-	TTL_7432_GATE(A)
-	TTL_7432_GATE(B)
-	TTL_7432_GATE(C)
-	TTL_7432_GATE(D)
+	TTL_7432_OR(A)
+	TTL_7432_OR(B)
+	TTL_7432_OR(C)
+	TTL_7432_OR(D)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
@@ -693,10 +693,10 @@ NETLIST_END()
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7437_DIP)
-	TTL_7437_GATE(A)
-	TTL_7437_GATE(B)
-	TTL_7437_GATE(C)
-	TTL_7437_GATE(D)
+	TTL_7437_NAND(A)
+	TTL_7437_NAND(B)
+	TTL_7437_NAND(C)
+	TTL_7437_NAND(D)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
@@ -909,7 +909,7 @@ static NETLIST_START(TTL_7473_DIP)
 		 B.CLK, /*  CLK2 |5           10| K2   */ B.K,
 		B.CLRQ, /*  CLR2 |6            9| Q2   */ B.Q,
 		   B.J, /*    J2 |7            8| QQ2  */ B.QQ
-			    /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -952,7 +952,7 @@ static NETLIST_START(TTL_7473A_DIP)
 		 B.CLK, /*  CLK2 |5           10| K2   */ B.K,
 		B.CLRQ, /*  CLR2 |6            9| Q2   */ B.Q,
 		   B.J, /*    J2 |7            8| QQ2  */ B.QQ
-			    /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -995,7 +995,7 @@ static NETLIST_START(TTL_7474_DIP)
 		   A.Q, /*    Q1 |5           10| PR2   */ B.PREQ,
 		  A.QQ, /*   QQ1 |6            9| Q2    */ B.Q,
 		 A.GND, /*   GND |7            8| QQ2   */ B.QQ
-			    /*       +-------------+        */
+				/*       +-------------+        */
 	)
 NETLIST_END()
 
@@ -1179,7 +1179,7 @@ static NETLIST_START(TTL_7485_DIP)
 		A.EQOUT, /* EQOUT |6           11| B1   */ A.B1,
 		A.LTOUT, /* LTOUT |7           10| A0   */ A.A0,
 		  A.GND, /*   GND |8            9| B0   */ A.B0
-			     /*       +--------------+      */
+				 /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -1202,10 +1202,10 @@ NETLIST_END()
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7486_DIP)
-	TTL_7486_GATE(A)
-	TTL_7486_GATE(B)
-	TTL_7486_GATE(C)
-	TTL_7486_GATE(D)
+	TTL_7486_XOR(A)
+	TTL_7486_XOR(B)
+	TTL_7486_XOR(C)
+	TTL_7486_XOR(D)
 
 	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
 	NET_C(A.GND, B.GND, C.GND, D.GND)
@@ -1354,56 +1354,69 @@ NETLIST_END()
 	)
 NETLIST_END()
 
-//- Identifier: TTL_7493_DIP
-//- Title: DM7493A Binary Counter
-//- Description: These monolithic counters contains four
-//-   master-slave flip-flops and additional gating to provide
-//-   a divide-by-two counter and a three-stage binary counter
-//-   for which the count cycle length is divide-by-eight.
+//- Identifier:  TTL_7493_DIP
+//- Title: 7493 Binary Counters
+//- Description:
+//-   Each of these monolithic counters contains four master-slave
+//-   flip-flops and additional gating to provide a divide-by-two
+//-   counter and a three-stage binary counter for which the
+//-   count cycle length is divide-by-five for the 90A and divide-by-eight
+//-   for the 93A.
 //-
-//-   These counters have a gated zero reset.
+//-   All of these counters have a gated zero reset and the 90A
+//-   also has gated set-to-nine inputs for use in BCD nine’s complement
+//-   applications.
 //-
-//-   To use their maximum count length (four-bit binary), the B input is connected
-//-   to the QA output. The input count pulses are applied to
-//-   input A and the outputs are as described in the appropriate
-//-   truth table.
+//-   To use their maximum count length (decade or four-bit binary),
+//-   the B input is connected to the Q A output. The input count pulses
+//-   are applied to input A and the outputs are as described in the
+//-   appropriate truth table. A symmetrical divide-by-ten count can be
+//-   obtained from the 90A counters by connecting the Q D output to the
+//-   A input and applying the input count to the B input which gives
+//-   a divide-by-ten square wave at output Q A.
+//-
 //- Pinalias: B,R01,R02,NC,VCC,NC,NC,QC,QB,GND,QD,QA,NC,A
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations: Internal resistor network currently fixed to 5k
+//-      more limitations
+//- Example: ne555_astable.c,ne555_example
 //- FunctionTable:
 //-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006533.PDF
 //-
-//-                 Count Sequence
-//-         +-------++----+----+----+----+
-//-         | Count || QD | QC | QB | QA |
-//-         +=======++====+====+====+====+
-//-         |   0   ||  0 |  0 |  0 |  0 |
-//-         |   1   ||  0 |  0 |  0 |  1 |
-//-         |   2   ||  0 |  0 |  1 |  0 |
-//-         |   3   ||  0 |  0 |  1 |  1 |
-//-         |   4   ||  0 |  1 |  0 |  0 |
-//-         |   5   ||  0 |  1 |  0 |  1 |
-//-         |   6   ||  0 |  1 |  1 |  0 |
-//-         |   7   ||  0 |  1 |  1 |  1 |
-//-         |   8   ||  1 |  0 |  0 |  0 |
-//-         |   9   ||  1 |  0 |  0 |  1 |
-//-         |  10   ||  1 |  0 |  1 |  0 |
-//-         |  11   ||  1 |  0 |  1 |  1 |
-//-         |  12   ||  1 |  1 |  0 |  0 |
-//-         |  13   ||  1 |  1 |  0 |  1 |
-//-         |  14   ||  1 |  1 |  1 |  0 |
-//-         |  15   ||  1 |  1 |  1 |  1 |
-//-         +-------++----+----+----+----+
+//-    Counter Sequence
 //-
-//-             Reset/Count Function Table
-//-         +-----+-----++----+----+----+----+
-//-         | R01 | R02 || QD | QC | QB | QA |
-//-         +=====+=====++====+====+====+====+
-//-         |  1  |  1  ||  0 |  0 |  0 |  0 |
-//-         |  0  |  X  ||       COUNT       |
-//-         |  X  |  0  ||       COUNT       |
-//-         +-----+-----++----+----+----+----+
+//-    | COUNT || QD | QC | QB | QA |
+//-    |------:||:--:|:--:|:--:|:--:|
+//-    |    0  ||  0 |  0 |  0 |  0 |
+//-    |    1  ||  0 |  0 |  0 |  1 |
+//-    |    2  ||  0 |  0 |  1 |  0 |
+//-    |    3  ||  0 |  0 |  1 |  1 |
+//-    |    4  ||  0 |  1 |  0 |  0 |
+//-    |    5  ||  0 |  1 |  0 |  1 |
+//-    |    6  ||  0 |  1 |  1 |  0 |
+//-    |    7  ||  0 |  1 |  1 |  1 |
+//-    |    8  ||  1 |  0 |  0 |  0 |
+//-    |    9  ||  1 |  0 |  0 |  1 |
+//-    |   10  ||  1 |  0 |  1 |  0 |
+//-    |   11  ||  1 |  0 |  1 |  1 |
+//-    |   12  ||  1 |  1 |  0 |  0 |
+//-    |   13  ||  1 |  1 |  0 |  1 |
+//-    |   14  ||  1 |  1 |  1 |  0 |
+//-    |   15  ||  1 |  1 |  1 |  1 |
 //-
+//-    Note C Output QA is connected to input B
+//-
+//-    Reset Count Function table
+//-
+//-    | R01 | R02 | QD | QC | QB | QA |
+//-    |:---:|:---:|:--:|:--:|:--:|:--:|
+//-    |  1  |  1  |  0 |  0 |  0 |  0 |
+//-    |  0  |  X  |       COUNT       ||||
+//-    |  X  |  0  |       COUNT       ||||
+//-
+//-
+
  static NETLIST_START(TTL_7493_DIP)
 	TTL_7493(A)
 	NC_PIN(NC)
@@ -1416,7 +1429,7 @@ NETLIST_END()
 		 A.VCC, /*  VCC |5           10| GND  */ A.GND,
 		  NC.I, /*   NC |6            9| QB   */ A.QB,
 		  NC.I, /*   NC |7            8| QC   */ A.QC
-		 	    /*      +--------------+      */
+				/*      +--------------+      */
 	)
 NETLIST_END()
 
@@ -1437,15 +1450,15 @@ static NETLIST_START(TTL_7497_DIP)
 	TTL_7497(A)
 
 	DIPPINS(      /*       +--------------+ */
-		    A.B1, /*    S1 |1     ++    16| VCC   */ A.VCC,
-		    A.B4, /*    S4 |2           15| S3    */ A.B3,
-		    A.B5, /*    S5 |3           14| S2    */ A.B2,
-		    A.B0, /*    S0 |4    7497   13| MR    */ A.CLR,
-		    A.ZQ, /*    ZQ |5           12| EY    */ A.UNITYQ,
-		     A.Y, /*     Y |6           11| CEQ   */ A.ENQ,
+			A.B1, /*    S1 |1     ++    16| VCC   */ A.VCC,
+			A.B4, /*    S4 |2           15| S3    */ A.B3,
+			A.B5, /*    S5 |3           14| S2    */ A.B2,
+			A.B0, /*    S0 |4    7497   13| MR    */ A.CLR,
+			A.ZQ, /*    ZQ |5           12| EY    */ A.UNITYQ,
+			 A.Y, /*     Y |6           11| CEQ   */ A.ENQ,
 		A.ENOUTQ, /*   TCQ |7           10| EZQ   */ A.STRBQ,
 		   A.GND, /*   GND |8            9| CP    */ A.CLK
-			      /*       +--------------+       */
+				  /*       +--------------+       */
 	)
 NETLIST_END()
 
@@ -1572,7 +1585,7 @@ static NETLIST_START(TTL_74113_DIP)
 		   A.Q, /*    Q1 |5           10| PRQ2  */ B.SETQ,
 		  A.QQ, /*   QQ1 |6            9| Q2    */ B.Q,
 		 A.GND, /*   GND |7            8| QQ2   */ B.QQ
-			    /*       +--------------+       */
+				/*       +--------------+       */
 	)
 NETLIST_END()
 
@@ -1615,7 +1628,7 @@ static NETLIST_START(TTL_74113A_DIP)
 		   A.Q, /*    Q1 |5           10| PRQ2  */ B.SETQ,
 		  A.QQ, /*   QQ1 |6            9| Q2    */ B.Q,
 		 A.GND, /*   GND |7            8| QQ2   */ B.QQ
-			    /*       +--------------+       */
+				/*       +--------------+       */
 	)
 NETLIST_END()
 
@@ -1663,7 +1676,7 @@ static NETLIST_START(TTL_74121_DIP)
 		   A.B, /*     B |5           10| CEXT      */ A.C,
 		   A.Q, /*     Q |6            9| RINT      */ RINT.1,
 		 A.GND, /*   GND |7            8| NC        */ NC.I
-			    /*       +--------------+           */
+				/*       +--------------+           */
 	)
 NETLIST_END()
 
@@ -1702,15 +1715,15 @@ static NETLIST_START(TTL_74123_DIP)
 	NET_C(A.GND, B.GND)
 
 	DIPPINS(      /*       +--------------+ */
-		     A.A, /*    A1 |1     ++    16| VCC   */ A.VCC,
-		     A.B, /*    B1 |2           15| RC1   */ A.RC,
+			 A.A, /*    A1 |1     ++    16| VCC   */ A.VCC,
+			 A.B, /*    B1 |2           15| RC1   */ A.RC,
 		  A.CLRQ, /* CLRQ1 |3           14| C1    */ A.C,
-		    A.QQ, /*   QQ1 |4   74123   13| Q1    */ A.Q,
-		     B.Q, /*    Q2 |5           12| QQ2   */ B.QQ,
-		     B.C, /*    C2 |6           11| CLRQ  */ B.CLRQ,
-		    B.RC, /*   RC2 |7           10| B2    */ B.B,
+			A.QQ, /*   QQ1 |4   74123   13| Q1    */ A.Q,
+			 B.Q, /*    Q2 |5           12| QQ2   */ B.QQ,
+			 B.C, /*    C2 |6           11| CLRQ  */ B.CLRQ,
+			B.RC, /*   RC2 |7           10| B2    */ B.B,
 		   A.GND, /*   GND |8            9| A2    */ B.A
-			      /*       +--------------+       */
+				  /*       +--------------+       */
 	)
 NETLIST_END()
 
@@ -2124,7 +2137,7 @@ static NETLIST_START(TTL_74161_DIP)
 		   A.D, /*        D |6           11| QD       */ A.QD,
 		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
 		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
-			    /*          +--------------+          */
+				/*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -2166,7 +2179,7 @@ static NETLIST_START(TTL_74163_DIP)
 		   A.D, /*        D |6           11| QD       */ A.QD,
 		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
 		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
-			    /*          +--------------+          */
+				/*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -2205,7 +2218,7 @@ static NETLIST_START(TTL_74164_DIP)
 		  A.QC, /*  QC |5           10| QE   */ A.QE,
 		  A.QD, /*  QD |6            9| CLRQ */ A.CLRQ,
 		 A.GND, /* GND |7            8| CLK  */ A.CLK
-			    /*     +--------------+      */
+				/*     +--------------+      */
 	)
 NETLIST_END()
 
@@ -2237,13 +2250,13 @@ static NETLIST_START(TTL_74165_DIP)
 	DIPPINS(      /*      +--------------+      */
 		A.SH_LDQ, /*  PLQ |1     ++    16| VCC  */ A.VCC,
 		   A.CLK, /*  CP1 |2           15| CP2  */ A.CLKINH,
-		     A.E, /*   P4 |3           14| P3   */ A.D,
-		     A.F, /*   P5 |4    74165  13| P2   */ A.C,
-		     A.G, /*   P6 |5           12| P1   */ A.B,
-		     A.H, /*   P7 |6           11| P0   */ A.A,
+			 A.E, /*   P4 |3           14| P3   */ A.D,
+			 A.F, /*   P5 |4    74165  13| P2   */ A.C,
+			 A.G, /*   P6 |5           12| P1   */ A.B,
+			 A.H, /*   P7 |6           11| P0   */ A.A,
 		   A.QHQ, /*  QQ7 |7           10| DS   */ A.SER,
 		   A.GND, /*  GND |8            9| Q7   */ A.QH
-			      /*      +--------------+      */
+				  /*      +--------------+      */
 	)
 NETLIST_END()
 
@@ -2282,14 +2295,14 @@ static NETLIST_START(TTL_74166_DIP)
 
 	DIPPINS(      /*        +--------------+        */
 		   A.SER, /*    SER |1     ++    16| VCC    */ A.VCC,
-		     A.A, /*      A |2           15| SH/LDQ */ A.SH_LDQ,
-		     A.B, /*      B |3           14| H      */ A.H,
-		     A.C, /*      C |4    74166  13| QH     */ A.QH,
-		     A.D, /*      D |5           12| G      */ A.G,
+			 A.A, /*      A |2           15| SH/LDQ */ A.SH_LDQ,
+			 A.B, /*      B |3           14| H      */ A.H,
+			 A.C, /*      C |4    74166  13| QH     */ A.QH,
+			 A.D, /*      D |5           12| G      */ A.G,
 		A.CLKINH, /* CLKINH |6           11| F      */ A.F,
 		   A.CLK, /*    CLK |7           10| E      */ A.E,
 		   A.GND, /*    GND |8            9| CLRQ   */ A.CLRQ
-			      /*        +--------------+        */
+				  /*        +--------------+        */
 	)
 NETLIST_END()
 
@@ -2316,12 +2329,12 @@ NETLIST_END()
 //-     +------+-----+---++---+
 //-
 static NETLIST_START(TTL_74174_DIP)
-	TTL_74174_GATE(A)
-	TTL_74174_GATE(B)
-	TTL_74174_GATE(C)
-	TTL_74174_GATE(D)
-	TTL_74174_GATE(E)
-	TTL_74174_GATE(F)
+	TTL_74174(A)
+	TTL_74174(B)
+	TTL_74174(C)
+	TTL_74174(D)
+	TTL_74174(E)
+	TTL_74174(F)
 
 	DIPPINS(    /*      +--------------+      */
 		A.CLRQ, /* CLRQ |1     ++    16| VCC  */ A.VCC,
@@ -2332,7 +2345,75 @@ static NETLIST_START(TTL_74174_DIP)
 		   C.D, /*   D3 |6           11| D4   */ D.D,
 		   C.Q, /*   Q3 |7           10| Q4   */ D.Q,
 		 A.GND, /*  GND |8            9| CLK  */ A.CLK
-			    /*      +--------------+      */
+				/*      +--------------+      */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74175_DIP)
+	TTL_74175(A)
+
+	DIPPINS(    /*      +--------------+      */
+		A.CLRQ, /* CLRQ |1     ++    16| VCC  */ A.VCC,
+		A.Q1,   /*   Q1 |2           15| Q4   */ A.Q4,
+		A.Q1Q,  /*  Q1Q |3           14| Q4Q  */ A.Q4Q,
+		A.D1,   /*   D1 |4   74175   13| D4   */ A.D4,
+		A.D2,   /*   D2 |5           12| D3   */ A.D3,
+		A.Q2Q,  /*  Q2Q |6           11| Q3Q  */ A.Q3Q,
+		A.Q2,   /*   Q2 |7           10| Q3   */ A.Q3,
+		A.GND,  /*  GND |8            9| CLK  */ A.CLK
+				/*      +--------------+   */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74192_DIP)
+	TTL_74192(A)
+
+	DIPPINS(    /*      +--------------+        */
+		A.B,    /*    B |1     ++    16| VCC    */ A.VCC,
+		A.QB,   /*   QB |2           15| A      */ A.A,
+		A.QA,   /*   QA |3           14| CLEAR  */ A.CLEAR,
+		A.CD,   /*   CD |4    74192  13| BORROWQ*/ A.BORROWQ,
+		A.CU,   /*   CU |5           12| CARRYQ */ A.CARRYQ,
+		A.QC,   /*   QC |6           11| LOADQ  */ A.LOADQ,
+		A.QD,   /*   QD |7           10| C      */ A.C,
+		A.GND,  /*  GND |8            9| D      */ A.D
+				/*      +--------------+        */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74193_DIP)
+	TTL_74193(A)
+
+	DIPPINS(    /*      +--------------+        */
+		A.B,    /*    B |1     ++    16| VCC    */ A.VCC,
+		A.QB,   /*   QB |2           15| A      */ A.A,
+		A.QA,   /*   QA |3           14| CLEAR  */ A.CLEAR,
+		A.CD,   /*   CD |4    74192  13| BORROWQ*/ A.BORROWQ,
+		A.CU,   /*   CU |5           12| CARRYQ */ A.CARRYQ,
+		A.QC,   /*   QC |6           11| LOADQ  */ A.LOADQ,
+		A.QD,   /*   QD |7           10| C      */ A.C,
+		A.GND,  /*  GND |8            9| D      */ A.D
+				/*      +--------------+        */
+	)
+NETLIST_END()
+
+//FIXME: add documentation
+static NETLIST_START(TTL_74194_DIP)
+	TTL_74194(A)
+
+	DIPPINS(    /*        +--------------+     */
+		A.CLRQ, /*   CLRQ |1     ++    16| VCC */ A.VCC,
+		A.SRIN, /*   SRIN |2           15| QA  */ A.QA,
+		A.A,    /*      A |3           14| QB  */ A.QB,
+		A.B,    /*      B |4    74194  13| QC  */ A.QC,
+		A.C,    /*      C |5           12| QD  */ A.QD,
+		A.D,    /*      D |6           11| CLK */ A.CLK,
+		A.SLIN, /*   SLIN |7           10| S1  */ A.S1,
+		A.GND,  /*    GND |8            9| S0  */ A.S0
+				/*        +--------------+     */
 	)
 NETLIST_END()
 
@@ -2357,8 +2438,8 @@ NETLIST_END()
 //-     +---+---+---+---+---++---+
 //-
 static NETLIST_START(TTL_74260_DIP)
-	TTL_74260_GATE(A)
-	TTL_74260_GATE(B)
+	TTL_74260_NOR(A)
+	TTL_74260_NOR(B)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
@@ -2430,6 +2511,23 @@ static NETLIST_START(TTL_74279_DIP)
 		  B.Q, /*   2Q |7           10| 3RQ  */ C.R,
 		A.GND, /*  GND |8            9| 3Q   */ C.Q
 			   /*      +--------------+      */
+	)
+NETLIST_END()
+
+// FIXME: Documentation
+static NETLIST_START(TTL_74365_DIP)
+	TTL_74365(A)
+
+	DIPPINS(   /*      +--------------+     */
+		A.G1Q, /*  G1Q |1     ++    16| VCC */ A.VCC,
+		A.A1,  /*   A1 |2           15| G2Q */ A.G2Q,
+		A.Y1,  /*   Y1 |3           14| A6  */ A.A6,
+		A.A2,  /*   A2 |4    74365  13| Y6  */ A.Y6,
+		A.Y2,  /*   Y2 |5           12| A5  */ A.A5,
+		A.A3,  /*   A3 |6           11| Y5  */ A.Y5,
+		A.Y3,  /*   Y3 |7           10| A4  */ A.A4,
+		A.GND, /*  GND |8            9| Y4  */ A.Y4
+			   /*      +--------------+     */
 	)
 NETLIST_END()
 
@@ -2716,7 +2814,7 @@ static NETLIST_START(TTL_9310_DIP)
 		   A.D, /*        D |6           11| QD       */ A.QD,
 		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
 		 A.GND, /*      GND |8            9| /LOAD    */ A.LOADQ
-			    /*          +--------------+          */
+				/*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -2763,6 +2861,23 @@ static NETLIST_START(TTL_9312_DIP)
 		 A.D6, /*  D6 |7           10| G   */ A.G, //Strobe
 		A.GND, /* GND |8            9| D7  */ A.D7
 			   /*     +--------------+     */
+	)
+NETLIST_END()
+
+// FIXME: Documenation
+static NETLIST_START(TTL_9314_DIP)
+	TTL_9314(A)
+
+	DIPPINS(   /*       +--------------+     */
+		A.EQ,  /*    /E |1     ++    16| VCC */ A.VCC,
+		A.S0Q, /*   /S0 |2           15| Q0  */ A.Q0,
+		A.D0,  /*    D0 |3           14| /S1 */ A.S1Q,
+		A.D1,  /*    D1 |4   DM9314  13| Q1  */ A.Q1,
+		A.S2Q, /*   /S2 |5           12| Q2  */ A.Q2,
+		A.D2,  /*    D2 |6           11| /S3 */ A.S3Q,
+		A.D3,  /*    D3 |7           10| Q3  */ A.Q3,
+		A.GND, /*   GND |8            9| /MR */ A.MRQ
+		       /*       +--------------+     */
 	)
 NETLIST_END()
 
@@ -2827,7 +2942,7 @@ static NETLIST_START(TTL_9316_DIP)
 		   A.D, /*        D |6           11| QD       */ A.QD,
 		 A.ENP, /* Enable P |7           10| Enable T */ A.ENT,
 		 A.GND, /*      GND |8            9| LOADQ    */ A.LOADQ
-			    /*          +--------------+          */
+				/*          +--------------+          */
 	)
 NETLIST_END()
 
@@ -2846,26 +2961,18 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006606.PDF
 //-
 static NETLIST_START(TTL_9322_DIP)
-	TTL_9322_GATE(A)
-	TTL_9322_GATE(B)
-	TTL_9322_GATE(C)
-	TTL_9322_GATE(D)
-
-	NET_C(A.SELECT, B.SELECT, C.SELECT, D.SELECT)
-	NET_C(A.STROBE, B.STROBE, C.STROBE, D.STROBE)
-	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
-	NET_C(A.GND, B.GND, C.GND, D.GND)
+	TTL_9322(A)
 
 	DIPPINS(      /*        +--------------+        */
-		A.SELECT, /* SELECT |1     ++    16| VCC    */ A.VCC,
-		     A.A, /*     A1 |2           15| STROBE */ A.STROBE,
-		     A.B, /*     B1 |3           14| A4     */ D.A,
-		     A.Y, /*     Y1 |4    9322   13| B4     */ D.B,
-		     B.A, /*     A2 |5           12| Y4     */ D.Y,
-		     B.B, /*     B2 |6           11| A3     */ C.A,
-		     B.Y, /*     Y2 |7           10| B3     */ C.B,
-		   A.GND, /*    GND |8            9| Y3     */ C.Y
-			      /*        +--------------+        */
+		 A.SELECT, /* SELECT |1     ++    16| VCC    */ A.VCC,
+			 A.A1, /*     A1 |2           15| STROBE */ A.STROBE,
+			 A.B1, /*     B1 |3           14| A4     */ A.A4,
+			 A.Y1, /*     Y1 |4    9322   13| B4     */ A.B4,
+			 A.A2, /*     A2 |5           12| Y4     */ A.Y4,
+			 A.B2, /*     B2 |6           11| A3     */ A.A3,
+			 A.Y2, /*     Y2 |7           10| B3     */ A.B3,
+			A.GND, /*    GND |8            9| Y3     */ A.Y3
+				  /*        +--------------+        */
 	)
 NETLIST_END()
 
@@ -2876,22 +2983,40 @@ NETLIST_END()
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //-
 static NETLIST_START(TTL_9321_DIP)
-	TTL_9321_GATE(A)
-	TTL_9321_GATE(B)
+	TTL_9321(A)
+	TTL_9321(B)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
 
 	DIPPINS(      /*        +--------------+        */
-		     A.E, /*     /E |1     ++    16| VCC    */ A.VCC,
-		    A.A0, /*     A0 |2           15| /E     */ B.E,
-		    A.A1, /*     A1 |3           14| A0     */ B.A0,
-		    A.D0, /*    /D0 |4    9321   13| A1     */ B.A1,
-		    A.D1, /*    /D1 |5           12| /D0    */ B.D0,
-		    A.D2, /*    /D2 |6           11| /D1    */ B.D1,
-		    A.D3, /*    /D3 |7           10| /D2    */ B.D2,
+			 A.E, /*     /E |1     ++    16| VCC    */ A.VCC,
+			A.A0, /*     A0 |2           15| /E     */ B.E,
+			A.A1, /*     A1 |3           14| A0     */ B.A0,
+			A.D0, /*    /D0 |4    9321   13| A1     */ B.A1,
+			A.D1, /*    /D1 |5           12| /D0    */ B.D0,
+			A.D2, /*    /D2 |6           11| /D1    */ B.D1,
+			A.D3, /*    /D3 |7           10| /D2    */ B.D2,
 		   A.GND, /*    GND |8            9| /D3    */ B.D3
-			      /*        +--------------+        */
+				  /*        +--------------+        */
+	)
+NETLIST_END()
+
+
+//FIXME: Documenation
+static NETLIST_START(TTL_9334_DIP)
+	TTL_9334(A)
+
+	DIPPINS(/*       +--------------+     */
+		A.A0, /*    A0 |1     ++    16| VCC */ A.VCC,
+		A.A1, /*    A1 |2           15| /C  */ A.CQ,
+		A.A2, /*    A2 |3           14| /E  */ A.EQ,
+		A.Q0, /*    Q0 |4   DM9334  13| D   */ A.D,
+		A.Q1, /*    Q1 |5           12| Q7  */ A.Q7,
+		A.Q2, /*    Q2 |6           11| Q6  */ A.Q6,
+		A.Q3, /*    Q3 |7           10| Q5  */ A.Q5,
+		A.GND,/*   GND |8            9| Q4  */ A.Q4
+		      /*       +--------------+     */
 	)
 NETLIST_END()
 
@@ -2940,7 +3065,41 @@ static NETLIST_START(TTL_9602_DIP)
 		   A.Q, /*    Q1 |6           11| A2    */ B.A,
 		  A.QQ, /*   QQ1 |7           10| Q2    */ B.Q,
 		 A.GND, /*   GND |8            9| QQ2   */ B.QQ
-			    /*       +--------------+       */
+				/*       +--------------+       */
+	)
+NETLIST_END()
+
+// FIXME: Documentation and naming
+static NETLIST_START(TTL_8277_DIP)
+	TTL_8277(A)
+
+	DIPPINS(     /*       +--------------+      */
+		A.RESET, /* RESET |1     ++    16| VCC  */ A.VCC,
+		A.Q7QA,  /*  /Q7A |2           15| /Q7B */ A.Q7QB,
+		A.Q7A,   /*   Q7A |3           14| Q7B  */ A.Q7B,
+		A.DSA,   /*   DSA |4    8277   13| DSB  */ A.DSB,
+		A.D1A,   /*   D1A |5           12| D1B  */ A.D1B,
+		A.D0A,   /*   D0A |6           11| D0B  */ A.D0B,
+		A.CLKA,  /*  CLKA |7           10| CLKB */ A.CLKB,
+		A.GND,   /*   GND |8            9| CLK  */ A.CLK
+		         /*       +--------------+       */
+	)
+NETLIST_END()
+
+// FIXME: Documentation, add model, seems to be a CMOS device
+static NETLIST_START(TTL_AM2847_DIP)
+	TTL_AM2847(A)
+
+	DIPPINS(    /*       +--------------+      */
+		A.OUTA, /*  OUTA |1     ++    16| VSS  */ A.VSS,
+		A.RCA,  /*   RCA |2           15| IND  */ A.IND,
+		A.INA,  /*   INA |3           14| RCD  */ A.RCD,
+		A.OUTB, /*  OUTB |4   Am2847  13| OUTD */ A.OUTD,
+		A.RCB,  /*   RCB |5           12| VGG  */ A.VGG,
+		A.INB,  /*   INB |6           11| CP   */ A.CP,
+		A.OUTC, /*  OUTC |7           10| INC  */ A.INC,
+		A.VDD,  /*   VDD |8            9| RCC  */ A.RCC
+		        /*       +--------------+      */
 	)
 NETLIST_END()
 
@@ -2952,14 +3111,6 @@ NETLIST_START(ttl74xx_lib)
 	//NET_MODEL("DM7414 FAMILY(IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.05 ORL=10.0 ORH=1.0e8)")
 
 
-	TRUTHTABLE_START(TTL_7400_GATE, 2, 1, "")
-		TT_HEAD("A,B|Q ")
-		TT_LINE("0,X|1|22")
-		TT_LINE("X,0|1|22")
-		TT_LINE("1,1|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
 	TRUTHTABLE_START(TTL_7400_NAND, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,X|1|22")
@@ -2968,26 +3119,11 @@ NETLIST_START(ttl74xx_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7402_GATE, 2, 1, "")
-		TT_HEAD("A,B|Q ")
-		TT_LINE("0,0|1|22")
-		TT_LINE("X,1|0|15")
-		TT_LINE("1,X|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
 	TRUTHTABLE_START(TTL_7402_NOR, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,0|1|22")
 		TT_LINE("X,1|0|15")
 		TT_LINE("1,X|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
-	TRUTHTABLE_START(TTL_7404_GATE, 1, 1, "")
-		TT_HEAD(" A | Q ")
-		TT_LINE(" 0 | 1 |22")
-		TT_LINE(" 1 | 0 |15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
@@ -3074,16 +3210,6 @@ NETLIST_START(ttl74xx_lib)
 		TT_FAMILY("74XXOC")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7420_GATE, 4, 1, "")
-		TT_HEAD("A,B,C,D|Q ")
-		TT_LINE("0,X,X,X|1|22")
-		TT_LINE("X,0,X,X|1|22")
-		TT_LINE("X,X,0,X|1|22")
-		TT_LINE("X,X,X,0|1|22")
-		TT_LINE("1,1,1,1|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
 	TRUTHTABLE_START(TTL_7420_NAND, 4, 1, "+A,+B,+C,+D,@VCC,@GND")
 		TT_HEAD("A,B,C,D|Q ")
 		TT_LINE("0,X,X,X|1|22")
@@ -3091,16 +3217,6 @@ NETLIST_START(ttl74xx_lib)
 		TT_LINE("X,X,0,X|1|22")
 		TT_LINE("X,X,X,0|1|22")
 		TT_LINE("1,1,1,1|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
-	TRUTHTABLE_START(TTL_7421_GATE, 4, 1, "")
-		TT_HEAD("A,B,C,D|Q ")
-		TT_LINE("0,X,X,X|0|22")
-		TT_LINE("X,0,X,X|0|22")
-		TT_LINE("X,X,0,X|0|22")
-		TT_LINE("X,X,X,0|0|22")
-		TT_LINE("1,1,1,1|1|15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
@@ -3114,16 +3230,6 @@ NETLIST_START(ttl74xx_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7425_GATE, 4, 1, "")
-		TT_HEAD("A,B,C,D|Q ")
-		TT_LINE("1,X,X,X|0|15")
-		TT_LINE("X,1,X,X|0|15")
-		TT_LINE("X,X,1,X|0|15")
-		TT_LINE("X,X,X,1|0|15")
-		TT_LINE("0,0,0,0|1|22")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
 	TRUTHTABLE_START(TTL_7425_NOR, 4, 1, "+A,+B,+C,+D,@VCC,@GND")
 		TT_HEAD("A,B,C,D|Q ")
 		TT_LINE("1,X,X,X|0|15")
@@ -3134,35 +3240,12 @@ NETLIST_START(ttl74xx_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7427_GATE, 3, 1, "")
-		TT_HEAD("A,B,C|Q ")
-		TT_LINE("1,X,X|0|15")
-		TT_LINE("X,1,X|0|15")
-		TT_LINE("X,X,1|0|15")
-		TT_LINE("0,0,0|1|22")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
 	TRUTHTABLE_START(TTL_7427_NOR, 3, 1, "+A,+B,+C,@VCC,@GND")
 		TT_HEAD("A,B,C|Q ")
 		TT_LINE("1,X,X|0|15")
 		TT_LINE("X,1,X|0|15")
 		TT_LINE("X,X,1|0|15")
 		TT_LINE("0,0,0|1|22")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
-	TRUTHTABLE_START(TTL_7430_GATE, 8, 1, "")
-		TT_HEAD("A,B,C,D,E,F,G,H|Q ")
-		TT_LINE("0,X,X,X,X,X,X,X|1|22")
-		TT_LINE("X,0,X,X,X,X,X,X|1|22")
-		TT_LINE("X,X,0,X,X,X,X,X|1|22")
-		TT_LINE("X,X,X,0,X,X,X,X|1|22")
-		TT_LINE("X,X,X,X,0,X,X,X|1|22")
-		TT_LINE("X,X,X,X,X,0,X,X|1|22")
-		TT_LINE("X,X,X,X,X,X,0,X|1|22")
-		TT_LINE("X,X,X,X,X,X,X,0|1|22")
-		TT_LINE("1,1,1,1,1,1,1,1|0|15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
@@ -3180,31 +3263,11 @@ NETLIST_START(ttl74xx_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-	TRUTHTABLE_START(TTL_7432_GATE, 2, 1, "")
-		TT_HEAD("A,B|Q ")
-		TT_LINE("1,X|1|22")
-		TT_LINE("X,1|1|22")
-		TT_LINE("0,0|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
 	TRUTHTABLE_START(TTL_7432_OR, 2, 1, "+A,+B,@VCC,@GND")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("1,X|1|22")
 		TT_LINE("X,1|1|22")
 		TT_LINE("0,0|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
-	/*  FIXME: Same as 7400, but drains higher output currents.
-	 *         Netlist currently does not model over currents (should it ever?)
-	 */
-
-	TRUTHTABLE_START(TTL_7437_GATE, 2, 1, "")
-		TT_HEAD("A,B|Q ")
-		TT_LINE("0,X|1|22")
-		TT_LINE("X,0|1|22")
-		TT_LINE("1,1|0|15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
@@ -3224,19 +3287,14 @@ NETLIST_START(ttl74xx_lib)
 		TT_LINE("1,1,X,X|1,1,1,1,1,1,1,1,1,1|30,30,30,30,30,30,30,30,30,30")
 	TRUTHTABLE_END()
 
+	/*  FIXME: Same as 7400, but drains higher output currents.
+	 *         Netlist currently does not model over currents (should it ever?)
+	 */
+
 	TRUTHTABLE_START(TTL_7437_NAND, 2, 1, "+A,+B")
 		TT_HEAD("A,B|Q ")
 		TT_LINE("0,X|1|22")
 		TT_LINE("X,0|1|22")
-		TT_LINE("1,1|0|15")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
-	TRUTHTABLE_START(TTL_7486_GATE, 2, 1, "")
-		TT_HEAD("A,B|Q ")
-		TT_LINE("0,0|0|15")
-		TT_LINE("0,1|1|22")
-		TT_LINE("1,0|1|22")
 		TT_LINE("1,1|0|15")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
@@ -3312,17 +3370,6 @@ NETLIST_START(ttl74xx_lib)
 		TT_LINE("0,1,X,1|1|14")
 		TT_LINE("0,0,0,X|0|14")
 		TT_LINE("0,0,1,X|1|14")
-		TT_FAMILY("74XX")
-	TRUTHTABLE_END()
-
-	TRUTHTABLE_START(TTL_74260_GATE, 5, 1, "")
-		TT_HEAD("A,B,C,D,E|Q ")
-		TT_LINE("0,0,0,0,0|1|10")
-		TT_LINE("X,X,X,X,1|0|12")
-		TT_LINE("X,X,X,1,X|0|12")
-		TT_LINE("X,X,1,X,X|0|12")
-		TT_LINE("X,1,X,X,X|0|12")
-		TT_LINE("1,X,X,X,X|0|12")
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
@@ -3434,16 +3481,25 @@ NETLIST_START(ttl74xx_lib)
 	LOCAL_LIB_ENTRY(TTL_74165_DIP)
 	LOCAL_LIB_ENTRY(TTL_74166_DIP)
 	LOCAL_LIB_ENTRY(TTL_74174_DIP)
+	LOCAL_LIB_ENTRY(TTL_74175_DIP)
+	LOCAL_LIB_ENTRY(TTL_74192_DIP)
+	LOCAL_LIB_ENTRY(TTL_74193_DIP)
+	LOCAL_LIB_ENTRY(TTL_74194_DIP)
 	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 	LOCAL_LIB_ENTRY(TTL_74279_DIP)
+	LOCAL_LIB_ENTRY(TTL_74365_DIP)
 	LOCAL_LIB_ENTRY(TTL_74377_DIP)
 	LOCAL_LIB_ENTRY(TTL_74378_DIP)
 	LOCAL_LIB_ENTRY(TTL_74379_DIP)
 	LOCAL_LIB_ENTRY(TTL_74393_DIP)
 	LOCAL_LIB_ENTRY(SN74LS629_DIP)
-	LOCAL_LIB_ENTRY(TTL_9312_DIP)
 	LOCAL_LIB_ENTRY(TTL_9310_DIP)
+	LOCAL_LIB_ENTRY(TTL_9312_DIP)
+	LOCAL_LIB_ENTRY(TTL_9314_DIP)
 	LOCAL_LIB_ENTRY(TTL_9316_DIP)
 	LOCAL_LIB_ENTRY(TTL_9321_DIP)
 	LOCAL_LIB_ENTRY(TTL_9322_DIP)
+	LOCAL_LIB_ENTRY(TTL_9334_DIP)
+	LOCAL_LIB_ENTRY(TTL_8277_DIP)
+	LOCAL_LIB_ENTRY(TTL_AM2847_DIP)
 NETLIST_END()

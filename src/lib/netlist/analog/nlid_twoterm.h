@@ -635,8 +635,8 @@ namespace analog
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			register_subalias("P", P());
-			register_subalias("N", N());
+			register_subalias("P", "1");
+			register_subalias("N", "2");
 			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}

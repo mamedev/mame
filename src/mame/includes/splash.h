@@ -130,6 +130,7 @@ public:
 	void funystrp(machine_config &config);
 
 	void init_funystrp();
+	void init_ringball();
 
 protected:
 	virtual void machine_start() override;

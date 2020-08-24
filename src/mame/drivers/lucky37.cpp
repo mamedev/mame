@@ -226,7 +226,7 @@ ROM_START( lucky37 )
 	ROM_LOAD( "6.bin", 0xa0000, 0x20000, CRC(3283c1b7) SHA1(7a30dd55216b47332ea7c18c2378352f405b2f0a) )
 ROM_END
 
-ROM_START( bingo75 )	// runs on wing 8802-c board
+ROM_START( bingo75 )    // runs on wing 8802-c board
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a001-nomarks", 0x0000, 0x10000, NO_DUMP )
 

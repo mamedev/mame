@@ -84,7 +84,7 @@ private:
 	// internal state
 	int m_index;                // index number of the timer
 	double m_clockin;           // input clock frequency in Hz
-	attotime m_clock_period;	// precomputed input clock period
+	attotime m_clock_period;    // precomputed input clock period
 	int m_clock_signal;         // clock signal when clockin is 0
 
 	attotime m_last_updated;    // time when last updated

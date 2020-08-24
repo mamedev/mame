@@ -143,7 +143,7 @@ namespace netlist
 			, m_param(nullptr)
 			, m_id(*this, "ID", 0)
 			{
-				connect(m_feedback, m_Q);
+				connect("FB", "Q");
 				m_buffer = nullptr;
 			}
 

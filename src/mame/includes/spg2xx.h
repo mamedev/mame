@@ -286,10 +286,10 @@ public:
 	void wfcentro(machine_config &config);
 
 protected:
-//	virtual void machine_start() override;
-//	virtual void machine_reset() override;
+//  virtual void machine_start() override;
+//  virtual void machine_reset() override;
 
-//	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+//  virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 

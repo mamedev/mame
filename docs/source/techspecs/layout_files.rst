@@ -59,7 +59,7 @@ Coordinates
 ~~~~~~~~~~~
 
 Layout coordinates are internally represented as IEEE754 32-bit binary
-floating-point numbers (also known as "single precision").  Coordinates increase
+floating-point numbers (also known as “single precision”).  Coordinates increase
 in the rightward and downward directions.  The origin (0,0) has no particular
 significance, and you may freely use negative coordinates in layouts.
 Coordinates are supplied as floating-point numbers.
@@ -95,7 +95,7 @@ Colours
 ~~~~~~~
 
 Colours are specified in RGBA space.  MAME is not aware of colour profiles and
-gamuts, so colours will typically be interpreted as sRGB with your system's
+gamuts, so colours will typically be interpreted as sRGB with your system’s
 target gamma (usually 2.2).  Channel values are specified as floating-point
 numbers.  Red, green and blue channel values range from 0.0 (off) to 1.0 (full
 intensity).  Alpha ranges from 0.0 (fully transparent) to 1.0 (opaque).  Colour
@@ -120,7 +120,7 @@ Parameters
 Parameters are named variables that can be used in most attributes.  To use
 a parameter in an attribute, surround its name with tilde (~) characters.  If a
 parameter is not defined, no substitution occurs.  Here is an examples showing
-two instances of parameter use -- the values of the ``digitno`` and ``x``
+two instances of parameter use – the values of the ``digitno`` and ``x``
 parameters will be substituted for ``~digitno~`` and ``~x~``::
 
     <element name="digit~digitno~" ref="digit">
@@ -137,7 +137,7 @@ scope level corresponds to the top-level ``mamelayout`` element.  Each
 Internally a parameter can hold a string, integer, or floating-point number, but
 this is mostly transparent.  Integers are stored as 64-bit signed
 twos-complement values, and floating-point numbers are stored as IEEE754 64-bit
-binary floating-point numbers (also known as "double precision").  Integers are
+binary floating-point numbers (also known as “double precision”).  Integers are
 substituted in decimal notation, and floating point numbers are substituted in
 default format, which may be decimal fixed-point or scientific notation
 depending on the value).  There is no way to override the default formatting of
@@ -156,7 +156,7 @@ Value parameters are assigned using a ``param`` element with ``name`` and
 ``view`` elements other ``group`` definition elements).  A value parameter may
 be reassigned at any point.
 
-Here's an example assigning the value "4" to the value parameter "firstdigit"::
+Here’s an example assigning the value “4” to the value parameter “firstdigit”::
 
     <param name="firstdigit" value="4" />
 
@@ -176,27 +176,27 @@ in a child scope).  Here are some example generator parameters::
 * The ``mask`` parameter generates values 2048, 128, 8...
 
 The ``increment`` attribute must be an integer or floating-point number to be
-added to the parameter's value.  The ``lshift`` and ``rshift`` attributes must
-be non-negative integers specifying numbers of bits to shift the parameter's
+added to the parameter’s value.  The ``lshift`` and ``rshift`` attributes must
+be non-negative integers specifying numbers of bits to shift the parameter’s
 value to the left or right.  The increment and shift are applied at the end of
 the repeating block before the next iteration starts.  If both an increment and
 shift are supplied, the increment is applied before the shift.
 
 If the ``increment`` attribute is present and is a floating-point number, the
-parameter's value will be interpreted as an integer or floating-point number and
+parameter’s value will be interpreted as an integer or floating-point number and
 converted to a floating-point number before the increment is added.  If the
-``increment`` attribute is present and is an integer, the parameter's value will
+``increment`` attribute is present and is an integer, the parameter’s value will
 be interpreted as an integer or floating number before the increment is added.
 The increment will be converted to a floating-point number before the addition
-if the parameter's value is a floating-point number.
+if the parameter’s value is a floating-point number.
 
 If the ``lshift`` and/or ``rshift`` attributes are present and not equal, the
-parameter's value will be interpreted as an integer or floating-point number,
+parameter’s value will be interpreted as an integer or floating-point number,
 converted to an integer as necessary, and shifted accordingly.  Shifting to the
 left is defined as shifting towards the most significant bit.  If both
 ``lshift`` and ``rshift`` are supplied, they are netted off before being
 applied.  This means you cannot, for example, use equal ``lshift`` and
-``rshift`` attributes to clear bits at one end of a parameter's value after the
+``rshift`` attributes to clear bits at one end of a parameter’s value after the
 first iteration.
 
 It is an error if a ``param`` element has neither ``value`` nor ``start``
@@ -245,21 +245,21 @@ scr0physicalyaspect
     fraction.  Note that this is the vertical component *before* rotation is
     applied.  This parameter is an integer defined at layout (global) scope.
 scr0nativexaspect
-    The horizontal part of the pixel aspect ratio of the first screen's visible
+    The horizontal part of the pixel aspect ratio of the first screen’s visible
     area (if present).  The pixel aspect ratio is provided as a reduced improper
     fraction.  Note that this is the horizontal component *before* rotation is
     applied.  This parameter is an integer defined at layout (global) scope.
 scr0nativeyaspect
-    The vertical part of the pixel aspect ratio of the first screen's visible
+    The vertical part of the pixel aspect ratio of the first screen’s visible
     area (if present).  The pixel aspect ratio is provided as a reduced improper
     fraction.  Note that this is the vertical component *before* rotation is
     applied.  This parameter is an integer defined at layout (global) scope.
 scr0width
-    The width of the first screen's visible area (if present) in emulated
+    The width of the first screen’s visible area (if present) in emulated
     pixels.  Note that this is the width *before* rotation is applied.  This
     parameter is an integer defined at layout (global) scope.
 scr0height
-    The height of the first screen's visible area (if present) in emulated
+    The height of the first screen’s visible area (if present) in emulated
     pixels.  Note that this is the height *before* rotation is applied.  This
     parameter is an integer defined at layout (global) scope.
 scr1physicalxaspect
@@ -269,18 +269,18 @@ scr1physicalyaspect
     The vertical part of the physical aspect ratio of the second screen (if
     present).  This parameter is an integer defined at layout (global) scope.
 scr1nativexaspect
-    The horizontal part of the pixel aspect ratio of the second screen's visible
+    The horizontal part of the pixel aspect ratio of the second screen’s visible
     area (if present).  This parameter is an integer defined at layout (global)
     scope.
 scr1nativeyaspect
-    The vertical part of the pixel aspect ratio of the second screen's visible
+    The vertical part of the pixel aspect ratio of the second screen’s visible
     area (if present).  This parameter is an integer defined at layout (global)
     scope.
 scr1width
-    The width of the second screen's visible area (if present) in emulated
+    The width of the second screen’s visible area (if present) in emulated
     pixels.  This parameter is an integer defined at layout (global) scope.
 scr1height
-    The height of the second screen's visible area (if present) in emulated
+    The height of the second screen’s visible area (if present) in emulated
     pixels.  This parameter is an integer defined at layout (global) scope.
 scr\ *N*\ physicalxaspect
     The horizontal part of the physical aspect ratio of the (zero-based) *N*\ th
@@ -292,18 +292,18 @@ scr\ *N*\ physicalyaspect
     (global) scope.
 scr\ *N*\ nativexaspect
     The horizontal part of the pixel aspect ratio of the (zero-based) *N*\ th
-    screen's visible area (if present).  This parameter is an integer defined at
+    screen’s visible area (if present).  This parameter is an integer defined at
     layout (global) scope.
 scr\ *N*\ nativeyaspect
     The vertical part of the pixel aspect ratio of the (zero-based) *N*\ th
-    screen's visible area (if present).  This parameter is an integer defined at
+    screen’s visible area (if present).  This parameter is an integer defined at
     layout (global) scope.
 scr\ *N*\ width
-    The width of the (zero-based) *N*\ th screen's visible area (if present) in
+    The width of the (zero-based) *N*\ th screen’s visible area (if present) in
     emulated pixels.  This parameter is an integer defined at layout (global)
     scope.
 scr\ *N*\ height
-    The height of the (zero-based) *N*\ th screen's visible area (if present) in
+    The height of the (zero-based) *N*\ th screen’s visible area (if present) in
     emulated pixels.  This parameter is an integer defined at layout (global)
     scope.
 viewname
@@ -348,13 +348,13 @@ param
     Defines or reassigns a value parameter.  See :ref:`layout-concepts-params`
     for details.
 element
-    Defines an element -- one of the basic objects that can be arranged in a
+    Defines an element – one of the basic objects that can be arranged in a
     view.  See :ref:`layout-parts-elements` for details.
 group
     Defines a reusable group of elements/screens that may be referenced from
     views or other groups.  See :ref:`layout-parts-groups` for details.
 repeat
-    A repeating group of elements -- may contain ``param``, ``element``,
+    A repeating group of elements – may contain ``param``, ``element``,
     ``group``, and ``repeat`` elements.  See :ref:`layout-parts-repeats` for
     details.
 view
@@ -375,17 +375,17 @@ but an element is treated as as single surface when building the scene graph
 and rendering.  An element may be used in multiple views, and may be used
 multiple times within a view.
 
-An element's appearance depends on its *state*.  The state is an integer which
+An element’s appearance depends on its *state*.  The state is an integer which
 usually comes from an I/O port field or an emulated output (see the discussion
 of :ref:`layout-parts-views` for information on connecting an element to an I/O
 port or output).  Any component of an element may be restricted to only drawing
-when the element's state is a particular value.  Some components (e.g.
+when the element’s state is a particular value.  Some components (e.g.
 multi-segment displays and reels) use the state directly to determine their
 appearance.
 
 Each element has its own internal coordinate system.  The bounds of the
-element's coordinate system are computed as the union of the bounds of the
-individual components it's composed of.
+element’s coordinate system are computed as the union of the bounds of the
+individual components it’s composed of.
 
 Every element must have a ``name`` attribute specifying its name.  Elements are
 referred to by name when instantiated in groups or views.  It is an error for a
@@ -399,7 +399,7 @@ drawn in reading order from first to last (components draw on top of components
 that come before them).  All components support a few common features:
 
 * Each component may have a ``state`` attribute.  If present, the component will
-  only be drawn when the element's state matches its value (if absent, the
+  only be drawn when the element’s state matches its value (if absent, the
   component will always be drawn).  If present, the ``state`` attribute must be
   a non-negative integer.
 * Each component may have a ``bounds`` child element specifying its position and
@@ -440,22 +440,22 @@ text
     will be centred.
 dotmatrix
     Draws an eight-pixel horizontal segment of a dot matrix display, using
-    circular pixels in the specified colour.  The bits of the element's state
+    circular pixels in the specified colour.  The bits of the element’s state
     determine which pixels are lit, with the least significant bit corresponding
     to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
 dotmatrix5dot
     Draws a five-pixel horizontal segment of a dot matrix display, using
-    circular pixels in the specified colour.  The bits of the element's state
+    circular pixels in the specified colour.  The bits of the element’s state
     determine which pixels are lit, with the least significant bit corresponding
     to the leftmost pixel.  Unlit pixels are drawn at low intensity (0x20/0xff).
 dotmatrixdot
     Draws a single element of a dot matrix display as a circular pixels in the
-    specified colour.  The least significant bit of the element's state
+    specified colour.  The least significant bit of the element’s state
     determines whether the pixel is lit.  An unlit pixel is drawn at low
     intensity (0x20/0xff).
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
-    display in the specified colour.  The low eight bits of the element's state
+    display in the specified colour.  The low eight bits of the element’s state
     control which segments are lit.  Starting from the least significant bit,
     the bits correspond to the top segment, the upper right-hand segment,
     continuing clockwise to the upper left segment, the middle bar, and the
@@ -470,7 +470,7 @@ led8seg_gts1
     intensity (0x20/0xff).
 led14seg
     Draws a standard fourteen-segment alphanumeric LED/fluorescent display in
-    the specified colour.  The low fourteen bits of the element's state control
+    the specified colour.  The low fourteen bits of the element’s state control
     which segments are lit.  Starting from the least significant bit, the bits
     correspond to the top segment, the upper right-hand segment, continuing
     clockwise to the upper left segment, the left-hand and right-hand halves of
@@ -480,13 +480,13 @@ led14seg
 led14segsc
     Draws a standard fourteen-segment alphanumeric LED/fluorescent display with
     decimal point/comma in the specified colour.  The low sixteen bits of the
-    element's state control which segments are lit.  The low fourteen bits
+    element’s state control which segments are lit.  The low fourteen bits
     correspond to the same segments as in the ``led14seg`` component.  Two
     additional bits correspond to the decimal point and comma tail.  Unlit
     segments are drawn at low intensity (0x20/0xff).
 led16seg
     Draws a standard sixteen-segment alphanumeric LED/fluorescent display in the
-    specified colour.  The low sixteen bits of the element's state control which
+    specified colour.  The low sixteen bits of the element’s state control which
     segments are lit.  Starting from the least significant bit, the bits
     correspond to the left-hand half of the top bar, the right-hand half of the
     top bar, continuing clockwise to the upper left segment, the left-hand and
@@ -496,12 +496,12 @@ led16seg
 led16segsc
     Draws a standard sixteen-segment alphanumeric LED/fluorescent display with
     decimal point/comma in the specified colour.  The low eighteen bits of the
-    element's state control which segments are lit.  The low sixteen bits
+    element’s state control which segments are lit.  The low sixteen bits
     correspond to the same segments as in the ``led16seg`` component.  Two
     additional bits correspond to the decimal point and comma tail.  Unlit
     segments are drawn at low intensity (0x20/0xff).
 simplecounter
-    Displays the numeric value of the element's state using the system font in
+    Displays the numeric value of the element’s state using the system font in
     the specified colour.  The value is formatted in decimal notation.  A
     ``digits`` attribute may be supplied to specify the minimum number of digits
     to display.  If present, the ``digits`` attribute must be a positive
@@ -558,11 +558,11 @@ load views from the layout file.  This is particularly useful for systems where
 a screen is optional, for example computer systems with front panel controls and
 an optional serial terminal.
 
-Views are identified by name in MAME's user interface and in command-line
+Views are identified by name in MAME’s user interface and in command-line
 options.  For layouts files associated with devices other than the root driver
-device, view names are prefixed with the device's tag (with the initial colon
-omitted) -- for example a view called "Keyboard LEDs" loaded for the device
-``:tty:ie15`` will be called "tty:ie15 Keyboard LEDs" in MAME's user interface.
+device, view names are prefixed with the device’s tag (with the initial colon
+omitted) – for example a view called “Keyboard LEDs” loaded for the device
+``:tty:ie15`` will be called “tty:ie15 Keyboard LEDs” in MAME’s user interface.
 Views are listed in the order they are loaded.  Within a layout file, views are
 loaded in the order they appear, from top to bottom.
 
@@ -583,15 +583,15 @@ values from the end of the ``mamelayout`` element.
 The following child elements are allowed inside a ``view`` element:
 
 bounds
-    Sets the origin and size of the view's internal coordinate system if
+    Sets the origin and size of the view’s internal coordinate system if
     present.  See :ref:`layout-concepts-coordinates` for details.  If absent,
     the bounds of the view are computed as the union of the bounds of all
     screens and elements within the view.  It only makes sense to have one
     ``bounds`` as a direct child of a view element.  Any content outside the
-    view's bounds is cropped, and the view is scaled proportionally to fit the
+    view’s bounds is cropped, and the view is scaled proportionally to fit the
     output window or screen.
 param
-    Defines or reassigns a value parameter in the view's scope.  See
+    Defines or reassigns a value parameter in the view’s scope.  See
     :ref:`layout-concepts-params` for details.
 element
     Adds an element to the view (see :ref:`layout-parts-elements`).  The name of
@@ -657,7 +657,7 @@ layout elements is alpha blending.
 Screens (``screen`` elements), layout elements (``element`` elements) and groups
 (``group`` elements) may be positioned and sized using a ``bounds`` child
 element (see :ref:`layout-concepts-coordinates` for details).  In the absence of
-a ``bounds`` child element, screens' and layout elements' bounds default to a
+a ``bounds`` child element, screens’ and layout elements’ bounds default to a
 unit square (origin at 0,0 and height and width both equal to 1).  In the
 absence of a ``bounds`` child element, groups are expanded with no
 translation/scaling (note that groups may position screens/elements outside
@@ -697,7 +697,7 @@ If an ``element`` element has a ``name`` attribute, it will take its state from
 the value of the correspondingly named emulated output.  Note that output names
 are global, which can become an issue when a machine uses multiple instances of
 the same type of device.  See :ref:`layout-parts-elements` for details on how an
-element's state affects its appearance.  This example shows how digital displays
+element’s state affects its appearance.  This example shows how digital displays
 may be connected to emulated outputs::
 
     <element name="digit6" ref="digit"><bounds x="16" y="16" width="48" height="80" /></element>
@@ -711,9 +711,9 @@ If an element instantiating a layout element has ``inputtag`` and ``inputmask``
 attributes but lacks a ``name`` attribute, it will take its state from the value
 of the corresponding I/O port, masked with the ``inputmask`` value and XORed
 with the I/O port default field value.  The latter is useful for inputs that are
-active-low.  If the result is non-zero, the state is 1, otherwise it's 0.  This
+active-low.  If the result is non-zero, the state is 1, otherwise it’s 0.  This
 is often used to allow clickable buttons and toggle switches to provide visible
-feedback.  By using ``inputraw="1"``, it's possible to obtain the raw data from
+feedback.  By using ``inputraw="1"``, it’s possible to obtain the raw data from
 the I/O port, masked with the ``inputmask`` value and shifted to the right to
 remove trailing zeroes (for example a mask of 0x05 will result in no shift, while
 a mask of 0xb0 will result in the value being shifted four bits to the right).
@@ -747,7 +747,7 @@ element::
 This group may then be instantiated in a view or another group element using a
 group reference element, optionally supplying destination bounds, orientation,
 and/or modifier colour.  The ``ref`` attribute identifies the group to
-instantiate -- in this example, destination bounds are supplied::
+instantiate – in this example, destination bounds are supplied::
 
     <group ref="panel"><bounds x="87" y="58" width="23" height="23.5" /></group>
 
@@ -762,7 +762,7 @@ element has no ``bounds`` element as a direct child, its bounds are computed as
 the union of the bounds of all the screens, layout elements and/or nested groups
 it instantiates.  A ``bounds`` child element may be used to explicitly specify
 group bounds (see :ref:`layout-concepts-coordinates` for details).  Note that
-groups' bounds are only used for the purpose of calculating the coordinate
+groups’ bounds are only used for the purpose of calculating the coordinate
 transform when instantiating a group.  A group may position screens and/or
 elements outside its bounds, and they will not be cropped.
 
@@ -785,7 +785,7 @@ To demonstrate how bounds calculation works, consider this example::
     </view>
 
 This is relatively straightforward, as all elements inherently fall within the
-group's automatically computed bounds.  Now consider what happens if a group
+group’s automatically computed bounds.  Now consider what happens if a group
 positions elements outside its explicit bounds::
 
     <group name="periphery">
@@ -805,8 +805,8 @@ positions elements outside its explicit bounds::
         <group ref="periphery"><bounds x="5" y="5" width="30" height="25" /></group>
     </view>
 
-The group's elements are translated and scaled as necessary to distort the
-group's internal bounds to the destination bounds in the view.  The group's
+The group’s elements are translated and scaled as necessary to distort the
+group’s internal bounds to the destination bounds in the view.  The group’s
 content is not restricted to its bounds.  The view considers the bounds of the
 actual layout elements when computing its bounds, not the destination bounds
 specified for the group.
@@ -818,9 +818,9 @@ the group is instantiated (*not* its lexical parent, the top-level
 element set parameters in the local scope for the group instantiation.  Local
 parameters do not persist across multiple instantiations.  See
 :ref:`layout-concepts-params` for more detail on parameters.  (Note that the
-group's name is not part of its content, and any parameter references in the
+group’s name is not part of its content, and any parameter references in the
 ``name`` attribute itself will be substituted at the point where the group
-definition appears in the top-level ``mamelayout`` element's scope.)
+definition appears in the top-level ``mamelayout`` element’s scope.)
 
 
 .. _layout-parts-repeats:
@@ -984,24 +984,24 @@ layouts, MAME automatically generates views based on the machine configuration.
 The following views will be automatically generated:
 
 * If the system has no screens and no viable views were found in the internal
-  and external layouts, MAME will load a view that shows the message "No screens
-  attached to the system".
+  and external layouts, MAME will load a view that shows the message “No screens
+  attached to the system”.
 * For each emulated screen, MAME will generate a view showing the screen at its
   physical aspect ratio with rotation applied.
-* For each emulated screen where the configured pixel aspect ratio doesn't match
+* For each emulated screen where the configured pixel aspect ratio doesn’t match
   the physical aspect ratio, MAME will generate a view showing the screen at an
   aspect ratio that produces square pixels, with rotation applied.
 * If the system has a single emulated screen, MAME will generate a view showing
   two copies of the screen image above each other with a small gap between them.
   The upper copy will be rotated by 180 degrees.  This view can be used in a
-  "cocktail table" cabinet for simultaneous two-player games, or alternating
-  play games that don't automatically rotate the display for the second player.
+  “cocktail table” cabinet for simultaneous two-player games, or alternating
+  play games that don’t automatically rotate the display for the second player.
   The screen will be displayed at its physical aspect ratio, with rotation
   applied.
 * If the system has exactly two emulated screens, MAME will generate a view
   showing the second screen above the first screen with a small gap between
   them.  The second screen will be rotated by 180 degrees.  This view can be
-  used to play a dual-screen two-player game on a "cocktail table" cabinet with
+  used to play a dual-screen two-player game on a “cocktail table” cabinet with
   a single screen.  The screens will be displayed at their physical aspect
   ratios, with rotation applied.
 * If the system has exactly two emulated screens and no view in the internal or
@@ -1023,17 +1023,17 @@ Using complay.py
 ----------------
 
 The MAME source contains a Python script called ``complay.py``, found in the
-``scripts/build`` subdirectory.  This script is used as part of MAME's build
+``scripts/build`` subdirectory.  This script is used as part of MAME’s build
 process to reduce the size of data for internal layouts and convert it to a form
 that can be built into the executable.  However, it can also detect many common
 layout file format errors, and generally provides better error messages than
-MAME does when loading a layout file.  Note that it doesn't actually run the
-whole layout engine, so it can't detect errors like undefined element references
+MAME does when loading a layout file.  Note that it doesn’t actually run the
+whole layout engine, so it can’t detect errors like undefined element references
 when parameters are used, or recursively nested groups.  The ``complay.py``
 script is compatible with both Python 2.7 and Python 3 interpreters.
 
-The ``complay.py`` script takes three parameters -- an input file name, an
-output file name, and a base name for variables in the output:
+The ``complay.py`` script takes three parameters – an input file name, an output
+file name, and a base name for variables in the output:
 
     **python scripts/build/complay.py** *<input>* [*<output>* [*<varname>*]]
 

@@ -23,14 +23,14 @@
     - 80/132 columns
 
     QVT-82:
-	- Z80 (Z0840008PSC)
-	- Z80 DART (Z0847006PSC)
-	- QUME 303489-01 QFP144
-	- ROM 64k * 2
-	- RAM 8k UM6264AK-10L (above Z80) + 8k UM6264K-70L * 3 (below Z80)
-	- DS1231
-	- 54.2857MHz XTAL
-	- Battery
+    - Z80 (Z0840008PSC)
+    - Z80 DART (Z0847006PSC)
+    - QUME 303489-01 QFP144
+    - ROM 64k * 2
+    - RAM 8k UM6264AK-10L (above Z80) + 8k UM6264K-70L * 3 (below Z80)
+    - DS1231
+    - 54.2857MHz XTAL
+    - Battery
 
 ****************************************************************************/
 

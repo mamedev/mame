@@ -8745,7 +8745,7 @@ license:CC0
 	</software>
 
 	<software name="aliencrn">
-		<description>Alien Carnage</description>
+		<description>Alien Carnage (set 1)</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
@@ -8758,6 +8758,42 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Alien Carnage [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="aeedf7b3" sha1="e9042334af6f6724a199560e71cc8f4e7b45969f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliencrna" cloneof="aliencrn">
+		<description>Alien Carnage (set 2, older)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
+		<info name="version" value="v1.0 - Registered Version" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Carnage [Apogee] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="7750f7fa" sha1="b3825eda41efc3f5aac0b8754caa428a50ee0516"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Carnage [Apogee] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="35aa35f8" sha1="dd1ba845de07e9841f63e049b020fc59f412522a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliencrnb" cloneof="aliencrn">
+		<description>Alien Carnage (FormGen release)</description>
+		<year>1995</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="Interactive Binary Illusions / Sub Zer0 Software" />
+		<info name="version" value="v1.0 - Registered Version" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Carnage [FormGen] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="5f015bc8" sha1="b3dd9134a65431955adadfb6119e787bb516c71f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alien Carnage [FormGen] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="bd2f6174" sha1="678444c54b7f804df826da696b548683de5b25e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9311,7 +9347,7 @@ license:CC0
 				<rom name="Battle Chess 4000 [Interplay] [1992] [3.5HD] [Data Disk 7 of 7].img" size="1474560" crc="b1649f1b" sha1="e84cdf93446c3695357502482875e6265309af1f"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="steelsky">
 		<description>Beneath a Steel Sky (Euro)</description>
@@ -9465,6 +9501,23 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Blake Stone - Planet Strike [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="fbe4f08b" sha1="afeb9458c07517554b95fc44ecaf45e385f5d614"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bldstone">
+		<description>Bloodstone: An Epic Dwarven Tale</description>
+		<year>1994</year>
+		<publisher>Mindcraft</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Bloodstone [Mindcraft] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="95c9d2cd" sha1="a9e2b7f48861bf48ba2146a157843c83b6ccbdb7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Bloodstone [Mindcraft] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="af5c6f85" sha1="005a0167a56e369b00ad76a57dba523a2f2ea99b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10847,7 +10900,30 @@ license:CC0
 	</software>
 
 	<software name="f1gp">
-		<description>Formula One Grand Prix (Euro)</description>
+		<description>Formula One Grand Prix (Euro, v1.05)</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MicroProse" />
+		<info name="version" value="1.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix (v1.05) [MicroProse] [1993] [3.5HD] [Disk A].img" size="1474560" crc="efac2236" sha1="e1cb274d256ab8b154b641bfe537d90cfd1b258c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix (v1.05) [MicroProse] [1993] [3.5HD] [Disk B].img" size="1474560" crc="95c48992" sha1="986ade2bdd950a3176b1cb11cdc849d671acb22c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Formula One Grand Prix (v1.05) [MicroProse] [1993] [3.5HD] [Disk C].img" size="1474560" crc="2e9285ac" sha1="bd078d705ec3bfd35900f7f307c67a3098595c59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1gpa" cloneof="f1gp">
+		<description>Formula One Grand Prix (Euro, v1.03)</description>
 		<year>1992</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="MicroProse" />
@@ -12200,6 +12276,53 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lba">
+		<description>Little Big Adventure (Euro)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Adeline Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="365c0bb9" sha1="88fe434fdf3d3364eff3ac7cc44e067f103ba449"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="595033cb" sha1="03db197e4f1f9e5b53f527e661f7c3654deadacb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="bd5f5709" sha1="33926962d0bffab2fb0381a9c2caa22089d00929"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="82f6961f" sha1="fb4f0eedf53ffc1bf2f039be0e740daf854e82b4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="5397bed1" sha1="d61a70f2da40a7a9f1f7e2c03580b11fc4884389"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="6c174cf7" sha1="b74b674df1d6adbba7930755921d841903309c34"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="54cbd2df" sha1="ba7c1c925858c9e786f014d0e94348e462992c13"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Little Big Adventure [Electronic Arts] [1995] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="639d67a4" sha1="66bd586bcb9c65b6a6c71a9dbf05f6eab494a11d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tleodoom">
 		<description>The Lost Episodes of Doom (Companion Disk)</description>
 		<year>1995</year>
@@ -13212,7 +13335,7 @@ license:CC0
 		<year>1990</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
-			<info name="version" value="1.000" />
+		<info name="version" value="1.000" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="disk1.img" size="1228800" crc="f477ffe2" sha1="c23e8979ccbf883a9f95692df0cf798c2d0fdbd4"/>
@@ -13625,6 +13748,28 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "2159681">
 				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 3 of 3].mfm" size="2159681" crc="f08d4015" sha1="d7e3919a5d2a51e6e915ffe5d44dd8de07b3ec30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccerkd">
+		<description>Soccer Kid (Euro)</description>
+		<year>1994</year>
+		<publisher>Krisalis Software</publisher>
+		<info name="developer" value="Krisalis Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Soccer Kid (Euro) [Krisalis] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="a53b8b99" sha1="6f10d65cdfa0346535b653880b171dd72efb47f9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Soccer Kid (Euro) [Krisalis] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="316210b1" sha1="e7d29f808b25d64e4f95c151341cd51f13b13fb2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Soccer Kid (Euro) [Krisalis] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="cd11d011" sha1="81aec89d851e90048ede5e383992947c2c6d4e5d"/>
 			</dataarea>
 		</part>
 	</software>

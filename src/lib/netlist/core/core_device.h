@@ -66,10 +66,12 @@ namespace netlist
 		};
 
 		stats_t * stats() const noexcept { return m_stats.get(); }
-#if 0
-		virtual void update() noexcept { }
-#endif
+
 		virtual void reset() { }
+
+		void handler_noop()
+		{
+		}
 
 	protected:
 

@@ -153,6 +153,8 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 
 #define NETLIB_DELEGATE(name) nldelegate(&this_type :: name, this)
 
+#define NETLIB_DELEGATE_NOOP() nldelegate(&core_device_t::handler_noop, static_cast<core_device_t *>(this))
+
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
 #define NETLIB_HANDLERI(name) void name() noexcept
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override

@@ -2689,7 +2689,7 @@ There is known to be a "perfect" version of Sinistar, that being the original ve
 */
 ROM_START( sinistar ) // rev. 3
 	ROM_REGION( 0x19000, "maincpu", 0 ) // solid RED labels with final production part numbers
-	ROM_LOAD( "sinistar_rom_10-b_16-3004-62.4c", 0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) ) 
+	ROM_LOAD( "sinistar_rom_10-b_16-3004-62.4c", 0x0e000, 0x1000, CRC(3d670417) SHA1(81802622bee8dbea5c0f08019d87d941dcdbe292) )
 	ROM_LOAD( "sinistar_rom_11-b_16-3004-63.4a", 0x0f000, 0x1000, CRC(3162bc50) SHA1(2f38e572ab9c731e38dfe9bad3cc8222a775c5ea) )
 	ROM_LOAD( "sinistar_rom_1-b_16-3004-53.1d",  0x10000, 0x1000, CRC(f6f3a22c) SHA1(026d8cab07734fa294a5645edbe65a904bcbc302) )
 	ROM_LOAD( "sinistar_rom_2-b_16-3004-54.1c",  0x11000, 0x1000, CRC(cab3185c) SHA1(423d1e3b0c07333ec582529bc4d0b7baf591820a) )
@@ -2709,12 +2709,12 @@ ROM_START( sinistar ) // rev. 3
 	ROM_LOAD( "video_sound_rom_9_std.808",         0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
 /*
-	ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
-	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
+    ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
+    ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+    ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+    ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+    ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+    ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
 */
 
 	ROM_REGION( 0x0400, "proms", 0 )
@@ -2744,12 +2744,12 @@ ROM_START( sinistar2 ) // rev. 2
 	ROM_LOAD( "video_sound_rom_9_std.808",         0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
 /*
-	ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
-	ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
-	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
-	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
-	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
+    ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
+    ROM_LOAD( "3004_speech_ic7_r1_16-3004-52.ic7", 0xb000, 0x1000, CRC(e1019568) SHA1(442f4f3ccd2e1db2136d2ffb121ea442921f87ca) )
+    ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
+    ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
+    ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
+    ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
 */
 
 	ROM_REGION( 0x0400, "proms", 0 )

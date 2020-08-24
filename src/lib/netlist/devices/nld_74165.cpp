@@ -36,7 +36,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(74165)
 		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" }, NETLIB_DELEGATE(inputs))
-		, m_SER(*this, "SER", NETLIB_DELEGATE(noop))
+		, m_SER(*this, "SER", NETLIB_DELEGATE_NOOP())
 		, m_SH_LDQ(*this, "SH_LDQ", NETLIB_DELEGATE(inputs))
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_CLKINH(*this, "CLKINH", NETLIB_DELEGATE(inputs))
@@ -51,10 +51,6 @@ namespace netlist
 		{
 			m_CLK.set_state(logic_t::STATE_INP_LH);
 			m_shifter = 0;
-		}
-
-		NETLIB_HANDLERI(noop)
-		{
 		}
 
 		NETLIB_HANDLERI(clk)

@@ -186,9 +186,9 @@ void mywicogt_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
-//[:] ':maincpu' (000508): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x  
-//[:] ':maincpu' (000510): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x  
-//[:] ':maincpu' (000518): porta_w 0f00 (0f00) x x x x | 1 1 1 1 | x x x x | x x x x  
+//[:] ':maincpu' (000508): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x
+//[:] ':maincpu' (000510): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x
+//[:] ':maincpu' (000518): porta_w 0f00 (0f00) x x x x | 1 1 1 1 | x x x x | x x x x
 
 	if (m_maincpu->pc() < 0x1000)
 	{
@@ -206,7 +206,7 @@ void mywicogt_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			logerror("changing to bank 0\n");
 		}
 	}
-	
+
 	m_porta_dat = data;
 }
 
@@ -649,6 +649,26 @@ static INPUT_PORTS_START( zon32bit )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mywicogt )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Green / Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red / Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Blue")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Orange")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Pause / Menu")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Back")
+	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( oplayer )
 	PORT_START("P1")
@@ -994,7 +1014,8 @@ CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,   
 // The Mi Guitar menu contains 24 games, but they're dupes, and just counting those would exclude the other Mi Fit and Mi Papacon menus (which also contain dupes)
 CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, mywicogt,  0, 0, zon32bit, zon32bit, mywicogt_state,  empty_init,      "<unknown>",                                   "My Wico Guitar", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Shows Mi Guitar 2 in the menu, it seems likely that there was an earlier version on VT1682 hardware as there is a very similar Guitar game (with the same song selection) in those multigames
+CONS( 200?, mywicogt,  0, 0, zon32bit, mywicogt, mywicogt_state,  empty_init,      "<unknown>",                                   "My Wico Guitar", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // issues with 'low battery' always showing, but otherwise functional
 CONS( 200?, oplayer,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

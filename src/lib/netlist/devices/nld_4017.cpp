@@ -60,6 +60,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_CLK.set_state(logic_t::STATE_INP_LH);
@@ -90,7 +91,6 @@ namespace netlist
 			}
 		}
 
-	public:
 		void update_outputs(const unsigned cnt) noexcept
 		{
 			for (std::size_t i = 0; i < _MaxCount; i++)

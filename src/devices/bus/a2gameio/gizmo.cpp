@@ -3,7 +3,7 @@
 /*********************************************************************
 
     gizmo.cpp - HAL Labs Gizmo digital joystick adapter
-	Used by Vindicator and Super Taxman 2.
+    Used by Vindicator and Super Taxman 2.
 
 *********************************************************************/
 
@@ -55,7 +55,7 @@ void apple2_gizmo_device::device_start()
 
 READ_LINE_MEMBER(apple2_gizmo_device::sw0_r)
 {
-    static const int gizmo_bits[8] = { 1,3,2,0,4,5,5,5 };
+	static const int gizmo_bits[8] = { 1,3,2,0,4,5,5,5 };
 	return BIT(m_player1->read(),gizmo_bits[m_an0+(m_an1<<1)+(m_an2<<2)]);
 }
 

@@ -27,6 +27,14 @@
 #define NE566_DIP(name)                                                        \
 		NET_REGISTER_DEV(NE566_DIP, name)
 
+// usage       : NE555_DIP(name)
+#define NE555_DIP(...)                                                 \
+	NET_REGISTER_DEVEXT(NE555_DIP, __VA_ARGS__)
+
+// usage       : MC1455P_DIP(name)
+#define MC1455P_DIP(...)                                               \
+	NET_REGISTER_DEVEXT(MC1455P_DIP, __VA_ARGS__)
+
 #endif
 
 /* ----------------------------------------------------------------------------

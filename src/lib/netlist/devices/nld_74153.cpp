@@ -67,6 +67,7 @@ namespace devices
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_chan = 0;
@@ -92,7 +93,6 @@ namespace devices
 			}
 		}
 
-	public:
 		object_array_t<logic_input_t, 4> m_C;
 		logic_input_t m_G;
 

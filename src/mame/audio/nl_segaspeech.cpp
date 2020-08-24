@@ -45,7 +45,7 @@ NETLIST_START(segaspeech)
 	// There are two schematic drawings of the speech board
 	// that show fairly different outputs from the SP0250.
 	// Both have their problems.
-	// 
+	//
 	// The simpler one is included in the Astro Blaster and
 	// Space Fury manuals. This is largely correct, except
 	// that it is believed (not verified) that R20 should be
@@ -89,14 +89,14 @@ NETLIST_START(segaspeech)
 	RES(R17, RES_K(10))
 	RES(R18, RES_K(22))
 	RES(R19, RES_K(250))
-	RES(R20, RES_K(4.7))	// schematic shows 470Ohm, but a real PCB had 4.7k here
+	RES(R20, RES_K(4.7))    // schematic shows 470Ohm, but a real PCB had 4.7k here
 	RES(R21, RES_K(10))
 
 	CAP(C9, CAP_U(0.1))
 	CAP(C10, CAP_U(0.047))
 	CAP(C50, CAP_U(0.003))
 
-	TL081_DIP(U8)			// Op. Amp.
+	TL081_DIP(U8)           // Op. Amp.
 	NET_C(U8.7, I_V5)
 	NET_C(U8.4, I_VM5)
 

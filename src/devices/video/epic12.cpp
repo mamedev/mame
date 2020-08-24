@@ -141,21 +141,21 @@ inline u16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
 }
 
 /*
-	Upload command
-	This command uploads gfx data to VRAM, from Main CPU RAM.
+    Upload command
+    This command uploads gfx data to VRAM, from Main CPU RAM.
 
-	Offset Bits              Description
-	       fedcba98 76543210
-	00     0010---- -------- 0x2 for upload
-	       ----0000 00000000 Fixed for upload?
-	02     00000000 00000000 ""
-	04     10011001 10011001 ""
-	06     10011001 10011001 ""
-	08     ---xxxxx xxxxxxxx Destination X start position
-	0a     ----xxxx xxxxxxxx Destination Y start position
-	0c     ---xxxxx xxxxxxxx Source Width
-	0e     ----xxxx xxxxxxxx Source Height
-	10...10 + (Width * Height * 2) Source GFX data (ARGB1555 format)
+    Offset Bits              Description
+           fedcba98 76543210
+    00     0010---- -------- 0x2 for upload
+           ----0000 00000000 Fixed for upload?
+    02     00000000 00000000 ""
+    04     10011001 10011001 ""
+    06     10011001 10011001 ""
+    08     ---xxxxx xxxxxxxx Destination X start position
+    0a     ----xxxx xxxxxxxx Destination Y start position
+    0c     ---xxxxx xxxxxxxx Source Width
+    0e     ----xxxx xxxxxxxx Source Height
+    10...10 + (Width * Height * 2) Source GFX data (ARGB1555 format)
 */
 
 inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *addr)
@@ -319,38 +319,38 @@ const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
 
 
 /*
-	Draw command
-	This command draws gfx data.
+    Draw command
+    This command draws gfx data.
 
-	Offset Bits              Description
-	       fedcba98 76543210
-	00     0001---- -------- 0x1 for draw
-	       ----x--- -------- Flip X
-	       -----x-- -------- Flip Y
-	       ------x- -------- Enable Blending
-	       -------x -------- Enable Transparent
-	       -------- -xxx---- Source Blending mode
-	       -------- -----xxx Destination Blending mode
-	02     xxxxxxxx -------- Source Alpha value
-	       -------- xxxxxxxx Destination Alpha value
-	04     ---xxxxx xxxxxxxx Source X start position
-	06     ----xxxx xxxxxxxx Source Y start position
-	08     sxxxxxxx xxxxxxxx Destination X start position
-	0a     sxxxxxxx xxxxxxxx Destination Y start position
-	0c     ---xxxxx xxxxxxxx Source Width
-	0e     ----xxxx xxxxxxxx Source Height
-	10     -------- xxxxxxxx Source Red multiplication (0x80 = 100%)
-	12     xxxxxxxx -------- Source Green multiplication (0x80 = 100%)
-	       -------- xxxxxxxx Source Blue multiplication (0x80 = 100%)
+    Offset Bits              Description
+           fedcba98 76543210
+    00     0001---- -------- 0x1 for draw
+           ----x--- -------- Flip X
+           -----x-- -------- Flip Y
+           ------x- -------- Enable Blending
+           -------x -------- Enable Transparent
+           -------- -xxx---- Source Blending mode
+           -------- -----xxx Destination Blending mode
+    02     xxxxxxxx -------- Source Alpha value
+           -------- xxxxxxxx Destination Alpha value
+    04     ---xxxxx xxxxxxxx Source X start position
+    06     ----xxxx xxxxxxxx Source Y start position
+    08     sxxxxxxx xxxxxxxx Destination X start position
+    0a     sxxxxxxx xxxxxxxx Destination Y start position
+    0c     ---xxxxx xxxxxxxx Source Width
+    0e     ----xxxx xxxxxxxx Source Height
+    10     -------- xxxxxxxx Source Red multiplication (0x80 = 100%)
+    12     xxxxxxxx -------- Source Green multiplication (0x80 = 100%)
+           -------- xxxxxxxx Source Blue multiplication (0x80 = 100%)
 
-	Blending mode (description from ibara test mode)
-	000 +alpha
-	001 +source
-	010 +destination
-	100 -alpha
-	101 -source
-	110 -destination
-	others are reserved/disable?
+    Blending mode (description from ibara test mode)
+    000 +alpha
+    001 +source
+    010 +destination
+    100 -alpha
+    101 -source
+    110 -destination
+    others are reserved/disable?
 */
 
 inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *addr)

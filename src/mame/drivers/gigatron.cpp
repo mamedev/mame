@@ -2,10 +2,10 @@
 // copyright-holders:Sterophonick, Phil Thomas
 /***************************************************************************
 
-	Driver for Gigatron TTL Microcomputer by Sterophonick
-	
-	Based on Gigatron.js by Phil Thomas
-	https://github.com/PhilThomas/gigatron
+    Driver for Gigatron TTL Microcomputer by Sterophonick
+
+    Based on Gigatron.js by Phil Thomas
+    https://github.com/PhilThomas/gigatron
 
 ***************************************************************************/
 
@@ -24,10 +24,10 @@
 
 /***************************************************************************
 
-	TODO
-	
-	Hook up a quikload for loading .gt1 files
-	HLE the keyboard and Pluggy McPlugface
+    TODO
+
+    Hook up a quikload for loading .gt1 files
+    HLE the keyboard and Pluggy McPlugface
 
 ***************************************************************************/
 
@@ -73,19 +73,19 @@ private:
 	int16_t m_row;
 	int16_t m_col;
 	uint8_t m_pixel;
-	
+
 	uint8_t m_dacoutput;
 
 	void port_outx(uint8_t data);
 	void port_out(uint8_t data);
-	
+
 	std::unique_ptr<bitmap_rgb32> m_bitmap_render;
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_inputs;
-	
+
 	output_finder<> m_blinken1;
 	output_finder<> m_blinken2;
 	output_finder<> m_blinken3;
@@ -98,7 +98,7 @@ private:
 
 void gigatron_state::video_start()
 {
-    m_bitmap_render = std::make_unique<bitmap_rgb32>(640, 480);
+	m_bitmap_render = std::make_unique<bitmap_rgb32>(640, 480);
 }
 
 void gigatron_state::video_reset()
@@ -110,52 +110,52 @@ void gigatron_state::video_reset()
 
 void gigatron_state::port_out(uint8_t data)
 {
-    m_pixel = data;
-    uint8_t out = m_pixel;
-    uint8_t falling = m_out & ~out;
+	m_pixel = data;
+	uint8_t out = m_pixel;
+	uint8_t falling = m_out & ~out;
 
-    if (falling & VSYNC)
-    {
-        m_row = -36;
-        m_pixel = 0;
-    }
+	if (falling & VSYNC)
+	{
+		m_row = -36;
+		m_pixel = 0;
+	}
 
-    if (falling & HSYNC)
-    {
-        m_col = -4;
-        m_row++;
-    }
+	if (falling & HSYNC)
+	{
+		m_col = -4;
+		m_row++;
+	}
 
-    m_out = out;
+	m_out = out;
 
-    if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
-    {
-        return;
-    }
+	if ((out & (VSYNC | HSYNC)) != (VSYNC | HSYNC))
+	{
+		return;
+	}
 
-    if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
-    {
-        uint8_t r = (out << 6) & 0xC0;
-        uint8_t g = (out << 4) & 0xC0;
-        uint8_t b = (out << 2) & 0xC0;
-        uint32_t *dest = &m_bitmap_render->pix32(m_row, m_col);
-        for(uint8_t i = 0; i < 4; i++)
-            *dest++ = b|(g<<8)|(r<<16);
-    }
-    m_col += 4;
+	if((m_row >= 0 && m_row < 480) && (m_col >= 0 && m_col < 640))
+	{
+		uint8_t r = (out << 6) & 0xC0;
+		uint8_t g = (out << 4) & 0xC0;
+		uint8_t b = (out << 2) & 0xC0;
+		uint32_t *dest = &m_bitmap_render->pix32(m_row, m_col);
+		for(uint8_t i = 0; i < 4; i++)
+			*dest++ = b|(g<<8)|(r<<16);
+	}
+	m_col += 4;
 }
 
 //6-bit color, VGA
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
 	video_reset();
-	
+
 	m_blinken1 = (m_lights >> 3) & 1;
 	m_blinken2 = (m_lights >> 2) & 1;
 	m_blinken3 = (m_lights >> 1) & 1;
 	m_blinken4 = (m_lights >> 0) & 1;
-    return 0;
+	return 0;
 }
 
 //**************************************************************************
@@ -195,7 +195,7 @@ void gigatron_state::machine_start()
 	m_blinken2.resolve();
 	m_blinken3.resolve();
 	m_blinken4.resolve();
-	
+
 	//Savestate stuff
 	save_item(NAME(m_lights));
 	save_item(NAME(m_out));
@@ -221,7 +221,7 @@ void gigatron_state::port_outx(uint8_t data)
 	//Write sound to DAC
 	m_dacoutput = (data & 0xF0) >> 4;
 	m_dac->write(m_dacoutput);
-	
+
 	//Blinkenlights
 	m_lights = data & 0xF;
 }
@@ -229,7 +229,7 @@ void gigatron_state::port_outx(uint8_t data)
 void gigatron_state::gigatron(machine_config &config)
 {
 	config.set_default_layout(layout_gigatron);
-	
+
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
