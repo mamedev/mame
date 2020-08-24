@@ -335,7 +335,24 @@ ROM_START(tecnodar)
 	ROM_LOAD("2_100_tecno_27c512.bin", 0x00000, 0x10000, CRC(971c0c62) SHA1(0eb6a29a5e07e2ed85d9fc298077fa522213e624))
 	ROM_LOAD("3_100_333_27c512.bin", 0x10000, 0x10000, CRC(f9bbbfe0) SHA1(505480188b4641cf48ca33f1600d4ec501122844))
 	// 2 more ROM sockets are empty
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("gal16v8.bin", 0x000, 0x117, NO_DUMP)
+ROM_END
+
+ROM_START(tecnodargr)
+	ROM_REGION(0x4000, "program", 0)
+	ROM_LOAD("15_100_tecno_27c128.bin", 0x0000, 0x4000, CRC(776f1c48) SHA1(90e659ca5339113113c621d8beddde0d478bbf4a))
+
+	ROM_REGION(0x20000, "banked", 0)
+	ROM_LOAD("2_100_gr_27c512.bin", 0x00000, 0x10000, CRC(fbcb5d7d) SHA1(1254ea7d4dec052aa29a51c1e8cf656e25849b13))
+	ROM_LOAD("3_100_tecno_27c512.bin", 0x10000, 0x10000, CRC(f9bbbfe0) SHA1(505480188b4641cf48ca33f1600d4ec501122844))
+	// 2 more ROM sockets are empty
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("16as25hb1.bin", 0x000, 0x117, NO_DUMP)
 ROM_END
 
 
-GAME(1991, tecnodar, 0, tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual", "Tecnodarts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1991, tecnodar,   0,        tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1991, tecnodargr, tecnodar, tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual / Recreativos G.R.", "Tecnodarts (Recreativos G.R. license)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
