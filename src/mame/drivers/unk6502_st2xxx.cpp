@@ -15,7 +15,8 @@
 // ST2205U cannot execute code directly from Flash, but has a built-in DMA-compatible NAND interface on Port F ($05).
 // The XOR used on ragc153 & dphh8630 is likely performed by the DMA controller.
 // $6003 performs a table lookup, depositing a sequence of data at $008e.
-// $6000 generates some duration of delay based on the X register.
+// $6000 is some sort of macro call with the X register as function selector
+// (X = $24 should display the character in $0102 on screen).
 // One other BIOS call ($6975 in bbl380, $69d2 in ragc153) has an unknown purpose.
 
 #include "emu.h"
