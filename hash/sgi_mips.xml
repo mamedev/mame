@@ -76,7 +76,7 @@ license:CC0
 	</software>
 
 	<software name="chalice_1_6_1">
-		<description>>Chalice 1.6.1</description>
+		<description>Chalice 1.6.1</description>
 		<year>1999</year>
 		<publisher>Silicon Grail</publisher>
 		<part name="cdrom" interface="cdrom">
