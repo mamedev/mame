@@ -176,6 +176,10 @@ void electron_plus2_device::expbus_w(offs_t offset, uint8_t data)
 		case 7:
 			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
+		case 13:
+			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
+			m_cart[1]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
+			break;
 		}
 		break;
 
