@@ -1143,7 +1143,7 @@ ROM_START( dinopic2 )
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD64_BYTE( "27c4000-m12481-4.bin", 0x000000, 0x40000, CRC(f3c2c98d) SHA1(98ae51a67fa4159456a4a205eebdd8d1775888d1) )
 	ROM_CONTINUE(                            0x000004, 0x40000)
-	ROM_LOAD64_BYTE( "27c4000-m12481-3.bin", 0x000001, 0x40000, BAD_DUMP CRC(417a4816) SHA1(5268f6667ff550a949a08f94171966f5d841c6b2) ) // this one is a perfect match, unlike dinopic set
+	ROM_LOAD64_BYTE( "27c4000-m12481-3.bin", 0x000001, 0x40000, CRC(a0e1f6e0) SHA1(119af72fb6e75933b6d39bc4a8030823ce9b7611) ) // this one is a perfect match, unlike dinopic set
 	ROM_CONTINUE(                            0x000005, 0x40000)
 	ROM_LOAD64_BYTE( "27c4000-m12481-2.bin", 0x000002, 0x40000, CRC(55ef0adc) SHA1(3b5551ae76ae80882d37fc70a1031a57885d6840) )
 	ROM_CONTINUE(                            0x000006, 0x40000)
@@ -1718,7 +1718,7 @@ ROM_END
 // ************************************************************************* DRIVER MACROS
 
 GAME( 1993,  dinopic,    dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
 GAME( 1993,  dinopic3,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
 GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ?
 
