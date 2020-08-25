@@ -1619,7 +1619,7 @@ void segag80r_state::init_spaceod()
 	iospace.install_readwrite_handler(0x08, 0x0f, read8sm_delegate(*this, FUNC(segag80r_state::spaceod_back_port_r)), write8sm_delegate(*this, FUNC(segag80r_state::spaceod_back_port_w)));
 
 	/* install Space Odyssey sound board */
-	iospace.install_write_handler(0x0e, 0x0f, write8sm_delegate(*m_g80_audio, FUNC(segag80_audio_device::write)));
+	iospace.install_write_handler(0x0e, 0x0f, write8sm_delegate(*m_g80_audio, FUNC(spaceod_audio_device::write)));
 
 	/* install our wacky mangled ports */
 	iospace.install_read_handler(0xf8, 0xfb, read8sm_delegate(*this, FUNC(segag80r_state::spaceod_mangled_ports_r)));

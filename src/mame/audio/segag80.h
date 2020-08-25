@@ -66,7 +66,7 @@ public:
 };
 
 
-class spaceod_audio_device : public segag80_audio_device
+class spaceod_audio_device : public segag80_audio_device_base
 {
 public:
 	spaceod_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

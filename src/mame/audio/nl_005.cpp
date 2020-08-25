@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:CC0
 // copyright-holders:Aaron Giles
 
 //
@@ -437,6 +437,7 @@ NETLIST_START(sega005)
 	NET_C(U2.16, I_V5)
 
 	NE555_DIP(U3)			// Timer
+	NET_C(U3.8, I_V5)
 
 	TTL_74LS14_DIP(U4)		// Dual Gate/Hex Inverter
 	NET_C(U4.7, GND)
@@ -454,6 +455,7 @@ NETLIST_START(sega005)
 
 	PROM_6331_DIP(U8)		// Bioplar PROM
 	PARAM(U8.A.ROM, "6331_sound_u8")
+	PARAM(U8.FORCE_TRISTATE_LOGIC, 1)
 	NET_C(U8.8, GND)
 	NET_C(U8.16, I_V5)
 
@@ -465,9 +467,9 @@ NETLIST_START(sega005)
 //	NET_C(U10.7, GND)
 //	NET_C(U10.14, I_V5)
 
-	TTL_74LS04_DIP(U11)		// Hex Inverting Gates
-	NET_C(U11.7, GND)
-	NET_C(U11.14, I_V5)
+//	TTL_74LS04_DIP(U11)		// Hex Inverting Gates
+//	NET_C(U11.7, GND)
+//	NET_C(U11.14, I_V5)
 
 	LM324_DIP(U12)			// Op. Amp.
 	NET_C(U12.4, I_V12)
@@ -485,12 +487,15 @@ NETLIST_START(sega005)
 
 	EPROM_2716_DIP(U16)		// EPROM
 	PARAM(U16.A.ROM, "epr_1286_sound_16")
+	RES(RU16_DUMMY, RES_K(1))
+	NET_C(U16.16, U16.17, RU16_DUMMY.1)
+	NET_C(RU16_DUMMY.2, GND)
 	NET_C(U16.12, GND)
 	NET_C(U16.24, I_V5)
 
-	TTL_74LS32_DIP(U17)		// Quad 2-Input OR Gate
-	NET_C(U17.7, GND)
-	NET_C(U17.14, I_V5)
+//	TTL_74LS32_DIP(U17)		// Quad 2-Input OR Gate
+//	NET_C(U17.7, GND)
+//	NET_C(U17.14, I_V5)
 
 	LM324_DIP(U18)			// Op. Amp.
 	NET_C(U18.4, I_V12)
@@ -505,8 +510,10 @@ NETLIST_START(sega005)
 	NET_C(U20.16, I_V5)
 
 	NE555_DIP(U21)			// Timer
+	NET_C(U21.8, I_V5)
 
 	NE555_DIP(U22)			// Timer
+	NET_C(U22.8, I_V5)
 
 	LM324_DIP(U23)			// Op. Amp.
 	NET_C(U23.4, I_V12)
@@ -526,12 +533,13 @@ NETLIST_START(sega005)
 	NET_C(U26.11, I_VM12)
 
 	NE555_DIP(U27)			// Timer
+	NET_C(U27.8, I_V5)
 
 	MB4391_DIP(U28)			// Sega custom
 	NET_C(U28.3, U28.7, GND)
 	NET_C(U28.12, U28.16, I_V12) // guess
 
-	CD4016_DIP(U29)		// Quad Bilateral Switch
+	CD4016_DIP(U29)			// Quad Bilateral Switch
 	NET_C(U29.7, GND)
 	NET_C(U29.14, I_V12)
 
@@ -604,11 +612,11 @@ NETLIST_START(sega005)
 	CLOCK(OSC1, 212595) // 1/1.39*4700e-12*(220+500)
 	NET_C(OSC1.GND, GND)
 	NET_C(OSC1.VCC, I_V5)
-	NET_C(R134.1, R134.2, C9.1, C9.2, U4.3, U4.5, GND)
+	NET_C(R134.1, R134.2, C9.1, C9.2, U4.3, U4.4, U4.5, U4.6, GND)
 	NET_C(OSC1.Q, U7.2, U15.2)
 	NET_C(U7.10, U7.7, U7.1, I_V5)
 	NET_C(U7.15, U15.7, U15.10)
-	NET_C(U17.9, U15.9, U4.12)
+	NET_C(U7.9, U15.9, U4.12)
 	NET_C(U15.1, I_V5)
 	NET_C(U15.15, U4.13, C35.2, U14.11)
 	NET_C(C35.1, GND)
@@ -664,6 +672,9 @@ NETLIST_START(sega005)
 	NET_C(D9.A, R98.2, R97.1, U22.7)
 	NET_C(R97.2, I_V5)
 	NET_C(U22.4, I_V5)
+	RES(RU22_DUMMY, RES_K(1))
+	NET_C(U22.3, RU22_DUMMY.1)
+	NET_C(RU22_DUMMY.2, GND)
 
 	NET_C(C71.1, R92.1, U23.9)
 	NET_C(C70.2, R92.2, U23.8, C66.1)
@@ -934,6 +945,7 @@ NETLIST_START(sega005)
 	NET_C(R35.2, U21.6, C41.1)
 	NET_C(C41.2, GND)
 	NET_C(U21.5, C42.2)
+	NET_C(U21.4, I_V5)
 	NET_C(C42.1, GND)
 	NET_C(U21.3, U19.3)
 	NET_C(U19.4, R48.2, U29.12)
@@ -985,7 +997,13 @@ NETLIST_START(sega005)
 
 	NET_C(GND, R99.1, R99.2, R124.1, R124.2)
 	NET_C(GND, C1.1, C1.2, C2.1, C2.2, C3.1, C3.2, C4.1, C4.2, C5.1, C5.2, C6.1, C6.2)
-
+	NET_C(GND, U4.2)
+	NET_C(GND, U6.12, U6.13)
+	NET_C(GND, U14.10)
+	NET_C(GND, U19.1, U19.9, U19.13)
+	NET_C(GND, U26.9, U26.10)
+	NET_C(GND, U29.1, U29.2, U29.3, U29.4, U29.5, U29.13)
+	NET_C(GND, U30.6, U30.10, U30.11)
 
 	//
 	// Unconnected outputs
