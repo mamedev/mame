@@ -4,7 +4,7 @@
 #ifndef NLD_74LS629_H_
 #define NLD_74LS629_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define SN74LS629(name, ...)                                                  \
 		NET_REGISTER_DEVEXT(SN74LS629, name,__VA_ARGS__)

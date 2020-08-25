@@ -4,7 +4,7 @@
 #ifndef NLD_TRISTATE_H_
 #define NLD_TRISTATE_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define TTL_TRISTATE(name, cCEQ1, cD1, cCEQ2, cD2)  \
 		NET_REGISTER_DEV(TTL_TRISTATE, name)    \

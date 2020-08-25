@@ -25,7 +25,7 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #define NL_DICE_COMPAT_H_
 
 #ifndef NL_CONVERT_CPP
-#include "devices/net_lib.h"
+#include "netlist/devices/net_lib.h"
 #endif
 
 

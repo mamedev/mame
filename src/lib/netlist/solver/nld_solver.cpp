@@ -2,9 +2,9 @@
 // copyright-holders:Couriersud
 
 
-#include "netlist/nl_factory.h"
+#include "nl_factory.h"
 #include "core/setup.h"
-#include "netlist/nl_setup.h" // FIXME: only needed for splitter code
+#include "nl_setup.h" // FIXME: only needed for splitter code
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"
 #include "nld_ms_direct1.h"

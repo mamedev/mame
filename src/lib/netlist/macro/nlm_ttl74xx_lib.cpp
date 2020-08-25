@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "netlist/devices/net_lib.h"
+#include "devices/net_lib.h"
 
 //- Identifier: TTL_7400_DIP
 //- Title: 5400/DM5400/DM7400 Quad 2-Input NAND Gates
@@ -3082,7 +3082,7 @@ static NETLIST_START(TTL_9314_DIP)
 		A.D2,  /*    D2 |6           11| /S3 */ A.S3Q,
 		A.D3,  /*    D3 |7           10| Q3  */ A.Q3,
 		A.GND, /*   GND |8            9| /MR */ A.MRQ
-		       /*       +--------------+     */
+			   /*       +--------------+     */
 	)
 NETLIST_END()
 
@@ -3221,7 +3221,7 @@ static NETLIST_START(TTL_9334_DIP)
 		A.Q2, /*    Q2 |6           11| Q6  */ A.Q6,
 		A.Q3, /*    Q3 |7           10| Q5  */ A.Q5,
 		A.GND,/*   GND |8            9| Q4  */ A.Q4
-		      /*       +--------------+     */
+			  /*       +--------------+     */
 	)
 NETLIST_END()
 
@@ -3287,7 +3287,7 @@ static NETLIST_START(TTL_8277_DIP)
 		A.D0A,   /*   D0A |6           11| D0B  */ A.D0B,
 		A.CLKA,  /*  CLKA |7           10| CLKB */ A.CLKB,
 		A.GND,   /*   GND |8            9| CLK  */ A.CLK
-		         /*       +--------------+       */
+				 /*       +--------------+       */
 	)
 NETLIST_END()
 
@@ -3304,7 +3304,7 @@ static NETLIST_START(TTL_AM2847_DIP)
 		A.INB,  /*   INB |6           11| CP   */ A.CP,
 		A.OUTC, /*  OUTC |7           10| INC  */ A.INC,
 		A.VDD,  /*   VDD |8            9| RCC  */ A.RCC
-		        /*       +--------------+      */
+				/*       +--------------+      */
 	)
 NETLIST_END()
 

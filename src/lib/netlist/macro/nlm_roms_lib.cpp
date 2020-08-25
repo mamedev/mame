@@ -1,7 +1,7 @@
 // license:CC0
 // copyright-holders:Couriersud
 
-#include "netlist/devices/net_lib.h"
+#include "devices/net_lib.h"
 
 
 //- Identifier:  PROM_82S126_DIP
@@ -447,7 +447,7 @@ static NETLIST_START(ROM_TMS4800_DIP)
 		A.A9,  /*    A9 |10            15| A11 */ A.A11,
 		A.A8,  /*    A8 |11            14| OE2 */ A.OE2,
 		A.A7,  /*    A7 |12            13| AR  */ A.AR
-		       /*       +----------------+      */
+			   /*       +----------------+      */
 	)
 NETLIST_END()
 

@@ -23,6 +23,8 @@
 .DEFAULT_GOAL := all
 
 SRC = ..
+#SRC = $(abspath ..)
+
 PSRC = $(SRC)/plib
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
@@ -91,7 +93,7 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../..
+CCOREFLAGS = -g -O3 -std=c++14 -I$(SRC) 
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
@@ -130,10 +132,10 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
-DEVSOURCES = $(wildcard $(SRC)/devices/*.cpp)
+DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
+DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
-DEVSOURCES += $(SRC)/solver/nld_solver.cpp
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -210,7 +212,7 @@ BUILD_DIRS = $(OBJDIRS) man html
 # all
 #-------------------------------------------------
 
-all: maketree generated $(DEPEND) $(TARGETS)
+all: maketree $(DEPEND) $(TARGETS)
 
 #-------------------------------------------------
 # clean
@@ -225,11 +227,11 @@ clean:
 
 nltool$(EXESUFFIX): $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 nlwav$(EXESUFFIX): $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 #-------------------------------------------------
 # directories
@@ -315,38 +317,40 @@ doc:
 	$(DOXYGEN) doxygen.conf
 
 #-------------------------------------------------
-# generated
-#-------------------------------------------------
-
-../generated/lib_entries.hxx: $(DEVSOURCES)
-	@echo creating $@
-	$(PYTHON) create_lib_entries.py $^ > $@
-
-../generated/nld_devinc.h: $(DEVSOURCES)
-	@echo creating $@
-	$(PYTHON) create_devinc.py $^ > $@
-
-.PHONY: generated
-generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
-
-#-------------------------------------------------
 # depends
 #-------------------------------------------------
 
 .PHONY: depend
 depend: $(DEPEND)
 
-$(DEPEND): $(OBJ) | $(ALLSOURCES)
+$(DEPEND): $(ALLSOURCES) | $(OBJ)
 	@echo creating $(DEPEND)
 	@$(RM) -f $(DEPEND)
 	@for i in $(ALLSOURCES); do \
-		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i | sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` >> $(DEPEND); \
+		$(DEPENDCC) $(CCOREFLAGS) -MM $$i -MT `echo $$i \
+		| sed -e 's+$(SRC)+$(OBJ)+' -e 's+.cpp+.o+' ` \
+		| sed -e 's_\.\./[a-z]*/\.\./_../_g' >> $(DEPEND); \
 	done
 
 # Include only if the goal needs it
 ifeq ($(filter $(MAKECMDGOALS),$(MAKEFILE_TARGETS_WITHOUT_INCLUDE)),)
 -include $(DEPEND)
 endif
+
+#-------------------------------------------------
+# generated
+#-------------------------------------------------
+
+$(SRC)/generated/lib_entries.hxx: $(DEVSOURCES)
+	@echo creating $@
+	$(PYTHON) create_lib_entries.py $^ > $@
+
+$(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
+	@echo creating $@
+	$(PYTHON) create_devinc.py $^ > $@
+
+.PHONY: generated
+generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
 
 #-------------------------------------------------
 # clang tidy

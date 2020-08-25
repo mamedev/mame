@@ -27,7 +27,7 @@
  */
 
 #include "nld_74192.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {

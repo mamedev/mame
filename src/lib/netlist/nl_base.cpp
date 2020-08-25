@@ -139,14 +139,17 @@ namespace netlist
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
 		m_setup->parser().add_include<plib::psource_str_t>("netlist/devices/net_lib.h", content);
+
+		// This is for core macro libraries
+		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h", content);
 #if 1
 		NETLIST_NAME(base_lib)(m_setup->parser());
 #else
-		// FIXME: This is very slow - need optimized parsing scanning
 #if 1
 		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
 		m_setup->parser().include("base_lib");
 #else
+		// FIXME: This is very slow - need optimized parsing scanning
 		pstring dir = "src/lib/netlist/macro/";
 		//m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_base_lib.cpp");

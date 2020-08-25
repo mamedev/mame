@@ -58,7 +58,7 @@
  */
 
 #include "nld_74113.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: this can probably be merged with nld_7473.cpp
 // FIXME: timing, see 74107 for example, use template

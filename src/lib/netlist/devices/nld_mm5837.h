@@ -4,7 +4,7 @@
 #ifndef NLD_MM5837_H_
 #define NLD_MM5837_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define MM5837(name)                                                        \
 		NET_REGISTER_DEV(MM5837, name)

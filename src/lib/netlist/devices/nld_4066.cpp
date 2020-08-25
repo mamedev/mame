@@ -23,8 +23,8 @@
 
 #include "nld_4066.h"
 
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/solver/nld_solver.h"
+#include "analog/nlid_twoterm.h"
+#include "solver/nld_solver.h"
 
 
 namespace netlist

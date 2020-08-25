@@ -4,7 +4,7 @@
 #ifndef NLD_7473_H_
 #define NLD_7473_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage: TTL_7473(name, cCLK, cJ, cK, cCLRQ)
 #define TTL_7473(...)                                                          \

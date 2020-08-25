@@ -4,7 +4,7 @@
 #ifndef NLD_74377_H_
 #define NLD_74377_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 
 #define TTL_74377_GATE(name)                                                   \

@@ -9,7 +9,7 @@
 #define NLID_TRUTHTABLE_H_
 
 #include "nl_factory.h"
-#include "nl_setup.h"
+#include "../nl_setup.h"
 
 #define USE_TT_ALTERNATIVE (0)
 

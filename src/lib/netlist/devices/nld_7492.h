@@ -4,7 +4,7 @@
 #ifndef NLD_7492_H_
 #define NLD_7492_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage: TTL_7492(name, cA, cB, cR1, cR2)
 #define TTL_7492(...)                                                     \

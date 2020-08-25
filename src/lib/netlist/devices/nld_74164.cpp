@@ -47,7 +47,7 @@
 **********************************************************************/
 
 #include "nld_74164.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: clk input to be separated - only falling edge relevant
 

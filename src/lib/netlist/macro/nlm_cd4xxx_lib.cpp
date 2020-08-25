@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "netlist/devices/net_lib.h"
+#include "devices/net_lib.h"
 
 //- Identifier: CD4001_DIP
 //- Title: CD4001BM/CD4001BC Quad 2-Input NOR Buffered B Series Gate
@@ -566,7 +566,7 @@ static NETLIST_START(MM5837_DIP)
 		A.VGG,  /*   VGG |2      7| NC */ NC.I,
 		A.OUT,  /*   OUT |3      6| NC */ NC.I,
 		A.VSS,  /*   VSS |4      5| NC */ NC.I,
-		        /*       +--------+    */
+				/*       +--------+    */
 	)
 NETLIST_END()
 

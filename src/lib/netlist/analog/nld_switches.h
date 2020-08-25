@@ -8,7 +8,7 @@
 /// \file nld_switches.h
 ///
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros

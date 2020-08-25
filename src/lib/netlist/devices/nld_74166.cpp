@@ -25,7 +25,7 @@
  */
 
 #include "nld_74166.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: separate handlers for inputs
 

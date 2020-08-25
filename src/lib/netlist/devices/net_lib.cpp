@@ -8,8 +8,8 @@
 // ***************************************************************************
 
 #include "net_lib.h"
-#include "netlist/nl_factory.h"
-#include "netlist/solver/nld_solver.h"
+#include "nl_factory.h"
+#include "solver/nld_solver.h"
 
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip

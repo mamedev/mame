@@ -4,7 +4,7 @@
 #ifndef NLD_4020_H_
 #define NLD_4020_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : CD4020(name)
 #define CD4020(...)                                                    \

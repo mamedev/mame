@@ -8,15 +8,15 @@
 /// \file nld_matrix_solver.h
 ///
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_errstr.h"
-#include "netlist/plib/mat_cr.h"
-#include "netlist/plib/palloc.h"
-#include "netlist/plib/penum.h"
-#include "netlist/plib/pmatrix2d.h"
-#include "netlist/plib/pmempool.h"
-#include "netlist/plib/putil.h"
-#include "netlist/plib/vector_ops.h"
+#include "nl_base.h"
+#include "nl_errstr.h"
+#include "plib/mat_cr.h"
+#include "plib/palloc.h"
+#include "plib/penum.h"
+#include "plib/pmatrix2d.h"
+#include "plib/pmempool.h"
+#include "plib/putil.h"
+#include "plib/vector_ops.h"
 
 #include <numeric>
 

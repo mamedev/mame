@@ -6,7 +6,7 @@
 /// \file nlm_cd4xxx.h
 ///
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 /*
  * Devices:

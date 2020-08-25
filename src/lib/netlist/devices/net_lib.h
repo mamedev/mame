@@ -10,7 +10,7 @@
 /// Discrete netlist implementation.
 ///
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #ifdef RES_R
 #warning "Do not include rescap.h in a netlist environment"
@@ -108,12 +108,12 @@ NETLIST_EXTERNAL(base_lib)
 #include "../macro/nlm_roms_lib.h"
 #include "../macro/nlm_ttl74xx_lib.h"
 
-#include "netlist/analog/nld_bjt.h"
-#include "netlist/analog/nld_fourterm.h"
-#include "netlist/analog/nld_mosfet.h"
-#include "netlist/analog/nld_opamps.h"
-#include "netlist/analog/nld_switches.h"
-#include "netlist/analog/nld_twoterm.h"
+#include "../analog/nld_bjt.h"
+#include "../analog/nld_fourterm.h"
+#include "../analog/nld_mosfet.h"
+#include "../analog/nld_opamps.h"
+#include "../analog/nld_switches.h"
+#include "../analog/nld_twoterm.h"
 
 #include "nld_legacy.h"
 #endif

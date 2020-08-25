@@ -17,8 +17,8 @@
  */
 
 #include "nld_mm5837.h"
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/solver/nld_matrix_solver.h"
+#include "analog/nlid_twoterm.h"
+#include "solver/nld_matrix_solver.h"
 
 namespace netlist
 {

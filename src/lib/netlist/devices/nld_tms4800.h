@@ -4,7 +4,7 @@
 #ifndef NLD_TMS4800_H_
 #define NLD_TMS4800_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : ROM_TMS4800(name, pAR, pOE1, pOE2, pA0, pA1, pA2, pA3, pA4, pA5, pA6, pA7, pA8, pA9, pA10)
 // auto connect: VCC, GND

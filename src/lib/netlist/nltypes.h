@@ -280,7 +280,7 @@ namespace netlist
 			{
 				return N == 0 ? NLTIME_FROM_NS(value0) :
 					   N == 1 ? NLTIME_FROM_NS(value1) :
-						   	    NLTIME_FROM_NS(value2);
+								NLTIME_FROM_NS(value2);
 			}
 		};
 

@@ -34,10 +34,10 @@
 ///
 //
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/pfunction.h"
-#include "netlist/solver/nld_solver.h"
+#include "nl_base.h"
+#include "../nl_setup.h"
+#include "plib/pfunction.h"
+#include "solver/nld_solver.h"
 #include "nld_generic_models.h"
 
 // -----------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 #ifndef NLD_DM9334_H_
 #define NLD_DM9334_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : TTL_9334(name, pCQ, pEQ, pD, pA0, pA1, pA2)
 // auto connect: VCC, GND

@@ -9,16 +9,16 @@
 //
 // ***************************************************************************
 
-#include "netlist/plib/pdynlib.h"
-#include "netlist/core/setup.h"
-#include "netlist/devices/net_lib.h"
-#include "netlist/nl_errstr.h"
-#include "netlist/nl_parser.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/pmain.h"
-#include "netlist/plib/pstrutil.h"
-#include "netlist/solver/nld_solver.h"
-#include "netlist/tools/nl_convert.h"
+#include "plib/pdynlib.h"
+#include "core/setup.h"
+#include "devices/net_lib.h"
+#include "nl_errstr.h"
+#include "nl_parser.h"
+#include "nl_setup.h"
+#include "plib/pmain.h"
+#include "plib/pstrutil.h"
+#include "solver/nld_solver.h"
+#include "tools/nl_convert.h"
 
 #include "plib/ptests.h"
 
