@@ -510,7 +510,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="balao">
+	<software name="balao" cloneof="loony">
 		<description>Balão Travesso! (Brazil)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -522,7 +522,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="loonyp" cloneof="balao">
+	<software name="loonyp" cloneof="loony">
 		<description>Loony Balloon (Europe, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -534,7 +534,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="battle">
+	<software name="battle" cloneof="airbattl">
 		<description>Barão Vermelho! (Brazil)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -546,7 +546,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="baron" cloneof="battle">
+	<software name="baron" cloneof="airbattl">
 		<description>Red Baron (Europe, prototype, set 1)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -558,7 +558,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="barona" cloneof="battle">
+	<software name="barona" cloneof="airbattl">
 		<description>Red Baron (Europe, prototype, set 2)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -653,7 +653,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="buraco">
+	<software name="buraco" cloneof="neutron">
 		<description>Buraco Negro! (Brazil)</description>
 		<year>1984</year>
 		<publisher>Philips</publisher>
@@ -665,7 +665,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="neutronp" cloneof="buraco">
+	<software name="neutronp" cloneof="neutron">
 		<description>Neutron Star (Europe, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -756,7 +756,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="claypig">
+	<software name="claypig" cloneof="claypigpl">
 		<description>Clay Pigeon! (Brazil)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -1411,7 +1411,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="phantom">
+	<software name="phantom" cloneof="nightmar">
 		<description>Phantom House (Europe, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -2013,7 +2013,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="2bsktbwlpl">
+	<software name="2bsktbwlpl" cloneof="2bwlbskt">
 		<description>Basket Bowling+ (France, plus)</description>
 		<year>198?</year>
 		<publisher>Brandt</publisher>
@@ -2026,8 +2026,8 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="2bwlbsktpl" cloneof="2bsktbwlpl">
-		<description>Tenpin Bowling/Basketball (Europe, plus, prototype)</description>
+	<software name="2bwlbsktpl" cloneof="2bwlbskt">
+		<description>Ten Pin Bowling/Basketball (Europe, plus, prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2039,7 +2039,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="billardpl">
+	<software name="billardpl" cloneof="billiard">
 		<description>Billard+ (France, plus)</description>
 		<year>1983</year>
 		<publisher>Brandt</publisher>
@@ -2054,7 +2054,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="billiardpl" cloneof="billardpl">
+	<software name="billiardpl" cloneof="billiard">
 		<description>Billiard (Europe, plus, prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2094,7 +2094,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="cosmicpl">
+	<software name="cosmicpl" cloneof="cosmic">
 		<description>Cosmic Conflict (Europe, plus)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -2107,7 +2107,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="cosmospl" cloneof="cosmicpl">
+	<software name="cosmospl" cloneof="cosmic">
 		<description>Cosmos+ (France, plus)</description>
 		<year>198?</year>
 		<publisher>Brandt</publisher>
@@ -2120,7 +2120,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="demonpl">
+	<software name="demonpl" cloneof="demon">
 		<description>Demon Attack+ (France, plus)</description>
 		<year>198?</year>
 		<publisher>Brandt</publisher>
@@ -2146,7 +2146,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="flipperpl">
+	<software name="flipperpl" cloneof="flipper">
 		<description>Flipper+ (France, plus)</description>
 		<year>198?</year>
 		<publisher>Brandt</publisher>
@@ -2159,7 +2159,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="flipperpla" cloneof="flipperpl">
+	<software name="flipperpla" cloneof="flipper">
 		<description>Flipper Game (Europe, plus, prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2172,7 +2172,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="freedompl">
+	<software name="freedompl" cloneof="freedom">
 		<description>Freedom Fighters (Europe, plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2185,7 +2185,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="beespl">
+	<software name="beespl" cloneof="bees">
 		<description>Killer Bees (Europe, plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2198,7 +2198,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="infernal" cloneof="beespl">
+	<software name="infernal" cloneof="bees">
 		<description>La Ruche Infernale (France, plus)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
@@ -2267,7 +2267,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="pickaxepl">
+	<software name="pickaxepl" cloneof="pickaxe">
 		<description>Pickaxe Pete (Europe, plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2280,7 +2280,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="3rcsocptpl">
+	<software name="3rcsocptpl" cloneof="3rcsocpt">
 		<description>Race/Spin-out/Cryptogram (Europe, plus)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -2293,7 +2293,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="3csaucptpl" cloneof="3rcsocptpl">
+	<software name="3csaucptpl" cloneof="3rcsocpt">
 		<description>Grand Prix+ (France, plus)</description>
 		<year>1983</year>
 		<publisher>Brandt</publisher>
@@ -2306,7 +2306,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="satellitpl">
+	<software name="satellitpl" cloneof="satellit">
 		<description>Satellite Attack (Europe, plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2319,7 +2319,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="stonepl">
+	<software name="stonepl" cloneof="stone">
 		<description>Stone Sling (Europe, plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2423,7 +2423,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 
 <!-- Odyssey³ prototypes, they won't work properly on European VP+ consoles -->
 
-	<software name="baseballpl">
+	<software name="baseballpl" cloneof="baseball">
 		<description>Baseball (US, plus, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -2493,7 +2493,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="deathracp">
+	<software name="deathracp" cloneof="deathrac">
 		<description>Death Race (Europe)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
