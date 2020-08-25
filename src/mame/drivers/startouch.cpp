@@ -9,10 +9,10 @@
     Hardware overview:
     MB Soyo M5EH V1.2 (1MB cache) or similar (e.g. Biostar M5ATD)
     16384 KB RAM
-    Intel Pentium MMX 233 MHz
+    Intel Pentium MMX 233 MHz or compatible (e.g. Cyrix M II-300GP 66MHz Bus 3.5x 2.9V)
 
-    MicroTouch ISA (BIOS 5.6)
-    ExpertColor Med3931 v1.0 ISA sound card (or other 82C931-based similar card, e.g. BTC 1817DS OPTi ISA)
+    MicroTouch ISA
+    ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
     S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
     Parallel port dongle HASP4
     Creative Video Blaster camera (parallel port)
@@ -65,10 +65,14 @@ ROM_START(europl01)
 
 	// Sleic used different motherboards for this machine. By now, we're adding the all the known BIOSes here
 	ROM_REGION(0x20000, "mb_bios", 0)
-	ROM_SYSTEM_BIOS(0, "soyo_m5eh_aw4_52", "Soyo M5EH with Award 4.51pg BIOS")     // Soyo M5EH V1.2 (1MB cache)
+	ROM_SYSTEM_BIOS(0, "soyo_m5eh_aw4_51", "Soyo M5EH with Award 4.51pg BIOS")     // Soyo M5EH V1.2 (1MB cache)
 	ROMX_LOAD("award_pci-pnp_586_222951562_v4.51pg.u2", 0x00000, 0x20000, CRC(5bb1bcbc) SHA1(6e2a7b5b3fc892ed20d0b12a1a533231c8953177), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "bst_m5atd_aw4_52", "Biostar M5ATD with Award 4.51pg BIOS") // Biostar M5ATD V1.2 (ALi M5819P + ALi M1543 B1 + ALi M1531 B1 + UMC UM61L6464F-6)
+	ROM_SYSTEM_BIOS(1, "bst_m5atd_aw4_51", "Biostar M5ATD with Award 4.51pg BIOS") // Biostar M5ATD V1.2 (ALi M5819P + ALi M1543 B1 + ALi M1531 B1 + UMC UM61L6464F-6)
 	ROMX_LOAD("award_pci_pnp_586_w29c011a.u11",         0x00000, 0x20000, CRC(1ec5749b) SHA1(3dd1dac852b00c8108aaf9c89f47ae1922d645f0), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "unknown1_aw4_51",  "Unknown PCB 1 with Award 4.51pg BIOS") // Unknown PCB/CPU/Chipset
+	ROMX_LOAD("award_1998_pci-pnp_586_149278871_w29c011.bin", 0x00000, 0x20000, CRC(3c6aea4d) SHA1(9e56b0f27c204a0eaaf1174070fc95faacc84b0b), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "unknown2_aw4_51",  "Unknown PCB 2 with Award 4.51pg BIOS") // Unknown PCB/CPU/Chipset
+	ROMX_LOAD("award_1998_pci-pnp_586_223123413_39sf010.bin", 0x00000, 0x20000, CRC(d30fe6c2) SHA1(022cf24d982b82e4c13ebbe974adae3a1638d1cd), ROM_BIOS(3))
 
 	ROM_REGION(0x8000, "vga_bios", 0)
 	ROM_LOAD("s3_86c775-86c785_video_bios_v1.01.04.u5", 0x0000, 0x8000, CRC(e718418f) SHA1(1288ce51bb732a346eb7c61d5bdf80ea22454d45))
