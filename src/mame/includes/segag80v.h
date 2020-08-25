@@ -105,7 +105,7 @@ private:
 	optional_device<samples_device> m_samples;
 	optional_device<sega_speech_device> m_speech;
 	optional_device<usb_sound_device> m_usb;
-	optional_device<segag80_audio_device> m_g80_audio;
+	optional_device<segag80_audio_device_base> m_g80_audio;
 	optional_device<ay8912_device> m_aysnd;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;

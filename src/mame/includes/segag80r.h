@@ -95,7 +95,7 @@ private:
 	optional_device<monsterb_sound_device> m_soundbrd;
 	optional_device<samples_device> m_samples;
 	optional_device<sega_speech_device> m_speech;
-	optional_device<segag80_audio_device> m_g80_audio;
+	optional_device<segag80_audio_device_base> m_g80_audio;
 	optional_device<usb_sound_device> m_usbsnd;
 	optional_device<sega005_sound_device> m_005snd;
 	required_device<gfxdecode_device> m_gfxdecode;
