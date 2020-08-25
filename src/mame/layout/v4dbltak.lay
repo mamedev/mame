@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="HOLD">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="STICK">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="LO/STICK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="TWIST">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="HI/TWIST">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="SWOP">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="SWOP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="COLLECT">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="COLLECT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	
+	<element name="SELECT">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="SELECT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	
+	<element name="DEAL">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="START/DEAL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	
+	<view name="Monitor and Lamps">
+		<screen index="0">
+			<bounds x="0" y="0" width="504" height="296" />
+		</screen>
+		<bezel name="lamp24" element="COLLECT" state="0">
+			<bounds x="0" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp25" element="HOLD" state="0">
+			<bounds x="50" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp26" element="HOLD" state="0">
+			<bounds x="100" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp32" element="HOLD" state="0">
+			<bounds x="150" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp33" element="HOLD" state="0">
+			<bounds x="200" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp34" element="HOLD" state="0">
+			<bounds x="250" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp40" element="TWIST" state="0">
+			<bounds x="300" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp41" element="STICK" state="0">
+			<bounds x="350" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp42" element="SWOP" state="0">
+			<bounds x="400" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp48" element="DEAL" state="0">
+			<bounds x="450" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp50" element="SELECT" state="0">
+			<bounds x="500" y="300" width="40" height="15"/>
+		</bezel>
+
+	</view>
+</mamelayout>
