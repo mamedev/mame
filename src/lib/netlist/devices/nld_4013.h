@@ -4,7 +4,7 @@
 #ifndef NLD_4013_H_
 #define NLD_4013_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage: CD4013(name, cCLOCK, cDATA, cRESET, cSET)
 #define CD4013(...)                                                            \

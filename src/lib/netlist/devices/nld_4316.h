@@ -4,7 +4,7 @@
 #ifndef NLD_4316_H_
 #define NLD_4316_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define CD4316_GATE(name)                                                       \
 		NET_REGISTER_DEV(CD4316_GATE, name)

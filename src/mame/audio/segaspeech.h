@@ -10,8 +10,6 @@
 
 #pragma once
 
-#define ENABLE_NETLIST_FILTERING (0)
-
 #include "cpu/mcs48/mcs48.h"
 #include "machine/netlist.h"
 #include "machine/timer.h"

@@ -19,7 +19,7 @@
  */
 
 #include "nld_dm9314.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {

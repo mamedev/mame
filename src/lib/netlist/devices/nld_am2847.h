@@ -4,7 +4,7 @@
 #ifndef NLD_AM2847_H_
 #define NLD_AM2847_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define TTL_AM2847(...)                                                \
 	NET_REGISTER_DEVEXT(TTL_AM2847, __VA_ARGS__)

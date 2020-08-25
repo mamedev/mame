@@ -50,7 +50,7 @@
  *
  */
 
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {

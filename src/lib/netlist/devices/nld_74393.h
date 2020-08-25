@@ -4,7 +4,7 @@
 #ifndef NLD_74393_H_
 #define NLD_74393_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage: TTL_74393(name, cCP, cMR)
 #define TTL_74393(...)                                                        \

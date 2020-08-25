@@ -15,7 +15,7 @@
  *
  */
 
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 #include "nld_log.h"
 #include "plib/pfmtlog.h"
 #include "plib/pmulti_threading.h"

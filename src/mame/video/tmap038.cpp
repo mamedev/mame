@@ -256,8 +256,8 @@ void tilemap038_device::prepare()
 void tilemap038_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 flags, u8 pri, u8 pri_mask) { draw_common(screen, bitmap, cliprect, flags, pri, pri_mask); }
 void tilemap038_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pri, u8 pri_mask) { draw_common(screen, bitmap, cliprect, flags, pri, pri_mask); }
 
-template<class _BitmapClass>
-void tilemap038_device::draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, u32 flags, u8 pri, u8 pri_mask)
+template<class BitmapClass>
+void tilemap038_device::draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, u32 flags, u8 pri, u8 pri_mask)
 {
 	m_tmap->draw(screen, bitmap, cliprect, flags, pri, pri_mask);
 }

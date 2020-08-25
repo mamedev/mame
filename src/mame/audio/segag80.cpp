@@ -25,14 +25,12 @@
  *
  *************************************/
 
-segag80_audio_device::segag80_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 lomask, u8 himask, bool haspsg, void (*netlist)(netlist::nlparse_t &), double output_scale) :
+segag80_audio_device_base::segag80_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 lomask, u8 himask, bool haspsg, netlist_ptr netlist, double output_scale) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_mixer_interface(mconfig, *this),
 	m_lo_input(*this, "sound_nl:lo_%u", 0),
 	m_hi_input(*this, "sound_nl:hi_%u", 0),
 	m_psg(*this, "psg"),
-	m_lo_vals(0xff),
-	m_hi_vals(0xff),
 	m_lo_mask(lomask),
 	m_hi_mask(himask),
 	m_has_psg(haspsg),
@@ -41,11 +39,7 @@ segag80_audio_device::segag80_audio_device(const machine_config &mconfig, device
 {
 }
 
-void segag80_audio_device::device_start()
-{
-}
-
-void segag80_audio_device::device_add_mconfig(machine_config &config)
+void segag80_audio_device_base::device_add_mconfig(machine_config &config)
 {
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(m_netlist)
@@ -102,21 +96,23 @@ void segag80_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(m_output_scale, 0.0);
 }
 
-void segag80_audio_device::write(offs_t addr, uint8_t data)
+void segag80_audio_device_base::device_start()
+{
+}
+
+void segag80_audio_device_base::write(offs_t addr, uint8_t data)
 {
 	addr &= 1;
 
 	auto &inputs = (addr == 0) ? m_lo_input : m_hi_input;
-	auto &oldvals = (addr == 0) ? m_lo_vals : m_hi_vals;
 	auto &mask = (addr == 0) ? m_lo_mask : m_hi_mask;
 
 	for (int bit = 0; bit < 8; bit++)
 		if (BIT(mask, bit))
 			inputs[bit]->write_line(BIT(data, bit));
-	oldvals = data;
 }
 
-void segag80_audio_device::write_ay(offs_t addr, uint8_t data)
+void segag80_audio_device_base::write_ay(offs_t addr, uint8_t data)
 {
 	assert(m_has_psg);
 	m_psg->address_data_w(addr, data);
@@ -133,7 +129,7 @@ void segag80_audio_device::write_ay(offs_t addr, uint8_t data)
 DEFINE_DEVICE_TYPE(ELIMINATOR_AUDIO, elim_audio_device, "elim_audio", "Eliminator Sound Board")
 
 elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	segag80_audio_device(mconfig, ELIMINATOR_AUDIO, tag, owner, clock, 0xfe, 0xff, false, NETLIST_NAME(elim), 5000.0)
+	segag80_audio_device_base(mconfig, ELIMINATOR_AUDIO, tag, owner, clock, 0xfe, 0xff, false, NETLIST_NAME(elim), 5000.0)
 {
 }
 
@@ -148,7 +144,7 @@ elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *
 DEFINE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device, "zektor_audio", "Zektor Sound Board")
 
 zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	segag80_audio_device(mconfig, ZEKTOR_AUDIO, tag, owner, clock, 0xfe, 0xff, true, NETLIST_NAME(zektor), 5000.0)
+	segag80_audio_device_base(mconfig, ZEKTOR_AUDIO, tag, owner, clock, 0xfe, 0xff, true, NETLIST_NAME(zektor), 5000.0)
 {
 }
 
@@ -163,7 +159,7 @@ zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device, "spcfury_audio", "Space Fury Sound Board")
 
 spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	segag80_audio_device(mconfig, SPACE_FURY_AUDIO, tag, owner, clock, 0xc7, 0x3f, false, NETLIST_NAME(spacfury), 60000.0)
+	segag80_audio_device_base(mconfig, SPACE_FURY_AUDIO, tag, owner, clock, 0xc7, 0x3f, false, NETLIST_NAME(spacfury), 60000.0)
 {
 }
 
@@ -178,7 +174,7 @@ spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device, "astrob_audio", "Astro Blaster Sound Board")
 
 astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	segag80_audio_device(mconfig, ASTRO_BLASTER_AUDIO, tag, owner, clock, 0xff, 0xff, false, NETLIST_NAME(astrob), 25000.0)
+	segag80_audio_device_base(mconfig, ASTRO_BLASTER_AUDIO, tag, owner, clock, 0xff, 0xff, false, NETLIST_NAME(astrob), 25000.0)
 {
 }
 
@@ -193,7 +189,7 @@ astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(SPACE_ODYSSEY_AUDIO, spaceod_audio_device, "astrob_audio", "Space Odyssey Sound Board")
 
 spaceod_audio_device::spaceod_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	segag80_audio_device(mconfig, SPACE_ODYSSEY_AUDIO, tag, owner, clock, 0xf5, 0xcb, false, NETLIST_NAME(spaceod), 25000.0)
+	segag80_audio_device_base(mconfig, SPACE_ODYSSEY_AUDIO, tag, owner, clock, 0xf5, 0xcb, false, NETLIST_NAME(spaceod), 25000.0)
 {
 }
 

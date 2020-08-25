@@ -346,8 +346,8 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 	}
 }
 
-template<class _BitmapClass>
-void segas24_tile_device::draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
+template<class BitmapClass>
+void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
 {
 	uint16_t hscr = tile_ram[0x5000+(layer >> 1)];
 	uint16_t vscr = tile_ram[0x5004+(layer >> 1)];

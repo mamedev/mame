@@ -116,9 +116,9 @@
   * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
   * Unknown Fun World A0-1 game,                                Fun World,          1991.
   * Joker Card / Multi Card (Epoxy brick CPU),                  Fun World,          1991.
-  * Gratis Poker (V.204, Set 1),                                Mega Soft,          1995.
-  * Gratis Poker (V.204, Set 2),                                Mega Soft,          1995.
-  * Nkoulit (Gullit) (encrypted GFX),                           JK Amusement,       1995.
+  * Gratis Poker (V.204, set 1),                                Mega Soft,          1995.
+  * Gratis Poker (V.204, set 2),                                Mega Soft,          1995.
+  * Gkoulit (encrypted GFX),                                    JK Amusement,       1995.
   * Reflex Cards (English, serial protected),                   TAB Austria,        1999.
   * Royal Card (stealth with NES multigame),                    bootleg,            1991.
   * Royal Card (stealth with MSX multigame),                    bootleg,            1991.
@@ -8321,9 +8321,9 @@ GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empt
 GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A7-11 game 2",               MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,    0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "unknown Fun World A0-1 game",                  MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, jokcrdep,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",         "Joker Card / Multi Card (Epoxy brick CPU)",    MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 199?, gratispk,   0,        gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, Set 1)",                  0,                       layout_jollycrd )
-GAMEL( 199?, gratispka,  gratispk, gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, Set 2)",                  0,                       layout_jollycrd )
-GAMEL( 1995, nkoulit,    royalcrd, royalcd1,   royalcrd,  funworld_state,   init_tabblue, ROT0, "JK Amusement",      "Nkoulit (Gullit) (encrypted GFX)",             0,                       layout_jollycrd )
+GAMEL( 199?, gratispk,   0,        gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, set 1)",                  0,                       layout_jollycrd )
+GAMEL( 199?, gratispka,  gratispk, gratispk,   funworld,  funworld_state,   empty_init,   ROT0, "Mega Soft",         "Gratis Poker (V.204, set 2)",                  0,                       layout_jollycrd )
+GAMEL( 1995, nkoulit,    royalcrd, royalcd1,   royalcrd,  funworld_state,   init_tabblue, ROT0, "JK Amusement",      "Gkoulit (encrypted GFX)",                      0,                       layout_jollycrd )
 GAMEL( 1999, reflexcrd,  royalcrd, royalcd1,   royalcrd,  funworld_state,   empty_init,   ROT0, "TAB Austria",       "Reflex Cards (English, serial protected)",     0,                       layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!

@@ -4,7 +4,7 @@
 #ifndef NLD_DM9314_H_
 #define NLD_DM9314_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : TTL_9314(name, pEQ, pMRQ, pS0Q, pS1Q, pS2Q, pS3Q, pD0, pD1, pD2, pD3)
 // auto connect: VCC, GND

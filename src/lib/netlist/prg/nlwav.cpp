@@ -1,10 +1,10 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "netlist/plib/pstring.h"
-#include "netlist/plib/pmain.h"
-#include "netlist/plib/ppmf.h"
-#include "netlist/plib/pstream.h"
-#include "netlist/plib/pstrutil.h"
+#include "plib/pstring.h"
+#include "plib/pmain.h"
+#include "plib/ppmf.h"
+#include "plib/pstream.h"
+#include "plib/pstrutil.h"
 
 #include <cstdio>
 

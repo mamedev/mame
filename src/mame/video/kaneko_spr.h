@@ -51,8 +51,8 @@ public:
 	void copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
-	template<class _BitmapClass>
-	void copybitmap_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	template<class BitmapClass>
+	void copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	void bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 

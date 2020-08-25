@@ -267,7 +267,10 @@ void electron_romboxp_device::expbus_w(offs_t offset, uint8_t data)
 			}
 			break;
 		case 12:
+			break;
 		case 13:
+			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
+			m_cart[1]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
 		case 14:
 		case 15:
 			if (m_rom_base == 12)

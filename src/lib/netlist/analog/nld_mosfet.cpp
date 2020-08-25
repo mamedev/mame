@@ -18,8 +18,8 @@
 // Stefan Jahn, Michael Margraf, Vincent Habchi and Raimund Jacob, "Qucs Technical Papers" (2007)
 //
 
-#include "netlist/solver/nld_solver.h"
-#include "netlist/nl_setup.h"
+#include "solver/nld_solver.h"
+#include "../nl_setup.h"
 #include "nlid_twoterm.h"
 
 #define BODY_CONNECTED_TO_SOURCE    (1)

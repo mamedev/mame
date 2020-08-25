@@ -2,9 +2,9 @@
 // copyright-holders:Couriersud
 
 #include "nlid_twoterm.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_factory.h"
-#include "netlist/solver/nld_solver.h"
+#include "nl_base.h"
+#include "nl_factory.h"
+#include "solver/nld_solver.h"
 
 // FIXME : convert to parameters
 

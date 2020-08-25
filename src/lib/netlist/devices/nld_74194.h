@@ -3,7 +3,7 @@
 #ifndef NLD_74194_H_
 #define NLD_74194_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : TTL_74194(name, pCLK, pS0, pS1, pSRIN, pA, pB, pC, pD, pSLIN, pCLRQ)
 // auto connect: VCC, GND

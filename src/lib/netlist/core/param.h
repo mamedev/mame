@@ -28,10 +28,10 @@
 #include "setup.h"
 
 #include "../plib/palloc.h"
+#include "../plib/pfunction.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 #include "../plib/putil.h" // psource_t
-#include "../plib/pfunction.h"
 
 #include <memory>
 

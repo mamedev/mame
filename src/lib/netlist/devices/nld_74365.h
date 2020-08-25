@@ -3,7 +3,7 @@
 #ifndef NLD_74365_H_
 #define NLD_74365_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : TTL_74365(name, pG1Q, pG2Q, pA1, pA2, pA3, pA4, pA5, pA6)
 // auto connect: VCC, GND

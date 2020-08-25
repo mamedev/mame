@@ -62,7 +62,7 @@
  */
 
 #include "nld_74107.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {

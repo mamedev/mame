@@ -7,12 +7,12 @@
 /// \file nlid_system.h
 ///
 
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_factory.h"
-#include "netlist/plib/prandom.h"
-#include "netlist/plib/pstonum.h"
-#include "netlist/plib/putil.h"
+#include "analog/nlid_twoterm.h"
+#include "nl_base.h"
+#include "nl_factory.h"
+#include "plib/prandom.h"
+#include "plib/pstonum.h"
+#include "plib/putil.h"
 
 #include <random>
 

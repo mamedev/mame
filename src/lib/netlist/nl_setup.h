@@ -16,10 +16,8 @@
 #include "plib/putil.h"
 
 #include "nl_config.h"
-#include "nltypes.h"
 #include "nl_parser.h"
-// FIXME: avoid including factory
-//#include "nl_factory.h"
+#include "nltypes.h"
 
 #include <initializer_list>
 #include <memory>
@@ -86,7 +84,6 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define EXTERNAL_SOURCE(name)                                                  \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
-// FIXME: Need to pass in parameter definition
 #define LOCAL_LIB_ENTRY_1(name)                                                \
 		LOCAL_SOURCE(name)                                                     \
 		setup.register_lib_entry(# name, "", PSOURCELOC());

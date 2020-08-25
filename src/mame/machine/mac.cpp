@@ -911,7 +911,7 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 {
-//        printf("VIA OUT CB2 = %x\n", state);
+	//printf("VIA OUT CB2 = %x (ticks %d)\n", state, m_adb_timer_ticks);
 	if (ADB_IS_EGRET)
 	{
 		m_egret->set_via_data(state & 1);
@@ -922,14 +922,17 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	}
 	else
 	{
-		m_adb_command <<= 1;
-		if (state)
+		if (m_adb_timer_ticks > 0)
 		{
-			m_adb_command |= 1;
-		}
-		else
-		{
-			m_adb_command &= ~1;
+			m_adb_command <<= 1;
+			if (state)
+			{
+				m_adb_command |= 1;
+			}
+			else
+			{
+				m_adb_command &= ~1;
+			}
 		}
 	}
 }

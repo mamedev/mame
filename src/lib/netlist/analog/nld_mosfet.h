@@ -4,7 +4,7 @@
 #ifndef NLD_MOSFET_H_
 #define NLD_MOSFET_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 ///
 /// \file nld_mosfet.h

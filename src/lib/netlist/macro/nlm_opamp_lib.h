@@ -8,7 +8,7 @@
 /// \file nlm_opamp.h
 ///
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #ifndef __PLIB_PREPROCESSOR__
 

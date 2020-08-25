@@ -7,7 +7,7 @@
 
 
 #include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
+#include "netlist/devices/net_lib.h"
 
 #define USE_CLOCK (1)
 

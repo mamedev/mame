@@ -31,6 +31,7 @@
 #define PEXPECT_FALSE(exp1) PINT_EXPECT(eq, exp1, false)
 
 #define PEXPECT_THROW(exp, excep) PINT_EXPECT_THROW(exp, excep)
+#define PEXPECT_NO_THROW(exp) PINT_EXPECT_NO_THROW(exp)
 
 #define PTEST(name, desc) PINT_TEST(name, desc)
 #define PTEST_F(name, desc) PINT_TEST_F(name, desc, name)
@@ -57,6 +58,14 @@
 	{ \
 		try { exp; std::cout << ptest_f << ":" << __LINE__ << ":1: error: no " #excep " exception thrown\n";} \
 		catch (excep &) { std::cout << "\tOK: got " #excep " for " # exp "\n";} \
+		catch (std::exception &ptest_e) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown: " << ptest_e.what() << "\n"; } \
+		catch (...) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown\n"; } \
+	} else do {} while (0)
+
+#define PINT_EXPECT_NO_THROW(exp) \
+	if (const char *ptest_f = __FILE__) \
+	{ \
+		try { exp; std::cout << "\tOK: got no exception for " # exp "\n";} \
 		catch (std::exception &ptest_e) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown: " << ptest_e.what() << "\n"; } \
 		catch (...) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown\n"; } \
 	} else do {} while (0)

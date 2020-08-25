@@ -4,7 +4,7 @@
 #ifndef NLD_4017_H_
 #define NLD_4017_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define CD4017(name)                                                            \
 		NET_REGISTER_DEV(CD4017, name)

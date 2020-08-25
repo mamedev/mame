@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "netlist/solver/nld_solver.h"
+#include "solver/nld_solver.h"
 
-#include "netlist/nl_factory.h"
+#include "nl_factory.h"
 #include "nlid_twoterm.h"
 
 namespace netlist

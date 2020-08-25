@@ -5,8 +5,8 @@
  *
  */
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_factory.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 template <typename N, typename T>
 constexpr bool TOR(N n, T &a)

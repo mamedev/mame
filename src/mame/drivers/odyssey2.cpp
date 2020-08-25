@@ -54,7 +54,7 @@ XTAL notes (differs per model):
 TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
   and writes to the ptr/color registers, but does not increment the Y regs
-- 824x screen resolution is not strictly defined, height(243) is correct, but
+- screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping characters on eachother will cause
   glitches (it is used to an advantage in some as-of-yet undumped homebrews)
@@ -62,6 +62,14 @@ TODO:
   hiding them will cause bugs in some Euro games
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
   be correct
+- according to tests, 8244 does not have a sound interrupt, but the Philips
+  service test cartridge for 8245 tests for it and fails if it did not get an irq
+- likewise, 8244 does not have a horizontal interrupt, but does 8245 have it?
+- tests done on 8244 suggests that Y(0xa4) is latched when reading X, but
+  that is inconsistent with the Philips service test cartridge: It reads X, Y, X,
+  then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
+  will also cause video glitches to look different on some games when compared
+  to the real console, for example powerlrd.
 - ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
   or is PAL detection going wrong? It does look like PAL/NTSC detection is working,
   see internal RAM $3D d7. So maybe it is due to inaccurate PAL video timing.
@@ -553,7 +561,7 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y / Yes") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N / No") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(8)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
 	PORT_START("KEY.6")
@@ -637,7 +645,7 @@ static INPUT_PORTS_START( g7400 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"=  \u2192") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y / Yes") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N / No") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear  ;") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(8) PORT_CHAR(';')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear  ;") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(';')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter  _") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(10) PORT_CHAR('_')
 
 	PORT_MODIFY("KEY.6")
@@ -856,4 +864,4 @@ COMP( 1979, videopacf, odyssey2,  0, videopacf, odyssey2, odyssey2_state,  empty
 
 COMP( 1983, videopacp, 0,         0, g7400,     g7400,    videopacp_state, empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, jopac,     videopacp, 0, jo7400,    g7400,    videopacp_state, empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, odyssey3,  videopacp, 0, odyssey3,  g7400,    videopacp_state, empty_init, "Magnavox", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, odyssey3,  videopacp, 0, odyssey3,  g7400,    videopacp_state, empty_init, "Philips", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )

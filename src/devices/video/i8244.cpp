@@ -140,14 +140,12 @@ void i8244_device::device_start()
 
 	save_item(NAME(m_x_beam_pos));
 	save_item(NAME(m_y_beam_pos));
-	save_item(NAME(m_y_latch));
 	save_item(NAME(m_control_status));
 	save_item(NAME(m_collision_status));
-	save_item(NAME(m_pos_hold));
-	save_item(NAME(m_y_hold));
 	save_item(NAME(m_sh_written));
 	save_item(NAME(m_sh_pending));
 	save_item(NAME(m_sh_prescaler));
+	save_item(NAME(m_sh_count));
 	save_item(NAME(m_sh_output));
 	save_item(NAME(m_sh_duty));
 }
@@ -309,7 +307,7 @@ uint8_t i8244_device::read(offs_t offset)
 			data |= (h >= 225 && h < m_bgate_start && get_y_beam() <= m_vblank_start) ? 1 : 0;
 
 			// position strobe status
-			data |= m_pos_hold ? 2 : 0;
+			data |= m_vdc.s.control & 0x02;
 
 			m_irq_func(CLEAR_LINE);
 			m_control_status &= ~0xcc;
@@ -323,34 +321,12 @@ uint8_t i8244_device::read(offs_t offset)
 			break;
 
 		case 0xa4:
-			if (m_y_hold)
-			{
-				data = m_y_latch;
-				m_y_hold = false;
-			}
-			else if (m_pos_hold)
-				data = m_y_beam_pos;
-			else
-				data = get_y_beam();
-
+			data = (m_vdc.s.control & 0x02) ? get_y_beam() : m_y_beam_pos;
 			break;
 
 		case 0xa5:
-		{
-			if (m_pos_hold)
-			{
-				data = m_x_beam_pos;
-				m_pos_hold = false;
-			}
-			else
-				data = get_x_beam();
-
-			// Y is latched when reading X
-			m_y_hold = true;
-			m_y_latch = get_y_beam();
-
+			data = (m_vdc.s.control & 0x02) ? get_x_beam() : m_x_beam_pos;
 			break;
-		}
 
 		default:
 			data = m_vdc.reg[offset];
@@ -387,15 +363,12 @@ void i8244_device::write(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0xa0:
-			if ((m_vdc.s.control & 0x02) && !(data & 0x02) && !m_pos_hold)
+			if ((m_vdc.s.control & 0x02) && !(data & 0x02))
 			{
 				// toggling strobe bit, tuck away values
 				m_x_beam_pos = get_x_beam();
 				m_y_beam_pos = get_y_beam();
-				m_pos_hold = true;
 			}
-			// note: manual talks about a hblank interrupt on d0, and a sound interrupt on d2,
-			// but tests done on 8244 reveal no such features
 			break;
 
 		case 0xa7: case 0xa8: case 0xa9:
@@ -800,19 +773,35 @@ void i8244_device::sound_update()
 		int feedback = m_sh_output;
 		signal >>= 1;
 
-		/* Noise tap is on bits 0 and 5 and fed back to bit 15 */
+		// noise tap is on bits 0 and 5 and fed back to bit 15
 		if (m_vdc.s.sound & 0x10)
 		{
 			feedback ^= signal >> 4 & 1; // pre-shift bit 5
 			signal = (signal & ~0x8000) | (feedback << 15);
 		}
 
-		/* Loop sound */
+		// loop sound
 		signal |= feedback << 23;
 
 		m_vdc.s.shift3 = signal & 0xFF;
 		m_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
 		m_vdc.s.shift1 = ( signal >> 16 ) & 0xFF;
+
+		// sound interrupt
+		if (++m_sh_count == 24)
+		{
+			m_sh_count = 0;
+			if (m_vdc.s.control & 0x04)
+			{
+				m_control_status |= 0x04;
+				m_irq_func(ASSERT_LINE);
+			}
+		}
 	}
-	m_sh_written = false;
+	else if (m_sh_written)
+	{
+		m_sh_count = 0;
+		m_sh_written = false;
+	}
+
 }

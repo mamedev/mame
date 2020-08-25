@@ -4,7 +4,7 @@
 #ifndef NLD_NE555_H_
 #define NLD_NE555_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : NE555(name)
 #define NE555(...)                                                     \

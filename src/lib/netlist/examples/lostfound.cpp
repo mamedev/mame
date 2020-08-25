@@ -211,5 +211,5 @@ private:
 	nld_power_pins             m_supply;
 };
 
-	NETLIB_DEVICE_IMPL(CD4066_GATE_DYNAMIC, "CD4066_GATE_DYNAMIC",            "")
+//  NETLIB_DEVICE_IMPL(CD4066_GATE_DYNAMIC, "CD4066_GATE_DYNAMIC",            "")
 

@@ -650,8 +650,17 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 		}
 
 		// do one clock transition on CB1 to advance the VIA shifter
-		m_via1->write_cb1(m_adb_extclock ^ 1);
-		m_via1->write_cb1(m_adb_extclock);
+		//printf("ADB transition (%d)\n", m_adb_timer_ticks);
+		if (m_adb_direction)
+		{
+			m_via1->write_cb1(m_adb_extclock ^ 1);
+			m_via1->write_cb1(m_adb_extclock);
+		}
+		else
+		{
+			m_via1->write_cb1(m_adb_extclock);
+			m_via1->write_cb1(m_adb_extclock ^ 1);
+		}
 
 		m_adb_timer_ticks--;
 		if (!m_adb_timer_ticks)
@@ -665,6 +674,12 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 					m_adb_timer_ticks = 8;
 					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				}
+			}
+
+			if (!(m_adb_direction) && (ADB_IS_BITBANG_CLASS))
+			{
+			//  m_via1->write_cb1(m_adb_extclock);
+				m_via1->write_cb1(m_adb_extclock ^ 1);
 			}
 		}
 		else
@@ -697,6 +712,7 @@ void mac_state::mac_adb_newaction(int state)
 
 			case ADB_STATE_XFER_EVEN:
 			case ADB_STATE_XFER_ODD:
+				//printf("EVEN/ODD: adb datasize %d\n", m_adb_datasize);
 				if (m_adb_datasize > 0)
 				{
 					int i;
@@ -706,6 +722,7 @@ void mac_state::mac_adb_newaction(int state)
 					{
 						// set up the byte
 						m_adb_send = m_adb_buffer[0];
+						//printf("ADB sending %02x\n", m_adb_send);
 						m_adb_datasize--;
 
 						// move down the rest of the buffer, if any
@@ -1144,7 +1161,7 @@ void mac_state::adb_vblank()
 			{
 				m_adb_irq_pending = 1;
 				m_adb_command = m_adb_send = 0;
-				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see  the IRQ
+				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see the IRQ
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				m_adb_srq_switch = 1;
 			}

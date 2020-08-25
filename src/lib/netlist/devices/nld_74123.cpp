@@ -46,7 +46,7 @@
  *
  */
 
-#include "netlist/analog/nlid_twoterm.h"
+#include "analog/nlid_twoterm.h"
 #include "nlid_system.h"
 
 namespace netlist

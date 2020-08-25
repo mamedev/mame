@@ -93,11 +93,11 @@ public:
 	void barrier(machine_config &config);
 	void armora(machine_config &config);
 
-	template<int _N>
+	template<int Index>
 	DECLARE_WRITE_LINE_MEMBER(speedfrk_gear_change_w)
 	{
 		if (state)
-			m_gear = _N;
+			m_gear = Index;
 	}
 
 	ioport_value speedfrk_gear_number_r()
