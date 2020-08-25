@@ -57,7 +57,7 @@
 //**************************************************************************
 
 // poly_manager is a template class
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
 class poly_manager
 {
 public:
@@ -69,26 +69,26 @@ public:
 	struct vertex_t
 	{
 		vertex_t() { }
-		vertex_t(_BaseType _x, _BaseType _y) { x = _x; y = _y; }
+		vertex_t(BaseType _x, BaseType _y) { x = _x; y = _y; }
 
-		_BaseType x, y;                         // X, Y coordinates
-		_BaseType p[_MaxParams];                // interpolated parameters
+		BaseType x, y;                          // X, Y coordinates
+		BaseType p[MaxParams];                  // interpolated parameters
 	};
 
 	// a single extent describes a span and a list of parameter extents
 	struct extent_t
 	{
-		int16_t startx, stopx;                    // starting (inclusive)/ending (exclusive) endpoints
+		int16_t startx, stopx;                  // starting (inclusive)/ending (exclusive) endpoints
 		struct
 		{
-			_BaseType start;                    // parameter value at start
-			_BaseType dpdx;                     // dp/dx relative to start
-		} param[_MaxParams];
+			BaseType start;                     // parameter value at start
+			BaseType dpdx;                      // dp/dx relative to start
+		} param[MaxParams];
 		void *userdata;                         // custom per-span data
 	};
 
 	// delegate type for scanline callbacks
-	typedef delegate<void (int32_t, const extent_t &, const _ObjectData &, int)> render_delegate;
+	typedef delegate<void (int32_t, const extent_t &, const ObjectData &, int)> render_delegate;
 
 	// construction/destruction
 	poly_manager(running_machine &machine, uint8_t flags = 0);
@@ -104,8 +104,8 @@ public:
 	void wait(const char *debug_reason = "general");
 
 	// object data allocators
-	_ObjectData &object_data_alloc();
-	_ObjectData &object_data_last() const { return m_object.last(); }
+	ObjectData &object_data_alloc();
+	ObjectData &object_data_last() const { return m_object.last(); }
 
 	// tiles
 	uint32_t render_tile(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &v1, const vertex_t &v2);
@@ -121,7 +121,7 @@ public:
 	uint32_t render_polygon(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t *v);
 
 	// public helpers
-	int zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, int paramcount, _BaseType clipval);
+	int zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, int paramcount, BaseType clipval);
 
 private:
 	poly_manager(running_machine &machine, screen_device *screen, uint8_t flags);
@@ -141,7 +141,7 @@ private:
 	struct polygon_info
 	{
 		poly_manager *      m_owner;                // pointer back to the poly manager
-		_ObjectData *       m_object;               // object data pointer
+		ObjectData *        m_object;               // object data pointer
 		render_delegate     m_callback;             // callback to handle a scanline's worth of work
 	};
 
@@ -222,18 +222,18 @@ private:
 	};
 
 	// internal array types
-	typedef poly_array<polygon_info, _MaxPolys> polygon_array;
-	typedef poly_array<_ObjectData, _MaxPolys + 1> objectdata_array;
-	typedef poly_array<work_unit, std::min(_MaxPolys * UNITS_PER_POLY, 65535)> unit_array;
+	typedef poly_array<polygon_info, MaxPolys> polygon_array;
+	typedef poly_array<ObjectData, MaxPolys + 1> objectdata_array;
+	typedef poly_array<work_unit, std::min(MaxPolys * UNITS_PER_POLY, 65535)> unit_array;
 
 	// round in a cross-platform consistent manner
-	inline int32_t round_coordinate(_BaseType value)
+	inline int32_t round_coordinate(BaseType value)
 	{
 		int32_t result = poly_floor(value);
 
 		if ((value > 0) && (result < 0))
 			return INT_MAX-1;
-		return result + (value - _BaseType(result) > _BaseType(0.5));
+		return result + (value - BaseType(result) > BaseType(0.5));
 	}
 
 	// internal helpers
@@ -286,22 +286,22 @@ private:
 //  poly_manager - constructor
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, uint8_t flags)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::poly_manager(running_machine &machine, uint8_t flags)
 	: poly_manager(machine, nullptr, flags)
 {
 }
 
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen_device &screen, uint8_t flags)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::poly_manager(screen_device &screen, uint8_t flags)
 	: poly_manager(screen.machine(), &screen, flags)
 {
 }
 
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, screen_device *screen, uint8_t flags)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::poly_manager(running_machine &machine, screen_device *screen, uint8_t flags)
 	: m_machine(machine)
 	, m_screen(screen)
 	, m_queue(nullptr)
@@ -334,8 +334,8 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(runnin
 //  ~poly_manager - destructor
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::~poly_manager()
 {
 #if KEEP_POLY_STATISTICS
 {
@@ -372,8 +372,8 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
 //  work_item_callback - process a work item
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_callback(void *param, int threadid)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+void *poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::work_item_callback(void *param, int threadid)
 {
 	while (1)
 	{
@@ -434,8 +434,8 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 //  wait - stall until all work is complete
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const char *debug_reason)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *debug_reason)
 {
 	osd_ticks_t time;
 
@@ -468,7 +468,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 	// we need to preserve the last object data that was supplied
 	if (m_object.count() > 0)
 	{
-		_ObjectData temp = object_data_last();
+		ObjectData temp = object_data_last();
 		m_object.reset();
 		m_object.next() = temp;
 	}
@@ -478,11 +478,11 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 
 
 //-------------------------------------------------
-//  object_data_alloc - allocate a new _ObjectData
+//  object_data_alloc - allocate a new ObjectData
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-_ObjectData &poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::object_data_alloc()
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+ObjectData &poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::object_data_alloc()
 {
 	// wait for a work item if we have to, then return the next item
 	m_object.wait_for_space();
@@ -494,8 +494,8 @@ _ObjectData &poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::object
 //  render_tile - render a tile
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_tile(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2)
 {
 	const vertex_t *v1 = &_v1;
 	const vertex_t *v2 = &_v2;
@@ -521,8 +521,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 		return 0;
 
 	// determine total X extents
-	_BaseType minx = v1->x;
-	_BaseType maxx = v2->x;
+	BaseType minx = v1->x;
+	BaseType maxx = v2->x;
 	if (minx > maxx)
 		return 0;
 
@@ -530,12 +530,12 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 	polygon_info &polygon = polygon_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v2yclip, callback);
 
 	// compute parameter deltas
-	_BaseType param_dpdx[_MaxParams];
-	_BaseType param_dpdy[_MaxParams];
+	BaseType param_dpdx[MaxParams];
+	BaseType param_dpdy[MaxParams];
 	if (paramcount > 0)
 	{
-		_BaseType oox = poly_recip(v2->x - v1->x);
-		_BaseType ooy = poly_recip(v2->y - v1->y);
+		BaseType oox = poly_recip(v2->x - v1->x);
+		BaseType ooy = poly_recip(v2->y - v1->y);
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 		{
 			param_dpdx[paramnum]  = oox * (v2->p[paramnum] - v1->p[paramnum]);
@@ -591,7 +591,7 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 		for (int extnum = 0; extnum < unit.count_next; extnum++)
 		{
 			// compute the ending X based on which part of the triangle we're in
-			_BaseType fully = _BaseType(curscan + extnum) + _BaseType(0.5);
+			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
 
 			// set the extent and update the total pixel count
 			extent_t &extent = unit.extent[extnum];
@@ -601,7 +601,7 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
-			_BaseType fullstartx = _BaseType(istartx) + _BaseType(0.5);
+			BaseType fullstartx = BaseType(istartx) + BaseType(0.5);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
 				extent.param[paramnum].start = v1->p[paramnum] + fullstartx * param_dpdx[paramnum] + fully * param_dpdy[paramnum];
@@ -626,8 +626,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 //  given 3 vertexes
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_triangle(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_triangle(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
 {
 	const vertex_t *v1 = &_v1;
 	const vertex_t *v2 = &_v2;
@@ -666,8 +666,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 		return 0;
 
 	// determine total X extents
-	_BaseType minx = v1->x;
-	_BaseType maxx = v1->x;
+	BaseType minx = v1->x;
+	BaseType maxx = v1->x;
 	if (v2->x < minx) minx = v2->x;
 	else if (v2->x > maxx) maxx = v2->x;
 	if (v3->x < minx) minx = v3->x;
@@ -677,39 +677,39 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 	polygon_info &polygon = polygon_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v3yclip, callback);
 
 	// compute the slopes for each portion of the triangle
-	_BaseType dxdy_v1v2 = (v2->y == v1->y) ? _BaseType(0.0) : (v2->x - v1->x) / (v2->y - v1->y);
-	_BaseType dxdy_v1v3 = (v3->y == v1->y) ? _BaseType(0.0) : (v3->x - v1->x) / (v3->y - v1->y);
-	_BaseType dxdy_v2v3 = (v3->y == v2->y) ? _BaseType(0.0) : (v3->x - v2->x) / (v3->y - v2->y);
+	BaseType dxdy_v1v2 = (v2->y == v1->y) ? BaseType(0.0) : (v2->x - v1->x) / (v2->y - v1->y);
+	BaseType dxdy_v1v3 = (v3->y == v1->y) ? BaseType(0.0) : (v3->x - v1->x) / (v3->y - v1->y);
+	BaseType dxdy_v2v3 = (v3->y == v2->y) ? BaseType(0.0) : (v3->x - v2->x) / (v3->y - v2->y);
 
 	// compute parameter starting points and deltas
-	_BaseType param_start[_MaxParams];
-	_BaseType param_dpdx[_MaxParams];
-	_BaseType param_dpdy[_MaxParams];
+	BaseType param_start[MaxParams];
+	BaseType param_dpdx[MaxParams];
+	BaseType param_dpdy[MaxParams];
 	if (paramcount > 0)
 	{
-		_BaseType a00 = v2->y - v3->y;
-		_BaseType a01 = v3->x - v2->x;
-		_BaseType a02 = v2->x*v3->y - v3->x*v2->y;
-		_BaseType a10 = v3->y - v1->y;
-		_BaseType a11 = v1->x - v3->x;
-		_BaseType a12 = v3->x*v1->y - v1->x*v3->y;
-		_BaseType a20 = v1->y - v2->y;
-		_BaseType a21 = v2->x - v1->x;
-		_BaseType a22 = v1->x*v2->y - v2->x*v1->y;
-		_BaseType det = a02 + a12 + a22;
+		BaseType a00 = v2->y - v3->y;
+		BaseType a01 = v3->x - v2->x;
+		BaseType a02 = v2->x*v3->y - v3->x*v2->y;
+		BaseType a10 = v3->y - v1->y;
+		BaseType a11 = v1->x - v3->x;
+		BaseType a12 = v3->x*v1->y - v1->x*v3->y;
+		BaseType a20 = v1->y - v2->y;
+		BaseType a21 = v2->x - v1->x;
+		BaseType a22 = v1->x*v2->y - v2->x*v1->y;
+		BaseType det = a02 + a12 + a22;
 
-		if (poly_abs(det) < _BaseType(0.00001))
+		if (poly_abs(det) < BaseType(0.00001))
 		{
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
-				param_dpdx[paramnum] = _BaseType(0.0);
-				param_dpdy[paramnum] = _BaseType(0.0);
+				param_dpdx[paramnum] = BaseType(0.0);
+				param_dpdy[paramnum] = BaseType(0.0);
 				param_start[paramnum] = v1->p[paramnum];
 			}
 		}
 		else
 		{
-			_BaseType idet = poly_recip(det);
+			BaseType idet = poly_recip(det);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
 				param_dpdx[paramnum]  = idet * (v1->p[paramnum]*a00 + v2->p[paramnum]*a10 + v3->p[paramnum]*a20);
@@ -720,9 +720,9 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 	}
 	else    // GCC 4.7.0 incorrectly claims these are uninitialized; humor it by initializing in the (hopefully rare) zero parameter case
 	{
-		param_start[0] = _BaseType(0.0);
-		param_dpdx[0] = _BaseType(0.0);
-		param_dpdy[0] = _BaseType(0.0);
+		param_start[0] = BaseType(0.0);
+		param_dpdx[0] = BaseType(0.0);
+		param_dpdy[0] = BaseType(0.0);
 	}
 
 	// compute the X extents for each scanline
@@ -749,9 +749,9 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 		for (int extnum = 0; extnum < unit.count_next; extnum++)
 		{
 			// compute the ending X based on which part of the triangle we're in
-			_BaseType fully = _BaseType(curscan + extnum) + _BaseType(0.5);
-			_BaseType startx = v1->x + (fully - v1->y) * dxdy_v1v3;
-			_BaseType stopx;
+			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
+			BaseType startx = v1->x + (fully - v1->y) * dxdy_v1v3;
+			BaseType stopx;
 			if (fully < v2->y)
 				stopx = v1->x + (fully - v1->y) * dxdy_v1v2;
 			else
@@ -789,7 +789,7 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
-			_BaseType fullstartx = _BaseType(istartx) + _BaseType(0.5);
+			BaseType fullstartx = BaseType(istartx) + BaseType(0.5);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
 				extent.param[paramnum].start = param_start[paramnum] + fullstartx * param_dpdx[paramnum] + fully * param_dpdy[paramnum];
@@ -814,8 +814,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 //  triangles in a fan
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_triangle_fan(const rectangle &cliprect, render_delegate callback, int paramcount, int numverts, const vertex_t *v)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_triangle_fan(const rectangle &cliprect, render_delegate callback, int paramcount, int numverts, const vertex_t *v)
 {
 	// iterate over vertices
 	uint32_t pixels = 0;
@@ -830,8 +830,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 //  triangles in a strip
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_triangle_strip(const rectangle &cliprect, render_delegate callback, int paramcount, int numverts, const vertex_t *v)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_triangle_strip(const rectangle &cliprect, render_delegate callback, int paramcount, int numverts, const vertex_t *v)
 {
 	// iterate over vertices
 	uint32_t pixels = 0;
@@ -846,8 +846,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 //  render of an object, given specific extents
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents)
 {
 	// clip coordinates
 	int32_t v1yclip = std::max(startscanline, cliprect.top());
@@ -900,7 +900,7 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 			extent.stopx = istopx;
 
 			// fill in the parameters for the extent
-			for (int paramnum = 0; paramnum < _MaxParams; paramnum++)
+			for (int paramnum = 0; paramnum < MaxParams; paramnum++)
 			{
 				extent.param[paramnum].start = srcextent.param[paramnum].start;
 				extent.param[paramnum].dpdx = srcextent.param[paramnum].dpdx;
@@ -930,13 +930,13 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 //  to 32 vertices
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
 template<int _NumVerts>
-uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polygon(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t *v)
+uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_polygon(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t *v)
 {
 	// determine min/max Y vertices
-	_BaseType minx = v[0].x;
-	_BaseType maxx = v[0].x;
+	BaseType minx = v[0].x;
+	BaseType maxx = v[0].x;
 	int minv = 0;
 	int maxv = 0;
 	for (int vertnum = 1; vertnum < _NumVerts; vertnum++)
@@ -973,8 +973,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 		int                 index;                  // index of this edge
 		const vertex_t *    v1;                     // pointer to first vertex
 		const vertex_t *    v2;                     // pointer to second vertex
-		_BaseType           dxdy;                   // dx/dy along the edge
-		_BaseType           dpdy[_MaxParams];       // per-parameter dp/dy values
+		BaseType            dxdy;                   // dx/dy along the edge
+		BaseType            dpdy[MaxParams];        // per-parameter dp/dy values
 	};
 	poly_edge fedgelist[_NumVerts - 1];
 	poly_edge *edgeptr = &fedgelist[0];
@@ -989,7 +989,7 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 			continue;
 
 		// need dx/dy always, and parameter deltas as necessary
-		_BaseType ooy = poly_recip(edgeptr->v2->y - edgeptr->v1->y);
+		BaseType ooy = poly_recip(edgeptr->v2->y - edgeptr->v1->y);
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
@@ -1010,7 +1010,7 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 			continue;
 
 		// need dx/dy always, and parameter deltas as necessary
-		_BaseType ooy = poly_recip(edgeptr->v2->y - edgeptr->v1->y);
+		BaseType ooy = poly_recip(edgeptr->v2->y - edgeptr->v1->y);
 		edgeptr->dxdy = (edgeptr->v2->x - edgeptr->v1->x) * ooy;
 		for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			edgeptr->dpdy[paramnum] = (edgeptr->v2->p[paramnum] - edgeptr->v1->p[paramnum]) * ooy;
@@ -1057,13 +1057,13 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 		for (int extnum = 0; extnum < unit.count_next; extnum++)
 		{
 			// compute the ending X based on which part of the triangle we're in
-			_BaseType fully = _BaseType(curscan + extnum) + _BaseType(0.5);
+			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
 			while (fully > ledge->v2->y && fully < v[maxv].y)
 				++ledge;
 			while (fully > redge->v2->y && fully < v[maxv].y)
 				++redge;
-			_BaseType startx = ledge->v1->x + (fully - ledge->v1->y) * ledge->dxdy;
-			_BaseType stopx = redge->v1->x + (fully - redge->v1->y) * redge->dxdy;
+			BaseType startx = ledge->v1->x + (fully - ledge->v1->y) * ledge->dxdy;
+			BaseType stopx = redge->v1->x + (fully - redge->v1->y) * redge->dxdy;
 
 			// clamp to full pixels
 			int32_t istartx = round_coordinate(startx);
@@ -1073,18 +1073,18 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 			extent_t &extent = unit.extent[extnum];
 			if (paramcount > 0)
 			{
-				_BaseType ldy = fully - ledge->v1->y;
-				_BaseType rdy = fully - redge->v1->y;
-				_BaseType oox = poly_recip(stopx - startx);
+				BaseType ldy = fully - ledge->v1->y;
+				BaseType rdy = fully - redge->v1->y;
+				BaseType oox = poly_recip(stopx - startx);
 
 				// iterate over parameters
 				for (int paramnum = 0; paramnum < paramcount; paramnum++)
 				{
-					_BaseType lparam = ledge->v1->p[paramnum] + ldy * ledge->dpdy[paramnum];
-					_BaseType rparam = redge->v1->p[paramnum] + rdy * redge->dpdy[paramnum];
-					_BaseType dpdx = (rparam - lparam) * oox;
+					BaseType lparam = ledge->v1->p[paramnum] + ldy * ledge->dpdy[paramnum];
+					BaseType rparam = redge->v1->p[paramnum] + rdy * redge->dpdy[paramnum];
+					BaseType dpdx = (rparam - lparam) * oox;
 
-					extent.param[paramnum].start = lparam;// - (_BaseType(istartx) + 0.5f) * dpdx;
+					extent.param[paramnum].start = lparam;// - (BaseType(istartx) + 0.5f) * dpdx;
 					extent.param[paramnum].dpdx = dpdx;
 				}
 			}
@@ -1129,8 +1129,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 //  a z coordinate
 //-------------------------------------------------
 
-template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
-int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, int paramcount, _BaseType clipval)
+template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
+int poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, int paramcount, BaseType clipval)
 {
 	bool prevclipped = (v[numverts - 1].p[0] < clipval);
 	vertex_t *nextout = outv;
@@ -1145,7 +1145,7 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 		{
 			const vertex_t &v1 = v[(vertnum == 0) ? (numverts - 1) : (vertnum - 1)];
 			const vertex_t &v2 = v[vertnum];
-			_BaseType frac = (clipval - v1.p[0]) / (v2.p[0] - v1.p[0]);
+			BaseType frac = (clipval - v1.p[0]) / (v2.p[0] - v1.p[0]);
 			nextout->x = v1.x + frac * (v2.x - v1.x);
 			nextout->y = v1.y + frac * (v2.y - v1.y);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
@@ -1164,23 +1164,23 @@ int poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::zclip_if_less(i
 }
 
 
-template<typename _BaseType, int _MaxParams>
+template<typename BaseType, int MaxParams>
 struct frustum_clip_vertex
 {
-	_BaseType x, y, z, w;       // A 3d coordinate already transformed by a projection matrix
-	_BaseType p[_MaxParams];    // Additional parameters to clip
+	BaseType x, y, z, w;       // A 3d coordinate already transformed by a projection matrix
+	BaseType p[MaxParams];     // Additional parameters to clip
 };
 
 
-template<typename _BaseType, int _MaxParams>
-int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
+template<typename BaseType, int MaxParams>
+int frustum_clip_w(const frustum_clip_vertex<BaseType, MaxParams>* v, int num_vertices, frustum_clip_vertex<BaseType, MaxParams>* out)
 {
 	if (num_vertices <= 0)
 		return 0;
 
-	const _BaseType W_PLANE = 0.000001f;
+	const BaseType W_PLANE = 0.000001f;
 
-	frustum_clip_vertex<_BaseType, _MaxParams> clipv[10];
+	frustum_clip_vertex<BaseType, MaxParams> clipv[10];
 	int clip_verts = 0;
 
 	int previ = num_vertices - 1;
@@ -1193,11 +1193,11 @@ int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_
 		if ((v1_side * v2_side) < 0)        // edge goes through W plane
 		{
 			// insert vertex at intersection point
-			_BaseType wdiv = v[previ].w - v[i].w;
+			BaseType wdiv = v[previ].w - v[i].w;
 			if (wdiv == 0.0f)       // 0 edge means degenerate polygon
 				return 0;
 
-			_BaseType t = fabs((W_PLANE - v[previ].w) / wdiv);
+			BaseType t = fabs((W_PLANE - v[previ].w) / wdiv);
 
 			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
 			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
@@ -1205,7 +1205,7 @@ int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_
 			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
 
 			// Interpolate the rest of the parameters
-			for (int pi = 0; pi < _MaxParams; pi++)
+			for (int pi = 0; pi < MaxParams; pi++)
 				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
 
 			++clip_verts;
@@ -1224,13 +1224,13 @@ int frustum_clip_w(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_
 }
 
 
-template<typename _BaseType, int _MaxParams>
-int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out, int axis, int sign)
+template<typename BaseType, int MaxParams>
+int frustum_clip(const frustum_clip_vertex<BaseType, MaxParams>* v, int num_vertices, frustum_clip_vertex<BaseType, MaxParams>* out, int axis, int sign)
 {
 	if (num_vertices <= 0)
 		return 0;
 
-	frustum_clip_vertex<_BaseType, _MaxParams> clipv[10];
+	frustum_clip_vertex<BaseType, MaxParams> clipv[10];
 	int clip_verts = 0;
 
 	int previ = num_vertices - 1;
@@ -1238,10 +1238,10 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 	for (int i=0; i < num_vertices; i++)
 	{
 		int v1_side, v2_side;
-		_BaseType* v1a = (_BaseType*)&v[i];
-		_BaseType* v2a = (_BaseType*)&v[previ];
+		BaseType* v1a = (BaseType*)&v[i];
+		BaseType* v2a = (BaseType*)&v[previ];
 
-		_BaseType v1_axis, v2_axis;
+		BaseType v1_axis, v2_axis;
 
 		if (sign)       // +axis
 		{
@@ -1260,12 +1260,12 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 		if ((v1_side * v2_side) < 0)        // edge goes through W plane
 		{
 			// insert vertex at intersection point
-			_BaseType wdiv = ((v[previ].w - v2_axis) - (v[i].w - v1_axis));
+			BaseType wdiv = ((v[previ].w - v2_axis) - (v[i].w - v1_axis));
 
 			if (wdiv == 0.0f)           // 0 edge means degenerate polygon
 				return 0;
 
-			_BaseType t = fabs((v[previ].w - v2_axis) / wdiv);
+			BaseType t = fabs((v[previ].w - v2_axis) / wdiv);
 
 			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
 			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
@@ -1273,7 +1273,7 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
 
 			// Interpolate the rest of the parameters
-			for (int pi = 0; pi < _MaxParams; pi++)
+			for (int pi = 0; pi < MaxParams; pi++)
 				clipv[clip_verts].p[pi] = v[previ].p[pi] + ((v[i].p[pi] - v[previ].p[pi]) * t);
 
 			++clip_verts;
@@ -1292,16 +1292,16 @@ int frustum_clip(const frustum_clip_vertex<_BaseType, _MaxParams>* v, int num_ve
 }
 
 
-template<typename _BaseType, int _MaxParams>
-int frustum_clip_all(frustum_clip_vertex<_BaseType, _MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<_BaseType, _MaxParams>* out)
+template<typename BaseType, int MaxParams>
+int frustum_clip_all(frustum_clip_vertex<BaseType, MaxParams>* clip_vert, int num_vertices, frustum_clip_vertex<BaseType, MaxParams>* out)
 {
-	num_vertices = frustum_clip_w<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert);
-	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
-	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
-	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
-	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
-	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
-	num_vertices = frustum_clip<_BaseType, _MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+	num_vertices = frustum_clip_w<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert);
+	num_vertices = frustum_clip<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+	num_vertices = frustum_clip<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+	num_vertices = frustum_clip<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+	num_vertices = frustum_clip<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+	num_vertices = frustum_clip<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+	num_vertices = frustum_clip<BaseType, MaxParams>(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
 	out = clip_vert;
 	return num_vertices;
 }

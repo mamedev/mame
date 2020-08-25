@@ -316,8 +316,8 @@ VIDEO_START_MEMBER(tetrisp2_state,rocknms)
 /* sprites should be able to create shadows too, how?
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
-template<class _BitmapClass>
-static void tetrisp2_draw_sprites(_BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u8* priority_ram,
+template<class BitmapClass>
+static void tetrisp2_draw_sprites(BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u8* priority_ram,
 									u16 *sprram_top, size_t sprram_size, ms32_sprite_device *chip, int flip, bool is_yuv)
 {
 	u16  *source =   sprram_top;

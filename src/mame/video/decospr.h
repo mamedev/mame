@@ -67,8 +67,8 @@ protected:
 	int m_transpen; // used by fncywld (tumbleb.cpp)
 
 private:
-	template<class _BitmapClass>
-	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
+	template<class BitmapClass>
+	void draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

@@ -182,8 +182,8 @@ void decospr_device::alloc_sprite_bitmap()
 	screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
-template<class _BitmapClass>
-void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords)
+template<class BitmapClass>
+void decospr_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords)
 {
 	//printf("cliprect %04x, %04x\n", cliprect.top(), cliprect.bottom());
 

@@ -12,8 +12,8 @@
 #define ALTO2_IO_PAGE_SIZE      0001000                     //!< size of the memory mapped io range
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2MEM_H_
-#define _A2MEM_H_
+#ifndef MAME_CPU_ALTO2_A2MEM_H
+#define MAME_CPU_ALTO2_A2MEM_H
 //! memory access mode
 enum {
 	ALTO2_MEM_NONE,
@@ -135,5 +135,5 @@ void watch_read(uint32_t addr, uint32_t data);
 void init_memory();                             //!< initialize the memory system
 void exit_memory();                             //!< deinitialize the memory system
 void reset_memory();                            //!< reset the memory system
-#endif // _A2MEM_H_
+#endif // MAME_CPU_ALTO2_A2MEM_H
 #endif  // ALTO2_DEFINE_CONSTANTS
