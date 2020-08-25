@@ -13,6 +13,8 @@
       reimplement as a push, not a pull
     - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
+    - according to the user manual, some opcodes(dis/enable timer/interrupt)
+      don't increment the timer, does it affect the prescaler too?
 
 ****************************************************************************
 

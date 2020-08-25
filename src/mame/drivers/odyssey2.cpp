@@ -818,12 +818,12 @@ void videopacp_state::odyssey3(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START (odyssey2)
+ROM_START (videopac)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
-ROM_START (videopac)
+ROM_START (odyssey2)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
@@ -858,9 +858,9 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP MACHINE    INPUT     STATE            INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1979, odyssey2,  0,         0, odyssey2,  odyssey2, odyssey2_state,  empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, videopac,  odyssey2,  0, videopac,  odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, videopacf, odyssey2,  0, videopacf, odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, videopac,  0,         0, videopac,  odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, videopacf, videopac,  0, videopacf, odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, odyssey2,  videopac,  0, odyssey2,  odyssey2, odyssey2_state,  empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1983, videopacp, 0,         0, g7400,     g7400,    videopacp_state, empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, jopac,     videopacp, 0, jo7400,    g7400,    videopacp_state, empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
