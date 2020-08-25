@@ -703,7 +703,6 @@ void odyssey2_state::odyssey2(machine_config &config)
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("O2");
-	SOFTWARE_LIST(config, "vpp_list").set_compatible("videopacp").set_filter("O2");
 }
 
 void odyssey2_state::videopac(machine_config &config)
@@ -720,7 +719,6 @@ void odyssey2_state::videopac(machine_config &config)
 	m_maincpu->set_clock(17.734476_MHz_XTAL / 3);
 
 	subdevice<software_list_device>("cart_list")->set_filter("VP");
-	subdevice<software_list_device>("vpp_list")->set_filter("VP");
 }
 
 void odyssey2_state::videopacf(machine_config &config)
@@ -776,8 +774,7 @@ void videopacp_state::g7400(machine_config &config)
 
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("videopacp").set_filter("VPP");
-	SOFTWARE_LIST(config, "vp_list").set_compatible("videopac").set_filter("VPP");
+	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("VPP");
 }
 
 void videopacp_state::jo7400(machine_config &config)
@@ -809,7 +806,6 @@ void videopacp_state::odyssey3(machine_config &config)
 	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	subdevice<software_list_device>("cart_list")->set_filter("O3");
-	subdevice<software_list_device>("vp_list")->set_filter("O3");
 }
 
 
