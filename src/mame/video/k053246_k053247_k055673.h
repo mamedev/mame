@@ -118,8 +118,8 @@ public:
 			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
 			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
-	template<class _BitmapClass>
-	inline void k053247_draw_single_sprite_gxcore(_BitmapClass &bitmap , rectangle const &cliprect,
+	template<class BitmapClass>
+	inline void k053247_draw_single_sprite_gxcore(BitmapClass &bitmap , rectangle const &cliprect,
 		u8* gx_objzbuf, u8* gx_shdzbuf, int code, u16* gx_spriteram, int offs,
 		int color, int alpha, int drawmode, int zcode, int pri,
 		int primask, int shadow, u8* drawmode_table, u8* shadowmode_table, int shdmask)
@@ -292,8 +292,8 @@ public:
 	}
 
 
-	template<class _BitmapClass>
-	void k053247_draw_yxloop_gx(_BitmapClass &bitmap, const rectangle &cliprect,
+	template<class BitmapClass>
+	void k053247_draw_yxloop_gx(BitmapClass &bitmap, const rectangle &cliprect,
 		int code,
 		int color,
 		int height, int width,
@@ -446,7 +446,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	template <class _BitmapClass> void k053247_sprites_draw_common(_BitmapClass &bitmap, const rectangle &cliprect);
+	template <class BitmapClass> void k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(K053247, k053247_device)

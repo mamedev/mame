@@ -4,7 +4,7 @@
 #ifndef NLD_LOG_H_
 #define NLD_LOG_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define LOG(name, cI)                                                        \
 		NET_REGISTER_DEV(LOG, name)                                         \

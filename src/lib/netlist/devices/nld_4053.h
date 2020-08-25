@@ -3,7 +3,7 @@
 #ifndef NLD_4053_H_
 #define NLD_4053_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // FIXME: Implement pure CMOS version
 

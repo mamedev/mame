@@ -2963,6 +2963,7 @@ void lua_engine::initialize()
 		}));
 	image_type.set("image_type_name", &device_image_interface::image_type_name);
 	image_type.set("load", &device_image_interface::load);
+	image_type.set("load_software", static_cast<image_init_result (device_image_interface::*)(const std::string &)>(&device_image_interface::load_software));
 	image_type.set("unload", &device_image_interface::unload);
 	image_type.set("create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); });
 	image_type.set("crc", &device_image_interface::crc);

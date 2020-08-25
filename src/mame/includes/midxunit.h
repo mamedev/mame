@@ -12,7 +12,7 @@
 
 #include "audio/dcs.h"
 #include "cpu/tms34010/tms34010.h"
-#include "machine/midwayic.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/nvram.h"
 #include "video/midtunit.h"
 #include "emupal.h"
@@ -29,7 +29,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxrom(*this, "gfxrom")
 		, m_nvram(*this, "nvram")
-		, m_midway_serial_pic(*this, "serial_pic")
+		, m_pic(*this, "pic")
 		, m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U)
 		, m_gun_led(*this, "Player%u_Gun_LED", 1U)
 	{ }
@@ -46,12 +46,12 @@ private:
 	void midxunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void midxunit_unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
-	uint16_t midxunit_status_r();
+	uint32_t midxunit_status_r();
 	uint8_t midxunit_uart_r(offs_t offset);
 	void midxunit_uart_w(offs_t offset, uint8_t data);
-	uint16_t midxunit_security_r();
-	void midxunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void midxunit_security_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t midxunit_security_r();
+	void midxunit_security_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midxunit_security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(midxunit_dcs_output_full);
 	uint32_t midxunit_dma_r(offs_t offset, uint32_t mem_mask = ~0);
 	void midxunit_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -65,16 +65,20 @@ private:
 	required_memory_region m_gfxrom;
 
 	required_device<nvram_device> m_nvram;
-	required_device<midway_serial_pic_device> m_midway_serial_pic;
+	required_device<pic16c57_device> m_pic;
 	output_finder<3> m_gun_recoil;
 	output_finder<3> m_gun_led;
 
 	uint8_t m_cmos_write_enable;
 	uint16_t m_iodata[8];
 	uint8_t m_uart[8];
-	uint8_t m_security_bits;
 	bool m_adc_int;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
+
+	uint8_t m_pic_command;
+	uint8_t m_pic_data;
+	uint8_t m_pic_clk;
+	uint8_t m_pic_status;
 };
 
 #endif // MAME_INCLUDES_MIDXUNIT_H

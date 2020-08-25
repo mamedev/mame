@@ -34,7 +34,7 @@
  */
 
 #include "nld_74174.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -162,7 +162,6 @@ namespace devices
 		NETLIB_SUB(74174_GATE) F;
 	};
 
-	NETLIB_DEVICE_IMPL(74174_GATE, "TTL_74174_GATE", "")
 	NETLIB_DEVICE_IMPL(74174,      "TTL_74174", "+CLK,+D1,+D2,+D3,+D4,+D5,+D6,+CLRQ,@VCC,@GND")
 
 	} //namespace devices

@@ -16,7 +16,7 @@
   BACTA Datalogger emulation
   The British Amusement and Catering Trade Association created a standard for the tracking of statistics
   and other features on British AWPs across hardware manufacturers.
-  The specification is very simple, a 1200 baud null modem connection  via RS232, with the logger sending an 
+  The specification is very simple, a 1200 baud null modem connection  via RS232, with the logger sending an
   ACK command (0x06) on receipt of a valid character, and NAK (0x15) on error.
   In this emulation, the simplest possible device is simulated here, derived from the RS232 null_modem.
   We only handle the feedback for acknowledgment, and limited logging.
@@ -53,7 +53,7 @@ void bacta_datalogger_device::device_reset()
 	int startbits = 1;
 	int databits = 8;
 	parity_t parity = device_serial_interface::PARITY_ODD;
-	stop_bits_t stopbits = 	device_serial_interface::STOP_BITS_1;
+	stop_bits_t stopbits =  device_serial_interface::STOP_BITS_1;
 
 	set_data_frame(startbits, databits, parity, stopbits);
 
@@ -95,7 +95,7 @@ void bacta_datalogger_device::rcv_complete()
 
 	receive_register_extract();
 
-	data = get_received_char();	
+	data = get_received_char();
 	if (data != 0x00)
 	{
 		if (data > 0x80)
@@ -106,7 +106,7 @@ void bacta_datalogger_device::rcv_complete()
 			{
 				return;
 			}
-		}		
+		}
 		m_last_input = data;
 		switch (data)
 		{
@@ -200,7 +200,7 @@ void bacta_datalogger_device::rcv_complete()
 			case 0x7f:
 				LOGDATA("(%c) User defined message (0x%x), next byte is message length\n",data,data);
 				break;
-			
+
 			default:
 				LOGDATA("(%c) Received: %02x\n",data, data);
 				break;
@@ -209,8 +209,8 @@ void bacta_datalogger_device::rcv_complete()
 		tx_queue();
 	}
 	else
-	{		
-		if (data != 0x00) 
+	{
+		if (data != 0x00)
 		{
 			m_output_char = 0x15;//NAK
 			tx_queue();

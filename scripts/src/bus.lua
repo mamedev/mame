@@ -1025,6 +1025,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.cpp",
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.h",
+		MAME_DIR .. "src/devices/bus/electron/fbprint.cpp",
+		MAME_DIR .. "src/devices/bus/electron/fbprint.h",
 		MAME_DIR .. "src/devices/bus/electron/mode7.cpp",
 		MAME_DIR .. "src/devices/bus/electron/mode7.h",
 		MAME_DIR .. "src/devices/bus/electron/plus1.cpp",

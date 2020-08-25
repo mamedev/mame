@@ -6038,7 +6038,7 @@ void vt1682_lxts3_state::unk1682_init()
 
 	uint8_t* ROM = memregion("mainrom")->base();
 	// this jumps to a function on startup that has a bunch of jumps / accesses to the 3xxx region, which is internal ROM
-	// but bypassing it allows the unit to boot.  
+	// but bypassing it allows the unit to boot.
 	ROM[0x7ef43] = 0xea;
 	ROM[0x7ef44] = 0xea;
 	ROM[0x7ef45] = 0xea;
@@ -6143,7 +6143,7 @@ ROM_START( unk1682 )
 ROM_END
 
 ROM_START( njp60in1 )
-	ROM_REGION( 0x2000000, "mainrom", 0 ) // the 6Mbyte - 7Mbyte region of the ROM is missing, causing Extreme Power Soccer to fail	
+	ROM_REGION( 0x2000000, "mainrom", 0 ) // the 6Mbyte - 7Mbyte region of the ROM is missing, causing Extreme Power Soccer to fail
 	ROM_LOAD( "60-in-1.bin", 0x00000, 0x0800000, CRC(7b2ee951) SHA1(fc7c214704908b85676efc64a21930483d24a457) )
 	ROM_CONTINUE(0x0800000, 0x0800000)
 	ROM_CONTINUE(0x1000000, 0x0800000)
@@ -6241,7 +6241,7 @@ CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp6
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
 // Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
 // has 26.6017 Mhz (6xPAL) XTAL
-CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682 based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
+CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
 
 CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // random number generation issues on 2 games, linescroll on racing games
 

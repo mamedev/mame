@@ -47,7 +47,7 @@
 **********************************************************************/
 
 #include "nld_74164.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: clk input to be separated - only falling edge relevant
 
@@ -103,8 +103,6 @@ namespace netlist
 			m_ab = static_cast<unsigned>((m_AB() == 3) ? 1 : 0);
 		}
 
-		friend class NETLIB_NAME(74164_dip);
-	private:
 		object_array_t<logic_input_t, 2> m_AB;
 		logic_input_t m_CLRQ;
 		logic_input_t m_CLK;

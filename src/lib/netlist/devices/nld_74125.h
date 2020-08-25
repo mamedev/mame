@@ -8,7 +8,7 @@
 #ifndef NLD_74125_H_
 #define NLD_74125_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 #define TTL_74125_GATE(...)                                                    \
 		NET_REGISTER_DEV(TTL_74125_GATE, __VA_ARGS__)

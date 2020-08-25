@@ -2,14 +2,14 @@
 // copyright-holders:Frank Palazzolo, Ryan Holtz
 /***************************************************************************
 
-	Ramtek Star Cruiser Driver
+    Ramtek Star Cruiser Driver
 
-	(no known issues)
+    (no known issues)
 
-	Frank Palazzolo
-	palazzol@home.com
+    Frank Palazzolo
+    palazzol@home.com
 
-	Netlist Audio by Ryan Holtz
+    Netlist Audio by Ryan Holtz
 
 ***************************************************************************/
 

@@ -4,7 +4,7 @@
 #ifndef NLD_7448_H_
 #define NLD_7448_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage       : TTL_7448(name, pA, pB, pC, pD, pLTQ, pBIQ, pRBIQ)
 // auto connect: VCC, GND

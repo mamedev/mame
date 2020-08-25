@@ -50,6 +50,7 @@ SOUNDS["VOTRAX"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["DMADAC"] = true
 SOUNDS["CDDA"] = true
+SOUNDS["POKEY"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -84,6 +85,7 @@ MACHINES["Z80DAISY"] = true
 MACHINES["NETLIST"] = true
 MACHINES["IDECTRL"] = true
 MACHINES["PS2INTC"] = true
+MACHINES["ER2055"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -180,6 +182,7 @@ files{
 	MAME_DIR .. "src/mame/drivers/kinst.cpp",
 	MAME_DIR .. "src/mame/audio/dcs.cpp",
 	MAME_DIR .. "src/mame/audio/dcs.h",
+	MAME_DIR .. "src/mame/drivers/akkaarrh.cpp",
 }
 end
 

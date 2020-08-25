@@ -63,6 +63,7 @@ void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	switch (m_type)
 	{
 		case LOWPASS:
+		case LOWPASS_2C:
 			while (samples--)
 			{
 				memory += ((*src++ - memory) * m_k) / 0x10000;
@@ -93,9 +94,20 @@ void filter_rc_device::recalc()
 			{
 				/* filter disabled */
 				m_k = 0x10000;
+				m_memory = 0x0;
 				return;
 			}
 			Req = (m_R1 * (m_R2 + m_R3)) / (m_R1 + m_R2 + m_R3);
+			break;
+		case LOWPASS_2C:
+			if (m_C == 0.0)
+			{
+				/* filter disabled */
+				m_k = 0x10000;
+				m_memory = 0x0;
+				return;
+			}
+			Req = m_R1;
 			break;
 		case HIGHPASS:
 		case AC:

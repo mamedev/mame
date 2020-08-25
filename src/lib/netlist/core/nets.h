@@ -9,9 +9,9 @@
 #define NL_CORE_NETS_H_
 
 #include "base_objects.h"
-#include "state_var.h"
 #include "core_device.h"
 #include "exec.h"
+#include "state_var.h"
 
 #include "../nltypes.h"
 #include "../plib/plists.h"

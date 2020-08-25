@@ -132,7 +132,8 @@ public:
 	// optional operation overrides for ABC 1600
 	virtual int abcbus_csb() { return 1; }
 	virtual uint8_t abcbus_ops() { return 0xff; }
-	virtual void abcbus_tren(int state) { }
+	virtual uint8_t abcbus_tren() { return 0xff; }
+	virtual void abcbus_tren(uint8_t data) { }
 	virtual void abcbus_prac(int state) { }
 	virtual uint8_t abcbus_exp() { return 0xff; }
 	virtual int abcbus_xcsb2() { return 1; }
@@ -198,7 +199,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( xcsb3_r ) { return m_card ? m_card->abcbus_xcsb3() : 1; }
 	DECLARE_READ_LINE_MEMBER( xcsb4_r ) { return m_card ? m_card->abcbus_xcsb4() : 1; }
 	DECLARE_READ_LINE_MEMBER( xcsb5_r ) { return m_card ? m_card->abcbus_xcsb5() : 1; }
-	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abcbus_tren(state); }
+	uint8_t read_tren() { return m_card ? m_card->abcbus_tren() : 0xff; }
+	void write_tren(uint8_t data) { if (m_card) m_card->abcbus_tren(data); }
 	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abcbus_prac(state); }
 
 	void cs_w(uint8_t data) { write_cs(data); }

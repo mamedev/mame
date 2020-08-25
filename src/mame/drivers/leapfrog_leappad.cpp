@@ -22,7 +22,49 @@
     also released some kind of Tablet with this name, and they even released
     a new "LEAPPAD" in around 2016:
     https://www.youtube.com/watch?v=MXFSgj6xLTU , which nearly looks like the
-    same, but is most likely techically completely different..
+    same, but is most likely techically completely different...
+
+    The cartridges pinout is the same on the three systems:
+       A1  N/C (A21?)
+       A2  A20
+       A3  A19
+       A4  A8
+       A5  A9
+       A6  A6
+       A7  A5
+       A8  A4
+       A9  A3
+      A10  A2
+      A11  A1
+      A12  A0
+      A13  N/C (R/W? /CE2?)
+      A14  /CE
+      A15  /OE
+      A16  D0
+      A17  D1
+      A18  D2
+      A19  D3
+      A20  VCC
+      B1   N/C (A22?)
+      B2   N/C (A23?)
+      B3   A18
+      B4   A17
+      B5   A7
+      B6   GND
+      B7   A10
+      B8   A11
+      B9   A12
+      B10  A13
+      B11  A14
+      B12  A15
+      B13  A16
+      B14  GND
+      B15  A-1
+      B16  D7
+      B17  D6
+      B18  D5
+      B19  D4
+      B20  GND
 
 *******************************************************************************/
 

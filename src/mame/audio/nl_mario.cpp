@@ -149,7 +149,7 @@ static NETLIST_START(nl_mario_snd7)
 	NET_C(R65.2, 4K_A.FC, C44.1)
 	NET_C(C44.2, GND)
 
-	CD4020_WI(3H, 4K_B.Y, ttllow, V5, GND)
+	CD4020(3H, 4K_B.Y, ttllow, V5, GND)
 	TTL_7404_INVERT(4J_B, 3H.Q12)
 
 	RES(R64, RES_K(20))

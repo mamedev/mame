@@ -19,6 +19,8 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+#define ENABLE_NETLIST_FILTERING (0)
+
 
 /***************************************************************************
     CONSTANTS

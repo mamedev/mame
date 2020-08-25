@@ -106,7 +106,7 @@ Small outline design for easy kit retrofitting of existing cabinets.
 #include "imagedev/harddriv.h"
 #include "screen.h"
 
-#define VERBOSE	(0)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 class vp10x_state : public driver_device

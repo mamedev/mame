@@ -139,14 +139,17 @@ namespace netlist
 		"#define IND_N(ind) ((ind) * 1e-9)   \n"
 		"#define IND_P(ind) ((ind) * 1e-12)  \n";
 		m_setup->parser().add_include<plib::psource_str_t>("netlist/devices/net_lib.h", content);
+
+		// This is for core macro libraries
+		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h", content);
 #if 1
 		NETLIST_NAME(base_lib)(m_setup->parser());
 #else
-		// FIXME: This is very slow - need optimized parsing scanning
 #if 1
 		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
 		m_setup->parser().include("base_lib");
 #else
+		// FIXME: This is very slow - need optimized parsing scanning
 		pstring dir = "src/lib/netlist/macro/";
 		//m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{}.cpp");
 		m_setup->parser().register_source<source_file_t>(dir + "nlm_base_lib.cpp");
@@ -332,9 +335,10 @@ namespace netlist
 				std::vector<const nldelegate *> t;
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
+				{
+					n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
 					for (auto & term : n->core_terms())
 					{
-						n->update_inputs(); // only used if USE_COPY_INSTEAD_OF_REFERENCE == 1
 						if (!plib::container::contains(t, &term->delegate()))
 						{
 							t.push_back(&term->delegate());
@@ -345,6 +349,7 @@ namespace netlist
 						if (!plib::container::contains(devices_called, dev))
 							devices_called.push_back(dev);
 					}
+				}
 				log().verbose("Devices not yet updated:");
 				for (auto &dev : m_devices)
 					if (!plib::container::contains(devices_called, dev.second.get()))
@@ -747,8 +752,6 @@ namespace netlist
 			nldelegate delegate)
 			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
 	{
-		if (!delegate.is_set())
-			throw nl_exception("delegate not set for {1}", this->name());
 		state().setup().register_term(*this);
 	}
 

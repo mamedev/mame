@@ -5,17 +5,8 @@
 
    By O. Galibert.
 
-   Unknown:
-   - Exact clock divider
-   - Exact noise algorithm
-   - Exact noise pitch (probably ok)
-   - 7 bits output mapping
-   - Whether the pitch starts counting from 0 or 1
-
    Unimplemented:
    - Direct Data test mode (pin 7)
-
-   Sound quite reasonably already though.
 */
 
 #include "emu.h"
@@ -99,10 +90,11 @@ void sp0250_device::device_start()
 	save_item(NAME(m_rcount));
 	for (int index = 0; index < 6; index++)
 	{
-		save_item(NAME(m_filter[index].F), index);
-		save_item(NAME(m_filter[index].B), index);
-		save_item(NAME(m_filter[index].z1), index);
-		save_item(NAME(m_filter[index].z2), index);
+		auto &filter = m_filter[index];
+		save_item(STRUCT_MEMBER(filter, F), index);
+		save_item(STRUCT_MEMBER(filter, B), index);
+		save_item(STRUCT_MEMBER(filter, z1), index);
+		save_item(STRUCT_MEMBER(filter, z2), index);
 	}
 
 	// FIFO state
@@ -205,17 +197,16 @@ int8_t sp0250_device::next()
 		}
 	}
 
+	// 15-bit LFSR algorithm verified by dump from actual hardware
+	// clocks every cycle regardless of voiced/unvoiced setting
+	m_lfsr ^= (m_lfsr ^ (m_lfsr >> 1)) << 15;
+	m_lfsr >>= 1;
+
 	int16_t z0;
 	if (m_voiced)
 		z0 = (m_pcount == 0) ? m_amp : 0;
 	else
-	{
 		z0 = (m_lfsr & 1) ? m_amp : -m_amp;
-
-		// 15-bit LFSR algorithm verified by dump from actual hardware
-		m_lfsr ^= (m_lfsr ^ (m_lfsr >> 1)) << 15;
-		m_lfsr >>= 1;
-	}
 
 	for (int f = 0; f < 6; f++)
 		z0 = m_filter[f].apply(z0);
@@ -248,12 +239,11 @@ int8_t sp0250_device::next()
 	//    DAC  62 -> 33,32,33,32
 	//    DAC  63 -> 33,33,33,32
 	m_pwm_counts = (((dac + 68 + 3) >> 2) << 0) +
-	               (((dac + 68 + 1) >> 2) << 8) +
+				   (((dac + 68 + 1) >> 2) << 8) +
 				   (((dac + 68 + 2) >> 2) << 16) +
 				   (((dac + 68 + 0) >> 2) << 24);
 
-	m_pcount++;
-	if (m_pcount >= m_pitch)
+	if (m_pcount++ == m_pitch)
 	{
 		m_pcount = 0;
 		m_rcount++;

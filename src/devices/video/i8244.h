@@ -140,15 +140,13 @@ protected:
 
 	uint8_t m_x_beam_pos = 0;
 	uint8_t m_y_beam_pos = 0;
-	uint8_t m_y_latch = 0;
 	uint8_t m_control_status = 0;
 	uint8_t m_collision_status = 0;
-	bool m_pos_hold = false;
-	bool m_y_hold = false;
 
 	bool m_sh_written = false;
 	bool m_sh_pending = false;
-	u8 m_sh_prescaler = 0 ;
+	u8 m_sh_prescaler = 0;
+	u8 m_sh_count = 0;
 	int m_sh_output = 0;
 	u8 m_sh_duty = 0;
 };

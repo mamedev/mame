@@ -28,7 +28,7 @@
 
     Notes:
         * Toggle both 'Back door' and 'Key switch' to enter test mode
-		* Opening the back door will disable coinup
+        * Opening the back door will disable coinup
         * Video hardware seems to match JPM System 5
         * IRQ 1 inits the PPIs, IRQ 2 does nothing
 
@@ -505,7 +505,7 @@ void guab_state::guab(machine_config &config)
 	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
 	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
-	
+
 	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
 	acia1.txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	acia1.irq_handler().set_inputline("maincpu", 4);

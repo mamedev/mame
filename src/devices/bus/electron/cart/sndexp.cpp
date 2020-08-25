@@ -88,7 +88,7 @@ uint8_t electron_sndexp_device::read(offs_t offset, int infc, int infd, int romq
 {
 	uint8_t data = 0xff;
 
-	if (oe)
+	if (oe2)
 	{
 		if (m_link->read())
 		{
@@ -134,7 +134,7 @@ void electron_sndexp_device::write(offs_t offset, uint8_t data, int infc, int in
 			break;
 		}
 	}
-	else if (oe)
+	else if (oe2)
 	{
 		if (m_link->read())
 		{

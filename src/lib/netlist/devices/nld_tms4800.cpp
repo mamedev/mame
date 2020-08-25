@@ -26,7 +26,7 @@
  */
 
 #include "nld_tms4800.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -46,7 +46,6 @@ namespace netlist
 		{
 		}
 
-		friend class NETLIB_NAME(TMS4800_dip);
 	private:
 		// FIXME: timing!
 		// FIXME: CS: The code looks odd, looks like m_last_data should be pushed out.
@@ -87,45 +86,8 @@ namespace netlist
 		NETLIB_NAME(power_pins) m_supply;
 	};
 
-	NETLIB_OBJECT(TMS4800_dip)
-	{
-		NETLIB_CONSTRUCTOR(TMS4800_dip)
-		, A(*this, "A")
-		{
-			// FIXME: this device is missing supply pins
-			register_subalias("2",     A.m_A[0]);
-			register_subalias("3",     A.m_A[1]);
-			register_subalias("4",     A.m_A[2]);
-			register_subalias("5",     A.m_A[3]);
-			register_subalias("6",     A.m_A[4]);
-			register_subalias("7",     A.m_A[5]);
-			register_subalias("12",    A.m_A[6]);
-			register_subalias("11",    A.m_A[7]);
-			register_subalias("10",    A.m_A[8]);
-			register_subalias("8",     A.m_A[9]);
-			register_subalias("15",    A.m_A[10]);
-
-			register_subalias("13",    A.m_AR);
-			register_subalias("24",    A.m_OE1);
-			register_subalias("14",    A.m_OE2);
-
-			register_subalias("23",     A.m_D[0]);
-			register_subalias("22",     A.m_D[1]);
-			register_subalias("21",     A.m_D[2]);
-			register_subalias("20",     A.m_D[3]);
-			register_subalias("19",     A.m_D[4]);
-			register_subalias("18",     A.m_D[5]);
-			register_subalias("17",     A.m_D[6]);
-			register_subalias("16",     A.m_D[7]);
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(TMS4800) A;
-
-	};
 
 	NETLIB_DEVICE_IMPL(TMS4800,     "ROM_TMS4800",     "+AR,+OE1,+OE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(TMS4800_dip, "ROM_TMS4800_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

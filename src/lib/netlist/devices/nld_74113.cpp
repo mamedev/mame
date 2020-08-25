@@ -58,9 +58,10 @@
  */
 
 #include "nld_74113.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
-// Note: this can probably be merged with nld_7473.cpp
+// FIXME: this can probably be merged with nld_7473.cpp
+// FIXME: timing, see 74107 for example, use template
 
 namespace netlist
 {
@@ -81,6 +82,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_last_CLK = 0;
@@ -122,7 +124,6 @@ namespace netlist
 			m_QQ.push(m_q ^ 1, NLTIME_FROM_NS(20)); // FIXME: timing
 		}
 
-	public:
 		logic_input_t m_CLK;
 		logic_input_t m_J;
 		logic_input_t m_K;
@@ -138,7 +139,6 @@ namespace netlist
 
 	NETLIB_OBJECT_DERIVED(74113A, 74113)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(74113A) { }
 
 	};

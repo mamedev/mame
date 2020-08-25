@@ -4568,7 +4568,7 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 //  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
-//	device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
+//  device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
 }
 

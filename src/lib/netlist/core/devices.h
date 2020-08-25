@@ -11,20 +11,11 @@
 /// here directly (e.g. nld_nc_pin).
 ///
 
-#if 0
-#include "core/base_objects.h"
-#include "core/logic.h"
-#include "core/logic_family.h"
-#include "core/netlist_state.h"
-#include "core/nets.h"
-#include "core/object_array.h"
-#include "core/param.h"
-#include "core/state_var.h"
-#include "core/exec.h"
-#endif
 #include "analog.h"
 #include "device.h"
 #include "device_macros.h"
+#include "logic.h"
+#include "param.h"
 
 //============================================================
 // Namespace starts
@@ -138,7 +129,7 @@ namespace netlist
 		{
 		public:
 			NETLIB_CONSTRUCTOR(nc_pin)
-			, m_I(*this, "I", NETLIB_DELEGATE(noop))
+			, m_I(*this, "I", NETLIB_DELEGATE_NOOP())
 			{
 			}
 
@@ -146,10 +137,6 @@ namespace netlist
 			//NETLIB_RESETI() {}
 
 		private:
-			NETLIB_HANDLERI(noop)
-			{
-			}
-
 			analog_input_t m_I;
 
 		};

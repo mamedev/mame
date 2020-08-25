@@ -79,7 +79,7 @@ namespace netlist
 				m_cnt = 0;
 				m_IP.inactivate();
 				/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-				for (int i = 0; i < _TotalBits; i++)
+				for (unsigned i = 0; i < _TotalBits; i++)
 					if (((_LiveBitmask >> i) & 1) != 0)
 						m_Q[i].push(0, reset_time);
 			}
@@ -100,7 +100,7 @@ namespace netlist
 					NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 			};
 
-			for (int i = 0; i < _TotalBits; i++)
+			for (unsigned i = 0; i < _TotalBits; i++)
 				if (((_LiveBitmask >> i) & 1) != 0)
 					m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 		}
@@ -115,24 +115,24 @@ namespace netlist
 	NETLIB_OBJECT(CD4020)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4020, "CD4XXX")
-		, m_sub(*this, "sub")
+		, m_sub(*this, "A")
 		{
-			register_subalias("IP", m_sub.m_IP);
-			register_subalias("RESET", m_sub.m_RESET);
-			register_subalias("Q1", m_sub.m_Q[0]);
-			register_subalias("Q4", m_sub.m_Q[3]);
-			register_subalias("Q5", m_sub.m_Q[4]);
-			register_subalias("Q6", m_sub.m_Q[5]);
-			register_subalias("Q7", m_sub.m_Q[6]);
-			register_subalias("Q8", m_sub.m_Q[7]);
-			register_subalias("Q9", m_sub.m_Q[8]);
-			register_subalias("Q10", m_sub.m_Q[9]);
-			register_subalias("Q11", m_sub.m_Q[10]);
-			register_subalias("Q12", m_sub.m_Q[11]);
-			register_subalias("Q13", m_sub.m_Q[12]);
-			register_subalias("Q14", m_sub.m_Q[13]);
-			register_subalias("VDD", "sub.VDD");
-			register_subalias("VSS", "sub.VSS");
+			register_subalias("IP", "A.IP");
+			register_subalias("RESET", "A.RESET");
+			register_subalias("Q1", "A.Q1");
+			register_subalias("Q4", "A.Q4");
+			register_subalias("Q5", "A.Q5");
+			register_subalias("Q6", "A.Q6");
+			register_subalias("Q7", "A.Q7");
+			register_subalias("Q8", "A.Q8");
+			register_subalias("Q9", "A.Q9");
+			register_subalias("Q10", "A.Q10");
+			register_subalias("Q11", "A.Q11");
+			register_subalias("Q12", "A.Q12");
+			register_subalias("Q13", "A.Q13");
+			register_subalias("Q14", "A.Q14");
+			register_subalias("VDD", "A.VDD");
+			register_subalias("VSS", "A.VSS");
 		}
 
 		//NETLIB_RESETI() {}
@@ -144,19 +144,19 @@ namespace netlist
 	NETLIB_OBJECT(CD4024)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4024, "CD4XXX")
-		, m_sub(*this, "sub")
+		, m_sub(*this, "A")
 		{
-			register_subalias("IP", m_sub.m_IP);
-			register_subalias("RESET", m_sub.m_RESET);
-			register_subalias("Q1", m_sub.m_Q[0]);
-			register_subalias("Q2", m_sub.m_Q[1]);
-			register_subalias("Q3", m_sub.m_Q[2]);
-			register_subalias("Q4", m_sub.m_Q[3]);
-			register_subalias("Q5", m_sub.m_Q[4]);
-			register_subalias("Q6", m_sub.m_Q[5]);
-			register_subalias("Q7", m_sub.m_Q[6]);
-			register_subalias("VDD", "sub.VDD");
-			register_subalias("VSS", "sub.VSS");
+			register_subalias("IP", "A.IP");
+			register_subalias("RESET", "A.RESET");
+			register_subalias("Q1", "A.Q1");
+			register_subalias("Q2", "A.Q2");
+			register_subalias("Q3", "A.Q3");
+			register_subalias("Q4", "A.Q4");
+			register_subalias("Q5", "A.Q5");
+			register_subalias("Q6", "A.Q6");
+			register_subalias("Q7", "A.Q7");
+			register_subalias("VDD", "A.VDD");
+			register_subalias("VSS", "A.VSS");
 		}
 
 		//NETLIB_RESETI() {}
@@ -167,8 +167,7 @@ namespace netlist
 
 
 
-	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "")
-	NETLIB_DEVICE_IMPL_ALIAS(CD4020_WI, CD4020, "CD4020_WI", "+IP,+RESET,+VDD,+VSS")
+	NETLIB_DEVICE_IMPL(CD4020,         "CD4020", "+IP,+RESET,+VDD,+VSS")
 
 	NETLIB_DEVICE_IMPL(CD4024,         "CD4024", "")
 

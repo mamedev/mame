@@ -4,7 +4,7 @@
 #ifndef NLD_9316_H_
 #define NLD_9316_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage: TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)
 #define TTL_9316(...)                                                          \

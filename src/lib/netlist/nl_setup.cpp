@@ -11,8 +11,8 @@
 #include "nl_parser.h"
 #include "nl_setup.h"
 #include "plib/penum.h"
-#include "plib/putil.h"
 #include "plib/pstonum.h"
+#include "plib/putil.h"
 
 #include "solver/nld_solver.h"
 
@@ -1688,12 +1688,15 @@ void setup_t::prepare_to_run()
 	}
 
 	for (auto &n : m_nlstate.nets())
+	{
 		for (auto & term : n->core_terms())
-			if (!term->delegate().is_set())
+			if (!term->delegate())
 			{
 				log().fatal(MF_DELEGATE_NOT_SET_1(term->name()));
 				throw nl_exception(MF_DELEGATE_NOT_SET_1(term->name()));
 			}
+		n->rebuild_list();
+	}
 }
 
 // ----------------------------------------------------------------------------------------

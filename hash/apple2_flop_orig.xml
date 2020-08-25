@@ -14271,4 +14271,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="srccly22">
+		<description>The Sorcerer of Claymorgue Castle (Version 2.2/122)</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2020-08-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241511">
+				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side a.woz" size="241511" crc="4f5e141c" sha1="82b64408d2430877b7b68afca9ad625374180943"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot Disk"/>
+			<dataarea name="flop" size="234855">
+				<rom name="s.a.g.a. 13 - sorcerer of claymorgue castle side b (boot).woz" size="234855" crc="12223084" sha1="54b12aecd5f80b7edc36f925552ec2a2810b5355"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

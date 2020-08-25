@@ -32,14 +32,16 @@ notes:
 Sound not working on Return of Lady Frog
 
 TS 2006.12.22:
-- Funny Strip is runing on pSOS RTOS ( http://en.wikipedia.org/wiki/PSOS and http://dr-linux.net/newbase/reference/psosCD/ ) .
-  There's copyright text at $480
+- Funny Strip is running on pSOS RTOS ( http://en.wikipedia.org/wiki/PSOS and http://dr-linux.net/newbase/reference/psosCD/ ) .
+  There's copyright text at $480. In Ring & Ball the copyright text is at 0x7c7a0.
   Also Rebus and TRoLF are running on it (the same internal code structure - traps, interrupt vectors),
   but copyright messages are removed.
 - Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
-  It's not a real protection check i think.
+  It's not a real protection check I think.
+- Ring & Ball is mostly decrypted, currently stops at 'scheda da inizializzare' (board must be initialized). Switching the dip to clear RAM it says
+  'Inizializzazione ok, ver 2.6' (Initialization ok, ver 2.6) then stops. By switching DSW2.8 it's possible to enter test mode.
 
-More notes about Funny Strip protection issues at the bottom of source file (DRIVER INIT)
+More notes about Funny Strip protection issues at the bottom of source file (init_funystrp)
 
 ***************************************************************************/
 
@@ -244,6 +246,26 @@ void splash_state::funystrp_sound_map(address_map &map)
 	map(0x8000, 0xffff).rom().bankr("sound_bank");
 }
 
+void funystrp_state::ringball_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	//map(0x2fff00, 0x2fff03); // trackballs read here
+	map(0x800000, 0x83ffff).ram().share("pixelram");
+	map(0x840000, 0x840001).portr("DSW1");
+	map(0x840002, 0x840003).portr("DSW2");
+	map(0x840004, 0x840005).portr("P1");
+	map(0x840006, 0x840007).portr("P2");
+	map(0x840008, 0x840009).portr("SYSTEM");
+	map(0x84000a, 0x84000a).w(FUNC(funystrp_state::eeprom_w)); // EEPROM doesn't seem to be written, wrong hook up?
+	map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // check when game works
+	map(0x880000, 0x8817ff).ram().w(FUNC(funystrp_state::vram_w)).share("videoram");
+	map(0x881800, 0x881803).ram().share("vregs");
+	map(0x881804, 0x881fff).ram();
+	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd01fff).rw(FUNC(funystrp_state::spr_read), FUNC(funystrp_state::spr_write)).share("spriteram");
+	map(0xff0000, 0xffffff).ram();
+}
+
 uint8_t funystrp_state::int_source_r()
 {
 	return ~m_msm_source;
@@ -437,7 +459,58 @@ static INPUT_PORTS_START( funystrp )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( ringball )
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8") // TODO: switching this doesn't shown it as on in test mode as all the others do. Why?
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )     PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// TODO: Missing controls wrt test mode: Track left, Track right (always stuck on for some reason)
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // Hopper in - Hopper out
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // Ticket in - Ticket out
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) // No effect, at least in test mode
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // No effect, at least in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Allarme sca.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Statistic
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin 1 - Count in
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin 2 - Count in
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // Coupon - Count coup
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // Scarico vin. - Lamp scarico
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) // Seems to exit test mode, resulting in black screen
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // Seems to exit test mode, resulting in black screen
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // Seems to exit test mode, resulting in black screen
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Seems to exit test mode, resulting in black screen
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) // Start left - Lamp start l.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) // Start right - Lamp start r.
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_DIPNAME( 0x02, 0x02, "Clear EEPROM" ) // Reset record in test mode
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tilelayout8 =
@@ -674,6 +747,12 @@ void funystrp_state::funystrp(machine_config &config)
 	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
+void funystrp_state::ringball(machine_config &config)
+{
+	funystrp(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &funystrp_state::ringball_map);
+}
 
 /***************************************************************************
 
@@ -1051,9 +1130,9 @@ no idea on this one...
 
 ROM_START( ringball )
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code + gfx */
-	// TODO: encrypted, there's a device with scratched part between 68k and roms. u87 looks to have standard 68k vectors with scrambled bits.
-	ROM_LOAD( "u87.bin",      0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
-	ROM_LOAD( "u111.bin",     0x040000, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
+	// TODO: encrypted, there's a device with scratched part between 68k and roms
+	ROM_LOAD16_BYTE( "u87.bin",      0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
+	ROM_LOAD16_BYTE( "u111.bin",     0x000001, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* Z80 code + sound data */
 	ROM_LOAD( "u130.bin",     0x000000, 0x080000, CRC(892202ea) SHA1(10b5933b136a6595f739510d380d12c4cefd9f09) )
@@ -1440,6 +1519,35 @@ void funystrp_state::init_funystrp()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16sm_delegate(*this, FUNC(funystrp_state::protection_r)));
 }
 
+void funystrp_state::init_ringball() // decryption is preliminary, can probably be simplified / rearranged once completely figured out
+{
+	m_bitmap_type = 0;
+	m_sprite_attr2_shift = 0;
+
+	uint16_t *audiorom = (uint16_t *)memregion("audiocpu")->base();
+
+	membank("sound_bank")->configure_entries(0, 16, &audiorom[0x00000], 0x8000);
+
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x2000 / 2; i++)  // believed ok
+		src[i] = bitswap<16>(src[i] ^ 0x85cc, 12, 13, 15, 10, 9, 11, 8, 14, 5, 4, 3, 2, 1, 0, 7, 6);
+
+	for (int i = 0x2000 / 2 ; i < 0x4000 / 2; i++)  // believed ok
+		src[i] = bitswap<16>(src[i] ^ 0xb622,  5, 4, 3, 2, 1, 0, 7, 6, 9, 8, 15, 14, 13, 12, 11, 10);
+
+	for (int i = 0x4000 / 2 ; i < 0x8000 / 2; i++) // probably
+		src[i] = bitswap<16>(src[i] ^ 0xb66d, 8, 9, 10, 11, 12, 13, 14, 15, 1, 0, 2, 3, 4, 5, 6, 7);
+
+	for (int i = 0x8000 / 2; i < 0x10000 / 2; i++)  // believed ok
+		src[i] = bitswap<16>(src[i] ^ 0xc8a6, 1, 3, 0, 5, 7, 9, 11, 13, 15, 14, 12, 8, 10, 6, 4, 2);
+
+	// 0x10000 - 0x61817 is 0xff filled
+
+	for (int i = 0x60000 / 2; i < 0x80000 / 2; i ++) // believed ok for 0x7c000 - 0x80000, probably ok for the rest (test mode doesn't appear otherwise)
+		src[i] ^= 0xffff;
+}
+
 GAME( 1992, splash,   0,        splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, splash10, splash,   splash,   splash,   splash_state,   init_splash10, ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.0 World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, paintlad, splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Painted Lady (Splash) (Ver. 1.3 US)", MACHINE_SUPPORTS_SAVE )
@@ -1449,4 +1557,4 @@ GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state,   init_roldfro
 GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state,   init_rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, ringball, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...
+GAME( 1995, ringball, funystrp, ringball, ringball, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring Ball (Ver. 2.6)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...

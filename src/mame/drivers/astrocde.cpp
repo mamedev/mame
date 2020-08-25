@@ -124,6 +124,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/votrax.h"
+#include "sound/flt_rc.h"
 
 #include "speaker.h"
 
@@ -397,10 +398,11 @@ void tenpindx_state::lights_w(uint8_t data)
 
 void astrocde_state::votrax_speech_w(uint8_t data)
 {
-	m_votrax->inflection_w(data >> 6);
+	// Note that the frequency change is smooth, but we just can't
+	// handle that.
+	m_votrax->set_clock(data & 0x40 ? 782000 : 756000);
+	m_votrax->inflection_w(data & 0x80 ? 0 : 2);
 	m_votrax->write(data & 0x3f);
-
-	/* Note : We should really also use volume in this as well as frequency */
 }
 
 
@@ -1355,8 +1357,13 @@ void astrocde_state::wow(machine_config &config)
 	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
 
-	VOTRAX_SC01(config, m_votrax, 720000);
-	m_votrax->add_route(ALL_OUTPUTS, "center", 0.85);
+	VOTRAX_SC01(config, m_votrax, 756000);
+
+	m_votrax->add_route(0, "f1", 0.85);
+	FILTER_RC(config, "f1").set_lowpass(110e3, 560e-12).add_route(0, "f2", 1.00);
+	FILTER_RC(config, "f2").set_lowpass(110e3, 560e-12).add_route(0, "f3", 1.00);
+	FILTER_RC(config, "f3").set_lowpass(110e3, 560e-12).add_route(0, "f4", 1.00);
+	FILTER_RC(config, "f4").set_lowpass(110e3, 560e-12).add_route(0, "center", 1.00);
 }
 
 void astrocde_state::gorf(machine_config &config)
@@ -1406,7 +1413,7 @@ void astrocde_state::gorf(machine_config &config)
 
 	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 1.0);
 
-	VOTRAX_SC01(config, m_votrax, 720000);
+	VOTRAX_SC01(config, m_votrax, 756000);
 	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.85);
 }
 

@@ -265,7 +265,7 @@ namespace netlist
 		{
 			static constexpr netlist_time value(std::size_t N)
 			{
-				return NLTIME_FROM_NS(N == 0 ? value0 : value1);
+				return N == 0 ? NLTIME_FROM_NS(value0) : NLTIME_FROM_NS(value1);
 			}
 		};
 
@@ -278,9 +278,9 @@ namespace netlist
 		{
 			static constexpr netlist_time value(std::size_t N)
 			{
-				return NLTIME_FROM_NS(N == 0 ? value0 :
-						N == 1 ? value1 :
-								 value2);
+				return N == 0 ? NLTIME_FROM_NS(value0) :
+					   N == 1 ? NLTIME_FROM_NS(value1) :
+								NLTIME_FROM_NS(value2);
 			}
 		};
 

@@ -39,8 +39,8 @@
  *  FIXME: Check that (*) is emulated properly
  */
 
-#include "netlist/nl_base.h"
-#include "netlist/nl_factory.h"
+#include "nl_base.h"
+#include "nl_factory.h"
 
 namespace netlist
 {

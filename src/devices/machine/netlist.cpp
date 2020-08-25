@@ -16,7 +16,6 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_interface.h"
-//#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
 #include "netlist/plib/pmempool.h"

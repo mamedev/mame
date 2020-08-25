@@ -6,7 +6,7 @@
 /// \file nlm_cd4xxx.h
 ///
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 /*
  * Devices:
@@ -88,8 +88,11 @@
 #define CD4316_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4016_DIP, name)
 
-#define CD4538_DIP(name)                                                        \
+#define CD4538_DIP(name)                                                       \
 		NET_REGISTER_DEV(CD4538_DIP, name)
+
+#define MM5837_DIP(name)                                                       \
+		NET_REGISTER_DEV(MM5837_DIP, name)
 
 #endif // !NL_AUTO_DEVICES
 

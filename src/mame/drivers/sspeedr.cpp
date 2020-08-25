@@ -278,7 +278,7 @@ void sspeedr_state::sspeedr(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off",
-			    "I_ENGINE_SOUND_OFF", 0);
+				"I_ENGINE_SOUND_OFF", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:silence", "I_SILENCE", 0);

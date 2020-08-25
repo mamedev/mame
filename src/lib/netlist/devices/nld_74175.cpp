@@ -34,7 +34,7 @@
  */
 
 #include "nld_74175.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: optimize
 
@@ -60,6 +60,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_CLK.set_state(logic_t::STATE_INP_LH);
@@ -102,8 +103,6 @@ namespace netlist
 			}
 		}
 
-		friend class NETLIB_NAME(74175_dip);
-	private:
 		object_array_t<logic_input_t, 4> m_D;
 		logic_input_t m_CLRQ;
 
@@ -115,40 +114,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74175_dip)
-	{
-		NETLIB_CONSTRUCTOR(74175_dip)
-		, A(*this, "A")
-		{
-			register_subalias("9", A.m_CLK);
-			register_subalias("1", A.m_CLRQ);
-
-			register_subalias("4", A.m_D[0]);
-			register_subalias("2", A.m_Q[0]);
-			register_subalias("3", A.m_QQ[0]);
-
-			register_subalias("5", A.m_D[1]);
-			register_subalias("7", A.m_Q[1]);
-			register_subalias("6", A.m_QQ[1]);
-
-			register_subalias("12", A.m_D[2]);
-			register_subalias("10", A.m_Q[2]);
-			register_subalias("11", A.m_QQ[2]);
-
-			register_subalias("13", A.m_D[3]);
-			register_subalias("15", A.m_Q[3]);
-			register_subalias("14", A.m_QQ[3]);
-
-			register_subalias("8",  "A.GND");
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(74175) A;
-	};
-
 	NETLIB_DEVICE_IMPL(74175,   "TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74175_dip,"TTL_74175_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

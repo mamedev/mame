@@ -19409,7 +19409,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="fh2tagc" cloneof="fh2tag">
+	<software name="fh2tagc" cloneof="fh2tag" supported="no">
 		<description>Finish Hold 2 - Tag (cracked)</description>
 		<year>1996</year>
 		<publisher>システムソフト (SystemSoft)</publisher>

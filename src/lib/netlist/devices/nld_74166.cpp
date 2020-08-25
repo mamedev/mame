@@ -25,7 +25,7 @@
  */
 
 #include "nld_74166.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 // FIXME: separate handlers for inputs
 
@@ -50,6 +50,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_shifter = 0;
@@ -103,8 +104,6 @@ namespace netlist
 			m_QH.push(qh, delay); //FIXME
 		}
 
-		friend class NETLIB_NAME(74166_dip);
-	private:
 		object_array_t<logic_input_t, 8> m_DATA;
 		logic_input_t m_SER;
 		logic_input_t m_CLRQ;

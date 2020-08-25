@@ -9,7 +9,7 @@
 ///
 
 #include "../plib/pstream.h"
-#include "netlist/nl_base.h"
+#include "../nl_base.h"
 #include "nld_matrix_solver.h"
 
 #include <map>
@@ -41,7 +41,7 @@ namespace devices
 			// internal stuff
 			state().save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), this->name(), "m_queue");
 
-			connect(m_fb_step, m_Q_step);
+			connect("FB_step", "Q_step");
 		}
 
 		void post_start();

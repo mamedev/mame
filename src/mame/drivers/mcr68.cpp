@@ -179,9 +179,24 @@ uint16_t mcr68_state::archrivl_port_1_r()
 
 void mcr68_state::archrivl_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// the arch rivals schematics are terrible here, but some information can be gathered from pages 30 and 42
+	// the bits here seem to have the following functions:
+	// code:   D0-D7 go to sound board pins 3-10
+	// code:   D8 goes to sound board pin 13 (/STB)
+	// guess:  D9 goes to sound board pin 12 (/STBR) ? (/STBR is usually an output, not an input?)
+	// code:   D10 goes to sound board pin 18 (/RESET)
+	// guess:  D11 is n/c (may control the SPARE pin on J3 pin 13)
+	// guess:  D12 is n/c
+	// schems: D13 goes to coin meter 1 (second meter)
+	// schems: D14 is SCREENFLIP
+	// schems: D15 goes to coin meter 0 (first meter)
 	COMBINE_DATA(&m_control_word);
-	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
-	m_cvsd_sound->write(m_control_word & 0x3ff);
+	m_bg->resetq_w(BIT(m_control_word, 10));
+	m_bg->data_w(m_control_word & 0xff);
+	m_bg->ctrl_w(BIT(m_control_word, 8));
+	m_bg->extra_w(BIT(m_control_word, 9));
+	///TODO: coin meters; do the games even use these?
+	///TODO: flipscreen; this is actually quite complex, involving many PLDs/pals
 }
 
 
@@ -602,7 +617,7 @@ static INPUT_PORTS_START( archrivl )
 	PORT_START("IN1")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 1/2 joysticks go here */
 
-	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, "Preset Time" )
 	PORT_DIPSETTING(      0x0002, "Preset + 10sec" )
@@ -677,7 +692,7 @@ static INPUT_PORTS_START( archrivlb )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog on the non-bootleg hardware, unclear here */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, "Preset Time" )
 	PORT_DIPSETTING(      0x0002, "Preset + 10sec" )
@@ -732,7 +747,7 @@ static INPUT_PORTS_START( pigskin )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 1 joystick goes here */
 
-	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "Shortest" )
 	PORT_DIPSETTING(      0x0002, "Short" )
@@ -789,7 +804,7 @@ static INPUT_PORTS_START( trisport )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* analog controls go here */
 
-	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_1C ) )
@@ -970,7 +985,9 @@ void mcr68_state::archrivl(machine_config &config)
 	mcr68(config);
 
 	/* basic machine hardware */
-	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	S11_BG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 1.0); // uses a D-11581 w/o W10/W11 jumpers, older mix resistors
+	// The schematics actually imply on the parts list that this may use the even older mix resistors from the D-1129x board
+	// but the actual schematic shows the D-11581 resistors. This may be worth checking from an original board.
 }
 
 
@@ -979,7 +996,7 @@ void mcr68_state::pigskin(machine_config &config)
 	mcr68(config);
 
 	/* basic machine hardware */
-	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	S11C_BG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 1.0); // uses a D-11581-4xxx w/ W10/W11 jumpers, newer mix resistors
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::pigskin_map);
 }
@@ -990,7 +1007,10 @@ void mcr68_state::trisport(machine_config &config)
 	mcr68(config);
 
 	/* basic machine hardware */
-	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	S11C_BG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 1.0); // uses a D-11581-4xxx w/ W10/W11 jumpers, newer mix resistors
+	// the above could use verification from the schematics, but based on the fact that it uses 3 roms, two 27512 and one 27256,
+	// and only the S11C_BG/D-11581-4xxx board properly supports that specific combination, it is almost certainly using
+	// S11C_BG and not S11_BG/D-11581
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::trisport_map);
 
@@ -1206,19 +1226,19 @@ ROM_START( archrivl ) /* Reports as rev 4.0 6/29/89 */
 	ROM_LOAD16_BYTE( "arch_rivals_2c_rev4.2c",  0x20000, 0x10000, CRC(cc2893f7) SHA1(44931299cb98e27ac2f11b3922da76895fbfe0a7) )
 	ROM_LOAD16_BYTE( "arch_rivals_2b_rev4.2b",  0x20001, 0x10000, CRC(fa977050) SHA1(67c66995da755401162f7e668b97eb42ac769ec0) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) /* "REV1" portion of label is brown */
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  /* Audio System board */
+	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) /* "REV1" portion of label is brown */
+	ROM_RELOAD(                           0x08000, 0x08000 )
+	ROM_RELOAD(                           0x10000, 0x08000 )
 	ROM_RELOAD(                           0x18000, 0x08000 )
-	ROM_RELOAD(                           0x20000, 0x08000 )
+	ROM_LOAD( "arch_rivals_u19_rev1.u19", 0x20000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
 	ROM_RELOAD(                           0x28000, 0x08000 )
-	ROM_LOAD( "arch_rivals_u19_rev1.u19", 0x30000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
+	ROM_RELOAD(                           0x30000, 0x08000 )
 	ROM_RELOAD(                           0x38000, 0x08000 )
-	ROM_RELOAD(                           0x40000, 0x08000 )
+	ROM_LOAD( "arch_rivals_u20_rev1.u20", 0x40000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
 	ROM_RELOAD(                           0x48000, 0x08000 )
-	ROM_LOAD( "arch_rivals_u20_rev1.u20", 0x50000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
+	ROM_RELOAD(                           0x50000, 0x08000 )
 	ROM_RELOAD(                           0x58000, 0x08000 )
-	ROM_RELOAD(                           0x60000, 0x08000 )
-	ROM_RELOAD(                           0x68000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "arch_rivals_11d_rev1.11d", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) /* "REV1" portion of label is brown */
@@ -1253,19 +1273,19 @@ ROM_START( archrivla ) /* Reports as rev 2.0 5/03/89 */
 	ROM_LOAD16_BYTE( "arch_rivals_2c_rev2.2c",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "arch_rivals_2b_rev2.2b",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) /* "REV1" portion of label is brown */
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  /* Audio System board */
+	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) /* "REV1" portion of label is brown */
+	ROM_RELOAD(                           0x08000, 0x08000 )
+	ROM_RELOAD(                           0x10000, 0x08000 )
 	ROM_RELOAD(                           0x18000, 0x08000 )
-	ROM_RELOAD(                           0x20000, 0x08000 )
+	ROM_LOAD( "arch_rivals_u19_rev1.u19", 0x20000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
 	ROM_RELOAD(                           0x28000, 0x08000 )
-	ROM_LOAD( "arch_rivals_u19_rev1.u19", 0x30000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
+	ROM_RELOAD(                           0x30000, 0x08000 )
 	ROM_RELOAD(                           0x38000, 0x08000 )
-	ROM_RELOAD(                           0x40000, 0x08000 )
+	ROM_LOAD( "arch_rivals_u20_rev1.u20", 0x40000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
 	ROM_RELOAD(                           0x48000, 0x08000 )
-	ROM_LOAD( "arch_rivals_u20_rev1.u20", 0x50000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
+	ROM_RELOAD(                           0x50000, 0x08000 )
 	ROM_RELOAD(                           0x58000, 0x08000 )
-	ROM_RELOAD(                           0x60000, 0x08000 )
-	ROM_RELOAD(                           0x68000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "arch_rivals_11d_rev1.11d", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) /* "REV1" portion of label is brown */
@@ -1300,19 +1320,19 @@ ROM_START( archrivlb ) /* Reports as rev 2.0 5/03/89 */
 	ROM_LOAD16_BYTE( "3.bin",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "1.bin",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "13.bin",   0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  /* Audio System board */
+	ROM_LOAD( "13.bin",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
+	ROM_RELOAD(                           0x08000, 0x08000 )
+	ROM_RELOAD(                           0x10000, 0x08000 )
 	ROM_RELOAD(                           0x18000, 0x08000 )
-	ROM_RELOAD(                           0x20000, 0x08000 )
+	ROM_LOAD( "12.bin", 0x20000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
 	ROM_RELOAD(                           0x28000, 0x08000 )
-	ROM_LOAD( "12.bin", 0x30000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
+	ROM_RELOAD(                           0x30000, 0x08000 )
 	ROM_RELOAD(                           0x38000, 0x08000 )
-	ROM_RELOAD(                           0x40000, 0x08000 )
+	ROM_LOAD( "11.bin", 0x40000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
 	ROM_RELOAD(                           0x48000, 0x08000 )
-	ROM_LOAD( "11.bin", 0x50000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
+	ROM_RELOAD(                           0x50000, 0x08000 )
 	ROM_RELOAD(                           0x58000, 0x08000 )
-	ROM_RELOAD(                           0x60000, 0x08000 )
-	ROM_RELOAD(                           0x68000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "5.bin", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) )
@@ -1347,13 +1367,13 @@ ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
 	ROM_LOAD16_BYTE( "pigskin-k_a6_la1.a6",  0x20000, 0x10000, CRC(4d8b7e50) SHA1(9e5d0edf1603e11f22d3129a2b8865ebcb5e27f9) )
 	ROM_LOAD16_BYTE( "pigskin-k_b6_la1.b6",  0x20001, 0x10000, CRC(1194f187) SHA1(e7cebe5322a5c8e382b6773939be5bc88492f289) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "pigskin_u4_sl1.u4",   0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
-	ROM_RELOAD(                      0x20000, 0x10000 )
-	ROM_LOAD( "pigskin_u19_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
-	ROM_RELOAD(                      0x40000, 0x10000 )
-	ROM_LOAD( "pigskin_u20_sl1.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
-	ROM_RELOAD(                      0x60000, 0x10000 )
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board; W10/W11 are jumpered: W10 shorted, W11 open (U20 is a 27512)
+	ROM_LOAD( "pigskin_u4_sl1.u4",   0x00000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
+	ROM_RELOAD(                      0x10000, 0x10000 )
+	ROM_LOAD( "pigskin_u19_sl1.u19", 0x20000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
+	ROM_RELOAD(                      0x30000, 0x10000 )
+	ROM_LOAD( "pigskin_u20_sl1.u20", 0x40000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
+	ROM_RELOAD(                      0x50000, 0x10000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "pigskin_e2_la1.e2", 0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
@@ -1374,13 +1394,13 @@ ROM_START( pigskina ) /* Initial boot screen reports REV 2.0 7/06/90 */
 	ROM_LOAD16_BYTE( "pigskin_a6_la2.a6", 0x20000, 0x10000, CRC(2fc91002) SHA1(64d270b78c69d3f4fb36d1233a1632d6ba3d87a5) )
 	ROM_LOAD16_BYTE( "pigskin_b6_la2.b6", 0x20001, 0x10000, CRC(0b93dc66) SHA1(f3b516a1d1e4abd7b0d56243949e9cd7ac79178b) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "pigskin_u4_sl1.u4",   0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
-	ROM_RELOAD(                      0x20000, 0x10000 )
-	ROM_LOAD( "pigskin_u19_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
-	ROM_RELOAD(                      0x40000, 0x10000 )
-	ROM_LOAD( "pigskin_u20_sl1.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
-	ROM_RELOAD(                      0x60000, 0x10000 )
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board; W10/W11 are jumpered: W10 shorted, W11 open (U20 is a 27512)
+	ROM_LOAD( "pigskin_u4_sl1.u4",   0x00000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
+	ROM_RELOAD(                      0x10000, 0x10000 )
+	ROM_LOAD( "pigskin_u19_sl1.u19", 0x20000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
+	ROM_RELOAD(                      0x30000, 0x10000 )
+	ROM_LOAD( "pigskin_u20_sl1.u20", 0x40000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
+	ROM_RELOAD(                      0x50000, 0x10000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "pigskin_e2_la1.e2", 0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
@@ -1401,13 +1421,13 @@ ROM_START( pigskinb ) /* Initial boot screen reports REV 1.1 6/05/90 */
 	ROM_LOAD16_BYTE( "pigskin_a6_la1.a6", 0x20000, 0x10000, CRC(5fca2c4e) SHA1(6892ba763a0c9847c589514ff989b7f40e09784b) )
 	ROM_LOAD16_BYTE( "pigskin_b6_la1.b6", 0x20001, 0x10000, CRC(778a75fc) SHA1(3199efa34676d5856b33a8810043616e3618229e) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "pigskin_u4_sl1.u4",   0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
-	ROM_RELOAD(                      0x20000, 0x10000 )
-	ROM_LOAD( "pigskin_u19_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
-	ROM_RELOAD(                      0x40000, 0x10000 )
-	ROM_LOAD( "pigskin_u20_sl1.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
-	ROM_RELOAD(                      0x60000, 0x10000 )
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board; W10/W11 are jumpered: W10 shorted, W11 open (U20 is a 27512)
+	ROM_LOAD( "pigskin_u4_sl1.u4",   0x00000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
+	ROM_RELOAD(                      0x10000, 0x10000 )
+	ROM_LOAD( "pigskin_u19_sl1.u19", 0x20000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
+	ROM_RELOAD(                      0x30000, 0x10000 )
+	ROM_LOAD( "pigskin_u20_sl1.u20", 0x40000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
+	ROM_RELOAD(                      0x50000, 0x10000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "pigskin_e2_la1.e2", 0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
@@ -1428,15 +1448,15 @@ ROM_START( trisport )
 	ROM_LOAD16_BYTE( "tri_sports_a6_la3.a6", 0x20000, 0x10000, CRC(9c6a1398) SHA1(ee115d9207f3a9034b7c9eccd2ff151d9c923c9a) )
 	ROM_LOAD16_BYTE( "tri_sports_b6_la3.b6", 0x20001, 0x10000, CRC(597b564c) SHA1(090da3ec0c86035cc41a9caea182b8a5419c3be9) )
 
-	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "tri_sports_u4_sl1.u4",   0x10000, 0x10000, CRC(0ed8c904) SHA1(21292a001c4c44f87b8782c706e5c346b767cd6b) )
-	ROM_RELOAD(                         0x20000, 0x10000 )
-	ROM_LOAD( "tri_sports_u19_sl1.u19", 0x30000, 0x10000, CRC(b57d7d7e) SHA1(483f718f1cc4549baf5696935532d30803254a19) )
-	ROM_RELOAD(                         0x40000, 0x10000 )
-	ROM_LOAD( "tri_sports_u20_sl1.u20", 0x50000, 0x08000, CRC(3ae15c08) SHA1(6b0fd09c39da08d1f67b6dd4287e8d2894522e1d) )
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board; W10/W11 are jumpered: W11 shorted, W10 open (U20 is a 27256)
+	ROM_LOAD( "tri_sports_u4_sl1.u4",   0x00000, 0x10000, CRC(0ed8c904) SHA1(21292a001c4c44f87b8782c706e5c346b767cd6b) )
+	ROM_RELOAD(                         0x10000, 0x10000 )
+	ROM_LOAD( "tri_sports_u19_sl1.u19", 0x20000, 0x10000, CRC(b57d7d7e) SHA1(483f718f1cc4549baf5696935532d30803254a19) )
+	ROM_RELOAD(                         0x30000, 0x10000 )
+	ROM_LOAD( "tri_sports_u20_sl1.u20", 0x40000, 0x08000, CRC(3ae15c08) SHA1(6b0fd09c39da08d1f67b6dd4287e8d2894522e1d) )
+	ROM_RELOAD(                         0x48000, 0x08000 )
+	ROM_RELOAD(                         0x50000, 0x08000 )
 	ROM_RELOAD(                         0x58000, 0x08000 )
-	ROM_RELOAD(                         0x60000, 0x08000 )
-	ROM_RELOAD(                         0x68000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "tri_sports_e2_la2.e2",  0x00000, 0x10000, CRC(f61149a0) SHA1(a43d184db23c7f194042709550e7bf36b838ee5c) )

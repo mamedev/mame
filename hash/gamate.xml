@@ -573,7 +573,7 @@ C1066 - ??
 				<rom name="incouple.bin" size="32768" crc="d092a22a" sha1="bbb5bd0466b79657e44c4e9fde603ec645e77bfe" />
 			</dataarea>
 		</part>
-	</software>  
+	</software>
 
 	<software name="famous7">
 		<description>Famous 7</description>

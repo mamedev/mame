@@ -62,6 +62,7 @@ public:
 	abc1600_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MC68008P8_TAG),
+		m_mac(*this, ABC1600_MAC_TAG),
 		m_dma0(*this, Z8410AB1_0_TAG),
 		m_dma1(*this, Z8410AB1_1_TAG),
 		m_dma2(*this, Z8410AB1_2_TAG),
@@ -82,6 +83,7 @@ public:
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
+	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
@@ -115,7 +117,11 @@ public:
 	void fw1_w(uint8_t data);
 	void spec_contr_reg_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
+	void dbrq_w(int state);
+	uint8_t dma0_iorq_r(offs_t offset) { return m_sysfs ? m_mac->dma0_iorq_r(offset) : (m_bus0i->read_tren() & m_bus0x->read_tren()); }
+	void dma0_iorq_w(offs_t offset, uint8_t data) { if (m_sysfs) m_mac->dma0_iorq_w(offset, data); else { m_bus0i->write_tren(data); m_bus0x->write_tren(data); }; }
+	uint8_t dma1_iorq_r(offs_t offset) { return m_sysscc ? m_mac->dma1_iorq_r(offset) : m_bus1->read_tren(); }
+	void dma1_iorq_w(offs_t offset, uint8_t data) { if (m_sysscc) m_mac->dma1_iorq_w(offset, data); else m_bus1->write_tren(data); }
 
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
@@ -123,15 +129,18 @@ public:
 	uint8_t cio_pc_r();
 	void cio_pc_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	void nmi_w(int state);
 
 	void cpu_space_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
-	void update_drdy0();
-	void update_drdy1();
-	void update_drdy2();
+	void update_pren0(int state);
+	void update_pren1(int state);
+	void update_drdy0(int state);
+	void update_drdy1(int state);
+	void sccrq_a_w(int state) { m_sccrq_a = state; update_drdy1(0); }
+	void sccrq_b_w(int state) { m_sccrq_b = state; update_drdy1(0); }
+	void dart_irq_w(int state) { m_dart_irq = state; m_maincpu->set_input_line(M68K_IRQ_5, (m_dart_irq || m_scc_irq) ? ASSERT_LINE : CLEAR_LINE); }
+	void scc_irq_w(int state) { m_scc_irq = state; m_maincpu->set_input_line(M68K_IRQ_5, (m_dart_irq || m_scc_irq) ? ASSERT_LINE : CLEAR_LINE); }
 
 	// DMA
 	int m_dmadis;
@@ -149,6 +158,10 @@ public:
 	uint8_t m_csb;                // card select
 	int m_atce;                 // V.24 channel A external clock enable
 	int m_btce;                 // V.24 channel B external clock enable
+	bool m_sccrq_a;
+	bool m_sccrq_b;
+	int m_dart_irq;
+	int m_scc_irq;
 };
 
 

@@ -4,21 +4,11 @@
 #ifndef NLD_74175_H_
 #define NLD_74175_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
-#define TTL_74175(name, cCLK, cD1, cD2, cD3, cD4, cCLRQ)                       \
-		NET_REGISTER_DEV(TTL_74175, name)                                      \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name, CLK,  cCLK)                                          \
-		NET_CONNECT(name, D1,   cD1)                                           \
-		NET_CONNECT(name, D2,   cD2)                                           \
-		NET_CONNECT(name, D3,   cD3)                                           \
-		NET_CONNECT(name, D4,   cD4)                                           \
-		NET_CONNECT(name, CLRQ, cCLRQ)
-
-#define TTL_74175_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL_74175_DIP, name)
-
+// usage       : TTL_74175(name, pCLK, pD1, pD2, pD3, pD4, pCLRQ)
+// auto connect: VCC, GND
+#define TTL_74175(...)                                                 \
+	NET_REGISTER_DEVEXT(TTL_74175, __VA_ARGS__)
 
 #endif /* NLD_74175_H_ */

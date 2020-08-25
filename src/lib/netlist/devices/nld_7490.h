@@ -4,7 +4,7 @@
 #ifndef NLD_7490_H_
 #define NLD_7490_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // usage: TTL_7490(name, cA, cB, cR1, cR2, cR91, cR92)
 #define TTL_7490(...)                                                     \

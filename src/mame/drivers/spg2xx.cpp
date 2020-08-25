@@ -1024,6 +1024,48 @@ static INPUT_PORTS_START( tmntbftc )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( hotwheels )
+	// 2 pads, each pad has 4 directions and 1 button, and an internal solder pad to select type, but input reading code seems a bit more complex
+	// the unit this was dumped from was a PAL, with P1 as 'Bling' and P2 as 'Tuner' so those are the defaults used
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x0500, 0x0000, "Player 2 Controller Type" )
+	PORT_CONFSETTING(      0x0000, "Tuner" )
+	PORT_CONFSETTING(      0x0100, "Off-Road" )
+	//PORT_CONFSETTING(      0x0400, "Tuner" )
+	PORT_CONFSETTING(      0x0500, "Nothing" )
+	PORT_BIT( 0x0a00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )   
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )  
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )  
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )     
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     
+	PORT_CONFNAME( 0x0080, 0x0000, "Player 1 Controller Type" )
+	PORT_CONFSETTING(      0x0000, "Bling" )
+	PORT_CONFSETTING(      0x0080, "Rally" )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P1EXTRA")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag  (ACTIVE_HIGH = NTSC, ACTIVE_LOW = PAL)
+	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )   PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )   PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_PLAYER(2)  
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3") // never read?
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1615,6 +1657,61 @@ void spg2xx_game_ordentv_state::ordentv(machine_config &config)
 }
 
 
+void spg2xx_game_hotwheels_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	m_porta_dat_hot = data;
+}
+
+uint16_t spg2xx_game_hotwheels_state::hotwheels_porta_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data;
+	if (m_porta_dat_hot)
+		data = m_io_p1->read();
+	else
+		data = m_io_p1_extra->read();
+
+	logerror("%s: Port A Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_hotwheels_state::mem_map_2m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_hotwheels_state::hotwheels_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_hotwheels_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_hotwheels_state::base_portc_r));
+
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_hotwheels_state::porta_w));
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
+
+
+
+
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
@@ -1785,6 +1882,14 @@ ROM_START( tiktokmm )
 	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
 ROM_END
 
+
+ROM_START( hotwhl2p )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// this needed to be reconstructed from 80 reads of the device, so isn't 100% trusted
+	ROM_LOAD16_WORD_SWAP( "hotwheels.bin", 0x000000, 0x400000, BAD_DUMP CRC(f3520b74) SHA1(02a53558d68cf3640a9ab09514cd6cebff8b30af) )
+ROM_END
+
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -1902,6 +2007,9 @@ CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_s
 
 // Mattel games
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
+
+// there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
+CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
 

@@ -1393,7 +1393,7 @@ void validity_checker::validate_rgb()
 
 	// test bilinear_filter and bilinear_filter_rgbaint
 	// SSE implementation carries more internal precision between the bilinear stages
-#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
+#if defined(MAME_RGB_HIGH_PRECISION)
 	const int first_shift = 1;
 #else
 	const int first_shift = 8;

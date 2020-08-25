@@ -153,8 +153,8 @@ void wecleman_state::sortsprite(int *idx_array, int *key_array, int size)
 }
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
-template<class _BitmapClass>
-void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite)
+template<class BitmapClass>
+void wecleman_state::do_blit_zoom32(BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -241,7 +241,7 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	{
 		uint8_t *row_base = sprite.pen_data + (src_f0y>>PRECISION_Y) * sprite.line_offset;
 		src_fpx = src_f0x;
-		typename _BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
+		typename BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
 
 		if (bitmap.format() == BITMAP_FORMAT_RGB32) // Wec Le Mans
 		{
@@ -313,8 +313,8 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	}
 }
 
-template<class _BitmapClass>
-void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+void wecleman_state::sprite_draw(BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int i;
 

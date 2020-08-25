@@ -63,7 +63,7 @@
  */
 
 #include "nld_dm9334.h"
-#include "netlist/nl_base.h"
+#include "nl_base.h"
 
 namespace netlist
 {
@@ -86,6 +86,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_last_CQ = 0;
@@ -95,8 +96,6 @@ namespace netlist
 			m_last_Q = 0;
 		}
 
-		friend class NETLIB_NAME(9334_dip);
-	private:
 		NETLIB_HANDLERI(inputs)
 		{
 			uint_fast8_t a = 0;
@@ -177,37 +176,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(9334_dip)
-	{
-		NETLIB_CONSTRUCTOR(9334_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_A[0]);
-			register_subalias("2", A.m_A[1]);
-			register_subalias("3", A.m_A[2]);
-			register_subalias("4", A.m_Q[0]);
-			register_subalias("5", A.m_Q[1]);
-			register_subalias("6", A.m_Q[2]);
-			register_subalias("7", A.m_Q[3]);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9",  A.m_Q[4]);
-			register_subalias("10", A.m_Q[5]);
-			register_subalias("11", A.m_Q[6]);
-			register_subalias("12", A.m_Q[7]);
-			register_subalias("13", A.m_D);
-			register_subalias("14", A.m_EQ);
-			register_subalias("15", A.m_CQ);
-			register_subalias("16", "A.VCC");
-
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(9334) A;
-	};
-
 	NETLIB_DEVICE_IMPL(9334,     "TTL_9334",     "+CQ,+EQ,+D,+A0,+A1,+A2,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(9334_dip, "TTL_9334_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

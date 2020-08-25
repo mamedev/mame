@@ -61,6 +61,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_HANDLERI(inputs)
 		{
 			if (m_last_clock && !m_CLOCK())
@@ -93,8 +94,6 @@ namespace netlist
 			}
 		}
 
-		friend class NETLIB_NAME(CD4006_dip);
-	private:
 		logic_input_t m_CLOCK;
 		object_array_t<logic_input_t, 4>  m_I;
 		object_array_t<logic_output_t, 7> m_Q;

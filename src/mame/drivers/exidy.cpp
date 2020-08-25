@@ -1383,7 +1383,7 @@ ROM_START( venture )
 	ROM_LOAD( "vea_7a-3.7a", 0x7800, 0x0800, CRC(466addc7) SHA1(0230b5365d6aeee3ca47666a9eadee4141de125b) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-//	ROM_LOAD( "11d-cpu", 0x0000, 0x0800, BAD_DUMP CRC(b4bb2503) SHA1(67303603b7c5e6301e976ef19f81c7519648b179) ) // bytes 0x536 & 0x537 have the high bit set (IE:0x80 instead of 0x00 in vel_11d-2.11d)
+//  ROM_LOAD( "11d-cpu", 0x0000, 0x0800, BAD_DUMP CRC(b4bb2503) SHA1(67303603b7c5e6301e976ef19f81c7519648b179) ) // bytes 0x536 & 0x537 have the high bit set (IE:0x80 instead of 0x00 in vel_11d-2.11d)
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )

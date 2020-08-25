@@ -13,7 +13,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "audio/midway.h"
-#include "audio/williams.h"
+#include "audio/s11c_bg.h"
 #include "machine/6840ptm.h"
 #include "machine/adc0844.h"
 #include "screen.h"
@@ -26,7 +26,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_sounds_good(*this, "sg"),
 		m_turbo_cheap_squeak(*this, "tcs"),
-		m_cvsd_sound(*this, "cvsd"),
+		m_bg(*this, "bg"),
 		m_adc(*this, "adc"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram") ,
@@ -56,7 +56,7 @@ public:
 private:
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
-	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
+	optional_device<s11c_bg_device> m_bg;
 	optional_device<adc0844_device> m_adc;
 
 	required_shared_ptr<uint16_t> m_videoram;

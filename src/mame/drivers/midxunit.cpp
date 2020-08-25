@@ -292,9 +292,12 @@ void midxunit_state::midxunit(machine_config &config)
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
 	screen.set_palette(m_palette);
 
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
-	/* serial prefixes 419, 420 */
-	m_midway_serial_pic->set_upper(419);
+	PIC16C57(config, m_pic, 625000); // need to be verified
+	m_pic->read_a().set([this]() { return m_pic_command; });
+	m_pic->write_b().set([this](u8 data) { m_pic_data = data; });
+	m_pic->read_c().set([this]() { return m_pic_clk ^ 1; });
+	m_pic->write_c().set([this](u8 data) { m_pic_status = BIT(data, 1); });
+	// there also should be PIC16 reset line control, unknown at the moment
 
 	adc0848_device &adc(ADC0848(config, "adc"));
 	adc.intr_callback().set(FUNC(midxunit_state::adc_int_w)); // ADC INT passed through PLSI1032
@@ -335,7 +338,7 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "revx.54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
-	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, BAD_DUMP CRC(eb8a8649) SHA1(a1e1d0b7a5e9802e8f889eb7e719259656dc8133) ) // garbage, useless
+	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, BAD_DUMP CRC(517e0110) SHA1(cd603c66794ff426dd2994fc1a0c0c8e6bbd864b) ) // manually restored
 
 	ROM_REGION( 0x1000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "revx.120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )
@@ -402,7 +405,7 @@ ROM_START( revxp5 )
 	ROM_LOAD32_BYTE( "revx_p5.54",  0x00003, 0x80000, CRC(fd684c31) SHA1(db3453792e4d9fc375297d030f0b3f9cc3cad925) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
-	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, BAD_DUMP CRC(eb8a8649) SHA1(a1e1d0b7a5e9802e8f889eb7e719259656dc8133) ) // garbage, useless
+	ROM_LOAD( "revx_16c57.bin", 0x0000000, 0x2000, BAD_DUMP CRC(517e0110) SHA1(cd603c66794ff426dd2994fc1a0c0c8e6bbd864b) ) // manually restored
 
 	ROM_REGION( 0x1000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "revx.120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )

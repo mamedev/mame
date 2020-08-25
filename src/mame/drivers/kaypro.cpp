@@ -362,6 +362,7 @@ void kaypro_state::kaypro484(machine_config &config)
 	m_fdc->set_force_ready(true);
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config, "flop_list").set_original("kaypro484");
 }
 
 void kaypro_state::kaypro10(machine_config &config)

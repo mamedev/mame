@@ -17,20 +17,20 @@
  */
 
 #include "nld_mm5837.h"
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/solver/nld_matrix_solver.h"
+#include "analog/nlid_twoterm.h"
+#include "solver/nld_matrix_solver.h"
 
 namespace netlist
 {
 	namespace devices
 	{
-	NETLIB_OBJECT(MM5837_dip)
+	NETLIB_OBJECT(MM5837)
 	{
-		NETLIB_CONSTRUCTOR(MM5837_dip)
+		NETLIB_CONSTRUCTOR(MM5837)
 		, m_RV(*this, "_RV")
-		, m_VDD(*this, "1", NETLIB_DELEGATE(inputs))
-		, m_VGG(*this, "2", NETLIB_DELEGATE(inputs))
-		, m_VSS(*this, "4", NETLIB_DELEGATE(inputs))
+		, m_VDD(*this, "VDD", NETLIB_DELEGATE(inputs))
+		, m_VGG(*this, "VGG", NETLIB_DELEGATE(inputs))
+		, m_VSS(*this, "VSS", NETLIB_DELEGATE(inputs))
 		, m_FREQ(*this, "FREQ", 24000 * 2)
 		, m_R_LOW(*this, "R_LOW", 1000)
 		, m_R_HIGH(*this, "R_HIGH", 1000)
@@ -40,11 +40,11 @@ namespace netlist
 		, m_inc(netlist_time::from_hz(24000 * 2))
 		, m_shift(*this, "m_shift", 0)
 		{
-			connect(m_feedback, m_Q);
+			connect("_FB", "_Q");
 
 			// output
-			connect(m_RV.N(), m_VDD);
-			register_subalias("3", m_RV.P());
+			connect("_RV.2", "VDD");
+			register_subalias("OUT", "_RV.1");
 		}
 
 		NETLIB_RESETI()
@@ -114,7 +114,7 @@ namespace netlist
 		state_var_u32 m_shift;
 	};
 
-	NETLIB_DEVICE_IMPL(MM5837_dip, "MM5837_DIP", "")
+	NETLIB_DEVICE_IMPL(MM5837, "MM5837", "")
 
 	} //namespace devices
 } // namespace netlist

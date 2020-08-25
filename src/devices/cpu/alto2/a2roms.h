@@ -5,8 +5,8 @@
  *   Xerox AltoII RAM PROM loading and decoding
  *
  *****************************************************************************/
-#ifndef _CPU_A2ROMS_H_
-#define _CPU_A2ROMS_H_
+#ifndef MAME_CPU_ALTO2_A2ROMS_H
+#define MAME_CPU_ALTO2_A2ROMS_H
 
 
 /**
@@ -39,4 +39,4 @@ typedef struct {
 #define DMAP_REVERSE_0_3    {3,2,1,0,}
 
 extern uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint8_t* src, int pages = 1, int segments = 1);
-#endif // _CPU_A2ROMS_H_
+#endif // MAME_CPU_ALTO2_A2ROMS_H

@@ -100,10 +100,10 @@ WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_status_r()
+uint32_t midxunit_state::midxunit_status_r()
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (m_midway_serial_pic->status_r() << 1) | (m_adc_int ? 1 : 0);
+	return (m_pic_status << 1) | (m_adc_int ? 1 : 0);
 }
 
 
@@ -247,9 +247,13 @@ void midxunit_state::machine_start()
 	save_item(NAME(m_cmos_write_enable));
 	save_item(NAME(m_iodata));
 	save_item(NAME(m_uart));
-	save_item(NAME(m_security_bits));
 	save_item(NAME(m_adc_int));
 	save_pointer(NAME(m_nvram_data), 0x2000);
+
+	save_item(NAME(m_pic_command));
+	save_item(NAME(m_pic_data));
+	save_item(NAME(m_pic_clk));
+	save_item(NAME(m_pic_status));
 }
 
 void midxunit_state::machine_reset()
@@ -258,7 +262,10 @@ void midxunit_state::machine_reset()
 	m_dcs->reset_w(0);
 	m_dcs->reset_w(1);
 
-	m_security_bits = 0;
+	m_pic_command = 0;
+	m_pic_data = 0;
+	m_pic_clk = 0;
+	m_pic_status = 0;
 
 	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::midxunit_dcs_output_full)), write_line_delegate(*this));
 }
@@ -271,30 +278,22 @@ void midxunit_state::machine_reset()
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_security_r()
+uint32_t midxunit_state::midxunit_security_r()
 {
-	return m_midway_serial_pic->read();
+	return m_pic_data;
 }
 
-void midxunit_state::midxunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_security_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-	{
-		m_security_bits &= ~0xf;
-		m_security_bits |= data & 0xf;
-		m_midway_serial_pic->write(m_security_bits ^ 0x10);
-	}
+		m_pic_command = data & 0x0f;
 }
 
 
-void midxunit_state::midxunit_security_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset == 0 && ACCESSING_BITS_0_7)
-	{
-		m_security_bits &= ~0x10;
-		m_security_bits |= BIT(data, 1) << 4;
-		m_midway_serial_pic->write(m_security_bits ^ 0x10);
-	}
+	if (ACCESSING_BITS_0_7)
+		m_pic_clk = BIT(data, 1);
 }
 
 

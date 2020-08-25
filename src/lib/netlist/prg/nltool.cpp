@@ -9,16 +9,16 @@
 //
 // ***************************************************************************
 
-#include "netlist/plib/pdynlib.h"
-#include "netlist/core/setup.h"
-#include "netlist/devices/net_lib.h"
-#include "netlist/nl_errstr.h"
-#include "netlist/nl_parser.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/pmain.h"
-#include "netlist/plib/pstrutil.h"
-#include "netlist/solver/nld_solver.h"
-#include "netlist/tools/nl_convert.h"
+#include "plib/pdynlib.h"
+#include "core/setup.h"
+#include "devices/net_lib.h"
+#include "nl_errstr.h"
+#include "nl_parser.h"
+#include "nl_setup.h"
+#include "plib/pmain.h"
+#include "plib/pstrutil.h"
+#include "solver/nld_solver.h"
+#include "tools/nl_convert.h"
 
 #include "plib/ptests.h"
 
@@ -1055,10 +1055,22 @@ void tool_app_t::create_docheader()
 					auto & pins = d.pinalias;
 					//const int w = 8;
 					poutprefix("///", " {1:10} +--------+", " ");
-					for (std::size_t i=0; i<pins.size()/2; i++)
+					for (std::size_t i=0; i < pins.size() / 2; i++)
 					{
 						poutprefix("///", " {1:10} |{2:-2}    {3:2}| {4:-10}",
 							pins[i], i+1, pins.size()-i, pins[pins.size()-i-1]);
+					}
+					poutprefix("///", " {1:10} +--------+", " ");
+				}
+				else if (d.package == "SIL")
+				{
+					auto & pins = d.pinalias;
+					//const int w = 8;
+					poutprefix("///", " {1:10} +--------+", " ");
+					for (std::size_t i=0; i < pins.size(); i++)
+					{
+						poutprefix("///", " {1:10} |{2:-2}      |",
+							pins[i], i+1);
 					}
 					poutprefix("///", " {1:10} +--------+", " ");
 				}

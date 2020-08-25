@@ -102,6 +102,7 @@ public:
 	void nes_vt_512kb(machine_config& config);
 	void nes_vt_1mb(machine_config& config);
 	void nes_vt_2mb(machine_config& config);
+	void nes_vt_2mb_baddma(machine_config& config);
 	void nes_vt_4mb(machine_config& config);
 	void nes_vt_8mb(machine_config& config);
 	void nes_vt_16mb(machine_config& config);
@@ -783,6 +784,12 @@ void nes_vt_state::nes_vt_2mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
+void nes_vt_state::nes_vt_2mb_baddma(machine_config& config)
+{
+	nes_vt_2mb(config);
+	m_soc->force_bad_dma();
+}
+
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -1137,6 +1144,21 @@ static INPUT_PORTS_START( nes_vt )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_vt_msi )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_vt_ddr )
@@ -1525,6 +1547,17 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
+ROM_START( msiwwe )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "wrestlemania_es29lv160fb_004a2249.bin", 0x00000, 0x200000, CRC(f524382d) SHA1(0c8d1c29c76e3e3c58018354f1eca9445c9ab945) )
+ROM_END
+
+ROM_START( msidd )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "doubledragon_m29w160eb_00202249.bin", 0x00000, 0x200000, CRC(44df5bb6) SHA1(a984aa1644d2d313d4263afdfed1cd64009f1137) )
+ROM_END
+
+
 ROM_START( sudopptv )
 	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
@@ -1602,7 +1635,7 @@ ROM_END
 ROM_START( lxcmcypp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
-	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )	
+	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )
 ROM_END
 
 ROM_START( lxcmc250 )
@@ -2025,6 +2058,12 @@ CONS( 200?, vtsndtest, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init
 
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
 CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
+
+CONS( 2017, msiwwe,     0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2017, msidd,      0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
 
 // Menu system clearly started off as 'vtpinball'  Many elements seem similar to Family Pinball for the Famicom.
 // 050329 (29th March 2005) date on PCB

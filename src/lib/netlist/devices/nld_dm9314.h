@@ -4,24 +4,11 @@
 #ifndef NLD_DM9314_H_
 #define NLD_DM9314_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
-#define TTL_9314(name, cEQ, cMRQ, cS0Q, cS1Q, cS2Q, cS3Q, cD0, cD1, cD2, cD3)  \
-		NET_REGISTER_DEV(TTL_9314, name)                                       \
-		NET_CONNECT(name, GND, GND)                                            \
-		NET_CONNECT(name, VCC, VCC)                                            \
-		NET_CONNECT(name,  EQ,  cEQ)                                           \
-		NET_CONNECT(name, MRQ, cMRQ)                                           \
-		NET_CONNECT(name, S0Q, cS0Q)                                           \
-		NET_CONNECT(name, S1Q, cS1Q)                                           \
-		NET_CONNECT(name, S2Q, cS2Q)                                           \
-		NET_CONNECT(name, S3Q, cS3Q)                                           \
-		NET_CONNECT(name,  D0,  cD0)                                           \
-		NET_CONNECT(name,  D1,  cD1)                                           \
-		NET_CONNECT(name,  D2,  cD2)                                           \
-		NET_CONNECT(name,  D3,  cD3)
-
-#define TTL_9314_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_9314_DIP, name)
+// usage       : TTL_9314(name, pEQ, pMRQ, pS0Q, pS1Q, pS2Q, pS3Q, pD0, pD1, pD2, pD3)
+// auto connect: VCC, GND
+#define TTL_9314(...)                                                  \
+	NET_REGISTER_DEVEXT(TTL_9314, __VA_ARGS__)
 
 #endif /* NLD_DM9314_H_ */

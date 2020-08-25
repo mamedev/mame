@@ -35,12 +35,12 @@ public:
 	void vram_w(int _N_, offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
 	// call to do the rendering etc.
-	template<class _BitmapClass>
-	void prepare_common(_BitmapClass &bitmap, const rectangle &cliprect);
-	template<class _BitmapClass>
-	void render_tilemap_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri);
-	template<class _BitmapClass>
-	void render_tilemap_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri);
+	template<class BitmapClass>
+	void prepare_common(BitmapClass &bitmap, const rectangle &cliprect);
+	template<class BitmapClass>
+	void render_tilemap_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
+	template<class BitmapClass>
+	void render_tilemap_alt_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri);
 
 	void prepare(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect);
