@@ -2374,7 +2374,6 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/cmsscsi.h",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/uthernet.h",
-
 	}
 end
 

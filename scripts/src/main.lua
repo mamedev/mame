@@ -310,6 +310,7 @@ end
 		"bx",
 		"ocore_" .. _OPTIONS["osd"],
 	}
+
 	override_resources = false;
 
 	maintargetosdoptions(_target,_subtarget)
