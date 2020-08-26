@@ -25,7 +25,7 @@ namespace netlist
 	PERRMSGV(MF_REMOVE_TERMINAL_1_FROM_NET_2,       2, "Can not remove terminal {1} from net {2}.")
 	PERRMSGV(MF_UNKNOWN_PARAM_TYPE,                 1, "Can not determine param_type for {1}")
 	//PERRMSGV(MF_ERROR_CONNECTING_1_TO_2,            2, "Error connecting {1} to {2}")
-	PERRMSGV(ME_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
+	//PERRMSGV(ME_HND_VAL_NOT_SUPPORTED,              1, "HINT_NO_DEACTIVATE value not supported: <{1}>")
 	PERRMSGV(MW_ROM_NOT_FOUND,                      1, "Rom {1} not found")
 
 	// nl_factory.cpp
@@ -40,17 +40,19 @@ namespace netlist
 
 	// nl_parser.cpp
 
+	PERRMSGV(MF_PARSER_UNEXPECTED_1,                1, "Unexpected {}")
 	PERRMSGV(MF_UNEXPECTED_NETLIST_END,             0, "Unexpected NETLIST_END")
 	PERRMSGV(MF_UNEXPECTED_END_OF_FILE,             0, "Unexpected end of file, missing NETLIST_END")
-	PERRMSGV(MF_UNEXPECTED_NETLIST_START,           0, "Unexpected NETLIST_START")
+	//PERRMSGV(MF_UNEXPECTED_NETLIST_START,           0, "Unexpected NETLIST_START")
 	PERRMSGV(MF_UNEXPECTED_NETLIST_EXTERNAL,        0, "Unexpected NETLIST_EXTERNAL within a netlist")
 	PERRMSGV(MF_EXPECTED_NETLIST_START_1,           1, "Expected NETLIST_START but got {1}")
 	PERRMSGV(MF_EXPECTED_IDENTIFIER_GOT_1,          1, "Expected an identifier, but got {1}")
 	PERRMSGV(MF_EXPECTED_COMMA_OR_RP_1,             1, "Expected comma or right parenthesis but found <{1}>")
 	PERRMSGV(MF_DIPPINS_EQUAL_NUMBER_1,             1, "DIPPINS requires equal number of pins to DIPPINS, first pin is {}")
-	PERRMSGV(MF_PARAM_NOT_FP_1,                     1, "Parameter value <{1}> not floating point")
+	//PERRMSGV(MF_PARAM_NOT_FP_1,                     1, "Parameter value <{1}> not floating point")
 	PERRMSGV(MF_TT_LINE_WITHOUT_HEAD,               0, "TT_LINE found without TT_HEAD")
 	PERRMSGV(MF_LOCAL_SOURCE_NOT_FOUND_1,           1, "Local source not found: <{1}>")
+	PERRMSGV(MF_TRUTHTABLE_NOT_FOUND_1,             1, "Truthtable not found: <{1}>")
 
 	// nl_setup.cpp
 
@@ -65,7 +67,7 @@ namespace netlist
 	PERRMSGV(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1, 1,"You must pass an equal number of pins to DIPPINS {1}")
 	PERRMSGV(MF_PARAM_COUNT_MISMATCH_2,             2, "Parameter count mismatch for {1} - only found {2}")
 	PERRMSGV(MF_PARAM_COUNT_EXCEEDED_2,             2, "Parameter count exceed for {1} - found {2}")
-	PERRMSGV(MF_UNKNOWN_OBJECT_TYPE_1,              1, "Unknown object type {1}")
+	//PERRMSGV(MF_UNKNOWN_OBJECT_TYPE_1,              1, "Unknown object type {1}")
 	PERRMSGV(MF_UNKNOWN_FAMILY_TYPE_1,              2, "Unknown family type {1} in model {2}")
 	PERRMSGV(MF_INVALID_NUMBER_CONVERSION_1_2,      2, "Invalid number conversion {1} : {2}")
 	PERRMSGV(MF_INVALID_ENUM_CONVERSION_1_2,        2, "Invalid element found {1} : {2}")
@@ -116,11 +118,12 @@ namespace netlist
 		"but has been forced to act as a logic output. Parameter "
 		" FORCE_TRISTATE_LOGIC for device {2} needs to be disabled!.")
 
-	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}. Please consider commenting those out.")
+	PERRMSGV(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3, 3, "Found device {1} connected only to railterminals {2}/{3}."
+		" This may reflect the schematic - but as well be an error. Please review.")
 
 	PERRMSGV(MW_DATA_1_NOT_FOUND,                   1, "unable to find data {1} in sources collection")
 
-	PERRMSGV(ME_DEVICE_NOT_FOUND_FOR_HINT,          1, "Device not found for hint {1}")
+	//PERRMSGV(ME_DEVICE_NOT_FOUND_FOR_HINT,          1, "Device not found for hint {1}")
 	PERRMSGV(ME_UNKNOWN_PARAMETER,                  1, "Unknown parameter {1}")
 	PERRMSGV(MF_ERRORS_FOUND,                       1, "Counted {1} errors which need to be fixed")
 
