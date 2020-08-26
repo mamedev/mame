@@ -51,7 +51,7 @@ const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAM
 //  stream_buffer - constructor
 //-------------------------------------------------
 
-stream_buffer::stream_buffer(int sample_rate) :
+stream_buffer::stream_buffer(u32 sample_rate) :
 	m_end_second(0),
 	m_end_sample(0),
 	m_sample_rate(sample_rate),
@@ -267,7 +267,7 @@ void stream_buffer::close_wav()
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
@@ -295,7 +295,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
@@ -330,14 +330,15 @@ sound_stream::~sound_stream()
 //  init_common - constructor
 //-------------------------------------------------
 
-void sound_stream::init_common(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
+void sound_stream::init_common(u32 inputs, u32 outputs, u32 sample_rate, sound_stream_flags flags)
 {
 	sound_assert(outputs > 0);
 
 	// create a name
 	m_name = m_device.name();
-	m_name += " ";
+	m_name += " '";
 	m_name += m_device.tag();
+	m_name += "'";
 
 	// create a unique tag for saving
 	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
@@ -348,7 +349,7 @@ void sound_stream::init_common(int inputs, int outputs, int sample_rate, sound_s
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
-		stream_output *resampler = nullptr;
+		sound_stream_output *resampler = nullptr;
 		int resampler_type = flags & STREAM_RESAMPLER_MASK;
 		if (resampler_type != STREAM_RESAMPLER_NONE)
 		{
@@ -374,104 +375,8 @@ void sound_stream::init_common(int inputs, int outputs, int sample_rate, sound_s
 	if (synchronous())
 		m_sync_timer = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_stream::sync_update), this));
 
-	// force an update to the sample rates; this will cause everything to be recomputed
-	// and will generate the initial resample buffers for our inputs
+	// force an update to the sample rates
 	sample_rate_changed();
-}
-
-
-//-------------------------------------------------
-//  sample_time - return the emulation time of the
-//  next sample to be generated on the stream
-//-------------------------------------------------
-
-attotime sound_stream::sample_time() const
-{
-	return m_output[0].end_time();
-}
-
-
-//-------------------------------------------------
-//  user_gain - return the user-controllable gain
-//  on a given stream's input
-//-------------------------------------------------
-
-float sound_stream::user_gain(int inputnum) const
-{
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	return m_input[inputnum].user_gain();
-}
-
-
-//-------------------------------------------------
-//  input_gain - return the input gain on a
-//  given stream's input
-//-------------------------------------------------
-
-float sound_stream::input_gain(int inputnum) const
-{
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	return m_input[inputnum].gain();
-}
-
-
-//-------------------------------------------------
-//  output_gain - return the output gain on a
-//  given stream's output
-//-------------------------------------------------
-
-float sound_stream::output_gain(int outputnum) const
-{
-	sound_assert(outputnum >= 0 && outputnum < m_output.size());
-	return m_output[outputnum].gain();
-}
-
-
-//-------------------------------------------------
-//  input_name - return the original input gain
-//  on a given stream's input
-//-------------------------------------------------
-
-std::string sound_stream::input_name(int inputnum) const
-{
-	std::ostringstream str;
-
-	// start with our device name and tag
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	util::stream_format(str, "%s '%s': ", m_device.name(), m_device.tag());
-
-	// if we have a source, indicate where the sound comes from by device name and tag
-	auto &input = m_input[inputnum];
-	if (input.valid())
-	{
-		device_t &srcdevice = input.source().stream().device();
-		util::stream_format(str, "%s '%s' Ch.%d", srcdevice.name(), srcdevice.tag(), input.source().index());
-	}
-	return str.str();
-}
-
-
-//-------------------------------------------------
-//  input_source_device - return the device
-//  attached as a given input's source
-//-------------------------------------------------
-
-device_t *sound_stream::input_source_device(int inputnum) const
-{
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	return m_input[inputnum].valid() ? &m_input[inputnum].source().stream().device() : nullptr;
-}
-
-
-//-------------------------------------------------
-//  input_source_device - return the output number
-//  attached as a given input's source
-//-------------------------------------------------
-
-int sound_stream::input_source_outputnum(int inputnum) const
-{
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	return m_input[inputnum].valid() ? m_input[inputnum].source().index() : -1;
 }
 
 
@@ -495,6 +400,10 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 	// wire it up
 	m_input[index].set_source((input_stream != nullptr) ? &input_stream->m_output[output_index] : nullptr);
 	m_input[index].set_gain(gain);
+
+	// if we are input-adaptive, tell the input stream to notify us on sample rate changes
+	if (input_stream != nullptr && input_adaptive())
+		input_stream->m_dependents.push_back(this);
 
 	// update sample rates now that we know the input
 	sample_rate_changed();
@@ -602,7 +511,7 @@ void sound_stream::sync_update(void *, s32)
 //  given stream
 //-------------------------------------------------
 
-void sound_stream::set_sample_rate(int new_rate)
+void sound_stream::set_sample_rate(u32 new_rate)
 {
 	// we will update this on the next global update
 	if (new_rate != sample_rate())
@@ -611,64 +520,32 @@ void sound_stream::set_sample_rate(int new_rate)
 
 
 //-------------------------------------------------
-//  set_user_gain - set the user-controllable gain
-//  on a given stream's input
-//-------------------------------------------------
-
-void sound_stream::set_user_gain(int inputnum, float gain)
-{
-	update();
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	m_input[inputnum].set_user_gain(gain);
-}
-
-
-//-------------------------------------------------
-//  set_input_gain - set the input gain on a
-//  given stream's input
-//-------------------------------------------------
-
-void sound_stream::set_input_gain(int inputnum, float gain)
-{
-	update();
-	sound_assert(inputnum >= 0 && inputnum < m_input.size());
-	m_input[inputnum].set_gain(gain);
-}
-
-
-//-------------------------------------------------
-//  set_output_gain - set the output gain on a
-//  given stream's output
-//-------------------------------------------------
-
-void sound_stream::set_output_gain(int outputnum, float gain)
-{
-	update();
-	sound_assert(outputnum >= 0 && outputnum < m_output.size());
-	m_output[outputnum].set_gain(gain);
-}
-
-
-//-------------------------------------------------
 //  apply_sample_rate_changes - if there is a
 //  pending sample rate change, apply it now
 //-------------------------------------------------
 
-void sound_stream::apply_sample_rate_changes()
+bool sound_stream::apply_sample_rate_changes()
 {
 	// grab the new rate and invalidate
 	u32 new_rate = m_pending_sample_rate;
-	if (new_rate == SAMPLE_RATE_INVALID)
-		return;
 	m_pending_sample_rate = SAMPLE_RATE_INVALID;
 
-	// if we're input adaptive, update the sample rate
+	// if we're input adaptive, override with the rate of our input
 	if (input_adaptive() && m_input.size() > 0 && m_input[0].valid())
 		new_rate = m_input[0].source().stream().sample_rate();
+
+	// if we're output adaptive, override with the rate of our output
+	if (output_adaptive() && m_dependents.size() > 0)
+		new_rate = m_dependents.front()->sample_rate();
+
+	// if no net change, do nothing
+	if (new_rate == SAMPLE_RATE_INVALID || new_rate == m_sample_rate)
+		return false;
 
 	// update to the new rate and notify everyone
 	m_sample_rate = new_rate;
 	sample_rate_changed();
+	return true;
 }
 
 
@@ -683,10 +560,6 @@ void sound_stream::sample_rate_changed()
 	// if invalid, just punt
 	if (m_sample_rate == SAMPLE_RATE_INVALID)
 		return;
-
-	// update all input buffers
-	for (auto &input : m_input)
-		input.sample_rate_changed(m_sample_rate);
 
 	// update all output buffers
 	for (auto &output : m_output)
@@ -809,8 +682,9 @@ default_resampler_stream::default_resampler_stream(device_t &device) :
 	m_max_latency(0)
 {
 	// create a name
-	m_name = "Resampler ";
-	m_name += this->device().tag();
+	m_name = "Default Resampler '";
+	m_name += device.tag();
+	m_name += "'";
 }
 
 
@@ -858,6 +732,8 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 		output.put(dstindex++, 0);
 		output_start += output.sample_period();
 	}
+	if (dstindex >= numsamples)
+		return;
 
 	// now rebase our input buffer around the adjusted start time
 	input.set_start(output_start - latency);
@@ -927,14 +803,14 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 
 
 //**************************************************************************
-//  STREAM INPUT
+//  SOUND STREAM INPUT
 //**************************************************************************
 
 //-------------------------------------------------
-//  stream_input - constructor
+//  sound_stream_input - constructor
 //-------------------------------------------------
 
-sound_stream::stream_input::stream_input() :
+sound_stream_input::sound_stream_input() :
 	m_owner(nullptr),
 	m_native_source(nullptr),
 	m_resampler_source(nullptr),
@@ -949,7 +825,7 @@ sound_stream::stream_input::stream_input() :
 //  init - initialization
 //-------------------------------------------------
 
-void sound_stream::stream_input::init(sound_stream &stream, u32 index, char const *tag, stream_output *resampler)
+void sound_stream_input::init(sound_stream &stream, u32 index, char const *tag, sound_stream_output *resampler)
 {
 	// set the passed-in values
 	m_owner = &stream;
@@ -964,39 +840,34 @@ void sound_stream::stream_input::init(sound_stream &stream, u32 index, char cons
 
 
 //-------------------------------------------------
-//  set_source - wire up the output source for
-//  our consumption
+//  name - return the friendly name of this input
 //-------------------------------------------------
 
-void sound_stream::stream_input::set_source(stream_output *source)
+std::string sound_stream_input::name() const
 {
-	m_native_source = source;
-	if (m_resampler_source != nullptr)
-		m_resampler_source->stream().set_input(0, &source->stream(), source->index());
+	// start with our owning stream's name
+	std::ostringstream str;
+	util::stream_format(str, "%s", m_owner->name());
+
+	// if we have a source, indicate where the sound comes from by device name and tag
+	if (valid())
+	{
+		util::stream_format(str, " <- %s Ch.%d", m_native_source->stream().name(), m_native_source->index());
+	}
+	return str.str();
 }
 
 
 //-------------------------------------------------
-//  sample_rate_changed - handle changes in the
-//  owner's sample rate
+//  set_source - wire up the output source for
+//  our consumption
 //-------------------------------------------------
 
-void sound_stream::stream_input::sample_rate_changed(u32 sample_rate)
+void sound_stream_input::set_source(sound_stream_output *source)
 {
-	// if invalid, nothing to do
-	if (!valid())
-		return;
-
-	// if the input stream is output-adaptive, set the sample rate there
-	if (m_native_source->stream().output_adaptive())
-		m_native_source->stream().set_sample_rate(sample_rate);
-
-	// if we have a resampler, set it there as well
+	m_native_source = source;
 	if (m_resampler_source != nullptr)
-	{
-		m_resampler_source->stream().set_sample_rate(sample_rate);
-		m_resampler_source->stream().apply_sample_rate_changes();
-	}
+		m_resampler_source->stream().set_input(0, &source->stream(), source->index());
 }
 
 
@@ -1006,7 +877,7 @@ void sound_stream::stream_input::sample_rate_changed(u32 sample_rate)
 //  contents
 //-------------------------------------------------
 
-read_stream_view sound_stream::stream_input::update(attotime start, attotime end)
+read_stream_view sound_stream_input::update(attotime start, attotime end)
 {
 	// shouldn't get here unless valid
 	sound_assert(valid());
@@ -1025,21 +896,21 @@ read_stream_view sound_stream::stream_input::update(attotime start, attotime end
 	}
 
 	// update the source, returning a view of the needed output over the start and end times
-	stream_output &source = resampled ? *m_resampler_source : *m_native_source;
+	sound_stream_output &source = resampled ? *m_resampler_source : *m_native_source;
 	return source.stream().update_view(start, end, source.index()).set_gain(m_gain * m_user_gain * m_native_source->gain());
 }
 
 
 
 //**************************************************************************
-//  STREAM OUTPUT
+//  SOUND STREAM OUTPUT
 //**************************************************************************
 
 //-------------------------------------------------
-//  stream_output - constructor
+//  sound_stream_output - constructor
 //-------------------------------------------------
 
-sound_stream::stream_output::stream_output() :
+sound_stream_output::sound_stream_output() :
 	m_stream(nullptr),
 	m_index(0),
 	m_gain(1.0)
@@ -1051,7 +922,7 @@ sound_stream::stream_output::stream_output() :
 //  init - initialization
 //-------------------------------------------------
 
-void sound_stream::stream_output::init(sound_stream &stream, u32 index, char const *tag)
+void sound_stream_output::init(sound_stream &stream, u32 index, char const *tag)
 {
 	// set the passed-in data
 	m_stream = &stream;
@@ -1088,21 +959,22 @@ void sound_stream::stream_output::init(sound_stream &stream, u32 index, char con
 //  sound_manager - constructor
 //-------------------------------------------------
 
-sound_manager::sound_manager(running_machine &machine)
-	: m_machine(machine),
-		m_update_timer(nullptr),
-		m_finalmix_leftover(0),
-		m_finalmix(machine.sample_rate()),
-		m_leftmix(machine.sample_rate()),
-		m_rightmix(machine.sample_rate()),
-		m_samples_this_update(0),
-		m_muted(0),
-		m_attenuation(0),
-		m_nosound_mode(machine.osd().no_sound()),
-		m_unique_id(0),
-		m_wavfile(nullptr),
-		m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds()),
-		m_last_update(attotime::zero)
+sound_manager::sound_manager(running_machine &machine) :
+	m_machine(machine),
+	m_update_timer(nullptr),
+	m_finalmix_leftover(0),
+	m_finalmix(machine.sample_rate()),
+	m_leftmix(machine.sample_rate()),
+	m_rightmix(machine.sample_rate()),
+	m_samples_this_update(0),
+	m_compressor_scale(1.0),
+	m_compressor_counter(0),
+	m_muted(0),
+	m_attenuation(0),
+	m_nosound_mode(machine.osd().no_sound()),
+	m_unique_id(0),
+	m_wavfile(nullptr),
+	m_last_update(attotime::zero)
 {
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = machine.options().wav_write();
@@ -1298,7 +1170,7 @@ void sound_manager::config_load(config_type cfg_type, util::xml::data_node const
 			float defvol = channelnode->get_attribute_float("defvol", 1.0f);
 			float newvol = channelnode->get_attribute_float("newvol", -1000.0f);
 			if (newvol != -1000.0f)
-				info.stream->set_user_gain(info.inputnum, newvol / defvol);
+				info.stream->input(info.inputnum).set_user_gain(newvol / defvol);
 		}
 	}
 }
@@ -1322,7 +1194,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 			mixer_input info;
 			if (!indexed_mixer_input(mixernum, info))
 				break;
-			float newvol = info.stream->user_gain(info.inputnum);
+			float newvol = info.stream->input(info.inputnum).user_gain();
 
 			if (newvol != 1.0f)
 			{
@@ -1365,6 +1237,50 @@ void sound_manager::update(void *ptr, int param)
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
 		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
+	// determine the maximum in this section
+	stream_buffer::sample_t curmax = 0;
+	for (int sampindex = 0; sampindex < m_samples_this_update; sampindex++)
+	{
+		auto sample = m_leftmix[sampindex];
+		if (sample < 0)
+			sample = -sample;
+		if (sample > curmax)
+			curmax = sample;
+
+		sample = m_rightmix[sampindex];
+		if (sample < 0)
+			sample = -sample;
+		if (sample > curmax)
+			curmax = sample;
+	}
+
+	// pull in current compressor scale factor before modifying
+	stream_buffer::sample_t lscale = m_compressor_scale;
+	stream_buffer::sample_t rscale = m_compressor_scale;
+
+	// if we're above what the compressor will handle, adjust the compression
+	if (curmax * m_compressor_scale > 1.0)
+	{
+		m_compressor_scale = 1.0 / curmax;
+		m_compressor_counter = STREAMS_UPDATE_FREQUENCY / 5;
+	}
+
+	// if we're currently scaled, wait a bit to see if we can trend back toward 1.0
+	else if (m_compressor_counter != 0)
+		m_compressor_counter--;
+
+	// try to migrate toward 0 unless we're going to introduce clipping
+	else if (m_compressor_scale < 1.0 && curmax * 1.01 * m_compressor_scale < 1.0)
+		m_compressor_scale *= 1.01f;
+
+if (lscale != m_compressor_scale)
+	printf("scale=%.5f\n", m_compressor_scale);
+
+	// track whether there are pending scale changes in left/right
+	bool lpending = (lscale != m_compressor_scale);
+	bool rpending = (rscale != m_compressor_scale);
+	stream_buffer::sample_t lprev = 0, rprev = 0;
+
 	// now downmix the final result
 	u32 finalmix_step = machine().video().speed_factor();
 	u32 finalmix_offset = 0;
@@ -1374,21 +1290,39 @@ void sound_manager::update(void *ptr, int param)
 	{
 		int sampindex = sample / 1000;
 
-		// clamp the left side
-		s32 samp = s32(m_leftmix[sampindex] * stream_buffer::sample_t(32768.0f));
-		if (samp < -32768)
-			samp = -32768;
-		else if (samp > 32767)
-			samp = 32767;
-		finalmix[finalmix_offset++] = samp;
+		// look for a zero-crossing to update compression
+		stream_buffer::sample_t lsamp = m_leftmix[sampindex];
+		if (lpending && ((lsamp < 0 && lprev > 0) || (lsamp > 0 && lprev < 0)))
+		{
+			lpending = false;
+			lscale = m_compressor_scale;
+		}
+		lprev = lsamp;
 
-		// clamp the right side
-		samp = s32(m_rightmix[sampindex] * stream_buffer::sample_t(32768.0f));
-		if (samp < -32768)
-			samp = -32768;
-		else if (samp > 32767)
-			samp = 32767;
-		finalmix[finalmix_offset++] = samp;
+		// clamp the left side
+		lsamp *= lscale;
+		if (lsamp > 1.0)
+			lsamp = 1.0;
+		else if (lsamp < -1.0)
+			lsamp = -1.0;
+		finalmix[finalmix_offset++] = s16(lsamp * 32767.0);
+
+		// look for a zero-crossing to update compression
+		stream_buffer::sample_t rsamp = m_rightmix[sampindex];
+		if (rpending && ((rsamp < 0 && rprev > 0) || (rsamp > 0 && rprev < 0)))
+		{
+			rpending = false;
+			rscale = m_compressor_scale;
+		}
+		rprev = rsamp;
+
+		// clamp the left side
+		rsamp *= rscale;
+		if (rsamp > 1.0)
+			rsamp = 1.0;
+		else if (rsamp < -1.0)
+			rsamp = -1.0;
+		finalmix[finalmix_offset++] = s16(rsamp * 32767.0);
 	}
 	m_finalmix_leftover = sample - m_samples_this_update * 1000;
 
@@ -1415,9 +1349,16 @@ void sound_manager::update(void *ptr, int param)
 	// remember the update time
 	m_last_update = curtime;
 
-	// update sample rates if they have changed
-	for (auto &stream : m_stream_list)
-		stream->apply_sample_rate_changes();
+	// update sample rates if they have changed; iterate over the graph
+	// until all streams have settled on a final rate
+	bool changed = true;
+	while (changed)
+	{
+		changed = false;
+		for (auto &stream : m_stream_list)
+			if (stream->apply_sample_rate_changes())
+				changed = true;
+	}
 
 	// notify that new samples have been generated
 	emulator_info::sound_hook();
@@ -1435,7 +1376,5 @@ void sound_manager::update(void *ptr, int param)
 void sound_manager::samples(s16 *buffer)
 {
 	for (int sample = 0; sample < m_samples_this_update * 2; sample++)
-	{
 		*buffer++ = m_finalmix[sample];
-	}
 }

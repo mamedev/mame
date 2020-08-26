@@ -965,8 +965,8 @@ int s_dsp_device::advance_envelope( int v )
 
 void s_dsp_device::set_volume(int volume)
 {
-	m_channel->set_output_gain(0, volume / 100.0);
-	m_channel->set_output_gain(1, volume / 100.0);
+	set_output_gain(0, volume / 100.0);
+	set_output_gain(1, volume / 100.0);
 }
 
 

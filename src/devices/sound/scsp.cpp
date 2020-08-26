@@ -297,8 +297,8 @@ void scsp_device::device_post_load()
 	for (int slot = 0; slot < 32; slot++)
 		Compute_LFO(&m_Slots[slot]);
 
-	m_stream->set_output_gain(0, MVOL() / 15.0);
-	m_stream->set_output_gain(1, MVOL() / 15.0);
+	set_output_gain(0, MVOL() / 15.0);
+	set_output_gain(1, MVOL() / 15.0);
 }
 
 //-------------------------------------------------
@@ -738,8 +738,8 @@ void scsp_device::UpdateReg(int reg)
 	switch (reg & 0x3f)
 	{
 		case 0x0:
-			m_stream->set_output_gain(0, MVOL() / 15.0);
-			m_stream->set_output_gain(1, MVOL() / 15.0);
+			set_output_gain(0, MVOL() / 15.0);
+			set_output_gain(1, MVOL() / 15.0);
 			break;
 		case 0x2:
 		case 0x3:

@@ -145,8 +145,7 @@ void samples_device::set_volume(uint8_t channel, float volume)
 	assert(channel < m_channels);
 
 	// force an update before we start
-	channel_t &chan = m_channel[channel];
-	chan.stream->set_output_gain(0, volume);
+	set_output_gain(channel, volume);
 }
 
 

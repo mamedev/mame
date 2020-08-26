@@ -181,7 +181,7 @@ float device_sound_interface::input_gain(int inputnum) const
 {
 	int stream_inputnum;
 	sound_stream *stream = input_to_stream_input(inputnum, stream_inputnum);
-	return (stream != nullptr) ? stream->input_gain(stream_inputnum) : 0.0f;
+	return (stream != nullptr) ? stream->input(stream_inputnum).gain() : 0.0f;
 }
 
 
@@ -194,7 +194,7 @@ float device_sound_interface::output_gain(int outputnum) const
 {
 	int stream_outputnum;
 	sound_stream *stream = output_to_stream_output(outputnum, stream_outputnum);
-	return (stream != nullptr) ? stream->output_gain(stream_outputnum) : 0.0f;
+	return (stream != nullptr) ? stream->output(stream_outputnum).gain() : 0.0f;
 }
 
 
@@ -208,7 +208,7 @@ void device_sound_interface::set_input_gain(int inputnum, float gain)
 	int stream_inputnum;
 	sound_stream *stream = input_to_stream_input(inputnum, stream_inputnum);
 	if (stream != nullptr)
-		stream->set_input_gain(stream_inputnum, gain);
+		stream->input(stream_inputnum).set_gain(gain);
 }
 
 
@@ -225,7 +225,7 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 		for (auto &stream : device().machine().sound().streams())
 			if (&stream->device() == &device())
 				for (int num = 0; num < stream->output_count(); num++)
-					stream->set_output_gain(num, gain);
+					stream->output(num).set_gain(gain);
 	}
 
 	// look up the stream and stream output index
@@ -234,7 +234,7 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 		int stream_outputnum;
 		sound_stream *stream = output_to_stream_output(outputnum, stream_outputnum);
 		if (stream != nullptr)
-			stream->set_output_gain(stream_outputnum, gain);
+			stream->output(stream_outputnum).set_gain(gain);
 	}
 }
 
@@ -250,8 +250,11 @@ int device_sound_interface::inputnum_from_device(device_t &source_device, int ou
 	for (auto &stream : device().machine().sound().streams())
 		if (&stream->device() == &device())
 			for (int inputnum = 0; inputnum < stream->input_count(); inputnum++, overall++)
-				if (stream->input_source_device(inputnum) == &source_device && stream->input_source_outputnum(inputnum) == outputnum)
+			{
+				auto &input = stream->input(inputnum);
+				if (input.valid() && &input.source().stream().device() == &source_device && input.source().index() == outputnum)
 					return overall;
+			}
 	return -1;
 }
 

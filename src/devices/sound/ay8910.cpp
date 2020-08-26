@@ -1382,7 +1382,7 @@ void ay8910_device::set_volume(int channel,int volume)
 {
 	for (int ch = 0; ch < m_streams; ch++)
 		if (channel == ch || m_streams == 1 || channel == ALL_8910_CHANNELS)
-			m_channel->set_output_gain(ch, volume / 100.0);
+			set_output_gain(ch, volume / 100.0);
 }
 
 void ay8910_device::ay_set_clock(int clock)

@@ -69,7 +69,7 @@ constexpr u32 SAMPLE_RATE_SYNCHRONOUS = 0xfffffffc;
 #define SOUND_DEBUG (1)
 
 #if (SOUND_DEBUG)
-#define sound_assert(x) do { if (!(x)) __debugbreak(); } while (0)
+#define sound_assert(x) do { if (!(x)) { osd_printf_error("sound_assert: " #x); __debugbreak(); } } while (0)
 #else
 #define sound_assert assert
 #endif
@@ -90,7 +90,7 @@ public:
 	using sample_t = float;
 
 	// constructor/destructor
-	stream_buffer(int sample_rate = 48000);
+	stream_buffer(u32 sample_rate = 48000);
 	~stream_buffer();
 
 	// disable copying of stream_buffers directly
@@ -370,6 +370,103 @@ public:
 };
 
 
+// ======================> sound_stream_output
+
+class sound_stream_output
+{
+#if (SOUND_DEBUG)
+	friend class sound_stream;
+#endif
+
+public:
+	// construction/destruction
+	sound_stream_output();
+
+	// initialization
+	void init(sound_stream &stream, u32 index, char const *tag_base);
+
+	// no copying allowed
+	sound_stream_output(sound_stream_output const &src) = delete;
+	sound_stream_output &operator=(sound_stream_output const &rhs) = delete;
+
+	// simple getters
+	sound_stream &stream() const { sound_assert(m_stream != nullptr); return *m_stream; }
+	attotime end_time() const { return m_buffer.end_time(); }
+	u32 index() const { return m_index; }
+	float gain() const { return m_gain; }
+
+	// simple setters
+	void set_gain(float gain) { m_gain = gain; }
+
+	// handle a changing sample rate
+	void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate); }
+
+	// return an output view
+	write_stream_view view(attotime start, attotime end) { return write_stream_view(m_buffer, start, end); }
+
+	// resync the buffer to the given end time
+	void set_end_time(attotime end) { m_buffer.set_end_time(end); }
+
+private:
+	// internal state
+	sound_stream *m_stream;               // owning stream
+	stream_buffer m_buffer;               // output buffer
+	u32 m_index;                          // output index
+	float m_gain;                         // gain to apply to the output
+};
+
+
+// ======================> sound_stream_input
+
+class sound_stream_input
+{
+#if (SOUND_DEBUG)
+	friend class sound_stream;
+#endif
+
+public:
+	// construction/destruction
+	sound_stream_input();
+
+	// initialization
+	void init(sound_stream &stream, u32 index, char const *tag_base, sound_stream_output *resampler);
+
+	// no copying allowed
+	sound_stream_input(sound_stream_input const &src) = delete;
+	sound_stream_input &operator=(sound_stream_input const &rhs) = delete;
+
+	// simple getters
+	bool valid() const { return (m_native_source != nullptr); }
+	sound_stream &owner() const { sound_assert(valid()); return *m_owner; }
+	sound_stream_output &source() const { sound_assert(valid()); return *m_native_source; }
+	u32 index() const { return m_index; }
+	float gain() const { return m_gain; }
+	float user_gain() const { return m_user_gain; }
+
+	// simple setters
+	void set_gain(float gain) { m_gain = gain; }
+	void set_user_gain(float gain) { m_user_gain = gain; }
+
+	// return a friendly name
+	std::string name() const;
+
+	// connect the source
+	void set_source(sound_stream_output *source);
+
+	// update and return an input view
+	read_stream_view update(attotime start, attotime end);
+
+private:
+	// internal state
+	sound_stream *m_owner;                   // reference to the owning stream
+	sound_stream_output *m_native_source;    // pointer to the native sound_output
+	sound_stream_output *m_resampler_source; // pointer to the resampled output; changed dynamically
+	u32 m_index;                             // input index
+	float m_gain;                            // gain to apply to this input
+	float m_user_gain;                       // user-controlled gain to apply to this input
+};
+
+
 // ======================> stream_update_delegate/stream_update_ex_delegate
 
 using stream_update_delegate = delegate<void (sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)>;
@@ -394,134 +491,39 @@ class sound_stream
 {
 	friend class sound_manager;
 
-	// stream output class
-	class stream_output
-	{
-		friend class sound_stream;
-
-	public:
-		// construction/destruction
-		stream_output();
-
-		// initialization
-		void init(sound_stream &stream, u32 index, char const *tag_base);
-
-		// no copying allowed
-		stream_output(stream_output const &src) = delete;
-		stream_output &operator=(stream_output const &rhs) = delete;
-
-		// simple getters
-		sound_stream &stream() const { sound_assert(m_stream != nullptr); return *m_stream; }
-		attotime end_time() const { return m_buffer.end_time(); }
-		u32 index() const { return m_index; }
-		float gain() const { return m_gain; }
-
-		// simple setters
-		void set_gain(float gain) { m_gain = gain; }
-
-		// handle a changing sample rate
-		void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate); }
-
-		// return an output view
-		write_stream_view view(attotime start, attotime end) { return write_stream_view(m_buffer, start, end); }
-
-		// resync the buffer to the given end time
-		void set_end_time(attotime end) { m_buffer.set_end_time(end); }
-
-	private:
-		// internal state
-		sound_stream *m_stream;               // owning stream
-		stream_buffer m_buffer;               // output buffer
-		u32 m_index;                          // output index
-		float m_gain;                         // gain to apply to the output
-	};
-
-	// stream input class
-	class stream_input
-	{
-		friend class sound_stream;
-
-	public:
-		// construction/destruction
-		stream_input();
-
-		// initialization
-		void init(sound_stream &stream, u32 index, char const *tag_base, stream_output *resampler);
-
-		// no copying allowed
-		stream_input(stream_input const &src) = delete;
-		stream_input &operator=(stream_input const &rhs) = delete;
-
-		// simple getters
-		sound_stream &owner() const { sound_assert(m_owner != nullptr); return *m_owner; }
-		bool valid() const { return (m_native_source != nullptr); }
-		stream_output &source() const { sound_assert(valid()); return *m_native_source; }
-		u32 index() const { return m_index; }
-		float gain() const { return m_gain; }
-		float user_gain() const { return m_user_gain; }
-
-		// simple setters
-		void set_gain(float gain) { m_gain = gain; }
-		void set_user_gain(float gain) { m_user_gain = gain; }
-
-		// connect the source
-		void set_source(stream_output *source);
-
-		// handle a changing sample rate
-		void sample_rate_changed(u32 rate);
-
-		// update and return an input view
-		read_stream_view update(attotime start, attotime end);
-
-	private:
-		// internal state
-		sound_stream *m_owner;                 // reference to the owning stream
-		stream_output *m_native_source;        // pointer to the native sound_output
-		stream_output *m_resampler_source;     // pointer to the resampled output; changed dynamically
-		std::unique_ptr<sound_stream> m_resampler; // the resampler stream, if needed
-		u32 m_index;                           // index of ourself
-		float m_gain;                          // gain to apply to this input
-		float m_user_gain;                     // user-controlled gain to apply to this input
-	};
-
 public:
 	// construction/destruction
-	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
-	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
 	virtual ~sound_stream();
 
-	void init_common(int inputs, int outputs, int sample_rate, sound_stream_flags flags);
-
-	// getters
+	// simple getters
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
 	char const *name() const { return m_name.c_str(); }
-	int sample_rate() const { return (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate; }
-	attotime sample_time() const;
-	attotime sample_period() const { return attotime(0, sample_period_attoseconds()); }
-	attoseconds_t sample_period_attoseconds() const { return (m_sample_rate != SAMPLE_RATE_INVALID) ? HZ_TO_ATTOSECONDS(m_sample_rate) : 0; }
-	int input_count() const { return m_input.size(); }
-	int output_count() const { return m_output.size(); }
-	std::string input_name(int inputnum) const;
-	device_t *input_source_device(int inputnum) const;
-	int input_source_outputnum(int inputnum) const;
-	float user_gain(int inputnum) const;
-	float input_gain(int inputnum) const;
-	float output_gain(int outputnum) const;
 	bool synchronous() const { return m_synchronous; }
 	bool input_adaptive() const { return m_input_adaptive || m_synchronous; }
 	bool output_adaptive() const { return m_output_adaptive; }
 
-	// operations
+	// input and output getters
+	int input_count() const { return m_input.size(); }
+	int output_count() const { return m_output.size(); }
+	sound_stream_input &input(int index) { sound_assert(index >= 0 && index < m_input.size()); return m_input[index]; }
+	sound_stream_output &output(int index) { sound_assert(index >= 0 && index < m_output.size()); return m_output[index]; }
+
+	// sample rate and timing getters
+	u32 sample_rate() const { return (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate; }
+	attotime sample_time() const { return m_output[0].end_time(); }
+	attotime sample_period() const { return attotime(0, sample_period_attoseconds()); }
+	attoseconds_t sample_period_attoseconds() const { return (m_sample_rate != SAMPLE_RATE_INVALID) ? HZ_TO_ATTOSECONDS(m_sample_rate) : ATTOSECONDS_PER_SECOND; }
+
+	// configuration
 	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
+	void set_sample_rate(u32 sample_rate);
+
+	// updates
 	void update();
 	read_stream_view update_view(attotime start, attotime end, u32 outputnum = 0);
-
-	// timing
-	void set_sample_rate(int sample_rate);
-	void set_user_gain(int inputnum, float gain);
-	void set_input_gain(int inputnum, float gain);
-	void set_output_gain(int outputnum, float gain);
 
 	// debugging
 #if (SOUND_DEBUG)
@@ -533,9 +535,10 @@ protected:
 
 private:
 	// helpers called by our friends only
-	void apply_sample_rate_changes();
+	bool apply_sample_rate_changes();
 
 	// internal helpers
+	void init_common(u32 inputs, u32 outputs, u32 sample_rate, sound_stream_flags flags);
 	void sample_rate_changed();
 	void reprime_sync_timer();
 	void postload();
@@ -555,15 +558,16 @@ private:
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
 	// input information
-	std::vector<stream_input> m_input;             // list of streams we directly depend upon
+	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
 	std::vector<stream_sample_t *> m_input_array;  // array of inputs for passing to the callback
 	std::vector<read_stream_view> m_input_view;    // array of output views for passing to the callback
 	std::vector<std::unique_ptr<sound_stream>> m_resampler_list; // internal list of resamplers
 
 	// output information
-	std::vector<stream_output> m_output;            // list of streams which directly depend upon us
+	std::vector<sound_stream_output> m_output;      // list of streams which directly depend upon us
 	std::vector<stream_sample_t *> m_output_array;  // array of outputs for passing to the callback
 	std::vector<write_stream_view> m_output_view;   // array of output views for passing to the callback
+	std::vector<sound_stream *> m_dependents;		// array of streams that are dependent upon our sample rate
 
 	// callback information
 	stream_update_delegate m_callback;              // callback function
@@ -623,7 +627,6 @@ public:
 	int attenuation() const { return m_attenuation; }
 	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	attotime last_update() const { return m_last_update; }
-	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
 	int sample_count() const { return m_samples_this_update; }
 	void samples(s16 *buffer);
 	int unique_id() { return m_unique_id++; }
@@ -654,6 +657,7 @@ private:
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	void update(void *ptr = nullptr, s32 param = 0);
+	void recompute_compressor_params(stream_buffer::sample_t maxsample);
 
 	// internal state
 	running_machine &m_machine;
@@ -665,7 +669,6 @@ private:
 	std::vector<stream_buffer::sample_t> m_rightmix;
 	int m_samples_this_update;
 
-	stream_buffer::sample_t m_compressor_thresh;
 	stream_buffer::sample_t m_compressor_scale;
 	int m_compressor_counter;
 
@@ -677,7 +680,6 @@ private:
 
 	// streams data
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list;    // list of streams
-	attoseconds_t m_update_attoseconds;           // attoseconds between global updates
 	attotime m_last_update;                       // last update time
 };
 
