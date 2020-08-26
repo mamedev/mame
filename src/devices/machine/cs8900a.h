@@ -80,10 +80,6 @@ private:
 
 	int rxevent_read_mask; /* set if L and/or H u8 was read in RXEVENT? */
 
-	//CRC support stuff
-	unsigned long crc32_table[256];
-	int crc32_is_initialized;
-
 	//The frame queue
 	std::queue<std::vector<u8>> m_frame_queue;
 

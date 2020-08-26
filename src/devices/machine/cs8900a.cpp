@@ -34,8 +34,6 @@ DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
 
 #define MAX_FRAME_QUEUE_ENTRIES 4096
 
-#define CRC32_POLY  0xedb88320
-
 /* CS8900 registers */
 /* these are the 8 16-bit-ports for "I/O space configuration"
    (see 4.10 on page 75 of cs8900a-4.pdf, the cs8900a data sheet)
@@ -233,19 +231,6 @@ DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
 
 //------------------- END #defines ---------------------
 
-
-unsigned long cs8900a_device::crc32_buf(const char *buffer, unsigned int len)
-{
-    unsigned long crc;
-    const char *p;
-
-    crc = 0xffffffff;
-    for (p = buffer; len > 0; ++p, --len)
-        crc = (crc >> 8) ^ crc32_table[(crc ^ *p) & 0xff];
-    
-    return ~crc;
-}
-
 void cs8900a_device::cs8900_set_tx_status(int ready,int error)
 {
     u16 old_status = GET_PP_16(CS8900_PP_ADDR_SE_BUSST);
@@ -380,13 +365,6 @@ cs8900a_device::cs8900a_device(const machine_config &mconfig, device_type type, 
 	, rx_enabled(0)
 	, rxevent_read_mask(3) /* set if L and/or H u8 was read in RXEVENT? */
 {
-// Initialize the CRC table
-    for (int i = 0; i < 256; i++) {
-        unsigned long c = (unsigned long) i;
-        for (int j = 0; j < 8; j++)
-            c = c & 1 ? CRC32_POLY ^ (c >> 1) : c >> 1;
-        crc32_table[i] = c;
-    }
 }
 
 cs8900a_device::cs8900a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -455,7 +433,7 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
     }
 
     /* now check if DA passes the hash filter */
-    hashreg = (~crc32_buf((char *)buffer,6) >> 26) & 0x3F;
+    hashreg = (~util::crc32_creator::simple((char *)buffer,6) >> 26) & 0x3F;
 
     *phashed = (cs8900_hash_mask[(hashreg>=32)?1:0] & (1 << (hashreg&0x1F))) ? 1 : 0;
     if (*phashed) {
