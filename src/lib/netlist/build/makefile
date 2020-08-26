@@ -64,22 +64,33 @@ TIDY_FLAGS = -p $(OBJ) -checks=llvm-include-order,llvm-namespace-comment,moderni
 #TIDY_FLAGS = -checks=modernize-use-override -fix
 #TIDY_FLAGS = -checks=modernize-use-using -fix
 
-ifeq ($(subst Windows_NT,windows,$(OS)),windows)
+ifeq ($(subst Windows_NT,Windows,$(OS)),Windows)
+    HOSTARCH := Windows
+else
+    HOSTARCH := $(shell uname -s)
+endif
+
+ifeq ($(HOSTARCH),Windows)
 OBJ = obj/mingw
 EXESUFFIX = .exe
 DOXYGEN = doxygen.exe
-HOSTARCH = WINDOWS
 CEXTRAFLAGS = -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN
 LDEXTRAFLAGS = -Wl,--subsystem,console -municode
 LIBS = $(EXTRALIBS)
 MD = @mkdir.exe
 RM = @rm.exe
 SHELL = sh.exe
+else ifeq ($(HOSTARCH),Darwin)
+OBJ = obj/darwin
+EXESUFFIX :=
+DOXYGEN = @doxygen
+LIBS = -lpthread -ldl $(EXTRALIBS)
+MD = @mkdir
+RM = @rm
 else
 OBJ = obj/nix
 EXESUFFIX :=
 DOXYGEN = @./doxygen
-HOSTARCH = NIX
 LIBS = -lpthread -ldl $(EXTRALIBS)
 MD = @mkdir
 RM = @rm
