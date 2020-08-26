@@ -757,7 +757,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="claypig" cloneof="claypigpl">
+	<software name="claypig">
 		<description>Clay Pigeon! (Brazil)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2069,7 +2069,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="claypigpl">
+	<software name="claypigpl" cloneof="claypig">
 		<description>Clay Pigeon (Europe, plus, prototype, set 1)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2082,7 +2082,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="claypigpla" cloneof="claypigpl">
+	<software name="claypigpla" cloneof="claypig">
 		<description>Clay Pigeon (Europe, plus, prototype, set 2)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
