@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Rhett Aultman
+// copyright-holders:Spiro Trikaliotis, Rhett Aultman
 /*************************************************************************
 
     CS8900A ethernet controller implementation
