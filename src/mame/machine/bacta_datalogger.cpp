@@ -5,8 +5,8 @@
 
 #define LOG_DATA    (1U << 1)
 
-#define VERBOSE (LOG_DATA)
-#define LOG_OUTPUT_STREAM std::cout
+//#define VERBOSE (LOG_DATA)
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
