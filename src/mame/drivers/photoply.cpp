@@ -346,6 +346,9 @@ ROM_START(photoply98sp)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
 
+	ROM_REGION(0x10000, "hdd_fw", 0) // Hard disk firmware
+	ROM_LOAD("m2_at29c512.bin", 0x0000, 0x10000, CRC(22a1c9ce) SHA1(6b695ee56867176d1702273e68b5584db1b94e02) ) // Seagate ST31722A
+
 	// Seagate ST31722A
 	// 3303 CYL 1704MB 16 HEADS 63 SECTORS
 	// Funworld label: Feb 1998
