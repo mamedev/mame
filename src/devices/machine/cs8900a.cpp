@@ -17,20 +17,22 @@
 DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
 
 /* warn illegal behaviour */
-/* #define CS8900_DEBUG_WARN_REG 1 */   /* warn about invalid register accesses */
-/* #define CS8900_DEBUG_WARN_RXTX 1 */  /* warn about invalid rx or tx conditions */
+#define CS8900_DEBUG_WARN_REG (1 << 1U)   /* warn about invalid register accesses */
+#define CS8900_DEBUG_WARN_RXTX (1 << 2U)  /* warn about invalid rx or tx conditions */
 
-/** #define CS8900_DEBUG 1 **/           /* enable to see port reads */
-/** #define CS8900_DEBUG_INIT 1 **/
-/** #define CS8900_DEBUG_LOAD 1  **/           /* enable to see port reads */
-/** #define CS8900_DEBUG_STORE 1  **/          /* enable to see port writes */
-/** #define CS8900_DEBUG_REGISTERS 1 **/      /* enable to see CS8900a register I/O */
+#define CS8900_DEBUG (1 << 3U)           /* enable to see port reads */
+#define CS8900_DEBUG_INIT (1 << 4U)
+#define CS8900_DEBUG_LOAD (1 << 5U)           /* enable to see port reads */
+#define CS8900_DEBUG_STORE (1 << 6U)          /* enable to see port writes */
+#define CS8900_DEBUG_REGISTERS (1 << 7U)      /* enable to see CS8900a register I/O */
+#define CS8900_DEBUG_RXTX_STATE (1 << 8U)     /* enable to see tranceiver state changes */
+#define CS8900_DEBUG_RXTX_DATA (1 << 9U)     /* enable to see data in/out flow */
+#define CS8900_DEBUG_FRAMES (1 << 10U)        /* enable to see arch frame send/recv */
+
 /** #define CS8900_DEBUG_IGNORE_RXEVENT 1 **/ /* enable to ignore RXEVENT in DEBUG_REGISTERS */
-/** #define CS8900_DEBUG_RXTX_STATE 1 **/     /* enable to see tranceiver state changes */
-/** #define CS8900_DEBUG_RXTX_DATA 1 **/      /* enable to see data in/out flow */
-/** #define CS8900_DEBUG_FRAMES 1 **/         /* enable to see arch frame send/recv */
+#define VERBOSE 0
 
-#define log_message(level,...) fprintf(stderr,__VA_ARGS__)
+#include "logmacro.h"
 
 #define MAX_FRAME_QUEUE_ENTRIES 4096
 
@@ -209,17 +211,6 @@ DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
 #define CS8900_RX_IDLE 0
 #define CS8900_RX_GOT_FRAME 1
 
-#ifdef CS8900_DEBUG_FRAMES
-    #define return( _x_ ) \
-    { \
-        int retval = _x_; \
-        \
-        log_message(cs8900_log, "%s correct_mac=%u, broadcast=%u, multicast=%u, hashed=%u, hash_index=%u", (retval? "+++ ACCEPTED":"--- rejected"), *pcorrect_mac, *pbroadcast, *pmulticast, *phashed, *phash_index); \
-        \
-        return retval; \
-    }
-#endif
-
 #define PP_PTR_AUTO_INCR_FLAG 0x8000 /* auto increment flag in package pointer */
 #define PP_PTR_FLAG_MASK      0xf000 /* is always : x y 1 1 (with x=auto incr) */
 #define PP_PTR_ADDR_MASK      0x0fff /* address portion of packet page pointer */
@@ -230,6 +221,30 @@ DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
 #define LOHI_WORD(x,y)  ( (u16)(x) | ( ((u16)(y)) <<8 ) )
 
 //------------------- END #defines ---------------------
+
+// ---- debug logging support ----
+char * cs8900a_device::debug_outbuffer(const int length, const unsigned char * const buffer)
+{
+    int i;
+    static const u32 MAXLEN_DEBUG = 1600;
+    static const u32 TFE_DEBUG_MAX_FRAME_DUMP = 150;
+    static char outbuffer[MAXLEN_DEBUG*4+1];
+    char *p = outbuffer;
+
+    assert( TFE_DEBUG_MAX_FRAME_DUMP <= MAXLEN_DEBUG );
+
+    *p = 0;
+
+    for (i=0; i<TFE_DEBUG_MAX_FRAME_DUMP; i++) {
+        if (i>=length)
+            break;
+
+        sprintf( p, "%02X%c", buffer[i], ((i+1)%16==0)?'*':(((i+1)%8==0)?'-':' '));
+        p+=3;
+    }
+
+    return outbuffer;
+}
 
 void cs8900a_device::cs8900_set_tx_status(int ready,int error)
 {
@@ -244,10 +259,8 @@ void cs8900a_device::cs8900_set_tx_status(int ready,int error)
     
     if(new_status!=old_status) {
         SET_PP_16(CS8900_PP_ADDR_SE_BUSST,new_status);
-#ifdef CS8900_DEBUG_RXTX_STATE
-        log_message(cs8900_log,"TX: set status Rdy4TxNOW=%d TxBidErr=%d",
+        LOGMASKED(CS8900_DEBUG_RXTX_STATE,"TX: set status Rdy4TxNOW=%d TxBidErr=%d",
                     ready,error);
-#endif
     }
 }
 
@@ -327,13 +340,8 @@ void cs8900a_device::device_reset(void)
 
 void cs8900a_device::device_start(void)
 {
-#ifdef CS8900_DEBUG
-    log_message( cs8900_log, "device_start().\n" );
-#endif
-
-#ifdef CS8900_DEBUG_INIT
-    log_message(cs8900_log, "\tcs8900_ioregs at $%08X, cs8900_packetpage at $%08X", cs8900_ioregs, cs8900_packetpage );
-#endif
+    LOGMASKED(CS8900_DEBUG, "device_start().\n");
+    LOGMASKED(CS8900_DEBUG_INIT, "\tcs8900_ioregs at $%08X, cs8900_packetpage at $%08X", cs8900_ioregs, cs8900_packetpage );
 
     /* virtually reset the LAN chip */
     device_reset();
@@ -391,14 +399,12 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
     *pbroadcast   = 0;
     *pmulticast   = 0;
 
-#ifdef CS8900_DEBUG_FRAMES
-    log_message(cs8900_log, "cs8900_should_accept called with %02X:%02X:%02X:%02X:%02X:%02X, length=%4u and buffer %s", 
+    LOGMASKED(CS8900_DEBUG_FRAMES, "cs8900_should_accept called with %02X:%02X:%02X:%02X:%02X:%02X, length=%4u", 
         cs8900_ia_mac[0], cs8900_ia_mac[1], cs8900_ia_mac[2],
         cs8900_ia_mac[3], cs8900_ia_mac[4], cs8900_ia_mac[5],
         length,
         debug_outbuffer(length, buffer)
         );
-#endif
 
     if (   buffer[0]==cs8900_ia_mac[0]
         && buffer[1]==cs8900_ia_mac[1]
@@ -408,14 +414,13 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
         && buffer[5]==cs8900_ia_mac[5]
        ) {
         /* this is our individual address (IA) */
-
         *pcorrect_mac = 1;
 
         /* if we don't want "correct MAC", we might have the chance
          * that this address fits the hash index 
          */
         if (cs8900_recv_mac || cs8900_recv_promiscuous) 
-            return(1);
+            return 1;
     }
 
     if (   buffer[0]==0xFF
@@ -455,10 +460,6 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
        
     return(cs8900_recv_promiscuous ? 1 : 0);
 }
-
-#ifdef CS8900_DEBUG_FRAMES
-    #undef return
-#endif
 
 u16 cs8900a_device::cs8900_receive(void)
 {
@@ -500,10 +501,8 @@ u16 cs8900a_device::cs8900_receive(void)
         if (newframe) {
             if (hashed || correct_mac || broadcast) {
                 /* we already know the type of frame: Trust it! */
-#ifdef CS8900_DEBUG_FRAMES
-                log_message( cs8900_log, "+++ cs8900_receive(): *** hashed=%u, correct_mac=%u, "
+                LOGMASKED(CS8900_DEBUG_FRAMES, "+++ cs8900_receive(): *** hashed=%u, correct_mac=%u, "
                     "broadcast=%u", hashed, correct_mac, broadcast);
-#endif
             }
             else {
                 /* determine ourself the type of frame */
@@ -560,24 +559,18 @@ u16 cs8900a_device::cs8900_receive(void)
                 rx_buffer = CS8900_PP_ADDR_RXSTATUS;
                 rx_length = len;
                 rx_count  = 0;
-#ifdef CS8900_DEBUG_WARN_RXTX
                 if(rx_state!=CS8900_RX_IDLE) {
-                    log_message(cs8900_log,"WARNING! New frame overwrites pending one!");
+                    LOGMASKED(CS8900_DEBUG_WARN_RXTX,"WARNING! New frame overwrites pending one!");
                 }
-#endif
                 rx_state  = CS8900_RX_GOT_FRAME;
-#ifdef CS8900_DEBUG_RXTX_STATE
-                log_message(cs8900_log,"RX: recvd frame (length=%04x,status=%04x)",
+                LOGMASKED(CS8900_DEBUG_RXTX_STATE,"RX: recvd frame (length=%04x,status=%04x)",
                             rx_length,ret_val);
-#endif
             }
         }
     } while (!ready);
 
-#ifdef CS8900_DEBUG_FRAMES
     if (ret_val != 0x0004)
-        log_message( cs8900_log, "+++ cs8900_receive(): ret_val=%04X", ret_val);
-#endif
+        LOGMASKED(CS8900_DEBUG_FRAMES, "+++ cs8900_receive(): ret_val=%04X", ret_val);
 
     return ret_val;
 }
@@ -607,18 +600,14 @@ void cs8900a_device::cs8900_write_tx_buffer(u8 value,int odd_address)
 {
     /* write tx data only if valid buffer is ready */
     if(tx_state != CS8900_TX_READ_BUSST) {
-#ifdef CS8900_DEBUG_WARN_RXTX
-        log_message(cs8900_log, "WARNING! Ignoring TX Write without correct Transmit Condition! (odd=%d,value=%02x)",
+        LOGMASKED(CS8900_DEBUG_WARN_RXTX, "WARNING! Ignoring TX Write without correct Transmit Condition! (odd=%d,value=%02x)",
                     odd_address,value);
-#endif
         /* ensure correct tx state (needed if transmit < 4 was started) */
         cs8900_set_tx_status(0,0);
     } else {
-#ifdef CS8900_DEBUG_RXTX_STATE
         if(tx_count==0) {
-            log_message(cs8900_log,"TX: write frame (length=%04x)",tx_length);
+            LOGMASKED(CS8900_DEBUG_RXTX_STATE,"TX: write frame (length=%04x)",tx_length);
         }
-#endif
 
         /* always write LH, LH... to tx buffer */
         u16 addr = tx_buffer;
@@ -629,38 +618,28 @@ void cs8900a_device::cs8900_write_tx_buffer(u8 value,int odd_address)
         tx_count++;            
         SET_PP_8(addr, value);
         
-#ifdef CS8900_DEBUG_RXTX_DATA
-        log_message(cs8900_log, "TX: %04x/%04x: %02x (buffer=%04x,odd=%d)",
+        LOGMASKED(CS8900_DEBUG_RXTX_DATA, "TX: %04x/%04x: %02x (buffer=%04x,odd=%d)",
                     tx_count,tx_length,value,addr,odd_address);
-#endif                
 
         /* full frame transmitted? */
         if(tx_count==tx_length) {
-#ifdef CS8900_DEBUG_FRAMES
-            log_message(cs8900_log, "cs8900_arch_transmit() called with:                 "
+            LOGMASKED(CS8900_DEBUG_FRAMES, "cs8900_arch_transmit() called with:                 "
                 "length=%4u and buffer %s", tx_length,
                 debug_outbuffer(tx_length, &cs8900_packetpage[CS8900_PP_ADDR_TX_FRAMELOC])
                 );
-#endif
 
             if(!tx_enabled) {
-#ifdef CS8900_DEBUG_WARN_RXTX
-                log_message(cs8900_log,"WARNING! Can't transmit frame (Transmitter is not enabled)!");
-#endif
+                LOGMASKED(CS8900_DEBUG_WARN_RXTX,"WARNING! Can't transmit frame (Transmitter is not enabled)!");
             } else {
                 /* send frame */
-#ifdef CS8900_DEBUG
-                printf("SENDING from buf %p len %d\n", &cs8900_packetpage[CS8900_PP_ADDR_TX_FRAMELOC], tx_length);
-#endif
+                LOGMASKED(CS8900_DEBUG, "SENDING from buf %p len %d\n", &cs8900_packetpage[CS8900_PP_ADDR_TX_FRAMELOC], tx_length);
                 send(&cs8900_packetpage[CS8900_PP_ADDR_TX_FRAMELOC],tx_length);
             }
 
             /* reset transmitter state */
             tx_state = CS8900_TX_IDLE;
     
-#ifdef CS8900_DEBUG_RXTX_STATE
-            log_message(cs8900_log, "TX: sent  frame (length=%04x)",tx_length);
-#endif
+            LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: sent  frame (length=%04x)",tx_length);
 
             /* reset tx status */
             cs8900_set_tx_status(0,0);
@@ -671,10 +650,8 @@ void cs8900a_device::cs8900_write_tx_buffer(u8 value,int odd_address)
 u8 cs8900a_device::cs8900_read_rx_buffer(int odd_address)
 {
     if(rx_state != CS8900_RX_GOT_FRAME) {
-#ifdef CS8900_DEBUG_WARN_RXTX
-        log_message(cs8900_log, "WARNING! RX Read without frame available! (odd=%d)",
+        LOGMASKED(CS8900_DEBUG_WARN_RXTX, "WARNING! RX Read without frame available! (odd=%d)",
                     odd_address);
-#endif
         /* always reads zero on HW */
         return 0;
     } else {
@@ -714,18 +691,14 @@ u8 cs8900a_device::cs8900_read_rx_buffer(int odd_address)
             rx_count++;
         }
         
-#ifdef CS8900_DEBUG_RXTX_DATA
-        log_message(cs8900_log,"RX: %04x/%04x: %02x (buffer=%04x,odd=%d)",
+        LOGMASKED(CS8900_DEBUG_RXTX_DATA,"RX: %04x/%04x: %02x (buffer=%04x,odd=%d)",
                     rx_count,rx_length+4,value,addr,odd_address);
-#endif
 
         /* check frame end */
         if(rx_count>=rx_length+4) {
             /* reset receiver state to idle */
             rx_state = CS8900_RX_IDLE;
-#ifdef CS8900_DEBUG_RXTX_STATE
-            log_message(cs8900_log,"RX: read  frame (length=%04x)",rx_length);
-#endif
+            LOGMASKED(CS8900_DEBUG_RXTX_STATE,"RX: read  frame (length=%04x)",rx_length);
         }        
         return value;
     }
@@ -752,9 +725,7 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
             /* restore tx state */ 
             if(tx_state!=CS8900_TX_IDLE) {
                 tx_state = CS8900_TX_IDLE;
-#ifdef CS8900_DEBUG_RXTX_STATE
-                log_message(cs8900_log,"TX: skipping current frame");
-#endif
+                LOGMASKED(CS8900_DEBUG_RXTX_STATE,"TX: skipping current frame");
             }
 
             /* reset transmitter */
@@ -806,9 +777,7 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
                 
                 /* already transmitting? */
                 if(tx_state == CS8900_TX_READ_BUSST) {
-#ifdef CS8900_DEBUG_WARN_RXTX
-                    log_message(cs8900_log, "WARNING! Early abort of transmitted frame");
-#endif
+                    LOGMASKED(CS8900_DEBUG_WARN_RXTX, "WARNING! Early abort of transmitted frame");
                 }
                 
                 /* The transmit status command gets the last transmit command */
@@ -818,9 +787,7 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
                 tx_state = CS8900_TX_GOT_CMD;
                 cs8900_set_tx_status(0,0);
                 
-#ifdef CS8900_DEBUG_RXTX_STATE
-                log_message(cs8900_log, "TX: COMMAND accepted (%04x)",txcommand);
-#endif
+                LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: COMMAND accepted (%04x)",txcommand);
             }
         }
         break;
@@ -833,9 +800,8 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
                 
                 if(txlength<4) {
                     /* frame to short */
-#ifdef CS8900_DEBUG_RXTX_STATE
-                    log_message(cs8900_log, "TX: LENGTH rejected - too short! (%04x)",txlength);
-#endif
+                    LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: LENGTH rejected - too short! (%04x)",txlength);
+                    
                     /* mask space available but do not commit */
                     tx_state = CS8900_TX_IDLE;
                     cs8900_set_tx_status(1,0);
@@ -844,9 +810,8 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
                          || ((txlength>MAX_TXLENGTH-4) && (!(txcommand&0x1000)))
                         ) {
                     tx_state = CS8900_TX_IDLE;
-#ifdef CS8900_DEBUG_RXTX_STATE
-                    log_message(cs8900_log, "TX: LENGTH rejected - too long! (%04x)",txlength);
-#endif
+                    LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: LENGTH rejected - too long! (%04x)",txlength);
+                    
                     /* txlength too big, mark an error */
                     cs8900_set_tx_status(0,1);
                 }
@@ -857,9 +822,8 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
                     tx_length = txlength;
                     tx_state  = CS8900_TX_GOT_LEN;
 
-#ifdef CS8900_DEBUG_RXTX_STATE
-                    log_message(cs8900_log, "TX: LENGTH accepted (%04x)",txlength);
-#endif
+                    LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: LENGTH accepted (%04x)",txlength);
+
                     /* all right, signal that we're ready for the next frame */
                     cs8900_set_tx_status(1,0);
                 }
@@ -887,12 +851,10 @@ void cs8900a_device::cs8900_sideeffects_write_pp(u16 ppaddress, int odd_address)
         cs8900_ia_mac[ppaddress-CS8900_PP_ADDR_MAC_ADDR+odd_address] = 
             GET_PP_8(ppaddress+odd_address);
         set_mac((char*)cs8900_ia_mac);
-#ifdef CS8900_DEBUG
         if(odd_address && (ppaddress == CS8900_PP_ADDR_MAC_ADDR+4))
-            log_message(cs8900_log,"set MAC address: %02x:%02x:%02x:%02x:%02x:%02x",
+            LOGMASKED(CS8900_DEBUG,"set MAC address: %02x:%02x:%02x:%02x:%02x:%02x",
                         cs8900_ia_mac[0],cs8900_ia_mac[1],cs8900_ia_mac[2],
                         cs8900_ia_mac[3],cs8900_ia_mac[4],cs8900_ia_mac[5]);
-#endif
         break;
     }
 }
@@ -917,9 +879,7 @@ void cs8900a_device::cs8900_sideeffects_read_pp(u16 ppaddress,int odd_address)
             if((access_mask & rxevent_read_mask)!=0) {
                 /* receiver is not enabled */
                 if(!rx_enabled) {
-#ifdef CS8900_DEBUG_WARN_RXTX
-                    log_message(cs8900_log,"WARNING! Can't receive any frame (Receiver is not enabled)!");
-#endif
+                    LOGMASKED(CS8900_DEBUG_WARN_RXTX,"WARNING! Can't receive any frame (Receiver is not enabled)!");
                 } else {
                     /* perform frame reception */
                     u16 ret_val = cs8900_receive();
@@ -949,15 +909,11 @@ void cs8900a_device::cs8900_sideeffects_read_pp(u16 ppaddress,int odd_address)
                 /* check Rdy4TXNow flag */
                 if((bus_status & 0x100) == 0x100) {
                     tx_state = CS8900_TX_READ_BUSST;
-#ifdef CS8900_DEBUG_RXTX_STATE
-                    log_message(cs8900_log, "TX: Ready4TXNow set! (%04x)",
+                    LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: Ready4TXNow set! (%04x)",
                                 bus_status);
-#endif
                 } else {
-#ifdef CS8900_DEBUG_RXTX_STATE
-                    log_message(cs8900_log, "TX: waiting for Ready4TXNow! (%04x)",
+                    LOGMASKED(CS8900_DEBUG_RXTX_STATE, "TX: waiting for Ready4TXNow! (%04x)",
                                 bus_status);
-#endif                    
                 }
             }
         }
@@ -986,19 +942,15 @@ u16 cs8900a_device::cs8900_read_register(u16 ppaddress)
     u16 regNum = ppaddress - 0x100;
     regNum &= ~1;
     regNum ++;
-#ifdef CS8900_DEBUG_REGISTERS
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_REGISTERS,
                 "Read  Control Register %04x: %04x (reg=%02x)",
                 ppaddress,value,regNum);
-#endif
  
     /* reserved register? */
     if((regNum==0x01)||(regNum==0x11)||(regNum>0x19)) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+        LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Read reserved Control Register %04x (reg=%02x)",
                   ppaddress,regNum);
-#endif
       /* real HW returns 0x0300 in reserved register range */
       return 0x0300;
     }
@@ -1011,27 +963,22 @@ u16 cs8900a_device::cs8900_read_register(u16 ppaddress)
   else if(ppaddress<0x140) {
     u16 regNum = ppaddress - 0x120;
     regNum &= ~1;
-#ifdef CS8900_DEBUG_REGISTERS
 #ifdef CS8900_DEBUG_IGNORE_RXEVENT
     if(regNum!=4) // do not show RXEVENT
 #endif
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_REGISTERS,
                 "Read  Status  Register %04x: %04x (reg=%02x)",
                 ppaddress,value,regNum);
-#endif
 
     /* reserved register? */
     if((regNum==0x02)||(regNum==0x06)||(regNum==0x0a)||
        (regNum==0x0e)||(regNum==0x1a)||(regNum==0x1e)) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Read reserved Status Register %04x (reg=%02x)",
                   ppaddress,regNum);
-#endif
       /* real HW returns 0x0300 in reserved register range */
       return 0x0300;
     }
-
     /* make sure interal address is always valid */
     assert((value&0x3f) == regNum);
   }
@@ -1041,26 +988,20 @@ u16 cs8900a_device::cs8900_read_register(u16 ppaddress)
     if(ppaddress==0x144) {
       /* make sure interal address is always valid */
       assert((value&0x3f) == 0x09);
-#ifdef CS8900_DEBUG_REGISTERS
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_REGISTERS,
                   "Read  TX Cmd  Register %04x: %04x",
                   ppaddress,value);
-#endif
     }
     else if(ppaddress==0x146) {
-#ifdef CS8900_DEBUG_REGISTERS
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_REGISTERS,
                   "Read  TX Len  Register %04x: %04x",
                   ppaddress,value);
-#endif
     }
     /* reserved range */
     else {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Read reserved Initiate Transmit Register %04x",
                   ppaddress);
-#endif
       /* real HW returns 0x0300 in reserved register range */
       return 0x0300;
     }
@@ -1070,11 +1011,9 @@ u16 cs8900a_device::cs8900_read_register(u16 ppaddress)
   else if(ppaddress<0x160) {
     /* reserved range */
     if(ppaddress>=0x15e) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Read reserved Address Filter Register %04x",
                   ppaddress);
-#endif
       /* real HW returns 0x0300 in reserved register range */
       return 0x0300;
     }
@@ -1084,31 +1023,25 @@ u16 cs8900a_device::cs8900_read_register(u16 ppaddress)
      returns 0x300 on real HW 
   */
   else if(ppaddress<0x400) {
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNING! Read reserved Register %04x",
                 ppaddress);
-#endif
     return 0x0300;
   }
   
   /* --- range from 0x400 .. 0x9ff --- RX Frame */
   else if(ppaddress<0xa00) {
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNING! Read from RX Buffer Range %04x",
                 ppaddress);
-#endif
     return 0x0000;
   }
   
   /* --- range from 0xa00 .. 0xfff --- TX Frame */
   else {
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNING! Read from TX Buffer Range %04x",
                 ppaddress);
-#endif
     return 0x0000;
   }
   
@@ -1131,11 +1064,9 @@ void cs8900a_device::cs8900_write_register(u16 ppaddress,u16 value)
       ignore = 1;
     }
     if(ignore) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+        LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Ignoring write to read only/reserved Bus Interface Register %04x",
                   ppaddress);
-#endif
       return;
     }
   }
@@ -1151,30 +1082,24 @@ void cs8900a_device::cs8900_write_register(u16 ppaddress,u16 value)
       value &= ~0x3f;
       value |= regNum;
     }
-#ifdef CS8900_DEBUG_REGISTERS
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_REGISTERS,
                 "Write Control Register %04x: %04x (reg=%02x)",
                 ppaddress,value,regNum);
-#endif
 
     /* invalid register? -> ignore! */
     if((regNum==0x01)||(regNum==0x11)||(regNum>0x19)) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+        LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Ignoring write to reserved Control Register %04x (reg=%02x)",
                   ppaddress,regNum);
-  #endif
       return;
     }
   }
   
   /* --- write to status register range --- */
   else if(ppaddress<0x140) {
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNING! Ignoring write to read-only Status Register %04x",
                 ppaddress);
-#endif
     return;
   }
 
@@ -1190,29 +1115,23 @@ void cs8900a_device::cs8900_write_register(u16 ppaddress,u16 value)
       }
       /* mask out reserved bits */
       value &= 0x33ff;
-#ifdef CS8900_DEBUG_REGISTERS
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_REGISTERS,
                   "Write TX Cmd  Register %04x: %04x",
                   ppaddress,value);
-#endif
     }
     /* check tx_length register */
     else if(ppaddress==0x146) {
       /* HW always masks 0x0fff */
       value &= 0x0fff;
-#ifdef CS8900_DEBUG_REGISTERS
-      log_message(cs8900_log,
+      LOGMASKED(CS8900_DEBUG_REGISTERS,
                   "Write TX Len  Register %04x: %04x",
                   ppaddress,value);
-#endif
     }
     /* reserved range */
     else if((ppaddress<0x144)||(ppaddress>0x147)) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+        LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Ignoring write to reserved Initiate Transmit Register %04x",
                   ppaddress);
-#endif
       return;
     }
   }
@@ -1221,41 +1140,32 @@ void cs8900a_device::cs8900_write_register(u16 ppaddress,u16 value)
   else if(ppaddress<0x160) {
     /* reserved range */
     if(ppaddress>=0x15e) {
-#ifdef CS8900_DEBUG_WARN_REG
-      log_message(cs8900_log,
+        LOGMASKED(CS8900_DEBUG_WARN_REG,
                   "WARNING! Ingoring write to reserved Address Filter Register %04x",
                   ppaddress);
-#endif
       return;
     }
   }
 
   /* --- ignore write outside --- */
   else if(ppaddress<0x400) {
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNING! Ingoring write to reserved Register %04x",
                 ppaddress);
-#endif
     return;
   }
   else if(ppaddress<0xa00){
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNING! Ignoring write to RX Buffer Range %04x",
                 ppaddress);
-#endif
     return;
   }
   else {
-#ifdef CS8900_DEBUG_WARN_REG
-    log_message(cs8900_log,
+    LOGMASKED(CS8900_DEBUG_WARN_REG,
                 "WARNIGN! Ignoring write to TX Buffer Range %04x",
                 ppaddress);
-#endif
     return;
   }
-
   /* actually set value */
   SET_PP_16(ppaddress, value);  
 }
@@ -1288,9 +1198,7 @@ u8 cs8900a_device::cs8900_read(u16 io_address)
 
     /* RX register is special as it reads from RX buffer directly */
     if((reg_base==CS8900_ADDR_RXTXDATA)||(reg_base==CS8900_ADDR_RXTXDATA2)) {
-#ifdef CS8900_DEBUG_LOAD
-        log_message(cs8900_log, "reading RX Register.\n");
-#endif
+        LOGMASKED(CS8900_DEBUG_LOAD, "reading RX Register.\n");
         return cs8900_read_rx_buffer(io_address & 0x01);
     }
     
@@ -1335,9 +1243,7 @@ u8 cs8900a_device::cs8900_read(u16 io_address)
         /* read register value */
         word_value = cs8900_read_register(ppaddress);
         
-#ifdef CS8900_DEBUG_LOAD
-        log_message(cs8900_log, "reading PP Ptr: $%04X => $%04X.\n",ppaddress,word_value);
-#endif
+        LOGMASKED(CS8900_DEBUG_LOAD, "reading PP Ptr: $%04X => $%04X.\n",ppaddress,word_value);
     }
 
     /* extract return value from word_value */
@@ -1351,9 +1257,7 @@ u8 cs8900a_device::cs8900_read(u16 io_address)
         retval = hi;
     }
 
-#ifdef CS8900_DEBUG_LOAD
-    log_message(cs8900_log, "read [$%02X] => $%02X.\n", io_address, retval);
-#endif
+    LOGMASKED(CS8900_DEBUG_LOAD, "read [$%02X] => $%02X.\n", io_address, retval);
     
     /* update _word_ value in register bank */
     cs8900_ioregs[reg_base]   = lo;
@@ -1372,9 +1276,7 @@ void cs8900a_device::cs8900_store(u16 io_address, u8 var)
     assert( cs8900_packetpage );
     assert( io_address < 0x10);
 
-#ifdef CS8900_DEBUG_STORE
-    log_message(cs8900_log, "store [$%02X] <= $%02X.\n", io_address, (int)var);
-#endif
+    LOGMASKED(CS8900_DEBUG_STORE, "store [$%02X] <= $%02X.\n", io_address, (int)var);
 
     /* register base addr */
     reg_base = io_address & ~1;
@@ -1402,9 +1304,7 @@ void cs8900a_device::cs8900_store(u16 io_address, u8 var)
             only register read and write have to be mapped to word boundary. */
         word_value |= 0x3000;
         cs8900_packetpage_ptr = word_value;
-#ifdef CS8900_DEBUG_STORE
-        log_message(cs8900_log, "set PP Ptr to $%04X.\n", cs8900_packetpage_ptr);
-#endif
+        LOGMASKED(CS8900_DEBUG_STORE, "set PP Ptr to $%04X.\n", cs8900_packetpage_ptr);
     } else {
         /* write a register */
 
@@ -1438,10 +1338,8 @@ void cs8900a_device::cs8900_store(u16 io_address, u8 var)
             break;
         }
 
-#ifdef CS8900_DEBUG_STORE
-        log_message(cs8900_log, "before writing to PP Ptr: $%04X <= $%04X.\n", 
+        LOGMASKED(CS8900_DEBUG_STORE, "before writing to PP Ptr: $%04X <= $%04X.\n", 
                     ppaddress,word_value);
-#endif
 
         /* perform the write */
         cs8900_write_register(ppaddress,word_value);
@@ -1452,10 +1350,8 @@ void cs8900a_device::cs8900_store(u16 io_address, u8 var)
         /* update word value if it was changed in write register or by side effect */
         word_value = GET_PP_16(ppaddress);
 
-#ifdef CS8900_DEBUG_STORE
-        log_message(cs8900_log, "after  writing to PP Ptr: $%04X <= $%04X.\n", 
+        LOGMASKED(CS8900_DEBUG_STORE, "after  writing to PP Ptr: $%04X <= $%04X.\n", 
                     ppaddress,word_value);
-#endif
     }
 
     /* update IO registers */
@@ -1472,9 +1368,7 @@ void cs8900a_device::write(u16 address, u8 data) {
 }
 
 int cs8900a_device::recv_start_cb(u8 *buf, int length) {
-#ifdef CS8900_DEBUG
-    printf("recv_start_cb(), %p len %d\n", buf, length);
-#endif
+    LOGMASKED(CS8900_DEBUG, "recv_start_cb(), %p len %d\n", buf, length);
     // Make an extra call to cs8900_should_accept() on the receive
     // callback to reduce the number of packets queueing up that
     // will just get rejected anyway.

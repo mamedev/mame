@@ -83,6 +83,7 @@ private:
 	//The frame queue
 	std::queue<std::vector<u8>> m_frame_queue;
 
+	char *debug_outbuffer(const int length, const unsigned char * const buffer);
 	void cs8900_set_tx_status(int ready, int error);
 	void cs8900_set_receiver(int enabled);
 	void cs8900_set_transmitter(int enabled);
