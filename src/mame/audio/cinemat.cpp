@@ -45,7 +45,7 @@
  *
  *************************************/
 
-cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale)
+cinemat_audio_device_base::cinemat_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_input(*this, "sound_nl:out_%u", 0)
 	, m_inputs_mask(inputs_mask)
@@ -54,25 +54,25 @@ cinemat_audio_device::cinemat_audio_device(const machine_config &mconfig, device
 {
 }
 
-void cinemat_audio_device::configure_latch_inputs(ls259_device &latch, u8 mask)
+void cinemat_audio_device_base::configure_latch_inputs(ls259_device &latch, u8 mask)
 {
 	if (mask == 0)
 		mask = m_inputs_mask;
 	if (BIT(mask, 0))
-		latch.q_out_cb<0>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<0>)));
+		latch.q_out_cb<0>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<0>)));
 	if (BIT(mask, 1))
-		latch.q_out_cb<1>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<1>)));
+		latch.q_out_cb<1>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<1>)));
 	if (BIT(mask, 2))
-		latch.q_out_cb<2>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<2>)));
+		latch.q_out_cb<2>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<2>)));
 	if (BIT(mask, 3))
-		latch.q_out_cb<3>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<3>)));
+		latch.q_out_cb<3>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<3>)));
 	if (BIT(mask, 4))
-		latch.q_out_cb<4>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<4>)));
+		latch.q_out_cb<4>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<4>)));
 	if (BIT(mask, 7))
-		latch.q_out_cb<7>().set(write_line_delegate(*this, FUNC(cinemat_audio_device::sound_w<7>)));
+		latch.q_out_cb<7>().set(write_line_delegate(*this, FUNC(cinemat_audio_device_base::sound_w<7>)));
 }
 
-void cinemat_audio_device::device_add_mconfig(machine_config &config)
+void cinemat_audio_device_base::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
@@ -99,14 +99,14 @@ void cinemat_audio_device::device_add_mconfig(machine_config &config)
 	}
 }
 
-void cinemat_audio_device::device_start()
+void cinemat_audio_device_base::device_start()
 {
 #if ENABLE_NETLIST_LOGGING
 	m_logfile = fopen("cinemat.csv", "w");
 #endif
 }
 
-void cinemat_audio_device::device_stop()
+void cinemat_audio_device_base::device_stop()
 {
 #if ENABLE_NETLIST_LOGGING
 	if (m_logfile != nullptr)
@@ -114,7 +114,7 @@ void cinemat_audio_device::device_stop()
 #endif
 }
 
-void cinemat_audio_device::input_set(int bit, int state)
+void cinemat_audio_device_base::input_set(int bit, int state)
 {
 	u8 oldvals = m_inputs;
 	m_inputs = (m_inputs & ~(1 << bit)) | ((state & 1) << bit);
@@ -145,7 +145,7 @@ void cinemat_audio_device::input_set(int bit, int state)
 DEFINE_DEVICE_TYPE(SPACE_WARS_AUDIO, spacewar_audio_device, "spacewar_audio", "Space Wars Sound Board")
 
 spacewar_audio_device::spacewar_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, SPACE_WARS_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(spacewar), 150000.0)
+	: cinemat_audio_device_base(mconfig, SPACE_WARS_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(spacewar), 150000.0)
 {
 }
 
@@ -160,7 +160,7 @@ spacewar_audio_device::spacewar_audio_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(BARRIER_AUDIO, barrier_audio_device, "barrier_audio", "Barrier Sound Board")
 
 barrier_audio_device::barrier_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, BARRIER_AUDIO, tag, owner, clock, 0x07, NETLIST_NAME(barrier), 200000.0)
+	: cinemat_audio_device_base(mconfig, BARRIER_AUDIO, tag, owner, clock, 0x07, NETLIST_NAME(barrier), 200000.0)
 {
 }
 
@@ -175,7 +175,7 @@ barrier_audio_device::barrier_audio_device(const machine_config &mconfig, const 
 DEFINE_DEVICE_TYPE(SPEED_FREAK_AUDIO, speedfrk_audio_device, "speedfrk_audio", "Speed Freak Sound Board")
 
 speedfrk_audio_device::speedfrk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(speedfrk), 12000.0)
+	: cinemat_audio_device_base(mconfig, SPEED_FREAK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(speedfrk), 12000.0)
 {
 }
 
@@ -190,7 +190,7 @@ speedfrk_audio_device::speedfrk_audio_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(STAR_HAWK_AUDIO, starhawk_audio_device, "starhawk_audio", "Star Hawk Sound Board")
 
 starhawk_audio_device::starhawk_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, STAR_HAWK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(starhawk), 50000.0)
+	: cinemat_audio_device_base(mconfig, STAR_HAWK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(starhawk), 50000.0)
 {
 }
 
@@ -205,7 +205,7 @@ starhawk_audio_device::starhawk_audio_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(SUNDANCE_AUDIO, sundance_audio_device, "sundance_audio", "Sundance Sound Board")
 
 sundance_audio_device::sundance_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, SUNDANCE_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(sundance), 45000.0)
+	: cinemat_audio_device_base(mconfig, SUNDANCE_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(sundance), 45000.0)
 {
 }
 
@@ -220,7 +220,7 @@ sundance_audio_device::sundance_audio_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(TAIL_GUNNER_AUDIO, tailg_audio_device, "tailg_audio", "Tail Gunner Sound Board")
 
 tailg_audio_device::tailg_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, TAIL_GUNNER_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(tailg), 75000.0)
+	: cinemat_audio_device_base(mconfig, TAIL_GUNNER_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(tailg), 75000.0)
 {
 }
 
@@ -235,7 +235,7 @@ tailg_audio_device::tailg_audio_device(const machine_config &mconfig, const char
 DEFINE_DEVICE_TYPE(WARRIOR_AUDIO, warrior_audio_device, "warrior_audio", "Warrior Sound Board")
 
 warrior_audio_device::warrior_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, WARRIOR_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(warrior), 50000.0)
+	: cinemat_audio_device_base(mconfig, WARRIOR_AUDIO, tag, owner, clock, 0x1f, NETLIST_NAME(warrior), 50000.0)
 {
 }
 
@@ -250,7 +250,7 @@ warrior_audio_device::warrior_audio_device(const machine_config &mconfig, const 
 DEFINE_DEVICE_TYPE(ARMOR_ATTACK_AUDIO, armora_audio_device, "armora_audio", "Armor Atrack Sound Board")
 
 armora_audio_device::armora_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, ARMOR_ATTACK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(armora), 5000.0)
+	: cinemat_audio_device_base(mconfig, ARMOR_ATTACK_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(armora), 5000.0)
 {
 }
 
@@ -265,7 +265,7 @@ armora_audio_device::armora_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(RIPOFF_AUDIO, ripoff_audio_device, "ripoff_audio", "Rip Off Sound Board")
 
 ripoff_audio_device::ripoff_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, RIPOFF_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(ripoff), 20000.0)
+	: cinemat_audio_device_base(mconfig, RIPOFF_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(ripoff), 20000.0)
 {
 }
 
@@ -280,7 +280,7 @@ ripoff_audio_device::ripoff_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(STAR_CASTLE_AUDIO, starcas_audio_device, "starcas_audio", "Star Castle Sound Board")
 
 starcas_audio_device::starcas_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(starcas), 5000.0)
+	: cinemat_audio_device_base(mconfig, STAR_CASTLE_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(starcas), 5000.0)
 {
 }
 
@@ -295,7 +295,7 @@ starcas_audio_device::starcas_audio_device(const machine_config &mconfig, const 
 DEFINE_DEVICE_TYPE(SOLAR_QUEST_AUDIO, solarq_audio_device, "solarq_audio", "Solar Quest Sound Board")
 
 solarq_audio_device::solarq_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, SOLAR_QUEST_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(solarq), 5000.0)
+	: cinemat_audio_device_base(mconfig, SOLAR_QUEST_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(solarq), 5000.0)
 {
 }
 
@@ -310,7 +310,7 @@ solarq_audio_device::solarq_audio_device(const machine_config &mconfig, const ch
 DEFINE_DEVICE_TYPE(BOXING_BUGS_AUDIO, boxingb_audio_device, "boxingb_audio", "Boxing Bugs Sound Board")
 
 boxingb_audio_device::boxingb_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, BOXING_BUGS_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(boxingb), 5000.0)
+	: cinemat_audio_device_base(mconfig, BOXING_BUGS_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(boxingb), 5000.0)
 {
 }
 
@@ -325,7 +325,7 @@ boxingb_audio_device::boxingb_audio_device(const machine_config &mconfig, const 
 DEFINE_DEVICE_TYPE(WAR_OF_THE_WORLDS_AUDIO, wotw_audio_device, "wotw_audio", "War of the Worlds Sound Board")
 
 wotw_audio_device::wotw_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cinemat_audio_device(mconfig, WAR_OF_THE_WORLDS_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(wotw), 5000.0)
+	: cinemat_audio_device_base(mconfig, WAR_OF_THE_WORLDS_AUDIO, tag, owner, clock, 0x9f, NETLIST_NAME(wotw), 5000.0)
 {
 }
 
