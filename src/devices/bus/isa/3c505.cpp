@@ -487,6 +487,26 @@ void isa16_3c505_device::hcr_w(u8 data)
 {
 	LOGMASKED(LOG_REG, "hcr_w 0x%02x (%s)\n", data, machine().describe_context());
 
+	// attention condition
+	if (!(m_hcr & HCR_ATTN) && (data & HCR_ATTN))
+	{
+		if (!(data & HCR_FLSH))
+		{
+			LOGMASKED(LOG_REG, "### soft reset\n");
+
+			// soft reset
+			m_cpu->set_input_line(INPUT_LINE_NMI, 1);
+			m_cpu->set_input_line(INPUT_LINE_NMI, 0);
+		}
+		else
+		{
+			LOGMASKED(LOG_REG, "### hard reset\n");
+
+			// hard reset
+			reset();
+		}
+	}
+
 	// update host status flags
 	if ((data ^ m_hcr) & HCR_HSF)
 		m_asr = (m_asr & ~ASR_HSF) | (data & HCR_HSF);

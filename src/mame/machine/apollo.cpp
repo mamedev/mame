@@ -91,9 +91,9 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_GERMAN_KBD, DEF_STR ( On ) )
 
-		PORT_CONFNAME(APOLLO_CONF_20_YEARS_AGO, APOLLO_CONF_20_YEARS_AGO, "20 Years Ago ...")
+		PORT_CONFNAME(APOLLO_CONF_30_YEARS_AGO, APOLLO_CONF_30_YEARS_AGO, "30 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
-		PORT_CONFSETTING(APOLLO_CONF_20_YEARS_AGO, DEF_STR ( On ) )
+		PORT_CONFSETTING(APOLLO_CONF_30_YEARS_AGO, DEF_STR ( On ) )
 
 		PORT_CONFNAME(APOLLO_CONF_25_YEARS_AGO, APOLLO_CONF_25_YEARS_AGO, "25 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
@@ -1220,15 +1220,15 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 		year += 75;
 		apollo_rtc_w(9, year);
 	}
-	else if (year < 20 && apollo_config(APOLLO_CONF_20_YEARS_AGO))
+	else if (year < 30 && apollo_config(APOLLO_CONF_30_YEARS_AGO))
 	{
-		year += 80;
+		year += 70;
 		apollo_rtc_w(9, year);
 	}
-	else if (year >= 80 && !apollo_config(APOLLO_CONF_20_YEARS_AGO)
+	else if (year >= 70 && !apollo_config(APOLLO_CONF_30_YEARS_AGO)
 			&& !apollo_config(APOLLO_CONF_25_YEARS_AGO))
 	{
-		year -= 80;
+		year -= 70;
 		apollo_rtc_w(9, year);
 	}
 
