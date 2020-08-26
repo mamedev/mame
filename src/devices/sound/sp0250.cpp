@@ -91,14 +91,11 @@ void sp0250_device::device_start()
 	save_item(NAME(m_pcount));
 	save_item(NAME(m_repeat));
 	save_item(NAME(m_rcount));
-	for (int index = 0; index < 6; index++)
-	{
-		auto &filter = m_filter[index];
-		save_item(STRUCT_MEMBER(filter, F), index);
-		save_item(STRUCT_MEMBER(filter, B), index);
-		save_item(STRUCT_MEMBER(filter, z1), index);
-		save_item(STRUCT_MEMBER(filter, z2), index);
-	}
+
+	save_item(STRUCT_MEMBER(m_filter, F));
+	save_item(STRUCT_MEMBER(m_filter, B));
+	save_item(STRUCT_MEMBER(m_filter, z1));
+	save_item(STRUCT_MEMBER(m_filter, z2));
 
 	// FIFO state
 	save_item(NAME(m_fifo));
