@@ -230,6 +230,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		<description>Service Test Cartridge (Europe)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
+		<info name="usage" value="Test 1: press all joystick inputs. Test 4: type NAGEL137. Hold UP to advance." />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -2332,7 +2333,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="hawks">
+	<software name="hawks" cloneof="timelord">
 		<description>Terrahawks (Europe, plus)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
