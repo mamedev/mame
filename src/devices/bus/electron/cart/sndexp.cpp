@@ -4,10 +4,6 @@
 
     Sound Expansion cartridge (Project Expansions)
 
-    TODO:
-    - compare with actual hardware, sounds awful compared to v3
-    - implement jumper to configure 8K as sideways RAM
-
 **********************************************************************/
 
 
@@ -40,11 +36,10 @@ void electron_sndexp_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 INPUT_PORTS_START(sndexp)
-	// TODO: Not known how jumper affects RAM access
-	PORT_START("JUMPER")
-	PORT_DIPNAME(0x01, 0x00, "SOUND / RAM")
-	PORT_DIPSETTING(0x00, "SOUND")
-	PORT_DIPSETTING(0x01, "RAM")
+	PORT_START("LINK")
+	PORT_CONFNAME(0x01, 0x00, "SOUND / RAM")
+	PORT_CONFSETTING(0x00, "SOUND")
+	PORT_CONFSETTING(0x01, "RAM")
 INPUT_PORTS_END
 
 
@@ -69,7 +64,7 @@ electron_sndexp_device::electron_sndexp_device(const machine_config &mconfig, co
 	: device_t(mconfig, ELECTRON_SNDEXP, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_sn(*this, "sn76489")
-	, m_jumper(*this, "JUMPER")
+	, m_link(*this, "LINK")
 	, m_sound_latch(0)
 	, m_sound_enable(0)
 {
@@ -93,28 +88,23 @@ uint8_t electron_sndexp_device::read(offs_t offset, int infc, int infd, int romq
 {
 	uint8_t data = 0xff;
 
-	if (oe)
+	if (oe2)
 	{
-		if (m_jumper->read())
+		if (m_link->read())
 		{
-			if (romqa == 0)
-			{
-				data = m_rom[offset & 0x1fff];
-			}
-			else
-			{
-				data = m_ram[offset & 0x1fff];
-			}
+			data = m_ram[offset & 0x1fff];
 		}
 		else
 		{
-			if (offset < 0x2000)
+			switch (offset & 0x2000)
 			{
+			case 0x0000:
 				data = m_rom[offset & 0x1fff];
-			}
-			else
-			{
+				break;
+
+			case 0x2000:
 				data = m_ram[offset & 0x1fff];
+				break;
 			}
 		}
 	}
@@ -144,24 +134,22 @@ void electron_sndexp_device::write(offs_t offset, uint8_t data, int infc, int in
 			break;
 		}
 	}
-	else if (oe)
+	else if (oe2)
 	{
-		if (m_jumper->read())
+		if (m_link->read())
 		{
-			if (romqa == 1)
-			{
-				m_ram[offset & 0x1fff] = data;
-			}
+			m_ram[offset & 0x1fff] = data;
 		}
 		else
 		{
-			if (offset < 0x2000)
+			switch (offset & 0x2000)
 			{
+			case 0x0000:
+				break;
+
+			case 0x2000:
 				m_ram[offset & 0x1fff] = data;
-			}
-			else
-			{
-				m_ram[offset & 0x1fff] = data;
+				break;
 			}
 		}
 	}

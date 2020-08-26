@@ -35337,7 +35337,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- red screen -->	
+	<!-- red screen -->
 	<software name="rickdng2" supported="no">
 		<!-- SPS (CAPS) release 570 -->
 		<description>Rick Dangerous 2 (Euro)</description>
@@ -35352,7 +35352,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- red screen -->	
+	<!-- red screen -->
 	<software name="rickdng2a" cloneof="rickdng2" supported="no">
 		<!-- SPS (CAPS) release 1877 -->
 		<description>Rick Dangerous 2 (Euro, Budget)</description>
@@ -48343,7 +48343,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Locks up at Xenon logo -->
 	<software name="xenon" supported="no">
 		<!-- SPS (CAPS) release 399 -->

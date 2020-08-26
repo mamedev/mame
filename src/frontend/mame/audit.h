@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "hash.h"
-
 #include <iosfwd>
 #include <list>
 #include <utility>

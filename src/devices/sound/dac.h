@@ -285,6 +285,7 @@ DAC_GENERATOR(MP1210, mp1210_device, dac_word_interface, dac_code_twos_complemen
 DAC_GENERATOR(PCM54HP, pcm54hp_device, dac_word_interface, dac_code_binary<16>, dac_gain_r2r, "PCM54HP", "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_interface, dac_code_twos_complement<16>, dac_gain_r2r, "UDA1341TS", "uda1341ts") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E, zn425e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN425E", "zn425e")
+DAC_GENERATOR(ZN426E, zn426e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN426E-8", "zn426e")
 DAC_GENERATOR(ZN428E, zn428e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN428E-8", "zn428e")
 DAC_GENERATOR(ZN429E, zn429e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN429E-8", "zn429e")
 

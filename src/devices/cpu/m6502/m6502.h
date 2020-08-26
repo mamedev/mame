@@ -122,7 +122,7 @@ protected:
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
-	bool irq_taken, sync, inhibit_interrupts;
+	bool nmi_pending, irq_taken, sync, inhibit_interrupts;
 
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }

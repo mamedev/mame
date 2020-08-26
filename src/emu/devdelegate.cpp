@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    devdelegate.c
+    devdelegate.cpp
 
     Delegates that are late-bound to MAME devices.
 

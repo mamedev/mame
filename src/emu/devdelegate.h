@@ -7,6 +7,7 @@
     Delegates that are late-bound to MAME devices.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_DEVDELEGATE_H
 #define MAME_EMU_DEVDELEGATE_H
 

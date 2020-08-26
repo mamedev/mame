@@ -5,8 +5,8 @@
  *   Xerox AltoII CPU core interface
  *
  *****************************************************************************/
-#ifndef MAME_DEVICES_CPU_ALTO2_H
-#define MAME_DEVICES_CPU_ALTO2_H
+#ifndef MAME_CPU_ALTO2_ALTO2CPU_H
+#define MAME_CPU_ALTO2_ALTO2CPU_H
 
 #pragma once
 
@@ -935,4 +935,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ALTO2, alto2_cpu_device)
 
-#endif // MAME_DEVICES_CPU_ALTO2_H
+#endif // MAME_CPU_ALTO2_ALTO2CPU_H

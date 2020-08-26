@@ -59,6 +59,7 @@ public:
 	void sys2(machine_config &config);
 	void sys2_315_5177(machine_config &config);
 	void nob(machine_config &config);
+	void blockgal(machine_config &config);
 	void sys1ppisx_315_5041(machine_config &config);
 	void sys1piox_315_5132(machine_config &config);
 	void sys1piox_315_5162(machine_config &config);
@@ -238,6 +239,7 @@ private:
 	void nobo_map(address_map &map);
 	void sound_map(address_map &map);
 	void system1_map(address_map &map);
+	void blockgal_pio_io_map(address_map &map);
 	void system1_pio_io_map(address_map &map);
 	void system1_ppi_io_map(address_map &map);
 };

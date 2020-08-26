@@ -45,6 +45,7 @@ public:
 		m_portd_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
+		m_cs_space(nullptr),
 		m_romtype(0),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),

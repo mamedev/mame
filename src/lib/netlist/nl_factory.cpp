@@ -23,8 +23,7 @@ namespace factory {
 		{
 		}
 	protected:
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
+		//NETLIB_RESETI() {}
 	};
 
 	element_t::element_t(const pstring &name, properties &&props)
@@ -42,14 +41,23 @@ namespace factory {
 	{
 	}
 
-	void list_t::add(host_arena::unique_ptr<element_t> &&factory)
+	bool exists(const pstring &name);
+
+	bool list_t::exists(const pstring &name) const noexcept
 	{
 		for (auto & e : *this)
-			if (e->name() == factory->name())
-			{
-				m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-				throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-			}
+			if (e->name() == name)
+				return true;
+		return false;
+	}
+
+	void list_t::add(host_arena::unique_ptr<element_t> &&factory)
+	{
+		if (exists(factory->name()))
+		{
+			m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+			throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+		}
 		push_back(std::move(factory));
 	}
 

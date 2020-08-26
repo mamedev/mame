@@ -155,7 +155,7 @@ private:
 	uint8_t megaduck_sound_r1(offs_t offset);
 	void megaduck_sound_w2(offs_t offset, uint8_t data);
 	uint8_t megaduck_sound_r2(offs_t offset);
-	void megaduck_palette(palette_device &palette) const;;
+	void megaduck_palette(palette_device &palette) const;
 	void megaduck_map(address_map &map);
 
 	uint8_t cart_r(offs_t offset);

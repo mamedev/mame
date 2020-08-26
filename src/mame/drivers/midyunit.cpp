@@ -145,6 +145,21 @@ void midyunit_state::yawdim_oki_bank_w(uint8_t data)
 		m_oki->set_rom_bank(data & 3);
 }
 
+void midyunit_state::yawdim2_oki_bank_w(uint8_t data)
+{
+	int bnk = (data >> 1 & 4) + (data & 3);
+	m_oki->set_rom_bank(bnk);
+
+	if (!(data & 4))
+		m_oki->reset();
+}
+
+uint8_t midyunit_state::yawdim2_soundlatch_r()
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return m_soundlatch->read();
+}
+
 
 
 /*************************************
@@ -2636,27 +2651,34 @@ ROM_END
 
 ROM_START( mkyawdim2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound CPU */
-	// Differs from other mkyawdim set
-	ROM_LOAD ( "yawdim.u167", 0x00000, 0x08000, CRC(16da7efb) SHA1(ac1db81a55aca36136b94977a91a1fc778b7b164) )
+	// Differs from other mkyawdim sets
+	ROM_LOAD ( "yawdim.u167", 0x00000, 0x08000, CRC(16da7efb) SHA1(ac1db81a55aca36136b94977a91a1fc778b7b164) )  // 27c512
 	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
-	// Half size as mkyawdim set
-	ROM_LOAD( "yawdim.u159", 0x00000, 0x20000, CRC(95b120af) SHA1(41b6fb384e5048926b87959a2c58d96b95698aba) )
-	ROM_CONTINUE(            0x40000, 0x20000 )
-	ROM_RELOAD(              0x80000, 0x20000 )
-	ROM_CONTINUE(            0xc0000, 0x20000 )
-	ROM_LOAD( "mw-15.u160",  0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )
-	ROM_CONTINUE(            0x60000, 0x20000 )
-	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_CONTINUE(            0xe0000, 0x20000 )
+	ROM_REGION( 0x200000, "oki", 0 )    /* ADPCM */
+	ROM_LOAD( "yawdim.u159", 0x000000, 0x20000, CRC(95b120af) SHA1(41b6fb384e5048926b87959a2c58d96b95698aba) )  // 27c020  Half size of mkyawdim set
+	ROM_CONTINUE(            0x100000, 0x20000 )
+	ROM_RELOAD(              0x040000, 0x20000 )
+	ROM_CONTINUE(            0x140000, 0x20000 )
+	ROM_RELOAD(              0x080000, 0x20000 )
+	ROM_CONTINUE(            0x180000, 0x20000 )
+	ROM_RELOAD(              0x0c0000, 0x20000 )
+	ROM_CONTINUE(            0x1c0000, 0x20000 )
+	ROM_LOAD( "mw-15.u160",  0x020000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )  // 4Mbit mask
+	ROM_CONTINUE(            0x060000, 0x20000 )
+	ROM_CONTINUE(            0x0a0000, 0x20000 )
+	ROM_CONTINUE(            0x0e0000, 0x20000 )
+	ROM_RELOAD(              0x120000, 0x20000 )
+	ROM_CONTINUE(            0x160000, 0x20000 )
+	ROM_CONTINUE(            0x1a0000, 0x20000 )
+	ROM_CONTINUE(            0x1e0000, 0x20000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "4.u25",  0x00000, 0x80000, CRC(b12b3bf2) SHA1(deb7755e8407d9de25124b3fdbc4c834a25d8252) )
+	ROM_LOAD16_BYTE( "4.u25",  0x00000, 0x80000, CRC(b12b3bf2) SHA1(deb7755e8407d9de25124b3fdbc4c834a25d8252) )  // 2x 4Mbit masks
 	ROM_LOAD16_BYTE( "5.u26",  0x00001, 0x80000, CRC(7a37dc5c) SHA1(c4fc6933d8b990c5c56c65282b1f72b90b5d5435) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* 8mbit dumps */
-	ROM_LOAD ( "b-1.bin",  0x000000, 0x100000, CRC(f41e61c6) SHA1(7dad38839d5c9aa0cfa7b2f7199f14e0f2c4494b) )
+	ROM_LOAD ( "b-1.bin",  0x000000, 0x100000, CRC(f41e61c6) SHA1(7dad38839d5c9aa0cfa7b2f7199f14e0f2c4494b) )  // 6x 8Mbit masks
 	ROM_LOAD ( "b-2.bin",  0x100000, 0x100000, CRC(8052740b) SHA1(f1b7fd536966d9d0ce690cdec635069c340d678e) )
 
 	ROM_LOAD ( "a-1.bin",  0x200000, 0x100000, CRC(7da3cb93) SHA1(23b9053b3241b69988f7f2e6a9d1353dac4fc8ab) )
@@ -2664,6 +2686,28 @@ ROM_START( mkyawdim2 )
 
 	ROM_LOAD ( "c-1.bin",  0x400000, 0x100000, CRC(de27c4c3) SHA1(a7760d239749c7463808adec72795f9785f553ec) )
 	ROM_LOAD ( "c-2.bin",  0x500000, 0x100000, CRC(d99203f3) SHA1(46ea21cbedfd42838562594b9bdc5d80360b7e5e) )
+
+	ROM_REGION( 0x900, "plds", 0 )
+	ROM_LOAD( "22v10.p1",  0x000, 0x2dd, CRC(15c24092) SHA1(7bbd1453c9a230dfa641239f15abb5aec93eb0dd) )  // unsecured
+	ROM_LOAD( "22v10.p2",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p3",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "16v8.p4",   0x000, 0x117, NO_DUMP )                                                       // secured, registered
+	ROM_LOAD( "22v10.p5",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "16v8.p6",   0x000, 0x117, NO_DUMP )                                                       // secured, registered
+	ROM_LOAD( "16v8.p7",   0x300, 0x117, CRC(fbbdc832) SHA1(8fe5448dad6025f98c70a9dd9aa7d07a75a6762c) )  // secured but bruteforced ok
+	ROM_LOAD( "16v8.p8",   0x500, 0x117, CRC(8c573ab4) SHA1(9f16936c34cbaaa89b56356353f2a76fd4f28605) )  // secured but bruteforced ok
+	ROM_LOAD( "22v10.p9",  0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p10",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p11",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p12", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p13", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p14", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p15", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p16",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "20v8.p17",  0x000, 0x157, NO_DUMP )                                                       // secured
+	ROM_LOAD( "22v10.p18", 0x000, 0x2dd, NO_DUMP )                                                       // secured
+	ROM_LOAD( "16v8.p19",  0x700, 0x117, CRC(0346b5fc) SHA1(0cc1e1dcd6017de2e80eb1d40ac3a591e589b030) )  // unsecured
+	// also u130: ti TPC1020AFN-084C PLCC84, unattempted
 ROM_END
 
 
@@ -2672,7 +2716,7 @@ ROM_START( mkyawdim3 )
 	ROM_LOAD (  "15.bin", 0x00000, 0x10000, CRC(b58d229e) SHA1(3ed14ef650dfa7f9d460611b19e9233a022cbea6) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
-	ROM_LOAD( "13.bin",  0x00000, 0x20000, CRC(921c613d) SHA1(be62b87f195b6347112ab13cc14514d4c88a8b86) ) // Half size as mkyawdim2 set and a quarter of mkyawdim
+	ROM_LOAD( "13.bin",  0x00000, 0x20000, CRC(921c613d) SHA1(be62b87f195b6347112ab13cc14514d4c88a8b86) ) // Half size of mkyawdim2 set and a quarter of mkyawdim
 	ROM_RELOAD(          0x40000, 0x20000 )
 	ROM_RELOAD(          0x80000, 0x20000 )
 	ROM_RELOAD(          0xc0000, 0x20000 )
@@ -3091,22 +3135,22 @@ GAME( 1991, term2la1,   term2,    term2,                   term2,    midyunit_st
 GAME( 1991, term2pa2,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, term2lg1,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mkla4,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla3,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla2,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla1,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot9,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot8,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot4,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyturbo,   mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyturboe,  mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mknifty,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mknifty666, mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkrep,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, mkyawdim,   mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim2,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkla4,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla3,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla2,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla1,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot9,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot8,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot4,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,   ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturbo,   mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo,  ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturboe,  mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo,  ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo,  ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty666, mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo,  ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkrep,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo,  ROT0, "hack",     "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, mkyawdim,   mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim,  ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim2,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim2, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // some sound effects are missing on real pcb
+GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim,  ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim,  ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 
 GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp,   totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )

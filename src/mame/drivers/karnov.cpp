@@ -766,10 +766,10 @@ void karnov_state::machine_reset()
 void karnov_state::karnov(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);    /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);     /* Accurate */
+	M6502(config, m_audiocpu, 12_MHz_XTAL/8);     /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
@@ -799,10 +799,10 @@ void karnov_state::karnov(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -826,7 +826,7 @@ void karnov_state::chelnov(machine_config &config)
 	karnov(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnov_map);
 
-	I8751(config, m_mcu, 8_MHz_XTAL); // unknown clock
+	I8751(config, m_mcu, 8_MHz_XTAL); // 8.000 MHz OSC next to MCU
 	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
 	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
 	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
@@ -844,7 +844,7 @@ void karnov_state::chelnovjbl(machine_config &config)
 	karnov(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnov_map);
 
-	I8031(config, m_mcu, 8_MHz_XTAL); // unknown clock
+	I8031(config, m_mcu, 8_MHz_XTAL); // info below states 8MHz for MCU
 	m_mcu->set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
 	m_mcu->set_addrmap(AS_IO, &karnov_state::chelnovjbl_mcu_io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(karnov_state::mcubl_p1_w));
@@ -856,10 +856,10 @@ void karnov_state::chelnovjbl(machine_config &config)
 void karnov_state::wndrplnt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10 MHz */
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);   /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);    /* Accurate */
+	M6502(config, m_audiocpu, 12_MHz_XTAL/8);    /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
@@ -889,10 +889,10 @@ void karnov_state::wndrplnt(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -904,7 +904,7 @@ void karnov_state::wndrplnt(machine_config &config)
  *
  *************************************/
 
-ROM_START( karnov )
+ROM_START( karnov ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-6.j15", 0x00000, 0x10000, CRC(4c60837f) SHA1(6886e6ee1d1563c3011b8fea79e7435f983a3ee0) )
 	ROM_LOAD16_BYTE( "dn11-6.j20", 0x00001, 0x10000, CRC(cd4abb99) SHA1(b4482175f5d90941ad3aec6c2269a50f57a465ed) )
@@ -930,20 +930,20 @@ ROM_START( karnov )
 
 	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-.f8",   0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
-	ROM_LOAD( "dn14-5.f9",  0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
-	ROM_LOAD( "dn13-.f13",  0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "dn15-5.f15", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
-	ROM_LOAD( "dn16-",      0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "dn17-5",     0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
-	ROM_LOAD( "dn18-",      0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "dn19-5",     0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
+	ROM_LOAD( "dn14-5.f11", 0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
+	ROM_LOAD( "dn13-.f9",   0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "dn15-5.f12", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
+	ROM_LOAD( "dn16-.f13",  0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "dn17-5.f15", 0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
+	ROM_LOAD( "dn18-.f16",  0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "dn19-5.f18", 0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
 	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( karnova )
+ROM_START( karnova ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) ) /* also known to be labeled DN08-5E */
 	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) ) /* also known to be labeled DN11-5E */
@@ -969,20 +969,20 @@ ROM_START( karnova )
 
 	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-.f8",   0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
-	ROM_LOAD( "dn14-5.f9",  0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
-	ROM_LOAD( "dn13-.f13",  0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "dn15-5.f15", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
-	ROM_LOAD( "dn16-",      0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "dn17-5",     0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
-	ROM_LOAD( "dn18-",      0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "dn19-5",     0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
+	ROM_LOAD( "dn14-5.f11", 0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
+	ROM_LOAD( "dn13-.f9",   0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "dn15-5.f12", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
+	ROM_LOAD( "dn16-.f13",  0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "dn17-5.f15", 0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
+	ROM_LOAD( "dn18-.f16",  0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "dn19-5.f18", 0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
 	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( karnovj )
+ROM_START( karnovj ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "kar8.j15",  0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
 	ROM_LOAD16_BYTE( "kar11.j20", 0x00001, 0x10000, CRC(417c936d) SHA1(d31f9291f18c3d5e3c4430768396e1ac10fd9ea3) )
@@ -1008,13 +1008,13 @@ ROM_START( karnovj )
 
 	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-.f8",  0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
-	ROM_LOAD( "kar14.f9",  0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
-	ROM_LOAD( "dn13-.f13", 0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "kar15.f15", 0x28000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
-	ROM_LOAD( "dn16-",     0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "kar17",     0x40000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
-	ROM_LOAD( "dn18-",     0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "kar19",     0x58000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
+	ROM_LOAD( "kar14.f11", 0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
+	ROM_LOAD( "dn13-.f9",  0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "kar15.f12", 0x28000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
+	ROM_LOAD( "dn16-.f13", 0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "kar17.f15", 0x40000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
+	ROM_LOAD( "dn18-.f16", 0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "kar19.f18", 0x58000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
@@ -1105,7 +1105,7 @@ ROM_START( wndrplnt )
 	ROM_LOAD( "ea-20.l6",      0x0400, 0x0400, CRC(619f9d1e) SHA1(17fe49b6c9ce17be4a03e3400229e3ef4998a46f) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( chelnov )
+ROM_START( chelnov ) /* DE-0248-1 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-e.j16",   0x00000, 0x10000, CRC(8275cc3a) SHA1(961166226b68744eef15fed6a306010757b83556) )
 	ROM_LOAD16_BYTE( "ee11-e.j19",   0x00001, 0x10000, CRC(889e40a0) SHA1(e927f32d9bc448a331fb7b3478b2d07154f5013b) )
@@ -1140,7 +1140,7 @@ ROM_START( chelnov )
 	ROM_LOAD( "ee-16.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( chelnovu )
+ROM_START( chelnovu ) /* DE-0248-1 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-a.j15",   0x00000, 0x10000, CRC(2f2fb37b) SHA1(f89b424099097a95cf184d20a15b876c5b639552) )
 	ROM_LOAD16_BYTE( "ee11-a.j20",   0x00001, 0x10000, CRC(f306d05f) SHA1(e523ffd17fb0104fe28eac288b6ebf7fc0ea2908) )
@@ -1175,9 +1175,9 @@ ROM_START( chelnovu )
 	ROM_LOAD( "ee-16.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
+ROM_START( chelnovj ) /* DE-0248-1 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "ee08-1.j15",  0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )
+	ROM_LOAD16_BYTE( "ee08-1.j15",  0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )/* at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
 	ROM_LOAD16_BYTE( "ee11-1.j20",  0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) )
 	ROM_LOAD16_BYTE( "ee07.j14",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
 	ROM_LOAD16_BYTE( "ee10.j18",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) )
@@ -1241,7 +1241,8 @@ ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
 	ROM_LOAD( "5.bin",    0x38000, 0x08000, CRC(99cee6cd) SHA1(b2cd0a1aef04fd63ad27ac8a61d17a6bb4c8b600) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) /* Sprites */
-	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad (1st half is 99.996948% match)
+//  ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad, 1 byte difference: byte 0x55CC == 0x30 vs 0xF0 in ee12-.f8
+	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )
 	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
 	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
 	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
@@ -1260,7 +1261,6 @@ Other ic: Philips MAB8031AH MCU
 OSC: 20 mhz, 12 mhz,8 mhz (for mcu)
 
 */
-
 
 // same pcb as above?
 // this is a further hacked set of the above, with the copyright messages removed etc. (black screens for several seconds instead)

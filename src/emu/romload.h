@@ -5,7 +5,9 @@
     romload.h
 
     ROM loading functions.
+
 *********************************************************************/
+
 #ifndef MAME_EMU_ROMLOAD_H
 #define MAME_EMU_ROMLOAD_H
 

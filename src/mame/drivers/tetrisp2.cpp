@@ -1929,7 +1929,7 @@ void stepstag_state::stepstag(machine_config &config)
 //  mscreen.set_palette(m_vj_palette_m));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_orientation(ROT270);;
+	rscreen.set_orientation(ROT270);
 	rscreen.set_refresh_hz(30);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(0x160, 0xf0);

@@ -1260,6 +1260,12 @@ INPUT_PORTS_START( sadari )
 	PORT_DIPNAME( 0x40, 0x40, "Girl Show Point" )       PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, "Other Country" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( primella )
@@ -1434,12 +1440,12 @@ u8 dooyong_z80_ym2203_state::unk_r()
 	return 0;
 }
 
+
 /***************************************************************************
 
     Machine driver(s)
 
 ***************************************************************************/
-
 
 void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
 {

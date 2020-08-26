@@ -82,7 +82,7 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
-	
+
 	// I/Os (common)
 	u32 flags_r();
 	void flags_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -243,7 +243,7 @@ protected:
 	u32 m_io_status;
 	u32 m_io_mtxc;
 	u32 m_io_mtxa;
-	
+
 	u32 m_pc;
 	u32 m_flags;
 	bool m_imask;
@@ -256,7 +256,7 @@ protected:
 	bool m_bus_hog;
 	u32 m_div_remainder;
 	bool m_div_offset;
-	
+
 	// GPU specific
 	u32 m_hidata;
 	static const op_func gpu_op_table[64];

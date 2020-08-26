@@ -90,6 +90,21 @@ template class handler_entry_read_dispatch< 7, 1, -1, ENDIANNESS_BIG>;
 template class handler_entry_read_dispatch< 8, 1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_read_dispatch< 8, 1, -1, ENDIANNESS_BIG>;
 
+template class handler_entry_read_dispatch< 2, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 2, 2,  3, ENDIANNESS_BIG>;
+template class handler_entry_read_dispatch< 3, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 3, 2,  3, ENDIANNESS_BIG>;
+template class handler_entry_read_dispatch< 4, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 4, 2,  3, ENDIANNESS_BIG>;
+template class handler_entry_read_dispatch< 5, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 5, 2,  3, ENDIANNESS_BIG>;
+template class handler_entry_read_dispatch< 6, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 6, 2,  3, ENDIANNESS_BIG>;
+template class handler_entry_read_dispatch< 7, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 7, 2,  3, ENDIANNESS_BIG>;
+template class handler_entry_read_dispatch< 8, 2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_dispatch< 8, 2,  3, ENDIANNESS_BIG>;
+
 template class handler_entry_read_dispatch< 2, 2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_dispatch< 2, 2,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_dispatch< 3, 2,  0, ENDIANNESS_LITTLE>;

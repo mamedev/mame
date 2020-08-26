@@ -69,8 +69,8 @@ private:
 	void draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const uint16_t *mask,
 					uint16_t tpri, uint8_t lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
 
-	template<class _BitmapClass>
-	void draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+	template<class BitmapClass>
+	void draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
 	devcb_write16 m_xhout_write_cb;
 	devcb_write16 m_xvout_write_cb;

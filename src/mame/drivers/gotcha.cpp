@@ -8,12 +8,10 @@ driver by Nicola Salmoria
 
 TODO:
 - Find out what the "Explane Type" dip switch actually does.
-- Should use the artwork system to show the lamp state: there are 12 lamps, one
-  for every button, and they are used a lot during the game (see gotcha_lamps_w).
 - Unknown writes to 0x30000c. It changes for some levels, it's probably
   gfx related but since everything seems fine I've no idea what it might do.
-- Unknown sound writes at C00F; also, there's an NMI handler that would
-  read from C00F.
+- Unknown sound writes at c00f; also, there's an NMI handler that would
+  read from c00f.
 - Sound samples were getting chopped; I fixed this by changing sound/adpcm.cpp to
   disregard requests to play new samples until the previous one is finished*.
 
@@ -75,7 +73,7 @@ Notes:
 #include "gotcha.lh"
 
 
-void gotcha_state::gotcha_lamps_w(uint16_t data)
+void gotcha_state::lamps_w(uint16_t data)
 {
 	for (int p = 0; p < 3; p++)
 	{
@@ -86,30 +84,30 @@ void gotcha_state::gotcha_lamps_w(uint16_t data)
 	}
 }
 
-void gotcha_state::gotcha_oki_bank_w(uint8_t data)
+void gotcha_state::oki_bank_w(uint8_t data)
 {
 	m_oki->set_rom_bank(!BIT(data, 0));
 }
 
 
-void gotcha_state::gotcha_map(address_map &map)
+void gotcha_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x100002, 0x100003).w(FUNC(gotcha_state::gotcha_lamps_w));
-	map(0x100004, 0x100004).w(FUNC(gotcha_state::gotcha_oki_bank_w));
+	map(0x100002, 0x100003).w(FUNC(gotcha_state::lamps_w));
+	map(0x100004, 0x100004).w(FUNC(gotcha_state::oki_bank_w));
 	map(0x120000, 0x12ffff).ram();
 	map(0x140000, 0x1405ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x160000, 0x1607ff).ram().share("spriteram");
+	map(0x160000, 0x1607ff).ram().share(m_spriteram);
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("SYSTEM");
 	map(0x180004, 0x180005).portr("DSW");
-	map(0x300000, 0x300001).w(FUNC(gotcha_state::gotcha_gfxbank_select_w));
-	map(0x300002, 0x300009).w(FUNC(gotcha_state::gotcha_scroll_w));
-//  { 0x30000c, 0x30000d,
-	map(0x30000e, 0x30000f).w(FUNC(gotcha_state::gotcha_gfxbank_w));
-	map(0x320000, 0x320fff).w(FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
-	map(0x322000, 0x322fff).w(FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
+	map(0x300000, 0x300000).w(FUNC(gotcha_state::gfxbank_select_w));
+	map(0x300002, 0x300009).w(FUNC(gotcha_state::scroll_w));
+//  map(0x30000c, 0x30000d).
+	map(0x30000e, 0x30000e).w(FUNC(gotcha_state::gfxbank_w));
+	map(0x320000, 0x320fff).w(FUNC(gotcha_state::fgvideoram_w)).share(m_fgvideoram);
+	map(0x322000, 0x322fff).w(FUNC(gotcha_state::bgvideoram_w)).share(m_bgvideoram);
 }
 
 
@@ -229,8 +227,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_gotcha )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0x100, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tilelayout, 0x100, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x000, 16 )
 GFXDECODE_END
 
 
@@ -249,9 +247,7 @@ void gotcha_state::machine_start()
 
 void gotcha_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_gfxbank[i] = 0;
 		m_scroll[i] = 0;
@@ -262,20 +258,20 @@ void gotcha_state::machine_reset()
 
 void gotcha_state::gotcha(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 14.318181_MHz_XTAL);    /* 14.31818 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gotcha_state::gotcha_map);
+	// basic machine hardware
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gotcha_state::main_map);
 
-	Z80(config, m_audiocpu, 6_MHz_XTAL);   /* 6 MHz */
+	Z80(config, m_audiocpu, 6_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gotcha_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(gotcha_state::screen_update_gotcha));
+	screen.set_screen_update(FUNC(gotcha_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
 	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
@@ -289,7 +285,7 @@ void gotcha_state::gotcha(machine_config &config)
 	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -318,7 +314,7 @@ ROM_START( gotcha )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gotcha_u.z02", 0x0000, 0x10000, CRC(f4f6e16b) SHA1(a360c571bee7391c66e98e5e111e78ac9732390e) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "gotcha-u.42a", 0x000000, 0x20000, CRC(4ea822f0) SHA1(5b25d4c80138d9a0f3d481fa0c2f3665772bc0c8) )
 	ROM_CONTINUE(             0x100000, 0x20000 )
 	ROM_CONTINUE(             0x020000, 0x20000 )
@@ -336,7 +332,7 @@ ROM_START( gotcha )
 	ROM_CONTINUE(             0x0e0000, 0x20000 )
 	ROM_CONTINUE(             0x1e0000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "gotcha.u56",   0x000000, 0x80000, CRC(85f6a062) SHA1(77d1c9c8394af0c487fa6d657ae740eae940682a) )
 	ROM_LOAD( "gotcha.u55",   0x080000, 0x80000, CRC(426b4e48) SHA1(91e79c9fd1f9cf84df8e1d6b67780d1cacd4a0f2) )
 	ROM_LOAD( "gotcha.u54",   0x100000, 0x80000, CRC(903e05a4) SHA1(4fb675958f4dc057f8da7edff1f6680482bdc5dd) )
@@ -354,7 +350,7 @@ ROM_START( ppchamp )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "uz02", 0x00000, 0x10000, CRC(f4f6e16b) SHA1(a360c571bee7391c66e98e5e111e78ac9732390e) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "u42a",         0x000000, 0x20000, CRC(f0b521d1) SHA1(fe44bfa13818eee08d112c2f75e14bfd67bbefbf) )
 	ROM_CONTINUE(             0x100000, 0x20000 )
 	ROM_CONTINUE(             0x020000, 0x20000 )
@@ -372,7 +368,7 @@ ROM_START( ppchamp )
 	ROM_CONTINUE(             0x0e0000, 0x20000 )
 	ROM_CONTINUE(             0x1e0000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "u56", 0x000000, 0x80000, CRC(160e46b3) SHA1(e2bec3388d41afb9f1025d66c15fcc6ca4d40703) )
 	ROM_LOAD( "u55", 0x080000, 0x80000, CRC(7351b61c) SHA1(2ef3011a7a1ff253f45186e46cfdce5f4ef17322) )
 	ROM_LOAD( "u54", 0x100000, 0x80000, CRC(a3d8c5ef) SHA1(f59874844934f3ce76a49e4a9618510537378387) )
@@ -390,7 +386,7 @@ ROM_START( ppchampa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "uz02", 0x00000, 0x10000, CRC(f4f6e16b) SHA1(a360c571bee7391c66e98e5e111e78ac9732390e) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "u42a",         0x000000, 0x20000, CRC(f0b521d1) SHA1(fe44bfa13818eee08d112c2f75e14bfd67bbefbf) )
 	ROM_CONTINUE(             0x100000, 0x20000 )
 	ROM_CONTINUE(             0x020000, 0x20000 )
@@ -408,7 +404,7 @@ ROM_START( ppchampa )
 	ROM_CONTINUE(             0x0e0000, 0x20000 )
 	ROM_CONTINUE(             0x1e0000, 0x20000 )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "u56", 0x000000, 0x80000, CRC(160e46b3) SHA1(e2bec3388d41afb9f1025d66c15fcc6ca4d40703) )
 	ROM_LOAD( "u55", 0x080000, 0x80000, CRC(7351b61c) SHA1(2ef3011a7a1ff253f45186e46cfdce5f4ef17322) )
 	ROM_LOAD( "u54", 0x100000, 0x80000, CRC(a3d8c5ef) SHA1(f59874844934f3ce76a49e4a9618510537378387) )
@@ -418,6 +414,6 @@ ROM_START( ppchampa )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAMEL( 1997, gotcha,   0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, gotcha,   0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                          MACHINE_SUPPORTS_SAVE, layout_gotcha )
 GAMEL( 1997, ppchamp,  gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea, set 1)", MACHINE_SUPPORTS_SAVE, layout_gotcha )
 GAMEL( 1997, ppchampa, gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea, set 2)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

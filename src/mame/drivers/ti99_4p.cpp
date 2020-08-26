@@ -116,7 +116,6 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/peb/peribox.h"
 #include "cpu/tms9900/tms9900.h"
@@ -125,8 +124,9 @@
 #include "machine/tms9901.h"
 #include "speaker.h"
 
-#define TI99_SGCPU_TAG "sgcpu"
-#define TI99_AMSRAM_TAG "amsram1meg"
+#define SGCPU_AMSRAM_TAG  "amsram1meg"
+#define SGCPU_PADRAM_TAG  "scratchpad"
+#define SGCPU_TMS9901_TAG     "tms9901"
 
 // Debugging
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -147,12 +147,12 @@ public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TI_TMS9901_TAG),
+		m_tms9901(*this, SGCPU_TMS9901_TAG),
 		m_cassette(*this, "cassette"),
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
-		m_scratchpad(*this, TI99_PADRAM_TAG),
-		m_amsram(*this, TI99_AMSRAM_TAG),
+		m_scratchpad(*this, SGCPU_PADRAM_TAG),
+		m_amsram(*this, SGCPU_AMSRAM_TAG),
 		m_keyboard(*this, "COL%u", 0U),
 		m_alpha(*this, "ALPHA")
 	{ }
@@ -1055,10 +1055,10 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_peribox->lcp_cb().set(FUNC(ti99_4p_state::video_interrupt_in));
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	RAM(config, TI99_PADRAM_TAG).set_default_size("1K").set_default_value(0);
+	RAM(config, SGCPU_PADRAM_TAG).set_default_size("1K").set_default_value(0);
 
 	// AMS RAM 1 MiB
-	RAM(config, TI99_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
+	RAM(config, SGCPU_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();

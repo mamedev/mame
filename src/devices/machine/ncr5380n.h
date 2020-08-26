@@ -133,7 +133,7 @@ private:
 
 	// state machine
 	emu_timer *m_state_timer;
-	enum state : unsigned
+	enum state : uint32_t
 	{
 		IDLE,
 

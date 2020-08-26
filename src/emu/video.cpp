@@ -266,7 +266,7 @@ void video_manager::frame_update(bool from_debugger)
 		screen_device *const screen = screen_device_iterator(machine().root_device()).first();
 		bool const debugger_enabled = machine().debug_flags & DEBUG_FLAG_ENABLED;
 		bool const within_instruction_hook = debugger_enabled && machine().debugger().within_instruction_hook();
-		if (screen && (machine().paused() || from_debugger || within_instruction_hook))
+		if (screen && ((machine().paused() && machine().options().update_in_pause()) || from_debugger || within_instruction_hook))
 			screen->reset_partial_updates();
 	}
 }
@@ -642,7 +642,10 @@ bool video_manager::finish_screen_updates()
 	bool has_live_screen = false;
 	for (screen_device &screen : iter)
 	{
+		if (screen.partial_scan_hpos() >= 0) // previous update ended mid-scanline
+			screen.update_now();
 		screen.update_partial(screen.visible_area().max_y);
+
 		if (machine().render().is_live(screen))
 			has_live_screen = true;
 	}

@@ -19,7 +19,7 @@ uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind1
 	{
 		for (int y = 0; y < 256; y++)
 		{
-			uint8_t const code = m_p_videoram[y + x*256];
+			uint8_t const code = m_vram[y + x*256];
 			for (int b = 7; b >= 0; b--)
 				bitmap.pix16(y, x*8+(7-b)) = BIT(code, b);
 		}
@@ -33,7 +33,7 @@ uint32_t special_state::screen_update_specialp(screen_device &screen, bitmap_ind
 	{
 		for (int y = 0; y < 256; y++)
 		{
-			uint8_t const code = m_p_videoram[y + x*256];
+			uint8_t const code = m_vram[y + x*256];
 			for (int b = 7; b >= 0; b--)
 				bitmap.pix16(y, x*8+(7-b)) = BIT(code, b);
 		}
@@ -64,12 +64,6 @@ static constexpr rgb_t specimx_pens[16] = {
 void special_state::specimx_palette(palette_device &palette) const
 {
 	palette.set_pen_colors(0, specimx_pens);
-}
-
-
-VIDEO_START_MEMBER(special_state,specimx)
-{
-	m_specimx_colorram = std::make_unique<uint8_t[]>(0x3000);
 }
 
 uint32_t special_state::screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

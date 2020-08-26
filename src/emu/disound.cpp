@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    disound.c
+    disound.cpp
 
     Device sound interfaces.
 

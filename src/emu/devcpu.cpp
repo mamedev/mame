@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    devcpu.c
+    devcpu.cpp
 
     CPU device definitions.
 

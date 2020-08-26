@@ -23,6 +23,8 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ELECTRON_PLUS1, electron_plus1_device, "electron_plus1", "Acorn Plus 1 Expansion")
+DEFINE_DEVICE_TYPE(ELECTRON_AP1, electron_ap1_device, "electron_ap1", "P.R.E.S. Advanced Plus 1")
+DEFINE_DEVICE_TYPE(ELECTRON_AP6, electron_ap6_device, "electron_ap6", "P.R.E.S. Advanced Plus 6")
 
 
 //-------------------------------------------------
@@ -36,22 +38,33 @@ ROM_START( plus1 )
 	ROM_SYSTEM_BIOS(0, "plus1", "Expansion 1.00")
 	ROMX_LOAD("plus1.rom", 0x0000, 0x1000, CRC(ac30b0ed) SHA1(2de04ab7c81414d6c9c967f965c53fc276392463), ROM_BIOS(0))
 	ROM_RELOAD(            0x1000, 0x1000)
+ROM_END
 
-	ROM_SYSTEM_BIOS(1, "presap1", "PRES Expansion 1.1")
-	ROMX_LOAD("presplus1.rom", 0x0000, 0x1000, CRC(8ef1e0e5) SHA1(080e1b788b3fe4fa272cd2cc792293eb7b874e82), ROM_BIOS(1))
+ROM_START( ap1 )
+	// Bank 12 Expansion module operating system
+	ROM_REGION( 0x2000, "exp_rom", 0 )
+	ROM_DEFAULT_BIOS("ap2")
+	ROM_SYSTEM_BIOS(0, "ap1", "PRES Expansion 1.1")
+	ROMX_LOAD("presplus1.rom", 0x0000, 0x1000, CRC(8ef1e0e5) SHA1(080e1b788b3fe4fa272cd2cc792293eb7b874e82), ROM_BIOS(0))
 	ROM_RELOAD(                0x1000, 0x1000)
 
-	ROM_SYSTEM_BIOS(2, "presap2", "PRES AP2 Support 1.23")
-	ROMX_LOAD("presap2_123.rom", 0x0000, 0x2000, CRC(f796689c) SHA1(bc40a79e6d2b4cb5e549d5d21f673c66a661850d), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "ap2", "PRES AP2 Support 1.23")
+	ROMX_LOAD("presap2_123.rom", 0x0000, 0x2000, CRC(f796689c) SHA1(bc40a79e6d2b4cb5e549d5d21f673c66a661850d), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(3, "sl200", "Slogger Expansion 2.00")
-	ROMX_LOAD("elkexp200.rom", 0x0000, 0x2000, CRC(dee02843) SHA1(5c9b940b4ddb46e9a223160310683a32266300c8), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(2, "ap6", "RH Plus 1 1.33")
+	ROMX_LOAD("ap6v133.rom", 0x0000, 0x2000, CRC(566c7bfe) SHA1(f1053109ea236dd3e4b91ec64859480e8c2ed549), ROM_BIOS(2))
+ROM_END
 
-	ROM_SYSTEM_BIOS(4, "sl201", "Slogger Expansion 2.01")
-	ROMX_LOAD("elkexp201.rom", 0x0000, 0x2000, CRC(0e896892) SHA1(4e0794f1083fe529b01bd4fa100996a533ed8b10), ROM_BIOS(4))
+ROM_START( ap6 )
+	// Bank 12 Expansion module operating system
+	ROM_REGION( 0x4000, "exp_rom", 0 )
+	ROM_DEFAULT_BIOS("ap6")
+	ROM_SYSTEM_BIOS(0, "ap2", "PRES AP2 Support 1.23")
+	ROMX_LOAD("presap2_123.rom", 0x0000, 0x2000, CRC(f796689c) SHA1(bc40a79e6d2b4cb5e549d5d21f673c66a661850d), ROM_BIOS(0))
+	ROM_RELOAD(                  0x2000, 0x2000)
 
-	ROM_SYSTEM_BIOS(5, "sl202", "Slogger Expansion 2.02")
-	ROMX_LOAD("elkexp202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(1, "ap6", "RH Plus 1 1.33")
+	ROMX_LOAD("ap6v133t.rom", 0x0000, 0x4000, CRC(364591eb) SHA1(316a25aeeda0266dae510eea52324b087875740f), ROM_BIOS(1))
 ROM_END
 
 //-------------------------------------------------
@@ -76,14 +89,33 @@ static INPUT_PORTS_START( plus1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ap6 )
+	PORT_INCLUDE(plus1)
+
+	PORT_START("LINKS")
+	PORT_CONFNAME(0x01, 0x01, "J1 ROM 13")
+	PORT_CONFSETTING(0x00, "Disabled")
+	PORT_CONFSETTING(0x01, "Enabled")
+	PORT_CONFNAME(0x02, 0x02, "J2 ROM 4")
+	PORT_CONFSETTING(0x00, "Disabled")
+	PORT_CONFSETTING(0x02, "Enabled")
+	PORT_CONFNAME(0x04, 0x04, "J3 ROM 4,5,6,7")
+	PORT_CONFSETTING(0x00, "Disabled")
+	PORT_CONFSETTING(0x04, "Enabled")
+INPUT_PORTS_END
+
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 ioport_constructor electron_plus1_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( plus1 );
+}
+
+ioport_constructor electron_ap6_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ap6 );
 }
 
 //-------------------------------------------------
@@ -94,13 +126,13 @@ void electron_plus1_device::device_add_mconfig(machine_config &config)
 {
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(electron_plus1_device::busy_w));
+	m_centronics->busy_handler().set([this](int state) { m_centronics_busy = state; });
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(latch);
 
 	/* adc */
 	ADC0844(config, m_adc);
-	m_adc->intr_callback().set(FUNC(electron_plus1_device::ready_w));
+	m_adc->intr_callback().set([this](int state) { m_adc_ready = !state; });
 	m_adc->ch1_callback().set_ioport("JOY1");
 	m_adc->ch2_callback().set_ioport("JOY2");
 	m_adc->ch3_callback().set_ioport("JOY3");
@@ -115,6 +147,25 @@ void electron_plus1_device::device_add_mconfig(machine_config &config)
 	m_cart_sk2->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 }
 
+void electron_ap6_device::device_add_mconfig(machine_config &config)
+{
+	electron_plus1_device::device_add_mconfig(config);
+
+	/* rom sockets */
+	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[0]->set_device_load(FUNC(electron_ap6_device::rom1_load));
+	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[1]->set_device_load(FUNC(electron_ap6_device::rom2_load));
+	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[2]->set_device_load(FUNC(electron_ap6_device::rom3_load));
+	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[3]->set_device_load(FUNC(electron_ap6_device::rom4_load));
+	GENERIC_SOCKET(config, m_rom[4], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[4]->set_device_load(FUNC(electron_ap6_device::rom5_load));
+	GENERIC_SOCKET(config, m_rom[5], generic_plain_slot, "electron_rom", "bin,rom");
+	m_rom[5]->set_device_load(FUNC(electron_ap6_device::rom6_load));
+}
+
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
@@ -122,6 +173,16 @@ void electron_plus1_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *electron_plus1_device::device_rom_region() const
 {
 	return ROM_NAME( plus1 );
+}
+
+const tiny_rom_entry *electron_ap1_device::device_rom_region() const
+{
+	return ROM_NAME( ap1 );
+}
+
+const tiny_rom_entry *electron_ap6_device::device_rom_region() const
+{
+	return ROM_NAME( ap6 );
 }
 
 //**************************************************************************
@@ -132,20 +193,37 @@ const tiny_rom_entry *electron_plus1_device::device_rom_region() const
 //  electron_plus1_device - constructor
 //-------------------------------------------------
 
-electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ELECTRON_PLUS1, tag, owner, clock),
-	device_electron_expansion_interface(mconfig, *this),
-	m_exp_rom(*this, "exp_rom"),
-	m_cart_sk1(*this, "cart_sk1"),
-	m_cart_sk2(*this, "cart_sk2"),
-	m_centronics(*this, "centronics"),
-	m_cent_data_out(*this, "cent_data_out"),
-	m_adc(*this, "adc"),
-	m_joy(*this, "JOY%u", 1),
-	m_buttons(*this, "BUTTONS"),
-	m_romsel(0),
-	m_centronics_busy(0),
-	m_adc_ready(0)
+electron_plus1_device::electron_plus1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_cart_sk1(*this, "cart_sk1")
+	, m_cart_sk2(*this, "cart_sk2")
+	, m_centronics(*this, "centronics")
+	, m_cent_data_out(*this, "cent_data_out")
+	, m_adc(*this, "adc")
+	, m_joy(*this, "JOY%u", 1)
+	, m_buttons(*this, "BUTTONS")
+	, m_romsel(0)
+	, m_centronics_busy(0)
+	, m_adc_ready(0)
+{
+}
+
+electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: electron_plus1_device(mconfig, ELECTRON_PLUS1, tag, owner, clock)
+{
+}
+
+electron_ap1_device::electron_ap1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: electron_plus1_device(mconfig, ELECTRON_AP1, tag, owner, clock)
+{
+}
+
+electron_ap6_device::electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: electron_plus1_device(mconfig, ELECTRON_AP6, tag, owner, clock)
+	, m_rom(*this, "rom%u", 1)
+	, m_links(*this, "LINKS")
 {
 }
 
@@ -156,6 +234,23 @@ electron_plus1_device::electron_plus1_device(const machine_config &mconfig, cons
 
 void electron_plus1_device::device_start()
 {
+	/* register for save states */
+	save_item(NAME(m_romsel));
+}
+
+void electron_ap6_device::device_start()
+{
+	electron_plus1_device::device_start();
+
+	m_ram = make_unique_clear<uint8_t[]>(0x18000);
+	memset(m_ram.get(), 0xff, 0x18000);
+
+	m_bank_locked[0] = false;
+	m_bank_locked[1] = false;
+
+	/* register for save states */
+	save_pointer(NAME(m_ram), 0x18000);
+	save_item(NAME(m_bank_locked));
 }
 
 
@@ -169,10 +264,7 @@ uint8_t electron_plus1_device::expbus_r(offs_t offset)
 
 	switch (offset >> 12)
 	{
-	case 0x8:
-	case 0x9:
-	case 0xa:
-	case 0xb:
+	case 0x8: case 0x9: case 0xa: case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
@@ -206,7 +298,11 @@ uint8_t electron_plus1_device::expbus_r(offs_t offset)
 			}
 			else if (offset == 0xfc72)
 			{
-				data &= status_r();
+				// Status: b7: printer Busy
+				//         b6: ADC conversion end
+				//         b5: Fire Button 1
+				//         b4: Fire Button 2
+				data &= (m_centronics_busy << 7) | (m_adc_ready << 6) | m_buttons->read() | 0x0f;
 			}
 			break;
 
@@ -221,6 +317,63 @@ uint8_t electron_plus1_device::expbus_r(offs_t offset)
 }
 
 
+uint8_t electron_ap6_device::expbus_r(offs_t offset)
+{
+	uint8_t data = electron_plus1_device::expbus_r(offset);
+
+	switch (offset >> 12)
+	{
+	case 0x8: case 0x9: case 0xa: case 0xb:
+		switch (m_romsel)
+		{
+		case 4:
+			if (BIT(m_links->read(), 1) && BIT(m_links->read(), 2)) // ROM 4 enabled
+			{
+				if (m_rom[m_romsel - 4]->exists())
+					data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
+				else
+					data = m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)];
+			}
+			break;
+
+		case 5: case 6: case 7:
+			if (BIT(m_links->read(), 2)) // ROM 4,5,6,7 enabled
+			{
+				if (m_rom[m_romsel - 4]->exists())
+					data = m_rom[m_romsel - 4]->read_rom(offset & 0x3fff);
+				else
+					data = m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)];
+			}
+			break;
+
+		case 12:
+			data = m_exp_rom->base()[offset & 0x3fff];
+			break;
+
+		case 13:
+			if (BIT(m_links->read(), 0)) // ROM 13 enabled
+			{
+				if (m_rom[m_romsel - 9]->exists())
+					data &= m_rom[m_romsel - 9]->read_rom(offset & 0x3fff);
+				else
+					data &= m_ram[(m_romsel - 9) << 14 | (offset & 0x3fff)];
+			}
+			break;
+
+		case 14:
+			if (m_rom[m_romsel - 9]->exists())
+				data &= m_rom[m_romsel - 9]->read_rom(offset & 0x3fff);
+			else
+				data &= m_ram[(m_romsel - 9) << 14 | (offset & 0x3fff)];
+			break;
+		}
+		break;
+	}
+
+	return data;
+}
+
+
 //-------------------------------------------------
 //  expbus_w - expansion data write
 //-------------------------------------------------
@@ -229,10 +382,7 @@ void electron_plus1_device::expbus_w(offs_t offset, uint8_t data)
 {
 	switch (offset >> 12)
 	{
-	case 0x8:
-	case 0x9:
-	case 0xa:
-	case 0xb:
+	case 0x8: case 0x9: case 0xa: case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
@@ -242,6 +392,10 @@ void electron_plus1_device::expbus_w(offs_t offset, uint8_t data)
 		case 2:
 		case 3:
 			m_cart_sk1->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			break;
+		case 13:
+			m_cart_sk1->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
+			m_cart_sk2->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
 			break;
 		}
 		break;
@@ -260,6 +414,8 @@ void electron_plus1_device::expbus_w(offs_t offset, uint8_t data)
 			else if (offset == 0xfc71)
 			{
 				m_cent_data_out->write(data);
+				m_centronics->write_strobe(0);
+				m_centronics->write_strobe(1);
 			}
 			break;
 
@@ -279,30 +435,100 @@ void electron_plus1_device::expbus_w(offs_t offset, uint8_t data)
 }
 
 
+void electron_ap6_device::expbus_w(offs_t offset, uint8_t data)
+{
+	electron_plus1_device::expbus_w(offset, data);
+
+	switch (offset >> 12)
+	{
+	case 0x8: case 0x9: case 0xa: case 0xb:
+		switch (m_romsel)
+		{
+		case 4:
+			if (BIT(m_links->read(), 1) && BIT(m_links->read(), 2)) // ROM 4 enabled
+			{
+				if (!m_rom[m_romsel - 4]->exists())
+					m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)] = data;
+			}
+			break;
+
+		case 7:
+			if (BIT(m_links->read(), 2)) // ROM 4,5,6,7 enabled
+			{
+				if (!m_rom[m_romsel - 4]->exists())
+					m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)] = data;
+			}
+			break;
+
+		case 5: case 6:
+			if (BIT(m_links->read(), 2)) // ROM 4,5,6,7 enabled
+			{
+				if (!m_rom[m_romsel - 4]->exists() && !m_bank_locked[0])
+					m_ram[(m_romsel - 4) << 14 | (offset & 0x3fff)] = data;
+			}
+			break;
+
+		case 13:
+			if (BIT(m_links->read(), 0)) // ROM 13 enabled
+			{
+				if (!m_rom[m_romsel - 9]->exists() && !m_bank_locked[1])
+					m_ram[(m_romsel - 9) << 14 | (offset & 0x3fff)] = data;
+			}
+			break;
+
+		case 14:
+			if (!m_rom[m_romsel - 9]->exists())
+				m_ram[(m_romsel - 9) << 14 | (offset & 0x3fff)] = data;
+			break;
+		}
+		break;
+
+	case 0xf:
+		switch (offset >> 8)
+		{
+		case 0xfc:
+			switch (offset & 0xff)
+			{
+			case 0xdc:
+				m_bank_locked[0] = false;
+				break;
+			case 0xdd:
+				m_bank_locked[0] = true;
+				break;
+			case 0xde:
+				m_bank_locked[1] = false;
+				break;
+			case 0xdf:
+				m_bank_locked[1] = true;
+				break;
+			}
+			break;
+		}
+	}
+}
+
+
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-u8 electron_plus1_device::status_r()
+image_init_result electron_ap6_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
-	u8 data = 0x0f;
-	// Status: b7: printer Busy
-	//         b6: ADC conversion end
-	//         b5: Fire Button 1
-	//         b4: Fire Button 2
-	data |= (m_centronics_busy << 7);
-	data |= (m_adc_ready << 6);
-	data |= m_buttons->read();
+	uint32_t size = slot->common_get_size("rom");
 
-	return data;
-}
+	// socket accepts 8K and 16K ROM only
+	if (size != 0x2000 && size != 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		return image_init_result::FAIL;
+	}
 
-WRITE_LINE_MEMBER(electron_plus1_device::busy_w)
-{
-	m_centronics_busy = !state;
-}
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-WRITE_LINE_MEMBER(electron_plus1_device::ready_w)
-{
-	m_adc_ready = !state;
+	// mirror 8K ROMs
+	uint8_t *crt = slot->get_rom_base();
+	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
+
+	return image_init_result::PASS;
 }

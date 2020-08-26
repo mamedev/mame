@@ -50,7 +50,7 @@ public:
 	{ }
 
 	void cm1800(machine_config &config);
-	
+
 private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);

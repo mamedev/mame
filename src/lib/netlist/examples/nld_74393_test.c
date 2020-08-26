@@ -13,8 +13,8 @@ NETLIST_START(perf)
 
 	ANALOG_INPUT(V5, 5)
 
-	CLOCK(CLK, 100)				// clock for driving the 74393
-	CLOCK(CLK2, 3)				// off-beat clock for master reset
+	CLOCK(CLK, 100)             // clock for driving the 74393
+	CLOCK(CLK2, 3)              // off-beat clock for master reset
 	TTL_74393_DIP(TESTCHIP)
 
 	NET_C(V5, CLK.VCC, CLK2.VCC, TESTCHIP.14)

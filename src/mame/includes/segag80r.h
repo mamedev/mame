@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include "audio/segag80.h"
 #include "audio/segag80r.h"
-#include "audio/segasnd.h"
+#include "audio/segaspeech.h"
+#include "audio/segausb.h"
 #include "machine/i8255.h"
 #include "machine/segag80.h"
 #include "sound/samples.h"
@@ -23,11 +25,11 @@
 
 class sega005_sound_device;
 
-class segag80r_state : public segag80snd_common
+class segag80r_state : public driver_device
 {
 public:
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag) :
-		segag80snd_common(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_sn1(*this, "sn1"),
@@ -36,7 +38,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_soundbrd(*this, "soundbrd"),
 		m_samples(*this, "samples"),
-		m_speech(*this, "segaspeech"),
+		m_speech(*this, "speech"),
+		m_g80_audio(*this, "g80sound"),
 		m_usbsnd(*this, "usbsnd"),
 		m_005snd(*this, "005"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -53,11 +56,11 @@ public:
 	void monster2(machine_config &config);
 	void sega005(machine_config &config);
 	void spaceod(machine_config &config);
-	void astrob_sound_board(machine_config &config);
 	void sega005_sound_board(machine_config &config);
 	void spaceod_sound_board(machine_config &config);
 	void monsterb_sound_board(machine_config &config);
 
+	void init_waitstates();
 	void init_spaceod();
 	void init_sindbadm();
 	void init_pignewt();
@@ -91,7 +94,8 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<monsterb_sound_device> m_soundbrd;
 	optional_device<samples_device> m_samples;
-	optional_device<speech_sound_device> m_speech;
+	optional_device<sega_speech_device> m_speech;
+	optional_device<segag80_audio_device_base> m_g80_audio;
 	optional_device<usb_sound_device> m_usbsnd;
 	optional_device<sega005_sound_device> m_005snd;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -147,7 +151,6 @@ private:
 	void pignewt_back_port_w(offs_t offset, uint8_t data);
 	void sindbadm_videoram_w(offs_t offset, uint8_t data);
 	void sindbadm_back_port_w(offs_t offset, uint8_t data);
-	void astrob_sound_w(offs_t offset, uint8_t data);
 	void spaceod_sound_w(offs_t offset, uint8_t data);
 
 	void usb_ram_w(offs_t offset, uint8_t data);

@@ -7,7 +7,8 @@ Schachcomputer SC 2 (G-5002.500)
 2nd chess computer by VEB(Volkseigener Betrieb) Funkwerk Erfurt. The company
 was renamed to VEB Mikroelektronik "Karl Marx" Erfurt in 1983, and formed into
 X-FAB Semiconductor Foundries AG after the German unification. SC 2 chess
-program is based on Fidelity Chess Challenger 10(C?).
+program is an unlicensed copy of Fidelity Chess Challenger 10 C, with some
+patches and an extra 1KB ROM to deal with the different I/O.
 
 3 versions known: initial version, revision E, revision EP.
 

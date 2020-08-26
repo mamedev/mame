@@ -4105,7 +4105,7 @@ void segas1x_bootleg_state::init_beautyb()
 /* Sys18 */
 void segas1x_bootleg_state::init_shdancbl()
 {
-	uint8_t *mem = m_soundcpu_region->base();;
+	uint8_t *mem = m_soundcpu_region->base();
 
 	/* Copy first 32K of IC45 to Z80 address space */
 	memcpy(mem, mem + 0x10000, 0x8000);

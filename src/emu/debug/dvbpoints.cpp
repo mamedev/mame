@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvbpoints.c
+    dvbpoints.cpp
 
     Breakpoint debugger view.
 

@@ -51,4 +51,4 @@ ROM_START(se70)
 	ROM_LOAD("boss_se-70_v1.01.ic29", 0x00000, 0x80000, CRC(f19151f3) SHA1(6c0de1e0debe72374802d54f8d37517b3ad0b131)) // 27C4001
 ROM_END
 
-SYST(1993, se70, 0, 0, se70, se70, boss_se70_state, empty_init, "Roland", "Boss SE-70 Studio Effects Processor", MACHINE_IS_SKELETON)
+SYST(1993, se70, 0, 0, se70, se70, boss_se70_state, empty_init, "Roland", "Boss SE-70 Super Effects Processor", MACHINE_IS_SKELETON)

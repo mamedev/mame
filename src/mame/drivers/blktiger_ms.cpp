@@ -38,6 +38,8 @@ public:
 
 	void blktigerm(machine_config &config);
 
+	void init_blktigerm();
+
 protected:
 	virtual void machine_start() override;
 
@@ -48,14 +50,31 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void blktigerm_map(address_map &map);
+	void blktigerm_sound_map(address_map &map);
 };
 
 
 void blktiger_ms_state::blktigerm_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	//map(0x8000, 0xbfff).bankr("mainbank");
+	//map(0xc003, 0xc003).r(); // ??
+	//map(0xd800, 0xd800).w(); // bankswitch?
+	map(0xe000, 0xffff).ram();
 }
 
+void blktiger_ms_state::blktigerm_sound_map(address_map &map) // seems similar to toki_ms.cpp and raiden_ms.cpp
+{
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0xc000, 0xc7ff).ram();
+	map(0xc900, 0xc900).noprw(); // what lives here?
+	map(0xdff8, 0xdff8).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xdff0, 0xdfff).nopw(); // what lives here?
+	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
+	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
+	map(0xe008, 0xe009).r("ym1", FUNC(ym2203_device::read));
+	map(0xe00a, 0xe00b).r("ym2", FUNC(ym2203_device::read));
+}
 
 void blktiger_ms_state::machine_start()
 {
@@ -75,16 +94,17 @@ GFXDECODE_END
 
 void blktiger_ms_state::blktigerm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &blktiger_ms_state::blktigerm_map);
 
-	Z80(config, "audiocpu", 24_MHz_XTAL / 8).set_disable(); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	z80_device &audiocpu(Z80(config, "audiocpu", 24_MHz_XTAL / 8)); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	audiocpu.set_addrmap(AS_PROGRAM, &blktiger_ms_state::blktigerm_sound_map);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(blktiger_ms_state::screen_update));
@@ -94,7 +114,7 @@ void blktiger_ms_state::blktigerm(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_blktiger_ms);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -106,34 +126,34 @@ void blktiger_ms_state::blktigerm(machine_config &config)
 
 ROM_START( blktigerm )
 	ROM_REGION( 0x50000, "maincpu", 0 ) // on MOD 3/4 board
-	ROM_LOAD( "3_bl_301.ic14",   0x00000, 0x08000, CRC(b4525312) SHA1(958ce9a7f41422f3011412e4a16dd3ad65019733) ) // encrypted / scrambled?
+	ROM_LOAD( "3_bl_301.ic14",   0x00000, 0x08000, CRC(b4525312) SHA1(958ce9a7f41422f3011412e4a16dd3ad65019733) )
 	ROM_LOAD( "3_bl_302_c.ic13", 0x10000, 0x10000, CRC(c943415f) SHA1(08e82d2557de01c979a0a58b5433e9bdcdb118cb) )
 	ROM_LOAD( "3_bl_303_b.ic12", 0x20000, 0x10000, CRC(72114f6b) SHA1(049e747431cd95db2e7414467754424f68a8d757) )
-	ROM_LOAD( "3_bl_304.ic18",   0x30000, 0x10000, CRC(36f669c6) SHA1(e91fd222919904d4d4b3ef70a22ab599a7cfa263) )
-	ROM_LOAD( "3_bl_305.ic19",   0x40000, 0x10000, CRC(b30a99af) SHA1(19d6dbe11ffeb9a21dbfe75eb39ce9ceaef5eb31) )
+	ROM_LOAD( "3_bl_304.ic18",   0x30000, 0x10000, CRC(36f669c6) SHA1(e91fd222919904d4d4b3ef70a22ab599a7cfa263) ) // this and the following ROM are swapped wrt to the sets in blktiger.cpp
+	ROM_LOAD( "3_bl_305.ic19",   0x40000, 0x10000, CRC(b30a99af) SHA1(19d6dbe11ffeb9a21dbfe75eb39ce9ceaef5eb31) ) // leaving them in the order suggested by the labels for now, since the banking calls have been changed
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) //
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1_bl_101.ic12",  0x0000, 0x8000, CRC(14028686) SHA1(64dc219d906f1bdd0c2bc05aff5aa73e001a6901) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 ) // on one of the MOD 4/3 boards, both ROMs 0xxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD( "4_bl_401.ic17",  0x00000, 0x04000, CRC(ab1afb3d) SHA1(555332ccfb69e65b776f94ffac9a4a051fb6f09e) ) /* characters */
+	ROM_LOAD( "4_bl_401.ic17",  0x00000, 0x04000, CRC(ab1afb3d) SHA1(555332ccfb69e65b776f94ffac9a4a051fb6f09e) ) // characters
 	ROM_CONTINUE(               0x00000, 0x04000)
 	ROM_LOAD( "4_bl_402.ic16",  0x04000, 0x04000, CRC(89445b11) SHA1(7d9ab6e88d7de3a0e31b3b8a5e57dd39afd7940d) )
 	ROM_CONTINUE(               0x04000, 0x04000)
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) // on the other MOD 4/3 board
-	ROM_LOAD( "4_a_bl_4a01.ic17",  0x00000, 0x10000, CRC(fc00fd6c) SHA1(066714421fa782c6cfad9f695f05e6e3551ffdc7) ) /* tiles */
+	ROM_LOAD( "4_a_bl_4a01.ic17",  0x00000, 0x10000, CRC(fc00fd6c) SHA1(066714421fa782c6cfad9f695f05e6e3551ffdc7) ) // tiles
 	ROM_LOAD( "4_a_bl_4a02.ic16",  0x10000, 0x10000, CRC(49cd8afa) SHA1(147b65dad4f05b940d1f7a4028f5748ba1b7daa5) )
 	ROM_LOAD( "4_a_bl_4a03.ic15",  0x20000, 0x10000, CRC(50207dd4) SHA1(bee343fbefc817fa14b8b303f013bf5b89e911f8) )
 	ROM_LOAD( "4_a_bl_4a04.ic14",  0x30000, 0x10000, CRC(4bb0c1ba) SHA1(9433c78f0de7cb1f92b22612b9f3c51d813b025a) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) // on MOD 51/1 board
-	ROM_LOAD( "51_bl_501.ic43",   0x00000, 0x10000, CRC(ace32b94) SHA1(4a09e8dc73bd16f7d378aefbe5d433dd1396f97d) )    /* sprites */
+	ROM_LOAD( "51_bl_501.ic43",   0x00000, 0x10000, CRC(ace32b94) SHA1(4a09e8dc73bd16f7d378aefbe5d433dd1396f97d) )    // sprites
 	ROM_LOAD( "51_bl_502.ic42",   0x10000, 0x10000, CRC(f6c4cc0b) SHA1(678fd71e90237f8e19eae78fe150a4c5d3494c6c) )
 	ROM_LOAD( "51_bl_503.ic41",   0x20000, 0x10000, CRC(61e3ae0b) SHA1(cbb83827f027acd6b905f4210476810bcd4b03a9) )
 	ROM_LOAD( "51_bl_504.ic40",   0x30000, 0x10000, CRC(2cb45034) SHA1(b2fd3b7b7b9d68b6ff1985166b106e65b17dbb23) )
 
-	ROM_REGION( 0x0700, "proms", 0 )    /* PROMs (function unknown) */
+	ROM_REGION( 0x0700, "proms", 0 )    // PROMs (function unknown)
 	ROM_LOAD( "1_p0101_82s123.ic20",       0x0000, 0x0020, CRC(3fd60d3a) SHA1(8100fa7453638ac40193b5d92404f41b101ed2cc) )
 	ROM_LOAD( "21_p0201_82s129.ic4",       0x0100, 0x0100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
 	ROM_LOAD( "21_p0202_82s129.ic12",      0x0200, 0x0100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
@@ -147,4 +167,21 @@ ROM_START( blktigerm )
 	ROM_LOAD( "51_p0503_pal16r8a.ic56",         0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
 ROM_END
 
-GAME( 1991, blktigerm,  blktiger,  blktigerm,  blktigerm,  blktiger_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Black Tiger (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+void blktiger_ms_state::init_blktigerm()
+{
+	uint8_t *src = memregion("maincpu")->base();
+	int len = 0x50000;
+
+	// bitswap data
+	for (int i = 0; i < len; i++)
+		src[i] = bitswap<8>(src[i], 5, 3, 7, 2, 0, 1, 4, 6);
+
+	// descramble address
+	std::vector<uint8_t> buffer(len);
+	memcpy(&buffer[0], src, len);
+
+	for (int i = 0; i < len; i++)
+		src[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 10, 8, 6, 4, 0, 2, 7, 3, 1, 9, 11, 5)];
+}
+
+GAME( 1991, blktigerm,  blktiger,  blktigerm,  blktigerm,  blktiger_ms_state, init_blktigerm, ROT0, "bootleg (Gaelco / Ervisa)", "Black Tiger (Modular System)", MACHINE_IS_SKELETON )

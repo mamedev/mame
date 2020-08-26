@@ -104,6 +104,7 @@ public:
 	void model3_20(machine_config &config);
 	void model3_21(machine_config &config);
 
+	void getbass(machine_config &config);
 	void scud(machine_config &config);
 	void lostwsga(machine_config &config);
 
@@ -382,6 +383,8 @@ private:
 	void model3_snd(address_map &map);
 	void scsp1_map(address_map &map);
 	void scsp2_map(address_map &map);
+	void getbass_iocpu_mem(address_map &map);
+	void getbass_iocpu_io(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MODEL3_H

@@ -58,9 +58,11 @@ private:
 	output_finder<> m_battery;
 	required_ioport_array<4> m_inputs;
 
+	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
+	// I/O handlers
 	template<int N> void lcd_output_w(u64 data);
 	void lcd_data_w(u8 data);
 
@@ -239,7 +241,7 @@ void exchess_state::exchess(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1020, 1080);
+	screen.set_size(1020/1.5, 1080/1.5);
 	screen.set_visarea_full();
 }
 

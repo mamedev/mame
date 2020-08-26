@@ -179,8 +179,7 @@ uint8_t spectrum_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 
 void spectrum_state::spectrum_128_bank1_w(offs_t offset, uint8_t data)
 {
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
+	m_exp->mreq_w(offset, data);
 }
 
 uint8_t spectrum_state::spectrum_128_bank1_r(offs_t offset)

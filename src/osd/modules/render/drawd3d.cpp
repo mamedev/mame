@@ -209,6 +209,7 @@ bool renderer_d3d9::init(running_machine &machine)
 	d3d9_create_fn d3d9_create_ptr = d3dintf->d3d9_dll->bind<d3d9_create_fn>("Direct3DCreate9");
 	if (d3d9_create_ptr == nullptr)
 	{
+		global_free(d3dintf);
 		osd_printf_verbose("Direct3D: Unable to find Direct3D 9 runtime library\n");
 		return true;
 	}
@@ -216,6 +217,7 @@ bool renderer_d3d9::init(running_machine &machine)
 	d3dintf->d3dobj = (*d3d9_create_ptr)(D3D_SDK_VERSION);
 	if (d3dintf->d3dobj == nullptr)
 	{
+		global_free(d3dintf);
 		osd_printf_verbose("Direct3D: Unable to initialize Direct3D 9\n");
 		return true;
 	}
@@ -971,6 +973,7 @@ void renderer_d3d9::exit()
 	{
 		d3dintf->d3dobj->Release();
 		global_free(d3dintf);
+		d3dintf = nullptr;
 	}
 }
 

@@ -791,7 +791,7 @@ void ecb_grip21_device::cxstb_w(uint8_t data)
 
 void grip5_state::eprom_w(uint8_t data)
 {
-	membank("eprom")->set_entry(BIT(data, 0));
+    membank("eprom")->set_entry(BIT(data, 0));
 }
 
 
@@ -801,7 +801,7 @@ void grip5_state::eprom_w(uint8_t data)
 
 void grip5_state::dpage_w(uint8_t data)
 {
-	m_dpage = BIT(data, 7);
+    m_dpage = BIT(data, 7);
 }
 */
 

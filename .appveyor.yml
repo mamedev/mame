@@ -23,8 +23,8 @@ install:
   - set MSYSTEM=MINGW64
 
 build_script:
-  - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2019 -j3"
-  - msbuild "build\projects\windows\mametiny\vs2019\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=ci PTR64=1 TOOLS=1 OPTIMIZE=0 vs2019 -j3"
+  - msbuild "build\projects\windows\mameci\vs2019\mameci.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 for:
   -
     matrix:
@@ -35,19 +35,24 @@ for:
     install:
       - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
       - set MSYSTEM=MINGW64
+      - bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+      - bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+      - bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+      - bash -lc "pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
       - bash -lc "pacman -Syu --noconfirm"
+      - taskkill /f /fi "MODULES eq msys-2.0.dll"
       - bash -lc "pacman -Syu --noconfirm"
     build_script:
-      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=1 IGNORE_GIT=1 -j3"
+      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=ci PTR64=1 TOOLS=1 OPTIMIZE=3 IGNORE_GIT=1 -j3"
     test_script:
-      - \projects\mame\mametiny64.exe -validate
+      - \projects\mame\mameci64.exe -validate
     after_test:
-      - 7z a mametiny64-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z %APPVEYOR_BUILD_FOLDER%\*.exe %APPVEYOR_BUILD_FOLDER%\artwork %APPVEYOR_BUILD_FOLDER%\bgfx %APPVEYOR_BUILD_FOLDER%\ctrlr %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\hash %APPVEYOR_BUILD_FOLDER%\hlsl %APPVEYOR_BUILD_FOLDER%\ini %APPVEYOR_BUILD_FOLDER%\language %APPVEYOR_BUILD_FOLDER%\nl_examples %APPVEYOR_BUILD_FOLDER%\plugins %APPVEYOR_BUILD_FOLDER%\roms %APPVEYOR_BUILD_FOLDER%\samples
-      - appveyor PushArtifact mametiny64-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z
+      - 7z a mameci64-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z %APPVEYOR_BUILD_FOLDER%\*.exe %APPVEYOR_BUILD_FOLDER%\artwork %APPVEYOR_BUILD_FOLDER%\bgfx %APPVEYOR_BUILD_FOLDER%\ctrlr %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\hash %APPVEYOR_BUILD_FOLDER%\hlsl %APPVEYOR_BUILD_FOLDER%\ini %APPVEYOR_BUILD_FOLDER%\language %APPVEYOR_BUILD_FOLDER%\nl_examples %APPVEYOR_BUILD_FOLDER%\plugins %APPVEYOR_BUILD_FOLDER%\roms %APPVEYOR_BUILD_FOLDER%\samples
+      - appveyor PushArtifact mameci64-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z
 
 test_script:
-  - \projects\mame\mametiny64d.exe -validate
+  - \projects\mame\mameci64d.exe -validate
 
 after_test:
-  - 7z a mametiny64d-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z %APPVEYOR_BUILD_FOLDER%\*.exe %APPVEYOR_BUILD_FOLDER%\artwork %APPVEYOR_BUILD_FOLDER%\bgfx %APPVEYOR_BUILD_FOLDER%\ctrlr %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\hash %APPVEYOR_BUILD_FOLDER%\hlsl %APPVEYOR_BUILD_FOLDER%\ini %APPVEYOR_BUILD_FOLDER%\language %APPVEYOR_BUILD_FOLDER%\nl_examples %APPVEYOR_BUILD_FOLDER%\plugins %APPVEYOR_BUILD_FOLDER%\roms %APPVEYOR_BUILD_FOLDER%\samples
-  - appveyor PushArtifact mametiny64d-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z
+  - 7z a mameci64d-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z %APPVEYOR_BUILD_FOLDER%\*.exe %APPVEYOR_BUILD_FOLDER%\artwork %APPVEYOR_BUILD_FOLDER%\bgfx %APPVEYOR_BUILD_FOLDER%\ctrlr %APPVEYOR_BUILD_FOLDER%\docs %APPVEYOR_BUILD_FOLDER%\hash %APPVEYOR_BUILD_FOLDER%\hlsl %APPVEYOR_BUILD_FOLDER%\ini %APPVEYOR_BUILD_FOLDER%\language %APPVEYOR_BUILD_FOLDER%\nl_examples %APPVEYOR_BUILD_FOLDER%\plugins %APPVEYOR_BUILD_FOLDER%\roms %APPVEYOR_BUILD_FOLDER%\samples
+  - appveyor PushArtifact mameci64d-appveyor-%APPVEYOR_REPO_BRANCH%-%APPVEYOR_REPO_COMMIT%-%APPVEYOR_BUILD_NUMBER%.7z

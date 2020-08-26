@@ -186,11 +186,11 @@ private:
 	void change_rombank();
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
-	template<class _BitmapClass>
-	int update_linemap(screen_device &screen, _BitmapClass &bitmap, int page, int flags);
+	template<class BitmapClass>
+	int update_linemap(screen_device &screen, BitmapClass &bitmap, int page, int flags);
 
-	template<class _BitmapClass>
-	void tilemap_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
+	template<class BitmapClass>
+	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority);
 
 	void create_gfx();
 	void create_tilemaps();

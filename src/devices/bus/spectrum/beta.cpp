@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nigel Barnes, David Haywood
+// copyright-holders:Nigel Barnes, David Haywood, MetalliC
 /*********************************************************************
 
     Technology Research Beta Disk interface & clones
@@ -46,11 +46,13 @@
      - common Brazilian clones: usually use FD1797 instead of FD1793, no ROM bits D0/D7 swap, DOS ROM area 3CXX might be disabled, equiped with printer port.
        - CBI-95
        - SYNCHRON IDS91
-       - SYNCHRON IDS2001ne
+       - SYNCHRON IDS2001ne (added interface disable jumper)
        - ARCADE AR-20
-     (not yet added)
-     - MIDAS Gammadisk (adds i8255 for joystick and printer, use 32KByte ROM with modified BASIC48 ROM in one half and TR-DOS 4.12 in another)
-     - Vision Desktop Betadisk
+     - MIDAS Gammadisk - 3 versions known to exists:
+        - straight clone
+        - added i8255 PPI for joystick and printer, uses 32KByte ROM with modified BASIC48 ROM in one half and TR-DOS 4.12 in another
+        - same as above plus 6850 ACIA
+     - number of straight clones with "Vision Desktop" boot ROM
 
     Some units also exist that allow population of both V3 and V4
     ROM types with a switch (unofficial, for compatibility?)
@@ -71,16 +73,19 @@
     memory access 0x3CXX (any type of access: code or data, read or write) -> temporary use BDI ROM (NOT permanent latch/switch like in beta128)
     memory access <0x4000 area and BDI ROM_latch==true -> use BDI ROM
 
-    IO write to port 0bxxxxxx00 -> D7 - master_latch, 0=enable, 1=disable
+    IO write to port 0bxxxxxx00 -> D7 - BDI I/O access, 0=enable, 1=disable (when BDI I/O enabled - /IORQ passthrough to next expansions is blocked)
                        CBI clones: D6 - 1=disable permanent BDI ROM mapping at 3c00-3cff, 0=enable (like original BDI)
+                       Gammadisk : D6 - 0 - enable Gammadisk I/O (/IORQ passthrough blocked), 1=disable all Gammadisk I/O (enable /IORQ passthrough)
+                                   D7 - (have effect if D6 is 0) 0=enable FDC I/O, 1=enable PPI and ACIA I/O;
 
-    while master_latch is enabled IO access to other expansions is blocked (output /IORQ forced to 1) but enabled BDI ports:
+    BDI I/O ports:
 
     IO write to port 0b1xxxx111 ->
       V2: D7 BDI ROM_latch (0=enable, 1=disble), D4 - FDC HLT, D3 - SIDE, D0-2 - floppy drive select (bitmask, active low).
       V3-V4: D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select (binary value).
       CBI clones: D5 - printer port /STROBE
-	IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
+    IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
+      CBI clones: D5 - printer port BUSY, D4 - printer standard select jumper (ABICOMP / MSX1.1)
     IO read/write ports 0b0YYxx111 - access FDC ports YY
 
     So mostly the same as beta128, except for new BDI ROM_latch bit
@@ -99,7 +104,9 @@
 DEFINE_DEVICE_TYPE(SPECTRUM_BETAV2,   spectrum_betav2_device,   "spectrum_betav2",   "TR Beta Disk Interface V2 (FD1771 based)")
 DEFINE_DEVICE_TYPE(SPECTRUM_BETAV3,   spectrum_betav3_device,   "spectrum_betav3",   "TR Beta Disk Interface V3 (FD1793 based)")
 DEFINE_DEVICE_TYPE(SPECTRUM_BETAPLUS, spectrum_betaplus_device, "spectrum_betaplus", "TR Beta Disk Plus Interface")
+DEFINE_DEVICE_TYPE(SPECTRUM_BETACLONE,spectrum_betaclone_device,"spectrum_betaclone","Beta Disk Plus clones")
 DEFINE_DEVICE_TYPE(SPECTRUM_BETACBI,  spectrum_betacbi_device,  "spectrum_betacbi",  "CBI-95 Disk Interface")
+DEFINE_DEVICE_TYPE(SPECTRUM_GAMMA,    spectrum_gamma_device,    "spectrum_gamma",    "MIDAS Gammadisk Interface")
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( beta_floppies )
@@ -108,6 +115,9 @@ DEFINE_DEVICE_TYPE(SPECTRUM_BETACBI,  spectrum_betacbi_device,  "spectrum_betacb
 static void beta_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
 }
 
 //-------------------------------------------------
@@ -192,6 +202,26 @@ ROM_START(betaplus)
 	ROM_SYSTEM_BIOS(5, "cas87", "CAS DOS 1987") // 4.12 with texts translated
 	ROMX_LOAD("cas1987.bin", 0x0000, 0x2000, CRC(a6a9450c) SHA1(b54b173a9f11ed730804d94584a1679193993e3c), ROM_BIOS(5))
 	ROM_RELOAD(0x2000,0x2000)
+	ROM_SYSTEM_BIOS(6, "icdos", "IC-DOS JUMBO v2.0") // v4.11 with name text changed
+	ROMX_LOAD("icdos.bin", 0x0000, 0x2000, CRC(1398d13a) SHA1(bf8cee39eb4b2a09a3f07db4cb8e7952bce4d3dd), ROM_BIOS(6))
+	ROM_RELOAD(0x2000,0x2000)
+ROM_END
+
+ROM_START(betaclone)
+	ROM_REGION(0x4000, "rom", 0)
+	ROM_DEFAULT_BIOS("vision10")
+	ROM_SYSTEM_BIOS(0, "vision10", "Vision 1.0 TR-DOS v4.12")
+	ROMX_LOAD("vision10.bin", 0x0000, 0x4000, CRC(20f49ff5) SHA1(d391324cb39e9fc6b93b867a71caec019c353518), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "vision14", "Vision 1.4 TR-DOS v4.40")
+	ROMX_LOAD("vision14.bin", 0x0000, 0x4000, CRC(9903f577) SHA1(579627a2865caf3079cbae360bdaf0309d4a2911), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "vision17b", "Vision 1.7 TR-DOS v4.82")
+	ROMX_LOAD("vision17b.bin", 0x0000, 0x4000, CRC(ecee1ff1) SHA1(ffde2a0f9b13328b6462fbf4eb95cfe8202a2d3f), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "vision17c", "Vision 1.7 TR-DOS v4.83")
+	ROMX_LOAD("vision17c.bin", 0x0000, 0x4000, CRC(c192a6b1) SHA1(d9eb1e06e28b2fb45c704cffd4a8b8a912041d08), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "vision18", "Vision 1.8 TR-DOS v4.80")
+	ROMX_LOAD("vision18.bin", 0x0000, 0x4000, CRC(3ee7a488) SHA1(57167b82a6a3ffa8b25e97fa8cc208da361f1cc7), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "vision19", "Vision 1.9 TR-DOS v4.81")
+	ROMX_LOAD("vision19.bin", 0x0000, 0x4000, CRC(1a793d53) SHA1(cdbd0ac2262ede3852998174f88ae333419a570f), ROM_BIOS(5))
 ROM_END
 
 ROM_START(betacbi)
@@ -207,6 +237,13 @@ ROM_START(betacbi)
 	ROMX_LOAD("ids2001.bin", 0x0000, 0x4000, CRC(a1701f84) SHA1(32bd5f980bec168677513c568c8381a9a59aada3), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "ar20", "ARCADE AR-20")
 	ROMX_LOAD("ar-20.bin", 0x0000, 0x4000, CRC(0ceeaa4d) SHA1(3e5f7d43218b5bd2a6e2aa28220c77cb651f5daa), ROM_BIOS(4))
+ROM_END
+
+ROM_START(gamma)
+	ROM_REGION(0x8000, "rom", 0)
+	ROM_DEFAULT_BIOS("gamma")
+	ROM_SYSTEM_BIOS(0, "gamma", "Gammadisk v4.1")
+	ROMX_LOAD("gamma.bin", 0x0000, 0x8000, CRC(00e4a835) SHA1(dffeb9f47b3eca94afbb61373eba003efd4675ff), ROM_BIOS(0))
 ROM_END
 
 
@@ -249,6 +286,29 @@ void spectrum_betacbi_device::device_add_mconfig(machine_config& config)
 	m_fdc->hld_wr_callback().set(FUNC(spectrum_betacbi_device::fdc_hld_w));
 
 	device_add_mconfig_base(config);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set([this](u8 data) { m_centronics_busy = data; });
+}
+
+void spectrum_gamma_device::device_add_mconfig(machine_config& config)
+{
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->hld_wr_callback().set(FUNC(spectrum_gamma_device::fdc_hld_w));
+
+	device_add_mconfig_base(config);
+
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("JOY");
+	m_ppi->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
+	m_ppi->out_pc_callback().set([this](u8 data) { m_centronics->write_strobe(BIT(data, 7)); });
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set([this](u8 data) { m_centronics_busy = data; });
+	m_centronics->set_output_latch(cent_data_out);
+
+	ACIA6850(config, m_acia, 0); // schematics missing, wiring unknown
 }
 
 const tiny_rom_entry *spectrum_betav2_device::device_rom_region() const
@@ -266,9 +326,19 @@ const tiny_rom_entry *spectrum_betaplus_device::device_rom_region() const
 	return ROM_NAME(betaplus);
 }
 
+const tiny_rom_entry *spectrum_betaclone_device::device_rom_region() const
+{
+	return ROM_NAME(betaclone);
+}
+
 const tiny_rom_entry *spectrum_betacbi_device::device_rom_region() const
 {
 	return ROM_NAME(betacbi);
+}
+
+const tiny_rom_entry *spectrum_gamma_device::device_rom_region() const
+{
+	return ROM_NAME(gamma);
 }
 
 
@@ -316,13 +386,39 @@ spectrum_betaplus_device::spectrum_betaplus_device(const machine_config &mconfig
 {
 }
 
-spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betaclone_device::spectrum_betaclone_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: spectrum_betaplus_device(mconfig, type, tag, owner, clock)
+{
+}
+
+spectrum_betaclone_device::spectrum_betaclone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: spectrum_betaclone_device(mconfig, SPECTRUM_BETACLONE, tag, owner, clock)
+{
+}
+
+spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: spectrum_betaclone_device(mconfig, type, tag, owner, clock)
+	, m_centronics(*this, "centronics")
+	, m_centronics_busy(0)
 {
 }
 
 spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: spectrum_betacbi_device(mconfig, SPECTRUM_BETACBI, tag, owner, clock)
+{
+}
+
+spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: spectrum_betaplus_device(mconfig, type, tag, owner, clock)
+	, m_ppi(*this, "PPI")
+	, m_acia(*this, "ACIA")
+	, m_centronics(*this, "centronics")
+	, m_centronics_busy(0)
+{
+}
+
+spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: spectrum_gamma_device(mconfig, SPECTRUM_GAMMA, tag, owner, clock)
 {
 }
 
@@ -346,6 +442,18 @@ void spectrum_betav2_device::device_start()
 		rom[i] = bitswap<8>(rom[i],0,6,5,4,3,2,1,7);
 	}
 #endif
+}
+
+void spectrum_betacbi_device::device_start()
+{
+	spectrum_betav2_device::device_start();
+	save_item(NAME(m_centronics_busy));
+}
+
+void spectrum_gamma_device::device_start()
+{
+	spectrum_betav2_device::device_start();
+	save_item(NAME(m_centronics_busy));
 }
 
 //-------------------------------------------------
@@ -512,6 +620,172 @@ void spectrum_betav3_device::iorq_w(offs_t offset, uint8_t data)
 		m_exp->iorq_w(offset, data);
 }
 
+uint8_t spectrum_betacbi_device::iorq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	if (!(m_masterdisable & 0x80))
+	{
+		switch (offset & 0x87)
+		{
+		case 0x07:
+			data = m_fdc->read((offset >> 5) & 0x03);
+			break;
+
+		case 0x87:
+			data &= 0x0f; // actually open bus
+			data |= 0x10; // some switch, unk purpose
+			data |= m_centronics_busy ? 0x20: 0;
+			data |= m_fdc->drq_r() ? 0x40 : 0;
+			data |= m_fdc->intrq_r() ? 0x80 : 0;
+			break;
+		}
+	}
+	else
+		data = m_exp->iorq_r(offset);
+
+	return data;
+}
+
+void spectrum_betacbi_device::iorq_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 3) == 0)
+		m_masterdisable = data;
+
+	if (!BIT(offset, 2))
+	{
+		m_centronics->write_data0(BIT(data, 0));
+		m_centronics->write_data1(BIT(data, 1));
+		m_centronics->write_data2(BIT(data, 2));
+		m_centronics->write_data3(BIT(data, 3));
+		m_centronics->write_data4(BIT(data, 4));
+		m_centronics->write_data5(BIT(data, 5));
+		m_centronics->write_data6(BIT(data, 6));
+		m_centronics->write_data7(BIT(data, 7));
+	}
+
+	if (!(m_masterdisable & 0x80))
+	{
+		switch (offset & 0x87)
+		{
+		case 0x07:
+			m_fdc->write((offset >> 5) & 0x03, data);
+			break;
+
+		case 0x87:
+			m_control = data;
+
+			floppy_image_device* floppy = m_floppy[data & 3]->get_device();
+
+			m_fdc->set_floppy(floppy);
+			if (floppy)
+				floppy->ss_w(BIT(data, 4) ? 0 : 1);
+			m_fdc->dden_w(BIT(data, 6));
+
+			m_fdc->hlt_w(BIT(data, 3));
+
+			m_fdc->mr_w(BIT(data, 2));
+			motors_control();
+
+			m_centronics->write_strobe(!BIT(data, 5));
+			break;
+		}
+	}
+	else
+		m_exp->iorq_w(offset, data);
+}
+
+uint8_t spectrum_gamma_device::iorq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	if (!(m_masterdisable & 0x40))
+	{
+		if (!(m_masterdisable & 0x80))
+		{
+			switch (offset & 0x9f)
+			{
+			case 0x1f:
+				data = m_fdc->read((offset >> 5) & 0x03);
+				break;
+
+			case 0x9f:
+				data &= 0x3f; // actually open bus
+				data |= m_fdc->drq_r() ? 0x40 : 0;
+				data |= m_fdc->intrq_r() ? 0x80 : 0;
+				break;
+			}
+		}
+		else
+		{
+			switch (offset & 0x9f)
+			{
+			case 0x1f:
+				data = m_ppi->read((offset >> 5) & 0x03);
+				break;
+
+			case 0x9f:
+				data = m_acia->read((offset >> 6) & 0x01);
+				break;
+			}
+		}
+	}
+	else
+		data = m_exp->iorq_r(offset);
+
+	return data;
+}
+
+void spectrum_gamma_device::iorq_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 3) == 0)
+		m_masterdisable = data;
+
+	if (!(m_masterdisable & 0x40))
+	{
+		if (!(m_masterdisable & 0x80))
+		{
+			switch (offset & 0x9f)
+			{
+			case 0x1f:
+				m_fdc->write((offset >> 5) & 0x03, data);
+				break;
+
+			case 0x9f:
+				m_control = data;
+
+				floppy_image_device* floppy = m_floppy[data & 3]->get_device();
+
+				m_fdc->set_floppy(floppy);
+				if (floppy)
+					floppy->ss_w(BIT(data, 4) ? 0 : 1);
+				m_fdc->dden_w(BIT(data, 6));
+
+				m_fdc->hlt_w(BIT(data, 3));
+
+				m_fdc->mr_w(BIT(data, 2));
+				motors_control();
+				break;
+			}
+		}
+		else
+		{
+			switch (offset & 0x9f)
+			{
+			case 0x1f:
+				m_ppi->write((offset >> 5) & 0x03, data);
+				break;
+
+			case 0x9f:
+				m_acia->write((offset >> 6) & 0x01, data);
+				break;
+			}
+		}
+	}
+	else
+		m_exp->iorq_w(offset, data);
+}
+
 uint8_t spectrum_betav2_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
@@ -528,7 +802,7 @@ uint8_t spectrum_betav2_device::mreq_r(offs_t offset)
 	return data;
 }
 
-uint8_t spectrum_betacbi_device::mreq_r(offs_t offset)
+uint8_t spectrum_betaclone_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -541,10 +815,9 @@ uint8_t spectrum_betacbi_device::mreq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_betav2_device::mreq_w(offs_t offset, uint8_t data)
+uint8_t spectrum_gamma_device::mreq_r(offs_t offset)
 {
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
+	return m_rom->base()[(offset & 0x3fff) + (m_romcs ? 0x4000 : 0)];
 }
 
 void spectrum_betav2_device::fdc_hld_w(int state)
@@ -589,9 +862,28 @@ INPUT_PORTS_START(betaplus)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_betaplus_device, magic_button, 0)
 INPUT_PORTS_END
 
+INPUT_PORTS_START(gamma)
+	PORT_INCLUDE(betaplus)
+
+	PORT_START("JOY")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_8WAY
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_8WAY
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(spectrum_gamma_device, busy_r)
+INPUT_PORTS_END
+
+
 ioport_constructor spectrum_betaplus_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(betaplus);
+}
+
+ioport_constructor spectrum_gamma_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(gamma);
 }
 
 INPUT_CHANGED_MEMBER(spectrum_betaplus_device::magic_button)

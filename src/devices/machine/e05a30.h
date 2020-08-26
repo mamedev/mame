@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data6 ) { if (state) m_centronics_data |= 0x40; else m_centronics_data &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_input_data7 ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
 
+		int ready_led() { return !m_centronics_busy; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

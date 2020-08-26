@@ -72,10 +72,11 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 				char const *const name(ROM_GETNAME(rom));
 				util::hash_collection const hashes(ROM_GETHASHDATA(rom));
-				device_t *const shared_device(find_shared_device(device, name, hashes, ROM_GETLENGTH(rom)));
+				device_t *const shared_device(find_shared_device(device, name, hashes, rom_file_size(rom)));
+				const auto dumped(!hashes.flag(util::hash_collection::FLAG_NO_DUMP));
 
 				// count the number of files with hashes
-				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP) && !ROM_ISOPTIONAL(rom))
+				if (dumped && !ROM_ISOPTIONAL(rom))
 				{
 					required++;
 					if (shared_device)
@@ -91,7 +92,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 				if (record)
 				{
 					// count the number of files that are found.
-					if ((record->status() == audit_status::GOOD) || ((record->status() == audit_status::FOUND_INVALID) && !find_shared_device(device, name, record->actual_hashes(), record->actual_length())))
+					if (!device.owner() && ((record->status() == audit_status::GOOD && dumped) || (record->status() == audit_status::FOUND_INVALID && !find_shared_device(device, name, record->actual_hashes(), record->actual_length()))))
 					{
 						found++;
 						if (shared_device)
@@ -515,7 +516,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 		{
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
-				if (ROM_GETLENGTH(rom) == romlength)
+				if (rom_file_size(rom) == romlength)
 				{
 					util::hash_collection hashes(ROM_GETHASHDATA(rom));
 					if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
@@ -535,7 +536,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 				{
 					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 					{
-						if (ROM_GETLENGTH(rom) == romlength)
+						if (rom_file_size(rom) == romlength)
 						{
 							util::hash_collection hashes(ROM_GETHASHDATA(rom));
 							if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))

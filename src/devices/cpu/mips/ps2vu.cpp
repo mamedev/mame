@@ -996,7 +996,7 @@ void sonyvu1_device::device_start()
 
 	save_item(NAME(m_p));
 
-	state_add(SONYVU1_P, "P", *(uint32_t*)&m_p).formatstr("%17s");;
+	state_add(SONYVU1_P, "P", *(uint32_t*)&m_p).formatstr("%17s");
 }
 
 void sonyvu1_device::device_reset()

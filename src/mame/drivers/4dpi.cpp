@@ -61,6 +61,8 @@
 // video and audio
 #include "video/sgi_gr1.h"
 
+#include "4dpi.lh"
+
 #define LOG_GENERAL (1U << 0)
 
 #define VERBOSE (LOG_GENERAL)
@@ -331,13 +333,13 @@ void pi4d2x_state::map(address_map &map)
 		[this](u8 data)
 		{
 			// cpu leds
-			m_leds[LED_HBT] = !BIT(data, 0);
-			m_leds[LED_CPU] = !BIT(data, 1);
-			m_leds[LED_GFX] = !BIT(data, 2);
-			m_leds[LED_FPU] = !BIT(data, 3);
+			m_leds[LED_HBT] = BIT(data, 0);
+			m_leds[LED_CPU] = BIT(data, 1);
+			m_leds[LED_GFX] = BIT(data, 2);
+			m_leds[LED_FPU] = BIT(data, 3);
 
 			// console led
-			m_leds[LED_CON] = !BIT(data, 4);
+			m_leds[LED_CON] = BIT(data, 4);
 
 			// serial eeprom chip select and clock out
 			m_eeprom->cs_write(BIT(data, 5));
@@ -770,6 +772,8 @@ void pi4d2x_state::common(machine_config &config)
 	// TODO: vme slot, cpu interrupt 0
 
 	SOFTWARE_LIST(config, m_softlist).set_original("sgi_mips");
+
+	config.set_default_layout(layout_4dpi);
 }
 
 void pi4d3x_state::common(machine_config &config)
@@ -989,18 +993,24 @@ u8 pi4d2x_state::sysid_r()
 
 ROM_START(4d20)
 	ROM_REGION32_BE(0x40000, "boot", 0)
-	ROM_SYSTEM_BIOS(0, "3.1c", "Version 4D1-3.1 Rev C, Tue Jan 10 15:11:42 PST 1989 SGI")
-	ROMX_LOAD("070_8000_005_boot_0.h1c5", 0x000000, 0x010000, CRC(c7a182de) SHA1(56038f54b5a3254960ad7c8232f1a7cf058b9ead), ROM_BIOS(0) | ROM_SKIP(3))
-	ROMX_LOAD("070_8000_005_boot_1.h1d2", 0x000001, 0x010000, CRC(4b1395f5) SHA1(926f3172b79ebaf7040ff04b0cfdc3d48d03293c), ROM_BIOS(0) | ROM_SKIP(3))
-	ROMX_LOAD("070_8000_005_boot_2.h1d9", 0x000002, 0x010000, CRC(e0a55120) SHA1(0b675489ea94bf85a5a0e5f0ebf0c0b7ff5fc389), ROM_BIOS(0) | ROM_SKIP(3))
-	ROMX_LOAD("070_8000_005_boot_3.h1e6", 0x000003, 0x010000, CRC(11536526) SHA1(5149f453347ae566e9fee4447615dff88c7f6a37), ROM_BIOS(0) | ROM_SKIP(3))
+	// 3.2e firmware has been found in both 4D/20 and 4D/25 hardware
+	ROM_SYSTEM_BIOS(0, "3.2e", "Version 3.2 Rev E, Fri Jul 14 14:37:38 PDT 1989 SGI")
+	ROMX_LOAD("070_8000_007_boot_0.h1c5", 0x000000, 0x010000, CRC(e448b865) SHA1(f0276b76360ea0b3250dbdaa7a1e57ea8f6144d6), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_1.h1d2", 0x000001, 0x010000, CRC(59fda717) SHA1(ef3ccb1f8a815e7b13c79deeea0d73006deed09f), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_2.h1d9", 0x000002, 0x010000, CRC(569146ad) SHA1(5442a13ed93afdaa55c1951b97e335cf60dde834), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_3.h1e6", 0x000003, 0x010000, CRC(682977c3) SHA1(d9bcf7cdc5caef4221929fe26eccf34253fa7f29), ROM_BIOS(0) | ROM_SKIP(3))
 
-	// this firmware has been found in both 4D/20 and 4D/25 hardware
-	ROM_SYSTEM_BIOS(1, "3.2e", "Version 3.2 Rev E, Fri Jul 14 14:37:38 PDT 1989 SGI")
-	ROMX_LOAD("070_8000_007_boot_0.h1c5", 0x000000, 0x010000, CRC(e448b865) SHA1(f0276b76360ea0b3250dbdaa7a1e57ea8f6144d6), ROM_BIOS(1) | ROM_SKIP(3))
-	ROMX_LOAD("070_8000_007_boot_1.h1d2", 0x000001, 0x010000, CRC(59fda717) SHA1(ef3ccb1f8a815e7b13c79deeea0d73006deed09f), ROM_BIOS(1) | ROM_SKIP(3))
-	ROMX_LOAD("070_8000_007_boot_2.h1d9", 0x000002, 0x010000, CRC(569146ad) SHA1(5442a13ed93afdaa55c1951b97e335cf60dde834), ROM_BIOS(1) | ROM_SKIP(3))
-	ROMX_LOAD("070_8000_007_boot_3.h1e6", 0x000003, 0x010000, CRC(682977c3) SHA1(d9bcf7cdc5caef4221929fe26eccf34253fa7f29), ROM_BIOS(1) | ROM_SKIP(3))
+	ROM_SYSTEM_BIOS(1, "3.1c", "Version 4D1-3.1 Rev C, Tue Jan 10 15:11:42 PST 1989 SGI")
+	ROMX_LOAD("070_8000_005_boot_0.h1c5", 0x000000, 0x010000, CRC(c7a182de) SHA1(56038f54b5a3254960ad7c8232f1a7cf058b9ead), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_005_boot_1.h1d2", 0x000001, 0x010000, CRC(4b1395f5) SHA1(926f3172b79ebaf7040ff04b0cfdc3d48d03293c), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_005_boot_2.h1d9", 0x000002, 0x010000, CRC(e0a55120) SHA1(0b675489ea94bf85a5a0e5f0ebf0c0b7ff5fc389), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_005_boot_3.h1e6", 0x000003, 0x010000, CRC(11536526) SHA1(5149f453347ae566e9fee4447615dff88c7f6a37), ROM_BIOS(1) | ROM_SKIP(3))
+
+	ROM_SYSTEM_BIOS(2, "3.1a", "Version 4D1-3.1 Rev A, Tue Aug  9 17:50:39 PDT 1988 SGI")
+	ROMX_LOAD("070_8000_003_boot_0.h1c5", 0x000000, 0x010000, CRC(32cdcdc5) SHA1(1568ae3877193d3c93bdcccd755736b6cd82cbf3), ROM_BIOS(2) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_003_boot_1.h1d2", 0x000001, 0x010000, CRC(4b3a02ee) SHA1(248e5cea8d3218686a044e5b013a1213441a5332), ROM_BIOS(2) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_003_boot_2.h1d9", 0x000002, 0x010000, CRC(3d80d19c) SHA1(42fb95f4d76ede073c5d9bbc2f144b4f2fbf407f), ROM_BIOS(2) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_003_boot_3.h1e6", 0x000003, 0x010000, CRC(48b9322c) SHA1(600554a0ccc4bab4881a96a9886eea40cd04c8e4), ROM_BIOS(2) | ROM_SKIP(3))
 ROM_END
 
 ROM_START(4d25)

@@ -49,6 +49,18 @@ protected:
 	int m_basebank;
 };
 
+class mywicogt_state : public zon32bit_state
+{
+public:
+	mywicogt_state(const machine_config& mconfig, device_type type, const char* tag) :
+		zon32bit_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
+
 class mywicodx_state : public zon32bit_state
 {
 public:
@@ -150,6 +162,52 @@ void zon32bit_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		logerror("bank is now %d\n", m_basebank);
 		m_maincpu->invalidate_cache();
 	}
+}
+
+
+void mywicogt_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (1)
+		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+//[:] ':maincpu' (000508): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x
+//[:] ':maincpu' (000510): porta_w 0b00 (0f00) x x x x | 1 0 1 1 | x x x x | x x x x
+//[:] ':maincpu' (000518): porta_w 0f00 (0f00) x x x x | 1 1 1 1 | x x x x | x x x x
+
+	if (m_maincpu->pc() < 0x1000)
+	{
+		if (data == 0x0f00)
+		{
+			m_basebank = 1;
+			m_maincpu->invalidate_cache();
+			logerror("changing to bank 1\n");
+
+		}
+		else if (data == 0x0b00)
+		{
+			m_basebank = 0;
+			m_maincpu->invalidate_cache();
+			logerror("changing to bank 0\n");
+		}
+	}
+
+	m_porta_dat = data;
 }
 
 
@@ -591,6 +649,26 @@ static INPUT_PORTS_START( zon32bit )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mywicogt )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Green / Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red / Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Blue")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Orange")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start / Pause / Menu")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Back")
+	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( oplayer )
 	PORT_START("P1")
@@ -747,6 +825,14 @@ ROM_START( zon32bit )
 	ROM_CONTINUE(0x1800000, 0x0800000)
 ROM_END
 
+ROM_START( mywicogt )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mywicoguitar.bin", 0x0000000, 0x0800000, CRC(3c037c50) SHA1(3b9a28fb643c9f90563d653be0f38eba09c26f26) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+ROM_END
+
 
 /*
     Following pinout was used for dumping
@@ -811,7 +897,7 @@ ROM_START( m505neo )
 ROM_END
 
 ROM_START( m521neo )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?             
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 ) // was this dumped with some address lines swapped?
 	ROM_LOAD16_WORD_SWAP( "6gu-1cd-a.u2", 0x0000000, 0x800000, CRC(7cb31b4c) SHA1(8de44756747a292c5d39bd491048d6fac4219953) )
 	ROM_CONTINUE(0x01000000, 0x800000)
 	ROM_CONTINUE(0x00800000, 0x800000)
@@ -884,16 +970,16 @@ void oplayer_100in1_state::init_m505neo()
 		ROM[i] = bitswap<16>(ROM[i],
 									 11,  3,   10,  2,
 									 9,  1,  8,  0,
-			
+
 									 4, 12, 5, 13,
-									 6, 14,  7,  15		
+									 6, 14,  7,  15
 			);
 
 	}
 
 	// TODO: remove these hacks
 	// port a checks when starting the system
-	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank		
+	ROM[0x43c30 + (0x2000000 / 2)] = 0xf165; // boot main bank
 }
 
 
@@ -927,6 +1013,9 @@ CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,   
 // Box claimed 53 Arcade Games + 8 Sports games + 24 Music games, although it's unclear where 24 Music Games comes from, there are 3, which are identical aside from the title screen.
 // The Mi Guitar menu contains 24 games, but they're dupes, and just counting those would exclude the other Mi Fit and Mi Papacon menus (which also contain dupes)
 CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// Shows Mi Guitar 2 in the menu, it seems likely that there was an earlier version on VT1682 hardware as there is a very similar Guitar game (with the same song selection) in those multigames
+CONS( 200?, mywicogt,  0, 0, zon32bit, mywicogt, mywicogt_state,  empty_init,      "<unknown>",                                   "My Wico Guitar", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // issues with 'low battery' always showing, but otherwise functional
 CONS( 200?, oplayer,   0, 0, zon32bit_bat, oplayer, oplayer_100in1_state, init_oplayer, "OPlayer", "OPlayer Mobile Game Console (MGS03-white) (Family Sport 100-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

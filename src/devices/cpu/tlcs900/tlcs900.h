@@ -40,7 +40,7 @@ enum
 };
 
 
-class tlcs900h_device : public cpu_device
+class tlcs900_device : public cpu_device
 {
 public:
 	// configuration helpers
@@ -48,7 +48,7 @@ public:
 
 protected:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,11 +75,11 @@ protected:
 	address_space_config m_program_config;
 
 	uint8_t RDMEM(offs_t addr) { return m_program->read_byte( addr ); }
-	uint16_t RDMEMW(offs_t addr) { return m_program->read_word( addr ); }
-	uint32_t RDMEML(offs_t addr) { return m_program->read_dword( addr ); }
+	uint16_t RDMEMW(offs_t addr) { return m_program->read_word_unaligned( addr ); }
+	uint32_t RDMEML(offs_t addr) { return m_program->read_dword_unaligned( addr ); }
 	void WRMEM(offs_t addr, uint8_t data) { m_program->write_byte( addr, data ); }
-	void WRMEMW(offs_t addr,uint16_t data) { m_program->write_word( addr, data ); }
-	void WRMEML(offs_t addr,uint32_t data) { m_program->write_dword( addr, data ); }
+	void WRMEMW(offs_t addr,uint16_t data) { m_program->write_word_unaligned( addr, data ); }
+	void WRMEML(offs_t addr,uint32_t data) { m_program->write_dword_unaligned( addr, data ); }
 
 	/* registers */
 	PAIR    m_xwa[4];
@@ -129,7 +129,7 @@ protected:
 	int m_regbank;
 	address_space *m_program;
 
-	typedef void (tlcs900h_device::*ophandler)();
+	typedef void (tlcs900_device::*ophandler)();
 	struct tlcs900inst
 	{
 		ophandler opfunc;
@@ -152,12 +152,42 @@ protected:
 	static const tlcs900inst s_mnemonic_e8[256];
 	static const tlcs900inst s_mnemonic_f0[256];
 	static const tlcs900inst s_mnemonic[256];
+	const tlcs900inst *m_mnemonic_80;
+	const tlcs900inst *m_mnemonic_88;
+	const tlcs900inst *m_mnemonic_90;
+	const tlcs900inst *m_mnemonic_98;
+	const tlcs900inst *m_mnemonic_a0;
+	const tlcs900inst *m_mnemonic_b0;
+	const tlcs900inst *m_mnemonic_b8;
+	const tlcs900inst *m_mnemonic_c0;
+	const tlcs900inst *m_mnemonic_c8;
+	const tlcs900inst *m_mnemonic_d0;
+	const tlcs900inst *m_mnemonic_d8;
+	const tlcs900inst *m_mnemonic_e0;
+	const tlcs900inst *m_mnemonic_e8;
+	const tlcs900inst *m_mnemonic_f0;
+	const tlcs900inst *m_mnemonic;
 
 	inline uint8_t RDOP();
 	virtual void tlcs900_check_hdma() = 0;
 	virtual void tlcs900_check_irqs() = 0;
 	virtual void tlcs900_handle_ad() = 0;
 	virtual void tlcs900_handle_timers() = 0;
+
+	virtual int tlcs900_gpr_cycles() const { return 1; }
+	virtual int tlcs900_mem_index_cycles() const { return 2; }
+	virtual int tlcs900_mem_absolute_8_cycles() const { return 2; }
+	virtual int tlcs900_mem_absolute_16_cycles() const { return 2; }
+	virtual int tlcs900_mem_absolute_24_cycles() const { return 3; }
+	virtual int tlcs900_mem_gpr_indirect_cycles() const { return 5; }
+	virtual int tlcs900_mem_gpr_index_cycles() const { return 5; }
+	virtual int tlcs900_mem_gpr_reg_index_cycles() const { return 8; }
+	virtual int tlcs900_mem_indirect_prepost_cycles() const { return 3; }
+	virtual int tlcs900_ldxx_repeat_cycles() const { return 4; }
+	virtual int tlcs900_jp_true_cycles() const { return 4; }
+	virtual int tlcs900_call_true_cycles() const { return 6; }
+	virtual int tlcs900_djnz_true_cycles() const { return 4; }
+	virtual int tlcs900_shift_cycles(uint8_t n) const { return 2 * n; }
 
 	int condition_true( uint8_t cond );
 	uint8_t *get_reg8_current( uint8_t reg );
@@ -563,6 +593,7 @@ protected:
 	void op_SUBLRM();
 	void op_SUBLRR();
 	void op_SWI();
+	void op_SWI900();
 	void op_TSETBIM();
 	void op_TSETBIR();
 	void op_TSETWIR();
@@ -604,6 +635,47 @@ protected:
 	void op_E0();
 	void op_E8();
 	void op_F0();
+};
+
+class tlcs900h_device : public tlcs900_device
+{
+protected:
+	// construction/destruction
+	tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_reset() override;
+
+	virtual int tlcs900_gpr_cycles() const override { return 1; }
+	virtual int tlcs900_mem_index_cycles() const override { return 1; }
+	virtual int tlcs900_mem_absolute_8_cycles() const override { return 1; }
+	virtual int tlcs900_mem_absolute_16_cycles() const override { return 2; }
+	virtual int tlcs900_mem_absolute_24_cycles() const override { return 3; }
+	virtual int tlcs900_mem_gpr_indirect_cycles() const override { return 1; }
+	virtual int tlcs900_mem_gpr_index_cycles() const override { return 3; }
+	virtual int tlcs900_mem_gpr_reg_index_cycles() const override { return 3; }
+	virtual int tlcs900_mem_indirect_prepost_cycles() const override { return 1; }
+	virtual int tlcs900_ldxx_repeat_cycles() const override { return -1; }
+	virtual int tlcs900_jp_true_cycles() const override { return 3; }
+	virtual int tlcs900_call_true_cycles() const override { return 8; }
+	virtual int tlcs900_djnz_true_cycles() const override { return 2; }
+	virtual int tlcs900_shift_cycles(uint8_t n) const override { return n / 4; }
+
+	static const tlcs900inst s_mnemonic_80[256];
+	static const tlcs900inst s_mnemonic_88[256];
+	static const tlcs900inst s_mnemonic_90[256];
+	static const tlcs900inst s_mnemonic_98[256];
+	static const tlcs900inst s_mnemonic_a0[256];
+	static const tlcs900inst s_mnemonic_b0[256];
+	static const tlcs900inst s_mnemonic_b8[256];
+	static const tlcs900inst s_mnemonic_c0[256];
+	static const tlcs900inst s_mnemonic_c8[256];
+	static const tlcs900inst s_mnemonic_d0[256];
+	static const tlcs900inst s_mnemonic_d8[256];
+	static const tlcs900inst s_mnemonic_e0[256];
+	static const tlcs900inst s_mnemonic_e8[256];
+	static const tlcs900inst s_mnemonic_f0[256];
+	static const tlcs900inst s_mnemonic[256];
 };
 
 #endif // MAME_CPU_TLCS900_TLCS900_H

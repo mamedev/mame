@@ -9,7 +9,7 @@ device_network_interface::device_network_interface(const machine_config &mconfig
 	m_promisc = false;
 	m_bandwidth = bandwidth;
 	set_mac("\0\0\0\0\0\0");
-	m_intf = 0;
+	m_intf = -1;
 	m_loopback_control = false;
 }
 

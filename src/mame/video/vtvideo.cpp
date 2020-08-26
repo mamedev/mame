@@ -651,30 +651,30 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 		for (int b = 0; b < bits_width; b++)
 		{
 			if (double_width)
-			{ 
-		  		if (bitmap.pix16(y_preset, DOUBLE_x_preset + b) == fg_intensity)
-		  		{
-			  		prev_bit = fg_intensity;
-		  		}
-		  		else
-		  		{
-			  		if (prev_bit == fg_intensity)
+			{
+				if (bitmap.pix16(y_preset, DOUBLE_x_preset + b) == fg_intensity)
+				{
+					prev_bit = fg_intensity;
+				}
+				else
+				{
+					if (prev_bit == fg_intensity)
 						bitmap.pix16(y_preset, DOUBLE_x_preset + b) = fg_intensity;
-			  		prev_bit = back_intensity;
-		  		}
+					prev_bit = back_intensity;
+				}
 			}
 			else
 			{
-		  		if (bitmap.pix16(y_preset, x_preset + b) == fg_intensity)
-		  		{
-			  		prev_bit = fg_intensity;
-		  		}
-		  		else
-		  		{
-			  		if (prev_bit == fg_intensity)
+				if (bitmap.pix16(y_preset, x_preset + b) == fg_intensity)
+				{
+					prev_bit = fg_intensity;
+				}
+				else
+				{
+					if (prev_bit == fg_intensity)
 						bitmap.pix16(y_preset, x_preset + b) = fg_intensity;
-			  		prev_bit = back_intensity;
-		  		}
+					prev_bit = back_intensity;
+				}
 			}
 		}
 	} // for (scan_line)

@@ -569,14 +569,14 @@ void gime_device::update_memory(int bank)
 		// are we in onboard ROM or cart ROM?
 		if (block > 3)
 		{
-			if( m_cart_rom)
+			if (m_cart_rom)
 			{
 				// perform the look up
 				memory = &m_cart_rom[((block & 3) * 0x2000) % m_cart_size];
 			}
 			else
 			{
-					memory = 0;
+				memory = 0;
 			}
 		}
 		else
@@ -596,11 +596,11 @@ void gime_device::update_memory(int bank)
 	memory += offset;
 
 	// set the banks
-	if( memory )
+	if (memory)
 	{
-	read_bank->set_base(memory);
-	write_bank->set_base(is_read_only ? m_dummy_bank : memory);
-}
+		read_bank->set_base(memory);
+		write_bank->set_base(is_read_only ? m_dummy_bank : memory);
+	}
 	else
 	{
 		read_bank->set_base(m_dummy_bank);

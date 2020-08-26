@@ -110,13 +110,16 @@ Hardware:   PPIA 8255
         * A 5v DC input is added in addition to the standard power in (but this may be a later upgrade),
         * The Utility ROM is labelled P2/FP is installed
 
+    - Cassette UEF not working - all data blocks overwrite each other at 0000 in ram
+
+
 */
 
 #include "emu.h"
 #include "includes/atom.h"
+#include "machine/clock.h"
 #include "formats/imageutl.h"
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 /***************************************************************************
@@ -150,7 +153,6 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 	*/
 
 	uint8_t header[0x16] = { 0 };
-	void *ptr;
 
 	image.fread(header, 0x16);
 
@@ -160,17 +162,28 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 
 	if (LOG)
 	{
-		header[16] = 0;
-		logerror("ATM filename: %s\n", header);
+		char pgmname[17];
+		for (u8 i = 0; i < 16; i++)
+			pgmname[i] = header[i];
+		pgmname[16] = 0;
+		logerror("ATM filename: %s\n", pgmname);
 		logerror("ATM start address: %04x\n", start_address);
 		logerror("ATM run address: %04x\n", run_address);
 		logerror("ATM size: %04x\n", size);
 	}
 
-	ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(start_address);
+	void *ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(start_address);
 	image.fread(ptr, size);
 
-	m_maincpu->set_pc(run_address);
+	if (run_address == 0xc2b2)
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		u16 end_address = start_address + size;
+		space.write_byte(13, end_address);
+		space.write_byte(14, end_address >> 8);
+	}
+	else
+		m_maincpu->set_state_int(M6502_PC, run_address);   // if not basic, autostart program (set_pc doesn't work)
 
 	return image_init_result::PASS;
 }
@@ -233,7 +246,8 @@ uint8_t atomeb_state::dos_r(offs_t offset)
 {
 	if (m_e0->exists() && !BIT(m_eprom, 7))
 		return m_e0->read_rom(offset);
-	else if (m_e1->exists() && BIT(m_eprom, 7))
+	else
+	if (m_e1->exists() && BIT(m_eprom, 7))
 		return m_e1->read_rom(offset);
 	else
 		return 0xff;
@@ -250,17 +264,15 @@ uint8_t atomeb_state::dos_r(offs_t offset)
 
 void atom_state::atom_mem(address_map &map)
 {
-	map(0x0000, 0x09ff).ram();
+	map(0x0000, 0x9fff).ram();
 	map(0x0a00, 0x0a03).mirror(0x1f8).m(m_fdc, FUNC(i8271_device::map));
 	map(0x0a04, 0x0a04).mirror(0x1f8).rw(m_fdc, FUNC(i8271_device::data_r), FUNC(i8271_device::data_w));
-	map(0x0a05, 0x7fff).ram();
-	map(0x8000, 0x97ff).ram().share("video_ram");
-	map(0x9800, 0x9fff).ram();
+	map(0x8000, 0x97ff).ram().share("videoram");
 //  map(0xa000, 0xafff)        // mapped by the cartslot
-	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb000, 0xb003).mirror(0x3fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  map(0xb400, 0xb403).rw(MC6854_TAG, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
 //  map(0xb404, 0xb404).portr("ECONET");
-	map(0xb800, 0xb80f).mirror(0x3f0).m(R6522_TAG, FUNC(via6522_device::map));
+	map(0xb800, 0xb80f).mirror(0x3f0).m(m_via, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
 }
 
@@ -283,9 +295,9 @@ void atomeb_state::atomeb_mem(address_map &map)
 void atom_state::atombb_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x57ff).ram().share("video_ram");
-	map(0x7000, 0x7003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7800, 0x780f).mirror(0x3f0).m(R6522_TAG, FUNC(via6522_device::map));
+	map(0x4000, 0x57ff).ram().share("videoram");
+	map(0x7000, 0x7003).mirror(0x3fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7800, 0x780f).mirror(0x3f0).m(m_via, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).rom().region("basic", 0);
 	map(0xf000, 0xffff).rom().region(SY6502_TAG, 0);
 }
@@ -296,13 +308,11 @@ void atom_state::atombb_mem(address_map &map)
 
 void atom_state::prophet_mem(address_map &map)
 {
-	map(0x0000, 0x09ff).ram();
-	map(0x0a00, 0x7fff).ram();
-	map(0x8000, 0x97ff).ram().share("video_ram");
-	map(0x9800, 0x9fff).ram();
+	map(0x0000, 0x9fff).ram();
+	map(0x8000, 0x97ff).ram().share("videoram");
 	map(0xa000, 0xafff).rom().region("ic24", 0);
-	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xb800, 0xb80f).mirror(0x3f0).m(R6522_TAG, FUNC(via6522_device::map));
+	map(0xb000, 0xb003).mirror(0x3fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb800, 0xb80f).mirror(0x3f0).m(m_via, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
 }
 
@@ -316,7 +326,12 @@ void atom_state::prophet_mem(address_map &map)
 
 INPUT_CHANGED_MEMBER( atom_state::trigger_reset )
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	if (newval)
+	{
+		m_ppi->reset();
+		m_via->reset();
+		m_maincpu->reset();
+	}
 }
 
 /*-------------------------------------------------
@@ -331,8 +346,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")          PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -341,8 +354,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x87\x95") PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -351,8 +362,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x87\x94") PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
@@ -361,18 +370,14 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK")         PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK")         PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DELETE")       PORT_CODE(KEYCODE_DEL)        PORT_CHAR(8)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR('^')
@@ -381,8 +386,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']')
@@ -391,8 +394,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\\')
@@ -401,8 +402,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('[')
@@ -411,8 +410,6 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE")        PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(32)
@@ -421,21 +418,13 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL")         PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT")        PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START("RPT")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	PORT_START("Y11")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
 	PORT_START("BRK")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED_MEMBER(DEVICE_SELF, atom_state, trigger_reset, 0)
@@ -496,23 +485,12 @@ uint8_t atom_state::ppi_pb_r()
 
 	*/
 
-	uint8_t data = 0xff;
+	uint8_t data = 0x3f;
 
-	switch (m_keylatch)
-	{
-	case 0: data &= m_y0->read(); break;
-	case 1: data &= m_y1->read(); break;
-	case 2: data &= m_y2->read(); break;
-	case 3: data &= m_y3->read(); break;
-	case 4: data &= m_y4->read(); break;
-	case 5: data &= m_y5->read(); break;
-	case 6: data &= m_y6->read(); break;
-	case 7: data &= m_y7->read(); break;
-	case 8: data &= m_y8->read(); break;
-	case 9: data &= m_y9->read(); break;
-	}
+	if (m_keylatch < 10)
+		data = m_io_keyboard[m_keylatch]->read();
 
-	data &= m_y10->read();
+	data |= m_io_keyboard[10]->read();
 
 	return data;
 }
@@ -534,19 +512,17 @@ uint8_t atom_state::ppi_pc_r()
 
 	*/
 
-	uint8_t data = 0;
-
 	/* 2400 Hz input */
-	data |= m_hz2400 << 4;
+	u8 data = m_hz2400 ? 0x10 : 0;
 
 	/* cassette input */
-	data |= (m_cassette->input() > 0.0) << 5;
+	data |= (m_cassette->input() > 0.02) << 5;
 
 	/* keyboard RPT */
-	data |= BIT(m_rpt->read(), 0) << 6;
+	data |= m_io_keyboard[11]->read();
 
 	/* MC6847 FS */
-	data |= (m_vdg->fs_r() ? 1 : 0) << 7;
+	data |= m_vdg->fs_r() ? 0x80 : 0;
 
 	return data;
 }
@@ -591,7 +567,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 	is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=m_previous_i8271_int_state)
+	if (state != m_previous_i8271_int_state)
 	{
 		if (state)
 		{
@@ -606,23 +582,23 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 
 WRITE_LINE_MEMBER( atom_state::motor_w )
 {
-	for (int i=0; i != 2; i++) {
+	for (u8 i = 0; i < 2; i++)
+	{
 		char devname[8];
 		sprintf(devname, "%d", i);
 		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
-		if (con) {
+		if (con)
 			con->get_device()->mon_w(!state);
-		}
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
+WRITE_LINE_MEMBER(atom_state::cassette_output_tick)
 {
-	int level = !(!(!m_hz2400 && m_pc1) && m_pc0);
+	m_hz2400 = state;
+
+	bool level = m_pc0 && !(m_pc1 && !m_hz2400);
 
 	m_cassette->output(level ? -1.0 : +1.0);
-
-	m_hz2400 = !m_hz2400;
 }
 
 /*-------------------------------------------------
@@ -633,11 +609,11 @@ uint8_t atom_state::vdg_videoram_r(offs_t offset)
 {
 	if (offset == ~0) return 0xff;
 
-	m_vdg->as_w(BIT(m_video_ram[offset], 6));
-	m_vdg->intext_w(BIT(m_video_ram[offset], 6));
-	m_vdg->inv_w(BIT(m_video_ram[offset], 7));
+	m_vdg->as_w(BIT(m_vram[offset], 6));
+	m_vdg->intext_w(BIT(m_vram[offset], 6));
+	m_vdg->inv_w(BIT(m_vram[offset], 7));
 
-	return m_video_ram[offset];
+	return m_vram[offset];
 }
 
 /***************************************************************************
@@ -664,6 +640,12 @@ void atom_state::machine_start()
 
 	if (m_cart.found() && m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xafff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
+
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_hz2400));
+	save_item(NAME(m_pc0));
+	save_item(NAME(m_pc1));
+	save_item(NAME(m_previous_i8271_int_state));
 }
 
 /*-------------------------------------------------
@@ -673,6 +655,22 @@ void atom_state::machine_start()
 void atomeb_state::machine_start()
 {
 	atom_state::machine_start();
+	save_item(NAME(m_eprom));
+}
+
+void atom_state::machine_reset()
+{
+	m_keylatch = 0;
+	m_hz2400 = 0;
+	m_pc0 = 0;
+	m_pc1 = 0;
+	m_previous_i8271_int_state = 0;
+}
+
+void atomeb_state::machine_reset()
+{
+	atom_state::machine_reset();
+	m_eprom = 0;
 }
 
 /***************************************************************************
@@ -708,46 +706,40 @@ FLOPPY_FORMATS_END0
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
-void atom_state::atom(machine_config &config)
+void atom_state::atom_common(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, X2/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
 
 	/* video hardware */
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
 	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
-	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
-	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
+	clock_device &cass_clock(CLOCK(config, "cass_clock", X2/16/13/8));
+	cass_clock.signal_handler().set(FUNC(atom_state::cassette_output_tick));  // 2403.846Hz
 
-	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
-	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
-	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
-	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
+	VIA6522(config, m_via, X2/4);
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
+	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	m_via->irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
-	i8255_device &ppi(I8255(config, INS8255_TAG));
-	ppi.out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
-	ppi.in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
-	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
-	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
-
-	I8271(config, m_fdc, 0);
-	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
-	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
-	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
+	m_ppi->in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
+	m_ppi->in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
-	m_centronics->busy_handler().set(R6522_TAG, FUNC(via6522_device::write_pa7));
+	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
+	m_centronics->busy_handler().set(m_via, FUNC(via6522_device::write_pa7));
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
@@ -757,8 +749,20 @@ void atom_state::atom(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_formats(atom_cassette_formats);
 	m_cassette->set_interface("atom_cass");
+}
 
-	QUICKLOAD(config, "quickload", "atm").set_load_callback(FUNC(atom_state::quickload_cb));
+void atom_state::atom(machine_config &config)
+{
+	atom_common(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
+
+	I8271(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
+	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
+	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);
+
+	QUICKLOAD(config, "quickload", "atm", attotime::from_seconds(2)).set_load_callback(FUNC(atom_state::quickload_cb));
 
 	/* utility rom slot */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "atom_cart", "bin,rom").set_device_load(FUNC(atom_state::cart_load));
@@ -777,7 +781,7 @@ void atom_state::atom(machine_config &config)
 -------------------------------------------------*/
 
 #define ATOM_ROM(_tag, _load) \
-	GENERIC_SOCKET(config, _tag, generic_linear_slot, "atom_cart", "bin,rom").set_device_load(FUNC(atomeb_state::_load)) \
+	GENERIC_SOCKET(config, _tag, generic_linear_slot, "atom_cart", "bin,rom").set_device_load(FUNC(atomeb_state::_load))
 
 void atomeb_state::atomeb(machine_config &config)
 {
@@ -814,46 +818,9 @@ void atomeb_state::atomeb(machine_config &config)
 
 void atom_state::atombb(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, X2/4);
+	atom_common(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atombb_mem);
-
-	/* video hardware */
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
-
-	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
-	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
-	m_vdg->set_screen(SCREEN_TAG);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	/* devices */
-	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
-
-	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
-	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
-	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
-	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
-
-	i8255_device &ppi(I8255(config, INS8255_TAG));
-	ppi.out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
-	ppi.in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
-	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
-	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
-
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
-	m_centronics->busy_handler().set(R6522_TAG, FUNC(via6522_device::write_pa7));
-
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	m_centronics->set_output_latch(cent_data_out);
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(atom_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->set_interface("atom_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K");
@@ -972,9 +939,9 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS          INIT         COMPANY          FULLNAME               FLAGS */
-COMP( 1979, atom,     0,      0,      atom,     atom,  atom_state,    empty_init,  "Acorn",         "Atom",                0)
-COMP( 1979, atomeb,   atom,   0,      atomeb,   atom,  atomeb_state,  empty_init,  "Acorn",         "Atom with Eprom Box", 0)
-COMP( 1982, atombb,   atom,   0,      atombb,   atom,  atom_state,    empty_init,  "Acorn",         "Atom with BBC Basic", 0)
-//COMP( 1983, prophet2, atom,   0,      prophet2, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 2",           0)
-//COMP( 1983, prophet3, atom,   0,      prophet3, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 3",           0)
-//COMP( 2011, atommc,   atom,   0,      atommc,   atom,  driver_device, empty_init,  "Acorn",         "Atom with AtoMMC2",   0)
+COMP( 1979, atom,     0,      0,      atom,     atom,  atom_state,    empty_init,  "Acorn",         "Atom",                MACHINE_SUPPORTS_SAVE )
+COMP( 1979, atomeb,   atom,   0,      atomeb,   atom,  atomeb_state,  empty_init,  "Acorn",         "Atom with Eprom Box", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, atombb,   atom,   0,      atombb,   atom,  atom_state,    empty_init,  "Acorn",         "Atom with BBC Basic", MACHINE_SUPPORTS_SAVE )
+//COMP( 1983, prophet2, atom,   0,      prophet2, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 2",           MACHINE_SUPPORTS_SAVE )
+//COMP( 1983, prophet3, atom,   0,      prophet3, atom,  driver_device, empty_init,  "Busicomputers", "Prophet 3",           MACHINE_SUPPORTS_SAVE )
+//COMP( 2011, atommc,   atom,   0,      atommc,   atom,  driver_device, empty_init,  "Acorn",         "Atom with AtoMMC2",   MACHINE_SUPPORTS_SAVE )

@@ -4,13 +4,47 @@
 
     Leapfrog Clickstart Emulation
 
-        Die markings show "SunPlus QL8041C" ( known as Sunplus SPG2?? )
-    The keyboard has a "SunPlus PU6583" MCU under a glob, and the
-     mouse optical sensor is a N2163, probably from Agilent.
+         Die markings show "SunPlus QL8041C" (known as Sunplus SPG2??).
+         The keyboard has a "SunPlus PU6583" MCU under a glob, and the
+         mouse optical sensor is a N2163, probably from Agilent.
+
+    ClickStart cartridges pinout:
+	
+         1 N/C          2 GND
+         3 GND          4 VCC
+         5 GND          6 VCC
+         7 N/C          8 N/C
+         9 N/C         10 N/C
+        11 N/C         12 to 53
+        13 A2          14 A1
+        15 A4          16 A3
+        17 A6          18 A5
+        19 A17         20 A7
+                 Key
+        21 N/C         22 A18
+        23 A19         24 A20
+        25 A9          26 A8
+        27 A11         28 A10
+        29 A13         30 A12
+        31 A15         32 A14
+        33 D15         34 A16
+        35 D14         36 D7
+        37 D13         38 D6
+        39 D12         40 D5
+        41 D11         42 D4
+        43 D10         44 D3
+        45 D9          46 D2
+        47 D8          48 D1
+        49 N/C         50 D0
+        51 /OE         52 A0
+        53 to 12       54 N/C
+        55 GND         56 N/C
+        57 GND         58 N/C
+        59 GND         60 GND
 
     Status:
 
-        Some games have Checksums listed in the header area that appear to be
+         Some games have Checksums listed in the header area that appear to be
          like the byte checksums on the Radica games in vii.cpp, however the
          calculation doesn't add up correctly.  There is also a checksum in
          a footer area at the end of every ROM that does add up correctly in

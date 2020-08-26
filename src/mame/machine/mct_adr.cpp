@@ -177,6 +177,9 @@ void mct_adr_device::device_reset()
 	m_memory_refresh_rate = 0x18186;
 	m_nvram_protect = 0x7;
 
+	m_dma_invalid_address = 0;
+	m_dma_memory_failed_address = 0;
+
 	m_isr = 0;
 	m_imr = 0x10; // firmware diagnostic expects network interrupts to be unmasked at boot
 

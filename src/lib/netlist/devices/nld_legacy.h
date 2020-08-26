@@ -11,7 +11,7 @@
 #ifndef NLD_LEGACY_H_
 #define NLD_LEGACY_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros

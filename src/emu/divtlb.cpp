@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    divtlb.c
+    divtlb.cpp
 
     Device generic virtual TLB interface.
 

@@ -2517,7 +2517,7 @@ void taitob_state::selfeena(machine_config &config)
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);;
+	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));

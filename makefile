@@ -392,6 +392,13 @@ ifndef NOASM
 endif
 endif
 
+# ppc has inline assembly support but no DRC
+ifeq ($(findstring ppc,$(UNAME)),ppc)
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
 # Autodetect BIGENDIAN
 # MacOSX
 ifndef BIGENDIAN
@@ -1704,14 +1711,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.221"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.224"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.221" > $@
+	@echo #define BARE_BUILD_VERSION "0.224" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1753,22 +1760,7 @@ tests: $(REGTESTS)
 # FIXME: make this work with SEPARATE_BIN
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
-ifeq ($(OS),windows)
-	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
-	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
-else
+ifeq (posix,$(SHELLTYPE))
 	$(SILENT) find src -name \*.c -exec ./srcclean {} \; >&2
 	$(SILENT) find src -name \*.cpp -exec ./srcclean {} \; >&2
 	$(SILENT) find src -name \*.h -exec ./srcclean {} \; >&2
@@ -1783,6 +1775,21 @@ else
 	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
 	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
 	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
+else
+	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
 endif
 
 #-------------------------------------------------

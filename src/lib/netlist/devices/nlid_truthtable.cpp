@@ -1,6 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
+#include "plib/pstonum.h"
+#include "plib/pstrutil.h"
+
 #include "nl_base.h"
 #include "nl_factory.h"
 #include "nlid_truthtable.h"
@@ -75,8 +78,7 @@ namespace devices
 			set_active_outputs(active_outputs);
 		}
 
-		// update is only called during startup here ...
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 #if USE_TT_ALTERNATIVE
 			m_state = 0;
@@ -157,7 +159,7 @@ namespace devices
 
 			if (doOUT)
 				//for (std::size_t i = 0; i < m_NO; ++i)
-				//	m_Q[i].push((out >> i) & 1, tim[t[i]]);
+				//  m_Q[i].push((out >> i) & 1, tim[t[i]]);
 				this->push(out, t);
 			else
 			{
@@ -191,8 +193,8 @@ namespace devices
 		}
 
 
-		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
-		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
+		plib::static_vector<logic_input_t, m_NI> m_I;
+		plib::static_vector<logic_output_t, m_NO> m_Q;
 
 #if USE_TT_ALTERNATIVE
 		state_var<type_t>   m_state;
@@ -387,7 +389,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
-			m_I.emplace(i, *this, inout[i]);
+			m_I.emplace_back(*this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
 		}
 #else
 		for (std::size_t i=0; i < m_NI; i++)
@@ -410,7 +412,7 @@ namespace devices
 		for (std::size_t i=0; i < m_NO; i++)
 		{
 			outputs[i] = plib::trim(outputs[i]);
-			m_Q.emplace(i, *this, outputs[i]);
+			m_Q.emplace_back(*this, outputs[i]);
 			// Connect output "Q" to input "_Q" if this exists
 			// This enables timed state without having explicit state ....
 			pstring tmp = "_" + outputs[i];
@@ -675,7 +677,8 @@ namespace factory
 
 	#define ENTRY(n, s) ENTRYY(n, 1, s); ENTRYY(n, 2, s); ENTRYY(n, 3, s); \
 						ENTRYY(n, 4, s); ENTRYY(n, 5, s); ENTRYY(n, 6, s); \
-						ENTRYY(n, 7, s); ENTRYY(n, 8, s)
+						ENTRYY(n, 7, s); ENTRYY(n, 8, s); ENTRYY(n, 9, s); \
+						ENTRYY(n, 10, s)
 
 	host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, properties &&props)
 	{

@@ -1,14 +1,96 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese,cam900
 /***************************************************************************
 
-    v3021.c
+    v3021.cpp
 
-    EM Microelectronic-Marin SA Ultra Low Power 32kHz CMOS RTC (DIP8)
+    EM Microelectronic-Marin SA Ultra Low Power 32kHz CMOS RTC (DIP8/SO8)
 
     Serial Real Time Clock
 
-    - very preliminary, borrowed from hard-coded PGM implementation.
+    - Reference: https://www.emmicroelectronic.com/product/real-time-clocks-ic/v3021
+
+    Pin assignment (SO8)
+
+          |-------------------------|
+         _|o                        |_
+     XI |_|                         |_| Vdd
+          |                         |
+         _|                         |_
+     XO |_|                         |_| WR
+          |          V3021          |
+         _|                         |_
+     CS |_|                         |_| RD
+          |                         |
+         _|                         |_
+    Vss |_|                         |_| I/O
+          |-------------------------|
+
+    Pin description
+
+    |-----|------|-----------------------------------------|
+    | Pin | Name | Description                             |
+    |-----|------|-----------------------------------------|
+    1  1  |  XI  | 32 kHz Crystal input                    |
+    |-----|------|-----------------------------------------|
+    1  2  |  XO  | 32 kHz Crystal output                   |
+    |-----|------|-----------------------------------------|
+    1  3  |  CS  | Chip select input                       |
+    |-----|------|-----------------------------------------|
+    1  4  | Vss  | Ground supply                           |
+    |-----|------|-----------------------------------------|
+    1  5  | I/O  | Data input and output                   |
+    |-----|------|-----------------------------------------|
+    1  6  |  RD  | Intel RD, Motorola DS (or tie to CS)    |
+    |-----|------|-----------------------------------------|
+    1  7  |  WR  | Intel WR, Motorola R/W                  |
+    |-----|------|-----------------------------------------|
+    1  8  | Vdd  | Positive supply                         |
+    |-----|------|-----------------------------------------|
+
+    Register map (Unused bits are reserved)
+
+    Address Bits     Description
+            76543210
+    Data space
+    0       ---x---- Time set lock
+            ---0---- Enable copy RAM to clock
+            ---1---- Disable copy RAM to clock
+            ----xx-- Test mode
+            ----00-- Normal operation
+            ----01-- All time keeping accelerated by 32
+            ----10-- Parallel increment of all time data
+                     at 1 Hz with no carry over
+            ----11-- Parallel increment of all time data
+                     at 32 Hz with no carry over
+            -------x Frequency measurement mode
+
+    1       (Read only)
+            x------- Week number is changed
+            -x------ Weekday is changed
+            --x----- Year is changed
+            ---x---- Month is changed
+            ----x--- Day of month is changed
+            -----x-- Hours is changed
+            ------x- Minutes is changed
+            -------x Seconds is changed
+
+    2       -xxxxxxx Seconds (BCD 00-59)
+    3       -xxxxxxx Minutes (BCD 00-59)
+    4       --xxxxxx Hours (BCD 00-23)
+    5       --xxxxxx Day of month (BCD 1-31)
+    6       ---xxxxx Month (BCD 01-12)
+    7       xxxxxxxx Year (BCD 00-99)
+    8       ----xxxx Week day (BCD 01-07)
+    9       -xxxxxxx Week number (BCD 00-52)
+
+    Address command space
+    e       Copy RAM to clock
+    f       Copy clock to RAM
+
+    TODO:
+    - verify status bit (RAM 0x00)
+    - Support Week number correctly
 
 ***************************************************************************/
 
@@ -16,13 +98,12 @@
 #include "machine/v3021.h"
 
 
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(V3021, v3021_device, "v3021", "V3021 RTC")
+DEFINE_DEVICE_TYPE(V3021, v3021_device, "v3021", "EM Microelectronic-Marin SA V3021 RTC")
 
 
 //**************************************************************************
@@ -34,39 +115,26 @@ DEFINE_DEVICE_TYPE(V3021, v3021_device, "v3021", "V3021 RTC")
 //-------------------------------------------------
 
 v3021_device::v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, V3021, tag, owner, clock), m_cal_mask(0), m_cal_com(0), m_cal_cnt(0), m_cal_val(0)
+	: device_t(mconfig, V3021, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
 {
+}
+
+void v3021_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_rtc.year = convert_to_bcd(year);
+	m_rtc.month = convert_to_bcd(month);
+	m_rtc.day = convert_to_bcd(day);
+	m_rtc.wday_bcd = convert_to_bcd(day_of_week);
+	m_rtc.wnum = convert_to_bcd((day % 7) + 1); // TODO: placeholder
+	m_rtc.hour = convert_to_bcd(hour);
+	m_rtc.min = convert_to_bcd(minute);
+	m_rtc.sec = convert_to_bcd(second);
 }
 
 TIMER_CALLBACK_MEMBER(v3021_device::timer_callback)
 {
-	static constexpr uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
-	int dpm_count;
-
-	m_rtc.sec++;
-
-	if((m_rtc.sec & 0x0f) >= 0x0a)              { m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
-	if((m_rtc.sec & 0xf0) >= 0x60)              { m_rtc.min++; m_rtc.sec = 0; }
-	if((m_rtc.min & 0x0f) >= 0x0a)              { m_rtc.min+=0x10; m_rtc.min&=0xf0; }
-	if((m_rtc.min & 0xf0) >= 0x60)              { m_rtc.hour++; m_rtc.min = 0; }
-	if((m_rtc.hour & 0x0f) >= 0x0a)             { m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
-	if((m_rtc.hour & 0xff) >= 0x24)             { m_rtc.day++; m_rtc.wday<<=1; m_rtc.hour = 0; }
-	if(m_rtc.wday & 0x80)                       { m_rtc.wday = 1; }
-	if((m_rtc.day & 0x0f) >= 0x0a)              { m_rtc.day+=0x10; m_rtc.day&=0xf0; }
-
-	/* TODO: crude leap year support */
-	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4)*10)-1;
-
-	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
-	{
-		if((m_rtc.day & 0xff) >= dpm[dpm_count]+1+1)
-			{ m_rtc.month++; m_rtc.day = 0x01; }
-	}
-	else if((m_rtc.day & 0xff) >= dpm[dpm_count]+1){ m_rtc.month++; m_rtc.day = 0x01; }
-	if((m_rtc.month & 0x0f) >= 0x0a)            { m_rtc.month = 0x10; }
-	if(m_rtc.month >= 0x13)                     { m_rtc.year++; m_rtc.month = 1; }
-	if((m_rtc.year & 0x0f) >= 0x0a)             { m_rtc.year+=0x10; m_rtc.year&=0xf0; }
-	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //2000-2099 possible timeframe
+	advance_seconds();
 }
 
 //-------------------------------------------------
@@ -88,16 +156,25 @@ void v3021_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v3021_device::timer_callback), this));
 	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
-	system_time systime;
-	machine().base_datetime(systime);
+	copy_clock_to_ram();
 
-	m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
-	m_rtc.month = (((systime.local_time.month+1) / 10) << 4) | (((systime.local_time.month+1) % 10) & 0xf);
-	m_rtc.wday = 1 << systime.local_time.weekday;
-	m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
-	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
-	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
-	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
+	save_item(NAME(m_cs));
+	save_item(NAME(m_io));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_data));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_cnt));
+	save_item(NAME(m_mode));
+
+	save_item(NAME(m_rtc.sec));
+	save_item(NAME(m_rtc.min));
+	save_item(NAME(m_rtc.hour));
+	save_item(NAME(m_rtc.day));
+	save_item(NAME(m_rtc.wday));
+	save_item(NAME(m_rtc.wday_bcd));
+	save_item(NAME(m_rtc.wnum));
+	save_item(NAME(m_rtc.month));
+	save_item(NAME(m_rtc.year));
 }
 
 
@@ -107,75 +184,162 @@ void v3021_device::device_start()
 
 void v3021_device::device_reset()
 {
-	m_cal_cnt = 0;
+	m_cs = false;
+	m_io = 0;
+	m_addr = 0;
+	m_data = 0;
+	m_ram[0] = m_ram[1] = 0;
+	m_cnt = 0;
+	m_mode = 0;
 }
 
 
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
+//-------------------------------------------------
+//  read/write - parallel interface, verified from
+//  "typical applications" section from datasheet
+//-------------------------------------------------
 
-uint8_t v3021_device::read()
+u8 v3021_device::read()
 {
-	uint8_t calr = (m_cal_val & m_cal_mask) ? 1 : 0;
-
-	m_cal_mask <<= 1;
-	return calr;
-}
-
-void v3021_device::write(uint8_t data)
-{
-	m_cal_com <<= 1;
-	m_cal_com |= data & 1;
-	++m_cal_cnt;
-
-	if (m_cal_cnt == 4)
+	u8 ret = io_r();
+	if (!machine().side_effects_disabled())
 	{
-		m_cal_mask = 1;
-		m_cal_val = 1;
-		m_cal_cnt = 0;
+		cs_w(1);
+		cs_w(0);
+	}
+	return ret & 1;
+}
 
-		switch (m_cal_com & 0xf)
+void v3021_device::write(u8 data)
+{
+	io_w(BIT(data, 0));
+	if (!machine().side_effects_disabled())
+	{
+		cs_w(1);
+		cs_w(0);
+	}
+}
+
+//-------------------------------------------------
+//  cs_w - CS pin handler
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(v3021_device::cs_w)
+{
+	if (m_cs != state)
+	{
+		m_cs = state;
+		if (m_cs)
 		{
-			case 1: case 3: case 5: case 7: case 9: case 0xb: case 0xd:
-				m_cal_val++;
-				break;
+			if (!m_mode) // address
+			{
+				m_addr = ((m_addr >> 1) | (m_io << 3)) & 0xf;
+				if (++m_cnt >= 4)
+				{
+					if (m_addr == 0xe) // copy RAM to clock
+					{
+						if (!BIT(m_ram[0x0], 4)) // time set lock
+							copy_ram_to_clock();
+					}
+					else if (m_addr == 0xf) // copy clock to RAM
+					{
+						copy_clock_to_ram();
+					}
+					else // normal accessing
+					{
+						m_data = m_ram[m_addr & 0xf];
+						m_mode = 1;
+					}
+					m_cnt = 0;
+				}
+			}
+			else // data
+			{
+				m_data = ((m_data >> 1) | (m_io << 7)) & 0xff;
+				if (++m_cnt >= 8)
+				{
+					if (m_addr != 1 && m_addr <= 9)
+						m_ram[m_addr & 0xf] = m_data;
+					else
+						logerror("%s: Writing undocumented register %02X at %02X\n", this->tag(), m_data, m_addr);
 
-			case 0:
-				m_cal_val = (m_rtc.wday); //??
-				break;
-
-			case 2:  //Hours
-				m_cal_val = (m_rtc.hour);
-				break;
-
-			case 4:  //Seconds
-				m_cal_val = (m_rtc.sec);
-				break;
-
-			case 6:  //Month
-				m_cal_val = (m_rtc.month); //?? not bcd in MVS
-				break;
-
-			case 8:
-				m_cal_val = 0; //Controls blinking speed, maybe milliseconds
-				break;
-
-			case 0xa: //Day
-				m_cal_val = (m_rtc.day);
-				break;
-
-			case 0xc: //Minute
-				m_cal_val = (m_rtc.min);
-				break;
-
-			case 0xe:  //Year
-				m_cal_val = (m_rtc.year % 100);
-				break;
-
-			case 0xf:  //Load Date
-				//machine().base_datetime(m_systime);
-				break;
+					m_mode = 0;
+					m_cnt = 0;
+				}
+			}
 		}
 	}
+}
+
+//-------------------------------------------------
+//  io_w - I/O pin write handler
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(v3021_device::io_w)
+{
+	m_io = state;
+}
+
+//-------------------------------------------------
+//  io_r - I/O pin read handler
+//-------------------------------------------------
+
+READ_LINE_MEMBER(v3021_device::io_r)
+{
+	return m_data & 1;
+}
+
+//-------------------------------------------------
+//  copy_clock_to_ram - copy current clock to RAM
+//-------------------------------------------------
+
+void v3021_device::copy_clock_to_ram()
+{
+	// set status1
+	m_ram[0x1] = 0;
+	if (m_ram[0x2] != m_rtc.sec)
+		m_ram[0x1] |= (1 << 0);
+	if (m_ram[0x3] != m_rtc.min)
+		m_ram[0x1] |= (1 << 1);
+	if (m_ram[0x4] != m_rtc.hour)
+		m_ram[0x1] |= (1 << 2);
+	if (m_ram[0x5] != m_rtc.day)
+		m_ram[0x1] |= (1 << 3);
+	if (m_ram[0x6] != m_rtc.month)
+		m_ram[0x1] |= (1 << 4);
+	if (m_ram[0x7] != m_rtc.year)
+		m_ram[0x1] |= (1 << 5);
+	if (m_ram[0x8] != m_rtc.wday_bcd)
+		m_ram[0x1] |= (1 << 6);
+	if (m_ram[0x9] != m_rtc.wnum)
+		m_ram[0x1] |= (1 << 7);
+
+	m_ram[0x2] = m_rtc.sec;
+	m_ram[0x3] = m_rtc.min;
+	m_ram[0x4] = m_rtc.hour;
+	m_ram[0x5] = m_rtc.day;
+	m_ram[0x6] = m_rtc.month;
+	m_ram[0x7] = m_rtc.year;
+	m_ram[0x8] = m_rtc.wday_bcd;
+	m_ram[0x9] = m_rtc.wnum;
+}
+
+//-------------------------------------------------
+//  copy_ram_to_clock - copy RAM data to clock
+//-------------------------------------------------
+
+void v3021_device::copy_ram_to_clock()
+{
+	// clear status1
+	m_ram[0x1] = 0;
+	m_rtc.sec = m_ram[0x2];
+	m_rtc.min = m_ram[0x3];
+	m_rtc.hour = m_ram[0x4];
+	m_rtc.day = m_ram[0x5];
+	m_rtc.month = m_ram[0x6];
+	m_rtc.year = m_ram[0x7];
+	m_rtc.wday_bcd = m_ram[0x8];
+	m_rtc.wnum = m_ram[0x9];
+	set_time(true, bcd_to_integer(m_rtc.year), bcd_to_integer(m_rtc.month), bcd_to_integer(m_rtc.day),
+					bcd_to_integer(m_rtc.wday_bcd), bcd_to_integer(m_rtc.hour), bcd_to_integer(m_rtc.min), bcd_to_integer(m_rtc.sec));
 }

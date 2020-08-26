@@ -17,7 +17,7 @@
   I/O devices
 ***************************************************************************/
 
-uint8_t galaxy_state::galaxy_keyboard_r(offs_t offset)
+uint8_t galaxy_state::keyboard_r(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -25,12 +25,10 @@ uint8_t galaxy_state::galaxy_keyboard_r(offs_t offset)
 		return (level >  0) ? 0xfe : 0xff;
 	}
 	else
-	{
-		return m_io_ports[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
-	}
+		return m_io_keyboard[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 }
 
-void galaxy_state::galaxy_latch_w(uint8_t data)
+void galaxy_state::latch_w(uint8_t data)
 {
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	m_latch_value = data;
@@ -43,14 +41,9 @@ void galaxy_state::galaxy_latch_w(uint8_t data)
   Interrupts
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
+IRQ_CALLBACK_MEMBER(galaxy_state::irq_callback)
 {
-	device.execute().set_input_line(0, HOLD_LINE);
-}
-
-IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
-{
-	galaxy_set_timer();
+	set_timer();
 	m_interrupts_enabled = true;
 	return 0xff;
 }
@@ -62,7 +55,7 @@ IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 #define GALAXY_SNAPSHOT_V1_SIZE 8268
 #define GALAXY_SNAPSHOT_V2_SIZE 8244
 
-void galaxy_state::galaxy_setup_snapshot(const uint8_t * data, uint32_t size)
+void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
 {
 	switch (size)
 	{
@@ -138,7 +131,7 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 
 	image.fread( snapshot_data, snapshot_size);
 
-	galaxy_setup_snapshot(snapshot_data, snapshot_size);
+	setup_snapshot(snapshot_data, snapshot_size);
 
 	return image_init_result::PASS;
 }
@@ -150,62 +143,29 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 
 void galaxy_state::init_galaxy()
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
-
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_bank( 0x2800, 0x2800 + m_ram->size() - 1, "bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 
 	if (m_ram->size() < (6 + 48) * 1024)
-	{
 		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);
-	}
+}
 
-	for ( int i = 0; i < 8; i++ )
-	{
-		m_io_ports[i] = ioport( keynames[i] );
-	}
+void galaxy_state::init_galaxyp()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	ROM[0x0037] = 0x29;
+	ROM[0x03f9] = 0xcd;
+	ROM[0x03fa] = 0x00;
+	ROM[0x03fb] = 0xe0;
 }
 
 /***************************************************************************
   Machine Initialization
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(galaxy_state,galaxy)
+void galaxy_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* ROM 2 enable/disable */
-	if (ioport("ROM2")->read()) {
-		space.install_read_bank(0x1000, 0x1fff, "bank10");
-	} else {
-		space.nop_read(0x1000, 0x1fff);
-	}
-	space.nop_write(0x1000, 0x1fff);
-
-	if (ioport("ROM2")->read())
-		membank("bank10")->set_base(memregion("maincpu")->base() + 0x1000);
-
 	m_interrupts_enabled = true;
 }
 
-void galaxy_state::init_galaxyp()
-{
-	init_galaxy();
-}
-
-MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	ROM[0x0037] = 0x29;
-	ROM[0x03f9] = 0xcd;
-	ROM[0x03fa] = 0x00;
-	ROM[0x03fb] = 0xe0;
-
-	space.install_read_bank(0xe000, 0xefff, "bank11");
-	space.nop_write(0xe000, 0xefff);
-	membank("bank11")->set_base(memregion("maincpu")->base() + 0xe000);
-	m_interrupts_enabled = true;
-}

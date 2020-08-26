@@ -125,9 +125,9 @@ void polygonet_state::polygonet_sys_w(offs_t offset, uint8_t data)
 }
 
 
-/* irqs 3, 5, and 7 have valid vectors                
+/* irqs 3, 5, and 7 have valid vectors
    irq 3 is network. currently disabled for reasons above
-   irq 5 is vblank 
+   irq 5 is vblank
    irq 7 does nothing (it jsrs to a rts and then rte) */
 INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 {

@@ -464,7 +464,7 @@ uint64_t h8_sci_device::internal_update(uint64_t current_time)
 
 	case CLKM_EXTERNAL_ASYNC:
 	case CLKM_EXTERNAL_SYNC:
-		break;;
+		break;
 	}
 	if(event) {
 		attotime ctime = machine().time();

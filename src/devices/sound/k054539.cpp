@@ -483,9 +483,12 @@ u8 k054539_device::read(offs_t offset)
 	case 0x22d:
 		if(regs[0x22f] & 0x10) {
 			uint8_t res = (rom_addr == 0x80) ? ram[cur_ptr] : read_byte((0x20000*rom_addr)+cur_ptr);
-			cur_ptr++;
-			if(cur_ptr == cur_limit)
-				cur_ptr = 0;
+			if (!machine().side_effects_disabled())
+			{
+				cur_ptr++;
+				if(cur_ptr == cur_limit)
+					cur_ptr = 0;
+			}
 			return res;
 		} else
 			return 0;

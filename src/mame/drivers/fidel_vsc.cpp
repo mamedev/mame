@@ -169,7 +169,7 @@ public:
 	vsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
+		m_nmi_on(*this, "nmi_on"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
 		m_board(*this, "board"),
@@ -189,7 +189,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
+	required_device<timer_device> m_nmi_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
 	required_device<sensorboard_device> m_board;
@@ -206,8 +206,8 @@ private:
 	void main_io_trampoline_w(offs_t offset, u8 data);
 
 	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(nmi_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -426,10 +426,10 @@ void vsc_state::vsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
 
-	const attotime irq_period = attotime::from_hz(600); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(vsc_state::irq_on<INPUT_LINE_NMI>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
-	TIMER(config, "irq_off").configure_periodic(FUNC(vsc_state::irq_off<INPUT_LINE_NMI>), irq_period);
+	const attotime nmi_period = attotime::from_hz(600); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
+	TIMER(config, m_nmi_on).configure_periodic(FUNC(vsc_state::nmi_on<INPUT_LINE_NMI>), nmi_period);
+	m_nmi_on->set_start_delay(nmi_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
+	TIMER(config, "nmi_off").configure_periodic(FUNC(vsc_state::nmi_off<INPUT_LINE_NMI>), nmi_period);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(vsc_state::ppi_porta_w));

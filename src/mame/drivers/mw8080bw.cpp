@@ -747,10 +747,10 @@ void zzzap_state::io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	map(0x02, 0x02).w("soundboard", FUNC(zzzap_audio_device::p1_w));
+	map(0x02, 0x02).w("soundboard", FUNC(zzzap_common_audio_device::p1_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w("soundboard", FUNC(zzzap_audio_device::p2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(zzzap_common_audio_device::p2_w));
 	map(0x07, 0x07).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -824,7 +824,7 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-void zzzap_state::zzzap(machine_config &config)
+void zzzap_state::zzzap_common(machine_config &config)
 {
 	mw8080bw_root(config);
 
@@ -836,8 +836,25 @@ void zzzap_state::zzzap(machine_config &config)
 	/* add shifter */
 	MB14241(config, m_mb14241);
 
+	/* audio hardware handled by specific machine */
+}
+
+
+void zzzap_state::zzzap(machine_config &config)
+{
+	zzzap_common(config);
+
 	/* audio hardware */
 	ZZZAP_AUDIO(config, "soundboard");
+}
+
+
+void zzzap_state::lagunar(machine_config &config)
+{
+	zzzap_common(config);
+
+	/* audio hardware */
+	LAGUNAR_AUDIO(config, "soundboard");
 }
 
 
@@ -2965,14 +2982,14 @@ ROM_END
 
 ROM_START( spcenctr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "4m33.h",     0x0000, 0x0800, CRC(7458b2db) SHA1(c4f41efb8a35fd8bebc75bff0111476affe2b34d) )
-	ROM_LOAD( "4m32.g",     0x0800, 0x0800, CRC(1b873788) SHA1(6cdf0d602a65c7efcf8abe149c6172b4c7ab87a1) )
-	ROM_LOAD( "4m31.f",     0x1000, 0x0800, CRC(d4319c91) SHA1(30830595c220f490fe150ad018fbf4671bb71e02) )
-	ROM_LOAD( "4m30.e",     0x1800, 0x0800, CRC(9b9a1a45) SHA1(8023a05c13e8b541f9e2fe4d389e6a2dcd4766ea) )
-	ROM_LOAD( "4m29.d",     0x4000, 0x0800, CRC(294d52ce) SHA1(0ee63413c5caf60d45ae8bef08f6c07099d30f79) )
-	ROM_LOAD( "4m28.c",     0x4800, 0x0800, CRC(ce44c923) SHA1(9d35908de3194c5fe6fc8495ae413fa722018744) )
-	ROM_LOAD( "4m27.b",     0x5000, 0x0800, CRC(098070ab) SHA1(72ae344591df0174353dc2e3d22daf5a70e2261f) )
-	ROM_LOAD( "4m26.a",     0x5800, 0x0800, CRC(7f1d1f44) SHA1(2f4951171a55e7ac072742fa24eceeee6aca7e39) )
+	ROM_LOAD( "m645h-4m33.h1", 0x0000, 0x0800, CRC(7458b2db) SHA1(c4f41efb8a35fd8bebc75bff0111476affe2b34d) )
+	ROM_LOAD( "m645g-4m32.g1", 0x0800, 0x0800, CRC(1b873788) SHA1(6cdf0d602a65c7efcf8abe149c6172b4c7ab87a1) )
+	ROM_LOAD( "m645f-4m31.f1", 0x1000, 0x0800, CRC(d4319c91) SHA1(30830595c220f490fe150ad018fbf4671bb71e02) )
+	ROM_LOAD( "m645e-4m30.e1", 0x1800, 0x0800, CRC(9b9a1a45) SHA1(8023a05c13e8b541f9e2fe4d389e6a2dcd4766ea) )
+	ROM_LOAD( "m645d-4m29.d1", 0x4000, 0x0800, CRC(294d52ce) SHA1(0ee63413c5caf60d45ae8bef08f6c07099d30f79) )
+	ROM_LOAD( "m645c-4m28.c1", 0x4800, 0x0800, CRC(ce44c923) SHA1(9d35908de3194c5fe6fc8495ae413fa722018744) )
+	ROM_LOAD( "m645b-4m27.b1", 0x5000, 0x0800, CRC(098070ab) SHA1(72ae344591df0174353dc2e3d22daf5a70e2261f) )
+	ROM_LOAD( "m645a-4m26.a1", 0x5800, 0x0800, CRC(7f1d1f44) SHA1(2f4951171a55e7ac072742fa24eceeee6aca7e39) )
 ROM_END
 
 
@@ -3094,14 +3111,14 @@ ROM_END
 /* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    zzzap_state,    empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_SUPPORTS_SAVE, layout_280zzzap )
 /* 611 */ GAMEL( 1976, maze,       0,        maze,     maze,     mw8080bw_state, empty_init, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
 /* 612 */ GAME(  1977, boothill,   0,        boothill, boothill, boothill_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
 /* 615 */ GAME(  1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, desertgu,   0,        desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 618 */ GAME(  1977, roadrunm,   desertgu, desertgu, desertgu, desertgu_state, empty_init, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 619 */ GAME(  1977, dplay,      0,        dplay,    dplay,    dplay_state,    empty_init, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL( 1977, lagunar,    0,        zzzap,    lagunar,  zzzap_state, empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
+/* 622 */ GAMEL( 1977, lagunar,    0,        lagunar,  lagunar,  zzzap_state,    empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_SUPPORTS_SAVE, layout_lagunar )
 /* 623 */ GAME(  1977, gmissile,   0,        gmissile, gmissile, boothill_state, empty_init, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 626 */ GAME(  1977, m4,         0,        m4,       m4,       boothill_state, empty_init, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )

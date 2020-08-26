@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    sound.c
+    sound.cpp
 
     Core sound functions and definitions.
 

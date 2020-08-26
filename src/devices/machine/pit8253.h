@@ -42,6 +42,14 @@ class pit_counter_device : public device_t
 	friend class pit8253_device;
 	friend class pit8254_device;
 
+	enum
+	{
+		TID_UPDATE = 1,
+		TID_CONTROL,
+		TID_COUNT,
+		TID_GATE
+	};
+
 public:
 	// construction/destruction
 	pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -54,6 +62,7 @@ protected:
 
 private:
 	inline uint32_t adjusted_count() const;
+	inline void adjust_timer(attotime target);
 	void decrease_counter_value(int64_t cycles);
 	void load_counter_value();
 	void set_output(int output);
@@ -63,18 +72,23 @@ private:
 	uint8_t read();
 	void load_count(uint16_t newcount);
 	void readback(int command);
-	void control_w(uint8_t data);
-	void count_w(uint8_t data);
-	void gate_w(int state);
+	void control_w(uint8_t data) { synchronize(TID_CONTROL, data); }
+	void control_w_deferred(uint8_t data);
+	void count_w(uint8_t data) { synchronize(TID_COUNT, data); }
+	void count_w_deferred(uint8_t data);
+	void gate_w(int state) { synchronize(TID_GATE, state); }
+	void gate_w_deferred(int state);
 	void set_clock_signal(int state);
 	void set_clockin(double new_clockin);
 
 	// internal state
 	int m_index;                // index number of the timer
 	double m_clockin;           // input clock frequency in Hz
+	attotime m_clock_period;    // precomputed input clock period
 	int m_clock_signal;         // clock signal when clockin is 0
 
 	attotime m_last_updated;    // time when last updated
+	attotime m_next_update;     // time of next update
 
 	emu_timer *m_updatetimer;   // MAME timer to process updates
 

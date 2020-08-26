@@ -2299,7 +2299,7 @@ ROM_END
 ROM_START( towerat2xx )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
 	ROM_SYSTEM_BIOS(0, "v2.02", "V2.02" ) // from a model 220
-	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" ) 
+	ROM_SYSTEM_BIOS(1, "v2.01", "V2.01" )
 	ROM_SYSTEM_BIOS(2, "v1.07", "V1.07" ) // seen on a model 240 "mega"
 	ROM_SYSTEM_BIOS(3, "v1.06", "V1.06" ) // from a model 220
 	ROM_SYSTEM_BIOS(4, "v1.05a", "V1.05a" )

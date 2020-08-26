@@ -23,7 +23,7 @@
     TODO:
 
     - sound is strange, volume is often low to non-existent.
-    - colours and graphics are different to those shown at 
+    - colours and graphics are different to those shown at
       http://www.phc25.com/collection.htm - who is correct?
     - screen attribute bit 7 is unknown
 

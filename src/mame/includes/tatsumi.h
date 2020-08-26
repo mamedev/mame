@@ -69,8 +69,8 @@ protected:
 	uint8_t tatsumi_hack_ym2151_r();
 
 	void tatsumi_reset();
-	template<class _BitmapClass> void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
-	template<class _BitmapClass> inline void roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, const rectangle &clip,
+	template<class BitmapClass> void draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
+	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,
 		gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,uint32_t ssx,uint32_t ssy,
 		int scalex, int scaley, int rotate, int write_priority_only );
 	void update_cluts(int fake_palette_offset, int object_base, int length);

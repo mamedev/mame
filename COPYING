@@ -237,7 +237,10 @@ LZMA SDK code is compatible with open source licenses, for example, you
 can include it to GNU GPL or GNU LGPL code.
 
 
-Nano SVG = Simple stupid SVG parser
+AsmJit - a lightweight library for machine code generation.
+Copyright (c) 2008-2020 The AsmJit Authors
+
+Nano SVG - Simple stupid SVG parser
 Copyright (c) 2013-14 Mikko Mononen memon@inside.org
 
 Simple DirectMedia Layer

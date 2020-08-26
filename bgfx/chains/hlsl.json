@@ -204,6 +204,7 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
+			"applytint": true,
 			"output": "ntsc"
 		},
 		{
@@ -348,6 +349,7 @@
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
+			"applytint": true,
 			"output": "guest"
 		},
 		{	"effect": "hlsl/color",

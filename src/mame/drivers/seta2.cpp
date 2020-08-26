@@ -2315,11 +2315,11 @@ void seta2_state::seta2(machine_config &config)
 
 
 /*
-	P0-113A PCB has different sound/cpu input clock (32.53047MHz / 2, common input clock is 50MHz / 3)
-	and/or some PCB variant has uses this input clock?
-	reference:
-	https://youtu.be/6f-znVzcrmg, https://youtu.be/zJi_d463UQE (gundamex)
-	https://youtu.be/Ung9XeLisV0 (grdiansa)
+    P0-113A PCB has different sound/cpu input clock (32.53047MHz / 2, common input clock is 50MHz / 3)
+    and/or some PCB variant has uses this input clock?
+    reference:
+    https://youtu.be/6f-znVzcrmg, https://youtu.be/zJi_d463UQE (gundamex)
+    https://youtu.be/Ung9XeLisV0 (grdiansa)
 */
 void seta2_state::seta2_32m(machine_config &config)
 {

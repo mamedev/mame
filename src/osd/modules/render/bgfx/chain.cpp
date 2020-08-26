@@ -125,7 +125,7 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 
 	for (bgfx_parameter* param : m_params)
 	{
-		param->tick(frameTimeInSeconds* toMs);
+		param->tick(frameTimeInSeconds * toMs);
 	}
 }
 

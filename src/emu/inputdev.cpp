@@ -570,8 +570,7 @@ void input_class::remap_device_index(int oldindex, int newindex)
 	if (nullptr != m_device[newindex].get())
 		m_device[newindex]->set_devindex(newindex);
 
-	// update the maximum index found, since newindex may
-	// exceed current m_maxindex
+	// update the maximum index found, since newindex may exceed current m_maxindex
 	m_maxindex = std::max(m_maxindex, newindex);
 }
 

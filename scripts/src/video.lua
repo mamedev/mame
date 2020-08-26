@@ -401,6 +401,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hlcd0438.h,VIDEOS["HLCD0438"] = true
+--------------------------------------------------
+
+if (VIDEOS["HLCD0438"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hlcd0438.cpp",
+		MAME_DIR .. "src/devices/video/hlcd0438.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hlcd0488.h,VIDEOS["HLCD0488"] = true
 --------------------------------------------------
 

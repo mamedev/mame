@@ -470,14 +470,17 @@ void votrax_sc01_device::chip_update()
 
 	// Pitch counter.  Equality comparison, so it's possible to make
 	// it miss by manipulating the inflection inputs, but it'll wrap.
-	// There's a delay, hence the +1.
-	m_pitch = (m_pitch + 1) & 0x7f;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ m_filt_f1) + 1)
+	// There's a delay, hence the +2.
+
+	// Intrinsically pre-divides by two, so we added one bit on the 7
+
+	m_pitch = (m_pitch + 1) & 0xff;
+	if(m_pitch == (0xe0 ^ (m_inflection << 5) ^ (m_filt_f1 << 1)) + 2)
 		m_pitch = 0;
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
-	if((m_pitch >> 2) == 1)
+	if((m_pitch & 0xf9) == 0x08)
 		filters_commit(false);
 
 	// Noise shift register.  15 bits, with a nxor on the last two
@@ -486,7 +489,7 @@ void votrax_sc01_device::chip_update()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 
-	//  logerror("tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 2, m_pitch & 3, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
+	//	logerror("%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
 }
 
 void votrax_sc01_device::filters_commit(bool force)
@@ -570,7 +573,7 @@ stream_sample_t votrax_sc01_device::analog_calc()
 	// Voice-only path.
 	// 1. Pick up the pitch wave
 
-	double v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
+	double v = m_pitch >= (9 << 3) ? 0 : s_glottal_wave[m_pitch >> 3];
 
 	// 2. Multiply by the initial amplifier.  It's linear on the die,
 	// even if it's not in the patent.
@@ -622,7 +625,7 @@ stream_sample_t votrax_sc01_device::analog_calc()
 	shift_hist(vn, m_vn_4);
 
 	// 13. Apply the glottal closure amplitude, also linear
-	vn = vn * (7 ^ (m_cur_closure >> 2)) / 7.0;
+	vn = vn * (7 ^ (m_closure >> 2)) / 7.0;
 	shift_hist(vn, m_vn_5);
 
 	// 13. Apply the final fixed filter

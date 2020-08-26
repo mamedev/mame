@@ -226,6 +226,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
+	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 /*************************************************************
@@ -656,6 +657,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 

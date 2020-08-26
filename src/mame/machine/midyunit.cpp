@@ -18,6 +18,7 @@
 #define SOUND_CVSD                  3
 #define SOUND_ADPCM                 4
 #define SOUND_YAWDIM                5
+#define SOUND_YAWDIM2               6
 
 
 
@@ -303,6 +304,7 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 			break;
 
 		case SOUND_YAWDIM:
+		case SOUND_YAWDIM2:
 			break;
 	}
 }
@@ -450,6 +452,13 @@ void midyunit_state::init_mkyawdim()
 	init_generic(6, SOUND_YAWDIM, 0, 0);
 }
 
+void midyunit_state::init_mkyawdim2()
+{
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x9000, 0x97ff, write8smo_delegate(*this, FUNC(midyunit_state::yawdim2_oki_bank_w)));
+	m_audiocpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xa7ff, read8smo_delegate(*this, FUNC(midyunit_state::yawdim2_soundlatch_r)));
+	init_mkyawdim();
+}
+
 
 /*************************************
  *
@@ -551,6 +560,7 @@ MACHINE_RESET_MEMBER(midyunit_state,midyunit)
 			break;
 
 		case SOUND_YAWDIM:
+		case SOUND_YAWDIM2:
 			break;
 	}
 }
@@ -594,6 +604,11 @@ void midyunit_state::midyunit_sound_w(offs_t offset, uint16_t data, uint16_t mem
 			case SOUND_YAWDIM:
 				m_soundlatch->write(data);
 				m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+				break;
+
+			case SOUND_YAWDIM2:
+				m_soundlatch->write(data);
+				m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 				break;
 		}
 }

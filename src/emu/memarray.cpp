@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    memarray.c
+    memarray.cpp
 
     Generic memory array accessor helper.
 

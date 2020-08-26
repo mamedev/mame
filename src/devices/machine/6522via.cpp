@@ -227,6 +227,7 @@ void via6522_device::device_start()
 	m_t1 = timer_alloc(TIMER_T1);
 	m_t2 = timer_alloc(TIMER_T2);
 	m_ca2_timer = timer_alloc(TIMER_CA2);
+	m_cb2_timer = timer_alloc(TIMER_CB2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
 	m_shift_irq_timer = timer_alloc(TIMER_SHIFT_IRQ);
 
@@ -308,6 +309,7 @@ void via6522_device::device_reset()
 	m_t1->adjust(attotime::never);
 	m_t2->adjust(attotime::never);
 	m_ca2_timer->adjust(attotime::never);
+	m_cb2_timer->adjust(attotime::never);
 	m_shift_timer->adjust(attotime::never);
 	m_shift_irq_timer->adjust(attotime::never);
 }
@@ -585,6 +587,17 @@ u8 via6522_device::read(offs_t offset)
 		{
 			LOGINT("PB INT ");
 			CLR_PB_INT();
+
+			if (m_out_cb2 && (CB2_PULSE_OUTPUT(m_pcr) || CB2_AUTO_HS(m_pcr)))
+			{
+				m_out_cb2 = 0;
+				m_cb2_handler(m_out_cb2);
+			}
+
+			if (CB2_PULSE_OUTPUT(m_pcr))
+			{
+				m_cb2_timer->adjust(clocks_to_attotime(1));
+			}
 		}
 		break;
 
@@ -780,10 +793,15 @@ void via6522_device::write(offs_t offset, u8 data)
 		LOGINT("PB INT ");
 		CLR_PB_INT();
 
-		if (m_out_cb2 && CB2_AUTO_HS(m_pcr))
+		if (m_out_cb2 && (CB2_PULSE_OUTPUT(m_pcr) || CB2_AUTO_HS(m_pcr)))
 		{
 			m_out_cb2 = 0;
 			m_cb2_handler(m_out_cb2);
+		}
+
+		if (CB2_PULSE_OUTPUT(m_pcr))
+		{
+			m_cb2_timer->adjust(clocks_to_attotime(1));
 		}
 		break;
 

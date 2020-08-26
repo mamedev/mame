@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	GPL16250 / GPAC800 / GMC384 / GCM420 related support
+    GPL16250 / GPAC800 / GMC384 / GCM420 related support
 
-	GPL16250 is the GeneralPlus / SunPlus part number
-	GPAC800 is the JAKKS Pacific codename
-	GMC384 / GCM420 is what is printed on the die
+    GPL16250 is the GeneralPlus / SunPlus part number
+    GPAC800 is the JAKKS Pacific codename
+    GMC384 / GCM420 is what is printed on the die
 
-	----
+    ----
 
-	GPL16250 games using ROM + RAM configuration
+    GPL16250 games using ROM + RAM configuration
 */
 
 #include "emu.h"
@@ -324,7 +324,7 @@ void paccon_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6593, 0x6593, read16smo_delegate(*this, FUNC(paccon_game_state::paccon_speedup_hack_r)));
-//	install_speedup_hack(0x6593, 0x30033);
+//  install_speedup_hack(0x6593, 0x30033);
 }
 
 void jak_pf_game_state::machine_reset()

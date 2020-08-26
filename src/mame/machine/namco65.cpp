@@ -164,7 +164,7 @@ void namcoc65_device::mcu_map(address_map &map)
 	map(0x3003, 0x3003).r(FUNC(namcoc65_device::mcudi3_r));
 	map(0x5000, 0x57ff).rw(FUNC(namcoc65_device::dpram_byte_r), FUNC(namcoc65_device::dpram_byte_w));
 	map(0x6000, 0x6fff).nopr(); /* watchdog */
-	map(0x8000, 0xffff).rom().region("external", 0);; /* external ROM socket */
+	map(0x8000, 0xffff).rom().region("external", 0); /* external ROM socket */
 }
 
 

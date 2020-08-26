@@ -4,18 +4,14 @@
 #ifndef NLD_NE555_H_
 #define NLD_NE555_H_
 
-#include "netlist/nl_setup.h"
+#include "../nl_setup.h"
 
-#define NE555(name)                                                             \
-		NET_REGISTER_DEV(NE555, name)
+// usage       : NE555(name)
+#define NE555(...)                                                     \
+	NET_REGISTER_DEVEXT(NE555, __VA_ARGS__)
 
-#define NE555_DIP(name)                                                         \
-		NET_REGISTER_DEV(NE555_DIP, name)
-
-#define MC1455P(name)                                                           \
-		NET_REGISTER_DEV(MC1455P, name)
-
-#define MC1455P_DIP(name)                                                       \
-		NET_REGISTER_DEV(MC1455P_DIP, name)
+/// usage       : MC1455P(name)
+#define MC1455P(...)                                                   \
+	NET_REGISTER_DEVEXT(MC1455P, __VA_ARGS__)
 
 #endif /* NLD_NE555_H_ */

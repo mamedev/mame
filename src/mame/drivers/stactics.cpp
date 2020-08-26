@@ -311,7 +311,7 @@ void stactics_state::machine_start()
 void stactics_state::stactics(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 1933560);
+	I8080(config, m_maincpu, 15.46848_MHz_XTAL / 8); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &stactics_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(stactics_state::interrupt));
 

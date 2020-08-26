@@ -2,7 +2,7 @@
 # copyright-holders:Olivier Galibert
 # deco 16 opcodes
 brk_16_imp
-	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
 	if(irq_taken) {
 		read_pc_noinc();
 	} else {
@@ -14,10 +14,10 @@ brk_16_imp
 	dec_SP();
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
-	if(nmi_state) {
+	if(nmi_pending) {
 		PC = read_arg(0xfff7);
 		PC = set_h(PC, read_arg(0xfff6));
-		nmi_state = false;
+		nmi_pending = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
 		PC = read_arg(0xfff3);

@@ -373,7 +373,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	}
 
 	//const uint16_t bgcol = 0x7c1f; // magenta
-//	const uint16_t bgcol = 0x0000; // black
+//  const uint16_t bgcol = 0x0000; // black
 	bool highres;
 	if (m_707f & 0x0010)
 	{
@@ -390,7 +390,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 
 	const uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
-	
+
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
 		m_renderer->new_line(cliprect);
@@ -1054,7 +1054,7 @@ void gcm394_base_video_device::palette_w(offs_t offset, uint16_t data)
 	{
 		offset |= (m_703a_palettebank & 0x000c) << 6;
 		m_paletteram[offset] = data;
-		
+
 		// for debug
 		m_palette->set_pen_color(offset, rgb_t(
 			(((data >> 10) & 0x1f)<<3),

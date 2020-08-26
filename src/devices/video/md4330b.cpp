@@ -70,7 +70,7 @@ void md4330b_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void md4330b_device::update_q()
+void md4330b_device::update_output()
 {
 	u32 out = m_shift;
 	if (m_tc)
@@ -96,8 +96,8 @@ WRITE_LINE_MEMBER(md4330b_device::clk_w)
 			m_shift = (m_shift << 1) | m_di;
 
 		// output
-		update_q();
 		m_write_do(m_do);
+		update_output();
 	}
 
 	m_clk = state;

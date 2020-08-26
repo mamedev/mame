@@ -116,6 +116,8 @@ template class memory_units_descriptor<1,  0, ENDIANNESS_LITTLE>;
 template class memory_units_descriptor<1,  0, ENDIANNESS_BIG>;
 template class memory_units_descriptor<1, -1, ENDIANNESS_LITTLE>;
 template class memory_units_descriptor<1, -1, ENDIANNESS_BIG>;
+template class memory_units_descriptor<2,  3, ENDIANNESS_LITTLE>;
+template class memory_units_descriptor<2,  3, ENDIANNESS_BIG>;
 template class memory_units_descriptor<2,  0, ENDIANNESS_LITTLE>;
 template class memory_units_descriptor<2,  0, ENDIANNESS_BIG>;
 template class memory_units_descriptor<2, -1, ENDIANNESS_LITTLE>;

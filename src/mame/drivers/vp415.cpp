@@ -508,7 +508,7 @@ void vp415_state::vp415(machine_config &config)
 
 	// Module S: Control
 	I8031(config, m_ctrlcpu, XTAL(11'059'200)); // 11.059MHz, per schematic
-	m_ctrlcpu->port_out_cb<1>().set(FUNC(vp415_state::ctrl_cpu_port1_w));;
+	m_ctrlcpu->port_out_cb<1>().set(FUNC(vp415_state::ctrl_cpu_port1_w));
 	m_ctrlcpu->port_in_cb<1>().set(FUNC(vp415_state::ctrl_cpu_port1_r));
 	m_ctrlcpu->port_out_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_w));
 	m_ctrlcpu->port_in_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_r));

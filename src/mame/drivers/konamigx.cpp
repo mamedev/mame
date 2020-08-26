@@ -3983,7 +3983,7 @@ void konamigx_state::init_posthack()
 GAME( 1994, konamigx,  0,        konamigx_bios, common, konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   Type 1: standard with an add-on 53936 on the ROM board, analog inputs, 
+   Type 1: standard with an add-on 53936 on the ROM board, analog inputs,
    and optional 056230 networking for Racin' Force only.
    needs the ROZ layer to be playable
    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/

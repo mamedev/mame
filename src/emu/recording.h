@@ -73,10 +73,11 @@ protected:
 
 	// accessors
 	int current_frame() const { return m_frame; }
+	void set_frame_period(attotime time) { m_frame_period = time; }
 
 private:
 	screen_device * m_screen;               // screen associated with this movie (can be nullptr)
-	attotime        m_frame_period;         // time of frame period
+	attotime        m_frame_period;         // duration of movie frame
 	attotime        m_next_frame_time;      // time of next frame
 	int             m_frame;                // current movie frame number
 };

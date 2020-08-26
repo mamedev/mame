@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ioport.c
+    ioport.cpp
 
     Input/output port handling.
 
@@ -1378,7 +1378,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
-		for (int which = 0; which < 4; which++)
+		for (int which = 0; which < (1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1)); which++)
 		{
 			std::vector<char32_t> const codes = field.keyboard_codes(which);
 			if (codes.empty())
@@ -3520,14 +3520,14 @@ void analog_field::frame_update(running_machine &machine)
 	// get the new raw analog value and its type
 	input_item_class itemclass;
 	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
-	
+
 	// use programmatically set value if avaiable
 	if (m_was_written)
 	{
 		m_was_written = false;
 		rawvalue = m_prog_analog_value;
 	}
-	
+
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
 	{

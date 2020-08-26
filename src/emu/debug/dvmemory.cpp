@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvmemory.c
+    dvmemory.cpp
 
     Memory debugger view.
 

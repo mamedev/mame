@@ -2199,11 +2199,6 @@ uint64_t newport_base_device::rex3_r(offs_t offset, uint64_t mem_mask)
 	return ret;
 }
 
-uint32_t newport_base_device::do_endian_swap(uint32_t color)
-{
-	return (color >> 24) | (color << 24) | ((color >> 8) & 0x0000ff00) | ((color << 8) & 0x00ff0000);
-}
-
 uint32_t newport_base_device::get_host_color()
 {
 	static const uint32_t s_color_masks[4] = { 0xf, 0xff, 0xfff, 0xffffffff };
@@ -2259,7 +2254,7 @@ uint32_t newport_base_device::get_host_color()
 		break;
 	}
 	if (BIT(m_rex3.m_draw_mode1, 11))
-		color = do_endian_swap(color);
+		color = swapendian_int32(color);
 	return color;
 }
 

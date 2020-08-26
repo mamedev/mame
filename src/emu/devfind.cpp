@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    devfind.c
+    devfind.cpp
 
     Device finding template helpers.
 

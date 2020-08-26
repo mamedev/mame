@@ -118,6 +118,7 @@ void a2_video_device::device_start()
 	save_item(NAME(m_GSborder));
 	save_item(NAME(m_newvideo));
 	save_item(NAME(m_monochrome));
+	save_item(NAME(m_rgbmode));
 	save_item(NAME(m_shr_palette));
 }
 
@@ -136,6 +137,7 @@ void a2_video_device::device_reset()
 	m_80store = false;
 	m_monohgr = false;
 	m_newvideo = 0x01;
+	m_rgbmode = 3;  // default to color DHGR
 }
 
 WRITE_LINE_MEMBER(a2_video_device::txt_w)
@@ -174,6 +176,14 @@ WRITE_LINE_MEMBER(a2_video_device::dhires_w)
 {
 	// select double hi-res
 	screen().update_now();
+
+	// RGB cards shift in a mode bit on the rising edge
+	if ((m_dhires) && (state))
+	{
+		m_rgbmode = (m_rgbmode << 1) & 3;
+		m_rgbmode |= m_80col ? 1 : 0;
+	}
+
 	m_dhires = !state;
 }
 
@@ -453,7 +463,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	switch (m_sysconfig & 0x03)
 	{
-		case 0: fg = WHITE; break;
+		case 0: case 4: fg = WHITE; break;
 		case 1: fg = WHITE; break;
 		case 2: fg = GREEN; break;
 		case 3: fg = ORANGE; break;
@@ -570,7 +580,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	switch (m_sysconfig & 0x03)
 	{
-		case 0: fg = WHITE; break;
+		case 0: case 4: fg = WHITE; break;
 		case 1: fg = WHITE; break;
 		case 2: fg = GREEN; break;
 		case 3: fg = ORANGE; break;
@@ -750,13 +760,14 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int fg = 0;
 	int bg = 0;
 
+	if (m_aux_ptr)
+	{
+		aux_page = m_aux_ptr;
+	}
+
 	if (m_80col)
 	{
 		start_address = 0x400;
-		if (m_aux_ptr)
-		{
-			aux_page = m_aux_ptr;
-		}
 	}
 	else
 	{
@@ -768,7 +779,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	switch (m_sysconfig & 0x03)
 	{
-		case 0: fg = WHITE; break;
+		case 0: case 4: fg = WHITE; break;
 		case 1: fg = WHITE; break;
 		case 2: fg = GREEN; break;
 		case 3: fg = ORANGE; break;
@@ -795,6 +806,13 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				/* calculate address */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				if (((m_sysconfig & 7) == 4) && (m_dhires))
+				{
+					u8 tmp = aux_page[address];
+					fg = tmp>>4;
+					bg = tmp & 0xf;
+				}
+
 				plot_text_character(bitmap, col * 14, row, 2, m_ram_ptr[address],
 					m_char_ptr, m_char_size, fg, bg);
 			}
@@ -815,7 +833,7 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 
 	switch (m_sysconfig & 0x03)
 	{
-		case 0: fg = WHITE; break;
+		case 0: case 4: fg = WHITE; break;
 		case 1: fg = WHITE; break;
 		case 2: fg = GREEN; break;
 		case 3: fg = ORANGE; break;
@@ -1027,6 +1045,12 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				mon_type = 1;
 			}
 
+			// IIgs $C021 monochrome HGR
+			if (m_monochrome & 0x80)
+			{
+				mon_type = 1;
+			}
+
 			switch (mon_type)
 			{
 				case 0:
@@ -1225,9 +1249,17 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	uint32_t w;
 	int page = m_page2 ? 0x4000 : 0x2000;
 	int mon_type = m_sysconfig & 0x03;
+	bool bIsRGB = ((m_sysconfig & 7) == 4);
+	bool bIsRGBMixed = ((bIsRGB) && (m_rgbmode == 1));
 
 	// IIgs force-monochrome-DHR setting
 	if (m_newvideo & 0x20)
+	{
+		mon_type = 1;
+	}
+
+	// IIe RGB card monochrome DHR
+	if ((bIsRGB) && (m_rgbmode == 0))
 	{
 		mon_type = 1;
 	}
@@ -1265,19 +1297,96 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		p = &bitmap.pix16(row);
 
+		// RGB DHR 160-wide mode
+		if ((bIsRGB) && (m_rgbmode == 2))
+		{
+			mon_type = 4;
+		}
+
 		for (col = 0; col < 80; col++)
 		{
 			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
 				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
 				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
+			/*
+			    DHGR pixel layout:
+			    column & 3 =  0        1        2        3
+			               nBBBAAAA nDDCCCCB nFEEEEDD nGGGGFFF
+
+			    n is don't care on the stock hardware's NTSC output.
+
+			    On RGB cards, in mixed mode (DHGR with special mode value == 1), n
+			    controls if a pixel quad starting in that byte is color or monochrome.
+			    Pixel quads A&B are controlled by n in byte 0, C&D by n in byte 1,
+			    E&F by n in byte 2, and G by n in byte 3.
+			*/
+
 			switch (mon_type)
 			{
 				case 0:
-					for (b = 0; b < 7; b++)
+					// every 3rd column, the first pixel quad is controlled by the previous
+					// byte's MSB, because we always draw 2 quads per column.
+					if ((bIsRGBMixed) && ((col & 3) == 3))
 					{
-						v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
-						*(p++) = v;
+						uint32_t tw = (w >> 6);
+
+						if (!(vram_row[col-1] & 0x80))
+						{
+							for (b = 0; b < 4; b++)
+							{
+								v = (tw & 1);
+								tw >>= 1;
+								*(p++) = v ? WHITE : BLACK;
+							}
+						}
+						else
+						{
+							for (b = 0; b < 4; b++)
+							{
+								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+								*(p++) = v;
+							}
+						}
+
+						if (!(vram_row[col] & 0x80))
+						{
+							for (b = 4; b < 7; b++)
+							{
+								v = (tw & 1);
+								tw >>= 1;
+								*(p++) = v ? WHITE : BLACK;
+							}
+						}
+						else
+						{
+							for (b = 4; b < 7; b++)
+							{
+								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+								*(p++) = v;
+							}
+						}
+					}
+					else
+					{
+						if ((bIsRGBMixed) && !(vram_row[col] & 0x80))
+						{
+							uint32_t tw = (w >> 6);
+							for (b = 0; b < 7; b++)
+							{
+								v = (tw & 1);
+								tw >>= 1;
+								*(p++) = v ? WHITE : BLACK;
+							}
+						}
+						else
+						{
+							for (b = 0; b < 7; b++)
+							{
+								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+								*(p++) = v;
+							}
+						}
 					}
 					break;
 
@@ -1310,6 +1419,35 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						*(p++) = v ? ORANGE : BLACK;
 					}
 					break;
+
+				// RGB 160-wide mode (which has a much simpler VRAM layout)
+				case 4:
+					if (col == 0)
+					{
+						// Center the 480-wide image in the 560-wide display.
+						// Aspect ratio won't be perfect, but it's in range.
+						for (b = 0; b < 40; b++)
+						{
+							*(p++) = BLACK;
+						}
+					}
+					v = vram_row[col];
+					*(p++) = v & 0xf;
+					*(p++) = v & 0xf;
+					*(p++) = v & 0xf;
+					v >>= 4;
+					*(p++) = v & 0xf;
+					*(p++) = v & 0xf;
+					*(p++) = v & 0xf;
+					break;
+			}
+		}
+
+		if (mon_type == 4)
+		{
+			for (b = 0; b < 40; b++)
+			{
+				*(p++) = BLACK;
 			}
 		}
 	}

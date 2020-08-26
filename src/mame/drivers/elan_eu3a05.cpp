@@ -247,7 +247,7 @@ public:
 
 	void init_sudelan();
 	void init_sudelan3();
-
+	
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -255,6 +255,9 @@ protected:
 
 	required_device<elan_eu3a05sys_device> m_sys;
 	required_device<elan_eu3a05gpio_device> m_gpio;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 private:
 	// screen updates
@@ -272,8 +275,6 @@ private:
 
 	virtual void video_start() override;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_ram;
 	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05vid_device> m_vid;
@@ -311,6 +312,27 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
+};
+
+
+class elan_eu3a05_pvwwcas_state : public elan_eu3a05_state
+{
+public:
+	elan_eu3a05_pvwwcas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		elan_eu3a05_state(mconfig, type, tag),
+		m_prevport_c(0xff)
+	{ }
+
+	void pvwwcas(machine_config& config);
+
+	void init_pvwwcas();
+
+protected:
+
+private:
+	uint8_t pvwwc_portc_r();
+	void pvwwc_portc_w(uint8_t data);
+	uint8_t m_prevport_c;
 };
 
 void elan_eu3a05_buzztime_state::machine_start()
@@ -804,6 +826,53 @@ void elan_eu3a05_state::airblsjs(machine_config& config)
 }
 
 
+uint8_t elan_eu3a05_pvwwcas_state::pvwwc_portc_r()
+{
+	int pc = m_maincpu->pc();
+
+	if ((pc!=0xEBAC) && (pc!= 0xEBB5) && (pc != 0xEBA3) && (pc != 0xEBE1))
+		logerror("%s: pvwwc_portc_r\n", machine().describe_context().c_str());
+
+	if (pc == 0xEBE1)
+		logerror("%s: pvwwc_portc_r reading input bit\n\n", machine().describe_context());
+
+	return m_prevport_c | 0x4;
+}
+
+void elan_eu3a05_pvwwcas_state::pvwwc_portc_w(uint8_t data)
+{
+	logerror("%s: pvwwc_portc_w %02x\n", machine().describe_context());
+
+
+	if ((m_prevport_c & 0x01) != (data & 0x01))
+	{
+		if (data & 0x01)
+			logerror("bit 0 going high\n");
+		else
+			logerror("bit 0 going low\n");
+	}
+
+	if ((m_prevport_c & 0x02) != (data & 0x02))
+	{
+		if (data & 0x02)
+			logerror("bit 1 going high\n");
+		else
+			logerror("bit 1 going low\n");
+	}
+
+	m_prevport_c = data;
+}
+
+void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config& config)
+{
+	elan_eu3a05(config);
+	m_screen->set_refresh_hz(50);
+	m_sys->set_pal(); // TODO: also set PAL clocks
+
+	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r)); 
+	m_gpio->write_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_w));
+}
+
 
 
 ROM_START( rad_tetr )
@@ -867,6 +936,12 @@ ROM_START( buzztime )
 ROM_END
 
 
+ROM_START( pvwwcas )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "playvisiontaikeecasino.bin", 0x000000, 0x200000, CRC(b5e4a58d) SHA1(0a7809e91023258ecd55386b3e36b1541fb9e7f6) )
+	ROM_RELOAD(0x200000, 0x200000)
+ROM_END
+
 void elan_eu3a05_state::init_sudelan3()
 {
 	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
@@ -883,6 +958,15 @@ void elan_eu3a05_state::init_sudelan()
 	ROM[0xd0f] = 0xea;
 	ROM[0xd10] = 0xea;
 	ROM[0xd11] = 0xea;
+}
+
+void elan_eu3a05_pvwwcas_state::init_pvwwcas()
+{
+	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown? or I/O failure?)
+	uint8_t* ROM = memregion("maincpu")->base();
+	ROM[0x3f8d92] = 0xea;
+	ROM[0x3f8d93] = 0xea;
+	ROM[0x3f8d94] = 0xea;
 }
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
@@ -904,3 +988,6 @@ CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, 
 
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
 CONS( 2006, pvmilfin, 0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Haluatko miljon\xc3\xa4\xc3\xa4riksi? (Finland)", MACHINE_NOT_WORKING )
+
+CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
+

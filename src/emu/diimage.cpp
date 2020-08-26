@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    diimage.c
+    diimage.cpp
 
     Device image interfaces.
 
@@ -195,7 +195,7 @@ void device_image_interface::set_image_filename(const std::string &filename)
 	auto iter = std::find_if(
 		m_image_name.rbegin(),
 		m_image_name.rend(),
-		[](char c) { return (c == '\\') || (c == '/'); });
+		[](char c) { return (c == '\\') || (c == '/') || (c == ':'); });
 
 	if (iter != m_image_name.rend())
 		m_basename.assign(iter.base(), m_image_name.end());

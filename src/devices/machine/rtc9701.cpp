@@ -377,7 +377,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos>4)
 					{
 						rtc9701_data_pos++;
-						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;
+						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);
 					}
 
 					if (cmd_stream_pos==12)
@@ -438,7 +438,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos>12)
 					{
 						rtc9701_data_pos++;
-						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;
+						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);
 					}
 
 					if (cmd_stream_pos==28)

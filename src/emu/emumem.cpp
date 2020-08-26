@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Olivier Galibert
 /***************************************************************************
 
-    emumem.c
+    emumem.cpp
 
     Functions which handle device memory access.
 
@@ -599,7 +599,7 @@ public:
 	// native read
 	NativeType read_native(offs_t offset, NativeType mask)
 	{
-		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);;
+		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, mask, m_dispatch_read);
 	}
 
 	// mask-less native read
@@ -611,13 +611,13 @@ public:
 	// native write
 	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 	// mask-less native write
 	void write_native(offs_t offset, NativeType data)
 	{
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), offset & m_addrmask, data, uX(0xffffffffffffffffU), m_dispatch_write);
 	}
 
 	// virtual access to these functions
@@ -939,6 +939,11 @@ void memory_manager::allocate(device_memory_interface &memory)
 				case 0x1000|0x000|16|(4-1): memory.allocate<address_space_specific<0, 1, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
 				case 0x0000|0x100|16|(4-1): memory.allocate<address_space_specific<1, 1, -1, ENDIANNESS_LITTLE>>(*this, spacenum); break;
 				case 0x1000|0x100|16|(4-1): memory.allocate<address_space_specific<1, 1, -1, ENDIANNESS_BIG   >>(*this, spacenum); break;
+
+				case 0x0000|0x000|32|(4+3): memory.allocate<address_space_specific<0, 2,  3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x000|32|(4+3): memory.allocate<address_space_specific<0, 2,  3, ENDIANNESS_BIG   >>(*this, spacenum); break;
+				case 0x0000|0x100|32|(4+3): memory.allocate<address_space_specific<1, 2,  3, ENDIANNESS_LITTLE>>(*this, spacenum); break;
+				case 0x1000|0x100|32|(4+3): memory.allocate<address_space_specific<1, 2,  3, ENDIANNESS_BIG   >>(*this, spacenum); break;
 
 				case 0x0000|0x000|32|(4-0): memory.allocate<address_space_specific<0, 2,  0, ENDIANNESS_LITTLE>>(*this, spacenum); break;
 				case 0x1000|0x000|32|(4-0): memory.allocate<address_space_specific<0, 2,  0, ENDIANNESS_BIG   >>(*this, spacenum); break;

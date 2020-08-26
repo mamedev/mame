@@ -318,8 +318,7 @@ void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 
 void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 {
-	if (m_exp->romcs())
-		m_exp->mreq_w(offset, data);
+	m_exp->mreq_w(offset, data);
 }
 
 uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
@@ -785,7 +784,11 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
+#if 1 // change to 0 in order to get working "Proceed 1" VC1541 FDC
 	config.set_maximum_quantum(attotime::from_hz(60));
+#else
+	config.set_perfect_quantum(m_maincpu);
+#endif
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 

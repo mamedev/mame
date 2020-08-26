@@ -21,18 +21,6 @@
 
 namespace plib
 {
-	template<class T>
-	struct string_info
-	{
-		using mem_t = typename T::mem_t;
-	};
-
-	template<>
-	struct string_info<std::string>
-	{
-		using mem_t = char;
-	};
-
 	template<typename T>
 	pstring to_string(const T &v)
 	{

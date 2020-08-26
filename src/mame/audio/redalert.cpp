@@ -274,7 +274,7 @@ void redalert_state::ww3_audio(machine_config &config)
 void redalert_state::panther_audio(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	
+
 	redalert_audio_m37b(config);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &redalert_state::panther_audio_map);
 }

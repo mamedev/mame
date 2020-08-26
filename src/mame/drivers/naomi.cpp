@@ -3265,9 +3265,10 @@ EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 Korea and Australia is missing.
 
-EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
-EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+version text at 0x1ffd60 / version shown in test mode
+EPR-21576h - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI GAME BOOT ROM Ver 2.01 (Japan)
+EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI GAME BOOT ROM Ver 2.01 (USA)
+EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI GAME BOOT ROM Ver 2.01 (Export)
 Korea and Australia is missing.
 
 EPR-21336  - No known dumps (Development BOOT ROM)
@@ -3514,9 +3515,10 @@ EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 EPR-23609B - NAOMI BOOT ROM 2001 09/10  1.70 (Korea)
 Australia is missing.
 
-EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
-EPR-23607C - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
-EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
+version text at 0x1ffd60 / version shown in test mode
+EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (Japan)
+EPR-23607C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (USA)
+EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (Export)
 Korea and Australia is missing.
 Actual build date Dec 19 2005.
 
@@ -6402,7 +6404,8 @@ ROM_START( shootplmp )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
-/* Oinori-daimyoujin Matsuri (medal) */
+// Oinori-daimyoujin Matsuri (medal)
+// 837-14391-01 SATL BD OND CRX MATSURI
 ROM_START( oinori )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -11482,6 +11485,7 @@ ROM_END
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
+// 0167 Mushiking 2K6 1ST (Japan)
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 // 0171 Mushiking 2K6 2ND (Japan) note: starting from ver 2K6 was moved to SystemSP platform and later to PC-based hardware

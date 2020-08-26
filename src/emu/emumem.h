@@ -1941,7 +1941,7 @@ private:
 
 
 template<int Width, int AddrShift, endianness_t Endian>
-typename emu::detail::handler_entry_size<Width>::uX 
+typename emu::detail::handler_entry_size<Width>::uX
 emu::detail::memory_access_cache<Width, AddrShift, Endian>::
 read_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX mask)
 {

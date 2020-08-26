@@ -44,9 +44,6 @@ protected:
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
 private:
-	uint8_t status_r();
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-
 	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
@@ -60,6 +57,7 @@ private:
 	required_device<output_latch_device> m_cent_data_out;
 	required_ioport m_option;
 
+	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_romsel;
 	uint8_t m_rom_base;
 	int m_centronics_busy;

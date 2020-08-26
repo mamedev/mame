@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvstate.c
+    dvstate.cpp
 
     State debugger view.
 

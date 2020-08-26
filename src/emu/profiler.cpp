@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    profiler.c
+    profiler.cpp
 
     Functions to manage profiling of MAME execution.
 

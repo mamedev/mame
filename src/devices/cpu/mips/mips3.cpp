@@ -5044,11 +5044,6 @@ void r5900le_device::handle_sdc2(uint32_t op)
 	}
 }
 
-void mips3_device::burn_cycles(int32_t cycles)
-{
-	execute_burn(cycles);
-}
-
 #if ENABLE_O2_DPRINTF
 #include "o2dprintf.hxx"
 #endif
