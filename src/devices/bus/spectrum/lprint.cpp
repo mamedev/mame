@@ -61,7 +61,7 @@ ROM_START(lprint3)
 	// clones
 	ROM_SYSTEM_BIOS(2, "kp", "Sandy") // from Sandy Disco V3 (Kempston Disc clone) lower PCB, also have joystick port and passthru connector
 	ROMX_LOAD("sandy.rom", 0x0000, 0x0800, CRC(77e752f2) SHA1(11f44c5e743a413e8bc0d07c4249f36d2c0a172a), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "rus", "Art East Computers (RU)") // added support for popular Soviet and Eastern Block made printers
+	ROM_SYSTEM_BIOS(3, "rus", "Art East Computers (RU)") // added support for popular Soviet and Eastern Bloc made printers
 	ROMX_LOAD("himak.rom", 0x0000, 0x0800, CRC(b1f15976) SHA1(d9c0297c05e8092fb7e0198f4172d3d4e6ed252c), ROM_BIOS(3))
 ROM_END
 
