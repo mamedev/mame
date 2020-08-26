@@ -18,7 +18,6 @@
         0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
         0xfffff0 - 0xffffff     Auto Vector
 
-
     Interrupts:
         M68K:
             Level 1 from VIA
@@ -41,6 +40,14 @@
           'g 6802c73c' to get to the interesting part (wait past the boot chime).  PPC register r24 is the 68000 PC.
           when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
           a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
+
+	TODO:
+		- SE and Classic to own driver
+		- Portable and PowerBook 100 to own driver
+		- Remaining PowerBooks to own driver
+		- Quadra 700 to own driver
+		- V8 and friends to own driver
+		- LC3 / LC520 / IIvx / IIvi to own driver
 
 ****************************************************************************/
 
@@ -728,7 +735,7 @@ void mac_state::maciifx_map(address_map &map)
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
 void mac_state::macpb140_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x01f00000);
 	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x01f00000);
@@ -745,7 +752,7 @@ void mac_state::macpb140_map(address_map &map)
 
 void mac_state::macpb160_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -763,7 +770,7 @@ void mac_state::macpb160_map(address_map &map)
 
 void mac_state::macpb165c_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -786,7 +793,7 @@ void mac_state::macpb165c_map(address_map &map)
 
 void mac_state::macpd210_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -806,7 +813,7 @@ void mac_state::macpd210_map(address_map &map)
 
 void mac_state::quadra700_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00fc0000);
 	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00fc0000);
