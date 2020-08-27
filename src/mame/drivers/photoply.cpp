@@ -338,13 +338,16 @@ void photoply_state::photoply_dx4_100(machine_config &config)
 
 ROM_START(photoply98sp)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
-	ROM_LOAD("funworld_award_v4.51g.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // Award Modular BIOS v4.51G, AT27C010, Funworld sticker: Sept 1998
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010, Funworld sticker: Sept 1998
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip, Funworld sticker: Sept 1998 
 	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	ROM_REGION(0x10000, "hdd_fw", 0) // Hard disk firmware
+	ROM_LOAD("m2_at29c512.bin", 0x0000, 0x10000, CRC(22a1c9ce) SHA1(6b695ee56867176d1702273e68b5584db1b94e02) ) // Seagate ST31722A
 
 	// Seagate ST31722A
 	// 3303 CYL 1704MB 16 HEADS 63 SECTORS
@@ -361,7 +364,7 @@ ROM_END
    3 x ISA + 2 x PCI */
 ROM_START(photoply99sp)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
-	ROM_LOAD("funworld_award_v4.51g.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // Award Modular BIOS v4.51G, AT29C010A
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT29C010A
 
 	/* Multifunction board with a ESS AudioDrive chip ISA Sound + I/O (PP2000/CI-8000)
 	   ESS AudioDrve ES1868F
@@ -410,7 +413,7 @@ ROM_END
 
 ROM_START(photoply)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
-	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // Award Modular BIOS v4.51G
+	ROM_LOAD("funworld_award_486e_w83787_alt.bin", 0x000000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS (same string as 'photoply99sp' and 'photoply99sp' BIOSes, but different hash)
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
 	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) ) // Centos Combo I/O ROM BIOS for CI-8000/PP2000 v1.06, M27128A
@@ -428,9 +431,9 @@ ROM_END
 // BIOS not provided, might be different
 ROM_START(photoply2k4)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
-	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
+	ROM_LOAD("funworld_award_486e_w83787_alt.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS (same string as 'photoply99sp' and 'photoply99sp' BIOSes, but different hash)
 
-	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip,  M27128A
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip, M27128A
 	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, BAD_DUMP CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
 //  ROM_RELOAD(                   0x004000, 0x4000 )
 //  ROM_RELOAD(                   0x008000, 0x4000 )
@@ -440,7 +443,7 @@ ROM_START(photoply2k4)
 	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) BAD_DUMP SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
 
 	DISK_REGION( "ide:0:hdd:image" )
-//  CYLS:1023,HEADS:64,SECS:63,BPS:512.
+	// CYLS:1023,HEADS:64,SECS:63,BPS:512.
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
 
