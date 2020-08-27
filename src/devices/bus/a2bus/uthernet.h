@@ -37,9 +37,6 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 
 private:
-
-	bool m_started;
-	std::string m_interface;
 	required_device<cs8900a_device> m_netinf;
 
 };

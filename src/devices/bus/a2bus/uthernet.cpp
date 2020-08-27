@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "uthernet.h"
 
 /***************************************************************************
@@ -20,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_UTHERNET, a2bus_uthernet_device, "uthernet", "Uthernet")
+DEFINE_DEVICE_TYPE(A2BUS_UTHERNET, a2bus_uthernet_device, "a2uthernet", "Uthernet")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -34,15 +33,13 @@ a2bus_uthernet_device::a2bus_uthernet_device(const machine_config &mconfig, cons
 a2bus_uthernet_device::a2bus_uthernet_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
-		m_started(false),
-		m_interface(mconfig.options().value(OPTION_UTHERNET_INTF)),
 		m_netinf(*this, "cs8900a")
 {
 }
 
 void a2bus_uthernet_device::device_add_mconfig(machine_config &config)
 {
-	CS8900A(config, m_netinf, 0);
+	CS8900A(config, m_netinf, 20_MHz_XTAL); // see CS8900A data sheet sec 3.13
 }
 
 //-------------------------------------------------
