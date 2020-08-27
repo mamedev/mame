@@ -33,8 +33,8 @@ protected:
 
 	virtual void cart_init() override;
 
-	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset + 0x2000]; }
-	virtual u8 read_rom0c(offs_t offset) override { return read_rom04(offset); }
+	virtual u8 read_rom04(offs_t offset) override { return m_rom[offset]; }
+	virtual u8 read_rom0c(offs_t offset) override { return m_rom[offset]; }
 
 	virtual void write_p1(u8 data) override;
 	virtual void io_write(offs_t offset, u8 data) override;
@@ -44,7 +44,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<generic_latch_8_device, 2> m_latch;
 
-	u8 internal_rom_r(offs_t offset) { return m_rom[offset]; }
+	u8 internal_rom_r(offs_t offset) { return m_exrom[offset]; }
 
 	void chess_io(address_map &map);
 	void chess_mem(address_map &map);

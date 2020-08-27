@@ -35,7 +35,7 @@ void o2_chess_device::device_start()
 
 void o2_chess_device::cart_init()
 {
-	if (m_rom_size != 0x2800)
+	if (m_rom.bytes() != 0x800 || !m_exrom || m_exrom.bytes() != 0x2000)
 		fatalerror("o2_chess_device: Wrong ROM region size\n");
 }
 

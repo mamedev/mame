@@ -575,53 +575,6 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		/* Display objects if enabled */
 		if ( m_vdc.s.control & 0x20 && scanline <= 242 )
 		{
-			/* Regular foreground objects */
-			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
-			{
-				int y = m_vdc.s.foreground[i].y;
-				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
-				if (height == 1) height = 8;
-
-				if ( y <= scanline && scanline < y + height * 2 )
-				{
-					uint16_t color = 8 + ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 );
-					int offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-					uint8_t chr = m_charset[ offset & 0x1FF ];
-					int x = (m_vdc.s.foreground[i].x + 5) * 2;
-
-					for ( uint8_t m = 0x80; m > 0; m >>= 1, x += 2 )
-					{
-						if ( chr & m )
-						{
-							for (int px = x; px < x + 2; px++)
-							{
-								if (cliprect.contains(px, scanline))
-								{
-									// Check collision with self
-									u8 colx = m_collision_map[ px ];
-									if (colx & 0x80)
-									{
-										colx &= ~0x80;
-										m_control_status |= 0x80;
-									}
-
-									// Check if we collide with an already drawn source object
-									if (m_vdc.s.collision & colx)
-										m_collision_status |= 0x80;
-
-									// Check if an already drawn object would collide with us
-									if (m_vdc.s.collision & 0x80)
-										m_collision_status |= colx;
-
-									m_collision_map[ px ] |= 0x80;
-									bitmap.pix16( scanline, px ) = color;
-								}
-							}
-						}
-					}
-				}
-			}
-
 			/* Quad objects */
 			for ( int i = ARRAY_LENGTH( m_vdc.s.quad ) - 1; i >= 0; i-- )
 			{
@@ -668,6 +621,53 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 										m_collision_map[ px ] |= 0x80;
 										bitmap.pix16( scanline, px ) = color;
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			/* Regular foreground objects */
+			for ( int i = ARRAY_LENGTH( m_vdc.s.foreground ) - 1; i >= 0; i-- )
+			{
+				int y = m_vdc.s.foreground[i].y;
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
+				if (height == 1) height = 8;
+
+				if ( y <= scanline && scanline < y + height * 2 )
+				{
+					uint16_t color = 8 + ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 );
+					int offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
+					uint8_t chr = m_charset[ offset & 0x1FF ];
+					int x = (m_vdc.s.foreground[i].x + 5) * 2;
+
+					for ( uint8_t m = 0x80; m > 0; m >>= 1, x += 2 )
+					{
+						if ( chr & m )
+						{
+							for (int px = x; px < x + 2; px++)
+							{
+								if (cliprect.contains(px, scanline))
+								{
+									// Check collision with self
+									u8 colx = m_collision_map[ px ];
+									if (colx & 0x80)
+									{
+										colx &= ~0x80;
+										m_control_status |= 0x80;
+									}
+
+									// Check if we collide with an already drawn source object
+									if (m_vdc.s.collision & colx)
+										m_collision_status |= 0x80;
+
+									// Check if an already drawn object would collide with us
+									if (m_vdc.s.collision & 0x80)
+										m_collision_status |= colx;
+
+									m_collision_map[ px ] |= 0x80;
+									bitmap.pix16( scanline, px ) = color;
 								}
 							}
 						}

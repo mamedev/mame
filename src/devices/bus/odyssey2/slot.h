@@ -30,6 +30,8 @@ enum
 
 class device_o2_cart_interface : public device_interface
 {
+	friend class o2_cart_slot_device;
+
 public:
 	// construction/destruction
 	virtual ~device_o2_cart_interface();
@@ -47,16 +49,18 @@ public:
 
 	virtual void cart_init() { } // called after loading ROM
 
-	void rom_alloc(uint32_t size, const char *tag);
-	uint8_t* get_rom_base() { return m_rom; }
-	uint32_t get_rom_size() { return m_rom_size; }
+	uint8_t* get_rom_base() { return m_rom ? &m_rom[0] : nullptr; }
+	uint32_t get_rom_size() { return m_rom ? m_rom.bytes() : 0; }
+
+	uint8_t* get_voice_base() { return m_voice ? &m_voice[0] : nullptr; }
+	uint32_t get_voice_size() { return m_voice ? m_voice.bytes() : 0; }
 
 protected:
 	device_o2_cart_interface(const machine_config &mconfig, device_t &device);
 
-	// internal state
-	uint8_t *m_rom;
-	uint32_t m_rom_size;
+	optional_shared_ptr<uint8_t> m_rom;
+	optional_shared_ptr<uint8_t> m_exrom;
+	optional_shared_ptr<uint8_t> m_voice;
 };
 
 
@@ -98,6 +102,7 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
+	device_o2_cart_interface* cart() { return m_cart; }
 
 	// reading and writing
 	uint8_t read_rom04(offs_t offset);
@@ -125,12 +130,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device)
 
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define O2SLOT_ROM_REGION_TAG ":cart:rom"
 
 void o2_cart(device_slot_interface &device);
 
