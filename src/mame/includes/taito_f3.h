@@ -78,7 +78,6 @@ public:
 		m_dial(*this, "DIAL.%u", 0),
 		m_eepromin(*this, "EEPROMIN"),
 		m_eepromout(*this, "EEPROMOUT"),
-		m_audiocpu(*this, "taito_en:audiocpu"),
 		m_taito_en(*this, "taito_en"),
 		m_oki(*this, "oki"),
 		m_paletteram32(*this, "paletteram"),
@@ -382,7 +381,6 @@ protected:
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	optional_device<cpu_device> m_audiocpu;
 	optional_device<taito_en_device> m_taito_en;
 	optional_device<okim6295_device> m_oki;
 

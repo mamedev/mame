@@ -162,6 +162,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_active_voices(0)
 	, m_mode(0)
 	, m_irqv(0x80)
+	, m_voice_index(0)
 	, m_scratch(nullptr)
 	, m_ulaw_lookup(nullptr)
 	, m_volume_lookup(nullptr)
@@ -217,6 +218,7 @@ void es550x_device::device_start()
 	save_item(NAME(m_active_voices));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_irqv));
+	save_item(NAME(m_voice_index));
 
 	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
 
@@ -235,7 +237,6 @@ void es550x_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, o2n1));
 	save_item(STRUCT_MEMBER(m_voice, o2n2));
 	save_item(STRUCT_MEMBER(m_voice, o1n1));
-	save_item(STRUCT_MEMBER(m_voice, exbank));
 }
 
 void es5506_device::device_start()
@@ -360,7 +361,6 @@ es5505_device::es5505_device(const machine_config &mconfig, const char *tag, dev
 	: es550x_device(mconfig, ES5505, tag, owner, clock)
 	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 20, -1) // 20 bit address bus, word addressing only
 	, m_bank1_config("bank1", ENDIANNESS_BIG, 16, 20, -1)
-	, m_exbank(0)
 {
 }
 
@@ -399,7 +399,6 @@ void es5505_device::device_start()
 	// 20 bit integer and 9 bit fraction
 	get_accum_mask(ADDRESS_INTEGER_BIT_ES5505, ADDRESS_FRAC_BIT_ES5505);
 
-	save_item(NAME(m_exbank));
 	// success
 }
 
@@ -504,7 +503,6 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 		m_voice[j].control = CONTROL_STOPMASK;
 		m_voice[j].lvol = (1 << (total_volume_bit - 1));
 		m_voice[j].rvol = (1 << (total_volume_bit - 1));
-		m_voice[j].exbank = 0;
 	}
 }
 
@@ -2024,7 +2022,7 @@ inline u16 es5505_device::reg_read_high(es550x_voice *voice, offs_t offset)
 			if ((voice->control & CONTROL_STOPMASK))
 			{
 				voice->o1n1 = read_sample(voice, get_integer_addr(voice->accum));
-				// logerror("%02x %08x ==> %08x\n",voice->o1n1,get_bank(voice->control),voice->exbank + get_integer_addr(voice->accum));
+				// logerror("%02x %08x ==> %08x\n",voice->o1n1,get_bank(voice->control),get_integer_addr(voice->accum));
 			}
 			result = voice->o1n1 & 0xffff;
 			break;
@@ -2121,16 +2119,6 @@ u16 es5505_device::read(offs_t offset)
 
 	// return the high byte
 	return result;
-}
-
-
-
-void es5505_device::voice_bank_w(int voice, u32 bank)
-{
-#if RAINE_CHECK
-	m_voice[voice].control = CONTROL_STOPMASK;
-#endif
-	m_voice[voice].exbank = bank;
 }
 
 

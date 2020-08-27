@@ -31,6 +31,7 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 	, m_duart68681(*this, "duart68681")
 	, m_mb87078(*this, "mb87078")
 	, m_osram(*this, "osram")
+	, m_otisbank(*this, "otisbank")
 	, m_otisrom(*this, "ensoniq")
 	, m_osrom(*this, "audiocpu")
 	, m_cpubank(*this, "cpubank%u", 1)
@@ -50,7 +51,13 @@ void taito_en_device::device_start()
 		m_cpubank[i]->configure_entries(0, max, &ROM[0x100000], 0x20000);
 
 	m_bankmask = ((m_otisrom.bytes()) / 0x200000) - 1;
+
+	// initialize precalculated ES5505 bank table
+	const size_t otisbank_size = m_otisbank.bytes() / 2;
+	m_calculated_otisbank = make_unique_clear<offs_t[]>(otisbank_size);
+
 	save_item(NAME(m_old_clock));
+	save_pointer(NAME(m_calculated_otisbank), otisbank_size);
 }
 
 
@@ -79,8 +86,8 @@ void taito_en_device::device_reset()
 void taito_en_device::en_es5505_bank_w(offs_t offset, uint16_t data)
 {
 	/* mask out unused bits */
-	data &= m_bankmask;
-	m_ensoniq->voice_bank_w(offset,data << 20);
+	m_otisbank[offset] = data;
+	m_calculated_otisbank[offset] = (m_otisbank[offset] & m_bankmask) << 20;
 }
 
 void taito_en_device::en_volume_w(offs_t offset, uint8_t data)
@@ -102,7 +109,7 @@ void taito_en_device::en_sound_map(address_map &map)
 	map(0x200000, 0x20001f).rw("ensoniq", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x260000, 0x2601ff).rw("esp", FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x280000, 0x28001f).rw("duart68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x300000, 0x30003f).w(FUNC(taito_en_device::en_es5505_bank_w));
+	map(0x300000, 0x30003f).w(FUNC(taito_en_device::en_es5505_bank_w)).share("otisbank");
 	map(0x340000, 0x340003).w(FUNC(taito_en_device::en_volume_w)).umask16(0xff00);
 	map(0xc00000, 0xc1ffff).bankr("cpubank1");
 	map(0xc20000, 0xc3ffff).bankr("cpubank2");
@@ -124,7 +131,8 @@ void taito_en_device::fc7_map(address_map &map)
 
 void taito_en_device::en_otis_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).lr16([this](offs_t offset) -> u16 { return m_otisrom[(m_ensoniq->exbank() + offset) & m_otisrom.mask()]; }, "banked_otisrom");
+	map(0x000000, 0x0fffff).lr16(
+		[this](offs_t offset) -> u16 { return m_otisrom[(m_calculated_otisbank[m_ensoniq->get_voice_index()] + offset) & m_otisrom.mask()]; }, "banked_otisrom");
 }
 
 
