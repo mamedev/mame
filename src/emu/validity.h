@@ -72,13 +72,13 @@ private:
 	void validate_core();
 	void validate_inlines();
 	void validate_rgb();
-	void validate_driver();
+	void validate_driver(device_t &root);
 	void validate_roms(device_t &root);
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
 	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
-	void validate_inputs();
-	void validate_devices();
+	void validate_inputs(device_t &root);
+	void validate_devices(machine_config &config);
 	void validate_device_types();
 
 	// output helpers
@@ -114,7 +114,6 @@ private:
 
 	// current state
 	const game_driver *     m_current_driver;
-	machine_config *        m_current_config;
 	const device_t *        m_current_device;
 	const char *            m_current_ioport;
 	int_map                 m_region_map;
