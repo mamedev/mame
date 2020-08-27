@@ -109,6 +109,7 @@ void bbc_userport_slot_device::pb_w(uint8_t data)
 #include "beebspch.h"
 //#include "digitiser.h"
 //#include "ev1.h"
+#include "lcd.h"
 #include "palext.h"
 #include "pointer.h"
 #include "usersplit.h"
@@ -127,6 +128,7 @@ void bbc_userport_devices(device_slot_interface &device)
 	device.option_add("cpalette",   BBC_CPALETTE);        /* Clwyd Technics Colour Palette */
 	//device.option_add("ev1",        BBC_EV1);             /* Micro-Robotics EV1 */
 	//device.option_add("hobbit",     BBC_HOBBIT);          /* Hobbit Floppy Tape System (Ikon) */
+	device.option_add("lcd",        BBC_LCD);             /* Sprow LCD Display */
 	device.option_add("m512mouse",  BBC_M512MOUSE);       /* Acorn Mouse (provided with Master 512) */
 	device.option_add("tracker",    BBC_TRACKER);         /* Marconi RB2 Tracker Ball / Acorn Tracker Ball */
 	device.option_add("usersplit",  BBC_USERSPLIT);       /*User Port Splitter (Watford Electronics) */
