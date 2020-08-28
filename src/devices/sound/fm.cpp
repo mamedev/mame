@@ -2111,12 +2111,12 @@ struct ym2203_state
 } // anonymous namespace
 
 /* Generate samples for one of the YM2203s */
-void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
+void ym2203_update_one(void *chip, FMBUFFER buffer, int length)
 {
 	ym2203_state *F2203 = (ym2203_state *)chip;
 	FM_OPN *OPN =   &F2203->OPN;
 	int i;
-	FMSAMPLE *buf = buffer;
+	FMBUFFER buf = buffer;
 	FM_CH   *cch[3];
 
 	cch[0]   = &F2203->CH[0];
@@ -2186,7 +2186,7 @@ void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
 			#endif
 
 			/* buffering */
-			buf[i] = lt;
+			FMBUFFER_WRITE(buf, i, lt);
 		}
 
 		/* timer A control */
@@ -2727,13 +2727,13 @@ static inline void YM2608IRQMaskWrite(FM_OPN *OPN, ym2608_state *F2608, int v)
 }
 
 /* Generate samples for one of the YM2608s */
-void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2608_update_one(void *chip, FMBUFFER *buffer, int length)
 {
 	ym2608_state *F2608 = (ym2608_state *)chip;
 	FM_OPN *OPN   = &F2608->OPN;
 	YM_DELTAT *DELTAT = &F2608->deltaT;
 	int i,j;
-	FMSAMPLE  *bufL,*bufR;
+	FMBUFFER  bufL,bufR;
 	FM_CH   *cch[6];
 	int32_t *out_fm = OPN->out_fm;
 
@@ -2846,8 +2846,8 @@ void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 			Limit( lt, MAXOUT, MINOUT );
 			Limit( rt, MAXOUT, MINOUT );
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			FMBUFFER_WRITE(bufL, i, lt);
+			FMBUFFER_WRITE(bufR, i, rt);
 
 			#ifdef SAVE_SAMPLE
 				SAVE_ALL_CHANNELS
@@ -3275,13 +3275,13 @@ int ym2608_timer_over(void *chip,int c)
 /* YM2610(OPNB) */
 
 /* Generate samples for one of the YM2610s */
-void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2610_update_one(void *chip, FMBUFFER *buffer, int length)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
-	FMSAMPLE  *bufL,*bufR;
+	FMBUFFER  bufL,bufR;
 	FM_CH   *cch[4];
 	int32_t *out_fm = OPN->out_fm;
 
@@ -3398,8 +3398,8 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 			#endif
 
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			FMBUFFER_WRITE(bufL, i, lt);
+			FMBUFFER_WRITE(bufR, i, rt);
 		}
 
 		/* timer A control */
@@ -3411,13 +3411,13 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 
 #if BUILD_YM2610B
 /* Generate samples for one of the YM2610Bs */
-void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2610b_update_one(void *chip, FMBUFFER *buffer, int length)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
-	FMSAMPLE  *bufL,*bufR;
+	FMBUFFER  bufL,bufR;
 	FM_CH   *cch[6];
 	int32_t *out_fm = OPN->out_fm;
 
@@ -3536,8 +3536,8 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 			#endif
 
 			/* buffering */
-			bufL[i] = lt;
-			bufR[i] = rt;
+			FMBUFFER_WRITE(bufL, i, lt);
+			FMBUFFER_WRITE(bufR, i, rt);
 		}
 
 		/* timer A control */
@@ -3915,3 +3915,25 @@ int ym2610_timer_over(void *chip,int c)
 }
 
 #endif /* (BUILD_YM2610||BUILD_YM2610B) */
+
+
+#undef FREQ_MASK
+#undef ENV_BITS
+#undef ENV_LEN
+#undef ENV_STEP
+#undef MAX_ATT_INDEX
+#undef MIN_ATT_INDEX
+#undef EG_ATT
+#undef EG_DEC
+#undef EG_SUS
+#undef EG_REL
+#undef EG_OFF
+#undef SIN_BITS
+#undef SIN_LEN
+#undef SIN_MASK
+#undef TL_RES_LEN
+#undef TL_TAB_LEN
+#undef ENV_QUIET
+#undef RATE_STEPS
+
+#include "ymopn.cpp"

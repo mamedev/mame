@@ -2174,7 +2174,7 @@ static void init_tables(void)
 /*******************************************************************************/
 
 /* Generate samples for one of the YM2612s */
-void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits)
+void ym2612_update_one(void *chip, FMBUFFER *buffer, int length, u8 output_bits)
 {
 	// TODO : 'ladder' effects for Mega Drive/Genesis
 	const u8 output_shift = (output_bits > 14) ? 0 : (14 - output_bits);
@@ -2183,7 +2183,7 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits
 	fm2612_FM_OPN *OPN   = &F2612->OPN;
 	int32_t *out_fm = OPN->out_fm;
 	int i;
-	FMSAMPLE  *bufL,*bufR;
+	FMBUFFER  bufL,bufR;
 	fm2612_FM_CH   *cch[6];
 	int lt,rt;
 
@@ -2302,8 +2302,8 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits
 		#endif
 
 		/* buffering */
-		bufL[i] = lt;
-		bufR[i] = rt;
+		FMBUFFER_WRITE(bufL, i, lt);
+		FMBUFFER_WRITE(bufR, i, rt);
 
 		/* CSM mode: if CSM Key ON has occurred, CSM Key OFF need to be sent       */
 		/* only if Timer A does not overflow again (i.e CSM Key ON not set again) */
