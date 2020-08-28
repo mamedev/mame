@@ -16,6 +16,7 @@
     - Legend
     - Rushing Beat
     - Venom & Spider-Man - Separation Anxiety
+    - Wild Guns
 
     Not dumped:
     - Final Fight 3
@@ -32,6 +33,7 @@ TODO:
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
  - venom    : gfx glitches on second level
+ - wldgunsb : not decrypted yet
 
 ***************************************************************************
 
@@ -1522,7 +1524,7 @@ ROM_START( venom )
 	ROM_LOAD( "u34.bin", 0x280000, 0x0080000, CRC(7a09c9e0) SHA1(794965d5501ec0e21f1f3a8cb8fd66f913d42760) )
 ROM_END
 
-ROM_START( unksnesb )
+ROM_START( wldgunsb )
 	ROM_REGION( 0x100000, "user3", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
@@ -1542,4 +1544,4 @@ GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_e
 GAME( 1996, legendsb,     0,       kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rushbets,     0,       kinstb,         rushbets, snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,       kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, unksnesb,     0,       kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "unknown SNES bootleg",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, wldgunsb,     0,       kinstb,         venom,    snesb_state, empty_init,    ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
