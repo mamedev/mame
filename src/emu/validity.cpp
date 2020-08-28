@@ -128,7 +128,7 @@ void validity_checker::validate_tag(const char *tag)
 //  validity_checker - constructor
 //-------------------------------------------------
 
-validity_checker::validity_checker(emu_options &options)
+validity_checker::validity_checker(emu_options &options, bool quick)
 	: m_drivlist(options)
 	, m_errors(0)
 	, m_warnings(0)
@@ -136,7 +136,8 @@ validity_checker::validity_checker(emu_options &options)
 	, m_current_driver(nullptr)
 	, m_current_device(nullptr)
 	, m_current_ioport(nullptr)
-	, m_validate_all(false)
+	, m_checking_card(false)
+	, m_quick(quick)
 {
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
@@ -260,6 +261,7 @@ void validity_checker::validate_begin()
 	m_roms_map.clear();
 	m_defstr_map.clear();
 	m_region_map.clear();
+	m_ioport_set.clear();
 
 	// reset internal state
 	m_errors = 0;
@@ -295,6 +297,8 @@ void validity_checker::validate_one(const game_driver &driver)
 	m_current_device = nullptr;
 	m_current_ioport = nullptr;
 	m_region_map.clear();
+	m_ioport_set.clear();
+	m_checking_card = false;
 
 	// reset error/warning state
 	int start_errors = m_errors;
@@ -303,7 +307,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	m_warning_text.clear();
 	m_verbose_text.clear();
 
-	// wrap in try/except to catch fatalerrors
+	// wrap in try/catch to catch fatalerrors
 	try
 	{
 		machine_config config(driver, m_blank_options);
@@ -312,7 +316,7 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_inputs(config.root_device());
 		validate_devices(config);
 	}
-	catch (emu_fatalerror &err)
+	catch (emu_fatalerror const &err)
 	{
 		osd_printf_error("Fatal error %s", err.what());
 	}
@@ -336,6 +340,9 @@ void validity_checker::validate_one(const game_driver &driver)
 	m_current_driver = nullptr;
 	m_current_device = nullptr;
 	m_current_ioport = nullptr;
+	m_region_map.clear();
+	m_ioport_set.clear();
+	m_checking_card = false;
 }
 
 
@@ -1847,11 +1854,10 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 //  stored within an ioport field or setting
 //-------------------------------------------------
 
-void validity_checker::validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map)
+void validity_checker::validate_condition(ioport_condition &condition, device_t &device)
 {
-	// resolve the tag
-	// then find a matching port
-	if (port_map.find(device.subtag(condition.tag())) == port_map.end())
+	// resolve the tag, then find a matching port
+	if (m_ioport_set.find(device.subtag(condition.tag())) == m_ioport_set.end())
 		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 
@@ -1862,8 +1868,6 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 
 void validity_checker::validate_inputs(device_t &root)
 {
-	std::unordered_set<std::string> port_map;
-
 	// iterate over devices
 	for (device_t &device : device_iterator(root))
 	{
@@ -1885,7 +1889,7 @@ void validity_checker::validate_inputs(device_t &root)
 
 		// do a first pass over ports to add their names and find duplicates
 		for (auto &port : portlist)
-			if (!port_map.insert(port.second->tag()).second)
+			if (!m_ioport_set.insert(port.second->tag()).second)
 				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port.second->tag());
 
 		// iterate over ports
@@ -1964,12 +1968,12 @@ void validity_checker::validate_inputs(device_t &root)
 
 				// verify conditions on the field
 				if (!field.condition().none())
-					validate_condition(field.condition(), device, port_map);
+					validate_condition(field.condition(), device);
 
 				// verify conditions on the settings
 				for (ioport_setting &setting : field.settings())
 					if (!setting.condition().none())
-						validate_condition(setting.condition(), device, port_map);
+						validate_condition(setting.condition(), device);
 
 				// verify natural keyboard codes
 				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
@@ -1980,9 +1984,9 @@ void validity_checker::validate_inputs(device_t &root)
 						if (!uchar_isvalid(code))
 						{
 							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
-								name,
-								(unsigned)code,
-								(int)code);
+									name,
+									(unsigned)code,
+									(int)code);
 						}
 					}
 				}
@@ -2013,7 +2017,7 @@ void validity_checker::validate_devices(machine_config &config)
 		m_current_device = &device;
 
 		// validate auto-finders
-		device.findit(true);
+		device.findit(this);
 
 		// validate the device tag
 		validate_tag(device.basetag());
@@ -2039,6 +2043,7 @@ void validity_checker::validate_devices(machine_config &config)
 				if (slot->default_option() != nullptr && option.first == slot->default_option())
 					continue;
 
+				m_checking_card = true;
 				device_t *card;
 				{
 					machine_config::token const tok(config.begin_configuration(slot->device()));
@@ -2079,13 +2084,14 @@ void validity_checker::validate_devices(machine_config &config)
 				for (device_t &card_dev : device_iterator(*card))
 				{
 					m_current_device = &card_dev;
-					card_dev.findit(true);
+					card_dev.findit(this);
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}
 
 				machine_config::token const tok(config.begin_configuration(slot->device()));
 				config.device_remove(option.second->name());
+				m_checking_card = false;
 			}
 		}
 	}
@@ -2199,9 +2205,15 @@ void validity_checker::validate_device_types()
 		if (unemulated & imperfect)
 			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
 
-		// give devices some of the same scrutiny that drivers get, necessary for cards not default for any slots
+		// give devices some of the same scrutiny that drivers get - necessary for cards not default for any slots
 		validate_roms(*dev);
 		validate_inputs(*dev);
+
+		// reset the device
+		m_current_device = nullptr;
+		m_current_ioport = nullptr;
+		m_region_map.clear();
+		m_ioport_set.clear();
 
 		// remove the device in preparation for re-using the machine configuration
 		config.device_remove(type.shortname());
