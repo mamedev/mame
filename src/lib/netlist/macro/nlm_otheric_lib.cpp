@@ -43,31 +43,6 @@ NETLIST_END()
 
 //- Identifier:  NE566_DIP
 //- Title: NE566 Voltage Controlled Oscillator
-//- Description: The LM566CN is a general purpose voltage controlled oscillator
-//-    which may be used to generate square and triangula waves, the frequency
-//-    of which is a very linear function of a control voltage. The frequency
-//-    is also a function of an external resistor and capacitor.
-//-
-//-    The LM566CN is specified for operation over the 0°C to a 70°C
-//-    temperature range.
-//-
-//-    Applications
-//-
-//-    - FM modulation
-//-    - Signal generation
-//-    - Function generation
-//-    - Frequency shift keying
-//-    - Tone generation
-//-
-//-    Features
-//-    - Wide supply voltage range: 10V to 24V
-//-    - Very linear modulation characteristics
-//-    - High temperature stability
-//-    - Excellent supply voltage rejection
-//-    - 10 to 1 frequency range with fixed capacitor
-//-    - Frequency programmable by means of current, voltage, resistor or capacitor
-//-
-//.
 //- Pinalias: GND,NC,SQUARE,TRIANGLE,MODULATION,R1,C1,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
@@ -155,33 +130,6 @@ NETLIST_END()
 
 //- Identifier:  NE555_DIP
 //- Title: NE555 PRECISION TIMERS
-//- Description:
-//-   These devices are precision timing circuits capable of producing accurate
-//-   time delays or oscillation. In the time-delay or monostable mode of
-//-   operation, the timed interval is controlled by a single external resistor
-//-   and capacitor network. In the astable mode of operation, the frequency and
-//-   duty cycle can be controlled independently with two external resistors and
-//-   a single external capacitor.
-//-
-//-   The threshold and trigger levels normally are two-thirds and one-third,
-//-   respectively, of V CC. These levels can be altered by use of the
-//-   control-voltage terminal. When the trigger input falls below the trigger
-//-   level, the flip-flop is set and NC – No internal connection the output
-//-   goes high. If the trigger input is above the trigger level and the
-//-   threshold input is above the threshold level, the flip-flop is reset and
-//-   the output is low. The reset (RESET) input can override all other
-//-   inputs and can be used to initiate a new timing cycle. When RESET goes
-//-   low, the flip-flop is reset and the output goes low. When the output is low,
-//-   a low-impedance path is provided between discharge (DISCH) and ground.
-//-
-//-   The output circuit is capable of sinking or sourcing current up to 200 mA.
-//-   Operation is specified for supplies of 5 V to 15 V. With a 5-V supply,
-//-   output levels are compatible with TTL inputs.
-//-
-//-   The NE555 is characterized for operation from 0°C to 70°C. The SA555 is
-//-   characterized for operation from –40°C to 85°C. The SE555 is characterized
-//-   for operation over the full military range of –55°C to 125°C.
-//-
 //- Pinalias: GND,TRIG,OUT,RESET,CONT,THRES,DISCH,VCC
 //- Package: DIP
 //- NamingConvention: Naming conventions follow Texas instrument datasheet
