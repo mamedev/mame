@@ -24,7 +24,7 @@
 Status of each game:
 --------------------
 dinopic:           No sound.
-dinopic2:          No sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
+dinopic2:          No sound.
 dinopic3:          No sound. Some minor gfx priority issues, confirmed present on real board.
 jurassic99:        No sound.
 punipic, punipic2: No sound. Problems in Central Park. Patches used.
