@@ -993,13 +993,11 @@ void gticlub_state::gticlub(machine_config &config)
 
 	K001006(config, m_k001006_1, 0);
 	m_k001006_1->set_gfx_region("gfx1");
-	m_k001006_1->set_tex_layout(1);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
 	K001006(config, m_k001006_2, 0);
 	m_k001006_2->set_gfx_region("gfx1");
-	m_k001006_2->set_tex_layout(1);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);

@@ -777,7 +777,6 @@ void zr107_state::zr107(machine_config &config)
 
 	K001006(config, m_k001006_1, 0);
 	m_k001006_1->set_gfx_region("gfx1");
-	m_k001006_1->set_tex_layout(1);
 
 	K056800(config, m_k056800, XTAL(18'432'000));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
@@ -837,13 +836,10 @@ void jetwave_state::jetwave(machine_config &config)
 	m_k001604->set_roz_mem_offset(0x4000);
 	m_k001604->set_palette(m_palette);
 
-	m_k001006_1->set_tex_layout(1);
-
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
 	K001006(config, m_k001006_2, 0);
 	m_k001006_2->set_gfx_region("gfx1");
-	m_k001006_2->set_tex_layout(1);
 
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
