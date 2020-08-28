@@ -27,7 +27,7 @@ def process_entry(srcfile, name, params):
         print("// ---------------------------------------------------------------------")
         print("// Source: {}".format(srcfile))
         print("// ---------------------------------------------------------------------")
-
+        print("")
     p = re.sub("\+","",params)
     ps = p.split(",")
     pusage = ""
@@ -41,7 +41,8 @@ def process_entry(srcfile, name, params):
     if len(pauto) > 0:
         print("// auto connect: {}".format(pauto[2:]))
     print("#define {}(...)                                                   \\".format(name))
-    print("    NET_REGISTER_DEVEXT({}, __VA_ARGS__)".format(name))
+    print("\tNET_REGISTER_DEVEXT({}, __VA_ARGS__)".format(name))
+    print("")
 
 
 def process_file(srcfile):
@@ -68,9 +69,9 @@ def process_file(srcfile):
                     if m != None:
                         process_entry(srcfile, m.group(1), "")
                     else:
-                        m = re.match(r"TRUTHTABLE_START\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
+                        m = re.match(r"(static)*TRUTHTABLE_START\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
                         if m != None:
-                            process_entry(srcfile, m.group(1), m.group(4))
+                            process_entry(srcfile, m.group(2), m.group(5))
 
     src.close()
 
@@ -79,7 +80,10 @@ if __name__ == '__main__':
         print('Usage:')
         print('  create_devinc files ...')
         sys.exit(0)
-
+    files_sorted = [];
     for argno in range(1, len(sys.argv)):
-        process_file(sys.argv[argno])
+        files_sorted.append(sys.argv[argno])
+    files_sorted.sort();
+    for entry in files_sorted:
+        process_file(entry)
 

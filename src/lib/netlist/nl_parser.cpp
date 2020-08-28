@@ -198,7 +198,7 @@ void parser_t::parse_netlist(const pstring &nlname)
 		else if (token.is(m_tok_EXTERNAL_SOURCE))
 			net_external_source();
 		//else if (token.is(m_tok_TRUTHTABLE_START))
-		//	net_truthtable_start(nlname);
+		//  net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
 		{
 			require_token(m_tok_paren_left);
