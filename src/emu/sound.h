@@ -398,6 +398,9 @@ public:
 	// simple setters
 	void set_gain(float gain) { m_gain = gain; }
 
+	// return a friendly name
+	std::string name() const;
+
 	// handle a changing sample rate
 	void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate); }
 
@@ -456,6 +459,9 @@ public:
 	// update and return an input view
 	read_stream_view update(attotime start, attotime end);
 
+	// tell inputs to apply sample rate changes
+	void apply_sample_rate_changes(u32 updatenum, u32 downstream_rate);
+
 private:
 	// internal state
 	sound_stream *m_owner;                   // reference to the owning stream
@@ -493,8 +499,8 @@ class sound_stream
 
 public:
 	// construction/destruction
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
 	virtual ~sound_stream();
 
 	// simple getters
@@ -506,8 +512,9 @@ public:
 	bool output_adaptive() const { return m_output_adaptive; }
 
 	// input and output getters
-	int input_count() const { return m_input.size(); }
-	int output_count() const { return m_output.size(); }
+	u32 input_count() const { return m_input.size(); }
+	u32 output_count() const { return m_output.size(); }
+	u32 output_base() const { return m_output_base; }
 	sound_stream_input &input(int index) { sound_assert(index >= 0 && index < m_input.size()); return m_input[index]; }
 	sound_stream_output &output(int index) { sound_assert(index >= 0 && index < m_output.size()); return m_output[index]; }
 
@@ -520,6 +527,7 @@ public:
 	// configuration
 	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
 	void set_sample_rate(u32 sample_rate);
+	void apply_sample_rate_changes(u32 updatenum, u32 downstream_rate);
 
 	// updates
 	void update();
@@ -534,9 +542,6 @@ protected:
 	std::string m_name;                            // name of this stream
 
 private:
-	// helpers called by our friends only
-	bool apply_sample_rate_changes();
-
 	// internal helpers
 	void init_common(u32 inputs, u32 outputs, u32 sample_rate, sound_stream_flags flags);
 	void sample_rate_changed();
@@ -552,6 +557,7 @@ private:
 	// general information
 	u32 m_sample_rate;                             // current live sample rate
 	u32 m_pending_sample_rate;                     // pending sample rate for dynamic changes
+	u32 m_last_sample_rate_update;                 // update number of last sample rate change
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
@@ -564,14 +570,15 @@ private:
 	std::vector<std::unique_ptr<sound_stream>> m_resampler_list; // internal list of resamplers
 
 	// output information
-	std::vector<sound_stream_output> m_output;      // list of streams which directly depend upon us
-	std::vector<stream_sample_t *> m_output_array;  // array of outputs for passing to the callback
-	std::vector<write_stream_view> m_output_view;   // array of output views for passing to the callback
-	std::vector<sound_stream *> m_dependents;		// array of streams that are dependent upon our sample rate
+	u32 m_output_base;                             // base index of our outputs, relative to our device
+	std::vector<sound_stream_output> m_output;     // list of streams which directly depend upon us
+	std::vector<stream_sample_t *> m_output_array; // array of outputs for passing to the callback
+	std::vector<write_stream_view> m_output_view;  // array of output views for passing to the callback
+	std::vector<sound_stream *> m_dependents;	   // array of streams that are dependent upon our sample rate
 
 	// callback information
-	stream_update_delegate m_callback;              // callback function
-	stream_update_ex_delegate m_callback_ex;        // extended callback function
+	stream_update_delegate m_callback;             // callback function
+	stream_update_ex_delegate m_callback_ex;       // extended callback function
 };
 
 
@@ -632,8 +639,8 @@ public:
 	int unique_id() { return m_unique_id++; }
 
 	// stream creation
-	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback);
-	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_ex_delegate callback, sound_stream_flags resampler = STREAM_RESAMPLER_DEFAULT);
+	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback);
+	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags resampler = STREAM_RESAMPLER_DEFAULT);
 
 	// global controls
 	void start_recording();
@@ -663,24 +670,25 @@ private:
 	running_machine &m_machine;
 	emu_timer *m_update_timer;
 
+	u32 m_update_number;
+	attotime m_last_update;
 	u32 m_finalmix_leftover;
+	u32 m_samples_this_update;
 	std::vector<s16> m_finalmix;
 	std::vector<stream_buffer::sample_t> m_leftmix;
 	std::vector<stream_buffer::sample_t> m_rightmix;
-	int m_samples_this_update;
 
 	stream_buffer::sample_t m_compressor_scale;
 	int m_compressor_counter;
 
 	u8 m_muted;
+	bool m_nosound_mode;
 	int m_attenuation;
-	int m_nosound_mode;
 	int m_unique_id;
 	wav_file *m_wavfile;
 
 	// streams data
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list;    // list of streams
-	attotime m_last_update;                       // last update time
 };
 
 

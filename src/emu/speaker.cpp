@@ -56,7 +56,7 @@ speaker_device::~speaker_device()
 //  mix - mix in samples from the speaker's stream
 //-------------------------------------------------
 
-void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, int &samples_this_update, bool suppress)
+void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample_t *rightmix, u32 &samples_this_update, bool suppress)
 {
 	// skip if no stream
 	if (m_mixer_stream == nullptr)
