@@ -33,6 +33,7 @@ TODO:
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
  - venom    : gfx glitches on second level
+ - wldgunsb : dipswitches
  - wldgunsb : sometimes continue counter doesn't start from '9', verify if protection is involved.
 
 ***************************************************************************
