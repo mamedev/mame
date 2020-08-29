@@ -1,5 +1,3 @@
-#include "ymopn.h"
-#if 0
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #ifndef MAME_SOUND_2608INTF_H
@@ -68,4 +66,3 @@ private:
 DECLARE_DEVICE_TYPE(YM2608, ym2608_device)
 
 #endif // MAME_SOUND_2608INTF_H
-#endif
