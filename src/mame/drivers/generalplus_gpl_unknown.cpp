@@ -617,7 +617,7 @@ void pcp8718_state::pcp8718(machine_config &config)
 
 ROM_START( pcp8718 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "internal.rom", 0x000000, 0x2000, BAD_DUMP CRC(dcac276e) SHA1(25b5f9e090950f621ce0a14852da9048256c107c) ) // still a few bad words, checksum doesn't match
+	ROM_LOAD( "internal.rom", 0x000000, 0x2000, CRC(ea119561) SHA1(a2680577e20fe1155efc40a5781cf1ec80ccec3a) )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	//ROM_LOAD16_WORD_SWAP( "8718_en25f32.bin", 0x000000, 0x400000, CRC(cc138db4) SHA1(379af3d94ae840f52c06416d6cf32e25923af5ae) ) // bad dump, some blocks are corrupt
@@ -626,7 +626,7 @@ ROM_END
 
 ROM_START( pcp8728 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "internal.rom", 0x000000, 0x2000, BAD_DUMP CRC(dcac276e) SHA1(25b5f9e090950f621ce0a14852da9048256c107c) ) // still a few bad words, checksum doesn't match
+	ROM_LOAD( "internal.rom", 0x000000, 0x2000, CRC(ea119561) SHA1(a2680577e20fe1155efc40a5781cf1ec80ccec3a) )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "pcp 8728 788 in 1.bin", 0x000000, 0x400000, CRC(60115f21) SHA1(e15c39f11e442a76fae3823b6d510178f6166926) )
