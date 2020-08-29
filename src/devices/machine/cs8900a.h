@@ -99,7 +99,6 @@ private:
 	void cs8900_auto_incr_pp_ptr(void);
 	u8 cs8900_read(u16 io_address);
 	void cs8900_store(u16 io_address, u8 var);
-	unsigned long crc32_buf(const char *buffer, unsigned int len);
 };
 
 DECLARE_DEVICE_TYPE(CS8900A, cs8900a_device)
