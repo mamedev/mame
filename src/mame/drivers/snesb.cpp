@@ -33,7 +33,7 @@ TODO:
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
  - venom    : gfx glitches on second level
- - wldgunsb : protection simulation
+ - wldgunsb : sometimes continue counter doesn't start from '9', verify if protection is involved.
 
 ***************************************************************************
 
@@ -836,6 +836,17 @@ static INPUT_PORTS_START( venom )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wldgunsb )
+	PORT_INCLUDE( venom )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 INPUT_PORTS_END
 
 void snesb_state::kinstb(machine_config &config)
@@ -1659,4 +1670,4 @@ GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_e
 GAME( 1996, legendsb,     0,       kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rushbets,     0,       kinstb,         rushbets, snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,       kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, wldgunsb,     0,       kinstb,         venom,    snesb_state, init_wldgunsb, ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, wldgunsb,     0,       kinstb,         wldgunsb, snesb_state, init_wldgunsb, ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
