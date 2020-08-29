@@ -110,10 +110,10 @@ enum io_space_conf_regs_e : u8 {
 #define GET_PP_32(  _xxx_ ) \
     ( assert(_xxx_<MAX_PACKETPAGE_ARRAY),     \
       assert((_xxx_ & 3) == 0 ),              \
-      (((long)cs8900_packetpage[_xxx_  ])      ) \
-    | (((long)cs8900_packetpage[_xxx_+1]) <<  8) \
-    | (((long)cs8900_packetpage[_xxx_+2]) << 16) \
-    | (((long)cs8900_packetpage[_xxx_+3]) << 24) \
+      (((u32)cs8900_packetpage[_xxx_  ])      ) \
+    | (((u32)cs8900_packetpage[_xxx_+1]) <<  8) \
+    | (((u32)cs8900_packetpage[_xxx_+2]) << 16) \
+    | (((u32)cs8900_packetpage[_xxx_+3]) << 24) \
     )
 
 #define SET_PP_8( _xxx_, _val_ ) \
