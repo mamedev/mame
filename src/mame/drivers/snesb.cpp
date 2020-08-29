@@ -191,6 +191,12 @@ private:
 	uint8_t rushbets_75axxx_r(offs_t offset);
 	uint8_t rushbets_5b8e3c_r();
 	uint8_t sharedram2_r(offs_t offset);
+	uint8_t wldgunsb_722262_r();
+	uint8_t wldgunsb_723364_r();
+	uint8_t wldgunsb_721197_r();
+	uint8_t wldgunsb_72553b_r();
+	uint8_t wldgunsb_72443a_r();
+
 	void sharedram2_w(offs_t offset, uint8_t data);
 	uint8_t snesb_dsw1_r();
 	uint8_t snesb_dsw2_r();
@@ -289,7 +295,6 @@ void snesb_state::sharedram2_w(offs_t offset, uint8_t data)
 }
 
 /* Rushing Beat Shura */
-
 uint8_t snesb_state::rushbets_75axxx_r(offs_t offset)
 {
 /* protection checks */
@@ -311,6 +316,37 @@ uint8_t snesb_state::rushbets_5b8e3c_r()
 {
 	/* protection check */
 	return ++m_cnt;
+}
+
+/* Wild Guns */
+uint8_t snesb_state::wldgunsb_722262_r()
+{
+	// PC 2e2f6
+	return 0x2b;
+} 
+
+uint8_t snesb_state::wldgunsb_723364_r()
+{
+	// PC b983
+	return 0x93;
+}
+
+uint8_t snesb_state::wldgunsb_721197_r()
+{
+	// PC 2e30c
+	return 0xe4;
+}
+
+uint8_t snesb_state::wldgunsb_72553b_r()
+{
+	// PC 2e216
+	return 0xbf;
+}
+
+uint8_t snesb_state::wldgunsb_72443a_r()
+{
+	// PC 2e322
+	return 0x66;
 }
 
 /* Generic read handlers for Dip Switches and coins inputs */
@@ -1414,9 +1450,22 @@ void snesb_state::init_wldgunsb()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
 	//m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770073, 0x770073, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770074, 0x770074, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770072, 0x770072, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	
+	// protection overlays
+	// counter (PC=0x2dfe7 / 0x2dfee)
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7bf45b, 0x7bf45b, read8smo_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
+
+	// these reads with a LDA but discards the upper 8-bit values
+	// POST
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x722262, 0x722262, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_722262_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x723363, 0x723363, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_723364_r)));
+	// in-game
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x721197, 0x721197, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_721197_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x72553b, 0x72553b, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_72553b_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x72443a, 0x72443a, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_72443a_r)));
 
 	init_snes();
 }
