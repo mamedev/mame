@@ -14778,6 +14778,9 @@ suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
+@source:gem_rp.cpp
+rp200
+
 @source:generalplus_gpl_unknown.cpp
 pcp8718
 pcp8728

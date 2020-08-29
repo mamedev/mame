@@ -329,6 +329,7 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+gem_rp.cpp
 generalplus_gpl_unknown.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
