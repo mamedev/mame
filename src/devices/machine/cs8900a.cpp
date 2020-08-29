@@ -14,7 +14,7 @@
 
 #include "machine/cs8900a.h"
 
-DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
+DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "cs8900a",  "CS8900A Crystal LAN 10Base-T Ethernet MAC")
 
 /* warn illegal behaviour */
 #define CS8900_DEBUG_WARN_REG (1 << 1U)   /* warn about invalid register accesses */
