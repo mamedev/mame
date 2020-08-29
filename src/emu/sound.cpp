@@ -96,7 +96,7 @@ void stream_buffer::set_sample_rate(u32 rate)
 	// (via simple point sampling) at the new rate. The litmus test is the
 	// voice when jumping off the edge in Q*Bert; without this extra effort
 	// it is crackly and/or glitchy at times
-	sample_t buffer[32];
+	sample_t buffer[256];
 	for (int index = 0; index < ARRAY_LENGTH(buffer); index++)
 		buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
 
