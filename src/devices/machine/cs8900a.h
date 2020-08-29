@@ -17,9 +17,6 @@
 
 #include <queue>
 
-#define CS8900_COUNT_IO_REGISTER 0x10 /* we have 16 I/O register */
-#define MAX_PACKETPAGE_ARRAY 0x1000 /* 4 KB */
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -42,6 +39,9 @@ protected:
 	virtual int recv_start_cb(u8 *buf, int length) override;
 
 private:
+	static constexpr u8 CS8900_COUNT_IO_REGISTER = 0x10; /* we have 16 I/O register */
+	static constexpr u16 MAX_PACKETPAGE_ARRAY = 0x1000; /* 4 KB */
+
 	u8 cs8900_ia_mac[6];
 
 	u32 cs8900_hash_mask[2];
@@ -104,8 +104,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CS8900A, cs8900a_device)
 
-	/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#endif // MAME_MACHINE_GM8900A_H
+#endif // MAME_MACHINE_CS8900A_H
