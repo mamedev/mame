@@ -1244,7 +1244,9 @@ u8 cs8900a_device::cs8900_read(u16 io_address)
             ppaddress = cs8900_packetpage_ptr & PP_PTR_ADDR_MASK;
             ppaddress &= ~1;
             /* if flags match then auto incr pointer */
-            cs8900_auto_incr_pp_ptr();
+            if (!machine().side_effects_disabled()) {
+                cs8900_auto_incr_pp_ptr();
+            }
             break;
         case CS8900_ADDR_INTSTQUEUE:
             ppaddress = CS8900_PP_ADDR_SE_ISQ;
@@ -1262,7 +1264,9 @@ u8 cs8900a_device::cs8900_read(u16 io_address)
         }
             
         /* do side effects before access */
-        cs8900_sideeffects_read_pp(ppaddress,io_address&1);
+        if (!machine().side_effects_disabled()) {
+            cs8900_sideeffects_read_pp(ppaddress,io_address&1);
+        }
 
         /* read register value */
         word_value = cs8900_read_register(ppaddress);
