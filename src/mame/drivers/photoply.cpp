@@ -451,6 +451,21 @@ ROM_START(photoply2ksp)
 ROM_END
 
 // BIOS not provided, might be different
+ROM_START(photoply2k1it)
+	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
+	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip
+	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c) ) // Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31 , AT27C256R
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "photoplay2k1it", 0, BAD_DUMP SHA1(274ea0ebc051d0f4846bc58a039d342241b4cc28) ) // Manually rebuilded by adding the resources for the folder C:\QP_MSTR from the 2001_NL version
+ROM_END
+
+// BIOS not provided, might be different
 ROM_START(photoply2k4)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
 	ROM_LOAD("funworld_award_486e_w83787_alt.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS (same string as 'photoply99sp' and 'photoply99sp' BIOSes, but different hash)
@@ -469,8 +484,9 @@ ROM_START(photoply2k4)
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
 
-GAME( 1998, photoply98sp, 0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1998 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999, photoply99sp, 0,          photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2000, photoply2k,   0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2000, photoply2ksp, photoply2k, photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, photoply2k4,  0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, photoply98sp,  0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1998 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1999, photoply99sp,  0,          photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, photoply2k,    0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, photoply2ksp,  photoply2k, photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (Spanish)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, photoply2k1it, 0,          photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Italian)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, photoply2k4,   0,          photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

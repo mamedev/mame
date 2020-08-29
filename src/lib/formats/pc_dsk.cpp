@@ -168,6 +168,11 @@ int pc_format::identify(io_generic *io, uint32_t form_factor)
 		file_header_skip_bytes = 0x200;
 	}
 
+	/* Disk Copy 4.2 images have an 84-byte header */
+	if (size == 1474560 + 84) {
+		file_header_skip_bytes = 84;
+	}
+
 	/* some 1.44MB images have a 1024-byte footer */
 	if (size == 1474560 + 0x400) {
 		file_footer_skip_bytes = 0x400;

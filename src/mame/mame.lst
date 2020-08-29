@@ -14778,6 +14778,9 @@ suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
+@source:gem_rp.cpp
+rp200
+
 @source:generalplus_gpl_unknown.cpp
 pcp8718
 pcp8728
@@ -32113,6 +32116,8 @@ vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 msiwwe
 msidd
+msimpac
+msisinv
 ablpinb
 mc_dgear
 dgun2500
@@ -34095,7 +34100,8 @@ photoply98sp                    // (c) 1998 Funworld
 photoply99sp                    // (c) 1999 Funworld
 photoply2k                      // (c) 2000 Funworld
 photoply2ksp                    // (c) 2000 Funworld
-photoply2k4                     //
+photoply2k1it                   // (c) 2001 Funworld
+photoply2k4                     // (c) 2004 Funworld
 
 @source:phunsy.cpp
 phunsy                          //

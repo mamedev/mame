@@ -3,6 +3,64 @@
 license:CC0
 -->
 <mamelayout version="2">
+<!-- luascript (demo for plugin -layout) -->
+<!-- this adds support for combining outputs to make an aggregated output--><script>
+	local layout = {}
+
+	local ledlamps = { 	{ 88, 89, 90, 91, 92, 93, 94, -1 },
+						{ 80, 81, 82, 83, 84, 85, 86, 87 },
+						{ 72, 73, 74, 75, 76, 77, 78, -1 },
+						{ 64, 65, 66, 67, 68, 69, 70, -1 } }
+
+	function layout.reset()
+		for led=0,3 do
+			machine:outputs():set_indexed_value("compoundled", led, 0)
+			return
+		end
+	end
+
+	function layout.frame()
+		for num, led in pairs(ledlamps) do
+			local temp_state = 0
+			for lamp=0,7 do
+				local lampval = led[lamp+1]
+				local lampstate = machine:outputs():get_indexed_value("lamp", lampval)
+				if (lampstate > 0) then
+					temp_state = temp_state | (1 &lt;&lt; lamp)
+				end
+			end
+			machine:outputs():set_indexed_value("compoundled", num-1, temp_state)
+		end
+	end
+return layout, "v4dbltak"
+</script>
+
+	<element name="£">
+		<text string="£">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="digit">
+	<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+	</led7seg>
+	</element>
+
+	<element name="LOSE">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LOSE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
 	<element name="HOLD">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -93,11 +151,36 @@ license:CC0
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
+
+	<element name="BANK">
+		<text string="BANK">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
 	
 	<view name="Monitor and Lamps">
 		<screen index="0">
 			<bounds x="0" y="0" width="504" height="296" />
 		</screen>
+		<bezel name="BANK" element="BANK" state="0">
+			<bounds x="505" y="180" width="40" height="15"/>
+		</bezel>
+		<bezel name="£" element="£" state="0">
+			<bounds x="505" y="200" width="8" height="15"/>
+		</bezel>
+		<bezel name="compoundled0" element="digit" state="0">
+			<bounds x="515" y="200" width="8" height="15"/>
+		</bezel>
+		<bezel name="compoundled1" element="digit" state="0">
+			<bounds x="525" y="200" width="8" height="15"/>
+		</bezel>
+		<bezel name="compoundled2" element="digit" state="0">
+			<bounds x="535" y="200" width="8" height="15"/>
+		</bezel>
+		<bezel name="compoundled3" element="digit" state="0">
+			<bounds x="545" y="200" width="8" height="15"/>
+		</bezel>
 		<bezel name="lamp24" element="COLLECT" state="0">
 			<bounds x="0" y="300" width="40" height="15"/>
 		</bezel>
@@ -130,6 +213,9 @@ license:CC0
 		</bezel>
 		<bezel name="lamp50" element="SELECT" state="0">
 			<bounds x="500" y="300" width="40" height="15"/>
+		</bezel>
+		<bezel name="lamp63" element="LOSE" state="0">
+			<bounds x="505" y="250" width="40" height="15"/>
 		</bezel>
 
 	</view>
