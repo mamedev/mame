@@ -1121,6 +1121,7 @@ z88.cpp
 z9001.cpp
 zapcomputer.cpp
 zaurus.cpp
+zeebo_qualcomm_adreno130.cpp
 zexall.cpp
 zms8085.cpp
 zorba.cpp
