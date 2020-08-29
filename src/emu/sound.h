@@ -69,7 +69,7 @@ constexpr u32 SAMPLE_RATE_SYNCHRONOUS = 0xfffffffc;
 #define SOUND_DEBUG (1)
 
 #if (SOUND_DEBUG)
-#define sound_assert(x) do { if (!(x)) { osd_printf_error("sound_assert: " #x); __debugbreak(); } } while (0)
+#define sound_assert(x) do { if (!(x)) { osd_printf_error("sound_assert: " #x "\n"); __debugbreak(); } } while (0)
 #else
 #define sound_assert assert
 #endif
