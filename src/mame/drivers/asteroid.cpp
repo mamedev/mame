@@ -1008,6 +1008,7 @@ ROM_START( meteorho )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0100, CRC(9e237193) SHA1(f663e12d5db0fa50ea49d03591475ae0a7168bc0) )
 ROM_END
 
+// The PCB was found inside a "Kasteroides" cab (a Spanish Asteriods bootleg from "Sede 3")
 ROM_START( meteorbl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2as.12", 0x6800, 0x0400, CRC(cdf720c6) SHA1(85fe748096478e28a06bd98ff3aad73ab21b22a4) )
