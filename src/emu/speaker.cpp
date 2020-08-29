@@ -153,16 +153,38 @@ void speaker_device::device_stop()
 
 		// levels 1 and 2 just get a summary
 		if (clipped != 0 || report == 2 || report == 4)
-			osd_printf_info("Speaker \"%s\" - max = %d (gain *= %.3f) - clipped in %d/%d (%d%%) buckets\n", tag(), overallmax, 1 / (overallmax ? overallmax : 1), clipped, m_max_sample.size(), clipped * 100 / m_max_sample.size());
+			osd_printf_info("Speaker \"%s\" - max = %.5f (gain *= %.3f) - clipped in %d/%d (%d%%) buckets\n", tag(), overallmax, 1 / (overallmax ? overallmax : 1), clipped, m_max_sample.size(), clipped * 100 / m_max_sample.size());
 
 		// levels 3 and 4 get a full dump
 		if (report >= 3)
 		{
+			static char const * const s_stars  = "************************************************************";
+			static char const * const s_spaces = "                                                            ";
+			int totalstars = strlen(s_stars);
 			double t = 0;
+			int leftstars = totalstars / overallmax;
 			for (auto &curmax : m_max_sample)
 			{
 				if (curmax > stream_buffer::sample_t(1.0) || report == 4)
-					osd_printf_info("   t=%5.1f  max=%6d\n", t, curmax);
+				{
+					osd_printf_info("%6.1f: %9.5f |", t, curmax);
+					if (curmax == 0)
+						osd_printf_info("\n");
+					else if (curmax <= 1.0)
+					{
+						int stars = std::max(1, std::min(leftstars, int(curmax * totalstars / overallmax)));
+						osd_printf_info("%.*s", stars, s_stars);
+						int spaces = leftstars - stars;
+						if (spaces != 0)
+							osd_printf_info("%.*s", spaces, s_spaces);
+						osd_printf_info("|\n");
+					}
+					else
+					{
+						int rightstars = std::max(1, std::min(totalstars, int(curmax * totalstars / overallmax)) - leftstars);
+						osd_printf_info("%.*s|%.*s\n", leftstars, s_stars, rightstars, s_stars);
+					}
+				}
 				t += 1.0 / double(BUCKETS_PER_SECOND);
 			}
 		}
