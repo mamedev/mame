@@ -618,7 +618,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 	<!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
 	    on the real machine. It was dumped and released to the public in ~2002,
 	    when FunnyMu emulator (written by Paul Hayter) was released -->
-	<software name="hapmon" supported="partial"><!-- drops keystrokes, need instructions -->
+	<software name="hapmon"><!-- need instructions -->
 		<description>Hapmon</description>
 		<year>198?</year>
 		<publisher>Richard Hayter</publisher>
