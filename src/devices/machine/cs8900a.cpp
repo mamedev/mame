@@ -346,6 +346,30 @@ void cs8900a_device::device_start(void)
     /* virtually reset the LAN chip */
     device_reset();
 
+    save_item(NAME(cs8900_ia_mac));
+    save_item(NAME(cs8900_hash_mask));
+    save_item(NAME(cs8900_ioregs));
+    save_item(NAME(cs8900_packetpage));
+    save_item(NAME(cs8900_packetpage_ptr));
+    save_item(NAME(cs8900_recv_control));
+    save_item(NAME(cs8900_recv_broadcast));
+    save_item(NAME(cs8900_recv_mac));
+    save_item(NAME(cs8900_recv_multicast));
+    save_item(NAME(cs8900_recv_correct));
+    save_item(NAME(cs8900_recv_promiscuous));
+    save_item(NAME(cs8900_recv_hashfilter));
+    save_item(NAME(tx_buffer));
+    save_item(NAME(rx_buffer));
+    save_item(NAME(tx_count));
+    save_item(NAME(rx_count));
+    save_item(NAME(tx_length));
+    save_item(NAME(rx_length));
+    save_item(NAME(tx_state));
+    save_item(NAME(rx_state));
+    save_item(NAME(tx_enabled));
+    save_item(NAME(rx_enabled));
+    save_item(NAME(rxevent_read_mask));
+
     return; 
 }
 
