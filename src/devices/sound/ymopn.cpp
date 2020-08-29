@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
+// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh,Aaron Giles
 //
 /*
 **
@@ -180,6 +180,7 @@ static const u32 s_sl_table[16] =
 };
 #undef SC
 
+
 //
 //
 //
@@ -259,6 +260,7 @@ static const u8 s_eg_rate_select[32+64+32] =
 	O(16),O(16),O(16),O(16),O(16),O(16),O(16),O(16)
 };
 #undef O
+
 
 //
 // rate  0,    1,    2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
@@ -504,8 +506,9 @@ static s32 *s_lfo_pm_table = nullptr;
 inline u32 ymopn_device_base::fn_value(u32 val) const
 {
 	// FREQ_SHIFT-10 because chip works with 10.10 fixed point, while we use 16.16
-//	return (val * 32 * m_freqbase) << (FREQ_SHIFT - 10);
-	return (val * m_freqbase) << (FREQ_SHIFT - 5);
+	// m_freqbase is x.1, so only shift by one less
+//	return (val * 32 * m_freqbase) << (FREQ_SHIFT - 11);
+	return (val * m_freqbase) << (FREQ_SHIFT - 6);
 }
 
 inline u32 ymopn_device_base::fn_max() const
@@ -523,13 +526,15 @@ inline u32 ymopn_device_base::fc_fix(s32 fc) const
 inline s32 ymopn_device_base::detune(u8 fd, u8 index) const
 {
 	// scale factor is: SIN_LEN * (1 << FREQ_SHIFT) / (1 << 20)
-	// assumine that SIN_BITS + FREQ_SHIFT > 20, so:
-	return (s_detune_table[fd * 32 + index] * m_freqbase) << (SIN_BITS + FREQ_SHIFT - 20);
+	// assuming that SIN_BITS + FREQ_SHIFT > 20
+	// also m_freqbase is x.1, so need to take off one more
+	return (s_detune_table[fd * 32 + index] * m_freqbase) << (SIN_BITS + FREQ_SHIFT - 20 - 1);
 }
 
 inline u32 ymopn_device_base::lfo_step(u8 index) const
 {
-	return (m_freqbase << LFO_SHIFT) / s_lfo_samples_per_step[index];
+	// m_freqbase is x.1, so shift by 1 less
+	return (m_freqbase << (LFO_SHIFT - 1)) / s_lfo_samples_per_step[index];
 }
 
 
@@ -599,35 +604,36 @@ opn_slot_t::opn_slot_t(ymopn_device_base &opn) :
 }
 
 // register for save states
+#define SLOT_NAME(x) x, "slot." #x
 void opn_slot_t::save(int index)
 {
-	m_opn.save_item(NAME(m_detune), index);
-	m_opn.save_item(NAME(m_ksr_shift), index);
-	m_opn.save_item(NAME(m_attack_rate), index);
-	m_opn.save_item(NAME(m_decay_rate), index);
-	m_opn.save_item(NAME(m_sustain_rate), index);
-	m_opn.save_item(NAME(m_release_rate), index);
-	m_opn.save_item(NAME(m_ksr), index);
-	m_opn.save_item(NAME(m_multiply), index);
-	m_opn.save_item(NAME(m_phase), index);
-	m_opn.save_item(NAME(m_phase_step), index);
-	m_opn.save_item(NAME(m_eg_state), index);
-	m_opn.save_item(NAME(m_total_level), index);
-	m_opn.save_item(NAME(m_volume), index);
-	m_opn.save_item(NAME(m_sustain_level), index);
-	m_opn.save_item(NAME(m_envelope_volume), index);
-	m_opn.save_item(NAME(m_attack_shift), index);
-	m_opn.save_item(NAME(m_attack_select), index);
-	m_opn.save_item(NAME(m_decay_shift), index);
-	m_opn.save_item(NAME(m_decay_select), index);
-	m_opn.save_item(NAME(m_sustain_shift), index);
-	m_opn.save_item(NAME(m_sustain_select), index);
-	m_opn.save_item(NAME(m_release_shift), index);
-	m_opn.save_item(NAME(m_release_select), index);
-	m_opn.save_item(NAME(m_ssg), index);
-	m_opn.save_item(NAME(m_ssg_state), index);
-	m_opn.save_item(NAME(m_key), index);
-	m_opn.save_item(NAME(m_am_mask), index);
+	m_opn.save_item(SLOT_NAME(m_detune), index);
+	m_opn.save_item(SLOT_NAME(m_ksr_shift), index);
+	m_opn.save_item(SLOT_NAME(m_attack_rate), index);
+	m_opn.save_item(SLOT_NAME(m_decay_rate), index);
+	m_opn.save_item(SLOT_NAME(m_sustain_rate), index);
+	m_opn.save_item(SLOT_NAME(m_release_rate), index);
+	m_opn.save_item(SLOT_NAME(m_ksr), index);
+	m_opn.save_item(SLOT_NAME(m_multiply), index);
+	m_opn.save_item(SLOT_NAME(m_phase), index);
+	m_opn.save_item(SLOT_NAME(m_phase_step), index);
+	m_opn.save_item(SLOT_NAME(m_eg_state), index);
+	m_opn.save_item(SLOT_NAME(m_total_level), index);
+	m_opn.save_item(SLOT_NAME(m_volume), index);
+	m_opn.save_item(SLOT_NAME(m_sustain_level), index);
+	m_opn.save_item(SLOT_NAME(m_envelope_volume), index);
+	m_opn.save_item(SLOT_NAME(m_attack_shift), index);
+	m_opn.save_item(SLOT_NAME(m_attack_select), index);
+	m_opn.save_item(SLOT_NAME(m_decay_shift), index);
+	m_opn.save_item(SLOT_NAME(m_decay_select), index);
+	m_opn.save_item(SLOT_NAME(m_sustain_shift), index);
+	m_opn.save_item(SLOT_NAME(m_sustain_select), index);
+	m_opn.save_item(SLOT_NAME(m_release_shift), index);
+	m_opn.save_item(SLOT_NAME(m_release_select), index);
+	m_opn.save_item(SLOT_NAME(m_ssg), index);
+	m_opn.save_item(SLOT_NAME(m_ssg_state), index);
+	m_opn.save_item(SLOT_NAME(m_key), index);
+	m_opn.save_item(SLOT_NAME(m_am_mask), index);
 }
 
 // reset the state
@@ -972,6 +978,7 @@ void opn_slot_t::advance_eg(u32 eg_cnt)
 opn_channel_t::opn_channel_t(ymopn_device_base &opn) :
 	m_opn(opn),
 	m_refresh(true),
+	m_disabled(false),
 	m_slot1(opn),
 	m_slot2(opn),
 	m_slot3(opn),
@@ -1001,6 +1008,7 @@ opn_channel_t::opn_channel_t(ymopn_device_base &opn) :
 }
 
 // register for save states
+#define CHANNEL_NAME(x) x, "channel." #x
 void opn_channel_t::save(int index)
 {
 	m_slot1.save(index * 4 + 0);
@@ -1008,20 +1016,20 @@ void opn_channel_t::save(int index)
 	m_slot3.save(index * 4 + 2);
 	m_slot4.save(index * 4 + 3);
 
-	m_opn.save_item(NAME(m_algorithm), index);
-	m_opn.save_item(NAME(m_fb_shift), index);
-	m_opn.save_item(NAME(m_op1_out), index);
+	m_opn.save_item(CHANNEL_NAME(m_algorithm), index);
+	m_opn.save_item(CHANNEL_NAME(m_fb_shift), index);
+	m_opn.save_item(CHANNEL_NAME(m_op1_out), index);
 
-	m_opn.save_item(NAME(m_mem_value), index);
+	m_opn.save_item(CHANNEL_NAME(m_mem_value), index);
 
-	m_opn.save_item(NAME(m_pm_shift), index);
-	m_opn.save_item(NAME(m_am_shift), index);
+	m_opn.save_item(CHANNEL_NAME(m_pm_shift), index);
+	m_opn.save_item(CHANNEL_NAME(m_am_shift), index);
 
-	m_opn.save_item(NAME(m_fc), index);
-	m_opn.save_item(NAME(m_kcode), index);
-	m_opn.save_item(NAME(m_block_fnum), index);
+	m_opn.save_item(CHANNEL_NAME(m_fc), index);
+	m_opn.save_item(CHANNEL_NAME(m_kcode), index);
+	m_opn.save_item(CHANNEL_NAME(m_block_fnum), index);
 
-	m_opn.save_item(NAME(m_pan), index);
+	m_opn.save_item(CHANNEL_NAME(m_pan), index);
 }
 
 // recover after loading a save state
@@ -1038,6 +1046,7 @@ void opn_channel_t::reset()
 	m_slot2.reset();
 	m_slot3.reset();
 	m_slot4.reset();
+	setup_connection();
 }
 
 // configure for 3-slot mode
@@ -1156,6 +1165,10 @@ void opn_channel_t::update(u32 lfo_am, u32 lfo_pm)
 	// restore delayed sample (MEM) value to m2 or c2
 	*m_mem_connect = m_mem_value;
 	m_m2 = m_c1 = m_c2 = m_mem = m_out_fm = 0;
+
+	// if disabled, do nothing more
+	if (m_disabled)
+		return;
 
 	u32 am = lfo_am >> m_am_shift;
 	u32 eg_out = m_slot1.volume(am);
@@ -1283,11 +1296,485 @@ void opn_channel_t::setup_connection()
 
 
 //*********************************************************
-// OPN base device class
+// OPN ADPCM CHANNEL
 //*********************************************************
+
+opn_adpcm_channel_t::opn_adpcm_channel_t(ymopn_device_base &opn) :
+	m_opn(opn),
+	m_total_level(0x3f),
+	m_instrument_level(0x1f),
+	m_flag(0),
+	m_curbyte(0),
+	m_curaddress(0),
+	m_curfrac(0),
+	m_start(0),
+	m_end(0),
+	m_adpcm_acc(0),
+	m_adpcm_step(0),
+	m_addrshift(8+1),
+	m_pan(3),
+	m_step_divisor(1)
+{
+}
+
+#define ADPCM_NAME(x) x, "adpcm." #x
+void opn_adpcm_channel_t::save(int index)
+{
+	m_opn.save_item(ADPCM_NAME(m_total_level), index);
+	m_opn.save_item(ADPCM_NAME(m_instrument_level), index);
+	m_opn.save_item(ADPCM_NAME(m_flag), index);
+	m_opn.save_item(ADPCM_NAME(m_curbyte), index);
+	m_opn.save_item(ADPCM_NAME(m_curaddress), index);
+	m_opn.save_item(ADPCM_NAME(m_curfrac), index);
+	m_opn.save_item(ADPCM_NAME(m_start), index);
+	m_opn.save_item(ADPCM_NAME(m_end), index);
+	m_opn.save_item(ADPCM_NAME(m_adpcm_acc), index);
+	m_opn.save_item(ADPCM_NAME(m_adpcm_step), index);
+	m_opn.save_item(ADPCM_NAME(m_pan), index);
+}
+
+void opn_adpcm_channel_t::reset()
+{
+	m_total_level = 0x3f;
+	m_instrument_level = 0x1f;
+	m_flag = 0;
+	m_curbyte = 0;
+	m_curaddress = 0;
+	m_curfrac = 0;
+	m_start = 0;
+	m_end = 0;
+	m_adpcm_acc = 0;
+	m_adpcm_step = 0;
+	m_pan = 3;
+}
+
+void opn_adpcm_channel_t::keyonoff(bool on)
+{
+	if (on)
+	{
+		m_curaddress = start_address();
+		m_curfrac = 0;
+		m_adpcm_acc = 0;
+		m_adpcm_step = 0;
+		m_flag = 1;
+	}
+	else
+		m_flag = 0;
+}
+
+void opn_adpcm_channel_t::set_volume_pan(u8 value)
+{
+	m_instrument_level = ~value & 0x1f;
+	m_pan = value >> 6;
+}
+
+bool opn_adpcm_channel_t::update(u32 freqbase)
+{
+	// usual ADPCM table (16 * 1.1^N)
+	static constexpr u16 s_steps[49] =
+	{
+		 16,  17,   19,   21,   23,   25,   28,
+		 31,  34,   37,   41,   45,   50,   55,
+		 60,  66,   73,   80,   88,   97,  107,
+		118, 130,  143,  157,  173,  190,  209,
+		230, 253,  279,  307,  337,  371,  408,
+		449, 494,  544,  598,  658,  724,  796,
+		876, 963, 1060, 1166, 1282, 1411, 1552
+	};
+	static constexpr s8 s_step_inc[8] = { -1, -1, -1, -1, 2, 5, 7, 9 };
+
+	if (m_flag == 0)
+	{
+		m_adpcm_acc = 0;
+		return false;
+	}
+
+	// freqbase is x.1, so shift by 1 less
+	for (m_curfrac += (freqbase << (FRAC_SHIFT - 1)) / (3 * m_step_divisor); m_curfrac >= FRAC_ONE; m_curfrac -= FRAC_ONE)
+	{
+		// YM2610 checks lower 20 bits only, the 4 MSB bits are sample bank
+		if ((((m_curaddress ^ end_address()) >> 1) & 0xfffff) == 0)
+		{
+			m_flag = 0;
+			return true;
+		}
+
+		int nibble = m_curaddress & 1;
+		if (nibble == 0)
+			m_curbyte = m_opn.adpcm_read(m_curaddress >> 1);
+		u8 data = u8(m_curbyte << (4 * nibble)) >> 4;
+		m_curaddress++;
+
+		// the 12-bit accumulator wraps on the ym2610 and ym2608 (like the msm5205), it does not saturate (like the msm5218)
+		s32 delta = (2 * (data & 7) + 1) * s_steps[m_adpcm_step] / 8;
+		if (BIT(data, 3))
+			delta = -delta;
+		m_adpcm_acc = (m_adpcm_acc + delta) & 0xfff;
+
+		// extend 12-bit signed int
+		if (m_adpcm_acc & 0x800)
+			m_adpcm_acc |= ~0xfff;
+
+		// adjust ADPCM step
+		m_adpcm_step += s_step_inc[data & 7];
+		if (m_adpcm_step > 48)
+			m_adpcm_step = 48;
+		else if (m_adpcm_step < 0)
+			m_adpcm_step = 0;
+	}
+	return false;
+}
+
+
+
+//*********************************************************
+// OPN DELTAT CHANNEL
+//*********************************************************
+
+opn_deltat_channel_t::opn_deltat_channel_t(ymopn_device_base &opn) :
+	m_opn(opn),
+	m_curaddress(0),
+	m_curfrac(0),
+	m_start(0),
+	m_limit(~0),
+	m_end(0),
+	m_delta(0),
+	m_volume(0),
+	m_adpcm_acc(0),
+	m_prev_acc(0),
+	m_adpcm_step(127),
+	m_output(0),
+	m_curbyte(0),
+	m_cpudata(0),
+	m_portstate(0),
+	m_control2(0),
+	m_addrshift(5),
+	m_memread(0),
+	m_status(0)
+{
+}
+
+#define DELTAT_NAME(x) x, "deltat." #x
+void opn_deltat_channel_t::save(int index)
+{
+	m_opn.save_item(DELTAT_NAME(m_curaddress), index);
+	m_opn.save_item(DELTAT_NAME(m_curfrac), index);
+	m_opn.save_item(DELTAT_NAME(m_start), index);
+	m_opn.save_item(DELTAT_NAME(m_limit), index);
+	m_opn.save_item(DELTAT_NAME(m_end), index);
+	m_opn.save_item(DELTAT_NAME(m_delta), index);
+	m_opn.save_item(DELTAT_NAME(m_volume), index);
+	m_opn.save_item(DELTAT_NAME(m_adpcm_acc), index);
+	m_opn.save_item(DELTAT_NAME(m_prev_acc), index);
+	m_opn.save_item(DELTAT_NAME(m_adpcm_step), index);
+	m_opn.save_item(DELTAT_NAME(m_output), index);
+	m_opn.save_item(DELTAT_NAME(m_curbyte), index);
+	m_opn.save_item(DELTAT_NAME(m_cpudata), index);
+	m_opn.save_item(DELTAT_NAME(m_portstate), index);
+	m_opn.save_item(DELTAT_NAME(m_control2), index);
+	m_opn.save_item(DELTAT_NAME(m_addrshift), index);
+	m_opn.save_item(DELTAT_NAME(m_memread), index);
+	m_opn.save_item(DELTAT_NAME(m_status), index);
+}
+
+void opn_deltat_channel_t::status_set_reset(u8 set, u8 reset)
+{
+	u8 prev = m_status;
+	m_status = (m_status & ~reset) | set;
+	if (m_status != prev)
+		m_opn.deltat_status_change(m_status);
+}
+
+void opn_deltat_channel_t::reset()
+{
+	m_curaddress = 0;
+	m_curfrac = 0;
+	m_start = 0;
+	m_limit = ~0;
+	m_end = 0;
+	m_delta = 0;
+	m_volume = 0;
+	m_adpcm_acc = 0;
+	m_prev_acc = 0;
+	m_adpcm_step = DELTA_DEFAULT;
+	m_output = 0;
+	m_portstate = (m_opn.type() == YM2610) ? 0x20 : 0x00;
+	m_control2 = (m_opn.type() == YM2610) ? 0xc1 : 0xc0;
+	m_addrshift = 5;
+	m_memread = 0;
+	status_set_reset(0, 0xff);
+}
+
+void opn_deltat_channel_t::set_portstate(u8 value)
+{
+	//
+	// START:
+	//     Accessing *external* memory is started when START bit (D7) is set to "1", so
+	//     you must set all conditions needed for recording/playback before starting.
+	//     If you access *CPU-managed* memory, recording/playback starts after
+	//     read/write of ADPCM data register $08.
+	//
+	// REC:
+	//     0 = ADPCM synthesis (playback)
+	//     1 = ADPCM analysis (record)
+	//
+	// MEMDATA:
+	//     0 = processor (*CPU-managed*) memory (means: using register $08)
+	//     1 = external memory (using start/end/limit registers to access memory: RAM or ROM)
+	//
+	// SPOFF:
+	//     controls output pin that should disable the speaker while ADPCM analysis
+	//
+	// RESET and REPEAT only work with external memory.
+	//
+	// some examples:
+	// value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
+	//   C8     1      1    0       0       1      0 0 0       Analysis (recording) from AUDIO to CPU (to reg $08), sample rate in PRESCALER register
+	//   E8     1      1    1       0       1      0 0 0       Analysis (recording) from AUDIO to EXT.MEMORY,       sample rate in PRESCALER register
+	//   80     1      0    0       0       0      0 0 0       Synthesis (playing) from CPU (from reg $08) to AUDIO,sample rate in DELTA-N register
+	//   a0     1      0    1       0       0      0 0 0       Synthesis (playing) from EXT.MEMORY to AUDIO,        sample rate in DELTA-N register
+	//
+	//   60     0      1    1       0       0      0 0 0       External memory write via ADPCM data register $08
+	//   20     0      0    1       0       0      0 0 0       External memory read via ADPCM data register $08
+	//
+	m_portstate = value & 0xf1;  // start, rec, memory mode, repeat flag copy, reset(bit0)
+	if (BIT(m_portstate, 7)) // START,REC,MEMDATA,REPEAT,SPOFF,--,--,RESET
+	{
+		status_set_reset(STATUS_BUSY);
+
+		// start ADPCM
+		m_curfrac  = 0;
+		m_adpcm_acc = 0;
+		m_prev_acc = 0;
+		m_output = 0;
+		m_adpcm_step = DELTA_DEFAULT;
+		m_curbyte = 0;
+	}
+
+	if (BIT(m_portstate, 5)) // do we access external memory?
+	{
+		m_curaddress = start_address();
+		m_memread = 2;    // two dummy reads needed before accesing external memory via register $08
+	}
+	else // we access CPU memory (ADPCM data register $08) so we only reset m_curaddress here
+		m_curaddress = 0;
+
+	if (BIT(m_portstate, 0))
+	{
+		m_portstate = 0x00;
+		status_set_reset(STATUS_BRDY, STATUS_BUSY);
+	}
+}
+
+void opn_deltat_channel_t::set_pan_control2(u8 value, u8 shift_override)
+{
+	m_control2 = value;
+
+	// low 2 bits:
+	//   0-DRAM x1, 1-ROM, 2-DRAM x8, 3-ROM (3 is bad setting - not allowed by the manual)
+	//
+	// final shift value depends on chip type and memory type selected:
+	//		8 for YM2610 (ROM only),
+	//		5 for ROM for Y8950 and YM2608,
+	//		5 for x8bit DRAMs for Y8950 and YM2608,
+	//		2 for x1bit DRAMs for Y8950 and YM2608.
+	m_addrshift = ((value & 3) == 0) ? 2 : 5;
+	if (shift_override != 0)
+		m_addrshift = shift_override;
+
+	// add 1 to the address shift since we work in nibbles
+	m_addrshift++;
+}
+
+void opn_deltat_channel_t::write_data(u8 value)
+{
+	// external memory write
+	if ((m_portstate & 0xe0) == 0x60)
+	{
+		// clear out dummy reads and set start address
+		if (m_memread != 0)
+		{
+			m_curaddress = start_address();
+			m_memread = 0;
+		}
+
+		// before end?
+		if (m_curaddress != end_address())
+		{
+			m_opn.deltat_write(m_curaddress, value);
+			m_curaddress += 2;
+
+			// reset BRDY bit in status register, which means we are processing the write
+			status_set_reset(0, STATUS_BRDY);
+
+			// should go high again after 10 master clock cycles (Y8950) but this is not simulated
+			status_set_reset(STATUS_BRDY);
+		}
+		else
+			status_set_reset(STATUS_EOS);
+	}
+
+	// ADPCM synthesis from CPU
+	else if ((m_portstate & 0xe0) == 0x80)
+	{
+		m_cpudata = value;
+		status_set_reset(0, STATUS_BRDY);
+	}
+}
+
+u8 opn_deltat_channel_t::read_data()
+{
+	u8 result = 0;
+
+	// external memory read
+	if ((m_portstate & 0xe0) == 0x20)
+	{
+		// two dummy reads
+		if (m_memread != 0)
+		{
+			m_curaddress = start_address();
+			m_memread--;
+		}
+
+		// before end?
+		else if (m_curaddress != end_address())
+		{
+			result = m_opn.deltat_read(m_curaddress);
+			m_curaddress += 2;
+
+			// reset BRDY bit in status register, which means we are reading the memory now
+			status_set_reset(0, STATUS_BRDY);
+
+			// should go high again after 10 master clock cycles (Y8950) but this is not simulated
+			status_set_reset(STATUS_BRDY);
+		}
+		else
+			status_set_reset(STATUS_EOS);
+	}
+	return result;
+}
+
+bool opn_deltat_channel_t::update(u32 freqbase)
+{
+	// Forecast to next Forecast (rate = *8)
+	// 1/8 , 3/8 , 5/8 , 7/8 , 9/8 , 11/8 , 13/8 , 15/8
+	static constexpr s8 s_decode_b1[16] =
+	{
+		 1,   3,   5,   7,   9,  11,  13,  15,
+		-1,  -3,  -5,  -7,  -9, -11, -13, -15,
+	};
+
+	// delta to next delta (rate= *64)
+	// 0.9 , 0.9 , 0.9 , 0.9 , 1.2 , 1.6 , 2.0 , 2.4
+	static constexpr s16 s_decode_b2[16] =
+	{
+		57,  57,  57,  57, 77, 102, 128, 153,
+		57,  57,  57,  57, 77, 102, 128, 153
+	};
+
+	// only process if active
+	if (!BIT(m_portstate, 7))
+		return false;
+
+	// determine which mode we are operating in
+	bool external_memory;
+	if ((m_portstate & 0xe0) == 0xa0)
+		external_memory = true;
+	else if ((m_portstate & 0xe0) == 0x80)
+		external_memory = false;
+	else
+		return false;
+
+	// process any samples once we cross the 1.0 fractional boundary
+	// freqbase is x.1, so shift one less
+	for (m_curfrac += (m_delta * freqbase) >> 1; m_curfrac >= FRAC_ONE; m_curfrac -= FRAC_ONE)
+	{
+		// in external memory mode, check the end address and process
+		if (external_memory)
+		{
+			// wrap at the limit address
+			if (m_curaddress == limit_address())
+				m_curaddress = 0;
+
+			// handle the sample end, either repeating or stopping
+			if (m_curaddress == end_address())
+			{
+				if (BIT(m_portstate, 4))
+				{
+					// repeat start
+					m_curaddress = start_address();
+					m_adpcm_acc = m_prev_acc = 0;
+					m_adpcm_step = DELTA_DEFAULT;
+				}
+				else
+				{
+					status_set_reset(STATUS_EOS, STATUS_BUSY);
+					m_portstate = 0;
+					m_output = 0;
+					m_prev_acc = 0;
+					return true;
+				}
+			}
+		}
+
+		// determine which nibble (0 = low, 1 = high)
+		int nibble = m_curaddress & 1;
+
+		// in external memory mode, fetch the data when we first need it
+		if (external_memory && nibble == 0)
+			m_curbyte = m_opn.deltat_read(m_curaddress >> 1);
+
+		// extract the nibble
+		u8 data = u8(m_curbyte << (4 * nibble)) >> 4;
+
+		// in CPU-driven mode, after we consume the upper nibble, copy the next byte and request more
+		if (!external_memory && nibble == 1)
+		{
+			m_curbyte = m_cpudata;
+			status_set_reset(STATUS_BRDY, 0);
+		}
+
+		// YM2610 address register is 24 bits wide.
+		// The "+1" is there because we use 1 bit more for nibble calculations.
+		m_curaddress++;
+		m_curaddress &= (1 << 25) - 1;
+
+		// remember previous value for interpolation
+		m_prev_acc = m_adpcm_acc;
+
+		// forecast to next forecast
+		m_adpcm_acc += s_decode_b1[data] * m_adpcm_step / 8;
+		if (m_adpcm_acc > 32767)
+			m_adpcm_acc = 32767;
+		else if (m_adpcm_acc < -32768)
+			m_adpcm_acc = -32768;
+
+		// delta to next delta
+		m_adpcm_step = (m_adpcm_step * s_decode_b2[data]) / 64;
+		if (m_adpcm_step > DELTA_MAX)
+			m_adpcm_step = DELTA_MAX;
+		else if (m_adpcm_step < DELTA_MIN)
+			m_adpcm_step = DELTA_MIN;
+	}
+
+	// interpolate between samples
+	m_output = (m_prev_acc * s32(FRAC_ONE - m_curfrac) + m_adpcm_acc * s32(m_curfrac)) >> FRAC_SHIFT;
+	return false;
+}
+
+
+
+//*********************************************************
+// OPN BASE DEVICE CLASS
+//*********************************************************
+
+//-------------------------------------------------
+//  ymopn_device_base - constructor
+//-------------------------------------------------
 
 ymopn_device_base::ymopn_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, (type == YM2203) ? 3 : 1, (type == YM2610 || type == YM2610B) ? 0 : 2),
+	m_adpcm_status(0),
 	m_eg_count(0),
 	m_eg_timer(0),
 	m_lfo_am(0),
@@ -1295,7 +1782,7 @@ ymopn_device_base::ymopn_device_base(const machine_config &mconfig, const char *
 	m_lfo_count(0),
 	m_lfo_step(0),
 	m_prescaler_sel(0),
-	m_freqbase(CLOCK_DIVIDER),
+	m_freqbase(CLOCK_DIVIDER * 2),
 	m_timer_prescaler(0),
 	m_busy_expiry_time(attotime::zero),
 	m_irq(0),
@@ -1314,10 +1801,24 @@ ymopn_device_base::ymopn_device_base(const machine_config &mconfig, const char *
 	int channels = (type == YM2203) ? 3 : 6;
 	for (int index = 0; index < channels; index++)
 		m_channel.push_back(std::make_unique<opn_channel_t>(*this));
+
+	// allocate the appropriate number of ADPCM channels
+	int adpcm = (type == YM2203) ? 0 : 6;
+	for (int index = 0; index < adpcm; index++)
+		m_adpcm_channel.push_back(std::make_unique<opn_adpcm_channel_t>(*this));
+
+	// allocate the deltat channel
+	bool deltat = (type != YM2203);
+	if (deltat)
+		m_deltat_channel = std::make_unique<opn_deltat_channel_t>(*this);
 }
 
-// status set and IRQ handling
-void ymopn_device_base::set_reset_status(u8 set, u8 reset)
+//-------------------------------------------------
+//  status_set_reset - set/reset bits in the status
+//  register, signaling IRQs according to the mask
+//-------------------------------------------------
+
+void ymopn_device_base::status_set_reset(u8 set, u8 reset)
 {
 	m_status = (m_status | set) & ~reset;
 	bool irq = ((m_status & m_irqmask) != 0);
@@ -1328,20 +1829,126 @@ void ymopn_device_base::set_reset_status(u8 set, u8 reset)
 	}
 }
 
-// IRQ mask set
+
+//-------------------------------------------------
+//  adpcm_read - read a byte of ADPCM data
+//-------------------------------------------------
+
+u8 ymopn_device_base::adpcm_read(offs_t offset)
+{
+	// default implementation is empty
+	return 0;
+}
+
+u8 ym2608_device::adpcm_read(offs_t offset)
+{
+	// ADPCM reads from the internal ROM
+	return m_internal->as_u8(offset % m_internal->bytes());
+}
+
+u8 ym2610_device::adpcm_read(offs_t offset)
+{
+	// read from space 0
+	return space(0).read_byte(offset);
+}
+
+
+//-------------------------------------------------
+//  deltat_read - read a byte of delta-T ADPCM data
+//-------------------------------------------------
+
+u8 ymopn_device_base::deltat_read(offs_t offset)
+{
+	// default implementation is empty
+	return 0;
+}
+
+u8 ym2608_device::deltat_read(offs_t offset)
+{
+	return space(0).read_byte(offset);
+}
+
+u8 ym2610_device::deltat_read(offs_t offset)
+{
+	return space(1).read_byte(offset);
+}
+
+
+//-------------------------------------------------
+//  deltat_write - write a byte of delta-T ADPCM
+//  data
+//-------------------------------------------------
+
+void ymopn_device_base::deltat_write(offs_t offset, u8 data)
+{
+	// default implementation is empty
+}
+
+void ym2608_device::deltat_write(offs_t offset, u8 data)
+{
+	space(0).write_byte(offset, data);
+}
+
+
+//-------------------------------------------------
+//  deltat_status_change - process a status change
+//  from the delta-T ADPCM unit
+//-------------------------------------------------
+
+void ymopn_device_base::deltat_status_change(u8 newstatus)
+{
+	// default implementation is empty
+}
+
+void ym2608_device::deltat_status_change(u8 newstatus)
+{
+	u8 set = 0;
+	u8 reset = 0;
+
+	// map EOS flag to the status register
+	if ((newstatus & opn_deltat_channel_t::STATUS_EOS) != 0)
+		set |= STATUS_DELTAT_EOS_2608;
+	else
+		reset |= STATUS_DELTAT_EOS_2608;
+
+	// map BRDY flag to the status register
+	if ((newstatus & opn_deltat_channel_t::STATUS_BRDY) != 0)
+		set |= STATUS_DELTAT_BRDY_2608;
+	else
+		reset |= STATUS_DELTAT_BRDY_2608;
+
+	// pass the bits through the regular status/IRQ mechanism
+	status_set_reset(set, reset);
+}
+
+
+//-------------------------------------------------
+//  set_irqmask - set the IRQ mask
+//-------------------------------------------------
+
 void ymopn_device_base::set_irqmask(u8 flag)
 {
 	m_irqmask = flag;
-	set_reset_status();
+	status_set_reset();
 }
+
+
+//-------------------------------------------------
+//  status - return the current status
+//-------------------------------------------------
 
 u8 ymopn_device_base::status()
 {
 	u8 status = m_status;
 	if (machine().time() < m_busy_expiry_time)
-		status |= 0x80;
+		status |= STATUS_BUSY;
 	return status;
 }
+
+
+//-------------------------------------------------
+//  busy_set - set the busy flag expiration time
+//-------------------------------------------------
 
 void ymopn_device_base::busy_set()
 {
@@ -1349,13 +1956,23 @@ void ymopn_device_base::busy_set()
 	m_busy_expiry_time = machine().time() + expiry_period;
 }
 
-// return the period of timer A, in attotime
+
+//-------------------------------------------------
+//  timer_a_period - return the period of timer A,
+//  in attotime
+//-------------------------------------------------
+
 attotime ymopn_device_base::timer_a_period() const
 {
 	return ((1024 - m_timer_a_value) * m_timer_prescaler) * attotime::from_hz(clock());
 }
 
-// return the period of timer B, in attotime
+
+//-------------------------------------------------
+//  timer_b_period - return the period of timer B,
+//  in attotime
+//-------------------------------------------------
+
 attotime ymopn_device_base::timer_b_period() const
 {
 	return ((256 - m_timer_b_value) * 16 * m_timer_prescaler) * attotime::from_hz(clock());
@@ -1383,11 +2000,11 @@ void ymopn_device_base::set_mode(u8 value)
 
 	// reset Timer b flag
 	if (BIT(value, 5))
-		set_reset_status(0, 0x02);
+		status_set_reset(0, STATUS_TIMERB);
 
 	// reset Timer a flag
 	if (BIT(value, 4))
-		set_reset_status(0, 0x01);
+		status_set_reset(0, STATUS_TIMERA);
 
 	// load b
 	if (BIT(value, 1))
@@ -1571,6 +2188,134 @@ void ymopn_device_base::write_reg(u16 reg, u8 value)
 
 
 //-------------------------------------------------
+//  write_adpcm - handle writes to ADPCM registers
+//-------------------------------------------------
+
+void ymopn_device_base::write_adpcm(u8 reg, u8 value)
+{
+	// determine channel
+	u8 chnum = reg & 7;
+	if (chnum >= m_adpcm_channel.size())
+		return;
+	opn_adpcm_channel_t &chan = *m_adpcm_channel[chnum];
+
+	switch (reg & 0xf8)
+	{
+		case 0x00:
+			if (chnum == 0)			// DM,--,C5,C4,C3,C2,C1,C0
+			{
+				for (int chnum = 0; chnum < m_adpcm_channel.size(); chnum++)
+					if (BIT(value, chnum))
+						m_adpcm_channel[chnum]->keyonoff(BIT(~value, 7));
+			}
+			else if (chnum == 1)	// B0-5 = TL
+			{
+				for (auto &chan : m_adpcm_channel)
+					chan->set_tl(~value & 0x3f);
+			}
+			break;
+
+		case 0x08:
+			chan.set_volume_pan(value);
+			break;
+
+		case 0x10:
+			chan.set_start_byte(value, 0);
+			break;
+
+		case 0x18:
+			chan.set_start_byte(value, 8);
+			break;
+
+		case 0x20:
+			chan.set_end_byte(value, 0);
+			break;
+
+		case 0x28:
+			chan.set_end_byte(value, 8);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  write_deltat - handle writes to DeltaT
+//  registers
+//-------------------------------------------------
+
+void ymopn_device_base::write_deltat(u8 reg, u8 value)
+{
+	// determine channel
+	if (!m_deltat_channel)
+		return;
+	opn_deltat_channel_t &chan = *m_deltat_channel;
+
+	switch (reg)
+	{
+		case 0x00:
+			// YM2610 always uses external memory and has no record support
+			if (type() == YM2610 || type() == YM2610B)
+				value = (value | 0x20) & ~0x40;
+			chan.set_portstate(value);
+			break;
+
+		case 0x01:  // L,R,-,-,SAMPLE,DA/AD,RAMTYPE,ROM
+			// YM2610 always uses ROM as an external memory and doesn't tave ROM/RAM memory flag bit
+			// it also has a fixed address shift of 8, which overrides the normal ones
+			if (type() == YM2610 || type() == YM2610B)
+				chan.set_pan_control2(value | 0x01, 8);
+			else
+				chan.set_pan_control2(value);
+			break;
+
+		case 0x02:  // start address low
+			chan.set_start_byte(value, 0);
+			break;
+
+		case 0x03:  // start address high
+			chan.set_start_byte(value, 8);
+			break;
+
+		case 0x04:  // end address low
+			chan.set_end_byte(value, 0);
+			break;
+
+		case 0x05:  // end address high
+			chan.set_end_byte(value, 8);
+			break;
+
+		case 0x06:  // prescale low/high (for record -- not supported)
+		case 0x07:
+			break;
+
+		case 0x08:  // data write
+			chan.write_data(value);
+			break;
+
+		case 0x09:  // delta-N low
+			chan.set_delta_byte(value, 0);
+			break;
+
+		case 0x0a:  // delta-N high
+			chan.set_delta_byte(value, 8);
+			break;
+
+		case 0x0b:  // output level control
+			chan.set_volume(value);
+			break;
+
+		case 0x0c:  // mimit address low
+			chan.set_limit_byte(value, 0);
+			break;
+
+		case 0x0d:  // limit address high
+			chan.set_limit_byte(value, 8);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
 //  prescaler_w - handle writes to prescaler
 //  registers
 //-------------------------------------------------
@@ -1625,7 +2370,7 @@ void ymopn_device_base::set_prescale(u8 sel)
 	sel &= 3;
 	m_prescaler_sel = sel;
 
-	m_freqbase = CLOCK_DIVIDER / (s_opn_pres[sel] * pre_divider);
+	m_freqbase = (CLOCK_DIVIDER * 2) / (s_opn_pres[sel] * pre_divider);
 	m_timer_prescaler = s_opn_pres[sel] * pre_divider;
 	ay_set_clock(clock() * 2 / (s_ssg_pres[sel] * pre_divider));
 }
@@ -1644,13 +2389,13 @@ void ymopn_device_base::device_timer(emu_timer &timer, device_timer_id id, int p
 			if (BIT(m_mode, 7))
 				channel(2).csm_key_control();
 			if (BIT(m_mode, 2))
-				set_reset_status(0x01);
+				status_set_reset(STATUS_TIMERA);
 			m_timer_a->adjust(timer_a_period());
 			break;
 
 		case TIMER_B:
 			if (BIT(m_mode, 3))
-				set_reset_status(0x02);
+				status_set_reset(STATUS_TIMERB);
 			m_timer_b->adjust(timer_b_period());
 			break;
 
@@ -1667,6 +2412,16 @@ void ymopn_device_base::device_timer(emu_timer &timer, device_timer_id id, int p
 		case TIMER_WRITE_MODE:
 			m_stream->update();
 			write_mode(param >> 8, param & 0xff);
+			break;
+
+		case TIMER_WRITE_ADPCM:
+			m_stream->update();
+			write_adpcm(param >> 8, param & 0xff);
+			break;
+
+		case TIMER_WRITE_DELTAT:
+			m_stream->update();
+			write_deltat(param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -1686,29 +2441,52 @@ void ymopn_device_base::sound_stream_update_ex(sound_stream &stream, std::vector
 	}
 
 	// refresh PG and EG
-	for (int index = 0; index < m_channel.size(); index++)
-		channel(index).refresh_fc_eg();
+	for (auto &chan : m_channel)
+		chan->refresh_fc_eg();
 
 	// buffering
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
+		// advance the LFO
+		advance_lfo();
+
 		// advance envelope generator
-		m_eg_timer += m_freqbase << EG_SHIFT;
+		// freqbase is x.1, so shift by one less
+		m_eg_timer += m_freqbase << (EG_SHIFT - 1);
 		while (m_eg_timer >= EG_TIMER_OVERFLOW)
 		{
 			m_eg_timer -= EG_TIMER_OVERFLOW;
 			m_eg_count++;
 
-			for (int index = 0; index < m_channel.size(); index++)
-				channel(index).advance_eg(m_eg_count);
+			for (auto &chan : m_channel)
+				chan->advance_eg(m_eg_count);
 		}
 
 		// calculate FM
 		s32 lsum = 0, rsum = 0;
-		for (int index = 0; index < m_channel.size(); index++)
+		for (auto &chan : m_channel)
 		{
-			auto &chan = channel(index);
-			chan.update(m_lfo_am, m_lfo_pm);
+			chan->update(m_lfo_am, m_lfo_pm);
+			lsum += chan->output_l();
+			rsum += chan->output_r();
+		}
+
+		// calculate delta-T ADPCM
+		if (m_deltat_channel)
+		{
+			auto &chan = *m_deltat_channel;
+			if (chan.update(m_freqbase))
+				m_adpcm_status |= 0x80;
+			lsum += chan.output_l();
+			rsum += chan.output_r();
+		}
+
+		// calculate ADPCM
+		for (int chnum = 0; chnum < m_adpcm_channel.size(); chnum++)
+		{
+			auto &chan = *m_adpcm_channel[chnum];
+			if (chan.update(m_freqbase))
+				m_adpcm_status |= 1 << chnum;
 			lsum += chan.output_l();
 			rsum += chan.output_r();
 		}
@@ -1806,6 +2584,7 @@ void ymopn_device_base::init_tables()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+#define YM_NAME(x) x, "ym." #x
 void ymopn_device_base::device_start()
 {
 	ay8910_device::device_start();
@@ -1815,82 +2594,80 @@ void ymopn_device_base::device_start()
 	m_timer_a = timer_alloc(TIMER_A);
 	m_timer_b = timer_alloc(TIMER_B);
 
-	m_stream = &stream_alloc_ex(0, 1, clock() / CLOCK_DIVIDER);
+	m_stream = &stream_alloc_ex(0, (type() == YM2203) ? 1 : 2, clock() / CLOCK_DIVIDER);
 
 	init_tables();
 
-	save_item(NAME(m_3slot_state.m_fc));
-	save_item(NAME(m_3slot_state.m_fn_h));
-	save_item(NAME(m_3slot_state.m_kcode));
-	save_item(NAME(m_3slot_state.m_block_fnum));
+	save_item(YM_NAME(m_3slot_state.m_fc));
+	save_item(YM_NAME(m_3slot_state.m_fn_h));
+	save_item(YM_NAME(m_3slot_state.m_kcode));
+	save_item(YM_NAME(m_3slot_state.m_block_fnum));
 	for (int chnum = 0; chnum < m_channel.size(); chnum++)
-		channel(chnum).save(chnum);
+		m_channel[chnum]->save(chnum);
+	for (int chnum = 0; chnum < m_adpcm_channel.size(); chnum++)
+		m_adpcm_channel[chnum]->save(chnum);
+	if (m_deltat_channel)
+		m_deltat_channel->save(0);
 
-	save_item(NAME(m_eg_count));
-	save_item(NAME(m_eg_timer));
+	save_item(YM_NAME(m_eg_count));
+	save_item(YM_NAME(m_eg_timer));
 
-	save_item(NAME(m_lfo_am));
-	save_item(NAME(m_lfo_pm));
-	save_item(NAME(m_lfo_count));
-	save_item(NAME(m_lfo_step));
+	save_item(YM_NAME(m_lfo_am));
+	save_item(YM_NAME(m_lfo_pm));
+	save_item(YM_NAME(m_lfo_count));
+	save_item(YM_NAME(m_lfo_step));
 
-	save_item(NAME(m_prescaler_sel));
-	save_item(NAME(m_freqbase));
-	save_item(NAME(m_timer_prescaler));
+	save_item(YM_NAME(m_prescaler_sel));
+	save_item(YM_NAME(m_freqbase));
+	save_item(YM_NAME(m_timer_prescaler));
 
-	save_item(NAME(m_busy_expiry_time));
-	save_item(NAME(m_irq));
-	save_item(NAME(m_irqmask));
-	save_item(NAME(m_status));
-	save_item(m_mode, "m_ym_mode");		// PSG also saves 'm_mode'
-	save_item(NAME(m_fn_h));
+	save_item(YM_NAME(m_busy_expiry_time));
+	save_item(YM_NAME(m_irq));
+	save_item(YM_NAME(m_irqmask));
+	save_item(YM_NAME(m_status));
+	save_item(YM_NAME(m_adpcm_status));
+	save_item(YM_NAME(m_mode));
+	save_item(YM_NAME(m_fn_h));
 
-	save_item(NAME(m_timer_a_value));
-	save_item(NAME(m_timer_b_value));
+	save_item(YM_NAME(m_timer_a_value));
+	save_item(YM_NAME(m_timer_b_value));
 }
 
 void ym2203_device::device_start()
 {
 	ymopn_device_base::device_start();
 
-	save_item(NAME(m_address));
-	save_item(m_regs, "m_ym_regs");		// PSG also saves 'm_regs'
+	save_item(YM_NAME(m_address));
 }
 
-#if 0
 void ym2608_device::device_start()
 {
 	ymopn_device_base::device_start();
 
-	/* DELTA-T */
-	F2608->deltaT.read_byte = ExternalReadByte;
-	F2608->deltaT.write_byte = ExternalWriteByte;
-
-	/*F2608->deltaT.write_time = 20.0 / clock;*/    /* a single byte write takes 20 cycles of main clock */
-	/*F2608->deltaT.read_time  = 18.0 / clock;*/    /* a single byte read takes 18 cycles of main clock */
-
-	F2608->deltaT.status_set_handler = YM2608_deltat_status_set;
-	F2608->deltaT.status_reset_handler = YM2608_deltat_status_reset;
-	F2608->deltaT.status_change_which_chip = F2608;
-	F2608->deltaT.status_change_EOS_bit = 0x04; /* status flag: set bit2 on End Of Sample */
-	F2608->deltaT.status_change_BRDY_bit = 0x08;    /* status flag: set bit3 on BRDY */
-	F2608->deltaT.status_change_ZERO_bit = 0x10;    /* status flag: set bit4 if silence continues for more than 290 milliseconds while recording the ADPCM */
-
-	/* ADPCM Rhythm */
-	F2608->read_byte = InternalReadByte;
-
-	Init_ADPCMATable();
-
-	save_item(NAME(m_address));
-	save_item(NAME(m_regs));
-	/* address register1 */
-	save_item(NAME(F2608->addr_A1));
-	/* rhythm(ADPCMA) */
-	FMsave_state_adpcma(device,F2608->adpcm);
-	/* Delta-T ADPCM unit */
-	F2608->deltaT.savestate(device);
+	save_item(YM_NAME(m_address));
+	save_item(YM_NAME(m_2608_irqmask));
+	save_item(YM_NAME(m_2608_flagmask));
 }
-#endif
+
+void ym2610_device::device_start()
+{
+	ymopn_device_base::device_start();
+
+	save_item(YM_NAME(m_address));
+	save_item(YM_NAME(m_2610_flagmask));
+
+	if (!has_configured_map(0) && !has_configured_map(1))
+	{
+		if (m_adpcm_a_region)
+			space(0).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
+
+		if (m_adpcm_b_region)
+			space(1).install_rom(0, m_adpcm_b_region->bytes() - 1, m_adpcm_b_region->base());
+		else if (m_adpcm_a_region)
+			space(1).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
+	}
+}
+
 
 
 //-------------------------------------------------
@@ -1918,6 +2695,9 @@ void ymopn_device_base::device_stop()
 
 void ymopn_device_base::device_reset()
 {
+	// reset prescaler
+	set_prescale(2);
+
 	// reset SSG section
 	ay8910_device::device_reset();
 
@@ -1928,19 +2708,22 @@ void ymopn_device_base::device_reset()
 
 	m_eg_timer = 0;
 	m_eg_count = 0;
-	for (int chnum = 0; chnum < m_channel.size(); chnum++)
-		channel(chnum).reset();
+	m_adpcm_status = 0;
+
+	for (auto &chan : m_channel)
+		chan->reset();
+	for (auto &chan : m_adpcm_channel)
+		chan->reset();
+	if (m_deltat_channel)
+		m_deltat_channel->reset();
 }
 
 void ym2203_device::device_reset()
 {
-	// reset prescaler
-	set_prescale(2);
-
 	// status clear
 	set_irqmask(0x03);
 	set_mode(0x30); // mode 0, timer reset
-	set_reset_status(0, 0xff);
+	status_set_reset(0, 0xff);
 	ymopn_device_base::device_reset();
 
 	// reset operator paramater
@@ -1950,23 +2733,17 @@ void ym2203_device::device_reset()
 		write_reg(regnum, 0);
 }
 
-#if 0
 void ym2608_device::device_reset()
 {
-	// reset prescaler
-	prescaler_w(0, 2);
+	// register 0x29 - default value after reset is:
+	// enable only 3 FM channels and enable all the status flags
+	irq_mask_write(0x1f);
 
-	F2608->deltaT.freqbase = OPN->ST.freqbase;
+	// register 0x110: default value is 1 for D4, D3, D2, 0 for the rest
+	irq_flag_write(0x1c);
 
-	/* register 0x29 - default value after reset is:
-	    enable only 3 FM channels and enable all the status flags */
-	YM2608IRQMaskWrite(OPN, F2608, 0x1f );  /* default value for D4-D0 is 1 */
-
-	/* register 0x10, A1=1 - default value is 1 for D4, D3, D2, 0 for the rest */
-	YM2608IRQFlagWrite(OPN, F2608, 0x1c );  /* default: enable timer A and B, disable EOS, BRDY and ZERO */
-
-	set_mode(0x30); // mode 0 , timer reset
-	set_reset_status(0, 0xff);
+	set_mode(0x30); // mode 0, timer reset
+	status_set_reset(0, 0xff);
 	ymopn_device_base::device_reset();
 
 	// reset operator paramater
@@ -1983,40 +2760,54 @@ void ym2608_device::device_reset()
 	for (int regnum = 0x26; regnum >= 0x20; regnum--)
 		write_reg(regnum, 0);
 
-	/* ADPCM - percussion sounds */
-	for( i = 0; i < 6; i++ )
+	// configure ADPCM percussion sounds
+	static const u32 s_rom_addresses[2*6] =
 	{
-		if (i<=3)   /* channels 0,1,2,3 */
-			F2608->adpcm[i].step      = (uint32_t)((float)(1<<ADPCM_SHIFT)*((float)F2608->OPN.ST.freqbase)/3.0f);
-		else        /* channels 4 and 5 work with slower clock */
-			F2608->adpcm[i].step      = (uint32_t)((float)(1<<ADPCM_SHIFT)*((float)F2608->OPN.ST.freqbase)/6.0f);
+		0x0000, 0x01bf, // bass drum
+		0x01c0, 0x043f, // snare drum
+		0x0440, 0x1b7f, // top cymbal
+		0x1b80, 0x1cff, // high hat
+		0x1d00, 0x1f7f, // tom tom
+		0x1f80, 0x1fff  // rim shot
+	};
+	for (int chnum = 0; chnum < 6; chnum++)
+	{
+		auto &chan = adpcm(chnum);
+		chan.set_start(s_rom_addresses[chnum * 2]);
+		chan.set_end(s_rom_addresses[chnum * 2 + 1]);
 
-		F2608->adpcm[i].start     = YM2608_ADPCM_ROM_addr[i*2];
-		F2608->adpcm[i].end       = YM2608_ADPCM_ROM_addr[i*2+1];
-
-		F2608->adpcm[i].now_addr  = 0;
-		F2608->adpcm[i].now_step  = 0;
-		/* F2608->adpcm[i].delta     = 21866; */
-		F2608->adpcm[i].vol_mul   = 0;
-		F2608->adpcm[i].pan       = &OPN->out_adpcm[OUTD_CENTER]; /* default center */
-		F2608->adpcm[i].flagMask  = 0;
-		F2608->adpcm[i].flag      = 0;
-		F2608->adpcm[i].adpcm_acc = 0;
-		F2608->adpcm[i].adpcm_step= 0;
-		F2608->adpcm[i].adpcm_out = 0;
+		// channels 4 and 5 work with a slower clock
+		chan.set_step_divisor((chnum <= 3) ? 1 : 2);
 	}
-	F2608->adpcmTL = 0x3f;
-
-	F2608->adpcm_arrivedEndAddress = 0; /* not used */
-
-	/* DELTA-T unit */
-	DELTAT->freqbase = OPN->ST.freqbase;
-	DELTAT->output_pointer = OPN->out_delta;
-	DELTAT->portshift = 5;      /* always 5bits shift */ /* ASG */
-	DELTAT->output_range = 1<<23;
-	DELTAT->ADPCM_Reset(OUTD_CENTER,YM_DELTAT::EMULATION_MODE_NORMAL,F2608->device);
 }
-#endif
+
+void ym2610_device::device_reset()
+{
+	// status clear
+	set_irqmask(0x03);
+	set_mode(0x30); // mode 0, timer reset
+	status_set_reset(0, 0xff);
+	ymopn_device_base::device_reset();
+
+	// reset operator paramater
+	for (int regnum = 0xb6; regnum >= 0xb4; regnum--)
+	{
+		write_reg(regnum + 0x000, 0xc0);
+		write_reg(regnum + 0x100, 0xc0);
+	}
+	for (int regnum = 0xb2; regnum >= 0x30; regnum--)
+	{
+		write_reg(regnum + 0x000, 0);
+		write_reg(regnum + 0x100, 0);
+	}
+	for (int regnum = 0x26; regnum >= 0x20; regnum--)
+		write_reg(regnum, 0);
+
+	// initialize delta-T ADPCM address shift
+	write_deltat(0x01, 0xc0);
+
+	m_2610_flagmask = 0xbf;
+}
 
 
 //-------------------------------------------------
@@ -2037,15 +2828,87 @@ void ymopn_device_base::device_clock_changed()
 
 u8 ym2203_device::read(offs_t offset)
 {
-	// status port
-	if ((offset & 1) == 0)
-		return status();
+	u8 result = 0;
+	switch (offset & 1)
+	{
+		case 0:	// status port
+			result = status();
+			break;
 
-	// data port (only SSG)
-	else if (m_address < 16)
-		return ay8910_read_ym();
+		case 1: // data port (only SSG)
+			if (m_address < 16)
+				result = ay8910_read_ym();
+			break;
+	}
+	return result;
+}
 
-	return 0;
+u8 ym2608_device::read(offs_t offset)
+{
+	u8 result = 0;
+	switch (offset & 3)
+	{
+		case 0: // status 0 : YM2203 compatible
+			// BUSY:x:x:x:x:x:FLAGB:FLAGA
+			result = status() & 0x83;
+			break;
+
+		case 1: // status 0, ID
+			if (m_address < 16)
+				result = ay8910_read_ym();
+			else if (m_address == 0xff)
+				result = 1;  // ID code
+			break;
+
+		case 2: // status 1 : status 0 + ADPCM status
+			// BUSY:x:PCMBUSY:ZERO:BRDY:EOS:FLAGB:FLAGA
+			result = status() & (m_2608_flagmask | 0x80);
+			if ((deltat().status() & opn_deltat_channel_t::STATUS_BUSY) != 0)
+				result |= 0x20;
+			break;
+
+		case 3:
+			if (m_address == 0x08)
+				result = deltat().read_data();
+			else if (m_address == 0x0f)
+			{
+				logerror("YM2608 A/D conversion is accessed but not implemented !\n");
+				result = 0x80; // 2's complement PCM data - result from A/D conversion
+			}
+			break;
+	}
+	return result;
+}
+
+u8 ym2610_device::read(offs_t offset)
+{
+	u8 result = 0;
+	switch (offset & 3)
+	{
+		case 0: // status 0 : YM2203 compatible
+			// BUSY:x:x:x:x:x:FLAGB:FLAGA
+			result = status() & 0x83;
+			break;
+
+		case 1: // status 0, ID
+			if (m_address < 16)
+				result = ay8910_read_ym();
+			else if (m_address == 0xff)
+				result = 1;  // ID code
+			break;
+
+		case 2: // status 1 : ADPCM status
+			// ADPCM STATUS (arrived End Address)
+			// B,--,A5,A4,A3,A2,A1,A0
+			// B     = ADPCM-B(DELTA-T) arrived end address
+			// A0-A5 = ADPCM-A          arrived end address
+			result = m_adpcm_status & m_2610_flagmask;
+			break;
+
+		case 3:
+			break;
+	}
+	return result;
 }
 
 
@@ -2056,1495 +2919,315 @@ u8 ym2203_device::read(offs_t offset)
 
 void ym2203_device::write(offs_t offset, u8 value)
 {
-	// address port
-	if ((offset & 1) == 0)
+	switch (offset & 1)
 	{
-		m_address = value;
+		case 0:	// address port
+			m_address = value;
 
-		// Write register to SSG emulator
-		if (m_address < 16)
-			ay8910_write_ym(0, m_address);
+			// write register to SSG emulator
+			if (m_address < 16)
+				ay8910_write_ym(0, m_address);
 
-		// prescaler select : 2d,2e,2f
-		if (m_address >= 0x2d && m_address <= 0x2f)
-			prescaler_w(m_address);
-	}
+			// prescaler select : 2d,2e,2f
+			if (m_address >= 0x2d && m_address <= 0x2f)
+				prescaler_w(m_address);
+			break;
 
-	// data port
-	else
-	{
-		m_regs[m_address] = value;
-		switch (m_address & 0xf0)
-		{
-			case 0x00:  // 0x00-0x0f : SSG section
-				ay8910_write_ym(1, value);
-				break;
+		case 1: // data port
+			switch (m_address & 0xf0)
+			{
+				case 0x00:  // 0x00-0x0f : SSG section
+					ay8910_write_ym(1, value);
+					break;
 
-			case 0x20:  // 0x20-0x2f : Mode section
-				synchronize(TIMER_WRITE_MODE, value | (m_address << 8));
-				break;
+				case 0x20:  // 0x20-0x2f : Mode section
+					synchronize(TIMER_WRITE_MODE, value | (m_address << 8));
+					break;
 
-			default:    // 0x30-0xff : OPN section
-				synchronize(TIMER_WRITE_REG, value | (m_address << 8));
-				break;
-		}
-		busy_set();
+				default:    // 0x30-0xff : OPN section
+					synchronize(TIMER_WRITE_REG, value | (m_address << 8));
+					break;
+			}
+			busy_set();
+			break;
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
-
-
-namespace {
-//*** YM2610 ADPCM defines ***
-constexpr unsigned ADPCM_SHIFT          = 16;  // frequency step rate
-constexpr unsigned ADPCMA_ADDRESS_SHIFT = 8;   // adpcm A address shift
-
-// speedup purposes only
-static int jedi_table[ 49*16 ];
-
-// ADPCM type A channel struct
-struct ADPCM_CH
+void ym2608_device::write(offs_t offset, u8 value)
 {
-	u8       flag;           // port state
-	u8       flagMask;       // arrived flag mask
-	u8       now_data;       // current ROM data
-	u32      now_addr;       // current ROM address
-	u32      now_step;
-	u32      step;
-	u32      start;          // sample data start address
-	u32      end;            // sample data end address
-	u8       IL;             // Instrument Level
-	s32       adpcm_acc;      // accumulator
-	s32       adpcm_step;     // step
-	s32       adpcm_out;      // (speedup) hiro-shi!!
-	s8        vol_mul;        // volume in "0.75dB" steps
-	u8       vol_shift;      // volume in "-6dB" steps
-	s32       *pan;           // &out_adpcm[OPN_xxxx]
-};
-
-// here's the virtual YM2610
-struct ym2610_state
-{
-	u8       REGS[512];          // registers
-	FM_OPN      OPN;                // OPN state
-	opn_channel_t       CH[6];              // channel state
-	u8       addr_A1;            // address line A1
-
-	// ADPCM-A unit
-	FM_READBYTE   read_byte;
-	u8       adpcmTL;            // adpcmA total level
-	ADPCM_CH    adpcm[6];           // adpcm channels
-	u32      adpcmreg[0x30];     // registers
-	u8       adpcm_arrivedEndAddress;
-	YM_DELTAT   deltaT;             // Delta-T ADPCM unit
-
-	u8       flagmask;           // YM2608 only
-	u8       irqmask;            // YM2608 only
-
-	device_t    *device;
-
-	// different from the usual ADPCM table
-	static constexpr int step_inc[8] = { -1*16, -1*16, -1*16, -1*16, 2*16, 5*16, 7*16, 9*16 };
-
-	// ADPCM A (Non control type) : calculate one channel output
-	inline void ADPCMA_calc_chan( ADPCM_CH *ch )
+	switch (offset & 3)
 	{
-		u32 step;
-		u8  data;
+		case 0:	// address port 0
+			m_address = value;
 
+			// write register to SSG emulator
+			if (m_address < 16)
+				ay8910_write_ym(0, m_address);
 
-		ch->now_step += ch->step;
-		if ( ch->now_step >= (1<<ADPCM_SHIFT) )
-		{
-			step = ch->now_step >> ADPCM_SHIFT;
-			ch->now_step &= (1<<ADPCM_SHIFT)-1;
-			do{
-				// end check
-				// 11-06-2001 JB: corrected comparison. Was > instead of ==
-				// YM2610 checks lower 20 bits only, the 4 MSB bits are sample bank
-				// Here we use 1<<21 to compensate for nibble calculations
+			// prescaler select : 2d,2e,2f
+			if (m_address >= 0x2d && m_address <= 0x2f)
+				prescaler_w(m_address);
+			break;
 
-				if (   (ch->now_addr & ((1<<21)-1)) == ((ch->end<<1) & ((1<<21)-1))    )
-				{
-					ch->flag = 0;
-					adpcm_arrivedEndAddress |= ch->flagMask;
-					return;
-				}
-				if ( ch->now_addr&1 )
-					data = ch->now_data & 0x0f;
-				else
-				{
-					ch->now_data = read_byte(device, ch->now_addr>>1);
-					data = (ch->now_data >> 4) & 0x0f;
-				}
+		case 1: // data port 0
+			if (BIT(m_address, 8))
+				break; // verified on real YM2608
 
-				ch->now_addr++;
-
-				ch->adpcm_acc += jedi_table[ch->adpcm_step + data];
-
-				// the 12-bit accumulator wraps on the ym2610 and ym2608 (like the msm5205), it does not saturate (like the msm5218)
-				ch->adpcm_acc &= 0xfff;
-
-				// extend 12-bit signed int
-				if (ch->adpcm_acc & 0x800)
-					ch->adpcm_acc |= ~0xfff;
-
-				ch->adpcm_step += step_inc[data & 7];
-				if (ch->adpcm_step > 48*16)
-					ch->adpcm_step = 48*16;
-				else if (ch->adpcm_step < 0*16)
-					ch->adpcm_step = 0*16;
-
-			}while(--step);
-
-			// calc pcm * volume data
-			ch->adpcm_out = ((ch->adpcm_acc * ch->vol_mul) >> ch->vol_shift) & ~3;  // multiply, shift and mask out 2 LSB bits
-		}
-
-		// output for work of output channels (out_adpcm[OPNxxxx])
-		*(ch->pan) += ch->adpcm_out;
-	}
-
-	// ADPCM type A Write
-	void FM_ADPCMAWrite(int r,int v)
-	{
-		u8 c = r&0x07;
-
-		adpcmreg[r] = v&0xff; // stock data
-		switch( r )
-		{
-		case 0x00: // DM,--,C5,C4,C3,C2,C1,C0
-			if( !(v&0x80) )
+			switch (m_address & 0xf0)
 			{
-				// KEY ON
-				for( c = 0; c < 6; c++ )
-				{
-					if( (v>>c)&1 )
+				case 0x00:  // 0x00-0x0f : SSG section
+					ay8910_write_ym(1, value);
+					break;
+
+				case 0x10:
+					synchronize(TIMER_WRITE_ADPCM, value | ((m_address & 0xf) << 8));
+					break;
+
+				case 0x20:  // 0x20-0x2f : Mode section
+					if (m_address == 0x29)
+						irq_mask_write(value);
+					else
+						synchronize(TIMER_WRITE_MODE, value | (m_address << 8));
+					break;
+
+				default:    // 0x30-0xff : OPN section
+					synchronize(TIMER_WRITE_REG, value | (m_address << 8));
+					break;
+			}
+			busy_set();
+			break;
+
+		case 2: // address port 1
+			m_address = value | 0x100;
+			break;
+
+		case 3: // data port 1
+			if (!BIT(m_address, 8))
+				break; // verified on real YM2608
+
+			switch (m_address & 0xf0)
+			{
+				case 0x00:  // DELTAT port
+					if (m_address < 0x10e)
+						synchronize(TIMER_WRITE_DELTAT, value | ((m_address & 0xf) << 8));
+					else if (m_address == 0x10e)
+						logerror("YM2608: write to DAC data (unimplemented) value=%02x\n", value);
+					break;
+
+				case 0x10:  // IRQ flag control
+					if (m_address == 0x110)
+						irq_flag_write(value);
+					break;
+
+				default:    // 0x30-0xff : OPN section
+					synchronize(TIMER_WRITE_REG, value | (m_address << 8));
+					break;
+			}
+			busy_set();
+			break;
+	}
+}
+
+void ym2610_device::write(offs_t offset, u8 value)
+{
+	switch (offset & 3)
+	{
+		case 0:	// address port 0
+			m_address = value;
+
+			// write register to SSG emulator
+			if (m_address < 16)
+				ay8910_write_ym(0, m_address);
+			break;
+
+		case 1: // data port 0
+			if (BIT(m_address, 8))
+				break; // verified on real YM2608
+
+			switch (m_address & 0xf0)
+			{
+				case 0x00:  // 0x00-0x0f : SSG section
+					ay8910_write_ym(1, value);
+					break;
+
+				case 0x10:
+					if (m_address < 0x1c)
+						synchronize(TIMER_WRITE_DELTAT, value | ((m_address & 0xf) << 8));
+					else if (m_address == 0x1c)
 					{
-						//*** start adpcm ***
-						adpcm[c].step      = (u32)((float)(1<<ADPCM_SHIFT)*((float)CLOCK_DIVIDER)/3.0f);
-						adpcm[c].now_addr  = adpcm[c].start<<1;
-						adpcm[c].now_step  = 0;
-						adpcm[c].adpcm_acc = 0;
-						adpcm[c].adpcm_step= 0;
-						adpcm[c].adpcm_out = 0;
-						adpcm[c].flag      = 1;
+						m_2610_flagmask = ~value;
+						m_adpcm_status &= ~value;
 					}
-				}
+					break;
+
+				case 0x20:  // 0x20-0x2f : Mode section
+					synchronize(TIMER_WRITE_MODE, value | (m_address << 8));
+					break;
+
+				default:    // 0x30-0xff : OPN section
+					synchronize(TIMER_WRITE_REG, value | (m_address << 8));
+					break;
 			}
-			else
-			{
-				// KEY OFF
-				for( c = 0; c < 6; c++ )
-					if( (v>>c)&1 )
-						adpcm[c].flag = 0;
-			}
+			busy_set();
 			break;
-		case 0x01:  // B0-5 = TL
-			adpcmTL = (v & 0x3f) ^ 0x3f;
-			for( c = 0; c < 6; c++ )
-			{
-				int volume = adpcmTL + adpcm[c].IL;
 
-				if ( volume >= 63 ) // This is correct, 63 = quiet
-				{
-					adpcm[c].vol_mul   = 0;
-					adpcm[c].vol_shift = 0;
-				}
-				else
-				{
-					adpcm[c].vol_mul   = 15 - (volume & 7);     // so called 0.75 dB
-					adpcm[c].vol_shift =  1 + (volume >> 3);    // Yamaha engineers used the approximation: each -6 dB is close to divide by two (shift right)
-				}
-
-				// calc pcm * volume data
-				adpcm[c].adpcm_out = ((adpcm[c].adpcm_acc * adpcm[c].vol_mul) >> adpcm[c].vol_shift) & ~3;  // multiply, shift and mask out low 2 bits
-			}
+		case 2: // address port 1
+			m_address = value | 0x100;
 			break;
-		default:
-			c = r&0x07;
-			if( c >= 0x06 ) return;
-			switch( r&0x38 )
+
+		case 3: // data port 1
+			if (!BIT(m_address, 8))
+				break; // verified on real YM2608
+
+			switch (m_address & 0xf0)
 			{
-			case 0x08:  // B7=L,B6=R, B4-0=IL
-			{
-				int volume;
+				case 0x00:  // DELTAT port
+				case 0x10:  // DELTAT port
+				case 0x20:  // DELTAT port
+					synchronize(TIMER_WRITE_ADPCM, value | ((m_address & 0x3f) << 8));
+					break;
 
-				adpcm[c].IL = (v & 0x1f) ^ 0x1f;
-
-				volume = adpcmTL + adpcm[c].IL;
-
-				if ( volume >= 63 ) // This is correct, 63 = quiet
-				{
-					adpcm[c].vol_mul   = 0;
-					adpcm[c].vol_shift = 0;
-				}
-				else
-				{
-					adpcm[c].vol_mul   = 15 - (volume & 7);     // so called 0.75 dB
-					adpcm[c].vol_shift =  1 + (volume >> 3);    // Yamaha engineers used the approximation: each -6 dB is close to divide by two (shift right)
-				}
-
-				adpcm[c].pan    = &OPN.out_adpcm[(v>>6)&0x03];
-
-				// calc pcm * volume data
-				adpcm[c].adpcm_out = ((adpcm[c].adpcm_acc * adpcm[c].vol_mul) >> adpcm[c].vol_shift) & ~3;  // multiply, shift and mask out low 2 bits
+				default:    // 0x30-0xff : OPN section
+					synchronize(TIMER_WRITE_REG, value | (m_address << 8));
+					break;
 			}
-				break;
-			case 0x10:
-			case 0x18:
-				adpcm[c].start  = ( (adpcmreg[0x18 + c]*0x0100 | adpcmreg[0x10 + c]) << ADPCMA_ADDRESS_SHIFT);
-				break;
-			case 0x20:
-			case 0x28:
-				adpcm[c].end    = ( (adpcmreg[0x28 + c]*0x0100 | adpcmreg[0x20 + c]) << ADPCMA_ADDRESS_SHIFT);
-				adpcm[c].end   += (1<<ADPCMA_ADDRESS_SHIFT) - 1;
-				break;
-			}
-		}
-	}
-
-};
-
-constexpr int ym2610_state::step_inc[8];
-
-// here is the virtual YM2608
-typedef ym2610_state ym2608_state;
-
-
-// Algorithm and tables verified on real YM2608 and YM2610
-
-// usual ADPCM table (16 * 1.1^N)
-constexpr int steps[49] =
-{
-		16,  17,   19,   21,   23,   25,   28,
-		31,  34,   37,   41,   45,   50,   55,
-		60,  66,   73,   80,   88,   97,  107,
-	118, 130,  143,  157,  173,  190,  209,
-	230, 253,  279,  307,  337,  371,  408,
-	449, 494,  544,  598,  658,  724,  796,
-	876, 963, 1060, 1166, 1282, 1411, 1552
-};
-
-
-void Init_ADPCMATable()
-{
-	int step, nib;
-
-	for (step = 0; step < 49; step++)
-	{
-		// loop over all nibbles and compute the difference
-		for (nib = 0; nib < 16; nib++)
-		{
-			int value = (2*(nib & 0x07) + 1) * steps[step] / 8;
-			jedi_table[step*16 + nib] = (nib&0x08) ? -value : value;
-		}
+			busy_set();
+			break;
 	}
 }
 
-// FM channel save , internal state only
-void FMsave_state_adpcma(device_t *device,ADPCM_CH *adpcm)
-{
-	int ch;
 
-	for(ch=0;ch<6;ch++,adpcm++)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* flag enable control 0x110 */
+void ym2608_device::irq_flag_write(u8 value)
+{
+	if (BIT(value, 7))
 	{
-		device->save_item(NAME(adpcm->flag), ch);
-		device->save_item(NAME(adpcm->now_data), ch);
-		device->save_item(NAME(adpcm->now_addr), ch);
-		device->save_item(NAME(adpcm->now_step), ch);
-		device->save_item(NAME(adpcm->adpcm_acc), ch);
-		device->save_item(NAME(adpcm->adpcm_step), ch);
-		device->save_item(NAME(adpcm->adpcm_out), ch);
-	}
-}
-} // anonymous namespace
-
-
-//***************************************************************************
-//      YM2608 local section
-//***************************************************************************
-
-
-
-static const u32 YM2608_ADPCM_ROM_addr[2*6] = {
-0x0000, 0x01bf, // bass drum
-0x01c0, 0x043f, // snare drum
-0x0440, 0x1b7f, // top cymbal
-0x1b80, 0x1cff, // high hat
-0x1d00, 0x1f7f, // tom tom
-0x1f80, 0x1fff  // rim shot
-};
-
-
-// flag enable control 0x110
-static inline void YM2608IRQFlagWrite(FM_OPN *OPN, ym2608_state *F2608, int v)
-{
-	if( v & 0x80 )
-	{   // Reset IRQ flag
-		set_reset_status(0, 0xf7); // don't touch BUFRDY flag otherwise we'd have to call ymdeltat module to set the flag back
+		// reset IRQ flag; don't touch BUFRDY flag otherwise we'd
+		// have to call ymdeltat module to set the flag back
+		status_set_reset(0, 0xf7);
 	}
 	else
-	{   // Set status flag mask
-		F2608->flagmask = (~(v&0x1f));
-		OPN->ST.set_irqmask(F2608->irqmask & F2608->flagmask);
+	{
+		// set status flag mask
+		m_2608_flagmask = ~(value & 0x1f);
+		set_irqmask(m_2608_irqmask & m_2608_flagmask);
 	}
 }
 
-// compatible mode & IRQ enable control 0x29
-static inline void YM2608IRQMaskWrite(FM_OPN *OPN, ym2608_state *F2608, int v)
+/* compatible mode & IRQ enable control 0x29 */
+void ym2608_device::irq_mask_write(u8 value)
 {
 	// SCH,xx,xxx,EN_ZERO,EN_BRDY,EN_EOS,EN_TB,EN_TA
 
 	// extend 3ch. enable/disable
-	if(v&0x80)
-		OPN->type |= TYPE_6CH;  // OPNA mode - 6 FM channels
-	else
-		OPN->type &= ~TYPE_6CH; // OPN mode - 3 FM channels
+	for (int chnum = 3; chnum < 6; chnum++)
+		channel(chnum).set_disabled(BIT(~value, 7));
 
 	// IRQ MASK store and set
-	F2608->irqmask = v&0x1f;
-	OPN->ST.set_irqmask(F2608->irqmask & F2608->flagmask);
+	m_2608_irqmask = value & 0x1f;
+	set_irqmask(m_2608_irqmask & m_2608_flagmask);
 }
-
-// Generate samples for one of the YM2608s
-void ym2608_update_one(void *chip, std::vector<write_stream_view> &buffer, int length)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-	FM_OPN *OPN   = &F2608->OPN;
-	YM_DELTAT *DELTAT = &F2608->deltaT;
-	int i,j;
-	opn_channel_t   *cch[6];
-	s32 *out_fm = OPN->m_out_fm;
-
-	cch[0]   = &F2608->CH[0];
-	cch[1]   = &F2608->CH[1];
-	cch[2]   = &F2608->CH[2];
-	cch[3]   = &F2608->CH[3];
-	cch[4]   = &F2608->CH[4];
-	cch[5]   = &F2608->CH[5];
-
-	// refresh PG and EG
-	cch[0].refresh_fc_eg();
-	cch[1].refresh_fc_eg();
-	cch[2].refresh_fc_eg();
-	cch[3].refresh_fc_eg();
-	cch[4].refresh_fc_eg();
-	cch[5].refresh_fc_eg();
-
-
-	// buffering
-	for(i=0; i < length ; i++)
-	{
-		OPN.advance_lfo();
-
-		// clear output acc.
-		OPN->out_adpcm[OUTD_LEFT] = OPN->out_adpcm[OUTD_RIGHT] = OPN->out_adpcm[OUTD_CENTER] = 0;
-		OPN->out_delta[OUTD_LEFT] = OPN->out_delta[OUTD_RIGHT] = OPN->out_delta[OUTD_CENTER] = 0;
-		// clear outputs
-		out_fm[0] = 0;
-		out_fm[1] = 0;
-		out_fm[2] = 0;
-		out_fm[3] = 0;
-		out_fm[4] = 0;
-		out_fm[5] = 0;
-
-		// calculate FM
-		chan_calc(OPN, cch[0], 0 );
-		chan_calc(OPN, cch[1], 1 );
-		chan_calc(OPN, cch[2], 2 );
-		chan_calc(OPN, cch[3], 3 );
-		chan_calc(OPN, cch[4], 4 );
-		chan_calc(OPN, cch[5], 5 );
-
-		// deltaT ADPCM
-		if( DELTAT->portstate&0x80 )
-			DELTAT->ADPCM_CALC();
-
-		// ADPCMA
-		for( j = 0; j < 6; j++ )
-		{
-			if( F2608->adpcm[j].flag )
-				F2608->ADPCMA_calc_chan( &F2608->adpcm[j]);
-		}
-
-		// advance envelope generator
-		OPN->m_eg_timer += EG_TIMER_ADD;
-		while (OPN->m_eg_timer >= EG_TIMER_OVERFLOW)
-		{
-			OPN->m_eg_timer -= EG_TIMER_OVERFLOW;
-			OPN->eg_cnt++;
-
-			cch[0].advance_eg_channel(OPN->eg_cnt);
-			cch[1].advance_eg_channel(OPN->eg_cnt);
-			cch[2].advance_eg_channel(OPN->eg_cnt);
-			cch[3].advance_eg_channel(OPN->eg_cnt);
-			cch[4].advance_eg_channel(OPN->eg_cnt);
-			cch[5].advance_eg_channel(OPN->eg_cnt);
-		}
-
-		// buffering
-		{
-			int lt,rt;
-
-			lt =  OPN->out_adpcm[OUTD_LEFT]  + OPN->out_adpcm[OUTD_CENTER];
-			rt =  OPN->out_adpcm[OUTD_RIGHT] + OPN->out_adpcm[OUTD_CENTER];
-			lt += (OPN->out_delta[OUTD_LEFT]  + OPN->out_delta[OUTD_CENTER])>>9;
-			rt += (OPN->out_delta[OUTD_RIGHT] + OPN->out_delta[OUTD_CENTER])>>9;
-			lt += ((out_fm[0]>>1) & OPN->pan[0]);   // shift right verified on real YM2608
-			rt += ((out_fm[0]>>1) & OPN->pan[1]);
-			lt += ((out_fm[1]>>1) & OPN->pan[2]);
-			rt += ((out_fm[1]>>1) & OPN->pan[3]);
-			lt += ((out_fm[2]>>1) & OPN->pan[4]);
-			rt += ((out_fm[2]>>1) & OPN->pan[5]);
-			lt += ((out_fm[3]>>1) & OPN->pan[6]);
-			rt += ((out_fm[3]>>1) & OPN->pan[7]);
-			lt += ((out_fm[4]>>1) & OPN->pan[8]);
-			rt += ((out_fm[4]>>1) & OPN->pan[9]);
-			lt += ((out_fm[5]>>1) & OPN->pan[10]);
-			rt += ((out_fm[5]>>1) & OPN->pan[11]);
-
-			Limit( lt, MAXOUT, MINOUT );
-			Limit( rt, MAXOUT, MINOUT );
-			// buffering
-			buffer[0].put(i, lt * sample_scale);
-			buffer[1].put(i, rt * sample_scale);
-		}
-	}
-
-	// check IRQ for DELTA-T EOS
-	set_reset_status();
-
-}
-void ym2608_postload(void *chip)
-{
-	if (chip)
-	{
-		ym2608_state *F2608 = (ym2608_state *)chip;
-		int r;
-
-		// prescaler
-		F2608->OPN.prescaler_w(1,2);
-		// IRQ mask / mode
-		YM2608IRQMaskWrite(&F2608->OPN, F2608, F2608->REGS[0x29]);
-		// SSG registers
-		for(r=0;r<16;r++)
-		{
-			(*F2608->OPN.ST.SSG->write)(F2608->OPN.ST.device,0,r);
-			(*F2608->OPN.ST.SSG->write)(F2608->OPN.ST.device,1,F2608->REGS[r]);
-		}
-
-		// OPN registers
-		// DT / MULTI , TL , KS / AR , AMON / DR , SR , SL / RR , SSG-EG
-		for(r=0x30;r<0x9e;r++)
-			if((r&3) != 3)
-			{
-				F2608->OPN.write_reg(r,F2608->REGS[r]);
-				F2608->OPN.write_reg(r|0x100,F2608->REGS[r|0x100]);
-			}
-		// FB / CONNECT , L / R / AMS / PMS
-		for(r=0xb0;r<0xb6;r++)
-			if((r&3) != 3)
-			{
-				F2608->OPN.write_reg(r,F2608->REGS[r]);
-				F2608->OPN.write_reg(r|0x100,F2608->REGS[r|0x100]);
-			}
-		// FM channels
-		//FM_channel_postload(F2608->CH,6);
-		// rhythm(ADPCMA)
-		F2608->FM_ADPCMAWrite(1,F2608->REGS[0x111]);
-		for( r=0x08 ; r<0x0c ; r++)
-			F2608->FM_ADPCMAWrite(r,F2608->REGS[r+0x110]);
-		// Delta-T ADPCM unit
-		F2608->deltaT.postload( &F2608->REGS[0x100] );
-	}
-}
-
-static void YM2608_save_state(ym2608_state *F2608, device_t *device)
-{
-	device->save_item(NAME(F2608->REGS));
-	FMsave_state_st(device,&F2608->OPN.ST);
-	FMsave_state_channel(device,F2608->CH,6);
-	// 3slots
-	device->save_item(NAME(F2608->OPN.SL3.fc));
-	device->save_item(NAME(F2608->OPN.SL3.fn_h));
-	device->save_item(NAME(F2608->OPN.SL3.kcode));
-	// address register1
-	device->save_item(NAME(F2608->addr_A1));
-	// rhythm(ADPCMA)
-	FMsave_state_adpcma(device,F2608->adpcm);
-	// Delta-T ADPCM unit
-	F2608->deltaT.savestate(device);
-}
-
-static void YM2608_deltat_status_set(void *chip, u8 changebits)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-	F2608->OPN.ST->set_status(changebits);
-}
-static void YM2608_deltat_status_reset(void *chip, u8 changebits)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-	F2608->OPN.ST->reset_status(changebits);
-}
-// YM2608(OPNA)
-void * ym2608_init(device_t *device, int clock,
-	FM_READBYTE InternalReadByte,
-	FM_READBYTE ExternalReadByte, FM_WRITEBYTE ExternalWriteByte,
-	FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
-{
-	ym2608_state *F2608;
-
-	// allocate extend state space
-	F2608 = auto_alloc_clear(device->machine(), <ym2608_state>());
-	// allocate total level table (128kb space)
-	if( !init_tables() )
-	{
-		auto_free( device->machine(), F2608 );
-		return nullptr;
-	}
-
-	F2608->device = device;
-	F2608->OPN.type = TYPE_YM2608;
-	F2608->OPN.P_CH = F2608->CH;
-	F2608->OPN.ST.device = device;
-	F2608->OPN.ST.clock = clock;
-
-	// External handlers
-	F2608->OPN.ST.timer_handler = timer_handler;
-	F2608->OPN.ST.IRQ_Handler   = IRQHandler;
-	F2608->OPN.ST.SSG           = ssg;
-
-	// DELTA-T
-	F2608->deltaT.read_byte = ExternalReadByte;
-	F2608->deltaT.write_byte = ExternalWriteByte;
-
-	//F2608->deltaT.write_time = 20.0 / clock;    // a single byte write takes 20 cycles of main clock
-	//F2608->deltaT.read_time  = 18.0 / clock;    // a single byte read takes 18 cycles of main clock
-
-	F2608->deltaT.status_set_handler = YM2608_deltat_status_set;
-	F2608->deltaT.status_reset_handler = YM2608_deltat_status_reset;
-	F2608->deltaT.status_change_which_chip = F2608;
-	F2608->deltaT.status_change_EOS_bit = 0x04; // status flag: set bit2 on End Of Sample
-	F2608->deltaT.status_change_BRDY_bit = 0x08;    // status flag: set bit3 on BRDY
-	F2608->deltaT.status_change_ZERO_bit = 0x10;    // status flag: set bit4 if silence continues for more than 290 milliseconds while recording the ADPCM
-
-	// ADPCM Rhythm
-	F2608->read_byte = InternalReadByte;
-
-	Init_ADPCMATable();
-
-	YM2608_save_state(F2608, device);
-	return F2608;
-}
-
-void ym2608_clock_changed(void *chip, int clock)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-
-	F2608->OPN.ST.clock = clock;
-}
-
-// shut down emulator
-void ym2608_shutdown(void *chip)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-
-	auto_free(F2608->OPN.ST.device->machine(), F2608);
-}
-
-// reset one of chips
-void ym2608_reset_chip(void *chip)
-{
-	int i;
-	ym2608_state *F2608 = (ym2608_state *)chip;
-	FM_OPN *OPN   = &F2608->OPN;
-	YM_DELTAT *DELTAT = &F2608->deltaT;
-
-	// Reset Prescaler
-	OPN->prescaler_w(0, 2);
-	// reset SSG section
-	(*OPN->ST.SSG->reset)(OPN->ST.device);
-
-	// status clear
-	OPN->ST.busy_clear();
-
-	// register 0x29 - default value after reset is:
-	// enable only 3 FM channels and enable all the status flags
-	YM2608IRQMaskWrite(OPN, F2608, 0x1f );  // default value for D4-D0 is 1
-
-	// register 0x10, A1=1 - default value is 1 for D4, D3, D2, 0 for the rest
-	YM2608IRQFlagWrite(OPN, F2608, 0x1c );  // default: enable timer A and B, disable EOS, BRDY and ZERO
-
-	OPN->write_mode(0x27,0x30);    // mode 0 , timer reset
-
-	OPN->ST.reset_status(0xff);
-	OPN->ST.reset();
-	OPN->reset();
-
-	// reset OPerator paramater
-	for(i = 0xb6 ; i >= 0xb4 ; i-- )
-	{
-		OPN->write_reg(i      ,0xc0);
-		OPN->write_reg(i|0x100,0xc0);
-	}
-	for(i = 0xb2 ; i >= 0x30 ; i-- )
-	{
-		OPN->write_reg(i      ,0);
-		OPN->write_reg(i|0x100,0);
-	}
-	for(i = 0x26 ; i >= 0x20 ; i-- ) OPN->write_reg(i,0);
-
-	// ADPCM - percussion sounds
-	for( i = 0; i < 6; i++ )
-	{
-		if (i<=3)   // channels 0,1,2,3
-			F2608->adpcm[i].step      = (u32)((float)(1<<ADPCM_SHIFT)*((float)F2608->CLOCK_DIVIDER)/3.0f);
-		else        // channels 4 and 5 work with slower clock
-			F2608->adpcm[i].step      = (u32)((float)(1<<ADPCM_SHIFT)*((float)F2608->CLOCK_DIVIDER)/6.0f);
-
-		F2608->adpcm[i].start     = YM2608_ADPCM_ROM_addr[i*2];
-		F2608->adpcm[i].end       = YM2608_ADPCM_ROM_addr[i*2+1];
-
-		F2608->adpcm[i].now_addr  = 0;
-		F2608->adpcm[i].now_step  = 0;
-		// F2608->adpcm[i].delta     = 21866;
-		F2608->adpcm[i].vol_mul   = 0;
-		F2608->adpcm[i].pan       = &OPN->out_adpcm[OUTD_CENTER]; // default center
-		F2608->adpcm[i].flagMask  = 0;
-		F2608->adpcm[i].flag      = 0;
-		F2608->adpcm[i].adpcm_acc = 0;
-		F2608->adpcm[i].adpcm_step= 0;
-		F2608->adpcm[i].adpcm_out = 0;
-	}
-	F2608->adpcmTL = 0x3f;
-
-	F2608->adpcm_arrivedEndAddress = 0; // not used
-
-	// DELTA-T unit
-	DELTAT->output_pointer = OPN->out_delta;
-	DELTAT->portshift = 5;      // always 5bits shift  // ASG
-	DELTAT->output_range = 1<<23;
-	DELTAT->ADPCM_Reset(OUTD_CENTER,YM_DELTAT::EMULATION_MODE_NORMAL,F2608->device);
-}
-
-// YM2608 write
-// n = number
-// a = address
-// v = value
-int ym2608_write(void *chip, int a,u8 v)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-	FM_OPN *OPN   = &F2608->OPN;
-	int addr;
-
-	v &= 0xff;  //adjust to 8 bit bus
-
-
-	switch(a&3)
-	{
-	case 0: // address port 0
-		OPN->ST.address = v;
-		F2608->addr_A1 = 0;
-
-		// Write register to SSG emulator
-		if( v < 16 ) (*OPN->ST.SSG->write)(OPN->ST.device,0,v);
-		// prescaler selecter : 2d,2e,2f
-		if( v >= 0x2d && v <= 0x2f )
-		{
-			OPN->prescaler_w(v, 2);
-		}
-		break;
-
-	case 1: // data port 0
-		if (F2608->addr_A1 != 0)
-			break;  // verified on real YM2608
-
-		addr = OPN->ST.address;
-		F2608->REGS[addr] = v;
-		switch(addr & 0xf0)
-		{
-		case 0x00:  // SSG section
-			// Write data to SSG emulator
-			(*OPN->ST.SSG->write)(OPN->ST.device,a,v);
-			break;
-		case 0x10:  // 0x10-0x1f : Rhythm section
-			ym2608_device::update_request(OPN->ST.device);
-			F2608->FM_ADPCMAWrite(addr-0x10,v);
-			break;
-		case 0x20:  // Mode Register
-			switch(addr)
-			{
-			case 0x29:  // SCH,xx,xxx,EN_ZERO,EN_BRDY,EN_EOS,EN_TB,EN_TA
-				YM2608IRQMaskWrite(OPN, F2608, v);
-				break;
-			default:
-				ym2608_device::update_request(OPN->ST.device);
-				OPN->write_mode(addr,v);
-			}
-			break;
-		default:    // OPN section
-			ym2608_device::update_request(OPN->ST.device);
-			OPN->write_reg(addr,v);
-		}
-		break;
-
-	case 2: // address port 1
-		OPN->ST.address = v;
-		F2608->addr_A1 = 1;
-		break;
-
-	case 3: // data port 1
-		if (F2608->addr_A1 != 1)
-			break;  // verified on real YM2608
-
-		addr = OPN->ST.address;
-		F2608->REGS[addr | 0x100] = v;
-		ym2608_device::update_request(OPN->ST.device);
-		switch( addr & 0xf0 )
-		{
-		case 0x00:  // DELTAT PORT
-			switch( addr )
-			{
-			case 0x0e:  // DAC data
-				F2608->device->logerror("YM2608: write to DAC data (unimplemented) value=%02x\n",v);
-				break;
-			default:
-				// 0x00-0x0d
-				F2608->deltaT.ADPCM_Write(addr,v);
-			}
-			break;
-		case 0x10:  // IRQ Flag control
-			if( addr == 0x10 )
-			{
-				YM2608IRQFlagWrite(OPN, F2608, v);
-			}
-			break;
-		default:
-			OPN->write_reg(addr | 0x100,v);
-		}
-	}
-	return OPN->ST.irq;
-}
-
-u8 ym2608_read(void *chip,int a)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-	int addr = F2608->OPN.ST.address;
-	u8 ret = 0;
-
-	switch( a&3 )
-	{
-	case 0: // status 0 : YM2203 compatible
-		// BUSY:x:x:x:x:x:FLAGB:FLAGA
-		ret = F2608->OPN.ST.status() & 0x83;
-		break;
-
-	case 1: // status 0, ID
-		if( addr < 16 ) ret = (*F2608->OPN.ST.SSG->read)(F2608->OPN.ST.device);
-		else if(addr == 0xff) ret = 0x01; // ID code
-		break;
-
-	case 2: // status 1 : status 0 + ADPCM status
-		// BUSY : x : PCMBUSY : ZERO : BRDY : EOS : FLAGB : FLAGA
-		ret = (F2608->OPN.ST.status() & (F2608->flagmask|0x80)) | ((F2608->deltaT.PCM_BSY & 1)<<5) ;
-		break;
-
-	case 3:
-		if(addr == 0x08)
-		{
-			ret = F2608->deltaT.ADPCM_Read();
-		}
-		else
-		{
-			if(addr == 0x0f)
-			{
-				F2608->device->logerror("YM2608 A/D conversion is accessed but not implemented !\n");
-				ret = 0x80; // 2's complement PCM data - result from A/D conversion
-			}
-		}
-		break;
-	}
-	return ret;
-}
-
-int ym2608_timer_over(void *chip,int c)
-{
-	ym2608_state *F2608 = (ym2608_state *)chip;
-
-	switch(c)
-	{
-#if 0
-	case 2:
-		{   // BUFRDY flag
-			F2608->deltaT.BRDY_callback();
-		}
-		break;
-#endif
-	case 1:
-		{   // Timer B
-			F2608->OPN.ST.timer_b_over();
-		}
-		break;
-	case 0:
-		{   // Timer A
-			ym2608_device::update_request(F2608->OPN.ST.device);
-			// timer update
-			F2608->OPN.ST.timer_a_over();
-			// CSM mode key,TL controll
-			if( F2608->OPN.ST.mode & 0x80 )
-			{   // CSM mode total level latch and auto key on
-				F2608->CH[2].csm_key_control();
-			}
-		}
-		break;
-	default:
-		break;
-	}
-
-	return F2608->OPN.ST.irq;
-}
-
-
-
-// YM2610(OPNB)
-
-// Generate samples for one of the YM2610s
-void ym2610_update_one(void *chip, std::vector<write_stream_view> &buffer, int length)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	FM_OPN *OPN   = &F2610->OPN;
-	YM_DELTAT *DELTAT = &F2610->deltaT;
-	int i,j;
-	opn_channel_t   *cch[4];
-	s32 *out_fm = OPN->m_out_fm;
-
-	cch[0] = &F2610->CH[1];
-	cch[1] = &F2610->CH[2];
-	cch[2] = &F2610->CH[4];
-	cch[3] = &F2610->CH[5];
-
-#ifdef YM2610B_WARNING
-#define FM_KEY_IS(SLOT) ((SLOT)->key)
-#define FM_MSG_YM2610B "YM2610-%p.CH%d is playing,Check whether the type of the chip is YM2610B\n"
-	// Check YM2610B warning message
-	if( FM_KEY_IS(&F2610->CH[0].SLOT[3]) )
-		LOG(F2610->device,LOG_WAR,(FM_MSG_YM2610B,F2610->OPN.ST.device,0));
-	if( FM_KEY_IS(&F2610->CH[3].SLOT[3]) )
-		LOG(F2610->device,LOG_WAR,(FM_MSG_YM2610B,F2610->OPN.ST.device,3));
-#endif
-
-	// refresh PG and EG
-	cch[0].refresh_fc_eg();
-	cch[1].refresh_fc_eg();
-	cch[2].refresh_fc_eg();
-	cch[3].refresh_fc_eg();
-
-	// buffering
-	for(i=0; i < length ; i++)
-	{
-		OPN.advance_lfo();
-
-		// clear output acc.
-		OPN->out_adpcm[OUTD_LEFT] = OPN->out_adpcm[OUTD_RIGHT] = OPN->out_adpcm[OUTD_CENTER] = 0;
-		OPN->out_delta[OUTD_LEFT] = OPN->out_delta[OUTD_RIGHT] = OPN->out_delta[OUTD_CENTER] = 0;
-		// clear outputs
-		out_fm[1] = 0;
-		out_fm[2] = 0;
-		out_fm[4] = 0;
-		out_fm[5] = 0;
-
-		// advance envelope generator
-		OPN->m_eg_timer += EG_TIMER_ADD;
-		while (OPN->m_eg_timer >= EG_TIMER_OVERFLOW)
-		{
-			OPN->m_eg_timer -= EG_TIMER_OVERFLOW;
-			OPN->eg_cnt++;
-
-			cch[0].advance_eg_channel(OPN->eg_cnt);
-			cch[1].advance_eg_channel(OPN->eg_cnt);
-			cch[2].advance_eg_channel(OPN->eg_cnt);
-			cch[3].advance_eg_channel(OPN->eg_cnt);
-		}
-
-		// calculate FM
-		chan_calc(OPN, cch[0], 1 ); //remapped to 1
-		chan_calc(OPN, cch[1], 2 ); //remapped to 2
-		chan_calc(OPN, cch[2], 4 ); //remapped to 4
-		chan_calc(OPN, cch[3], 5 ); //remapped to 5
-
-		// deltaT ADPCM
-		if( DELTAT->portstate&0x80 )
-			DELTAT->ADPCM_CALC();
-
-		// ADPCMA
-		for( j = 0; j < 6; j++ )
-		{
-			if( F2610->adpcm[j].flag )
-				F2610->ADPCMA_calc_chan(&F2610->adpcm[j]);
-		}
-
-		// buffering
-		{
-			int lt,rt;
-
-			lt =  OPN->out_adpcm[OUTD_LEFT]  + OPN->out_adpcm[OUTD_CENTER];
-			rt =  OPN->out_adpcm[OUTD_RIGHT] + OPN->out_adpcm[OUTD_CENTER];
-			lt += (OPN->out_delta[OUTD_LEFT]  + OPN->out_delta[OUTD_CENTER])>>9;
-			rt += (OPN->out_delta[OUTD_RIGHT] + OPN->out_delta[OUTD_CENTER])>>9;
-
-
-			lt += ((out_fm[1]>>1) & OPN->pan[2]);   // the shift right was verified on real chip
-			rt += ((out_fm[1]>>1) & OPN->pan[3]);
-			lt += ((out_fm[2]>>1) & OPN->pan[4]);
-			rt += ((out_fm[2]>>1) & OPN->pan[5]);
-
-			lt += ((out_fm[4]>>1) & OPN->pan[8]);
-			rt += ((out_fm[4]>>1) & OPN->pan[9]);
-			lt += ((out_fm[5]>>1) & OPN->pan[10]);
-			rt += ((out_fm[5]>>1) & OPN->pan[11]);
-
-			Limit( lt, MAXOUT, MINOUT );
-			Limit( rt, MAXOUT, MINOUT );
-
-			// buffering
-			buffer[0].put(i, lt * sample_scale);
-			buffer[1].put(i, rt * sample_scale);
-		}
-	}
-}
-
-// Generate samples for one of the YM2610Bs
-void ym2610b_update_one(void *chip, std::vector<write_stream_view> &buffer, int length)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	FM_OPN *OPN   = &F2610->OPN;
-	YM_DELTAT *DELTAT = &F2610->deltaT;
-	int i,j;
-	opn_channel_t   *cch[6];
-	s32 *out_fm = OPN->m_out_fm;
-
-	cch[0] = &F2610->CH[0];
-	cch[1] = &F2610->CH[1];
-	cch[2] = &F2610->CH[2];
-	cch[3] = &F2610->CH[3];
-	cch[4] = &F2610->CH[4];
-	cch[5] = &F2610->CH[5];
-
-	// refresh PG and EG
-	cch[0].refresh_fc_eg();
-	cch[1].refresh_fc_eg();
-	cch[2].refresh_fc_eg();
-	cch[3].refresh_fc_eg();
-	cch[4].refresh_fc_eg();
-	cch[5].refresh_fc_eg();
-
-	// buffering
-	for(i=0; i < length ; i++)
-	{
-		OPN.advance_lfo();
-
-		// clear output acc.
-		OPN->out_adpcm[OUTD_LEFT] = OPN->out_adpcm[OUTD_RIGHT] = OPN->out_adpcm[OUTD_CENTER] = 0;
-		OPN->out_delta[OUTD_LEFT] = OPN->out_delta[OUTD_RIGHT] = OPN->out_delta[OUTD_CENTER] = 0;
-		// clear outputs
-		out_fm[0] = 0;
-		out_fm[1] = 0;
-		out_fm[2] = 0;
-		out_fm[3] = 0;
-		out_fm[4] = 0;
-		out_fm[5] = 0;
-
-		// advance envelope generator
-		OPN->m_eg_timer += EG_TIMER_ADD;
-		while (OPN->m_eg_timer >= EG_TIMER_OVERFLOW)
-		{
-			OPN->m_eg_timer -= EG_TIMER_OVERFLOW;
-			OPN->eg_cnt++;
-
-			cch[0].advance_eg_channel(OPN->eg_cnt);
-			cch[1].advance_eg_channel(OPN->eg_cnt);
-			cch[2].advance_eg_channel(OPN->eg_cnt);
-			cch[3].advance_eg_channel(OPN->eg_cnt);
-			cch[4].advance_eg_channel(OPN->eg_cnt);
-			cch[5].advance_eg_channel(OPN->eg_cnt);
-		}
-
-		// calculate FM
-		chan_calc(OPN, cch[0], 0 );
-		chan_calc(OPN, cch[1], 1 );
-		chan_calc(OPN, cch[2], 2 );
-		chan_calc(OPN, cch[3], 3 );
-		chan_calc(OPN, cch[4], 4 );
-		chan_calc(OPN, cch[5], 5 );
-
-		// deltaT ADPCM
-		if( DELTAT->portstate&0x80 )
-			DELTAT->ADPCM_CALC();
-
-		// ADPCMA
-		for( j = 0; j < 6; j++ )
-		{
-			if( F2610->adpcm[j].flag )
-				F2610->ADPCMA_calc_chan(&F2610->adpcm[j]);
-		}
-
-		// buffering
-		{
-			int lt,rt;
-
-			lt =  OPN->out_adpcm[OUTD_LEFT]  + OPN->out_adpcm[OUTD_CENTER];
-			rt =  OPN->out_adpcm[OUTD_RIGHT] + OPN->out_adpcm[OUTD_CENTER];
-			lt += (OPN->out_delta[OUTD_LEFT]  + OPN->out_delta[OUTD_CENTER])>>9;
-			rt += (OPN->out_delta[OUTD_RIGHT] + OPN->out_delta[OUTD_CENTER])>>9;
-
-			lt += ((out_fm[0]>>1) & OPN->pan[0]);   // the shift right is verified on YM2610
-			rt += ((out_fm[0]>>1) & OPN->pan[1]);
-			lt += ((out_fm[1]>>1) & OPN->pan[2]);
-			rt += ((out_fm[1]>>1) & OPN->pan[3]);
-			lt += ((out_fm[2]>>1) & OPN->pan[4]);
-			rt += ((out_fm[2]>>1) & OPN->pan[5]);
-			lt += ((out_fm[3]>>1) & OPN->pan[6]);
-			rt += ((out_fm[3]>>1) & OPN->pan[7]);
-			lt += ((out_fm[4]>>1) & OPN->pan[8]);
-			rt += ((out_fm[4]>>1) & OPN->pan[9]);
-			lt += ((out_fm[5]>>1) & OPN->pan[10]);
-			rt += ((out_fm[5]>>1) & OPN->pan[11]);
-
-			Limit( lt, MAXOUT, MINOUT );
-			Limit( rt, MAXOUT, MINOUT );
-
-			// buffering
-			buffer[0].put(i, lt * sample_scale);
-			buffer[1].put(i, rt * sample_scale);
-		}
-	}
-}
-
-
-void ym2610_postload(void *chip)
-{
-	if (chip)
-	{
-		ym2610_state *F2610 = (ym2610_state *)chip;
-		int r;
-
-		// SSG registers
-		for(r=0;r<16;r++)
-		{
-			(*F2610->OPN.ST.SSG->write)(F2610->OPN.ST.device,0,r);
-			(*F2610->OPN.ST.SSG->write)(F2610->OPN.ST.device,1,F2610->REGS[r]);
-		}
-
-		// OPN registers
-		// DT / MULTI , TL , KS / AR , AMON / DR , SR , SL / RR , SSG-EG
-		for(r=0x30;r<0x9e;r++)
-			if((r&3) != 3)
-			{
-				F2610->OPN.write_reg(r,F2610->REGS[r]);
-				F2610->OPN.write_reg(r|0x100,F2610->REGS[r|0x100]);
-			}
-		// FB / CONNECT , L / R / AMS / PMS
-		for(r=0xb0;r<0xb6;r++)
-			if((r&3) != 3)
-			{
-				F2610->OPN.write_reg(r,F2610->REGS[r]);
-				F2610->OPN.write_reg(r|0x100,F2610->REGS[r|0x100]);
-			}
-		// FM channels
-		//FM_channel_postload(F2610->CH,6);
-
-		// rhythm(ADPCMA)
-		F2610->FM_ADPCMAWrite(1,F2610->REGS[0x101]);
-		for( r=0 ; r<6 ; r++)
-		{
-			F2610->FM_ADPCMAWrite(r+0x08,F2610->REGS[r+0x108]);
-			F2610->FM_ADPCMAWrite(r+0x10,F2610->REGS[r+0x110]);
-			F2610->FM_ADPCMAWrite(r+0x18,F2610->REGS[r+0x118]);
-			F2610->FM_ADPCMAWrite(r+0x20,F2610->REGS[r+0x120]);
-			F2610->FM_ADPCMAWrite(r+0x28,F2610->REGS[r+0x128]);
-		}
-		// Delta-T ADPCM unit
-		F2610->deltaT.postload( &F2610->REGS[0x010] );
-	}
-}
-
-static void YM2610_save_state(ym2610_state *F2610, device_t *device)
-{
-	device->save_item(NAME(F2610->REGS));
-	FMsave_state_st(device,&F2610->OPN.ST);
-	FMsave_state_channel(device,F2610->CH,6);
-	// 3slots
-	device->save_item(NAME(F2610->OPN.SL3.fc));
-	device->save_item(NAME(F2610->OPN.SL3.fn_h));
-	device->save_item(NAME(F2610->OPN.SL3.kcode));
-	// address register1
-	device->save_item(NAME(F2610->addr_A1));
-
-	device->save_item(NAME(F2610->adpcm_arrivedEndAddress));
-	// rhythm(ADPCMA)
-	FMsave_state_adpcma(device,F2610->adpcm);
-	// Delta-T ADPCM unit
-	F2610->deltaT.savestate(device);
-}
-
-static void YM2610_deltat_status_set(void *chip, u8 changebits)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	F2610->adpcm_arrivedEndAddress |= changebits;
-}
-static void YM2610_deltat_status_reset(void *chip, u8 changebits)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	F2610->adpcm_arrivedEndAddress &= (~changebits);
-}
-
-void *ym2610_init(device_t *device, int clock,
-	FM_READBYTE adpcm_a_read_byte, FM_READBYTE adpcm_b_read_byte,
-	FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
-{
-	ym2610_state *F2610;
-
-	// allocate extend state space
-	F2610 = auto_alloc_clear(device->machine(), <ym2610_state>());
-	// allocate total level table (128kb space)
-	if( !init_tables() )
-	{
-		auto_free( device->machine(), F2610 );
-		return nullptr;
-	}
-
-	F2610->device = device;
-	// FM
-	F2610->OPN.type = TYPE_YM2610;
-	F2610->OPN.P_CH = F2610->CH;
-	F2610->OPN.ST.device = device;
-	F2610->OPN.ST.clock = clock;
-	// Extend handler
-	F2610->OPN.ST.timer_handler = timer_handler;
-	F2610->OPN.ST.IRQ_Handler   = IRQHandler;
-	F2610->OPN.ST.SSG           = ssg;
-	// ADPCM
-	F2610->read_byte = adpcm_a_read_byte;
-	// DELTA-T
-	F2610->deltaT.read_byte = adpcm_b_read_byte;
-	F2610->deltaT.write_byte = nullptr;
-
-	F2610->deltaT.status_set_handler = YM2610_deltat_status_set;
-	F2610->deltaT.status_reset_handler = YM2610_deltat_status_reset;
-	F2610->deltaT.status_change_which_chip = F2610;
-	F2610->deltaT.status_change_EOS_bit = 0x80; // status flag: set bit7 on End Of Sample
-
-	Init_ADPCMATable();
-	YM2610_save_state(F2610, device);
-	return F2610;
-}
-
-void ym2610_clock_changed(void *chip, int clock)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-
-	F2610->OPN.ST.clock = clock;
-}
-
-// shut down emulator
-void ym2610_shutdown(void *chip)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-
-	auto_free(F2610->OPN.ST.device->machine(), F2610);
-}
-
-// reset one of chip
-void ym2610_reset_chip(void *chip)
-{
-	int i;
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	FM_OPN *OPN   = &F2610->OPN;
-	YM_DELTAT *DELTAT = &F2610->deltaT;
-
-	device_t* dev = F2610->OPN.ST.device;
-	std::string name(dev->tag());
-
-	// Reset Prescaler
-	OPN->set_prescale(6*24, 4*2); // OPN 1/6 , SSG 1/4
-	// reset SSG section
-	(*OPN->ST.SSG->reset)(OPN->ST.device);
-	// status clear
-	OPN->ST.set_irqmask(0x03);
-	OPN->ST.busy_clear();
-	OPN->write_mode(0x27,0x30); // mode 0 , timer reset
-
-	OPN->ST.reset_status(0xff);
-	OPN->ST.reset();
-	OPN->reset_channels();
-
-	// reset OPerator paramater
-	for(i = 0xb6 ; i >= 0xb4 ; i-- )
-	{
-		OPN->write_reg(i      ,0xc0);
-		OPN->write_reg(i|0x100,0xc0);
-	}
-	for(i = 0xb2 ; i >= 0x30 ; i-- )
-	{
-		OPN->write_reg(i      ,0);
-		OPN->write_reg(i|0x100,0);
-	}
-	for(i = 0x26 ; i >= 0x20 ; i-- ) OPN->write_reg(i,0);
-	//*** ADPCM work initial ***
-	for( i = 0; i < 6 ; i++ )
-	{
-		F2610->adpcm[i].step      = (u32)((float)(1<<ADPCM_SHIFT)*((float)F2610->CLOCK_DIVIDER)/3.0f);
-		F2610->adpcm[i].now_addr  = 0;
-		F2610->adpcm[i].now_step  = 0;
-		F2610->adpcm[i].start     = 0;
-		F2610->adpcm[i].end       = 0;
-		// F2610->adpcm[i].delta     = 21866;
-		F2610->adpcm[i].vol_mul   = 0;
-		F2610->adpcm[i].pan       = &OPN->out_adpcm[OUTD_CENTER]; // default center
-		F2610->adpcm[i].flagMask  = 1<<i;
-		F2610->adpcm[i].flag      = 0;
-		F2610->adpcm[i].adpcm_acc = 0;
-		F2610->adpcm[i].adpcm_step= 0;
-		F2610->adpcm[i].adpcm_out = 0;
-	}
-	F2610->adpcmTL = 0x3f;
-
-	F2610->adpcm_arrivedEndAddress = 0;
-
-	// DELTA-T unit
-	DELTAT->output_pointer = OPN->out_delta;
-	DELTAT->portshift = 8;      // allways 8bits shift
-	DELTAT->output_range = 1<<23;
-	DELTAT->ADPCM_Reset(OUTD_CENTER,YM_DELTAT::EMULATION_MODE_YM2610,F2610->device);
-}
-
-// YM2610 write
-// n = number
-// a = address
-// v = value
-int ym2610_write(void *chip, int a, u8 v)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	FM_OPN *OPN   = &F2610->OPN;
-	int addr;
-	int ch;
-
-	v &= 0xff;  // adjust to 8 bit bus
-
-	switch( a&3 )
-	{
-	case 0: // address port 0
-		OPN->ST.address = v;
-		F2610->addr_A1 = 0;
-
-		// Write register to SSG emulator
-		if( v < 16 ) (*OPN->ST.SSG->write)(OPN->ST.device,0,v);
-		break;
-
-	case 1: // data port 0
-		if (F2610->addr_A1 != 0)
-			break;  // verified on real YM2608
-
-		addr = OPN->ST.address;
-		F2610->REGS[addr] = v;
-		switch(addr & 0xf0)
-		{
-		case 0x00:  // SSG section
-			// Write data to SSG emulator
-			(*OPN->ST.SSG->write)(OPN->ST.device,a,v);
-			break;
-		case 0x10: // DeltaT ADPCM
-			ym2610_device::update_request(OPN->ST.device);
-
-			switch(addr)
-			{
-			case 0x10:  // control 1
-			case 0x11:  // control 2
-			case 0x12:  // start address L
-			case 0x13:  // start address H
-			case 0x14:  // stop address L
-			case 0x15:  // stop address H
-
-			case 0x19:  // delta-n L
-			case 0x1a:  // delta-n H
-			case 0x1b:  // volume
-				{
-					F2610->deltaT.ADPCM_Write(addr-0x10,v);
-				}
-				break;
-
-			case 0x1c: //  FLAG CONTROL : Extend Status Clear/Mask
-				{
-					u8 statusmask = ~v;
-					// set arrived flag mask
-					for(ch=0;ch<6;ch++)
-						F2610->adpcm[ch].flagMask = statusmask&(1<<ch);
-
-					F2610->deltaT.status_change_EOS_bit = statusmask & 0x80;    // status flag: set bit7 on End Of Sample
-
-					// clear arrived flag
-					F2610->adpcm_arrivedEndAddress &= statusmask;
-				}
-				break;
-
-			default:
-				F2610->device->logerror("YM2610: write to unknown deltat register %02x val=%02x\n",addr,v);
-				break;
-			}
-
-			break;
-		case 0x20:  // Mode Register
-			ym2610_device::update_request(OPN->ST.device);
-			OPN->write_mode(addr,v);
-			break;
-		default:    // OPN section
-			ym2610_device::update_request(OPN->ST.device);
-			// write register
-			OPN->write_reg(addr,v);
-		}
-		break;
-
-	case 2: // address port 1
-		OPN->ST.address = v;
-		F2610->addr_A1 = 1;
-		break;
-
-	case 3: // data port 1
-		if (F2610->addr_A1 != 1)
-			break;  // verified on real YM2608
-
-		ym2610_device::update_request(OPN->ST.device);
-		addr = OPN->ST.address;
-		F2610->REGS[addr | 0x100] = v;
-		if( addr < 0x30 )
-			// 100-12f : ADPCM A section
-			F2610->FM_ADPCMAWrite(addr,v);
-		else
-			OPN->write_reg(addr | 0x100,v);
-	}
-	return OPN->ST.irq;
-}
-
-u8 ym2610_read(void *chip,int a)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-	int addr = F2610->OPN.ST.address;
-	u8 ret = 0;
-
-	switch( a&3)
-	{
-	case 0: // status 0 : YM2203 compatible
-		ret = F2610->OPN.ST.status() & 0x83;
-		break;
-	case 1: // data 0
-		if( addr < 16 ) ret = (*F2610->OPN.ST.SSG->read)(F2610->OPN.ST.device);
-		if( addr == 0xff ) ret = 0x01;
-		break;
-	case 2: // status 1 : ADPCM status
-		// ADPCM STATUS (arrived End Address)
-		// B,--,A5,A4,A3,A2,A1,A0
-		// B     = ADPCM-B(DELTA-T) arrived end address
-		// A0-A5 = ADPCM-A          arrived end address
-		ret = F2610->adpcm_arrivedEndAddress;
-		break;
-	case 3:
-		ret = 0;
-		break;
-	}
-	return ret;
-}
-
-int ym2610_timer_over(void *chip,int c)
-{
-	ym2610_state *F2610 = (ym2610_state *)chip;
-
-	if( c )
-	{   // Timer B
-		F2610->OPN.ST.timer_b_over();
-	}
-	else
-	{   // Timer A
-		ym2610_device::update_request(F2610->OPN.ST.device);
-		// timer update
-		F2610->OPN.ST.timer_a_over();
-		// CSM mode key,TL controll
-		if( F2610->OPN.ST.mode & 0x80 )
-		{   // CSM mode total level latch and auto key on
-			F2610->CH[2].csm_key_control();
-		}
-	}
-	return F2610->OPN.ST.irq;
-}
-#endif
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ymopn_device_base(mconfig, tag, owner, clock, YM2203)
 {
 }
 
+ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymopn_device_base(mconfig, tag, owner, clock, YM2608),
+	device_rom_interface(mconfig, *this),
+	m_internal(*this, "internal")
+{
+}
+
+ROM_START( ym2608 )
+	ROM_REGION( 0x2000, "internal", 0 )
+	//
+	// While this rom was dumped by output analysis, not decap, it was tested
+	// by playing it back into the chip as an external adpcm sample and produced
+	// an identical dac result. a decap would be nice to verify things 100%,
+	// but there is currently no reason to think this rom dump is incorrect.
+	//
+	// offset 0:
+	//    Source: 01BD.ROM
+	//     Length: 448 / 0x000001C0
+	// offset 0x1C0:
+	//     Source: 02SD.ROM
+	//     Length: 640 / 0x00000280
+	// offset 0x440:
+	//     Source: 04TOP.ROM
+	//     Length: 5952 / 0x00001740
+	// offset 0x1B80:
+	//     Source: 08HH.ROM
+	//     Length: 384 / 0x00000180
+	// offset 0x1D00
+	//     Source: 10TOM.ROM
+	//     Length: 640 / 0x00000280
+	// offset 0x1F80
+	//     Source: 20RIM.ROM
+	//     Length: 128 / 0x00000080
+	//
+	ROM_LOAD16_WORD( "ym2608_adpcm_rom.bin", 0x0000, 0x2000, CRC(23c9e0d8) SHA1(50b6c3e288eaa12ad275d4f323267bb72b0445df) )
+ROM_END
+
+const tiny_rom_entry *ym2608_device::device_rom_region() const
+{
+	return ROM_NAME( ym2608 );
+}
+
+void ym2608_device::rom_bank_updated()
+{
+	stream_update();
+}
+
+ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ymopn_device_base(mconfig, tag, owner, clock, type),
+	device_memory_interface(mconfig, *this),
+	m_adpcm_a_config("adpcm-a", ENDIANNESS_LITTLE, 8, 24, 0),
+	m_adpcm_b_config("adpcm-b", ENDIANNESS_LITTLE, 8, 24, 0),
+	m_adpcm_b_region_name("^" + std::string(basetag()) + ".deltat"),
+	m_adpcm_a_region(*this, DEVICE_SELF),
+	m_adpcm_b_region(*this, m_adpcm_b_region_name.c_str())
+{
+	channel(0).set_disabled(type == YM2610);
+	channel(3).set_disabled(type == YM2610);
+}
+
+ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ym2610_device(mconfig, tag, owner, clock, YM2610B)
+{
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector ym2610_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_adpcm_a_config),
+		std::make_pair(1, &m_adpcm_b_config)
+	};
+}
+
 DEFINE_DEVICE_TYPE(YM2203, ym2203_device, "ym2203", "YM2203 OPN")
+DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPN")
+DEFINE_DEVICE_TYPE(YM2610, ym2610_device, "ym2610", "YM2610 OPNB")
+DEFINE_DEVICE_TYPE(YM2610B, ym2610b_device, "ym2610b", "YM2610B OPNB")
