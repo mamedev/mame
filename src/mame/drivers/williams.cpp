@@ -2493,73 +2493,184 @@ ROM_START( robotrontd )
 ROM_END
 
 
-ROM_START( joust )
+/*
+
+Joust ROM labels are in this format:
+
++--------------------+
+| JOUST ROM 1A       |   <-- Game name, ROM board number and ROM type (A is 2532, B is 2732)
+| (c) 1982 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|     3006-1         |   <-- Williams game number & ROM number
++--------------------+
+
++--------------------+
+| Video Sound Rom 4  |
+| (c) 1981 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|         STD. 780   |
++--------------------+
+
+Solid yellow* 3006-1  through 3006-12 - ROM type A, 2532 (jumpers W2 & W4)
+Solid green^  3006-13 through 3006-24 - ROM type B, 2732 (jumpers W1 & W3)
+Solid red     3006-28 through 3006-39 - ROM type A, 2532 (jumpers W2 & W4)
+ --Missing--  3006-40 through 3006-51 - This set is unknown
+White/green   3006-52 through 3006-63 - ROM type B, 2732 (jumpers W1 & W3)
+
+* NOTE: Earliest examples are yellow lables with red stripe numbered 16-3006-1 through 16-3006-12
+^ NOTE: Earliest examples have been mixed solid green labels and white labels with green stripe
+
+           |Solid Yellow|Solid Green| Solid Red |White/Green|
+ROM | Board|  "A" 2532  |  "B" 2732 |  "A" 2532 | "B" 2732  |
+ ## | Loc. |  label #   |  label #  |  label #  |  label #  |
+----+------+------------+-----------+-----------+-----------+
+  1 |  E4  | 16-3006-1  |  3006-13  |  3006-28  |  3006-52  |
+  2 |  C4  | 16-3006-2  |  3006-14  |  3006-29  |  3006-53  |
+  3 |  A4  | 16-3006-3  |  3006-15  |  3006-30  |  3006-54  |
+  4 |  E5  | 16-3006-4  |  3006-16  |  3006-31  |  3006-55  |
+  5 |  C5  | 16-3006-5  |  3006-17  |  3006-32  |  3006-56  |
+  6 |  A5  | 16-3006-6  |  3006-18  |  3006-33  |  3006-57  |
+  7 |  E6  | 16-3006-7  |  3006-19  |  3006-34  |  3006-58  |
+  8 |  C6  | 16-3006-8  |  3006-20  |  3006-35  |  3006-59  |
+  9 |  A6  | 16-3006-9  |  3006-21  |  3006-36  |  3006-60  |
+ 10 |  A7  | 16-3006-10 |  3006-22  |  3006-37  |  3006-61  |
+ 11 |  C7  | 16-3006-11 |  3006-23  |  3006-38  |  3006-62  |
+ 12 |  E7  | 16-3006-12 |  3006-24  |  3006-39  |  3006-63  |
+----+------+------------+-----------+-----------+-----------+
+
+    Solid Yellow labeled ROMs      |      Solid Green labeled ROMs
+Part Number       ROM     Number   |  Part Number       ROM     Number
+-----------------------------------------------------------------------
+A-5343-09961-A   ROM 1A   3006-1   |  A-5343-09961-B   ROM 1B   3006-13
+A-5343-09962-A   ROM 2A   3006-2   |  A-5343-09962-B   ROM 2B   3006-14
+A-5343-09963-A   ROM 3A   3006-3   |  A-5343-09963-B   ROM 3B   3006-15
+A-5343-09964-A   ROM 4A   3006-4   |  A-5343-09964-B   ROM 4B   3006-16
+A-5343-09965-A   ROM 5A   3006-5   |  A-5343-09965-B   ROM 5B   3006-17
+A-5343-09966-A   ROM 6A   3006-6   |  A-5343-09966-B   ROM 6B   3006-18
+A-5343-09967-A   ROM 7A   3006-7   |  A-5343-10150-B   ROM 7B   3006-19 <-- Revised code with a completly different part number
+A-5343-09968-A   ROM 8A   3006-8   |  A-5343-09968-B   ROM 8B   3006-20
+A-5343-09969-A   ROM 9A   3006-9   |  A-5343-09969-B   ROM 9B   3006-21
+A-5343-09970-A   ROM 10A  3006-10  |  A-5343-10153-B   ROM 10B  3006-22 <-- Revised code with a completly different part number
+A-5343-09971-A   ROM 11A  3006-11  |  A-5343-09971-B   ROM 11B  3006-23
+A-5343-09972-A   ROM 12A  3006-12  |  A-5343-09972-B   ROM 12B  3006-24
+
+Joust Manual Amendment No. 16P-3006-101-AMD-1 October 1982:
+  - Current JOUST games use green-label ROMs.  Earlier games have either yellow or red-labels ROMs, which are interchangable
+      and may be mixed in the same game. DO NOT attempt to mix green-label ROMs with red or yellow label ROMs.
+  - Boards with green-label ROMs should include jumper W1 and W3 only. Boards with red or yellow label ROMs subsitute jumpers W2 and W4
+
+ROMs changed in October 1982 as Instruction Manuals 16P-3006-101-T September 1982 & 16P-3006-101 October 1982 only mention Yellow-label ROMs.
+  Only the 16P-3006-101-AMD-1 October 1982 Amendment and the 16P-3006-101 Revision A December 1982 manuals mention the new green label ROMs
+
+ROMs 3006-52 through 3006-63 have white labels with green stripe, they are different from the ROMs 3006-13 through 3006-24 white label with green stripe
+
+D-9144-3006 ROM Board Assembly:
++----------------------------------------------+
+|       2J3                           2J4      |
+|              +---------------+               |
+|              | 6821 PIA @ 1B |               |
+|2             +---------------+             L |
+|J   4049BP    7420N       7474     SN7425N  E |
+|2     7474    74LS139N    7411PC   SN7404N  D |
+| +----------+    +----------+    +----------+ |
+| | ROM3  4A |    | ROM2  4C |    | ROM1  4E | |
+| +----------+    +----------+    +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM6  5A |WW  | ROM5  5C |WW  | ROM4  5E | |
+| +----------+12  +----------+34  +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM9  6A |    | ROM8  6C |    | ROM7  6E | |
+| +----------+    +----------+    +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM10 7A |    | ROM11 7C |    | ROM12 7E | |
+| +----------+    +----------+    +----------+ |
+| +------------------+            +----------+ |
+| | VTI 8220  VL2001 |  74LS245N  |  74154N  | |
+| +------------------+            +----------+ |
+| +------------------+  74LS244N               |
+| | VTI 8220  VL2001 |    +------------------+ |
+| +------------------+    |  2J1  connector  | |
++-------------------------+------------------+-+
+
+Connectors:
+2J1 40 pin ribbon cable connetor
+2J2  6 pin header (KEY pin 4)
+2J3 10 pin header (KEY pin 9)
+2J4  9 pin header (KEY pin 1)
+
+LED - 7Seg LED display
+
+Wire W1 & W3 with Zero Ohm resistors for 2732 ROMs
+Wire W2 & W4 with Zero Ohm resistors for 2532 ROMs
+
+*/
+ROM_START( joust ) /* Solid green labels */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "3006-22.10b", 0x0d000, 0x1000, CRC(3f1c4f89) SHA1(90864a8ab944df45287bf0f68ad3a85194077a82) )
-	ROM_LOAD( "3006-23.11b", 0x0e000, 0x1000, CRC(ea48b359) SHA1(6d38003d56bebeb1f5b4d2287d587342847aa195) )
-	ROM_LOAD( "3006-24.12b", 0x0f000, 0x1000, CRC(c710717b) SHA1(7d01764e8251c60b3cab96f7dc6dcc1c624f9d12) )
-	ROM_LOAD( "3006-13.1b",  0x10000, 0x1000, CRC(fe41b2af) SHA1(0443e00ae2eb3e66cf805562ee04309487bb0ba4) )
-	ROM_LOAD( "3006-14.2b",  0x11000, 0x1000, CRC(501c143c) SHA1(5fda266d43cbbf42eeae1a078b5209d9408ab99f) )
-	ROM_LOAD( "3006-15.3b",  0x12000, 0x1000, CRC(43f7161d) SHA1(686da120aa4bd4a41f3d93e8c79ebb343977851a) )
-	ROM_LOAD( "3006-16.4b",  0x13000, 0x1000, CRC(db5571b6) SHA1(cb1c3285344e2cfbe0a81ab9b51758c40da8a23f) )
-	ROM_LOAD( "3006-17.5b",  0x14000, 0x1000, CRC(c686bb6b) SHA1(d9cac4c46820e1a451a145864bca7a35cfab7d37) )
-	ROM_LOAD( "3006-18.6b",  0x15000, 0x1000, CRC(fac5f2cf) SHA1(febaa8cf5c3a0af901cd12d0b7909f6fec3beadd) )
-	ROM_LOAD( "3006-19.7b",  0x16000, 0x1000, CRC(81418240) SHA1(5ad14aa65e71c3856dcdb04c99edda92e406a3e3) )
-	ROM_LOAD( "3006-20.8b",  0x17000, 0x1000, CRC(ba5359ba) SHA1(f4ee13d5a95ed3e1050a3927a3a0ccf86ed7752d) )
-	ROM_LOAD( "3006-21.9b",  0x18000, 0x1000, CRC(39643147) SHA1(d95d3b746133eac9dcc9ee05eabecb797023f1a5) )
+	ROM_LOAD( "joust_rom_10b_3006-22.a7", 0x0d000, 0x1000, CRC(3f1c4f89) SHA1(90864a8ab944df45287bf0f68ad3a85194077a82) )
+	ROM_LOAD( "joust_rom_11b_3006-23.c7", 0x0e000, 0x1000, CRC(ea48b359) SHA1(6d38003d56bebeb1f5b4d2287d587342847aa195) ) // == joust_rom_11a_3006-11.c7
+	ROM_LOAD( "joust_rom_12b_3006-24.e7", 0x0f000, 0x1000, CRC(c710717b) SHA1(7d01764e8251c60b3cab96f7dc6dcc1c624f9d12) ) // == joust_rom_12a_3006-12.e7
+	ROM_LOAD( "joust_rom_1b_3006-13.e4",  0x10000, 0x1000, CRC(fe41b2af) SHA1(0443e00ae2eb3e66cf805562ee04309487bb0ba4) ) // == joust_rom_1a_3006-1.e4
+	ROM_LOAD( "joust_rom_2b_3006-14.c4",  0x11000, 0x1000, CRC(501c143c) SHA1(5fda266d43cbbf42eeae1a078b5209d9408ab99f) ) // == joust_rom_2a_3006-2.c4
+	ROM_LOAD( "joust_rom_3b_3006-15.a4",  0x12000, 0x1000, CRC(43f7161d) SHA1(686da120aa4bd4a41f3d93e8c79ebb343977851a) ) // == joust_rom_3a_3006-3.a4
+	ROM_LOAD( "joust_rom_4b_3006-16.e5",  0x13000, 0x1000, CRC(db5571b6) SHA1(cb1c3285344e2cfbe0a81ab9b51758c40da8a23f) ) // == joust_rom_4a_3006-4.e5
+	ROM_LOAD( "joust_rom_5b_3006-17.c5",  0x14000, 0x1000, CRC(c686bb6b) SHA1(d9cac4c46820e1a451a145864bca7a35cfab7d37) ) // == joust_rom_5a_3006-5.c5
+	ROM_LOAD( "joust_rom_6b_3006-18.a5",  0x15000, 0x1000, CRC(fac5f2cf) SHA1(febaa8cf5c3a0af901cd12d0b7909f6fec3beadd) ) // == joust_rom_6a_3006-6.a5
+	ROM_LOAD( "joust_rom_7b_3006-19.e6",  0x16000, 0x1000, CRC(81418240) SHA1(5ad14aa65e71c3856dcdb04c99edda92e406a3e3) )
+	ROM_LOAD( "joust_rom_8b_3006-20.c6",  0x17000, 0x1000, CRC(ba5359ba) SHA1(f4ee13d5a95ed3e1050a3927a3a0ccf86ed7752d) ) // == joust_rom_8a_3006-8.c6
+	ROM_LOAD( "joust_rom_9b_3006-21.a6",  0x18000, 0x1000, CRC(39643147) SHA1(d95d3b746133eac9dcc9ee05eabecb797023f1a5) ) // == joust_rom_9a_3006-9.a6
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "joust.snd",   0xf000, 0x1000, CRC(f1835bdd) SHA1(af7c066d2949d36b87ea8c425ca7d12f82b5c653) )
+	ROM_LOAD( "video_sound_rom_4_std_780.ic12", 0xf000, 0x1000, CRC(f1835bdd) SHA1(af7c066d2949d36b87ea8c425ca7d12f82b5c653) ) // P/N A-5343-09973
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( joustwr )
+ROM_START( jousty ) /* Solid yellow labels */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "joust.wra",   0x0d000, 0x1000, CRC(2039014a) SHA1(b9a76ecf01404585f833f76c54aa5a88a0215715) )
-	ROM_LOAD( "joust.wgb",   0x0e000, 0x1000, CRC(ea48b359) SHA1(6d38003d56bebeb1f5b4d2287d587342847aa195) )
-	ROM_LOAD( "joust.wgc",   0x0f000, 0x1000, CRC(c710717b) SHA1(7d01764e8251c60b3cab96f7dc6dcc1c624f9d12) )
-	ROM_LOAD( "joust.wg1",   0x10000, 0x1000, CRC(fe41b2af) SHA1(0443e00ae2eb3e66cf805562ee04309487bb0ba4) )
-	ROM_LOAD( "joust.wg2",   0x11000, 0x1000, CRC(501c143c) SHA1(5fda266d43cbbf42eeae1a078b5209d9408ab99f) )
-	ROM_LOAD( "joust.wg3",   0x12000, 0x1000, CRC(43f7161d) SHA1(686da120aa4bd4a41f3d93e8c79ebb343977851a) )
-	ROM_LOAD( "joust.wg4",   0x13000, 0x1000, CRC(db5571b6) SHA1(cb1c3285344e2cfbe0a81ab9b51758c40da8a23f) )
-	ROM_LOAD( "joust.wg5",   0x14000, 0x1000, CRC(c686bb6b) SHA1(d9cac4c46820e1a451a145864bca7a35cfab7d37) )
-	ROM_LOAD( "joust.wg6",   0x15000, 0x1000, CRC(fac5f2cf) SHA1(febaa8cf5c3a0af901cd12d0b7909f6fec3beadd) )
-	ROM_LOAD( "joust.wr7",   0x16000, 0x1000, CRC(e6f439c4) SHA1(ff8f1d54f3ac91101ab9f5f115baeca4f2670186) )
-	ROM_LOAD( "joust.wg8",   0x17000, 0x1000, CRC(ba5359ba) SHA1(f4ee13d5a95ed3e1050a3927a3a0ccf86ed7752d) )
-	ROM_LOAD( "joust.wg9",   0x18000, 0x1000, CRC(39643147) SHA1(d95d3b746133eac9dcc9ee05eabecb797023f1a5) )
+	ROM_LOAD( "joust_rom_10a_3006-10.a7", 0x0d000, 0x1000, CRC(2039014a) SHA1(b9a76ecf01404585f833f76c54aa5a88a0215715) )
+	ROM_LOAD( "joust_rom_11a_3006-11.c7", 0x0e000, 0x1000, CRC(ea48b359) SHA1(6d38003d56bebeb1f5b4d2287d587342847aa195) )
+	ROM_LOAD( "joust_rom_12a_3006-12.e7", 0x0f000, 0x1000, CRC(c710717b) SHA1(7d01764e8251c60b3cab96f7dc6dcc1c624f9d12) )
+	ROM_LOAD( "joust_rom_1a_3006-1.e4",   0x10000, 0x1000, CRC(fe41b2af) SHA1(0443e00ae2eb3e66cf805562ee04309487bb0ba4) )
+	ROM_LOAD( "joust_rom_2a_3006-2.c4",   0x11000, 0x1000, CRC(501c143c) SHA1(5fda266d43cbbf42eeae1a078b5209d9408ab99f) )
+	ROM_LOAD( "joust_rom_3a_3006-3.a4",   0x12000, 0x1000, CRC(43f7161d) SHA1(686da120aa4bd4a41f3d93e8c79ebb343977851a) )
+	ROM_LOAD( "joust_rom_4a_3006-4.e5",   0x13000, 0x1000, CRC(db5571b6) SHA1(cb1c3285344e2cfbe0a81ab9b51758c40da8a23f) )
+	ROM_LOAD( "joust_rom_5a_3006-5.c5",   0x14000, 0x1000, CRC(c686bb6b) SHA1(d9cac4c46820e1a451a145864bca7a35cfab7d37) )
+	ROM_LOAD( "joust_rom_6a_3006-6.a5",   0x15000, 0x1000, CRC(fac5f2cf) SHA1(febaa8cf5c3a0af901cd12d0b7909f6fec3beadd) )
+	ROM_LOAD( "joust_rom_7a_3006-7.e6",   0x16000, 0x1000, CRC(e6f439c4) SHA1(ff8f1d54f3ac91101ab9f5f115baeca4f2670186) )
+	ROM_LOAD( "joust_rom_8a_3006-8.c6",   0x17000, 0x1000, CRC(ba5359ba) SHA1(f4ee13d5a95ed3e1050a3927a3a0ccf86ed7752d) )
+	ROM_LOAD( "joust_rom_9a_3006-9.a6",   0x18000, 0x1000, CRC(39643147) SHA1(d95d3b746133eac9dcc9ee05eabecb797023f1a5) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "joust.snd",   0xf000, 0x1000, CRC(f1835bdd) SHA1(af7c066d2949d36b87ea8c425ca7d12f82b5c653) )
+	ROM_LOAD( "video_sound_rom_4_std_780.ic12", 0xf000, 0x1000, CRC(f1835bdd) SHA1(af7c066d2949d36b87ea8c425ca7d12f82b5c653) ) // P/N A-5343-09973
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( joustr )
+ROM_START( joustr ) /* Solid red labels */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "joust.sra",   0x0d000, 0x1000, CRC(c0c6e52a) SHA1(f14ff16195027f3e199e79e43741f0849c17fd10) )
-	ROM_LOAD( "joust.srb",   0x0e000, 0x1000, CRC(ab11bcf9) SHA1(efb09e92a621d6c4d6cde2f166e8c988c64d81ae) )
-	ROM_LOAD( "joust.src",   0x0f000, 0x1000, CRC(ea14574b) SHA1(7572d118b2343646054e558f0bd48e4959d84ce7) )
-	ROM_LOAD( "joust.wg1",   0x10000, 0x1000, CRC(fe41b2af) SHA1(0443e00ae2eb3e66cf805562ee04309487bb0ba4) )
-	ROM_LOAD( "joust.wg2",   0x11000, 0x1000, CRC(501c143c) SHA1(5fda266d43cbbf42eeae1a078b5209d9408ab99f) )
-	ROM_LOAD( "joust.wg3",   0x12000, 0x1000, CRC(43f7161d) SHA1(686da120aa4bd4a41f3d93e8c79ebb343977851a) )
-	ROM_LOAD( "joust.sr4",   0x13000, 0x1000, CRC(ab347170) SHA1(ad50c83fcfa958f2673cae04bd811095f9ee08c0) )
-	ROM_LOAD( "joust.wg5",   0x14000, 0x1000, CRC(c686bb6b) SHA1(d9cac4c46820e1a451a145864bca7a35cfab7d37) )
-	ROM_LOAD( "joust.sr6",   0x15000, 0x1000, CRC(3d9a6fac) SHA1(0c81394ae96a2fcfa4c953d38e43f3ef415fe4fc) )
-	ROM_LOAD( "joust.sr7",   0x16000, 0x1000, CRC(0a70b3d1) SHA1(eb78b694aa29f777f3c7e7104e568f865930c0ec) )
-	ROM_LOAD( "joust.sr8",   0x17000, 0x1000, CRC(a7f01504) SHA1(0ca3211d060befc102bda2e97d163de7fb12a6f6) )
-	ROM_LOAD( "joust.sr9",   0x18000, 0x1000, CRC(978687ad) SHA1(25e651af3e3be08d6293aab427a0843e9333a629) )
+	ROM_LOAD( "joust_rom_10a_3006-37.a7", 0x0d000, 0x1000, CRC(c0c6e52a) SHA1(f14ff16195027f3e199e79e43741f0849c17fd10) )
+	ROM_LOAD( "joust_rom_11a_3006-38.c7", 0x0e000, 0x1000, CRC(ab11bcf9) SHA1(efb09e92a621d6c4d6cde2f166e8c988c64d81ae) )
+	ROM_LOAD( "joust_rom_12a_3006-39.e7", 0x0f000, 0x1000, CRC(ea14574b) SHA1(7572d118b2343646054e558f0bd48e4959d84ce7) )
+	ROM_LOAD( "joust_rom_1a_3006-28.e4",  0x10000, 0x1000, CRC(fe41b2af) SHA1(0443e00ae2eb3e66cf805562ee04309487bb0ba4) ) // == joust_rom_1a_3006-1.e4
+	ROM_LOAD( "joust_rom_2a_3006-29.c4",  0x11000, 0x1000, CRC(501c143c) SHA1(5fda266d43cbbf42eeae1a078b5209d9408ab99f) ) // == joust_rom_2a_3006-2.c4
+	ROM_LOAD( "joust_rom_3a_3006-30.a4",  0x12000, 0x1000, CRC(43f7161d) SHA1(686da120aa4bd4a41f3d93e8c79ebb343977851a) ) // == joust_rom_3a_3006-3.a4
+	ROM_LOAD( "joust_rom_4a_3006-31.e5",  0x13000, 0x1000, CRC(ab347170) SHA1(ad50c83fcfa958f2673cae04bd811095f9ee08c0) )
+	ROM_LOAD( "joust_rom_5a_3006-32.c5",  0x14000, 0x1000, CRC(c686bb6b) SHA1(d9cac4c46820e1a451a145864bca7a35cfab7d37) ) // == joust_rom_5a_3006-5.c5
+	ROM_LOAD( "joust_rom_6a_3006-33.a5",  0x15000, 0x1000, CRC(3d9a6fac) SHA1(0c81394ae96a2fcfa4c953d38e43f3ef415fe4fc) )
+	ROM_LOAD( "joust_rom_7a_3006-34.e6",  0x16000, 0x1000, CRC(0a70b3d1) SHA1(eb78b694aa29f777f3c7e7104e568f865930c0ec) )
+	ROM_LOAD( "joust_rom_8a_3006-35.c6",  0x17000, 0x1000, CRC(a7f01504) SHA1(0ca3211d060befc102bda2e97d163de7fb12a6f6) )
+	ROM_LOAD( "joust_rom_9a_3006-36.a6",  0x18000, 0x1000, CRC(978687ad) SHA1(25e651af3e3be08d6293aab427a0843e9333a629) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "joust.snd",   0xf000, 0x1000, CRC(f1835bdd) SHA1(af7c066d2949d36b87ea8c425ca7d12f82b5c653) )
+	ROM_LOAD( "video_sound_rom_4_std_780.ic12", 0xf000, 0x1000, CRC(f1835bdd) SHA1(af7c066d2949d36b87ea8c425ca7d12f82b5c653) ) // P/N A-5343-09973
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 
@@ -3464,9 +3575,9 @@ GAME( 1987, robotron87, robotron, williams_base,  robotron, williams_state,     
 GAME( 2012, robotron12, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
 GAME( 2015, robotrontd, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
-GAME( 1982, joust,      0,        williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (White/Green label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustr,     joust,    williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Solid Red label)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustwr,    joust,    williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (White/Red label)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joust,      0,        williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustr,     joust,    williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jousty,     joust,    williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, bubbles,    0,        bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesr,   bubbles,  bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)",   MACHINE_SUPPORTS_SAVE )
