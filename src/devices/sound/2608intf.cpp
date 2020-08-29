@@ -66,9 +66,9 @@ void ym2608_device::timer_handler(int c,int count,int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2608_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void ym2608_device::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	ym2608_update_one(m_chip, &outputs[0], outputs[0].samples());
+	ym2608_update_one(m_chip, outputs, samples);
 }
 
 void ym2608_device::device_post_load()
@@ -93,7 +93,7 @@ void ym2608_device::device_start()
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = stream_alloc(0,2,rate);
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(&ym2608_device::stream_generate,this));
 
 	/* initialize YM2608 */
 	m_chip = ym2608_init(this,clock(),rate,

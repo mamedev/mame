@@ -59,9 +59,9 @@ void ym2612_device::timer_handler(int c,int count,int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2612_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	ym2612_update_one(m_chip, &outputs[0], outputs[0].samples(), m_output_bits);
+	ym2612_update_one(m_chip, outputs, samples, m_output_bits);
 }
 
 

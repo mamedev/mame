@@ -1,7 +1,3 @@
-#if 1
-#include "ymopn.h"
-#else
-
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #ifndef MAME_SOUND_2203INTF_H
@@ -43,7 +39,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
 	enum
@@ -74,5 +70,3 @@ private:
 DECLARE_DEVICE_TYPE(YM2203, ym2203_device)
 
 #endif // MAME_SOUND_2203INTF_H
-
-#endif
