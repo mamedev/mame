@@ -1823,6 +1823,7 @@ static void do_create_hd(parameters_map &params)
 
 	// process template
 	auto template_str = params.find(OPTION_TEMPLATE);
+	std::string template_idnt_str;
 	if (template_str != params.end())
 	{
 		uint32_t id = parse_number(template_str->second->c_str());
@@ -1834,8 +1835,12 @@ static void do_create_hd(parameters_map &params)
 		heads = s_hd_templates[id].heads;
 		sectors = s_hd_templates[id].sectors;
 		sector_size = s_hd_templates[id].sector_size;
+		std::string manuf_str(s_hd_templates[id].manufacturer);
+		std::transform(manuf_str.begin(), manuf_str.end(), manuf_str.begin(), ::toupper);
+		template_idnt_str = string_format("%-8s%-16s%4s", manuf_str.substr(0, 6), s_hd_templates[id].model, "1.00");
 
 		printf("Template:     %s %s\n", s_hd_templates[id].manufacturer, s_hd_templates[id].model);
+		printf("Identifier:   %s\n", template_idnt_str.c_str());
 	}
 
 	// extract geometry from the parent if we have one
@@ -1908,6 +1913,12 @@ static void do_create_hd(parameters_map &params)
 		{
 			err = chd->write_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
 			if (err != CHDERR_NONE)
+				report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
+		}
+		else if (!template_idnt_str.empty())
+		{
+		  err = chd->write_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, template_idnt_str);
+		  if (err != CHDERR_NONE)
 				report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
 		}
 
