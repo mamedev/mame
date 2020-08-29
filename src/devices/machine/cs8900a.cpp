@@ -55,14 +55,16 @@ DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
     RW: PP_DATA1   = DE0E/DE0F (PacketPage Data (Port 1))  (for 32 bit only)
 */
 
-#define CS8900_ADDR_RXTXDATA   0x00 /* RW */
-#define CS8900_ADDR_RXTXDATA2  0x02 /* RW 32 bit only! */
-#define CS8900_ADDR_TXCMD      0x04 /* -W Maps to PP+0144 */
-#define CS8900_ADDR_TXLENGTH   0x06 /* -W Maps to PP+0146 */
-#define CS8900_ADDR_INTSTQUEUE 0x08 /* R- Interrupt status queue, maps to PP + 0120 */
-#define CS8900_ADDR_PP_PTR     0x0a /* RW PacketPage Pointer */
-#define CS8900_ADDR_PP_DATA    0x0c /* RW PacketPage Data, Port 0 */
-#define CS8900_ADDR_PP_DATA2   0x0e /* RW PacketPage Data, Port 1 - 32 bit only */    
+enum io_space_conf_regs_e : u8 {
+    CS8900_ADDR_RXTXDATA    = 0x00, /* RW */
+    CS8900_ADDR_RXTXDATA2   = 0x02, /* RW 32 bit only! */
+    CS8900_ADDR_TXCMD       = 0x04, /* -W Maps to PP+0144 */
+    CS8900_ADDR_TXLENGTH    = 0x06, /* -W Maps to PP+0146 */
+    CS8900_ADDR_INTSTQUEUE  = 0x08, /* R- Interrupt status queue, maps to PP + 0120 */
+    CS8900_ADDR_PP_PTR      = 0x0a, /* RW PacketPage Pointer */
+    CS8900_ADDR_PP_DATA     = 0x0c, /* RW PacketPage Data, Port 0 */
+    CS8900_ADDR_PP_DATA2    = 0x0e  /* RW PacketPage Data, Port 1 - 32 bit only */ 
+};
 
 /* Makros for reading and writing the visible register: */
 #define GET_CS8900_8(  _xxx_ ) \
@@ -138,83 +140,87 @@ DEFINE_DEVICE_TYPE(CS8900A,  cs8900a_device,  "CS8900A",  "CA8900A ETHERNET IC")
         cs8900_packetpage[_xxx_+3] = (_val_>>24) & 0xFF; \
     } while (0) 
 
-
+enum packetpage_regs_e : u16 {
 /* The packetpage register: see p. 39f */
-#define CS8900_PP_ADDR_PRODUCTID       0x0000 /*   R- - 4.3., p. 41 */
-#define CS8900_PP_ADDR_IOBASE          0x0020 /* i RW - 4.3., p. 41 - 4.7., p. 72 */
-#define CS8900_PP_ADDR_INTNO           0x0022 /* i RW - 3.2., p. 17 - 4.3., p. 41 */
-#define CS8900_PP_ADDR_DMA_CHAN        0x0024 /* i RW - 3.2., p. 17 - 4.3., p. 41 */
-#define CS8900_PP_ADDR_DMA_SOF         0x0026 /* ? R- - 4.3., p. 41 - 5.4., p. 89 */
-#define CS8900_PP_ADDR_DMA_FC          0x0028 /* ? R- - 4.3., p. 41, "Receive DMA" */
-#define CS8900_PP_ADDR_RXDMA_BC        0x002a /* ? R- - 4.3., p. 41 - 5.4., p. 89 */
-#define CS8900_PP_ADDR_MEMBASE         0x002c /* i RW - 4.3., p. 41 - 4.9., p. 73 */
-#define CS8900_PP_ADDR_BPROM_BASE      0x0030 /* i RW - 3.6., p. 24 - 4.3., p. 41 */
-#define CS8900_PP_ADDR_BPROM_MASK      0x0034 /* i RW - 3.6., p. 24 - 4.3., p. 41 */
+    CS8900_PP_ADDR_PRODUCTID        = 0x0000, /*   R- - 4.3., p. 41 */
+    CS8900_PP_ADDR_IOBASE           = 0x0020, /* i RW - 4.3., p. 41 - 4.7., p. 72 */
+    CS8900_PP_ADDR_INTNO            = 0x0022, /* i RW - 3.2., p. 17 - 4.3., p. 41 */
+    CS8900_PP_ADDR_DMA_CHAN         = 0x0024, /* i RW - 3.2., p. 17 - 4.3., p. 41 */
+    CS8900_PP_ADDR_DMA_SOF          = 0x0026, /* ? R- - 4.3., p. 41 - 5.4., p. 89 */
+    CS8900_PP_ADDR_DMA_FC           = 0x0028, /* ? R- - 4.3., p. 41, "Receive DMA" */
+    CS8900_PP_ADDR_RXDMA_BC         = 0x002a, /* ? R- - 4.3., p. 41 - 5.4., p. 89 */
+    CS8900_PP_ADDR_MEMBASE          = 0x002c, /* i RW - 4.3., p. 41 - 4.9., p. 73 */
+    CS8900_PP_ADDR_BPROM_BASE       = 0x0030, /* i RW - 3.6., p. 24 - 4.3., p. 41 */
+    CS8900_PP_ADDR_BPROM_MASK       = 0x0034, /* i RW - 3.6., p. 24 - 4.3., p. 41 */
 /* 0x0038 - 0x003F: reserved */
-#define CS8900_PP_ADDR_EEPROM_CMD      0x0040 /* i RW - 3.5., p. 23 - 4.3., p. 41 */
-#define CS8900_PP_ADDR_EEPROM_DATA     0x0042 /* i RW - 3.5., p. 23 - 4.3., p. 41 */
+    CS8900_PP_ADDR_EEPROM_CMD       = 0x0040, /* i RW - 3.5., p. 23 - 4.3., p. 41 */
+    CS8900_PP_ADDR_EEPROM_DATA      = 0x0042, /* i RW - 3.5., p. 23 - 4.3., p. 41 */
 /* 0x0044 - 0x004F: reserved */
-#define CS8900_PP_ADDR_REC_FRAME_BC    0x0050 /*   RW - 4.3., p. 41 - 5.2.9., p. 86 */
+    CS8900_PP_ADDR_REC_FRAME_BC     = 0x0050, /*   RW - 4.3., p. 41 - 5.2.9., p. 86 */
 /* 0x0052 - 0x00FF: reserved */
-#define CS8900_PP_ADDR_CONF_CTRL       0x0100 /* - RW - 4.4., p. 46; see below */
-#define CS8900_PP_ADDR_STATUS_EVENT    0x0120 /* - R- - 4.4., p. 46; see below */
+    CS8900_PP_ADDR_CONF_CTRL        = 0x0100, /* - RW - 4.4., p. 46; see below */
+    CS8900_PP_ADDR_STATUS_EVENT     = 0x0120, /* - R- - 4.4., p. 46; see below */
 /* 0x0140 - 0x0143: reserved */
-#define CS8900_PP_ADDR_TXCMD           0x0144 /* # -W - 4.5., p. 70 - 5.7., p. 98 */
-#define CS8900_PP_ADDR_TXLENGTH        0x0146 /* # -W - 4.5., p. 70 - 5.7., p. 98 */
+    CS8900_PP_ADDR_TXCMD            = 0x0144, /* # -W - 4.5., p. 70 - 5.7., p. 98 */
+    CS8900_PP_ADDR_TXLENGTH         = 0x0146, /* # -W - 4.5., p. 70 - 5.7., p. 98 */
 /* 0x0148 - 0x014F: reserved */
-#define CS8900_PP_ADDR_LOG_ADDR_FILTER 0x0150 /*   RW - 4.6., p. 71 - 5.3., p. 86 */
-#define CS8900_PP_ADDR_MAC_ADDR        0x0158 /* # RW - 4.6., p. 71 - 5.3., p. 86 */
+    CS8900_PP_ADDR_LOG_ADDR_FILTER  = 0x0150, /*   RW - 4.6., p. 71 - 5.3., p. 86 */
+    CS8900_PP_ADDR_MAC_ADDR         = 0x0158, /* # RW - 4.6., p. 71 - 5.3., p. 86 */
 /* 0x015E - 0x03FF: reserved */
-#define CS8900_PP_ADDR_RXSTATUS        0x0400 /*   R- - 4.7., p. 72 - 5.2., p. 78 */
-#define CS8900_PP_ADDR_RXLENGTH        0x0402 /*   R- - 4.7., p. 72 - 5.2., p. 78 */
-#define CS8900_PP_ADDR_RX_FRAMELOC     0x0404 /*   R- - 4.7., p. 72 - 5.2., p. 78 */
+    CS8900_PP_ADDR_RXSTATUS         = 0x0400, /*   R- - 4.7., p. 72 - 5.2., p. 78 */
+    CS8900_PP_ADDR_RXLENGTH         = 0x0402, /*   R- - 4.7., p. 72 - 5.2., p. 78 */
+    CS8900_PP_ADDR_RX_FRAMELOC      = 0x0404, /*   R- - 4.7., p. 72 - 5.2., p. 78 */
 /* here, the received frame is stored */
-#define CS8900_PP_ADDR_TX_FRAMELOC     0x0A00 /*   -W - 4.7., p. 72 - 5.7., p. 98 */
+    CS8900_PP_ADDR_TX_FRAMELOC      = 0x0A00, /*   -W - 4.7., p. 72 - 5.7., p. 98 */
 /* here, the frame to transmit is stored */
-#define CS8900_PP_ADDR_END             0x1000 /* memory to CS8900_PP_ADDR_END-1 is used */
-
-
+    CS8900_PP_ADDR_END              = 0x1000, /* memory to CS8900_PP_ADDR_END-1 is used */
 /* CS8900_PP_ADDR_CONF_CTRL is subdivided: */
-#define CS8900_PP_ADDR_CC_RXCFG        0x0102 /* # RW - 4.4.6.,  p. 52 - 0003 */
-#define CS8900_PP_ADDR_CC_RXCTL        0x0104 /* # RW - 4.4.8.,  p. 54 - 0005 */
-#define CS8900_PP_ADDR_CC_TXCFG        0x0106 /*   RW - 4.4.9.,  p. 55 - 0007 */
-#define CS8900_PP_ADDR_CC_TXCMD        0x0108 /*   R- - 4.4.11., p. 57 - 0009 */
-#define CS8900_PP_ADDR_CC_BUFCFG       0x010A /*   RW - 4.4.12., p. 58 - 000B */
-#define CS8900_PP_ADDR_CC_LINECTL      0x0112 /* # RW - 4.4.16., p. 62 - 0013 */
-#define CS8900_PP_ADDR_CC_SELFCTL      0x0114 /*   RW - 4.4.18., p. 64 - 0015 */
-#define CS8900_PP_ADDR_CC_BUSCTL       0x0116 /*   RW - 4.4.20., p. 66 - 0017 */
-#define CS8900_PP_ADDR_CC_TESTCTL      0x0118 /*   RW - 4.4.22., p. 68 - 0019 */
-
+    CS8900_PP_ADDR_CC_RXCFG         = 0x0102, /* # RW - 4.4.6.,  p. 52 - 0003 */
+    CS8900_PP_ADDR_CC_RXCTL         = 0x0104, /* # RW - 4.4.8.,  p. 54 - 0005 */
+    CS8900_PP_ADDR_CC_TXCFG         = 0x0106, /*   RW - 4.4.9.,  p. 55 - 0007 */
+    CS8900_PP_ADDR_CC_TXCMD         = 0x0108, /*   R- - 4.4.11., p. 57 - 0009 */
+    CS8900_PP_ADDR_CC_BUFCFG        = 0x010A, /*   RW - 4.4.12., p. 58 - 000B */
+    CS8900_PP_ADDR_CC_LINECTL       = 0x0112, /* # RW - 4.4.16., p. 62 - 0013 */
+    CS8900_PP_ADDR_CC_SELFCTL       = 0x0114, /*   RW - 4.4.18., p. 64 - 0015 */
+    CS8900_PP_ADDR_CC_BUSCTL        = 0x0116, /*   RW - 4.4.20., p. 66 - 0017 */
+    CS8900_PP_ADDR_CC_TESTCTL       = 0x0118, /*   RW - 4.4.22., p. 68 - 0019 */
 /* CS8900_PP_ADDR_STATUS_EVENT is subdivided: */
-#define CS8900_PP_ADDR_SE_ISQ          0x0120 /*   R- - 4.4.5.,  p. 51 - 0000 */
-#define CS8900_PP_ADDR_SE_RXEVENT      0x0124 /* # R- - 4.4.7.,  p. 53 - 0004 */
-#define CS8900_PP_ADDR_SE_TXEVENT      0x0128 /*   R- - 4.4.10., p. 56 - 0008 */
-#define CS8900_PP_ADDR_SE_BUFEVENT     0x012C /*   R- - 4.4.13., p. 59 - 000C */
-#define CS8900_PP_ADDR_SE_RXMISS       0x0130 /*   R- - 4.4.14., p. 60 - 0010 */
-#define CS8900_PP_ADDR_SE_TXCOL        0x0132 /*   R- - 4.4.15., p. 61 - 0012 */
-#define CS8900_PP_ADDR_SE_LINEST       0x0134 /*   R- - 4.4.17., p. 63 - 0014 */
-#define CS8900_PP_ADDR_SE_SELFST       0x0136 /*   R- - 4.4.19., p. 65 - 0016 */
-#define CS8900_PP_ADDR_SE_BUSST        0x0138 /* # R- - 4.4.21., p. 67 - 0018 */
-#define CS8900_PP_ADDR_SE_TDR          0x013C /*   R- - 4.4.23., p. 69 - 001C */
+    CS8900_PP_ADDR_SE_ISQ           = 0x0120, /*   R- - 4.4.5.,  p. 51 - 0000 */
+    CS8900_PP_ADDR_SE_RXEVENT       = 0x0124, /* # R- - 4.4.7.,  p. 53 - 0004 */
+    CS8900_PP_ADDR_SE_TXEVENT       = 0x0128, /*   R- - 4.4.10., p. 56 - 0008 */
+    CS8900_PP_ADDR_SE_BUFEVENT      = 0x012C, /*   R- - 4.4.13., p. 59 - 000C */
+    CS8900_PP_ADDR_SE_RXMISS        = 0x0130, /*   R- - 4.4.14., p. 60 - 0010 */
+    CS8900_PP_ADDR_SE_TXCOL         = 0x0132, /*   R- - 4.4.15., p. 61 - 0012 */
+    CS8900_PP_ADDR_SE_LINEST        = 0x0134, /*   R- - 4.4.17., p. 63 - 0014 */
+    CS8900_PP_ADDR_SE_SELFST        = 0x0136, /*   R- - 4.4.19., p. 65 - 0016 */
+    CS8900_PP_ADDR_SE_BUSST         = 0x0138, /* # R- - 4.4.21., p. 67 - 0018 */
+    CS8900_PP_ADDR_SE_TDR           = 0x013C /*   R- - 4.4.23., p. 69 - 001C */
+};
 
-#define MAX_TXLENGTH 1518
-#define MIN_TXLENGTH 4
+enum tx_rx_min_max_e : u16 {
+    MAX_TXLENGTH = 1518,
+    MIN_TXLENGTH = 4,
+    MAX_RXLENGTH = 1518,
+    MIN_RXLENGTH = 64
+};
 
-#define MAX_RXLENGTH 1518
-#define MIN_RXLENGTH 64
+enum cs8900_tx_state_e : u8 {
+    CS8900_TX_IDLE          = 0,
+    CS8900_TX_GOT_CMD       = 1,
+    CS8900_TX_GOT_LEN       = 2,
+    CS8900_TX_READ_BUSST    = 3
+};
 
-#define CS8900_TX_IDLE 0
-#define CS8900_TX_GOT_CMD 1
-#define CS8900_TX_GOT_LEN 2
-#define CS8900_TX_READ_BUSST 3
+enum cs8900_rx_state_e : u8 {
+    CS8900_RX_IDLE      = 0,
+    CS8900_RX_GOT_FRAME = 1
+};
 
-#define CS8900_RX_IDLE 0
-#define CS8900_RX_GOT_FRAME 1
-
-#define PP_PTR_AUTO_INCR_FLAG 0x8000 /* auto increment flag in package pointer */
-#define PP_PTR_FLAG_MASK      0xf000 /* is always : x y 1 1 (with x=auto incr) */
-#define PP_PTR_ADDR_MASK      0x0fff /* address portion of packet page pointer */
-
+enum pp_ptr_masks_e : u16 {
+    PP_PTR_AUTO_INCR_FLAG   = 0x8000, /* auto increment flag in package pointer */
+    PP_PTR_FLAG_MASK        = 0xf000, /* is always : x y 1 1 (with x=auto incr) */
+    PP_PTR_ADDR_MASK        = 0x0fff  /* address portion of packet page pointer */
+};
 
 #define LO_BYTE(x)      (u8)((x) & 0xff)
 #define HI_BYTE(x)      (u8)(((x) >> 8) & 0xff)
