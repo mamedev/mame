@@ -539,7 +539,7 @@ inline u32 ymopn_device_base::lfo_step(u8 index) const
 //  OPN 3-SLOT STATE
 //***************************************************************************
 
-opn_3slot_t::opn_3slot_t() :
+ymopn_3slot_state::ymopn_3slot_state() :
 	m_fc{0, 0, 0},
 	m_fn_h(0),
 	m_kcode{0, 0, 0},
@@ -547,7 +547,7 @@ opn_3slot_t::opn_3slot_t() :
 {
 }
 
-void opn_3slot_t::set_fnum(ymopn_device_base &opn, u8 chnum, u8 value)
+void ymopn_3slot_state::set_fnum(ymopn_device_base &opn, u8 chnum, u8 value)
 {
 	u32 fn = ((m_fn_h & 7) << 8) + value;
 	u8 blk = m_fn_h >> 3;
@@ -567,7 +567,7 @@ void opn_3slot_t::set_fnum(ymopn_device_base &opn, u8 chnum, u8 value)
 //***************************************************************************
 
 // constructor
-opn_slot_t::opn_slot_t(ymopn_device_base &opn) :
+ymopn_slot::ymopn_slot(ymopn_device_base &opn) :
 	m_opn(opn),
 	m_detune(0),
 	m_ksr_shift(0),
@@ -601,7 +601,7 @@ opn_slot_t::opn_slot_t(ymopn_device_base &opn) :
 
 // register for save states
 #define SLOT_NAME(x) x, "slot." #x
-void opn_slot_t::save(int index)
+void ymopn_slot::save(int index)
 {
 	m_opn.save_item(SLOT_NAME(m_detune), index);
 	m_opn.save_item(SLOT_NAME(m_ksr_shift), index);
@@ -633,7 +633,7 @@ void opn_slot_t::save(int index)
 }
 
 // reset the state
-void opn_slot_t::reset()
+void ymopn_slot::reset()
 {
 	m_ssg = 0;
 	m_ssg_state = 0;
@@ -643,7 +643,7 @@ void opn_slot_t::reset()
 }
 
 // process a key on signal
-void opn_slot_t::keyonoff(bool on)
+void ymopn_slot::keyonoff(bool on)
 {
 	if (on && m_key == 0)
 	{
@@ -661,14 +661,14 @@ void opn_slot_t::keyonoff(bool on)
 }
 
 // set detune & multiply
-void opn_slot_t::set_det_mul(u8 value)
+void ymopn_slot::set_det_mul(u8 value)
 {
 	m_multiply = ((value & 0x0f) != 0) ? 2 * (value & 0x0f) : 1;
 	m_detune = (value >> 4) & 7;
 }
 
 // set attack rate & key scale
-bool opn_slot_t::set_ar_ksr(u8 value)
+bool ymopn_slot::set_ar_ksr(u8 value)
 {
 	// refresh attack rate
 	m_attack_rate = ((value & 0x1f) != 0) ? 32 + 2 * (value & 0x1f) : 0;
@@ -689,7 +689,7 @@ bool opn_slot_t::set_ar_ksr(u8 value)
 }
 
 // set decay rate
-void opn_slot_t::set_dr_am(u8 value)
+void ymopn_slot::set_dr_am(u8 value)
 {
 	m_decay_rate = ((value & 0x1f) != 0) ? 32 + 2 * (value & 0x1f) : 0;
 	m_decay_shift = s_eg_rate_shift[m_decay_rate + m_ksr];
@@ -700,7 +700,7 @@ void opn_slot_t::set_dr_am(u8 value)
 }
 
 // set sustain rate
-void opn_slot_t::set_sr(u8 value)
+void ymopn_slot::set_sr(u8 value)
 {
 	m_sustain_rate = ((value & 0x1f) != 0) ? 32 + 2 * (value & 0x1f) : 0;
 	m_sustain_shift = s_eg_rate_shift[m_sustain_rate + m_ksr];
@@ -708,7 +708,7 @@ void opn_slot_t::set_sr(u8 value)
 }
 
 // set release rate
-void opn_slot_t::set_sl_rr(int value)
+void ymopn_slot::set_sl_rr(int value)
 {
 	m_sustain_level = s_sl_table[value >> 4];
 	m_release_rate = 34 + 4 * (value & 0x0f);
@@ -717,13 +717,13 @@ void opn_slot_t::set_sl_rr(int value)
 }
 
 // set total level
-void opn_slot_t::set_tl(u8 value)
+void ymopn_slot::set_tl(u8 value)
 {
 	m_total_level = (value & 0x7f) << (ENV_BITS - 7); // 7bit TL
 }
 
 // set the envelope shape
-void opn_slot_t::set_ssg(u8 value)
+void ymopn_slot::set_ssg(u8 value)
 {
 	// SSG-EG envelope shapes :
 	//
@@ -798,7 +798,7 @@ void opn_slot_t::set_ssg(u8 value)
 }
 
 // update phase increment and envelope generator
-void opn_slot_t::refresh_fc_eg(int fc, int kc)
+void ymopn_slot::refresh_fc_eg(int fc, int kc)
 {
 	// (frequency) phase increment counter
 	fc = m_opn.fc_fix(fc + m_opn.detune(m_detune, kc));
@@ -832,7 +832,7 @@ void opn_slot_t::refresh_fc_eg(int fc, int kc)
 }
 
 // updat the phase LFO
-void opn_slot_t::update_phase_lfo(s32 lfo_pm, s32 pm_shift, u32 block_fnum)
+void ymopn_slot::update_phase_lfo(s32 lfo_pm, s32 pm_shift, u32 block_fnum)
 {
 	if (pm_shift != 0)
 	{
@@ -863,7 +863,7 @@ void opn_slot_t::update_phase_lfo(s32 lfo_pm, s32 pm_shift, u32 block_fnum)
 }
 
 // advance the envelope generator
-void opn_slot_t::advance_eg(u32 eg_cnt)
+void ymopn_slot::advance_eg(u32 eg_cnt)
 {
 	// reset SSG-EG swap flag
 	u8 swap_flag = 0;
@@ -971,7 +971,7 @@ void opn_slot_t::advance_eg(u32 eg_cnt)
 //***************************************************************************
 
 // constructor
-opn_channel_t::opn_channel_t(ymopn_device_base &opn) :
+ymopn_channel::ymopn_channel(ymopn_device_base &opn) :
 	m_opn(opn),
 	m_refresh(true),
 	m_disabled(false),
@@ -1005,7 +1005,7 @@ opn_channel_t::opn_channel_t(ymopn_device_base &opn) :
 
 // register for save states
 #define CHANNEL_NAME(x) x, "channel." #x
-void opn_channel_t::save(int index)
+void ymopn_channel::save(int index)
 {
 	m_slot1.save(index * 4 + 0);
 	m_slot2.save(index * 4 + 1);
@@ -1029,13 +1029,13 @@ void opn_channel_t::save(int index)
 }
 
 // recover after loading a save state
-void opn_channel_t::post_load()
+void ymopn_channel::post_load()
 {
 	setup_connection();
 }
 
 // reset our state and all our owned slots
-void opn_channel_t::reset()
+void ymopn_channel::reset()
 {
 	m_fc = 0;
 	m_slot1.reset();
@@ -1046,13 +1046,13 @@ void opn_channel_t::reset()
 }
 
 // configure for 3-slot mode
-void opn_channel_t::set_three_slot_mode(opn_3slot_t *state)
+void ymopn_channel::set_three_slot_mode(ymopn_3slot_state *state)
 {
 	m_3slot = state;
 }
 
 // set the values from fnum
-void opn_channel_t::set_fnum(u8 upper, u8 value)
+void ymopn_channel::set_fnum(u8 upper, u8 value)
 {
 	u32 fn = ((upper & 7) << 8) + value;
 	u8 blk = upper >> 3;
@@ -1069,7 +1069,7 @@ void opn_channel_t::set_fnum(u8 upper, u8 value)
 }
 
 // set the LFO shift and panning values
-void opn_channel_t::set_lfo_shift_pan(u8 value)
+void ymopn_channel::set_lfo_shift_pan(u8 value)
 {
 	// b0-2 PMS
 	m_pm_shift = (value & 7) * 32; // CH->pm_shift = PM depth * 32 (index in s_lfo_pm_table)
@@ -1082,7 +1082,7 @@ void opn_channel_t::set_lfo_shift_pan(u8 value)
 }
 
 // set algorithm and feedback values
-void opn_channel_t::set_algorithm_feedback(u8 value)
+void ymopn_channel::set_algorithm_feedback(u8 value)
 {
 	u8 feedback = (value >> 3) & 7;
 	m_algorithm = value & 7;
@@ -1091,7 +1091,7 @@ void opn_channel_t::set_algorithm_feedback(u8 value)
 }
 
 // refresh the parameters if needed
-void opn_channel_t::refresh_fc_eg()
+void ymopn_channel::refresh_fc_eg()
 {
 	// skip if nothing to do
 	if (!m_refresh)
@@ -1114,7 +1114,7 @@ void opn_channel_t::refresh_fc_eg()
 }
 
 // CSM key control
-void opn_channel_t::csm_key_control()
+void ymopn_channel::csm_key_control()
 {
 	// all key on then off (only for operators which were OFF!)
 	if (!m_slot1.key())
@@ -1140,7 +1140,7 @@ void opn_channel_t::csm_key_control()
 }
 
 // advance the envelope generator in all our slots
-void opn_channel_t::advance_eg(u32 eg_cnt)
+void ymopn_channel::advance_eg(u32 eg_cnt)
 {
 	m_slot1.advance_eg(eg_cnt);
 	m_slot2.advance_eg(eg_cnt);
@@ -1149,14 +1149,14 @@ void opn_channel_t::advance_eg(u32 eg_cnt)
 }
 
 // compute the operator result
-inline s32 opn_channel_t::op_calc(u32 phase, u32 env, s32 pm)
+inline s32 ymopn_channel::op_calc(u32 phase, u32 env, s32 pm)
 {
 	u32 p = (env << 3) + s_sin_table[(s32((phase & ~FREQ_MASK) + pm) >> FREQ_SHIFT) & SIN_MASK];
 	return (p < TL_TAB_LEN) ? s_tl_table[p] : 0;
 }
 
 // update the channel state with the given LFO parameters
-void opn_channel_t::update(u32 lfo_am, u32 lfo_pm)
+void ymopn_channel::update(u32 lfo_am, u32 lfo_pm)
 {
 	// restore delayed sample (MEM) value to m2 or c2
 	*m_mem_connect = m_mem_value;
@@ -1219,7 +1219,7 @@ void opn_channel_t::update(u32 lfo_am, u32 lfo_pm)
 }
 
 // helper to set the 5 connections
-inline void opn_channel_t::set_connections(s32 *c1, s32 *c2, s32 *c3, s32 *c4, s32 *mem)
+inline void ymopn_channel::set_connections(s32 *c1, s32 *c2, s32 *c3, s32 *c4, s32 *mem)
 {
 	m_connect1 = c1;
 	m_connect2 = c2;
@@ -1229,7 +1229,7 @@ inline void opn_channel_t::set_connections(s32 *c1, s32 *c2, s32 *c3, s32 *c4, s
 }
 
 // set the connections based on the algorithm
-void opn_channel_t::setup_connection()
+void ymopn_channel::setup_connection()
 {
 	switch (m_algorithm)
 	{
@@ -1295,7 +1295,7 @@ void opn_channel_t::setup_connection()
 // OPN ADPCM CHANNEL
 //*********************************************************
 
-opn_adpcm_channel_t::opn_adpcm_channel_t(ymopn_device_base &opn) :
+ymopn_adpcm_channel::ymopn_adpcm_channel(ymopn_device_base &opn) :
 	m_opn(opn),
 	m_total_level(0x3f),
 	m_instrument_level(0x1f),
@@ -1314,7 +1314,7 @@ opn_adpcm_channel_t::opn_adpcm_channel_t(ymopn_device_base &opn) :
 }
 
 #define ADPCM_NAME(x) x, "adpcm." #x
-void opn_adpcm_channel_t::save(int index)
+void ymopn_adpcm_channel::save(int index)
 {
 	m_opn.save_item(ADPCM_NAME(m_total_level), index);
 	m_opn.save_item(ADPCM_NAME(m_instrument_level), index);
@@ -1329,7 +1329,7 @@ void opn_adpcm_channel_t::save(int index)
 	m_opn.save_item(ADPCM_NAME(m_pan), index);
 }
 
-void opn_adpcm_channel_t::reset()
+void ymopn_adpcm_channel::reset()
 {
 	m_total_level = 0x3f;
 	m_instrument_level = 0x1f;
@@ -1344,7 +1344,7 @@ void opn_adpcm_channel_t::reset()
 	m_pan = 3;
 }
 
-void opn_adpcm_channel_t::keyonoff(bool on)
+void ymopn_adpcm_channel::keyonoff(bool on)
 {
 	if (on)
 	{
@@ -1358,13 +1358,13 @@ void opn_adpcm_channel_t::keyonoff(bool on)
 		m_flag = 0;
 }
 
-void opn_adpcm_channel_t::set_volume_pan(u8 value)
+void ymopn_adpcm_channel::set_volume_pan(u8 value)
 {
 	m_instrument_level = ~value & 0x1f;
 	m_pan = value >> 6;
 }
 
-bool opn_adpcm_channel_t::update()
+bool ymopn_adpcm_channel::update()
 {
 	// usual ADPCM table (16 * 1.1^N)
 	static constexpr u16 s_steps[49] =
@@ -1426,7 +1426,7 @@ bool opn_adpcm_channel_t::update()
 // OPN DELTAT CHANNEL
 //*********************************************************
 
-opn_deltat_channel_t::opn_deltat_channel_t(ymopn_device_base &opn) :
+ymopn_deltat_channel::ymopn_deltat_channel(ymopn_device_base &opn) :
 	m_opn(opn),
 	m_curaddress(0),
 	m_curfrac(0),
@@ -1450,7 +1450,7 @@ opn_deltat_channel_t::opn_deltat_channel_t(ymopn_device_base &opn) :
 }
 
 #define DELTAT_NAME(x) x, "deltat." #x
-void opn_deltat_channel_t::save(int index)
+void ymopn_deltat_channel::save(int index)
 {
 	m_opn.save_item(DELTAT_NAME(m_curaddress), index);
 	m_opn.save_item(DELTAT_NAME(m_curfrac), index);
@@ -1472,7 +1472,7 @@ void opn_deltat_channel_t::save(int index)
 	m_opn.save_item(DELTAT_NAME(m_status), index);
 }
 
-void opn_deltat_channel_t::status_set_reset(u8 set, u8 reset)
+void ymopn_deltat_channel::status_set_reset(u8 set, u8 reset)
 {
 	u8 prev = m_status;
 	m_status = (m_status & ~reset) | set;
@@ -1480,7 +1480,7 @@ void opn_deltat_channel_t::status_set_reset(u8 set, u8 reset)
 		m_opn.deltat_status_change(m_status);
 }
 
-void opn_deltat_channel_t::reset()
+void ymopn_deltat_channel::reset()
 {
 	m_curaddress = 0;
 	m_curfrac = 0;
@@ -1500,7 +1500,7 @@ void opn_deltat_channel_t::reset()
 	status_set_reset(0, 0xff);
 }
 
-void opn_deltat_channel_t::set_portstate(u8 value)
+void ymopn_deltat_channel::set_portstate(u8 value)
 {
 	//
 	// START:
@@ -1561,7 +1561,7 @@ void opn_deltat_channel_t::set_portstate(u8 value)
 	}
 }
 
-void opn_deltat_channel_t::set_pan_control2(u8 value, u8 shift_override)
+void ymopn_deltat_channel::set_pan_control2(u8 value, u8 shift_override)
 {
 	m_control2 = value;
 
@@ -1581,7 +1581,7 @@ void opn_deltat_channel_t::set_pan_control2(u8 value, u8 shift_override)
 	m_addrshift++;
 }
 
-void opn_deltat_channel_t::write_data(u8 value)
+void ymopn_deltat_channel::write_data(u8 value)
 {
 	// external memory write
 	if ((m_portstate & 0xe0) == 0x60)
@@ -1617,7 +1617,7 @@ void opn_deltat_channel_t::write_data(u8 value)
 	}
 }
 
-u8 opn_deltat_channel_t::read_data()
+u8 ymopn_deltat_channel::read_data()
 {
 	u8 result = 0;
 
@@ -1649,7 +1649,7 @@ u8 opn_deltat_channel_t::read_data()
 	return result;
 }
 
-bool opn_deltat_channel_t::update()
+bool ymopn_deltat_channel::update()
 {
 	// Forecast to next Forecast (rate = *8)
 	// 1/8 , 3/8 , 5/8 , 7/8 , 9/8 , 11/8 , 13/8 , 15/8
@@ -1793,17 +1793,17 @@ ymopn_device_base::ymopn_device_base(const machine_config &mconfig, const char *
 	// allocate the appropriate number of channels
 	int channels = (type == YM2203) ? 3 : 6;
 	for (int index = 0; index < channels; index++)
-		m_channel.push_back(std::make_unique<opn_channel_t>(*this));
+		m_channel.push_back(std::make_unique<ymopn_channel>(*this));
 
 	// allocate the appropriate number of ADPCM channels
 	int adpcm = (type == YM2203) ? 0 : 6;
 	for (int index = 0; index < adpcm; index++)
-		m_adpcm_channel.push_back(std::make_unique<opn_adpcm_channel_t>(*this));
+		m_adpcm_channel.push_back(std::make_unique<ymopn_adpcm_channel>(*this));
 
 	// allocate the deltat channel
 	bool deltat = (type != YM2203);
 	if (deltat)
-		m_deltat_channel = std::make_unique<opn_deltat_channel_t>(*this);
+		m_deltat_channel = std::make_unique<ymopn_deltat_channel>(*this);
 }
 
 //-------------------------------------------------
@@ -1899,13 +1899,13 @@ void ym2608_device::deltat_status_change(u8 newstatus)
 	u8 reset = 0;
 
 	// map EOS flag to the status register
-	if ((newstatus & opn_deltat_channel_t::STATUS_EOS) != 0)
+	if ((newstatus & ymopn_deltat_channel::STATUS_EOS) != 0)
 		set |= STATUS_DELTAT_EOS_2608;
 	else
 		reset |= STATUS_DELTAT_EOS_2608;
 
 	// map BRDY flag to the status register
-	if ((newstatus & opn_deltat_channel_t::STATUS_BRDY) != 0)
+	if ((newstatus & ymopn_deltat_channel::STATUS_BRDY) != 0)
 		set |= STATUS_DELTAT_BRDY_2608;
 	else
 		reset |= STATUS_DELTAT_BRDY_2608;
@@ -2077,7 +2077,7 @@ void ymopn_device_base::write_mode(u8 reg, u8 value)
 		case 0x28:  // key on / off
 			if ((value & 3) != 3)
 			{
-				opn_channel_t &chan = channel(value & 3, BIT(value, 2));
+				ymopn_channel &chan = channel(value & 3, BIT(value, 2));
 				chan.slot1().keyonoff(BIT(value, 4));
 				chan.slot2().keyonoff(BIT(value, 5));
 				chan.slot3().keyonoff(BIT(value, 6));
@@ -2099,11 +2099,11 @@ void ymopn_device_base::write_reg(u16 reg, u8 value)
 	u8 chnum = reg & 3;
 	if (chnum == 3)
 		return; // 0xX3,0xX7,0xXB,0xXF
-	opn_channel_t &chan = channel(chnum, reg >= 0x100);
+	ymopn_channel &chan = channel(chnum, reg >= 0x100);
 
 	// determine slot
 	u8 slotnum = (reg >> 2) & 3;
-	opn_slot_t &slot = chan.slot(slotnum);
+	ymopn_slot &slot = chan.slot(slotnum);
 
 	switch (reg & 0xf0)
 	{
@@ -2190,7 +2190,7 @@ void ymopn_device_base::write_adpcm(u8 reg, u8 value)
 	u8 chnum = reg & 7;
 	if (chnum >= m_adpcm_channel.size())
 		return;
-	opn_adpcm_channel_t &chan = *m_adpcm_channel[chnum];
+	ymopn_adpcm_channel &chan = *m_adpcm_channel[chnum];
 
 	switch (reg & 0xf8)
 	{
@@ -2241,7 +2241,7 @@ void ymopn_device_base::write_deltat(u8 reg, u8 value)
 	// determine channel
 	if (!m_deltat_channel)
 		return;
-	opn_deltat_channel_t &chan = *m_deltat_channel;
+	ymopn_deltat_channel &chan = *m_deltat_channel;
 
 	switch (reg)
 	{
@@ -2876,7 +2876,7 @@ u8 ym2608_device::read(offs_t offset)
 		case 2: // status 1 : status 0 + ADPCM status
 			// BUSY:x:PCMBUSY:ZERO:BRDY:EOS:FLAGB:FLAGA
 			result = status() & (m_2608_flagmask | 0x80);
-			if ((deltat().status() & opn_deltat_channel_t::STATUS_BUSY) != 0)
+			if ((deltat().status() & ymopn_deltat_channel::STATUS_BUSY) != 0)
 				result |= 0x20;
 			break;
 

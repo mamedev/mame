@@ -19,11 +19,11 @@ DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
 DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device);
 
 
-// ======================> opn_3slot_t
+// ======================> ymopn_3slot_state
 
-struct opn_3slot_t
+struct ymopn_3slot_state
 {
-	opn_3slot_t();
+	ymopn_3slot_state();
 	void set_fnum(ymopn_device_base &opn, u8 chnum, u8 value);
 
 	u32  m_fc[3];          // fnum3,blk3: calculated
@@ -33,13 +33,13 @@ struct opn_3slot_t
 };
 
 
-// ======================> opn_slot_t
+// ======================> ymopn_slot
 
-class opn_slot_t
+class ymopn_slot
 {
 public:
 	// constructor
-	opn_slot_t(ymopn_device_base &opn);
+	ymopn_slot(ymopn_device_base &opn);
 
 	// register for save states
 	void save(int index);
@@ -112,13 +112,13 @@ private:
 };
 
 
-// ======================> opn_channel_t
+// ======================> ymopn_channel
 
-class opn_channel_t
+class ymopn_channel
 {
 public:
 	// constructor
-	opn_channel_t(ymopn_device_base &opn);
+	ymopn_channel(ymopn_device_base &opn);
 
 	// save state handling
 	void save(int index);
@@ -133,7 +133,7 @@ public:
 
 	// return a reference to the given slot; note that the indexing order is
 	// different than the expected order
-	opn_slot_t &slot(int index)
+	ymopn_slot &slot(int index)
 	{
 		switch (index)
 		{
@@ -144,10 +144,10 @@ public:
 			case 3:	return m_slot4;
 		}
 	}
-	opn_slot_t &slot1() { return m_slot1; }
-	opn_slot_t &slot2() { return m_slot2; }
-	opn_slot_t &slot3() { return m_slot3; }
-	opn_slot_t &slot4() { return m_slot4; }
+	ymopn_slot &slot1() { return m_slot1; }
+	ymopn_slot &slot2() { return m_slot2; }
+	ymopn_slot &slot3() { return m_slot3; }
+	ymopn_slot &slot4() { return m_slot4; }
 
 	// return the computed output value, with panning applied
 	s32 output() const { return m_out_fm; }
@@ -155,7 +155,7 @@ public:
 	s32 output_r() const { return BIT(m_pan, 0) ? output() : 0; }
 
 	// parameter settings
-	void set_three_slot_mode(opn_3slot_t *state);
+	void set_three_slot_mode(ymopn_3slot_state *state);
 	void set_fnum(u8 upper, u8 value);
 	void set_lfo_shift_pan(u8 value);
 	void set_algorithm_feedback(u8 value);
@@ -179,10 +179,10 @@ private:
 	ymopn_device_base &m_opn; // reference to base device
 	bool m_refresh;           // true if slots need a refresh
 	bool m_disabled;          // true of this channel is disabled
-	opn_slot_t m_slot1;       // four SLOTs (operators)
-	opn_slot_t m_slot2;       // four SLOTs (operators)
-	opn_slot_t m_slot3;       // four SLOTs (operators)
-	opn_slot_t m_slot4;       // four SLOTs (operators)
+	ymopn_slot m_slot1;       // four SLOTs (operators)
+	ymopn_slot m_slot2;       // four SLOTs (operators)
+	ymopn_slot m_slot3;       // four SLOTs (operators)
+	ymopn_slot m_slot4;       // four SLOTs (operators)
 
 	u8 m_algorithm;           // algorithm
 	u8 m_fb_shift;            // feedback shift
@@ -207,20 +207,20 @@ private:
 	s32 m_out_fm;             // outputs of working channels
 	u8 m_pan;                 // pan values (bit 1 = left, bit 0 = right)
 
-	opn_3slot_t *m_3slot;     // pointer to 3-slot state if active (or nullptr if not)
+	ymopn_3slot_state *m_3slot; // pointer to 3-slot state if active (or nullptr if not)
 };
 
 
-// ======================> ymopn_adpcm_channel_t
+// ======================> ymopn_adpcm_channel
 
-class opn_adpcm_channel_t
+class ymopn_adpcm_channel
 {
 	static constexpr int FRAC_SHIFT = 16;
 	static constexpr u32 FRAC_ONE = 1 << FRAC_SHIFT;
 
 public:
 	// constructor
-	opn_adpcm_channel_t(ymopn_device_base &opn);
+	ymopn_adpcm_channel(ymopn_device_base &opn);
 
 	// save state handling
 	void save(int index);
@@ -282,9 +282,9 @@ private:
 };
 
 
-// ======================> opn_deltat_channel_t
+// ======================> ymopn_deltat_channel
 
-class opn_deltat_channel_t
+class ymopn_deltat_channel
 {
 	static constexpr int FRAC_SHIFT = 16;
 	static constexpr u32 FRAC_ONE = 1 << FRAC_SHIFT;
@@ -298,7 +298,7 @@ public:
 	static constexpr u8 STATUS_BUSY = 0x04;
 
 	// constructor
-	opn_deltat_channel_t(ymopn_device_base &opn);
+	ymopn_deltat_channel(ymopn_device_base &opn);
 
 	// save state handling
 	void save(int index);
@@ -399,7 +399,7 @@ protected:
 
 	// return a reference to the given channel; if extended is true,
 	// return an extended channel, if currently enabled
-	opn_channel_t &channel(int index, bool extended = false)
+	ymopn_channel &channel(int index, bool extended = false)
 	{
 		if (extended && m_channel.size() > 3)
 			index += 3;
@@ -407,13 +407,13 @@ protected:
 	}
 
 	// return a reference to the channel with 3-slot support
-	opn_channel_t &three_slot_channel() { return channel(2); }
+	ymopn_channel &three_slot_channel() { return channel(2); }
 
 	// return a reference to an ADPCM channel
-	opn_adpcm_channel_t &adpcm(int index) { return *m_adpcm_channel[index]; }
+	ymopn_adpcm_channel &adpcm(int index) { return *m_adpcm_channel[index]; }
 
 	// return a reference to the delta-T channel
-	opn_deltat_channel_t &deltat() { return *m_deltat_channel; }
+	ymopn_deltat_channel &deltat() { return *m_deltat_channel; }
 
 	// status/IRQ handling
 	u8 status();
@@ -472,10 +472,10 @@ private:
 	attotime timer_b_period() const;
 
 	// internal state
-	opn_3slot_t m_3slot_state; // 3 slot mode state
-	std::vector<std::unique_ptr<opn_channel_t>> m_channel;
-	std::vector<std::unique_ptr<opn_adpcm_channel_t>> m_adpcm_channel;
-	std::unique_ptr<opn_deltat_channel_t> m_deltat_channel;
+	ymopn_3slot_state m_3slot_state; // 3 slot mode state
+	std::vector<std::unique_ptr<ymopn_channel>> m_channel;
+	std::vector<std::unique_ptr<ymopn_adpcm_channel>> m_adpcm_channel;
+	std::unique_ptr<ymopn_deltat_channel> m_deltat_channel;
 
 	u32 m_eg_count;            // global envelope generator counter
 	u32 m_eg_timer;            // global envelope generator counter works at frequency = chipclock/64/3
