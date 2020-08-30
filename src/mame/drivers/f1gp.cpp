@@ -32,7 +32,7 @@
 
 #include "machine/clock.h"
 
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "sound/okim6295.h"
 
 #include "video/vsystem_gga.h"

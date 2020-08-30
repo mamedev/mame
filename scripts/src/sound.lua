@@ -1166,10 +1166,10 @@ end
 ---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2151.h,SOUNDS["YM2151"] = true
---@src/devices/sound/2203intf.h,SOUNDS["YM2203"] = true
+--@src/devices/sound/ymopn.h,SOUNDS["YM2203"] = true
 --@src/devices/sound/ym2413.h,SOUNDS["YM2413"] = true
---@src/devices/sound/2608intf.h,SOUNDS["YM2608"] = true
---@src/devices/sound/2610intf.h,SOUNDS["YM2610"] = true
+--@src/devices/sound/ymopn.h,SOUNDS["YM2608"] = true
+--@src/devices/sound/ymopn.h,SOUNDS["YM2610"] = true
 --@src/devices/sound/2612intf.h,SOUNDS["YM2612"] = true
 --@src/devices/sound/3812intf.h,SOUNDS["YM3812"] = true
 --@src/devices/sound/3526intf.h,SOUNDS["YM3526"] = true
@@ -1197,39 +1197,29 @@ end
 if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null or SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
 --if (SOUNDS["YM2203"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/2203intf.cpp",
-		MAME_DIR .. "src/devices/sound/2203intf.h",
 		MAME_DIR .. "src/devices/sound/ay8910.cpp",
 		MAME_DIR .. "src/devices/sound/ay8910.h",
-		MAME_DIR .. "src/devices/sound/fm.cpp",
-		MAME_DIR .. "src/devices/sound/fm.h",
+		MAME_DIR .. "src/devices/sound/ymopn.cpp",
+		MAME_DIR .. "src/devices/sound/ymopn.h",
 	}
 --end
 
 
 --if (SOUNDS["YM2608"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/2608intf.cpp",
-		MAME_DIR .. "src/devices/sound/2608intf.h",
 		MAME_DIR .. "src/devices/sound/ay8910.cpp",
 		MAME_DIR .. "src/devices/sound/ay8910.h",
-		MAME_DIR .. "src/devices/sound/fm.cpp",
-		MAME_DIR .. "src/devices/sound/fm.h",
-		MAME_DIR .. "src/devices/sound/ymdeltat.cpp",
-		MAME_DIR .. "src/devices/sound/ymdeltat.h",
+		MAME_DIR .. "src/devices/sound/ymopn.cpp",
+		MAME_DIR .. "src/devices/sound/ymopn.h",
 	}
 --end
 
 --if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/2610intf.cpp",
-		MAME_DIR .. "src/devices/sound/2610intf.h",
 		MAME_DIR .. "src/devices/sound/ay8910.cpp",
 		MAME_DIR .. "src/devices/sound/ay8910.h",
-		MAME_DIR .. "src/devices/sound/fm.cpp",
-		MAME_DIR .. "src/devices/sound/fm.h",
-		MAME_DIR .. "src/devices/sound/ymdeltat.cpp",
-		MAME_DIR .. "src/devices/sound/ymdeltat.h",
+		MAME_DIR .. "src/devices/sound/ymopn.cpp",
+		MAME_DIR .. "src/devices/sound/ymopn.h",
 	}
 --end
 
@@ -1237,9 +1227,10 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 	files {
 		MAME_DIR .. "src/devices/sound/2612intf.cpp",
 		MAME_DIR .. "src/devices/sound/2612intf.h",
-		MAME_DIR .. "src/devices/sound/ay8910.cpp",
-		MAME_DIR .. "src/devices/sound/ay8910.h",
 		MAME_DIR .. "src/devices/sound/fm2612.cpp",
+		MAME_DIR .. "src/devices/sound/fm2612.h",
+		MAME_DIR .. "src/devices/sound/ymdeltat.cpp",
+		MAME_DIR .. "src/devices/sound/ymdeltat.h",
 	}
 --end
 end

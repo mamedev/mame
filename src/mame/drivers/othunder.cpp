@@ -284,7 +284,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "sound/flt_vol.h"
 #include "screen.h"
 #include "speaker.h"

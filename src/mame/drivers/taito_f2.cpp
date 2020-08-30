@@ -272,8 +272,8 @@ Notes:
 #include "machine/rp5c01.h"
 #include "machine/te7750.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
+#include "sound/ymopn.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 

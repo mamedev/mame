@@ -1421,7 +1421,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"

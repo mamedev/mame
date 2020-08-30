@@ -506,8 +506,8 @@
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
+#include "sound/ymopn.h"
+#include "sound/ymopn.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 

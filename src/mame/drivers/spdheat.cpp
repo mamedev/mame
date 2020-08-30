@@ -19,7 +19,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/flt_vol.h"
 #include "sound/volt_reg.h"
 

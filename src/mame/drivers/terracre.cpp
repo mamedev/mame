@@ -85,7 +85,7 @@ AT-2
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

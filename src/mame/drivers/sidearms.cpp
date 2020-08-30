@@ -56,7 +56,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"

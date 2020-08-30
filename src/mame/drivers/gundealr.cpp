@@ -72,7 +72,7 @@ Z80 CPU - 12MHz/2
 #include "includes/gundealr.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

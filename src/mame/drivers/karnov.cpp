@@ -83,7 +83,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/input_merger.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "screen.h"

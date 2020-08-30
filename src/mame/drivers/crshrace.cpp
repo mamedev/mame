@@ -132,7 +132,7 @@ Dip locations verified with Service Mode.
 #include "includes/crshrace.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

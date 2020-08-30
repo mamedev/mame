@@ -109,15 +109,14 @@
 #include "emu.h"
 
 #define YM2610B_WARNING
-#include "fm.h"
-#include "ymdeltat.h"
-#include "2203intf.h"
-#include "2608intf.h"
-#include "2610intf.h"
+#include "ymopn.h"
 
 
+#if (YMOPN_NEW_SOUND)
 // samples are computed to 16 bits internally; scale by 1/32768 to get 1.0
 constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+#endif
+
 
 // base output clock rate is /72
 constexpr int CLOCK_DIVIDER = 72;
@@ -506,9 +505,8 @@ static s32 *s_lfo_pm_table = nullptr;
 inline u32 ymopn_device_base::fn_value(u32 val) const
 {
 	// FREQ_SHIFT-10 because chip works with 10.10 fixed point, while we use 16.16
-	// m_freqbase is x.1, so only shift by one less
-//	return (val * 32 * m_freqbase) << (FREQ_SHIFT - 11);
-	return (val * m_freqbase) << (FREQ_SHIFT - 6);
+//	return (val * 32) << (FREQ_SHIFT - 10);
+	return val << (FREQ_SHIFT - 5);
 }
 
 inline u32 ymopn_device_base::fn_max() const
@@ -522,19 +520,17 @@ inline u32 ymopn_device_base::fc_fix(s32 fc) const
 	return (fc < 0) ? (fc + fn_max()) : fc;
 }
 
-// lookup the detune value, which depends on m_freqbase
+// lookup the detune value
 inline s32 ymopn_device_base::detune(u8 fd, u8 index) const
 {
 	// scale factor is: SIN_LEN * (1 << FREQ_SHIFT) / (1 << 20)
 	// assuming that SIN_BITS + FREQ_SHIFT > 20
-	// also m_freqbase is x.1, so need to take off one more
-	return (s_detune_table[fd * 32 + index] * m_freqbase) << (SIN_BITS + FREQ_SHIFT - 20 - 1);
+	return s_detune_table[fd * 32 + index] << (SIN_BITS + FREQ_SHIFT - 20);
 }
 
 inline u32 ymopn_device_base::lfo_step(u8 index) const
 {
-	// m_freqbase is x.1, so shift by 1 less
-	return (m_freqbase << (LFO_SHIFT - 1)) / s_lfo_samples_per_step[index];
+	return (1 << LFO_SHIFT) / s_lfo_samples_per_step[index];
 }
 
 
@@ -1368,7 +1364,7 @@ void opn_adpcm_channel_t::set_volume_pan(u8 value)
 	m_pan = value >> 6;
 }
 
-bool opn_adpcm_channel_t::update(u32 freqbase)
+bool opn_adpcm_channel_t::update()
 {
 	// usual ADPCM table (16 * 1.1^N)
 	static constexpr u16 s_steps[49] =
@@ -1389,8 +1385,7 @@ bool opn_adpcm_channel_t::update(u32 freqbase)
 		return false;
 	}
 
-	// freqbase is x.1, so shift by 1 less
-	for (m_curfrac += (freqbase << (FRAC_SHIFT - 1)) / (3 * m_step_divisor); m_curfrac >= FRAC_ONE; m_curfrac -= FRAC_ONE)
+	for (m_curfrac += (1 << FRAC_SHIFT) / (3 * m_step_divisor); m_curfrac >= FRAC_ONE; m_curfrac -= FRAC_ONE)
 	{
 		// YM2610 checks lower 20 bits only, the 4 MSB bits are sample bank
 		if ((((m_curaddress ^ end_address()) >> 1) & 0xfffff) == 0)
@@ -1654,7 +1649,7 @@ u8 opn_deltat_channel_t::read_data()
 	return result;
 }
 
-bool opn_deltat_channel_t::update(u32 freqbase)
+bool opn_deltat_channel_t::update()
 {
 	// Forecast to next Forecast (rate = *8)
 	// 1/8 , 3/8 , 5/8 , 7/8 , 9/8 , 11/8 , 13/8 , 15/8
@@ -1686,8 +1681,7 @@ bool opn_deltat_channel_t::update(u32 freqbase)
 		return false;
 
 	// process any samples once we cross the 1.0 fractional boundary
-	// freqbase is x.1, so shift one less
-	for (m_curfrac += (m_delta * freqbase) >> 1; m_curfrac >= FRAC_ONE; m_curfrac -= FRAC_ONE)
+	for (m_curfrac += m_delta; m_curfrac >= FRAC_ONE; m_curfrac -= FRAC_ONE)
 	{
 		// in external memory mode, check the end address and process
 		if (external_memory)
@@ -1782,7 +1776,6 @@ ymopn_device_base::ymopn_device_base(const machine_config &mconfig, const char *
 	m_lfo_count(0),
 	m_lfo_step(0),
 	m_prescaler_sel(0),
-	m_freqbase(CLOCK_DIVIDER * 2),
 	m_timer_prescaler(0),
 	m_busy_expiry_time(attotime::zero),
 	m_irq(0),
@@ -2370,8 +2363,9 @@ void ymopn_device_base::set_prescale(u8 sel)
 	sel &= 3;
 	m_prescaler_sel = sel;
 
-	m_freqbase = (CLOCK_DIVIDER * 2) / (s_opn_pres[sel] * pre_divider);
 	m_timer_prescaler = s_opn_pres[sel] * pre_divider;
+printf("Prescale = %d; sample_rate = %d\n", m_timer_prescaler, clock() / m_timer_prescaler);
+	m_stream->set_sample_rate(clock() / m_timer_prescaler);
 	ay_set_clock(clock() * 2 / (s_ssg_pres[sel] * pre_divider));
 }
 
@@ -2431,12 +2425,20 @@ void ymopn_device_base::device_timer(emu_timer &timer, device_timer_id id, int p
 //  sound_stream_update_ex - generate samples
 //-------------------------------------------------
 
+#if (YMOPN_NEW_SOUND)
 void ymopn_device_base::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+#else
+void ymopn_device_base::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+#endif
 {
 	// if this is not our stream, pass it on
 	if (&stream != m_stream)
 	{
+#if (YMOPN_NEW_SOUND)
 		ay8910_device::sound_stream_update_ex(stream, inputs, outputs);
+#else
+		ay8910_device::sound_stream_update(stream, inputs, outputs, samples);
+#endif
 		return;
 	}
 
@@ -2445,14 +2447,16 @@ void ymopn_device_base::sound_stream_update_ex(sound_stream &stream, std::vector
 		chan->refresh_fc_eg();
 
 	// buffering
-	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+#if (YMOPN_NEW_SOUND)
+	int samples = outputs[0].samples();
+#endif
+	for (int sampindex = 0; sampindex < samples; sampindex++)
 	{
 		// advance the LFO
 		advance_lfo();
 
 		// advance envelope generator
-		// freqbase is x.1, so shift by one less
-		m_eg_timer += m_freqbase << (EG_SHIFT - 1);
+		m_eg_timer += 1 << EG_SHIFT;
 		while (m_eg_timer >= EG_TIMER_OVERFLOW)
 		{
 			m_eg_timer -= EG_TIMER_OVERFLOW;
@@ -2475,7 +2479,7 @@ void ymopn_device_base::sound_stream_update_ex(sound_stream &stream, std::vector
 		if (m_deltat_channel)
 		{
 			auto &chan = *m_deltat_channel;
-			if (chan.update(m_freqbase))
+			if (chan.update())
 				m_adpcm_status |= 0x80;
 			lsum += chan.output_l();
 			rsum += chan.output_r();
@@ -2485,7 +2489,7 @@ void ymopn_device_base::sound_stream_update_ex(sound_stream &stream, std::vector
 		for (int chnum = 0; chnum < m_adpcm_channel.size(); chnum++)
 		{
 			auto &chan = *m_adpcm_channel[chnum];
-			if (chan.update(m_freqbase))
+			if (chan.update())
 				m_adpcm_status |= 1 << chnum;
 			lsum += chan.output_l();
 			rsum += chan.output_r();
@@ -2502,9 +2506,15 @@ void ymopn_device_base::sound_stream_update_ex(sound_stream &stream, std::vector
 			rsum = 32767;
 
 		// buffering
+#if (YMOPN_NEW_SOUND)
 		outputs[0].put(sampindex, lsum * sample_scale);
 		if (outputs.size() > 1)
 			outputs[1].put(sampindex, rsum * sample_scale);
+#else
+		outputs[0][sampindex] = lsum;
+		if (type() != YM2203)
+			outputs[1][sampindex] = rsum;
+#endif
 	}
 }
 
@@ -2594,7 +2604,11 @@ void ymopn_device_base::device_start()
 	m_timer_a = timer_alloc(TIMER_A);
 	m_timer_b = timer_alloc(TIMER_B);
 
-	m_stream = &stream_alloc_ex(0, (type() == YM2203) ? 1 : 2, clock() / CLOCK_DIVIDER);
+#if (YMOPN_NEW_SOUND)
+	m_stream = stream_alloc_ex(0, (type() == YM2203) ? 1 : 2, clock() / CLOCK_DIVIDER);
+#else
+	m_stream = stream_alloc(0, (type() == YM2203) ? 1 : 2, clock() / CLOCK_DIVIDER);
+#endif
 
 	init_tables();
 
@@ -2618,7 +2632,6 @@ void ymopn_device_base::device_start()
 	save_item(YM_NAME(m_lfo_step));
 
 	save_item(YM_NAME(m_prescaler_sel));
-	save_item(YM_NAME(m_freqbase));
 	save_item(YM_NAME(m_timer_prescaler));
 
 	save_item(YM_NAME(m_busy_expiry_time));

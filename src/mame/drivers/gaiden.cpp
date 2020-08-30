@@ -144,7 +144,7 @@ Notes:
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "speaker.h"

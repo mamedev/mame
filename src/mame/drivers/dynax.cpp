@@ -86,7 +86,7 @@ TODO:
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
 

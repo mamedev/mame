@@ -67,7 +67,7 @@ Verification still needed for the other PCBs.
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
 #include "video/vsystem_gga.h"

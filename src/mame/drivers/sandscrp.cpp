@@ -77,7 +77,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"

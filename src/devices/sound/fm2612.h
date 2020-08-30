@@ -12,9 +12,9 @@
 
 /* --- select emulation chips --- */
 #define BUILD_YM2203  (0)       /* build YM2203(OPN)   emulator */
-#define BUILD_YM2608  (1)       /* build YM2608(OPNA)  emulator */
-#define BUILD_YM2610  (1)       /* build YM2610(OPNB)  emulator */
-#define BUILD_YM2610B (1)       /* build YM2610B(OPNB?)emulator */
+#define BUILD_YM2608  (0)       /* build YM2608(OPNA)  emulator */
+#define BUILD_YM2610  (0)       /* build YM2610(OPNB)  emulator */
+#define BUILD_YM2610B (0)       /* build YM2610B(OPNB?)emulator */
 #define BUILD_YM2612  (1)       /* build YM2612(OPN2)  emulator */
 #define BUILD_YM3438  (1)       /* build YM3438(OPN) emulator */
 
@@ -50,27 +50,15 @@ template <typename X> constexpr TIME_TYPE MULTIPLY_TIME_BY_INT(TIME_TYPE const &
 #endif
 
 
-// MAME-specific interface
-#if 1
-
-using FMSAMPLE = s32;
-using FMBUFFER = write_stream_view;
-static constexpr stream_buffer::sample_t FMBUFFER_SCALE = 1.0 / 32768.0;
-#define FMBUFFER_WRITE(buffer, index, value) buffer.put(index, stream_buffer::sample_t(value) * FMBUFFER_SCALE)
-
-#else
-
+typedef stream_sample_t FMSAMPLE;
+/*
 #if (FM_SAMPLE_BITS==16)
 typedef int16_t FMSAMPLE;
 #endif
 #if (FM_SAMPLE_BITS==8)
 typedef unsigned char  FMSAMPLE;
 #endif
-
-typedef FMSAMPLE *FMBUFFER;
-#define FMBUFFER_WRITE(buffer, index, value) buffer[index] = value
-
-#endif
+*/
 
 typedef uint8_t (*FM_READBYTE)(device_t *device, offs_t offset);
 typedef void(*FM_WRITEBYTE)(device_t *device, offs_t offset, uint8_t data);
@@ -120,7 +108,7 @@ void ym2203_reset_chip(void *chip);
 /*
 ** update one of chip
 */
-void ym2203_update_one(void *chip, FMBUFFER buffer, int length);
+void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length);
 
 /*
 ** Write
@@ -154,7 +142,7 @@ void * ym2608_init(device_t *device, int baseclock, int rate,
 void ym2608_clock_changed(void *chip, int clock, int rate);
 void ym2608_shutdown(void *chip);
 void ym2608_reset_chip(void *chip);
-void ym2608_update_one(void *chip, FMBUFFER *buffer, int length);
+void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);
 
 int ym2608_write(void *chip, int a,unsigned char v);
 unsigned char ym2608_read(void *chip,int a);
@@ -170,10 +158,10 @@ void * ym2610_init(device_t *device, int baseclock, int rate,
 void ym2610_clock_changed(void *chip, int clock, int rate);
 void ym2610_shutdown(void *chip);
 void ym2610_reset_chip(void *chip);
-void ym2610_update_one(void *chip, FMBUFFER *buffer, int length);
+void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length);
 
 #if BUILD_YM2610B
-void ym2610b_update_one(void *chip, FMBUFFER *buffer, int length);
+void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length);
 #endif /* BUILD_YM2610B */
 
 int ym2610_write(void *chip, int a,unsigned char v);
@@ -188,7 +176,7 @@ void * ym2612_init(device_t *device, int baseclock, int rate,
 void ym2612_clock_changed(void *chip, int clock, int rate);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);
-void ym2612_update_one(void *chip, FMBUFFER *buffer, int length, u8 output_bits);
+void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits);
 
 int ym2612_write(void *chip, int a,unsigned char v);
 unsigned char ym2612_read(void *chip,int a);

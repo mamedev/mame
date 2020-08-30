@@ -27,7 +27,7 @@
 #include "machine/vt83c461.h"
 #include "machine/watchdog.h"
 #include "machine/znmcu.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/spu.h"

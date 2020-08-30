@@ -21,7 +21,7 @@
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 
 #include "emupal.h"
 #include "screen.h"

@@ -24,7 +24,7 @@
 #include "machine/mc8123.h"
 #include "machine/nvram.h"
 #include "machine/i8255.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"

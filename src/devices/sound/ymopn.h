@@ -9,6 +9,8 @@
 #include "ay8910.h"
 #include "dirom.h"
 
+#define YMOPN_NEW_SOUND (0)
+
 class ymopn_device_base;
 
 DECLARE_DEVICE_TYPE(YM2203, ym2203_device);
@@ -255,7 +257,7 @@ public:
 	void set_step_divisor(u8 value) { m_step_divisor = value; }
 
 	// overall update
-	bool update(u32 freqbase);
+	bool update();
 
 private:
 	// internal helpers
@@ -327,7 +329,7 @@ public:
 	u8 read_data();
 
 	// overall update
-	bool update(u32 freqbase);
+	bool update();
 
 private:
 	// internal helpers
@@ -443,7 +445,11 @@ protected:
 	virtual void device_clock_changed() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+#if (YMOPN_NEW_SOUND)
 	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+#else
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+#endif
 
 	enum
 	{
@@ -481,7 +487,6 @@ private:
 	u32 m_lfo_step;
 
 	u8 m_prescaler_sel;        // prescaler selector
-	u8 m_freqbase;             // frequency base
 	u32 m_timer_prescaler;     // timer prescaler
 
 	attotime m_busy_expiry_time; // expiry time of the busy status

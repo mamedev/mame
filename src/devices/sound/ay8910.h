@@ -137,12 +137,6 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	// trampolines for callbacks from fm.cpp
-	static void psg_set_clock(device_t *device, int clock) { downcast<ay8910_device *>(device)->ay_set_clock(clock); }
-	static void psg_write(device_t *device, int address, int data) { downcast<ay8910_device *>(device)->ay8910_write_ym(address, data); }
-	static int psg_read(device_t *device) { return downcast<ay8910_device *>(device)->ay8910_read_ym(); }
-	static void psg_reset(device_t *device) { downcast<ay8910_device *>(device)->ay8910_reset_ym(); }
-
 	void ay8910_write_ym(int addr, u8 data);
 	u8 ay8910_read_ym();
 	void ay8910_reset_ym();

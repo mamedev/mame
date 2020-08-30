@@ -8,7 +8,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/msm5205.h"
 
 #include "video/bufsprite.h"

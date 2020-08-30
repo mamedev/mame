@@ -211,7 +211,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "sound/3526intf.h"
 #include "screen.h"
 #include "speaker.h"

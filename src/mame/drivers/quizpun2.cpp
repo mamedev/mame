@@ -90,7 +90,7 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 
 #include "emupal.h"
 #include "screen.h"

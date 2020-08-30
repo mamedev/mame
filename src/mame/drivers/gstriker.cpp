@@ -43,7 +43,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
