@@ -58,7 +58,7 @@ public:
 
 	// parameter settings
 	void set_det_mul(u8 value);
-	bool set_ar_ksr(u8 value);
+	void set_ar_ksr(u8 value);
 	void set_dr_am(u8 value);
 	void set_sr(u8 value);
 	void set_sl_rr(int value);
@@ -74,6 +74,17 @@ public:
 	void advance_eg(u32 eg_cnt);
 
 private:
+	// set of basic parameters for each envelope generator phase
+	struct eg_params
+	{
+		eg_params() : rate(0), shift(0), inctable(0) { }
+		u8 rate;              // raw rate value; kept for recalcs
+		u8 shift;             // bits to shift eg_count left to make 4.12
+		u8 inctable;          // index into the increment steps table
+	};
+	void update_eg_params(eg_params &params);
+	void update_eg_params_all();
+
 	// internal state
 	ymopn_device_base &m_opn; // reference to base device
 	u8 m_detune;              // detune table index
@@ -91,19 +102,11 @@ private:
 
 	// envelope generator
 	u8 m_eg_state;            // phase type
+	eg_params m_eg_params[4]; // parameters for 4 EG phases
 	u32 m_total_level;        // total level: TL << 3
 	s32 m_volume;             // envelope counter
 	u32 m_sustain_level;      // sustain level:s_sl_table[SL]
 	u32 m_envelope_volume;    // current output from EG circuit (without AM from LFO)
-
-	u8 m_attack_shift;        //  (attack state)
-	u8 m_attack_select;       //  (attack state)
-	u8 m_decay_shift;         //  (decay state)
-	u8 m_decay_select;        //  (decay state)
-	u8 m_sustain_shift;       //  (sustain state)
-	u8 m_sustain_select;      //  (sustain state)
-	u8 m_release_shift;       //  (release state)
-	u8 m_release_select;      //  (release state)
 
 	u8 m_ssg;                 // SSG-EG waveform
 	u8 m_ssg_state;           // SSG-EG negated output; bit 1=negate, bit 0=have we swapped yet?
@@ -467,7 +470,6 @@ protected:
 private:
 	// internal helpers
 	void init_tables();
-	void advance_lfo();
 	attotime timer_a_period() const;
 	attotime timer_b_period() const;
 
@@ -477,14 +479,14 @@ private:
 	std::vector<std::unique_ptr<ymopn_adpcm_channel>> m_adpcm_channel;
 	std::unique_ptr<ymopn_deltat_channel> m_deltat_channel;
 
-	u32 m_eg_count;            // global envelope generator counter
-	u32 m_eg_timer;            // global envelope generator counter works at frequency = chipclock/64/3
+	// envelope generator
+	u16 m_eg_count;            // EG counter
+	u8 m_eg_subcount;          // EG sub-counter
 
 	// LFO
-	u32 m_lfo_am;              // runtime LFO calculations helper
-	s32 m_lfo_pm;              // runtime LFO calculations helper
-	u32 m_lfo_count;
-	u32 m_lfo_step;
+	u8 m_lfo_count;            // LFO counter
+	u8 m_lfo_subcount;         // LFO sub-counter
+	u8 m_lfo_submax;           // LFO sub-counter maximum value
 
 	u8 m_prescaler_sel;        // prescaler selector
 	u32 m_timer_prescaler;     // timer prescaler

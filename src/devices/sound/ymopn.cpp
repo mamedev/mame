@@ -1,114 +1,33 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Tatsuyuki Satoh,Aaron Giles
-//
-/*
-**
-** File: fm.c -- software implementation of Yamaha FM sound generator
-**
-** Copyright Jarek Burczynski (bujar at mame dot net)
-** Copyright Tatsuyuki Satoh , MultiArcadeMachineEmulator development
-**
-** Version 1.4.2 (final beta)
-**
-** History:
-**
-** 2006-2008 Eke-Eke (Genesis Plus GX), MAME backport by R. Belmont.
-**  - implemented PG overflow, aka "detune bug" (Ariel, Comix Zone, Shaq Fu, Spiderman,...), credits to Nemesis
-**  - fixed SSG-EG support, credits to Nemesis and additional fixes from Alone Coder
-**  - modified EG rates and frequency, tested by Nemesis on real hardware
-**  - implemented LFO phase update for CH3 special mode (Warlock birds, Alladin bug sound)
-**  - fixed Attack Rate update (Batman & Robin intro)
-**  - fixed attenuation level at the start of Substain (Gynoug explosions)
-**  - fixed EG decay->substain transition to handle special cases, like SL=0 and Decay rate is very slow (Mega Turrican tracks 03,09...)
-**
-** 06-23-2007 Zsolt Vasvari:
-**  - changed the timing not to require the use of floating point calculations
-**
-** 03-08-2003 Jarek Burczynski:
-**  - fixed YM2608 initial values (after the reset)
-**  - fixed flag and irqmask handling (YM2608)
-**  - fixed BUFRDY flag handling (YM2608)
-**
-** 14-06-2003 Jarek Burczynski:
-**  - implemented all of the YM2608 status register flags
-**  - implemented support for external memory read/write via YM2608
-**  - implemented support for deltat memory limit register in YM2608 emulation
-**
-** 22-05-2003 Jarek Burczynski:
-**  - fixed LFO PM calculations (copy&paste bugfix)
-**
-** 08-05-2003 Jarek Burczynski:
-**  - fixed SSG support
-**
-** 22-04-2003 Jarek Burczynski:
-**  - implemented 100% correct LFO generator (verified on real YM2610 and YM2608)
-**
-** 15-04-2003 Jarek Burczynski:
-**  - added support for YM2608's register 0x110 - status mask
-**
-** 01-12-2002 Jarek Burczynski:
-**  - fixed register addressing in YM2608, YM2610, YM2610B chips. (verified on real YM2608)
-**    The addressing patch used for early Neo-Geo games can be removed now.
-**
-** 26-11-2002 Jarek Burczynski, Nicola Salmoria:
-**  - recreated YM2608 ADPCM ROM using data from real YM2608's output which leads to:
-**  - added emulation of YM2608 drums.
-**  - output of YM2608 is two times lower now - same as YM2610 (verified on real YM2608)
-**
-** 16-08-2002 Jarek Burczynski:
-**  - binary exact Envelope Generator (verified on real YM2203);
-**    identical to YM2151
-**  - corrected 'off by one' error in feedback calculations (when feedback is off)
-**  - corrected connection (algorithm) calculation (verified on real YM2203 and YM2610)
-**
-** 18-12-2001 Jarek Burczynski:
-**  - added SSG-EG support (verified on real YM2203)
-**
-** 12-08-2001 Jarek Burczynski:
-**  - corrected sin_tab and tl_tab data (verified on real chip)
-**  - corrected feedback calculations (verified on real chip)
-**  - corrected phase generator calculations (verified on real chip)
-**  - corrected envelope generator calculations (verified on real chip)
-**  - corrected FM volume level (YM2610 and YM2610B).
-**  - changed YMxxxUpdateOne() functions (YM2203, YM2608, YM2610, YM2610B, YM2612) :
-**    this was needed to calculate YM2610 FM channels output correctly.
-**    (Each FM channel is calculated as in other chips, but the output of the channel
-**    gets shifted right by one *before* sending to accumulator. That was impossible to do
-**    with previous implementation).
-**
-** 23-07-2001 Jarek Burczynski, Nicola Salmoria:
-**  - corrected YM2610 ADPCM type A algorithm and tables (verified on real chip)
-**
-** 11-06-2001 Jarek Burczynski:
-**  - corrected end of sample bug in ADPCMA_calc_cha().
-**    Real YM2610 checks for equality between current and end addresses (only 20 LSB bits).
-**
-** 08-12-98 hiro-shi:
-** rename ADPCMA -> ADPCMB, ADPCMB -> ADPCMA
-** move ROM limit check.(CALC_CH? -> 2610Write1/2)
-** test program (ADPCMB_TEST)
-** move ADPCM A/B end check.
-** ADPCMB repeat flag(no check)
-** change ADPCM volume rate (8->16) (32->48).
-**
-** 09-12-98 hiro-shi:
-** change ADPCM volume. (8->16, 48->64)
-** replace ym2610 ch0/3 (YM-2610B)
-** change ADPCM_SHIFT (10->8) missing bank change 0x4000-0xffff.
-** add ADPCM_SHIFT_MASK
-** change ADPCMA_DECODE_MIN/MAX.
-*/
 
-//**********************************************************************
-//    comment of hiro-shi(Hiromitsu Shioya)
-//    YM2610(B) = OPN-B
-//    YM2610  : PSG:3ch FM:4ch ADPCM(18.5KHz):6ch DeltaT ADPCM:1ch
-//    YM2610B : PSG:3ch FM:6ch ADPCM(18.5KHz):6ch DeltaT ADPCM:1ch
-//**********************************************************************
+//
+// Special thanks to:
+//   Tatsuyuki Satoh for the original fm.c implementation
+//   Jarek Burczynski for many additional refinements
+//   Nemesis for many small tweaks/fixes based on research
+//   David Viens and Hubert Lamontagne for additional details and documentation
+//
+// OPN pedigree:
+//
+//                    +--------+--------+--------+---------+--------+
+//                    | YM2203 | YM2608 | YM2610 | YM2610B | YM2612 |
+//                    +--------+--------+--------+---------+--------+
+//               aka: |   OPN  |  OPNA  |  OPNB  |  OPNB2  |  OPN2  |
+//       FM channels: |    3   |    6   |    4   |    6    |    6   |
+//AY-3-8910 channels: |    3   |    3   |    3   |    3    |    -   |
+//  ADPCM-A channels: |    -   |  6 int |  6 ext |  6 ext  |    -   |
+//  ADPCM-B channels: |    -   |  1 ext |  1 ext |  1 ext  |    -   |
+//   Channel 6 "DAC": |   no   |   no   |   no   |   no    |   yes  |
+//     Clock divider: |  6/3/2 |  6/3/2 |    6   |    6    |    6   |
+//            Stereo: |   no   |   yes  |   yes  |   yes   |   yes  |
+//               DAC: | 10.3fp | 10.3fp | 16-bit |  16-bit |  9-bit |
+//           Summing: |  adder |  adder |  adder |  adder  |  muxer |
+//               LFO: |   no   |   yes  |   yes  |   yes   |   yes  |
+//                    +--------+--------+--------+---------+--------+
+//
 
 #include "emu.h"
-
-#define YM2610B_WARNING
 #include "ymopn.h"
 
 
@@ -117,46 +36,38 @@
 constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 #endif
 
-
-// base output clock rate is /72
-constexpr int CLOCK_DIVIDER = 72;
-
-
-constexpr int FREQ_SHIFT = 16; // 16.16 fixed point (frequency calculations)
-constexpr int EG_SHIFT = 16;   // 16.16 fixed point (envelope generator timing)
-constexpr int LFO_SHIFT = 24;  //  8.24 fixed point (LFO calculations)
-
-constexpr u32 FREQ_MASK = (1 << FREQ_SHIFT) - 1;
-
+//
+// Envelope is computed as attenuation, in a 10-bit range:
+//    ENV_MIN =    0 = minimum attenuation (max volume)
+//    ENV_MAX = 1023 = maximum attenuation (min volume)
+//
 constexpr int ENV_BITS = 10;
 constexpr u32 ENV_LEN = 1 << ENV_BITS;
+constexpr s32 ENV_MAX = ENV_LEN - 1; // 1023
+constexpr s32 ENV_MIN = 0;           // 0
 constexpr double ENV_STEP = 128.0 / double(ENV_LEN);
 
-constexpr s32 MAX_ATT_INDEX = ENV_LEN - 1; // 1023
-constexpr s32 MIN_ATT_INDEX = 0;           // 0
-
+//
+// Envelope states; the first four have parameter blocks
+//
 enum : u8
 {
-	EG_ATT = 4,
-	EG_DEC = 3,
-	EG_SUS = 2,
-	EG_REL = 1,
-	EG_OFF = 0
+	EG_ATTACK = 0,
+	EG_DECAY = 1,
+	EG_SUSTAIN = 2,
+	EG_RELEASE = 3,
+	EG_OFF = 4
 };
+
+constexpr int FREQ_SHIFT = 16; // 16.16 fixed point (frequency calculations)
+constexpr u32 FREQ_MASK = (1 << FREQ_SHIFT) - 1;
 
 constexpr int SIN_BITS = 10;
 constexpr u32 SIN_LEN = 1 << SIN_BITS;
 constexpr u32 SIN_MASK = SIN_LEN - 1;
 
-// bit0 = Right enable , bit1 = Left enable
-#define OUTD_RIGHT  1
-#define OUTD_LEFT   2
-#define OUTD_CENTER 3
+constexpr u8 EG_INC_STEPS = 8;
 
-constexpr u8 RATE_STEPS = 8;
-
-
-constexpr u32 EG_TIMER_OVERFLOW = 3 << EG_SHIFT;
 
 
 //***************************************************************************
@@ -183,130 +94,28 @@ static const u32 s_sl_table[16] =
 //
 //
 //
-static const u8 s_eg_inc[19*RATE_STEPS] =
+static const u8 s_eg_inc[19][EG_INC_STEPS] =
 {
-	//cycle:0 1  2 3  4 5  6 7
-
-	/* 0 */ 0,1, 0,1, 0,1, 0,1, // rates 00..11 0 (increment by 0 or 1)
-	/* 1 */ 0,1, 0,1, 1,1, 0,1, // rates 00..11 1
-	/* 2 */ 0,1, 1,1, 0,1, 1,1, // rates 00..11 2
-	/* 3 */ 0,1, 1,1, 1,1, 1,1, // rates 00..11 3
-
-	/* 4 */ 1,1, 1,1, 1,1, 1,1, // rate 12 0 (increment by 1)
-	/* 5 */ 1,1, 1,2, 1,1, 1,2, // rate 12 1
-	/* 6 */ 1,2, 1,2, 1,2, 1,2, // rate 12 2
-	/* 7 */ 1,2, 2,2, 1,2, 2,2, // rate 12 3
-
-	/* 8 */ 2,2, 2,2, 2,2, 2,2, // rate 13 0 (increment by 2)
-	/* 9 */ 2,2, 2,4, 2,2, 2,4, // rate 13 1
-	/*10 */ 2,4, 2,4, 2,4, 2,4, // rate 13 2
-	/*11 */ 2,4, 4,4, 2,4, 4,4, // rate 13 3
-
-	/*12 */ 4,4, 4,4, 4,4, 4,4, // rate 14 0 (increment by 4)
-	/*13 */ 4,4, 4,8, 4,4, 4,8, // rate 14 1
-	/*14 */ 4,8, 4,8, 4,8, 4,8, // rate 14 2
-	/*15 */ 4,8, 8,8, 4,8, 8,8, // rate 14 3
-
-	/*16 */ 8,8, 8,8, 8,8, 8,8, // rates 15 0, 15 1, 15 2, 15 3 (increment by 8)
-	/*17 */ 16,16,16,16,16,16,16,16, // rates 15 2, 15 3 for attack
-	/*18 */ 0,0, 0,0, 0,0, 0,0, // infinity rates for attack and decay(s)
-};
-
-
-//
-// note that there is no O(17) in this table - it's directly in the code
-//
-#define O(a) (a*RATE_STEPS)
-static const u8 s_eg_rate_select[32+64+32] =
-{
-	// Envelope Generator rates (32 + 64 rates + 32 RKS)
-	// 32 infinite time rates
-	O(18),O(18),O(18),O(18),O(18),O(18),O(18),O(18),
-	O(18),O(18),O(18),O(18),O(18),O(18),O(18),O(18),
-	O(18),O(18),O(18),O(18),O(18),O(18),O(18),O(18),
-	O(18),O(18),O(18),O(18),O(18),O(18),O(18),O(18),
-
-	// rates 00-11
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-	O( 0),O( 1),O( 2),O( 3),
-
-	// rate 12
-	O( 4),O( 5),O( 6),O( 7),
-
-	// rate 13
-	O( 8),O( 9),O(10),O(11),
-
-	// rate 14
-	O(12),O(13),O(14),O(15),
-
-	// rate 15
-	O(16),O(16),O(16),O(16),
-
-	// 32 dummy rates (same as 15 3)
-	O(16),O(16),O(16),O(16),O(16),O(16),O(16),O(16),
-	O(16),O(16),O(16),O(16),O(16),O(16),O(16),O(16),
-	O(16),O(16),O(16),O(16),O(16),O(16),O(16),O(16),
-	O(16),O(16),O(16),O(16),O(16),O(16),O(16),O(16)
-};
-#undef O
-
-
-//
-// rate  0,    1,    2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
-// shift 11,  10,  9,  8,  7,  6,  5,  4,  3,  2, 1,  0,  0,  0,  0,  0
-// mask  2047, 1023, 511, 255, 127, 63, 31, 15, 7,  3, 1,  0,  0,  0,  0,  0
-//
-static const u8 s_eg_rate_shift[32+64+32] =
-{
-	// Envelope Generator counter shifts (32 + 64 rates + 32 RKS)
-
-	// 32 infinite time rates
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-
-	// rates 00-11
-	11, 11, 11, 11,
-	10, 10, 10, 10,
-	 9,  9,  9,  9,
-	 8,  8,  8,  8,
-	 7,  7,  7,  7,
-	 6,  6,  6,  6,
-	 5,  5,  5,  5,
-	 4,  4,  4,  4,
-	 3,  3,  3,  3,
-	 2,  2,  2,  2,
-	 1,  1,  1,  1,
-	 0,  0,  0,  0,
-
-	// rate 12
-	0, 0, 0, 0,
-
-	// rate 13
-	0, 0, 0, 0,
-
-	// rate 14
-	0, 0, 0, 0,
-
-	// rate 15
-	0, 0, 0, 0,
-
-	// 32 dummy rates (same as 15 3)
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
+	// cycle:   0  1  2  3  4  5  6  7
+	/*  0 */ {  0, 1, 0, 1, 0, 1, 0, 1 }, // rates 00..11 0 (increment by 0 or 1)
+	/*  1 */ {  0, 1, 0, 1, 1, 1, 0, 1 }, // rates 00..11 1
+	/*  2 */ {  0, 1, 1, 1, 0, 1, 1, 1 }, // rates 00..11 2
+	/*  3 */ {  0, 1, 1, 1, 1, 1, 1, 1 }, // rates 00..11 3
+	/*  4 */ {  1, 1, 1, 1, 1, 1, 1, 1 }, // rate 12 0 (increment by 1)
+	/*  5 */ {  1, 1, 1, 2, 1, 1, 1, 2 }, // rate 12 1
+	/*  6 */ {  1, 2, 1, 2, 1, 2, 1, 2 }, // rate 12 2
+	/*  7 */ {  1, 2, 2, 2, 1, 2, 2, 2 }, // rate 12 3
+	/*  8 */ {  2, 2, 2, 2, 2, 2, 2, 2 }, // rate 13 0 (increment by 2)
+	/*  9 */ {  2, 2, 2, 4, 2, 2, 2, 4 }, // rate 13 1
+	/* 10 */ {  2, 4, 2, 4, 2, 4, 2, 4 }, // rate 13 2
+	/* 11 */ {  2, 4, 4, 4, 2, 4, 4, 4 }, // rate 13 3
+	/* 12 */ {  4, 4, 4, 4, 4, 4, 4, 4 }, // rate 14 0 (increment by 4)
+	/* 13 */ {  4, 4, 4, 8, 4, 4, 4, 8 }, // rate 14 1
+	/* 14 */ {  4, 8, 4, 8, 4, 8, 4, 8 }, // rate 14 2
+	/* 15 */ {  4, 8, 8, 8, 4, 8, 8, 8 }, // rate 14 3
+	/* 16 */ {  8, 8, 8, 8, 8, 8, 8, 8 }, // rates 15 0, 15 1, 15 2, 15 3 (increment by 8)
+	/* 17 */ { 16,16,16,16,16,16,16,16 }, // rates 15 2, 15 3 for attack
+	/* 18 */ {  0, 0, 0, 0, 0, 0, 0, 0 }, // infinity rates for attack and decay(s)
 };
 
 
@@ -528,11 +337,6 @@ inline s32 ymopn_device_base::detune(u8 fd, u8 index) const
 	return s_detune_table[fd * 32 + index] << (SIN_BITS + FREQ_SHIFT - 20);
 }
 
-inline u32 ymopn_device_base::lfo_step(u8 index) const
-{
-	return (1 << LFO_SHIFT) / s_lfo_samples_per_step[index];
-}
-
 
 
 //***************************************************************************
@@ -581,17 +385,9 @@ ymopn_slot::ymopn_slot(ymopn_device_base &opn) :
 	m_phase_step(0),
 	m_eg_state(EG_OFF),
 	m_total_level(0),
-	m_volume(MAX_ATT_INDEX),
+	m_volume(ENV_MAX),
 	m_sustain_level(0),
-	m_envelope_volume(MAX_ATT_INDEX),
-	m_attack_shift(0),
-	m_attack_select(0),
-	m_decay_shift(0),
-	m_decay_select(0),
-	m_sustain_shift(0),
-	m_sustain_select(0),
-	m_release_shift(0),
-	m_release_select(0),
+	m_envelope_volume(ENV_MAX),
 	m_ssg(0),
 	m_ssg_state(0),
 	m_key(0),
@@ -614,18 +410,13 @@ void ymopn_slot::save(int index)
 	m_opn.save_item(SLOT_NAME(m_phase), index);
 	m_opn.save_item(SLOT_NAME(m_phase_step), index);
 	m_opn.save_item(SLOT_NAME(m_eg_state), index);
+	m_opn.save_item(STRUCT_MEMBER(m_eg_params, rate), index);
+	m_opn.save_item(STRUCT_MEMBER(m_eg_params, shift), index);
+	m_opn.save_item(STRUCT_MEMBER(m_eg_params, inctable), index);
 	m_opn.save_item(SLOT_NAME(m_total_level), index);
 	m_opn.save_item(SLOT_NAME(m_volume), index);
 	m_opn.save_item(SLOT_NAME(m_sustain_level), index);
 	m_opn.save_item(SLOT_NAME(m_envelope_volume), index);
-	m_opn.save_item(SLOT_NAME(m_attack_shift), index);
-	m_opn.save_item(SLOT_NAME(m_attack_select), index);
-	m_opn.save_item(SLOT_NAME(m_decay_shift), index);
-	m_opn.save_item(SLOT_NAME(m_decay_select), index);
-	m_opn.save_item(SLOT_NAME(m_sustain_shift), index);
-	m_opn.save_item(SLOT_NAME(m_sustain_select), index);
-	m_opn.save_item(SLOT_NAME(m_release_shift), index);
-	m_opn.save_item(SLOT_NAME(m_release_select), index);
 	m_opn.save_item(SLOT_NAME(m_ssg), index);
 	m_opn.save_item(SLOT_NAME(m_ssg_state), index);
 	m_opn.save_item(SLOT_NAME(m_key), index);
@@ -638,8 +429,8 @@ void ymopn_slot::reset()
 	m_ssg = 0;
 	m_ssg_state = 0;
 	m_eg_state = EG_OFF;
-	m_volume = MAX_ATT_INDEX;
-	m_envelope_volume = MAX_ATT_INDEX;
+	m_volume = ENV_MAX;
+	m_envelope_volume = ENV_MAX;
 }
 
 // process a key on signal
@@ -650,13 +441,13 @@ void ymopn_slot::keyonoff(bool on)
 		m_key = 1;
 		m_phase = 0;        // restart Phase Generator
 		m_ssg_state = BIT(m_ssg, 2) << 1;
-		m_eg_state = EG_ATT;
+		m_eg_state = EG_ATTACK;
 	}
 	else if (!on && m_key != 0)
 	{
 		m_key = 0;
-		if (m_eg_state > EG_REL)
-			m_eg_state = EG_REL;// phase -> Release
+		if (m_eg_state < EG_RELEASE)
+			m_eg_state = EG_RELEASE;// phase -> Release
 	}
 }
 
@@ -667,33 +458,78 @@ void ymopn_slot::set_det_mul(u8 value)
 	m_detune = (value >> 4) & 7;
 }
 
-// set attack rate & key scale
-bool ymopn_slot::set_ar_ksr(u8 value)
+// update parameters for one of the envelope generators
+void ymopn_slot::update_eg_params(eg_params &params)
 {
-	// refresh attack rate
-	m_attack_rate = ((value & 0x1f) != 0) ? 32 + 2 * (value & 0x1f) : 0;
-	if ((m_attack_rate + m_ksr) < 32 + 62)
+	// Based on the 6-bit rate, select one of the rows of the
+	// s_eg_inc table above.
+	static const u8 s_eg_rate_inctable[64] =
 	{
-		m_attack_shift = s_eg_rate_shift[m_attack_rate + m_ksr];
-		m_attack_select = s_eg_rate_select[m_attack_rate + m_ksr];
+		0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
+		0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
+		0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
+		4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,16,16,16
+	};
+
+	// Based on the 6-bit rate, select a shift amount to apply
+	// to the global eg_count.
+	static const u8 s_eg_rate_shift[64] =
+	{
+		11,11,11,11,10,10,10,10, 9, 9, 9, 9, 8, 8, 8, 8,
+		 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4,
+		 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+
+	// rate == 0 selects a special "infinite" rate (18) regardless of ksr
+	if (params.rate == 0)
+	{
+		params.shift = 0;
+		params.inctable = 18;
 	}
 	else
 	{
-		m_attack_shift = 0;
-		m_attack_select = 17 * RATE_STEPS;
-	}
+		// compute the base rate as 2*R + ksr
+		u8 rate = 2 * params.rate + m_ksr;
 
-	u8 prev_ksr = m_ksr_shift;
+		// less than 64 comes from the table
+		if (rate < 64)
+		{
+			params.shift = 12 - s_eg_rate_shift[rate];
+			params.inctable = s_eg_rate_inctable[rate];
+		}
+
+		// above 64 selects one of two maximum rates (attack = 17, others = 16)
+		// that clock on every sample
+		else
+		{
+			params.shift = 12;
+			params.inctable = (&params == &m_eg_params[EG_ATTACK]) ? 17 : 16;
+		}
+	}
+}
+
+void ymopn_slot::update_eg_params_all()
+{
+	update_eg_params(m_eg_params[EG_ATTACK]);
+	update_eg_params(m_eg_params[EG_DECAY]);
+	update_eg_params(m_eg_params[EG_SUSTAIN]);
+	update_eg_params(m_eg_params[EG_RELEASE]);
+}
+
+// set attack rate & key scale
+void ymopn_slot::set_ar_ksr(u8 value)
+{
+	m_eg_params[EG_ATTACK].rate = value & 0x1f;
 	m_ksr_shift = 3 - (value >> 6);
-	return (m_ksr_shift != prev_ksr);
+	update_eg_params_all();
 }
 
 // set decay rate
 void ymopn_slot::set_dr_am(u8 value)
 {
-	m_decay_rate = ((value & 0x1f) != 0) ? 32 + 2 * (value & 0x1f) : 0;
-	m_decay_shift = s_eg_rate_shift[m_decay_rate + m_ksr];
-	m_decay_select = s_eg_rate_select[m_decay_rate + m_ksr];
+	m_eg_params[EG_DECAY].rate = value & 0x1f;
+	update_eg_params(m_eg_params[EG_DECAY]);
 
 	if (m_opn.type() != YM2203)
 		m_am_mask = BIT(value, 7) ? ~0 : 0;
@@ -702,24 +538,22 @@ void ymopn_slot::set_dr_am(u8 value)
 // set sustain rate
 void ymopn_slot::set_sr(u8 value)
 {
-	m_sustain_rate = ((value & 0x1f) != 0) ? 32 + 2 * (value & 0x1f) : 0;
-	m_sustain_shift = s_eg_rate_shift[m_sustain_rate + m_ksr];
-	m_sustain_select = s_eg_rate_select[m_sustain_rate + m_ksr];
+	m_eg_params[EG_SUSTAIN].rate = value & 0x1f;
+	update_eg_params(m_eg_params[EG_SUSTAIN]);
 }
 
 // set release rate
 void ymopn_slot::set_sl_rr(int value)
 {
+	m_eg_params[EG_RELEASE].rate = 2 * (value & 0xf) + 1;
 	m_sustain_level = s_sl_table[value >> 4];
-	m_release_rate = 34 + 4 * (value & 0x0f);
-	m_release_shift = s_eg_rate_shift[m_release_rate + m_ksr];
-	m_release_select = s_eg_rate_select[m_release_rate + m_ksr];
+	update_eg_params(m_eg_params[EG_RELEASE]);
 }
 
 // set total level
 void ymopn_slot::set_tl(u8 value)
 {
-	m_total_level = (value & 0x7f) << (ENV_BITS - 7); // 7bit TL
+	m_total_level = (value & 0x7f) << (ENV_BITS - 7);
 }
 
 // set the envelope shape
@@ -808,26 +642,7 @@ void ymopn_slot::refresh_fc_eg(int fc, int kc)
 	if (m_ksr != ksr)
 	{
 		m_ksr = ksr;
-
-		// calculate envelope generator rates
-		if ((m_attack_rate + m_ksr) < 32 + 62)
-		{
-			m_attack_shift  = s_eg_rate_shift[m_attack_rate + m_ksr];
-			m_attack_select = s_eg_rate_select[m_attack_rate + m_ksr];
-		}
-		else
-		{
-			m_attack_shift  = 0;
-			m_attack_select = 17 * RATE_STEPS;
-		}
-
-		m_decay_shift = s_eg_rate_shift[m_decay_rate + m_ksr];
-		m_sustain_shift = s_eg_rate_shift[m_sustain_rate + m_ksr];
-		m_release_shift = s_eg_rate_shift[m_release_rate + m_ksr];
-
-		m_decay_select = s_eg_rate_select[m_decay_rate + m_ksr];
-		m_sustain_select = s_eg_rate_select[m_sustain_rate + m_ksr];
-		m_release_select = s_eg_rate_select[m_release_rate + m_ksr];
+		update_eg_params_all();
 	}
 }
 
@@ -865,101 +680,97 @@ void ymopn_slot::update_phase_lfo(s32 lfo_pm, s32 pm_shift, u32 block_fnum)
 // advance the envelope generator
 void ymopn_slot::advance_eg(u32 eg_cnt)
 {
+	// skip this if off
+	if (m_eg_state == EG_OFF)
+	{
+		m_envelope_volume = m_volume;
+		return;
+	}
+
 	// reset SSG-EG swap flag
 	u8 swap_flag = 0;
 
-	switch (m_eg_state)
+	// shift the count up so it is a 4.12 fixed point value
+	eg_params &params = m_eg_params[m_eg_state];
+	eg_cnt <<= params.shift;
+
+	// if the low 12 bits are 0, it is time to apply the increment
+	if ((eg_cnt & 0xfff) == 0)
 	{
-		case EG_ATT:        // attack phase
-			if ((eg_cnt & ((1 << m_attack_shift) - 1)) == 0)
-			{
-				m_volume += (~m_volume * s_eg_inc[m_attack_select + ((eg_cnt >> m_attack_shift) & 7)]) >> 4;
-				if (m_volume <= MIN_ATT_INDEX)
+		u8 increment = s_eg_inc[params.inctable][(eg_cnt >> 12) & 7];
+
+		switch (m_eg_state)
+		{
+			// attack phase
+			case EG_ATTACK:
+				m_volume += (~m_volume * increment) >> 4;
+				if (m_volume <= ENV_MIN)
 				{
-					m_volume = MIN_ATT_INDEX;
-					m_eg_state = EG_DEC;
+					m_volume = ENV_MIN;
+					m_eg_state = EG_DECAY;
+//					fm2612 has special case here from SL = 0
+//					m_eg_state = (m_sustain_level == ENV_MIN) ? EG_SUSTAIN : EG_DECAY;
 				}
-			}
-			break;
+				break;
 
-		case EG_DEC:    // decay phase
-			if ((eg_cnt & ((1 << m_decay_shift) - 1)) == 0)
-			{
-				// SSG EG type envelope selected?
-				int scale = BIT(m_ssg, 3) ? 4 : 1;
-				m_volume += scale * s_eg_inc[m_decay_select + ((eg_cnt >> m_decay_shift) & 7)];
-
+			// decay phase
+			case EG_DECAY:
+				m_volume += BIT(m_ssg, 3) ? 4 * increment : increment;
 				if (m_volume >= s32(m_sustain_level))
-					m_eg_state = EG_SUS;
-			}
-			break;
+					m_eg_state = EG_SUSTAIN;
+				break;
 
-		case EG_SUS:    // sustain phase
-			if ((eg_cnt & ((1 << m_sustain_shift) - 1)) == 0)
-			{
-				// SSG EG type envelope selected?
-				int scale = BIT(m_ssg, 3) ? 4 : 1;
-				m_volume += scale * s_eg_inc[m_sustain_select + ((eg_cnt >> m_sustain_shift) & 7)];
+			// sustain phase
+			case EG_SUSTAIN:
+				m_volume += BIT(m_ssg, 3) ? 4 * increment : increment;
+				if (m_volume >= ENV_MAX)
+					m_volume = ENV_MAX;
 
 				// special behavior for SSG EG
-				if (BIT(m_ssg, 3))
+				if (BIT(m_ssg, 3) && m_volume >= ENV_QUIET)
 				{
-					if (m_volume >= ENV_QUIET)
-					{
-						m_volume = MAX_ATT_INDEX;
+					m_volume = ENV_MAX;
 
-						if (BIT(m_ssg, 0)) // bit 0 = hold
-						{
-							if (BIT(m_ssg_state, 0))   // have we swapped once ???
-								; // yes, so do nothing, just hold current level
-							else
-								swap_flag = (m_ssg & 2) | 1; // bit 1 = alternate
-						}
+					if (BIT(m_ssg, 0)) // bit 0 = hold
+					{
+						if (BIT(m_ssg_state, 0))   // have we swapped once ???
+							; // yes, so do nothing, just hold current level
 						else
-						{
-							// same as KEY-ON operation
-							// restart of the Phase Generator should be here
-							m_phase = 0;
-
-							// phase -> Attack
-							m_volume = 511;
-							m_eg_state = EG_ATT;
-
-							swap_flag = (m_ssg & 2) | 0; // bit 1 = alternate
-						}
+							swap_flag = (m_ssg & 2) | 1; // bit 1 = alternate
 					}
-				}
-				else
-				{
-					if (m_volume >= MAX_ATT_INDEX)
+					else
 					{
-						m_volume = MAX_ATT_INDEX;
-						// do not change m_eg_state (verified on real chip)
+						// same as KEY-ON operation
+						// restart of the Phase Generator should be here
+						m_phase = 0;
+
+						// phase -> Attack
+						m_volume = 511;
+						m_eg_state = EG_ATTACK;
+
+						swap_flag = (m_ssg & 2) | 0; // bit 1 = alternate
 					}
 				}
-			}
-			break;
+				break;
 
-		case EG_REL:    // release phase
-			if ((eg_cnt & ((1 << m_release_shift) - 1)) == 0)
-			{
+			// release phase
+			case EG_RELEASE:
 				// SSG-EG affects Release phase also (Nemesis)
-				m_volume += s_eg_inc[m_release_select + ((eg_cnt >> m_release_shift) & 7)];
-
-				if (m_volume >= MAX_ATT_INDEX)
+				m_volume += increment;
+				if (m_volume >= ENV_MAX)
 				{
-					m_volume = MAX_ATT_INDEX;
+					m_volume = ENV_MAX;
 					m_eg_state = EG_OFF;
 				}
-			}
-			break;
+				break;
+		}
 	}
 
 	u32 out = u32(m_volume);
 
 	// negate output (changes come from alternate bit, init comes from attack bit)
-	if (BIT(m_ssg, 3) && BIT(m_ssg_state, 1) && m_eg_state > EG_REL)
-		out ^= MAX_ATT_INDEX;
+	if (BIT(m_ssg, 3) && BIT(m_ssg_state, 1) && m_eg_state < EG_RELEASE)
+		out ^= ENV_MAX;
 	m_ssg_state ^= swap_flag;
 	m_envelope_volume = out;
 }
@@ -1770,11 +1581,10 @@ ymopn_device_base::ymopn_device_base(const machine_config &mconfig, const char *
 	ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, (type == YM2203) ? 3 : 1, (type == YM2610 || type == YM2610B) ? 0 : 2),
 	m_adpcm_status(0),
 	m_eg_count(0),
-	m_eg_timer(0),
-	m_lfo_am(0),
-	m_lfo_pm(0),
+	m_eg_subcount(0),
 	m_lfo_count(0),
-	m_lfo_step(0),
+	m_lfo_subcount(0),
+	m_lfo_submax(0),
 	m_prescaler_sel(0),
 	m_timer_prescaler(0),
 	m_busy_expiry_time(attotime::zero),
@@ -2020,28 +1830,6 @@ void ymopn_device_base::set_mode(u8 value)
 
 
 //-------------------------------------------------
-//  advance_lfo - step the LFO forward one step
-//-------------------------------------------------
-
-void ymopn_device_base::advance_lfo()
-{
-	if (m_lfo_step != 0)   // LFO enabled ?
-	{
-		m_lfo_count += m_lfo_step;
-
-		u8 pos = (m_lfo_count >> LFO_SHIFT) & 0x7f;
-		m_lfo_am = (pos < 64) ? (pos * 2) : (126 - (pos & 63) * 2);
-		m_lfo_pm = pos >> 2;
-	}
-	else
-	{
-		m_lfo_am = 0;
-		m_lfo_pm = 0;
-	}
-}
-
-
-//-------------------------------------------------
 //  write_mode - handle writes to OPN mode
 //  registers (0x20-0x2f)
 //-------------------------------------------------
@@ -2055,7 +1843,7 @@ void ymopn_device_base::write_mode(u8 reg, u8 value)
 
 		case 0x22:  // LFO FREQ (YM2608/YM2610/YM2610B/YM2612)
 			if (type() != YM2203)
-				m_lfo_step = BIT(value, 3) ? lfo_step(value & 7) : 0;
+				m_lfo_submax = BIT(value, 3) ? s_lfo_samples_per_step[value & 7] : 0;
 			break;
 
 		case 0x24:  // timer A High 8
@@ -2117,8 +1905,7 @@ void ymopn_device_base::write_reg(u16 reg, u8 value)
 			break;
 
 		case 0x50:  // KS, AR
-			if (slot.set_ar_ksr(value))
-				chan.force_refresh();
+			slot.set_ar_ksr(value);
 			break;
 
 		case 0x60:  // bit7 = AM ENABLE, DR
@@ -2358,7 +2145,7 @@ void ymopn_device_base::set_prescale(u8 sel)
 {
 	static const u8 s_opn_pres[4] = { 2*12, 2*12, 6*12, 3*12 };
 	static const u8 s_ssg_pres[4] = {    1,    1,    4,    2 };
-	const u8 pre_divider = (type() == YM2203) ? 1 : 2;
+	const u8 pre_divider = m_channel.size() / 3;
 
 	sel &= 3;
 	m_prescaler_sel = sel;
@@ -2452,25 +2239,33 @@ void ymopn_device_base::sound_stream_update(sound_stream &stream, stream_sample_
 #endif
 	for (int sampindex = 0; sampindex < samples; sampindex++)
 	{
-		// advance the LFO
-		advance_lfo();
-
-		// advance envelope generator
-		m_eg_timer += 1 << EG_SHIFT;
-		while (m_eg_timer >= EG_TIMER_OVERFLOW)
+		// advance envelope generator every 3 samples
+		if (++m_eg_subcount >= 3)
 		{
-			m_eg_timer -= EG_TIMER_OVERFLOW;
+			m_eg_subcount = 0;
 			m_eg_count++;
-
 			for (auto &chan : m_channel)
 				chan->advance_eg(m_eg_count);
+		}
+
+		// advance the LFO every m_lfo_submax samples
+		u8 lfo_am = 0, lfo_pm = 0;
+		if (m_lfo_submax != 0)
+		{
+			if (++m_lfo_subcount >= m_lfo_submax)
+			{
+				m_lfo_subcount = 0;
+				m_lfo_count = (m_lfo_count + 1) & 0x7f;
+			}
+			lfo_am = ((m_lfo_count < 64) ? (m_lfo_count ^ 63) : (m_lfo_count & 63)) << 1;
+			lfo_pm = m_lfo_count >> 2;
 		}
 
 		// calculate FM
 		s32 lsum = 0, rsum = 0;
 		for (auto &chan : m_channel)
 		{
-			chan->update(m_lfo_am, m_lfo_pm);
+			chan->update(lfo_am, lfo_pm);
 			lsum += chan->output_l();
 			rsum += chan->output_r();
 		}
@@ -2605,9 +2400,9 @@ void ymopn_device_base::device_start()
 	m_timer_b = timer_alloc(TIMER_B);
 
 #if (YMOPN_NEW_SOUND)
-	m_stream = stream_alloc_ex(0, (type() == YM2203) ? 1 : 2, clock() / CLOCK_DIVIDER);
+	m_stream = stream_alloc_ex(0, (type() == YM2203) ? 1 : 2, clock() / 72);
 #else
-	m_stream = stream_alloc(0, (type() == YM2203) ? 1 : 2, clock() / CLOCK_DIVIDER);
+	m_stream = stream_alloc(0, (type() == YM2203) ? 1 : 2, clock() / 72);
 #endif
 
 	init_tables();
@@ -2624,12 +2419,11 @@ void ymopn_device_base::device_start()
 		m_deltat_channel->save(0);
 
 	save_item(YM_NAME(m_eg_count));
-	save_item(YM_NAME(m_eg_timer));
+	save_item(YM_NAME(m_eg_subcount));
 
-	save_item(YM_NAME(m_lfo_am));
-	save_item(YM_NAME(m_lfo_pm));
 	save_item(YM_NAME(m_lfo_count));
-	save_item(YM_NAME(m_lfo_step));
+	save_item(YM_NAME(m_lfo_subcount));
+	save_item(YM_NAME(m_lfo_submax));
 
 	save_item(YM_NAME(m_prescaler_sel));
 	save_item(YM_NAME(m_timer_prescaler));
@@ -2719,8 +2513,8 @@ void ymopn_device_base::device_reset()
 	m_timer_a_value = 0;
 	m_timer_b_value = 0;
 
-	m_eg_timer = 0;
 	m_eg_count = 0;
+	m_eg_subcount = 0;
 	m_adpcm_status = 0;
 
 	for (auto &chan : m_channel)
@@ -2830,7 +2624,7 @@ void ym2610_device::device_reset()
 
 void ymopn_device_base::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / CLOCK_DIVIDER);
+	set_prescale(m_prescaler_sel);
 }
 
 
