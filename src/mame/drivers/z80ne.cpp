@@ -87,8 +87,36 @@
             9000-9FFF EPROM     EPROM to be written
             8400-8FFF EPROM     firmware
 
+Quick Instructions:
+  Z80NE:
+  - Use 0-F to enter an address (or use mouse in artwork)
+  - Hold CTRL press 0 to show data at that address (CTRL cannot be held with mouse)
+  - Use 0-F to enter data
+  - CTRL 0 to advance to next address
+  - CTRL 2 to view/change CPU registers
+  - CTRL 0 change register, advance to next
+  Z80NET
+  - In Machine Configuration, select your preferred baud rate, and reboot machine.
+  - CTRL 6 to load a tape, press A or B to choose tape device, choose Play.
+  - After this, click any key, enter 1000, CTRL 4 to run.
+  - CTRL 5 to save
+  - All tapes in software list (except bioritmi & tapebas) are BASIC programs.
+  - To use tapebas, load side 1 in the normal way, run it, select side 2 for cas 0, play, the rest loads
+  - The Basic is bilingual - ENG for English, ITA for Italian, so enter ENG.
+  - Then for any Basic program in software list: CLOAD hit Play RUN
+  Z80NETB
+  - BASIC-only, English only. A version of TRS80 Level II Basic. Not compatible with software list.
+  Z80NETF
+  - There is a choice of 5 bioses, via the Machine Configuration menu
+  - EP382:  same as Z80NET.
+  - EP548:  same as Z80NETB.
+  - EP390:  for swlist-item "basic55k". Press B, from the menu select 2, runs. Type ENG for English.
+            It can load and run tapes from the swlist, although it seems to often have load errors.
+  - EP1390: requires a floppy to boot from. Disks marked as NE-DOS 1.5 should work.
+  - EP2390: uses ports 8x, not emulated, not working. For NE-DOS G.1
 
-******************************************************************************/
+
+*********************************************************************************************************/
 
 /* Core includes */
 #include "emu.h"
@@ -113,25 +141,22 @@
 
 /* LX.382 CPU Board RAM */
 /* LX.382 CPU Board EPROM */
-void z80ne_state::main_mem(address_map &map)
+void z80ne_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x03ff).bankrw("bank1");
-	map(0x0400, 0x7fff).ram();
-	map(0x8000, 0x83ff).bankr("bank2");
-	map(0x8400, 0xffff).nopr().nopw();
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0x83ff).rom().region("maincpu",0);
 }
 
-void z80net_state::main_mem(address_map &map)
+void z80net_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x03ff).bankrw("bank1");
-	map(0x0400, 0x7fff).ram();
-	map(0x8000, 0x83ff).bankr("bank2");
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0x83ff).rom().region("maincpu",0);
 	map(0x8400, 0xebff).ram();
 	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
 	map(0xee00, 0xffff).ram();
 }
 
-void z80netb_state::main_mem(address_map &map)
+void z80netb_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xebff).ram();
@@ -139,7 +164,7 @@ void z80netb_state::main_mem(address_map &map)
 	map(0xee00, 0xffff).ram();
 }
 
-void z80ne_state::main_io(address_map &map)
+void z80ne_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
@@ -147,7 +172,7 @@ void z80ne_state::main_io(address_map &map)
 	map(0xf0, 0xff).rw(FUNC(z80ne_state::lx383_r), FUNC(z80ne_state::lx383_w));
 }
 
-void z80net_state::main_io(address_map &map)
+void z80net_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xea, 0xea).r(FUNC(z80net_state::lx387_data_r));
@@ -157,21 +182,18 @@ void z80net_state::main_io(address_map &map)
 	map(0xf0, 0xff).rw(FUNC(z80net_state::lx383_r), FUNC(z80net_state::lx383_w));
 }
 
-void z80netf_state::main_mem(address_map &map)
+void z80netf_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x03ff).bankrw("bank1");
 	map(0x0400, 0x3fff).bankrw("bank2");
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x83ff).bankrw("bank3");
 	map(0x8400, 0xdfff).ram();
-	map(0xe000, 0xebff).nopr().nopw();
 	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
-	map(0xee00, 0xefff).nopr().nopw();
 	map(0xf000, 0xf3ff).bankrw("bank4");
-	map(0xf400, 0xffff).nopr().nopw();
 }
 
-void z80netf_state::main_io(address_map &map)
+void z80netf_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xd0, 0xd7).rw(FUNC(z80netf_state::lx390_fdc_r), FUNC(z80netf_state::lx390_fdc_w));
@@ -195,30 +217,30 @@ static INPUT_PORTS_START( z80ne )
 	 * In natural mode the CTRL key is mapped on shift
 	 */
 	PORT_START("ROW0")          /* IN0 keys row 0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 0") PORT_CODE(KEYCODE_0)          //PORT_CHAR('0') PORT_CHAR('=')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 1") PORT_CODE(KEYCODE_1)          //PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 2") PORT_CODE(KEYCODE_2)          //PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 3") PORT_CODE(KEYCODE_3)          //PORT_CHAR('3') PORT_CHAR(0x00a3) // ??
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 4") PORT_CODE(KEYCODE_4)          //PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 5") PORT_CODE(KEYCODE_5)          //PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 6") PORT_CODE(KEYCODE_6)          //PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 7") PORT_CODE(KEYCODE_7)          //PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 0") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=') // set address, increment
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('-') // ?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('R') // registers
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('T') // single-step
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('X') // go
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 5") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('L') // load
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('S') // save
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('K') // reserved for future expansion
 
 	PORT_START("ROW1")          /* IN1 keys row 1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 8") PORT_CODE(KEYCODE_8)          //PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 9") PORT_CODE(KEYCODE_9)          //PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 A") PORT_CODE(KEYCODE_A)          //PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 B") PORT_CODE(KEYCODE_B)          //PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 C") PORT_CODE(KEYCODE_C)          //PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 D") PORT_CODE(KEYCODE_D)          //PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 E") PORT_CODE(KEYCODE_E)          //PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 F") PORT_CODE(KEYCODE_F)          //PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("CTRL")          /* CONTROL key */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) //PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -227,7 +249,7 @@ static INPUT_PORTS_START( z80ne )
 	PORT_START("RST")           /* RESET key */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, 0)
 
-	/* Settings */
+	/* Settings - need to reboot after altering these */
 	PORT_START("LX.385")
 	PORT_CONFNAME(0x07, 0x04, "LX.385 Cassette: P1,P3 Data Rate")
 	PORT_CONFSETTING( 0x01, "A-B: 300 bps")
@@ -246,7 +268,7 @@ static INPUT_PORTS_START( z80net )
 
 	/* LX.387 Keyboard BREAK key */
 	PORT_START("LX387_BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CHANGED_MEMBER(DEVICE_SELF, z80net_state, z80net_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_CHANGED_MEMBER(DEVICE_SELF, z80net_state, z80net_nmi, 0)
 
 	/* LX.387 Keyboard (Encoded by KR2376) */
 
@@ -419,8 +441,8 @@ void z80ne_state::z80ne(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
-	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::main_mem);
-	m_maincpu->set_addrmap(AS_IO, &z80ne_state::main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80ne_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &z80ne_state::io_map);
 
 	AY31015(config, m_uart);
 
@@ -441,9 +463,6 @@ void z80ne_state::z80ne(machine_config &config)
 	m_cassette2->set_interface("z80ne_cass");
 
 	config.set_default_layout(layout_z80ne);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("32K");
 
 	// all known tapes require LX.388 expansion
 	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
@@ -468,8 +487,8 @@ void z80net_state::z80net(machine_config &config)
 {
 	z80ne(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &z80net_state::main_mem);
-	m_maincpu->set_addrmap(AS_IO, &z80net_state::main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80net_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &z80net_state::io_map);
 
 	lx387(config);
 
@@ -484,9 +503,6 @@ void z80net_state::z80net(machine_config &config)
 
 	config.set_default_layout(layout_z80net);
 
-	/* internal ram */
-	m_ram->set_default_size("32K").set_extra_options("1K");
-
 	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 }
 
@@ -494,8 +510,8 @@ void z80netb_state::z80netb(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
-	m_maincpu->set_addrmap(AS_PROGRAM, &z80netb_state::main_mem);
-	m_maincpu->set_addrmap(AS_IO, &z80netb_state::main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80netb_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &z80netb_state::io_map);
 
 	AY31015(config, m_uart);
 
@@ -528,18 +544,16 @@ void z80netb_state::z80netb(machine_config &config)
 
 	config.set_default_layout(layout_z80netb);
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K");
-
-	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
+	// none of the software is compatible
+	//SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 }
 
 void z80netf_state::z80netf(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, Z80NE_CPU_SPEED_HZ);
-	m_maincpu->set_addrmap(AS_PROGRAM, &z80netf_state::main_mem);
-	m_maincpu->set_addrmap(AS_IO, &z80netf_state::main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80netf_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &z80netf_state::io_map);
 
 	AY31015(config, m_uart);
 
@@ -579,7 +593,7 @@ void z80netf_state::z80netf(machine_config &config)
 	config.set_default_layout(layout_z80netf);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("56K");
+	RAM(config, m_ram).set_default_size("56K").set_default_value(0x00);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("z80ne_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("z80ne_flop");
@@ -591,20 +605,20 @@ void z80netf_state::z80netf(machine_config &config)
 
 
 ROM_START( z80ne )
-	ROM_REGION(0x20000, "z80ne", 0)
-	ROM_LOAD( "ep382.ic5", 0x14000, 0x0400, CRC(55818366) SHA1(adcac04b83c09265517b7bafbc2f5f665d751bec) )
+	ROM_REGION(0x0400, "maincpu", 0)
+	ROM_LOAD( "ep382.ic5", 0x0000, 0x0400, CRC(55818366) SHA1(adcac04b83c09265517b7bafbc2f5f665d751bec) )
 ROM_END
 
 ROM_START( z80net )
-	ROM_REGION(0x20000, "z80ne", 0)
-	ROM_LOAD( "ep382.ic5", 0x14000, 0x0400, CRC(55818366) SHA1(adcac04b83c09265517b7bafbc2f5f665d751bec) )
+	ROM_REGION(0x0400, "maincpu", 0)
+	ROM_LOAD( "ep382.ic5", 0x0000, 0x0400, CRC(55818366) SHA1(adcac04b83c09265517b7bafbc2f5f665d751bec) )
 ROM_END
 
 ROM_START( z80netb )
 /*
  * 16k Basic
  */
-	ROM_REGION(0x10000, "z80ne", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "548-1.ic1", 0x0000, 0x0800, CRC(868cad39) SHA1(0ea8af010786a080f823a879a4211f5712d260da) )
 	ROM_LOAD( "548-2.ic2", 0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0) )
 	ROM_LOAD( "548-3.ic3", 0x1000, 0x0800, CRC(9c1fe511) SHA1(ff5b6e49a137c2ff9cb760c39bfd85ce4b52bb7d) )
@@ -616,30 +630,29 @@ ROM_START( z80netb )
 ROM_END
 
 ROM_START( z80netf )
-	ROM_REGION(0x20000, "z80ne", 0) /* 64k for code  64k for banked code */
+	ROM_REGION(0x5000, "maincpu", 0)
 	/* ep548 banked at 0x0000 - 0x3FFF */
-	ROM_LOAD(  "548-1.ic1", 0x10000, 0x0800, CRC(868cad39) SHA1(0ea8af010786a080f823a879a4211f5712d260da) )
-	ROM_LOAD(  "548-2.ic2", 0x10800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0) )
-	ROM_LOAD(  "548-3.ic3", 0x11000, 0x0800, CRC(9c1fe511) SHA1(ff5b6e49a137c2ff9cb760c39bfd85ce4b52bb7d) )
-	ROM_LOAD(  "548-4.ic4", 0x11800, 0x0800, CRC(cb5e0de3) SHA1(0beaa8927faaf61f6c3fc0ea1d3d5670f901aae3) )
-	ROM_LOAD(  "548-5.ic5", 0x12000, 0x0800, CRC(0bd4559c) SHA1(e736a3124819ffb43e96a8114cd188f18d538053) )
-	ROM_LOAD(  "548-6.ic6", 0x12800, 0x0800, CRC(6d663034) SHA1(57588be4e360658dbb313946d7a608e36c1fdd68) )
-	ROM_LOAD(  "548-7.ic7", 0x13000, 0x0800, CRC(0bab06c0) SHA1(d52f1519c798e91f25648e996b1db174d90ce0f5) )
-	ROM_LOAD(  "548-8.ic8", 0x13800, 0x0800, CRC(f381b594) SHA1(2de7a8941ba48d463974c73d62e994d3cbe2868d) )
+	ROM_LOAD(  "548-1.ic1", 0x0000, 0x0800, CRC(868cad39) SHA1(0ea8af010786a080f823a879a4211f5712d260da) )
+	ROM_LOAD(  "548-2.ic2", 0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0) )
+	ROM_LOAD(  "548-3.ic3", 0x1000, 0x0800, CRC(9c1fe511) SHA1(ff5b6e49a137c2ff9cb760c39bfd85ce4b52bb7d) )
+	ROM_LOAD(  "548-4.ic4", 0x1800, 0x0800, CRC(cb5e0de3) SHA1(0beaa8927faaf61f6c3fc0ea1d3d5670f901aae3) )
+	ROM_LOAD(  "548-5.ic5", 0x2000, 0x0800, CRC(0bd4559c) SHA1(e736a3124819ffb43e96a8114cd188f18d538053) )
+	ROM_LOAD(  "548-6.ic6", 0x2800, 0x0800, CRC(6d663034) SHA1(57588be4e360658dbb313946d7a608e36c1fdd68) )
+	ROM_LOAD(  "548-7.ic7", 0x3000, 0x0800, CRC(0bab06c0) SHA1(d52f1519c798e91f25648e996b1db174d90ce0f5) )
+	ROM_LOAD(  "548-8.ic8", 0x3800, 0x0800, CRC(f381b594) SHA1(2de7a8941ba48d463974c73d62e994d3cbe2868d) )
 
-	/* ep382 - banked at 0x0000 - 0x03FF */
-	ROM_LOAD(  "ep382.ic5", 0x14000, 0x0400, CRC(55818366) SHA1(adcac04b83c09265517b7bafbc2f5f665d751bec) )
-
-	/* ep390 - banked at 0x0000 - 0x03FF */
-	ROM_LOAD(  "ep390.ic6", 0x14400, 0x0400, CRC(e4dd7de9) SHA1(523caa97112a9e67cc078c1a70ceee94ec232093) )
-	/* ep1390 - banked at 0x0000 - 0x03FF */
-	ROM_LOAD( "ep1390.ic6", 0x14800, 0x0400, CRC(dc2cbc1d) SHA1(e23418b8f8261a17892f3a73ec09c72bb02e1d0b) )
-	/* ep2390 - banked at 0x0000 - 0x03FF */
-	ROM_LOAD( "ep2390.ic6", 0x14C00, 0x0400, CRC(28d28eee) SHA1(b80f75c1ac4905ae369ecbc9b9ce120cc85502ed) )
+	/* ep382 - 8000 */
+	ROM_LOAD(  "ep382.ic5", 0x4000, 0x0400, CRC(55818366) SHA1(adcac04b83c09265517b7bafbc2f5f665d751bec) )
+	/* ep390 - F000 */
+	ROM_LOAD(  "ep390.ic6", 0x4400, 0x0400, CRC(e4dd7de9) SHA1(523caa97112a9e67cc078c1a70ceee94ec232093) )
+	/* ep1390 - F000 */
+	ROM_LOAD( "ep1390.ic6", 0x4800, 0x0400, CRC(dc2cbc1d) SHA1(e23418b8f8261a17892f3a73ec09c72bb02e1d0b) )
+	/* ep2390 - F000 */
+	ROM_LOAD( "ep2390.ic6", 0x4C00, 0x0400, CRC(28d28eee) SHA1(b80f75c1ac4905ae369ecbc9b9ce120cc85502ed) )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME                      FLAGS
-COMP( 1980, z80ne,   0,      0,      z80ne,   z80ne,   z80ne_state,   empty_init, "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW)
-COMP( 1980, z80net,  z80ne,  0,      z80net,  z80net,  z80net_state,  empty_init, "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW)
-COMP( 1980, z80netb, z80ne,  0,      z80netb, z80net,  z80netb_state, empty_init, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW)
-COMP( 1980, z80netf, z80ne,  0,      z80netf, z80netf, z80netf_state, empty_init, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW)
+COMP( 1980, z80ne,   0,      0,      z80ne,   z80ne,   z80ne_state,   init_z80ne, "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z80net,  z80ne,  0,      z80net,  z80net,  z80net_state,  init_z80ne, "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z80netb, z80ne,  0,      z80netb, z80net,  z80netb_state, init_z80ne, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z80netf, z80ne,  0,      z80netf, z80netf, z80netf_state, empty_init, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

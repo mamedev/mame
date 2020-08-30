@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="redled" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="yellowled" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.20" green="0.20" blue="0.0" />
+		</disk>
+	</element>
+	<element name="blueled" defstate="0">
+		<disk state="1">
+			<color red="0" green="0.0" blue="0.75" />
+		</disk>
+		<disk state="0">
+			<color red="0.0" green="0.0" blue="0.20" />
+		</disk>
+	</element>
+	<element name="greenled" defstate="0">
+		<disk state="1">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</disk>
+	</element>
+	<view name="Screen Only">
+		<screen index="0">
+			<bounds x="0" y="0" width="320" height="240" />
+		</screen>
+	</view>
+	<view name="Screen with Controller LEDs">
+		<screen index="0">
+			<bounds x="0" y="0" width="320" height="240" />
+		</screen>
+		<bezel name="redled1" element="redled">
+			<bounds x="5" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="yellowled1" element="yellowled">
+			<bounds x="20" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="blueled1" element="blueled">
+			<bounds x="35" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="greenled1" element="greenled">
+			<bounds x="50" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="redled2" element="redled">
+			<bounds x="260" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="yellowled2" element="yellowled">
+			<bounds x="275" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="blueled2" element="blueled">
+			<bounds x="290" y="245" width="10" height="10" />
+		</bezel>
+		<bezel name="greenled2" element="greenled">
+			<bounds x="305" y="245" width="10" height="10" />
+		</bezel>
+	</view>
+</mamelayout>

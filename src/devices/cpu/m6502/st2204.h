@@ -24,15 +24,20 @@ public:
 		ST_T1C,
 		ST_PSG0,
 		ST_PSG1,
+		ST_VOL,
+		ST_DAC,
 		ST_DMS,
 		ST_DMD
 	};
 
 	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto dac_callback() { return m_dac_callback.bind(); }
+
 protected:
 	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
 
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -85,8 +90,15 @@ private:
 	void t1m_w(u8 data);
 	u8 t1c_r();
 	void t1c_w(u8 data);
+	TIMER_CALLBACK_MEMBER(psg_interrupt);
+	void psg_timer_reload();
+	u8 psg_r(offs_t offset);
 	void psg_w(offs_t offset, u8 data);
+	u8 psgc_r();
 	void psgc_w(u8 data);
+	u8 vol_r();
+	void vol_w(u8 data);
+	u8 dac_r();
 	void dac_w(u8 data);
 	u8 dmsl_r();
 	void dmsl_w(u8 data);
@@ -106,12 +118,17 @@ private:
 
 	void int_map(address_map &map);
 
+	devcb_write8 m_dac_callback;
+
 	u8 m_tmode[2];
 	u8 m_tcntr[2];
 	u8 m_tload[2];
 	emu_timer *m_timer[2];
 	u16 m_psg[2];
 	u8 m_psgc;
+	u8 m_vol;
+	u8 m_dac;
+	emu_timer *m_psg_timer;
 	u16 m_dms;
 	u16 m_dmd;
 	u8 m_dcnth;

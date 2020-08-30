@@ -35,6 +35,7 @@ public:
 	void witchryl(machine_config &config);
 	void fw_brick_1(machine_config &config);
 	void fw_brick_2(machine_config &config);
+	void gratispk(machine_config &config);
 
 	void init_saloon();
 	void init_mongolnw();
@@ -76,6 +77,7 @@ private:
 	void fw_brick_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
+	void gratispk_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;

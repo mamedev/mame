@@ -626,6 +626,24 @@ void cischeat_state::scudhamm_map(address_map &map)
 
 /**************************************************************************
                             Arm Champs II
+
+The Arm Champs II start-up arm movement and info
+---------------------------------------------------------------------
+At power-on, the arm moves left, then right then to center and stops.
+The center position is 0000.
+Note when the arm is at 0000 (center) the center limit switch is not
+on. It comes on when the arm is moved just off center (+-0002 or greater
+away from center) and stays on as long as the arm is not on
+0001-0000-FFFF (both left and right side). When the arm hits the
+left/right limit, both center and that left or right limit switch is on.
+
+Full movement to left limit switch is 0000-0040 (0x41h) and full right
+limit switch movement is 0000-FFC2 (0x3eh). Obviously the pot and arm
+are not 100% accurate and there's a small amount of slop between the
+arm shaft / motor mechanism and the pot.
+The limit switches are triggered just before the full movement.
+For the purpose of MAME emulation it can be rounded off so both sides
+move +- 0x40h.
 **************************************************************************/
 
 uint16_t armchamp2_state::motor_status_r()

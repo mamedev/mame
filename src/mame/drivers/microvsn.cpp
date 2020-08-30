@@ -259,7 +259,8 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 10000;
 			p = (p > 255) ? 0 : p ^ 255;
 
-			bitmap.pix32(y, x) = p << 16 | p << 8 | p;
+			if (cliprect.contains(x, y))
+				bitmap.pix32(y, x) = p << 16 | p << 8 | p;
 		}
 	}
 

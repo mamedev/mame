@@ -1,7 +1,54 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_7490.c
+ * nld_7490.cpp
+ *
+ *  DM7490: Decade Counters
+ *
+ *          +--------------+
+ *        B |1     ++    14| A
+ *      R01 |2           13| NC
+ *      R02 |3           12| QA
+ *       NC |4    7490   11| QD
+ *      VCC |5           10| GND
+ *      R91 |6            9| QB
+ *      R92 |7            8| QC
+ *          +--------------+
+ *
+ *          Counter Sequence
+ *
+ *          +-------++----+----+----+----+
+ *          | COUNT || QD | QC | QB | QA |
+ *          +=======++====+====+====+====+
+ *          |    0  ||  0 |  0 |  0 |  0 |
+ *          |    1  ||  0 |  0 |  0 |  1 |
+ *          |    2  ||  0 |  0 |  1 |  0 |
+ *          |    3  ||  0 |  0 |  1 |  1 |
+ *          |    4  ||  0 |  1 |  0 |  0 |
+ *          |    5  ||  0 |  1 |  0 |  1 |
+ *          |    6  ||  0 |  1 |  1 |  0 |
+ *          |    7  ||  0 |  1 |  1 |  1 |
+ *          |    8  ||  1 |  0 |  0 |  0 |
+ *          |    9  ||  1 |  0 |  0 |  1 |
+ *          +-------++----+----+----+----+
+ *
+ *          Note A Output QA is connected to input B for BCD count
+ *
+ *          Reset Count Function table
+ *
+ *          +-----+-----+-----+-----++----+----+----+----+
+ *          | R01 | R02 | R91 | R92 || QD | QC | QB | QA |
+ *          +=====+=====+=====+=====++====+====+====+====+
+ *          |  1  |  1  |  0  |  X  ||  0 |  0 |  0 |  0 |
+ *          |  1  |  1  |  X  |  0  ||  0 |  0 |  0 |  0 |
+ *          |  X  |  X  |  1  |  1  ||  1 |  0 |  0 |  1 |
+ *          |  X  |  0  |  X  |  0  ||       COUNT       |
+ *          |  0  |  X  |  0  |  X  ||       COUNT       |
+ *          |  0  |  X  |  X  |  0  ||       COUNT       |
+ *          |  X  |  0  |  0  |  X  ||       COUNT       |
+ *          +-----+-----+-----+-----++----+----+----+----+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
  *
  */
 
@@ -95,35 +142,7 @@ namespace devices
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(7490_dip)
-	{
-		NETLIB_CONSTRUCTOR(7490_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", "A.B");
-			register_subalias("2", "A.R1");
-			register_subalias("3", "A.R2");
-
-			// register_subalias("4", ); --> NC
-			register_subalias("5", "A.VCC");
-			register_subalias("6", "A.R91");
-			register_subalias("7", "A.R92");
-
-			register_subalias("8", "A.QC");
-			register_subalias("9", "A.QB");
-			register_subalias("10", "A.GND");
-			register_subalias("11", "A.QD");
-			register_subalias("12", "A.QA");
-			// register_subalias("13", ); --> NC
-			register_subalias("14", "A.A");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(7490) A;
-	};
-
 	NETLIB_DEVICE_IMPL(7490,     "TTL_7490",        "+A,+B,+R1,+R2,+R91,+R92,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(7490_dip, "TTL_7490_DIP",    "")
 
 } // namespace devices
 } // namespace netlist

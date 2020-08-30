@@ -475,8 +475,8 @@ license:CC0
 		<year>1985</year>
 		<publisher>Slogger</publisher>
 		<part name="rom" interface="electron_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="ElkMan-1.4.rom" size="16384" crc="762e4ee6" sha1="9bd1c016aa0473183b5a137d6564423f3e3ff0f9"/>
+			<dataarea name="rom" size="8192">
+				<rom name="ElkMan-1.4.rom" size="8192" crc="d2bcacf4" sha1="3ba7d6b40794969dbb2322de8dc2434543abb8ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -503,6 +503,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gommc" supported="no">
+		<description>GoMMC Tools 1.03</description>
+		<year>2007</year>
+		<publisher>John Kortink</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="GoMMCTools-E1.03.rom" size="16384" crc="ab7cd089" sha1="f2b069f7b29ae699e55a9f3e7d187efce052582f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="matrix">
 		<description>Matrix</description>
 		<year>1986</year>
@@ -514,13 +525,46 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mode7sim">
+	<software name="mode7mk211" cloneof="mode7mk2" supported="no">
+		<description>Mode 7 Mk2 v1.1</description>
+		<year>1989</year>
+		<publisher>JAFA Systems</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Mode7Mk2-1.1.rom" size="16384" crc="d5d7c7db" sha1="5e98963c268ac56c49631fe808b4f37aca3bef63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mode7mk2" supported="no">
+		<description>Mode 7 Mk2 v2.2</description>
+		<year>1989</year>
+		<publisher>JAFA Systems</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Mode7Mk2-2.2.rom" size="16384" crc="28792451" sha1="efabe095f7a87ff42d8da318a14ad57c5c03772e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mode7sim11" cloneof="mode7sim">
 		<description>Mode 7 Simulator v1.1</description>
 		<year>1988</year>
 		<publisher>JAFA Systems</publisher>
 		<part name="rom" interface="electron_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Mode7Simulator-1.1.rom" size="16384" crc="3d4bbd16" sha1="22755882e39a6b5f92b9e29fb29d87cf4053c8e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mode7sim">
+		<description>Mode 7 Simulator v1.5</description>
+		<year>1988</year>
+		<publisher>JAFA Systems</publisher>
+		<part name="rom" interface="electron_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Mode7Simulator-1.5.rom" size="16384" crc="ad5f6ee8" sha1="c00ec0902d03f81254ea264af1f4d7a03b28e8a6"/>
 			</dataarea>
 		</part>
 	</software>

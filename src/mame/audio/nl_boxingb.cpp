@@ -13,8 +13,6 @@
 
 #include "netlist/devices/net_lib.h"
 #include "nl_cinemat_common.h"
-#include "nl_boxingb.h"
-
 
 //
 // Hacks/workarounds

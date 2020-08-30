@@ -241,7 +241,7 @@ void exchess_state::exchess(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1020, 1080);
+	screen.set_size(1020/1.5, 1080/1.5);
 	screen.set_visarea_full();
 }
 

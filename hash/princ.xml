@@ -2,7 +2,11 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+Known undumped titles:
+New Kazoku de Nengajou
 -->
+
 <softwarelist name="princ" description="Tomy Prin-C cartridges">
 	<software name="bbmaru" supported="no">
 		<description>Bad Badtz-Maru</description>
@@ -11,6 +15,17 @@ license:CC0
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
 				<rom name="01.bin" size="0x80000" crc="b91a4cb6" sha1="21fcfd16a821796fdf38fe0a23dca93b85fd3339"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraemon" supported="no">
+		<description>Doraemon</description> <!-- Character Rom Cassette EX series -->
+		<year>1998</year>
+		<publisher>Tomy</publisher>
+		<part name="rom" interface="princ_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="u1.bin" size="0x80000" crc="7e8cdd27" sha1="4487aea62d6f7913a2df1677846420a6f5626326"/>
 			</dataarea>
 		</part>
 	</software>

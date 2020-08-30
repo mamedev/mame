@@ -1,5 +1,5 @@
 language: cpp
-dist: bionic
+dist: focal
 addons:
   apt:
     sources:
@@ -37,6 +37,13 @@ jobs:
       arch: s390x
       compiler: gcc
       env: SUBTARGET=ci   MAME=mameci64
+    - os: linux
+      arch: ppc64le
+      compiler: gcc
+      env: SUBTARGET=ci   MAME=mameci64
+  allow_failures:
+    - arch: ppc64le
+  fast_finish: true
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then

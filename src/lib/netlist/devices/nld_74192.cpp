@@ -1,7 +1,28 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_74192.c
+ * nld_74192.cpp
+ *
+ *  DM74192: Synchronous 4-Bit Binary Counter with Dual Clock
+ *           Decade counter
+ *
+ *  FIXME: This should be merged with the 74193 which counts to 16
+ *
+ *          +--------------+
+ *        B |1     ++    16| VCC
+ *       QB |2           15| A
+ *       QA |3           14| CLEAR
+ *       CD |4    74192  13| BORROWQ
+ *       CU |5           12| CARRYQ
+ *       QC |6           11| LOADQ
+ *       QD |7           10| C
+ *      GND |8            9| D
+ *          +--------------+
+ *
+ * CD: Count up
+ * CU: Count down
+ *
+ *  Naming conventions follow National Semiconductor datasheet
  *
  */
 
@@ -54,7 +75,6 @@ namespace netlist
 			m_last_CD = 0;
 		}
 
-		friend class NETLIB_NAME(74192_dip);
 	private:
 		logic_input_t m_CLEAR;
 		logic_input_t m_LOADQ;
@@ -131,36 +151,7 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT(74192_dip)
-	{
-		NETLIB_CONSTRUCTOR(74192_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_B);
-			register_subalias("2", A.m_Q[1]);
-			register_subalias("3", A.m_Q[0]);
-			register_subalias("4", A.m_CD);
-			register_subalias("5", A.m_CU);
-			register_subalias("6", A.m_Q[2]);
-			register_subalias("7", A.m_Q[3]);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9", A.m_D);
-			register_subalias("10", A.m_C);
-			register_subalias("11", A.m_LOADQ);
-			register_subalias("12", A.m_CARRYQ);
-			register_subalias("13", A.m_BORROWQ);
-			register_subalias("14", A.m_CLEAR);
-			register_subalias("15", A.m_A);
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(74192) A;
-	};
-
 	NETLIB_DEVICE_IMPL(74192,    "TTL_74192", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74192_dip,"TTL_74192_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

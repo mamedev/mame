@@ -7,6 +7,44 @@
  * implementing this was simple.
  *
  */
+/*****************************************************************************
+
+    5/74164 8-bit parallel-out serial shift registers
+
+***********************************************************************
+
+    Connection Diagram:
+              ___ ___
+        A  1 |*  u   | 14  Vcc
+        B  2 |       | 13  QH
+       QA  3 |       | 12  QG
+       QB  4 |       | 11  QF
+       QC  5 |       | 10  QE
+       QD  6 |       |  9  *Clear
+      GND  7 |_______|  8  Clock
+
+***********************************************************************
+    Function Table:
+    +-------------------------+----------------+
+    |       Inputs            |  Qutputs*      |
+    +-------+-------+---------+----------------+
+    | Clear | Clock |  A   B  | QA  QB ... QH  |
+    +-------+-------+---------+----------------+
+    |   L   |   X   |  X   X  |  L   L      L  |
+    |   H   |   L   |  X   X  | QA0 QB0    QH0 |
+    |   H   |   ^   |  H   H  |  H  QAn    QGn |
+    |   H   |   ^   |  L   X  |  L  QAn    QGn |
+    |   H   |   ^   |  X   L  |  L  QAn    QGn |
+    +-------+-------+---------+----------------+
+
+    H = High Level (steady state)
+    L = Low Level (steady state)
+    X = Don't Care
+    ^ = Transition from low to high level
+    QA0, QB0 ... QH0 = The level of QA, QB ... QH before the indicated steady-state input conditions were established.
+    QAn, QGn = The level of QA or QG before the most recent ^ transition of the clock; indicates a 1 bit shift.
+
+**********************************************************************/
 
 #include "nld_74164.h"
 #include "netlist/nl_base.h"
@@ -78,34 +116,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74164_dip)
-	{
-		NETLIB_CONSTRUCTOR(74164_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_AB[0]);
-			register_subalias("2", A.m_AB[1]);
-			register_subalias("3", A.m_Q[0]);
-			register_subalias("4", A.m_Q[1]);
-			register_subalias("5", A.m_Q[2]);
-			register_subalias("6", A.m_Q[3]);
-			register_subalias("7", "A.GND");
-
-			register_subalias("8", A.m_CLK);
-			register_subalias("9", A.m_CLRQ);
-			register_subalias("10", A.m_Q[4]);
-			register_subalias("11", A.m_Q[5]);
-			register_subalias("12", A.m_Q[6]);
-			register_subalias("13", A.m_Q[7]);
-			register_subalias("14", "A.VCC");
-		}
-	private:
-		NETLIB_SUB(74164) A;
-	};
-
-
 	NETLIB_DEVICE_IMPL(74164, "TTL_74164", "+A,+B,+CLRQ,+CLK,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74164_dip, "TTL_74164_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

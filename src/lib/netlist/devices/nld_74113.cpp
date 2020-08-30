@@ -1,7 +1,59 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_74113.c
+ * nld_74113.cpp
+ *
+ *  74113: Dual Master-Slave J-K Flip-Flops with Set and Complementary Outputs
+ *  74113A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Set and Complementary Outputs
+ *
+ *          +----------+
+ *     1CLK |1   ++  14| VCC
+ *       1K |2       13| 2CLK
+ *       1J |3       12| 2K
+ *    1SETQ |4 74113 11| 2J
+ *       1Q |5       10| 2SETQ
+ *      1QQ |6        9| 2Q
+ *      GND |7        8| 2QQ
+ *          +----------+
+ *
+ *
+ *          Function table 113
+ *
+ *          +-----+-----+-----+---++---+-----+
+ *          | SETQ| CLK |  J  | K || Q | QQ  |
+ *          +=====+=====+=====+===++===+=====+
+ *          |  0  |  X  |  X  | X || 1 |  0  |
+ *          |  1  |  *  |  0  | 0 || Q0| Q0Q |
+ *          |  1  |  *  |  1  | 0 || 1 |  0  |
+ *          |  1  |  *  |  0  | 1 || 0 |  1  |
+ *          |  1  |  *  |  1  | 1 || TOGGLE  |
+ *          +-----+-----+-----+---++---+-----+
+ *                _
+ *          * = _| |_
+ *
+ *          This is positive triggered, J and K
+ *          are latched during clock high and
+ *          transferred when CLK falls.
+ *
+ *          Function table 113A
+ *
+ *          +-----+-----+-----+---++---+-----+
+ *          | CLRQ| CLK |  J  | K || Q | QQ  |
+ *          +=====+=====+=====+===++===+=====+
+ *          |  0  |  X  |  X  | X || 0 |  1  |
+ *          |  1  |  F  |  0  | 0 || Q0| Q0Q |
+ *          |  1  |  F  |  1  | 0 || 1 |  0  |
+ *          |  1  |  F  |  0  | 1 || 0 |  1  |
+ *          |  1  |  F  |  1  | 1 || TOGGLE  |
+ *          |  1  |  1  |  X  | X || Q0| Q0Q |
+ *          +-----+-----+-----+---++---+-----+
+ *
+ *          THe 113A is negative triggered.
+ *
+ *  Naming conventions follow Texas instruments datasheet
+ *
+ *  FIXME: Currently, only the 113 is implemented.
+ *         The 113A uses the same model.
  *
  */
 
@@ -91,72 +143,8 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT(74113_dip)
-	{
-		NETLIB_CONSTRUCTOR(74113_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", m_A.m_CLK);
-			register_subalias("2", m_A.m_K);
-			register_subalias("3", m_A.m_J);
-			register_subalias("4", m_A.m_SETQ);
-			register_subalias("5", m_A.m_Q);
-			register_subalias("6", m_A.m_QQ);
-			register_subalias("7", "A.GND");
-
-			register_subalias("8", m_B.m_QQ);
-			register_subalias("9", m_B.m_Q);
-			register_subalias("10", m_B.m_SETQ);
-			register_subalias("11", m_B.m_J);
-			register_subalias("12", m_B.m_K);
-			register_subalias("13", m_B.m_CLK);
-			register_subalias("14", "A.VCC");
-
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
-		}
-
-	private:
-		NETLIB_SUB(74113) m_A;
-		NETLIB_SUB(74113) m_B;
-	};
-
-	NETLIB_OBJECT(74113A_dip)
-	{
-		NETLIB_CONSTRUCTOR(74113A_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1", m_A.m_CLK);
-			register_subalias("2", m_A.m_K);
-			register_subalias("3", m_A.m_J);
-			register_subalias("4", m_A.m_SETQ);
-			register_subalias("5", m_A.m_Q);
-			register_subalias("6", m_A.m_QQ);
-			register_subalias("7", "A.GND");
-
-			register_subalias("8", m_B.m_QQ);
-			register_subalias("9", m_B.m_Q);
-			register_subalias("10", m_B.m_SETQ);
-			register_subalias("11", m_B.m_J);
-			register_subalias("12", m_B.m_K);
-			register_subalias("13", m_B.m_CLK);
-			register_subalias("14", "A.VCC");
-
-			connect("A.GND", "B.GND");
-			connect("A.VCC", "B.VCC");
-		}
-
-	private:
-		NETLIB_SUB(74113A) m_A;
-		NETLIB_SUB(74113A) m_B;
-	};
-
 	NETLIB_DEVICE_IMPL(74113, "TTL_74113", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74113A, "TTL_74113A", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74113_dip, "TTL_74113_DIP", "")
-	NETLIB_DEVICE_IMPL(74113A_dip, "TTL_74113A_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

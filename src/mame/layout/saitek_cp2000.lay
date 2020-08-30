@@ -600,12 +600,10 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="61" right="198.25" top="0" bottom="86" />
+		<bounds left="49.75" right="186" top="0" bottom="86" />
 
 		<group ref="sb_board"><bounds x="102" y="2" width="82" height="82" /></group>
-
-		<!-- putting sb_ui on the right side, since chesscomputer has its own ui on the left -->
-		<group ref="sb_ui"><bounds x="186" y="2" width="10.25" height="82" /></group>
+		<group ref="sb_ui"><bounds x="51.25" y="2" width="10.25" height="82" /></group>
 
 	<!-- left side display -->
 

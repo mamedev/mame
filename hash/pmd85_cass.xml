@@ -3,16 +3,21 @@
 <!--
 license:CC0
 
-For now tape loading only works in PMD-85.1
+See source notes for more information about tapes and Basic.
+
+These tapes are generally usable with pmd851, pmd852, pmd852a, pmd852b and alfa.
+
+If the Usage shows a filename of xx, it's because it hasn't been possible to identify the number.
+
 -->
 
 <softwarelist name="pmd85_cass" description="Tesla PMD-85 cassettes">
 <!-- From TOSEC -->
-	<software name="auto">
+	<software name="auto" supported="partial"><!-- loads but does nothing -->
 		<description>Auto</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="1317">
 				<rom name="auto (198x)(-).ptp" size="1317" crc="1e33b4d6" sha1="6527f2b701e78de177315c43ce434287668ad22a"/>
@@ -24,7 +29,7 @@ For now tape loading only works in PMD-85.1
 		<description>Bludiště</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="8567">
 				<rom name="bludiste (1988)(-).ptp" size="8567" crc="62c8ad42" sha1="5b891fb3c92a6d7a23725fcb2e94a046314e98c2"/>
@@ -32,11 +37,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="bombard">
+	<software name="bombard" supported="no"><!-- unrecognised, and can crash MAME at start -->
 		<description>Bombarder</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In BASIC, LOAD xx and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="2772">
 				<rom name="bombarder (19xx)(-).ptp" size="2772" crc="7e5b178e" sha1="2d876752fcf774be6464a084144a6a85e2f4c31d"/>
@@ -44,11 +49,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="bdash">
+	<software name="bdash" supported="no"><!-- can crash MAME at start, machine resets while loading -->
 		<description>Boulder Dash</description>
 		<year>1988</year>
 		<publisher>VBG Software</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 03 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="24903">
 				<rom name="boulder dash (1988)(vbg software).ptp" size="24903" crc="9ea24bb6" sha1="19617ebfe73fcc752c7ddaa8d43367ca7cc74581"/>
@@ -56,11 +61,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="faraonov">
+	<software name="faraonov" supported="no"><!-- unrecognised -->
 		<description>Faraonova Hbroka</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In BASIC, LOAD xx and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="7096">
 				<rom name="faraonova hbroka (1988)(-).ptp" size="7096" crc="307994fc" sha1="198ce2a78304aeb61d081d3e64d8f737d2a64918"/>
@@ -68,11 +73,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="flappy">
+	<software name="flappy" supported="no"><!-- machine resets while loading -->
 		<description>Flappy</description>
 		<year>1987</year>
 		<publisher>VBG Software</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 03 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="36448">
 				<rom name="flappy (1987)(vbg software).ptp" size="36448" crc="0f4cb0a9" sha1="40bf5f34362fdaa25f5de1f95640916ccaee1c4d"/>
@@ -84,7 +89,7 @@ For now tape loading only works in PMD-85.1
 		<description>Fred</description>
 		<year>1988</year>
 		<publisher>VBG Software</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 03 and press Play. E to go up, Ctrl if you get stuck"/>
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="17235">
 				<rom name="fred (1988)(vbg software).ptp" size="17235" crc="39499aa9" sha1="9b1670900ec3aff9a78ad1dc4079a5c521f62e95"/>
@@ -96,7 +101,7 @@ For now tape loading only works in PMD-85.1
 		<description>Galaxia</description>
 		<year>1988</year>
 		<publisher>Ceres Soft</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="21656">
 				<rom name="galaxia (1988)(ceres soft).ptp" size="21656" crc="7de36b2e" sha1="ee0e489c99e7274dca788f24bbf4ca45df0cfdda"/>
@@ -108,7 +113,7 @@ For now tape loading only works in PMD-85.1
 		<description>Hlípa</description>
 		<year>1989</year>
 		<publisher>ZO Svazarmu</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="44336">
 				<rom name="hlipa (1989)(zo svazarmu).ptp" size="44336" crc="26f53a9f" sha1="90ee9074f98b4b110bf5ba34cfc3432a428bde35"/>
@@ -116,11 +121,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="horac">
+	<software name="horac" supported="no"><!-- unrecognised, and can crash MAME at start -->
 		<description>Horác a pavouci</description>
 		<year>1985</year>
 		<publisher>ZO Svazarmu</publisher>
-
+		<info name="usage" value="In Monitor, MGLD xx and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="3292">
 				<rom name="horac a pavouci (1985)(zo svazarmu).ptp" size="3292" crc="44d23af1" sha1="960961bbffa7d76c0f4e9a0f64c5373f7eabb978"/>
@@ -128,11 +133,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="karel">
+	<software name="karel" supported="no"><!-- loads then freezes -->
 		<description>Karel</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="7027">
 				<rom name="karel (1988)(-).ptp" size="7027" crc="8cfb094b" sha1="6bb68b63b1baeb75400fd130a6f962ddafaea3ff"/>
@@ -140,11 +145,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="kuriatko">
+	<software name="kuriatko" supported="partial"><!-- loads but does nothing -->
 		<description>Kuriatko</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="6379">
 				<rom name="kuriatko (19xx)(-).ptp" size="6379" crc="bb208585" sha1="3f0a958bc750d49b11b02cb2e5722109472bde5f"/>
@@ -156,7 +161,7 @@ For now tape loading only works in PMD-85.1
 		<description>Manic Miner</description>
 		<year>1987</year>
 		<publisher>VBG Software</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play. Shift to jump." />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="27792">
 				<rom name="manic miner (1987)(vbg software).ptp" size="27792" crc="f21937aa" sha1="cfbc4ea6f39d2f38da095c19dd8e784e8686861f"/>
@@ -168,7 +173,7 @@ For now tape loading only works in PMD-85.1
 		<description>Město robotů</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="28221">
 				<rom name="mesto robotu (1988)(-).ptp" size="28221" crc="07938025" sha1="8c4460275829e503cf330c1fc08d27bd41e878ee"/>
@@ -176,11 +181,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="pampuch">
+	<software name="pampuch" supported="partial"><!-- loads but does nothing -->
 		<description>Pampuch &amp; Duch</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 01 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="4691">
 				<rom name="pampuch &amp; duch (1986)(-).ptp" size="4691" crc="8552213a" sha1="a2845da6f8ca66ae78d7815c8e839dfcca79eb06"/>
@@ -192,7 +197,7 @@ For now tape loading only works in PMD-85.1
 		<description>Penetrator</description>
 		<year>1988</year>
 		<publisher>VBG Software</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 03 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="34125">
 				<rom name="penetrator (1988)(vbg software).ptp" size="34125" crc="c46033fe" sha1="19739f1b1328be1a0886a03fa7619652989afb22"/>
@@ -204,7 +209,7 @@ For now tape loading only works in PMD-85.1
 		<description>Pexeso</description>
 		<year>1988</year>
 		<publisher>Petisoft</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="23006">
 				<rom name="pexeso (1988)(petisoft).ptp" size="23006" crc="f994b980" sha1="cb2b6be14dd2a85447f41cdf838e0dd66c7e3f97"/>
@@ -212,11 +217,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="piskvork">
+	<software name="piskvork" supported="no"><!-- machine resets while loading -->
 		<description>Piškvorky</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="10132">
 				<rom name="piskvorky (1987)(-).ptp" size="10132" crc="9ea553c2" sha1="4660b90d8d0c06107795a4faf2db7e5be20e92e2"/>
@@ -224,11 +229,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="princjas">
+	<software name="princjas" supported="no"><!-- machine froze while loading -->
 		<description>Princ Jasoň</description>
 		<year>1989</year>
 		<publisher>Ceres Soft</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="37194">
 				<rom name="princ jason (1989)(ceres soft).ptp" size="37194" crc="f0e67ee4" sha1="3593fc5b95e16cd6c6ac95748f097bf5eb9da5e6"/>
@@ -240,7 +245,7 @@ For now tape loading only works in PMD-85.1
 		<description>Saboter</description>
 		<year>1989</year>
 		<publisher>VBG Software</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 03 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="30541">
 				<rom name="saboter (1989)(vbg software).ptp" size="30541" crc="0706a1ca" sha1="1d6485f12903f3cc0be07754b975eaca67895f28"/>
@@ -248,11 +253,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="tava">
+	<software name="tava" supported="no"><!-- unrecognised, and can crash MAME at start -->
 		<description>Tava - HRA s Nahodou a Prirodou</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In BASIC, LOAD xx and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="6841">
 				<rom name="tava - hra s nahodou a prirodou (1985)(-).ptp" size="6841" crc="3346f7a1" sha1="50a87c7e81c637161742929b42f225183e3215f6"/>
@@ -260,11 +265,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="zaby">
+	<software name="zaby" supported="partial"><!-- loads but does nothing -->
 		<description>Zaby</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 09 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="2883">
 				<rom name="zaby (198x)(-).ptp" size="2883" crc="f8ff3af1" sha1="89c0df30ce1c1e703396f76eb85cd77688054e2a"/>
@@ -272,11 +277,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="zed">
+	<software name="zed" supported="partial"><!-- loads but does nothing -->
 		<description>ZED</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="1185">
 				<rom name="zed (198x)(-).ptp" size="1185" crc="99be7a35" sha1="bfbb57b61e5867082feb6d80c658a8bccabd0010"/>
@@ -284,11 +289,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="grdemo">
+	<software name="grdemo" supported="no"><!-- loads then freezes -->
 		<description>GRDEMO</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="29639">
 				<rom name="zzz-unk-grdemo.ptp" size="29639" crc="f9e1e8ac" sha1="5dc2a7436073eb59ebe74a4c2c56ffdf2cb92cd5"/>
@@ -296,11 +301,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="kurca">
+	<software name="kurca" supported="partial"><!-- loads but does nothing -->
 		<description>KURCA</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 14 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="18243">
 				<rom name="zzz-unk-kurca.ptp" size="18243" crc="dc8db4aa" sha1="0c74ac004911cd4024c08b0bc91a608ed1885455"/>
@@ -308,11 +313,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="wurmi">
+	<software name="wurmi" supported="no"><!-- unrecognised, and can crash MAME at start -->
 		<description>WURMI</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In BASIC, LOAD xx and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="2440">
 				<rom name="zzz-unk-wurmi.ptp" size="2440" crc="8aa15e50" sha1="d69ccff727f54c79fdc689c7099de8e18dcfc1e1"/>
@@ -323,21 +328,21 @@ For now tape loading only works in PMD-85.1
 <!-- From pmd85.borik.net/ -->
 
 <!-- bas20-demo.ptp
-| CURSOR   | Ilustrácia príkazu CURSOR                                        |
-| GENZN    | Generátor znakov MON 20                                          |
-| CHANNEL0 | Ilustrácia príkazov OUTPUT a ENTER kanál 0                       |
-| INPUT    | Ilustrácia príkazov PRINT DIM a INPUT DIM                        |
-| KEYBOARD | Rozloženie kláves na klávesnici v príkaze TEXT                   |
-| MENU     | Ilustrácia príkazu WINDOW                                        |
-| MODIF    | Program na modifikovanie BASIC 20                                |
-| SACHOV   | Ilustrácia zobrazenia sachovnice príkazmi FILL a WINDOW          |
-| ZIZALA   | Klasická Húsenka alias Wurmi                                     |
+| 00 CURSOR   | Ilustrácia príkazu CURSOR                                        |
+| 00 GENZN    | Generátor znakov MON 20                                          |
+| 00 CHANNEL0 | Ilustrácia príkazov OUTPUT a ENTER kanál 0                       |
+| 00 INPUT    | Ilustrácia príkazov PRINT DIM a INPUT DIM                        |
+| 00 KEYBOARD | Rozloženie kláves na klávesnici v príkaze TEXT                   |
+| 00 MENU     | Ilustrácia príkazu WINDOW                                        |
+| 00 MODIF    | Program na modifikovanie BASIC 20                                |
+| 00 SACHOV   | Ilustrácia zobrazenia sachovnice príkazmi FILL a WINDOW          |
+| 00 ZIZALA   | Klasická Húsenka alias Wurmi                                     |
 -->
-	<software name="bas20dem">
+	<software name="bas20dem"><!-- doesn't seem to work? -->
 		<description>BASIC20 Demo</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In BASIC v2.0, LOAD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="13998">
 				<rom name="bas20-demo.ptp" size="13998" crc="08f25c1f" sha1="bdd77e5c4417e20e2b256ab2e3e65a4a29439602"/>
@@ -346,17 +351,17 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- cirkus-sasa-tomasa.ptp
-| SASO     | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, D. Tóth                |
-| POSTARIK | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, M. Lupták, D. Tóth     |
-| ZMRZLINY | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, ¼. Moravèíková, D. Tóth|
-| DOMCEKY  | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, D. Tóth, M. Vittek     |
-| ROBOTIK  | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, D. Tóth                |
+| 01 SASO     | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, D. Tóth                |
+| 02 POSTARIK | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, M. Lupták, D. Tóth     |
+| 03 ZMRZLINY | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, M. Moravèíková, D. Tóth|
+| 04 DOMCEKY  | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, D. Tóth, M. Vittek     |
+| 05 ROBOTIK  | AutoRun   | 1,2,2A,3 | A. Blaho, I. Kalaš, D. Tóth                |
 -->
 	<software name="cirkus">
 		<description>cirkus-sasa-tomasa</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In BASIC, LOAD 01 (saso), 02 (postarik), 03 (zmrzliny), 04 (domceky) or 05 (robotik), and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="112591">
 				<rom name="cirkus-sasa-tomasa.ptp" size="112591" crc="46e8bfda" sha1="f6ad3626d190a549bf6ade72739590bea9110326"/>
@@ -365,17 +370,17 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- copytape.ptp
-| COPY     | JUMP 0000 | 1        | IFO software - UAK                        |
-| COPYPLUS | JUMP 0100 | 1        | IFO software                              |
-| COPYCOPY | JUMP 0000 | 1        | IFO software                              |
-| COPPY    | JUMP 0000 | 1        | ODPM PRAHA 2                              |
-| WELL+2   | AutoRun   | 2,2A,3   | Karel Šuhajda, Petr Tùma                  |
+| 00 COPY     | JUMP 0000 | 1        | IFO software - UAK                        |
+| 00 COPYPLUS | JUMP 0100 | 1        | IFO software                              |
+| 00 COPYCOPY | JUMP 0000 | 1        | IFO software                              |
+| 00 COPPY    | JUMP 0000 | 1        | ODPM PRAHA 2                              |
+| 00 WELL+2   | AutoRun   | 2,2A,3   | Karel Šuhajda, Petr Tùma                  |
 -->
-	<software name="copytape">
+	<software name="copytape"><!-- untested -->
 		<description>Copy Tape</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="8177">
 				<rom name="copytape.ptp" size="8177" crc="1fb93bb7" sha1="d23d44bb4c2fa41a2fe5027b4c329665e725c688"/>
@@ -384,27 +389,27 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- dam+2.ptp
-| DAM+2    |  ?  | AutoRun   | 2,2A,3   | štandardný relokovate¾ný DAM        |
-| DAM+2.1  |  X  |           |          | \                                   |
-| DAM+2.2  |  X  |           |          |  \ manuál k DAM+2 napísaný v        |
-| DAM+2.3  |  X  |           |          |  / v textovom editore KASWORD       |
-| DAM+2.3  |  X  |           |          | /                                   |
-| TRANSFER |  ?  | JUMP 0000 | 2,2A,3   | konvertor zdroj. textov z DAM-0000  |
-| TRANSFER |  X  |           |          | manuál k utilite TRANSFER           |
-| OPTIMAX  |  ?  | JUMP 0000 | 2,2A,3   | optimalizér zdrojových textov       |
-| RESRC2   |  ?  | AutoRun   | 2,2A,3   | disassemblig do zdrojového textu    |
-| TEXTER   |  A  |           |          | zdrojak - prevod dat do zdr. textu  |
-| EXTENDCH |  A  |           |          | zdrojak - zobr. znakov s diakr.     |
-| JOYDEMO  |  A  |           |          | zdrojak - 4004/482 joystick test    |
-| JOYSTICK |  >  | RUN       | 1,2,2A,3 | BASIC - schema zapojenia joysticku  |
-| ALLRAM2A |  ?  | JUMP 7000 | 2A       | prepnutie do AllRAM na PMD 85-2A    |
-| DAM+9000 |  ?  | JUMP 9000 | 2A,3     | DAM od adresy 9000H                 |
+| 00 DAM+2    |  ?  | AutoRun   | 2,2A,3   | štandardný relokovate¾ný DAM        |
+| 00 DAM+2.1  |  X  |           |          | \                                   |
+| 00 DAM+2.2  |  X  |           |          |  \ manuál k DAM+2 napísaný v        |
+| 00 DAM+2.3  |  X  |           |          |  / v textovom editore KASWORD       |
+| 00 DAM+2.3  |  X  |           |          | /                                   |
+| 00 TRANSFER |  ?  | JUMP 0000 | 2,2A,3   | konvertor zdroj. textov z DAM-0000  |
+| 00 TRANSFER |  X  |           |          | manuál k utilite TRANSFER           |
+| 00 OPTIMAX  |  ?  | JUMP 0000 | 2,2A,3   | optimalizér zdrojových textov       |
+| 00 RESRC2   |  ?  | AutoRun   | 2,2A,3   | disassemblig do zdrojového textu    |
+| 00 TEXTER   |  A  |           |          | zdrojak - prevod dat do zdr. textu  |
+| 00 EXTENDCH |  A  |           |          | zdrojak - zobr. znakov s diakr.     |
+| 00 JOYDEMO  |  A  |           |          | zdrojak - 4004/482 joystick test    |
+| 00 JOYSTICK |  >  | RUN       | 1,2,2A,3 | BASIC - schema zapojenia joysticku  |
+| 00 ALLRAM2A |  ?  | JUMP 7000 | 2A       | prepnutie do AllRAM na PMD 85-2A    |
+| 00 DAM+9000 |  ?  | JUMP 9000 | 2A,3     | DAM od adresy 9000H                 |
 -->
-	<software name="dam2">
+	<software name="dam2"><!-- untested -->
 		<description>DAM+2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="73030">
 				<rom name="dam+2.ptp" size="73030" crc="b388c4ee" sha1="7ee8d1625d4274ac068dab54d533603ba6d29eb1"/>
@@ -413,13 +418,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- dat-pmd.ptp
-| DAT PMD  |  ?  | JUMP 0000 | 2,2A,3   |                                     |
+| 00 DAT PMD  |  ?  | JUMP 0000 | 2,2A,3   |                                     |
 -->
 	<software name="datpmd">
 		<description>DAT PMD</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play, then JUMP 0000" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="6213">
 				<rom name="dat-pmd.ptp" size="6213" crc="4f262583" sha1="31ee56a4566eb3ddc137b1cfae27c17507c50948"/>
@@ -428,17 +433,17 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- devutils.ptp
-| DDT 6000 | JUMP 6000 | 1,2,2A,3 | ? / monitor, debbugger                    |
-| VMON 2.1 | JUMP E900 | 1,2,2A,3 | Petr Tùma / obrazovkový monitor, debugger |
-| ALLRAM2A | JUMP 7000 | 2A       | prepnutie do AllRAM na PMD 85-2A    |
-| VMON9000 | JUMP 9000 | 2A,3     | Petr Tùma / monitor, debugger v ext. mem. |
-| DISASS   | RUN       | 1,2,2A,3 | Pavol Kiko / disassembler v BASICu        |
+| 00 DDT 6000 | JUMP 6000 | 1,2,2A,3 | ? / monitor, debbugger                    |
+| 00 VMON 2.1 | JUMP E900 | 1,2,2A,3 | Petr Tùma / obrazovkový monitor, debugger |
+| 00 ALLRAM2A | JUMP 7000 | 2A       | prepnutie do AllRAM na PMD 85-2A    |
+| 00 VMON9000 | JUMP 9000 | 2A,3     | Petr Tùma / monitor, debugger v ext. mem. |
+| 00 DISASS   | RUN       | 1,2,2A,3 | Pavol Kiko / disassembler v BASICu        |
 -->
-	<software name="devutils">
+	<software name="devutils"><!-- untested -->
 		<description>Development Utils</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="20914">
 				<rom name="devutils.ptp" size="20914" crc="68c99dc8" sha1="cde02be5b0b1f53e1e16d3e5f7dcb76c731edaef"/>
@@ -447,23 +452,23 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- evidence.ptp
-| EVIDENCE |  ?  | AutoRun   | 1,2,2A,3 | samotný databázový systém           |
-| EVIDEDIT |  ?  | AutoRun   | 1,2,2A,3 | editor formulárov pre databázu      |
-| ZAJ.CIN  |  E  |           |          | \                                   |
-| CLEN.ZAK |  E  |           |          |  \ ukážkové dátove súbory           |
-|  SEZNAM  |  E  |           |          |  /                                  |
-| PROGRAMY |  E  |           |          | /                                   |
-| EVIMAN 1 |  X  |           |          | \                                   |
-| EVIMAN 2 |  X  |           |          |  \                                  |
-| EVIMAN 3 |  X  |           |          |  | manuál k programu                |
-| EVIMAN 4 |  X  |           |          |  /                                  |
-| EVIMAN 5 |  X  |           |          | /                                   |
+| 00 EVIDENCE |  ?  | AutoRun   | 1,2,2A,3 | samotný databázový systém           |
+| 00 EVIDEDIT |  ?  | AutoRun   | 1,2,2A,3 | editor formulárov pre databázu      |
+| 00 ZAJ.CIN  |  E  |           |          | \                                   |
+| 00 CLEN.ZAK |  E  |           |          |  \ ukážkové dátove súbory           |
+| 00  SEZNAM  |  E  |           |          |  /                                  |
+| 00 PROGRAMY |  E  |           |          | /                                   |
+| 00 EVIMAN 1 |  X  |           |          | \                                   |
+| 00 EVIMAN 2 |  X  |           |          |  \                                  |
+| 00 EVIMAN 3 |  X  |           |          |  | manuál k programu                |
+| 00 EVIMAN 4 |  X  |           |          |  /                                  |
+| 00 EVIMAN 5 |  X  |           |          | /                                   |
 -->
-	<software name="evidence">
+	<software name="evidence"><!-- untested -->
 		<description>Evidence</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="74358">
 				<rom name="evidence.ptp" size="74358" crc="25938fbf" sha1="dbc699b46932a701d5ebdaf063a9a5c74023ad8e"/>
@@ -471,11 +476,11 @@ For now tape loading only works in PMD-85.1
 		</part>
 	</software>
 
-	<software name="lemm256k">
+	<software name="lemm256k" supported="no"><!-- machine resets while loading -->
 		<description>Lemmings (256k)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="115835">
 				<rom name="game-lemmings-256k.ptp" size="115835" crc="14800807" sha1="b5d3cc843584cbcd062252aa86d33c04b2f1814c"/>
@@ -487,7 +492,7 @@ For now tape loading only works in PMD-85.1
 		<description>Lemmings</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="168252">
 				<rom name="game-lemmings.ptp" size="168252" crc="95cdfcd5" sha1="6f57ebffff27ffb9b44d29ab1484d3ead42e55ee"/>
@@ -496,20 +501,20 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-1.ptp
-| AUTO     | JUMP 2000 | 1,2,2A,3 | R.D.                                      |
-| INVADERS | JUMP 0100 | 1,2,2A,3 | IFO software, UAK Bratislava              |
-| KURA     | JUMP 0000 | 1,2,2A,3 | SAS                                       |
-| MUR      | JUMP 0000 | 1,2,2A,3 | SAS                                       |
-| PUZZLE   | JUMP 0000 | 1,2,2A,3 | SAS                                       |
-| TANK     | JUMP 2000 | 1,2,2A   | Pavol Kiko (prednostne pre PMD 85-1)      |
-| TENISS   | JUMP 7000 | 2,2A     | ?                                         |
-| ZABY     | JUMP 1500 | 1,2,2A,3 | ?                                         |
-| ZED      | JUMP 1000 | 1,2,2A,3 | R.D.                                      |
-| CROSFIRE | JUMP 0000 | 1        | ?                                         |
-| AIR RAID | JUMP 1000 | 1,2,2A,3 | ? (NITRA 1987)                            |
-| REVERZ   | JUMP 0000 | 1,2,2A,3 | SEN SOFTWARE                              |
+| 00 AUTO     | JUMP 2000 | 1,2,2A,3 | R.D.                                      |
+| 17 INVADERS | JUMP 0100 | 1,2,2A,3 | IFO software, UAK Bratislava              |
+| 01 KURA     | JUMP 0000 | 1,2,2A,3 | SAS                                       |
+| 04 MUR      | JUMP 0000 | 1,2,2A,3 | SAS                                       |
+| 02 PUZZLE   | JUMP 0000 | 1,2,2A,3 | SAS                                       |
+| 00 TANK     | JUMP 2000 | 1,2,2A   | Pavol Kiko (prednostne pre PMD 85-1)      |
+| 16 TENISS   | JUMP 7000 | 2,2A     | ?                                         |
+| 09 ZABY     | JUMP 1500 | 1,2,2A,3 | ?                                         |
+| 00 ZED      | JUMP 1000 | 1,2,2A,3 | R.D.                                      |
+| 00 CROSFIRE | JUMP 0000 | 1        | ?                                         |
+| 00 AIR RAID | JUMP 1000 | 1,2,2A,3 | ? (NITRA 1987)                            |
+| 00 REVERZ   | JUMP 0000 | 1,2,2A,3 | SEN SOFTWARE                              |
 -->
-	<software name="games1">
+	<software name="games1"><!-- untested -->
 		<description>Games 1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -522,21 +527,21 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-2.ptp
-| GALAXIA  | AutoRun   | 1,2,2A   | Petr Tuma (CERES SOFT)                    |
-| GLUTTON  | AutoRun   | 1,2,2A,3 | Jaroslav Szczurek, Peter Gregorovic       |
-| GRDEMO   | AutoRun   | 1,2,2A,3 | Petr Tuma (CERES SOFT)                    |
-| JASON    | AutoRun   | 1,2,2A,3 | Petr Tuma (CERES SOFT)                    |
-| KANKAN   | JUMP 0000 | 1,2,2A,3 | ?                                         |
-| MESTO    | AutoRun   | 1,2,2A   | Vit Libovicky (heslo: konvalinka)         |
-| MANIC+   | AutoRun   | 1        | Vit Libovicky, Daniel Jenne               |
-| MANIC+2  | AutoRun   | 2,2A,3   | Vit Libovicky, Daniel Jenne               |
-| PAMPUCH  | AutoRun   | 1        | D. Blasko                                 |
-| PAMPUCHX | AutoRun   | 1        | D. Blasko (255 zivotov)                   |
-| ON&DUCH4 | AutoRun   | 1        | D. Blasko (s hudobnym podmazom)           |
-| SPACE-RA | AutoRun   | 1        | Dusan Kertes                              |
-| SP'DEMIS | AutoRun   | 1        | Ján Miche¾, Igor Kolla                    |
+| 00 GALAXIA  | AutoRun   | 1,2,2A   | Petr Tuma (CERES SOFT)                    |
+| 00 GLUTTON  | AutoRun   | 1,2,2A,3 | Jaroslav Szczurek, Peter Gregorovic       |
+| 00 GRDEMO   | AutoRun   | 1,2,2A,3 | Petr Tuma (CERES SOFT)                    |
+| 00 JASON    | AutoRun   | 1,2,2A,3 | Petr Tuma (CERES SOFT)                    |
+| 00 KANKAN   | JUMP 0000 | 1,2,2A,3 | ?                                         |
+| 00 MESTO    | AutoRun   | 1,2,2A   | Vit Libovicky (heslo: konvalinka)         |
+| 02 MANIC+   | AutoRun   | 1        | Vit Libovicky, Daniel Jenne               |
+| 01 MANIC+2  | AutoRun   | 2,2A,3   | Vit Libovicky, Daniel Jenne               |
+| 00 PAMPUCH  | AutoRun   | 1        | D. Blasko                                 |
+| 00 PAMPUCHX | AutoRun   | 1        | D. Blasko (255 zivotov)                   |
+| 17 ON&DUCH4 | AutoRun   | 1        | D. Blasko (s hudobnym podmazom)           |
+| 02 SPACE-RA | AutoRun   | 1        | Dusan Kertes                              |
+| 01 SP'DEMIS | AutoRun   | 1        | Ján Miche, Igor Kolla                     |
 -->
-	<software name="games2">
+	<software name="games2"><!-- untested -->
 		<description>Games 2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -549,15 +554,15 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-3.ptp
-| CATEGORI | JUMP 1000 | 1        | Miroslav Urda                             |
-| COBRA    | JUMP 5B00 | 1        | Miroslav Urda                             |
-| STRIPPED | AutoRun   | 1        | Miroslav Urda                             |
-| PANGO    | AutoRun   | 1        | Miroslav Urda                             |
-| MISSION  | AutoRun   | 1        | Miroslav Urda                             |
-| RESCUER  | AutoRun   | 1        | Miroslav Urda, OK soft                    |
-| MICRHYTM | AutoRun   | 1        | Miroslav Urda                             |
+| 11 CATEGORI | JUMP 1000 | 1        | Miroslav Urda                             |
+| 05 COBRA    | JUMP 5B00 | 1        | Miroslav Urda                             |
+| 03 STRIPPED | AutoRun   | 1        | Miroslav Urda                             |
+| 30 PANGO    | AutoRun   | 1        | Miroslav Urda                             |
+| 06 MISSION  | AutoRun   | 1        | Miroslav Urda                             |
+| 01 RESCUER  | AutoRun   | 1        | Miroslav Urda, OK soft                    |
+| 05 MICRHYTM | AutoRun   | 1        | Miroslav Urda                             |
 -->
-	<software name="games3">
+	<software name="games3"><!-- untested -->
 		<description>Games 3</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -570,20 +575,20 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-4004-482.ptp
-| -WILLY-  | AutoRun   | 1        | Karel Šuhajda                             |
-| WILLY2   | JUMP 0000 | 2,2A,3   | Karel Šuhajda                             |
-| HORACE+2 | AutoRun   | 1,2,2A,3 | Karel Šuhajda                             |
-| FERLAJT  | AutoRun   | 1        | K. Šuhajda, Pavel Šindelka, Michal Èerný  |
-| M-TRON 1 | AutoRun   | 1        | Karel Šuhajda, Michal Èerný               |
-| M-TRON 2 | AutoRun   | 1        | Karel Šuhajda, Michal Èerný               |
-| M-TRON 3 | AutoRun   | 1        | Karel Šuhajda, Michal Èerný               |
-| PISQORKY | AutoRun   | 2,2A,3   | K. Šuhajda, P. Paleta                     |
-| BLUDISTE | AutoRun   | 1,2,2A,3 | K. Šuhajda, P. Šindelka, M. Èerný, T. Švec|
-| PEXESO   | AutoRun   | 1,2,2A   | Petr Thiel - elektrické znaèky            |
-| PEXESO2  | AutoRun   | 1,2,2A   | Petr Thiel - detské obrázky               |
-| HLIPA    | AutoRun   | 1,2,2A   | Karel Šuhajda, Tomáš Švec                 |
+| 00 -WILLY-  | AutoRun   | 1        | Karel Šuhajda                             |
+| 00 WILLY2   | JUMP 0000 | 2,2A,3   | Karel Šuhajda                             |
+| 17 HORACE+2 | AutoRun   | 1,2,2A,3 | Karel Šuhajda                             |
+| 13 FERLAJT  | AutoRun   | 1        | K. Šuhajda, Pavel Šindelka, Michal Èerný  |
+| 00 M-TRON 1 | AutoRun   | 1        | Karel Šuhajda, Michal Èerný               |
+| 00 M-TRON 2 | AutoRun   | 1        | Karel Šuhajda, Michal Èerný               |
+| 00 M-TRON 3 | AutoRun   | 1        | Karel Šuhajda, Michal Èerný               |
+| 00 PISQORKY | AutoRun   | 2,2A,3   | K. Šuhajda, P. Paleta                     |
+| 00 BLUDISTE | AutoRun   | 1,2,2A,3 | K. Šuhajda, P. Šindelka, M. Èerný, T. Švec|
+| 00 PEXESO   | AutoRun   | 1,2,2A   | Petr Thiel - elektrické znaèky            |
+| 00 PEXESO2  | AutoRun   | 1,2,2A   | Petr Thiel - detské obrázky               |
+| 21 HLIPA    | AutoRun   | 1,2,2A   | Karel Šuhajda, Tomáš Švec                 |
 -->
-	<software name="game4004">
+	<software name="game4004"><!-- untested -->
 		<description>Games by 4004/482 ZO Svazarmu</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -596,10 +601,10 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-libor-lasota.ptp
-| JETPAC   | AutoRun   | 1,2,2A,3 | Konverzia hry zo ZX Spectrum              |
-| PSSST    | AutoRun   | 1,2,2A,3 | Konverzia hry zo ZX Spectrum              |
+| 01 JETPAC   | AutoRun   | 1,2,2A,3 | Konverzia hry zo ZX Spectrum              |
+| 02 PSSST    | AutoRun   | 1,2,2A,3 | Konverzia hry zo ZX Spectrum              |
 -->
-	<software name="gameslib">
+	<software name="gameslib"><!-- untested -->
 		<description>Games by Libor Lasota</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -612,13 +617,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-rm-team.ptp
-| KVADRO   | AutoRun | 1,2,2A,3 | Martin Bórik, Roman Bórik                   |
-| KVADRO.E | AutoRun | 1,2,2A,3 | Martin Bórik, Roman Bórik / anglická verzia |
-| PLOTTING | AutoRun | 1,2,2A,3 | Roman Bórik, Martin Bórik                   |
-| SPINDZ   | AutoRun | 2A,3     | Roman Bórik, Martin Bórik                   |
-| GAME2048 | AutoRun | 1,2,2A,3 | Roman Bórik, Martin Bórik                   |
+| 00 KVADRO   | AutoRun | 1,2,2A,3 | Martin Bórik, Roman Bórik                   |
+| 00 KVADRO.E | AutoRun | 1,2,2A,3 | Martin Bórik, Roman Bórik / anglická verzia |
+| 00 PLOTTING | AutoRun | 1,2,2A,3 | Roman Bórik, Martin Bórik                   |
+| 00 SPINDZ   | AutoRun | 2A,3     | Roman Bórik, Martin Bórik                   |
+| 00 GAME2048 | AutoRun | 1,2,2A,3 | Roman Bórik, Martin Bórik                   |
 -->
-	<software name="gamesrm">
+	<software name="gamesrm"><!-- untested -->
 		<description>Games by RM-TEAM</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -631,22 +636,22 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- games-vbg.ptp
-| JERRY    | JUMP 1100 | 1,2,2A,3 | Jerry                                     |
-| *FLAPPY* | AutoRun   | 1        | Flappy (prvotna verzia, odlisny obrazok)  |
-| FLAPPY+4 | AutoRun   | 1,2,2A,3 | Flappy                                    |
-| MANIC2+3 | AutoRun   | 1,2,2A,3 | Manic Miner                               |
-| MANIC23c | AutoRun   | 1,2,2A,3 | Manic Miner s Cheat modom                 |
-| BOULDER  | AutoRun   | 1        | Boulder Dash (prvotna verzia)             |
-| BOULD+4  | AutoRun   | 1,2,2A,3 | Boulder Dash                              |
-| PENETR.3 | AutoRun   | 1,2,2A,3 | Penetrator                                |
-| FRED +4  | AutoRun   | 1,2,2A,3 | Fred                                      |
-| TETRIS+4 | AutoRun   | 1,2,2A,3 | Tetris (aj vo farbe)                      |
-| SABO +4  | AutoRun   | 1,2,2A,3 | Saboter                                   |
-| CERES-01 | AutoRun   | 1,2,2A,3 | DEMO od CERES-SOFTu s POKE do hier        |
-|          |           |          |   PENETR.3, FLAPPY+4, MANIC2+3, BOULD+4   |
-| PONTRIS  | AutoRun   | 1,2,2A,3 | Pontris (nova hra aj vo farbe, rok 2010)  |
+| 00 JERRY    | JUMP 1100 | 1,2,2A,3 | Jerry                                     |
+| 03 *FLAPPY* | AutoRun   | 1        | Flappy (prvotna verzia, odlisny obrazok)  |
+| 03 FLAPPY+4 | AutoRun   | 1,2,2A,3 | Flappy                                    |
+| 03 MANIC2+3 | AutoRun   | 1,2,2A,3 | Manic Miner                               |
+| 03 MANIC23c | AutoRun   | 1,2,2A,3 | Manic Miner s Cheat modom                 |
+| 03 BOULDER  | AutoRun   | 1        | Boulder Dash (prvotna verzia)             |
+| 03 BOULD+4  | AutoRun   | 1,2,2A,3 | Boulder Dash                              |
+| 03 PENETR.3 | AutoRun   | 1,2,2A,3 | Penetrator                                |
+| 03 FRED +4  | AutoRun   | 1,2,2A,3 | Fred                                      |
+| 03 TETRIS+4 | AutoRun   | 1,2,2A,3 | Tetris (aj vo farbe)                      |
+| 03 SABO +4  | AutoRun   | 1,2,2A,3 | Saboter                                   |
+| 00 CERES-01 | AutoRun   | 1,2,2A,3 | DEMO od CERES-SOFTu s POKE do hier        |
+|             |           |          |   PENETR.3, FLAPPY+4, MANIC2+3, BOULD+4   |
+| 00 PONTRIS  | AutoRun   | 1,2,2A,3 | Pontris (nova hra aj vo farbe, rok 2010)  |
 -->
-	<software name="gamesvbg">
+	<software name="gamesvbg"><!-- untested -->
 		<description>Games by VBG Software</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -659,13 +664,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- gr.ptp
-| GR v1.00 |  ?  | AutoRun   | 2,2A,3   |                                     |
-| GR - obr |  C  |           |          | \                                   |
-| GR - obr |  C  |           |          |  \ obrázky vytvorené v editore      |
-| GR - obr |  C  |           |          |  /                                  |
-| GR - obr |  C  |           |          | /                                   |
+| 00 GR v1.00 |  ?  | AutoRun   | 2,2A,3   |                                     |
+| 00 GR - obr |  C  |           |          | \                                   |
+| 00 GR - obr |  C  |           |          |  \ obrázky vytvorené v editore      |
+| 00 GR - obr |  C  |           |          |  /                                  |
+| 00 GR - obr |  C  |           |          | /                                   |
 -->
-	<software name="gr">
+	<software name="gr"><!-- untested -->
 		<description>GR v1.00</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -678,11 +683,11 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- gred.ptp
-| GRED 2.1 |  ?  | AutoRun   | 2,2A,3   | verzia 2.1 - 10/1988                |
-| GRED 3.2 |  ?  | AutoRun   | 2,2A,3   | verzia 3.2 - 4/1989                 |
-| *        |  C  |           |          | rôzne obrázky zo ZX Spectrum        |
+| 00 GRED 2.1 |  ?  | AutoRun   | 2,2A,3   | verzia 2.1 - 10/1988                |
+| 00 GRED 3.2 |  ?  | AutoRun   | 2,2A,3   | verzia 3.2 - 4/1989                 |
+| 00 *        |  C  |           |          | rôzne obrázky zo ZX Spectrum        |
 -->
-	<software name="gred">
+	<software name="gred"><!-- untested -->
 		<description>GRED</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -695,10 +700,10 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- grep.ptp
-| GREP2    |  ?  | AutoRun   | 2,2A,3   |                                     |
-| *        |  G  |           |          | ukážkové sprity                     |
+| 00 GREP2    |  ?  | AutoRun   | 2,2A,3   |                                     |
+| 00 *        |  G  |           |          | ukážkové sprity                     |
 -->
-	<software name="grep">
+	<software name="grep"><!-- untested -->
 		<description>GREP</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -711,26 +716,26 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- hry1.ptp
-| BLACK    | 1,2,2A,3 | Andrej Blaho / logicka hra                            |
-| BOMBARDE | 1,2,2A   | org. František Fuka / Bombardér                       |
-| ELKA     | 1,2,2A   | D / logicka hra                                       |
-| FARAON   | 1,2,2A,3 | KM PF Nitra / log. hra Faraónova hrobka štýlu "HRA 15"|
-| GARDNER  | 2,2A,3   | Roman Bórik pod¾a Zenitu Pionierov / logická hra      |
-| LAVICKA  | 2,2A,3   | ? / hra Lietajúca lavièka (primárne pre PMD 85-3)     |
-| KON      | 1,2,2A   | ? / logická hra ah koòom                              |
-| NALET    | 3        | org. František Fuka / upraveny Bombardér pre PMD 85-3 |
-| PAVUCI   | 1,2,2A   | Karel Šuhajda / Horac a pavouci                       |
-| PEXESO   | 1,2,2A,3 | ? Zenit Pionierov / Písmenové pexeso                  |
-| REVERZ   | 2,2A,3   | P.N. / logická hra (primárne pre PMD 85-3)            |
-| ROBINSON | 1,2,2A   | RNDr. Daniel Polcin / strielanie na kaèicu :-)        |
-| SLALOM   | 3        | ? / slalom na lyžiach :-)                             |
-| TANKY    | 1,2,2A   | Pavol Kiko / Tanková bitva                            |
-| TAVA     | 1,2,2A,3 | KM PF Nitra / textovka-prejdite s avou 200km v púšti  |
-| VIDEOSTP | 2,2A,3   | Roman Bórik / na motívy známej TV hry                 |
-| VOTRELCI | 2,2A,3   | TESLA / nicenie votrelcov (primárne pre PMD 85-3)     |
-| WURMI    | 1,2,2A   | org. František Fuka / Húsenka :-)                     |
+| 01 BLACK    | 1,2,2A,3 | Andrej Blaho / logicka hra                            |
+| 02 BOMBARDE | 1,2,2A   | org. František Fuka / Bombardér                       |
+| 00 ELKA     | 1,2,2A   | D / logicka hra                                       |
+| 03 FARAON   | 1,2,2A,3 | KM PF Nitra / log. hra Faraónova hrobka štýlu "HRA 15"|
+| 44 GARDNER  | 2,2A,3   | Roman Bórik pod¾a Zenitu Pionierov / logická hra      |
+| 00 LAVICKA  | 2,2A,3   | ? / hra Lietajúca lavièka (primárne pre PMD 85-3)     |
+| 04 KON      | 1,2,2A   | ? / logická hra ah koòom                              |
+| 00 NALET    | 3        | org. František Fuka / upraveny Bombardér pre PMD 85-3 |
+| 40 PAVUCI   | 1,2,2A   | Karel Šuhajda / Horac a pavouci                       |
+| 30 PEXESO   | 1,2,2A,3 | ? Zenit Pionierov / Písmenové pexeso                  |
+| 00 REVERZ   | 2,2A,3   | P.N. / logická hra (primárne pre PMD 85-3)            |
+| 01 ROBINSON | 1,2,2A   | RNDr. Daniel Polcin / strielanie na kaèicu :-)        |
+| 00 SLALOM   | 3        | ? / slalom na lyžiach :-)                             |
+| 53 TANKY    | 1,2,2A   | Pavol Kiko / Tanková bitva                            |
+| 05 TAVA     | 1,2,2A,3 | KM PF Nitra / textovka-prejdite s avou 200km v púšti  |
+| 11 VIDEOSTP | 2,2A,3   | Roman Bórik / na motívy známej TV hry                 |
+| 00 VOTRELCI | 2,2A,3   | TESLA / nicenie votrelcov (primárne pre PMD 85-3)     |
+| 07 WURMI    | 1,2,2A   | org. František Fuka / Húsenka :-)                     |
 -->
-	<software name="hry1">
+	<software name="hry1"><!-- untested -->
 		<description>HRY1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -743,20 +748,20 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- hry2.ptp
-| ADC      | 2,2A     | R&I / chodièka                                        |
-| BARBAR   | 2,2A     | R&I / chodièka                                        |
-| COSMIC   | 2,2A     | R&I / chodièka                                        |
-| ERB      | 2,2A     | R&I / chodièka                                        |
-| JOE1     | 2,2A     | R&I / chodièka                                        |
-| KRES     | 2,2A     | R&I / kreslenie                                       |
-| MYTH1    | 2,2A     | R&I / chodièka                                        |
-| MYTH2    | 2,2A     | R&I / chodièka                                        |
-| MYTH3    | 2,2A     | R&I / chodièka                                        |
-| NINJA    | 2,2A     | R&I / chodièka                                        |
-| OSTROV   | 2,2A     | R&I / chodièka                                        |
-| POKLAD   | 2,2A     | R&I / chodièka                                        |
+| 01 ADC      | 2,2A     | R&I / chodièka                                        |
+| 01 BARBAR   | 2,2A     | R&I / chodièka                                        |
+| 01 COSMIC   | 2,2A     | R&I / chodièka                                        |
+| 01 ERB      | 2,2A     | R&I / chodièka                                        |
+| 01 JOE1     | 2,2A     | R&I / chodièka                                        |
+| 01 KRES     | 2,2A     | R&I / kreslenie                                       |
+| 01 MYTH1    | 2,2A     | R&I / chodièka                                        |
+| 01 MYTH2    | 2,2A     | R&I / chodièka                                        |
+| 01 MYTH3    | 2,2A     | R&I / chodièka                                        |
+| 01 NINJA    | 2,2A     | R&I / chodièka                                        |
+| 01 OSTROV   | 2,2A     | R&I / chodièka                                        |
+| 01 POKLAD   | 2,2A     | R&I / chodièka                                        |
 -->
-	<software name="hry2">
+	<software name="hry2"><!-- untested -->
 		<description>HRY2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -769,13 +774,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- k-studio.ptp
-| K-STUDIO |  ?  | AutoRun   | 2,2A,3   |                                     |
+| 01 K-STUDIO |  ?  | AutoRun   | 2,2A,3   |                                     |
 -->
 	<software name="kstudio">
-		<description>K-Studio</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
+		<description>K-Studio v2.7</description>
+		<year>1988</year>
+		<publisher>S2 Software</publisher>
+		<info name="usage" value="In Monitor, MGLD 01 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="19156">
 				<rom name="k-studio.ptp" size="19156" crc="a765d1c3" sha1="0aaa901ffeb3f2e7bb38f92e87bc3720d5b1938b"/>
@@ -784,18 +789,18 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- karel.ptp
-| KAREL    | AutoRun   | 1,2,2A,3 | Karel Šuhajda / 2D Karel                  |
-| KAREL2D  | RUN       | 1,2,2A   | Tomáš Bartovský / 2D Karel (Basic)        |
-| KAREL-2R | JUMP 0000 | 1        | Tomáš Bartovský / 2D Karel                |
-| KAREL3D0 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v0.0             |
-| KAREL3.2 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v2.0             |
-| KAREL3D2 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v3.2             |
+| 00 KAREL    | AutoRun   | 1,2,2A,3 | Karel Šuhajda / 2D Karel                  |
+| 22 KAREL2D  | RUN       | 1,2,2A   | Tomáš Bartovský / 2D Karel (Basic)        |
+| 16 KAREL-2R | JUMP 0000 | 1        | Tomáš Bartovský / 2D Karel                |
+| 17 KAREL3D0 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v0.0             |
+| 18 KAREL3.2 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v2.0             |
+| 19 KAREL3D2 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v3.2             |
 -->
-	<software name="karela" cloneof="karel">
+	<software name="karela" cloneof="karel"><!-- untested -->
 		<description>Karel (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
 		<part name="cass1" interface="pmd85_cass">
 			<dataarea name="cass" size="54244">
 				<rom name="karel.ptp" size="54244" crc="20e10dd8" sha1="ce8c6b7a790754edecb65bb9e6f15ee64d466502"/>
@@ -804,12 +809,12 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- karel2d3d.ptp
-| KAREL    | AutoRun   | 1,2,2A,3 | Karel Šuhajda / 2D Karel                  |
-| KAREL3D0 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v0.0             |
-| KAREL3.2 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v2.0             |
-| KAREL3D2 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v3.2             |
+| 00 KAREL    | AutoRun   | 1,2,2A,3 | Karel Šuhajda / 2D Karel                  |
+| 01 KAREL3D0 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v0.0             |
+| 02 KAREL3.2 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v2.0             |
+| 03 KAREL3D2 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v3.2             |
 -->
-	<software name="karelb" cloneof="karel">
+	<software name="karelb" cloneof="karel"><!-- untested -->
 		<description>Karel (Alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -822,13 +827,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- krivky.ptp
-    - SIERPIN  - program na kreslenie Sierpinskeho kriviek
-    - HILBERT  - program na kreslenie Hilbertovych kriviek
-    - W-KRIVKY - program na kreslenie W kriviek (Iba krivky 1. a 2. rádu sa
+    - SIERPIN  - program na kreslenie Sierpinskeho kriviek (01/P, 02/?, 03/?, 04/?)
+    - HILBERT  - program na kreslenie Hilbertovych kriviek (01/P, 02/?, 03/?)
+    - W-KRIVKY - program na kreslenie W kriviek (Iba krivky 1. a 2. rádu sa (01/P, 02/?, 03/?)
                  kreslia správne. Od 3. rádu sa kreslia zle.
                  Nájde niekto správne riešenie?... :-)
 -->
-	<software name="krivky">
+	<software name="krivky"><!-- untested -->
 		<description>Krivky</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -841,16 +846,16 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- logo.ptp
-    - ZOFKA1   - korytnaèka Žofka v BASICu (v1)
-    - ZOFKA2   - korytnaèka Žofka v BASICu (v2/v2A/v3)
-    - ZOFKA 2  - korytnaèka Žofka v BASICu (staršia verzia) (v2/v2A/v3)
-    - ZOFKA2T  - korytnaèka Žofka v BASICu s prikazom pre tlac (v2/v2A/v3)
-    - Zofka 3  - korytnaèka Žofka v strojovom kóde (v2/v2A/v3). Po nahratí sa spúšta JUMP 0003
+ 01 - ZOFKA1   - korytnaèka Žofka v BASICu (v1)
+ 10 - ZOFKA2   - korytnaèka Žofka v BASICu (v2/v2A/v3)
+ 12 - ZOFKA 2  - korytnaèka Žofka v BASICu (staršia verzia) (v2/v2A/v3)
+ 11 - ZOFKA2T  - korytnaèka Žofka v BASICu s prikazom pre tlac (v2/v2A/v3)
+ 42 - Zofka 3  - korytnaèka Žofka v strojovom kóde (v2/v2A/v3). Po nahratí sa spúšta JUMP 0003
                  (pri PMD 85-3 je treba najprv prejs do režimu kompatibility zadanim JUMP FFF0 v monitore).
-    - MRAVEC   - jednoduchý logický jazyk Mravec (v2/v2A/v3)
-    - T.MRAVEC - jednoduchý logický jazyk Toèi-Mravec (v2/v2A/v3)
+ 34 - MRAVEC   - jednoduchý logický jazyk Mravec (v2/v2A/v3)
+ 52 - T.MRAVEC - jednoduchý logický jazyk Toèi-Mravec (v2/v2A/v3)
 -->
-	<software name="logo">
+	<software name="logo"><!-- untested -->
 		<description>LOGO</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -863,13 +868,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- mrs.ptp
-| MRS      | JUMP 6000 | 1        |                                           |
-| MRS-NOVE | JUMP 6000 | 1        | upravená verzia                           |
-| MRS2     | JUMP 6000 | 2,2A,3   | verzia pre PMD 85-2, 2A a 3               |
-| LIB      |           |          | knižnica                                  |
-| BZZZZT   |           |          | zdroják - zabzuèanie z hry Hlípa          |
+| 00 MRS      | JUMP 6000 | 1        |                                           |
+| 00 MRS-NOVE | JUMP 6000 | 1        | upravená verzia                           |
+| 00 MRS2     | JUMP 6000 | 2,2A,3   | verzia pre PMD 85-2, 2A a 3               |
+| 00 LIB      |           |          | knižnica                                  |
+| 00 BZZZZT   |           |          | zdroják - zabzuèanie z hry Hlípa          |
 -->
-	<software name="mrs">
+	<software name="mrs"><!-- untested -->
 		<description>MRS</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -882,13 +887,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- musica.ptp
-| MUSICA   |  ?  | AutoRun   | 1        |                                     |
-| MUSICA+2 |  ?  | AutoRun   | 2,2A,3   |                                     |
-| MUSICA+3 |  ?  | AutoRun   | 2,2A,3   |                                     |
-| MUSICman |  T  |           |          | manuál k programu                   |
-| *        |  M  |           |          | rôzne ukážkové hudby                |
+| 00 MUSICA   |  ?  | AutoRun   | 1        |                                     |
+| 00 MUSICA+2 |  ?  | AutoRun   | 2,2A,3   |                                     |
+| 00 MUSICA+3 |  ?  | AutoRun   | 2,2A,3   |                                     |
+| 00 MUSICman |  T  |           |          | manuál k programu                   |
+| 00 *        |  M  |           |          | rôzne ukážkové hudby                |
 -->
-	<software name="musica">
+	<software name="musica"><!-- untested -->
 		<description>Musica</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -901,20 +906,20 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- rozne.ptp
-| BUBLSORT | 1,2,2A,3 | KM PF Nitra / vysvetlenie bublinkového triedenia      |
-| GONIO    | 2,2A,3   | Martin Bórik / ukážka SIN/COS (primárne pre PMD 85-3) |
-| KLAV-PMD | 3        | TESLA Bratislava / demo                               |
-| LISSAJ   | 1,2,2A,3 | ? / ukážka SIN/COS                                    |
-| MATODEMO | 1,2,2A,3 | ? / demo z poèítaèa MAO                               |
-| MESIAC   | 1,2,2A,3 | Brestenský - Zenit Pionierov / Fázy mesiaca           |
-| MUZIKANT | 1,2,2A,3 | ? Zenit Pionierov / Vytváranie jednoduchých melódií   |
-| REZ      | 2,2A,3   | ? / demonštrácia rezu kockou                          |
-| TEST3A   | 3        | TESLA Bratislava / demo k PMD 85-3                    |
-| TESTATTR | 2,2A,3   | Roman Bórik / Test farebného zobrazenia               |
-| TESTATR2 | 2,2A,3   | Roman Bórik / Test farebného zobrazenia               |
-| TEST LOG | 1,2,2A,3 | KM PF Nitra / Test logiky a inteligencie              |
+| 00 BUBLSORT | 1,2,2A,3 | KM PF Nitra / vysvetlenie bublinkového triedenia      |
+| 34 GONIO    | 2,2A,3   | Martin Bórik / ukážka SIN/COS (primárne pre PMD 85-3) |
+| 00 KLAV-PMD | 3        | TESLA Bratislava / demo                               |
+| 09 LISSAJ   | 1,2,2A,3 | ? / ukážka SIN/COS                                    |
+| 55 MATODEMO | 1,2,2A,3 | ? / demo z poèítaèa MATO                              |
+| 23 MESIAC   | 1,2,2A,3 | Brestenský - Zenit Pionierov / Fázy mesiaca           |
+| 19 MUZIKANT | 1,2,2A,3 | ? Zenit Pionierov / Vytváranie jednoduchých melódií   |
+| 00 REZ      | 2,2A,3   | ? / demonštrácia rezu kockou                          |
+| 00 TEST3A   | 3        | TESLA Bratislava / demo k PMD 85-3                    |
+| 00 TESTATTR | 2,2A,3   | Roman Bórik / Test farebného zobrazenia               |
+| 01 TESTATR2 | 2,2A,3   | Roman Bórik / Test farebného zobrazenia               |
+| 06 TEST LOG | 1,2,2A,3 | KM PF Nitra / Test logiky a inteligencie              |
 -->
-	<software name="rozne">
+	<software name="rozne"><!-- untested -->
 		<description>Rozne</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -927,12 +932,12 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- rozne.ptp (pascal)
-    - DRAW     - test grafických príkazov
-    - GRAPH    - test grafických príkazov 2
-    - FACT.PAS - výpoèet faktoriálu
-    - SNC.PAS  - súèet nepárnych èísel
+    - DRAW     - test grafických príkazov (01/P)
+    - GRAPH    - test grafických príkazov 2 (01/P, 02/:, 03/:)
+    - FACT.PAS - výpoèet faktoriálu (01/P)
+    - SNC.PAS  - súèet nepárnych èísel (01/P)
 -->
-	<software name="rozne_1">
+	<software name="rozne_1"><!-- untested -->
 		<description>Rozne (Pascal)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -945,14 +950,14 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- skladatel.ptp
-| SKLADATE |  ?  | JUMP 0100 | 2,2A,3   |                                     |
-| FLAPPY1  |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Flappy                 |
-| FLAPPY2  |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Flappy                 |
-| PENETR-1 |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Penetrator             |
-| PENETR-2 |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Penetrator             |
-| PENETR-3 |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Penetrator             |
+| 03 SKLADATE |  ?  | JUMP 0100 | 2,2A,3   |                                     |
+| 00 FLAPPY1  |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Flappy                 |
+| 00 FLAPPY2  |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Flappy                 |
+| 00 PENETR-1 |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Penetrator             |
+| 00 PENETR-2 |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Penetrator             |
+| 00 PENETR-3 |  ?  | JUMP 0F90 | 1,2,2A,3 | muzika z hry Penetrator             |
 -->
-	<software name="skladate">
+	<software name="skladate"><!-- untested -->
 		<description>Skladatel</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -965,14 +970,14 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- texted.ptp
-| KASWORD3 |  ?  | JUMP 0000 | 1,2,2A,3 | KASWORD 3                           |
-| KASW.MAN |  X  |           |          | manuál k editoru KASWORD3           |
-| TEXED    |  ?  | JUMP 0000 | 2,2A,3   | úprava P. Holubek                   |
-| MANTEXED |  T  |           |          | manuál k editoru TEXED              |
-| KASWRD+2 |  ?  | AutoRun   | 2,2A,3   | KASWORD+2                           |
-| KASW-CON |  ?  | AutoRun   | 2,2A,3   | KASWORD+2 s inym ovladacom tlaciarne|
+| 00 KASWORD3 |  ?  | JUMP 0000 | 1,2,2A,3 | KASWORD 3                           |
+| 00 KASW.MAN |  X  |           |          | manuál k editoru KASWORD3           |
+| 00 TEXED    |  ?  | JUMP 0000 | 2,2A,3   | úprava P. Holubek                   |
+| 00 MANTEXED |  T  |           |          | manuál k editoru TEXED              |
+| 00 KASWRD+2 |  ?  | AutoRun   | 2,2A,3   | KASWORD+2                           |
+| 03 KASW-CON |  ?  | AutoRun   | 2,2A,3   | KASWORD+2 s inym ovladacom tlaciarne|
 -->
-	<software name="texted">
+	<software name="texted"><!-- untested -->
 		<description>Texted</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -985,13 +990,13 @@ For now tape loading only works in PMD-85.1
 	</software>
 
 <!-- vegrap.ptp
-| VEGRAP3X |  ?  | JUMP 0000 | 1,2,2A,3 | (9.3.1988)                          |
-| MANVEGR1 |  T  |           |          | manuál k editoru VEGRAP3X           |
-| MANVEGR2 |  T  |           |          |                                     |
-| VEGRAP;Q |  ?  | JUMP 0000 | 1,2,2A,3 | (30.12.1989)                        |
-| MANVGP;Q |  X  |           |          | manuál k editoru VEGRAP;Q           |
+| 03 VEGRAP3X |  ?  | JUMP 0000 | 1,2,2A,3 | (9.3.1988)                          |
+| 00 MANVEGR1 |  T  |           |          | manuál k editoru VEGRAP3X           |
+| 00 MANVEGR2 |  T  |           |          |                                     |
+| 03 VEGRAP;Q |  ?  | JUMP 0000 | 1,2,2A,3 | (30.12.1989)                        |
+| 00 MANVGP;Q |  X  |           |          | manuál k editoru VEGRAP;Q           |
 -->
-	<software name="vegrap">
+	<software name="vegrap"><!-- untested -->
 		<description>Vegrap</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

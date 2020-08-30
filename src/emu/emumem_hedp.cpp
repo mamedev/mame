@@ -180,6 +180,8 @@ template class handler_entry_read_delegate<1,  0, ENDIANNESS_LITTLE, read16_dele
 template class handler_entry_read_delegate<1,  0, ENDIANNESS_BIG,    read16_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_LITTLE, read16_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_BIG,    read16_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_LITTLE, read32_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_BIG,    read32_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_LITTLE, read32_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_BIG,    read32_delegate>;
 template class handler_entry_read_delegate<2, -1, ENDIANNESS_LITTLE, read32_delegate>;
@@ -205,6 +207,8 @@ template class handler_entry_read_delegate<1,  0, ENDIANNESS_LITTLE, read16m_del
 template class handler_entry_read_delegate<1,  0, ENDIANNESS_BIG,    read16m_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_LITTLE, read16m_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_BIG,    read16m_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_LITTLE, read32m_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_BIG,    read32m_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_LITTLE, read32m_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_BIG,    read32m_delegate>;
 template class handler_entry_read_delegate<2, -1, ENDIANNESS_LITTLE, read32m_delegate>;
@@ -230,6 +234,8 @@ template class handler_entry_read_delegate<1,  0, ENDIANNESS_LITTLE, read16s_del
 template class handler_entry_read_delegate<1,  0, ENDIANNESS_BIG,    read16s_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_LITTLE, read16s_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_BIG,    read16s_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_LITTLE, read32s_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_BIG,    read32s_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_LITTLE, read32s_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_BIG,    read32s_delegate>;
 template class handler_entry_read_delegate<2, -1, ENDIANNESS_LITTLE, read32s_delegate>;
@@ -255,6 +261,8 @@ template class handler_entry_read_delegate<1,  0, ENDIANNESS_LITTLE, read16sm_de
 template class handler_entry_read_delegate<1,  0, ENDIANNESS_BIG,    read16sm_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_LITTLE, read16sm_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_BIG,    read16sm_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_LITTLE, read32sm_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_BIG,    read32sm_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_LITTLE, read32sm_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_BIG,    read32sm_delegate>;
 template class handler_entry_read_delegate<2, -1, ENDIANNESS_LITTLE, read32sm_delegate>;
@@ -280,6 +288,8 @@ template class handler_entry_read_delegate<1,  0, ENDIANNESS_LITTLE, read16mo_de
 template class handler_entry_read_delegate<1,  0, ENDIANNESS_BIG,    read16mo_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_LITTLE, read16mo_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_BIG,    read16mo_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_LITTLE, read32mo_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_BIG,    read32mo_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_LITTLE, read32mo_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_BIG,    read32mo_delegate>;
 template class handler_entry_read_delegate<2, -1, ENDIANNESS_LITTLE, read32mo_delegate>;
@@ -305,6 +315,8 @@ template class handler_entry_read_delegate<1,  0, ENDIANNESS_LITTLE, read16smo_d
 template class handler_entry_read_delegate<1,  0, ENDIANNESS_BIG,    read16smo_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_LITTLE, read16smo_delegate>;
 template class handler_entry_read_delegate<1, -1, ENDIANNESS_BIG,    read16smo_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_LITTLE, read32smo_delegate>;
+template class handler_entry_read_delegate<2,  3, ENDIANNESS_BIG,    read32smo_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_LITTLE, read32smo_delegate>;
 template class handler_entry_read_delegate<2,  0, ENDIANNESS_BIG,    read32smo_delegate>;
 template class handler_entry_read_delegate<2, -1, ENDIANNESS_LITTLE, read32smo_delegate>;
@@ -330,6 +342,8 @@ template class handler_entry_write_delegate<1,  0, ENDIANNESS_LITTLE, write16_de
 template class handler_entry_write_delegate<1,  0, ENDIANNESS_BIG,    write16_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_LITTLE, write16_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_BIG,    write16_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_LITTLE, write32_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_BIG,    write32_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_LITTLE, write32_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_BIG,    write32_delegate>;
 template class handler_entry_write_delegate<2, -1, ENDIANNESS_LITTLE, write32_delegate>;
@@ -355,6 +369,8 @@ template class handler_entry_write_delegate<1,  0, ENDIANNESS_LITTLE, write16m_d
 template class handler_entry_write_delegate<1,  0, ENDIANNESS_BIG,    write16m_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_LITTLE, write16m_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_BIG,    write16m_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_LITTLE, write32m_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_BIG,    write32m_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_LITTLE, write32m_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_BIG,    write32m_delegate>;
 template class handler_entry_write_delegate<2, -1, ENDIANNESS_LITTLE, write32m_delegate>;
@@ -380,6 +396,8 @@ template class handler_entry_write_delegate<1,  0, ENDIANNESS_LITTLE, write16s_d
 template class handler_entry_write_delegate<1,  0, ENDIANNESS_BIG,    write16s_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_LITTLE, write16s_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_BIG,    write16s_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_LITTLE, write32s_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_BIG,    write32s_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_LITTLE, write32s_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_BIG,    write32s_delegate>;
 template class handler_entry_write_delegate<2, -1, ENDIANNESS_LITTLE, write32s_delegate>;
@@ -405,6 +423,8 @@ template class handler_entry_write_delegate<1,  0, ENDIANNESS_LITTLE, write16sm_
 template class handler_entry_write_delegate<1,  0, ENDIANNESS_BIG,    write16sm_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_LITTLE, write16sm_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_BIG,    write16sm_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_LITTLE, write32sm_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_BIG,    write32sm_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_LITTLE, write32sm_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_BIG,    write32sm_delegate>;
 template class handler_entry_write_delegate<2, -1, ENDIANNESS_LITTLE, write32sm_delegate>;
@@ -430,6 +450,8 @@ template class handler_entry_write_delegate<1,  0, ENDIANNESS_LITTLE, write16mo_
 template class handler_entry_write_delegate<1,  0, ENDIANNESS_BIG,    write16mo_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_LITTLE, write16mo_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_BIG,    write16mo_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_LITTLE, write32mo_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_BIG,    write32mo_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_LITTLE, write32mo_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_BIG,    write32mo_delegate>;
 template class handler_entry_write_delegate<2, -1, ENDIANNESS_LITTLE, write32mo_delegate>;
@@ -455,6 +477,8 @@ template class handler_entry_write_delegate<1,  0, ENDIANNESS_LITTLE, write16smo
 template class handler_entry_write_delegate<1,  0, ENDIANNESS_BIG,    write16smo_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_LITTLE, write16smo_delegate>;
 template class handler_entry_write_delegate<1, -1, ENDIANNESS_BIG,    write16smo_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_LITTLE, write32smo_delegate>;
+template class handler_entry_write_delegate<2,  3, ENDIANNESS_BIG,    write32smo_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_LITTLE, write32smo_delegate>;
 template class handler_entry_write_delegate<2,  0, ENDIANNESS_BIG,    write32smo_delegate>;
 template class handler_entry_write_delegate<2, -1, ENDIANNESS_LITTLE, write32smo_delegate>;
@@ -481,6 +505,8 @@ template class handler_entry_read_ioport<1,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_ioport<1,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_ioport<1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_read_ioport<1, -1, ENDIANNESS_BIG>;
+template class handler_entry_read_ioport<2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_ioport<2,  3, ENDIANNESS_BIG>;
 template class handler_entry_read_ioport<2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_ioport<2,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_ioport<2, -1, ENDIANNESS_LITTLE>;
@@ -506,6 +532,8 @@ template class handler_entry_write_ioport<1,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_ioport<1,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_ioport<1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_write_ioport<1, -1, ENDIANNESS_BIG>;
+template class handler_entry_write_ioport<2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_write_ioport<2,  3, ENDIANNESS_BIG>;
 template class handler_entry_write_ioport<2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_ioport<2,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_ioport<2, -1, ENDIANNESS_LITTLE>;

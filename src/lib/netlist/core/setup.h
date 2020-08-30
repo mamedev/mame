@@ -9,9 +9,9 @@
 #define NL_CORE_SETUP_H_
 
 #include "../nl_config.h"
-#include "../nltypes.h"
 #include "../nl_factory.h"
 #include "../nl_setup.h"
+#include "../nltypes.h"
 
 #include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
@@ -283,6 +283,22 @@ namespace netlist
 		pstring m_filename;
 	};
 
+	class source_pattern_t : public source_netlist_t
+	{
+	public:
+
+		explicit source_pattern_t(const pstring &pat)
+		: m_pattern(pat)
+		{
+		}
+
+	protected:
+		stream_ptr stream(const pstring &name) override;
+
+	private:
+		pstring m_pattern;
+	};
+
 	class source_mem_t : public source_netlist_t
 	{
 	public:
@@ -315,6 +331,25 @@ namespace netlist
 	private:
 		nlsetup_func m_setup_func;
 		pstring m_setup_func_name;
+	};
+
+	class source_token_t : public source_netlist_t
+	{
+	public:
+		source_token_t(const pstring &name, const parser_t::token_store &store)
+		: m_store(store)
+		, m_name(name)
+		{
+		}
+
+		bool parse(nlparse_t &setup, const pstring &name) override;
+
+	protected:
+		stream_ptr stream(const pstring &name) override;
+
+	private:
+		parser_t::token_store m_store;
+		pstring m_name;
 	};
 
 } // namespace netlist

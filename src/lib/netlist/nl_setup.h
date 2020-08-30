@@ -17,6 +17,7 @@
 
 #include "nl_config.h"
 #include "nltypes.h"
+#include "nl_parser.h"
 // FIXME: avoid including factory
 //#include "nl_factory.h"
 
@@ -80,6 +81,9 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
+		setup.register_source_proc(# name, &NETLIST_NAME(name));
+
+#define EXTERNAL_SOURCE(name)                                                  \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 // FIXME: Need to pass in parameter definition
@@ -229,6 +233,7 @@ namespace netlist
 
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
+		bool parse_tokens(const parser_t::token_store &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)
@@ -270,6 +275,7 @@ namespace netlist
 		plib::psource_collection_t<>                m_sources;
 		detail::abstract_t &                        m_abstract;
 
+		std::unordered_map<pstring, parser_t::token_store>    m_source_cache;
 		log_type &m_log;
 		unsigned m_frontier_cnt;
 	};

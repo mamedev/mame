@@ -4113,13 +4113,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	const int IRQ1_SCANLINE = 25; // guess
 	const int VBIN_SCANLINE = 0;
 	const int VBOUT_SCANLINE = 240;
+	const int SPRDMA_SCANLINE = 241; // 256 USEC after VBOUT
 
 	int scanline = param;
 
 	if (scanline == VBOUT_SCANLINE) // vblank-out irq
 	{
 		m_maincpu->set_input_line(4, HOLD_LINE);
-		m_dma_timer->adjust(attotime::from_usec(256)); // 256 USEC after VBOUT
+		m_dma_timer->adjust(m_screen->time_until_pos(SPRDMA_SCANLINE)/*attotime::from_usec(256)*/);
 	}
 
 	/* Vblank-in irq, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous

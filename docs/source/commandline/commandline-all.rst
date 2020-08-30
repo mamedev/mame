@@ -237,9 +237,9 @@ overwritten.
             </mame>
 
 .. Tip:: Output from this command is typically more useful if redirected to
-         an output file. For instance, doing 
+         an output file. For instance, doing
          **mame64 -listxml galaxian > galax.xml** will make ``galax.xml`` or
-         overwrite any existing data in the file with the results of 
+         overwrite any existing data in the file with the results of
          **-listxml**; this will allow you to view it in a text editor or parse
          it with external tools.
 
@@ -607,7 +607,7 @@ overwritten.
 
 **-getsoftlist** / **-glist** [<*pattern*>]
 
-    Displays the contents of a specific softlist with the filename represented 
+    Displays the contents of a specific softlist with the filename represented
     by *pattern*.
 
     Example:
@@ -698,21 +698,21 @@ OSD-related Options
       - dwrite
       - none
       - auto
-      - 
+      -
       - sdl [#UIFPSDLWindows]_.
     * - **macOS**
-      - 
-      - 
+      -
+      -
       - none
       - auto
       - osx
       - sdl
     * - **Linux**
-      - 
-      - 
+      -
+      -
       - none
       - auto
-      - 
+      -
       - sdl
 
 ..  rubric:: Footnotes
@@ -745,16 +745,16 @@ Example:
       - sdl [#KBIPSDLWindows]_.
     * - **SDL (macOS and Linux)**
       - auto [#KBIPAutoSDL]_.
-      - 
-      - 
-      - 
+      -
+      -
+      -
       - none
       - sdl
     * - **Linux**
       - auto [#KBIPAutoSDL]_.
-      - 
-      - 
-      - 
+      -
+      -
+      -
       - none
       - sdl
 
@@ -797,16 +797,16 @@ Example:
       - sdl [#MIPSDLWindows]_.
     * - **SDL (macOS and Linux)**
       - auto [#MIPAutoSDL]_.
-      - 
-      - 
-      - 
+      -
+      -
+      -
       - none
       - sdl
     * - **Linux**
       - auto [#MIPAutoSDL]_.
-      - 
-      - 
-      - 
+      -
+      -
+      -
       - none
       - sdl
 
@@ -841,21 +841,21 @@ Example:
       - rawinput
       - win32
       - none
-      - 
-      - 
+      -
+      -
     * - **macOS**
       - auto [#LGIPAutoSDL]_.
-      - 
-      - 
+      -
+      -
       - none
-      - 
-      - 
+      -
+      -
     * - **Linux**
       - auto [#LGIPAutoLinux]_.
-      - 
-      - 
+      -
+      -
       - none
-      - 
+      -
       - x11
 
 ..  rubric:: Footnotes
@@ -892,9 +892,9 @@ Example:
       - sdl
     * - **SDL**
       - auto [#JIPAutoSDL]_.
-      - 
-      - 
-      - 
+      -
+      -
+      -
       - none
       - sdl
 
@@ -1036,7 +1036,7 @@ Core Search Path Options
     The default is ``.`` (that is, in the current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -homepath c:\mame\lua
 
@@ -1051,7 +1051,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -rompath c:\mame\roms;c:\roms\another
 
@@ -1066,7 +1066,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -hashpath c:\mame\hash;c:\roms\softlists
 
@@ -1081,7 +1081,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -samplepath c:\mame\samples;c:\roms\samples
 
@@ -1096,7 +1096,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -artpath c:\mame\artwork;c:\emu\shared-artwork
 
@@ -1111,7 +1111,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
 
@@ -1140,7 +1140,7 @@ Core Search Path Options
     directory ``ini`` in the current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -inipath c:\users\thisuser\documents\mameini
 
@@ -1155,7 +1155,7 @@ Core Search Path Options
     The default is ``.`` (that is, search in the current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -fontpath c:\mame\;c:\emu\artwork\mamefonts
 
@@ -1170,7 +1170,7 @@ Core Search Path Options
     current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -cheatpath c:\mame\cheat;c:\emu\cheats
 
@@ -1185,7 +1185,7 @@ Core Search Path Options
     current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
 
@@ -1199,7 +1199,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -pluginspath c:\mame\plugins;c:\emu\lua
 
@@ -1214,7 +1214,7 @@ Core Search Path Options
     current working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -languagepath c:\mame\language;c:\emu\mame-languages
 
@@ -1228,7 +1228,7 @@ Core Search Path Options
     working directory).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -swpath c:\mame\software;c:\emu\mydisks
 
@@ -1251,7 +1251,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -cfg_directory c:\mame\cfg
 
@@ -1269,7 +1269,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -nvram_directory c:\mame\nvram
 
@@ -1286,7 +1286,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -input_directory c:\mame\inp
 
@@ -1303,7 +1303,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -state_directory c:\mame\sta
 
@@ -1319,7 +1319,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -snapshot_directory c:\mame\snap
 
@@ -1338,7 +1338,7 @@ Core Output Directory Options
     automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -diff_directory c:\mame\diff
 
@@ -1355,7 +1355,7 @@ Core Output Directory Options
     created automatically.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -comment_directory c:\mame\comments
 
@@ -1380,7 +1380,7 @@ Core State/Playback Options
     command.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -norewind
 
@@ -1395,7 +1395,7 @@ Core State/Playback Options
     clamped to 0.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -rewind_capacity 30
 
@@ -1407,7 +1407,7 @@ Core State/Playback Options
     in the specified <slot> to be loaded.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -state 1
 
@@ -1423,7 +1423,7 @@ Core State/Playback Options
     The default is OFF (**-noautosave**).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 -autosave
 
@@ -1438,7 +1438,7 @@ Core State/Playback Options
     The default is ``NULL`` (no playback).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -playback worldrecord
 
@@ -1458,7 +1458,7 @@ Core State/Playback Options
     The default is OFF (**-noexit_after_playback**).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -playback worldrecord -exit_after_playback
 
@@ -1473,7 +1473,7 @@ Core State/Playback Options
     The default is ``NULL`` (no recording).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -record worldrecord
 
@@ -1494,7 +1494,7 @@ Core State/Playback Options
     By default, no timecode file is saved.
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -record worldrecord -record_timecode
 
@@ -1511,7 +1511,7 @@ Core State/Playback Options
     The default is ``NULL`` (no recording).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -mngwrite pacman-video
 
@@ -1531,7 +1531,7 @@ Core State/Playback Options
     The default is ``NULL`` (no recording).
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -playback worldrecord -exit_after_playback -aviwrite worldrecord
 
@@ -1547,7 +1547,7 @@ Core State/Playback Options
 .. _mame-commandline-snapname:
 
     Example:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 pacman -wavewrite pacsounds
 
@@ -1572,21 +1572,21 @@ Core State/Playback Options
     with the media switch you want to use.
 
     Example 1:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 robby -snapname foo\%g%i
 
         Snapshots will be saved as ``snaps\foo\robby0000.png``, ``snaps\foo\robby0001.png`` and so on.
 
     Example 2:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 nes -cart robby -snapname %g\%d_cart
 
         Snapshots will be saved as ``snaps\nes\robby.png``.
 
     Example 3:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 c64 -flop1 robby -snapname %g\%d_flop1/%i
 
@@ -1671,19 +1671,19 @@ Core State/Playback Options
     ``[media]`` with the media switch you want to use.
 
     Example 1:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 robby -statename foo\%g
             All save states will be stored inside sta\foo\robby\
 
     Example 2:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 nes -cart robby -statename %g/%d_cart
             All save states will be stored inside sta\nes\robby\
 
     Example 3:
-        .. code-block::
+        .. code-block:: bash
 
             mame64 c64 -flop1 robby -statename %g/%d_flop1
             All save states will be stored inside sta\c64\robby\
@@ -1878,7 +1878,7 @@ Core Performance Options
     latency.  This is particularly effective with VRR (Variable Refresh Rate)
     displays.
 
-    This may cause frame pacing issues in the form of jitter with some 
+    This may cause frame pacing issues in the form of jitter with some
     systems (especially newer 3D-based systems or systems that run software
     akin to an operating system), so the default is off (**-nolowlatency**).
 
@@ -1959,7 +1959,7 @@ Core Rotation Options
 
             mame64 pacman -autorol
 
-.. Tip:: If you have a display that can be rotated, **-autorol** or 
+.. Tip:: If you have a display that can be rotated, **-autorol** or
          **-autoror** will allow you to get a larger display for both horizontal
          and vertical systems.
 
@@ -2039,9 +2039,9 @@ Core Video Options
 
 **-numscreens** *<count>*
 
-    Tells MAME how many output windows or screens to create.  For most systems, 
-    a single output window is all you need, but some systems originally used 
-    multiple screens (*e.g. Darius and PlayChoice-10 arcade machines*).  Some 
+    Tells MAME how many output windows or screens to create.  For most systems,
+    a single output window is all you need, but some systems originally used
+    multiple screens (*e.g. Darius and PlayChoice-10 arcade machines*).  Some
     systems with front panel controls and/or status lights also may let you put
     these in different windows/screens. Each screen (up to 4) has its own
     independent settings for physical monitor, aspect ratio, resolution, and
@@ -2180,6 +2180,7 @@ Core Video Options
     The default is OFF (**-nosyncrefresh**).
 
 .. _mame-commandline-prescale:
+
     Example:
         .. code-block:: bash
 
@@ -2520,7 +2521,7 @@ Core Screen Options
     ramp, for the system screens.  This option does not affect the artwork or
     other parts of the display.  Using the MAME UI, you can individually set
     the gamma for each system screen; this option controls the initial value for
-    all visible system screens.  The standard and default value is ``1.0``, 
+    all visible system screens.  The standard and default value is ``1.0``,
     which gives a linear ramp from black to white.  Selecting lower values
     (down to 0.1) will increase the nonlinearity toward black, while
     selecting higher values (up to 3.0) will push the nonlinearity toward white.
@@ -2576,7 +2577,10 @@ Core Vector Options
 
 **-beam_width_min** *<width>*
 
-    Sets the vector beam minimum width.
+    Sets the vector beam minimum width. The beam width varies between
+    the minimum and maximum beam widths as the intensity of the vector
+    drawn changes. To disable vector width changes based on intensity,
+    set the maximum equal to the minimum.
 
     Example:
         .. code-block:: bash
@@ -2587,7 +2591,10 @@ Core Vector Options
 
 **-beam_width_max** *<width>*
 
-    Sets the vector beam maximum width.
+    Sets the vector beam maximum width. The beam width varies between
+    the minimum and maximum beam widths as the intensity of the vector
+    drawn changes. To disable vector width changes based on intensity,
+    set the maximum equal to the minimum.
 
     Example:
         .. code-block:: bash
@@ -2598,12 +2605,34 @@ Core Vector Options
 
 **-beam_intensity_weight** *<weight>*
 
-    Sets the vector beam intensity weight.
+    Sets the vector beam intensity weight. This value determines how the
+    intensity of the vector drawn affects the width. A value of 0 creates
+    a linear mapping from intensity to width. Negative values mean that
+    lower intensities will increase the width toward maximum faster,
+    while positive values will increase the width toward maximum more
+    slowly.
 
     Example:
         .. code-block:: bash
 
             mame64 asteroid -beam_intensity_weight 0.5
+
+.. _mame-commandline-beamdotsize:
+
+**-beam_dot_size** *<scale>*
+
+    Scale factor to apply to the size of single-point dots in vector games.
+    Normally these are rendered according to the computed beam width; however,
+    it is common for this to produce dots that are difficult to see. The
+    beam_dot_size option applies a scale factor on top of the beam width to
+    help them show up better.
+
+    The default is ``1``.
+
+    Example:
+        .. code-block:: bash
+
+            mame64 asteroid -beam_dot_size 2
 
 .. _mame-commandline-flicker:
 
@@ -2828,21 +2857,21 @@ Core Sound Options
       - dsound
       - xaudio2
       - portaudio
-      - 
+      -
       - sdl [#SoundWinSDL]_.
       - none
     * - **macOS**
-      - 
-      - 
+      -
+      -
       - portaudio
       - coreaudio
       - sdl
       - none
     * - **Linux** and others
-      - 
-      - 
+      -
+      -
       - portaudio
-      - 
+      -
       - sdl
       - none
 
@@ -2860,9 +2889,9 @@ Core Sound Options
     Higher values increase audio delay but may help avoid buffer under-runs and
     audio interruptions.
 
-    The default is ``1``. 
+    The default is ``1``.
 
-    | For PortAudio, see :ref:`mame-commandline-pa-latency`.
+    | For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-pa-latency>`.
     | XAudio2 calculates audio_latency as 10ms steps.
     | DSound calculates audio_latency as 10ms steps.
     | CoreAudio calculates audio_latency as 25ms steps.
@@ -3045,8 +3074,8 @@ Core Input Options
 
 **-joystick_map** *<map>* / **-joymap** *<map>*
 
-    Controls how analog joystick values map to digital joystick controls.   
-    
+    Controls how analog joystick values map to digital joystick controls.
+
     Systems such as Pac-Man use a 4-way digital joystick and will exhibit
     undesired behavior when a diagonal is triggered; in the case of Pac-Man,
     movement will stop completely at intersections when diagonals are triggered
@@ -3055,12 +3084,12 @@ Core Input Options
     joysticks), so for true analog joysticks such as flight sticks and analog
     thumb sticks, this then needs to be mapped down to the expected
     4-way or 8-way digital joystick values.
-    
+
     To do this, MAME divides the analog range into a 9x9 grid that looks
     like this:
-    
+
     **insert 9x9 grid picture here**
-    
+
     MAME then takes the joystick axis position (for X and Y axes only), maps it
     to this grid, and then looks up a translation from a joystick map.  This
     parameter allows you to specify the map.
@@ -3081,7 +3110,7 @@ Core Input Options
 
     Generally you will want to set up the **-joystick_map** setting in the
     per-system ``<system>.ini`` file as opposed to the main ``MAME.INI``
-    file so that the mapping only affects the systems you want it to.  See 
+    file so that the mapping only affects the systems you want it to.  See
     :ref:`Multiple Configuration Files <advanced-multi-CFG>` for further
     details on per-system configuration.
 
@@ -3174,7 +3203,7 @@ Core Input Options
     +------------------------------+
     | **-joymap s8.4s8.44s8.4445** |
     +------------------------------+
-    
+
 
 
 .. _mame-commandline-joystickdeadzone:
@@ -3715,6 +3744,7 @@ Core Misc Options
     The default is (**-noui_mouse**).
 
 .. _mame-commandline-language:
+
     Example:
         .. code-block:: bash
 

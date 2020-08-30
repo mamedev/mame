@@ -59,10 +59,10 @@ DEFINE_DEVICE_TYPE(TMS34020, tms34020_device, "tms34020", "Texas Instruments TMS
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map, bool is_34020)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3, internal_regs_map)
+	, m_program_config("program", ENDIANNESS_LITTLE, is_34020 ? 32 : 16, 32, 3, internal_regs_map)
 	, m_pc(0)
 	, m_ppc(0)
 	, m_st(0)
@@ -76,7 +76,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_convmp(0)
 	, m_gfxcycles(0)
 	, m_pixelshift(0)
-	, m_is_34020(0)
+	, m_is_34020(is_34020)
 	, m_reset_deferred(false)
 	, m_halt_on_reset(false)
 	, m_hblank_stable(0)
@@ -97,16 +97,14 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 
 
 tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34010, tag, owner, clock, address_map_constructor(FUNC(tms34010_device::internal_regs_map), this))
+	: tms340x0_device(mconfig, TMS34010, tag, owner, clock, address_map_constructor(FUNC(tms34010_device::internal_regs_map), this), false)
 {
-	m_is_34020 = 0;
 }
 
 
 tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34020, tag, owner, clock, address_map_constructor(FUNC(tms34020_device::internal_regs_map), this))
+	: tms340x0_device(mconfig, TMS34020, tag, owner, clock, address_map_constructor(FUNC(tms34020_device::internal_regs_map), this), true)
 {
-	m_is_34020 = 1;
 }
 
 device_memory_interface::space_config_vector tms340x0_device::memory_space_config() const
@@ -230,37 +228,120 @@ inline void tms340x0_device::RESET_ST()
 }
 
 /* shortcuts for reading opcodes */
-inline uint32_t tms340x0_device::ROPCODE()
+uint32_t tms34010_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
 	return m_cache.read_word(pc);
 }
 
-inline int16_t tms340x0_device::PARAM_WORD()
+uint32_t tms34020_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
 	return m_cache.read_word(pc);
 }
 
-inline int32_t tms340x0_device::PARAM_LONG()
+int16_t tms34010_device::PARAM_WORD()
+{
+	uint32_t pc = m_pc;
+	m_pc += 2 << 3;
+	return m_cache.read_word(pc);
+}
+
+int16_t tms34020_device::PARAM_WORD()
+{
+	uint32_t pc = m_pc;
+	m_pc += 2 << 3;
+	return m_cache.read_word(pc);
+}
+
+int32_t tms34010_device::PARAM_LONG()
 {
 	uint32_t pc = m_pc;
 	m_pc += 4 << 3;
 	return (uint16_t)m_cache.read_word(pc) | (m_cache.read_word(pc + 16) << 16);
 }
 
-inline int16_t tms340x0_device::PARAM_WORD_NO_INC()
+int32_t tms34020_device::PARAM_LONG()
+{
+	uint32_t pc = m_pc;
+	m_pc += 4 << 3;
+	return m_cache.read_dword_unaligned(pc);
+}
+
+int16_t tms34010_device::PARAM_WORD_NO_INC()
 {
 	return m_cache.read_word(m_pc);
 }
 
-inline int32_t tms340x0_device::PARAM_LONG_NO_INC()
+int16_t tms34020_device::PARAM_WORD_NO_INC()
+{
+	return m_cache.read_word(m_pc);
+}
+
+int32_t tms34010_device::PARAM_LONG_NO_INC()
 {
 	uint32_t pc = m_pc;
 	return (uint16_t)m_cache.read_word(pc) | (m_cache.read_word(pc + 16) << 16);
 }
+
+int32_t tms34020_device::PARAM_LONG_NO_INC()
+{
+	return m_cache.read_dword_unaligned(m_pc);
+}
+
+uint32_t tms34010_device::TMS34010_RDMEM_WORD(offs_t A)
+{
+	return m_program.read_word(A);
+}
+
+uint32_t tms34020_device::TMS34010_RDMEM_WORD(offs_t A)
+{
+	return m_program.read_word(A);
+}
+
+uint32_t tms34010_device::TMS34010_RDMEM_DWORD(offs_t A)
+{
+	uint32_t result = m_program.read_word(A);
+	return result | (m_program.read_word(A+16)<<16);
+}
+
+uint32_t tms34020_device::TMS34010_RDMEM_DWORD(offs_t A)
+{
+	return m_program.read_dword_unaligned(A);
+}
+
+void tms34010_device::TMS34010_WRMEM_WORD(offs_t A, uint32_t V)
+{
+	m_program.write_word(A,V);
+}
+
+void tms34020_device::TMS34010_WRMEM_WORD(offs_t A, uint32_t V)
+{
+	if (BIT(A, 4))
+		m_program.write_dword(A-16,(V<<16)|(V>>16),0xffff0000);
+	else
+		m_program.write_dword(A,V,0x0000ffff);
+}
+
+void tms34010_device::TMS34010_WRMEM_DWORD(offs_t A, uint32_t V)
+{
+	m_program.write_word(A,V);
+	m_program.write_word(A+16,V>>16);
+}
+
+void tms34020_device::TMS34010_WRMEM_DWORD(offs_t A, uint32_t V)
+{
+	if (BIT(A, 4))
+	{
+		m_program.write_dword(A-16,(V<<16)|(V>>16),0xffff0000);
+		m_program.write_dword(A+16,(V<<16)|(V>>16),0x0000ffff);
+	}
+	else
+		m_program.write_dword(A,V);
+}
+
 
 /* read memory byte */
 inline uint32_t tms340x0_device::RBYTE(offs_t offset)
@@ -331,7 +412,7 @@ uint32_t tms340x0_device::read_pixel_32(offs_t offset)
 uint32_t tms340x0_device::read_pixel_shiftreg(offs_t offset)
 {
 	if (!m_to_shiftreg_cb.isnull())
-		m_to_shiftreg_cb(m_program, offset, &m_shiftreg[0]);
+		m_to_shiftreg_cb(offset, &m_shiftreg[0]);
 	else
 		fatalerror("To ShiftReg function not set. PC = %08X\n", m_pc);
 	return m_shiftreg[0];
@@ -473,7 +554,7 @@ void tms340x0_device::write_pixel_r_t_32(offs_t offset, uint32_t data)
 void tms340x0_device::write_pixel_shiftreg(offs_t offset, uint32_t data)
 {
 	if (!m_from_shiftreg_cb.isnull())
-		m_from_shiftreg_cb(m_program, offset, &m_shiftreg[0]);
+		m_from_shiftreg_cb(offset, &m_shiftreg[0]);
 	else
 		fatalerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
@@ -640,9 +721,6 @@ void tms340x0_device::device_start()
 
 	m_external_host_access = false;
 
-	space(AS_PROGRAM).cache(m_cache);
-	space(AS_PROGRAM).specific(m_program);
-
 	/* set up the state table */
 	{
 		state_add(TMS34010_PC,     "PC",        m_pc);
@@ -680,6 +758,22 @@ void tms340x0_device::device_start()
 	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
 
 	set_icountptr(m_icount);
+}
+
+void tms34010_device::device_start()
+{
+	tms340x0_device::device_start();
+
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+}
+
+void tms34020_device::device_start()
+{
+	tms340x0_device::device_start();
+
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
 }
 
 void tms340x0_device::device_reset()

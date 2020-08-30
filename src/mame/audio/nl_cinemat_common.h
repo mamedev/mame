@@ -71,7 +71,7 @@
 // models copied from https://www.diodes.com/assets/Spice-Models/Discrete-Prodcut-Groups/Zener-Diodes.txt
 #define D_1N914(name) DIODE(name, "1N914")
 #define D_1N914B(name) DIODE(name, "1N914")
-#define D_1N5236B(name) DIODE(name, "D(BV=7.5 IS=27.5p RS=33.8 N=1.10 CJO=58.2p VJ=0.750 M=0.330 TT=50.1n)")
+#define D_1N5236B(name) ZDIODE(name, "D(BV=7.5 IS=27.5p RS=33.8 N=1.10 CJO=58.2p VJ=0.750 M=0.330 TT=50.1n)")
 #define D_1N5240(name) ZDIODE(name, "D(BV=10 IS=14.4p RS=32.0 N=1.10 CJO=24.1p VJ=0.750 M=0.330 TT=50.1n)")
 #define D_1N5240B(name) ZDIODE(name, "D(BV=10 IS=14.4p RS=32.0 N=1.10 CJO=24.1p VJ=0.750 M=0.330 TT=50.1n)")
 

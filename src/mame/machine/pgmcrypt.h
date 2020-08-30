@@ -22,6 +22,7 @@ void pgm_svgpcb_decrypt(running_machine &machine);
 void pgm_ket_decrypt(running_machine &machine);
 void pgm_espgal_decrypt(running_machine &machine);
 void pgm_happy6_decrypt(running_machine &machine);
+void pgm_dwpc_decrypt(running_machine &machine);
 void sdwx_decrypt(running_machine &machine);
 void hauntedh_decrypt(running_machine &machine);
 void chessc2_decrypt(running_machine &machine);

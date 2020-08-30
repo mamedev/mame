@@ -40,40 +40,13 @@ void starcrus_state::video_start()
 	save_item(NAME(m_p2_sprite));
 	save_item(NAME(m_s1_sprite));
 	save_item(NAME(m_s2_sprite));
-	save_item(NAME(m_engine1_on));
-	save_item(NAME(m_engine2_on));
-	save_item(NAME(m_explode1_on));
-	save_item(NAME(m_explode2_on));
-	save_item(NAME(m_launch1_on));
-	save_item(NAME(m_launch2_on));
 	save_item(NAME(m_collision_reg));
-	save_item(NAME(m_engine_sound_playing));
-	save_item(NAME(m_explode_sound_playing));
-	save_item(NAME(m_launch1_sound_playing));
-	save_item(NAME(m_launch2_sound_playing));
 }
 
 void starcrus_state::ship_parm_1_w(uint8_t data)
 {
-	m_s1_sprite = data&0x1f;
-	m_engine1_on = ((data&0x20)>>5)^0x01;
-
-	if (m_engine1_on || m_engine2_on)
-	{
-		if (m_engine_sound_playing == 0)
-		{
-			m_engine_sound_playing = 1;
-			m_samples->start(0, 0, true); /* engine sample */
-		}
-	}
-	else
-	{
-		if (m_engine_sound_playing == 1)
-		{
-			m_engine_sound_playing = 0;
-			m_samples->stop(0);
-		}
-	}
+	m_s1_sprite = data & 0x1f;
+	m_engine[0]->write_line(BIT(data, 5));
 }
 
 void starcrus_state::ship_parm_2_w(uint8_t data)
@@ -81,99 +54,21 @@ void starcrus_state::ship_parm_2_w(uint8_t data)
 	m_s2_sprite = data & 0x1f;
 	m_led = !BIT(data, 7); /* game over lamp */
 	machine().bookkeeping().coin_counter_w(0, ((data & 0x40) >> 6) ^ 0x01);    /* coin counter */
-	m_engine2_on = ((data & 0x20) >> 5) ^ 0x01;
-
-	if (m_engine1_on || m_engine2_on)
-	{
-		if (m_engine_sound_playing == 0)
-		{
-			m_engine_sound_playing = 1;
-			m_samples->start(0, 0, true); /* engine sample */
-		}
-	}
-	else
-	{
-		if (m_engine_sound_playing == 1)
-		{
-			m_engine_sound_playing = 0;
-			m_samples->stop(0);
-		}
-	}
-
+	m_engine[1]->write_line(BIT(data, 5));
 }
 
 void starcrus_state::proj_parm_1_w(uint8_t data)
 {
 	m_p1_sprite = data & 0x0f;
-	m_launch1_on = ((data & 0x20) >> 5) ^ 0x01;
-	m_explode1_on = ((data & 0x10) >> 4) ^ 0x01;
-
-	if (m_explode1_on || m_explode2_on)
-	{
-		if (m_explode_sound_playing == 0)
-		{
-			m_explode_sound_playing = 1;
-			m_samples->start(1, 1, true);  /* explosion initial sample */
-		}
-	}
-	else
-	{
-		if (m_explode_sound_playing == 1)
-		{
-			m_explode_sound_playing = 0;
-			m_samples->start(1,2);    /* explosion ending sample */
-		}
-	}
-
-	if (m_launch1_on)
-	{
-		if (m_launch1_sound_playing == 0)
-		{
-			m_launch1_sound_playing = 1;
-			m_samples->start(2,3);    /* launch sample */
-		}
-	}
-	else
-	{
-		m_launch1_sound_playing = 0;
-	}
+	m_launch[0]->write_line(BIT(data, 5));
+	m_explode[0]->write_line(BIT(data, 4));
 }
 
 void starcrus_state::proj_parm_2_w(uint8_t data)
 {
 	m_p2_sprite = data & 0x0f;
-	m_launch2_on = ((data & 0x20) >> 5) ^ 0x01;
-	m_explode2_on = ((data & 0x10) >> 4) ^ 0x01;
-
-	if (m_explode1_on || m_explode2_on)
-	{
-		if (m_explode_sound_playing == 0)
-		{
-			m_explode_sound_playing = 1;
-			m_samples->start(1, 1, true);  /* explosion initial sample */
-		}
-	}
-	else
-	{
-		if (m_explode_sound_playing == 1)
-		{
-			m_explode_sound_playing = 0;
-			m_samples->start(1,2);    /* explosion ending sample */
-		}
-	}
-
-	if (m_launch2_on)
-	{
-		if (m_launch2_sound_playing == 0)
-		{
-			m_launch2_sound_playing = 1;
-			m_samples->start(3,3);    /* launch sample */
-		}
-	}
-	else
-	{
-		m_launch2_sound_playing = 0;
-	}
+	m_launch[1]->write_line(BIT(data, 5));
+	m_explode[1]->write_line(BIT(data, 4));
 }
 
 int starcrus_state::collision_check_s1s2()

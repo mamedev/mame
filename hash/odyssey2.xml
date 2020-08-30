@@ -3,57 +3,145 @@
 <!--
 license:CC0
 
+The softwarelist is sorted alphabetically per title, not counting clone sets.
+See g7400.xml for G7400 cartridges that can also be run on G7000/O2.
+When adding new sets, avoid naming conflicts between odyssey2.xml and g7400.xml.
+
+This list does not include ROM hacks, but those can still be loaded with -cart.
+WIP beta homebrews are also not included.
+
 TODO:
-add first release date were applicable
-add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
-add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
-add ntsc pal compatibility (<sharedfeat name="compatibility" value="NTSC,PAL"/>)
-add rom names from pcbs (lack of)
-add serials for radiola and jopacs
+- add first release date were applicable
+- add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
+- add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
+- add compatibility flags (<sharedfeat name="compatibility" value="O2,VP,VPP,O3"/>),
+  but it's not user-friendly since MAME refuses to load an incompatible game at all,
+  while on the real console you can still play them (just with more glitches)
+- add rom names from pcbs (lack of)
+- add serials for radiola and jopacs
 
 Undumped:
-Spaans          (spanish to dutch translator)
-Crazy Horses
+- Spaans          (spanish to dutch translator)
+- Crazy Horses
+- Service Test Cartridge
 
 Protos:
-Bastion         youtube.com/watch?v=cFdmgs4r7_E
-Catburglar      youtube.com/watch?v=DDsWDFxy0oE
-Himalaya        youtube.com/watch?v=L_lvOs6EnA4
-SoundTool       youtube.com/watch?v=7JYn6B7rxqw
-Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
+- Bastion         youtube.com/watch?v=cFdmgs4r7_E
+- Catburglar      youtube.com/watch?v=DDsWDFxy0oE
+- Himalaya        youtube.com/watch?v=L_lvOs6EnA4
+- SoundTool       youtube.com/watch?v=7JYn6B7rxqw
+- Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
 
 http://www.ozyr.com/rene/PICS/protos.jpg
-Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
-Back Gammon
-Freedom Fighters
-K.C.'s Crazy Chase
-Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
-Power Lords
-Handicap I (?)
-Frogger
-Robot City
-Requins (Shark Hunter?)
-K.C. Munchkin!
-Pick Axe Pete
+- Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
+- Back Gammon
+- Freedom Fighters
+- K.C.'s Crazy Chase
+- Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
+- Handicap I (?)
+- Frogger
+- Robot City
+- Requins (Shark Hunter?)
+- K.C. Munchkin! (looks more like Pacman)
+- Pick Axe Pete
 
 Unreleased, possibly no prototypes exist:
-A Turma da Mônica [Mônica's Gang]
-Pink Panther
-Clean Up Yer Act (programmed by Robert S. Harris, never completed)
-Star Wars (GST Video)
-Moonsweeper (Imagic)
-Fathom (Imagic)
+- A Turma da Mônica [Mônica's Gang]
+- Pink Panther
+- Clean Up Yer Act (programmed by Robert S. Harris, never completed)
+- Star Wars (GST Video)
+- Moonsweeper (Imagic)
+- Fathom (Imagic)
 
-NOTE:
-PAL colours leave a lot to be desired
-Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS microprocessor, which gave the G7000 extra CPU and memory.
-The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.574 MHz,
-adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
+misc. homebrew cartridges
+
+================================================================================
+
+1st-party Philips Videopac games, especially the older ones, didn't prominently
+have the game title on either the box or the cartridge, but simply "Videopac X"
+where X is the game number.
+
+1:  3rcsocpt - Race/Spin-Out/Cryptogram
+2:  3prspclg - Pairs/Space Rendezvous/Logic
+3:  football - American Football
+4:  2armrsub - Air-Sea War/Battle
+5:  lsvsblck - Blackjack
+6:  2bwlbskt - Ten Pin Bowling/Basketball
+7:  2mthecho - Mathematician/Echo
+8:  baseball - Baseball
+9:  compprog - Computer Programmer
+10: golf     - Golf
+11: cosmic   - Cosmic Conflict
+12: moneyrun - Take the Money and Run
+13: number   - Playschool Maths
+14: gunfight - Gunfighter
+15: samurai  - Samurai
+16: 2dpthmrk - Depth Charge/Marksman
+17: chinese  - Chinese Logic
+18: laser    - Laser War
+19: 2bllcrss - Catch the Ball/Noughts and Crosses
+20: stone    - Stone Sling
+21: pharaohs - Secret of the Pharaohs
+22: alieninv - Space Monster
+23: casino   - Las Vegas Gambling
+24: flipper  - Flipper Game
+25: alpine   - Skiing
+26: pachinko - Basket Game
+27: soccer   - Electronic Table Football
+28: volley   - Electronic Volleyball
+29: 2blckbrk - Dam Buster
+30: battlef  - Battlefield
+31: musician - Musician
+32: 2lbsprmd - A Labyrinth Game/Supermind
+33: acrobat/acrobata - Jumping Acrobats
+34: satellit - Satellite Attack
+35: billiard - Electronic Billiards
+36: 2hckyscr - Electronic Ice Hockey/Electronic Soccer
+37: monkey   - Monkeyshines
+38: munchkin - Munchkin
+39: freedom  - Freedom Fighters
+40: 4in1     - 4 in 1 Row
+41: conquest - Conquest of the World
+42: quest    - The Quest for the Rings
+43: pickaxe  - Pickaxe Pete
+44: kckrazy  - Crazy Chase
+45: morse    - Morse
+46: gtwallst - The Great Wall Street Fortune Hunt
+47: mousing  - The Mousing Cat
+48: backgamm - Backgammon
+49: turtles  - Turtles
+50: superbee - Super Bee
+51+:hawks    - Terrahawks
+52+:beespl   - Killer Bees
+53+:nightmar - Nightmare
+54+:loony    - Loony Balloon
+55+:neutron  - Neutron Star
+56‡:norseman - Norseman
+57: blobbers - Blobbers
+58+:airbattl - Air Battle
+59‡:helicopt - Helicopter Rescue
+60‡:rally    - Trans American Rally
+
+A:  newscast - Newscaster
+V:  kndrvrkr - Kinder im Verkehr 1
+C7010: chess - Chess Module
+C7420‡:homecomp - Home Computer Module
+
++: Videopac+ games, compatible with Videopac
+‡: Videopac+ games, not playable on Videopac
+These are in g7400.xml
+
+Official VP+ upgaded versions (simply adds a background picture):
+3rcsocptpl, cosmicpl, stonepl, satellitpl, freedompl, pickaxepl
+
 -->
-<softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
+
+<softwarelist name="odyssey2" description="Magnavox Odyssey 2 / Philips Videopac cartridges">
+
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
 
 <!-- Applications -->
+
 	<software name="compprog">
 		<description>Computer Programmer (Euro)</description>
 		<year>1980</year>
@@ -112,9 +200,20 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="serial" value="31"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="musician (europe).bin" size="4096" crc="afb23f89" sha1="7445f4df9017c4d2ea94542d0db335dc18c9d7ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="voice">
+		<description>The Voice</description>
+		<year>1979?</year>
+		<publisher>Magnavox</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_voice" />
+			<dataarea name="rom" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -133,19 +232,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+
 <!-- Educational -->
-	<software name="number">
-		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AC9413 (USA) ~ 13 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="i've got your number (usa, europe).bin" size="2048" crc="1c8368e7" sha1="498cb0882d8a692042889e83775a83cf267a1837" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="2mthecho">
 		<description>Mathematician/Echo (Euro) ~ Math-a-Magic!/Echo! (USA)</description>
@@ -213,6 +302,19 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+	<software name="number">
+		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9413 (USA) ~ 13 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="i've got your number (usa, europe).bin" size="2048" crc="1c8368e7" sha1="498cb0882d8a692042889e83775a83cf267a1837" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sidspell">
 		<description>Sid the Spellbinder (USA)</description>
 		<year>1982</year>
@@ -263,14 +365,17 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+
 <!-- Games -->
+
 	<software name="4in1">
 		<description>4 in 1 Row (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="40"/>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="4 in 1 row (europe).bin" size="4096" crc="3bfef56b" sha1="e9a8996c4fb87120d8620ab8876b90ddb48335db" offset="0" />
 			</dataarea>
@@ -282,47 +387,22 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1982</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
+			<feature name="slot" value="o2_4in1" />
 			<dataarea name="rom" size="4096">
 				<rom name="4 en 1 ligne (france).bin" size="4096" crc="9b5e9356" sha1="0831c3212a9e0a588a242dcd2b136e350aaceac9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alieninv">
-		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
-		<year>1980</year>
-		<publisher>Magnavox</publisher>
-		<info name="serial" value="AA9428 (USA) ~ 22 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="alien invaders - plus (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alpine">
-		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
-		<year>1979</year>
+	<software name="2lbsprmd">
+		<description>A Labyrinth Game/Supermind (Euro)</description>
+		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="AK9418 (USA) ~ 25 (Euro)"/>
+		<info name="serial" value="32"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="alpine skiing (usa, europe).bin" size="2048" crc="4663c4b6" sha1="9e7e16744b44fa83fa14c211b2365cf04604e06e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ski" cloneof="alpine">
-		<description>Ski (Fra)</description>
-		<year>1979</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="ski (france).bin" size="2048" crc="e129490d" sha1="a6e07b727b4f48d13ce21442911995eb46b99c5d" offset="0" />
+				<rom name="a labyrinth game - supermind (europe).bin" size="2048" crc="d158eeba" sha1="85c567c8f38239350a5d04f8cfd9dd7872f448c9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -354,8 +434,21 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+	<software name="football">
+		<description>American Football (Euro) ~ Football! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9402 (USA) ~ 3 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="football (usa, europe).bin" size="2048" crc="f9084aa3" sha1="364504ffce1108bcf09a5cc784f7ea2cf141f7b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="timelord">
-		<description>Attack of the Timelord! (USA)</description><!-- possibly also "Terrahawks (Euro)[Videopac 51]"? -->
+		<description>Attack of the Timelord! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9445"/>
@@ -363,6 +456,81 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="attack of the timelord (usa).bin" size="4096" crc="fc5a7f08" sha1="c63ad4e9aaa903ded9fcf185caf24e76f8aaf3a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamm" supported="partial">
+		<description>Backgammon (Euro)</description>
+		<year>1983</year>
+		<publisher>GST Video</publisher>
+		<info name="programmer" value="Mick Rouse"/>
+		<info name="serial" value="48"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="8192">
+				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balao">
+		<description>Balão Travesso! (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="balao travesso (brazil).bin" size="4096" crc="5b6e741a" sha1="73bf363400fece63d1a10b6b8cd9413612a1a126" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loonyp" cloneof="balao">
+		<description>Loony Balloon (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="loony balloon (europe) (proto).bin" size="4096" crc="ca23f40c" sha1="3cb324b047cbac8ec4381150b1c2aee98573841b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battle">
+		<description>Barão Vermelho! (Bra)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="air battle (brazil).bin" size="8192" crc="4103ee95" sha1="b6842b9264b722e2b39c8647b7963e513a0cde16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baron" cloneof="battle">
+		<description>Red Baron (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="red baron (europe) (proto).bin" size="8192" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barona" cloneof="battle">
+		<description>Red Baron (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="red baron (europe, proto, alt).bin" size="8192" crc="5c4f35d3" sha1="2fc0080d132e0063e21fd72d501eef94d3eefab8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -380,6 +548,59 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+	<software name="pachinko">
+		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AA9425 (USA) ~ 26 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="pachinko (usa, europe).bin" size="2048" crc="239df97d" sha1="ffd525d5c6023409afdcdb2afbda227bc4568304" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlef">
+		<description>Battlefield (Euro) ~ War of Nerves! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9417 (USA) ~ 30 (Euro)"/>
+		<info name="programmer" value="Ed Averett" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="war of nerves (usa, europe).bin" size="2048" crc="58fa6766" sha1="e56b674c832e5a7cad977cc76779548fdd2f338e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsvsblck">
+		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9401 (USA) ~ 5 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="las vegas blackjack (usa, europe).bin" size="2048" crc="6f66b1f7" sha1="3e10fc687b1d07612305f680f24590f99842e62b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackjck" cloneof="lsvsblck">
+		<description>Blackjack (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="blackjack (france).bin" size="2048" crc="6381e402" sha1="9ec331ce8e50ef60de93e615c18327f08b4a24fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blobbers">
 		<description>Blobbers (Euro)</description>
 		<year>1983</year>
@@ -387,61 +608,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<info name="serial" value="56"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="blobbers (europe).bin" size="8192" crc="9d72d4e9" sha1="cae4e1f3ee090ec423aff89102f359b9e14dba41" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2blckbrk">
-		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
-		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
-				</dataarea>
-		</part>
-	</software>
-
-	<software name="magique" cloneof="2blckbrk">
-		<description>Le Mûr Magique (Fra)</description>
-		<year>1981</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="mur magique, le (france).bin" size="2048" crc="d38153f6" sha1="ff0ebe9efc275011a0534fd98ca1f4112dae3dab" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2bwlbskt">
-		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
-		<year>1978</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
-		<info name="serial" value="AJ9404 (USA) ~ 6 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="bowling - basketball (usa, europe).bin" size="2048" crc="084ee035" sha1="2630c304b6beb0f8021578277be68e837202895d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2qllbskt" cloneof="2bwlbskt">
-		<description>Jeu de Quilles/Basketball (Fra)</description>
-		<year>1978</year>
-		<publisher>Radiola</publisher>
-		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="jeu de quilles - basketball (france).bin" size="2048" crc="a7e97958" sha1="30cbbec570fa0872c13e89ddc312b2f74e3749fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -458,7 +627,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="neutron" cloneof="buraco">
+	<software name="neutronp" cloneof="buraco">
 		<description>Neutron Star (Euro, Prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
@@ -466,31 +635,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="neutron star (europe) (proto).bin" size="8192" crc="d03efa86" sha1="0a91bdb293f52ac37414a63f71d90c6338a4a91a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="casino">
-		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
-		<year>1980</year>
-		<publisher>Magnavox</publisher>
-		<info name="serial" value="AA9426 (USA) ~ 23 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="casino slot machine (usa, europe).bin" size="2048" crc="bb6e7135" sha1="052bc62eb03e2673a802bab866dd0ab3c39fd584" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lasvegas" cloneof="casino">
-		<description>Las Vegas (Fra)</description>
-		<year>1980</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="las vegas (france).bin" size="2048" crc="a0620082" sha1="b83463b7c40367d4310f142fa15d06d12061f3be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -522,21 +666,22 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="chess" supported="no"><!-- needs chess module emulation -->
-		<description>Chess (Euro)</description>
-		<year>198?</year>
+	<software name="chess">
+		<description>Chess Module (Euro)</description>
+		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="G7010"/>
+		<info name="serial" value="C7010"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_chess" />
-			<dataarea name="rom" size="2048">
-				<rom name="chess (europe).bin" size="2048" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0" />
+			<dataarea name="rom" size="0x2800">
+				<rom name="z80_c7010.bin" offset="0x0000" size="0x2000" crc="45080245" sha1="fff3e6449a0e82e8e4ff45e5830c98fc38a8848e" /> <!-- NSC800 CPU on module with its own ROM/RAM -->
+				<rom name="vp_c7010.bin"  offset="0x2000" size="0x0800" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="chezmxme"><!-- I know it's a clone of something... -->
-		<description>Chez Maxime (Fra)</description>
+	<software name="chezmxme">
+		<description>Chez Maxime (Fra)</description><!-- aka Restaurant -->
 		<year>198?</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -675,6 +820,45 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+	<software name="kckrazy">
+		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9442 (USA) ~ 44 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="k.c.'s krazy chase (usa, europe).bin" size="4096" crc="a6909a8b" sha1="3391e48c0048a2f588d8238bb202e2ec346a6ad4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2blckbrk">
+		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
+		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magique" cloneof="2blckbrk">
+		<description>Le Mûr Magique (Fra)</description>
+		<year>1981</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="mur magique, le (france).bin" size="2048" crc="d38153f6" sha1="ff0ebe9efc275011a0534fd98ca1f4112dae3dab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demon">
 		<description>Demon Attack (Euro, USA)</description>
 		<year>1983</year>
@@ -688,13 +872,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2dpthmrk" supported="partial">
+	<software name="2dpthmrk">
 		<description>Depth Charge/Marksman (Euro)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
 		<info name="serial" value="16"/>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -708,11 +891,64 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="bombardeio submarino - tiro ao alvo (brazil).bin" size="2048" crc="b1109a09" sha1="e15f778efeb95530f8108854b14c404cf63f213a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="billiard">
+		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9424 (USA) ~ 35 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="pocket billiards (usa, europe).bin" size="2048" crc="24d53e2c" sha1="8abd1057202ebac12acf3822ed4d965bba02b7de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="billamer" cloneof="billiard">
+		<description>Billard Américain (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="billiard americain (france).bin" size="2048" crc="a674ea27" sha1="283ae5fa1d6e89a5ac921c7f2e21a89a67dd138c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2hckyscr">
+		<description>Electronic Ice Hockey/Electronic Soccer (Euro) ~ Hockey!/Soccer! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Move joystick when game is on screen." />
+		<info name="serial" value="AK9420 (USA) ~ 36 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="hockey - soccer (usa, europe).bin" size="2048" crc="39989464" sha1="f39c9801984f97d5a685a4b7a1accd0164a49b43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2fblhcky" cloneof="2hckyscr">
+		<description>Football Electronique/Hockey Electronique (Fra)</description>
+		<year>1981</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Move joystick when game is on screen." />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="football electronique - hockey electronique (france).bin" size="2048" crc="f00f9dba" sha1="d7593ade4d60a6e314e4f18711e8ea59e3c8c3ad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -730,15 +966,54 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="football">
-		<description>American Football (Euro) ~ Football! (USA)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AJ9402 (USA) ~ 3 (Euro)"/>
+	<software name="volley">
+		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett" />
+		<info name="serial" value="AA9422 (USA) ~ 28 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="football (usa, europe).bin" size="2048" crc="f9084aa3" sha1="364504ffce1108bcf09a5cc784f7ea2cf141f7b8" offset="0" />
+				<rom name="volleyball (usa, europe).bin" size="2048" crc="d3b09fec" sha1="830c9b3628f2e9c4f8c882024dd912b9d7610765" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volleyf" cloneof="volley">
+		<description>Volleyball (Fra)</description>
+		<year>1979</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="volleyball electronique (france).bin" size="2048" crc="551e38a2" sha1="9ea8d921ca03699f74e53e25b139632391838c7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipper">
+		<description>Flipper Game (Euro) ~ Thunderball! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="serial" value="AK9415 (USA) ~ 24 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="thunderball (usa, europe).bin" size="2048" crc="2c9d1715" sha1="d0070e12d6b0f406dab6e1fa550ab01509c9362e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipperf" cloneof="flipper">
+		<description>Flipper (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="billard electrique (france).bin" size="2048" crc="54bf4750" sha1="d12a242d273c4f4417806c3bcd868a9a0f553854" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -809,31 +1084,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="gtwallst">
-		<description>The Great Wall Street Fortune Hunt (Euro, USA)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="the great wall street fortune hunt (usa, europe).bin" size="4096" crc="881ceae4" sha1="d54b1d5667bf90368dddab55a91955b1789f177c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wallst" cloneof="gtwallst">
-		<description>Wall Street (Bra)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="wall street (brazil).bin" size="4096" crc="228842df" sha1="af9db337a2edbb3fe79a3d50f1b4ec1b007f4a52" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gunfight">
 		<description>Gunfighter (Euro)</description>
 		<year>1980</year>
@@ -856,33 +1106,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="showdown in 2100 a.d. (usa).bin" size="2048" crc="9487c920" sha1="7163c3e0d0e926287df670bfa5d5d5c42b5b3cf6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2hckyscr">
-		<description>Electronic Ice Hockey/Electronic Soccer (Euro) ~ Hockey!/Soccer! (USA)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Move joystick when game is on screen." />
-		<info name="serial" value="AK9420 (USA) ~ 36 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="hockey - soccer (usa, europe).bin" size="2048" crc="39989464" sha1="f39c9801984f97d5a685a4b7a1accd0164a49b43" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2fblhcky" cloneof="2hckyscr">
-		<description>Football Electronique/Hockey Electronique (Fra)</description>
-		<year>1981</year>
-		<publisher>Radiola</publisher>
-		<info name="usage" value="Move joystick when game is on screen." />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="football electronique - hockey electronique (france).bin" size="2048" crc="f00f9dba" sha1="d7593ade4d60a6e314e4f18711e8ea59e3c8c3ad" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -941,21 +1164,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="kckrazy">
-		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
-		<year>1982</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AC9442 (USA) ~ 44 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="k.c.'s krazy chase (usa, europe).bin" size="4096" crc="a6909a8b" sha1="3391e48c0048a2f588d8238bb202e2ec346a6ad4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bees">
-		<description>Killer Bees! (USA)</description><!-- also "Killer Bees (Euro)[Videopac 52]"? -->
+		<description>Killer Bees! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Robert S. Harris" />
@@ -968,40 +1178,27 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2lbsprmd">
-		<description>A Labyrinth Game/Supermind (Euro)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="32"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="a labyrinth game - supermind (europe).bin" size="2048" crc="d158eeba" sha1="85c567c8f38239350a5d04f8cfd9dd7872f448c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsvsblck">
-		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
+	<software name="casino">
+		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
 		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AJ9401 (USA) ~ 5 (Euro)"/>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9426 (USA) ~ 23 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="las vegas blackjack (usa, europe).bin" size="2048" crc="6f66b1f7" sha1="3e10fc687b1d07612305f680f24590f99842e62b" offset="0" />
+				<rom name="casino slot machine (usa, europe).bin" size="2048" crc="bb6e7135" sha1="052bc62eb03e2673a802bab866dd0ab3c39fd584" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="blackjck" cloneof="lsvsblck">
-		<description>Blackjack (Fra)</description>
+	<software name="lasvegas" cloneof="casino">
+		<description>Las Vegas (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="blackjack (france).bin" size="2048" crc="6381e402" sha1="9ec331ce8e50ef60de93e615c18327f08b4a24fb" offset="0" />
+				<rom name="las vegas (france).bin" size="2048" crc="a0620082" sha1="b83463b7c40367d4310f142fa15d06d12061f3be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1044,30 +1241,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="balao">
-		<description>Balão Travesso! (Bra)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="balao travesso (brazil).bin" size="4096" crc="5b6e741a" sha1="73bf363400fece63d1a10b6b8cd9413612a1a126" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="loony" cloneof="balao">
-		<description>Loony Balloon (Euro, Prototype)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="loony balloon (europe) (proto).bin" size="4096" crc="ca23f40c" sha1="3cb324b047cbac8ec4381150b1c2aee98573841b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="martian">
 		<description>Martian Threat (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1081,30 +1254,15 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="3prspclg">
-		<description>Pairs/Space Rendezvous/Logic (Euro)</description>
-		<year>1978</year>
+	<software name="martiana" cloneof="martian">
+		<description>Martian Threat (Euro, Prototype, Alt)</description>
+		<year>198?</year>
 		<publisher>Philips</publisher>
-		<info name="usage" value="Press 1 for Pairs 1 player, press 2 for Pairs 2 players, press 3 for Space Rendezvous, press 4 for Logic" />
-		<info name="serial" value="2"/>
+		<info name="programmer" value="Jake Dowding?" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="pairs - space rendezvous - logic (europe).bin" size="2048" crc="a69c2c93" sha1="7ea8e5ff3b9f86914774de2aa6f7a4652adcf47a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="3mkrbzlg" cloneof="3prspclg">
-		<description>Matchmaker!/Buzzword!/Logix! (USA)</description>
-		<year>1978</year>
-		<publisher>Magnavox</publisher>
-		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
-		<info name="serial" value="AJ9407"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="matchmaker - buzzword - logix (usa).bin" size="2048" crc="bbf276a0" sha1="908387d2446f4c62019017fe262b412dfa040d10" offset="0" />
+			<dataarea name="rom" size="8192">
+				<rom name="martian threat (europe, proto, alt).bin" size="8192" crc="335481f1" sha1="d6a3f2def966b798099dbf3c754ab12f69bb4ee8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1132,31 +1290,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="monkeyshines (usa, europe).bin" size="4096" crc="fee664f3" sha1="6d6659539934255711357537d4fa6e969c3c4754" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mousing">
-		<description>The Mousing Cat (Euro)</description>
-		<year>1982</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="47"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="the mousing cat (europe).bin" size="4096" crc="f390bfec" sha1="f9727e6c5a941518187c08e5f5d104460ac3b3e3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chat" cloneof="mousing">
-		<description>Chat et Souris (Fra)</description>
-		<year>1983</year>
-		<publisher>Radiola</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="chat et souris (france).bin" size="4096" crc="61a350e6" sha1="afa67f2110647753de9dfacb268d96e75d6d8657" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1189,18 +1322,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="phantom">
-		<description>Phantom House (Euro, Prototype)</description>
-		<year>1983</year>
-		<publisher>Philips</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="phantom house (europe)(proto).bin" size="8192" crc="313547eb" sha1="3cc218587116eb105e95ffce9eb1b5e268258d4a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="2wrldrsc">
 		<description>Out of this World!/Helicopter Rescue! (USA)</description>
 		<year>1979</year>
@@ -1215,16 +1336,42 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="pachinko">
-		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
-		<year>1981</year>
+	<software name="3prspclg">
+		<description>Pairs/Space Rendezvous/Logic (Euro)</description>
+		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AA9425 (USA) ~ 26 (Euro)"/>
+		<info name="usage" value="Press 1 for Pairs 1 player, press 2 for Pairs 2 players, press 3 for Space Rendezvous, press 4 for Logic" />
+		<info name="serial" value="2"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="pachinko (usa, europe).bin" size="2048" crc="239df97d" sha1="ffd525d5c6023409afdcdb2afbda227bc4568304" offset="0" />
+				<rom name="pairs - space rendezvous - logic (europe).bin" size="2048" crc="a69c2c93" sha1="7ea8e5ff3b9f86914774de2aa6f7a4652adcf47a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3mkrbzlg" cloneof="3prspclg">
+		<description>Matchmaker!/Buzzword!/Logix! (USA)</description>
+		<year>1978</year>
+		<publisher>Magnavox</publisher>
+		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
+		<info name="serial" value="AJ9407"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="matchmaker - buzzword - logix (usa).bin" size="2048" crc="bbf276a0" sha1="908387d2446f4c62019017fe262b412dfa040d10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantom">
+		<description>Phantom House (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="phantom house (europe)(proto).bin" size="8192" crc="313547eb" sha1="3cc218587116eb105e95ffce9eb1b5e268258d4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1263,33 +1410,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="playtag (europe) (proto).bin" size="4096" crc="a29f0fd4" sha1="759dc0efb9dbf64034d9fd78c12207206b173c0c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="billiard">
-		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
-		<year>1978</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AC9424 (USA) ~ 35 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="pocket billiards (usa, europe).bin" size="2048" crc="24d53e2c" sha1="8abd1057202ebac12acf3822ed4d965bba02b7de" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="billamer" cloneof="billiard">
-		<description>Billard Américain (Fra)</description>
-		<year>1978</year>
-		<publisher>Radiola</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="billiard americain (france).bin" size="2048" crc="a674ea27" sha1="283ae5fa1d6e89a5ac921c7f2e21a89a67dd138c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1334,6 +1454,19 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+	<software name="powerlrda" cloneof="powerlrd">
+		<description>Power Lords (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="power lords (europe) (proto).bin" size="4096" crc="bbeb1bd2" sha1="d6b2c274082a42634d08f514cf0fa30c5360a462" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qbert">
 		<description>Q*bert (Euro)</description>
 		<year>1983</year>
@@ -1343,20 +1476,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="q-bert (europe).bin" size="8192" crc="202f2749" sha1="80d76d5c56fc716a8f7a55166390658c320e4c34" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="quest">
-		<description>Quest for the Rings (Euro, USA)</description>
-		<year>1981</year>
-		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1374,26 +1493,29 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="battle">
-		<description>Barão Vermelho! (Bra)</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
+	<software name="3rcsocpt">
+		<description>Race/Spin-Out/Cryptogram (Euro) ~ Speedway/Spin-Out/Crypto-logic (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
+		<info name="serial" value="AC9400 (USA) ~ 1 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="air battle (brazil).bin" size="8192" crc="4103ee95" sha1="b6842b9264b722e2b39c8647b7963e513a0cde16" offset="0" />
+			<dataarea name="rom" size="2048">
+				<rom name="speedway - spin-out - crypto-logic (usa, europe).bin" size="2048" crc="4eda4917" sha1="29d078f587be2afa4612800c64a5af72705e5681" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="baron" cloneof="battle">
-		<description>Red Baron (Euro, Prototype)</description>
-		<year>198?</year>
-		<publisher>Philips</publisher>
+	<software name="3csaucpt" cloneof="3rcsocpt">
+		<description>Course de Voitures/Autodrome/Cryptogramme (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="red baron (europe) (proto).bin" size="8192" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" offset="0" />
+			<dataarea name="rom" size="2048">
+				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="2048" crc="3b24e1ee" sha1="9e44ca9fc9e5def58c61b24274f0cbfb57d559ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1466,18 +1588,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="syracuse">
-		<description>Syracuse (Fra)</description>
-		<year>1981</year>
-		<publisher>Jopac</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="4096">
-				<rom name="syracuse (france).bin" size="4096" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pharaohs">
 		<description>Secret of the Pharaohs (Euro)</description>
 		<year>1981</year>
@@ -1516,29 +1626,40 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="3rcsocpt">
-		<description>Race/Spin-Out/Cryptogram (Euro) ~ Speedway/Spin-Out/Crypto-logic (USA)</description>
-		<year>1978</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
-		<info name="serial" value="AC9400 (USA) ~ 1 (Euro)"/>
+	<software name="alpine">
+		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9418 (USA) ~ 25 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="speedway - spin-out - crypto-logic (usa, europe).bin" size="2048" crc="4eda4917" sha1="29d078f587be2afa4612800c64a5af72705e5681" offset="0" />
+				<rom name="alpine skiing (usa, europe).bin" size="2048" crc="4663c4b6" sha1="9e7e16744b44fa83fa14c211b2365cf04604e06e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="3csaucpt" cloneof="3rcsocpt">
-		<description>Course de Voitures/Autodrome/Cryptogramme (Fra)</description>
-		<year>1978</year>
+	<software name="ski" cloneof="alpine">
+		<description>Ski (Fra)</description>
+		<year>1979</year>
 		<publisher>Radiola</publisher>
-		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="2048" crc="3b24e1ee" sha1="9e44ca9fc9e5def58c61b24274f0cbfb57d559ee" offset="0" />
+				<rom name="ski (france).bin" size="2048" crc="e129490d" sha1="a6e07b727b4f48d13ce21442911995eb46b99c5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv">
+		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
+		<year>1980</year>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9428 (USA) ~ 22 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="alien invaders - plus (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1551,6 +1672,18 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="spider-man (europe) (proto).bin" size="8192" crc="35ace4e8" sha1="4b1d675cb1fbf72ed35681e2b2e6e99fed7154cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidera" cloneof="spider">
+		<description>Spider-Man (Euro, Prototype, Alt)</description>
+		<year>198?</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="spider-man (europe, proto, alt).bin" size="8192" crc="3e5f71f3" sha1="69661c91c984aa26bb971e989fe3aaca93ab718c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1591,6 +1724,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<info name="serial" value="50"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="4096">
 				<rom name="super bee (europe).bin" size="4096" crc="9585d511" sha1="dfcfd9c019773e703aa130bc55f5b2f972ece8f0" offset="0" />
 			</dataarea>
@@ -1603,6 +1737,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="4096">
 				<rom name="super bee (brazil).bin" size="4096" crc="02743352" sha1="98c1f3a9726fe1ba880d43f0ba004821c4cbec6c" offset="0" />
 			</dataarea>
@@ -1629,6 +1764,18 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
 				<rom name="super cobra (brazil).bin" size="8192" crc="e58aa0ac" sha1="46716a927b902759bfe252022f84186098fb5863" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syracuse">
+		<description>Syracuse (Fra)</description>
+		<year>1981</year>
+		<publisher>Brandt</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="syracuse (france).bin" size="4096" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1660,27 +1807,93 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="flipper">
-		<description>Flipper Game (Euro) ~ Thunderball! (USA)</description>
-		<year>1979</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="serial" value="AK9415 (USA) ~ 24 (Euro)"/>
+	<software name="gtwallst">
+		<description>The Great Wall Street Fortune Hunt (Euro, USA)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="thunderball (usa, europe).bin" size="2048" crc="2c9d1715" sha1="d0070e12d6b0f406dab6e1fa550ab01509c9362e" offset="0" />
+			<dataarea name="rom" size="4096">
+				<rom name="the great wall street fortune hunt (usa, europe).bin" size="4096" crc="881ceae4" sha1="d54b1d5667bf90368dddab55a91955b1789f177c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="flipperf">
-		<description>Flipper (Fra)</description>
-		<year>1980</year>
+	<software name="wallst" cloneof="gtwallst">
+		<description>Wall Street (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="wall street (brazil).bin" size="4096" crc="228842df" sha1="af9db337a2edbb3fe79a3d50f1b4ec1b007f4a52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousing">
+		<description>The Mousing Cat (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="47"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="the mousing cat (europe).bin" size="4096" crc="f390bfec" sha1="f9727e6c5a941518187c08e5f5d104460ac3b3e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chat" cloneof="mousing">
+		<description>Chat et Souris (Fra)</description>
+		<year>1983</year>
 		<publisher>Radiola</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="chat et souris (france).bin" size="4096" crc="61a350e6" sha1="afa67f2110647753de9dfacb268d96e75d6d8657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest">
+		<description>The Quest for the Rings (Euro, USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="4096">
+				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2bwlbskt">
+		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
+		<info name="serial" value="AJ9404 (USA) ~ 6 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
-				<rom name="billard electrique (france).bin" size="2048" crc="54bf4750" sha1="d12a242d273c4f4417806c3bcd868a9a0f553854" offset="0" />
+				<rom name="bowling - basketball (usa, europe).bin" size="2048" crc="084ee035" sha1="2630c304b6beb0f8021578277be68e837202895d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2qllbskt" cloneof="2bwlbskt">
+		<description>Jeu de Quilles/Basketball (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="jeu de quilles - basketball (france).bin" size="2048" crc="a7e97958" sha1="30cbbec570fa0872c13e89ddc312b2f74e3749fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1693,6 +1906,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<info name="serial" value="49"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="turtles (europe).bin" size="8192" crc="1c750349" sha1="1fdca749675f62212d0b79c5f0911bcabc4e4e11" offset="0" />
 			</dataarea>
@@ -1707,6 +1921,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<info name="serial" value="AC9446"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="8192">
 				<rom name="turtles (usa).bin" size="8192" crc="9e42e766" sha1="ee456305397ecbd54fffa0bb7a894f53976d2a7c" offset="0" />
 			</dataarea>
@@ -1726,47 +1941,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="volley">
-		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
-		<year>1979</year>
-		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="AA9422 (USA) ~ 28 (Euro)"/>
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="volleyball (usa, europe).bin" size="2048" crc="d3b09fec" sha1="830c9b3628f2e9c4f8c882024dd912b9d7610765" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
-	<software name="volleyf" cloneof="volley">
-		<description>Volleyball (Fra)</description>
-		<year>1979</year>
-		<publisher>Radiola</publisher>
-		<info name="programmer" value="Ed Averett" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="volleyball electronique (france).bin" size="2048" crc="551e38a2" sha1="9ea8d921ca03699f74e53e25b139632391838c7d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
-	<software name="battlef">
-		<description>Battlefield (Euro) ~ War of Nerves! (USA)</description>
-		<year>1979</year>
-		<publisher>Philips</publisher>
-		<info name="serial" value="AK9417 (USA) ~ 30 (Euro)"/>
-		<info name="programmer" value="Ed Averett" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="war of nerves (usa, europe).bin" size="2048" crc="58fa6766" sha1="e56b674c832e5a7cad977cc76779548fdd2f338e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
+<!-- Homebrew -->
 
 	<software name="amok">
 		<description>AMOK!</description>
@@ -1794,13 +1971,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-<!-- NTSC Cartidge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
+	<!-- NTSC Cartridge dumped from a 39SF010 flashrom (1MB) and actual data (2KB) data is repeated to fill space and matches publicly posted rom from author -->
 	<software name="deathrac">
 		<description>Death Race (USA)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1814,7 +1990,6 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1829,7 +2004,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Soeren Gust" />
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom12" />
+			<feature name="slot" value="o2_ktaa" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="12288">
 				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" offset="0" />
 			</dataarea>
@@ -1888,15 +2064,17 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-
-	<software name="voice">
-		<description>The Voice</description>
-		<year>1979?</year>
-		<publisher>Magnavox</publisher>
+	<software name="route66">
+		<description>Route 66</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Rafael Cardoso, René van den Enden" />
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_voice" />
+			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
+				<rom name="new_route66.bin" size="2048" crc="abe9b016" sha1="21f0210ec8c25a37cc728aba195bad9cad904061" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

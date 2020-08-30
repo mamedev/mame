@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, Jonathan Gevaryahu
 /*
  * s11c_bg.h - Williams System 11C background sound (M68B09E + YM2151 + HC55516 + DAC)
  *
@@ -15,6 +15,7 @@
 #include "machine/6821pia.h"
 #include "sound/hc55516.h"
 #include "sound/ym2151.h"
+#include "sound/dac.h"
 
 
 class s11c_bg_device : public device_t, public device_mixer_interface
@@ -23,8 +24,12 @@ public:
 	// construction/destruction
 	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// common config
-	void s11_bg_core(machine_config &config);
+	// base config
+	void s11_bg_base(machine_config &config);
+	// add ym2151
+	void s11_bg_ym(machine_config &config);
+	// add cvsd
+	void s11_bg_cvsd(machine_config &config);
 
 	// note to keep synchronization working, the host machine should have synchronization timer expired delegates
 	// before writing to the following 3 things:
@@ -38,9 +43,11 @@ public:
 	auto cb2_cb() { return m_cb2_cb.bind(); }
 	auto pb_cb() { return m_pb_cb.bind(); }
 
-	template <typename T> void set_romregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
-
 	void s11c_bg_map(address_map &map);
+	void s11c_bgm_map(address_map &map);
+	void s11c_bgs_map(address_map &map);
+
+	//mc6809e_device *get_cpu() { return m_cpu; }
 protected:
 	// constructor with overridable type for subclass
 	s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -52,12 +59,12 @@ protected:
 	TIMER_CALLBACK_MEMBER(deferred_cb2_w);
 	TIMER_CALLBACK_MEMBER(deferred_pb_w);
 
-	required_device<cpu_device> m_cpu;
-	required_device<ym2151_device> m_ym2151;
-	required_device<hc55516_device> m_hc55516;
+	required_device<mc6809e_device> m_cpu;
+	required_device<mc1408_device> m_dac;
+	optional_device<ym2151_device> m_ym2151;
+	optional_device<hc55516_device> m_cvsd;
 	required_device<pia6821_device> m_pia40;
 	required_memory_bank m_cpubank;
-	required_region_ptr<uint8_t> m_rom;
 
 private:
 	devcb_write_line m_cb2_cb;
@@ -81,7 +88,34 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
+class s11_obg_device : public s11c_bg_device
+{
+public:
+	s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class s11_bgm_device : public s11c_bg_device
+{
+public:
+	s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class s11_bgs_device : public s11c_bg_device
+{
+public:
+	s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
 DECLARE_DEVICE_TYPE(S11C_BG, s11c_bg_device)
 DECLARE_DEVICE_TYPE(S11_BG, s11_bg_device)
+DECLARE_DEVICE_TYPE(S11_OBG, s11_obg_device)
+DECLARE_DEVICE_TYPE(S11_BGM, s11_bgm_device)
+DECLARE_DEVICE_TYPE(S11_BGS, s11_bgs_device)
 
 #endif // MAME_AUDIO_S11C_BG_H

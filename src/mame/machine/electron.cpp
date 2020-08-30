@@ -151,6 +151,10 @@ uint8_t electron_state::electron64_fetch_r(offs_t offset)
 
 uint8_t electron_state::electron_mem_r(offs_t offset)
 {
+	uint8_t data = 0xff;
+
+	data &= m_exp->expbus_r(offset);
+
 	switch (m_mrb.read_safe(0))
 	{
 	case 0x00: /* Normal */
@@ -167,11 +171,15 @@ uint8_t electron_state::electron_mem_r(offs_t offset)
 		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
 		break;
 	}
-	return m_ram->read(offset);
+	data &= m_ram->read(offset);
+
+	return data;
 }
 
 void electron_state::electron_mem_w(offs_t offset, uint8_t data)
 {
+	m_exp->expbus_w(offset, data);
+
 	switch (m_mrb.read_safe(0))
 	{
 	case 0x00: /* Normal */

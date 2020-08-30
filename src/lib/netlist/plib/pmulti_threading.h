@@ -12,10 +12,10 @@
 
 #include <algorithm>
 #include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <type_traits>
 #include <utility>
-#include <condition_variable>
 
 namespace plib {
 

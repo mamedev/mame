@@ -72,23 +72,11 @@ void cassette_image_device::device_config_complete()
     cassette IO
 *********************************************************************/
 
-bool cassette_image_device::is_motor_on()
-{
-	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
-		return false;
-	if ((m_state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
-		return false;
-	else
-		return true;
-}
-
-
-
 void cassette_image_device::update()
 {
 	double cur_time = machine().time().as_double();
 
-	if (is_motor_on())
+	if (!is_stopped() && motor_on())
 	{
 		double new_position = m_position + (cur_time - m_position_time)*m_speed*m_direction;
 
@@ -170,7 +158,7 @@ double cassette_image_device::get_position()
 {
 	double position = m_position;
 
-	if (is_motor_on())
+	if (!is_stopped() && motor_on())
 		position += (machine().time().as_double() - m_position_time)*m_speed*m_direction;
 	return position;
 }
@@ -369,7 +357,7 @@ std::string cassette_image_device::call_display()
 	std::string result;
 
 	// only show the image when a cassette is loaded and the motor is on
-	if (exists() && is_motor_on())
+	if (exists() && !is_stopped() && motor_on())
 	{
 		static char const *const shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
 

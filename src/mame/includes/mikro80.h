@@ -18,11 +18,6 @@
 class mikro80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RESET
-	};
-
 	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_aram(*this, "attrram")
@@ -50,6 +45,7 @@ private:
 	void sound_w(u8 data);
 	u8 portb_r();
 	u8 portc_r();
+	u8 kristall2_portc_r();
 	void porta_w(u8 data);
 	void portc_w(u8 data);
 	void tape_w(u8 data);

@@ -16,7 +16,9 @@ Note: To start a game, certain switches need to be activated.  You must first pr
       hold one of the trough switches (usually the left) and the ball shooter switch for
       about 1 second.  Then you are able to start a game.
       For Pinbot, you must hold L and V for a second, then press start.
-      For Millionaire, you must hold [ and ] for a second, then start.
+      For Millionaire, you must hold [ and ] for a second, then press start.
+      For Fire!, you must hold U, I, O for a second, then press start.
+      For F-14, unknown. It seems likely it would be D, F, G, H, or D, F, G but this doesn't seem to work. The machine may be EXTREMELY picky about seeing all 4 balls pass the 4 trough sensors in the expected order before it thinks they are present
 
 *****************************************************************************************/
 
@@ -29,28 +31,6 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 
 #include "s11a.lh"
 
-
-void s11a_state::s11a_main_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).mirror(0x01ff).w(FUNC(s11a_state::sol3_w)); // solenoids
-	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
-	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
-	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
-	map(0x3000, 0x3003).mirror(0x03fc).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
-	map(0x3400, 0x3403).mirror(0x0bfc).rw(m_pia34, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
-	map(0x4000, 0xffff).rom();
-}
-
-void s11a_state::s11a_audio_map(address_map &map)
-{
-	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x1000, 0x1fff).w(FUNC(s11a_state::bank_w));
-	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x8000, 0xbfff).bankr("bank0");
-	map(0xc000, 0xffff).bankr("bank1");
-}
 
 static INPUT_PORTS_START( s11a )
 	PORT_START("SW.0")
@@ -166,11 +146,11 @@ void s11a_state::init_s11a()
 	s11_state::init_s11();
 }
 
-void s11a_state::s11a(machine_config &config)
+void s11a_state::s11a_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
@@ -226,7 +206,6 @@ void s11a_state::s11a(machine_config &config)
 	PIA6821(config, m_pia34, 0);
 	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
-	m_pia34->ca2_handler().set(m_bg, FUNC(s11c_bg_device::resetq_w));
 	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
 	m_pia34->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<12>));
@@ -236,13 +215,13 @@ void s11a_state::s11a(machine_config &config)
 	/* Add the soundcard */
 	M6802(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_ram_enable(false);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_audio_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &s11_state::s11_audio_map);
 	INPUT_MERGER_ANY_HIGH(config, m_audioirq).output_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speech").front_center();
 	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, "speech", 0.50);
@@ -251,19 +230,35 @@ void s11a_state::s11a(machine_config &config)
 	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
 	m_pias->set_port_a_input_overrides_output_mask(0xff);
 	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
-	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->writepb_handler().set(m_dac, FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->irqa_handler().set(m_audioirq, FUNC(input_merger_device::in_w<0>));
 	m_pias->irqb_handler().set(m_audioirq, FUNC(input_merger_device::in_w<1>));
+}
 
+void s11a_state::s11a(machine_config &config)
+{
+	s11a_base(config);
 	/* Add the background music card */
-	SPEAKER(config, "bg").front_center();
+	SPEAKER(config, "bgspk").front_center();
 	S11_BG(config, m_bg);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11_bg_device::resetq_w));
 	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
 	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
-	m_bg->set_romregion(m_bgcpu);
-	m_bg->add_route(ALL_OUTPUTS, "bg", 1.0);
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
+}
+
+void s11a_state::s11a_obg(machine_config &config)
+{
+	s11a_base(config);
+	/* Add the older-style background music card */
+	SPEAKER(config, "bgspk").front_center();
+	S11_OBG(config, m_bg);
+	m_pia34->ca2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w));
+	m_bg->pb_cb().set(m_pia34, FUNC(pia6821_device::portb_w));
+	m_bg->cb2_cb().set(m_pia34, FUNC(pia6821_device::cb1_w));
+	m_bg->add_route(ALL_OUTPUTS, "bgspk", 1.0);
 }
 
 /*------------------------
@@ -279,7 +274,7 @@ ROM_START(f14_p3)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -299,7 +294,7 @@ ROM_START(f14_p4)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -319,7 +314,7 @@ ROM_START(f14_p5)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -339,7 +334,7 @@ ROM_START(f14_l1)
 	ROM_LOAD("f14_u21.l1", 0x18000, 0x8000, CRC(e412300c) SHA1(382d0cfa47abea295f0c7501bc0a010473e9d73b))
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -362,7 +357,7 @@ ROM_START(fire_l3)
 	ROM_LOAD("fire_u21.l2", 0x18000, 0x8000, CRC(2edde0a4) SHA1(de292a340a3a06b0b996fc69fee73eb7bbfbbe64))
 	ROM_LOAD("fire_u22.l2", 0x10000, 0x8000, CRC(16145c97) SHA1(523e99df3907a2c843c6e27df4d16799c4136a46))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("fire_u4.l1", 0x00000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -378,7 +373,7 @@ ROM_START(fire_l2)
 	ROM_LOAD("fire_u21.l2", 0x18000, 0x8000, CRC(2edde0a4) SHA1(de292a340a3a06b0b996fc69fee73eb7bbfbbe64))
 	ROM_LOAD("fire_u22.l2", 0x10000, 0x8000, CRC(16145c97) SHA1(523e99df3907a2c843c6e27df4d16799c4136a46))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("fire_u4.l1", 0x00000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -401,7 +396,7 @@ ROM_START(milln_l3)
 	ROM_LOAD("mill_u21.l1", 0x18000, 0x8000, CRC(4cd1ee90) SHA1(4e24b96138ced16eff9036303ca6347e3423dbfc))
 	ROM_LOAD("mill_u22.l1", 0x10000, 0x8000, CRC(73735cfc) SHA1(f74c873a20990263e0d6b35609fc51c08c9f8e31))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("mill_u4.l1", 0x00000, 0x8000, CRC(cf766506) SHA1(a6e4df19a513102abbce2653d4f72245f54407b1))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -424,7 +419,7 @@ ROM_START(pb_l5)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -444,7 +439,7 @@ ROM_START(pb_l1)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -464,7 +459,7 @@ ROM_START(pb_l2)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -484,7 +479,7 @@ ROM_START(pb_l3)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -504,7 +499,7 @@ ROM_START(pb_p4)
 	ROM_LOAD("pbot_u21.l1", 0x18000, 0x8000, CRC(3eab88d9) SHA1(667e3b675e2ae8fec6a6faddb9b0dd5531d64f8f))
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
-	ROM_REGION(0x80000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_RELOAD(0x08000,0x8000)
 	ROM_RELOAD(0x10000,0x8000)
@@ -521,9 +516,9 @@ GAME(1987, f14_p4,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams
 GAME(1987, f14_p5,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, fire_l3,  0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987, fire_l2,  fire_l3, s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, milln_l3, 0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l5,    0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l1,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l2,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l3,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_p4,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, milln_l3, 0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l5,    0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l1,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l2,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l3,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_p4,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)

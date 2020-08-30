@@ -2379,6 +2379,7 @@ void pc8801_state::pc8801(machine_config &config)
 	//CENTRONICS(config, "centronics", centronics_devices, "printer");
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("pc8801_cass");
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
@@ -2403,6 +2404,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
 	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));

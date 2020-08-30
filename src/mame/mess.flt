@@ -107,7 +107,6 @@ basic52.cpp
 basssta.cpp
 bbc.cpp
 bbcbc.cpp
-bbl380.cpp
 bcs3.cpp
 bebox.cpp
 bert.cpp
@@ -162,6 +161,7 @@ chaos.cpp
 chessmate.cpp
 chessmst.cpp
 cit101.cpp
+cit101xl.cpp
 cit1500.cpp
 cit220.cpp
 cking_master.cpp
@@ -329,7 +329,7 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
-generalplus_gpl16250.cpp
+generalplus_gpl_unknown.cpp
 generalplus_gpl16250_mobigo.cpp
 generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp
@@ -423,7 +423,6 @@ instruct.cpp
 inteladv.cpp
 intellec4.cpp
 intellect02.cpp
-interact.cpp
 interpro.cpp
 intv.cpp
 ipc.cpp
@@ -493,6 +492,7 @@ leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
+lee1220.cpp
 lft.cpp
 lft_chiptune.cpp
 lft_craft.cpp
@@ -506,7 +506,6 @@ lms46.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
-lx_jg7425.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
@@ -783,8 +782,6 @@ qvt70.cpp
 qx10.cpp
 r9751.cpp
 radio86.cpp
-rad_eu3a05.cpp
-rad_eu3a14.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
@@ -1036,7 +1033,7 @@ unior.cpp
 unistar.cpp
 univac.cpp
 unixpc.cpp
-unkmandd.cpp
+unk6502_st2xxx.cpp
 ut88.cpp
 uzebox.cpp
 v100.cpp
@@ -1060,7 +1057,6 @@ vic10.cpp
 vic20.cpp
 victor9k.cpp
 vidbrain.cpp
-vii.cpp
 vip.cpp
 vis.cpp
 vixen.cpp
@@ -1101,6 +1097,8 @@ x1.cpp
 x1twin.cpp
 x68k.cpp
 xavix.cpp
+xavix_2000.cpp
+xavix_2002.cpp
 xavix2.cpp
 xbase09.cpp
 xbox.cpp

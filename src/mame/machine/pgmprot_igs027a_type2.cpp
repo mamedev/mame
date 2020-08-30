@@ -271,10 +271,20 @@ void pgm_arm_type2_state::init_dw2001()
 void pgm_arm_type2_state::init_dwpc()
 {
 	pgm_basic_init();
+	pgm_dwpc_decrypt(machine());
+	kov2_latch_init();
+
+	// we only have a JAPAN internal ROM dumped for now, so hack it to allow booting the Chinese version
+	u8 *armrom = memregion("prot")->base();
+	armrom[0x3c8] = 0x01;
+}
+
+void pgm_arm_type2_state::init_dwpc101j()
+{
+	pgm_basic_init();
 	kov2_latch_init();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
-
 
 INPUT_PORTS_START( kov2 )
 	PORT_INCLUDE ( pgm )

@@ -239,7 +239,7 @@ uint16_t pcd_state::mmu_r(offs_t offset)
 	//logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		return m_mmu.ctl;
-	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
+	else if((offset >= 0x200) && (offset < 0x400) && !(offset & 3))
 		return (data << 4) | (data >> 12) | (m_mmu.sc && (offset == 0x200) ? 0xc0 : 0);
 	else if(offset == 0x400)
 	{
@@ -254,7 +254,7 @@ void pcd_state::mmu_w(offs_t offset, uint16_t data)
 	//logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
 		m_mmu.ctl = data;
-	else if((offset >= 0x200) && (offset < 0x300) && !(offset & 3))
+	else if((offset >= 0x200) && (offset < 0x400) && !(offset & 3))
 		m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)] = (data >> 4) | (data << 12);
 	else if(offset == 0x400)
 	{
@@ -376,7 +376,7 @@ void pcd_state::mem_w(address_space &space, offs_t offset, uint16_t data, uint16
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effects_disabled())
+		if(!(reg & 1) && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);
@@ -398,7 +398,7 @@ uint16_t pcd_state::mem_r(address_space &space, offs_t offset)
 			reg = m_mmu.regs[((offset >> 10) & 0xff) | ((m_mmu.ctl & 0x18) << 5)];
 		else
 			reg = m_mmu.regs[((offset >> 10) & 0x7f) | ((m_mmu.ctl & 0x1c) << 5)];
-		if(!reg && !machine().side_effects_disabled())
+		if(!(reg & 2) && !machine().side_effects_disabled())
 		{
 			offset <<= 1;
 			logerror("%s: Null mmu entry %06x\n", machine().describe_context(), offset);

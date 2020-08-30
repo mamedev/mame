@@ -171,10 +171,11 @@ private:
 	uint8_t   m_asci_rdr[2];                    // ASCI receive data register 0-1
 	uint8_t   m_csio_cntr;                      // CSI/O control/status register
 	uint8_t   m_csio_trdr;                      // CSI/O transmit/receive register
-	PAIR16    m_tmdr[2];                        // TIMER data register ch 0-1
-	PAIR16    m_rldr[2];                        // TIMER reload register ch 0-1
-	uint8_t   m_tcr;                            // TIMER control register
-	uint8_t   m_frc;                            // free running counter
+	PAIR16    m_tmdr[2];                        // PRT data register ch 0-1
+	PAIR16    m_rldr[2];                        // PRT reload register ch 0-1
+	uint8_t   m_tcr;                            // PRT control register
+	uint8_t   m_frc;                            // free running counter (also time base for ASCI, CSI/O & PRT)
+	uint8_t   m_frc_prescale;                   // divide CPU clock by 10
 	PAIR      m_dma_sar0;                       // DMA source address register ch 0
 	PAIR      m_dma_dar0;                       // DMA destination address register ch 0
 	PAIR16    m_dma_bcr[2];                     // DMA byte register ch 0-1
@@ -200,9 +201,6 @@ private:
 	uint8_t   m_int_pending[11 + 1];            // interrupt pending
 	uint8_t   m_after_EI;                       // are we in the EI shadow?
 	uint32_t  m_ea;
-	uint8_t   m_timer_cnt;                      // timer counter / divide by 20
-	uint8_t   m_dma0_cnt;                       // DMA0 counter / divide by 20
-	uint8_t   m_dma1_cnt;                       // DMA1 counter / divide by 20
 	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_copcodes;
 	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;

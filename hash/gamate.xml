@@ -12,7 +12,6 @@ C1034 - Superboy (Unreleased?)
 C1039 - Column #5 (Unreleased?)
 C1040 - ??
 C1041 - Mighty Boxer
-C1051 - Incantational Couple
 C1055 - ??
 C1059 - ??
 C1062 - ??
@@ -130,6 +129,8 @@ C1066 - ??
 		</part>
 	</software>
 
+	<!-- c1-010 - Bump N' Run (unreleased?) -->
+
 	<software name="moneymaz">
 		<description>Money Maze</description>
 		<year>199?</year>
@@ -239,6 +240,8 @@ C1066 - ??
 		</part>
 	</software>
 
+	<!-- c1-020 - Bad Bud Chou Chu's Adventure (unreleased?) -->
+
 	<software name="mythasam">
 		<description>Myth of Asamia</description>
 		<year>1990</year>
@@ -287,6 +290,8 @@ C1066 - ??
 		</part>
 	</software>
 
+	<!-- c1-025 - Jackpot (unreleased?) -->
+
 	<software name="flipuzle">
 		<description>Flipuzzle</description>
 		<year>1991</year>
@@ -334,6 +339,8 @@ C1066 - ??
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- c1-030 - Beach Volleyball (unreleased?) -->
 
 	<software name="bomblast">
 		<description>Bomb Blaster</description>
@@ -385,6 +392,8 @@ C1066 - ??
 		</part>
 	</software>
 
+	<!-- c1-034 - Super Boy (unreleased?) -->
+
 	<software name="treashnt">
 		<description>Treasure Hunter</description>
 		<year>1990</year>
@@ -433,6 +442,12 @@ C1066 - ??
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- c1-039 - Column #5 (unreleased?) -->
+
+	<!-- c1-040 - unknown / unreleased -->
+
+	<!-- c1-041 - Mighty Boxer -->
 
 	<software name="flgoblin">
 		<description>Flying Goblin</description>
@@ -548,6 +563,18 @@ C1066 - ??
 		</part>
 	</software>
 
+	<software name="incouple">
+		<description>Incantational Couple</description>
+		<year>1991</year> <!-- 1992 on gamecard, 1991 on title screen -->
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1051" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="incouple.bin" size="32768" crc="d092a22a" sha1="bbb5bd0466b79657e44c4e9fde603ec645e77bfe" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="famous7">
 		<description>Famous 7</description>
 		<year>1993</year>
@@ -585,6 +612,8 @@ C1066 - ??
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- c1-055 - unknown / unreleased -->
 
 	<software name="gprace">
 		<description>GP Race</description>
@@ -625,6 +654,8 @@ C1066 - ??
 		</part>
 	</software>
 
+	<!-- c1-059 - unknown / unreleased -->
+
 	<software name="hannibal">
 		<description>Further Adventures of Hannibal The Cat</description>
 		<year>1993</year>
@@ -650,6 +681,8 @@ C1066 - ??
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- c1-062 - unknown / unreleased -->
 
 	<software name="basketba">
 		<description>Basketball</description>
@@ -689,6 +722,8 @@ C1066 - ??
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- c1-066 - unknown / unreleased -->
 
 	<software name="robinhoo">
 		<description>Robin Hood</description>

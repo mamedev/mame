@@ -385,6 +385,11 @@ public:
 
 	void zzzap(machine_config &config);
 
+	void lagunar(machine_config &config);
+
+protected:
+	void zzzap_common(machine_config &config);
+
 private:
 	void io_map(address_map &map);
 };

@@ -91,6 +91,33 @@ protected:
 	int m_busy;
 };
 
+class spectrum_kempcentrs_device :
+	public device_t,
+	public device_spectrum_expansion_interface
+
+{
+public:
+	// construction/destruction
+	spectrum_kempcentrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual uint8_t iorq_r(offs_t offset) override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
+
+	DECLARE_WRITE_LINE_MEMBER(busy_w) { m_busy = state; };
+
+	required_device<centronics_device> m_centronics;
+
+	int m_busy;
+};
+
 class spectrum_kempcentre_device :
 	public device_t,
 	public device_spectrum_expansion_interface
@@ -150,6 +177,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_LPRINT, spectrum_lprint_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_LPRINT3, spectrum_lprint3_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_KEMPCENTRS, spectrum_kempcentrs_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_KEMPCENTREF, spectrum_kempcentre_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_KEMPCENTREU, spectrum_kempcentreu_device)
 

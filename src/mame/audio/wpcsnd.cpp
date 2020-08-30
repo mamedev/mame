@@ -1,8 +1,41 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * wpcsnd.c - Williams WPC pinball sound
+ * wpcsnd.c - A-12738-50003 Williams WPC Sound Board
  *   M6809E + YM2151 + HC55516 + DAC
+ *
+ * TODO: The sound and io interface here needs to be verified from the ASIC on a real PCB, and documented better.
+ *       The WPC mainboard has two connectors used for IO/sound:
+ *       HDR 17X2 "I/O SOUND"
+ *         has the 68B09E signals:
+ *           A0-A4, D0-D7, and /FIRQ (with pullup)
+ *         it also has the WPC ASIC signals:
+ *           BLANK, WDEN, RESET
+ *       HDR 2X13 "I/O EXTEND"
+ *         has the 68B09E signals:
+ *           A5-A12, /FIRQ (with pullup (as above)), /IRQ (with pullup), /E, /Q
+ *         it also has the WPC ASIC signal:
+ *           /IO
+ *
+ *       The funhouse schematics show the A-12738-50003 WPC Sound Board to the HDR 17X2 "I/O SOUND" connector as such:
+ *       A4 A3 A2 A1 A0 WDEN R/W
+ *        0  x  x  x  x    x   x   open bus
+ *        x  0  x  x  x    x   x   open bus
+ *        x  x  0  x  x    x   x   open bus
+ *        x  x  x  x  x    1   x   open bus
+ *        1  1  1  1  *    0   *   open bus* (technically the 74LS138 is enabled here, with ** selecting between 4 unused outputs)
+ *        1  1  1  0  *    0   *   The used registers, see below
+ *        1  1  1  0  0    0   W   write to input gen_8_latch and set semamphore to assert /IRQ on the sound board 68B09E
+ *        1  1  1  0  0    0   R   read the output gen_8_latch and clear semamphore to deassert /FIRQ on the main board 68B09E
+ *        1  1  1  0  1    0   W   any write here causes the sound board to be reset
+ *        1  1  1  0  1    0   R   read from here returns the sound->mainboard semaphore status on D7, all other pins are open bus
+ *
+ *      Exactly which addresses cause the WPC ASIC to assert low the WDEN pin is not clear,
+ *      but presumably it is asserted in the 0x0x3fc0-3fdf area, meaning that the addresses
+ *      actually used are 0x3fdc and 0x3fdd (offsets 0x2c and 0x2d).
+ *      See /machine/wpc.h
+ *
+ * TODO: add generic_latch_8 devices for the two latch+semaphore pairs.
  *
  *  Created on: 4/10/2013
  */
