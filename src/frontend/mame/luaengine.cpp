@@ -2584,6 +2584,7 @@ void lua_engine::initialize()
  * screen:yscale() - screen y scale factor
  * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
  * screen:pixels() - get whole screen binary bitmap as string
+ * screen:time_until_pos(vpos, hpos) - get the time until this screen pos is reached
  */
 
 	auto screen_dev_type = sol().registry().create_simple_usertype<screen_device>("new", sol::no_constructor);
@@ -2712,6 +2713,7 @@ void lua_engine::initialize()
 			luaL_pushresultsize(&buff, size);
 			return sol::make_reference(L, sol::stack_reference(L, -1));
 		});
+	screen_dev_type.set("time_until_pos", [](screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
 	sol().registry().set_usertype("screen_dev", screen_dev_type);
 
 
@@ -2933,7 +2935,8 @@ void lua_engine::initialize()
  * image:year()
  * image:software_list_name()
  * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
- * image:load()
+ * image:load(filename)
+ * image:load_software(softlist_name)
  * image:unload()
  * image:create()
  * image:crc()
