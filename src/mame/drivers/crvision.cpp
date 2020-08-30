@@ -964,7 +964,7 @@ CONS( 1982, crvision, 0,        0,      pal,      crvision, crvision_pal_state, 
 CONS( 1982, fnvision, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "FunVision",                   MACHINE_SUPPORTS_SAVE )
 CONS( 1982, crvisioj, crvision, 0,      ntsc,     crvision, crvision_state,     empty_init, "Cheryco",                "CreatiVision (Japan)",        MACHINE_SUPPORTS_SAVE )
 CONS( 1982, wizzard,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "Wizzard (Oceania)",           MACHINE_SUPPORTS_SAVE )
-CONS( 1982, rameses,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Hanimex",                "Rameses (Oceania)",           MACHINE_SUPPORTS_SAVE )
+CONS( 1982, rameses,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Hanimex",                "Rameses HVC6502 (Oceania)",   MACHINE_SUPPORTS_SAVE )
 CONS( 1983, vz2000,   crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "VZ 2000 (Oceania)",           MACHINE_SUPPORTS_SAVE )
 CONS( 1983, crvisio2, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision MK-II (Europe)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, lasr2001, 0,        0,      lasr2001, manager,  laser2001_state,    empty_init, "Video Technology",       "Laser 2001",                  MACHINE_SUPPORTS_SAVE )
