@@ -58,12 +58,12 @@ private:
 
 	/* reveiver setup */
 	u16 cs8900_recv_control;		/* copy of CC_RXCTL (contains all bits below) */
-	int cs8900_recv_broadcast;		/* broadcast */
-	int cs8900_recv_mac;			/* individual address (IA) */
-	int cs8900_recv_multicast;		/* multicast if address passes the hash filter */
-	int cs8900_recv_correct;		/* accept correct frames */
-	int cs8900_recv_promiscuous;	/* promiscuous mode */
-	int cs8900_recv_hashfilter;		/* accept if IA passes the hash filter */
+	bool cs8900_recv_broadcast;		/* broadcast */
+	bool cs8900_recv_mac;			/* individual address (IA) */
+	bool cs8900_recv_multicast;		/* multicast if address passes the hash filter */
+	bool cs8900_recv_correct;		/* accept correct frames */
+	bool cs8900_recv_promiscuous;	/* promiscuous mode */
+	bool cs8900_recv_hashfilter;		/* accept if IA passes the hash filter */
 
 	u16 tx_buffer;
 	u16 rx_buffer;
@@ -84,11 +84,11 @@ private:
 	// The frame queue
 	std::queue<std::vector<u8> >m_frame_queue;
 
-	char* debug_outbuffer(const int length, const unsigned char *const buffer);
+	std::string debug_outbuffer(const int length, const unsigned char *const buffer);
 	void cs8900_set_tx_status(int ready, int error);
 	void cs8900_set_receiver(int enabled);
 	void cs8900_set_transmitter(int enabled);
-	int cs8900_should_accept(unsigned char *buffer, int length, int *phashed, int *phash_index, int *pcorrect_mac, int *pbroadcast, int *pmulticast);
+	bool cs8900_should_accept(unsigned char *buffer, int length, bool *phashed, int *phash_index, bool *pcorrect_mac, bool *pbroadcast, bool *pmulticast);
 	u16 cs8900_receive(void);
 	void cs8900_write_tx_buffer(u8	value, int odd_address);
 	u8 cs8900_read_rx_buffer(int odd_address);

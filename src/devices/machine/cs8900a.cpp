@@ -12,9 +12,10 @@
 
  **************************************************************************/
 
-#include <cstring>
-
+#include "emu.h"
 #include "machine/cs8900a.h"
+
+#include <cstring>
 
 DEFINE_DEVICE_TYPE(CS8900A, cs8900a_device, "cs8900a", "CS8900A Crystal LAN 10Base-T Ethernet MAC")
 
@@ -232,28 +233,18 @@ enum pp_ptr_masks_e : u16 {
 // ------------------- END #defines ---------------------
 
 // ---- debug logging support ----
-char * cs8900a_device::debug_outbuffer(const int length, const unsigned char *const buffer)
+std::string cs8900a_device::debug_outbuffer(const int length, const unsigned char *const buffer)
 {
-	int i;
-	static const u32 MAXLEN_DEBUG = 1600;
-	static const u32 TFE_DEBUG_MAX_FRAME_DUMP = 150;
-	static char outbuffer[MAXLEN_DEBUG * 4 + 1];
-	char *p = outbuffer;
+	static constexpr u32 MAXLEN_DEBUG = 1600;
+	static constexpr u32 TFE_DEBUG_MAX_FRAME_DUMP = 150;
+	std::ostringstream outbuffer;
 
-	assert(TFE_DEBUG_MAX_FRAME_DUMP <= MAXLEN_DEBUG);
+	static_assert(TFE_DEBUG_MAX_FRAME_DUMP <= MAXLEN_DEBUG, "Max frame dump must not be larger than max debug length");
 
-	*p = 0;
+	for (int i = 0; (i < TFE_DEBUG_MAX_FRAME_DUMP) && (i < length); i++)
+		util::stream_format(outbuffer, "%02X%c", buffer[i], ((i + 1) % 16 == 0) ? '*' : (((i + 1) % 8 == 0) ? '-' : ' '));
 
-	for (i = 0; i < TFE_DEBUG_MAX_FRAME_DUMP; i++)
-	{
-		if (i >= length)
-			break;
-
-		sprintf(p, "%02X%c", buffer[i], ((i + 1) % 16 == 0) ? '*' : (((i + 1) % 8 == 0) ? '-' : ' '));
-		p += 3;
-	}
-
-	return outbuffer;
+	return outbuffer.str();
 }
 
 void cs8900a_device::cs8900_set_tx_status(int ready, int error)
@@ -390,12 +381,12 @@ cs8900a_device::cs8900a_device(const machine_config& mconfig, device_type type, 
 	, cs8900_ia_mac{0, 0, 0, 0, 0, 0}
 	, cs8900_packetpage_ptr(0)
 	, cs8900_recv_control(0)		/* copy of CC_RXCTL (contains all bits below) */
-	, cs8900_recv_broadcast(0)		/* broadcast */
-	, cs8900_recv_mac(0)			/* individual address (IA) */
-	, cs8900_recv_multicast(0)		/* multicast if address passes the hash filter */
-	, cs8900_recv_correct(0)		/* accept correct frames */
-	, cs8900_recv_promiscuous(0)	/* promiscuous mode */
-	, cs8900_recv_hashfilter(0) 	/* accept if IA passes the hash filter */
+	, cs8900_recv_broadcast(false)		/* broadcast */
+	, cs8900_recv_mac(false)			/* individual address (IA) */
+	, cs8900_recv_multicast(false)		/* multicast if address passes the hash filter */
+	, cs8900_recv_correct(false)		/* accept correct frames */
+	, cs8900_recv_promiscuous(false)	/* promiscuous mode */
+	, cs8900_recv_hashfilter(false) 	/* accept if IA passes the hash filter */
 	, tx_buffer(CS8900_PP_ADDR_TX_FRAMELOC)
 	, rx_buffer(CS8900_PP_ADDR_RXSTATUS)
 	, tx_count(0)
@@ -417,19 +408,19 @@ cs8900a_device::cs8900a_device(machine_config const& mconfig, char const *tag, d
 	This is a helper for cs8900_receive() to determine if the received frame should be accepted
 	according to the settings.
  */
-int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int *phashed, int *phash_index,
-											int *pcorrect_mac, int *pbroadcast, int *pmulticast)
+bool cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, bool *phashed, int *phash_index,
+											bool *pcorrect_mac, bool *pbroadcast, bool *pmulticast)
 {
 	int hashreg; /* Hash Register (for hash computation) */
 
 	assert(length >= 6); /* we need at least 6 octets since the DA has this length */
 
 	/* first of all, delete any status */
-	*phashed = 0;
+	*phashed = false;
 	*phash_index = 0;
-	*pcorrect_mac = 0;
-	*pbroadcast	= 0;
-	*pmulticast	= 0;
+	*pcorrect_mac = false;
+	*pbroadcast	= false;
+	*pmulticast	= false;
 
 	LOGMASKED(CS8900_DEBUG_FRAMES, "cs8900_should_accept called with %02X:%02X:%02X:%02X:%02X:%02X, length=%4u",
 				cs8900_ia_mac[0], cs8900_ia_mac[1], cs8900_ia_mac[2],
@@ -447,13 +438,13 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
 			)
 	{
 		/* this is our individual address (IA) */
-		*pcorrect_mac = 1;
+		*pcorrect_mac = true;
 
 		/* if we don't want "correct MAC", we might have the chance
 		 * that this address fits the hash index
 		 */
 		if (cs8900_recv_mac || cs8900_recv_promiscuous)
-			return 1;
+			return true;
 	}
 
 	if ((buffer[0] == 0xFF)
@@ -465,16 +456,16 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
 			)
 	{
 		/* this is a broadcast address */
-		*pbroadcast = 1;
+		*pbroadcast = true;
 
 		/* broadcasts cannot be accepted by the hash filter */
-		return (cs8900_recv_broadcast || cs8900_recv_promiscuous) ? 1 : 0;
+		return (cs8900_recv_broadcast || cs8900_recv_promiscuous);
 	}
 
 	/* now check if DA passes the hash filter */
 	hashreg = (~util::crc32_creator::simple((char *)buffer, 6) >> 26) & 0x3F;
 
-	*phashed = (cs8900_hash_mask[(hashreg >= 32) ? 1 : 0] & (1 << (hashreg & 0x1F))) ? 1 : 0;
+	*phashed = (cs8900_hash_mask[(hashreg >= 32) ? 1 : 0] & (1 << (hashreg & 0x1F)));
 
 	if (*phashed)
 	{
@@ -483,19 +474,19 @@ int cs8900a_device::cs8900_should_accept(unsigned char *buffer, int length, int 
 		if (buffer[0] & 0x80)
 		{
 			/* we have a multicast address */
-			*pmulticast = 1;
+			*pmulticast = true;
 
 			/* if the multicast address fits into the hash filter,
 			 * the hashed bit has to be clear
 			 */
-			*phashed = 0;
+			*phashed = false;
 
-			return (cs8900_recv_multicast || cs8900_recv_promiscuous) ? 1 : 0;
+			return (cs8900_recv_multicast || cs8900_recv_promiscuous);
 		}
-		return (cs8900_recv_hashfilter || cs8900_recv_promiscuous) ? 1 : 0;
+		return (cs8900_recv_hashfilter || cs8900_recv_promiscuous);
 	}
 
-	return cs8900_recv_promiscuous ? 1 : 0;
+	return cs8900_recv_promiscuous;
 }
 
 u16 cs8900a_device::cs8900_receive()
@@ -505,22 +496,22 @@ u16 cs8900a_device::cs8900_receive()
 	u8 buffer[MAX_RXLENGTH];
 
 	int len;
-	int hashed	= 0;
+	bool hashed	= false;
 	int hash_index	= 0;
-	int rx_ok = 0;
-	int correct_mac = 0;
-	int broadcast = 0;
-	int multicast = 0;
-	int crc_error = 0;
+	bool rx_ok = false;
+	bool correct_mac = false;
+	bool broadcast = false;
+	bool multicast = false;
+	bool crc_error = false;
 
-	int newframe = 0;
+	bool newframe = false;
 
-	int ready = 0;
+	bool ready = false;
 
 	do {
 		len = MAX_RXLENGTH;
 
-		ready = 1; /* assume we will find a good frame */
+		ready = true; /* assume we will find a good frame */
 		std::vector<u8> frame;
 
 		if (!m_frame_queue.empty())
@@ -529,12 +520,12 @@ u16 cs8900a_device::cs8900_receive()
 			m_frame_queue.pop();
 			len = frame.size();
 			std::memcpy(buffer, frame.data(), len);
-			newframe = 1;
-			rx_ok = 1;
+			newframe = true;
+			rx_ok = true;
 		}
 		else
 		{
-			newframe = 0;
+			newframe = false;
 		}
 
 		assert((len & 1) == 0); /* length has to be even! */
@@ -555,7 +546,7 @@ u16 cs8900a_device::cs8900_receive()
 				{
 					/* if we should not accept this frame, just do nothing
 					 * now, look for another one */
-					ready = 0; /* try another frame */
+					ready = false; /* try another frame */
 					continue;
 				}
 			}
@@ -1497,11 +1488,11 @@ int cs8900a_device::recv_start_cb(u8 *buf, int length)
 	// Make an extra call to cs8900_should_accept() on the receive
 	// callback to reduce the number of packets queueing up that
 	// will just get rejected anyway.
-	int phashed = 0;
+	bool phashed = false;
 	int phash_index = 0;
-	int pcorrect_mac = 0;
-	int pbroadcast = 0;
-	int pmulticast = 0;
+	bool pcorrect_mac = false;
+	bool pbroadcast = false;
+	bool pmulticast = false;
 
 	if (cs8900_should_accept(buf, length, &phashed, &phash_index, &pcorrect_mac, &pbroadcast, &pmulticast))
 	{
