@@ -1574,7 +1574,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	{
 		m_vbl = true;
 
-		/* VBL interrupt */
+		// check for ctrl-reset
+		if ((m_kbspecial->read() & 0x88) == 0x88)
+		{
+			m_maincpu->reset();
+		}
+
+		// VBL interrupt
 		if ((m_inten & 0x08) && !(m_intflag & INTFLAG_VBL))
 		{
 			m_intflag |= INTFLAG_VBL;
@@ -2206,11 +2212,11 @@ uint8_t apple2gs_state::c000_r(offs_t offset)
 				}
 				if (temp & 0x10)    // open apple/command
 				{
-					ret |= 0x40;
+					ret |= 0x80;
 				}
 				if (temp & 0x20)    // option
 				{
-					ret |= 0x80;
+					ret |= 0x40;
 				}
 				// keypad is a little rough right now
 				if (m_lastchar >= 0x28 && m_lastchar <= 0x2d)
@@ -2343,7 +2349,7 @@ uint8_t apple2gs_state::c000_r(offs_t offset)
 		case 0x61:  // button 0 or Open Apple
 			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x62:  // button 1 or Solid Apple
+		case 0x62:  // button 1 or Option
 			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // button 2 or SHIFT key
@@ -4506,7 +4512,7 @@ INPUT_PORTS_START( apple2gs )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
 	PORT_START("adb_mouse_x")

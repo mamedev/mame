@@ -1628,7 +1628,6 @@ void setup_t::prepare_to_run()
 	// resolve inputs
 	resolve_inputs();
 
-#if 0
 	log().verbose("looking for two terms connected to rail nets ...");
 	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
 	{
@@ -1644,7 +1643,6 @@ void setup_t::prepare_to_run()
 #endif
 		}
 	}
-#endif
 
 	log().verbose("looking for unused hints ...");
 	for (auto &h : m_abstract.m_hints)

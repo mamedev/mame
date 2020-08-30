@@ -2007,7 +2007,7 @@ license:CC0
 			<feature name="part_number" value="812-4015-001"/>
 			<diskarea name="cdrom">
 				<!-- Origin: private dump -->
-				<disk name="support_advantage_intl_11_93.chd" sha1="36324701f84531b965046a17ed7aebfa4e8bf7ca" />
+				<disk name="support_advantage_intl_11_93" sha1="36324701f84531b965046a17ed7aebfa4e8bf7ca" />
 			</diskarea>
 		</part>
 	</software>
@@ -2020,7 +2020,7 @@ license:CC0
 			<feature name="part_number" value="812-4015-002"/>
 			<diskarea name="cdrom">
 				<!-- Origin: private dump -->
-				<disk name="support_advantage_intl_3_94.chd" sha1="3079331e1f47f6d9537d1a1dcda9c00ad3a6b0af" />
+				<disk name="support_advantage_intl_3_94" sha1="3079331e1f47f6d9537d1a1dcda9c00ad3a6b0af" />
 			</diskarea>
 		</part>
 	</software>

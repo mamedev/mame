@@ -24,21 +24,22 @@ public:
 	// construction/destruction
 	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void cart_init() override;
+
 	// reading and writing
 	virtual u8 read_rom04(offs_t offset) override { return (m_subslot->exists()) ? m_subslot->read_rom04(offset) : 0xff; }
 	virtual u8 read_rom0c(offs_t offset) override { return (m_subslot->exists()) ? m_subslot->read_rom0c(offset) : 0xff; }
 
-	virtual void write_p1(u8 data) override { m_control = data; if (m_subslot->exists()) m_subslot->write_p1(data); }
-	virtual void write_p2(u8 data) override { if (m_subslot->exists()) m_subslot->write_p2(data); }
+	virtual void write_p1(u8 data) override { m_control = data; if (m_subslot->exists()) m_subslot->write_p1(data & 3); }
+	virtual void write_p2(u8 data) override { if (m_subslot->exists()) m_subslot->write_p2(data & ~4); }
 
 	virtual void io_write(offs_t offset, u8 data) override;
-	virtual u8 io_read(offs_t offset) override { return (m_subslot->exists()) ? m_subslot->io_read(offset) : 0xff; }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) override;
-	virtual int b_read() override { return (m_subslot->exists()) ? m_subslot->b_read() : -1; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

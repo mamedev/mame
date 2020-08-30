@@ -6,17 +6,6 @@
 
 //- Identifier:  PROM_82S126_DIP
 //- Title: 82S126 1K-bit TTL bipolar PROM
-//- Description: The 82S126 and 82S129 are field programmable, which means that
-//-    custom patterns are immediately available by following the Signetics
-//-    Generic I fusing procedure. The 82S126 and 82S129 devices are supplied
-//-    with all outputs at logical Low. Outputs are programmed to a logic High
-//-    level at any specified address by fusing the Ni-Cr link matrix.
-//-
-//-    These devices include on-chip decoding and 2 Chip Enable inputs for ease
-//-    of memory expansion. They feature either open collector or 3-State outputs
-//-    for optimization of word expansion in bused organizations.
-//-
-//.
 //- Pinalias: A6,A5,A4,A3,A0,A1,A2,GND,O4,O3,O2,O1,CE1Q,CE2Q,A7,VCC
 //- Package: DIP
 //- Param: ROM
@@ -66,17 +55,6 @@ NETLIST_END()
 
 //- Identifier:  PROM_74S287_DIP
 //- Title: 74S287 (256 x 4) 1024-Bit TTL PROM
-//- Description: This Schottky memory is organized in the popular 256 words by
-//-    4 bits configuration. Memory enable inputs are provided to control the
-//-    output states. When the device is enabled, the outputs represent the
-//-    contents of the selected word. When disabled, the 4 outputs go to the
-//-    or high impedance state.
-//-
-//-    PROMs are shipped from the factory with lows in all locations. A high
-//-    may be programmed into any selected location by following the
-//-    programming instructions.
-//-
-//.
 //- Pinalias: A6,A5,A4,A3,A0,A1,A2,GND,O3,O2,O1,O0,CE1Q,CE2Q,A7,VCC
 //- Package: DIP
 //- Param: ROM
@@ -126,17 +104,6 @@ NETLIST_END()
 
 //- Identifier:  PROM_82S123_DIP
 //- Title: 82S123 256 bit TTL bipolar PROM
-//- Description: The 82S123 and 82S23 are field programmable, which means that
-//-    custom patterns are immediately available by following the Signetics
-//-    Generic I fusing procedure. The 82S123 and 82S23 devices are supplied
-//-    with all outputs at logical Low. Outputs are programmed to a logic High
-//-    level at any specified address by fusing the Ni-Cr link matrix.
-//-
-//-    These devices include on-chip decoding and 1 Chip Enable inputs for
-//-    memory expansion. They feature either open collector or 3-State outputs
-//-    for optimization of word expansion in bused organizations.
-//-
-//-
 //- Pinalias: O1,O2,O3,O4,O5,O6,O7,GND,O8,A0,A1,A2,A3,A4,CEQ,VCC
 //- Package: DIP
 //- Param: ROM
@@ -208,28 +175,6 @@ NETLIST_END()
 
 //- Identifier:  EPROM_2716_DIP
 //- Title: 2716 16K (2K x 8) UV ERASABLE PROM
-//- Description: The Intel®2716 is a 16,384-bit ultraviolet erasable and
-//-   electrically programmable read-only memory (EPROM). The 2716 operates
-//-   from a single 5-volt power supply, has a static standby mode, and
-//-   features fast single address location programming. It makes designing
-//-   with EPROMs faster, easier and more economical.
-//-
-//-   The 2716, with its single 5-volt supply and with an access time up
-//-   to 350 ns, is ideal for use with the newer high performance
-//-   +5V microprocessors such as Intel's 8085 and 8086. A selected
-//-   2716-5 and 2716-6 is available for slower speed applications.
-//-   The 2716 is also the first EPROM with a static standby mode which reduces
-//-   the power dissipation without increasing access time. The maximum
-//-   active power dissipation is 525 mW while the maximum standby power
-//-   dissipation is only 132 mW, a 75% savings.
-//-
-//-   The 2716 has the simplest and fastest method yet devised for
-//-   programming EPROMs - single pulse TTL level programming. No need for high
-//-   voltage pulsing because all programming controls are handled by
-//-   TTL signals. Program any location at any time-either individually,
-//-   sequentially or at random, with the 2716's single address location
-//-   programming. Total programming time for all 16,384 bits is only 100 seconds
-//-
 //- Pinalias: A7,A6,A6,A4,A4,A2,A1,A0,O0,O1,O2,GND,O3,O4,O5,O6,O7,CE1Q/CE,A10,CE2Q/OE,VPP,A9,A8,VCC
 //- Package: DIP
 //- Param: ROM
@@ -357,10 +302,6 @@ NETLIST_END()
 
 //- Identifier:  PROM_MK28000_DIP
 //- Title: MK28000 (2048 x 8 or 4096 x 4) 16384-Bit TTL PROM
-//- Description: This dynamic ROM is organized internally as 2048 x 8 bits,
-//-    but has separate enables for the upper and lower nybbles, permitting
-//-    use as 4096 x 4 as well.
-//.
 //- Pinalias: VCC,A1,A2,A3,A4,A5,A6,A10,GND,A9,A8,A7,ARQ,OE2,A11,O8,O7,O6,O5,O4,O3,O2,O1,OE1
 //- Package: DIP
 //- Param: ROM

@@ -6,7 +6,7 @@
 *        by Robbbert, March 2011.
 *
 *    Described in Electronics Australia magazine during 1982.
-*    Construction and usage: http://messui.the-chronicles.org/comp/eacc.pdf
+*    Construction and usage: http://messui.polygonal-moogle.com/comp/eacc.pdf
 *
 *    The only RAM is the 128 bytes that comes inside the CPU.
 *

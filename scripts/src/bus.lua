@@ -595,6 +595,8 @@ if (BUSES["BBC_USERPORT"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/beebspch.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/beebspch.h",
+		MAME_DIR .. "src/devices/bus/bbc/userport/lcd.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/lcd.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/palext.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/palext.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.cpp",

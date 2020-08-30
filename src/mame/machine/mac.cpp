@@ -325,8 +325,8 @@ void mac_state::v8_resize()
 	if (is_rom)
 	{
 		/* ROM mirror */
-		memory_size = memregion("bootrom")->bytes();
-		memory_data = memregion("bootrom")->base();
+		memory_size = m_rom_size;
+		memory_data = reinterpret_cast<uint8_t *>(m_rom_ptr);
 		is_rom = true;
 	}
 	else
@@ -353,9 +353,9 @@ void mac_state::v8_resize()
 		static const uint32_t simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
 		// re-install ROM in its normal place
-		size_t rom_mirror = 0xfffff ^ (memregion("bootrom")->bytes() - 1);
+		size_t rom_mirror = 0xfffff ^ (m_rom_size - 1);
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0xa00000, 0xafffff, rom_mirror, "bankR");
-		membank("bankR")->set_base((void *)memregion("bootrom")->base());
+		membank("bankR")->set_base((void *)m_rom_ptr);
 
 		// force unmap of entire RAM region
 		space.unmap_write(0, 0x9fffff);
@@ -412,8 +412,8 @@ void mac_state::set_memory_overlay(int overlay)
 		if (overlay)
 		{
 			/* ROM mirror */
-			memory_size = memregion("bootrom")->bytes();
-			memory_data = memregion("bootrom")->base();
+			memory_size = m_rom_size;
+			memory_data = reinterpret_cast<uint8_t *>(m_rom_ptr);
 			is_rom = true;
 		}
 		else
@@ -440,6 +440,8 @@ void mac_state::set_memory_overlay(int overlay)
 			else    // RAM: be careful not to populate ram B with a mirror or the ROM will get confused
 			{
 				mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+				// switch ROM region to direct access instead of through rom_switch_r
+				mac_install_memory(0x40000000, 0x4007ffff, memory_size, memory_data, is_rom, "bank2");
 			}
 		}
 		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIFX))
@@ -468,13 +470,17 @@ void mac_state::set_memory_overlay(int overlay)
 			}
 			else
 			{
-				size_t rom_mirror = 0xfffffff ^ (memregion("bootrom")->bytes() - 1);
+				size_t rom_mirror = 0xfffffff ^ (m_rom_size - 1);
 				m_maincpu->space(AS_PROGRAM).install_read_bank(0x40000000, 0x4fffffff & ~rom_mirror, rom_mirror, "bankR");
-				membank("bankR")->set_base((void *)memregion("bootrom")->base());
+				membank("bankR")->set_base((void *)m_rom_ptr);
 			}
 		}
 		else if (m_model == MODEL_MAC_QUADRA_700)
 		{
+			if (!is_rom)
+			{
+				mac_install_memory(0x40000000, 0x400fffff, m_rom_size, m_rom_ptr, true, "bank2");
+			}
 			mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else
@@ -491,18 +497,15 @@ void mac_state::set_memory_overlay(int overlay)
 
 uint32_t mac_state::rom_switch_r(offs_t offset)
 {
-	offs_t ROM_size = memregion("bootrom")->bytes();
-	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
-
 	// disable the overlay
 	if (m_overlay)
 	{
 		set_memory_overlay(0);
 	}
 
-	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
+	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, m_rom_size-1, offset & ((m_rom_size - 1)>>2));
 
-	return ROM_data[offset & ((ROM_size - 1)>>2)];
+	return m_rom_ptr[offset & ((m_rom_size - 1)>>2)];
 }
 
 
@@ -1843,6 +1846,9 @@ void mac_state::mac_driver_init(model_t model)
 	m_scsi_interrupt = 0;
 	m_model = model;
 
+	m_rom_size = memregion("bootrom")->bytes();
+	m_rom_ptr = reinterpret_cast<uint32_t *>(memregion("bootrom")->base());
+
 	if (model < MODEL_MAC_PORTABLE)
 	{
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
@@ -1850,7 +1856,7 @@ void mac_state::mac_driver_init(model_t model)
 
 		/* set up ROM at 0x400000-0x4fffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x4fffff : 0x5fffff,
-			memregion("bootrom")->bytes(), memregion("bootrom")->base(), true, "bank3");
+			m_rom_size, m_rom_ptr, true, "bank3");
 	}
 
 	m_overlay = -1;
@@ -1863,7 +1869,7 @@ void mac_state::mac_driver_init(model_t model)
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) || (model >= MODEL_MAC_LC_475 && model <= MODEL_MAC_LC_580) ||
 		(model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)) ||
-		(model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (model >= MODEL_MAC_QUADRA_700 && model <= MODEL_MAC_QUADRA_800))
+		(model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
 		m_overlay_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::overlay_timeout_func),this));
 	}

@@ -83,6 +83,7 @@ void genpc_state::pcmda(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "hdd_list").set_original("ibm5150_hdd");
 }
 
 void genpc_state::pcv20(machine_config &config)

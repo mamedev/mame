@@ -102,7 +102,9 @@ public:
 	void nes_vt_512kb(machine_config& config);
 	void nes_vt_1mb(machine_config& config);
 	void nes_vt_2mb(machine_config& config);
+	void nes_vt_1mb_baddma(machine_config& config);
 	void nes_vt_2mb_baddma(machine_config& config);
+	void nes_vt_4mb_baddma(machine_config& config);
 	void nes_vt_4mb(machine_config& config);
 	void nes_vt_8mb(machine_config& config);
 	void nes_vt_16mb(machine_config& config);
@@ -784,11 +786,24 @@ void nes_vt_state::nes_vt_2mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
 }
 
+void nes_vt_state::nes_vt_1mb_baddma(machine_config& config)
+{
+	nes_vt_1mb(config);
+	m_soc->force_bad_dma();
+}
+
 void nes_vt_state::nes_vt_2mb_baddma(machine_config& config)
 {
 	nes_vt_2mb(config);
 	m_soc->force_bad_dma();
 }
+
+void nes_vt_state::nes_vt_4mb_baddma(machine_config& config)
+{
+	nes_vt_4mb(config);
+	m_soc->force_bad_dma();
+}
+
 
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
@@ -1156,6 +1171,21 @@ static INPUT_PORTS_START( nes_vt_msi )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_vt_msi_mm2 )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("IO1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1557,6 +1587,20 @@ ROM_START( msidd )
 	ROM_LOAD( "doubledragon_m29w160eb_00202249.bin", 0x00000, 0x200000, CRC(44df5bb6) SHA1(a984aa1644d2d313d4263afdfed1cd64009f1137) )
 ROM_END
 
+ROM_START( msimm2 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "megaman2_s99jl032hbt1_001227e_readas_s29jl032h.bin", 0x00000, 0x400000, CRC(f537a053) SHA1(bd9353df34c0c0ee7d0e5e9808fc36f1a5eecc22) )
+ROM_END
+
+ROM_START( msimpac )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "mspacman_29dl800ba_000422cb.bin", 0x00000, 0x100000, CRC(c66300e3) SHA1(3fc0bdfbf449d884151f1b581e848243cd2df3a5) )
+ROM_END
+
+ROM_START( msisinv )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "spaceinvaders_en29lv800bb_007f225b.bin", 0x00000, 0x100000, CRC(e444d129) SHA1(33742bc3a6250337cc42b73812e797023818282a) )
+ROM_END
 
 ROM_START( sudopptv )
 	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
@@ -2059,9 +2103,16 @@ CONS( 200?, vtsndtest, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
 CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
 
+// MSI games (MSI is the same company as Majesco)
 CONS( 2017, msiwwe,     0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2017, msidd,      0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2016, msimpac,    0,  0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2017, msimm2,     0,  0,  nes_vt_4mb_baddma, nes_vt_msi_mm2, nes_vt_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
+
+CONS( 2016, msisinv,    0,  0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
 

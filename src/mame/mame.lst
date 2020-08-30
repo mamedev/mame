@@ -2170,6 +2170,7 @@ llander                         // 0345xx           no copyright notice
 llander1                        // 0345xx           no copyright notice
 llandert                        // (test)           no copyright notice
 meteorho                        // Hoei? bootleg    (c) 1980
+meteorbl                        // bootleg
 meteorite                       // Proel bootleg    (c) 1979
 meteorts                        // VCC bootleg      (c) 1979
 spcrocks                        // J.Estevez        (c) 1981
@@ -14778,6 +14779,9 @@ suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
+@source:gem_rp.cpp
+rp200
+
 @source:generalplus_gpl_unknown.cpp
 pcp8718
 pcp8728
@@ -18637,6 +18641,7 @@ junior                          //
 
 @source:juno106.cpp
 juno106                         //
+mks7                            //
 
 @source:juno6.cpp
 juno6                           //
@@ -22163,6 +22168,7 @@ sonic2mb                        // MegaDrive-based hack
 srmdb                           // MegaDrive-based hack
 ssf2mdb                         // MegaDrive-based hack
 topshoot                        // (c) 1995 Sun Mixing
+sbubsm                          // (c) 1996 Sun Mixing
 twinktmb                        // MegaDrive-based hack
 
 @source:megadriv_rad.cpp
@@ -32111,6 +32117,9 @@ vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 msiwwe
 msidd
+msimpac
+msisinv
+msimm2
 ablpinb
 mc_dgear
 dgun2500
@@ -34091,8 +34100,10 @@ kok                             //
 @source:photoply.cpp
 photoply98sp                    // (c) 1998 Funworld
 photoply99sp                    // (c) 1999 Funworld
-photoply                        //
-photoply2k4                     //
+photoply2k                      // (c) 2000 Funworld
+photoply2ksp                    // (c) 2000 Funworld
+photoply2k1it                   // (c) 2001 Funworld
+photoply2k4                     // (c) 2004 Funworld
 
 @source:phunsy.cpp
 phunsy                          //
@@ -37703,6 +37714,7 @@ kinstb                          // bootleg
 rushbets                        // bootleg
 sblast2b                        // bootleg
 venom                           // bootleg
+wldgunsb                        // bootleg
 
 @source:snk.cpp
 alphamis                        // (c) 1985
@@ -40286,6 +40298,7 @@ bgareggabla                     // hack
 bgareggacn                      // (c) 1996 Raizing/8ing
 bgareggahk                      // (c) 1996 Raizing/8ing
 bgaregganv                      // (c) 1996 Raizing/8ing
+bgareggat                       // (c) 1996 Raizing/8ing
 bgareggat2                      // (c) 1996 Raizing/8ing
 bgareggatw                      // (c) 1996 Raizing/8ing
 dogyuun                         // TP-022 (c) 1992 Toaplan
@@ -41847,7 +41860,7 @@ joust                           // (c) 1982
 joust2                          // (c) 1986
 joust2r1                        // (c) 1986
 joustr                          // (c) 1982
-joustwr                         // (c) 1982
+jousty                          // (c) 1982
 lottofun                        // (c) 1987 H.A.R. Management
 mayday                          // bootleg
 maydaya                         // bootleg
@@ -42649,6 +42662,9 @@ zerozone                        // (c) 1993 Comad
 
 @source:zexall.cpp
 zexall                          // zexall z80 test suite with kevtris' preloader/serial interface at 0000-00ff
+
+@source:zeebo_qualcomm_adreno130.cpp
+zeebo
 
 @source:zms8085.cpp
 zephyr                          //

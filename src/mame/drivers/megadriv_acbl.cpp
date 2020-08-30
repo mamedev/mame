@@ -392,6 +392,18 @@ uint16_t md_boot_state::topshoot_200051_r()
 	return -0x5b;
 }
 
+uint16_t md_boot_state::sbubsm_400000_r()
+{
+	logerror("%s: sbubsm_400000_r\n", machine().describe_context().c_str());
+	return 0x5500;
+}
+
+uint16_t md_boot_state::sbubsm_400002_r()
+{
+	logerror("%s: sbubsm_400002_r\n", machine().describe_context().c_str());
+	return 0x0f00;
+}
+
 // jzth protection
 void md_boot_state::bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -782,6 +794,61 @@ static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sbubsm )
+	// the bit ordering in the ports is strange here because this is being read through shared RAM, the MCU presumably reads the real inputs then scrambles them in RAM for the 68k to sort out
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// no service mode here?
+INPUT_PORTS_END
+
 INPUT_PORTS_START( barek2 )
 	PORT_INCLUDE( aladmdb )
 	// TODO!
@@ -918,6 +985,16 @@ ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "89c51.bin", 0x0000, 0x1000, CRC(595475c8) SHA1(8313819ba06cc92b54f88c1ca9f34be8d1ec94d0) )
 ROM_END
+
+ROM_START( sbubsm )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u11.bin", 0x000000, 0x080000, CRC(4f9337ea) SHA1(b245eb615f80afd25e29b2efdddb7f61c1deff6b) )
+	ROM_LOAD16_BYTE( "u12.bin", 0x000001, 0x080000, CRC(f5374835) SHA1(3a97910f5f7327ec7ad6425dfdfa72c86196ed33) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) // could be the same as topshoot (same PCB)
+	ROM_LOAD( "89c51.bin", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 
 ROM_START( sonic2mb )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
@@ -1088,6 +1165,8 @@ void md_boot_state::init_srmdb()
 
 void md_boot_state::init_topshoot()
 {
+
+	// these are shared RAM, MCU puts the inputs here
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16smo_delegate(*this, FUNC(md_boot_state::topshoot_200051_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
@@ -1096,6 +1175,25 @@ void md_boot_state::init_topshoot()
 
 	init_megadriv();
 }
+
+
+void md_boot_state::init_sbubsm()
+{
+	// needed to boot, somme kind of hardware ident?
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x400001, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400000_r))); 
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400002, 0x400003, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400002_r)));
+
+	// these are shared RAM, MCU puts the inputs here
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16smo_delegate(*this, FUNC(md_boot_state::topshoot_200051_r))); // needed for coins to work
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x20007e, 0x20007f, "IN4");
+
+	init_megadriv();
+}
+
 
 void md_boot_state::init_barek2()
 {
@@ -1162,6 +1260,7 @@ GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_state, init_mk3mdb,   R
 GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
+GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   ROT0, "Sun Mixing",       "Super Bubble Bobble (Sun Mixing, Megadrive clone hardware)", 0)
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", 0 ) // flying wires going through the empty PIC space aren't completely understood
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )

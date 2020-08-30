@@ -24,7 +24,7 @@
 Status of each game:
 --------------------
 dinopic:           No sound.
-dinopic2:          No sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
+dinopic2:          No sound.
 dinopic3:          No sound. Some minor gfx priority issues, confirmed present on real board.
 jurassic99:        No sound.
 punipic, punipic2: No sound. Problems in Central Park. Patches used.
@@ -1125,12 +1125,12 @@ ROM_END
   ROMs
   13x 27C4000
   3x GAL20V8A
-  3x PALCE16V8H (1 broken not dumped)
+  3x PALCE16V8H
   1x CAT93C46P
 
   Note
   1x JAMMA edge connector
-  1x 10 legs connector
+  1x 10-pin connector (player 3 inputs)
   1x trimmer (volume)
 */
 ROM_START( dinopic2 )
@@ -1143,7 +1143,7 @@ ROM_START( dinopic2 )
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD64_BYTE( "27c4000-m12481-4.bin", 0x000000, 0x40000, CRC(f3c2c98d) SHA1(98ae51a67fa4159456a4a205eebdd8d1775888d1) )
 	ROM_CONTINUE(                            0x000004, 0x40000)
-	ROM_LOAD64_BYTE( "27c4000-m12481-3.bin", 0x000001, 0x40000, BAD_DUMP CRC(417a4816) SHA1(5268f6667ff550a949a08f94171966f5d841c6b2) ) // this one is a perfect match, unlike dinopic set
+	ROM_LOAD64_BYTE( "27c4000-m12481-3.bin", 0x000001, 0x40000, CRC(a0e1f6e0) SHA1(119af72fb6e75933b6d39bc4a8030823ce9b7611) ) // this one is a perfect match, unlike dinopic set
 	ROM_CONTINUE(                            0x000005, 0x40000)
 	ROM_LOAD64_BYTE( "27c4000-m12481-2.bin", 0x000002, 0x40000, CRC(55ef0adc) SHA1(3b5551ae76ae80882d37fc70a1031a57885d6840) )
 	ROM_CONTINUE(                            0x000006, 0x40000)
@@ -1162,15 +1162,27 @@ ROM_START( dinopic2 )
 	ROM_LOAD( "pic16c57-xt.hex", 0x00000, 0x26cc, BAD_DUMP CRC(a6a5eac4) SHA1(2039789084836769180f0bfd230c2553a37e2aaf) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
-	ROM_LOAD( "27c4000-m12623.bin",      0x000000, 0x80000,  CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )
+	ROM_LOAD( "27c4000-m12623.bin", 0x000000, 0x80000,  CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )
 
-	ROM_REGION( 0xc00, "user1", 0 ) /* extra bits on this set */
-	ROM_LOAD( "cat93c46p.bin",    0x000, 0x080, CRC(d49fa351) SHA1(e6dfaff1c6aa962d34ae8e82b71e6f394d82e19c) )
-	ROM_LOAD( "gal20v8a-1.bin",   0x200, 0x157, CRC(cd99ca47) SHA1(ee1d990fd294aa46f56f31264134251569f6792e) )
-	ROM_LOAD( "gal20v8a-2.bin",   0x400, 0x157, CRC(60d016b9) SHA1(add42c763c819f3fe6d7cf3adc7123a52c2a3be9) )
-	ROM_LOAD( "gal20v8a-3.bin",   0x600, 0x157, CRC(049b7f4f) SHA1(6c6ea03d9a293db69a8bd10e042ee75e3c01313c) )
-	ROM_LOAD( "palce16v8h-1.bin", 0x800, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )
-	ROM_LOAD( "palce16v8h-2.bin", 0xa00, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )
+	/* pld devices:
+	     ______________________________
+	    |               16-2           |      (no component reference markings on pcb)
+	    |                              |
+	  ==         16-1                  |
+	  ==                               |
+	  ==                               |
+	  ==                               |
+	  ==                               |
+	    |  20-1         20-2 20-3 16-3 |
+	    |______________________________|
+	*/
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "gal20v8a-1.bin",   0x000, 0x157, CRC(cd99ca47) SHA1(ee1d990fd294aa46f56f31264134251569f6792e) )
+	ROM_LOAD( "gal20v8a-2.bin",   0x200, 0x157, CRC(60d016b9) SHA1(add42c763c819f3fe6d7cf3adc7123a52c2a3be9) )
+	ROM_LOAD( "gal20v8a-3.bin",   0x400, 0x157, CRC(049b7f4f) SHA1(6c6ea03d9a293db69a8bd10e042ee75e3c01313c) )
+	ROM_LOAD( "palce16v8h-1.bin", 0x600, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )
+	ROM_LOAD( "palce16v8h-2.bin", 0x800, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )
+	ROM_LOAD( "palce16v8h-3.bin", 0xa00, 0x117, CRC(b0f10adf) SHA1(5136e9495ef6c37edb0ddf1fe70c0d48c4785c80) )
 ROM_END
 
 /*
@@ -1230,13 +1242,13 @@ ROM_START( dinopic3 )
 	#7   a1020b      actel plcc84            unattempted
 	(The dinopic2 1-3,5-6 dumps were burnt, tested, and work ok on this board)
 	*/
-	ROM_REGION( 0xe00, "plds", 0 )
-	ROM_LOAD( "1_palce20v8.bin", 0x200, 0x157, CRC(cd99ca47) SHA1(ee1d990fd294aa46f56f31264134251569f6792e) )  // dinopic2
-	ROM_LOAD( "2_palce20v8.bin", 0x400, 0x157, CRC(60d016b9) SHA1(add42c763c819f3fe6d7cf3adc7123a52c2a3be9) )  // dinopic2
-	ROM_LOAD( "3_palce20v8.bin", 0x600, 0x157, CRC(049b7f4f) SHA1(6c6ea03d9a293db69a8bd10e042ee75e3c01313c) )  // dinopic2
-	ROM_LOAD( "4_palce16v8.bin", 0x800, 0x117, CRC(97a67c6d) SHA1(822411f878f1efe462a7a8e93960a1fc5140422e) )
-	ROM_LOAD( "5_palce16v8.bin", 0xa00, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )  // dinopic2
-	ROM_LOAD( "6_palce16v8.bin", 0xc00, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )  // dinopic2
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "1_palce20v8.bin", 0x000, 0x157, CRC(cd99ca47) SHA1(ee1d990fd294aa46f56f31264134251569f6792e) )  // dinopic2
+	ROM_LOAD( "2_palce20v8.bin", 0x200, 0x157, CRC(60d016b9) SHA1(add42c763c819f3fe6d7cf3adc7123a52c2a3be9) )  // dinopic2
+	ROM_LOAD( "3_palce20v8.bin", 0x400, 0x157, CRC(049b7f4f) SHA1(6c6ea03d9a293db69a8bd10e042ee75e3c01313c) )  // dinopic2
+	ROM_LOAD( "4_palce16v8.bin", 0x600, 0x117, CRC(97a67c6d) SHA1(822411f878f1efe462a7a8e93960a1fc5140422e) )
+	ROM_LOAD( "5_palce16v8.bin", 0x800, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )  // dinopic2
+	ROM_LOAD( "6_palce16v8.bin", 0xa00, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )  // dinopic2
 ROM_END
 
 /*
@@ -1491,6 +1503,26 @@ ROM_START( slampic )
 
 	ROM_REGION( 0x20000, "user1", 0 ) // not in the dump, but needed for protection
 	ROM_LOAD( "mb_qa.5k", 0x00000, 0x20000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
+
+	/* pld devices:
+	     ________________________
+	    |              1         |      (no component reference markings on pcb)
+	    |                        |
+	  ==         2               |
+	  ==                         |
+	  ==                         |
+	  ==                         |
+	  ==                         |
+	    |  3           4   5   6 |
+	    |________________________|
+	*/
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "1_palce16v8.bin", 0x000, 0x117, CRC(bac89609) SHA1(4796a476843b448059ed28ef735d9c6a7886fdef) )
+	ROM_LOAD( "2_palce16v8.bin", 0x200, 0x117, CRC(680edfd5) SHA1(b1b6ad4e2c4e23c384de32326986a58bc74a12ca) )
+	ROM_LOAD( "3_palce20v8.bin", 0x400, 0x157, CRC(f1fe9368) SHA1(821b5ad60cd1aa1f325fd07af3b9c4d116aa227e) )
+	ROM_LOAD( "4_palce20v8.bin", 0x600, 0x157, CRC(20946530) SHA1(307ad5644aca89d1462510f12fd10187a50376b6) )
+	ROM_LOAD( "5_palce20v8.bin", 0x800, 0x157, CRC(44df0cc6) SHA1(b6c4249d6d173792d2736654c93dc30c15c9a4fb) )
+	ROM_LOAD( "6_palce16v8.bin", 0xa00, 0x117, CRC(12516583) SHA1(990225b1a8fecb2b95011f25d7d3cc35840103f3) )
 ROM_END
 
 /*
@@ -1686,7 +1718,7 @@ ROM_END
 // ************************************************************************* DRIVER MACROS
 
 GAME( 1993,  dinopic,    dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic2,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
 GAME( 1993,  dinopic3,   dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
 GAME( 1993,  jurassic99, dino,      dinopic,   dino,      dinopic_state,     init_dinopic,   ROT0,  "bootleg",  "Jurassic 99 (Cadillacs and Dinosaurs bootleg with EM78P447AP)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ?
 

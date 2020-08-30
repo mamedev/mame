@@ -133,27 +133,22 @@ void usb_sound_device::device_start()
 	for (int tgroup = 0; tgroup < 3; tgroup++)
 	{
 		timer8253 &group = m_timer_group[tgroup];
-		for (int tchan = 0; tchan < 3; tchan++)
-		{
-			timer8253::channel &channel = group.chan[tchan];
-			save_item(STRUCT_MEMBER(channel, holding), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, latchmode), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, latchtoggle), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, clockmode), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, bcdmode), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, output), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, lastgate), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, gate), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, subcount), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, count), tgroup * 3 + tchan);
-			save_item(STRUCT_MEMBER(channel, remain), tgroup * 3 + tchan);
-		}
-		save_item(STRUCT_MEMBER(group, env), tgroup);
-		save_item(STRUCT_MEMBER(group.chan_filter[0], capval), tgroup);
-		save_item(STRUCT_MEMBER(group.chan_filter[1], capval), tgroup);
-		save_item(STRUCT_MEMBER(group.gate1, capval), tgroup);
-		save_item(STRUCT_MEMBER(group.gate2, capval), tgroup);
-		save_item(STRUCT_MEMBER(group, config), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, holding), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, latchmode), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, latchtoggle), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, clockmode), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, bcdmode), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, output), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, lastgate), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, gate), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, subcount), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, count), tgroup);
+		save_item(STRUCT_MEMBER(group.chan, remain), tgroup);
+		save_item(NAME(group.env), tgroup);
+		save_item(STRUCT_MEMBER(group.chan_filter, capval), tgroup);
+		save_item(NAME(group.gate1.capval), tgroup);
+		save_item(NAME(group.gate2.capval), tgroup);
+		save_item(NAME(group.config), tgroup);
 	}
 
 	save_item(NAME(m_timer_mode));

@@ -495,12 +495,12 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool isvalidation) const
+bool device_t::findit(validity_checker *valid) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
 	{
-		if (isvalidation)
+		if (valid)
 		{
 			// sanity checking
 			char const *const tag = autodev->finder_tag();
@@ -517,7 +517,7 @@ bool device_t::findit(bool isvalidation) const
 				continue;
 			}
 		}
-		allfound &= autodev->findit(isvalidation);
+		allfound &= autodev->findit(valid);
 	}
 	return allfound;
 }
@@ -541,7 +541,7 @@ void device_t::resolve_pre_map()
 void device_t::resolve_post_map()
 {
 	// find all the registered post-map objects
-	if (!findit(false))
+	if (!findit(nullptr))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// allow implementation to do additional setup

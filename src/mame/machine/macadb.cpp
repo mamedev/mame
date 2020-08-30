@@ -1210,7 +1210,6 @@ void mac_state::adb_reset()
 	m_adb_extclock = 0;
 	m_adb_send = 0;
 	m_adb_waiting_cmd = 0;
-	m_adb_streaming = MCU_STREAMING_NONE;
 	m_adb_state = 0;
 	m_adb_srqflag = false;
 	m_pmu_poll = 0;

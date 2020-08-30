@@ -423,9 +423,12 @@ PYTHON := python
 else
 PYTHON := $(PYTHON_EXECUTABLE)
 endif
+
+ifneq ($(TARGETOS),asmjs)
 CC := $(SILENT)gcc
 LD := $(SILENT)g++
 CXX:= $(SILENT)g++
+endif
 
 #-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
@@ -1010,7 +1013,11 @@ GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 
 else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
 endif
+ifeq ($(findstring emcc,$(CC)),emcc)
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  -v  2>&1 >/dev/null | grep 'clang version' | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
+else
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
+endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 GIT_AVAILABLE := $(shell git --version > /dev/null 2>&1 && echo git)
 endif
@@ -1334,7 +1341,7 @@ $(PROJECTDIR)/$(MAKETYPE)-asmjs/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=3.7.0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
 
 .PHONY: asmjs
 asmjs: generate $(PROJECTDIR)/$(MAKETYPE)-asmjs/Makefile
@@ -1711,14 +1718,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.223"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.224"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.223" > $@
+	@echo #define BARE_BUILD_VERSION "0.224" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

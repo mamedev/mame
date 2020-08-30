@@ -1632,8 +1632,7 @@ void cli_frontend::execute_commands(const char *exename)
 			osd_printf_error("Auxiliary verb -validate takes at most 1 argument\n");
 			return;
 		}
-		validity_checker valid(m_options);
-		valid.set_validate_all(true);
+		validity_checker valid(m_options, false);
 		const char *sysname = m_options.command_arguments().empty() ? nullptr : m_options.command_arguments()[0].c_str();
 		bool result = valid.check_all_matching(sysname);
 		if (!result)

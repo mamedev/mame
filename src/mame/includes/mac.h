@@ -92,6 +92,8 @@ public:
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac")
 	{
+		m_rom_size = 0;
+		m_rom_ptr = nullptr;
 	}
 
 	void add_scsi(machine_config &config, bool cdrom = false);
@@ -267,16 +269,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	/* for Egret and CUDA streaming MCU commands, command types */
-	enum mac_streaming_t
-	{
-		MCU_STREAMING_NONE = 0,
-		MCU_STREAMING_PRAMRD,
-		MCU_STREAMING_PRAMWR,
-		MCU_STREAMING_WRAMRD,
-		MCU_STREAMING_WRAMWR
-	};
-
 	enum
 	{
 		RBV_TYPE_RBV = 0,
@@ -317,7 +309,7 @@ private:
 	int32_t m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
 	int32_t m_adb_state, m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
 	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
-	int32_t m_adb_streaming, m_adb_stream_ptr;
+	int32_t m_adb_stream_ptr;
 	int32_t m_adb_linestate;
 	bool  m_adb_srqflag;
 #define kADBKeyBufSize 32
@@ -501,6 +493,9 @@ private:
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<dac_8bit_pwm_device> m_dac;
+
+	uint32_t m_rom_size;
+	uint32_t *m_rom_ptr;
 
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;

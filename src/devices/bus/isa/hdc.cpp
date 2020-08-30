@@ -923,8 +923,8 @@ void isa8_hdc_device::device_add_mconfig(machine_config &config)
 	XT_HDC(config, m_hdc,0);
 	m_hdc->irq_handler().set(FUNC(isa8_hdc_device::irq_w));
 	m_hdc->drq_handler().set(FUNC(isa8_hdc_device::drq_w));
-	HARDDISK(config, "hdc:primary");
-	HARDDISK(config, "hdc:slave");
+	HARDDISK(config, "hdc:primary", "st_hdd");
+	HARDDISK(config, "hdc:slave", "st_hdd");
 }
 
 void isa8_hdc_ec1841_device::device_add_mconfig(machine_config &config)
@@ -932,8 +932,8 @@ void isa8_hdc_ec1841_device::device_add_mconfig(machine_config &config)
 	EC1841_HDC(config, m_hdc,0);
 	m_hdc->irq_handler().set(FUNC(isa8_hdc_ec1841_device::irq_w));
 	m_hdc->drq_handler().set(FUNC(isa8_hdc_ec1841_device::drq_w));
-	HARDDISK(config, "hdc:primary");
-	HARDDISK(config, "hdc:slave");
+	HARDDISK(config, "hdc:primary", "st_hdd");
+	HARDDISK(config, "hdc:slave", "st_hdd");
 }
 
 //-------------------------------------------------

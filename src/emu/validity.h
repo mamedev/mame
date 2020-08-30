@@ -25,17 +25,16 @@
 class validity_checker : public osd_output
 {
 public:
-	validity_checker(emu_options &options);
+	validity_checker(emu_options &options, bool quick);
 	~validity_checker();
 
 	// getters
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
-	bool validate_all() const { return m_validate_all; }
+	bool quick() const { return m_quick; }
 
 	// setter
 	void set_verbose(bool verbose) { m_print_verbose = verbose; }
-	void set_validate_all(bool all) { m_validate_all = all; }
 
 	// operations
 	void check_driver(const game_driver &driver);
@@ -44,20 +43,21 @@ public:
 
 	// helpers for devices
 	void validate_tag(const char *tag);
-	int region_length(const char *tag) { auto i = m_region_map.find(tag); return i == m_region_map.end() ? 0 : i->second; }
+	int region_length(const char *tag) { auto const i = m_region_map.find(tag); return (i == m_region_map.end()) ? 0 : i->second; }
+	bool ioport_missing(const char *tag) { return !m_checking_card && (m_ioport_set.find(tag) == m_ioport_set.end()); }
 
 	// generic registry of already-checked stuff
 	bool already_checked(const char *string) { return !m_already_checked.insert(string).second; }
 
-	// osd_output interface
-
 protected:
+	// osd_output interface
 	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args) override;
 
 private:
 	// internal map types
-	typedef std::unordered_map<std::string,const game_driver *> game_driver_map;
-	typedef std::unordered_map<std::string,uintptr_t> int_map;
+	using game_driver_map = std::unordered_map<std::string, game_driver const *>;
+	using int_map = std::unordered_map<std::string, uintptr_t>;
+	using string_set = std::unordered_set<std::string>;
 
 	// internal helpers
 	const char *ioport_string_from_index(u32 index);
@@ -72,13 +72,13 @@ private:
 	void validate_core();
 	void validate_inlines();
 	void validate_rgb();
-	void validate_driver();
+	void validate_driver(device_t &root);
 	void validate_roms(device_t &root);
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
-	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
-	void validate_inputs();
-	void validate_devices();
+	void validate_condition(ioport_condition &condition, device_t &device);
+	void validate_inputs(device_t &root);
+	void validate_devices(machine_config &config);
 	void validate_device_types();
 
 	// output helpers
@@ -113,13 +113,14 @@ private:
 	int_map                 m_defstr_map;
 
 	// current state
-	const game_driver *     m_current_driver;
-	machine_config *        m_current_config;
-	const device_t *        m_current_device;
-	const char *            m_current_ioport;
+	game_driver const *     m_current_driver;
+	device_t const *        m_current_device;
+	char const *            m_current_ioport;
 	int_map                 m_region_map;
-	std::unordered_set<std::string>   m_already_checked;
-	bool                    m_validate_all;
+	string_set              m_ioport_set;
+	string_set              m_already_checked;
+	bool                    m_checking_card;
+	bool const              m_quick;
 };
 
 #endif // MAME_EMU_VALIDITY_H

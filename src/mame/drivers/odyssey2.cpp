@@ -703,7 +703,6 @@ void odyssey2_state::odyssey2(machine_config &config)
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("O2");
-	SOFTWARE_LIST(config, "vpp_list").set_compatible("videopacp").set_filter("O2");
 }
 
 void odyssey2_state::videopac(machine_config &config)
@@ -720,7 +719,6 @@ void odyssey2_state::videopac(machine_config &config)
 	m_maincpu->set_clock(17.734476_MHz_XTAL / 3);
 
 	subdevice<software_list_device>("cart_list")->set_filter("VP");
-	subdevice<software_list_device>("vpp_list")->set_filter("VP");
 }
 
 void odyssey2_state::videopacf(machine_config &config)
@@ -776,8 +774,7 @@ void videopacp_state::g7400(machine_config &config)
 
 	/* cartridge */
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("videopacp").set_filter("VPP");
-	SOFTWARE_LIST(config, "vp_list").set_compatible("videopac").set_filter("VPP");
+	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("VPP");
 }
 
 void videopacp_state::jo7400(machine_config &config)
@@ -809,7 +806,6 @@ void videopacp_state::odyssey3(machine_config &config)
 	PALETTE(config.replace(), "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	subdevice<software_list_device>("cart_list")->set_filter("O3");
-	subdevice<software_list_device>("vp_list")->set_filter("O3");
 }
 
 
@@ -818,12 +814,12 @@ void videopacp_state::odyssey3(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START (odyssey2)
+ROM_START (videopac)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
 
-ROM_START (videopac)
+ROM_START (odyssey2)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
 ROM_END
@@ -858,9 +854,9 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP MACHINE    INPUT     STATE            INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1979, odyssey2,  0,         0, odyssey2,  odyssey2, odyssey2_state,  empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, videopac,  odyssey2,  0, videopac,  odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, videopacf, odyssey2,  0, videopacf, odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, videopac,  0,         0, videopac,  odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, videopacf, videopac,  0, videopacf, odyssey2, odyssey2_state,  empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, odyssey2,  videopac,  0, odyssey2,  odyssey2, odyssey2_state,  empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1983, videopacp, 0,         0, g7400,     g7400,    videopacp_state, empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, jopac,     videopacp, 0, jo7400,    g7400,    videopacp_state, empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )

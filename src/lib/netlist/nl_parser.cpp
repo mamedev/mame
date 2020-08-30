@@ -51,6 +51,7 @@ parser_t::parser_t(nlparse_t &setup)
 	m_tok_EXTERNAL_SOURCE = m_tokenizer.register_token("EXTERNAL_SOURCE");
 	m_tok_TRUTHTABLE_START = m_tokenizer.register_token("TRUTHTABLE_START");
 	m_tok_TRUTHTABLE_END = m_tokenizer.register_token("TRUTHTABLE_END");
+	m_tok_TRUTHTABLE_ENTRY = m_tokenizer.register_token("TRUTHTABLE_ENTRY");
 	m_tok_TT_HEAD = m_tokenizer.register_token("TT_HEAD");
 	m_tok_TT_LINE = m_tokenizer.register_token("TT_LINE");
 	m_tok_TT_FAMILY = m_tokenizer.register_token("TT_FAMILY");
@@ -93,11 +94,11 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			return false;
 		}
 
-		if (token.is(m_tok_NETLIST_END))
+		if (token.is(m_tok_NETLIST_END) || token.is(m_tok_TRUTHTABLE_END))
 		{
 			require_token(m_tok_paren_left);
 			if (!in_nl)
-				error (MF_UNEXPECTED_NETLIST_END());
+				error (MF_PARSER_UNEXPECTED_1(token.str()));
 			else
 			{
 				in_nl = false;
@@ -109,16 +110,21 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			m_cur_local->push_back(token_t(m_tok_paren_right));
 
 		}
-		else if (token.is(m_tok_NETLIST_START))
+		else if (token.is(m_tok_NETLIST_START) || token.is(m_tok_TRUTHTABLE_START))
 		{
 			if (in_nl)
-				error (MF_UNEXPECTED_NETLIST_START());
+				error (MF_PARSER_UNEXPECTED_1(token.str()));
 			require_token(m_tok_paren_left);
 			token_t name = get_token();
-			require_token(m_tok_paren_right);
-			if (name.str() == nlname || nlname.empty())
+			if (token.is(m_tok_NETLIST_START) && (name.str() == nlname || nlname.empty()))
 			{
+				require_token(m_tok_paren_right);
 				parse_netlist(name.str());
+				return true;
+			}
+			if (token.is(m_tok_TRUTHTABLE_START) && name.str() == nlname)
+			{
+				net_truthtable_start(nlname);
 				return true;
 			}
 
@@ -130,10 +136,10 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			auto num = plib::pfmt("{1}")(sl.line());
 			m_cur_local->push_back(token_t(token_type::NUMBER, num));
 			m_cur_local->push_back(token_t(token_type::STRING, sl.file_name()));
-			m_cur_local->push_back(token_t(m_tok_NETLIST_START));
+			m_cur_local->push_back(token);
 			m_cur_local->push_back(token_t(m_tok_paren_left));
 			m_cur_local->push_back(name);
-			m_cur_local->push_back(token_t(m_tok_paren_right));
+			//m_cur_local->push_back(token_t(m_tok_paren_right));
 			in_nl = true;
 		}
 		else if (token.is(m_tok_NETLIST_EXTERNAL))
@@ -191,8 +197,8 @@ void parser_t::parse_netlist(const pstring &nlname)
 			net_local_source();
 		else if (token.is(m_tok_EXTERNAL_SOURCE))
 			net_external_source();
-		else if (token.is(m_tok_TRUTHTABLE_START))
-			net_truthtable_start(nlname);
+		//else if (token.is(m_tok_TRUTHTABLE_START))
+		//  net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
 		{
 			require_token(m_tok_paren_left);
@@ -200,6 +206,14 @@ void parser_t::parse_netlist(const pstring &nlname)
 			register_local_as_source(name);
 			// FIXME: Need to pass in parameter definition FIXME: get line number right
 			m_setup.register_lib_entry(name, "", plib::source_location("parser: " + nlname, 1));
+			require_token(m_tok_paren_right);
+		}
+		else if (token.is(m_tok_TRUTHTABLE_ENTRY))
+		{
+			require_token(m_tok_paren_left);
+			pstring name(get_identifier());
+			register_local_as_source(name);
+			m_setup.include(name);
 			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_NET_REGISTER_DEV))
@@ -220,10 +234,9 @@ void parser_t::parse_netlist(const pstring &nlname)
 
 void parser_t::net_truthtable_start(const pstring &nlname)
 {
-	require_token(m_tok_paren_left);
-	pstring name(get_identifier());
 	bool head_found(false);
 
+	// parse remaining parameters
 	require_token(m_tok_comma);
 	long ni = get_number_long();
 	require_token(m_tok_comma);
@@ -233,7 +246,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 	require_token(m_tok_paren_right);
 
 	netlist::tt_desc desc;
-	desc.name = name;
+	desc.name = nlname;
 	desc.ni = gsl::narrow<unsigned long>(ni);
 	desc.no = gsl::narrow<unsigned long>(no);
 	desc.family = "";

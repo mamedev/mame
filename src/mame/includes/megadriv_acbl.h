@@ -29,6 +29,7 @@ public:
 	void init_sonic2mb();
 	void init_twinktmb();
 	void init_jparkmb();
+	void init_sbubsm();
 
 private:
 	void bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -42,6 +43,8 @@ private:
 	uint16_t ssf2mdb_dsw_r(offs_t offset);
 	uint16_t srmdb_dsw_r(offs_t offset);
 	uint16_t topshoot_200051_r();
+	uint16_t sbubsm_400000_r();
+	uint16_t sbubsm_400002_r();
 	uint16_t puckpkmna_70001c_r();
 	uint16_t puckpkmna_4b2476_r();
 

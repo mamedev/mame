@@ -638,7 +638,7 @@ public:
 	device_debug *debug() const { return m_debug.get(); }
 
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
-	bool findit(bool isvalidation) const;
+	bool findit(validity_checker *valid) const;
 
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;

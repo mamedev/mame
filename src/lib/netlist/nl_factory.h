@@ -181,6 +181,7 @@ namespace factory {
 			return dynamic_cast<device_element_t<C> *>(f) != nullptr;
 		}
 
+		bool exists(const pstring &name) const noexcept;
 	private:
 		log_type &m_log;
 	};

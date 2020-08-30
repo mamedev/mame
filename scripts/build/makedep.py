@@ -606,18 +606,42 @@ def collect_lua_directives(options):
 
 def scan_source_dependencies(options):
     def locate_include(path):
-        relative = os.path.join(*path)
-        for incdir in roots:
-            if os.path.isfile(os.path.join(os.path.join(options.root, *incdir), relative)):
-                return tuple(incdir + path)
+        split = [ ]
+        forward = 0
+        reverse = 0
+        for part in path.split('/'):
+            if part and (part != '.'):
+                if part != '..':
+                    forward += 1
+                    split.append(part)
+                elif forward:
+                    split.pop()
+                    forward -= 1
+                else:
+                    split.append(part)
+                    reverse += 1
+        split = tuple(split)
+        for incdir, depth in roots:
+            if (not depth) or (not reverse):
+                components = incdir + split
+                depth = depth + forward - 1
+            elif depth >= reverse:
+                components = incdir[:-reverse] + split[reverse:]
+                depth = depth + forward - reverse - 1
+            else:
+                components = incdir[:-depth] + split[depth:]
+                depth = forward - 1
+            if os.path.isfile(os.path.join(options.root, *components)):
+                return components, depth
+        return None, 0
 
-    def test_siblings(relative, basename):
+    def test_siblings(relative, basename, depth):
         pathbase = '/'.join(relative) + '/'
         dirname = os.path.join(options.root, *relative)
         for ext in ('.cpp', '.ipp', '.hxx'):
             path = pathbase + basename + ext
             if (path not in seen) and os.path.isfile(os.path.join(dirname, basename + ext)):
-                remaining.append(path)
+                remaining.append((path, depth))
                 seen.add(path)
 
     def line_hook(text):
@@ -629,29 +653,30 @@ def scan_source_dependencies(options):
                 if text[:1].isspace():
                     text = text.strip()
                     if (len(text) > 2) and (text[0] == '"') and (text[-1] == '"'):
-                        components = locate_include(tuple(x for x in text[1:-1].split('/') if x))
+                        components, depth = locate_include(text[1:-1])
                         if components:
                             path = '/'.join(components)
                             if path not in seen:
-                                remaining.append(path)
+                                remaining.append((path, depth))
                                 seen.add(path)
                                 base, ext = os.path.splitext(components[-1])
                                 if ext.lower().startswith('.h'):
                                     components = components[:-1]
-                                    test_siblings(components, base)
+                                    test_siblings(components, base, depth)
                                     if components == ('src', 'mame', 'includes'):
                                         for aspect in ('audio', 'drivers', 'video', 'machine'):
-                                            test_siblings(('src', 'mame', aspect), base)
+                                            test_siblings(('src', 'mame', aspect), base, depth)
 
     handler = CppParser.Handler()
     handler.line = line_hook
     parser = CppParser(handler)
     seen = set('/'.join(x for x in split_path(source) if x) for source in options.sources)
-    remaining = list(seen)
+    remaining = list([(x, 0) for x in seen])
+    default_roots = ((('src', 'devices'), 0), (('src', 'mame'), 0), (('src', 'lib'), 0))
     while remaining:
-        source = remaining.pop()
+        source, depth = remaining.pop()
         components = tuple(source.split('/'))
-        roots = (components[:-1], ('src', 'devices'), ('src', 'mame'), ('src', 'lib'))
+        roots = ((components[:-1], depth), ) + default_roots
         try:
             f = io.open(os.path.join(options.root, *components), 'r', encoding='utf-8')
         except IOError:

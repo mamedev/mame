@@ -133,6 +133,10 @@ Switches   Aux-RS232   Aux Port   Alpha      Vend-Bus
                        13 - +12
                        14 - GAP
                        15 - 0V
+
+MPU5 Horizon and Genesis machines use also a mux PCB for LEDs, lamps and buttons called
+"Barcrest -MUX5E- XP19642 ISS4", wich uses a Zilog Z86E6116PSG MCU (undumped).
+
 */
 
 
