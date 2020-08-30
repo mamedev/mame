@@ -204,13 +204,20 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	if (image.loaded_through_softlist())
 	{
-		u32 sclock = strtoul(image.get_feature("clock"), nullptr, 0);
+		const char *cclock = image.get_feature("clock");
+		u32 sclock = cclock ? strtoul(cclock, nullptr, 0) : 0;
 		if (sclock != 0)
 			clock = sclock;
 
-		m_butmask_auto = ~strtoul(image.get_feature("butmask"), nullptr, 0) & 0xfff;
-		m_pla_auto = strtoul(image.get_feature("pla"), nullptr, 0) ? 1 : 0;
-		m_paddle_auto = bool(strtoul(image.get_feature("paddle"), nullptr, 0) ? 1 : 0);
+		const char *butmask = image.get_feature("butmask");
+		m_butmask_auto = butmask ? strtoul(butmask, nullptr, 0) : 0;
+		m_butmask_auto = ~m_butmask_auto & 0xfff;
+
+		const char *pla = image.get_feature("pla");
+		m_pla_auto = pla && strtoul(pla, nullptr, 0) ? 1 : 0;
+
+		const char *paddle = image.get_feature("paddle");
+		m_paddle_auto = paddle && strtoul(paddle, nullptr, 0);
 	}
 
 	// detect MCU on file size

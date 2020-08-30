@@ -2570,7 +2570,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="ppp">
+	<software name="ppp" supported="partial">
 		<description>Puzzle Piece Panic!</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
