@@ -1463,7 +1463,7 @@ void netlist_mame_sound_device::device_start()
 	m_inbuffer.resize(m_in.size());
 
 	/* initialize the stream(s) */
-	m_stream = &stream_alloc_ex(m_in.size(), m_out.size(), m_sound_clock, STREAM_RESAMPLER_NONE);
+	m_stream = stream_alloc_ex(m_in.size(), m_out.size(), m_sound_clock, STREAM_RESAMPLER_NONE);
 
 	LOGDEVCALLS("sound device_start exit\n");
 }
@@ -1506,7 +1506,7 @@ void netlist_mame_sound_device::update_to_current_time()
 		LOGTIMING("%s : %f us before machine time\n", this->name(), (cur - mtime).as_double() * 1000000.0);
 }
 
-void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void netlist_mame_sound_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	for (auto &e : m_in)
 	{

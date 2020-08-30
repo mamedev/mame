@@ -101,9 +101,9 @@ void namco_audio_device::device_start()
 
 	/* get stream channels */
 	if (m_stereo)
-		m_stream = &stream_alloc_ex(0, 2, 192000);
+		m_stream = stream_alloc_ex(0, 2, 192000);
 	else
-		m_stream = &stream_alloc_ex(0, 1, 192000);
+		m_stream = stream_alloc_ex(0, 1, 192000);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = true;
@@ -657,7 +657,7 @@ void namco_15xx_device::sharedram_w(offs_t offset, uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void namco_audio_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void namco_audio_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_stereo)
 	{
@@ -842,17 +842,17 @@ void namco_audio_device::sound_stream_update_ex(sound_stream &stream, std::vecto
 	}
 }
 
-void namco_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void namco_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	namco_audio_device::sound_stream_update_ex(stream, inputs, outputs);
 }
 
-void namco_15xx_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void namco_15xx_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	namco_audio_device::sound_stream_update_ex(stream, inputs, outputs);
 }
 
-void namco_cus30_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void namco_cus30_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	namco_audio_device::sound_stream_update_ex(stream, inputs, outputs);
 }

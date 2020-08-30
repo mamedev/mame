@@ -78,12 +78,12 @@ public:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs);
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 	// stream creation
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
-	sound_stream &stream_alloc_ex(int inputs, int outputs, int sample_rate);
-	sound_stream &stream_alloc_ex(int inputs, int outputs, int sample_rate, sound_stream_flags resampler);
+	sound_stream *stream_alloc_ex(int inputs, int outputs, int sample_rate);
+	sound_stream *stream_alloc_ex(int inputs, int outputs, int sample_rate, sound_stream_flags resampler);
 
 	// helpers
 	int inputs() const;
@@ -133,7 +133,7 @@ protected:
 	virtual void interface_post_load() override;
 
 	// sound interface overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
 	u8 m_outputs;                           // number of outputs

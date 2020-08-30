@@ -60,7 +60,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;

@@ -918,7 +918,7 @@ void tms57002_device::execute_run()
 		icount = 0;
 }
 
-void tms57002_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void tms57002_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	assert(inputs[0].samples() == 1);
 	assert(outputs[0].samples() == 1);

@@ -63,7 +63,7 @@ void sp0250_device::device_start()
 	// output PWM data at the ROMCLOCK frequency
 	int sample_rate = clock() / 2;
 	int frame_rate = sample_rate / (4 * PWM_CLOCKS);
-	m_stream = &stream_alloc_ex(0, 1, m_pwm_mode ? sample_rate : frame_rate);
+	m_stream = stream_alloc_ex(0, 1, m_pwm_mode ? sample_rate : frame_rate);
 
 	// if a DRQ callback is offered, run a timer at the frame rate
 	// to ensure the DRQ gets picked up in a timely manner
@@ -255,7 +255,7 @@ int8_t sp0250_device::next()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sp0250_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void sp0250_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	auto &output = outputs[0];
 

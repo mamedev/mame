@@ -105,7 +105,7 @@ void k054539_device::keyoff(int channel)
 		regs[0x22c] &= ~(1 << channel);
 }
 
-void k054539_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void k054539_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 #define VOL_CAP 1.80
 
@@ -326,7 +326,7 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram.get(), 0, 0x4000);
 
-	stream = &stream_alloc_ex(0, 2, clock() / 384);
+	stream = stream_alloc_ex(0, 2, clock() / 384);
 
 	save_item(NAME(voltab));
 	save_item(NAME(pantab));

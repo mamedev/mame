@@ -238,7 +238,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_handler.resolve_safe();
 
-	m_sound = &stream_alloc_ex(0, (m_stereo? 2:1), sample_rate);
+	m_sound = stream_alloc_ex(0, (m_stereo? 2:1), sample_rate);
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
@@ -374,7 +374,7 @@ inline bool sn76496_base_device::in_noise_mode()
 	return ((m_register[6] & 4)!=0);
 }
 
-void sn76496_base_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void sn76496_base_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i;
 	auto *lbuffer = &outputs[0];

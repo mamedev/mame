@@ -237,7 +237,7 @@ public:
 	netlist_mame_sound_input_buffer() :
 		read_stream_view() { }
 
-	netlist_mame_sound_input_buffer(read_stream_view &src) :
+	netlist_mame_sound_input_buffer(read_stream_view const &src) :
 		read_stream_view(src) { }
 
 	stream_buffer::sample_t operator[](std::size_t index) { return get(index); }
@@ -281,7 +281,7 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	// device_sound_interface overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	//virtual void device_reset() override;
 

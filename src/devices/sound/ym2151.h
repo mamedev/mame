@@ -75,11 +75,11 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void calculate_timers();
 	virtual void write_reg(int r, int v);
-	
+
 private:
 	enum {
 		TIMER_IRQ_A_OFF,

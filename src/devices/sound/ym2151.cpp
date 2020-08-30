@@ -942,7 +942,7 @@ void ym2151_device::device_start()
 	m_irqhandler.resolve_safe();
 	m_portwritehandler.resolve_safe();
 
-	m_stream = &stream_alloc_ex(0, 2, clock() / 64);
+	m_stream = stream_alloc_ex(0, 2, clock() / 64);
 
 	timer_A_irq_off = timer_alloc(TIMER_IRQ_A_OFF);
 	timer_B_irq_off = timer_alloc(TIMER_IRQ_B_OFF);
@@ -1833,7 +1833,7 @@ WRITE_LINE_MEMBER(ym2151_device::reset_w)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2151_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void ym2151_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_reset_active)
 	{

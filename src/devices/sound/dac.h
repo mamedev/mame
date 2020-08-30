@@ -76,7 +76,7 @@ protected:
 		}
 	}
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) = 0;
+	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) = 0;
 };
 
 template <unsigned bits>
@@ -85,7 +85,7 @@ class dac_code_binary : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
@@ -103,7 +103,7 @@ class dac_code_ones_complement : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
@@ -132,7 +132,7 @@ class dac_code_twos_complement : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
@@ -150,7 +150,7 @@ class dac_code_sign_magntitude : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
@@ -189,17 +189,17 @@ protected:
 
 	virtual void device_start() override
 	{
-		this->m_stream = &stream_alloc_ex(2, 1, 48000 * 4);
+		this->m_stream = stream_alloc_ex(2, 1, 48000 * 4);
 
 		save_item(NAME(this->m_code));
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
 	{
-		setCode(param);
+		this->setCode(param);
 	}
 
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		_dac_code::sound_stream_update_ex_tag(stream, inputs, outputs);
 	}
@@ -218,8 +218,8 @@ public:
 	{
 	}
 
-	virtual WRITE_LINE_MEMBER(write) override { synchronize(0, state); }
-	virtual void data_w(uint8_t data) override { synchronize(0, data); }
+	virtual WRITE_LINE_MEMBER(write) override { device_t::synchronize(0, state); }
+	virtual void data_w(uint8_t data) override { device_t::synchronize(0, data); }
 };
 
 template <typename _dac_code>
@@ -233,8 +233,8 @@ public:
 	{
 	}
 
-	virtual void write(unsigned char data) override { synchronize(0, data); }
-	virtual void data_w(uint8_t data) override { synchronize(0, data); }
+	virtual void write(unsigned char data) override { device_t::synchronize(0, data); }
+	virtual void data_w(uint8_t data) override { device_t::synchronize(0, data); }
 };
 
 template <typename _dac_code>
@@ -248,8 +248,8 @@ public:
 	{
 	}
 
-	virtual void write(unsigned short data) override { synchronize(0, data); }
-	virtual void data_w(uint16_t data) override { synchronize(0, data); }
+	virtual void write(unsigned short data) override { device_t::synchronize(0, data); }
+	virtual void data_w(uint16_t data) override { device_t::synchronize(0, data); }
 };
 
 constexpr double dac_gain_r2r = 1.0;

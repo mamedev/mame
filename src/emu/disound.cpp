@@ -75,14 +75,14 @@ sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int 
 	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this));
 }
 
-sound_stream &device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate)
+sound_stream *device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate)
 {
-	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), STREAM_RESAMPLER_DEFAULT);
+	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), STREAM_RESAMPLER_DEFAULT);
 }
 
-sound_stream &device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
+sound_stream *device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
 {
-	return *device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), flags);
+	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), flags);
 }
 
 
@@ -391,7 +391,7 @@ void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sa
 	throw emu_fatalerror("sound_stream_update called but not overridden by owning class");
 }
 
-void device_sound_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void device_sound_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	throw emu_fatalerror("sound_stream_update_ex called but not overridden by owning class");
 }
@@ -463,7 +463,7 @@ void device_mixer_interface::interface_pre_start()
 	m_output_clear.resize(m_outputs);
 
 	// allocate the mixer stream
-	m_mixer_stream = &stream_alloc_ex(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate(), STREAM_RESAMPLER_DEFAULT);
+	m_mixer_stream = stream_alloc_ex(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate(), STREAM_RESAMPLER_DEFAULT);
 }
 
 
@@ -489,7 +489,7 @@ void device_mixer_interface::interface_post_load()
 //  output
 //-------------------------------------------------
 
-void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the clear flags
 	std::fill(std::begin(m_output_clear), std::end(m_output_clear), false);

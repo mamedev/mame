@@ -210,7 +210,7 @@ upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, 
 void upd775x_device::device_start()
 {
 	// allocate a stream channel
-	m_channel = &stream_alloc_ex(0, 1, clock()/4);
+	m_channel = stream_alloc_ex(0, 1, clock()/4);
 
 	// compute the stepping rate based on the chip's clock speed
 	m_step = 4 * FRAC_ONE;
@@ -729,7 +729,7 @@ READ_LINE_MEMBER( upd775x_device::busy_r )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd775x_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void upd775x_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	constexpr stream_buffer::sample_t sample_scale = 128.0 / 32768.0;
 	stream_buffer::sample_t sample = stream_buffer::sample_t(m_sample) * sample_scale;

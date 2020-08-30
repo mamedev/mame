@@ -135,7 +135,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// trampolines for callbacks from fm.cpp
 	static void psg_set_clock(device_t *device, int clock) { downcast<ay8910_device *>(device)->ay_set_clock(clock); }

@@ -238,7 +238,7 @@ void samples_device::device_start()
 	{
 		// initialize channel
 		channel_t &chan = m_channel[channel];
-		chan.stream = &stream_alloc_ex(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+		chan.stream = stream_alloc_ex(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 		chan.source = nullptr;
 		chan.source_num = -1;
 		chan.pos = 0;
@@ -316,7 +316,7 @@ void samples_device::device_post_load()
 //  sound_stream_update - update a sound stream
 //-------------------------------------------------
 
-void samples_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void samples_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// find the channel with this stream
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
