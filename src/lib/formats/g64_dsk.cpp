@@ -12,8 +12,6 @@
 
 #include "formats/g64_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 
 #define G64_FORMAT_HEADER   "GCR-1541"
 
@@ -34,9 +32,9 @@ int g64_format::identify(io_generic *io, uint32_t form_factor)
 	char h[8];
 
 	io_generic_read(io, h, 0, 8);
-	if (!memcmp(h, G64_FORMAT_HEADER, 8)) {
+	if (!memcmp(h, G64_FORMAT_HEADER, 8))
 		return 100;
-	}
+
 	return 0;
 }
 
@@ -46,8 +44,10 @@ bool g64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	std::vector<uint8_t> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
-	if (img[POS_VERSION]) {
-		throw emu_fatalerror("g64_format: Unsupported version %u", img[POS_VERSION]);
+	if (img[POS_VERSION])
+	{
+		osd_printf_error("g64_format: Unsupported version %u\n", img[POS_VERSION]);
+		return false;
 	}
 
 	int track_count = img[POS_TRACK_COUNT];
@@ -68,12 +68,18 @@ bool g64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			continue;
 
 		if (dpos > size)
-			throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, dpos);
+		{
+			osd_printf_error("g64_format: Track %u offset %06x out of bounds\n", track, dpos);
+			return false;
+		}
 
 		uint32_t speed_zone = pick_integer_le(&img[0], spos, 4);
 
 		if (speed_zone > 3)
-			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
+		{
+			osd_printf_error("g64_format: Unsupported variable speed zones on track %d\n", track);
+			return false;
+		}
 
 		uint16_t track_bytes = pick_integer_le(&img[0], dpos, 2);
 		int track_size = track_bytes * 8;
@@ -137,8 +143,10 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 			if ((speed_zone = generate_bitstream(track, head, 3, &trackbuf[0], track_size, image)) == -1)
 				if ((speed_zone = generate_bitstream(track, head, 2, &trackbuf[0], track_size, image)) == -1)
 					if ((speed_zone = generate_bitstream(track, head, 1, &trackbuf[0], track_size, image)) == -1)
-						if ((speed_zone = generate_bitstream(track, head, 0, &trackbuf[0], track_size, image)) == -1)
-							throw emu_fatalerror("g64_format: Cannot determine speed zone for track %u", track);
+						if ((speed_zone = generate_bitstream(track, head, 0, &trackbuf[0], track_size, image)) == -1) {
+							osd_printf_error("g64_format: Cannot determine speed zone for track %u\n", track);
+							return false;
+						}
 
 			LOG_FORMATS("head %u track %u size %u cell %u\n", head, track, track_size, c1541_cell_size[speed_zone]);
 

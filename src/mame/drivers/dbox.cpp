@@ -34,9 +34,9 @@
  *
  * History of Nokia Multimedia Division
  *-------------------------------------
- * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
+ * Luxor AB was a Swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
  * by Nokia 1985. Luxor designed among other things TV sets, Radios and the famous ABC-80. The Nokia Multimedia
- * Division was formed in Linköping as a result of the Luxor aquisition. Their main design was a satellite
+ * Division was formed in Linköping as a result of the Luxor acquisition. Their main design was a satellite
  * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
  * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
@@ -45,7 +45,7 @@
  *
  * The heavily subsidised Dbox was very popular in Holland since Kirsch Gruppe didn't lock usage to themselves. This was
  * corrected in a forced firmware upgrade leaving the "customers" in Holland without a working box. Pretty soon a
- * shareware software developed by Uli Hermann appeared called DVB98 and later DVB2000 reenabling the boxes in  Holland
+ * shareware software developed by Uli Hermann appeared called DVB98 and later DVB2000 re-enabling the boxes in  Holland
  * and blocking upgrades. Uli's software was by many considered better than the original software.
  *
  * Misc links about Nokia Multimedia Division and this board:
@@ -237,7 +237,7 @@
  *                            - ignore FREEZE
  *                            - The crystal clock is the clear-to-send input capture clock for both channels
  *  SIM40 + 0x0701: 0x8A     Serial Module - MCR Low Byte
- *                            - The serial control registers are only accessable from supervisor mode
+ *                            - The serial control registers are only accessible from supervisor mode
  *                            - IARB = 0x0A - serial module has priority level 10d
  *  SIM40 + 0x0704: 0x01     Serial Module - ILR Interrupt Level
  *  SIM40 + 0x0705: 0x44     Serial Module - IVR Interrupt Vector
@@ -255,7 +255,7 @@
  *                                           - No Parity
  *                                           - Eight bits
  *  SIM40 + 0x0720: 0x07     Serial Module - MR2A Mode Register 2A
- *                                           - No CTS or RTS controll
+ *                                           - No CTS or RTS control
  *                                           - 1 STOP bit
  *  SIM40 + 0x0711: 0xCC     Serial Module - CSRA Clock Select Register A
  *                                           - 19200 baud TXc
@@ -510,7 +510,7 @@ void dbox_state::write_pa(uint8_t data) {
 
 #if LOCALFLASH
 /* Local emulation of the 29F800B 8Mbit flashes if the intelflsh bugs, relies on a complete command cycle is done per device, not in parallel */
-/* TODO: Make a flash device of this and support programming per sector and persistance, as settings etc may be stored in a 8Kb sector  */
+/* TODO: Make a flash device of this and support programming per sector and persistence, as settings etc may be stored in a 8Kb sector  */
 void dbox_state::sysflash_w(offs_t offset, uint16_t data, uint16_t mem_mask) {
 	LOGFLASH("%s pc:%08x offset:%08x data:%08x mask:%08x\n", FUNCNAME, m_maincpu->pc(), offset, data, mem_mask);
 
