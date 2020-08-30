@@ -11775,7 +11775,30 @@ license:CC0
 	</software>
 
 	<software name="indy3adv">
-		<description>Indiana Jones and the Last Crusade - The Graphic Adventure (VGA version)</description>
+		<description>Indiana Jones and the Last Crusade - The Graphic Adventure (3.5", VGA version, re-release)</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="developer" value="Lucasfilm" />
+		<info name="version" value="version IBM 256 color 2.0 5/3/90" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Last Crusade - Adventure (VGA version) [US Gold] [1992] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="224afb72" sha1="633239ca5027cad254b0ca206ecfb9665dc0471b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Last Crusade - Adventure (VGA version) [US Gold] [1992] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="2c5040eb" sha1="2a29d771ec3116e132ca952c89c6999b419d0384"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Indiana Jones and the Last Crusade - Adventure (VGA version) [US Gold] [1992] [3.5DD] [Disk 3 of 3].img" size="737280" crc="40f31d6d" sha1="af3f1322ce0ceabb1072063f9f1c1852edbbbf5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indy3adv525" cloneof="indy3adv">
+		<description>Indiana Jones and the Last Crusade - The Graphic Adventure (5.25", VGA version)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="developer" value="Lucasfilm" />
@@ -11820,6 +11843,48 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="innocent">
+		<description>Innocent Until Caught</description>
+		<year>1993</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Divide By Zero" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="ce9e18f0" sha1="8e4d7ce4cb1290c9ec0eab729cd3a728c62f4d11"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="7dc3d1e5" sha1="cc39d0adb871f37dfc7d0b0e2fb9c04a5f19644a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="312a4f9b" sha1="232dfdbbfee3fc6382d48065dcb39d2db57a668d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="e993b9e1" sha1="0bdbf7cf492cfb9c6c92c0fefc894131e8fbc46a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="e53efcd7" sha1="bf33e5b0e3d518c098e74c25c50bc0a32a0b8325"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="9462aa7c" sha1="e4085016e2c167377c3736b9d7028e4ab4334d8d"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Innocent Until Caught [Psygnosis] [1993] [3.5HD] [Disk 7 of 7].img" size="1474560" crc="ca5b4c7e" sha1="b4b198d1df121130437cb547a6ae0e771b555306"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12600,7 +12665,7 @@ license:CC0
 		<info name="ported by" value="The Big Red Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Micro Machines [Codemasters] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="3bc676f8" sha1="da941c58f12b7e07b19356716bf5f028106488f5"/>
+				<rom name="Micro Machines [Codemasters] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="c862e1f2" sha1="25646c00e70d5ab2256118a424b1c20b302d1c8f"/>
 			</dataarea>
 		</part>
 	</software>
