@@ -86,6 +86,7 @@ public:
 	pcp8718_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainrom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -103,6 +104,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<unsp_20_device> m_maincpu;
+	required_region_ptr<uint16_t> m_mainrom;
 	required_shared_ptr<uint16_t> m_mainram;
 
 	required_device<palette_device> m_palette;
@@ -127,6 +129,7 @@ private:
 
 	uint16_t unk_7abf_r();
 	uint16_t unk_7860_r();
+	uint16_t unk_780f_r();
 
 	void unk_7868_w(uint16_t data);
 
@@ -154,8 +157,12 @@ private:
 	   // probably not
 	   SPI_STATE_WAITING_DUMMY1_ADDR = 4,
 	   SPI_STATE_WAITING_DUMMY2_ADDR = 5,
-	   SPI_STATE_READING = 6
+	   SPI_STATE_READING = 6,
 
+	   SPI_STATE_WAITING_HIGH_ADDR_FAST = 8,
+	   SPI_STATE_WAITING_MID_ADDR_FAST = 9,
+	   SPI_STATE_WAITING_LOW_ADDR_FAST = 10,
+	   SPI_STATE_WAITING_LOW_ADDR_FAST_DUMMY = 11
 	};
 
 	spistate m_spistate;
@@ -190,6 +197,13 @@ uint16_t pcp8718_state::unk_7860_r()
 }
 
 
+uint16_t pcp8718_state::unk_780f_r()
+{
+	return 0x0002;
+}
+
+
+
 uint16_t pcp8718_state::spi_misc_control_r()
 {
 	logerror("%06x: spi_misc_control_r\n", machine().describe_context());
@@ -215,6 +229,11 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 		{
 			logerror("set to read mode (need address) %02x\n", data);
 			m_spistate = SPI_STATE_WAITING_HIGH_ADDR;
+		}
+		else if (data == 0x0b)
+		{
+			logerror("set to fast read mode (need address) %02x\n", data);
+			m_spistate = SPI_STATE_WAITING_HIGH_ADDR_FAST;
 		}
 		else
 		{
@@ -265,6 +284,40 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	//  m_spistate = SPI_STATE_READY;
 		break;
 	}
+
+
+	case SPI_STATE_WAITING_HIGH_ADDR_FAST:
+	{
+		m_spiaddress = (m_spiaddress & 0xff00ffff) | data << 16;
+		logerror("set to high address %02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_WAITING_MID_ADDR_FAST;
+		break;
+	}
+
+	case SPI_STATE_WAITING_MID_ADDR_FAST:
+	{
+		m_spiaddress = (m_spiaddress & 0xffff00ff) | data << 8;
+		logerror("set to mid address %02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_WAITING_LOW_ADDR_FAST;
+		break;
+	}
+
+	case SPI_STATE_WAITING_LOW_ADDR_FAST:
+	{
+		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
+		logerror("set to low address %02x address is now %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_WAITING_LOW_ADDR_FAST_DUMMY;
+
+		break;
+	}
+
+	case SPI_STATE_WAITING_LOW_ADDR_FAST_DUMMY:
+	{
+		logerror("dummy write %08x\n", data, m_spiaddress);
+		m_spistate = SPI_STATE_READING;
+		break;
+	}
+
 	}
 }
 
@@ -278,9 +331,9 @@ uint8_t pcp8718_state::spi_process_rx()
 		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
 
 		// hack internal BIOS checksum check
-		if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
-			if (dat == 0x4e)
-				dat = 0x5e;
+		//if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
+		//	if (dat == 0x4e)
+		//		dat = 0x5e;
 
 		logerror("reading SPI %02x from SPI Address %08x (adjusted word offset %08x)\n", dat, m_spiaddress, (m_spiaddress/2)+0x20000);
 		m_spiaddress++;
@@ -346,6 +399,9 @@ void pcp8718_state::map(address_map &map)
 	map(0x000000, 0x006fff).ram().share("mainram");
 	map(0x007000, 0x0077ff).ram(); // might be registers, but the call stubs for RAM calls explicitly use addresses in here for private stack so that previous snippets can be restored?
 
+	map(0x00780f, 0x00780f).r(FUNC(pcp8718_state::unk_780f_r));
+
+
 	map(0x007860, 0x007860).r(FUNC(pcp8718_state::unk_7860_r));
 
 	map(0x007868, 0x007868).w(FUNC(pcp8718_state::unk_7868_w));
@@ -378,6 +434,7 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 		if ((offset + 0xf000) == (realpc))
 		{
+			// still simulate this as it uses 'fast read' mode which doesn't work in the SPI handler at the moment
 			if (realpc == 0xf000)
 			{
 				address_space& mem = m_maincpu->space(AS_PROGRAM);
@@ -388,11 +445,16 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 				{
 					uint16_t data = m_spirom[((source - 0x20000) * 2) + 0] | (m_spirom[((source - 0x20000) * 2) + 1] << 8);
 					uint16_t data2 = m_spirom[((source - 0x20000) * 2) + 2] | (m_spirom[((source - 0x20000) * 2) + 3] << 8);
+					uint16_t data3 = m_spirom[((source - 0x20000) * 2) + 4] | (m_spirom[((source - 0x20000) * 2) + 5] << 8);
+					uint16_t data4 = m_spirom[((source - 0x20000) * 2) + 6] | (m_spirom[((source - 0x20000) * 2) + 7] << 8);
 
-					logerror("call to 0xf000 - copying from %08x to 04/05\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
+					logerror("call to 0xf000 - copying 4 words from %08x to 04/05/06/07\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
 
 					mem.write_word(0x0004, data);
 					mem.write_word(0x0005, data2);
+					mem.write_word(0x0006, data3);
+					mem.write_word(0x0007, data4);
+
 				}
 
 				return 0x9a90; // retf
@@ -400,30 +462,31 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 			else if (realpc == 0xf58f)
 			{
 				logerror("call to 0xf58f - unknown function\n");
-				return 0x9a90; // retf
+				return m_mainrom[offset];
 			}
 			else if (realpc == 0xfb26) // done with a call, and also a pc =
 			{
 				logerror("call to 0xfb26 - unknown function\n");
-				return 0x9a90; // retf
+				return m_mainrom[offset];
 			}
 			else if (realpc == 0xf56f) // done with a pc =
 			{
 				logerror("call to 0xf56f - unknown function\n");
-				return 0x9a90; // retf
+				return m_mainrom[offset];
 			}
 			else
 			{
-				fatalerror("simulate_f000_r unhandled BIOS simulation offset %04x\n", offset);
+				return m_mainrom[offset];
 			}
 
 		}
 		else
 		{
 			logerror("simulate_f000_r reading BIOS area (for checksum?) %04x\n", offset);
+			return m_mainrom[offset];
 		}
 	}
-	return 0x0000;
+	return m_mainrom[offset];
 }
 
 uint16_t pcp8718_state::ramcall_2060_logger_r()
@@ -501,14 +564,14 @@ void pcp8718_state::machine_reset()
 {
 	// this looks like it might actually be part of the IRQ handler (increase counter at 00 at the very start) rather than where we should end up after startup
 	// it also looks like (from the pc = 2xxx opcodes) that maybe this code should be being executed in RAM as those don't give correct offsets in the data segment.
-	m_maincpu->set_state_int(UNSP_PC, 0x4000);
-	m_maincpu->set_state_int(UNSP_SR, 0x0000);
+	//m_maincpu->set_state_int(UNSP_PC, 0x4000);
+	//m_maincpu->set_state_int(UNSP_SR, 0x0000);
 
 	//uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
 	//ROM[0x0000] = 0x9a90; // retf from internal ROM call to 0xf000 (unknown purpose)
 
 	// there doesn't appear to be any code to set the SP, so it must be done by the internal ROM
-	m_maincpu->set_state_int(UNSP_SP, 0x5fff);
+	//m_maincpu->set_state_int(UNSP_SP, 0x5fff);
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
 
@@ -554,7 +617,7 @@ void pcp8718_state::pcp8718(machine_config &config)
 
 ROM_START( pcp8718 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
+	ROM_LOAD( "internal.rom", 0x000000, 0x2000, CRC(ea119561) SHA1(a2680577e20fe1155efc40a5781cf1ec80ccec3a) )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	//ROM_LOAD16_WORD_SWAP( "8718_en25f32.bin", 0x000000, 0x400000, CRC(cc138db4) SHA1(379af3d94ae840f52c06416d6cf32e25923af5ae) ) // bad dump, some blocks are corrupt
@@ -563,7 +626,7 @@ ROM_END
 
 ROM_START( pcp8728 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
+	ROM_LOAD( "internal.rom", 0x000000, 0x2000, CRC(ea119561) SHA1(a2680577e20fe1155efc40a5781cf1ec80ccec3a) )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "pcp 8728 788 in 1.bin", 0x000000, 0x400000, CRC(60115f21) SHA1(e15c39f11e442a76fae3823b6d510178f6166926) )
@@ -580,34 +643,6 @@ ROM_END
 
 void pcp8718_state::spi_init()
 {
-	uint8_t* rom = memregion("spi")->base();
-
-	uint32_t start = rom[0] | (rom[1] << 8) | (rom[2] << 16) | (rom[3] << 24);
-	uint32_t end =   rom[4] | (rom[5] << 8) | (rom[2] << 16) | (rom[3] << 24);
-
-
-	logerror("start: %08x\n", start);
-	logerror("end: %08x\n", end);
-
-	int writebase = 0x4000;
-
-	if (start > end)
-	{
-		logerror("invalid initial copy?\n");
-		return;
-	}
-	else
-	{
-		start -= 0x20000;
-		end -= 0x20000;
-
-		for (int i = start*2; i <= end*2; i+=2)
-		{
-			uint16_t dat = rom[i] | (rom[i+1] << 8);
-			m_mainram[writebase++] = dat;
-		}
-	}
-
 }
 
 
