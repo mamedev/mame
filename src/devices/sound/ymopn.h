@@ -19,17 +19,35 @@ DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
 DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device);
 
 
+// ======================> ymopn_block_fnum
+
+class ymopn_block_fnum
+{
+public:
+	ymopn_block_fnum() : m_raw(0) { }
+
+	void set(u16 raw) { m_raw = raw & 0x3fff; }
+
+	u8 block() const { return (m_raw >> 11) & 7; }
+	u16 fnum() const { return m_raw & 0x7ff; }
+
+	u8 keycode() const;
+	u32 fc(s32 offset = 0) const;
+
+	u16 m_raw;
+};
+
+
 // ======================> ymopn_3slot_state
 
-struct ymopn_3slot_state
+class ymopn_3slot_state
 {
-	ymopn_3slot_state();
-	void set_fnum(ymopn_device_base &opn, u8 chnum, u8 value);
+public:
+	ymopn_3slot_state() : m_upper(0) { }
+	void set_fnum(u8 chnum, u8 value) { m_blk_fnum[chnum].set((m_upper << 8) | value); }
 
-	u32  m_fc[3];          // fnum3,blk3: calculated
-	u8   m_fn_h;           // freq3 latch
-	u8   m_kcode[3];       // key code
-	u32  m_block_fnum[3];  // current fnum value for this slot (can be different betweeen slots of one channel in 3slot mode)
+	ymopn_block_fnum m_blk_fnum[3]; // three 16-bit block/fnum values
+	u8 m_upper;            // upper 8-bit latch
 };
 
 
@@ -69,8 +87,8 @@ public:
 	void keyonoff(bool on);
 
 	// updates
-	void refresh_fc_eg(int fc, int kc);
-	void update_phase_lfo(s32 lfo_pm, s32 pm_shift, u32 block_fnum);
+	void refresh_fc_eg(ymopn_block_fnum blk_fnum);
+	void update_phase_lfo(s32 lfo_pm, s32 pm_shift, ymopn_block_fnum blk_fnum);
 	void advance_eg(u32 eg_cnt);
 
 private:
@@ -201,9 +219,7 @@ private:
 	s32 m_pm_shift;           // PM shift
 	u8 m_am_shift;            // AM shift
 
-	u32 m_fc;                 // fnum, blk
-	u8 m_kcode;               // key code:
-	u32 m_block_fnum;         // current blk/fnum value
+	ymopn_block_fnum m_blk_fnum; // current blk/fnum values
 
 	s32 m_m2, m_c1, m_c2;     // phase modulation input for slots 2,3,4
 	s32 m_mem;                // one sample delay memory
@@ -370,15 +386,6 @@ private:
 class ymopn_device_base : public ay8910_device
 {
 public:
-	// calculations
-	u32 fn_value(u32 val) const;
-	u32 fn_max() const;
-	u32 fc_fix(s32 fc) const;
-
-	// lookups
-	s32 detune(u8 fd, u8 index) const;
-	u32 lfo_step(u8 index) const;
-
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
 

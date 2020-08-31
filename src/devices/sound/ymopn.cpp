@@ -152,13 +152,6 @@ static const s8 s_detune_table[8*32] =
 
 
 //
-// OPN key frequency number -> key code follow table
-// fnum higher 4bit -> keycode lower 2bit
-//
-static const u8 s_opn_fktable[16] = {0,0,0,0,0,0,0,1,2,3,3,3,3,3,3,3};
-
-
-//
 // 8 LFO speed parameters
 // each raw value represents number of samples that one LFO level will last for
 //
@@ -311,57 +304,49 @@ static s32 *s_lfo_pm_table = nullptr;
 //  INLINE HELPERS
 //***************************************************************************
 
-inline u32 ymopn_device_base::fn_value(u32 val) const
+inline u32 fn_value(u32 val)
 {
 	// FREQ_SHIFT-10 because chip works with 10.10 fixed point, while we use 16.16
 //	return (val * 32) << (FREQ_SHIFT - 10);
 	return val << (FREQ_SHIFT - 5);
 }
 
-inline u32 ymopn_device_base::fn_max() const
+inline u32 fn_max()
 {
 	return fn_value(4096);
 }
 
 // detects frequency overflow (credits to Nemesis)
-inline u32 ymopn_device_base::fc_fix(s32 fc) const
+inline u32 fc_fix(s32 fc)
 {
 	return (fc < 0) ? (fc + fn_max()) : fc;
 }
 
 // lookup the detune value
-inline s32 ymopn_device_base::detune(u8 fd, u8 index) const
+inline s32 detune(u8 fd, u8 index)
 {
 	// scale factor is: SIN_LEN * (1 << FREQ_SHIFT) / (1 << 20)
 	// assuming that SIN_BITS + FREQ_SHIFT > 20
 	return s_detune_table[fd * 32 + index] << (SIN_BITS + FREQ_SHIFT - 20);
 }
 
-
-
-//***************************************************************************
-//  OPN 3-SLOT STATE
-//***************************************************************************
-
-ymopn_3slot_state::ymopn_3slot_state() :
-	m_fc{0, 0, 0},
-	m_fn_h(0),
-	m_kcode{0, 0, 0},
-	m_block_fnum{0, 0, 0}
+inline u8 ymopn_block_fnum::keycode() const
 {
+	// upper 4 bits are 3 block bits and top FNUM bit
+	u8 result = (m_raw >> 9) & 0x1e;
+
+	// lowest bit is determined by a mix of next lower FNUM bits
+	if (BIT(m_raw, 10))
+		result |= ((m_raw & 0x380) != 0);
+	else
+		result |= ((m_raw & 0x380) == 0x380);
+	return result;
 }
 
-void ymopn_3slot_state::set_fnum(ymopn_device_base &opn, u8 chnum, u8 value)
+inline u32 ymopn_block_fnum::fc(s32 offset) const
 {
-	u32 fn = ((m_fn_h & 7) << 8) + value;
-	u8 blk = m_fn_h >> 3;
-
-	// keyscale code
-	m_kcode[chnum] = (blk << 2) | s_opn_fktable[fn >> 7];
-	// phase increment counter
-	m_fc[chnum] = opn.fn_value(fn * 2) >> (7 - blk);
-	// store fnum in clear form for LFO PM calculations
-	m_block_fnum[chnum] = (blk << 11) | fn;
+	u32 temp = m_raw * 2 + offset;
+	return fn_value(temp & 0xfff) >> ((~temp >> 12) & 7);
 }
 
 
@@ -461,26 +446,6 @@ void ymopn_slot::set_det_mul(u8 value)
 // update parameters for one of the envelope generators
 void ymopn_slot::update_eg_params(eg_params &params)
 {
-	// Based on the 6-bit rate, select one of the rows of the
-	// s_eg_inc table above.
-	static const u8 s_eg_rate_inctable[64] =
-	{
-		0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
-		0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
-		0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
-		4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,16,16,16
-	};
-
-	// Based on the 6-bit rate, select a shift amount to apply
-	// to the global eg_count.
-	static const u8 s_eg_rate_shift[64] =
-	{
-		11,11,11,11,10,10,10,10, 9, 9, 9, 9, 8, 8, 8, 8,
-		 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4,
-		 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	};
-
 	// rate == 0 selects a special "infinite" rate (18) regardless of ksr
 	if (params.rate == 0)
 	{
@@ -492,18 +457,24 @@ void ymopn_slot::update_eg_params(eg_params &params)
 		// compute the base rate as 2*R + ksr
 		u8 rate = 2 * params.rate + m_ksr;
 
-		// less than 64 comes from the table
-		if (rate < 64)
+		// values 0-47 pick a shift equal to rate/4, and use table entries 0-3
+		if (rate < 48)
 		{
-			params.shift = 12 - s_eg_rate_shift[rate];
-			params.inctable = s_eg_rate_inctable[rate];
+			params.shift = rate >> 2;
+			params.inctable = rate & 3;
 		}
 
-		// above 64 selects one of two maximum rates (attack = 17, others = 16)
-		// that clock on every sample
+		// values 48-59 have a maximal shift and use table entries 4-15
+		else if (rate < 60)
+		{
+			params.shift = 11;
+			params.inctable = 4 + rate - 48;
+		}
+
+		// value 60-63 use the maximum value
 		else
 		{
-			params.shift = 12;
+			params.shift = 11;
 			params.inctable = (&params == &m_eg_params[EG_ATTACK]) ? 17 : 16;
 		}
 	}
@@ -632,10 +603,13 @@ void ymopn_slot::set_ssg(u8 value)
 }
 
 // update phase increment and envelope generator
-void ymopn_slot::refresh_fc_eg(int fc, int kc)
+void ymopn_slot::refresh_fc_eg(ymopn_block_fnum blk_fnum)
 {
+	u8 kc = blk_fnum.keycode();
+	u32 fc = blk_fnum.fc();
+
 	// (frequency) phase increment counter
-	fc = m_opn.fc_fix(fc + m_opn.detune(m_detune, kc));
+	fc = fc_fix(fc + detune(m_detune, kc));
 	m_phase_step = (fc * m_multiply) >> 1;
 
 	int ksr = kc >> m_ksr_shift;
@@ -647,28 +621,16 @@ void ymopn_slot::refresh_fc_eg(int fc, int kc)
 }
 
 // updat the phase LFO
-void ymopn_slot::update_phase_lfo(s32 lfo_pm, s32 pm_shift, u32 block_fnum)
+void ymopn_slot::update_phase_lfo(s32 lfo_pm, s32 pm_shift, ymopn_block_fnum blk_fnum)
 {
 	if (pm_shift != 0)
 	{
-		u32 fnum_lfo = ((block_fnum & 0x7f0) >> 4) * 32 * 8;
+		u32 fnum_lfo = (blk_fnum.fnum() >> 4) * 32 * 8;
 		s32 lfo_fn_table_index_offset = s_lfo_pm_table[fnum_lfo + pm_shift + lfo_pm];
 
 		if (lfo_fn_table_index_offset != 0)    // LFO phase modulation active
 		{
-			block_fnum = block_fnum * 2 + lfo_fn_table_index_offset;
-
-			u8 blk = (block_fnum & 0x7000) >> 12;
-			u32 fn = block_fnum & 0xfff;
-
-			// keyscale code
-			int kc = (blk << 2) | s_opn_fktable[fn >> 8];
-
-			// phase increment counter
-			int fc = m_opn.fc_fix((m_opn.fn_value(fn) >> (7 - blk)) + m_opn.detune(m_detune, kc));
-
-			// update phase and return
-			m_phase += (fc * m_multiply) >> 1;
+			m_phase += (blk_fnum.fc(lfo_fn_table_index_offset) * m_multiply) >> 1;
 			return;
 		}
 	}
@@ -690,14 +652,14 @@ void ymopn_slot::advance_eg(u32 eg_cnt)
 	// reset SSG-EG swap flag
 	u8 swap_flag = 0;
 
-	// shift the count up so it is a 4.12 fixed point value
+	// shift the count up so it is a 5.11 fixed point value
 	eg_params &params = m_eg_params[m_eg_state];
 	eg_cnt <<= params.shift;
 
-	// if the low 12 bits are 0, it is time to apply the increment
-	if ((eg_cnt & 0xfff) == 0)
+	// if the low 11 bits are 0, it is time to apply the increment
+	if ((eg_cnt & 0x7ff) == 0)
 	{
-		u8 increment = s_eg_inc[params.inctable][(eg_cnt >> 12) & 7];
+		u8 increment = s_eg_inc[params.inctable][(eg_cnt >> 11) & 7];
 
 		switch (m_eg_state)
 		{
@@ -801,9 +763,6 @@ ymopn_channel::ymopn_channel(ymopn_device_base &opn) :
 	m_mem_value(0),
 	m_pm_shift(0),
 	m_am_shift(0),
-	m_fc(0),
-	m_kcode(0),
-	m_block_fnum(0),
 	m_m2(0),
 	m_c1(0),
 	m_c2(0),
@@ -832,9 +791,7 @@ void ymopn_channel::save(int index)
 	m_opn.save_item(CHANNEL_NAME(m_pm_shift), index);
 	m_opn.save_item(CHANNEL_NAME(m_am_shift), index);
 
-	m_opn.save_item(CHANNEL_NAME(m_fc), index);
-	m_opn.save_item(CHANNEL_NAME(m_kcode), index);
-	m_opn.save_item(CHANNEL_NAME(m_block_fnum), index);
+	m_opn.save_item(CHANNEL_NAME(m_blk_fnum.m_raw), index);
 
 	m_opn.save_item(CHANNEL_NAME(m_pan), index);
 }
@@ -848,7 +805,7 @@ void ymopn_channel::post_load()
 // reset our state and all our owned slots
 void ymopn_channel::reset()
 {
-	m_fc = 0;
+	m_blk_fnum.set(0);
 	m_slot1.reset();
 	m_slot2.reset();
 	m_slot3.reset();
@@ -865,17 +822,7 @@ void ymopn_channel::set_three_slot_mode(ymopn_3slot_state *state)
 // set the values from fnum
 void ymopn_channel::set_fnum(u8 upper, u8 value)
 {
-	u32 fn = ((upper & 7) << 8) + value;
-	u8 blk = upper >> 3;
-
-	// keyscale code
-	m_kcode = (blk << 2) | s_opn_fktable[fn >> 7];
-
-	// phase increment counter
-	m_fc = m_opn.fn_value(fn * 2) >> (7 - blk);
-
-	// store fnum in clear form for LFO PM calculations
-	m_block_fnum = (blk << 11) | fn;
+	m_blk_fnum.set((upper << 8) | value);
 	force_refresh();
 }
 
@@ -910,17 +857,17 @@ void ymopn_channel::refresh_fc_eg()
 
 	if (m_3slot != nullptr)
 	{
-		m_slot1.refresh_fc_eg(m_3slot->m_fc[1], m_3slot->m_kcode[1]);
-		m_slot2.refresh_fc_eg(m_3slot->m_fc[2], m_3slot->m_kcode[2]);
-		m_slot3.refresh_fc_eg(m_3slot->m_fc[0], m_3slot->m_kcode[0]);
+		m_slot1.refresh_fc_eg(m_3slot->m_blk_fnum[1]);
+		m_slot2.refresh_fc_eg(m_3slot->m_blk_fnum[2]);
+		m_slot3.refresh_fc_eg(m_3slot->m_blk_fnum[0]);
 	}
 	else
 	{
-		m_slot1.refresh_fc_eg(m_fc, m_kcode);
-		m_slot2.refresh_fc_eg(m_fc, m_kcode);
-		m_slot3.refresh_fc_eg(m_fc, m_kcode);
+		m_slot1.refresh_fc_eg(m_blk_fnum);
+		m_slot2.refresh_fc_eg(m_blk_fnum);
+		m_slot3.refresh_fc_eg(m_blk_fnum);
 	}
-	m_slot4.refresh_fc_eg(m_fc, m_kcode);
+	m_slot4.refresh_fc_eg(m_blk_fnum);
 	m_refresh = false;
 }
 
@@ -1016,17 +963,17 @@ void ymopn_channel::update(u32 lfo_am, u32 lfo_pm)
 	// update phase counters AFTER output calculations
 	if (m_3slot != nullptr)
 	{
-		m_slot1.update_phase_lfo(lfo_pm, m_pm_shift, m_3slot->m_block_fnum[1]);
-		m_slot2.update_phase_lfo(lfo_pm, m_pm_shift, m_3slot->m_block_fnum[2]);
-		m_slot3.update_phase_lfo(lfo_pm, m_pm_shift, m_3slot->m_block_fnum[0]);
+		m_slot1.update_phase_lfo(lfo_pm, m_pm_shift, m_3slot->m_blk_fnum[1]);
+		m_slot2.update_phase_lfo(lfo_pm, m_pm_shift, m_3slot->m_blk_fnum[2]);
+		m_slot3.update_phase_lfo(lfo_pm, m_pm_shift, m_3slot->m_blk_fnum[0]);
 	}
 	else
 	{
-		m_slot1.update_phase_lfo(lfo_pm, m_pm_shift, m_block_fnum);
-		m_slot2.update_phase_lfo(lfo_pm, m_pm_shift, m_block_fnum);
-		m_slot3.update_phase_lfo(lfo_pm, m_pm_shift, m_block_fnum);
+		m_slot1.update_phase_lfo(lfo_pm, m_pm_shift, m_blk_fnum);
+		m_slot2.update_phase_lfo(lfo_pm, m_pm_shift, m_blk_fnum);
+		m_slot3.update_phase_lfo(lfo_pm, m_pm_shift, m_blk_fnum);
 	}
-	m_slot4.update_phase_lfo(lfo_pm, m_pm_shift, m_block_fnum);
+	m_slot4.update_phase_lfo(lfo_pm, m_pm_shift, m_blk_fnum);
 }
 
 // helper to set the 5 connections
@@ -1938,14 +1885,14 @@ void ymopn_device_base::write_reg(u16 reg, u8 value)
 				case 2:     // 0xa8-0xaa : 3CH FNUM1
 					if (reg < 0x100)
 					{
-						m_3slot_state.set_fnum(*this, chnum, value);
+						m_3slot_state.set_fnum(chnum, value);
 						three_slot_channel().force_refresh();
 					}
 					break;
 
 				case 3:     // 0xac-0xae : 3CH FNUM2,BLK
 					if (reg < 0x100)
-						m_3slot_state.m_fn_h = value & 0x3f;
+						m_3slot_state.m_upper = value & 0x3f;
 					break;
 			}
 			break;
@@ -2407,10 +2354,8 @@ void ymopn_device_base::device_start()
 
 	init_tables();
 
-	save_item(YM_NAME(m_3slot_state.m_fc));
-	save_item(YM_NAME(m_3slot_state.m_fn_h));
-	save_item(YM_NAME(m_3slot_state.m_kcode));
-	save_item(YM_NAME(m_3slot_state.m_block_fnum));
+	save_item(YM_NAME(m_3slot_state.m_upper));
+	save_item(STRUCT_MEMBER(m_3slot_state.m_blk_fnum, m_raw));
 	for (int chnum = 0; chnum < m_channel.size(); chnum++)
 		m_channel[chnum]->save(chnum);
 	for (int chnum = 0; chnum < m_adpcm_channel.size(); chnum++)
