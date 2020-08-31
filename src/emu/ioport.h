@@ -1059,8 +1059,9 @@ public:
 	s32 delta() const noexcept { return m_delta; }
 	s32 centerdelta() const noexcept { return m_centerdelta; }
 	crosshair_axis_t crosshair_axis() const noexcept { return m_crosshair_axis; }
-	double crosshair_scale() const noexcept { return m_crosshair_scale; }
-	double crosshair_offset() const noexcept { return m_crosshair_offset; }
+	float crosshair_scale() const noexcept { return m_crosshair_scale; }
+	float crosshair_offset() const noexcept { return m_crosshair_offset; }
+	float crosshair_altaxis() const noexcept { return m_crosshair_altaxis; }
 	u16 full_turn_count() const noexcept { return m_full_turn_count; }
 	const ioport_value *remap_table() const noexcept { return m_remap_table; }
 
@@ -1070,8 +1071,8 @@ public:
 	ioport_field_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// setters
-	void set_crosshair_scale(double scale) { m_crosshair_scale = scale; }
-	void set_crosshair_offset(double offset) { m_crosshair_offset = offset; }
+	void set_crosshair_scale(float scale) { m_crosshair_scale = scale; }
+	void set_crosshair_offset(float offset) { m_crosshair_offset = offset; }
 	void set_player(u8 player) { m_player = player; }
 
 	// derived getters
@@ -1086,7 +1087,7 @@ public:
 	void select_previous_setting();
 	bool has_next_setting() const;
 	void select_next_setting();
-	void crosshair_position(float &x, float &y, bool &gotx, bool &goty);
+	float crosshair_read();
 	void init_live_state(analog_field *analog);
 	void frame_update(ioport_value &result);
 	void reduce_mask(ioport_value bits_to_remove) { m_mask &= ~bits_to_remove; }
@@ -1140,9 +1141,9 @@ private:
 	s32                         m_delta;            // delta to apply each frame a digital inc/dec key is pressed
 	s32                         m_centerdelta;      // delta to apply each frame no digital inputs are pressed
 	crosshair_axis_t            m_crosshair_axis;   // crosshair axis
-	double                      m_crosshair_scale;  // crosshair scale
-	double                      m_crosshair_offset; // crosshair offset
-	double                      m_crosshair_altaxis;// crosshair alternate axis value
+	float                       m_crosshair_scale;  // crosshair scale
+	float                       m_crosshair_offset; // crosshair offset
+	float                       m_crosshair_altaxis;// crosshair alternate axis value
 	ioport_field_crossmap_delegate m_crosshair_mapper; // crosshair mapping function
 	u16                         m_full_turn_count;  // number of optical counts for 1 full turn of the original control
 	const ioport_value *        m_remap_table;      // pointer to an array that remaps the port value
@@ -1403,7 +1404,6 @@ public:
 	// other helpers
 	digital_joystick &digjoystick(int player, int joysticknum);
 	int count_players() const noexcept;
-	bool crosshair_position(int player, float &x, float &y);
 	s32 frame_interpolate(s32 oldval, s32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
