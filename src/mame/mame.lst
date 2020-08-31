@@ -35387,6 +35387,9 @@ sc88vl                          //
 @source:roland_tb303.cpp
 tb303                           // Roland
 
+@source:roland_tr505.cpp
+tr505                           //
+
 @source:roland_tr606.cpp
 tr606                           // Roland
 
