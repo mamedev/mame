@@ -77,6 +77,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/mc6845.h"
+#include "memarray.h"
 #include "screen.h"
 
 
