@@ -44,7 +44,7 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	, m_tc_12bit{0}
 	, m_t4c(0)
 	, m_tien(0)
-	, m_dac_fifo{0}
+  , m_dac_fifo{{0}}
 	, m_fifo_filled{0}
 	, m_psgc(0)
 	, m_psgm(0)
