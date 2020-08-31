@@ -401,9 +401,9 @@ void ddealer_state::fg_vram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_fg_vram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 	if (offset & 0x800)
-		m_fg_tilemap_right->mark_tile_dirty(offset & ~0x800);
+		m_fg_tilemap_right->mark_tile_dirty(offset & 0x17ff);
 	else
-		m_fg_tilemap_left->mark_tile_dirty(offset & ~0x800);
+		m_fg_tilemap_left->mark_tile_dirty(offset & 0x17ff);
 }
 
 
