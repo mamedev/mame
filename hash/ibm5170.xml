@@ -1436,36 +1436,43 @@ license:CC0
 		<year>1990</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Installation Diskette A"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="install a.img" size="1474560" crc="e40194dd" sha1="c2003f08e2e88d327ba5a469a4436a58abcfeb01"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Installation Diskette B"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="install b.img" size="1474560" crc="03d72834" sha1="9cd1b6f43f2157b4ba2e1fdecf4992789c7a6c45"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 1.img" size="1474560" crc="7f933590" sha1="1165ecd0a0b891d29f4096cf690edfacbd6b2da6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 2.img" size="1474560" crc="ed2d93d1" sha1="cabd43e5c263d7891e731ac3728c932b737021e5"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 3"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 3.img" size="1474560" crc="45616040" sha1="d7a7b2fdacb71308188b6fc9dba7260572d6a40f"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 4"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 4.img" size="1474560" crc="62c716f6" sha1="4a1d5b916f93974a66407660a77f4b3e2e5cb561"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 5"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 5.img" size="1474560" crc="515501af" sha1="2fa2fce813156ad16cef094961f40ffc44c57953"/>
 			</dataarea>
@@ -1476,16 +1483,19 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Presentation Manager Device Driver Diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="presentation manager 1.img" size="1474560" crc="0a16d365" sha1="8dec8913728738b7aee4929fdd8e117129edd9e0"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Presentation Manager Device Driver Diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="presentation manager 2.img" size="1474560" crc="024aa1a8" sha1="d8eee0971f67de90259450639ef608de29983150"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Systems Support Diskette"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="support.img" size="1474560" crc="dc433ce5" sha1="a46a1cb3d796c3f3726e74222d2c09129b82574e"/>
 			</dataarea>
