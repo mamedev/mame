@@ -12,9 +12,9 @@
     05/2009 Skeleton driver.
 
     Known issues:
-     - 1200 bauds cassette don't works
+     - Support the K7 filetype for ease of usage, but as read only.
 
-    Informations ( see the very informative http://vg5k.free.fr/ ):
+    Information ( see the very informative http://vg5k.free.fr/ ):
      - Variants: Radiola VG5000 and Schneider VG5000
      - CPU: Zilog Z80 running at 4MHz
      - ROM: 18KB (16 KB BASIC + 2 KB charset )
@@ -27,7 +27,7 @@
             - Colors: 8
      - Sound: Synthesizer, 4 Octaves
      - Keyboard: 63 keys AZERTY, Caps Lock, CTRL key to access 33 BASIC instructions
-     - I/O: Tape recorder connector (1200/2400 bauds), Scart connector to TV (RGB),
+     - I/O: Tape recorder connector (1200/2400 bauds), SCART connector to TV (RGB),
        External PSU (VU0022) connector, Bus connector (2x25 pins)
      - There are 2 versions of the VG5000 ROM, one with Basic v1.0,
        contained in two 8 KB ROMs, and one with Basic 1.1, contained in
@@ -83,7 +83,7 @@ public:
 	void init_vg5k();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
 	required_device<printer_image_device> m_printer;
@@ -95,6 +95,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void z80_m1_w(uint8_t data);
 	uint8_t printer_r();
 	void printer_w(uint8_t data);
 	void ef9345_offset_w(uint8_t data);
@@ -109,6 +110,15 @@ private:
 	void vg5k_mem(address_map &map);
 };
 
+void vg5k_state::z80_m1_w(uint8_t data)
+{
+    // Leverage the refresh callback of the Z80 emulator to pretend
+    // the second T state of the M1 cycle didn't happen.
+    // This simulates the WAIT line asserted at that moment, as
+    // the current implementation of the Z80 doesn't handle the WAIT
+    // line at that moment.
+    m_maincpu->adjust_icount(-1);
+}
 
 uint8_t vg5k_state::printer_r()
 {
@@ -151,13 +161,17 @@ uint8_t vg5k_state::cassette_r()
 void vg5k_state::cassette_w(uint8_t data)
 {
 	m_dac->write(BIT(data, 3));
+    m_cassette->change_state(BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED , CASSETTE_MASK_MOTOR);
 
-	if (data == 0x03)
-		m_cassette->output(+1);
-	else if (data == 0x02)
-		m_cassette->output(-1);
-	else
-		m_cassette->output(0);
+    if (BIT(data, 1)) {
+        if (BIT(data, 0)) {
+            m_cassette->output(+1);
+        } else {
+            m_cassette->output(-1);
+        }
+    } else {
+        m_cassette->output(0);
+    }
 }
 
 
@@ -371,6 +385,7 @@ void vg5k_state::vg5k(machine_config &config)
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vg5k_state::vg5k_mem);
 	m_maincpu->set_addrmap(AS_IO, &vg5k_state::vg5k_io);
+    m_maincpu->refresh_cb().set(FUNC(vg5k_state::z80_m1_w));
 
 	TIMER(config, "vg5k_scanline").configure_scanline(FUNC(vg5k_state::vg5k_scanline), "screen", 0, 10);
 
