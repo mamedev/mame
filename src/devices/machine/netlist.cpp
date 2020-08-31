@@ -1238,35 +1238,6 @@ netlist_mame_cpu_device::netlist_mame_cpu_device(const machine_config &mconfig, 
 }
 
 
-// Fixes overflow error in device_pseudo_state_register
-template<>
-class device_pseudo_state_register<double> : public device_state_entry
-{
-public:
-	typedef typename std::function<double ()> getter_func;
-	typedef typename std::function<void (double)> setter_func;
-
-	// construction/destruction
-	device_pseudo_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
-			m_getter(std::move(getter)),
-			m_setter(std::move(setter))
-	{
-	}
-
-protected:
-	// device_state_entry overrides
-	virtual u64 entry_value() const override { return u64(m_getter()); }
-	virtual void entry_set_value(u64 value) const override { m_setter(double(value)); }
-	virtual double entry_dvalue() const override { return m_getter(); }
-	virtual void entry_set_dvalue(double value) const override { m_setter(value); }
-
-private:
-	getter_func             m_getter;               // function to retrieve the data
-	setter_func             m_setter;               // function to store the data
-};
-
-
 void netlist_mame_cpu_device::device_start()
 {
 	LOGDEVCALLS("device_start entry\n");
@@ -1299,12 +1270,11 @@ void netlist_mame_cpu_device::device_start()
 		else
 		{
 			auto nl = downcast<netlist::analog_net_t *>(n.get());
-			state_add(std::make_unique<device_pseudo_state_register<double>>(
+			state_add<double>(
 				index++,
 				name.c_str(),
 				[nl]() { return nl->Q_Analog(); },
-				[nl](double data) { nl->set_Q_Analog(data); },
-				this));
+				[nl](double data) { nl->set_Q_Analog(data); });
 		}
 	}
 

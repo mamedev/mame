@@ -513,8 +513,8 @@ device_debug::device_debug(device_t &device)
 				strmakelower(tempstr.assign(entry->symbol()));
 				m_symtable->add(
 						tempstr.c_str(),
-						std::bind(&device_state_interface::state_int, m_state, entry->index()),
-						entry->writeable() ? std::bind(&device_state_interface::set_state_int, m_state, entry->index(), _1) : symbol_table::setter_func(nullptr),
+						std::bind(&device_state_entry::value, entry.get()),
+						entry->writeable() ? std::bind(&device_state_entry::set_value, entry.get(), _1) : symbol_table::setter_func(nullptr),
 						entry->format_string());
 			}
 		}
