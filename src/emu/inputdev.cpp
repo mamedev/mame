@@ -1012,5 +1012,5 @@ bool input_device_absolute_item::item_check_axis(input_item_modifier modifier)
 		return false;
 
 	// for absolute axes, look for 25% of maximum
-	return (curval - memory()) > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4;
+	return std::abs(curval - memory()) > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4;
 }
