@@ -14306,7 +14306,7 @@ but dumps still have to be confirmed.
 
 	<software name="ddragon">
 		<description>Double Dragon (Euro, USA)</description>
-		<year>1993</year>
+		<year>1992</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
