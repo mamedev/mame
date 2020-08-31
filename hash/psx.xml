@@ -37455,10 +37455,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- Non-redump JAPAN sets -->
-
-	<!-- Images below are 'low-grade' i.e. not dumped to any specific standard, or verified to be of any specific quality, they could have bad gaps or audio tracks etc. -->
-	<!-- They should be replaced with better quality images once said images are available (and verified to be the same versions) -->
+	<!-- 
+	Non-redump JAPAN sets 
+	Images below are 'low-grade' i.e. not dumped to any specific standard, or verified to be of any specific quality, they could have bad gaps or audio tracks etc.
+	They should be replaced with better quality images once said images are available (and verified to be the same versions)
+	-->
 
 	<!-- boot OK -->
 	<software name="007tndj" cloneof="007tnd" supported="yes">
