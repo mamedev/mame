@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "a1cassette.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -38,9 +39,11 @@ ROM_END
 
 void a1bus_cassette_device::device_add_mconfig(machine_config &config)
 {
+	SPEAKER(config, "mono").front_center();
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple1_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.08);
 }
 
 const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const

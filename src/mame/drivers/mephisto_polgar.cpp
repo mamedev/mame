@@ -285,7 +285,12 @@ void mephisto_milano_state::milano(machine_config &config)
 
 ROM_START( polgar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("polgar_1.5_1.2.1990", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913) )
+	ROM_LOAD("polgar_1.5_01.02.1990", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913) )
+ROM_END
+
+ROM_START( polgara )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("polgar_1.10_04.08.1989", 0x0000, 0x10000, CRC(a4519c55) SHA1(35463a4cbcf20ebbd5ac5bc7664a862b1557c65f) ) // TC57512AD-15
 ROM_END
 
 ROM_START( polgar10 )
@@ -333,7 +338,8 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                  FLAGS */
-CONS( 1989, polgar,    0,       0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, polgar,    0,       0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, polgara,   polgar,  0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, polgar10,  polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, polgar101, polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

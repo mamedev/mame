@@ -3455,7 +3455,7 @@ ROMs found in a genuine Taito Cleopatra Fortune cart meant for the Japanese mark
 all genuine parts including mask ROMs, PALs, ect.  However the 4 program ROMs were replaced with 4 EPROMs without specific labels.
 
 The replacement ROMs were 27C010 type instead of the standard 27C040 that Taito would normaly use.  In the case of Cleopatra
-Fortune, each original program ROM is 0xFF filled from bytes 0x20000 through 0x3FFFF.
+Fortune, each original program ROM is 0xFF filled from bytes 0x20000 through 0x7FFFF.
 
 In cleopatro, the program ROMs match the 1st 1/4 of cleopatr program ROMs except for 1 byte in ic17.bin.  0x1FFFF has been
 changed from 0x00 to 0x03, which amounts to a simple region hack.

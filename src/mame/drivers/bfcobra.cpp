@@ -52,14 +52,32 @@
     ==================
 
     A compact video expansion board for Scorpion II.
-    The Z80 is replaced by a Z180 and there is no Flare DSP or FDC
+    The Z80 is replaced by a Z180 and there is no Flare DSP.
+    The FDC is replaced by a NCR53C80 SCSI controller.
+    Cyclone was never released due to reliability issues.
 
+    Cobra II Jamma
+    ==============
+    Based on Cobra II but with a JAMMA edge connector for easy use in video game cabinets.
+    This is a standalone board which is not paired with any Scorpion boards.
+    Break Ball is the only released game for this platform.
+    The only other known software is for a functional test unit (FTU).
+
+    Note that for Z8S180 boards the CPU has 20 address lines so can select the entire memory map
+    without using the Flare chipset paging option. I believe changing the addresses using chipset_w
+    have no effect on Z8S180 boards.
 
     To do:
 
     * Complete blitter emulation
-    * Cobra II support
+    * Cobra II support.
     * Hook up additional inputs, EM meters, lamps etc
+    * The prom range selected for the first 16K of Z80 memory map is not fixed so chipset_w
+      function needs changing to process offset 0. Note that no released software changes this anyway.
+    * Frame interrupt for Z80 boards is wrong. It isn't a frame interrupt but an interrupt which can be
+      triggered on any scan line. For Z80 boards the fact that it's treated as a frame interrupt doesn't
+      matter as no released software changes the position of the interrupt.  Emulation for Z8S180 boards
+      is correct as Break Ball uses multiple scan line interrupts.
 
     Known issues:
 
@@ -71,35 +89,50 @@
     * Plane priority is probably wrong but it's only used in Treble Top.
     * Blitter loop counts and step are wrong - they are 9 bit counts, not 8.
     * Blitter emulation doesn't support hi-res mode (needed for Inquizitor)
+    * Blitter emulation currently runs until blit is complete then burns the required number of Z80
+      cycles to simulate it holding the bus. On the real hardware the blitter halts the CPU until the
+      operation is complete or an interrupt is issued to CPU. When the interrupt line is asserted the
+      CPU is allowed to run until the interrupt line is released. This allows all interrupts to run at
+      the correct time. The current emulation is OK for Z80 boards and all released software for those
+      boards, however, for Cobra II/JAMMA this causes problems due to the UPD7759 audio chip issuing
+      dma requests which are then processed too late if the Z8S180 cycles are burnt. To get round this
+      the Z8S180 blitter emulation does not burn CPU cycles.
+      The blitter emulation ought to take account of irq/dma requests but I don't know how to do that!
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/i2cmem.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
+#include "sound/ym2413.h"
+#include "video/bfm_dm01.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "brkball.lh"
 
 
 /*
     Defines
 */
+#define Z8S180_XTAL 24000000
 #define Z80_XTAL    5910000     /* Unconfirmed */
-#define M6809_XTAL  4000000     /* Unconfirmed */
+#define M6809_XTAL  4000000
 
 
 
 /***************************************************************************
 
-    Split into video\cobra.c !
+    Split into video\bfcobra.cpp !
 
 ***************************************************************************/
 
@@ -641,8 +674,7 @@ void bfcobra_state::RunBlit()
 				}
 				if (blitter.compfunc & CMPFUNC_LT)
 				{
-					/* Might be wrong */
-					if ((srcdata & 0xc0) < (dstdata & 0xc0))
+					if ((srcdata & 0xc0) > (dstdata & 0xc0))
 					{
 						inhibit = 1;
 
@@ -664,8 +696,7 @@ void bfcobra_state::RunBlit()
 				}
 				if (blitter.compfunc & CMPFUNC_GT)
 				{
-					/* Might be wrong */
-					if ((srcdata & 0xc0) > (dstdata & 0xc0))
+					if ((srcdata & 0xc0) < (dstdata & 0xc0))
 					{
 						inhibit = 1;
 
@@ -984,7 +1015,7 @@ void bfcobra_state::rombank_w(uint8_t data)
 
 /***************************************************************************
 
-    Split into machine\cobra.c !
+    Split into machine\bfcobra.cpp !
 
     Alternatively chuck it all away and borrow the MESS implementation
     because it's a million times better.
@@ -1691,6 +1722,1100 @@ void bfcobra_state::bfcobra(machine_config &config)
 }
 
 /***************************************************************************
+  Cobra II Jamma.
+
+  This has a Z180 and no 6809
+
+***************************************************************************/
+class bfcobjam_state : public driver_device
+{
+public:
+	bfcobjam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_acia6850_0(*this, "acia6850_0"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_aux_upd7759(*this, "upd"),
+		m_upd7759_int(*this, "updint"),
+		m_ym2413(*this, "ymsnd"),
+		m_i2cmem(*this, "i2cmem"),
+		m_dm01(*this, "dm01"),
+		m_work_ram(*this, "work_ram"),
+		m_video_ram(*this, "video_ram")
+	{
+	}
+
+	void init_bfcobjam();
+	void bfcobjam(machine_config &config);
+	void bfcobjam_with_dmd(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	uint8_t m_bank_data[4];
+	uint8_t m_rompage;
+	uint8_t m_h_scroll;
+	uint8_t m_v_scroll;
+	uint8_t m_flip_8;
+	uint8_t m_flip_22;
+	uint8_t m_videomode;
+	uint8_t m_data_r;
+	uint8_t m_data_t;
+	uint8_t m_port_0;
+	int m_irq_state;
+	int m_acia_irq;
+	int m_scanline_irq;
+	int m_blitter_irq;
+	int m_global_volume;
+	uint8_t dm_shift_data ;
+	int dm_shift = 0 ;
+	int dm_last_data = 0 ;
+
+	uint8_t m_z8s180_int;
+	uint8_t m_z8s180_inten;
+	uint8_t m_col4bit[16];
+	uint8_t m_col3bit[16];
+	uint8_t m_col8bit[256];
+	uint8_t m_col7bit[256];
+	uint8_t m_col6bit[256];
+	struct bf_blitter_t m_blitter;
+	emu_timer *m_scanline_timer;
+	uint8_t m_genio ;
+	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia6850_0;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<upd7759_device> m_aux_upd7759;
+	required_device<upd7759_device> m_upd7759_int;
+	required_device<ym2413_device> m_ym2413;
+	required_device<i2c_24c08_device> m_i2cmem;
+	optional_device<bfm_dm01_device> m_dm01;
+	required_shared_ptr<uint8_t> m_work_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
+
+	uint8_t chipset_r(offs_t offset);
+	void chipset_w(offs_t offset, uint8_t data);
+	void rombank_w(uint8_t data);
+	void upd7759_w(uint8_t data);
+	uint8_t aux_upd7759_r();
+	void aux_upd7759_w(uint8_t data);
+	void output0_w(uint8_t data);
+	uint8_t input0_r();
+	uint8_t input1_r();
+	DECLARE_WRITE_LINE_MEMBER(z8s180_acia_irq);
+	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_dreq );
+	uint32_t screen_update_bfcobjam(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(timer_irq);
+	TIMER_CALLBACK_MEMBER( scanline_callback ) ;
+	void RunBlit();
+	void update_irqs();
+	void genio_w( uint8_t data ) ;
+	void dotmatrix_w( uint8_t data );
+	inline uint8_t* blitter_get_addr(uint32_t addr);
+	inline void z8s180_bank(int num, int data);
+
+	void ramdac_map(address_map &map);
+	void z8s180_io_map(address_map &map);
+	void z8s180_prog_map(address_map &map);
+};
+
+void bfcobjam_state::init_bfcobjam()
+{
+	m_rompage = 0 ;
+	m_bank_data[0] = 0;
+	m_bank_data[1] = 0;
+	m_bank_data[2] = 0;
+	m_bank_data[3] = 0;
+
+	/* Fixed 16kB ROM region */
+	membank("bank4")->set_base(memregion("user1")->base());
+	membank("bank1")->set_base(memregion("user1")->base()+0x04000);
+	membank("bank2")->set_base(memregion("user1")->base()+0x08000);
+	membank("bank3")->set_base(memregion("user1")->base()+0x0c000);
+
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bfcobjam_state::scanline_callback),this));
+
+	/* Finish this */
+	save_item(NAME(m_data_r));
+	save_item(NAME(m_data_t));
+	save_item(NAME(m_h_scroll));
+	save_item(NAME(m_v_scroll));
+	save_item(NAME(m_flip_8));
+	save_item(NAME(m_flip_22));
+	save_item(NAME(m_z8s180_int));
+	save_item(NAME(m_z8s180_inten));
+	save_item(NAME(m_bank_data));
+	save_item(NAME(m_genio));
+	save_item(NAME(m_global_volume));
+
+}
+
+/*
+    This is based this on the Slipstream technical reference manual.
+    The Flare One blitter is a simpler design with slightly different parameters
+    and will require hardware tests to figure everything out correctly.
+*/
+void bfcobjam_state::RunBlit()
+{
+#define BLITPRG_READ(x)     blitter.x = *(blitter_get_addr(blitter.program.addr++))
+
+	struct bf_blitter_t &blitter = m_blitter;
+	int cycles_used = 0;
+
+
+	do
+	{
+		uint8_t srcdata = 0;
+		uint8_t dstdata = 0;
+
+		/* Read the blitter command */
+		BLITPRG_READ(source.as8bit.addr0);
+		BLITPRG_READ(source.as8bit.addr1);
+		BLITPRG_READ(source.as8bit.addr2);
+		BLITPRG_READ(dest.as8bit.addr0);
+		BLITPRG_READ(dest.as8bit.addr1);
+		BLITPRG_READ(dest.as8bit.addr2);
+		BLITPRG_READ(modectl);
+		BLITPRG_READ(compfunc);
+		BLITPRG_READ(outercnt);
+		BLITPRG_READ(innercnt);
+		BLITPRG_READ(step);
+		BLITPRG_READ(pattern);
+
+#if 0
+		/* This debug is now wrong ! */
+		if (DEBUG_BLITTER)
+		{
+			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
+			osd_printf_debug("Command Reg         %.2x",   blitter.command);
+			osd_printf_debug("     %s %s %s %s %s %s %s\n",
+				blitter.command & CMD_RUN ? "RUN" : "     ",
+				blitter.command & CMD_COLST ? "COLST" : "     ",
+				blitter.command & CMD_PARRD ? "PARRD" : "     ",
+				blitter.command & CMD_SRCUP ? "SRCUP" : "     ",
+				blitter.command & CMD_DSTUP ? "DSTUP" : "     ");
+
+			osd_printf_debug("Src Address Byte 0  %.2x\n", blitter.source.as8bit.addr0);
+			osd_printf_debug("Src Address Byte 1  %.2x\n", blitter.source.as8bit.addr1);
+			osd_printf_debug("Src Control         %.2x\n", blitter.source.as8bit.addr2);
+			osd_printf_debug("  Src Address       %.5x\n", blitter.source.addr & 0xfffff);
+			osd_printf_debug("Dest Address Byte 0 %.2x\n", blitter.dest.as8bit.addr0);
+			osd_printf_debug("Dest Address Byte 1 %.2x\n", blitter.dest.as8bit.addr1);
+			osd_printf_debug("Dest Control        %.2x\n", blitter.dest.as8bit.addr2);
+			osd_printf_debug("  Dst. Address      %.5x\n", blitter.dest.addr & 0xfffff);
+			osd_printf_debug("Mode Control        %.2x",   blitter.modectl);
+			osd_printf_debug("     %s\n", blitter.modectl & MODE_BITTOBYTE ? "BIT_TO_BYTE" : "");
+
+			osd_printf_debug("Comp. and LFU       %.2x\n", blitter.compfunc);
+			osd_printf_debug("Outer Loop Count    %.2x (%d)\n", blitter.outercnt, blitter.outercnt);
+			osd_printf_debug("Inner Loop Count    %.2x (%d)\n", blitter.innercnt, blitter.innercnt);
+			osd_printf_debug("Step Value          %.2x\n", blitter.step);
+			osd_printf_debug("Pattern Byte        %.2x\n", blitter.pattern);
+		}
+#endif
+
+		/* Ignore these writes */
+		if (blitter.dest.addr == 0)
+			return;
+
+		/* Begin outer loop */
+		for (;;)
+		{
+			uint8_t innercnt = blitter.innercnt;
+			dstdata = blitter.pattern;
+
+			if (blitter.command & CMD_LINEDRAW)
+			{
+				do
+				{
+					if (blitter.modectl & MODE_YFRAC)
+					{
+						if (blitter.modectl & MODE_SSIGN )
+							blitter.dest.as8bit.addr0--;
+						else
+							blitter.dest.as8bit.addr0++;
+					}
+					else
+					{
+						if (blitter.modectl & MODE_DSIGN )
+							blitter.dest.as8bit.addr1--;
+						else
+							blitter.dest.as8bit.addr1++;
+					}
+					if( blitter.source.as8bit.addr0 < blitter.step )
+					{
+						blitter.source.as8bit.addr0 -= blitter.step ;
+						blitter.source.as8bit.addr0 += blitter.source.as8bit.addr1;
+
+						if ( blitter.modectl & MODE_YFRAC )
+						{
+							if (blitter.modectl & MODE_DSIGN )
+								blitter.dest.as8bit.addr1--;
+							else
+								blitter.dest.as8bit.addr1++;
+						}
+						else
+						{
+							if (blitter.modectl & MODE_SSIGN )
+								blitter.dest.as8bit.addr0--;
+							else
+								blitter.dest.as8bit.addr0++;
+						}
+					}
+					else
+					{
+						blitter.source.as8bit.addr0 -= blitter.step;
+					}
+
+					*blitter_get_addr( blitter.dest.addr) = blitter.pattern;
+					cycles_used++;
+
+				} while (--innercnt);
+			}
+			else do
+			{
+				uint8_t   inhibit = 0;
+
+				/* TODO: Set this correctly */
+				uint8_t   result = blitter.pattern;
+
+				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
+				{
+					srcdata = *(blitter_get_addr( blitter.source.addr & 0xfffff));
+					blitter.source.as16bit.loword++;
+					cycles_used++;
+				}
+
+				/* Enable source address read and increment? */
+				if (!(blitter.modectl & (MODE_BITTOBYTE | MODE_PALREMAP)))
+				{
+					if (LOOPTYPE == 0 || LOOPTYPE == 1)
+					{
+						srcdata = *(blitter_get_addr( blitter.source.addr & 0xfffff));
+						cycles_used++;
+
+						if (blitter.modectl & MODE_SSIGN)
+							blitter.source.as16bit.loword-- ;
+						else
+							blitter.source.as16bit.loword++;
+
+						result = srcdata;
+					}
+				}
+
+				/* Read destination pixel? */
+				if (LOOPTYPE == 0)
+				{
+					dstdata = *blitter_get_addr( blitter.dest.addr & 0xfffff);
+					cycles_used++;
+				}
+
+				/* Inhibit depending on the bit selected by the inner count */
+
+				/* Switch on comparator type? */
+				if (blitter.modectl & MODE_BITTOBYTE)
+				{
+					inhibit = !(srcdata & (1 << (8 - innercnt)));
+				}
+
+				if (blitter.compfunc & CMPFUNC_BEQ)
+				{
+					if (srcdata == blitter.pattern)
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+				if (blitter.compfunc & CMPFUNC_LT)
+				{
+					if ((srcdata & 0xc0) > (dstdata & 0xc0))
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+				if (blitter.compfunc & CMPFUNC_EQ)
+				{
+					if ((srcdata & 0xc0) == (dstdata & 0xc0))
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+				if (blitter.compfunc & CMPFUNC_GT)
+				{
+					if ((srcdata & 0xc0) < (dstdata & 0xc0))
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+
+				/* Write the data if not inhibited */
+				if (!inhibit)
+				{
+					if (blitter.modectl == MODE_PALREMAP)
+					{
+						/*
+						    In this mode, the source points to a 256 entry lookup table.
+						    The existing destination pixel is used as a lookup
+						    into the table and the colours is replaced.
+						*/
+						uint8_t dest = *blitter_get_addr( blitter.dest.addr);
+						uint8_t newcol = *(blitter_get_addr( (blitter.source.addr + dest) & 0xfffff));
+
+						*blitter_get_addr( blitter.dest.addr) = newcol;
+						cycles_used += 3;
+					}
+					else
+					{
+						uint8_t final_result = 0;
+
+						if (blitter.compfunc & CMPFUNC_LOG3)
+							final_result |= result & dstdata;
+
+						if (blitter.compfunc & CMPFUNC_LOG2)
+							final_result |= result & ~dstdata;
+
+						if (blitter.compfunc & CMPFUNC_LOG1)
+							final_result |= ~result & dstdata;
+
+						if (blitter.compfunc & CMPFUNC_LOG0)
+							final_result |= ~result & ~dstdata;
+
+						*blitter_get_addr( blitter.dest.addr) = final_result;
+						cycles_used++;
+					}
+				}
+
+				/* Update destination address */
+				if (blitter.modectl & MODE_DSIGN)
+					blitter.dest.as16bit.loword--;
+				else
+					blitter.dest.as16bit.loword++;
+
+			} while (--innercnt);
+
+			if (!--blitter.outercnt)
+			{
+				break;
+			}
+			else
+			{
+				if (blitter.command & CMD_DSTUP)
+					blitter.dest.as16bit.loword += blitter.step;
+
+				if (blitter.command & CMD_SRCUP)
+					blitter.source.as16bit.loword += blitter.step;
+
+				if (blitter.command & CMD_PARRD)
+				{
+					BLITPRG_READ(innercnt);
+					BLITPRG_READ(step);
+					BLITPRG_READ(pattern);
+				}
+			}
+		}
+
+		/* Read next command header */
+		BLITPRG_READ(command);
+
+	} while (blitter.command  & CMD_RUN);
+
+	/* Burn Z180 cycles while blitter is in operation */
+	/* Don't burn for Z8S180 */
+//  m_maincpu->spin_until_time(attotime::from_nsec( (1000000000 / Z8S180_XTAL)*cycles_used * 2 ) );
+}
+
+uint8_t* bfcobjam_state::blitter_get_addr(uint32_t addr)
+{
+	if (addr < 0x10000)
+	{
+		/* Is this region fixed? */
+		return (uint8_t*)(memregion("user1")->base() + addr);
+	}
+	else if(addr < 0x20000)
+	{
+		addr &= 0xffff;
+		addr += m_rompage * 0x10000 ;
+
+		return (uint8_t*)(memregion("user1")->base() + addr );
+	}
+	else if (addr >= 0x20000 && addr < 0x40000)
+	{
+		return (uint8_t*)&m_video_ram[addr - 0x20000];
+	}
+	else
+	{
+		return (uint8_t*)&m_work_ram[addr - 0x40000];
+	}
+}
+
+uint8_t bfcobjam_state::chipset_r(offs_t offset)
+{
+	uint8_t val = 0xff;
+
+	switch(offset)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		{
+			val = m_bank_data[offset];
+			break;
+		}
+		case 6:
+		{
+			/* TODO */
+			val = m_scanline_irq << 4;
+			break;
+		}
+		case 7:
+		{
+			m_scanline_irq = 0;
+			val = 0x1;
+
+			/* TODO */
+			update_irqs();
+			break;
+		}
+		case 0x1C:
+		{
+			/* Blitter status ? */
+			val = ioport("CJIN3")->read();
+			break;
+		}
+		case 0x20:
+		{
+			/* Seems correct - used during RLE pic decoding */
+			val = m_blitter.dest.as8bit.addr0;
+			break;
+		}
+		case 0x22:
+		{
+			val = 0x40 | ioport("CJIN2")->read() | ( m_upd7759_int->busy_r() ? 0x20 : 0 ) ;
+			break;
+		}
+		default:
+		{
+			osd_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, m_maincpu->pcbase());
+		}
+	}
+
+	return val;
+}
+
+void bfcobjam_state::chipset_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		{
+			popmessage("%x: Unusual bank access (%x)\n", m_maincpu->pcbase(), data);
+
+			data &= 0x3f;
+			m_bank_data[offset] = data;
+			z8s180_bank(offset, data);
+			break;
+		}
+
+		case 0x07:
+			m_scanline_timer->adjust(m_screen->time_until_pos(data));
+			break ;
+
+		case 0x08:
+		{
+			m_flip_8 = data;
+			break;
+		}
+		case 9:
+			m_videomode = data;
+			break;
+
+		case 0x0B:
+		{
+			m_h_scroll = data;
+			break;
+		}
+		case 0x0C:
+		{
+			m_v_scroll = data;
+			break;
+		}
+		case 0x0E:
+		{
+			m_col4bit[5] = data;
+			m_col3bit[5] = data;
+			m_col3bit[5 + 8] = data;
+			break;
+		}
+		case 0x0f:
+		{
+			m_col4bit[6] = data;
+			m_col3bit[6] = data;
+			m_col3bit[6 + 8] = data;
+			break;
+		}
+		case 0x18:
+		{
+			m_blitter.program.as8bit.addr0 = data;
+			break;
+		}
+		case 0x19:
+		{
+			m_blitter.program.as8bit.addr1 = data;
+			break;
+		}
+		case 0x1A:
+		{
+			m_blitter.program.as8bit.addr2 = data;
+			break;
+		}
+		case 0x20:
+		{
+			m_blitter.command = data;
+
+			if (data & CMD_RUN)
+				RunBlit();
+			else
+				osd_printf_debug("Blitter stopped by IO.\n");
+
+			break;
+		}
+		case 0x22:
+		{
+			m_flip_22 = data;
+			genio_w( data ) ;
+			break;
+		}
+		default:
+		{
+			osd_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, m_maincpu->pcbase());
+		}
+	}
+}
+
+uint32_t bfcobjam_state::screen_update_bfcobjam(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int x, y;
+	uint8_t  *src;
+	uint32_t *dest;
+	uint32_t offset;
+	uint8_t *hirescol;
+	uint8_t *lorescol;
+
+
+	/* Select screen has to be programmed into two registers */
+	/* No idea what happens if the registers are different */
+	if (m_flip_8 & 0x40 && m_flip_22 & 0x40)
+		offset = 0x10000;
+	else
+		offset = 0;
+
+	if(m_videomode & 0x20)
+	{
+		hirescol = m_col3bit;
+		lorescol = m_col7bit;
+	}
+	else if(m_videomode & 0x40)
+	{
+		hirescol = m_col4bit;
+		lorescol = m_col6bit;
+	}
+	else
+	{
+		hirescol = m_col4bit;
+		lorescol = m_col8bit;
+	}
+
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
+	{
+		uint16_t y_offset = (y + m_v_scroll) * 256;
+		src = &m_video_ram[offset + y_offset];
+		dest = &bitmap.pix32(y);
+
+		for (x = cliprect.left(); x <= cliprect.right() / 2; ++x)
+		{
+			uint8_t x_offset = x + m_h_scroll;
+			uint8_t pen = *(src + x_offset);
+
+			if ( ( m_videomode & 0x81 ) == 1 || (m_videomode & 0x80 && pen & 0x80) )
+			{
+				*dest++ = m_palette->pen(hirescol[pen & 0x0f]);
+				*dest++ = m_palette->pen(hirescol[(pen >> 4) & 0x0f]);
+			}
+			else
+			{
+				*dest++ = m_palette->pen(lorescol[pen]);
+				*dest++ = m_palette->pen(lorescol[pen]);
+			}
+		}
+	}
+
+	return 0;
+}
+
+void bfcobjam_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
+
+
+void bfcobjam_state::z8s180_bank(int num, int data)
+{
+	static const char * const bank_names[] = { "bank4","bank1", "bank2", "bank3" };
+
+	if (data < 0x04)
+	{
+		membank(bank_names[num])->set_base(memregion("user1")->base() + (data*0x4000));
+	}
+	else if (data < 0x08)
+	{
+		uint32_t offset ;
+		offset = m_rompage * 0x10000 ;
+		offset += (data-4) * 0x4000 ;
+
+		membank(bank_names[num])->set_base(memregion("user1")->base() + offset);
+	}
+	else if (data < 0x10)
+	{
+		membank(bank_names[num])->set_base(&m_video_ram[(data - 0x08) * 0x4000]);
+	}
+	else
+	{
+		membank(bank_names[num])->set_base(&m_work_ram[(data - 0x10) * 0x4000]);
+	}
+}
+
+void bfcobjam_state::update_irqs()
+{
+	int newstate = m_blitter_irq || m_scanline_irq || m_acia_irq;
+
+	if (newstate != m_irq_state)
+	{
+		m_irq_state = newstate;
+		m_maincpu->set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+TIMER_CALLBACK_MEMBER( bfcobjam_state::scanline_callback )
+{
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+	m_scanline_irq = 1;
+	update_irqs();
+}
+
+WRITE_LINE_MEMBER(bfcobjam_state::z8s180_acia_irq)
+{
+	m_acia_irq = state;
+	update_irqs();
+}
+
+
+void bfcobjam_state::rombank_w(uint8_t data)
+{
+	m_rompage = data ;
+
+	membank("bank5")->set_entry(m_rompage & 0x0f);
+}
+
+/*
+  This parallel port is used for bit-bashing the following devices.
+    1. Dot matrix display
+    2. I2C 24C08
+  The bit use is as follows:
+    b0 =
+    b1 =
+    b2 = Dot matrix clock
+    b3 = Dot matrix data
+    b4 = Dot matrix reset
+    b5 = I2C SDA
+    b6 = I2C SCL
+    b7 =
+*/
+void bfcobjam_state::output0_w(uint8_t data)
+{
+	uint8_t changed = m_port_0 ^ data ;
+	m_port_0 = data ;
+
+	dotmatrix_w( data ) ;
+
+	//cobra handling of scl and sda is wrong but devices handle it ok
+	//unfortunately mame emulation of i2c 24c08 doesn't :(
+	//we frig the driving of scl/sda to correct this
+	changed &= 0x60 ;
+
+	if( changed == 0x60 )
+	{
+		if( data & 0x40 )
+		{
+			m_i2cmem->write_scl(!(BIT(data, 6)));
+			m_i2cmem->write_sda(!(BIT(data, 5)));
+		}
+		else
+		{
+			m_i2cmem->write_sda(!(BIT(data, 5)));
+			m_i2cmem->write_scl(!(BIT(data, 6)));
+		}
+	}
+	else
+	{
+		m_i2cmem->write_scl(!(BIT(data, 6)));
+		m_i2cmem->write_sda(!(BIT(data, 5)));
+	}
+}
+
+void bfcobjam_state::dotmatrix_w( uint8_t data )
+{
+	if( m_dm01 )
+	{
+		data &= 0x1c ;
+
+		if( data != dm_last_data )
+		{
+			if( data & 0x10 )
+			{
+			}
+			else
+			{
+				m_dm01->reset() ;
+				dm_shift=0;
+				dm_shift_data=0;
+			}
+			if( !(data & 4 ) && ( dm_last_data & 4 ) && data & 0x10 ) // clock is low but was high and out of reset
+			{
+				dm_shift_data <<= 1 ;
+				if( !(data & 0x08 ))
+				{
+					dm_shift_data |=1 ;
+				}
+				dm_shift++;
+				if( dm_shift == 8 )
+				{
+					dm_shift=0;
+					m_dm01->writedata( dm_shift_data ) ;
+				}
+			}
+			dm_last_data = data ;
+		}
+	}
+}
+
+uint8_t bfcobjam_state::input0_r()
+{
+	return ioport("CJIN0")->read() | (m_i2cmem->read_sda() ? 0x80 : 0x00);
+}
+
+uint8_t bfcobjam_state::input1_r()
+{
+	return ioport("CJIN1")->read();
+}
+
+void bfcobjam_state::aux_upd7759_w(uint8_t data)
+{
+	if( m_aux_upd7759 )
+	{
+		m_aux_upd7759->set_rom_bank((data>>2)&3);
+
+		m_aux_upd7759->port_w((data>>4)&0xf);
+
+		m_aux_upd7759->md_w(1);
+
+		m_aux_upd7759->reset_w(BIT(data, 0));
+
+		m_aux_upd7759->start_w(!BIT(data, 1));
+	}
+}
+
+uint8_t bfcobjam_state::aux_upd7759_r()
+{
+	if( m_aux_upd7759 )
+	{
+		return m_aux_upd7759->busy_r();
+	}
+	else
+	{
+		return 0 ;
+	}
+}
+
+void bfcobjam_state::genio_w( uint8_t data )
+{
+	//bit 0 = ??
+	//bit 1 = upd7759 start
+	//bit 2 = upd7759 reset
+	//bit 3 = ??
+	//bit 4 = digital volume clock
+	//bit 5 = digital volume up/down
+	//bit 6 = ??
+	//bit 7 = ??
+
+	uint8_t changed = m_genio ^ data ;
+
+	m_genio = data ;
+
+	if ( changed & 0x10)
+	{ // digital volume clock line changed
+		if ( !(data & 0x10) )
+		{ // changed from high to low,
+			if ( data & 0x20 )
+			{
+				if ( m_global_volume < 31 ) m_global_volume++; //0-31 expressed as 1-32
+			}
+			else
+			{
+				if ( m_global_volume > 0  ) m_global_volume--;
+			}
+
+			{
+				if (m_ym2413)
+				{
+					float percent = (32 - m_global_volume) / 32.0f;
+
+					m_ym2413->set_output_gain(ALL_OUTPUTS, percent);
+					m_upd7759_int->set_output_gain(ALL_OUTPUTS, percent);
+					if( m_aux_upd7759 )
+					{
+						m_aux_upd7759->set_output_gain(ALL_OUTPUTS, percent);
+					}
+				}
+			}
+		}
+	}
+
+	//bits 1 and 2 are for upd7759
+	m_upd7759_int->md_w(0);
+	m_upd7759_int->reset_w(!BIT(data,2));
+	m_upd7759_int->start_w(BIT(data,1));
+}
+
+void bfcobjam_state::upd7759_w(uint8_t data)
+{
+	m_upd7759_int->port_w(data);
+}
+
+WRITE_LINE_MEMBER( bfcobjam_state::upd7759_generate_dreq )
+{
+	if( state )
+	{
+		m_maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, ASSERT_LINE );
+	}
+	else
+	{
+		m_maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, CLEAR_LINE );
+	}
+}
+
+void bfcobjam_state::video_start()
+{
+	memcpy(m_col4bit, col4bit_default, sizeof(m_col4bit));
+	memcpy(m_col3bit, col3bit_default, sizeof(m_col3bit));
+	for (int i = 0; i < 256; ++i)
+	{
+		uint8_t col;
+
+		m_col8bit[i] = i;
+		col = i & 0x7f;
+		col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
+		m_col7bit[i] = col;
+
+		col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
+				(col76index[( (col & 0x30) >> 4) & 3] << 5 );
+		m_col6bit[i] = col;
+	}
+}
+
+/***************************************************************************
+
+    Cobra II Z8S180 Memory Map
+
+***************************************************************************/
+
+void bfcobjam_state::z8s180_prog_map(address_map &map)
+{
+	map(0x00000, 0x03fff).bankrw("bank4");
+	map(0x04000, 0x07fff).bankrw("bank1");
+	map(0x08000, 0x0bfff).bankrw("bank2");
+	map(0x0c000, 0x0ffff).bankrw("bank3");
+	map(0x10000, 0x1ffff).bankrw("bank5");
+	map(0x20000, 0x3ffff).ram().share(m_video_ram);
+	map(0x40000, 0xfffff).ram().share(m_work_ram);
+}
+
+void bfcobjam_state::z8s180_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x23).rw(FUNC(bfcobjam_state::chipset_r), FUNC(bfcobjam_state::chipset_w));
+	map(0x24, 0x25).w(m_acia6850_0, FUNC(acia6850_device::write));
+	map(0x26, 0x27).r(m_acia6850_0, FUNC(acia6850_device::read));
+	map(0x2c, 0x2c).w(FUNC(bfcobjam_state::rombank_w));
+	map(0x30, 0x30).w(FUNC(bfcobjam_state::upd7759_w));
+	map(0x50, 0x50).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x51, 0x51).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0x52, 0x52).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x53, 0x53).w("ramdac", FUNC(ramdac_device::index_r_w));
+	map(0x80, 0x87).r(FUNC(bfcobjam_state::input1_r));
+	map(0x88, 0x8f).r(FUNC(bfcobjam_state::input0_r));
+	map(0x88, 0x8f).w(FUNC(bfcobjam_state::output0_w));
+	map(0x90, 0x97).r(FUNC(bfcobjam_state::aux_upd7759_r));
+	map(0x90, 0x97).w(m_ym2413,FUNC(ym2413_device::write));
+	map(0x98, 0x9f).w(FUNC(bfcobjam_state::aux_upd7759_w));
+}
+
+
+static INPUT_PORTS_START( brkball )
+	PORT_START("CJIN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 FIRE C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("CJIN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Left Flip")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Right Flip")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("CJIN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P1 Left Flip")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)  PORT_NAME("P1 Right Flip")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_START("CJIN3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_TILT ) PORT_NAME("TEST") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+void bfcobjam_state::machine_start()
+{
+	membank("bank5")->configure_entries(0, 0x10, memregion("user1")->base(), 0x10000);
+	membank("bank5")->set_entry(1);
+}
+
+void bfcobjam_state::machine_reset()
+{
+	for (unsigned int pal = 0; pal < 256; ++pal)
+	{
+		m_palette->set_pen_color(pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
+	}
+
+	m_rompage = 0 ;
+	m_bank_data[0] = 0;
+	m_bank_data[1] = 0;
+	m_bank_data[2] = 0;
+	m_bank_data[3] = 0;
+
+	m_genio = 0 ;
+	m_global_volume = 0;
+
+	m_ym2413->reset();
+
+
+	m_irq_state = m_blitter_irq = m_scanline_irq = m_acia_irq = 0;
+
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+
+	if( m_dm01 )
+		m_dm01->reset() ;
+}
+
+WRITE_LINE_MEMBER(bfcobjam_state::write_acia_clock)
+{
+	m_acia6850_0->write_txc(state);
+	m_acia6850_0->write_rxc(state);
+}
+
+void bfcobjam_state::bfcobjam(machine_config &config)
+{
+	Z8S180(config, m_maincpu, Z8S180_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfcobjam_state::z8s180_prog_map);
+	m_maincpu->set_addrmap(AS_IO, &bfcobjam_state::z8s180_io_map);
+
+	/* TODO */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(bfcobjam_state::screen_update_bfcobjam));
+
+	PALETTE(config, m_palette).set_entries(256);
+
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac.set_addrmap(0, &bfcobjam_state::ramdac_map);
+	ramdac.set_split_read(1);
+
+	SPEAKER(config, "mono").front_center();
+
+	UPD7759(config, m_upd7759_int);
+	m_upd7759_int->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_upd7759_int->drq().set(FUNC(bfcobjam_state::upd7759_generate_dreq));
+
+	YM2413(config, m_ym2413, XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+
+	/* ACIAs */
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->irq_handler().set(FUNC(bfcobjam_state::z8s180_acia_irq));
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	acia_clock.signal_handler().set(FUNC(bfcobjam_state::write_acia_clock));
+
+	I2C_24C08(config, m_i2cmem);
+}
+
+void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
+{
+	bfcobjam( config ) ;
+
+	UPD7759(config, m_aux_upd7759);
+	m_aux_upd7759->add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	BFM_DM01(config, m_dm01, 0);
+}
+
+/***************************************************************************
 
   Game driver(s)
 
@@ -1846,12 +2971,28 @@ ROM_START( qosb )
 
 ROM_END
 
+/*  The dot matrix software "ledv1.bin" is development software and not the release version.
+    Everything appears to work correctly except there are issues when the machine first starts with the
+    display showing a strange animation.
+*/
+ROM_START( brkball )
+	ROM_REGION( 0x200000, "user1", 0 )
+	ROM_LOAD( "95000352.bin", 0x000000, 0x80000, CRC(8daad60a) SHA1(10ac31b7791c2215d0561972ae63e1405361b908) )
+	ROM_LOAD( "95000353.bin", 0x080000, 0x80000, CRC(8e7b84ed) SHA1(b5e9ffe08eabe1446aa583fb85548451d944e811) )
 
-GAME( 1989, inquiztr, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Inquizitor",                       MACHINE_NOT_WORKING )
-GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos, bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos, bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "sounds.bin", 0x00000, 0x80000, CRC(4e84402d) SHA1(f6056669f005d8790331be5b0f34d9441190b120) )
+
+	ROM_REGION( 0x20000, "dm01:matrix", 0 )
+	ROM_LOAD("ledv1.bin",  0x00000, 0x10000, CRC(ea918cb9) SHA1(9e7047613cf1cb4b9a7fefb8a02d8479a7b09e6a))
+ROM_END
+
+GAME( 1989, inquiztr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor",                              MACHINE_NOT_WORKING )
+GAME( 1990, escounts, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,  0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,      0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,     qos, bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,     qos, bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1994, brkball,  0,   bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )

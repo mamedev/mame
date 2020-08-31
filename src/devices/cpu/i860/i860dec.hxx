@@ -57,21 +57,6 @@ enum {
 };
 
 
-/*  TODO: THESE WILL BE REPLACED BY MAME FUNCTIONS
-#define BYTE_REV32(t)   \
-  do { \
-    (t) = ((uint32_t)(t) >> 16) | ((uint32_t)(t) << 16); \
-    (t) = (((uint32_t)(t) >> 8) & 0x00ff00ff) | (((uint32_t)(t) << 8) & 0xff00ff00); \
-  } while (0);
-
-#define BYTE_REV16(t)   \
-  do { \
-    (t) = (((uint16_t)(t) >> 8) & 0x00ff) | (((uint16_t)(t) << 8) & 0xff00); \
-  } while (0);
-#endif
-*/
-
-
 /* Get/set general register value -- watch for r0 on writes.  */
 #define get_iregval(gr)       (m_iregs[(gr)])
 #define set_iregval(gr, val)  (m_iregs[(gr)] = ((gr) == 0 ? 0 : (val)))
@@ -352,7 +337,7 @@ uint32_t i860_cpu_device::ifetch (uint32_t pc)
 	   the BE bit), we need to adjust the instruction below on MSB hosts.  */
 	w1 = m_program->read_dword(phys_pc);
 #ifdef HOST_MSB
-	BYTE_REV32 (w1);
+	w1 = swapendian_int32(w1);
 #endif /* HOST_MSB.  */
 	return w1;
 }
@@ -390,7 +375,7 @@ uint32_t i860_cpu_device::get_address_translation (uint32_t vaddr, int is_datare
 	pg_dir_entry_a = dtb | (vdir << 2);
 	pg_dir_entry = m_program->read_dword(pg_dir_entry_a);
 #ifdef HOST_MSB
-	BYTE_REV32 (pg_dir_entry);
+	pg_dir_entry = swapendian_int32(pg_dir_entry);
 #endif
 
 	/* Check for non-present PDE.  */
@@ -438,7 +423,7 @@ uint32_t i860_cpu_device::get_address_translation (uint32_t vaddr, int is_datare
 	pg_tbl_entry_a = pfa1 | (vpage << 2);
 	pg_tbl_entry = m_program->read_dword(pg_tbl_entry_a);
 #ifdef HOST_MSB
-	BYTE_REV32 (pg_tbl_entry);
+	pg_tbl_entry = swapendian_int32(pg_tbl_entry);
 #endif
 
 	/* Check for non-present PTE.  */
@@ -483,8 +468,8 @@ uint32_t i860_cpu_device::get_address_translation (uint32_t vaddr, int is_datare
 	ttpde = pg_dir_entry | 0x20;
 	ttpte = pg_tbl_entry | 0x20;
 #ifdef HOST_MSB
-	BYTE_REV32 (ttpde);
-	BYTE_REV32 (ttpte);
+	ttpde = swapendian_int32(ttpde);
+	ttpte = swapendian_int32(ttpte);
 #endif
 	m_program->write_dword(pg_dir_entry_a, ttpde);
 	m_program->write_dword(pg_tbl_entry_a, ttpte);
@@ -555,7 +540,7 @@ uint32_t i860_cpu_device::readmemi_emu (uint32_t addr, int size)
 	{
 		uint32_t ret = m_program->read_word(addr);
 #ifdef HOST_MSB
-		BYTE_REV16 (ret);
+		ret = swapendian_int16(ret);
 #endif
 		return ret & 0xffff;
 	}
@@ -563,7 +548,7 @@ uint32_t i860_cpu_device::readmemi_emu (uint32_t addr, int size)
 	{
 		uint32_t ret = m_program->read_dword(addr);
 #ifdef HOST_MSB
-		BYTE_REV32 (ret);
+		ret = swapendian_int32(ret);
 #endif
 		return ret;
 	}
@@ -615,14 +600,14 @@ void i860_cpu_device::writememi_emu (uint32_t addr, int size, uint32_t data)
 	else if (size == 2)
 	{
 #ifdef HOST_MSB
-		BYTE_REV16 (data);
+		data = swapendian_int16(data);
 #endif
 		m_program->write_word(addr, data);
 	}
 	else if (size == 4)
 	{
 #ifdef HOST_MSB
-		BYTE_REV32 (data);
+		data = swapendian_int32(data);
 #endif
 		m_program->write_dword(addr, data);
 	}
@@ -4523,7 +4508,7 @@ void i860_cpu_device::disasm (uint32_t addr, int len)
 		fprintf (stderr, "  (%s) 0x%08x: ", m_device->tag(), addr);
 		insn = m_program->read_dword(phys_addr);
 #ifdef HOST_MSB
-		BYTE_REV32 (insn);
+		insn = swapendian_int32(insn);
 #endif /* HOST_MSB.  */
 		disasm_i860 (buf, addr, insn); fprintf (stderr, "%s", buf);
 		fprintf (stderr, "\n");

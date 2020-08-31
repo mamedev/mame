@@ -1,7 +1,35 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_74175.c
+ * nld_74175.cpp
+ *
+ *  DM74175: Quad D Flip-Flops with Clear
+ *
+ *          +--------------+
+ *      CLR |1     ++    16| VCC
+ *       Q1 |2           15| Q4
+ *      Q1Q |3           14| Q4Q
+ *       D1 |4   74175   13| D4
+ *       D2 |5           12| D3
+ *      Q2Q |6           11| Q3Q
+ *       Q2 |7           10| Q3
+ *      GND |8            9| CLK
+ *          +--------------+
+ *
+ *          +-----+-----+---++---+-----+
+ *          | CLR | CLK | D || Q | QQ  |
+ *          +=====+=====+===++===+=====+
+ *          |  0  |  X  | X || 0 |  1  |
+ *          |  1  |  R  | 1 || 1 |  0  |
+ *          |  1  |  R  | 0 || 0 |  1  |
+ *          |  1  |  0  | X || Q0| Q0Q |
+ *          +-----+-----+---++---+-----+
+ *
+ *   Q0 The output logic level of Q before the indicated input conditions were established
+ *
+ *  R:  0 -> 1
+ *
+ *  Naming conventions follow National Semiconductor datasheet
  *
  */
 
@@ -32,6 +60,7 @@ namespace netlist
 		{
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
 			m_CLK.set_state(logic_t::STATE_INP_LH);
@@ -74,8 +103,6 @@ namespace netlist
 			}
 		}
 
-		friend class NETLIB_NAME(74175_dip);
-	private:
 		object_array_t<logic_input_t, 4> m_D;
 		logic_input_t m_CLRQ;
 
@@ -87,40 +114,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74175_dip)
-	{
-		NETLIB_CONSTRUCTOR(74175_dip)
-		, A(*this, "A")
-		{
-			register_subalias("9", A.m_CLK);
-			register_subalias("1", A.m_CLRQ);
-
-			register_subalias("4", A.m_D[0]);
-			register_subalias("2", A.m_Q[0]);
-			register_subalias("3", A.m_QQ[0]);
-
-			register_subalias("5", A.m_D[1]);
-			register_subalias("7", A.m_Q[1]);
-			register_subalias("6", A.m_QQ[1]);
-
-			register_subalias("12", A.m_D[2]);
-			register_subalias("10", A.m_Q[2]);
-			register_subalias("11", A.m_QQ[2]);
-
-			register_subalias("13", A.m_D[3]);
-			register_subalias("15", A.m_Q[3]);
-			register_subalias("14", A.m_QQ[3]);
-
-			register_subalias("8",  "A.GND");
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(74175) A;
-	};
-
 	NETLIB_DEVICE_IMPL(74175,   "TTL_74175", "+CLK,+D1,+D2,+D3,+D4,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74175_dip,"TTL_74175_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -63,6 +63,42 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="chalice_1_5_12">
+		<description>Chalice 1.5.12</description>
+		<year>1998</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="chalice_1_5_12" sha1="e747549772d3947582d2a66b70760376b97a5753" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chalice_1_6_1">
+		<description>Chalice 1.6.1</description>
+		<year>1999</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="chalice_1_6_1" sha1="2cd47e3686be21b2a8dbdf08c69d6ab3622ef8a7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="chalice_2_0">
+		<description>Chalice 2.0</description>
+		<year>2000</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown, reconstructed from a tarball -->
+			<diskarea name="cdrom">
+				<disk name="chalice_2_0" sha1="188b9180acdc7714b45b8ea1d62c914b407788ef" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="cosmo_1_1_1">
 		<description>Cosmo Compress 1.1.1</description>
 		<year>1994</year> <!-- 11/94 -->
@@ -313,6 +349,31 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="framemaker_5_0">
+		<description>Adobe FrameMaker 5 and Adobe Frame Developer's Kit</description>
+		<year>1996</year> <!-- 5/96 -->
+		<publisher>Adobe</publisher>
+		<info name="version" value="5.0" />
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="frame_products" sha1="270cad068d237e69684a82b036eaae26ff861ebb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="framemaker_5_5_6">
+		<description>Adobe FrameMaker 5.5.6</description>
+		<year>1998</year>
+		<publisher>Adobe</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unixfiles.org, reconstructed from a tarball -->
+			<diskarea name="cdrom">
+				<disk name="framemaker_5_5_6" sha1="19c77eeec5858303113dfc69512fed5fa56602c9" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="freeware_2_0">
 		<description>Freeware 2.0 - Unsupported Software compatible with IRIX 6.2 and later</description>
 		<year>1996</year> <!-- 04/96 -->
@@ -479,6 +540,18 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="812_0136_003_iris_inventor_1_1_2_sep93" sha1="86d22528711db9bf209627324dd5a0e7ce2d6d37" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mathematica_5_2">
+		<description>Mathematica 5.2</description>
+		<year>2005</year>
+		<publisher>Wolfram</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="mathematica_5_2_all_unix" sha1="fffc51ad8bf28c68c64ca834e52f8bcbd3423b0a" />
 			</diskarea>
 		</part>
 	</software>
@@ -928,6 +1001,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rayz_2_2">
+		<description>RAYZ 2.2</description>
+		<year>2002</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="rayz_2_2" sha1="f53cab16b7bed7a89abe46a9595ac9b068f4b1f9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rayz_2_2_12">
+		<description>RAYZ 2.2.12</description>
+		<year>200?</year>
+		<publisher>Silicon Grail</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown, reconstructed from a tarball -->
+			<diskarea name="cdrom">
+				<disk name="rayz_2_2_12" sha1="0c33586e0b0fa86742d8a47b1292fddcc17c22e9" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="samba_2_0_0">
 		<description>Samba 2.0.0 for IRIX for IRIX 6.5 and later</description>
 		<year>1998</year> <!-- 12/98 -->
@@ -999,6 +1096,36 @@ license:CC0
 			<!-- Origin: unknown -->
 			<diskarea name="cdrom">
 				<disk name="softwindows95_v5_0_for_irix_6_5" sha1="89fab878248514f0e4e98f073f28e778803d1f81" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sybyl_7_2">
+		<description>Tripos SYBYL 7.2</description>
+		<year>2006</year>
+		<publisher>Tripos, Inc.</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd1" sha1="4ee395eeeca2dfa3f0ff42e1f4973e49e9a7cbf7" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd2" sha1="91f4e7fad5acab29847beaafa5bc10d6366bda1b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<!-- Origin: unixfiles.org -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd3" sha1="c073cf3042b4816bff033cb76cd08983b8d9cf0d" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<!-- Origin: unixfiles.org; modified image, needs redump from an original -->
+			<diskarea name="cdrom">
+				<disk name="sybyl_7_2_cd4_pr" sha1="e158700f39cd7f61ddb15fa8f8d9ac6983a418a1" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -1387,6 +1514,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ido_5_2">
+		<description>IRIS Development Option 5.2</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0129-004"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="iris_development_option_5_2" sha1="b011702ba853d744e047dcf28091a75a06fcf972" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ido_5_3">
 		<description>IRIS Development Option 5.3</description>
 		<year>1994</year> <!-- 11/94 -->
@@ -1409,6 +1549,19 @@ license:CC0
 			<!-- Origin: jrra.zone -->
 			<diskarea name="cdrom">
 				<disk name="iris_development_option_6_2" sha1="eabaa5238a3515f1c71d693efc2781b4d1675cf9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_4_0_1">
+		<description>FORTRAN 77 Compiler 4.0.1</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0132-005"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_4_0_1" sha1="1d214d44deb8d68833e334628e333a54f7ce7c04" />
 			</diskarea>
 		</part>
 	</software>
@@ -1690,7 +1843,7 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<!-- Origin: archive.org; reconstructed from a tarball, needs redump -->
 			<diskarea name="cdrom">
-				<disk name="indizone_1_1" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" />
+				<disk name="indizone_1_1" sha1="a534bba52ce0eff4be54e8a7d2603dc1295763b4" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -1842,6 +1995,32 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="supportfolio_irix_5_3_6_3_and_6_4_patches_4_97" sha1="b33cc43486fe375d126b8e39178f69072b0310d3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_11_93">
+		<description>Support Advantage Int'l 11/93</description>
+		<year>1993</year> <!-- 11/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4015-001"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="support_advantage_intl_11_93.chd" sha1="36324701f84531b965046a17ed7aebfa4e8bf7ca" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sadvantage_3_94">
+		<description>Support Advantage Int'l 3/94</description>
+		<year>1994</year> <!-- 3/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-4015-002"/>
+			<diskarea name="cdrom">
+				<!-- Origin: private dump -->
+				<disk name="support_advantage_intl_3_94.chd" sha1="3079331e1f47f6d9537d1a1dcda9c00ad3a6b0af" />
 			</diskarea>
 		</part>
 	</software>
@@ -2377,6 +2556,19 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="irix_5_2_for_indy_r4600sc_xz_and_presenter" sha1="5f81496d2291e80d8d0bd5b0c470725fc6214ab4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_2_patches">
+		<description>IRIX 5.2 Patches</description>
+		<year>1994</year> <!-- 06/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0290-001"/>
+			<!-- Origin: private dump -->
+			<diskarea name="cdrom">
+				<disk name="irix_5_2_patches" sha1="fb7e6b45f0cc96d40f9e2634882345f4846bfb60" />
 			</diskarea>
 		</part>
 	</software>

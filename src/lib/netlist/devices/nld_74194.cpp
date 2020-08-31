@@ -3,7 +3,26 @@
 /*
  * nld_74194.cpp
  *
+ *  74194: Parallel-Load 8-Bit Shift Register
+ *
+ *          +--------------+
+ *     CLRQ |1     ++    16| VCC
+ *     SRIN |2           15| QA
+ *        A |3           14| QB
+ *        B |4    74194  13| QC
+ *        C |5           12| QD
+ *        D |6           11| CLK
+ *     SLIN |7           10| S1
+ *      GND |8            9| S0
+ *          +--------------+
+ *
+ * CLR: Clear
+ * SRIN: Shift Right Serial Input
+ * SLIN: Shift Left Serial Input
+ * CLK: Clock
+ *
  */
+
 
 #include "nld_74194.h"
 #include "netlist/nl_base.h"
@@ -95,37 +114,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74194_dip)
-	{
-		NETLIB_CONSTRUCTOR(74194_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_CLRQ);
-			register_subalias("2", A.m_SRIN);
-			register_subalias("3", A.m_DATA[3]);
-			register_subalias("4", A.m_DATA[2]);
-			register_subalias("5", A.m_DATA[1]);
-			register_subalias("6", A.m_DATA[0]);
-			register_subalias("7", A.m_SLIN);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9",  A.m_S0);
-			register_subalias("10", A.m_S1);
-			register_subalias("11", A.m_CLK);
-			register_subalias("12", A.m_Q[0]);
-			register_subalias("13", A.m_Q[1]);
-			register_subalias("14", A.m_Q[2]);
-			register_subalias("15", A.m_Q[3]);
-			register_subalias("16", "VCC");
-
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(74194) A;
-	};
-
 	NETLIB_DEVICE_IMPL(74194,    "TTL_74194",     "+CLK,+S0,+S1,+SRIN,+A,+B,+C,+D,+SLIN,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74194_dip, "TTL_74194_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

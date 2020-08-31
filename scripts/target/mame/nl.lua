@@ -58,6 +58,9 @@ SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
 SOUNDS["DIGITALKER"] = true
 SOUNDS["SN76477"] = true
+SOUNDS["SN76496"] = true
+SOUNDS["SP0250"] = true
+SOUNDS["TMS36XX"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -80,12 +83,16 @@ MACHINES["AY31015"] = true
 MACHINES["KB3600"] = true
 MACHINES["COM8116"] = true
 
+MACHINES["TTL7474"] = true
 MACHINES["TTL74145"] = true
+MACHINES["TTL74148"] = true
+MACHINES["TTL74153"] = true
 MACHINES["TTL74259"] = true
 MACHINES["6522VIA"] = true
 
 MACHINES["6821PIA"] = true
 MACHINES["I8255"] = true
+MACHINES["I8243"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["EEPROMDEV"] = true
 MACHINES["UPD4701"] = true
@@ -94,7 +101,7 @@ MACHINES["CXD1095"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
 --MACHINES["RIOT6532"] = true
---MACHINES["PIT8253"] = true
+MACHINES["PIT8253"] = true
 --MACHINES["Z80CTC"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
@@ -153,6 +160,16 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.cpp",
 	MAME_DIR .. "src/mame/machine/nl_gtrak10.h",
+	MAME_DIR .. "src/mame/machine/nl_tank.cpp",
+	MAME_DIR .. "src/mame/machine/nl_tank.h",
+
+	MAME_DIR .. "src/mame/audio/nl_flyball.cpp",
+	MAME_DIR .. "src/mame/audio/nl_flyball.h",
+	MAME_DIR .. "src/mame/drivers/flyball.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_destroyr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_destroyr.h",
+	MAME_DIR .. "src/mame/drivers/destroyr.cpp",
 
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
@@ -187,16 +204,24 @@ files{
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
 
-  MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
-  MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
-  MAME_DIR .. "src/mame/includes/mw8080bw.h",
-  MAME_DIR .. "src/mame/audio/mw8080bw.h",
-  MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
-  MAME_DIR .. "src/mame/video/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/machine/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/drivers/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/includes/mw8080bw.h",
+	MAME_DIR .. "src/mame/audio/mw8080bw.h",
+	MAME_DIR .. "src/mame/audio/mw8080bw.cpp",
+	MAME_DIR .. "src/mame/video/mw8080bw.cpp",
+
 	MAME_DIR .. "src/mame/audio/nl_gunfight.cpp",
 	MAME_DIR .. "src/mame/audio/nl_gunfight.h",
 	MAME_DIR .. "src/mame/audio/nl_280zzzap.cpp",
 	MAME_DIR .. "src/mame/audio/nl_280zzzap.h",
+
+	MAME_DIR .. "src/mame/drivers/sspeedr.cpp",
+	MAME_DIR .. "src/mame/includes/sspeedr.h",
+	MAME_DIR .. "src/mame/video/sspeedr.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_sspeedr.cpp",
+	MAME_DIR .. "src/mame/audio/nl_sspeedr.h",
 
 	MAME_DIR .. "src/mame/audio/cheekyms.cpp",
 	MAME_DIR .. "src/mame/audio/cheekyms.h",
@@ -264,11 +289,44 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
 
+	MAME_DIR .. "src/mame/machine/segacrpt_device.cpp",
+	MAME_DIR .. "src/mame/machine/segacrpt_device.h",
+	MAME_DIR .. "src/mame/drivers/segag80r.cpp",
+	MAME_DIR .. "src/mame/includes/segag80r.h",
+	MAME_DIR .. "src/mame/machine/segag80.cpp",
+	MAME_DIR .. "src/mame/machine/segag80.h",
+	MAME_DIR .. "src/mame/audio/segag80r.cpp",
+	MAME_DIR .. "src/mame/audio/segag80r.h",
+	MAME_DIR .. "src/mame/video/segag80r.cpp",
+	MAME_DIR .. "src/mame/drivers/segag80v.cpp",
+	MAME_DIR .. "src/mame/includes/segag80v.h",
+	MAME_DIR .. "src/mame/audio/segag80.cpp",
+	MAME_DIR .. "src/mame/audio/segag80.h",
+	MAME_DIR .. "src/mame/audio/segaspeech.cpp",
+	MAME_DIR .. "src/mame/audio/segaspeech.h",
+	MAME_DIR .. "src/mame/audio/segausb.cpp",
+	MAME_DIR .. "src/mame/audio/segausb.h",
+	MAME_DIR .. "src/mame/audio/nl_astrob.cpp",
+	MAME_DIR .. "src/mame/audio/nl_astrob.h",
+	MAME_DIR .. "src/mame/audio/nl_elim.cpp",
+	MAME_DIR .. "src/mame/audio/nl_elim.h",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.cpp",
+	MAME_DIR .. "src/mame/audio/nl_spacfury.h",
+	MAME_DIR .. "src/mame/video/segag80v.cpp",
+	MAME_DIR .. "src/mame/drivers/zaxxon.cpp",
+	MAME_DIR .. "src/mame/includes/zaxxon.h",
+	MAME_DIR .. "src/mame/audio/zaxxon.cpp",
+	MAME_DIR .. "src/mame/video/zaxxon.cpp",
+
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",
 	MAME_DIR .. "src/mame/video/segas16b.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",
 	MAME_DIR .. "src/mame/audio/nl_segas16b.h",
+	MAME_DIR .. "src/mame/audio/nl_segausb.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segausb.h",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segaspeech.h",
 	MAME_DIR .. "src/mame/machine/315_5195.cpp",
 	MAME_DIR .. "src/mame/machine/315_5195.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",
@@ -291,6 +349,33 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_tp1983.h",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.h",
+
+	MAME_DIR .. "src/mame/audio/nl_starcrus.h",
+	MAME_DIR .. "src/mame/audio/nl_starcrus.cpp",
+	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
+	MAME_DIR .. "src/mame/includes/starcrus.h",
+	MAME_DIR .. "src/mame/video/starcrus.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_carpolo.h",
+	MAME_DIR .. "src/mame/audio/nl_carpolo.cpp",
+	MAME_DIR .. "src/mame/drivers/carpolo.cpp",
+	MAME_DIR .. "src/mame/includes/carpolo.h",
+	MAME_DIR .. "src/mame/machine/carpolo.cpp",
+	MAME_DIR .. "src/mame/video/carpolo.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_fireone.h",
+	MAME_DIR .. "src/mame/audio/nl_fireone.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starfire.h",
+	MAME_DIR .. "src/mame/audio/nl_starfire.cpp",
+	MAME_DIR .. "src/mame/drivers/starfire.cpp",
+	MAME_DIR .. "src/mame/includes/starfire.h",
+	MAME_DIR .. "src/mame/video/starfire.cpp",
+
+	MAME_DIR .. "src/mame/audio/nl_starcrus.cpp",
+	MAME_DIR .. "src/mame/audio/nl_starcrus.h",
+	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
+	MAME_DIR .. "src/mame/includes/starcrus.h",
+	MAME_DIR .. "src/mame/video/starcrus.cpp",
 
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",

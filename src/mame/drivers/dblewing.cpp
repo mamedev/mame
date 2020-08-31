@@ -423,6 +423,11 @@ ROM_START( dblewing )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
 	ROM_RELOAD(               0x020000, 0x020000 )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8-vg-00.1f",  0x000, 0x117, CRC(8c2849e5) SHA1(72c5142dd78ea7d009229bad9f1a5651eec1e858) )
+	ROM_LOAD( "pal16l8-vg-01.1h",  0x200, 0x117, CRC(04b0bab6) SHA1(6b1ad69506b385eeeac6cb952e166304bf6fbb40) )
+	ROM_LOAD( "pal16r8-vg-02.11b", 0x400, 0x117, NO_DUMP )
 ROM_END
 
 ROM_START( dblewinga )
@@ -443,6 +448,11 @@ ROM_START( dblewinga )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
 	ROM_RELOAD(               0x020000, 0x020000 )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8-vg-00.1f",  0x000, 0x117, CRC(8c2849e5) SHA1(72c5142dd78ea7d009229bad9f1a5651eec1e858) )
+	ROM_LOAD( "pal16l8-vg-01.1h",  0x200, 0x117, CRC(04b0bab6) SHA1(6b1ad69506b385eeeac6cb952e166304bf6fbb40) )
+	ROM_LOAD( "pal16r8-vg-02.11b", 0x400, 0x117, NO_DUMP )
 ROM_END
 
 /*
@@ -467,6 +477,11 @@ ROM_START( dblewingb )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
 	ROM_RELOAD(               0x020000, 0x020000 )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "pal16l8-vg-00.1f",  0x000, 0x117, CRC(8c2849e5) SHA1(72c5142dd78ea7d009229bad9f1a5651eec1e858) )
+	ROM_LOAD( "pal16l8-vg-01.1h",  0x200, 0x117, CRC(04b0bab6) SHA1(6b1ad69506b385eeeac6cb952e166304bf6fbb40) )
+	ROM_LOAD( "pal16r8-vg-02.11b", 0x400, 0x117, NO_DUMP )
 ROM_END
 
 void dblewing_state::init_dblewing()

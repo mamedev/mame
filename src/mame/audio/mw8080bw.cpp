@@ -574,6 +574,7 @@ DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Mid
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
 DEFINE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device, "invad2ct_audio", "Midway Space Invaders II Audio")
 DEFINE_DEVICE_TYPE(ZZZAP_AUDIO,    zzzap_audio_device,    "zzzap_audio",    "Midway 280-ZZZAP Audio")
+DEFINE_DEVICE_TYPE(LAGUNAR_AUDIO,  lagunar_audio_device,  "lagunar_audio",  "Midway Laguna Racer Audio")
 
 
 /*************************************
@@ -3653,8 +3654,9 @@ static INPUT_PORTS_START(zzzap_audio)
 	PORT_ADJUSTER( 50, "Pot: Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_master_vol")
 INPUT_PORTS_END
 
-zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, ZZZAP_AUDIO, tag, owner, clock),
+zzzap_common_audio_device::zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &)) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_netlist(netlist),
 	m_pedal_bit0(*this, "sound_nl:pedal_bit0"),
 	m_pedal_bit1(*this, "sound_nl:pedal_bit1"),
 	m_pedal_bit2(*this, "sound_nl:pedal_bit2"),
@@ -3669,7 +3671,7 @@ zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const
 }
 
 
-void zzzap_audio_device::p1_w(u8 data)
+void zzzap_common_audio_device::p1_w(u8 data)
 {
 	// **** Output pins from 74174 latch at F5 ****
 
@@ -3694,7 +3696,7 @@ void zzzap_audio_device::p1_w(u8 data)
 }
 
 
-void zzzap_audio_device::p2_w(u8 data)
+void zzzap_common_audio_device::p2_w(u8 data)
 {
 	// **** Output pins from 74174 latch at F4 ****
 
@@ -3724,47 +3726,73 @@ void zzzap_audio_device::p2_w(u8 data)
 }
 
 
-void zzzap_audio_device::device_add_mconfig(machine_config &config)
+void zzzap_common_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	NETLIST_SOUND(config, "sound_nl", 48000)
-		.set_source(NETLIST_NAME(280zzzap))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
+	if (m_netlist != nullptr) {
 
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit0", "I_PEDAL_BIT0", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit1", "I_PEDAL_BIT1", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit2", "I_PEDAL_BIT2", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit3", "I_PEDAL_BIT3", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift", "I_HI_SHIFT", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift", "I_LO_SHIFT", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off", "I_ENGINE_SOUND_OFF", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1", "I_NOISE_CR_1", 0);
-	NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2", "I_NOISE_CR_2", 0);
+		NETLIST_SOUND(config, "sound_nl", 48000)
+			.set_source(m_netlist)
+			.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	// The audio output is taken from an LM3900 op-amp whose output has a
-	// peak-to-peak range of about 5 volts, centered on 2.5 volts. With
-	// the master volume potentiometer at its default midpoint setting,
-	// this range is cut in half, to 2.5 volts peak to peak. In the real
-	// machine, the audio power amps might clip the highest output peaks,
-	// but I don't model this. Instead, I take the easy way out: assume
-	// the output at midpoint volume will just avoid clipping the extreme
-	// peaks, and scale and offset it so that those peaks will just reach
-	// the clipping limits for signed 16-bit samples. So turning the
-	// volume up much higher than the default will give clipped output.
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 1.25, -(32767.0 / 1.25) * 2.50);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit0",
+					"I_PEDAL_BIT0", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit1",
+					"I_PEDAL_BIT1", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit2",
+					"I_PEDAL_BIT2", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:pedal_bit3",
+					"I_PEDAL_BIT3", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:hi_shift",
+					"I_HI_SHIFT", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:lo_shift",
+					"I_LO_SHIFT", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:boom", "I_BOOM", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:engine_sound_off",
+					"I_ENGINE_SOUND_OFF", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_1",
+					"I_NOISE_CR_1", 0);
+		NETLIST_LOGIC_INPUT(config, "sound_nl:noise_cr_2",
+					"I_NOISE_CR_2", 0);
 
-	// Netlist volume-potentiometer interface
-	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");
+		// The audio output is taken from an LM3900 op-amp whose
+		// output has a peak-to-peak range of about 5 volts, centered
+		// on 2.5 volts. With the master volume potentiometer at its
+		// default midpoint setting, this range is cut in half, to 2.5
+		// volts peak to peak. In the real machine, the audio power
+		// amps might clip the highest output peaks, but I don't model
+		// this. Instead, I take the easy way out: assume the output
+		// at midpoint volume will just avoid clipping the extreme
+		// peaks, and scale and offset it so that those peaks will
+		// just reach the clipping limits for signed 16-bit samples.
+		// So turning the volume up much higher than the default will
+		// give clipped output.
+		NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 1.25, -(32767.0 / 1.25) * 2.50);
+
+		// Netlist volume-potentiometer interface
+		NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");
+	}
 }
 
-ioport_constructor zzzap_audio_device::device_input_ports() const
+ioport_constructor zzzap_common_audio_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(zzzap_audio);
 }
 
-void zzzap_audio_device::device_start()
+void zzzap_common_audio_device::device_start()
+{
+}
+
+
+zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		zzzap_common_audio_device(mconfig, ZZZAP_AUDIO, tag, owner, clock, NETLIST_NAME(280zzzap))
+{
+}
+
+
+lagunar_audio_device::lagunar_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		zzzap_common_audio_device(mconfig, LAGUNAR_AUDIO, tag, owner, clock, NETLIST_NAME(lagunar))
 {
 }
 

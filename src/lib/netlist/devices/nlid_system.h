@@ -21,29 +21,6 @@ namespace netlist
 namespace devices
 {
 	// -----------------------------------------------------------------------------
-	// netlistparams
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(netlistparams)
-	{
-		NETLIB_CONSTRUCTOR(netlistparams)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
-		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
-		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
-		{
-		}
-		//NETLIB_RESETI() {}
-		//NETLIB_UPDATE_PARAMI() { }
-	public:
-		param_logic_t m_use_deactivate;
-		param_num_t<unsigned>   m_startup_strategy;
-		param_num_t<unsigned>   m_mos_capmodel;
-		//! How many times do we try to resolve links (connections)
-		param_num_t<unsigned>   m_max_link_loops;
-	};
-
-	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
 
@@ -102,7 +79,7 @@ namespace devices
 				for (int i=0; i < m_N(); i++)
 				{
 					pstring inpname = plib::pfmt("A{1}")(i);
-					m_I.push_back(state().make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(fb)));
+					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(fb)));
 					inps.push_back(inpname);
 					m_vals.push_back(nlconst::zero());
 				}
@@ -300,50 +277,6 @@ namespace devices
 		param_fp_t m_IN;
 	};
 
-	// -----------------------------------------------------------------------------
-	// nld_gnd
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(gnd)
-	{
-		NETLIB_CONSTRUCTOR(gnd)
-		, m_Q(*this, "Q")
-		{
-		}
-
-		NETLIB_UPDATE_PARAMI()
-		{
-			m_Q.push(nlconst::zero());
-		}
-
-		//NETLIB_RESETI() {}
-	protected:
-		analog_output_t m_Q;
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_nc_pin
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(nc_pin)
-	{
-	public:
-		NETLIB_CONSTRUCTOR(nc_pin)
-		, m_I(*this, "I", NETLIB_DELEGATE(noop))
-		{
-		}
-
-	protected:
-		//NETLIB_RESETI() {}
-
-	private:
-		NETLIB_HANDLERI(noop)
-		{
-		}
-
-		analog_input_t m_I;
-
-	};
 
 	// -----------------------------------------------------------------------------
 	// nld_frontier
@@ -453,14 +386,16 @@ namespace devices
 		NETLIB_CONSTRUCTOR(function)
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
+		, m_thresh(*this, "THRESH", nlconst::zero())
 		, m_Q(*this, "Q")
 		, m_compiled(*this, "m_compiled")
+		, m_last(*this, "m_last")
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring inpname = plib::pfmt("A{1}")(i);
-				m_I.push_back(state().make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(inputs)));
+				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(inputs)));
 				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}
@@ -479,18 +414,25 @@ namespace devices
 			{
 				m_vals[i] = (*m_I[i])();
 			}
-			m_Q.push(m_compiled->evaluate(m_vals));
+			auto result = m_compiled->evaluate(m_vals);
+			if (plib::abs(m_last - result) >= m_thresh)
+			{
+				m_Q.push(result);
+				m_last = result;
+			}
 		}
 
 	private:
 		using pf_type = plib::pfunction<nl_fptype>;
 		param_int_t m_N;
 		param_str_t m_func;
+		param_fp_t m_thresh;
 		analog_output_t m_Q;
 		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
 		pf_type::values_container m_vals;
 		state_var<pf_type> m_compiled;
+		state_var<nl_fptype> m_last;
 
 	};
 

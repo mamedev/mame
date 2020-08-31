@@ -13,6 +13,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "vsmile.lh"
+
 #define VERBOSE (1)
 #include "logmacro.h"
 
@@ -57,6 +59,11 @@ void vsmile_state::machine_start()
 {
 	vsmile_base_state::machine_start();
 
+	m_redled.resolve();
+	m_yellowled.resolve();
+	m_blueled.resolve();
+	m_greenled.resolve();
+
 	save_item(NAME(m_ctrl_rts));
 	save_item(NAME(m_ctrl_select));
 }
@@ -85,6 +92,25 @@ void vsmile_state::uart_rx(uint8_t data)
 	//printf("Ctrl Rx: %02x\n", data);
 	m_ctrl[0]->data_w(data);
 	m_ctrl[1]->data_w(data);
+
+	//TODO: should be moved to pad code somehow
+	if ((data & 0xF0) == 0x60)
+	{
+		if (m_ctrl_select[0])
+		{
+			m_redled[0] = BIT(data, 3);
+			m_yellowled[0] = BIT(data, 2);
+			m_blueled[0] = BIT(data, 1);
+			m_greenled[0] = BIT(data, 0);
+		}
+		if (m_ctrl_select[1])
+		{
+			m_redled[1] = BIT(data, 3);
+			m_yellowled[1] = BIT(data, 2);
+			m_blueled[1] = BIT(data, 1);
+			m_greenled[1] = BIT(data, 0);
+		}
+	}
 }
 
 uint16_t vsmile_state::portb_r()
@@ -245,6 +271,8 @@ static void vsmile_cart(device_slot_interface &device)
 
 void vsmile_base_state::vsmile_base(machine_config &config)
 {
+	config.set_default_layout(layout_vsmile);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);

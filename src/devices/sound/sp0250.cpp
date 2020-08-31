@@ -5,50 +5,39 @@
 
    By O. Galibert.
 
-   Unknown:
-   - Exact clock divider
-   - Exact noise algorithm
-   - Exact noise pitch (probably ok)
-   - 7 bits output mapping
-   - Whether the pitch starts counting from 0 or 1
-
    Unimplemented:
    - Direct Data test mode (pin 7)
-
-   Sound quite reasonably already though.
 */
 
 #include "emu.h"
 #include "sp0250.h"
 
-/*
-standard external clock is 3.12MHz
-the chip provides a 445.7kHz output clock, which is = 3.12MHz / 7
-therefore I expect the clock divider to be a multiple of 7
-Also there are 6 cascading filter stages so I expect the divider to be a multiple of 6.
+//
+// Input clock is divided by 2 to make ROMCLOCK.
+// Output is via pulse-width modulation (PWM) over the course of 39 ROMCLOCKs.
+// 4 PWM periods per frame.
+//
+static constexpr int PWM_CLOCKS = 39;
 
-The SP0250 manual states that the original speech is sampled at 10kHz, so the divider
-should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 is unlikely.
-
-7*6*8 = 336 gives a 9.286kHz sample rate and matches the samples from the Sega boards.
-*/
-#define CLOCK_DIVIDER (7*6*8)
 
 DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 
 sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SP0250, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_amp(0),
-	m_pitch(0),
-	m_repeat(0),
-	m_pcount(0),
-	m_rcount(0),
-	m_playing(0),
-	m_RNG(0),
-	m_stream(nullptr),
+	m_pwm_mode(false),
+	m_pwm_index(PWM_CLOCKS),
+	m_pwm_count(0),
+	m_pwm_counts(0),
 	m_voiced(0),
+	m_amp(0),
+	m_lfsr(0x7fff),
+	m_pitch(0),
+	m_pcount(0),
+	m_repeat(0),
+	m_rcount(0),
 	m_fifo_pos(0),
+	m_stream(nullptr),
 	m_drq(*this)
 {
 	for (auto & elem : m_fifo)
@@ -71,27 +60,53 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 
 void sp0250_device::device_start()
 {
-	m_RNG = 1;
+	// output PWM data at the ROMCLOCK frequency
+	int sample_rate = clock() / 2;
+	int frame_rate = sample_rate / (4 * PWM_CLOCKS);
+	if (!m_pwm_mode)
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, frame_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
+
+	// if a DRQ callback is offered, run a timer at the frame rate
+	// to ensure the DRQ gets picked up in a timely manner
 	m_drq.resolve_safe();
 	if (!m_drq.isnull())
 	{
 		m_drq(ASSERT_LINE);
-		m_tick_timer= machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
-		m_tick_timer->adjust(attotime::from_hz(clock()) * CLOCK_DIVIDER, 0, attotime::from_hz(clock()) * CLOCK_DIVIDER);
+		attotime period = attotime::from_hz(frame_rate);
+		timer_alloc()->adjust(period, 0, period);
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
+	// PWM state
+	save_item(NAME(m_pwm_index));
+	save_item(NAME(m_pwm_count));
+	save_item(NAME(m_pwm_counts));
 
-	save_item(NAME(m_amp));
-	save_item(NAME(m_pitch));
-	save_item(NAME(m_repeat));
-	save_item(NAME(m_pcount));
-	save_item(NAME(m_rcount));
-	save_item(NAME(m_playing));
-	save_item(NAME(m_RNG));
+	// LPC state
 	save_item(NAME(m_voiced));
+	save_item(NAME(m_amp));
+	save_item(NAME(m_lfsr));
+	save_item(NAME(m_pitch));
+	save_item(NAME(m_pcount));
+	save_item(NAME(m_repeat));
+	save_item(NAME(m_rcount));
+	for (int index = 0; index < 6; index++)
+	{
+		save_item(NAME(m_filter[index].F), index);
+		save_item(NAME(m_filter[index].B), index);
+		save_item(NAME(m_filter[index].z1), index);
+		save_item(NAME(m_filter[index].z2), index);
+	}
+
+	// FIFO state
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_pos));
+}
+
+void sp0250_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_stream->update();
 }
 
 static uint16_t sp0250_ga(uint8_t v)
@@ -140,19 +155,11 @@ void sp0250_device::load_values()
 	m_filter[5].F = sp0250_gc(m_fifo[14]);
 	m_fifo_pos = 0;
 	m_drq(ASSERT_LINE);
-
 	m_pcount = 0;
 	m_rcount = 0;
 
 	for (int f = 0; f < 6; f++)
-		m_filter[f].z1 = m_filter[f].z2 = 0;
-
-	m_playing = 1;
-}
-
-TIMER_CALLBACK_MEMBER( sp0250_device::timer_tick )
-{
-	m_stream->update();
+		m_filter[f].reset();
 }
 
 void sp0250_device::write(uint8_t data)
@@ -175,6 +182,77 @@ uint8_t sp0250_device::drq_r()
 	return (m_fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;
 }
 
+int8_t sp0250_device::next()
+{
+	if (m_rcount >= m_repeat)
+	{
+		if (m_fifo_pos == 15)
+			load_values();
+		else
+		{
+			// According to http://www.cpcwiki.eu/index.php/SP0256_Measured_Timings
+			// the SP0250 executes "NOPs" with a repeat count of 1 and unchanged
+			// pitch while waiting for input
+			m_repeat = 1;
+			m_pcount = 0;
+			m_rcount = 0;
+		}
+	}
+
+	// 15-bit LFSR algorithm verified by dump from actual hardware
+	// clocks every cycle regardless of voiced/unvoiced setting
+	m_lfsr ^= (m_lfsr ^ (m_lfsr >> 1)) << 15;
+	m_lfsr >>= 1;
+
+	int16_t z0;
+	if (m_voiced)
+		z0 = (m_pcount == 0) ? m_amp : 0;
+	else
+		z0 = (m_lfsr & 1) ? m_amp : -m_amp;
+
+	for (int f = 0; f < 6; f++)
+		z0 = m_filter[f].apply(z0);
+
+	// maximum amp value is effectively 13 bits
+	// reduce to 7 bits; due to filter effects it
+	// may occasionally clip
+	int dac = z0 >> 6;
+	if (dac < -64)
+		dac = -64;
+	if (dac > 63)
+		dac = 63;
+
+	// PWM is divided into 4x 5-bit sections; the lower
+	// bits of the original 7-bit value are added to only
+	// some of the pulses in the following pattern:
+	//
+	//    DAC -64 -> 1,1,1,1
+	//    DAC -63 -> 2,1,1,1
+	//    DAC -62 -> 2,1,2,1
+	//    DAC -61 -> 2,2,2,1
+	//    DAC -60 -> 2,2,2,2
+	//    ...
+	//    DAC  -1 -> 17,17,17,16
+	//    DAC   0 -> 17,17,17,17
+	//    DAC   1 -> 18,17,17,17
+	//    ...
+	//    DAC  60 -> 32,32,32,32
+	//    DAC  61 -> 33,32,32,32
+	//    DAC  62 -> 33,32,33,32
+	//    DAC  63 -> 33,33,33,32
+	m_pwm_counts = (((dac + 68 + 3) >> 2) << 0) +
+				   (((dac + 68 + 1) >> 2) << 8) +
+				   (((dac + 68 + 2) >> 2) << 16) +
+				   (((dac + 68 + 0) >> 2) << 24);
+
+	if (m_pcount++ == m_pitch)
+	{
+		m_pcount = 0;
+		m_rcount++;
+	}
+	return dac;
+}
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -182,62 +260,49 @@ uint8_t sp0250_device::drq_r()
 void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
-	for (int i = 0; i < samples; i++)
+	if (!m_pwm_mode)
 	{
-		if (m_playing)
+		while (samples-- != 0)
+			*output++ = next() << 8;
+	}
+	else
+	{
+		while (samples != 0)
 		{
-			int16_t z0;
-
-			if (m_voiced)
+			// see where we're at in the current PWM cycle
+			if (m_pwm_index >= PWM_CLOCKS)
 			{
-				if(!m_pcount)
-					z0 = m_amp;
-				else
-					z0 = 0;
+				m_pwm_index = 0;
+				if (m_pwm_counts == 0)
+					next();
+				m_pwm_count = m_pwm_counts & 0xff;
+				m_pwm_counts >>= 8;
+			}
+
+			// determine the value to fill and the number of samples remaining
+			// until it changes
+			stream_sample_t value;
+			int remaining;
+			if (m_pwm_index < m_pwm_count)
+			{
+				value = 32767;
+				remaining = m_pwm_count - m_pwm_index;
 			}
 			else
 			{
-				// Borrowing the ay noise generation LFSR
-				if(m_RNG & 1)
-				{
-					z0 = m_amp;
-					m_RNG ^= 0x24000;
-				}
-				else
-					z0 = -m_amp;
-
-				m_RNG >>= 1;
+				value = 0;
+				remaining = PWM_CLOCKS - m_pwm_index;
 			}
 
-			for (int f = 0; f < 6; f++)
-			{
-				z0 += ((m_filter[f].z1 * m_filter[f].F) >> 8)
-					+ ((m_filter[f].z2 * m_filter[f].B) >> 9);
-				m_filter[f].z2 = m_filter[f].z1;
-				m_filter[f].z1 = z0;
-			}
+			// clamp to the number of samples requested and advance the counters
+			if (remaining > samples)
+				remaining = samples;
+			m_pwm_index += remaining;
+			samples -= remaining;
 
-			// Physical resolution is only 7 bits, but heh
-
-			// max amplitude is 0x0f80 so we have margin to push up the output
-			output[i] = z0 << 3;
-
-			m_pcount++;
-			if (m_pcount >= m_pitch)
-			{
-				m_pcount = 0;
-				m_rcount++;
-				if (m_rcount >= m_repeat)
-					m_playing = 0;
-			}
-		}
-		else
-			output[i] = 0;
-
-		if (!m_playing)
-		{
-			if(m_fifo_pos == 15)
-				load_values();
+			// fill the output
+			while (remaining-- != 0)
+				*output++ = value;
 		}
 	}
 }

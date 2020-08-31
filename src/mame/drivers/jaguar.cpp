@@ -2114,10 +2114,10 @@ ROM_END
 
 ROM_START( area51 ) /* R3000 based, Area51 Atari Games License - MAIN: Oct 24 1996 12:02:23 / GUTS: 2.06CJ Nov 11 1996 11:46:43 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "2-c_area_51_hh.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Grean labels: 2-C AREA 51 HH */
-	ROM_LOAD32_BYTE( "2-c_area_51_hl.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) ) /* Grean labels: 2-C AREA 51 HL */
-	ROM_LOAD32_BYTE( "2-c_area_51_lh.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) ) /* Grean labels: 2-C AREA 51 LH */
-	ROM_LOAD32_BYTE( "2-c_area_51_ll.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) ) /* Grean labels: 2-C AREA 51 LL */
+	ROM_LOAD32_BYTE( "2-c_area_51_hh.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Green labels: 2-C AREA 51 HH */
+	ROM_LOAD32_BYTE( "2-c_area_51_hl.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) ) /* Green labels: 2-C AREA 51 HL */
+	ROM_LOAD32_BYTE( "2-c_area_51_lh.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) ) /* Green labels: 2-C AREA 51 LH */
+	ROM_LOAD32_BYTE( "2-c_area_51_ll.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) ) /* Green labels: 2-C AREA 51 LL */
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )

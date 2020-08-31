@@ -1,29 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Felipe Sanches
-/*
- * nld_tms4800.h
- *
- *  TMS-4800: 16 Kbit (2Kb x 8) READ ONLY MEMORY
- *
- *          +----------------+
- *      VSS |1      ++     24| OE1
- *       A1 |2             23| O1
- *       A2 |3             22| O2
- *       A3 |4   TMS-4800  21| O3
- *       A4 |5             20| O4
- *       A5 |6             19| O5
- *       A6 |7             18| O6
- *      A10 |8             17| O7
- *      VGG |9             16| O8
- *       A9 |10            15| A11
- *       A8 |11            14| OE2
- *       A7 |12            13| AR
- *          +----------------+
- *
- *
- *  Naming conventions follow Texas Instruments datasheet:
- *  http://bitsavers.trailing-edge.com/components/ti/_dataBooks/1975_TI_The_Semiconductor_Memory_Data_Book.pdf
- */
 
 #ifndef NLD_TMS4800_H_
 #define NLD_TMS4800_H_

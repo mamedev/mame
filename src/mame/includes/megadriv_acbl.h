@@ -24,6 +24,7 @@ public:
 	void init_topshoot();
 	void init_puckpkmn();
 	void init_hshavoc();
+	void init_barek2();
 	void init_barek3();
 	void init_sonic2mb();
 	void init_twinktmb();
@@ -34,6 +35,7 @@ private:
 	uint16_t bl_710000_r();
 	void aladmdb_w(uint16_t data);
 	uint16_t aladmdb_r();
+	uint16_t barek2mb_r();
 	uint16_t jparkmb_r();
 	uint16_t twinktmb_r();
 	uint16_t mk3mdb_dsw_r(offs_t offset);

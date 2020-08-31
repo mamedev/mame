@@ -280,25 +280,20 @@ void midvunit_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t m
 
 uint32_t midvunit_state::crusnwld_serial_status_r()
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r() << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
 	return in1 | in1 << 16;
 }
 
 
 uint32_t midvunit_state::crusnwld_serial_data_r()
 {
-	return m_midway_serial_pic->read() << 16;
+	return m_midway_serial_pic2->read() << 16;
 }
 
 
 void midvunit_state::crusnwld_serial_data_w(uint32_t data)
 {
-	if ((data & 0xf0000) == 0x10000)
-	{
-		m_midway_serial_pic->reset_w(1);
-		m_midway_serial_pic->reset_w(0);
-	}
-	m_midway_serial_pic->write(data >> 16);
+	m_midway_serial_pic2->write(data >> 16);
 }
 
 
@@ -332,31 +327,6 @@ void midvunit_state::bit_reset_w(uint32_t data)
 	m_bit_index = 0;
 }
 
-
-
-/*************************************
- *
- *  Off Road Challenge PIC access
- *
- *************************************/
-
-uint32_t midvunit_state::offroadc_serial_status_r()
-{
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
-	return in1 | in1 << 16;
-}
-
-
-uint32_t midvunit_state::offroadc_serial_data_r()
-{
-	return m_midway_serial_pic2->read() << 16;
-}
-
-
-void midvunit_state::offroadc_serial_data_w(uint32_t data)
-{
-	m_midway_serial_pic2->write(data >> 16);
-}
 
 uint32_t midvunit_state::midvunit_wheel_board_r()
 {
@@ -1147,8 +1117,9 @@ void midvunit_state::crusnwld(machine_config &config)
 {
 	midvunit(config);
 	/* valid values are 450 or 460 */
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
-	m_midway_serial_pic->set_upper(450);
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	m_midway_serial_pic2->set_upper(450);
+	m_midway_serial_pic2->set_yearoffs(94);
 }
 
 void midvunit_state::offroadc(machine_config &config)
@@ -1281,7 +1252,7 @@ Also had V4.4 printed sideways at front of the label.
 */
 ROM_START( crusnusa ) /* Version 4.4, Wed Mar 15 1995 - 10:52:28 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1323,7 +1294,7 @@ ROM_END
 
 ROM_START( crusnusa41 ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1366,7 +1337,7 @@ ROM_END
 
 ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1409,7 +1380,7 @@ ROM_END
 
 ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
-	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* seen labeled as P1 & P2, niether seems dumped to verify if they are different */
+	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u2.u2", 0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) ) /* also known to be labeled as P2, the P1 revision hasn't been dumped or confirmed to be different */
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u3.u3", 0x200000, 0x80000, CRC(cd8325d6) SHA1(d65d7263e056ca1d637adb44cafef523e0831a34) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u4.u4", 0x400000, 0x80000, CRC(fab457f3) SHA1(2b4b647838b7a8100afc25ca1ffdc74ed67ae00a) )
 	ROM_LOAD16_BYTE( "l1_cruisin_u.s.a._sound_rom_u5.u5", 0x600000, 0x80000, CRC(becc92f4) SHA1(6dffa73ff5270155c44f295e443d5e77c03c0338) )
@@ -1450,6 +1421,19 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 ROM_END
 
 
+/*
+Some Cruis'n World PCBs have mask ROMs for the data ROMs
+
+Mask ROMs are in the following format:
+--------------------------------   --------------------------------
+|    MIDWAY GAMES INC          |   |    MIDWAY GAMES INC          |
+|    CRUISN WORLD              |   |    CRUISN WORLD              |
+)    5341-15282-01             |   )    5341-15287-01             |
+|    U3 SOUND                  |   |    U14 VIDEO IMAGE           |
+|   (C)1996 MIDWAY GAMES       |   |   (C)1996 MIDWAY GAMES       |
+--------------------------------   --------------------------------
+
+*/
 ROM_START( crusnwld ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "1.0_cruisn_world_u2_sound.u2", 0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
@@ -1898,6 +1882,8 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (11/07/1996) */
 	DISK_IMAGE( "wargods_11-07-1996", 0, SHA1(7585bc65b1038589cb59d3e7c56e08ca9d7015b8) ) // HDD had a label of 10-09-1996, but the game reports
 																						  // a version of 11-07-1996, so it was probably upgraded
 																						  // in the field.
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "452_wargods.u69",  0x0000, 0x2000, CRC(b908f560) SHA1(68b081f0583aa35c2daeedd43e030ebdcea1a54c) )
 ROM_END
 
 ROM_START( wargodsa ) /* Boot EPROM Version 1.0, Game Type: 452 (08/15/1996) */
@@ -1909,6 +1895,9 @@ ROM_START( wargodsa ) /* Boot EPROM Version 1.0, Game Type: 452 (08/15/1996) */
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "wargods_08-15-1996", 0, SHA1(5dee00be40c315fbb1d6e3994dae8e498ab87fb2) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "452_wargods.u69",  0x0000, 0x2000, CRC(b908f560) SHA1(68b081f0583aa35c2daeedd43e030ebdcea1a54c) )
 ROM_END
 
 ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
@@ -1920,6 +1909,9 @@ ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "wargods_12-11-1995", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "452_wargods.u69",  0x0000, 0x2000, CRC(b908f560) SHA1(68b081f0583aa35c2daeedd43e030ebdcea1a54c) )
 ROM_END
 
 
@@ -1984,8 +1976,9 @@ void midvunit_state::init_offroadc()
 	/* control register is different */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32s_delegate(*this, FUNC(midvunit_state::crusnwld_control_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32smo_delegate(*this, FUNC(midvunit_state::offroadc_serial_status_r)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32smo_delegate(*this, FUNC(midvunit_state::offroadc_serial_data_r)), write32smo_delegate(*this, FUNC(midvunit_state::offroadc_serial_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32smo_delegate(*this, FUNC(midvunit_state::crusnwld_serial_status_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x996000, 0x996000, read32smo_delegate(*this, FUNC(midvunit_state::crusnwld_serial_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x996000, 0x996000, write32smo_delegate(*this, FUNC(midvunit_state::crusnwld_serial_data_w)));
 
 	/* speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32sm_delegate(*this, FUNC(midvunit_state::generic_speedup_r)));

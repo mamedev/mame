@@ -27,11 +27,10 @@ class diskiing_device:
 	public device_t,
 	public device_a2bus_card_interface
 {
-public:
+protected:
 	// construction/destruction
 	diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;

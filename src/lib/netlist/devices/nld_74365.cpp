@@ -3,6 +3,23 @@
 /*
  * nld_74365.cpp
  *
+ *  SN74365: Hex Bus Driver with 3-State Outputs
+ *
+ *          +--------------+
+ *      G1Q |1     ++    16| VCC
+ *       A1 |2           15| G2Q
+ *       Y1 |3           14| A6
+ *       A2 |4    74365  13| Y6
+ *       Y2 |5           12| A5
+ *       A3 |6           11| Y5
+ *       Y3 |7           10| A4
+ *      GND |8            9| Y4
+ *          +--------------+
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  Note: Currently the netlist system does not support proper tristate output, so this
+ *        is not a "real" bus driver, it simply outputs 0 if the chip is not enabled.
  */
 
 #include "nld_74365.h"
@@ -31,7 +48,6 @@ namespace netlist
 		{
 		}
 
-		friend class NETLIB_NAME(74365_dip);
 	private:
 		NETLIB_HANDLERI(inputs)
 		{
@@ -54,36 +70,7 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT(74365_dip)
-	{
-		NETLIB_CONSTRUCTOR(74365_dip)
-		, A(*this, "A")
-		{
-			register_subalias("1", A.m_G1Q);
-			register_subalias("2", A.m_A[0]);
-			register_subalias("3", A.m_Y[0]);
-			register_subalias("4", A.m_A[1]);
-			register_subalias("5", A.m_Y[1]);
-			register_subalias("6", A.m_A[2]);
-			register_subalias("7", A.m_Y[2]);
-			register_subalias("8", "A.GND");
-
-			register_subalias("9",  A.m_A[3]);
-			register_subalias("10", A.m_Y[3]);
-			register_subalias("11", A.m_A[4]);
-			register_subalias("12", A.m_Y[4]);
-			register_subalias("13", A.m_A[5]);
-			register_subalias("14", A.m_Y[5]);
-			register_subalias("15", A.m_G2Q);
-			register_subalias("16", "A.VCC");
-		}
-		//NETLIB_RESETI() {}
-	private:
-		NETLIB_SUB(74365) A;
-	};
-
 	NETLIB_DEVICE_IMPL(74365, "TTL_74365", "+G1Q,+G2Q,+A1,+A2,+A3,+A4,+A5,+A6,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74365_dip, "TTL_74365_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

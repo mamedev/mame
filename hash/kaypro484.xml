@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="kaypro484" description="Kaypro 4/84 disk images">
+
+<!-- Operating systems -->
+
+	<software name="cpm22f">
+		<description>CP/M 2.2F (81-292)</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="270208">
+				<rom name="k4f-292.td0" size="270208" crc="8309cabe" sha1="7eb6829aaadae67b71bf4bfa19ce72f1e780747e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22g">
+		<description>CP/M 2.2G (81-292-A)</description>
+		<year>19??</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="202620">
+				<rom name="kp22gdsd.td0" size="202620" crc="6ab35630" sha1="106fb294b719d620abd82ee74f0f16130264e3d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

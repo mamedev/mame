@@ -1,7 +1,27 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_SN74LS629.c
+ * nld_SN74LS629.cpp
+ *
+ *  SN74LS629: VOLTAGE-CONTROLLED OSCILLATORS
+ *
+ *          +--------------+
+ *      2FC |1     ++    16| VCC
+ *      1FC |2           15| QSC VCC
+ *     1RNG |3           14| 2RNG
+ *     1CX1 |4  74LS629  13| 2CX1
+ *     1CX2 |5           12| 2CX2
+ *     1ENQ |6           11| 2ENQ
+ *       1Y |7           10| 2Y
+ *  OSC GND |8            9| GND
+ *          +--------------+
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  NOTE: The CX1 and CX2 pins are not connected!
+ *        The capacitor value has to be specified as a parameter.
+ *        There are more comments on the challenges of emulating this
+ *        chip in the *.c file
  *
  */
 
@@ -46,23 +66,17 @@ namespace netlist
 {
 	namespace devices
 	{
-	NETLIB_OBJECT(SN74LS629clk)
-	{
-		NETLIB_CONSTRUCTOR(SN74LS629clk)
-		, m_FB(*this, "FB", NETLIB_DELEGATE(fb))
-		, m_Y(*this, "Y")
-		, m_enableq(*this, "m_enableq", 1)
-		, m_out(*this, "m_out", 0)
-		, m_inc(*this, "m_inc", netlist_time::zero())
-		{
-			connect(m_FB, m_Y);
-		}
 
-		NETLIB_RESETI()
+	struct SN74LS629clk
+	{
+		SN74LS629clk(device_t &owner)
+		: m_FB(owner, "FB", nldelegate(&SN74LS629clk::fb, this))
+		, m_Y(owner, "Y")
+		, m_enableq(owner, "m_enableq", 0)
+		, m_out(owner, "m_out", 0)
+		, m_inc(owner, "m_inc", netlist_time::zero())
 		{
-			m_enableq = 0;
-			m_out = 0;
-			m_inc = netlist_time::zero();
+			owner.connect(m_FB, m_Y);
 		}
 
 	public:
@@ -72,6 +86,7 @@ namespace netlist
 		state_var<netlist_sig_t> m_enableq;
 		state_var<netlist_sig_t> m_out;
 		state_var<netlist_time> m_inc;
+
 	private:
 		NETLIB_HANDLERI(fb)
 		{
@@ -91,15 +106,17 @@ namespace netlist
 	NETLIB_OBJECT(SN74LS629)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629)
-		, m_clock(*this, "OSC")
+		, m_clock(*this)
 		, m_R_FC(*this, "R_FC")
 		, m_R_RNG(*this, "R_RNG")
 		, m_ENQ(*this, "ENQ", NETLIB_DELEGATE(inputs))
 		, m_RNG(*this, "RNG", NETLIB_DELEGATE(inputs))
 		, m_FC(*this, "FC", NETLIB_DELEGATE(inputs))
 		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
+		, m_power_pins(*this)
+		, m_power_pins_osc(*this, "OSCVCC", "OSCGND")
 		{
-			register_subalias("GND",    m_R_FC.N());
+			connect(m_power_pins_osc.GND(), m_R_FC.N());
 
 			connect(m_FC, m_R_FC.P());
 			connect(m_RNG, m_R_RNG.P());
@@ -112,7 +129,6 @@ namespace netlist
 		{
 			m_R_FC.set_R( nlconst::magic(90000.0));
 			m_R_RNG.set_R(nlconst::magic(90000.0));
-			m_clock.reset();
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -121,7 +137,7 @@ namespace netlist
 		}
 
 	public:
-		NETLIB_SUB(SN74LS629clk) m_clock;
+		SN74LS629clk m_clock;
 		analog::NETLIB_SUB(R_base) m_R_FC;
 		analog::NETLIB_SUB(R_base) m_R_RNG;
 
@@ -130,6 +146,8 @@ namespace netlist
 		analog_input_t m_FC;
 
 		param_fp_t m_CAP;
+		nld_power_pins m_power_pins;
+		nld_power_pins m_power_pins_osc;
 
 	private:
 		NETLIB_HANDLERI(inputs)
@@ -174,8 +192,6 @@ namespace netlist
 				// FIXME: we need a possibility to remove entries from queue ...
 				//        or an exact model ...
 				m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
-
-				//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
 			}
 
 			if (!m_clock.m_enableq && m_ENQ())
@@ -194,43 +210,7 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT(SN74LS629_dip)
-	{
-		NETLIB_CONSTRUCTOR(SN74LS629_dip)
-		, m_A(*this, "A")
-		, m_B(*this, "B")
-		{
-			register_subalias("1",  m_B.m_FC);
-			register_subalias("2",  m_A.m_FC);
-			register_subalias("3",  m_A.m_RNG);
-
-			register_subalias("6",  m_A.m_ENQ);
-			register_subalias("7",  m_A.m_clock.m_Y);
-
-			register_subalias("8",  m_A.m_R_FC.N());
-			register_subalias("9",  m_A.m_R_FC.N());
-			connect(m_A.m_R_FC.N(), m_B.m_R_FC.N());
-
-			register_subalias("10",  m_B.m_clock.m_Y);
-
-			register_subalias("11",  m_B.m_ENQ);
-			register_subalias("14",  m_B.m_RNG);
-		}
-
-
-		NETLIB_RESETI()
-		{
-			m_A.reset();
-			m_B.reset();
-		}
-
-	private:
-		NETLIB_SUB(SN74LS629) m_A;
-		NETLIB_SUB(SN74LS629) m_B;
-	};
-
-	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
-	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")
+	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP,@VCC,@GND")
 
 	} //namespace devices
 } // namespace netlist

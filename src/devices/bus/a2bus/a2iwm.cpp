@@ -12,9 +12,11 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "formats/ap2_dsk.h"
-#include "machine/applefdintf.h"
 #include "a2iwm.h"
+
+#include "machine/applefdintf.h"
+#include "formats/ap2_dsk.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES

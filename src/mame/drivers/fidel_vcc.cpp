@@ -159,20 +159,14 @@ private:
 	u8 ppi_portc_r();
 	void ppi_portc_w(u8 data);
 
-	u8 m_led_select;
-	u8 m_7seg_data;
-	u8 m_inp_mux;
-	u8 m_speech_bank;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
 };
 
 void vcc_state::machine_start()
 {
-	// zerofill
-	m_led_select = 0;
-	m_7seg_data = 0;
-	m_inp_mux = 0;
-	m_speech_bank = 0;
-
 	// register for savestates
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_7seg_data));

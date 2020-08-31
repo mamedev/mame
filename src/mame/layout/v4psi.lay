@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="0.12" />
+			<color red="0.055" green="0.43" blue="0.04" />
+		</rect>
+		<rect>
+			<bounds left="0" top="0.12" right="1" bottom="0.85" />
+			<color red="0.66" green="0.65" blue="0.05" />
+		</rect>
+		<rect>
+			<bounds left="0" top="0.85" right="1" bottom="1.0" />
+			<color red="0.69" green="0.28" blue="0.00" />
+		</rect>
+	</element>
+
+	<view name="Monitor with Overlay">
+		<screen index="0">
+			<bounds x="0" y="0" width="504" height="296" />
+		</screen>
+		<overlay element="overlay">
+			<bounds x="0" y="0" width="504" height="296" />
+		</overlay>
+
+	</view>
+</mamelayout>

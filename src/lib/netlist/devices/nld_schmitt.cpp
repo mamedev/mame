@@ -8,7 +8,6 @@
 #include "nld_schmitt.h"
 
 #include "netlist/analog/nlid_twoterm.h"
-#include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/solver/nld_solver.h"

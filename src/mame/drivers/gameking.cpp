@@ -6,14 +6,14 @@
 
   Thanks to Deathadder, Judge, Porchy, Klaus Sommer, James Brolly & Brian Provinciano
 
-  hopefully my work (reverse engineerung, cartridge+bios backup, emulation) will be honored in future
+  hopefully my work (reverse engineering, cartridge+bios backup, emulation) will be honored in future
   and my name will not be removed entirely, especially by simple code rewrites of working emulation
 
   flashcard, handheld, programmer, assembler ready to do some test on real hardware
 
   todo:
   !back up gameking3 bios so emulation of gameking3 gets possible; my gameking bios backup solution should work
-  (improove emulation)
+  (improve emulation)
   (add audio)
 
   use gameking3 cartridge to get illegal cartridge scroller
@@ -23,9 +23,12 @@
 #include "cpu/m6502/st2204.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class gameking_state : public driver_device
@@ -239,7 +242,7 @@ void gameking_state::init_gameking()
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 {
 	m_maincpu->set_state_int(st2xxx_device::ST_IREQ,
-		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x012 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
+		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x010 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
 	timer1->enable(false);
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
@@ -281,12 +284,13 @@ void gameking_state::machine_start()
 void gameking_state::gameking(machine_config &config)
 {
 	/* basic machine hardware */
-	st2xxx_device &maincpu(ST2204(config, m_maincpu, 6000000));
+	st2204_device &maincpu(ST2204(config, m_maincpu, 6000000));
 	maincpu.set_addrmap(AS_DATA, &gameking_state::gameking_mem);
 	maincpu.in_pa_callback().set(FUNC(gameking_state::input_r));
 	maincpu.in_pb_callback().set(FUNC(gameking_state::input2_r));
 	maincpu.out_pc_callback().set(FUNC(gameking_state::timer_w)); // wrong
 	maincpu.in_pl_callback().set_constant(6); // bios protection endless loop
+	maincpu.dac_callback().set("dac", FUNC(dac_byte_interface::write));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -297,6 +301,14 @@ void gameking_state::gameking(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(0, "speaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load));
@@ -338,9 +350,9 @@ ROM_START(gamekin3)
 	ROM_LOAD("gm220.bin", 0x00000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
-CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it

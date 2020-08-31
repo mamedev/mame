@@ -635,6 +635,8 @@ void ibm5150_mb_device::device_add_mconfig(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("ibm5150_cass");
 }
 
 //**************************************************************************

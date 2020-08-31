@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /***************************************************************************
 
-    BBC Micro MRM E00 DFS emulation
+    BBC Micro E00 DFS emulation
 
 ***************************************************************************/
 
@@ -17,14 +17,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> bbc_mrme00_device
+// ======================> bbc_dfse00_device
 
-class bbc_mrme00_device : public device_t,
-							public device_bbc_rom_interface
+class bbc_dfse00_device : public device_t, public device_bbc_rom_interface
 {
 public:
 	// construction/destruction
-	bbc_mrme00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_dfse00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -36,7 +35,7 @@ protected:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(BBC_MRME00, bbc_mrme00_device)
+DECLARE_DEVICE_TYPE(BBC_DFSE00, bbc_dfse00_device)
 
 
 #endif // MAME_BUS_BBC_ROM_DFS_H

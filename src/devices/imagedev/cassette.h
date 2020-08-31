@@ -74,13 +74,23 @@ public:
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
 
+	double input();
+	void output(double value);
+
 	// specific implementation
 	cassette_state get_state() { return m_state; }
 	void set_state(cassette_state state) { change_state(state, cassette_state(~0)); }
 	void change_state(cassette_state state, cassette_state mask);
 
-	double input();
-	void output(double value);
+	// state getters/setters
+	bool is_stopped() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED; }
+	bool is_playing() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY; }
+	bool is_recording() { return (m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD; }
+
+	void set_motor(int state) { change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR); } // aka remote control
+	int motor_on() { return ((m_state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED) ? 1 : 0; }
+	void set_speaker(int state) { change_state(state ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER); }
+	int speaker_on() { return ((m_state & CASSETTE_MASK_SPEAKER) == CASSETTE_SPEAKER_ENABLED) ? 1 : 0; }
 
 	cassette_image *get_image() { return m_cassette; }
 	double get_position();
@@ -96,9 +106,6 @@ public:
 	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
 
 protected:
-	bool is_motor_on();
-	void update();
-
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
@@ -107,12 +114,14 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
+	void update();
+
 private:
 	cassette_image  *m_cassette;
 	cassette_state  m_state;
 	double          m_position;
 	double          m_position_time;
-	int32_t           m_value;
+	int32_t         m_value;
 	int             m_channel;
 	double          m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
 	int             m_direction; // direction select

@@ -19,7 +19,7 @@ Notes:
   Invulnerability isn't possible in 'tnzsop' (level select is stucked to level 6-1).
 
 
-Hardware datails for the newer tnzs board (from pictures):
+Hardware details for the newer tnzs board (from pictures):
 
   Main board
   M6100409A N.ZEALAND STORY (written on label)

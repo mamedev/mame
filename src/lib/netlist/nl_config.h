@@ -111,27 +111,6 @@
 #define NL_USE_BACKWARD_EULER (1)
 #endif
 
-/// \brief  Use the truthtable implementation of 7448 instead of the coded device
-///
-/// FIXME: Using truthtable is a lot slower than the explicit device
-///        in breakout. Performance drops by 20%. This can be fixed by
-///        setting param USE_DEACTIVATE for the device.
-
-#ifndef NL_USE_TRUTHTABLE_7448
-#define NL_USE_TRUTHTABLE_7448 (0)
-#endif
-
-/// \brief  Use the truthtable implementation of 74107 instead of the coded device
-///
-/// FIXME: The truthtable implementation of 74107 (JK-Flipflop)
-///        is included for educational purposes to demonstrate how
-///        to implement state holding devices as truthtables.
-///        It will completely nuke performance for pong.
-
-#ifndef NL_USE_TRUTHTABLE_74107
-#define NL_USE_TRUTHTABLE_74107 (0)
-#endif
-
 /// \brief  Use the __float128 type for matrix calculations.
 ///
 /// Defaults to \ref PUSE_FLOAT128
@@ -223,11 +202,11 @@ namespace netlist
 
 		/// \brief Maximum queue size
 		///
-		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
+		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 1024>; // NOLINT
 
 		/// \brief Maximum queue size for solvers
 		///
-		using MAX_SOLVER_QUEUE_SIZE = std::integral_constant<std::size_t, 64>; // NOLINT
+		using MAX_SOLVER_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
 
 		using use_float_matrix = std::integral_constant<bool, NL_USE_FLOAT_MATRIX>;
 		using use_long_double_matrix = std::integral_constant<bool, NL_USE_LONG_DOUBLE_MATRIX>;

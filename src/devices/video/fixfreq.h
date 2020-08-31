@@ -131,6 +131,8 @@ struct fixedfreq_monitor_state
 	m_line_time(time_type(0)),
 	m_last_hsync_time(time_type(0)),
 	m_last_vsync_time(time_type(0)),
+	m_last_line_duration(time_type(0)),
+	m_last_field_time(time_type(0)),
 	m_vsync_filter(0),
 	m_sig_vsync(0),
 	m_sig_composite(0),
@@ -208,6 +210,9 @@ struct fixedfreq_monitor_state
 	time_type m_last_hsync_time;
 	time_type m_last_vsync_time;
 
+	time_type m_last_line_duration;
+	time_type m_last_field_time;
+
 	/* sync separator */
 	double m_vsync_filter;
 
@@ -233,6 +238,7 @@ public:
 	fixedfreq_device &set_monitor_clock(uint32_t clock) { m_monitor.m_monitor_clock = clock; return *this;}
 	fixedfreq_device &set_fieldcount(int count) { m_monitor.m_fieldcount = count; return *this; }
 	fixedfreq_device &set_threshold(double threshold) { m_monitor.m_sync_threshold = threshold; return *this; }
+	fixedfreq_device &set_vsync_threshold(double threshold) { m_monitor.m_vsync_threshold = threshold; return *this; }
 	fixedfreq_device &set_gain(double gain) { m_monitor.m_gain = gain; return *this; }
 	fixedfreq_device &set_horz_params(int visible, int frontporch, int sync, int backporch)
 	{

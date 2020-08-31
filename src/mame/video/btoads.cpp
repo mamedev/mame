@@ -121,25 +121,6 @@ void btoads_state::scroll1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 /*************************************
  *
- *  Palette RAM
- *
- *************************************/
-
-void btoads_state::paletteram_w(offs_t offset, uint16_t data)
-{
-	m_tlc34076->write(offset/2, data);
-}
-
-
-uint16_t btoads_state::paletteram_r(offs_t offset)
-{
-	return m_tlc34076->read(offset/2);
-}
-
-
-
-/*************************************
- *
  *  Background video RAM
  *
  *************************************/

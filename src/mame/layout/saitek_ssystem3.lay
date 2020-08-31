@@ -12,17 +12,9 @@ license:CC0
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="brown"><rect><color red="0.4" green="0.2" blue="0.1" /></rect></element>
 
-	<element name="lcd_bg" defstate="1">
-		<rect state="1"><color red="0.58" green="0.61" blue="0.62" /></rect>
-		<rect state="0"><color red="0.40" green="0.42" blue="0.43" /></rect>
-	</element>
-
 	<element name="hl" defstate="0">
 		<text string=" "/>
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
-	</element>
-	<element name="nothing" defstate="0">
-		<text string=" "/>
 	</element>
 
 	<element name="switch" defstate="0">
@@ -47,6 +39,48 @@ license:CC0
 			<color red="0.4" green="0.4" blue="0.4" />
 		</disk>
 	</element>
+
+	<element name="switch2" defstate="0">
+		<rect state="0">
+			<bounds x="0" y="1" width="4" height="4" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="4" height="4" />
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="0" width="4" height="4" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="1" width="4" height="4" />
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+	</element>
+
+	<element name="text_v0"><text string="8"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v1"><text string="7"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v2"><text string="6"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v3"><text string="5"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v4"><text string="4"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v5"><text string="3"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v6"><text string="2"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_v7"><text string="1"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+
+	<element name="text_a0"><text string="A"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a1"><text string="B"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a2"><text string="C"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a3"><text string="D"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a4"><text string="E"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a5"><text string="F"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a6"><text string="G"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+	<element name="text_a7"><text string="H"><color red="0.65" green="0.65" blue="0.653" /></text></element>
+
+	<element name="text_cu1"><text string="LOOK"><color red="0.65" green="0.65" blue="0.65" /></text></element>
+	<element name="text_cu2"><text string="&#x2193;NOW &#x2191;MOVE"><color red="0.65" green="0.65" blue="0.65" /></text></element>
+	<element name="text_cu3"><text string="LIGHT"><color red="0.65" green="0.65" blue="0.65" /></text></element>
+	<element name="text_cu4"><text string="&#x2193;ON &#x2191;OFF"><color red="0.65" green="0.65" blue="0.65" /></text></element>
 
 	<element name="text_n1">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
@@ -160,16 +194,86 @@ license:CC0
 	<element name="text_u3"><text string="TIME"><color red="0.65" green="0.65" blue="0.65" /></text></element>
 
 
-<!-- build screen -->
+<!-- lcd screen 1 -->
 
-	<view name="Internal Layout">
-		<bounds left="-2" right="48" top="2" bottom="32" />
+	<element name="lcd_bg" defstate="1">
+		<rect state="1"><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect state="0"><color red="0.40" green="0.42" blue="0.43" /></rect>
+	</element>
 
-		<bezel element="brown"><bounds x="-2" y="12" width="52" height="6" /></bezel>
+	<element name="nothing" defstate="0"><text string=" "/></element>
 
+	<group name="lcd1">
+		<bounds x="-1" y="3" width="18" height="8" />
 		<screen index="0" blend="alpha"><bounds x="0" y="4" width="15.8" height="6" /></screen>
 		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="1"><bounds x="-1" y="3" width="18" height="8" /></element>
 		<element ref="lcd_bg" blend="multiply" inputtag="IN.4" inputmask="0x02" inputraw="1"><bounds x="-1" y="3" width="18" height="8" /></element>
+	</group>
+
+
+<!-- lcd screen 2 -->
+
+	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="lcd2m"><rect><color red="0.69" green="0.69" blue="0.69" /></rect></element>
+
+	<element name="lcd_cb">
+		<rect><bounds x="-2.5" y="-2.5" width="45" height="45" /><color red="0.05" green="0.55" blue="0.4" /></rect>
+
+		<rect><bounds x="0"  y="0" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="10" y="0" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="20" y="0" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="30" y="0" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="5"  y="5" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="15" y="5" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="25" y="5" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="35" y="5" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+
+		<rect><bounds x="0"  y="10" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="10" y="10" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="20" y="10" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="30" y="10" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="5"  y="15" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="15" y="15" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="25" y="15" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="35" y="15" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+
+		<rect><bounds x="0"  y="20" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="10" y="20" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="20" y="20" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="30" y="20" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="5"  y="25" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="15" y="25" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="25" y="25" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="35" y="25" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+
+		<rect><bounds x="0"  y="30" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="10" y="30" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="20" y="30" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="30" y="30" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="5"  y="35" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="15" y="35" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="25" y="35" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+		<rect><bounds x="35" y="35" width="5" height="5" /><color red="0.58" green="0.61" blue="0.62" /></rect>
+	</element>
+
+	<group name="lcd2">
+		<bounds x="1.5" y="2.9" width="122.6" height="122.1" />
+		<element ref="whitew"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<screen index="1" blend="alpha"><bounds x="9.8" y="10" width="106" height="108" /></screen>
+		<element ref="lcd_cb" blend="multiply"><bounds x="1.5" y="2.9" width="122.6" height="122.1" /></element>
+
+		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="1"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<element ref="lcd2m" blend="multiply" inputtag="IN.4" inputmask="0x04" inputraw="1"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+	</group>
+
+
+<!-- master unit -->
+
+	<group name="main">
+		<bounds left="-2" right="48" top="2" bottom="32" />
+		<group ref="lcd1"><bounds x="-1" y="3" width="18" height="8" /></group>
+
+		<bezel element="brown"><bounds x="-2" y="12" width="52" height="6" /></bezel>
 
 		<bezel element="switch" inputtag="IN.4" inputmask="0x02" inputraw="1"><bounds x="30.0" y="5.5" width="1.2" height="2.4" /></bezel>
 		<bezel element="switch" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="34.4" y="5.5" width="1.2" height="2.4" /></bezel>
@@ -246,6 +350,53 @@ license:CC0
 		<bezel element="text_b9a"><bounds x="41" y="30.2" width="6" height="0.9" /></bezel>
 		<bezel element="text_b0b"><bounds x="-2.3" y="29.2" width="2" height="0.9" /></bezel>
 		<bezel element="text_b9b"><bounds x="46.3" y="29.2" width="2" height="0.9" /></bezel>
+	</group>
 
+
+<!-- build screen -->
+
+	<view name="Internal Layout (Full)">
+		<bounds left="26" right="100" top="0" bottom="30" />
+		<group ref="main"><bounds x="50" y="0" width="50" height="30" /></group>
+		<group ref="lcd2"><bounds x="29.3" y="0.35" width="17.37" height="17.3" /></group>
+
+		<bezel element="brown"><bounds x="26" y="0" width="2" height="30" /></bezel>
+		<bezel element="brown"><bounds x="48" y="0" width="2" height="30" /></bezel>
+		<bezel element="brown"><bounds x="49" y="10" width="2" height="6" /></bezel>
+
+		<repeat count="8">
+			<param name="y" start="1.75" increment="1.93" />
+			<param name="i" start="0" increment="1" />
+			<element ref="text_v~i~"><bounds x="28.6" y="~y~" width="1.5" height="0.9" /></element>
+		</repeat>
+		<repeat count="8">
+			<param name="x" start="30.45" increment="1.93" />
+			<param name="i" start="0" increment="1" />
+			<element ref="text_a~i~"><bounds x="~x~" y="17.2" width="1.5" height="0.9" /></element>
+		</repeat>
+
+		<bezel element="switch2" inputtag="IN.6" inputmask="0x01" inputraw="1"><bounds x="36" y="24" width="4" height="5" /></bezel>
+		<bezel element="switch2" inputtag="IN.4" inputmask="0x04" inputraw="1"><bounds x="42" y="24" width="4" height="5" /></bezel>
+
+		<bezel element="text_cu1"><bounds x="35" y="21.9" width="6" height="0.9" /></bezel>
+		<bezel element="text_cu2"><bounds x="35" y="22.9" width="6" height="0.9" /></bezel>
+		<bezel element="text_cu3"><bounds x="41" y="21.9" width="6" height="0.9" /></bezel>
+		<bezel element="text_cu4"><bounds x="41" y="22.9" width="6" height="0.9" /></bezel>
 	</view>
+
+	<view name="Internal Layout (Master Unit)">
+		<bounds x="0" y="0" width="50" height="30" />
+		<group ref="main"><bounds x="0" y="0" width="50" height="30" /></group>
+	</view>
+
+	<view name="Internal Layout (Screen 1)">
+		<bounds x="0" y="4" width="15.8" height="6" />
+		<group ref="lcd1"><bounds x="-1" y="3" width="18" height="8" /></group>
+	</view>
+
+	<view name="Internal Layout (Screen 2)">
+		<bounds x="6.2" y="7.6" width="113.3" height="112.8" />
+		<group ref="lcd2"><bounds x="1.5" y="2.9" width="122.6" height="122.1" /></group>
+	</view>
+
 </mamelayout>

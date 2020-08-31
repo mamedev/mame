@@ -4,11 +4,15 @@
 #include "netlist/devices/net_lib.h"
 
 
-// This is a netlist description for the sound circuits of Midway's 280-ZZZAP,
-// based on Midway's schematic "280 ZZZAP Game Logic P.C. 0610-00907A". It
-// should also apply to Midway's Laguna Racer with only very minor changes and
-// to Taito/Midway's Super Speed Race with only modest changes, because these
-// games use almost identical sound circuits to 280-ZZZAP.
+// This is a netlist description for the sound circuits of Midway's 280-ZZZAP
+// and Laguna Racer, based on Midway's schematics "280 ZZZAP Game Logic P.C.
+// 0610-00907A", "Laguna Racer Game Logic A084-90700-A622", and "Laguna Racer
+// Game Logic A084-90700-B622". Midway PCB drawings for Laguna Racer and a
+// photo by Andrew Wellburn of a 280-ZZZAP game logic board were also used to
+// help determine correct values for certain components. The netlist should
+// also apply to Taito/Midway's Super Speed Race with only modest changes,
+// because that game uses very similar sound circuits to 280-ZZZAP and Laguna
+// Racer.
 
 // (Incidentally, the 280-ZZZAP schematic has some notes on changes made to
 // the circuitry during production, a few of which were to audio circuits.
@@ -45,6 +49,20 @@
 // and crashes), and the final mix and amplification of all sounds.
 
 
+// When comparing the sound circuitry and components between 280-ZZZAP and
+// Laguna Racer, here are some things to note. There are two different
+// versions of the Laguna Racer game logic board (where the sound circuits
+// reside): A622 and B622. Midway's A622 schematic was clearly copied directly
+// from 280-ZZZAP's--even the letter indicators for change notes in
+// 280-ZZZAP's circuitry remain, though the actual notes were blanked out.
+// B622's schematics show sound circuitry differences from 280-ZZZAP and A622,
+// and these differences are consistent with Midway's PCB drawings for *both*
+// the A622 and B622 games boards. Some of them are also consistent with
+// Wellburn's 280-ZZZAP PCB photo. So it seems that actual 280-ZZZAP boards
+// lie somewhere between the 280-ZZZAP schematic and the B622 Laguna Racer
+// schematic.
+
+
 // Include special frontiers within engine sound oscillators whose purpose is
 // to improve solution convergence by reducing the oscillators' inherent
 // numeric instability. Also adjusts values of resistors associated with these
@@ -68,172 +86,47 @@
 #define REMOVE_POST_CRASH_NOISE_GLITCHES  1
 
 
-static NETLIST_START(mc3340)
+// Netlists for two different games are defined in this file. These netlists
+// are mostly alike but differ in a few key components. I use Aaron Giles'
+// scheme for combining the two definitions in one file.
+//
+// Initial compilation includes this section.
+//
 
-	// A netlist description of the Motorola MC3340 Electronic Attenuator
-	// IC, a voltage-controlled amplifier/attenuator. It amplifies or
-	// attenuates an input signal according to the voltage of a second,
-	// control signal, with a maximum gain of about 12-13 dB (about a
-	// factor of 4 in voltage), and higher control voltages giving greater
-	// attenuation, which scales logarithmically.
+#ifndef SOUND_VARIANT
 
-	// The netlist here is based on the circuit schematic given in
-	// Motorola's own data books, especially the most recent ones
-	// published in the 1990s (e.g. _Motorola Analog/Interface ICs Device
-	// Data, Vol. II_ (1996), p. 9-67), which are the only schematics that
-	// include resistor values. However, the 1990s schematics are missing
-	// one crossover connection which is present in older schematics
-	// published in the 1970s (e.g. _Motorola Linear Integrated Circuits_
-	// (1979), p. 5-130). This missing connection is clearly an error
-	// which has been fixed in this netlist; without it, the circuit won't
-	// amplify properly, generating only a very weak output signal.
 
-	// The 1990s schematics also omit a couple of diodes which are present
-	// in the 1970s schematics. One of these omitted diodes noticeably
-	// raises the minimum control voltage at which signal attenuation
-	// starts; that diode has been included here, to get the netlist's
-	// profile of attenuation vs. control voltage to better match
-	// Motorola's charts for the device.
+//
+// Now include ourselves twice, once for 280-ZZZAP and once for Laguna Racer.
+//
 
-	// The Motorola schematics do not label components, so I've created my
-	// own labeling scheme based on numbering components on the schematics
-	// from top to bottom, left to right, with resistors also getting
-	// their value (expressed European-style to avoid decimal points) as
-	// part of the name. The netlist is also listed following the
-	// schematics in roughly top-to-bottom, left-to-right order.
+#define VARIANT_280ZZZAP  0
+#define VARIANT_LAGUNAR   1
 
-	// A very simple model is used for the transistors here, based on the
-	// generic NPN default but with a larger scale current. Again, this
-	// was chosen to better match the netlist's attenuation vs. control
-	// voltage profile to that given in Motorola's charts for the device.
+#define SOUND_VARIANT       (VARIANT_280ZZZAP)
+#include "nl_280zzzap.cpp"
 
-	// The MC3340 has the same circuit internally as an older Motorola
-	// device, the MFC6040, which was replaced by the MC3340 in the
-	// mid-1970s. The two chips differ only in packaging. Older arcade
-	// games which use the MFC6040 may also benefit from this netlist
-	// implementation.
+#undef SOUND_VARIANT
+#define SOUND_VARIANT       (VARIANT_LAGUNAR)
+#include "nl_280zzzap.cpp"
 
-	RES(R1_5K1, RES_K(5.1))
 
-	DIODE(D1_MC3340, "D(IS=1e-15 N=1)")
+#else
 
-	RES(R2_4K7, RES_K(4.7))
 
-	NET_MODEL("NPN1 NPN(IS=1E-13 BF=100)")
+//
+// Main netlist
+//
 
-	QBJT_EB(Q1, "NPN1")
-
-	RES(R3_750, RES_R(750))
-	RES(R4_10K, RES_K(10))
-
-	QBJT_EB(Q2, "NPN1")
-
-	RES(R5_750, RES_R(750))
-	RES(R6_3K9, RES_K(3.9))
-
-	RES(R7_5K1, RES_K(5.1))
-	RES(R8_20K, RES_K(20))
-
-	// 1970s Motorola schematics have another diode just above what I call
-	// "R9_510"; this diode doesn't seem to affect normal operation much,
-	// so I've left it out.
-	RES(R9_510, RES_R(510))
-
-	QBJT_EB(Q3, "NPN1")
-
-	QBJT_EB(Q4, "NPN1")
-
-	QBJT_EB(Q5, "NPN1")
-
-	RES(R10_1K3, RES_K(1.3))
-
-	QBJT_EB(Q6, "NPN1")
-
-	RES(R11_5K1, RES_K(5.1))
-
-	QBJT_EB(Q7, "NPN1")
-
-	QBJT_EB(Q8, "NPN1")
-
-	RES(R12_1K5, RES_K(1.5))
-
-	RES(R13_6K2, RES_K(6.2))
-
-	QBJT_EB(Q9, "NPN1")
-
-	RES(R14_5K1, RES_K(5.1))
-
-	QBJT_EB(Q10, "NPN1")
-
-	RES(R15_5K1, RES_K(5.1))
-
-	RES(R16_200, RES_R(200))
-
-	RES(R17_5K1, RES_K(5.1))
-
-	DIODE(D2_MC3340, "D(IS=1e-15 N=1)")
-
-	RES(R18_510, RES_R(510))
-
-	ALIAS(MC3340_VCC, R1_5K1.1)
-	NET_C(R1_5K1.1, Q1.C, Q2.C, R7_5K1.1, Q3.C, Q4.C, Q7.C,
-		R13_6K2.1, Q10.C, R17_5K1.1)
-	// Location of first diode present on 1970s schematics but omitted on
-	// 1990s ones. Including it raises the control voltage threshold for
-	// attenuation significantly.
-	NET_C(R1_5K1.2, D1_MC3340.A, Q1.B)
-	NET_C(D1_MC3340.K, R2_4K7.1)
-	NET_C(R2_4K7.2, GND)
-
-	NET_C(Q1.E, R3_750.1, R5_750.1)
-	NET_C(R3_750.2, R4_10K.1, Q2.B)
-	NET_C(R4_10K.2, GND)
-
-	NET_C(R5_750.2, R6_3K9.1, Q3.B)
-	ALIAS(MC3340_CONTROL, R6_3K9.2)
-
-	ALIAS(MC3340_INPUT, Q5.B)
-
-	NET_C(MC3340_INPUT, R8_20K.1)
-	NET_C(R7_5K1.2, R8_20K.2, R9_510.1)
-	// (This is approximately where the other omitted diode, which I've
-	// left out, would go.)
-	NET_C(R9_510.2, GND)
-
-	NET_C(Q4.E, Q6.E, Q5.C)
-	NET_C(Q5.E, R10_1K3.1)
-	NET_C(R10_1K3.2, GND)
-
-	NET_C(Q6.B, Q7.B, Q2.E, R11_5K1.1)
-	NET_C(R11_5K1.2, GND)
-
-	NET_C(Q7.E, Q9.E, Q8.C)
-	NET_C(Q8.E, R12_1K5.1)
-	NET_C(R12_1K5.2, GND)
-
-	NET_C(Q4.B, Q9.B, Q3.E, R14_5K1.1)
-	NET_C(R14_5K1.2, GND)
-
-	// This is where the cross-connection is erroneously omitted from
-	// 1990s schematics.
-	NET_C(Q6.C, R13_6K2.2, Q9.C, Q10.B)
-
-	// Connection for external frequency compensation capacitor; unused
-	// here.
-	ALIAS(MC3340_ROLLOFF, Q10.B)
-
-	NET_C(Q10.E, R16_200.1, R15_5K1.1)
-	NET_C(R15_5K1.2, GND)
-	ALIAS(MC3340_OUTPUT, R16_200.2)
-
-	NET_C(R17_5K1.2, D2_MC3340.A, Q8.B)
-	NET_C(D2_MC3340.K, R18_510.1)
-	NET_C(R18_510.2, GND)
-
-NETLIST_END()
-
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
 
 static NETLIST_START(280zzzap_schematics)
+
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+
+static NETLIST_START(lagunar_schematics)
+
+#endif
 
 	// **** Conversion of accelerator level to "engine speed" control
 	// **** voltage for engine sound, with capacitor-based "engine
@@ -297,15 +190,19 @@ static NETLIST_START(280zzzap_schematics)
 	RES(R62, RES_K(1))
 	RES(R61, RES_K(1))
 
-	// The 480 Kohm resistors listed here are shown as such on the
-	// 280-ZZZAP schematic and the schematic for the earlier Laguna Racer
-	// board, but this is a non-standard value. The nearest standard value
-	// is 470 Kohm, and this may have been used in production. Need to
-	// check against actual PCBs.
-	RES(R51, RES_K(480))  // 470 Kohm in later Laguna and Super Speed Race
-	RES(R46, RES_M(2))    // 2.2 Mohm in later Laguna and Super Speed Race
+	// For the following resistors R51 and R46-R49, the values given are
+	// those shown in the Laguna Racer PCB drawings, the Laguna Racer B622
+	// board schematic, the Super Speed Race schematic, and Andrew
+	// Wellburn's 280-ZZZAP PCB photo. In the 280-ZZZAP schematic (and the
+	// Laguna Racer A622 board schematic, a near copy), R51 and R48 are
+	// 480 Kohms and R46 is 2 Mohms, but these seem to be errors in that
+	// schematic. 480 Kohm is not even a standard resistor value for any
+	// tolerance band, so it could not have been used on production
+	// boards.
+	RES(R51, RES_K(470))
+	RES(R46, RES_M(2.2))
 	RES(R47, RES_M(1))
-	RES(R48, RES_K(480))  // 470 Kohm in later Laguna and Super Speed Race
+	RES(R48, RES_K(470))
 	RES(R49, RES_K(240))
 
 	RES(R50, RES_K(100))
@@ -323,7 +220,19 @@ static NETLIST_START(280zzzap_schematics)
 	RES(R59, RES_K(560))
 	RES(R60, RES_K(10))
 
-	CAP(C18, CAP_U(47))  // 22 uF in later Laguna and Super Speed Race
+	// The size of capacitor C18 varies with the game: 47 uF in 280-ZZZAP,
+	// 22 uF in Laguna Racer and Super Speed Race:
+
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
+
+	CAP(C18, CAP_U(47))
+
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+
+	CAP(C18, CAP_U(22))
+
+#endif
+
 	NET_C(C18.2, GND)
 
 	CAP(C19, CAP_U(2.2))
@@ -413,6 +322,8 @@ static NETLIST_START(280zzzap_schematics)
 	// These are the remaining connections from H5_4.OUT:
 	NET_C(H5_4.OUT, R36.1, R37.1, R31.1, R32.1, R29.1, R30.1)
 
+	MC3340_DIP(MC3340_H2)
+
 	CD4016_DIP(J4)
 
 	// First oscillator (bottommost in schematics).
@@ -500,26 +411,60 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(J3_4.OUT, R35.1, J4.5)
 	NET_C(I_V5.Q, R34.1)
 	NET_C(J3_4.PLUS, R34.2, R35.2)
-	NET_C(C16.2, MC3340_INPUT)  // to MC3340 H2 pin 1
+	NET_C(C16.2, MC3340_H2.1)  // to MC3340 input pin
 
 	// Third oscillator (topmost in schematics).
-	// This is the amplitude-modulation oscillator.
-	// Schematic shows frequency of "428 Hz", but when modeled without a
-	// frontier, the maximum in low gear is 465 Hz.
-	// With a frontier, uncompensated, this decreases to 442 Hz.
+
+	// This is the amplitude-modulation oscillator, whose frequency
+	// differs slightly between 280-ZZZAP and the later games, Laguna
+	// Racer and Super Speed Race. This difference distinctly changes the
+	// tone of the engine sound.
+	// The 280-ZZZAP and Laguna Racer schematics all show a frequency of
+	// "428 Hz", but for 280-ZZZAP, when equipped with a 110 Kohm resistor
+	// and modeled without a frontier, the maximum in low gear is 465 Hz;
+	// with a frontier, uncompensated, this decreases to 442 Hz.
+	// For Laguna Racer, when equipped with a 100 Kohm resistor and
+	// modeled without a frontier, the maximum low gear frequency is 511
+	// Hz; with a frontier, uncompensated, it's 482 Hz.
 
 	LM3900(J3_2)
 	LM3900(J3_1)
 
 	RES(R29, RES_K(220))
-	RES(R30, RES_K(110))  // 100 Kohm in later Laguna and Super Speed Race
+
+	// The value of resistor R30 is what changes the engine sound between
+	// 280-ZZZAP and the later games. The 280-ZZZAP schematic indicates
+	// that it is 110 Kohm in that game. This resistor is hidden on Andrew
+	// Wellburn's 280-ZZZAP PCB photo, but the sound resulting from 110
+	// Kohm is more consistent with actual 280-ZZZAP machines than that
+	// from 100 Kohm.
+	// The resistor is 100 Kohm in the B622 Laguna Racer and Super Speed
+	// Race schematics and on the PCB drawings for both Laguna Racer board
+	// versions, so I assume all Laguna Racer versions had this value.
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
+
+	RES(R30, RES_K(110))
+
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+
+	RES(R30, RES_K(100))
+
+#endif
+
 	RES(R28, RES_K(100))
 
 #if CONVERGENCE_FRONTIERS
 	// Schmitt trigger resistors changed to compensate for waveform changes
-	// from use of frontier:
+	// from use of frontier.
+	// Since the different games have different oscillator frequencies,
+	// the compensated values of these resistors differ slightly as well.
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
 	RES(R26, RES_K(455))
 	RES(R27, RES_K(284))
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+	RES(R26, RES_K(453))
+	RES(R27, RES_K(286))
+#endif
 #else
 	RES(R26, RES_K(470))
 	RES(R27, RES_K(270))
@@ -550,7 +495,7 @@ static NETLIST_START(280zzzap_schematics)
 	NET_C(J3_1.OUT, R27.1, J4.13)
 	NET_C(I_V5.Q, R26.1)
 	NET_C(J3_1.PLUS, R26.2, R27.2)
-	NET_C(D1.K, R23.2, C13.2, R25.1, MC3340_CONTROL)  // to MC3340 H2 pin 2
+	NET_C(D1.K, R23.2, C13.2, R25.1, MC3340_H2.2)  // to MC3340 ctrl pin
 
 	// The MC3340's output is the complete engine sound, which is sent to
 	// the final mix.
@@ -735,10 +680,8 @@ static NETLIST_START(280zzzap_schematics)
 
 	// The result is a high-pitched "tire skid" screeching sound.
 
-	// The circuit appears to be taken almost verbatim from page 19 of
-	// National Semiconductor's Application Note 72 about the LM3900, with
-	// only minor changes in the values of a few components to alter the
-	// DC bias.
+	// The circuit appears to be taken practically verbatim from page 19 of
+	// National Semiconductor's Application Note 72 about the LM3900.
 
 	CD4016_DIP(G4)
 
@@ -765,9 +708,17 @@ static NETLIST_START(280zzzap_schematics)
 
 	LM3900(H4_4)
 
+	// For resistor R11, the value given is that shown in the Laguna Racer
+	// PCB drawings, the Laguna Racer B622 board schematic, the Super
+	// Speed Race schematic, and Andrew Wellburn's 280-ZZZAP PCB photo. In
+	// the 280-ZZZAP schematic and the near-copy Laguna Racer A622 board
+	// schematic, R11 is 100 Kohms, but this seems to be a schematic
+	// error. (The original National Semiconductor Application Note 72
+	// from which this circuit was apparently taken also uses 120 Kohm for
+	// R11.)
 	RES(R9, RES_K(39))
 	RES(R10, RES_K(62))   // 240 Kohm in Super Speed Race
-	RES(R11, RES_K(100))  // 120 Kohm in later Laguna and Super Speed Race
+	RES(R11, RES_K(120))
 	RES(R12, RES_K(62))
 
 	NET_C(H4_4.MINUS, R9.2, R11.1)
@@ -848,12 +799,16 @@ static NETLIST_START(280zzzap_schematics)
 
 	LM3900(H5_1)
 
-	// On the 280-ZZZAP game logic board schematic, resistor R18 (which is
-	// not labeled as such) is a 2.2K resistor, but it has a note "E"
-	// stating that one of the changes made after the first 325 units was:
-	// "2.2K resistor at G4 pin 2 was 6.8K." I interpret this to mean that
-	// the resistor was lowered to 2.2K from 6.8K.
+	// Resistor R18, part of the BOOM filter, is 2.2 Kohms on the
+	// 280-ZZZAP schematic as well as in Laguna Racer, but the 280-ZZZAP
+	// schematic has a note "E" saying that the first 325 machines had a
+	// 6.8 Kohm resistor here instead. Andrew Wellburn's 280-ZZZAP board
+	// photo may show such a resistor. With this larger resistor, the
+	// filter's values are: center frequency 54 Hz, Q 16.9, gain 73.5; so
+	// the filter is slightly broader, pitched a bit lower, and has only a
+	// third as much gain. Still, the basic effect is the same.
 	RES(R18, RES_K(2.2))  // 20 Kohm in Super Speed Race
+
 	RES(R19, RES_K(1))
 	RES(R20, RES_M(3.3))
 	RES(R21, RES_M(1))    // 1.5 Mohm in Super Speed Race
@@ -904,20 +859,27 @@ static NETLIST_START(280zzzap_schematics)
 
 	RES(R63, RES_K(12))  // 3 Kohm in Super Speed Race
 	RES(R64, RES_K(150))
-	// On the 280-ZZZAP game logic board schematic, resistor R65 (which is
-	// not labeled as such) is a 12K resistor, but it has a note "F"
-	// stating that one of the changes made after the first 325 units was:
-	// "12K resistor in series with 10MF cap and J5 pin 8 was 4.3K." I
-	// interpret this to mean that the resistor was raised to 12K from
-	// 4.3K.
+
+	// Resistor R65, the mixing resistor for the BOOM effect, is 12 Kohms
+	// on the 280-ZZZAP schematic and in Laguna Racer and Super Speed
+	// Race, but the 280-ZZZAP schematic has a note "F" saying that the
+	// first 325 machines had a 4.3 Kohm resistor here instead. Andrew
+	// Wellburn's 280-ZZZAP board photo shows such a resistor. The lower
+	// resistor makes the BOOM effect much louder, countering the reduced
+	// gain on its generating filter described above. In fact, it makes it
+	// loud enough to be clipped by the post-mixer op-amps; turning down
+	// the volume to prevent this clipping makes all other sounds quieter
+	// by comparison. This may explain why both the mixing resistor and
+	// the filter resistor were changed in later machines.
 	RES(R65, RES_K(12))
+
 	RES(R66, RES_K(33))
 
 	CAP(C20, CAP_U(10))
 	CAP(C21, CAP_U(10))
 
 	NET_C(R63.2, R64.2, R65.2, C20.1)
-	NET_C(MC3340_OUTPUT, R66.1)
+	NET_C(MC3340_H2.7, R66.1)  // MC3340 output pin
 	NET_C(R66.2, C21.1)
 
 	LM3900(J5_3)
@@ -953,7 +915,15 @@ static NETLIST_START(280zzzap_schematics)
 NETLIST_END()
 
 
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
+
 NETLIST_START(280zzzap)
+
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+
+NETLIST_START(lagunar)
+
+#endif
 
 	SOLVER(Solver, 48000)
 
@@ -978,15 +948,22 @@ NETLIST_START(280zzzap)
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_V5, 5)
 
-	LOCAL_SOURCE(mc3340)
-	INCLUDE(mc3340)
-
-	// The MC3340 gets 12-volt power in 280-ZZZAP and Laguna Racer.
-	// In Super Speed Race it gets 5-volt power.
-	NET_C(I_V12.Q, MC3340_VCC)
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
 
 	LOCAL_SOURCE(280zzzap_schematics)
 	INCLUDE(280zzzap_schematics)
+
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+
+	LOCAL_SOURCE(lagunar_schematics)
+	INCLUDE(lagunar_schematics)
+
+#endif
+
+	// The MC3340 gets 12-volt power in 280-ZZZAP and Laguna Racer.
+	// In Super Speed Race it gets 5-volt power.
+	NET_C(I_V12.Q, MC3340_H2.8)
+	NET_C(GND, MC3340_H2.3)
 
 	// Logic inputs which represent output pins from 74174 latches at F4
 	// and F5
@@ -1089,7 +1066,11 @@ NETLIST_START(280zzzap)
 	OPTIMIZE_FRONTIER(R31.1, RES_K(300), 50)
 	OPTIMIZE_FRONTIER(R32.1, RES_K(150), 50)
 	OPTIMIZE_FRONTIER(R29.1, RES_K(220), 50)
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
 	OPTIMIZE_FRONTIER(R30.1, RES_K(110), 50)
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+	OPTIMIZE_FRONTIER(R30.1, RES_K(100), 50)
+#endif
 
 #if CONVERGENCE_FRONTIERS
 	// Frontiers at Schmitt trigger op-amp outputs of engine sound
@@ -1099,7 +1080,14 @@ NETLIST_START(280zzzap)
 	// otherwise change the oscillator waveforms.
 	OPTIMIZE_FRONTIER(R40.1, RES_K(275), 50)
 	OPTIMIZE_FRONTIER(R35.1, RES_K(281), 50)
+#if (SOUND_VARIANT == VARIANT_280ZZZAP)
 	OPTIMIZE_FRONTIER(R27.1, RES_K(284), 50)
+#else // (SOUND_VARIANT == VARIANT_LAGUNAR)
+	OPTIMIZE_FRONTIER(R27.1, RES_K(286), 50)
+#endif
 #endif
 
 NETLIST_END()
+
+
+#endif

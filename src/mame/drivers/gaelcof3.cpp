@@ -5,19 +5,39 @@
 
   The PCB is very compact and has few components. The main ones are:
 
-  PIC16C55 as main CPU
+  PIC16C56 as main CPU
   OKI M6295 for sound
   1 bank of 6 dips
 
+  Gaelco FUTBOL-3 PCB
+  _____________________________________________________
+  |JP1  JP2         __________                        |
+  | __   ___        |ULN2803A_|                       |
+  || |  |  |        ___________                       |
+  || |  |  |        |MC74HCT273A                      |
+  ||_|  |  |        _________   _________             |
+  |JP3  |  |        |TLP504A_| |TLP504A_|             |
+  | __  |  |        __________                        |
+  || |  |  |        |PIC16C56|                        |
+  ||_|  |  |                                          |
+  | ___ |__|   ___ <-SN74LS365AN                      |
+  | VOL        |  |   ______    ___________________   |
+  |  _______   |  |  | OKI |   |ROM U1             |  |
+  | |DIPSx6|   |  |  |6295_|   |___________________|  |
+  |            |__|                                   |
+  |___________________________________________________|
+
+  JP1 = 10 pin [+5V, GND, DAT, CLK, ENA, PU1, PU2, PU3, PU4, GND]
+  JP2 = 14 pin [12VA, 12VA, +5V, ALT, CON, BOM, MOT, N/U, BOM, POT, ALT, 12V, GND, GND]
+  JP3 =  5 pin [PU5, PU6, PU7, PU8, GND]
 
   The PCBs were inside two "Coche de Bomberos" kiddie rides from CMC Cresmatic (https://www.recreativas.org/coche-de-bomberos-6022-cresmatic).
   Anyway, the hardware is generic enough to serve any basic kiddie ride.
 
-  The only dumpable ROM on the PCB is the Oki sound samples. There are two different versions dumped (from two different machines):
-
-  "Susanita tiene un ratón" - Based on the song composed by Emilio Alberto Aragón 'Miliki'.
-
-  "El auto de papá" - Based on the song composed by Enrique Fischer 'Pipo Pescador'.
+  The only dumped ROM on the PCB is the Oki sound samples. There are three different versions dumped (from different machines):
+     -"Susanita" - Based on the song composed by Rafael Pérez Botija.
+     -"El auto feo" - Based on the song composed by Enrique Fischer 'Pipo Pescador'.
+     -"Hola Don Pepito" - Based on the song composed by Ramón del Rivero.
 */
 
 #include "emu.h"
@@ -70,7 +90,7 @@ INPUT_PORTS_END
 
 void gaelcof3_state::gaelcof3(machine_config &config)
 {
-	PIC16C55(config, m_maincpu, 4000000); // clock not confirmed
+	PIC16C56(config, m_maincpu, 4000000); // clock not confirmed
 
 	SPEAKER(config, "mono").front_center();
 
@@ -79,20 +99,29 @@ void gaelcof3_state::gaelcof3(machine_config &config)
 
 
 ROM_START( autopapa )
-	ROM_REGION( 0x400, "maincpu", 0 )
-	ROM_LOAD( "pic16c55.u3", 0x000, 0x400, NO_DUMP )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "pic16c56.u3", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "autopapa.u1", 0x00000, 0x40000, CRC(a3e5607e) SHA1(24a9c79edec7b2f7f64b622240f2ad8f3ffa29ca) )
 ROM_END
 
+ROM_START( donpepito )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "pic16c56.u3", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "don_pepito.u1", 0x00000, 0x40000, CRC(574fcd14) SHA1(a23f1eb6d2cef5aa07df3a553fe1d33803648f43) )
+ROM_END
+
 ROM_START( susanita )
-	ROM_REGION( 0x400, "maincpu", 0 )
-	ROM_LOAD( "pic16c55.u3", 0x000, 0x400, NO_DUMP )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "pic16c56.u3", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "susanita.u1", 0x00000, 0x40000, CRC(766868cb) SHA1(eb42dc46b865bc448052d9d67c840e51c49ce49a) )
 ROM_END
 
-GAME( 199?, autopapa, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "El auto de papa",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, susanita, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "Susanita tiene un raton", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, autopapa,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "El auto feo",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, donpepito, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "Hola Don Pepito", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, susanita,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco", "Susanita",        MACHINE_IS_SKELETON_MECHANICAL )

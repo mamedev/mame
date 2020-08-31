@@ -154,7 +154,38 @@ namespace plib
 	{
 	public:
 
-		using stream_ptr = std::unique_ptr<std::istream>;
+		struct stream_ext
+		{
+			explicit stream_ext() = default;
+
+			stream_ext(std::unique_ptr<std::istream> &&strm, const pstring &filename)
+			: m_strm(std::move(strm))
+			, m_filename(filename)
+			{
+			}
+			stream_ext(const stream_ext &) = delete;
+			stream_ext &operator=(const stream_ext &) = delete;
+			stream_ext(stream_ext &&rhs) /*noexcept*/
+			{
+				m_strm = std::move(rhs.m_strm);
+				m_filename = rhs.m_filename;
+			}
+			stream_ext &operator=(stream_ext &&) /*noexcept*/ = delete;
+
+			std::istream &stream() noexcept { return *m_strm; }
+			pstring filename() { return m_filename; }
+
+			bool empty() { return m_strm == nullptr; }
+
+			// FIXME: workaround input context should accept stream_ptr
+
+			std::unique_ptr<std::istream> release_stream() { return std::move(m_strm); }
+		private:
+			std::unique_ptr<std::istream> m_strm;
+			pstring m_filename;
+		};
+
+		using stream_ptr = stream_ext; //FIXME: rename to stream_type
 
 		psource_t() noexcept = default;
 
@@ -184,9 +215,9 @@ namespace plib
 		typename psource_t::stream_ptr stream(const pstring &name) override
 		{
 			if (name == m_name)
-				return std::make_unique<std::stringstream>(m_str);
+				return stream_ptr(std::make_unique<std::stringstream>(m_str), name);
 
-			return psource_t::stream_ptr(nullptr);
+			return psource_t::stream_ptr();
 		}
 	private:
 		pstring m_name;
@@ -223,11 +254,11 @@ namespace plib
 				if (source)
 				{
 					auto strm = source->stream(name);
-					if (strm)
+					if (!strm.empty())
 						return strm;
 				}
 			}
-			return typename S::stream_ptr(nullptr);
+			return typename S::stream_ptr();
 		}
 
 		template <typename S, typename F>

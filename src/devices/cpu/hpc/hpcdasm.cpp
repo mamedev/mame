@@ -5,21 +5,15 @@
     National Semiconductor HPC disassembler
 
     Note that though all 16-bit fields in instructions have the MSB first,
-    the HPC's memory organization is in fact little-endian. This is why r16
-    is not used to read them.
+    the HPC's memory organization is in fact little-endian (including
+    vector and JIDW tables). This is why r16 is always swapped here.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "util/disasmintf.h"
 #include "hpcdasm.h"
 
-#include "util/strformat.h"
 #include <cctype>
-
-using osd::u32;
-using util::BIT;
-using offs_t = u32;
 
 const char *const hpc16083_disassembler::s_regs[128] =
 {
@@ -270,7 +264,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		if (BIT(opcode, 1))
 			imm = true;
 
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
+		src = swapendian_int16(opcodes.r16(pc + 1));
 		reg = opcodes.r8(pc + 3);
 		opcode = opcodes.r8(pc + 4);
 		bytes = 5;
@@ -284,7 +278,7 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 			imm = true;
 
 		src = opcodes.r8(pc + 1);
-		reg = (opcodes.r8(pc + 2) << 8) | opcodes.r8(pc + 3);
+		reg = swapendian_int16(opcodes.r16(pc + 2));
 		opcode = opcodes.r8(pc + 4);
 		bytes = 5;
 		break;
@@ -304,15 +298,15 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 		if (BIT(opcode, 1))
 			imm = true;
 
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
-		reg = (opcodes.r8(pc + 3) << 8) | opcodes.r8(pc + 4);
+		src = swapendian_int16(opcodes.r16(pc + 1));
+		reg = swapendian_int16(opcodes.r16(pc + 3));
 		opcode = opcodes.r8(pc + 5);
 		bytes = 6;
 		break;
 
 	case 0xa6:
 		idx = true;
-		reg = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
+		reg = swapendian_int16(opcodes.r16(pc + 1));
 		src = opcodes.r8(pc + 3);
 		opcode = opcodes.r8(pc + 4);
 		bytes = 5;
@@ -389,8 +383,8 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 
 	case 0xa7:
 		imm = true;
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
-		reg = (opcodes.r8(pc + 3) << 8) | opcodes.r8(pc + 4);
+		src = swapendian_int16(opcodes.r16(pc + 1));
+		reg = swapendian_int16(opcodes.r16(pc + 3));
 		bytes = 5;
 		break;
 
@@ -403,33 +397,33 @@ offs_t hpc_disassembler::disassemble(std::ostream &stream, offs_t pc, const hpc_
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 		imm = true;
 		reg = 0x00c8 | ((opcode & 0x03) << 1);
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
+		src = swapendian_int16(opcodes.r16(pc + 1));
 		bytes = 3;
 		break;
 
 	case 0xb8: case 0xb9: case 0xba: case 0xbb:
 	case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 		imm = true;
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
+		src = swapendian_int16(opcodes.r16(pc + 1));
 		bytes = 3;
 		break;
 
 	case 0xb4: case 0xb5:
 		jmp = true;
-		src = pc + 3 + ((opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2));
+		src = pc + 3 + swapendian_int16(opcodes.r16(pc + 1));
 		bytes = 3;
 		break;
 
 	case 0xb6:
 		indir = false;
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
+		src = swapendian_int16(opcodes.r16(pc + 1));
 		opcode = opcodes.r8(pc + 3);
 		bytes = 4;
 		break;
 
 	case 0xb7:
 		imm = true;
-		src = (opcodes.r8(pc + 1) << 8) | opcodes.r8(pc + 2);
+		src = swapendian_int16(opcodes.r16(pc + 1));
 		reg = opcodes.r8(pc + 3);
 		bytes = 4;
 		break;

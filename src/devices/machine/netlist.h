@@ -12,8 +12,13 @@
 #define MAME_MACHINE_NETLIST_H
 
 #include <functional>
+#include <deque>
 
 #include "../../lib/netlist/nltypes.h"
+
+#ifndef NETLIST_CREATE_CSV
+#define NETLIST_CREATE_CSV (0)
+#endif
 
 class netlist_mame_stream_output_device;
 class nld_sound_in;
@@ -75,24 +80,7 @@ public:
 	netlist::setup_t &setup();
 	netlist_mame_t &netlist() noexcept { return *m_netlist; }
 
-	void update_icount(netlist::netlist_time_ext time) noexcept;
-	void check_mame_abort_slice() noexcept;
-
 	static void register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name);
-
-	int m_icount;
-
-	static constexpr const unsigned MDIV_SHIFT = 16;
-
-	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
-	{
-		return (m_div * c).shr(MDIV_SHIFT);
-	}
-
-	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
-	{
-		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
-	}
 
 protected:
 
@@ -109,44 +97,39 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_pre_save() override;
-	virtual void device_clock_changed() override;
+	//virtual void device_clock_changed() override;
+
+	void device_start_common();
+	void save_state();
 
 	std::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
-	attotime m_cur_time;
-	attotime m_attotime_per_clock;
 private:
-	void save_state();
-
 	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
-
-	netlist::netlist_time_ext    m_div;
-	netlist::netlist_time_ext    m_rem;
-	netlist::netlist_time_ext    m_old;
 
 	std::unique_ptr<netlist_mame_t> m_netlist;
 
 	func_type m_setup_func;
 	bool m_device_reset_called;
-};
 
-// ----------------------------------------------------------------------------------------
-// netlist_mame_cpu_device
-// ----------------------------------------------------------------------------------------
+#if NETLIST_CREATE_CSV
+	static constexpr int MAX_BUFFER_ENTRIES = 1000;
 
-class netlist_mame_cpu_device;
-
-class netlist_disassembler : public util::disasm_interface
-{
 public:
-	netlist_disassembler(netlist_mame_cpu_device *dev);
-	virtual ~netlist_disassembler() = default;
-
-	virtual u32 opcode_alignment() const override;
-	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+	void log_add(char const* param, double value, bool isfloat);
+	void log_flush(int count = MAX_BUFFER_ENTRIES);
 
 private:
-	netlist_mame_cpu_device *m_dev;
+	struct buffer_entry
+	{
+		attotime time;
+		bool isfloat;
+		double value;
+		char const *string;
+	};
+	std::deque<buffer_entry> m_buffer;
+	FILE* m_csv_file = nullptr;
+#endif
 };
 
 class netlist_mame_cpu_device : public netlist_mame_device,
@@ -156,6 +139,8 @@ class netlist_mame_cpu_device : public netlist_mame_device,
 								public device_memory_interface
 {
 public:
+	static constexpr const unsigned MDIV_SHIFT = 16;
+
 	// construction/destruction
 	netlist_mame_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -179,12 +164,26 @@ public:
 		return *this;
 	}
 
+	void update_icount(netlist::netlist_time_ext time) noexcept;
+	void check_mame_abort_slice() noexcept;
+
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
+	{
+		return (m_div * c).shr(MDIV_SHIFT);
+	}
+
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
+	{
+		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
+	}
+
 protected:
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
@@ -204,7 +203,28 @@ protected:
 	address_space_config m_program_config;
 
 private:
+	int m_icount;
+	netlist::netlist_time_ext    m_div;
+	netlist::netlist_time_ext    m_rem;
+	netlist::netlist_time_ext    m_old;
 	offs_t m_genPC;
+};
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_cpu_device
+// ----------------------------------------------------------------------------------------
+
+class netlist_disassembler : public util::disasm_interface
+{
+public:
+	netlist_disassembler(netlist_mame_cpu_device *dev);
+	virtual ~netlist_disassembler() = default;
+
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	netlist_mame_cpu_device *m_dev;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -235,27 +255,28 @@ public:
 	inline sound_stream *get_stream() { return m_stream; }
 	void update_to_current_time();
 
-
-	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-	virtual void device_validity_check(validity_checker &valid) const override;
-
 	void register_stream_output(int channel, netlist_mame_stream_output_device *so);
 
 protected:
+
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_clock_changed() override;
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	//virtual void device_reset() override;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
-	nld_sound_in *m_in;
+	std::map<std::size_t, nld_sound_in *> m_in;
 	sound_stream *m_stream;
-	bool m_is_device_call;
+	attotime m_cur_time;
+	uint32_t m_sound_clock;
+	attotime m_attotime_per_clock;
+	attotime m_last_update_to_current_time;
 };
 
 // ----------------------------------------------------------------------------------------

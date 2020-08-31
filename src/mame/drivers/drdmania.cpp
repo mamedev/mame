@@ -4,14 +4,14 @@
 
     Skeleton driver for Sleic Dardomania darts machines
     This game has a monitor to select the game type.
-    PCB is marked SLEIC and DIANA'94
+    PCB is marked "SLEIC", "DIANA'94" and "13/94".
 
     Hardware overview:
-    Main CPU: Z0840006PSC
-    Sound: AY-3-8910
-    Other: MK48Z02B-20
-    OSCs: 18.432 MHz
-    Dips: 1 x 6 dips banks
+    -Main CPU: Z0840006PSC
+    -Sound: AY-3-8910
+    -Other: MK48Z02B-20
+    -OSCs: 18.432 MHz
+    -Dips: 1 x 6 dips banks
 
 *******************************************************************************/
 
@@ -58,9 +58,9 @@ void drdmania_state::drdmania(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &drdmania_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &drdmania_state::io_map);
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02B-20
 
-	// SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -78,7 +78,7 @@ ROM_START(drdmania)
 	ROM_LOAD( "dardomania_dmp05_v2.1.ic10", 0x18000, 0x8000, CRC(e24f2a02) SHA1(16f3a9c80b3d60c66b070521a90c958b0fc690e7) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION(0x20, "proms", 0)
-	ROM_LOAD( "n82s123n.ic49", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "n82s123n.ic49", 0x00, 0x20, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )
 ROM_END
 
-GAME(199?, drdmania, 0, drdmania, drdmania, drdmania_state, empty_init, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, empty_init, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_IS_SKELETON_MECHANICAL)

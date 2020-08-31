@@ -33,7 +33,10 @@ void qixmcu_state::machine_start()
 
 void zookeep_state::machine_start()
 {
-	qixmcu_state::machine_start();
+	if (m_mcu)
+		qixmcu_state::machine_start();
+	else
+		qix_state::machine_start();
 
 	/* configure the banking */
 	m_vidbank->configure_entry(0, memregion("videocpu")->base() + 0xa000);

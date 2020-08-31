@@ -735,6 +735,8 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "includes/model3.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/kl5c80a16.h"
+#include "machine/315_5296.h"
 #include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
@@ -6006,6 +6008,31 @@ void model3_state::model3_10(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 }
 
+void model3_state::getbass_iocpu_mem(address_map &map)
+{
+	map(0x00000, 0x0efff).rom();
+	map(0x0f000, 0x0ffff).ram();
+}
+
+void model3_state::getbass_iocpu_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x60, 0x6f).rw("io60", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
+	map(0x70, 0x7f).rw("io70", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write));
+}
+
+void model3_state::getbass(machine_config &config)
+{
+	model3_10(config);
+
+	kl5c80a16_device &iocpu(KL5C80A16(config, "iocpu", 32_MHz_XTAL / 2));
+	iocpu.set_addrmap(AS_PROGRAM, &model3_state::getbass_iocpu_mem);
+	iocpu.set_addrmap(AS_IO, &model3_state::getbass_iocpu_io);
+
+	SEGA_315_5296(config, "io60", 32_MHz_XTAL);
+	SEGA_315_5649(config, "io70", 0);
+}
+
 void model3_state::model3_15(machine_config &config)
 {
 	add_cpu_100mhz(config);
@@ -6469,7 +6496,7 @@ GAME( 1996, vf3a,         vf3, model3_10, model3, model3_state,        init_vf3,
 GAME( 1996, vf3tb,        vf3, model3_10, model3, model3_state,  init_model3_10, ROT0, "Sega", "Virtua Fighter 3 Team Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, bass,           0, model3_10, bass,   model3_state,       init_bass, ROT0, "Sega", "Sega Bass Fishing", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, bassdx,      bass, model3_10, bass,   model3_state,    init_getbass, ROT0, "Sega", "Sega Bass Fishing Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, getbass,     bass, model3_10, bass,   model3_state,    init_getbass, ROT0, "Sega", "Get Bass", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, getbass,     bass,   getbass, bass,   model3_state,    init_getbass, ROT0, "Sega", "Get Bass", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 1.5 */
 GAME( 1996, scud,           0,      scud, scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
