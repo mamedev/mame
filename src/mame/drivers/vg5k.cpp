@@ -82,6 +82,8 @@ public:
 
 	void init_vg5k();
 
+    DECLARE_INPUT_CHANGED_MEMBER(delta_button);
+
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
@@ -306,6 +308,8 @@ static INPUT_PORTS_START( vg5k )
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+    PORT_START("direct")
+        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)        PORT_CODE(KEYCODE_END)                              PORT_NAME("DELTA")          PORT_CHANGED_MEMBER(DEVICE_SELF, vg5k_state, delta_button, 0)
 INPUT_PORTS_END
 
 
@@ -327,6 +331,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
 	m_ef9345->update_scanline((uint16_t)param);
 }
 
+INPUT_CHANGED_MEMBER(vg5k_state::delta_button)
+{
+    // The yellow Delta key on the keyboard is wired so that it asserts directly the NMI line of the Z80.
+    if (!newval) {
+        m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+    }
+}
+
 
 void vg5k_state::machine_start()
 {
@@ -337,6 +349,7 @@ void vg5k_state::machine_reset()
 {
 	m_ef9345_offset = 0;
 }
+
 
 /* F4 Character Displayer */
 static const gfx_layout vg5k_charlayout =
