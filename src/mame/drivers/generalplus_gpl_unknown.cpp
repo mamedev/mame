@@ -169,8 +169,9 @@ private:
 	void spi_process_tx_data(uint8_t data);
 	uint8_t spi_process_rx();
 	uint8_t spi_rx();
+	uint8_t spi_rx_fast();
 
-	uint8_t m_rx_fifo[4]; // actually 8 bytes? or 8 half-bytes?
+	uint8_t m_rx_fifo[5]; // actually 8 bytes? or 8 half-bytes?
 
 	uint32_t m_spiaddress;
 
@@ -188,7 +189,9 @@ private:
 	   SPI_STATE_WAITING_HIGH_ADDR_FAST = 8,
 	   SPI_STATE_WAITING_MID_ADDR_FAST = 9,
 	   SPI_STATE_WAITING_LOW_ADDR_FAST = 10,
-	   SPI_STATE_WAITING_LOW_ADDR_FAST_DUMMY = 11
+	   SPI_STATE_WAITING_LOW_ADDR_FAST_DUMMY = 11,
+	   SPI_STATE_READING_FAST = 12
+
 	};
 
 	spistate m_spistate;
@@ -328,6 +331,9 @@ uint16_t pcp8718_state::spi_misc_control_r()
 
 uint16_t pcp8718_state::spi_rx_fifo_r()
 {
+	if (m_spistate == SPI_STATE_READING_FAST)
+		return spi_rx_fast();
+
 	//logerror("%06x: spi_rx_fifo_r\n", machine().describe_context());
 	return spi_rx();
 }
@@ -430,7 +436,14 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 	case SPI_STATE_WAITING_LOW_ADDR_FAST_DUMMY:
 	{
 		logerror("dummy write %08x\n", data, m_spiaddress);
-		m_spistate = SPI_STATE_READING;
+		m_spistate = SPI_STATE_READING_FAST;
+		break;
+	}
+
+	case SPI_STATE_READING_FAST:
+	{
+		// writes when in read mode clock in data?
+	//	logerror("write while in read mode (clock data?)\n", data, m_spiaddress);
 		break;
 	}
 
@@ -443,6 +456,7 @@ uint8_t pcp8718_state::spi_process_rx()
 	switch (m_spistate)
 	{
 	case SPI_STATE_READING:
+	case SPI_STATE_READING_FAST:
 	{
 		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
 
@@ -479,6 +493,18 @@ uint8_t pcp8718_state::spi_rx()
 	return ret;
 }
 
+uint8_t pcp8718_state::spi_rx_fast()
+{
+	uint8_t ret = m_rx_fifo[0];
+
+	m_rx_fifo[0] = m_rx_fifo[1];
+	m_rx_fifo[1] = m_rx_fifo[2];
+	m_rx_fifo[2] = m_rx_fifo[3];
+	m_rx_fifo[3] = m_rx_fifo[4];
+	m_rx_fifo[4] = spi_process_rx();
+
+	return ret;
+}
 
 void pcp8718_state::spi_tx_fifo_w(uint16_t data)
 {
@@ -640,6 +666,7 @@ uint16_t pcp8718_state::system_dma_params_channel0_r(offs_t offset)
 
 uint16_t pcp8718_state::unk_7870_r()
 {
+	logerror("%06x: unk_7870_r (IO port)\n", machine().describe_context());
 	return m_io_p1->read();
 }
 
@@ -750,7 +777,7 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 		if ((offset + 0xf000) == (realpc))
 		{
-#if 1
+#if 0
 			// still simulate this as it uses 'fast read' mode which doesn't work in the SPI handler at the moment
 			if (realpc == 0xf000)
 			{
