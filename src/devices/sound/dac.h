@@ -76,7 +76,7 @@ protected:
 		}
 	}
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) = 0;
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) = 0;
 };
 
 template <unsigned bits>
@@ -85,7 +85,7 @@ class dac_code_binary : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
@@ -103,7 +103,7 @@ class dac_code_ones_complement : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
@@ -132,7 +132,7 @@ class dac_code_twos_complement : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
@@ -150,7 +150,7 @@ class dac_code_sign_magntitude : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_ex_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
@@ -201,7 +201,7 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		_dac_code::sound_stream_update_ex_tag(stream, inputs, outputs);
+		_dac_code::sound_stream_update_tag(stream, inputs, outputs);
 	}
 };
 
