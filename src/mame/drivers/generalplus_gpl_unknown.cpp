@@ -158,6 +158,7 @@ private:
 	uint16_t m_dmaregs[8];
 
 	void lcd_w(uint16_t data);
+	void lcd_command_w(uint16_t data);
 
 	uint16_t spi_misc_control_r();
 	uint16_t spi_rx_fifo_r();
@@ -191,6 +192,16 @@ private:
 	};
 
 	spistate m_spistate;
+
+	enum lcdstate : const int
+	{
+		LCD_STATE_READY = 0,
+		LCD_STATE_WAITING_FOR_COMMAND = 1,
+		LCD_STATE_PROCESSING_COMMAND = 2
+	};
+
+	lcdstate m_lcdstate;
+	int m_lastlcdcommand;
 
 	uint8_t m_displaybuffer[0x40000];
 	int m_lcdaddr;
@@ -680,22 +691,53 @@ void pcp8718_state::map(address_map &map)
 	// there are calls to 0x0f000 (internal ROM?)
 	map(0x00f000, 0x00ffff).rom().region("maincpu", 0x00000);
 
-
+	// external LCD controller
+	map(0x200000, 0x200000).w(FUNC(pcp8718_state::lcd_command_w));
 	map(0x20fc00, 0x20fc00).w(FUNC(pcp8718_state::lcd_w));
+}
+
+void pcp8718_state::lcd_command_w(uint16_t data)
+{
+	data &= 0xff;
+
+	switch (m_lcdstate)
+	{
+	case LCD_STATE_READY:
+	case LCD_STATE_PROCESSING_COMMAND:
+	{
+		if (data == 0x0000)
+		{
+			m_lcdstate = LCD_STATE_WAITING_FOR_COMMAND;
+			m_lastlcdcommand = 0;
+		}
+		break;
+	}
+
+	case LCD_STATE_WAITING_FOR_COMMAND:
+	{
+		m_lastlcdcommand = data;
+		m_lcdstate = LCD_STATE_PROCESSING_COMMAND;
+		break;
+	}
+
+	}
 }
 
 void pcp8718_state::lcd_w(uint16_t data)
 {
-	logerror("%06x: lcd_w %04x\n", machine().describe_context(), data);
 	data &= 0xff; // definitely looks like 8-bit port as 16-bit values are shifted and rewritten
+	logerror("%06x: lcd_w %02x\n", machine().describe_context(), data);
 
-	m_displaybuffer[m_lcdaddr] = data;
-	m_lcdaddr++;
+	if ((m_lcdstate == LCD_STATE_PROCESSING_COMMAND) && (m_lastlcdcommand == 0x22))
+	{
+		m_displaybuffer[m_lcdaddr] = data;
+		m_lcdaddr++;
 
-	if (m_lcdaddr >= ((320 * 240)*2))
-		m_lcdaddr = 0;
+		if (m_lcdaddr >= ((320 * 240) * 2))
+			m_lcdaddr = 0;
 
-	//m_lcdaddr &= 0x3ffff;
+		//m_lcdaddr &= 0x3ffff;
+	}
 }
 
 uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
@@ -872,6 +914,8 @@ void pcp8718_state::machine_reset()
 
 	m_lcdaddr = 0;
 
+	m_lcdstate = LCD_STATE_READY;
+	m_lastlcdcommand = 0;
 }
 
 
