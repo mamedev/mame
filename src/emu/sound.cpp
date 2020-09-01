@@ -84,19 +84,20 @@ stream_buffer::~stream_buffer()
 
 void stream_buffer::set_sample_rate(u32 rate, bool resample)
 {
-	sound_assert(rate > 0);
-
 	// skip if nothing is actually changing
 	if (rate == m_sample_rate)
 		return;
-	bool new_rate_higher = (rate > m_sample_rate);
+
+	// translate a rate of 0 to a rate of 1 to make the math work out
+	if (rate == 0)
+		rate = 1;
 
 	// note the time and period of the current buffer (end_time is AFTER the final sample)
 	attotime prevperiod = sample_period();
 	attotime prevend = end_time();
 
 	// compute the time and period of the new buffer
-	attotime newperiod = attotime(0, (rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + rate - 1) / rate));
+	attotime newperiod = attotime(0, (ATTOSECONDS_PER_SECOND + rate - 1) / rate);
 	attotime newend = attotime(prevend.seconds(), (prevend.attoseconds() / newperiod.attoseconds()) * newperiod.attoseconds());
 
 	// buffer a short runway of previous samples; in order to support smooth
@@ -110,6 +111,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 
 	// if the new rate is lower, downsample into our holding buffer;
 	// otherwise just copy into our holding buffer for later upsampling
+	bool new_rate_higher = (rate > m_sample_rate);
 	if (resample)
 	{
 		if (!new_rate_higher)
@@ -128,7 +130,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	m_sample_attos = newperiod.attoseconds();
 
 	// compute the new end sample index based on the buffer time
-	m_end_sample = time_to_buffer_index(prevend);
+	m_end_sample = (rate != 0) ? time_to_buffer_index(prevend) : 0;
 
 	// if the new rate is higher, upsample from our temporary buffer;
 	// otherwise just copy our previously-downsampled data
@@ -629,12 +631,13 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 void sound_stream::update()
 {
+	// ignore any update requests if we're already up to date
 	attotime start = m_output[0].end_time();
 	attotime end = m_device.machine().time();
-
-	// ignore any update requests if we're already up to date
 	if (start >= end)
 		return;
+
+	// regular update then
 	update_view(start, end);
 }
 
@@ -990,6 +993,13 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 
 	auto &input = inputs[0];
 	auto &output = outputs[0];
+
+	// if the input has an invalid rate, just fill with zeros
+	if (input.sample_rate() <= 1)
+	{
+		output.fill(0);
+		return;
+	}
 
 	// if we have equal sample rates, we just need to copy
 	auto numsamples = output.samples();
