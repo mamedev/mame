@@ -162,6 +162,8 @@ void speaker_device::device_stop()
 			static char const * const s_spaces = "                                                            ";
 			int totalstars = strlen(s_stars);
 			double t = 0;
+			if (overallmax < 1.0)
+				overallmax = 1.0;
 			int leftstars = totalstars / overallmax;
 			for (auto &curmax : m_max_sample)
 			{
@@ -169,7 +171,7 @@ void speaker_device::device_stop()
 				{
 					osd_printf_info("%6.1f: %9.5f |", t, curmax);
 					if (curmax == 0)
-						osd_printf_info("\n");
+						osd_printf_info("%.*s|\n", leftstars, s_spaces);
 					else if (curmax <= 1.0)
 					{
 						int stars = std::max(1, std::min(leftstars, int(curmax * totalstars / overallmax)));
