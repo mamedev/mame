@@ -70,7 +70,8 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_lcd_ireq(0)
 	, m_lcd_timer(nullptr)
 	, m_uctr(0)
-	, m_ustr(0)
+	, m_usr(0)
+	, m_irctr(0)
 	, m_bctr(0)
 {
 	program_config.m_internal_map = std::move(internal_map);
@@ -192,7 +193,8 @@ void st2xxx_device::save_common_registers()
 	if (st2xxx_uctr_mask() != 0)
 	{
 		save_item(NAME(m_uctr));
-		save_item(NAME(m_ustr));
+		save_item(NAME(m_usr));
+		save_item(NAME(m_irctr));
 		save_item(NAME(m_bctr));
 		save_item(NAME(m_brs));
 		save_item(NAME(m_bdiv));
@@ -251,7 +253,8 @@ void st2xxx_device::device_reset()
 
 	// reset UART and BRG
 	m_uctr = 0;
-	m_ustr = 0;
+	m_usr = 0x01;
+	m_irctr = 0;
 	m_bctr = 0;
 }
 
@@ -792,19 +795,39 @@ void st2xxx_device::uctr_w(u8 data)
 	m_uctr = data & st2xxx_uctr_mask();
 }
 
-u8 st2xxx_device::ustr_r()
+u8 st2xxx_device::usr_r()
 {
-	return m_ustr | 0x80;
+	return m_usr | 0x80;
 }
 
 void st2xxx_device::ustr_trg_w(u8 data)
 {
-	m_ustr = (m_ustr & 0x7a) | (data & 0x05);
+	m_usr = (m_usr & 0x7a) | (data & 0x05);
 }
 
-void st2xxx_device::ustr_clr_w(u8 data)
+void st2xxx_device::usr_clr_w(u8 data)
 {
-	m_ustr &= ~data;
+	m_usr &= ~data;
+}
+
+u8 st2xxx_device::irctr_r()
+{
+	return m_irctr | 0x3c;
+}
+
+void st2xxx_device::irctr_w(u8 data)
+{
+	m_irctr = data & 0xc7;
+}
+
+u8 st2xxx_device::udata_r()
+{
+	return 0;
+}
+
+void st2xxx_device::udata_w(u8 data)
+{
+	logerror("Writing %02X to UART transmitter (PC = %04X)\n", data, PPC);
 }
 
 u8 st2xxx_device::bctr_r()

@@ -58,7 +58,8 @@ public:
 		ST_LAC,
 		ST_LPWM,
 		ST_UCTR,
-		ST_USTR,
+		ST_USR,
+		ST_IRCTR,
 		ST_BCTR,
 		ST_BRS,
 		ST_BDIV
@@ -218,9 +219,13 @@ protected:
 
 	u8 uctr_r();
 	void uctr_w(u8 data);
-	u8 ustr_r();
+	u8 usr_r();
 	void ustr_trg_w(u8 data);
-	void ustr_clr_w(u8 data);
+	void usr_clr_w(u8 data);
+	u8 irctr_r();
+	void irctr_w(u8 data);
+	u8 udata_r();
+	void udata_w(u8 data);
 	u8 bctr_r();
 	void bctr_w(u8 data);
 	u8 brs_r();
@@ -280,7 +285,8 @@ protected:
 	emu_timer *m_lcd_timer;
 
 	u8 m_uctr;
-	u8 m_ustr;
+	u8 m_usr;
+	u8 m_irctr;
 	u8 m_bctr;
 	u8 m_brs;
 	u8 m_bdiv;

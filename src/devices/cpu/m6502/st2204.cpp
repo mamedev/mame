@@ -152,7 +152,8 @@ void st2204_device::device_start()
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
 	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
-	state_add(ST_USTR, "USTR", m_ustr).mask(0x7f);
+	state_add(ST_USR, "USTR", m_usr).mask(0x7f);
+	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
 	state_add(ST_BCTR, "BCTR", m_bctr).mask(0x87);
 	state_add(ST_BRS, "BRS", m_brs);
 	state_add(ST_BDIV, "BDIV", m_bdiv);
@@ -657,7 +658,8 @@ void st2204_device::common_map(address_map &map)
 	// PCL is listed as write-only in ST2202 specification, but DynamiDesk suggests otherwise
 	map(0x004e, 0x004e).rw(FUNC(st2204_device::pcl_r), FUNC(st2204_device::pcl_w));
 	map(0x0060, 0x0060).rw(FUNC(st2204_device::uctr_r), FUNC(st2204_device::uctr_w));
-	map(0x0061, 0x0061).rw(FUNC(st2204_device::ustr_r), FUNC(st2204_device::ustr_trg_w));
+	map(0x0061, 0x0061).rw(FUNC(st2204_device::usr_r), FUNC(st2204_device::ustr_trg_w));
+	map(0x0062, 0x0062).rw(FUNC(st2204_device::irctr_r), FUNC(st2204_device::irctr_w));
 	map(0x0063, 0x0063).rw(FUNC(st2204_device::bctr_r), FUNC(st2204_device::bctr_w));
 	map(0x0066, 0x0066).rw(FUNC(st2204_device::brs_r), FUNC(st2204_device::brs_w));
 	map(0x0067, 0x0067).rw(FUNC(st2204_device::bdiv_r), FUNC(st2204_device::bdiv_w));

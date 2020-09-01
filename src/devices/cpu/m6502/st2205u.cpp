@@ -124,12 +124,10 @@ void st2205u_device::device_start()
 	state_add(ST_BTEN, "BTEN", m_bten, [this](u8 data) { bten_w(data); });
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
-	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
@@ -148,7 +146,8 @@ void st2205u_device::device_start()
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
 	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
-	state_add(ST_USTR, "USTR", m_ustr).mask(0x7f);
+	state_add(ST_USR, "USR", m_usr).mask(0x7f);
+	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
 	state_add(ST_BCTR, "BCTR", m_bctr).mask(0xb7);
 	state_add(ST_BRS, "BRS", m_brs);
 	state_add(ST_BDIV, "BDIV", m_bdiv);
@@ -629,8 +628,10 @@ void st2205u_device::int_map(address_map &map)
 	map(0x005a, 0x005a).rw(FUNC(st2205u_device::dmrl_r), FUNC(st2205u_device::dmrl_w));
 	map(0x005b, 0x005b).rw(FUNC(st2205u_device::dmrh_r), FUNC(st2205u_device::dmrh_w));
 	map(0x0060, 0x0060).rw(FUNC(st2205u_device::uctr_r), FUNC(st2205u_device::uctr_w));
-	map(0x0061, 0x0061).rw(FUNC(st2205u_device::ustr_r), FUNC(st2205u_device::ustr_clr_w));
+	map(0x0061, 0x0061).rw(FUNC(st2205u_device::usr_r), FUNC(st2205u_device::usr_clr_w));
+	map(0x0062, 0x0062).rw(FUNC(st2205u_device::irctr_r), FUNC(st2205u_device::irctr_w));
 	map(0x0063, 0x0063).rw(FUNC(st2205u_device::bctr_r), FUNC(st2205u_device::bctr_w));
+	map(0x0064, 0x0064).rw(FUNC(st2205u_device::udata_r), FUNC(st2205u_device::udata_w));
 	map(0x0066, 0x0066).rw(FUNC(st2205u_device::brs_r), FUNC(st2205u_device::brs_w));
 	map(0x0067, 0x0067).rw(FUNC(st2205u_device::bdiv_r), FUNC(st2205u_device::bdiv_w));
 	map(0x0070, 0x0070).rw(FUNC(st2205u_device::usbcon_r), FUNC(st2205u_device::usbcon_w));
