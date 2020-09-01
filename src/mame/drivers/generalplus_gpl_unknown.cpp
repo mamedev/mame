@@ -217,11 +217,11 @@ uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		for (int x = 0; x < 320; x++)
 		{
 			// 8-bit values get pumped through a 256 word table in intenral ROM and converted to words, so it's probably raw 16-bit RGB data?
-			uint16_t dat = m_displaybuffer[(count * 2) + 0] | (m_displaybuffer[(count * 2) + 1] << 8);
+			uint16_t dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
 
-			int r = ((dat >> 0) & 0x1f) << 3;
-			int b = ((dat >> 5) & 0x3f) << 2;
-			int g = ((dat >> 11) & 0x1f) << 3;
+			int b = ((dat >> 0) & 0x1f) << 3;
+			int g = ((dat >> 5) & 0x3f) << 2;
+			int r = ((dat >> 11) & 0x1f) << 3;
 
 			dst[x] = (r << 16) | (g << 8) | (b << 0);
 			count++;
@@ -338,6 +338,7 @@ void pcp8718_state::spi_process_tx_data(uint8_t data)
 		{
 			logerror("set to fast read mode (need address) %02x\n", data);
 			m_spistate = SPI_STATE_WAITING_HIGH_ADDR_FAST;
+			//machine().debug_break();
 		}
 		else
 		{
@@ -707,6 +708,7 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 		if ((offset + 0xf000) == (realpc))
 		{
+#if 1
 			// still simulate this as it uses 'fast read' mode which doesn't work in the SPI handler at the moment
 			if (realpc == 0xf000)
 			{
@@ -751,7 +753,7 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 			{
 				return m_mainrom[offset];
 			}
-
+#endif
 		}
 		else
 		{
@@ -883,7 +885,7 @@ void pcp8718_state::pcp8718(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 320-1, 0*8, 256-1);
+	m_screen->set_visarea(0*8, 320-1, 0*8, 240-1);
 	m_screen->set_screen_update(FUNC(pcp8718_state::screen_update));
 	//m_screen->set_palette(m_palette);
 
