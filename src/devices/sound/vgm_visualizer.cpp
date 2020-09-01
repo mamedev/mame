@@ -279,14 +279,14 @@ void vgmviz_device::cycle_viz_mode()
 
 
 //-------------------------------------------------
-//  sound_stream_update - update the outgoing
+//  sound_stream_update_legacy - update the outgoing
 //  audio stream and process as necessary
 //-------------------------------------------------
 
-void vgmviz_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void vgmviz_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// call the normal interface to actually mix
-	device_mixer_interface::sound_stream_update_ex(stream, inputs, outputs);
+	device_mixer_interface::sound_stream_update(stream, inputs, outputs);
 
 	// now consume the outputs
 	for (int pos = 0; pos < outputs[0].samples(); pos++)

@@ -62,7 +62,7 @@ void ym2610_device::timer_handler(int c,int count,int clock)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 void ym2610_device::stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
@@ -70,7 +70,7 @@ void ym2610_device::stream_generate(sound_stream &stream, stream_sample_t const 
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
 void ym2610b_device::stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
@@ -102,7 +102,7 @@ void ym2610_device::device_start()
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(&ym2610_device::stream_generate,this));
+	m_stream = machine().sound().stream_alloc_legacy(*this,0,2,rate, stream_update_legacy_delegate(&ym2610_device::stream_generate,this));
 
 	if (!has_configured_map(0) && !has_configured_map(1))
 	{

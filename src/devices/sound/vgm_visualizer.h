@@ -91,7 +91,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_sound_interface-level overrides
-	void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void update_waveform();
 	void update_fft();

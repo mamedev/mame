@@ -212,7 +212,7 @@ void scsp_device::device_start()
 	m_main_irq_cb.resolve_safe();
 
 	// Stereo output with EXTS0,1 Input (External digital audio output)
-	m_stream = stream_alloc(2, 2, clock() / 512);
+	m_stream = stream_alloc_legacy(2, 2, clock() / 512);
 
 	for (int slot = 0; slot < 32; slot++)
 	{
@@ -317,10 +317,10 @@ void scsp_device::rom_bank_updated()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void scsp_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void scsp_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	m_exts0 = inputs[0];
 	m_exts1 = inputs[1];

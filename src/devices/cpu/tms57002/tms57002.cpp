@@ -918,7 +918,7 @@ void tms57002_device::execute_run()
 		icount = 0;
 }
 
-void tms57002_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tms57002_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	assert(inputs[0].samples() == 1);
 	assert(outputs[0].samples() == 1);
@@ -975,7 +975,7 @@ void tms57002_device::device_start()
 	state_add(TMS57002_HOST3, "HOST3",  host[3]);
 
 	set_icountptr(icount);
-	stream_alloc_ex(4, 4, SAMPLE_RATE_INPUT_ADAPTIVE, STREAM_SYNCHRONOUS);
+	stream_alloc(4, 4, SAMPLE_RATE_INPUT_ADAPTIVE, STREAM_SYNCHRONOUS);
 
 	save_item(NAME(macc));
 	save_item(NAME(macc_read));

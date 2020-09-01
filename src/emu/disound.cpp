@@ -66,23 +66,23 @@ device_sound_interface &device_sound_interface::add_route(u32 output, device_t &
 
 
 //-------------------------------------------------
-//  stream_alloc - allocate a stream implicitly
+//  stream_alloc_legacy - allocate a stream implicitly
 //  associated with this device
 //-------------------------------------------------
 
+sound_stream *device_sound_interface::stream_alloc_legacy(int inputs, int outputs, int sample_rate)
+{
+	return device().machine().sound().stream_alloc_legacy(*this, inputs, outputs, sample_rate, stream_update_legacy_delegate(&device_sound_interface::sound_stream_update_legacy, this));
+}
+
 sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate)
 {
-	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this));
+	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this), STREAM_RESAMPLER_DEFAULT);
 }
 
-sound_stream *device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate)
+sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
 {
-	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), STREAM_RESAMPLER_DEFAULT);
-}
-
-sound_stream *device_sound_interface::stream_alloc_ex(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
-{
-	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_ex_delegate(&device_sound_interface::sound_stream_update_ex, this), flags);
+	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this), flags);
 }
 
 
@@ -382,18 +382,18 @@ void device_sound_interface::interface_pre_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update - default implementation
+//  sound_stream_update_legacy - default implementation
 //  that should be overridden
 //-------------------------------------------------
 
-void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void device_sound_interface::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	throw emu_fatalerror("sound_stream_update called but not overridden by owning class");
+	throw emu_fatalerror("sound_stream_update_legacy called but not overridden by owning class");
 }
 
-void device_sound_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void device_sound_interface::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	throw emu_fatalerror("sound_stream_update_ex called but not overridden by owning class");
+	throw emu_fatalerror("sound_stream_update called but not overridden by owning class");
 }
 
 
@@ -463,7 +463,7 @@ void device_mixer_interface::interface_pre_start()
 	m_output_clear.resize(m_outputs);
 
 	// allocate the mixer stream
-	m_mixer_stream = stream_alloc_ex(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate(), STREAM_RESAMPLER_DEFAULT);
+	m_mixer_stream = stream_alloc(m_auto_allocated_inputs, m_outputs, device().machine().sample_rate(), STREAM_RESAMPLER_DEFAULT);
 }
 
 
@@ -485,11 +485,11 @@ void device_mixer_interface::interface_post_load()
 
 
 //-------------------------------------------------
-//  sound_stream_update_ex - mix all inputs to one
+//  sound_stream_update - mix all inputs to one
 //  output
 //-------------------------------------------------
 
-void device_mixer_interface::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void device_mixer_interface::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the clear flags
 	std::fill(std::begin(m_output_clear), std::end(m_output_clear), false);

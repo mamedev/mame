@@ -129,7 +129,7 @@ void i8244_device::device_start()
 	m_hblank_timer->adjust(screen().time_until_pos(0, m_hblank_start), 0, screen().scan_period());
 
 	// allocate a stream
-	m_stream = stream_alloc(0, 1, clock());
+	m_stream = stream_alloc_legacy(0, 1, clock());
 
 	// register our state
 	memset(m_vdc.reg, 0, 0x100);
@@ -740,7 +740,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void i8244_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	u8 volume = m_vdc.s.sound & 0xf;
 	int sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0x4000;

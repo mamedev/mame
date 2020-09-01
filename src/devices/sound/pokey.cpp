@@ -256,7 +256,7 @@ void pokey_device::device_start()
 	m_serin_r_cb.resolve();
 	m_serout_w_cb.resolve_safe();
 
-	m_stream = stream_alloc_ex(0, 1, clock());
+	m_stream = stream_alloc(0, 1, clock());
 
 	timer_alloc(SYNC_WRITE);    /* timer for sync operation */
 	timer_alloc(SYNC_NOOP);
@@ -349,7 +349,7 @@ void pokey_device::device_clock_changed()
 		if (m_stream != nullptr)
 			m_stream->set_sample_rate(clock());
 		else
-			m_stream = stream_alloc_ex(0, 1, clock());
+			m_stream = stream_alloc(0, 1, clock());
 	}
 }
 
@@ -681,7 +681,7 @@ void pokey_device::step_one_clock(void)
 //  our sound stream
 //-------------------------------------------------
 
-void pokey_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	auto &buffer = outputs[0];
 

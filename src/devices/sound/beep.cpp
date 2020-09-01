@@ -47,7 +47,7 @@ beep_device::beep_device(const machine_config &mconfig, const char *tag, device_
 
 void beep_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, BEEP_RATE);
+	m_stream = stream_alloc_legacy(0, 1, BEEP_RATE);
 	m_enable = 0;
 	m_signal = 0x07fff;
 
@@ -60,10 +60,10 @@ void beep_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void beep_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	int16_t signal = m_signal;

@@ -479,7 +479,7 @@ void multipcm_device::device_start()
 	const float clock_divider = 180.0f;
 	m_rate = (float)clock() / clock_divider;
 
-	m_stream = stream_alloc(0, 2, m_rate);
+	m_stream = stream_alloc_legacy(0, 2, m_rate);
 
 	// Volume + pan table
 	m_left_pan_table = make_unique_clear<int32_t[]>(0x800);
@@ -677,10 +677,10 @@ void multipcm_device::dump_sample(slot_t &slot)
 #endif
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int32_t samples)
+void multipcm_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int32_t samples)
 {
 	stream_sample_t  *datap[2];
 

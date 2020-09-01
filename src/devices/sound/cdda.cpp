@@ -12,10 +12,10 @@
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void cdda_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void cdda_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	get_audio_data(&outputs[0][0], &outputs[1][0], samples);
 	m_audio_volume[0] = int16_t(outputs[0][0]);
@@ -31,7 +31,7 @@ void cdda_device::device_start()
 	/* allocate an audio cache */
 	m_audio_cache = std::make_unique<uint8_t[]>(CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	m_stream = stream_alloc(0, 2, clock());
+	m_stream = stream_alloc_legacy(0, 2, clock());
 
 	m_audio_playing = 0;
 	m_audio_pause = 0;

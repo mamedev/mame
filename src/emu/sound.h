@@ -490,13 +490,13 @@ private:
 };
 
 
-// ======================> stream_update_delegate/stream_update_ex_delegate
+// ======================> stream_update_legacy_delegate/stream_update_delegate
 
 // old-style callback; eventually should be deprecated
-using stream_update_delegate = delegate<void (sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)>;
+using stream_update_legacy_delegate = delegate<void (sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)>;
 
 // new-style callback
-using stream_update_ex_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)>;
+using stream_update_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)>;
 
 
 // ======================> sound_stream_flags
@@ -528,8 +528,8 @@ class sound_stream
 
 public:
 	// construction/destruction
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
 	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
 	virtual ~sound_stream();
 
 	// simple getters
@@ -598,7 +598,7 @@ private:
 
 	// return a view of 0 data covering the given time period
 	read_stream_view empty_view(attotime start, attotime end);
-		
+
 	// linking information
 	device_t &m_device;                            // owning device
 	sound_stream *m_next;                          // next stream in the chain
@@ -626,8 +626,8 @@ private:
 	std::vector<write_stream_view> m_output_view;  // array of output views for passing to the callback
 
 	// callback information
-	stream_update_delegate m_callback;             // callback function
-	stream_update_ex_delegate m_callback_ex;       // extended callback function
+	stream_update_legacy_delegate m_callback;             // callback function
+	stream_update_delegate m_callback_ex;       // extended callback function
 };
 
 
@@ -687,10 +687,10 @@ public:
 	int unique_id() { return m_unique_id++; }
 
 	// allocate a new stream with the old-style callback
-	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback);
+	sound_stream *stream_alloc_legacy(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_legacy_delegate callback);
 
 	// allocate a new stream with a new-style callback
-	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags resampler = STREAM_RESAMPLER_DEFAULT);
+	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags resampler = STREAM_RESAMPLER_DEFAULT);
 
 	// begin recording a WAV file if options has requested it
 	void start_recording();

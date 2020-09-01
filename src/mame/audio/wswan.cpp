@@ -62,7 +62,7 @@ constexpr int clk_div = 64;
 
 void wswan_sound_device::device_start()
 {
-	m_channel = stream_alloc(0, 2, clock() / clk_div);
+	m_channel = stream_alloc_legacy(0, 2, clock() / clk_div);
 
 	save_item(NAME(m_sweep_step));
 	save_item(NAME(m_sweep_time));
@@ -164,10 +164,10 @@ int wswan_sound_device::fetch_sample(int channel, int offset)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void wswan_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t sample, left, right;
 

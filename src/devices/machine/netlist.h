@@ -281,7 +281,7 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	// device_sound_interface overrides
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	//virtual void device_reset() override;
 

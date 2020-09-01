@@ -169,7 +169,7 @@ void okim6376_device::device_start()
 	m_ch2_update = 0;
 	m_st_pulses = 0;
 	/* generate the name and create the stream */
-	m_stream = stream_alloc(0, 1, get_sample_rate());
+	m_stream = stream_alloc_legacy(0, 1, get_sample_rate());
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)
@@ -578,10 +578,10 @@ void okim6376_device::write(uint8_t data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void okim6376_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i;
 

@@ -31,7 +31,7 @@ void tvc_sound_device::device_start()
 	// resolve callbacks
 	m_write_sndint.resolve_safe();
 
-	m_stream = stream_alloc(0, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
 	m_sndint_timer = timer_alloc(TIMER_SNDINT);
 }
 
@@ -58,11 +58,11 @@ void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void tvc_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void tvc_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int rate = machine().sample_rate() / 2;
 	stream_sample_t *output = outputs[0];

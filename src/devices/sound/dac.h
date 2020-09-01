@@ -189,7 +189,7 @@ protected:
 
 	virtual void device_start() override
 	{
-		this->m_stream = stream_alloc_ex(2, 1, 48000 * 4);
+		this->m_stream = stream_alloc(2, 1, 48000 * 4);
 
 		save_item(NAME(this->m_code));
 	}
@@ -199,7 +199,7 @@ protected:
 		this->setCode(param);
 	}
 
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		_dac_code::sound_stream_update_ex_tag(stream, inputs, outputs);
 	}

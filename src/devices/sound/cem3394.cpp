@@ -144,10 +144,10 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  sound_stream_update - generate sound to the mix buffer in mono
+//  sound_stream_update_legacy - generate sound to the mix buffer in mono
 //-------------------------------------------------
 
-void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void cem3394_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int int_volume = (m_volume * m_mixer_internal) / 256;
 	int ext_volume = (m_volume * m_mixer_external) / 256;
@@ -333,7 +333,7 @@ void cem3394_device::device_start()
 	m_inv_sample_rate = 1.0 / (double)m_sample_rate;
 
 	/* allocate stream channels, 1 per chip */
-	m_stream = stream_alloc(0, 1, m_sample_rate);
+	m_stream = stream_alloc_legacy(0, 1, m_sample_rate);
 
 	m_ext_cb.resolve();
 

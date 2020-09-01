@@ -522,7 +522,7 @@ void sound_stream_input::apply_sample_rate_changes(u32 updatenum, u32 downstream
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
@@ -541,7 +541,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_output_array(outputs),
 	m_output_view(outputs),
 	m_callback(std::move(callback)),
-	m_callback_ex(stream_update_ex_delegate(&sound_stream::oldstyle_callback_ex, this))
+	m_callback_ex(stream_update_delegate(&sound_stream::oldstyle_callback_ex, this))
 {
 	// common init
 	init_common(inputs, outputs, sample_rate, flags);
@@ -553,7 +553,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 //  callback
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
@@ -970,7 +970,7 @@ read_stream_view sound_stream::empty_view(attotime start, attotime end)
 //-------------------------------------------------
 
 default_resampler_stream::default_resampler_stream(device_t &device) :
-	sound_stream(device, 1, 1, 0, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_ex_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_RESAMPLER_NONE),
+	sound_stream(device, 1, 1, 0, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_RESAMPLER_NONE),
 	m_max_latency(0)
 {
 	// create a name
@@ -1171,10 +1171,10 @@ sound_manager::~sound_manager()
 
 
 //-------------------------------------------------
-//  stream_alloc - allocate a new stream
+//  stream_alloc_legacy - allocate a new stream
 //-------------------------------------------------
 
-sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback)
+sound_stream *sound_manager::stream_alloc_legacy(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_legacy_delegate callback)
 {
 	// determine output base
 	u32 output_base = 0;
@@ -1192,7 +1192,7 @@ sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outp
 //  new-style callback and flags
 //-------------------------------------------------
 
-sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_ex_delegate callback, sound_stream_flags flags)
+sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags)
 {
 	// determine output base
 	u32 output_base = 0;

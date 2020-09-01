@@ -249,7 +249,7 @@ void es5506_device::device_start()
 		channels = m_channels;
 
 	/* create the stream */
-	m_stream = stream_alloc(0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
 	if (m_region0 && !has_configured_map(0))
@@ -378,7 +378,7 @@ void es5505_device::device_start()
 		channels = m_channels;
 
 	/* create the stream */
-	m_stream = stream_alloc(0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
 	if (m_region0 && !has_configured_map(0))
@@ -2123,10 +2123,10 @@ u16 es5505_device::read(offs_t offset)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void es550x_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 #if ES5506_MAKE_WAVS
 	// start the logging once we have a sample rate

@@ -97,7 +97,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	virtual void set_default_params();
 

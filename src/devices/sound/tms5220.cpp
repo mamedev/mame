@@ -1649,7 +1649,7 @@ void tms5220_device::device_start()
 	m_data_cb.resolve();
 
 	/* initialize a stream */
-	m_stream = stream_alloc_ex(0, 1, clock() / 80);
+	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_timer_io_ready = timer_alloc(0);
 
@@ -2052,10 +2052,10 @@ READ_LINE_MEMBER( tms5220_device::intq_r )
 ***********************************************************************************************/
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void tms5220_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tms5220_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
 	auto &output = outputs[0];

@@ -122,7 +122,7 @@ void c352_device::ramp_volume(c352_voice_t &v, int ch, u8 val)
 		v.curr_vol[ch] += (vol_delta > 0) ? -1 : 1;
 }
 
-void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void c352_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer_fl = outputs[0];
 	stream_sample_t *buffer_fr = outputs[1];
@@ -358,14 +358,14 @@ void c352_device::device_clock_changed()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(m_sample_rate_base);
 	else
-		m_stream = stream_alloc(0, 4, m_sample_rate_base);
+		m_stream = stream_alloc_legacy(0, 4, m_sample_rate_base);
 }
 
 void c352_device::device_start()
 {
 	m_sample_rate_base = clock() / m_divider;
 
-	m_stream = stream_alloc(0, 4, m_sample_rate_base);
+	m_stream = stream_alloc_legacy(0, 4, m_sample_rate_base);
 
 	// generate mulaw table (Output similar to namco's VC emulator)
 	int j = 0;

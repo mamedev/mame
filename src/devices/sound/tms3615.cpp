@@ -42,17 +42,17 @@ tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, d
 
 void tms3615_device::device_start()
 {
-	m_channel = stream_alloc(0, 2, clock()/8);
+	m_channel = stream_alloc_legacy(0, 2, clock()/8);
 	m_samplerate = clock()/8;
 	m_basefreq = clock();
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void tms3615_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void tms3615_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int samplerate = m_samplerate;
 	stream_sample_t *buffer8 = outputs[FOOTAGE_8];

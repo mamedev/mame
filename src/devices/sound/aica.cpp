@@ -1390,10 +1390,10 @@ int aica_device::IRQCB(void *param)
 #endif
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void aica_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	m_bufferl = outputs[0];
 	m_bufferr = outputs[1];
@@ -1418,7 +1418,7 @@ void aica_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = stream_alloc(2, 2, (int)m_rate);
+	m_stream = stream_alloc_legacy(2, 2, (int)m_rate);
 
 	// save state
 	save_item(NAME(m_udata.data));

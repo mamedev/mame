@@ -69,7 +69,7 @@ protected:
 	/* decoded waveform table */
 	int16_t *m_waveform[MAX_VOLUME];
 
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 class namco_device : public namco_audio_device
@@ -85,7 +85,7 @@ public:
 	void polepos_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 
@@ -99,7 +99,7 @@ public:
 	void sharedram_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 
@@ -115,7 +115,7 @@ public:
 	void pacman_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 

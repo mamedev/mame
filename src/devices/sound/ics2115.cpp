@@ -63,7 +63,7 @@ void ics2115_device::device_start()
 
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
-	m_stream = stream_alloc(0, 2, clock() / (32 * 32));
+	m_stream = stream_alloc_legacy(0, 2, clock() / (32 * 32));
 
 	m_irq_cb.resolve_safe();
 
@@ -426,7 +426,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t * const ou
 	return irq_invalid;
 }
 
-void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void ics2115_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));

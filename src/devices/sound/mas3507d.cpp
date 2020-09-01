@@ -29,7 +29,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 void mas3507d_device::device_start()
 {
 	current_rate = 44100;
-	stream = stream_alloc(0, 2, current_rate);
+	stream = stream_alloc_legacy(0, 2, current_rate);
 	cb_sample.resolve();
 }
 
@@ -400,7 +400,7 @@ void mas3507d_device::append_buffer(stream_sample_t * const *outputs, int &pos, 
 	total_frame_count += s1;
 }
 
-void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int csamples)
+void mas3507d_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int csamples)
 {
 	int pos = 0;
 

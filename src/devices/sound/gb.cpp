@@ -142,7 +142,7 @@ cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *ta
 
 void gameboy_sound_device::device_start()
 {
-	m_channel = stream_alloc(0, 2, machine().sample_rate());
+	m_channel = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameboy_sound_device::timer_callback),this));
 	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES/128), 0, clocks_to_attotime(FRAME_CYCLES/128));
 
@@ -1211,10 +1211,10 @@ void cgb04_apu_device::apu_power_off()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void gameboy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outputl = outputs[0];
 	stream_sample_t *outputr = outputs[1];

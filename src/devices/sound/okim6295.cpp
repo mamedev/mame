@@ -118,7 +118,7 @@ void okim6295_device::device_start()
 
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
-	m_stream = stream_alloc_ex(0, 1, clock() / divisor);
+	m_stream = stream_alloc(0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
 	save_item(NAME(m_pin7_state));
@@ -175,7 +175,7 @@ void okim6295_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-void okim6295_device::sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void okim6295_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the output stream
 	outputs[0].fill(0);
