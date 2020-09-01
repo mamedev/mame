@@ -192,7 +192,7 @@ private:
 
 	spistate m_spistate;
 
-	uint8_t m_displaybuffer[0x20000];
+	uint8_t m_displaybuffer[0x40000];
 	int m_lcdaddr;
 
 	uint16_t unk_7870_r();
@@ -214,7 +214,7 @@ uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		uint32_t* dst = &bitmap.pix32(y);
 
-		for (int x = 0; x < 256; x++)
+		for (int x = 0; x < 320; x++)
 		{
 			// 8-bit values get pumped through a 256 word table in intenral ROM and converted to words, so it's probably raw 16-bit RGB data?
 			uint16_t dat = m_displaybuffer[(count * 2) + 0] | (m_displaybuffer[(count * 2) + 1] << 8);
@@ -685,12 +685,16 @@ void pcp8718_state::map(address_map &map)
 
 void pcp8718_state::lcd_w(uint16_t data)
 {
-	//logerror("%06x: lcd_w %04x\n", machine().describe_context(), data);
+	logerror("%06x: lcd_w %04x\n", machine().describe_context(), data);
 	data &= 0xff; // definitely looks like 8-bit port as 16-bit values are shifted and rewritten
 
 	m_displaybuffer[m_lcdaddr] = data;
 	m_lcdaddr++;
-	m_lcdaddr &= 0x1ffff;
+
+	if (m_lcdaddr >= ((320 * 240)*2))
+		m_lcdaddr = 0;
+
+	//m_lcdaddr &= 0x3ffff;
 }
 
 uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
@@ -879,7 +883,7 @@ void pcp8718_state::pcp8718(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 256-1, 0*8, 256-1);
+	m_screen->set_visarea(0*8, 320-1, 0*8, 256-1);
 	m_screen->set_screen_update(FUNC(pcp8718_state::screen_update));
 	//m_screen->set_palette(m_palette);
 
