@@ -105,6 +105,7 @@ void st2204_device::device_start()
 	save_item(NAME(m_dms));
 	save_item(NAME(m_dmd));
 	save_item(NAME(m_dcnth));
+	save_item(NAME(intf->dmr));
 
 	mintf = std::move(intf);
 	save_common_registers();
@@ -178,6 +179,9 @@ void st2204_device::device_reset()
 	m_dac = 0;
 	m_psg_timer->enable(false);
 	m_dac_callback(0);
+
+	downcast<mi_st2204 &>(*mintf).dmr = 0;
+	// other DMA registers are undefined
 }
 
 const char *st2204_device::st2xxx_irq_name(int i) const
@@ -583,6 +587,28 @@ void st2204_device::dcntl_w(u8 data)
 void st2204_device::dcnth_w(u8 data)
 {
 	m_dcnth = data & 0x1f;
+}
+
+u8 st2204_device::dmrl_r()
+{
+	return downcast<mi_st2204 &>(*mintf).dmr & 0xff;
+}
+
+void st2204_device::dmrl_w(u8 data)
+{
+	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
+	dmr = (data & m_drr_mask) | (dmr & 0xff00);
+}
+
+u8 st2204_device::dmrh_r()
+{
+	return downcast<mi_st2204 &>(*mintf).dmr >> 8;
+}
+
+void st2204_device::dmrh_w(u8 data)
+{
+	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
+	dmr = ((u16(data) << 8) & m_drr_mask) | (dmr & 0x00ff);
 }
 
 u8 st2204_device::pmem_r(offs_t offset)

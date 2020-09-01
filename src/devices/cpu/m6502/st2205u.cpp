@@ -44,7 +44,7 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	, m_tc_12bit{0}
 	, m_t4c(0)
 	, m_tien(0)
-  , m_dac_fifo{{0}}
+	, m_dac_fifo{{0}}
 	, m_fifo_filled{0}
 	, m_psgc(0)
 	, m_psgm(0)
@@ -55,6 +55,11 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	, m_gray_levels{0}
 	, m_usbcon(0)
 	, m_usbien(0)
+	, m_dptr{0}
+	, m_dbkr{0}
+	, m_dcnt{0}
+	, m_dctr(0)
+	, m_dmod{0}
 	, m_rctr(0)
 	, m_lvctr(0)
 {
@@ -91,6 +96,11 @@ void st2205u_device::device_start()
 	save_item(NAME(m_gray_levels));
 	save_item(NAME(m_usbcon));
 	save_item(NAME(m_usbien));
+	save_item(NAME(m_dptr));
+	save_item(NAME(m_dbkr));
+	save_item(NAME(m_dcnt));
+	save_item(NAME(m_dctr));
+	save_item(NAME(m_dmod));
 	save_item(NAME(m_rctr));
 	save_item(NAME(m_lvctr));
 	save_item(NAME(intf->brr));
@@ -153,6 +163,16 @@ void st2205u_device::device_start()
 	state_add(ST_BDIV, "BDIV", m_bdiv);
 	state_add(ST_USBCON, "USBCON", m_usbcon).mask(0xfc);
 	state_add(ST_USBIEN, "USBIEN", m_usbien).mask(0xbf);
+	for (int i = 0; i < 2; i++)
+	{
+		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+	}
+	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);
 	state_add(ST_LVCTR, "LVCTR", m_lvctr).mask(0x0f);
 }
@@ -181,6 +201,12 @@ void st2205u_device::device_reset()
 
 	m_usbcon = 0;
 	m_usbien = 0x20;
+
+	std::fill(std::begin(m_dptr), std::end(m_dptr), 0);
+	std::fill(std::begin(m_dbkr), std::end(m_dbkr), 0);
+	std::fill(std::begin(m_dcnt), std::end(m_dcnt), 0);
+	m_dctr = 0;
+	std::fill(std::begin(m_dmod), std::end(m_dmod), 0);
 
 	m_rctr = 0;
 
@@ -513,6 +539,87 @@ void st2205u_device::usbien_w(u8 data)
 	m_usbien = data & 0xbf;
 }
 
+u8 st2205u_device::dptrl_r()
+{
+	return m_dptr[m_dctr] & 0x00ff;
+}
+
+void st2205u_device::dptrl_w(u8 data)
+{
+	m_dptr[m_dctr] = (m_dptr[m_dctr] & 0x7f00) | data;
+}
+
+u8 st2205u_device::dptrh_r()
+{
+	return (m_dptr[m_dctr] >> 8) | 0x80;
+}
+
+void st2205u_device::dptrh_w(u8 data)
+{
+	m_dptr[m_dctr] = u16(data & 0x7f) << 8 | (m_dptr[m_dctr] & 0x00ff);
+}
+
+u8 st2205u_device::dbkrl_r()
+{
+	return m_dbkr[m_dctr] & 0x00ff;
+}
+
+void st2205u_device::dbkrl_w(u8 data)
+{
+	m_dbkr[m_dctr] = (m_dbkr[m_dctr] & 0x8700) | data;
+}
+
+u8 st2205u_device::dbkrh_r()
+{
+	return (m_dbkr[m_dctr] >> 8) | 0x78;
+}
+
+void st2205u_device::dbkrh_w(u8 data)
+{
+	m_dbkr[m_dctr] = u16(data & 0x87) << 8 | (m_dbkr[m_dctr] & 0x00ff);
+}
+
+u8 st2205u_device::dcntl_r()
+{
+	return m_dcnt[m_dctr >> 1] & 0x00ff;
+}
+
+void st2205u_device::dcntl_w(u8 data)
+{
+	m_dcnt[m_dctr >> 1] = (m_dcnt[m_dctr >> 1] & 0x7f00) | data;
+}
+
+u8 st2205u_device::dcnth_r()
+{
+	return (m_dcnt[m_dctr >> 1] >> 8) | 0x80;
+}
+
+void st2205u_device::dcnth_w(u8 data)
+{
+	m_dcnt[m_dctr >> 1] = (m_dcnt[m_dctr >> 1] & 0x7f00) | data;
+	// TODO: start DMA here
+}
+
+u8 st2205u_device::dctr_r()
+{
+	return m_dctr | 0xfc;
+}
+
+void st2205u_device::dctr_w(u8 data)
+{
+	m_dctr = data & 0x03;
+}
+
+u8 st2205u_device::dmod_r()
+{
+	return m_dmod[m_dctr >> 1] | 0xc0;
+}
+
+void st2205u_device::dmod_w(u8 data)
+{
+	m_dmod[m_dctr >> 1] = data & 0x3f;
+}
+
 u8 st2205u_device::rctr_r()
 {
 	return (m_rctr & 0xe0) | 0x10;
@@ -625,8 +732,14 @@ void st2205u_device::int_map(address_map &map)
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));
-	map(0x005a, 0x005a).rw(FUNC(st2205u_device::dmrl_r), FUNC(st2205u_device::dmrl_w));
-	map(0x005b, 0x005b).rw(FUNC(st2205u_device::dmrh_r), FUNC(st2205u_device::dmrh_w));
+	map(0x0058, 0x0058).rw(FUNC(st2205u_device::dptrl_r), FUNC(st2205u_device::dptrl_w));
+	map(0x0059, 0x0059).rw(FUNC(st2205u_device::dptrh_r), FUNC(st2205u_device::dptrh_w));
+	map(0x005a, 0x005a).rw(FUNC(st2205u_device::dbkrl_r), FUNC(st2205u_device::dbkrl_w));
+	map(0x005b, 0x005b).rw(FUNC(st2205u_device::dbkrh_r), FUNC(st2205u_device::dbkrh_w));
+	map(0x005c, 0x005c).rw(FUNC(st2205u_device::dcntl_r), FUNC(st2205u_device::dcntl_w));
+	map(0x005d, 0x005d).rw(FUNC(st2205u_device::dcnth_r), FUNC(st2205u_device::dcnth_w));
+	map(0x005e, 0x005e).rw(FUNC(st2205u_device::dctr_r), FUNC(st2205u_device::dctr_w));
+	map(0x005f, 0x005f).rw(FUNC(st2205u_device::dmod_r), FUNC(st2205u_device::dmod_w));
 	map(0x0060, 0x0060).rw(FUNC(st2205u_device::uctr_r), FUNC(st2205u_device::uctr_w));
 	map(0x0061, 0x0061).rw(FUNC(st2205u_device::usr_r), FUNC(st2205u_device::usr_clr_w));
 	map(0x0062, 0x0062).rw(FUNC(st2205u_device::irctr_r), FUNC(st2205u_device::irctr_w));

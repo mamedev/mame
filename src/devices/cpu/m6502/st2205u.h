@@ -38,6 +38,19 @@ public:
 		ST_VOLM1,
 		ST_LBUF,
 		ST_BRR,
+		ST_DMS0,
+		ST_DMS1,
+		ST_DMD0,
+		ST_DMD1,
+		ST_DBKS0,
+		ST_DBKS1,
+		ST_DBKD0,
+		ST_DBKD1,
+		ST_DCNT0,
+		ST_DCNT1,
+		ST_DCTR,
+		ST_DMOD0,
+		ST_DMOD1,
 		ST_USBCON,
 		ST_USBIEN,
 		ST_RCTR,
@@ -124,6 +137,22 @@ private:
 	void usbcon_w(u8 data);
 	u8 usbien_r();
 	void usbien_w(u8 data);
+	u8 dptrl_r();
+	void dptrl_w(u8 data);
+	u8 dptrh_r();
+	void dptrh_w(u8 data);
+	u8 dbkrl_r();
+	void dbkrl_w(u8 data);
+	u8 dbkrh_r();
+	void dbkrh_w(u8 data);
+	u8 dcntl_r();
+	void dcntl_w(u8 data);
+	u8 dcnth_r();
+	void dcnth_w(u8 data);
+	u8 dctr_r();
+	void dctr_w(u8 data);
+	u8 dmod_r();
+	void dmod_w(u8 data);
 	u8 rctr_r();
 	void rctr_w(u8 data);
 	u8 lvctr_r();
@@ -155,6 +184,11 @@ private:
 	u8 m_gray_levels[16];
 	u8 m_usbcon;
 	u8 m_usbien;
+	u16 m_dptr[4];
+	u16 m_dbkr[4];
+	u16 m_dcnt[2];
+	u8 m_dctr;
+	u8 m_dmod[2];
 	u8 m_rctr;
 	u8 m_lvctr;
 };

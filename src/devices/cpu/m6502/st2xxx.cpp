@@ -161,11 +161,7 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(intf->prr));
 	}
 	if (m_drr_mask != 0)
-	{
 		save_item(NAME(intf->drr));
-		if (st2xxx_has_dma())
-			save_item(NAME(intf->dmr));
-	}
 	if (m_bt_mask != 0)
 	{
 		save_item(NAME(m_bten));
@@ -220,7 +216,6 @@ void st2xxx_device::device_reset()
 	m.irr = 0;
 	m.prr = 0;
 	m.drr = 0;
-	m.dmr = 0;
 
 	// reset interrupt registers
 	m_ireq = 0;
@@ -253,7 +248,7 @@ void st2xxx_device::device_reset()
 
 	// reset UART and BRG
 	m_uctr = 0;
-	m_usr = 0x01;
+	m_usr = BIT(st2xxx_uctr_mask(), 4) ? 0x01 : 0;
 	m_irctr = 0;
 	m_bctr = 0;
 }
@@ -570,28 +565,6 @@ void st2xxx_device::drrh_w(u8 data)
 {
 	u16 &drr = downcast<mi_st2xxx &>(*mintf).drr;
 	drr = ((u16(data) << 8) & m_drr_mask) | (drr & 0x00ff);
-}
-
-u8 st2xxx_device::dmrl_r()
-{
-	return downcast<mi_st2xxx &>(*mintf).dmr & 0xff;
-}
-
-void st2xxx_device::dmrl_w(u8 data)
-{
-	u16 &dmr = downcast<mi_st2xxx &>(*mintf).dmr;
-	dmr = (data & m_drr_mask) | (dmr & 0xff00);
-}
-
-u8 st2xxx_device::dmrh_r()
-{
-	return downcast<mi_st2xxx &>(*mintf).dmr >> 8;
-}
-
-void st2xxx_device::dmrh_w(u8 data)
-{
-	u16 &dmr = downcast<mi_st2xxx &>(*mintf).dmr;
-	dmr = ((u16(data) << 8) & m_drr_mask) | (dmr & 0x00ff);
 }
 
 u8 st2xxx_device::ireql_r()

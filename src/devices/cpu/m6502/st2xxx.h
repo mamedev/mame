@@ -121,7 +121,6 @@ protected:
 		u16 irr;
 		u16 prr;
 		u16 drr;
-		u16 dmr;
 	};
 
 	void init_base_timer(u16 ireq);
@@ -173,10 +172,6 @@ protected:
 	void drrl_w(u8 data);
 	u8 drrh_r();
 	void drrh_w(u8 data);
-	u8 dmrl_r();
-	void dmrl_w(u8 data);
-	u8 dmrh_r();
-	void dmrh_w(u8 data);
 
 	u8 bten_r();
 	void bten_w(u8 data);

@@ -77,6 +77,8 @@ private:
 		u8 dread(u16 adr);
 		u8 dreadc(u16 adr);
 		void dwrite(u16 adr, u8 val);
+
+		u16 dmr;
 	};
 
 	TIMER_CALLBACK_MEMBER(t0_interrupt);
@@ -91,6 +93,7 @@ private:
 	void t1m_w(u8 data);
 	u8 t1c_r();
 	void t1c_w(u8 data);
+
 	TIMER_CALLBACK_MEMBER(psg_interrupt);
 	void psg_timer_reload();
 	u8 psg_r(offs_t offset);
@@ -101,6 +104,7 @@ private:
 	void vol_w(u8 data);
 	u8 dac_r();
 	void dac_w(u8 data);
+
 	u8 dmsl_r();
 	void dmsl_w(u8 data);
 	u8 dmsh_r();
@@ -111,6 +115,10 @@ private:
 	void dmdh_w(u8 data);
 	void dcntl_w(u8 data);
 	void dcnth_w(u8 data);
+	u8 dmrl_r();
+	void dmrl_w(u8 data);
+	u8 dmrh_r();
+	void dmrh_w(u8 data);
 
 	u8 pmem_r(offs_t offset);
 	void pmem_w(offs_t offset, u8 data);
