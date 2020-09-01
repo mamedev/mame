@@ -101,7 +101,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<unsp_20_device> m_maincpu;
 	required_region_ptr<uint16_t> m_mainrom;
@@ -143,14 +143,13 @@ private:
 	uint16_t bankswitch_703a_r();
 	uint16_t m_703a_bank;
 
-	void palette_w(offs_t offset, uint16_t data);
-	uint16_t palette_r(offs_t offset);
-	uint16_t m_paletteram[0x400];
+	void bankedram_7300_w(offs_t offset, uint16_t data);
+	uint16_t bankedram_7300_r(offs_t offset);
+	uint16_t m_bankedram_7300[0x400];
 
-
-	void spriteram_w(offs_t offset, uint16_t data);
-	uint16_t spriteram_r(offs_t offset);
-	uint16_t m_spriteram[0x800];
+	void bankedram_7400_w(offs_t offset, uint16_t data);
+	uint16_t bankedram_7400_r(offs_t offset);
+	uint16_t m_bankedram_7400[0x800];
 
 	void system_dma_params_channel0_w(offs_t offset, uint16_t data);
 	uint16_t system_dma_params_channel0_r(offs_t offset);
@@ -197,12 +196,12 @@ private:
 
 	spistate m_spistate;
 
-	uint16_t m_displaybuffer[0x20000];
+	uint8_t m_displaybuffer[0x20000];
 	int m_lcdaddr;
 
 };
 
-uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_mainram[0x12] |= 0x8000; // some code waits on this, what is it?
 
@@ -215,15 +214,20 @@ uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
-		uint16_t* dst = &bitmap.pix16(y);
+		uint32_t* dst = &bitmap.pix32(y);
 
-		for (int x = 0; x < 512; x++)
+		for (int x = 0; x < 256; x++)
 		{
-			uint16_t dat = m_displaybuffer[count]&0x7fff;
-			dst[x] = dat;
+			// 8-bit values get pumped through a 256 word table in intenral ROM and converted to words, so it's probably raw 16-bit RGB data?
+			uint16_t dat = m_displaybuffer[(count * 2) + 0] | (m_displaybuffer[(count * 2) + 1] << 8);
+
+			int r = ((dat >> 0) & 0x1f) << 3;
+			int b = ((dat >> 5) & 0x3f) << 2;
+			int g = ((dat >> 11) & 0x1f) << 3;
+
+			dst[x] = (r << 16) | (g << 8) | (b << 0);
 			count++;
 		}
-
 	}
 
 	return 0;
@@ -466,39 +470,39 @@ uint16_t pcp8718_state::bankswitch_703a_r()
 	return m_703a_bank;
 }
 
-void pcp8718_state::palette_w(offs_t offset, uint16_t data)
+void pcp8718_state::bankedram_7300_w(offs_t offset, uint16_t data)
 {
 	offset |= (m_703a_bank & 0x000c) << 6;
-	m_paletteram[offset] = data;
+	m_bankedram_7300[offset] = data;
 }
 
-uint16_t pcp8718_state::palette_r(offs_t offset)
+uint16_t pcp8718_state::bankedram_7300_r(offs_t offset)
 {
 	offset |= (m_703a_bank & 0x000c) << 6;
-	return m_paletteram[offset];
+	return m_bankedram_7300[offset];
 }
 
-void pcp8718_state::spriteram_w(offs_t offset, uint16_t data)
+void pcp8718_state::bankedram_7400_w(offs_t offset, uint16_t data)
 {
 	if (m_707e_bank & 1)
 	{
-		m_spriteram[offset + 0x400] = data;
+		m_bankedram_7400[offset + 0x400] = data;
 	}
 	else 
 	{
-		m_spriteram[offset] = data;
+		m_bankedram_7400[offset] = data;
 	}
 }
 
-uint16_t pcp8718_state::spriteram_r(offs_t offset)
+uint16_t pcp8718_state::bankedram_7400_r(offs_t offset)
 {
 	if (m_707e_bank & 1)
 	{
-		return m_spriteram[offset + 0x400];
+		return m_bankedram_7400[offset + 0x400];
 	}
 	else 
 	{
-		return m_spriteram[offset];
+		return m_bankedram_7400[offset];
 	}
 }
 
@@ -595,8 +599,8 @@ void pcp8718_state::map(address_map &map)
 	map(0x00707e, 0x00707e).rw(FUNC(pcp8718_state::bankswitch_707e_r), FUNC(pcp8718_state::bankswitch_707e_w));
 
 	map(0x007100, 0x0071ff).ram(); // rowscroll on gpl16250
-	map(0x007300, 0x0073ff).rw(FUNC(pcp8718_state::palette_r), FUNC(pcp8718_state::palette_w)); // palette on gpl16250
-	map(0x007400, 0x0077ff).rw(FUNC(pcp8718_state::spriteram_r), FUNC(pcp8718_state::spriteram_w)); // spriteram on gpl16250
+	map(0x007300, 0x0073ff).rw(FUNC(pcp8718_state::bankedram_7300_r), FUNC(pcp8718_state::bankedram_7300_w)); // palette on gpl16250
+	map(0x007400, 0x0077ff).rw(FUNC(pcp8718_state::bankedram_7400_r), FUNC(pcp8718_state::bankedram_7400_w)); // spriteram on gpl16250
 
 	map(0x00780f, 0x00780f).r(FUNC(pcp8718_state::unk_780f_r));
 
@@ -631,6 +635,7 @@ void pcp8718_state::map(address_map &map)
 void pcp8718_state::lcd_w(uint16_t data)
 {
 	//logerror("%06x: lcd_w %04x\n", machine().describe_context(), data);
+	data &= 0xff; // definitely looks like 8-bit port as 16-bit values are shifted and rewritten
 
 	m_displaybuffer[m_lcdaddr] = data;
 	m_lcdaddr++;
@@ -806,7 +811,7 @@ void pcp8718_state::machine_reset()
 	m_spiaddress = 0;
 
 	for (int i = 0; i < 0x20000; i++)
-		m_displaybuffer[i] = i&0x7fff;
+		m_displaybuffer[i] = i&0xff;
 
 	m_lcdaddr = 0;
 
@@ -823,9 +828,9 @@ void pcp8718_state::pcp8718(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 512-1, 0*8, 256-1);
+	m_screen->set_visarea(0*8, 256-1, 0*8, 256-1);
 	m_screen->set_screen_update(FUNC(pcp8718_state::screen_update));
-	m_screen->set_palette(m_palette);
+	//m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 }
