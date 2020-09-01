@@ -563,7 +563,7 @@ void pcp8718_state::system_dma_params_channel0_w(offs_t offset, uint16_t data)
 		{
 			logerror("%06x: system_dma_params_channel0_w %01x %04x (DMA Mode)\n", machine().describe_context(), offset, data);
 
-#if 0
+#if 1
 
 			uint16_t mode = m_dmaregs[0];
 			uint32_t source = m_dmaregs[1] | (m_dmaregs[4] << 16);
@@ -580,8 +580,8 @@ void pcp8718_state::system_dma_params_channel0_w(offs_t offset, uint16_t data)
 				// source and dest are swapped compared to gpl16250 hookup? probably mode?
 				for (int i = 0; i < length; i++)
 				{
-					uint16_t dat = mem.read_word(dest);
-					mem.write_word(source, dat);
+					uint16_t dat = mem.read_word(source);
+					mem.write_word(dest, dat);
 
 					dest++;
 					source++;
