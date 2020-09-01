@@ -89,6 +89,15 @@ void stream_buffer::set_sample_rate(u32 rate)
 	// skip if nothing is actually changing
 	if (rate == m_sample_rate)
 		return;
+	bool new_rate_higher = (rate > m_sample_rate);
+
+	// note the time and period of the current buffer (end_time is AFTER the final sample)
+	attotime prevperiod = sample_period();
+	attotime prevend = end_time();
+
+	// compute the time and period of the new buffer
+	attotime newperiod = attotime(0, (rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + rate - 1) / rate));
+	attotime newend = attotime(prevend.seconds(), (prevend.attoseconds() / newperiod.attoseconds()) * newperiod.attoseconds());
 
 	// buffer a short runway of previous samples; in order to support smooth
 	// sample rate changes (needed by, e.g., Q*Bert's Votrax), we buffer a few
@@ -96,13 +105,16 @@ void stream_buffer::set_sample_rate(u32 rate)
 	// (via simple point sampling) at the new rate. The litmus test is the
 	// voice when jumping off the edge in Q*Bert; without this extra effort
 	// it is crackly and/or glitchy at times
-	sample_t buffer[256];
-	for (int index = 0; index < ARRAY_LENGTH(buffer); index++)
-		buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
+	sample_t buffer[32];
+	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(ARRAY_LENGTH(buffer))));
 
-	// also note the time and rate of these samples (end_time is AFTER the final sample)
-	attotime buffer_period = sample_period();
-	attotime buffer_time = end_time();
+	// if the new rate is lower, downsample into our holding buffer;
+	// otherwise just copy into our holding buffer for later upsampling
+	if (!new_rate_higher)
+		backfill_downsample(&buffer[0], buffered_samples, newend, newperiod);
+	else
+		for (int index = 0; index < buffered_samples; index++)
+			buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
 
 	// ensure our buffer is large enough to hold a full second at the new rate
 	if (m_buffer.size() < rate)
@@ -110,7 +122,10 @@ void stream_buffer::set_sample_rate(u32 rate)
 
 	// set the new rate
 	m_sample_rate = rate;
-	m_sample_attos = (rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + rate - 1) / rate);
+	m_sample_attos = newperiod.attoseconds();
+
+	// compute the new end sample index based on the buffer time
+	m_end_sample = time_to_buffer_index(prevend);
 
 #if (SOUND_DEBUG)
 	// for aggressive debugging, fill the buffer with NANs to catch anyone
@@ -118,36 +133,13 @@ void stream_buffer::set_sample_rate(u32 rate)
 	std::fill_n(&m_buffer[0], m_buffer.size(), NAN);
 #endif
 
-	// compute the new end sample index based on the buffer time
-	m_end_sample = time_to_buffer_index(buffer_time);
-
-	// compute the time of the first sample to be backfilled; start one period before
-	attotime backfill_period = sample_period();
-	attotime backfill_time = end_time() - backfill_period;
-
-	// also adjust the buffered sample end time to point to the sample time of the
-	// final sample captured
-	buffer_time -= buffer_period;
-
-	// loop until we run out of buffered data
-	for (int srcindex = 0, dstindex = 0; ; dstindex++)
-	{
-		// if our backfill time is before the current buffered sample time,
-		// back up until we have a sample that covers this time
-		while (backfill_time < buffer_time && srcindex < ARRAY_LENGTH(buffer))
-		{
-			buffer_time -= buffer_period;
-			srcindex++;
-		}
-
-		// stop when we run out of source
-		if (srcindex >= ARRAY_LENGTH(buffer))
-			break;
-
-		// write this sample, and back up to the next sample time
-		put(m_end_sample - 1 - dstindex, buffer[srcindex]);
-		backfill_time -= backfill_period;
-	}
+	// if the new rate is higher, upsample from our temporary buffer;
+	// otherwise just copy our previously-downsampled data
+	if (new_rate_higher)
+		backfill_upsample(&buffer[0], buffered_samples, prevend, prevperiod);
+	else
+		for (int index = 0; index < buffered_samples; index++)
+			m_buffer[clamp_index(m_end_sample - 1 - index)] = buffer[index];
 }
 
 
@@ -256,6 +248,74 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up)
 		throw emu_fatalerror("Attempt to create an out-of-bounds view");
 
 	return clamp_index(sample);
+}
+
+
+//-------------------------------------------------
+//  backfill_downsample - this is called BEFORE
+//  the sample rate change to downsample from the
+//  end of the current buffer into a temporary
+//  holding location
+//-------------------------------------------------
+
+void stream_buffer::backfill_downsample(sample_t *dest, int samples, attotime newend, attotime newperiod)
+{
+	// compute the time of the first sample to be backfilled; start one period before
+	attotime time = newend - newperiod;
+
+	// loop until we run out of buffered data
+	int dstindex;
+	for (dstindex = 0; dstindex < samples && time.seconds() >= 0; dstindex++)
+	{
+		u32 srcindex = time_to_buffer_index(time);
+#if (SOUND_DEBUG)
+		if (std::isnan(m_buffer[srcindex]))
+			dest[dstindex] = 0;
+		else
+#endif
+			dest[dstindex] = m_buffer[srcindex];
+		time -= newperiod;
+	}
+	for ( ; dstindex < samples; dstindex++)
+		dest[dstindex] = 0;
+}
+
+
+//-------------------------------------------------
+//  backfill_upsample - this is called AFTER the
+//  sample rate change to take a copied buffer
+//  of samples at the old rate and upsample them
+//  to the new (current) rate
+//-------------------------------------------------
+
+void stream_buffer::backfill_upsample(sample_t const *src, int samples, attotime prevend, attotime prevperiod)
+{
+	// compute the time of the first sample to be backfilled; start one period before
+	attotime time = end_time() - sample_period();
+
+	// also adjust the buffered sample end time to point to the sample time of the
+	// final sample captured
+	prevend -= prevperiod;
+
+	// loop until we run out of buffered data
+	for (int srcindex = 0, dstindex = 0; ; dstindex++)
+	{
+		// if our backfill time is before the current buffered sample time,
+		// back up until we have a sample that covers this time
+		while (time < prevend && srcindex < samples)
+		{
+			prevend -= prevperiod;
+			srcindex++;
+		}
+
+		// stop when we run out of source
+		if (srcindex >= samples)
+			break;
+
+		// write this sample, and back up to the next sample time
+		put(m_end_sample - 1 - dstindex, src[srcindex]);
+		time -= sample_period();
+	}
 }
 
 
@@ -1464,11 +1524,15 @@ void sound_manager::update(void *ptr, int param)
 	// update sample rates if they have changed
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
 	{
-		sound_assert(speaker.outputs() == 1);
 		int stream_out;
 		sound_stream *stream = speaker.output_to_stream_output(0, stream_out);
-		sound_assert(stream != nullptr);
-		stream->apply_sample_rate_changes(m_update_number, machine().sample_rate());
+
+		// due to device removal, some speakers may end up with no outputs; just skip those
+		if (stream != nullptr)
+		{
+			sound_assert(speaker.outputs() == 1);
+			stream->apply_sample_rate_changes(m_update_number, machine().sample_rate());
+		}
 	}
 
 	// notify that new samples have been generated

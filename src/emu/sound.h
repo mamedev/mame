@@ -162,6 +162,12 @@ private:
 	// given an attotime, return the buffer index corresponding to it
 	u32 time_to_buffer_index(attotime time, bool round_up = false);
 
+	// downsample from our buffer into a temporary buffer
+	void backfill_downsample(sample_t *dest, int samples, attotime newend, attotime newperiod);
+
+	// upsample from a temporary buffer into our buffer
+	void backfill_upsample(sample_t const *src, int samples, attotime prevend, attotime prevperiod);
+
 	// internal state
 	u32 m_end_second;                     // current full second of the buffer end
 	u32 m_end_sample;                     // current sample number within the final second
