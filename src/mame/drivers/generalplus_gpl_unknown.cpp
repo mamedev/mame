@@ -876,7 +876,7 @@ void pcp8718_state::machine_reset()
 void pcp8718_state::pcp8718(machine_config &config)
 {
 
-	UNSP_20(config, m_maincpu, 20000000); // unknown CPU, unsp20 based
+	UNSP_20(config, m_maincpu, 100000000); // unknown CPU, unsp20 based, must be clocked ~100Mhz, maybe higher (or cycles per instruction needs to be lower for unSP 2.0)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcp8718_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
