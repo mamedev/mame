@@ -159,7 +159,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_volume_shift(0)
 	, m_volume_acc_shift(0)
 	, m_current_page(0)
-	, m_active_voices(0)
+	, m_active_voices(0x1f)
 	, m_mode(0)
 	, m_irqv(0x80)
 	, m_voice_index(0)
