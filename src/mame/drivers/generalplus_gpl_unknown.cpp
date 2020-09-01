@@ -197,7 +197,7 @@ private:
 
 	spistate m_spistate;
 
-	uint16_t m_displaybuffer[0x10000];
+	uint16_t m_displaybuffer[0x20000];
 	int m_lcdaddr;
 
 };
@@ -217,15 +217,11 @@ uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		uint16_t* dst = &bitmap.pix16(y);
 
-		for (int x = 0; x < 512 / 2; x++)
+		for (int x = 0; x < 512; x++)
 		{
-			uint16_t dat = m_displaybuffer[count];
-
-			uint8_t pix;
-			pix = dat & 0xff;
-			dst[(x * 2) + 0] = pix;
-			pix = (dat >> 8) & 0xff;
-			dst[(x * 2) + 1] = pix;
+			uint16_t dat = m_displaybuffer[count]&0x7fff;
+			dst[x] = dat;
+			count++;
 		}
 
 	}
@@ -638,7 +634,7 @@ void pcp8718_state::lcd_w(uint16_t data)
 
 	m_displaybuffer[m_lcdaddr] = data;
 	m_lcdaddr++;
-	m_lcdaddr &= 0xffff;
+	m_lcdaddr &= 0x1ffff;
 }
 
 uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
@@ -809,8 +805,8 @@ void pcp8718_state::machine_reset()
 	m_spistate = SPI_STATE_READY;
 	m_spiaddress = 0;
 
-	for (int i = 0; i < 0x10000; i++)
-		m_displaybuffer[i] = 0;
+	for (int i = 0; i < 0x20000; i++)
+		m_displaybuffer[i] = i&0x7fff;
 
 	m_lcdaddr = 0;
 
@@ -831,7 +827,7 @@ void pcp8718_state::pcp8718(machine_config &config)
 	m_screen->set_screen_update(FUNC(pcp8718_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 }
 
 // pcp8718 and pcp8728 both contain user data (player name?) and will need to be factory defaulted once they work
