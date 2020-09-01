@@ -382,14 +382,20 @@ void device_sound_interface::interface_pre_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - default implementation
-//  that should be overridden
+//  sound_stream_update_legacy - implementation
+//  that should be overridden by legacy devices
 //-------------------------------------------------
 
 void device_sound_interface::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	throw emu_fatalerror("sound_stream_update_legacy called but not overridden by owning class");
 }
+
+
+//-------------------------------------------------
+//  sound_stream_update - default implementation
+//  that should be overridden
+//-------------------------------------------------
 
 void device_sound_interface::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {

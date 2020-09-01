@@ -677,7 +677,7 @@ void pokey_device::step_one_clock(void)
 }
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 

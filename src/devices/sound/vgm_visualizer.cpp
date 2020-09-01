@@ -279,7 +279,7 @@ void vgmviz_device::cycle_viz_mode()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - update the outgoing
+//  sound_stream_update - update the outgoing
 //  audio stream and process as necessary
 //-------------------------------------------------
 

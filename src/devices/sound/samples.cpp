@@ -313,7 +313,7 @@ void samples_device::device_post_load()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - update a sound stream
+//  sound_stream_update - update a sound stream
 //-------------------------------------------------
 
 void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)

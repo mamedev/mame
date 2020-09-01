@@ -654,7 +654,7 @@ void namco_15xx_device::sharedram_w(offs_t offset, uint8_t data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
 void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)

@@ -171,7 +171,7 @@ void okim6295_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
