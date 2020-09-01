@@ -41225,6 +41225,10 @@ volfiedo                        // C04 (c) 1989 Taito Corporation Japan (World)
 volfiedu                        // C04 (c) 1989 Taito America Corporation (US)
 volfieduo                       // C04 (c) 1989 Taito America Corporation (US)
 
+@source:votrhv.cpp
+hc110                           // 1978 Votrax/Phonic Mirror HandiVoice HC-110
+hc120                           // 1978 Votrax/Phonic Mirror HandiVoice HC-120
+
 @source:votrpss.cpp
 votrpss                         // 1982 Votrax Personal Speech System
 

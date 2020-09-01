@@ -4128,6 +4128,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "votrax")
 files {
+	MAME_DIR .. "src/mame/drivers/votrhv.cpp",
 	MAME_DIR .. "src/mame/drivers/votrpss.cpp",
 	MAME_DIR .. "src/mame/drivers/votrtnt.cpp",
 }
