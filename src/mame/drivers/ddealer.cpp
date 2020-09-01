@@ -227,7 +227,7 @@ template<unsigned Offset>
 TILE_GET_INFO_MEMBER(ddealer_state::get_fg_splitted_tile_info)
 {
 	u32 code, color;
-	get_tile_info(m_fg_vram[Offset + (tile_index & ~0x800)], code, color);
+	get_tile_info(m_fg_vram[Offset + (tile_index & 0x17ff)], code, color);
 	tileinfo.set(1,
 			code,
 			color,
