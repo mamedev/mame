@@ -90,7 +90,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_spirom(*this, "spi")
+		m_spirom(*this, "spi"),
+		m_io_p1(*this, "IN0")
 	{ }
 
 	void pcp8718(machine_config &config);
@@ -156,18 +157,13 @@ private:
 
 	uint16_t m_dmaregs[8];
 
-
-
-
 	void lcd_w(uint16_t data);
-
 
 	uint16_t spi_misc_control_r();
 	uint16_t spi_rx_fifo_r();
 	void spi_tx_fifo_w(uint16_t data);
 
 	void spi_control_w(uint16_t data);
-
 
 	void spi_process_tx_data(uint8_t data);
 	uint8_t spi_process_rx();
@@ -199,6 +195,8 @@ private:
 	uint8_t m_displaybuffer[0x20000];
 	int m_lcdaddr;
 
+	uint16_t unk_7870_r();
+	required_ioport m_io_p1;
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -241,6 +239,55 @@ void pcp8718_state::machine_start()
 }
 
 static INPUT_PORTS_START( pcp8718 )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_DIPNAME( 0x0002, 0x0002, "P1:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0004, "P1:0004" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_DIPNAME( 0x0008, 0x0008, "P1:0008" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0008, "0008" )
+	PORT_DIPNAME( 0x0010, 0x0010, "P1:0010" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_DIPNAME( 0x0020, 0x0020, "P1:0020" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0020, "0020" )
+	PORT_DIPNAME( 0x0040, 0x0040, "P1:0040" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0040, "0040" )
+	PORT_DIPNAME( 0x0080, 0x0080, "P1:0080" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0080, "0080" )
+	PORT_DIPNAME( 0x0100, 0x0100, "P1:0100" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0100, "0100" )
+	PORT_DIPNAME( 0x0200, 0x0200, "P1:0200" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0200, "0200" )
+	PORT_DIPNAME( 0x0400, 0x0400, "P1:0400" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0400, "0400" )
+	PORT_DIPNAME( 0x0800, 0x0800, "P1:0800" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0800, "0800" )
+	PORT_DIPNAME( 0x1000, 0x1000, "P1:1000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x1000, "1000" )
+	PORT_DIPNAME( 0x2000, 0x2000, "P1:2000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x2000, "2000" )
+	PORT_DIPNAME( 0x4000, 0x4000, "P1:4000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x4000, "4000" )
+	PORT_DIPNAME( 0x8000, 0x8000, "P1:8000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
 uint16_t pcp8718_state::unk_7abf_r()
@@ -579,7 +626,10 @@ uint16_t pcp8718_state::system_dma_params_channel0_r(offs_t offset)
 	return m_dmaregs[offset];
 }
 
-
+uint16_t pcp8718_state::unk_7870_r()
+{
+	return m_io_p1->read();
+}
 
 void pcp8718_state::spi_control_w(uint16_t data)
 {
@@ -607,7 +657,8 @@ void pcp8718_state::map(address_map &map)
 
 	map(0x007860, 0x007860).r(FUNC(pcp8718_state::unk_7860_r));
 
-	
+	map(0x007870, 0x007870).r(FUNC(pcp8718_state::unk_7870_r)); // I/O
+
 	map(0x007862, 0x007862).nopw();
 
 
