@@ -22973,8 +22973,10 @@ bublpong                        // bootleg on enhanced hardware
 missb2                          // bootleg on enhanced hardware
 
 @source:missbamby.cpp
-gwinner                         //
-msbamby                         // 198?
+gwinner                         // (c) 1983 Reben
+luckyplr                        // (c) 1981 Cirsa
+minisupf                        // (c) 1981 Cirsa
+msbamby                         // (c) 198? Automatics Pasqual
 
 @source:missile.cpp
 mcombat                         // bootleg

@@ -4,14 +4,16 @@
 /*
 Skeleton driver for Cirsa "Mini Super Fruits" and clones.
 Known games on this hardware:
-
-Dumped Game              Manufacturer
-NO     Mini Super Fruits Cirsa
-YES    Miss Bamby        Automatics Pasqual
-YES    Golden Winer      Reben
-NO     Golden Fruits     unknown
-NO     St.-Tropez        unknown
-
+ __________________________________________________
+ | Dumped | Game              | Manufacturer       |
+ +--------+-------------------+--------------------+
+ | YES    | Mini Super Fruits | Cirsa              |
+ | YES    | Lucky Player      | Cirsa              |
+ | YES    | Miss Bamby        | Automatics Pasqual |
+ | YES    | Golden Winer      | Reben              |
+ | NO     | Golden Fruits     | unknown            |
+ | NO     | St.-Tropez        | unknown            |
+ +-------------------------------------------------+
 */
 /*
 Miss Bamby - Automatics Pasqual
@@ -139,14 +141,13 @@ void missbamby_state::machine_start()
 }
 
 
-
 void missbamby_state::missbamby(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // M5L8085AP
 	m_maincpu->set_addrmap(AS_PROGRAM, &missbamby_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &missbamby_state::io_map);
 
-	I8155(config, "i8155", 6.144_MHz_XTAL/2); // M5L8155P, guessed divisor
+	I8155(config, "i8155", 6.144_MHz_XTAL/2); // Guessed divisor
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", 6.144_MHz_XTAL / 4));
@@ -169,6 +170,25 @@ void missbamby_state::gldwinner(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0); // guess
 }
 
+ROM_START( minisupf )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "mini_av_1.4.a", 0x0000, 0x0800, CRC(d29a6468) SHA1(9a6d25a6d5602aff226340e8b4a87aa8a55e7c51) )
+	ROM_LOAD( "mini_av_1.4.b", 0x0800, 0x0800, CRC(0ebf0bd8) SHA1(d4a1a551dbeb56f16f17d7c02f926364132fb4a5) )
+	ROM_LOAD( "mini_av_1.4.c", 0x1000, 0x0800, CRC(5f976549) SHA1(5b81e71967719a913c51fe2e027f4477d507c5b6) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "mini_18sa030n.bin", 0x00, 0x20, CRC(fa7822eb) SHA1(586705f64a5fb95e5dd1c7bfc929dccfebc3ec49) )
+ROM_END
+
+// The 8155 was missing on this PCB, but probably it was just removed for reusing it elsewhere.
+ROM_START( luckyplr )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "lucky_player_24.a", 0x0000, 0x1000, CRC(11a3daf2) SHA1(239d2e53f05eecfcbc0cf5e037df21e3851e4d69) )
+	ROM_LOAD( "lucky_player.b",    0x1000, 0x1000, CRC(5578abba) SHA1(1daf3de6c12792043fbea533d619e81b092a0a7d) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "lucky_player_18sa030n.bin", 0x00, 0x20, CRC(cf80f260) SHA1(b965017aa871454c54f6175fee486eea810a9c2e) )
+ROM_END
 
 ROM_START( msbamby )
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -188,6 +208,7 @@ ROM_START( gwinner )
 	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-
-GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, gwinner, 0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
