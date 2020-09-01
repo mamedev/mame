@@ -63,7 +63,11 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 		return;
 
 	// update the stream, getting the start/end pointers around the operation
-	read_stream_view view = m_mixer_stream->update_view(m_mixer_stream->sample_time(), machine().time());
+	attotime start = m_mixer_stream->sample_time();
+	attotime end = machine().time();
+	if (start > end)
+		return;
+	read_stream_view view = m_mixer_stream->update_view(start, end);
 
 	// set or assert that all streams have the same count
 	if (samples_this_update == 0)

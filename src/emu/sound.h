@@ -59,7 +59,6 @@
 constexpr u32 SAMPLE_RATE_INVALID = 0xffffffff;
 constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xfffffffe;
 constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
-constexpr u32 SAMPLE_RATE_SYNCHRONOUS = 0xfffffffc;
 
 
 
@@ -111,7 +110,7 @@ public:
 	attotime end_time() const { return index_time(m_end_sample); }
 
 	// set a new sample rate
-	void set_sample_rate(u32 rate);
+	void set_sample_rate(u32 rate, bool resample);
 
 	// set the ending time (for forced resyncs; generally not used)
 	void set_end_time(attotime time)
@@ -420,7 +419,7 @@ public:
 	std::string name() const;
 
 	// handle a changing sample rate
-	void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate); }
+	void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate, true); }
 
 	// return an output view covering a time period
 	write_stream_view view(attotime start, attotime end) { return write_stream_view(m_buffer, start, end); }
@@ -597,6 +596,9 @@ private:
 	// now callback which wrapps calls through to the old-style callbacks
 	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
+	// return a view of 0 data covering the given time period
+	read_stream_view empty_view(attotime start, attotime end);
+		
 	// linking information
 	device_t &m_device;                            // owning device
 	sound_stream *m_next;                          // next stream in the chain
@@ -615,6 +617,7 @@ private:
 	std::vector<stream_sample_t *> m_input_array;  // array of inputs for passing to the callback
 	std::vector<read_stream_view> m_input_view;    // array of output views for passing to the callback
 	std::vector<std::unique_ptr<sound_stream>> m_resampler_list; // internal list of resamplers
+	stream_buffer m_empty_buffer;                  // empty buffer for invalid inputs
 
 	// output information
 	u32 m_output_base;                             // base index of our outputs, relative to our device

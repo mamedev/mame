@@ -82,7 +82,7 @@ stream_buffer::~stream_buffer()
 //  this buffer
 //-------------------------------------------------
 
-void stream_buffer::set_sample_rate(u32 rate)
+void stream_buffer::set_sample_rate(u32 rate, bool resample)
 {
 	sound_assert(rate > 0);
 
@@ -110,11 +110,14 @@ void stream_buffer::set_sample_rate(u32 rate)
 
 	// if the new rate is lower, downsample into our holding buffer;
 	// otherwise just copy into our holding buffer for later upsampling
-	if (!new_rate_higher)
-		backfill_downsample(&buffer[0], buffered_samples, newend, newperiod);
-	else
-		for (int index = 0; index < buffered_samples; index++)
-			buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
+	if (resample)
+	{
+		if (!new_rate_higher)
+			backfill_downsample(&buffer[0], buffered_samples, newend, newperiod);
+		else
+			for (int index = 0; index < buffered_samples; index++)
+				buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
+	}
 
 	// ensure our buffer is large enough to hold a full second at the new rate
 	if (m_buffer.size() < rate)
@@ -127,19 +130,26 @@ void stream_buffer::set_sample_rate(u32 rate)
 	// compute the new end sample index based on the buffer time
 	m_end_sample = time_to_buffer_index(prevend);
 
-#if (SOUND_DEBUG)
-	// for aggressive debugging, fill the buffer with NANs to catch anyone
-	// reading beyond what we resample below
-	std::fill_n(&m_buffer[0], m_buffer.size(), NAN);
-#endif
-
 	// if the new rate is higher, upsample from our temporary buffer;
 	// otherwise just copy our previously-downsampled data
-	if (new_rate_higher)
-		backfill_upsample(&buffer[0], buffered_samples, prevend, prevperiod);
+	if (resample)
+	{
+#if (SOUND_DEBUG)
+		// for aggressive debugging, fill the buffer with NANs to catch anyone
+		// reading beyond what we resample below
+		std::fill_n(&m_buffer[0], m_buffer.size(), NAN);
+#endif
+
+		if (new_rate_higher)
+			backfill_upsample(&buffer[0], buffered_samples, prevend, prevperiod);
+		else
+			for (int index = 0; index < buffered_samples; index++)
+				m_buffer[clamp_index(m_end_sample - 1 - index)] = buffer[index];
+	}
+
+	// if not resampling, clear the buffer
 	else
-		for (int index = 0; index < buffered_samples; index++)
-			m_buffer[clamp_index(m_end_sample - 1 - index)] = buffer[index];
+		std::fill_n(&m_buffer[0], m_buffer.size(), 0);
 }
 
 
@@ -523,6 +533,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_input(inputs),
 	m_input_array(inputs),
 	m_input_view(inputs),
+	m_empty_buffer(100),
 	m_output_base(output_base),
 	m_output(outputs),
 	m_output_array(outputs),
@@ -665,8 +676,12 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 
 			// ensure all input streams are up to date, and create views for them as well
 			for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
+			{
 				if (m_input[inputnum].valid())
 					m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
+				else
+					m_input_view[inputnum] = empty_view(update_start, end);
+			}
 
 #if (SOUND_DEBUG)
 			// clear each output view to NANs before we call the callback
@@ -921,6 +936,23 @@ void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_s
 				outputs[outputnum].put(baseindex + index, stream_buffer::sample_t(src[index]) * stream_buffer::sample_t(1.0 / 32768.0));
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  empty_view - return an empty view covering the
+//  given time period as a substitute for invalid
+//  inputs
+//-------------------------------------------------
+
+read_stream_view sound_stream::empty_view(attotime start, attotime end)
+{
+	// if our dummy buffer doesn't match our sample rate, update and clear it
+	if (m_empty_buffer.sample_rate() != m_sample_rate)
+		m_empty_buffer.set_sample_rate(m_sample_rate, false);
+
+	// return a view
+	return read_stream_view(m_empty_buffer, start, end, 1.0);
 }
 
 
