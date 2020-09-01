@@ -91,7 +91,8 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_spirom(*this, "spi"),
-		m_io_p1(*this, "IN0")
+		m_io_p1(*this, "IN0"),
+		m_io_p2(*this, "IN1")
 	{ }
 
 	void pcp8718(machine_config &config);
@@ -211,6 +212,7 @@ private:
 
 	uint16_t unk_7870_r();
 	required_ioport m_io_p1;
+	required_ioport m_io_p2;
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -302,6 +304,38 @@ static INPUT_PORTS_START( pcp8718 )
 	PORT_DIPNAME( 0x8000, 0x8000, "P1:8000" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x8000, "8000" )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0001, "P2:0001" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_DIPNAME( 0x0002, 0x0002, "P2:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Show Vs in Test Mode" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_DIPNAME( 0x0008, 0x0008, "P2:0008" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0008, "0008" )
+	PORT_DIPNAME( 0x0010, 0x0010, "P2:0010" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SOUND")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("ON/OFF")
+	PORT_DIPNAME( 0x1000, 0x1000, "P2:1000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x1000, "1000" )
+	PORT_DIPNAME( 0x2000, 0x2000, "P2:2000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x2000, "2000" )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 INPUT_PORTS_END
 
 uint16_t pcp8718_state::unk_7abf_r()
@@ -311,7 +345,7 @@ uint16_t pcp8718_state::unk_7abf_r()
 
 uint16_t pcp8718_state::unk_7860_r()
 {
-	return machine().rand() & 0x8;
+	return (machine().rand() & 0x0008) | (m_io_p2->read() & 0xfff7);
 }
 
 
@@ -667,7 +701,7 @@ uint16_t pcp8718_state::system_dma_params_channel0_r(offs_t offset)
 uint16_t pcp8718_state::unk_7870_r()
 {
 	logerror("%06x: unk_7870_r (IO port)\n", machine().describe_context());
-	return m_io_p1->read();
+	return m_io_p2->read();
 }
 
 void pcp8718_state::spi_control_w(uint16_t data)
