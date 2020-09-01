@@ -143,7 +143,7 @@ u8 namco_163_sound_device::data_r()
 }
 
 
-void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	std::fill_n(&outputs[0][0], samples, 0);
 

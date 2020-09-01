@@ -45,7 +45,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 private:
 	// internal state
@@ -85,7 +85,7 @@ void istrebiteli_sound_device::device_start()
 	m_rom = machine().root_device().memregion("soundrom")->base();
 }
 
-void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *sample = outputs[0];
 

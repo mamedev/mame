@@ -85,7 +85,7 @@ void upd934g_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void upd934g_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd934g_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for (unsigned ch = 0; ch < 4; ch++)
 	{

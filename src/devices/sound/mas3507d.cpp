@@ -359,7 +359,7 @@ void mas3507d_device::fill_buffer()
 	}
 }
 
-void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int scount)
+void mas3507d_device::append_buffer(stream_sample_t * const *outputs, int &pos, int scount)
 {
 	if(!sample_count)
 		return;
@@ -400,7 +400,7 @@ void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int sco
 	total_frame_count += s1;
 }
 
-void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int csamples)
+void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int csamples)
 {
 	int pos = 0;
 

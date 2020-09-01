@@ -21,7 +21,7 @@
 constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(min, val)); }
 
 
-void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for (int i = 0; i < samples; i++)
 	{

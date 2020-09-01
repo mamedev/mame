@@ -190,7 +190,7 @@ device_memory_interface::space_config_vector dave_device::memory_space_config() 
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,

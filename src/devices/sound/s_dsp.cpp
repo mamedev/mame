@@ -1064,7 +1064,7 @@ void s_dsp_device::state_register()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s_dsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void s_dsp_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	s16 mix[2];
 

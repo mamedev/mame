@@ -2761,7 +2761,7 @@ void spu_device::update_timing()
 //
 //
 
-void spu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void spu_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int16_t temp[44100], *src;

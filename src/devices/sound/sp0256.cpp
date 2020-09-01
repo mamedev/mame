@@ -1263,7 +1263,7 @@ TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
 	int output_index = 0;

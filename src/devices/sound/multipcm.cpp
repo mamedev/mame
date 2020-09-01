@@ -680,7 +680,7 @@ void multipcm_device::dump_sample(slot_t &slot)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int32_t samples)
+void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int32_t samples)
 {
 	stream_sample_t  *datap[2];
 

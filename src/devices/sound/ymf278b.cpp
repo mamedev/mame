@@ -215,7 +215,7 @@ void ymf278b_device::compute_envelope(YMF278BSlot *slot)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i, j;
 	YMF278BSlot *slot;

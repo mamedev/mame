@@ -887,7 +887,7 @@ void spg2xx_audio_device::audio_w(offs_t offset, uint16_t data)
 	}
 }
 
-void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *out_l = outputs[0];
 	stream_sample_t *out_r = outputs[1];

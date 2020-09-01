@@ -386,7 +386,7 @@ void device_sound_interface::interface_pre_reset()
 //  that should be overridden
 //-------------------------------------------------
 
-void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sample_t** inputs, stream_sample_t** outputs, int samples)
+void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	throw emu_fatalerror("sound_stream_update called but not overridden by owning class");
 }

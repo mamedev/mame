@@ -106,7 +106,7 @@ void geebee_sound_device::sound_w(u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void geebee_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void geebee_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 	{
 	stream_sample_t *buffer = outputs[0];
 

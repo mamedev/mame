@@ -147,7 +147,7 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 //  sound_stream_update - generate sound to the mix buffer in mono
 //-------------------------------------------------
 
-void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int int_volume = (m_volume * m_mixer_internal) / 256;
 	int ext_volume = (m_volume * m_mixer_external) / 256;

@@ -2174,7 +2174,7 @@ static void init_tables(void)
 /*******************************************************************************/
 
 /* Generate samples for one of the YM2612s */
-void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits)
+void ym2612_update_one(void *chip, FMSAMPLE * const *buffer, int length, u8 output_bits)
 {
 	// TODO : 'ladder' effects for Mega Drive/Genesis
 	const u8 output_shift = (output_bits > 14) ? 0 : (14 - output_bits);

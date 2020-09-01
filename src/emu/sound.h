@@ -494,7 +494,7 @@ private:
 // ======================> stream_update_delegate/stream_update_ex_delegate
 
 // old-style callback; eventually should be deprecated
-using stream_update_delegate = delegate<void (sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)>;
+using stream_update_delegate = delegate<void (sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)>;
 
 // new-style callback
 using stream_update_ex_delegate = delegate<void (sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)>;

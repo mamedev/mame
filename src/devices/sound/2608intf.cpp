@@ -66,7 +66,7 @@ void ym2608_device::timer_handler(int c,int count,int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2608_device::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2608_device::stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	ym2608_update_one(m_chip, outputs, samples);
 }

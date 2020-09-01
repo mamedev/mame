@@ -1372,7 +1372,7 @@ void floppy_sound_device::step(int zone)
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// We are using only one stream, unlike the parent class
 	// Also, there is no need for interpolation, as we only expect

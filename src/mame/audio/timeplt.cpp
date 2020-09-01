@@ -231,7 +231,7 @@ void locomotn_audio_device::device_add_mconfig(machine_config &config)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void timeplt_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void timeplt_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");

@@ -208,7 +208,7 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
 	int16_t *source = m_buffer.get();

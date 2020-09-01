@@ -239,7 +239,7 @@ void mos6581_device::device_post_load()
 //  our sound stream
 //-------------------------------------------------
 
-void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	m_token->fill_buffer(outputs[0], samples);
 }

@@ -93,7 +93,7 @@ void vrc6snd_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	std::fill_n(&outputs[0][0], samples, 0);
 

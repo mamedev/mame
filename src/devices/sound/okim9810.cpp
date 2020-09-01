@@ -214,7 +214,7 @@ void okim9810_device::rom_bank_updated()
 //  our sound stream
 //-------------------------------------------------
 
-void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// reset the output streams
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -613,7 +613,7 @@ okim9810_device::okim_voice::okim_voice()
 //-------------------------------------------------
 
 void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
-													stream_sample_t **buffers,
+													stream_sample_t * const *buffers,
 													int samples,
 													const uint8_t global_volume,
 													const uint8_t filter_type)

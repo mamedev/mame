@@ -468,7 +468,7 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 //-------------------------------------------------
 //  sound_stream_update -
 //-------------------------------------------------
-void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// Rset the output stream
 	memset(outputs[0], 0x0, samples * sizeof(*outputs[0]));

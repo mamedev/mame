@@ -728,7 +728,7 @@ void msm5232_device::set_clock(int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buf1 = outputs[0];
 	stream_sample_t *buf2 = outputs[1];

@@ -1022,7 +1022,7 @@ inline void es550x_device::generate_irq(es550x_voice *voice, int v)
 
 ***********************************************************************************************/
 
-void es5506_device::generate_samples(s32 **outputs, int offset, int samples)
+void es5506_device::generate_samples(s32 * const *outputs, int offset, int samples)
 {
 	// skip if nothing to do
 	if (!samples)
@@ -1067,7 +1067,7 @@ void es5506_device::generate_samples(s32 **outputs, int offset, int samples)
 	}
 }
 
-void es5505_device::generate_samples(s32 **outputs, int offset, int samples)
+void es5505_device::generate_samples(s32 * const *outputs, int offset, int samples)
 {
 	// skip if nothing to do
 	if (!samples)
@@ -2126,7 +2126,7 @@ u16 es5505_device::read(offs_t offset)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 #if ES5506_MAKE_WAVS
 	// start the logging once we have a sample rate

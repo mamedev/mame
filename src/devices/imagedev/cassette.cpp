@@ -404,7 +404,7 @@ std::string cassette_image_device::call_display()
 //  Cassette sound
 //-------------------------------------------------
 
-void cassette_image_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cassette_image_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *left_buffer = outputs[0];
 	stream_sample_t *right_buffer = nullptr;

@@ -242,7 +242,7 @@ void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, uint8_t dat
 #define DSS_INPUT_STREAM__GAIN      DISCRETE_INPUT(1)
 #define DSS_INPUT_STREAM__OFFSET    DISCRETE_INPUT(2)
 
-void discrete_dss_input_stream_node::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void discrete_dss_input_stream_node::stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *ptr = outputs[0];
 	int samplenum = samples;

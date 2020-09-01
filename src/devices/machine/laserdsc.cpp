@@ -312,7 +312,7 @@ void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 //  laserdiscs
 //-------------------------------------------------
 
-void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// compute AND values based on the squelch
 	int16_t leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;

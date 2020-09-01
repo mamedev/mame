@@ -935,7 +935,7 @@ void sega_32x_device::m68k_pwm_w(offs_t offset, uint16_t data)
 		pwm_w(offset,data);
 }
 
-void sega_32x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sega_32x_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for (int s = 0; s < samples; s++)
 	{

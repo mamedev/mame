@@ -1473,7 +1473,7 @@ void ym2413_device::write_reg(int r, int v)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for(int i=0; i < samples ; i++ )
 	{

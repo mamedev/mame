@@ -232,7 +232,7 @@ void dsbz80_device::mpeg_stereo_w(uint8_t data)
 	mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }
 
-void dsbz80_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dsbz80_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *out_l = outputs[0];
 	stream_sample_t *out_r = outputs[1];

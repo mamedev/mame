@@ -740,7 +740,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	u8 volume = m_vdc.s.sound & 0xf;
 	int sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0x4000;

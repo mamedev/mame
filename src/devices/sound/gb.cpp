@@ -1214,8 +1214,10 @@ void cgb04_apu_device::apu_power_off()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
+	stream_sample_t *outputl = outputs[0];
+	stream_sample_t *outputr = outputs[1];
 	while (samples-- > 0)
 	{
 		stream_sample_t sample;
@@ -1272,7 +1274,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		right <<= 6;
 
 		/* Update the buffers */
-		*(outputs[0]++) = left;
-		*(outputs[1]++) = right;
+		*outputl++ = left;
+		*outputr++ = right;
 	}
 }

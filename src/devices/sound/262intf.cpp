@@ -53,7 +53,7 @@ void ymf262_device::timer_handler(int c, const attotime &period)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	ymf262_update_one(m_chip, outputs, samples);
 }

@@ -359,7 +359,7 @@ static inline void update_engine(int eng[4])
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
@@ -766,7 +766,7 @@ void buggyboy_sound_device::ym2_b_w(uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	/* This is admittedly a bit of a hack job... */
 

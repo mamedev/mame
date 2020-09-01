@@ -283,7 +283,7 @@ void vgmviz_device::cycle_viz_mode()
 //  audio stream and process as necessary
 //-------------------------------------------------
 
-void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// clear output buffers
 	for (int output = 0; output < m_outputs; output++)
@@ -336,7 +336,7 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //  update_waveform - perform a wave-style update
 //-------------------------------------------------
 
-void vgmviz_device::update_waveform(stream_sample_t **outputs)
+void vgmviz_device::update_waveform(stream_sample_t * const *outputs)
 {
 	m_history_length++;
 	m_audio_count[m_audio_fill_index]++;
@@ -355,7 +355,7 @@ void vgmviz_device::update_waveform(stream_sample_t **outputs)
 //  update_fft - keep the FFT up-to-date
 //-------------------------------------------------
 
-void vgmviz_device::update_fft(stream_sample_t **outputs)
+void vgmviz_device::update_fft(stream_sample_t * const *outputs)
 {
 	m_audio_count[m_audio_fill_index]++;
 	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)

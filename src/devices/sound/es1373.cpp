@@ -233,7 +233,7 @@ void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 //  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
-void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	if (m_dac1.enable) {
 		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag());

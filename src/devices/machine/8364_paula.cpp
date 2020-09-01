@@ -162,7 +162,7 @@ void paula_8364_device::dma_reload(audio_channel *chan)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void paula_8364_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int channum, sampoffs = 0;
 

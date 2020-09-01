@@ -81,7 +81,7 @@ void turrett_device::device_reset()
 //  sound_stream_update - update sound stream
 //-------------------------------------------------
 
-void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// Silence the buffers
 	memset(outputs[0], 0x00, sizeof(stream_sample_t) * samples);

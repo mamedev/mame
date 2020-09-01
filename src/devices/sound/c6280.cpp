@@ -42,7 +42,7 @@
 
 #include <algorithm>
 
-void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	const u8 lmal = (m_balance >> 4) & 0x0f;
 	const u8 rmal = (m_balance >> 0) & 0x0f;

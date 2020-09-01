@@ -58,7 +58,7 @@ void ym2203_device::timer_handler(int c, int count, int clock)
 //-------------------------------------------------
 
 
-void ym2203_device::stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2203_device::stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	ym2203_update_one(m_chip, outputs[0], samples);
 }

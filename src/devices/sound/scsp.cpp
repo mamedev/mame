@@ -320,7 +320,7 @@ void scsp_device::rom_bank_updated()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void scsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void scsp_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	m_exts0 = inputs[0];
 	m_exts1 = inputs[1];
@@ -1279,7 +1279,7 @@ inline s32 scsp_device::UpdateSlot(SCSP_SLOT *slot)
 void scsp_device::DoMasterSamples(int nsamples)
 {
 	stream_sample_t *bufr,*bufl;
-	stream_sample_t *exts[2];
+	stream_sample_t const *exts[2];
 
 	bufr = m_bufferr;
 	bufl = m_bufferl;

@@ -128,7 +128,7 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 	}
 }
 
-void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	static int32_t mix[(44100/60)*2*8];
 	int32_t *mixp;

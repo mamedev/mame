@@ -119,7 +119,7 @@ WRITE_LINE_MEMBER(dai_sound_device::set_input_ch2)
 //  our sound stream
 //-------------------------------------------------
 
-void dai_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dai_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *sample_left = outputs[0];
 	stream_sample_t *sample_right = outputs[1];

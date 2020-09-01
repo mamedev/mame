@@ -60,7 +60,7 @@ void sega005_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
 	const uint8_t *sound_prom = state->memregion("proms")->base();

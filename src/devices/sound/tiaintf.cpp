@@ -52,7 +52,7 @@ void tia_device::device_stop()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	tia_process(m_chip, outputs[0], samples);
 }

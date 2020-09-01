@@ -82,7 +82,7 @@ void nile_device::device_start()
 //  for our sound stream
 //-------------------------------------------------
 
-void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void nile_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	uint8_t *sound_ram = &m_sound_ram[0];
 	int v, i, snum;

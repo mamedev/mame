@@ -209,7 +209,7 @@ void k007232_device::set_bank(int chan_a_bank, int chan_b_bank)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));

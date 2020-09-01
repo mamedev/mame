@@ -454,7 +454,7 @@ void usb_sound_device::env_w(int which, u8 offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *dest = outputs[0];
 

@@ -207,7 +207,7 @@ void x1_010_device::word_w(offs_t offset, u16 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// mixer buffer zero clear
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));

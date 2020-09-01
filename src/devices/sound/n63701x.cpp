@@ -64,7 +64,7 @@ void namco_63701x_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void namco_63701x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void namco_63701x_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int ch;
 

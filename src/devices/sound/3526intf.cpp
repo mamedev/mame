@@ -63,7 +63,7 @@ void ym3526_device::timer_handler(int c,const attotime &period)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	ym3526_update_one(m_chip, outputs[0], samples);
 }
