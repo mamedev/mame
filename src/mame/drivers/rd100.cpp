@@ -33,31 +33,45 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_keys(*this, "KEY%u", 0U)
+		, m_pia1(*this, "pia1")
 	{ }
 
 	void rd100(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
 	uint8_t keys_r();
 	void key_scan_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER( shift_r );
+	DECLARE_READ_LINE_MEMBER( ctrl_r );
 
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<8> m_keys;
+	required_ioport_array<9> m_keys;
+	required_device<pia6821_device> m_pia1;
 
 	uint8_t m_key_scan;
+	bool m_shift;
+	bool m_ctrl;
 };
 
 
 void rd100_state::machine_start()
 {
 	save_item(NAME(m_key_scan));
+}
+
+void rd100_state::machine_reset()
+{
+	m_key_scan = 0;
+	m_shift = 0;
+	m_ctrl = 0;
 }
 
 HD44780_PIXEL_UPDATE(rd100_state::pixel_update)
@@ -81,6 +95,32 @@ void rd100_state::key_scan_w(uint8_t data)
 	m_key_scan = data;
 }
 
+READ_LINE_MEMBER(rd100_state::shift_r)
+{
+	if (m_shift)
+	{
+		m_shift = 0;
+		m_pia1->ca1_w(1);
+	}
+	bool ky = BIT(m_keys[8]->read(), 0);
+	if (!ky)
+		m_shift = 1;
+	return ky;
+}
+
+READ_LINE_MEMBER(rd100_state::ctrl_r)
+{
+	if (m_ctrl)
+	{
+		m_ctrl = 0;
+		m_pia1->cb1_w(1);
+	}
+	bool ky = BIT(m_keys[8]->read(), 1);
+	if (!ky)
+		m_ctrl = 1;
+	return ky;
+}
+
 void rd100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -89,7 +129,7 @@ void rd100_state::mem_map(address_map &map)
 	map(0x8408, 0x840b).rw("piay", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8608, 0x860f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x8610, 0x8611).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x8640, 0x8643).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8640, 0x8643).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8680, 0x8683).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8700, 0x8701).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x8800, 0xffff).rom().region("roms", 0x800);
@@ -105,7 +145,7 @@ static INPUT_PORTS_START( rd100 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('K') PORT_CHAR('k') PORT_CHAR(0x0b) PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('@') PORT_CHAR('`') PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(',') PORT_CHAR('<') PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c) PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c) PORT_CODE(KEYCODE_TAB)
 
 	PORT_START("KEY1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('9') PORT_CHAR(')') PORT_CODE(KEYCODE_9)
@@ -176,6 +216,10 @@ static INPUT_PORTS_START( rd100 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('J') PORT_CHAR('j') PORT_CHAR(0x0a) PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('M') PORT_CHAR('m') PORT_CODE(KEYCODE_M)
+
+	PORT_START("KEY8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -193,9 +237,11 @@ void rd100_state::rd100(machine_config &config)
 	MC6809(config, m_maincpu, 4_MHz_XTAL); // MC6809P???
 	m_maincpu->set_addrmap(AS_PROGRAM, &rd100_state::mem_map);
 
-	pia6821_device &pia1(PIA6821(config, "pia1"));
-	pia1.readpa_handler().set(FUNC(rd100_state::keys_r));
-	pia1.writepb_handler().set(FUNC(rd100_state::key_scan_w));
+	PIA6821(config, m_pia1);
+	m_pia1->readpa_handler().set(FUNC(rd100_state::keys_r));
+	m_pia1->writepb_handler().set(FUNC(rd100_state::key_scan_w));
+	m_pia1->readca1_handler().set(FUNC(rd100_state::shift_r));
+	m_pia1->readcb1_handler().set(FUNC(rd100_state::ctrl_r));
 
 	PIA6821(config, "pia2");
 	PIA6821(config, "piax");
@@ -238,4 +284,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1989, rd100, 0,      0,      rd100,   rd100, rd100_state, empty_init, "Data R.D.", "RD100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, rd100, 0,      0,      rd100,   rd100, rd100_state, empty_init, "Data R.D.", "RD100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
