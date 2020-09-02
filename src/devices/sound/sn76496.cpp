@@ -126,7 +126,7 @@
   * NCR8496's output is inverted, PSSJ-3's output is not.
 
   10/12/2019: Michael Zapf
-  * READY line handling by own emu_timer, not depending on sound_stream_update_legacy
+  * READY line handling by own emu_timer, not depending on sound_stream_update
 
 
   TODO: * Implement the TMS9919 - any difference to sn94624?

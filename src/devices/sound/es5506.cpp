@@ -248,7 +248,7 @@ void es5506_device::device_start()
 	if (1 <= m_channels && m_channels <= 6)
 		channels = m_channels;
 
-	/* create the stream */
+	// create the stream
 	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
@@ -377,7 +377,7 @@ void es5505_device::device_start()
 	if (1 <= m_channels && m_channels <= 4)
 		channels = m_channels;
 
-	/* create the stream */
+	// create the stream
 	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions

@@ -518,11 +518,10 @@ void sound_stream_input::apply_sample_rate_changes(u32 updatenum, u32 downstream
 //**************************************************************************
 
 //-------------------------------------------------
-//  sound_stream - constructor with old-style
-//  callback
+//  sound_stream - private common constructor
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
 	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
@@ -539,12 +538,66 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_output_base(output_base),
 	m_output(outputs),
 	m_output_array(outputs),
-	m_output_view(outputs),
-	m_callback(std::move(callback)),
-	m_callback_ex(stream_update_delegate(&sound_stream::oldstyle_callback_ex, this))
+	m_output_view(outputs)
 {
-	// common init
-	init_common(inputs, outputs, sample_rate, flags);
+	sound_assert(outputs > 0);
+
+	// create a name
+	m_name = m_device.name();
+	m_name += " '";
+	m_name += m_device.tag();
+	m_name += "'";
+
+	// create a unique tag for saving
+	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
+	auto &save = m_device.machine().save();
+	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
+
+	// initialize all inputs
+	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
+	{
+		// allocate a resampler stream if needed, and get a pointer to its output
+		sound_stream_output *resampler = nullptr;
+		int resampler_type = flags & STREAM_RESAMPLER_MASK;
+		if (resampler_type != STREAM_RESAMPLER_NONE)
+		{
+			switch (resampler_type)
+			{
+				default:
+				case STREAM_RESAMPLER_DEFAULT:
+					m_resampler_list.push_back(std::make_unique<default_resampler_stream>(m_device));
+					break;
+			}
+			resampler = &m_resampler_list.back()->m_output[0];
+		}
+
+		// add the new input
+		m_input[inputnum].init(*this, inputnum, state_tag.c_str(), resampler);
+	}
+
+	// initialize all outputs
+	for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
+		m_output[outputnum].init(*this, outputnum, state_tag.c_str());
+
+	// create an update timer for synchronous streams
+	if (synchronous())
+		m_sync_timer = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_stream::sync_update), this));
+
+	// force an update to the sample rates
+	sample_rate_changed();
+}
+
+
+//-------------------------------------------------
+//  sound_stream - constructor with old-style
+//  callback
+//-------------------------------------------------
+
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags) :
+	sound_stream(device, inputs, outputs, output_base, sample_rate, flags)
+{
+	m_callback = std::move(callback);
+	m_callback_ex = stream_update_delegate(&sound_stream::stream_update_legacy, this);
 }
 
 
@@ -554,25 +607,9 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 //-------------------------------------------------
 
 sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
-	m_device(device),
-	m_next(nullptr),
-	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
-	m_pending_sample_rate(SAMPLE_RATE_INVALID),
-	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
-	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
-	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
-	m_sync_timer(nullptr),
-	m_input(inputs),
-	m_input_array(inputs),
-	m_input_view(inputs),
-	m_output_base(output_base),
-	m_output(outputs),
-	m_output_array(outputs),
-	m_output_view(outputs),
-	m_callback_ex(std::move(callback))
+	sound_stream(device, inputs, outputs, output_base, sample_rate, flags)
 {
-	// common init
-	init_common(inputs, outputs, sample_rate, flags);
+	m_callback_ex = std::move(callback);
 }
 
 
@@ -779,60 +816,6 @@ void sound_stream::print_graph_recursive(int indent)
 
 
 //-------------------------------------------------
-//  init_common - constructor
-//-------------------------------------------------
-
-void sound_stream::init_common(u32 inputs, u32 outputs, u32 sample_rate, sound_stream_flags flags)
-{
-	sound_assert(outputs > 0);
-
-	// create a name
-	m_name = m_device.name();
-	m_name += " '";
-	m_name += m_device.tag();
-	m_name += "'";
-
-	// create a unique tag for saving
-	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
-	auto &save = m_device.machine().save();
-	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
-
-	// initialize all inputs
-	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
-	{
-		// allocate a resampler stream if needed, and get a pointer to its output
-		sound_stream_output *resampler = nullptr;
-		int resampler_type = flags & STREAM_RESAMPLER_MASK;
-		if (resampler_type != STREAM_RESAMPLER_NONE)
-		{
-			switch (resampler_type)
-			{
-				default:
-				case STREAM_RESAMPLER_DEFAULT:
-					m_resampler_list.push_back(std::make_unique<default_resampler_stream>(m_device));
-					break;
-			}
-			resampler = &m_resampler_list.back()->m_output[0];
-		}
-
-		// add the new input
-		m_input[inputnum].init(*this, inputnum, state_tag.c_str(), resampler);
-	}
-
-	// initialize all outputs
-	for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
-		m_output[outputnum].init(*this, outputnum, state_tag.c_str());
-
-	// create an update timer for synchronous streams
-	if (synchronous())
-		m_sync_timer = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_stream::sync_update), this));
-
-	// force an update to the sample rates
-	sample_rate_changed();
-}
-
-
-//-------------------------------------------------
 //  sample_rate_changed - recompute sample
 //  rate data, and all streams that are affected
 //  by this stream
@@ -892,12 +875,12 @@ void sound_stream::sync_update(void *, s32)
 
 
 //-------------------------------------------------
-//  oldstyle_callback_ex - extended callback which
-//  resamples and then forward on to the old-style
-//  traditional callback
+//  stream_update_legacy - new-style callback which
+//  forwards on to the old-style traditional
+//  callback, converting to/from floats
 //-------------------------------------------------
 
-void sound_stream::oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sound_stream::stream_update_legacy(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// temporary buffer to hold stream_sample_t inputs and outputs
 	stream_sample_t temp_buffer[1024];

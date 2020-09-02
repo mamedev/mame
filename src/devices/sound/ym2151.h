@@ -85,8 +85,7 @@ private:
 		TIMER_IRQ_A_OFF,
 		TIMER_IRQ_B_OFF,
 		TIMER_A,
-		TIMER_B,
-		TIMER_WRITE
+		TIMER_B
 	};
 
 	enum {

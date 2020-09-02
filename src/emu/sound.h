@@ -71,7 +71,7 @@ constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
 
 // if SOUND_DEBUG is on, make assertions fire regardless of MAME_DEBUG
 #if (SOUND_DEBUG)
-#define sound_assert(x) do { if (!(x)) { osd_printf_error("sound_assert: " #x "\n"); __debugbreak(); } } while (0)
+#define sound_assert(x) do { if (!(x)) { osd_printf_error("sound_assert: " #x "\n"); osd_break_into_debugger("sound_assert: " #x "\n"); } } while (0)
 #else
 #define sound_assert assert
 #endif
@@ -526,6 +526,9 @@ class sound_stream
 {
 	friend class sound_manager;
 
+	// private common constructopr
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, sound_stream_flags flags);
+
 public:
 	// construction/destruction
 	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
@@ -593,8 +596,8 @@ private:
 	// timer callback for synchronous streams
 	void sync_update(void *, s32);
 
-	// now callback which wrapps calls through to the old-style callbacks
-	void oldstyle_callback_ex(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
+	// new callback which wrapps calls through to the old-style callbacks
+	void stream_update_legacy(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 	// return a view of 0 data covering the given time period
 	read_stream_view empty_view(attotime start, attotime end);

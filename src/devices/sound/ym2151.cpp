@@ -1736,7 +1736,10 @@ void ym2151_device::write(offs_t offset, u8 data)
 	if (offset & 1)
 	{
 		if (!m_reset_active)
-			synchronize(TIMER_WRITE, data | (m_lastreg << 8));
+		{
+			m_stream->update();
+			write_reg(m_lastreg, data);
+		}
 	}
 	else
 		m_lastreg = data;
@@ -1861,6 +1864,14 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			outr += chanout[ch] & pan[2*ch+1];
 		}
 
+		if (outl > 32767)
+			outl = 32767;
+		else if (outl < -32768)
+			outl = -32768;
+		if (outr > 32767)
+			outr = 32767;
+		else if (outr < -32768)
+			outr = -32768;
 		outputs[0].put(sampindex, stream_buffer::sample_t(outl) * sample_scale);
 		outputs[1].put(sampindex, stream_buffer::sample_t(outr) * sample_scale);
 
@@ -1872,11 +1883,6 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 void ym2151_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id) {
-	case TIMER_WRITE:
-		m_stream->update();
-		write_reg(param >> 8, param & 0xff);
-		break;
-
 	case TIMER_IRQ_A_OFF: {
 		int old = irqlinestate;
 		irqlinestate &= ~1;

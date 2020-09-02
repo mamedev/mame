@@ -194,11 +194,6 @@ protected:
 		save_item(NAME(this->m_code));
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
-	{
-		this->setCode(param);
-	}
-
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		_dac_code::sound_stream_update_tag(stream, inputs, outputs);
@@ -218,8 +213,8 @@ public:
 	{
 	}
 
-	virtual WRITE_LINE_MEMBER(write) override { device_t::synchronize(0, state); }
-	virtual void data_w(uint8_t data) override { device_t::synchronize(0, data); }
+	virtual WRITE_LINE_MEMBER(write) override { this->setCode(state); }
+	virtual void data_w(uint8_t data) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -233,8 +228,8 @@ public:
 	{
 	}
 
-	virtual void write(unsigned char data) override { device_t::synchronize(0, data); }
-	virtual void data_w(uint8_t data) override { device_t::synchronize(0, data); }
+	virtual void write(unsigned char data) override { this->setCode(data); }
+	virtual void data_w(uint8_t data) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -248,8 +243,8 @@ public:
 	{
 	}
 
-	virtual void write(unsigned short data) override { device_t::synchronize(0, data); }
-	virtual void data_w(uint16_t data) override { device_t::synchronize(0, data); }
+	virtual void write(unsigned short data) override { this->setCode(data); }
+	virtual void data_w(uint16_t data) override { this->setCode(data); }
 };
 
 constexpr double dac_gain_r2r = 1.0;
