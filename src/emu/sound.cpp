@@ -106,7 +106,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	// (via simple point sampling) at the new rate. The litmus test is the
 	// voice when jumping off the edge in Q*Bert; without this extra effort
 	// it is crackly and/or glitchy at times
-	sample_t buffer[32];
+	sample_t buffer[64];
 	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(ARRAY_LENGTH(buffer))));
 
 	// if the new rate is lower, downsample into our holding buffer;
