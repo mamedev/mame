@@ -19711,26 +19711,27 @@ m6805evs                        //
 
 @source:m72.cpp
 airduel                         // (c) 1990 (World)
-airduelu
-airduelm72                      // (c) 1990 (Japan)
-bchopper                        // (c) 1987
+airduelu                        // (c) 1990 Irem America (US)
+airdueljm72                     // (c) 1990 (Japan)
+airduelm72                      // (c) 1990 (World)
+bchopper                        // (c) 1987 (World)
 cosmccop                        // (c) 1991 (World)
-dbreed                          // (c) 1989
-dbreedm72                       // (c) 1989
-dbreedm72j                      // (c) 1989 (Japan)
+dbreed                          // (c) 1989 (World)
+dbreedjm72                      // (c) 1989 (Japan)
+dbreedm72                       // (c) 1989 (World)
 dkgensan                        // (c) 1990 (Japan)
 dkgensanm72                     // (c) 1990 (Japan)
 dkgensanm82                     // (c) 1990 (Japan)
 gallop                          // (c) 1991 (Japan)
 hharry                          // (c) 1990 (World)
 hharryu                         // (c) 1990 Irem America (US)
-hharryb                       // bootleg
+hharryb                         // bootleg
 imgfight                        // (c) 1988 (World)
 imgfightb                       // bootleg
 imgfightj                       // (c) 1988 (Japan)
 kengo                           // (c) 1991 (Japan)
 kengoa                          // (c) 1991 (Japan)
-loht                            // (c) 1989
+loht                            // (c) 1989 (World)
 loht_ms                         // (c) 1989 (bootleg)
 lohtb                           // (c) 1989 (bootleg)
 lohtb2                          // (c) 1989 (bootleg)
@@ -19740,13 +19741,13 @@ ltswords                        // (c) 1991 (World)
 majtitle                        // (c) 1990 (World)
 majtitlej                       // (c) 1990 (Japan)
 mrheli                          // (c) 1987 (Japan)
-nspirit                         // (c) 1988
+nspirit                         // (c) 1988 (World)
 nspiritj                        // (c) 1988 (Japan)
 poundfor                        // (c) 1990 (World)
 poundforj                       // (c) 1990 (Japan)
 poundforu                       // (c) 1990 Irem America (US)
 rtype                           // (c) 1987 (Japan)
-rtype2                          // (c) 1989
+rtype2                          // (c) 1989 (World)
 rtype2j                         // (c) 1989 (Japan)
 rtype2jc                        // (c) 1989 (Japan)
 rtype2m82b                      // bootleg
@@ -19784,11 +19785,11 @@ riskchal                        // (c) 1993 Irem
 shisen2                         // (c) 1993 Tamtex
 
 @source:m92.cpp
-bmaster                         // (c) 1991 Irem
+bmaster                         // (c) 1991 Irem (World)
 crossbld                        // (c) 1991 Irem (Japan)
 dsoccr94j                       // (c) 1994 Irem (Japan)
 geostorm                        // (c) 1994 Irem (Japan)
-gunforc2                        // (c) 1994 Irem
+gunforc2                        // (c) 1994 Irem (World)
 gunforce                        // (c) 1991 Irem (World)
 gunforcej                       // (c) 1991 Irem (Japan)
 gunforceu                       // (c) 1991 Irem America (US)
@@ -19797,7 +19798,7 @@ hook                            // (c) 1992 Irem (World)
 hookj                           // (c) 1992 Irem (Japan)
 hooku                           // (c) 1992 Irem America (US)
 inthunt                         // (c) 1993 Irem (World)
-inthuntu                        // (c) 1993 Irem (US)
+inthuntu                        // (c) 1993 Irem America (US)
 kaiteids                        // (c) 1993 Irem (Japan)
 leaguemn                        // (c) 1993 Irem (Japan)
 lethalth                        // (c) 1991 Irem (World)
@@ -19822,7 +19823,7 @@ uccops                          // (c) 1992 Irem (World)
 uccopsar                        // (c) 1992 Irem (World)
 uccopsaru                       // (c) 1992 Irem America (US)
 uccopsj                         // (c) 1992 Irem (Japan)
-uccopsu                         // (c) 1992 Irem (US)
+uccopsu                         // (c) 1992 Irem America (US)
 
 @source:mac.cpp
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
