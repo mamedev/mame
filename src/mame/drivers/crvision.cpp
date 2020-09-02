@@ -135,13 +135,13 @@ SHFT Z X C V B          N M . , /  SHFT
 - laser2001, manager: cassette format is incompatible with crvision.
 - manager: appears the joystick is 4-way only.
 - crvision: if you get "ERROR 00" while loading a tape, you can continue to load the remainder of it with CLOAD or CRUN.
-            The bad line(s) will be missing.
+            The bad line(s) will be missing. (behaviour depends on version of Basic)
 
 TODO:
 - manager: paste can lose a character or 2 at the start of a line
 - crvision: paste is very poor
 - crvision: in natural key mode & in paste, shifted characters do not appear.
-- crvision: there is a buzzing noise while game carts are running.
+- crvision: there is a buzzing noise while carts are running.
 
 */
 
@@ -813,7 +813,7 @@ void crvision_state::creativision(machine_config &config)
 	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
