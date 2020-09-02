@@ -959,17 +959,15 @@ ROM_START( captcommb2 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(aed2f4bd) SHA1(3bd567dc350bf6ac3a349548790ad49eb5bd8307) )
 	ROM_RELOAD(        0x10000, 0x40000 )
 
-	/* pld devices:
-	#1   IC169   gal20v8           secured
-	#2   IC7     gal16v8           secured, bruteforce ok
-	#3   IC72    gal16v8           secured, bruteforce ng, assume registered
-	#4   IC80    gal16v8           secured, bruteforce ng, assume registered
-	#5   IC121   gal20v8           secured
-	#6   IC120   gal20v8           secured
-	#7   IC116   tpc1020afn-084c   unattempted
-	*/
-	ROM_REGION( 0x0200, "plds", 0 )  // z80 mapper + banking
-	ROM_LOAD( "2_gal16v8.ic7", 0x0000, 0x0117, CRC(bad3316b) SHA1(b25141540fbaab028ba563f4fe1796b6039a4d59) )
+	/* pld devices */
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "1_gal20v8.ic169", 0x000, 0x157, CRC(e5cf9f53) SHA1(9c5f88d2dcfaab1c1ba80019e9ec60f0c1fb8c49) )  // all unsecured
+	ROM_LOAD( "2_gal16v8.ic7",   0x200, 0x117, CRC(0ebc7cd7) SHA1(95f0cba1f588920634b5f09b85197474201d9aed) )
+	ROM_LOAD( "3_gal16v8.ic72",  0x400, 0x117, CRC(ebf1f643) SHA1(d2d1d60ced5665469589122001d9b7b36b7444d2) )
+	ROM_LOAD( "4_gal16v8.ic80",  0x600, 0x117, CRC(2c43c330) SHA1(7df648b63bc0c845a579a29722004f28d3e04a10) )
+	ROM_LOAD( "5_gal20v8.ic121", 0x800, 0x157, CRC(76fa8969) SHA1(8fce620ece2d70511868c9cdd8c421762a467c11) )
+	ROM_LOAD( "6_gal20v8.ic120", 0xa00, 0x157, CRC(6a55a974) SHA1(f4df5a45409eca84c1ac36f7f8dbb218b79b57ac) )
+	// ic116  tpc1020afn-084c  no dump
 ROM_END
 
 
@@ -1072,6 +1070,30 @@ ROM_START( knightsb3 )
 	ROM_REGION( 0x50000, "audiocpu", 0 )
 	ROM_LOAD( "1.ic26", 0x00000, 0x40000, CRC(bd6f9cc1) SHA1(9f33cccef224d2204736a9eae761196866bd6e41) )  // knightsb
 	ROM_RELOAD( 0x10000, 0x40000 )
+
+	/* pld devices:
+	     ________________________
+	    |                   4    |      (no component reference markings on pcb)
+	    |                        |
+	  ==       2    3            |
+	  ==                    7    |
+	  ==                         |
+	  ==                         |
+	  ==                         |
+	    |   1            5    6  |
+	    |________________________|
+		
+	#1   palce20v8h     secured, bruteforce ok
+	#2   palce16v8h     secured, bruteforce ok
+	#3   palce16v8h     secured, registered
+	#4   palce16v8h     secured, registered
+	#5   palce20v8h     secured, registered
+	#6   palce20v8h     secured, registered
+	#7   a1020a pl84c   unattempted
+	*/
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "1_palce20v8.bin", 0x000, 0x157, CRC(a5078c38) SHA1(59558a514ec60cd7148ede78a5641f5e6c0479c8) )
+	ROM_LOAD( "2_palce16v8.bin", 0x200, 0x117, CRC(bad3316b) SHA1(b25141540fbaab028ba563f4fe1796b6039a4d59) )
 ROM_END
 
 

@@ -1517,7 +1517,7 @@ ROM_START( slampic )
 	    |________________________|
 	*/
 	ROM_REGION( 0xc00, "plds", 0 )
-	ROM_LOAD( "1_palce16v8.bin", 0x000, 0x117, CRC(bac89609) SHA1(4796a476843b448059ed28ef735d9c6a7886fdef) )
+	ROM_LOAD( "1_palce16v8.bin", 0x000, 0x117, CRC(bac89609) SHA1(4796a476843b448059ed28ef735d9c6a7886fdef) )  // all unsecured
 	ROM_LOAD( "2_palce16v8.bin", 0x200, 0x117, CRC(680edfd5) SHA1(b1b6ad4e2c4e23c384de32326986a58bc74a12ca) )
 	ROM_LOAD( "3_palce20v8.bin", 0x400, 0x157, CRC(f1fe9368) SHA1(821b5ad60cd1aa1f325fd07af3b9c4d116aa227e) )
 	ROM_LOAD( "4_palce20v8.bin", 0x600, 0x157, CRC(20946530) SHA1(307ad5644aca89d1462510f12fd10187a50376b6) )
