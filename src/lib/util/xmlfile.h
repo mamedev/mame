@@ -89,8 +89,9 @@ public:
 	data_node *get_parent() { return m_parent; }
 	data_node const *get_parent() const { return m_parent; }
 
-	// count the number of child nodes
-	int count_children() const;
+	// count the number of children
+	std::size_t count_children() const;
+	std::size_t count_attributes() const;
 
 	// get the first child
 	data_node *get_first_child() { return m_first_child; }

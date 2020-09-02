@@ -268,14 +268,24 @@ void data_node::trim_whitespace()
     number of child nodes
 -------------------------------------------------*/
 
-int data_node::count_children() const
+std::size_t data_node::count_children() const
 {
-	int count = 0;
-
 	/* loop over children and count */
+	std::size_t count = 0;
 	for (data_node const *node = get_first_child(); node; node = node->get_next_sibling())
 		count++;
 	return count;
+}
+
+
+/*-------------------------------------------------
+    data_node::count_children - count the
+    number of child nodes
+-------------------------------------------------*/
+
+std::size_t data_node::count_attributes() const
+{
+	return m_attributes.size();
 }
 
 
