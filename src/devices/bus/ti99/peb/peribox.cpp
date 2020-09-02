@@ -601,6 +601,7 @@ void ti99_peribox_slot_geneve(device_slot_interface &device)
 	device.option_add("ccfdc",    TI99_CCFDC);
 	device.option_add("ddcc1",    TI99_DDCC1);
 	device.option_add("forti",    TI99_FORTI);
+	device.option_add("sidmaster", TI99_SIDMASTER);
 }
 
 void peribox_gen_device::device_add_mconfig(machine_config &config)
