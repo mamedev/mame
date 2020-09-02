@@ -3314,6 +3314,8 @@ bcs3d                           //
 @source:beaminv.cpp
 beaminv                         // (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top)
 pacominv                        // (c) 1979 Pacom Corporation
+pacominva                       // Pacom Corporation
+ctainv                          // CTA Corporation
 
 @source:beathead.cpp
 beathead                        // (proto)          (c) 1993
