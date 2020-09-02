@@ -178,11 +178,6 @@ sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, U8106, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
-{
-}
-
 y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
@@ -477,7 +472,6 @@ void sn76496_base_device::register_for_save_states()
 }
 
 DEFINE_DEVICE_TYPE(SN76496,  sn76496_device,   "sn76496",      "SN76496")
-DEFINE_DEVICE_TYPE(U8106,    u8106_device,     "u8106",        "U8106")
 DEFINE_DEVICE_TYPE(Y2404,    y2404_device,     "y2404",        "Y2404")
 DEFINE_DEVICE_TYPE(SN76489,  sn76489_device,   "sn76489",      "SN76489")
 DEFINE_DEVICE_TYPE(SN76489A, sn76489a_device,  "sn76489a",     "SN76489A")

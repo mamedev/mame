@@ -7,7 +7,6 @@
 
 
 DECLARE_DEVICE_TYPE(SN76496,  sn76496_device)
-DECLARE_DEVICE_TYPE(U8106,    u8106_device)
 DECLARE_DEVICE_TYPE(Y2404,    y2404_device)
 DECLARE_DEVICE_TYPE(SN76489,  sn76489_device)
 DECLARE_DEVICE_TYPE(SN76489A, sn76489a_device)
@@ -85,13 +84,6 @@ class sn76496_device : public sn76496_base_device
 {
 public:
 	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-// U8106 not verified yet. todo: verify; (a custom marked sn76489? only used on mr. do and maybe other universal games)
-class u8106_device : public sn76496_base_device
-{
-public:
-	u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // Y2404 not verified yet. todo: verify; (don't be fooled by the Y, it's a TI chip, not Yamaha)
