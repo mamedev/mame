@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_UTHERNET, a2bus_uthernet_device, "a2uthernet", "Uthernet")
+DEFINE_DEVICE_TYPE(A2BUS_UTHERNET, a2bus_uthernet_device, "a2uthernet", "a2RetroSystems Uthernet")
 
 //**************************************************************************
 //  LIVE DEVICE

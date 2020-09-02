@@ -138,7 +138,7 @@ public:
 	const char *get_attribute_string(const char *attribute, const char *defvalue) const;
 
 	// return the integer value of an attribute, or the specified default if not present
-	int get_attribute_int(const char *attribute, int defvalue) const;
+	long long get_attribute_int(const char *attribute, long long defvalue) const;
 
 	// return the format of the given integer attribute
 	int_format get_attribute_int_format(const char *attribute) const;
@@ -150,7 +150,7 @@ public:
 	void set_attribute(const char *name, const char *value);
 
 	// set the integer value of an attribute
-	void set_attribute_int(const char *name, int value);
+	void set_attribute_int(const char *name, long long value);
 
 	// set the float value of an attribute
 	void set_attribute_float(const char *name, float value);
