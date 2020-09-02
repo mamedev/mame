@@ -16,9 +16,9 @@ VBlank duration: 1/VSYNC * (70/262) = 4457 us
 The manual for this model clearly shows above values in 'Misc' parts listings.
 There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 
-Sound chips have custom label "8106", the original label was scratched off.
-They are presumedly SN76489. Note that Lady Bug's PCB S/N is also 8106 and
-has the same sound chips.
+Sound chips have custom label "U8106". Or "8106" or unlabeled with the original
+label scratched off. They are presumedly SN76489. Note that Lady Bug's PCB S/N
+is also 8106 and has the same sound chips.
 
 ***************************************************************************/
 
