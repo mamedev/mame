@@ -139,6 +139,9 @@ private:
 	uint16_t unk_7860_r();
 	uint16_t unk_780f_r();
 
+	void unk_7860_w(uint16_t data);
+	uint16_t m_7860;
+
 	void unk_7868_w(uint16_t data);
 	uint16_t unk_7868_r();
 	uint16_t m_7868;
@@ -351,7 +354,20 @@ uint16_t pcp8718_state::unk_7abf_r()
 
 uint16_t pcp8718_state::unk_7860_r()
 {
-	return (machine().rand() & 0x0008) | (m_io_p2->read() & 0xfff7);
+	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: unk_7860_r (IO port)\n", machine().describe_context());
+
+	uint16_t ret = (m_io_p2->read() & 0xfff7);
+
+	if ((m_7860 & 0x20))
+		ret |= 0x08;
+
+	return ret;
+}
+
+void pcp8718_state::unk_7860_w(uint16_t data)
+{
+	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: unk_7860_w %04x (IO port)\n", machine().describe_context(), data);
+	m_7860 = data;
 }
 
 
@@ -718,7 +734,7 @@ uint16_t pcp8718_state::system_dma_params_channel0_r(offs_t offset)
 
 uint16_t pcp8718_state::unk_7870_r()
 {
-	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: unk_7870_r (IO port)\n", machine().describe_context());
+	logerror("%06x: unk_7870_r (IO port)\n", machine().describe_context());
 	return m_io_p2->read();
 }
 
@@ -746,15 +762,13 @@ void pcp8718_state::map(address_map &map)
 	map(0x00780f, 0x00780f).r(FUNC(pcp8718_state::unk_780f_r));
 
 
-	map(0x007860, 0x007860).r(FUNC(pcp8718_state::unk_7860_r)).nopw();
+	map(0x007860, 0x007860).rw(FUNC(pcp8718_state::unk_7860_r),FUNC(pcp8718_state::unk_7860_w));
+	map(0x007862, 0x007862).nopw();
 	map(0x007863, 0x007863).nopw();
 
-	map(0x007870, 0x007870).r(FUNC(pcp8718_state::unk_7870_r)); // I/O
-
-	map(0x007862, 0x007862).nopw();
-
-
 	map(0x007868, 0x007868).rw(FUNC(pcp8718_state::unk_7868_r), FUNC(pcp8718_state::unk_7868_w));
+
+	map(0x007870, 0x007870).r(FUNC(pcp8718_state::unk_7870_r)); // I/O
 
 	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
 	// 7941 SPI Transmit Status
