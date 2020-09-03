@@ -142,13 +142,16 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 					extregs[end],
 					(rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 
+			// FF80 CA20     Extended group) push r13, r10 to [sp]
+
+
 		}
 		else
 		{
 			uint8_t rb =   (ximm & 0x000f) >> 0;
 			uint8_t size = (ximm & 0x7000) >> 12;
 			uint8_t rx   = (ximm & 0x0e00) >> 9;
-
+			
 			if (size == 0) size = 8;
 
 			int start = (rx + 1)&7;
@@ -158,6 +161,9 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 					extregs[start],
 					extregs[end],
 					(rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+
+			// FF80 4220   (Extended group) pop r10, r13 from [sp]
+
 		}
 		return UNSP_DASM_OK;
 	}

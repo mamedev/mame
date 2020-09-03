@@ -66,9 +66,11 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			while (size>0)
 			{
-				push(m_core->m_r[((rx++)&7) + 8], &m_core->m_r[rb]);
+				push(m_core->m_r[((rx--)&7) + 8], &m_core->m_r[rb]);
 				size--;
 			}
+
+			// FF80 CA20     Extended group) push r13, r10 to [sp]
 
 			return;
 		}
@@ -82,9 +84,11 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			while (size>0)
 			{
-				m_core->m_r[((--rx)&7) + 8] = pop(&m_core->m_r[rb]);
+				m_core->m_r[((++rx)&7) + 8] = pop(&m_core->m_r[rb]);
 				size--;
 			}
+
+			// FF80 4220   (Extended group) pop r10, r13 from [sp]
 
 			return;
 		}
