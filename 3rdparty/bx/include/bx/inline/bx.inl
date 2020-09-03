@@ -33,6 +33,12 @@ namespace bx
 		return __is_trivially_copyable(Ty);
 	}
 
+	template<typename ProtoT>
+	inline constexpr ProtoT functionCast(AnyFn _fn)
+	{
+		return reinterpret_cast<ProtoT>(_fn);
+	}
+
 	template<typename Ty>
 	inline void swap(Ty& _a, Ty& _b)
 	{
