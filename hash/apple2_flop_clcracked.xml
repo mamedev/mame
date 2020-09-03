@@ -37202,4 +37202,43 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bopabet">
+		<description>Bop-A-Bet (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-08-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bop-a-bet (4am and san inc crack).dsk" size="143360" crc="7ee2295f" sha1="84c269e55a873422715f7a7f12af6d7f462c2b0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwstemp">
+		<description>Playing with Science: Temperature (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-08-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="playing with science- temperature (4am crack).dsk" size="143360" crc="694d7f51" sha1="c098c1da499e8635bf0acf0274d5be06322a81ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lraddsub">
+		<description>Learning to Add and Subtract (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Panda Learning Systems</publisher>
+		<info name="release" value="2020-08-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="learning to add and subtract (4am crack).dsk" size="143360" crc="9b336a84" sha1="3534dcacdf79690fd0f88286e79e956dab7038c2"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
