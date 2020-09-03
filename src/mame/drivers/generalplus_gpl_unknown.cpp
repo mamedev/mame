@@ -185,6 +185,9 @@ private:
 
 	uint32_t m_spiaddress;
 
+	uint16_t unk_78a1_r();
+
+
 	enum spistate : const int
 	{
 	   SPI_STATE_READY = 0,
@@ -224,18 +227,12 @@ private:
 	required_ioport m_io_p2;
 
 	int m_gamehack;
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_mainram[0x12] |= 0x8000; // some code waits on this, what is it?
-
-	for (int x = 8; x < 8 + 4; x++)
-	{
-		if (m_mainram[x] > 0)
-			m_mainram[x] -= 1;
-	}
-
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
@@ -576,10 +573,17 @@ void pcp8718_state::unk_7868_w(uint16_t data)
 {
 	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: unk_7868_w %04x (Port B + SPI reset?)\n", machine().describe_context(), data);
 
-	for (int i = 0; i < 4; i++)
-		m_rx_fifo[i] = 0xff;
+	if ((m_7868 & 0x0100) != (data & 0x0100))
+	{
+		if (!(data & 0x0100))
+		{
+			for (int i = 0; i < 4; i++)
+				m_rx_fifo[i] = 0xff;
 
-	m_spistate = SPI_STATE_READY;
+			m_spistate = SPI_STATE_READY;
+		}
+	}
+
 	m_7868 = data;
 }
 
@@ -743,6 +747,13 @@ void pcp8718_state::spi_control_w(uint16_t data)
 	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: spi_control_w %04x\n", machine().describe_context(), data);
 }
 
+uint16_t pcp8718_state::unk_78a1_r()
+{
+	// checked in interrupt, code skipped entirely if this isn't set
+	return 0x8000;
+}
+
+
 void pcp8718_state::map(address_map &map)
 {
 	// there are calls to 01xxx and 02xxx regions
@@ -769,6 +780,8 @@ void pcp8718_state::map(address_map &map)
 	map(0x007868, 0x007868).rw(FUNC(pcp8718_state::unk_7868_r), FUNC(pcp8718_state::unk_7868_w));
 
 	map(0x007870, 0x007870).r(FUNC(pcp8718_state::unk_7870_r)); // I/O
+
+	map(0x0078a1, 0x0078a1).r(FUNC(pcp8718_state::unk_78a1_r));
 
 	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
 	// 7941 SPI Transmit Status
@@ -1006,6 +1019,18 @@ void pcp8718_state::machine_reset()
 	m_spirom[0x16000] = m_gamehack;
 }
 
+WRITE_LINE_MEMBER(pcp8718_state::screen_vblank)
+{
+	if (state)
+	{
+		// probably a timer
+		m_maincpu->set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(UNSP_IRQ4_LINE, CLEAR_LINE);
+	}
+}
 
 void pcp8718_state::pcp8718(machine_config &config)
 {
@@ -1015,11 +1040,12 @@ void pcp8718_state::pcp8718(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 320-1, 0*8, 240-1);
 	m_screen->set_screen_update(FUNC(pcp8718_state::screen_update));
 	//m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(pcp8718_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 }
