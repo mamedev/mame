@@ -4899,6 +4899,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/headonb.cpp",
 	MAME_DIR .. "src/mame/drivers/highvdeo.cpp",
 	MAME_DIR .. "src/mame/drivers/hitpoker.cpp",
+	MAME_DIR .. "src/mame/drivers/hobbyplay.cpp",
 	MAME_DIR .. "src/mame/drivers/homedata.cpp",
 	MAME_DIR .. "src/mame/includes/homedata.h",
 	MAME_DIR .. "src/mame/video/homedata.cpp",
