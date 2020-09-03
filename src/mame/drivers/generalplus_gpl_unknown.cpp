@@ -186,7 +186,8 @@ private:
 	uint32_t m_spiaddress;
 
 	uint16_t unk_78a1_r();
-
+	uint16_t m_78a1;
+	void unk_78d8_w(uint16_t data);
 
 	enum spistate : const int
 	{
@@ -750,7 +751,14 @@ void pcp8718_state::spi_control_w(uint16_t data)
 uint16_t pcp8718_state::unk_78a1_r()
 {
 	// checked in interrupt, code skipped entirely if this isn't set
-	return 0x8000;
+	return m_78a1;
+}
+
+void pcp8718_state::unk_78d8_w(uint16_t data)
+{
+	// written in IRQ, possible ack
+	if (data & 0x8000)
+		m_78a1 &= ~0x8000;
 }
 
 
@@ -782,6 +790,9 @@ void pcp8718_state::map(address_map &map)
 	map(0x007870, 0x007870).r(FUNC(pcp8718_state::unk_7870_r)); // I/O
 
 	map(0x0078a1, 0x0078a1).r(FUNC(pcp8718_state::unk_78a1_r));
+
+	map(0x0078d8, 0x0078d8).w(FUNC(pcp8718_state::unk_78d8_w));
+
 
 	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
 	// 7941 SPI Transmit Status
@@ -1017,6 +1028,8 @@ void pcp8718_state::machine_reset()
 	m_gamehack %= 0x65;
 	m_gamehack++;
 	m_spirom[0x16000] = m_gamehack;
+
+	m_78a1 = 0;
 }
 
 WRITE_LINE_MEMBER(pcp8718_state::screen_vblank)
@@ -1025,6 +1038,7 @@ WRITE_LINE_MEMBER(pcp8718_state::screen_vblank)
 	{
 		// probably a timer
 		m_maincpu->set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
+		m_78a1 |= 0x8000;
 	}
 	else
 	{
