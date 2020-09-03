@@ -156,7 +156,10 @@ bool machine_static_info::has_warnings() const
 
 bool machine_static_info::has_severe_warnings() const
 {
-	return (machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION);
+	return
+			(machine_flags() & MACHINE_ERRORS) ||
+			(unemulated_features() & (device_t::feature::PROTECTION | device_t::feature::GRAPHICS | device_t::feature::SOUND)) ||
+			(imperfect_features() & device_t::feature::PROTECTION);
 }
 
 
