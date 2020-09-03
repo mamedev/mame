@@ -6829,26 +6829,6 @@ gaplust:
 @:maincpu,program,09b6,03,00,00
 
 
-;@s:gauntlet.cpp
-
-; note saves last level completed and high scores
-gauntlet:
-gauntlet2p:
-gauntletr4:
-gauntletr5:
-gauntletr7:
-gauntletr9:
-gauntlets:
-@:maincpu,program,904010,2,0,7
-@:maincpu,program,904de8,c8,00,50
-
-
-; note saves last level completed and high scores
-gaunt2:
-@:maincpu,program,904010,2,0,5
-@:maincpu,program,904de8,c8,00,e3
-
-
 ;@s:gb.cpp
 
 gameboy,tetris:
