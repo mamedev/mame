@@ -280,7 +280,7 @@ namespace bx
 		// Try to use the new thread naming API from Win10 Creators update onwards if we have it
 		typedef HRESULT (WINAPI *SetThreadDescriptionProc)(HANDLE, PCWSTR);
 		SetThreadDescriptionProc SetThreadDescription = bx::functionCast<SetThreadDescriptionProc>(
-			  GetProcAddressA(GetModuleHandleA("Kernel32.dll"), "SetThreadDescription")
+			  GetProcAddress(GetModuleHandleA("Kernel32.dll"), "SetThreadDescription")
 			);
 		if (SetThreadDescription)
 		{
