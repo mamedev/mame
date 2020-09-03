@@ -279,7 +279,9 @@ namespace bx
 #elif BX_PLATFORM_WINDOWS
 		// Try to use the new thread naming API from Win10 Creators update onwards if we have it
 		typedef HRESULT (WINAPI *SetThreadDescriptionProc)(HANDLE, PCWSTR);
-		SetThreadDescriptionProc SetThreadDescription = (SetThreadDescriptionProc)(GetProcAddress(GetModuleHandleA("Kernel32.dll"), "SetThreadDescription"));
+		SetThreadDescriptionProc SetThreadDescription = bx::functionCast<SetThreadDescriptionProc>(
+			  GetProcAddressA(GetModuleHandleA("Kernel32.dll"), "SetThreadDescription")
+			);
 		if (SetThreadDescription)
 		{
 			uint32_t length = (uint32_t)bx::strLen(_name)+1;
