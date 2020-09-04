@@ -227,7 +227,8 @@ private:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 
-	int m_gamehack;
+	uint16_t m_stored_gamenum;
+	int m_addval;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 };
@@ -956,19 +957,79 @@ uint16_t pcp8718_state::ramcall_2829_logger_r()
 uint16_t pcp8718_state::ramcall_287a_logger_r()
 {
 	// this transmits to a device, then reads back the result, needed for menu navigation?!
+	// TODO: data should transmit etc. over bits in the I/O ports, this is HLE, although
+	// most of this code will end up in a simulation handler for whatever this device is
 
 	if (!machine().side_effects_disabled())
 	{
 		if (m_maincpu->pc() == 0x287a)
 		{
 			// 1d = command, 1e = param?
-			LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x\n", m_mainram[0x1d] & 0xff, m_mainram[0x1e] & 0xff);
+			int command = m_mainram[0x1d] & 0xff;
+			int param = m_mainram[0x1e] & 0xff;
 
-			if ((m_mainram[0x1d] & 0xff) == 0x00)
-				m_maincpu->set_state_int(UNSP_R1, m_gamehack);
-
-			if ((m_mainram[0x1d] & 0xff) == 0x01)
-				m_maincpu->set_state_int(UNSP_R1, 0x0000);
+			if ((command) == 0x00)  // request result  low
+			{
+				m_maincpu->set_state_int(UNSP_R1, m_stored_gamenum & 0xff);
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x (request result low)\n", command);
+			}
+			else if ((command) == 0x01) // request result  high
+			{
+				m_maincpu->set_state_int(UNSP_R1, (m_stored_gamenum>>8) & 0xff);
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x (request result high)\n", command);
+			}
+			else if ((command) == 0x02)
+			{
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data low)\n", command, param);
+				m_stored_gamenum = (m_stored_gamenum & 0xff00) | (m_mainram[0x1e] & 0x00ff);
+			}
+			else if ((command) == 0x03)
+			{
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data high)\n", command, param);
+				m_stored_gamenum = (m_stored_gamenum & 0x00ff) | ((m_mainram[0x1e] & 0x00ff) << 8);
+			}
+			else if ((command) == 0x04)
+			{
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
+				// used with down
+				if (param == 0x03)
+					m_addval = 4;
+				else if (param == 0x00)
+					m_addval = 0;
+			}
+			else if ((command) == 0x05)
+			{
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
+			}
+			else if (command == 0x26)
+			{
+				// used in direction handlers
+				m_stored_gamenum += m_addval;
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				// command 0x0c is called after 26
+			}
+			else if (command == 0x30)
+			{
+				// used with right
+				m_addval = 1;
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+			}
+			else if (command == 0x37)
+			{
+				// used with left
+				m_addval = -1;
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+			}
+			else if (command == 0x39)
+			{
+				// used with up
+				m_addval = -4;
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+			}
+			else
+			{
+				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+			}
 
 			// hack retf
 			return 0x9a90;
@@ -1007,7 +1068,6 @@ uint16_t pcp8718_state::ramcall_2434_logger_r()
 
 void pcp8718_state::machine_start()
 {
-	m_gamehack = 0x0;
 }
 
 void pcp8718_state::machine_reset()
@@ -1038,10 +1098,6 @@ void pcp8718_state::machine_reset()
 
 	m_lcdstate = LCD_STATE_READY;
 	m_lastlcdcommand = 0;
-
-	// hack the HLE response to the transmit command
-	m_gamehack %= 0x65;
-	m_gamehack++;
 
 	m_78a1 = 0;
 }
