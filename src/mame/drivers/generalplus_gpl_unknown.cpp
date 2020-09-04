@@ -955,9 +955,24 @@ uint16_t pcp8718_state::ramcall_2829_logger_r()
 
 uint16_t pcp8718_state::ramcall_287a_logger_r()
 {
+	// this transmits to a device, then reads back the result, needed for menu navigation?!
+
 	if (!machine().side_effects_disabled())
 	{
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (unknown)\n");
+		if (m_maincpu->pc() == 0x287a)
+		{
+			// 1d = command, 1e = param?
+			LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x\n", m_mainram[0x1d] & 0xff, m_mainram[0x1e] & 0xff);
+
+			if ((m_mainram[0x1d] & 0xff) == 0x00)
+				m_maincpu->set_state_int(UNSP_R1, m_gamehack);
+
+			if ((m_mainram[0x1d] & 0xff) == 0x01)
+				m_maincpu->set_state_int(UNSP_R1, 0x0000);
+
+			// hack retf
+			return 0x9a90;
+		}
 	}
 	return m_mainram[0x287a];
 }
@@ -1024,10 +1039,9 @@ void pcp8718_state::machine_reset()
 	m_lcdstate = LCD_STATE_READY;
 	m_lastlcdcommand = 0;
 
-	// hack the first game in the menu to allow for easier testing until we figure out why the menu isn't working
+	// hack the HLE response to the transmit command
 	m_gamehack %= 0x65;
 	m_gamehack++;
-	m_spirom[0x16000] = m_gamehack;
 
 	m_78a1 = 0;
 }
