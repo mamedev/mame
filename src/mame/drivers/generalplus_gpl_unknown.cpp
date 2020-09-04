@@ -79,10 +79,13 @@ the first piece of code copied appears to attempt to checksum the internal BIOS!
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_GPL_UNKNOWN            (1U << 1)
-#define LOG_ALL             ( LOG_GPL_UNKNOWN )
 
+#define LOG_GPL_UNKNOWN            (1U << 1)
+#define LOG_GPL_UNKNOWN_SELECT_SIM (1U << 2)
+
+#define LOG_ALL             (LOG_GPL_UNKNOWN | LOG_GPL_UNKNOWN_SELECT_SIM)
 #define VERBOSE             (0)
+
 #include "logmacro.h"
 
 
@@ -927,26 +930,26 @@ uint16_t pcp8718_state::ramcall_287a_logger_r()
 			if ((command) == 0x00)  // request result  low
 			{
 				m_maincpu->set_state_int(UNSP_R1, m_stored_gamenum & 0xff);
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x (request result low)\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x (request result low)\n", command);
 			}
 			else if ((command) == 0x01) // request result  high
 			{
 				m_maincpu->set_state_int(UNSP_R1, (m_stored_gamenum>>8) & 0xff);
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x (request result high)\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x (request result high)\n", command);
 			}
 			else if ((command) == 0x02)
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data low)\n", command, param);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data low)\n", command, param);
 				m_stored_gamenum = (m_stored_gamenum & 0xff00) | (m_mainram[0x1e] & 0x00ff);
 			}
 			else if ((command) == 0x03)
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data high)\n", command, param);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data high)\n", command, param);
 				m_stored_gamenum = (m_stored_gamenum & 0x00ff) | ((m_mainram[0x1e] & 0x00ff) << 8);
 			}
 			else if ((command) == 0x04)
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
 				// used with down
 				if (param == 0x03)
 					m_addval = 4;
@@ -955,36 +958,36 @@ uint16_t pcp8718_state::ramcall_287a_logger_r()
 			}
 			else if ((command) == 0x05)
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
 			}
 			else if (command == 0x26)
 			{
 				// used in direction handlers
 				m_stored_gamenum += m_addval;
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
 				// command 0x0c is called after 26
 			}
 			else if (command == 0x30)
 			{
 				// used with right
 				m_addval = 1;
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
 			}
 			else if (command == 0x37)
 			{
 				// used with left
 				m_addval = -1;
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
 			}
 			else if (command == 0x39)
 			{
 				// used with up
 				m_addval = -4;
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
 			}
 			else
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
 			}
 
 			// hack retf
