@@ -426,7 +426,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		if (bby < 0)
 			continue;
 
-		if (bby >= full_sprite_screen_height >> 16)
+		if (bby > (full_sprite_screen_height + 0xffff) >> 16)
 			continue;
 
 //      color = machine().rand();
@@ -434,6 +434,9 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		int srcline = ((bby << 16) / ratio);
 
 		const int by = srcline >> 4;
+
+		if (by >= h)
+			continue;
 
 		srcline &= 0xf;
 		if (fy)
