@@ -868,56 +868,12 @@ uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
 
 		if ((offset + 0xf000) == (realpc))
 		{
-#if 0
-			// still simulate this as it uses 'fast read' mode which doesn't work in the SPI handler at the moment
-			if (realpc == 0xf000)
-			{
-				address_space& mem = m_maincpu->space(AS_PROGRAM);
-
-				uint32_t source = (mem.read_word(0x001e) << 16) | mem.read_word(0x001d);
-
-				if (source >= 0x20000)
-				{
-					uint16_t data = m_spirom[((source - 0x20000) * 2) + 0] | (m_spirom[((source - 0x20000) * 2) + 1] << 8);
-					uint16_t data2 = m_spirom[((source - 0x20000) * 2) + 2] | (m_spirom[((source - 0x20000) * 2) + 3] << 8);
-					uint16_t data3 = m_spirom[((source - 0x20000) * 2) + 4] | (m_spirom[((source - 0x20000) * 2) + 5] << 8);
-					uint16_t data4 = m_spirom[((source - 0x20000) * 2) + 6] | (m_spirom[((source - 0x20000) * 2) + 7] << 8);
-
-					LOGMASKED(LOG_GPL_UNKNOWN,"call to 0xf000 - copying 4 words from %08x to 04/05/06/07\n", source); // some code only uses 04, but other code copies pointers and expects results in 04 and 05
-
-					mem.write_word(0x0004, data);
-					mem.write_word(0x0005, data2);
-					mem.write_word(0x0006, data3);
-					mem.write_word(0x0007, data4);
-
-				}
-
-				return 0x9a90; // retf
-			}
-			else if (realpc == 0xf58f)
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0xf58f - unknown function\n");
-				return m_mainrom[offset];
-			}
-			else if (realpc == 0xfb26) // done with a call, and also a pc =
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0xfb26 - unknown function\n");
-				return m_mainrom[offset];
-			}
-			else if (realpc == 0xf56f) // done with a pc =
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN,"call to 0xf56f - unknown function\n");
-				return m_mainrom[offset];
-			}
-			else
-			{
-				return m_mainrom[offset];
-			}
-#endif
+			//LOGMASKED(LOG_GPL_UNKNOWN,"simulate_f000_r reading BIOS area (for BIOS call?) %04x\n", offset);
+			return m_mainrom[offset];
 		}
 		else
 		{
-			LOGMASKED(LOG_GPL_UNKNOWN,"simulate_f000_r reading BIOS area (for checksum?) %04x\n", offset);
+			//LOGMASKED(LOG_GPL_UNKNOWN,"simulate_f000_r reading BIOS area (for checksum?) %04x\n", offset);
 			return m_mainrom[offset];
 		}
 	}
@@ -1092,7 +1048,7 @@ void pcp8718_state::machine_reset()
 	m_spiaddress = 0;
 
 	for (int i = 0; i < 320*240*2; i++)
-		m_displaybuffer[i] = i&0xff;
+		m_displaybuffer[i] = 0x00;
 
 	m_lcdaddr = 0;
 
