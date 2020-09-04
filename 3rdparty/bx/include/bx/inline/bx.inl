@@ -34,7 +34,7 @@ namespace bx
 	}
 
 	template<typename ProtoT>
-	inline constexpr ProtoT functionCast(AnyFn _fn)
+	inline constexpr ProtoT functionCast(void* _fn)
 	{
 		return reinterpret_cast<ProtoT>(_fn);
 	}

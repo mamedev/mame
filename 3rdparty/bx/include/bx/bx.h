@@ -39,11 +39,8 @@ namespace bx
 	constexpr bool isTriviallyCopyable();
 
 	///
-	typedef void (*AnyFn)(void);
-
-	///
 	template<typename ProtoT>
-	constexpr ProtoT functionCast(AnyFn _fn);
+	constexpr ProtoT functionCast(void* _fn);
 
 	/// Swap two values.
 	template<typename Ty>
