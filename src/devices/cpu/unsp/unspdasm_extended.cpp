@@ -133,32 +133,30 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 			uint8_t rx   = (ximm & 0x0e00) >> 9;
 
 			if (size == 0) size = 8;
-			size -= 1;
 
-			if ((rx-size) >= 0)
-				util::stream_format(stream, "(Extended group) push %s, %s to [%s]",
-					   extregs[rx-size],
-					   extregs[rx],
-					   (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			else
-				util::stream_format(stream, "(Extended group) push <BAD>");
+			int start = rx;
+			int end = (start-(size-1))&7;
+
+			util::stream_format(stream, "(Extended group) push %s, %s to [%s]",
+					extregs[start],
+					extregs[end],
+					(rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 		}
 		else
 		{
 			uint8_t rb =   (ximm & 0x000f) >> 0;
 			uint8_t size = (ximm & 0x7000) >> 12;
 			uint8_t rx   = (ximm & 0x0e00) >> 9;
-
+			
 			if (size == 0) size = 8;
-			size -= 1;
 
-			if ((rx-size) >= 0)
-				util::stream_format(stream, "(Extended group) pop %s, %s from [%s]",
-					   extregs[7-rx],
-					   extregs[7-(rx-size)],
-					   (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			else
-				util::stream_format(stream, "(Extended group) pop <BAD>");
+			int start = (rx + 1)&7;
+			int end = (start+(size-1))&7;
+
+			util::stream_format(stream, "(Extended group) pop %s, %s from [%s]",
+					extregs[start],
+					extregs[end],
+					(rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 		}
 		return UNSP_DASM_OK;
 	}
