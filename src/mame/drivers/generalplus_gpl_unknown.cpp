@@ -949,41 +949,64 @@ uint16_t pcp8718_state::ramcall_287a_logger_r()
 			}
 			else if ((command) == 0x04)
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set add value)\n", command, param);
 				// used with down
 				if (param == 0x03)
 					m_addval = 4;
 				else if (param == 0x00)
 					m_addval = 0;
+
+				// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
+				// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
+				if (param == 0x14)
+					m_addval = 0x314;
+
 			}
 			else if ((command) == 0x05)
 			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set unknown)\n", command, param);
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set subtract value)\n", command, param);
+
+				// used if you try to scroll down past the and the value becomes too large
+				// actually writes 0x313 split into 2 commands, so the 2nd write to 0x05 with param then instead 0b/16 sequence of writes instead of 26/0c subtracts from the high byte?
+				if (param == 0x13)
+					m_addval = -0x314; // why 314, it writes 313
+
+			}
+			else if ((command) == 0x10)
+			{
+				// this is followed by 0x1b, written if you try to move right off last entry
+				m_stored_gamenum = 0x00;
+				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x (reset value)\n", command);
 			}
 			else if (command == 0x26)
 			{
-				// used in direction handlers
+				// used in direction handlers after writing the first command
 				m_stored_gamenum += m_addval;
 				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
-				// command 0x0c is called after 26
 			}
 			else if (command == 0x30)
 			{
 				// used with right
 				m_addval = 1;
 				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				// 26/0c called after this, then another fixed command value, then 0b/16
+				// unlike commands 04/05 there's no parameter byte written here, must be derived from the command? 
 			}
 			else if (command == 0x37)
 			{
 				// used with left
 				m_addval = -1;
 				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				// 26/0c called after this, then another fixed command value, then 0b/16
+				// unlike commands 04/05 there's no parameter byte written here, must be derived from the command? 
 			}
 			else if (command == 0x39)
 			{
 				// used with up
 				m_addval = -4;
 				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
+				// 26/0c called after this, then another fixed command value, then 0b/16
+				// unlike commands 04/05 there's no parameter byte written here, must be derived from the command? 
 			}
 			else
 			{
