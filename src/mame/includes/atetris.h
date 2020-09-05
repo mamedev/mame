@@ -32,7 +32,6 @@ public:
 
 	void atetris_base(machine_config &config);
 	void atetris(machine_config &config);
-	void atetrisbp(machine_config &config);
 	void atetrisb2(machine_config &config);
 
 	void init_atetris();
@@ -58,7 +57,6 @@ protected:
 	void irq_ack_w(uint8_t data);
 	uint8_t slapstic_r(address_space &space, offs_t offset);
 	void coincount_w(uint8_t data);
-	void atetrisbp_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -66,8 +64,23 @@ protected:
 	void reset_bank();
 
 	void atetrisb2_map(address_map &map);
-	void atetrisbp_map(address_map &map);
 	void main_map(address_map &map);
+};
+
+class atetris_bartop_state : public atetris_state
+{
+public:
+	atetris_bartop_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atetris_state(mconfig, type, tag)
+	{
+	}
+
+	void atetrisbp(machine_config &config);
+
+private:
+	void output_w(uint8_t data);
+
+	void atetrisbp_map(address_map &map);
 };
 
 class atetris_mcu_state : public atetris_state
