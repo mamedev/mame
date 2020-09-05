@@ -2495,7 +2495,7 @@ void lua_engine::initialize()
 
 	auto target_type = sol().registry().create_simple_usertype<render_target>("new", sol::no_constructor);
 	target_type.set("view_bounds", [](render_target &rt) {
-			const render_bounds b = rt.current_view()->bounds();
+			const render_bounds b = rt.current_view().bounds();
 			return std::tuple<float, float, float, float>(b.x0, b.x1, b.y0, b.y1);
 		});
 	target_type.set("width", &render_target::width);

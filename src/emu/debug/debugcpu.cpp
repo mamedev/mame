@@ -1490,7 +1490,7 @@ bool device_debug::comment_export(util::xml::data_node &curnode)
 	// iterate through the comments
 	for (const auto & elem : m_comment_set)
 	{
-		util::xml::data_node *datanode = curnode.add_child("comment", util::xml::normalize_string(elem.m_text.c_str()));
+		util::xml::data_node *datanode = curnode.add_child("comment", elem.m_text.c_str());
 		if (datanode == nullptr)
 			return false;
 		datanode->set_attribute_int("address", elem.m_address);

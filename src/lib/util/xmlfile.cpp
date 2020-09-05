@@ -33,6 +33,37 @@ namespace {
 constexpr unsigned TEMP_BUFFER_SIZE(4096U);
 std::locale const f_portable_locale("C");
 
+
+/***************************************************************************
+    UTILITY FUNCTIONS
+***************************************************************************/
+
+void write_escaped(core_file &file, std::string const &str)
+{
+	std::string::size_type pos = 0;
+	while ((str.size() > pos) && (std::string::npos != pos))
+	{
+		std::string::size_type const found = str.find_first_of("\"&<>", pos);
+		if (found != std::string::npos)
+		{
+			file.write(&str[pos], found - pos);
+			switch (str[found])
+			{
+			case '"': file.puts("&quot;"); pos = found + 1; break;
+			case '&': file.puts("&amp;");  pos = found + 1; break;
+			case '<': file.puts("&lt;");   pos = found + 1; break;
+			case '>': file.puts("&gt;");   pos = found + 1; break;
+			default: pos = found;
+			}
+		}
+		else
+		{
+			file.write(&str[pos], str.size() - pos);
+			pos = found;
+		}
+	}
+}
+
 } // anonymous namespace
 
 
@@ -950,9 +981,13 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 		/* output this tag */
 		file.printf("%*s<%s", indent, "", get_name());
 
-		/* output any attributes */
+		/* output any attributes, escaping as necessary */
 		for (attribute_node const &anode : m_attributes)
-			file.printf(" %s=\"%s\"", anode.name, anode.value);
+		{
+			file.printf(" %s=\"", anode.name);
+			write_escaped(file, anode.value);
+			file.puts("\"");
+		}
 
 		if (!get_first_child() && !get_value())
 		{
@@ -965,8 +1000,11 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 			file.printf(">\n");
 
 			/* if there is a value, output that here */
-			if (get_value())
-				file.printf("%*s%s\n", indent + 4, "", get_value());
+			if (!m_value.empty())
+			{
+				file.printf("%*s\n", indent + 4, "");
+				write_escaped(file, m_value);
+			}
 
 			/* loop over children and output them as well */
 			if (get_first_child())
