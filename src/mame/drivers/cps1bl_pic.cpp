@@ -1307,24 +1307,35 @@ ROM_START( jurassic99 )
 	ROM_LOAD( "21003_u27.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // == dinopic, dinopic2, dinopic3
 
 	/* pld devices:
-	U25    ATF20V8B-15PC  1?
-	U66    ATF16V8B-15PC  2
-	U100   ATF16V8B-15PC  3
-	U118   ATF20V8B-15PC  4?  socketed, secured
-	U146   ATF20V8B-15PC  5
-	U160   ATF16V8B-15PC  6
-	U97G   ATF16V8B-15PC  8
-	U96G   ATF16V8B-15PC  8
-	U98G   ATF16V8B-15PC  8
-	U99G   ATF16V8B-15PC  8
-	U134G  ATF16V8B-15PC  8?
-	U124   Actel A1020A   84-pin PLCC
-
+	U25    ATF20V8B-15PC  1?  secured, bruteforce ok
+	U66    ATF16V8B-15PC  2   unsecured
+	U100   ATF16V8B-15PC  3   unsecured
+	U118   ATF20V8B-15PC  4?  secured, registered, dinopic3 #2 tested ok
+	U146   ATF20V8B-15PC  5   secured, registered, dinopic3 #3 tested ok
+	U160   ATF16V8B-15PC  6   unsecured
+	U124   Actel A1020A   7?  84-pin plcc, unattempted
+	U97G   ATF16V8B-15PC  8   secured, registered
+	U96G   ATF16V8B-15PC  8   secured, registered
+	U98G   ATF16V8B-15PC  8   secured, registered
+	U99G   ATF16V8B-15PC  8   secured, registered
+	U134G  ATF16V8B-15PC  8?  secured, registered
+	
 	3rd column numbers are what's hand-written on each chip
 	? = hard to read or rubbed off
-	seems to be no #7 ?
-	the #8's have alternative 16-pin dip footprints underneath, picture of a very similar pcb shows some ttl chips fitted instead of the pals, can't read what they are unfortunately!
+	the #8 pals appear to be just 74LS298 equivalents, can be replaced with real 74LS298 (additional 16-pin footprints underneath each chip) or hand-crafted jed
 	*/
+	ROM_REGION( 0x1600, "plds", 0 )
+	ROM_LOAD( "1_atf20v8.u25",   0x0000, 0x157, CRC(cd99ca47) SHA1(ee1d990fd294aa46f56f31264134251569f6792e) )  // == dinopic2 #20-1, dinopic3 #1
+	ROM_LOAD( "2_atf16v8.u66",   0x0200, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )  // == dinopic2 #16-1, dinopic3 #5
+	ROM_LOAD( "3_atf16v8.u100",  0x0400, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )  // == dinopic2 #16-2, dinopic3 #6
+	ROM_LOAD( "4_atf20v8.u118",  0x0600, 0x157, CRC(60d016b9) SHA1(add42c763c819f3fe6d7cf3adc7123a52c2a3be9) )  // == dinopic2 #20-2, dinopic3 #2
+	ROM_LOAD( "5_atf20v8.u146",  0x0800, 0x157, CRC(049b7f4f) SHA1(6c6ea03d9a293db69a8bd10e042ee75e3c01313c) )  // == dinopic2 #20-3, dinopic3 #3
+	ROM_LOAD( "6_atf16v8.u160",  0x0a00, 0x117, CRC(b0f10adf) SHA1(5136e9495ef6c37edb0ddf1fe70c0d48c4785c80) )  // == dinopic2 #16-3
+	ROM_LOAD( "8_atf16v8.u96g",  0x0c00, 0x117, BAD_DUMP CRC(11f38ab7) SHA1(4c21b199410a57d6a6a0d9a528b590fefa844856) )  // hand-crafted, works ok on real board
+	ROM_LOAD( "8_atf16v8.u97g",  0x0e00, 0x117, BAD_DUMP CRC(11f38ab7) SHA1(4c21b199410a57d6a6a0d9a528b590fefa844856) )
+	ROM_LOAD( "8_atf16v8.u98g",  0x1000, 0x117, BAD_DUMP CRC(11f38ab7) SHA1(4c21b199410a57d6a6a0d9a528b590fefa844856) )
+	ROM_LOAD( "8_atf16v8.u99g",  0x1200, 0x117, BAD_DUMP CRC(11f38ab7) SHA1(4c21b199410a57d6a6a0d9a528b590fefa844856) )
+	ROM_LOAD( "8_atf16v8.u134g", 0x1400, 0x117, BAD_DUMP CRC(11f38ab7) SHA1(4c21b199410a57d6a6a0d9a528b590fefa844856) )
 ROM_END
 
 
