@@ -830,7 +830,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 			voffset = 0;
 			pixel = (m_towns_txtvram[poffset] & 0xf0) >> 4;
-			col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
+			col = (m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8)) & 0x7fff;
 			if (rotation)
 			{
 				voffset += linesize * (xpos & 0x1ff);  // scanline size in bytes * y pos
@@ -861,7 +861,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 						voffset-=2;
 
 				pixel = m_towns_txtvram[poffset] & 0x0f;
-				col = m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8);
+				col = (m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8)) & 0x7fff;
 				if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
 				{
 					m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
@@ -1126,7 +1126,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			curoff = ((off & 0x7fff8) >> 1) | (off & 3);
 		}
 		colour = (m_towns_gfxvram[curoff+(offpage*0x40000)+1] << 8) | m_towns_gfxvram[curoff+(offpage*0x40000)];
-		if(colour < 0x8000)
+		if(!(m_video.towns_video_reg[0] & 0x10) || (m_video.towns_video_reg[1] & 0x01) != layer || colour < 0x8000)
 		{
 			for (pixel = 0; pixel < hzoom; pixel++)
 				bitmap.pix32(scanline, x+pixel) =
