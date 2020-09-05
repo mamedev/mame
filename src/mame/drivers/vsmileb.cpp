@@ -162,11 +162,17 @@ ROM_END
 
 ROM_START( vsmilebsw )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilebabyswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_sweden.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
 ROM_END
 
-//    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
-CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-// has the Winnie the Pooh game in the BIOS ROM.  This was supplied as a 'Romless cart' with the device, so probably triggers a switch, currently always banked in.
-CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with Aventuras en el Bosque de los Cien Acres)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( vsmilebg )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_german_pooh.bin", 0x000000, 0x800000, CRC(22261569) SHA1(8918a905af4bb186beb5577b1d295d9c037584f7) )
+ROM_END
+
+//    year, name,      parent,  compat, machine, input,   class,         init,       company, fullname,                                                                flags
+CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (USA)",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// 'vsmilebs' and 'vsmilebg' have the Winnie the Pooh game in the BIOS ROM. This was supplied as a 'Romless cart' with the device, so probably triggers a switch, currently always banked in.
+CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with 'Aventuras en el Bosque de los Cien Acres')", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebg,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Germany, with 'Puuhs Hundert-Morgen-Wald')",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
