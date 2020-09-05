@@ -1002,8 +1002,9 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 			/* if there is a value, output that here */
 			if (!m_value.empty())
 			{
-				file.printf("%*s\n", indent + 4, "");
+				file.printf("%*s", indent + 4, "");
 				write_escaped(file, m_value);
+				file.puts("\n");
 			}
 
 			/* loop over children and output them as well */
