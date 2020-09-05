@@ -130,7 +130,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	m_sample_attos = newperiod.attoseconds();
 
 	// compute the new end sample index based on the buffer time
-	m_end_sample = (rate != 0) ? time_to_buffer_index(prevend, false) : 0;
+	m_end_sample = (rate != 0) ? time_to_buffer_index(prevend, false, true) : 0;
 
 	// if the new rate is higher, upsample from our temporary buffer;
 	// otherwise just copy our previously-downsampled data
@@ -939,8 +939,9 @@ read_stream_view sound_stream::empty_view(attotime start, attotime end)
 	if (m_empty_buffer.sample_rate() != m_sample_rate)
 		m_empty_buffer.set_sample_rate(m_sample_rate, false);
 
-	// return a view
-	return read_stream_view(m_empty_buffer, start, end, 1.0);
+	// allocate a write view so that it can expand, and convert back to a read view
+	// on the return
+	return write_stream_view(m_empty_buffer, start, end);
 }
 
 
@@ -1044,7 +1045,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 			else
 			{
 				srcpos -= 1.0;
-				sound_assert(srcpos <= step);
+				sound_assert(srcpos <= step + 1e-5);
 				stream_buffer::sample_t prevsample = cursample;
 				cursample = rebased.get(srcindex++);
 				output.put(dstindex, stepinv * (prevsample * (step - srcpos) + srcpos * cursample));
