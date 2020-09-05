@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="ibm5170_hdd" description="IBM PC/AT hard disk images">
+	<!--
+	Unless otherwise specified, all images are based on default installs of the
+	corresponding ibm5150 or ibm5170 sets. BIOS should be able to autodetect the
+	hard drive, if not set it up as Type 47 with C/H/S of 1015/16/63.
+	-->
+
+	<software name="msdos5">
+		<description>MS-DOS (Version 5.00)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos5" sha1="2c585ce9193b5420bfe4f6fca591226bf69a8664" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos622">
+		<description>MS-DOS (Version 6.22)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos622" sha1="ceaa0a963ae2b301c8d799e3f7c733f13eebe8bc" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos2k">
+		<description>IBM PC DOS 2000</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos2k" sha1="96addad58a341c5ac005bbec700e7e52e2ae091f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win30">
+		<description>Microsoft Windows Version 3.0</description>
+		<year>1990</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="win30" sha1="64c7099b65b6561c8e346d240796bf4c00d381ab" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
