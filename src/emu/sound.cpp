@@ -130,7 +130,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	m_sample_attos = newperiod.attoseconds();
 
 	// compute the new end sample index based on the buffer time
-	m_end_sample = (rate != 0) ? time_to_buffer_index(prevend) : 0;
+	m_end_sample = (rate != 0) ? time_to_buffer_index(prevend, false) : 0;
 
 	// if the new rate is higher, upsample from our temporary buffer;
 	// otherwise just copy our previously-downsampled data
@@ -181,7 +181,7 @@ void stream_buffer::flush_wav()
 		return;
 
 	// grab a view of the data from the last-written point
-	read_stream_view view(*this, m_last_written, m_end_sample, 1.0f);
+	read_stream_view view(this, m_last_written, m_end_sample, 1.0f);
 	m_last_written = m_end_sample;
 
 	// iterate over chunks for conversion
@@ -235,7 +235,7 @@ attotime stream_buffer::index_time(s32 index) const
 //  return the buffer index corresponding to it
 //-------------------------------------------------
 
-u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up)
+u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow_expansion)
 {
 	// compute the sample index within the second
 	int sample = (time.attoseconds() + (round_up ? (m_sample_attos - 1) : 0)) / m_sample_attos;
@@ -244,6 +244,8 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up)
 	// if the time is past the current end, make it the end
 	if (time.seconds() > m_end_second || (time.seconds() == m_end_second && sample > m_end_sample))
 	{
+		sound_assert(allow_expansion);
+
 		m_end_sample = sample;
 		m_end_second = time.m_seconds;
 
@@ -279,7 +281,7 @@ void stream_buffer::backfill_downsample(sample_t *dest, int samples, attotime ne
 	int dstindex;
 	for (dstindex = 0; dstindex < samples && time.seconds() >= 0; dstindex++)
 	{
-		u32 srcindex = time_to_buffer_index(time);
+		u32 srcindex = time_to_buffer_index(time, false);
 #if (SOUND_DEBUG)
 		if (std::isnan(m_buffer[srcindex]))
 			dest[dstindex] = 0;
@@ -802,7 +804,7 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent)
 {
-	printf("%c %*s%s @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", name().c_str(), sample_rate());
+	osd_printf_info("%c %*s%s @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", name().c_str(), sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 		{
@@ -993,13 +995,13 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	}
 
 	// compute the stepping value and the inverse
-	float step = float(input.sample_rate()) / float(output.sample_rate());
-	float stepinv = 1.0f / step;
+	stream_buffer::sample_t step = stream_buffer::sample_t(input.sample_rate()) / stream_buffer::sample_t(output.sample_rate());
+	stream_buffer::sample_t stepinv = 1.0 / step;
 
 	// determine the latency we need to introduce, in input samples:
 	//    1 input sample for undersampled inputs
 	//    1 + step input samples for oversampled inputs
-	s64 latency_samples = 1 + ((step < 1.0f) ? 0 : s32(step));
+	s64 latency_samples = 1 + ((step < 1.0) ? 0 : s32(step));
 	if (latency_samples <= m_max_latency)
 		latency_samples = m_max_latency;
 	else
@@ -1019,62 +1021,61 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 
 	// create a rebased input buffer around the adjusted start time
 	read_stream_view rebased(input, output_start - latency);
+	sound_assert(rebased.start_time() + latency <= output_start);
 
 	// compute the fractional input start position
 	attotime delta = output_start - (rebased.start_time() + latency);
 	sound_assert(delta.seconds() == 0);
-	float srcpos = float(double(delta.attoseconds()) / double(rebased.sample_period_attoseconds()));
+	stream_buffer::sample_t srcpos = stream_buffer::sample_t(double(delta.attoseconds()) / double(rebased.sample_period_attoseconds()));
 	sound_assert(srcpos <= 1.0f);
 
 	// input is undersampled: point sample except where our sample period covers a boundary
 	s32 srcindex = 0;
-	if (step < 1.0f)
+	if (step < 1.0)
 	{
-		while (dstindex < numsamples)
+		stream_buffer::sample_t cursample = rebased.get(srcindex++);
+		for ( ; dstindex < numsamples; dstindex++)
 		{
-			// fill in with point samples until we hit a boundary
-			float nextpos;
-			while ((nextpos = srcpos + step) < 1.0f && dstindex < numsamples)
+			// if still within the current sample, just replicate
+			if (srcpos <= 1.0)
+				output.put(dstindex, cursample);
+
+			// if crossing a sample boundary, blend with the neighbor
+			else
 			{
-				output.put(dstindex++, rebased.get(srcindex));
-				srcpos = nextpos;
+				srcpos -= 1.0;
+				sound_assert(srcpos <= step);
+				stream_buffer::sample_t prevsample = cursample;
+				cursample = rebased.get(srcindex++);
+				output.put(dstindex, stepinv * (prevsample * (step - srcpos) + srcpos * cursample));
 			}
-
-			// if we're done, we're done
-			if (dstindex >= numsamples)
-				break;
-
-			// blend between the two samples accordingly
-			float sample = rebased.get(srcindex) * (1.0f - srcpos) + rebased.get(srcindex + 1) * (nextpos - 1.0f);
-			output.put(dstindex++, sample * stepinv);
-			srcindex++;
-
-			// advance
-			srcpos = nextpos - 1.0f;
-			sound_assert(srcindex <= rebased.samples());
+			srcpos += step;
 		}
+		sound_assert(srcindex <= rebased.samples());
 	}
 
 	// input is oversampled: sum the energy
 	else
 	{
-		while (dstindex < numsamples)
+		float cursample = rebased.get(srcindex++);
+		for ( ; dstindex < numsamples; dstindex++)
 		{
 			// compute the partial first sample and advance
-			float scale = 1.0f - srcpos;
-			float sample = rebased.get(srcindex++) * scale;
+			stream_buffer::sample_t scale = 1.0 - srcpos;
+			stream_buffer::sample_t sample = cursample * scale;
 
 			// add in complete samples until we only have a fraction left
-			float remaining = step - scale;
-			while (remaining >= 1.0f)
+			stream_buffer::sample_t remaining = step - scale;
+			while (remaining >= 1.0)
 			{
 				sample += rebased.get(srcindex++);
-				remaining -= 1.0f;
+				remaining -= 1.0;
 			}
 
 			// add in the final partial sample
-			sample += rebased.get(srcindex) * remaining;
-			output.put(dstindex++, sample * stepinv);
+			cursample = rebased.get(srcindex++);
+			sample += cursample * remaining;
+			output.put(dstindex, sample * stepinv);
 
 			// our position is now the remainder
 			srcpos = remaining;
@@ -1109,7 +1110,8 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_nosound_mode(machine.osd().no_sound()),
 	m_attenuation(0),
 	m_unique_id(0),
-	m_wavfile(nullptr)
+	m_wavfile(nullptr),
+	m_first_reset(true)
 {
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = machine.options().wav_write();
@@ -1281,6 +1283,47 @@ void sound_manager::mute(bool mute, u8 reason)
 
 
 //-------------------------------------------------
+//  recursive_remove_stream_from_orphan_list -
+//  remove the given stream from the orphan list
+//  and recursively remove all our inputs
+//-------------------------------------------------
+
+void sound_manager::recursive_remove_stream_from_orphan_list(sound_stream *which)
+{
+	m_orphan_stream_list.erase(which);
+	for (int inputnum = 0; inputnum < which->input_count(); inputnum++)
+	{
+		auto &input = which->input(inputnum);
+		if (input.valid())
+			recursive_remove_stream_from_orphan_list(&input.source().stream());
+	}
+}
+
+
+//-------------------------------------------------
+//  apply_sample_rate_changes - recursively
+//  update sample rates throughout the system
+//-------------------------------------------------
+
+void sound_manager::apply_sample_rate_changes()
+{
+	// update sample rates if they have changed
+	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+	{
+		int stream_out;
+		sound_stream *stream = speaker.output_to_stream_output(0, stream_out);
+
+		// due to device removal, some speakers may end up with no outputs; just skip those
+		if (stream != nullptr)
+		{
+			sound_assert(speaker.outputs() == 1);
+			stream->apply_sample_rate_changes(m_update_number, machine().sample_rate());
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  reset - reset all sound chips
 //-------------------------------------------------
 
@@ -1289,6 +1332,47 @@ void sound_manager::reset()
 	// reset all the sound chips
 	for (device_sound_interface &sound : sound_interface_iterator(machine().root_device()))
 		sound.device().reset();
+
+	// apply any sample rate changes now
+	apply_sample_rate_changes();
+
+	// on first reset, identify any orphaned streams
+	if (m_first_reset)
+	{
+		m_first_reset = false;
+
+		// put all the streams on the orphan list to start
+		for (auto &stream : m_stream_list)
+			m_orphan_stream_list[stream.get()] = 0;
+
+		// then walk the graph like we do on update and remove any we touch
+		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		{
+			int dummy;
+			sound_stream *output = speaker.output_to_stream_output(0, dummy);
+			if (output != nullptr)
+				recursive_remove_stream_from_orphan_list(output);
+		}
+
+#if (SOUND_DEBUG)
+		// dump the sound graph when we start up
+		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		{
+			int dummy;
+			sound_stream *output = speaker.output_to_stream_output(0, dummy);
+			if (output)
+				output->print_graph_recursive(0);
+		}
+
+		// dump the orphan list as well
+		if (m_orphan_stream_list.size() != 0)
+		{
+			osd_printf_info("\nOrphaned streams:\n");
+			for (auto &stream : m_orphan_stream_list)
+				osd_printf_info("   %s\n", stream.first->name());
+		}
+#endif
+	}
 }
 
 
@@ -1376,8 +1460,9 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 
 //-------------------------------------------------
-//  update - adjust the current scale factor
-//  toward the current goal, in small increments
+//  adjust_toward_compressor_scale - adjust the
+//  current scale factor toward the current goal,
+//  in small increments
 //-------------------------------------------------
 
 stream_buffer::sample_t sound_manager::adjust_toward_compressor_scale(stream_buffer::sample_t curscale, stream_buffer::sample_t prevsample, stream_buffer::sample_t rawsample)
@@ -1423,18 +1508,6 @@ void sound_manager::update(void *ptr, int param)
 	VPRINTF(("sound_update\n"));
 
 	g_profiler.start(PROFILER_SOUND);
-
-#if (SOUND_DEBUG)
-	// dump the sound graph when we start up
-	if (m_last_update == attotime::zero)
-		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
-		{
-			int dummy;
-			sound_stream *output = speaker.output_to_stream_output(0, dummy);
-			if (output)
-				output->print_graph_recursive(0);
-		}
-#endif
 
 	// force all the speaker streams to generate the proper number of samples
 	m_samples_this_update = 0;
@@ -1537,6 +1610,10 @@ void sound_manager::update(void *ptr, int param)
 			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);
 	}
 
+	// update any orphaned streams so they don't get too far behind
+	for (auto &stream : m_orphan_stream_list)
+		stream.first->update();
+
 	// see if we ticked over to the next second
 	attotime curtime = machine().time();
 	if (curtime.seconds() != m_last_update.seconds())
@@ -1546,19 +1623,8 @@ void sound_manager::update(void *ptr, int param)
 	m_last_update = curtime;
 	m_update_number++;
 
-	// update sample rates if they have changed
-	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
-	{
-		int stream_out;
-		sound_stream *stream = speaker.output_to_stream_output(0, stream_out);
-
-		// due to device removal, some speakers may end up with no outputs; just skip those
-		if (stream != nullptr)
-		{
-			sound_assert(speaker.outputs() == 1);
-			stream->apply_sample_rate_changes(m_update_number, machine().sample_rate());
-		}
-	}
+	// apply sample rate changes
+	apply_sample_rate_changes();
 
 	// notify that new samples have been generated
 	emulator_info::sound_hook();

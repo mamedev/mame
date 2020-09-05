@@ -87,6 +87,7 @@ constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
 class stream_buffer
 {
 	friend class read_stream_view;
+	friend class write_stream_view;
 
 public:
 	using sample_t = float;
@@ -159,7 +160,7 @@ private:
 	attotime index_time(s32 index) const;
 
 	// given an attotime, return the buffer index corresponding to it
-	u32 time_to_buffer_index(attotime time, bool round_up = false);
+	u32 time_to_buffer_index(attotime time, bool round_up, bool allow_expansion = false);
 
 	// downsample from our buffer into a temporary buffer
 	void backfill_downsample(sample_t *dest, int samples, attotime newend, attotime newperiod);
@@ -186,62 +187,53 @@ private:
 
 class read_stream_view
 {
-	friend class write_stream_view;
-
 public:
 	using sample_t = stream_buffer::sample_t;
 
-	// empty constructor so we can live in an array or vector
-	read_stream_view() :
-		m_buffer(nullptr),
-		m_start(0),
-		m_end(0),
-		m_gain(1.0)
+protected:
+	// private constructor used by write_stream_view that allows for expansion
+	read_stream_view(stream_buffer &buffer, attotime start, attotime end) :
+		read_stream_view(&buffer, 0, buffer.time_to_buffer_index(end, true, true), 1.0)
 	{
-	}
-
-	// constructor that covers the given sample range of a buffer
-	read_stream_view(stream_buffer &buffer, s32 start, s32 end, sample_t gain) :
-		m_buffer(&buffer),
-		m_start(start),
-		m_end(end),
-		m_gain(gain)
-	{
-		normalize_start_end();
-	}
-
-	// constructor that covers the given time period
-	read_stream_view(stream_buffer &buffer, attotime start, attotime end, sample_t gain) :
-		m_buffer(&buffer),
-		m_start(0),
-		m_end(buffer.time_to_buffer_index(end, true)),
-		m_gain(gain)
-	{
-		// it's important to compute the end first, since it could invalidate the start
+		// start has to be set after end, since end can expand the buffer and
+		// potentially invalidate start
 		m_start = buffer.time_to_buffer_index(start, false);
 		normalize_start_end();
 	}
 
-	// copy constructor
-	read_stream_view(read_stream_view const &src) :
-		m_buffer(src.m_buffer),
-		m_start(src.m_start),
-		m_end(src.m_end),
-		m_gain(src.m_gain)
+public:
+	// base constructor to simplify some of the code
+	read_stream_view(stream_buffer *buffer, s32 start, s32 end, sample_t gain) :
+		m_buffer(buffer),
+		m_end(end),
+		m_start(start),
+		m_gain(gain)
 	{
 		normalize_start_end();
 	}
 
+	// empty constructor so we can live in an array or vector
+	read_stream_view() :
+		read_stream_view(nullptr, 0, 0, 1.0)
+	{
+	}
+
+	// constructor that covers the given time period
+	read_stream_view(stream_buffer &buffer, attotime start, attotime end, sample_t gain) :
+		read_stream_view(&buffer, buffer.time_to_buffer_index(start, false), buffer.time_to_buffer_index(end, true), gain)
+	{
+	}
+
+	// copy constructor
+	read_stream_view(read_stream_view const &src) :
+		read_stream_view(src.m_buffer, src.m_start, src.m_end, src.m_gain)
+	{
+	}
+
 	// copy constructor that sets a different start time
 	read_stream_view(read_stream_view const &src, attotime start) :
-		m_buffer(src.m_buffer),
-		m_start(0),
-		m_end(src.m_end),
-		m_gain(src.m_gain)
+		read_stream_view(src.m_buffer, src.m_buffer->time_to_buffer_index(start, false), src.m_end, src.m_gain)
 	{
-		// end must be set before start can be
-		m_start = m_buffer->time_to_buffer_index(start, false);
-		normalize_start_end();
 	}
 
 	// copy assignment
@@ -281,6 +273,7 @@ public:
 	// safely fetch a gain-scaled sample from the buffer
 	sample_t get(s32 index) const
 	{
+		sound_assert(u32(index) < samples());
 		if (u32(index) >= samples())
 			return 0;
 		return m_buffer->get(m_start + index) * m_gain;
@@ -290,6 +283,7 @@ public:
 	// apply the gain yourself for correctness
 	sample_t getraw(s32 index) const
 	{
+		sound_assert(u32(index) < samples());
 		if (u32(index) >= samples())
 			return 0;
 		return m_buffer->get(m_start + index);
@@ -308,8 +302,8 @@ protected:
 
 	// internal state
 	stream_buffer *m_buffer;              // pointer to the stream buffer we're viewing
-	s32 m_start;                          // starting sample index
 	s32 m_end;                            // ending sample index (always >= start)
+	s32 m_start;                          // starting sample index
 	sample_t m_gain;                      // overall gain factor
 };
 
@@ -326,7 +320,7 @@ public:
 
 	// constructor that covers the given time period
 	write_stream_view(stream_buffer &buffer, attotime start, attotime end) :
-		read_stream_view(buffer, start, end, sample_t(1.0))
+		read_stream_view(buffer, start, end)
 	{
 	}
 
@@ -720,6 +714,12 @@ private:
 	// set/reset the mute state for the given reason
 	void mute(bool mute, u8 reason);
 
+	// helper to remove items from the orphan list
+	void recursive_remove_stream_from_orphan_list(sound_stream *stream);
+
+	// apply pending sample rate changes
+	void apply_sample_rate_changes();
+
 	// reset all sound chips
 	void reset();
 
@@ -760,6 +760,8 @@ private:
 
 	// streams data
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list; // list of streams
+	std::map<sound_stream *, u8> m_orphan_stream_list; // list of orphaned streams
+	bool m_first_reset;                   // is this our first reset?
 };
 
 
