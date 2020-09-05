@@ -12,7 +12,7 @@
 #include "pstring.h"
 
 #include "penum.h"
-#include "putil.h" // psource_t
+#include "psource.h"
 
 #include <unordered_map>
 #include <vector>
@@ -58,8 +58,11 @@ namespace plib {
 			: m_id(id)
 			, m_name(name)
 			{}
+
+			PCOPYASSIGNMOVE(token_id_t, default)
+
 			std::size_t id() const { return m_id; }
-			pstring name() const { return m_name; }
+			const pstring & name() const { return m_name; }
 		private:
 			std::size_t m_id;
 			pstring     m_name;
@@ -84,6 +87,8 @@ namespace plib {
 			{
 			}
 
+			PCOPYASSIGNMOVE(token_t, default)
+
 			bool is(const token_id_t &tok_id) const noexcept { return m_id == tok_id.id(); }
 			bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }
 
@@ -91,7 +96,7 @@ namespace plib {
 
 			token_type type() const noexcept { return m_type; }
 
-			pstring str() const noexcept { return m_token; }
+			const pstring &str() const noexcept { return m_token; }
 
 		private:
 			token_type m_type;
@@ -212,6 +217,7 @@ namespace plib {
 		// tokenizer stuff follows ...
 
 		token_t get_token();
+		token_t get_token_raw(); // includes line information
 		pstring get_string();
 		pstring get_identifier();
 		pstring get_identifier_or_number();
@@ -225,10 +231,14 @@ namespace plib {
 		void error(const perrmsg &errs);
 
 		plib::source_location sourceloc() { return m_source_location.back(); }
+
+		pstring current_line() const { return m_line; }
 	protected:
 		virtual void verror(const pstring &msg) = 0;
 
 	private:
+		bool process_line_token(const token_t &tok);
+
 		token_t get_token_queue()
 		{
 			if (m_idx < m_token_store->size())

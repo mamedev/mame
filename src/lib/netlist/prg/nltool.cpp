@@ -108,7 +108,7 @@ public:
 	void poutprefix(const pstring &prefix, const pstring &fmt, ARGS&&... args)
 	{
 		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
-		auto lines(plib::psplit(res, "\n", false));
+		auto lines(plib::psplit(res, '\n', false));
 		if (lines.empty())
 			pout(prefix + "\n");
 		else
@@ -174,6 +174,8 @@ private:
 
 	using compile_map = std::map<pstring, compile_map_entry>;
 
+	void logger(plib::plog_level l, const pstring &ls);
+
 	void run_with_progress(netlist_tool_t &nt, netlist::netlist_time_ext nlstart, netlist::netlist_time_ext ttr);
 
 	void run();
@@ -213,14 +215,14 @@ public:
 	{
 	}
 
-	stream_ptr stream(const pstring &file) override
+	plib::istream_uptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		stream_ptr strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)), plib::filesystem::u8path(name));
-		if (strm.stream().fail())
-			return stream_ptr();
+		plib::istream_uptr strm(std::make_unique<plib::ifstream>(plib::filesystem::u8path(name)), plib::filesystem::u8path(name));
+		if (strm->fail())
+			return plib::istream_uptr();
 
-		strm.stream().imbue(std::locale::classic());
+		strm->imbue(std::locale::classic());
 		return strm;
 	}
 
@@ -228,40 +230,22 @@ private:
 	pstring m_folder;
 };
 
-class netlist_tool_callbacks_t : public netlist::callbacks_t
-{
-public:
-	explicit netlist_tool_callbacks_t(tool_app_t &app, const pstring &boostlib)
-	: m_app(app), m_boostlib(boostlib)
-	{ }
-
-	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
-
-	std::unique_ptr<plib::dynlib_base> static_solver_lib() const override
-	{
-		if (m_boostlib == "builtin")
-			return std::make_unique<plib::dynlib_static>(nl_static_solver_syms);
-		if (m_boostlib == "generic")
-			return std::make_unique<plib::dynlib_static>(nullptr);
-		if (NL_DISABLE_DYNAMIC_LOAD)
-			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
-
-		//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-		return std::make_unique<plib::dynlib>(m_boostlib);
-	}
-
-private:
-	tool_app_t &m_app;
-	pstring    m_boostlib;
-};
-
 class netlist_tool_t : public netlist::netlist_state_t
 {
 public:
 
-	netlist_tool_t(tool_app_t &app, const pstring &name, const pstring &boostlib)
-	: netlist::netlist_state_t(name, plib::make_unique<netlist_tool_callbacks_t, netlist::host_arena>(app, boostlib))
+	netlist_tool_t(plib::plog_delegate logger, const pstring &name, const pstring &boostlib)
+	: netlist::netlist_state_t(name, logger)
 	{
+		if (boostlib == "builtin")
+			set_static_solver_lib(std::make_unique<plib::dynlib_static>(nl_static_solver_syms));
+		else if (boostlib == "generic")
+			set_static_solver_lib(std::make_unique<plib::dynlib_static>(nullptr));
+		else if (NL_DISABLE_DYNAMIC_LOAD)
+			throw netlist::nl_exception("Dynamic library loading not supported due to project security concerns.");
+		else
+			//pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
+			set_static_solver_lib(std::make_unique<plib::dynlib>(boostlib));
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name,
@@ -341,21 +325,10 @@ protected:
 private:
 };
 
-void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls) const noexcept
-{
-	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
-	if (l == plib::plog_level::WARNING)
-		m_app.m_warnings++;
-	if (l == plib::plog_level::ERROR)
-		m_app.m_errors++;
-	if (l == plib::plog_level::FATAL)
-		m_app.m_errors++;
-	m_app.pout("{}", err);
-}
 
 struct input_t
 {
-	input_t(const netlist::setup_t &setup, const pstring &line)
+	input_t(const netlist::setup_t &setup, const putf8string &line)
 	: m_value(netlist::nlconst::zero())
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
@@ -404,7 +377,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 		if (r.stream().fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
-		pstring l;
+		putf8string l;
 		while (r.readline(l))
 		{
 			if (!l.empty())
@@ -447,6 +420,18 @@ void tool_app_t::run_with_progress(netlist_tool_t &nt, netlist::netlist_time_ext
 	}
 }
 
+void tool_app_t::logger(plib::plog_level l, const pstring &ls)
+{
+	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
+	if (l == plib::plog_level::WARNING)
+		m_warnings++;
+	if (l == plib::plog_level::ERROR)
+		m_errors++;
+	if (l == plib::plog_level::FATAL)
+		m_errors++;
+	pout("{}", err);
+}
+
 void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
@@ -461,7 +446,7 @@ void tool_app_t::run()
 
 	t.start();
 
-	netlist_tool_t nt(*this, "netlist", opt_boostlib());
+	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
 
 	nt.exec().enable_stats(opt_stats());
 
@@ -549,7 +534,7 @@ void tool_app_t::run()
 
 void tool_app_t::validate()
 {
-	netlist_tool_t nt(*this, "netlist", opt_boostlib());
+	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
 
 	if (opt_files().size() != 1)
 		throw netlist::nl_exception("nltool: validate needs exactly one file");
@@ -593,7 +578,7 @@ void tool_app_t::compile_one_and_add_to_map(const pstring &file,
 {
 	try
 	{
-		netlist_tool_t nt(*this, "netlist", opt_boostlib());
+		netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
 
 		nt.log().verbose.set_enabled(false);
 		nt.log().info.set_enabled(false);
@@ -657,7 +642,7 @@ void tool_app_t::static_compile()
 		for (auto &e : mp)
 		{
 			plib::ofstream sout(opt_dir() + "/" + e.first + ".c" );
-			sout << e.second.m_code;
+			sout << putf8string(e.second.m_code);
 		}
 	}
 	else
@@ -675,12 +660,12 @@ void tool_app_t::static_compile()
 				if (r.stream().fail())
 					throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(f));
 				r.stream().imbue(std::locale::classic());
-				pstring line;
+				putf8string line;
 				while (r.readline(line))
 				{
 					if (plib::startsWith(line, "//NL_CONTAINS "))
 					{
-						auto sp = plib::psplit(plib::trim(line.substr(13)), " ", true);
+						auto sp = plib::psplit(pstring(plib::trim(line.substr(13))), ' ', true);
 						for (auto &e : sp)
 							names.push_back(e);
 					}
@@ -710,15 +695,15 @@ void tool_app_t::static_compile()
 		sout << "#include \"plib/pdynlib.h\"\n\n";
 		for (auto &e : map)
 		{
-			sout << "// " << e.second.m_module << "\n";
-			sout << e.second.m_code;
+			sout << "// " << putf8string(e.second.m_module) << "\n";
+			sout << putf8string(e.second.m_code);
 		}
 		sout << "extern const plib::dynlib_static_sym nl_static_solver_syms[];\n";
 		sout << "const plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
 		for (auto &e : map)
 		{
-			sout << "// " << e.second.m_module << "\n";
-			sout << "\t{\"" << e.first << "\", reinterpret_cast<void *>(&" << e.first << ")},\n";
+			sout << "// " << putf8string(e.second.m_module) << "\n";
+			sout << "\t{\"" << putf8string(e.first) << "\", reinterpret_cast<void *>(&" << putf8string(e.first) << ")},\n";
 		}
 		sout << "{\"\", nullptr}\n";
 		sout << "};\n";
@@ -760,7 +745,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 	r.stream().imbue(std::locale::classic());
 	doc_ext ret;
 
-	pstring l;
+	putf8string l;
 	if (!r.readline(l))
 		return ret;
 	do
@@ -771,9 +756,9 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 			l = plib::trim(l.substr(3));
 			if (!l.empty())
 			{
-				auto a(plib::psplit(l, ":", true));
+				auto a(plib::psplit(pstring(l), ':', true));
 				if (a.empty() || (a.size() > 2))
-					throw netlist::nl_exception(l+" size mismatch");
+					throw netlist::nl_exception(pstring(l) + " size mismatch");
 				pstring n(plib::trim(a[0]));
 				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
 				pstring v2(v);
@@ -792,12 +777,12 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 						if (!(plib::startsWith(l, "//-  ") || plib::startsWith(l, "//-\t"))
 							&& !(plib::rtrim(l) == "//-"))
 							break;
-						v = v + "\n" + l.substr(3);
+						v = v + "\n" + pstring(l.substr(3));
 					}
 					if (n == "Title")
 						ret.title = plib::trim(v);
 					else if (n == "Pinalias")
-						ret.pinalias = plib::psplit(plib::trim(v),",",true);
+						ret.pinalias = plib::psplit(plib::trim(v),',',true);
 					else if (n == "Description")
 						ret.description = v;
 					else if (n == "Package")
@@ -812,7 +797,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 						ret.params.emplace_back(v2, plib::trim(v.substr(v2.length())));
 					else if (n == "Example")
 					{
-						ret.example = plib::psplit(plib::trim(v),",",true);
+						ret.example = plib::psplit(plib::trim(v),',',true);
 						if (ret.example.size() != 2 && !ret.example.empty())
 							throw netlist::nl_exception("Example requires 2 parameters, but found {1}", ret.example.size());
 					}
@@ -856,7 +841,7 @@ void tool_app_t::mac_out(const pstring &s, const bool cont)
 
 void tool_app_t::header_entry(const netlist::factory::element_t *e)
 {
-	auto v = plib::psplit(e->param_desc(), ",");
+	auto v = plib::psplit(e->param_desc(), ',');
 	pstring vs;
 	pstring avs;
 	for (const auto &s : v)
@@ -876,7 +861,7 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 
 void tool_app_t::mac(const netlist::factory::element_t *e)
 {
-	auto v = plib::psplit(e->param_desc(), ",");
+	auto v = plib::psplit(e->param_desc(), ',');
 	pstring vs;
 	for (const auto &s : v)
 		if (!plib::startsWith(s, "@"))
@@ -905,7 +890,7 @@ void tool_app_t::create_header()
 	if (!opt_files().empty())
 		throw netlist::nl_exception("Header doesn't support input files, but {1} where given", opt_files().size());
 
-	netlist_tool_t nt(*this, "netlist", opt_boostlib());
+	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -954,7 +939,7 @@ void tool_app_t::create_header()
 
 void tool_app_t::create_docheader()
 {
-	netlist_tool_t nt(*this, "netlist", opt_boostlib());
+	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -1109,7 +1094,7 @@ void tool_app_t::create_docheader()
 
 void tool_app_t::listdevices()
 {
-	netlist_tool_t nt(*this, "netlist", opt_boostlib());
+	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -1137,7 +1122,7 @@ void tool_app_t::listdevices()
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));
 
 		out += "," + f->param_desc();
-		for (const auto &p : plib::psplit(f->param_desc(),",") )
+		for (const auto &p : plib::psplit(f->param_desc(),',') )
 		{
 			if (plib::startsWith(p, "+"))
 			{
@@ -1163,7 +1148,6 @@ void tool_app_t::listdevices()
 
 void tool_app_t::convert()
 {
-	pstring contents;
 	std::stringstream ostrm;
 	ostrm.imbue(std::locale::classic());
 
@@ -1182,7 +1166,8 @@ void tool_app_t::convert()
 		strm.imbue(std::locale::classic());
 		plib::copystream(ostrm, strm);
 	}
-	contents = pstring(ostrm.str());
+
+	pstring contents(putf8string(ostrm.str()));
 
 	pstring result;
 	if (opt_type.as_string() == "spice")

@@ -97,7 +97,8 @@ namespace plib
 	template<typename T, typename S>
 	T pstonum(const S &arg, const std::locale &loc = std::locale::classic()) noexcept(false)
 	{
-		decltype(arg.c_str()) cstr = arg.c_str();
+		putf8string u8arg(arg);
+		decltype(u8arg.c_str()) cstr(u8arg.c_str());
 		std::size_t idx(0);
 		auto ret = pstonum_helper<T>()(loc, cstr, &idx);
 		using ret_type = decltype(ret);

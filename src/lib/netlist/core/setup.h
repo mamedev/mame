@@ -13,7 +13,7 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-#include "../plib/ppreprocessor.h"
+//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 
@@ -260,7 +260,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -276,7 +276,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -292,7 +292,7 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		pstring m_pattern;
@@ -307,10 +307,10 @@ namespace netlist
 		}
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
-		pstring m_str;
+		std::string m_str;
 	};
 
 	class source_proc_t : public source_netlist_t
@@ -325,7 +325,7 @@ namespace netlist
 		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		nlsetup_func m_setup_func;
@@ -344,7 +344,7 @@ namespace netlist
 		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
-		stream_ptr stream(const pstring &name) override;
+		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
 		parser_t::token_store m_store;

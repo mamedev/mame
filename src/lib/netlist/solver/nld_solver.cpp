@@ -59,7 +59,7 @@ namespace devices
 		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt;
 		std::size_t p=0;
 
-		while (m_queue.size() > 0)
+		while (!m_queue.empty())
 		{
 			auto t = m_queue.top().exec_time();
 			auto o = m_queue.top().object();
@@ -112,7 +112,7 @@ namespace devices
 				tmp[i]->update_inputs();
 			}
 		}
-		if (m_queue.size() > 0)
+		if (!m_queue.empty())
 			m_Q_step.net().toggle_and_push_to_queue(m_queue.top().exec_time() - now);
 	}
 

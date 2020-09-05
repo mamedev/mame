@@ -105,6 +105,7 @@ protected:
 	std::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
 private:
+
 	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
 
 	std::unique_ptr<netlist_mame_t> m_netlist;

@@ -9,7 +9,7 @@
 ///
 
 #include "nl_base.h"
-#include "../nl_setup.h"
+//#include "../nl_setup.h"
 
 //
 // Set to 0 to use a linearized diode model in the range exceeding
