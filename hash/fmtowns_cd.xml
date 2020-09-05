@@ -11638,8 +11638,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Wrong colors and other graphical glitches -->
-	<software name="niko2" supported="partial">
+	<software name="niko2">
 		<!--
 		Origin: redump.org
 		<rom name="Niko^2 (Japan).bin" size="10231200" crc="a0d255b9" sha1="16924ba91862c909730502cadec7eefb94150521"/>
