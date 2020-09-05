@@ -5,7 +5,8 @@
     Micronic 1000
 
     This is a small handheld CP/M computer with a 4x8 keypad and a 128x64
-    LCD display.
+    LCD display. It was produced by Victor Micronic Ltd, a UK subsidiary
+    of Datronic AB.
 
     06/2010 (Sandro Ronco)
     - ROM/RAM banking
@@ -399,4 +400,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME         FLAGS
-COMP( 1987, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic M1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
