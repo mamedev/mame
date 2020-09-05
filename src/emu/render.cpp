@@ -2651,6 +2651,9 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 					view->second &= ~(u32(1) << std::distance(vistoggles.begin(), vistoggle));
 			}
 		}
+
+		if (&current_view() == &view->first.get())
+			current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
 	}
 }
 
