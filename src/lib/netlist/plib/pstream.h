@@ -372,10 +372,12 @@ public:
 	{
 	}
 
+#if 0
 	explicit ifstream(const std::string name, ios_base::openmode mode = ios_base::in)
 	: std::ifstream(filename_type(name).c_str(), mode)
 	{
 	}
+#endif
 };
 
 ///
@@ -393,10 +395,12 @@ public:
 	{
 	}
 
+#if 0
 	explicit ofstream(const std::string name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
 	: std::ofstream(filename_type(name).c_str(), mode)
 	{
 	}
+#endif
 };
 
 
