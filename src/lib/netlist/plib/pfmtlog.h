@@ -184,6 +184,17 @@ namespace plib {
 	};
 
 	template<>
+	struct ptype_traits<const char32_t *> : ptype_traits_base<const char32_t *>
+	{
+		static char32_t fmt_spec() { return 's'; }
+		static inline void streamify(std::ostream &s, const char32_t *v)
+		{
+			const putf32string su32(v);
+			s << putf8string(su32).c_str();
+		}
+	};
+
+	template<>
 	struct ptype_traits<std::string> : ptype_traits_base<std::string>
 	{
 		static char32_t fmt_spec() { return 's'; }
