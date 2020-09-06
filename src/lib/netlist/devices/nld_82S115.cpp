@@ -25,7 +25,6 @@
  *
  */
 
-#include "nld_82S115.h"
 #include "nl_base.h"
 
 namespace netlist

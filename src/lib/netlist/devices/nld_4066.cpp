@@ -21,8 +21,6 @@
  *
  */
 
-#include "nld_4066.h"
-
 #include "analog/nlid_twoterm.h"
 #include "solver/nld_solver.h"
 

@@ -7,7 +7,6 @@
  *
  */
 
-#include "nld_tristate.h"
 #include "nl_base.h"
 
 // FIXME: netlist now supports proper tristate outputs. All of this is legacy

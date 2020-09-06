@@ -25,7 +25,6 @@
  *  http://bitsavers.trailing-edge.com/components/ti/_dataBooks/1975_TI_The_Semiconductor_Memory_Data_Book.pdf
  */
 
-#include "nld_tms4800.h"
 #include "nl_base.h"
 
 namespace netlist

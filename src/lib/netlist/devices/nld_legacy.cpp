@@ -5,7 +5,6 @@
  *
  */
 
-#include "nld_legacy.h"
 #include "nl_base.h"
 
 namespace netlist
