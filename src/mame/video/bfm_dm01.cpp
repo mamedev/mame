@@ -35,8 +35,10 @@ Standard dm01 memorymap
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "bfm_dm01.h"
+
+#include "cpu/m6809/m6809.h"
+
 
 // local vars /////////////////////////////////////////////////////////////
 
@@ -49,13 +51,14 @@ Standard dm01 memorymap
 #define VERBOSE 0
 #endif
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(BFM_DM01, bfm_dm01_device, "bfm_dm01", "BFM Dotmatrix 01")
 
 
-bfm_dm01_device::bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BFM_DM01, tag, owner, clock),
+bfm_dm01_device::bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BFM_DM01, tag, owner, clock),
 	m_matrixcpu(*this, "matrix"),
 	m_screen(*this, "dmd"),
 	m_palette(*this, "palette_lcd"),
@@ -67,10 +70,10 @@ bfm_dm01_device::bfm_dm01_device(const machine_config &mconfig, const char *tag,
 	m_busy_cb(*this)
 {
 	for (auto & elem : m_segbuffer)
-	elem = 0;
+		elem = 0;
 
 	for (auto & elem : m_scanline)
-	elem = 0;
+		elem = 0;
 }
 
 //-------------------------------------------------

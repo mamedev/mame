@@ -1686,10 +1686,21 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	screen_device_iterator iter(m_manager.machine().root_device());
 	std::vector<screen_info> const screens(std::begin(iter), std::end(iter));
 
+	// need this because views aren't fully set up yet
+	auto const nth_view =
+		[this] (unsigned n) -> layout_view *
+		{
+			for (layout_file &file : m_filelist)
+				for (layout_view &view : file.views())
+					if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
+						if (n-- == 0)
+							return &view;
+			return nullptr;
+		};
 
 	if (screens.empty()) // ensure the fallback view for systems with no screens is loaded if necessary
 	{
-		if (!view_by_index(0))
+		if (!nth_view(0))
 		{
 			load_layout_file(nullptr, layout_noscreens);
 			if (m_filelist.empty())
@@ -1800,7 +1811,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		{
 			need_tiles = true;
 			int viewindex(0);
-			for (layout_view *view = view_by_index(viewindex); need_tiles && view; view = view_by_index(++viewindex))
+			for (layout_view *view = nth_view(viewindex); need_tiles && view; view = nth_view(++viewindex))
 			{
 				if (view->screen_count() >= screens.size())
 				{
