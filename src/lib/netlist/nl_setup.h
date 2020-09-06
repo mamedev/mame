@@ -8,7 +8,7 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#define NL_AUTO_DEVICES 0
+#define NL_AUTO_DEVICES 1
 
 #include "plib/ppreprocessor.h"
 #include "plib/psource.h"
