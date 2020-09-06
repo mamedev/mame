@@ -39,7 +39,7 @@ VTech V.Smile Baby cartridges
 |        | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur                                          |
 |        | 80-099023(UK)     | Pooh's Hundred Acre Wood Adventure                                         |
 |   NA   | 80-099024(GE)     | Puuhs Hundert-Morgen-Wald (no-ROM cartridge)                               |
-|        | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus                           |
+|   XX   | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus                           |
 |   NA   | 80-099027(SP)     | Aventuras en el Bosque de los Cien Acres (no-ROM cartridge)                |
 |   XX   | 80-099034(SE)     | Nalle Puhs Äventyr i Sjumilaskogen                                         |
 +========+===================+============================================================================+
@@ -72,8 +72,9 @@ VTech V.Smile Baby cartridges
 |        | 80-099163(UK)     | Discovery with Baby Mickey and Friends                                     |
 |   XX   | 80-099165(UK)     | Les découvertes de Mickey et ses amis                                      |
 +========+===================+============================================================================+
-|        | 80-099180(US)     | Bailey Goes To Town (Included Bailey Plush Bear Controller)                |
-|        | 80-099183(UK)     | Bailey Goes To Town (Included Bailey Plush Bear Controller)                |
+|        | 80-099180(US)     | Bailey Goes To Town (included Bailey Plush Bear Controller)                |
+|        | 80-099183(UK)     | Bailey Goes To Town (included Bailey Plush Bear Controller)                |
+|   XX   | 80-099185(FR)     | En Ville avec l'ourson Patoune (included Patoune Plush Bear Controller)    |
 +========+===================+============================================================================+
 |        | 80-099200(US)     | Mother Goose                                                               |
 +========+===================+============================================================================+
@@ -96,6 +97,19 @@ VTech V.Smile Baby cartridges
 			<feature name="u4" value="U4" />
 			<dataarea name="rom" size="8388608">
 				<rom name="099045 - Baby Einstein (BABY) (FR).bin" size="8388608" crc="d0690ae6" sha1="bde281db67b477798974983a505bed7497e25763" />
+ 			</dataarea>
+		</part>
+	</software>
+
+	<!-- This game uses a plush bear as a controller (the buttons and their layout are the same as the regular controller) -->
+	<software name="baileyf" supported="no">
+		<description>En Ville avec l'ourson Patoune (France)</description>
+		<year>199?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099185(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmilebabyfrenchcourson.bin" size="8388608" crc="57757602" sha1="a7495e1c6b2edaeb63bf1c658575689304f15804" />
 			</dataarea>
 		</part>
 	</software>
@@ -207,6 +221,18 @@ VTech V.Smile Baby cartridges
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="099020.bin" size="8388608" crc="a3ac4cd4" sha1="3562c632e0a1e70cb9e382ebb823449757afed67" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohhawaf" cloneof="poohhawa" supported="no">
+		<description>Winnie et ses amis dans la Forêt des Rêves Bleus (France)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-099025(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmilebabyfrenchwinnie.bin" size="8388608" crc="3dfa2acb" sha1="aaa2c632e0a1e70cb9e382ebb823449757afed67" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

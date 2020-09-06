@@ -131,6 +131,7 @@ DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Zilog Z8611")
 DEFINE_DEVICE_TYPE(Z8671,   z8671_device,   "z8671",   "Zilog Z8671")
 DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
 DEFINE_DEVICE_TYPE(Z8682,   z8682_device,   "z8682",   "Zilog Z8682")
+DEFINE_DEVICE_TYPE(Z86E02,  z86e02_device,  "z86e02",  "Zilog Z86E02")
 
 
 /***************************************************************************
@@ -246,6 +247,12 @@ const tiny_rom_entry *z8682_device::device_rom_region() const
 }
 
 
+z86e02_device::z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z86E02, tag, owner, clock, 0x200, false)
+{
+}
+
+
 std::unique_ptr<util::disasm_interface> z8_device::create_disassembler()
 {
 	return std::make_unique<z8_disassembler>();
@@ -332,7 +339,7 @@ uint16_t z8_device::fetch_word()
 
 uint8_t z8_device::p0_read()
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0;
 	uint8_t mask = 0;
 
 	switch (m_p01m & Z8_P01M_P0L_MODE_MASK)
@@ -386,7 +393,7 @@ void z8_device::p0_write(uint8_t data)
 
 uint8_t z8_device::p1_read()
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0;
 	uint8_t mask = 0;
 
 	switch (m_p01m & Z8_P01M_P1_MODE_MASK)
