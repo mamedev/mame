@@ -321,7 +321,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 	uint16_t* dest = &bitmap.pix16(screenline);
 
 	int minx = cliprect.min_x << 16;
-	int maxx = cliprect.max_x << 16;
+	int maxx = (cliprect.max_x + 1) << 16;
 
 	if (xzoom < 0x10000) // shrink
 	{
@@ -337,7 +337,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 			uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
 
 
-			if (sx >= minx && sx <= maxx)
+			if (sx >= minx && sx < maxx)
 			{
 				int realsx = sx >> 16;
 
@@ -379,7 +379,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16& bitmap, const rectangle& cli
 		{
 			uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
 
-			if (sx >= minx && sx <= maxx)
+			if (sx >= minx && sx < maxx)
 			{
 				int realsx = sx >> 16;
 
