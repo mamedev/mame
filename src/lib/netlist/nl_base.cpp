@@ -1,7 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "macro/nlm_base_lib.h"
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
 
@@ -16,6 +15,8 @@
 #include "nl_base.h"
 
 #include "nl_errstr.h"
+
+#include "devices/net_lib.h"
 
 #include <limits>
 
@@ -209,7 +210,6 @@ namespace netlist
 		ENTRY(NL_USE_MEMPOOL)
 		ENTRY(NL_USE_QUEUE_STATS)
 		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
-		ENTRY(NL_AUTO_DEVICES)
 		ENTRY(NL_USE_FLOAT128)
 		ENTRY(NL_USE_FLOAT_MATRIX)
 		ENTRY(NL_USE_LONG_DOUBLE_MATRIX)
