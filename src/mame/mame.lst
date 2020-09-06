@@ -16709,6 +16709,9 @@ indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
 
+@source:informer_207_376.cpp
+in207376                        // Informer 207/376
+
 @source:instantm.cpp
 instantm                        //
 

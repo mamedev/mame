@@ -1227,6 +1227,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ibm6580",
 		"ie15",
 		"imp",
+		"informer",
 		"intel",
 		"interpro",
 		"interton",
@@ -2596,6 +2597,13 @@ files {
 createMESSProjects(_target, _subtarget, "ie15")
 files {
 	MAME_DIR .. "src/mame/drivers/ie15.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "informer")
+files {
+	MAME_DIR .. "src/mame/drivers/informer_207_376.cpp",
+	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "intel")
