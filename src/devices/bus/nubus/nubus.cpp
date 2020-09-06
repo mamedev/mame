@@ -48,7 +48,11 @@ void nubus_slot_device::device_resolve_objects()
 {
 	device_nubus_card_interface *dev = get_card_device();
 
-	if (dev) dev->set_nubus_tag(m_nubus.target(), m_nubus_slottag);
+	if (dev)
+	{
+		dev->set_nubus_tag(m_nubus.target(), m_nubus_slottag);
+		m_nubus->add_nubus_card(dev);
+	}
 }
 
 //-------------------------------------------------
@@ -240,42 +244,37 @@ device_nubus_card_interface::~device_nubus_card_interface()
 
 void device_nubus_card_interface::interface_pre_start()
 {
-	if (!m_nubus)
+	if (!strncmp(m_nubus_slottag, "pds030", 6))
 	{
-		if (!strncmp(m_nubus_slottag, "pds030", 6))
+		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+	}
+	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
+	{
+		m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
+	}
+	else
+	{
+		// extract the slot number from the last digit of the slot tag
+		int tlen = strlen(m_nubus_slottag);
+
+		if (m_nubus_slottag[tlen-1] == '9')
 		{
-			m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
-		}
-		else if (!strncmp(m_nubus_slottag, "lcpds", 6))
-		{
-			m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
+			m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
 		}
 		else
 		{
-			// extract the slot number from the last digit of the slot tag
-			int tlen = strlen(m_nubus_slottag);
-
-			if (m_nubus_slottag[tlen-1] == '9')
-			{
-				m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
-			}
-			else
-			{
-				m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
-			}
+			m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
 		}
+	}
 
-		if (m_slot < 9 || m_slot > 0xe)
-		{
-			fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
-		}
+	if (m_slot < 9 || m_slot > 0xe)
+	{
+		fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
+	}
 
-		if (!m_nubus)
-		{
-			fatalerror("Can't find NuBus device\n");
-		}
-
-		nubus().add_nubus_card(this);
+	if (!m_nubus)
+	{
+		fatalerror("Can't find NuBus device\n");
 	}
 }
 
