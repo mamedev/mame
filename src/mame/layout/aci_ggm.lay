@@ -159,11 +159,11 @@ license:CC0
 			<param name="ap2_x" start="10.5" increment="11" />
 			<param name="dot_x" start="3.5" increment="11" />
 
-			<bezel name="digit~i~" element="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></bezel>
-			<bezel name="~i~.15" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
-			<bezel name="~i~.14" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
-			<bezel name="~i~.14" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
-			<bezel element="disk_white"><bounds x="~dot_x~" y="17.1" width="1.9" height="1.9" /></bezel>
+			<element name="digit~i~" ref="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></element>
+			<element name="~i~.15" ref="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></element>
+			<element name="~i~.14" ref="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></element>
+			<element name="~i~.14" ref="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></element>
+			<element ref="disk_white"><bounds x="~dot_x~" y="17.1" width="1.9" height="1.9" /></element>
 		</repeat>
 	</group>
 
@@ -370,10 +370,10 @@ license:CC0
 	<group name="mem_switch">
 		<bounds x="0" y="0" width="6" height="6.4" />
 
-		<bezel element="black"><bounds x="2.5" y="2" width="1" height="2.5" /></bezel>
-		<bezel element="text_r1"><bounds x="0" y="0" width="6" height="1.8" /></bezel>
-		<bezel element="text_r2"><bounds x="0" y="4.6" width="6" height="1.8" /></bezel>
-		<bezel element="reset" inputtag="IN.4" inputmask="0x02"><bounds x="2.345" y="1.9" width="1.31" height="2.7" /></bezel>
+		<element ref="black"><bounds x="2.5" y="2" width="1" height="2.5" /></element>
+		<element ref="text_r1"><bounds x="0" y="0" width="6" height="1.8" /></element>
+		<element ref="text_r2"><bounds x="0" y="4.6" width="6" height="1.8" /></element>
+		<element ref="reset" inputtag="IN.4" inputmask="0x02"><bounds x="2.345" y="1.9" width="1.31" height="2.7" /></element>
 	</group>
 
 
@@ -382,7 +382,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-5" right="104" top="-2" bottom="93" />
 		<group ref="display"><bounds x="0" y="0" width="88" height="19" /></group>
-		<bezel element="black"><bounds x="-6" y="23" width="111" height="1.5" /></bezel>
+		<element ref="black"><bounds x="-6" y="23" width="111" height="1.5" /></element>
 
 		<group ref="buttons"><bounds x="0" y="30" width="88" height="60.92" /></group>
 		<group ref="mem_switch"><bounds x="87" y="28" width="18" height="19.2" /></group>
