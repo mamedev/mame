@@ -12,8 +12,8 @@
 #include "nl_setup.h"
 #include "plib/penum.h"
 #include "plib/pstonum.h"
-#include "plib/putil.h"
 #include "plib/pstrutil.h"
+#include "plib/putil.h"
 
 #include "solver/nld_solver.h"
 
@@ -379,12 +379,13 @@ namespace netlist
 			return parser.parse(st, name);
 		}
 #else
+		const auto filename = istrm.filename();
 		auto preprocessed = std::make_unique<std::stringstream>(putf8string(
-				plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), istrm.filename())));
+				plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), filename)));
 
 		parser_t::token_store st;
 		parser_t parser(*this);
-		parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), istrm.filename()), st);
+		parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), filename), st);
 		return parser.parse(st, name);
 #endif
 	}
@@ -1725,8 +1726,8 @@ plib::istream_uptr source_file_t::stream(const pstring &name)
 	{
 		return plib::istream_uptr(std::move(f), m_filename);
 	}
-	else
-		return plib::istream_uptr();
+
+	return plib::istream_uptr();
 }
 
 plib::istream_uptr source_pattern_t::stream(const pstring &name)
@@ -1737,8 +1738,8 @@ plib::istream_uptr source_pattern_t::stream(const pstring &name)
 	{
 		return plib::istream_uptr(std::move(f), filename);
 	}
-	else
-		return plib::istream_uptr();
+
+	return plib::istream_uptr();
 }
 
 

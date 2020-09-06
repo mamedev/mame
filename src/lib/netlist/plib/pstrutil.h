@@ -243,7 +243,7 @@ namespace plib
 
 		auto p = str.begin();
 		auto pn = std::search(p, str.end(), onstr.begin(), onstr.end());
-		auto ol = onstr.length();
+		const auto ol = static_cast<typename T::difference_type>(onstr.length());
 
 		while (pn != str.end())
 		{

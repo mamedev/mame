@@ -3,8 +3,8 @@
 
 #include "palloc.h"
 #include "pstonum.h"
-#include "ptokenizer.h"
 #include "pstrutil.h"
+#include "ptokenizer.h"
 
 namespace plib {
 

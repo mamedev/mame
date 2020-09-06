@@ -10,8 +10,8 @@
 
 #include "palloc.h"
 #include "pexception.h"
-#include "pstring.h"
 #include "pstream.h"
+#include "pstring.h"
 
 #include <algorithm>
 #include <initializer_list>

@@ -14,10 +14,10 @@
 
 #include <array>
 #include <memory>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <string>
 
 namespace plib {
 

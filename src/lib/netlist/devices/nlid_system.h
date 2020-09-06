@@ -74,7 +74,7 @@ namespace devices
 			if (!m_func().empty())
 			{
 				std::vector<pstring> inps;
-				inps.push_back(pstring("T"));
+				inps.emplace_back("T");
 				m_vals.push_back(nlconst::zero());
 				for (int i=0; i < m_N(); i++)
 				{

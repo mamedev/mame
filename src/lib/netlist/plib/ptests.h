@@ -124,7 +124,7 @@ namespace testing
 	{
 		using reg_entry_base::reg_entry_base;
 
-		Test *create() const override { return new T(); }
+		Test *create() const override { return new T(); } // NOLINT
 	};
 
 	template <typename C, typename T1, typename T2>

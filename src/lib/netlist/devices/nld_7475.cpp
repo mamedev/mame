@@ -41,7 +41,7 @@ namespace netlist
 {
 	namespace devices
 	{
-	template<bool _HasQQ>
+	template<bool HasQQ>
 	NETLIB_OBJECT(7475_GATE_BASE)
 	{
 		NETLIB_CONSTRUCTOR(7475_GATE_BASE)
@@ -87,7 +87,7 @@ namespace netlist
 			// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 			static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 			m_Q.push(stateQ, delay[stateQ]);
-			if (_HasQQ)
+			if (HasQQ)
 				m_QQ.push(stateQQ, delay[stateQQ]);
 		}
 	};

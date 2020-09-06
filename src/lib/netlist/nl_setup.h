@@ -11,9 +11,9 @@
 #define NL_AUTO_DEVICES 0
 
 #include "plib/ppreprocessor.h"
+#include "plib/psource.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
-#include "plib/psource.h"
 
 #include "nl_config.h"
 #include "nl_parser.h"

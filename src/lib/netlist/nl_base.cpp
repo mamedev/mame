@@ -158,7 +158,7 @@ namespace netlist
 	void netlist_state_t::set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib)
 	{
 		m_lib = std::move(lib);
-	};
+	}
 
 
 	void netlist_t::stop()

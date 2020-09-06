@@ -24,6 +24,7 @@ namespace plib {
 	public:
 		explicit ptokenizer() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
 		: m_strm(nullptr)
+		, m_unget(0)
 		, m_string('"')
 		, m_support_line_markers(true) // FIXME
 		, m_token_queue(nullptr)
@@ -61,6 +62,8 @@ namespace plib {
 
 			PCOPYASSIGNMOVE(token_id_t, default)
 
+			~token_id_t() = default;
+
 			std::size_t id() const { return m_id; }
 			const pstring & name() const { return m_name; }
 		private:
@@ -88,6 +91,8 @@ namespace plib {
 			}
 
 			PCOPYASSIGNMOVE(token_t, default)
+
+			~token_t() = default;
 
 			bool is(const token_id_t &tok_id) const noexcept { return m_id == tok_id.id(); }
 			bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }

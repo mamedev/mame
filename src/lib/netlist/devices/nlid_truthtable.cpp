@@ -112,8 +112,6 @@ namespace devices
 			m_ign = (1<<m_NI)-1;
 		}
 
-	private:
-
 		template<bool doOUT>
 		void process() noexcept
 		{

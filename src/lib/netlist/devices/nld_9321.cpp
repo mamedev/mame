@@ -43,7 +43,7 @@ namespace netlist
 	private:
 		NETLIB_HANDLERI(in)
 		{
-			m_enable = m_E() ? 0 : 1;
+			m_enable = m_E() ? false : true;
 			m_o = (m_A[1]() << 1) | m_A[0]();
 			for (std::size_t i=0; i<4; i++)
 				m_D[i].push((i == m_o && m_enable) ? 0 : 1, NLTIME_FROM_NS(21));
