@@ -1,7 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include "nld_opamps.h"
 #include "nl_base.h"
 #include "nl_errstr.h"
 #include "nlid_fourterm.h"

@@ -2,7 +2,6 @@
 // copyright-holders:Couriersud
 
 
-#include "nld_ne555.h"
 #include "analog/nlid_twoterm.h"
 #include "solver/nld_solver.h"
 

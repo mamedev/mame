@@ -21,7 +21,6 @@
  *
  */
 
-#include "nld_2102A.h"
 #include "nl_base.h"
 
 #define ADDR2BYTE(a)    ((a) >> 3)

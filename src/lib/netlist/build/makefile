@@ -116,7 +116,7 @@ DEPENDCC=$(CC)
 
 
 ifndef FAST
-FAST=0
+FAST=1
 endif
 
 ifeq ($(FAST),1)
@@ -138,15 +138,18 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/macro/modules \
 			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
+MODULESOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
 DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
 DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
+DEVSOURCES += $(MODULESOURCES)
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -158,6 +161,7 @@ CORESOURCES := \
 	$(SRC)/nl_factory.cpp \
 	$(SRC)/tools/nl_convert.cpp \
 	$(SRC)/generated/static_solvers.cpp \
+	$(SRC)/generated/nlm_modules_lib.cpp \
 
 MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
 
@@ -287,7 +291,8 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code" \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:
@@ -360,8 +365,12 @@ $(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_devinc.py $^ > $@
 
+$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+	@echo creating $@
+	$(PYTHON) create_modules.py $^ > $@
+
 .PHONY: generated
-generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
+generated: $(SRC)/generated/lib_entries.hxx $(SRC)/generated/nld_devinc.h $(SRC)/generated/nlm_modules_lib.cpp
 
 #-------------------------------------------------
 # clang tidy

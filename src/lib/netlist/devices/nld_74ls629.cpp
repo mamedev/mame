@@ -58,8 +58,6 @@
  * Then just use that to toggle a waveform.
  */
 
-
-#include "nld_74ls629.h"
 #include "analog/nlid_twoterm.h"
 
 namespace netlist

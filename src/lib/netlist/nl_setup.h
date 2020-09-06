@@ -8,8 +8,6 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#define NL_AUTO_DEVICES 0
-
 #include "plib/ppreprocessor.h"
 #include "plib/psource.h"
 #include "plib/pstream.h"
@@ -82,17 +80,20 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 #define EXTERNAL_SOURCE(name)                                                  \
+		NETLIST_EXTERNAL(name)                                                 \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
-#define LOCAL_LIB_ENTRY_1(name)                                                \
-		LOCAL_SOURCE(name)                                                     \
+#define LOCAL_LIB_ENTRY_2(type, name)                                          \
+		type ## _SOURCE(name)                                                  \
 		setup.register_lib_entry(# name, "", PSOURCELOC());
 
-#define LOCAL_LIB_ENTRY_2(name, param_spec)                                    \
-		LOCAL_SOURCE(name)                                                     \
+#define LOCAL_LIB_ENTRY_3(type, name, param_spec)                              \
+		type ## _SOURCE(name)                                                  \
 		setup.register_lib_entry(# name, param_spec, PSOURCELOC());
 
-#define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, __VA_ARGS__)
+#define LOCAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, LOCAL, __VA_ARGS__)
+
+#define EXTERNAL_LIB_ENTRY(...) PCALLVARARG(LOCAL_LIB_ENTRY_, EXTERNAL, __VA_ARGS__)
 
 #define INCLUDE(name)                                                          \
 		setup.include(# name);

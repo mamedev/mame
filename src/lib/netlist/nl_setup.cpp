@@ -2,7 +2,6 @@
 // copyright-holders:Couriersud
 
 #include "plib/palloc.h"
-#include "analog/nld_twoterm.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_truthtable.h"

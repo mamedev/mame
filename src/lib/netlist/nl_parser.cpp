@@ -44,6 +44,7 @@ parser_t::parser_t(nlparse_t &setup)
 	m_tok_INCLUDE = m_tokenizer.register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = m_tokenizer.register_token("LOCAL_SOURCE");
 	m_tok_LOCAL_LIB_ENTRY = m_tokenizer.register_token("LOCAL_LIB_ENTRY");
+	m_tok_EXTERNAL_LIB_ENTRY = m_tokenizer.register_token("EXTERNAL_LIB_ENTRY");
 	m_tok_SUBMODEL = m_tokenizer.register_token("SUBMODEL");
 	m_tok_NETLIST_START = m_tokenizer.register_token("NETLIST_START");
 	m_tok_NETLIST_END = m_tokenizer.register_token("NETLIST_END");
@@ -141,6 +142,8 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			//m_cur_local->push_back(token_t(m_tok_paren_right));
 			in_nl = true;
 		}
+		// FIXME: do we really need this going forward ? there should be no need
+		//        for NETLIST_EXTERNAL in netlist files
 		else if (token.is(m_tok_NETLIST_EXTERNAL))
 		{
 			if (in_nl)
@@ -197,17 +200,10 @@ void parser_t::parse_netlist(const pstring &nlname)
 			net_local_source();
 		else if (token.is(m_tok_EXTERNAL_SOURCE))
 			net_external_source();
-		//else if (token.is(m_tok_TRUTHTABLE_START))
-		//  net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
-		{
-			require_token(m_tok_paren_left);
-			pstring name(get_identifier());
-			register_local_as_source(name);
-			// FIXME: Need to pass in parameter definition FIXME: get line number right
-			m_setup.register_lib_entry(name, "", plib::source_location("parser: " + nlname, 1));
-			require_token(m_tok_paren_right);
-		}
+			net_lib_entry(true);
+		else if (token.is(m_tok_EXTERNAL_LIB_ENTRY))
+			net_lib_entry(false);
 		else if (token.is(m_tok_TRUTHTABLE_ENTRY))
 		{
 			require_token(m_tok_paren_left);
@@ -230,6 +226,21 @@ void parser_t::parse_netlist(const pstring &nlname)
 		else
 			device(token.str());
 	}
+}
+
+void parser_t::net_lib_entry(bool is_local)
+{
+	require_token(m_tok_paren_left);
+	pstring name(get_identifier());
+
+	if (is_local)
+		register_local_as_source(name);
+	else if (m_local.find(name) != m_local.end())
+		error(MF_EXTERNAL_SOURCE_IS_LOCAL_1(name));
+
+	// FIXME: Need to pass in parameter definition FIXME: get line number right
+	m_setup.register_lib_entry(name, "", sourceloc());
+	require_token(m_tok_paren_right);
 }
 
 void parser_t::net_truthtable_start(const pstring &nlname)
@@ -282,7 +293,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truthtable_create(desc, def_param, plib::source_location(nlname, 1));
+			m_setup.truthtable_create(desc, def_param, sourceloc());
 			return;
 		}
 	}
@@ -355,9 +366,7 @@ void parser_t::register_local_as_source(const pstring &name)
 {
 	auto p = m_local.find(name);
 	if (p != m_local.end())
-	{
 		m_setup.register_source<source_token_t>(name, p->second);
-	}
 	else
 		error(MF_LOCAL_SOURCE_NOT_FOUND_1(name));
 }

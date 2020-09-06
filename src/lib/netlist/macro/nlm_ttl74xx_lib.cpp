@@ -2235,12 +2235,6 @@ NETLIST_END()
 //-     +-----+-----+----++---+
 //-
 #ifndef __PLIB_PREPROCESSOR__
-#if !NL_AUTO_DEVICES
-#define TTL_74279A(name)                                                         \
-		NET_REGISTER_DEV(TTL_74279A, name)
-#define TTL_74279B(name)                                                         \
-		NET_REGISTER_DEV(TTL_74279B, name)
-#endif
 #endif
 
 static NETLIST_START(TTL_74279_DIP)
