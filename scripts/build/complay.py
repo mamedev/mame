@@ -97,7 +97,7 @@ class LayoutChecker(Minifyer):
     VARPATTERN = re.compile('^.*~[0-9A-Za-z_]+~.*$')
     FLOATCHARS = re.compile('^.*[.eE].*$')
     SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
-    OBJECTS = frozenset(('backdrop', 'bezel', 'cpanel', 'marquee', 'overlay'))
+    OBJECTS = frozenset(('backdrop', 'bezel'))
     ORIENTATIONS = frozenset((0, 90, 180, 270))
     YESNO = frozenset(('yes', 'no'))
     BLENDMODES = frozenset(('none', 'alpha', 'multiply', 'add'))
@@ -471,7 +471,11 @@ class LayoutChecker(Minifyer):
             inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
             if (inputmask is not None) and (0 == inputmask):
                 if (inputraw is None) or (0 == inputraw):
-                    self.handleError('Element %s has attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+                    self.handleError('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+            if ('element' != name) and not self.has_legacy_object:
+                self.has_legacy_object = True
+                if self.has_collection:
+                    self.handleError('Layout contains collection as well as legacy backdrop/bezel elements')
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
             self.have_orientation.append(False)
@@ -507,6 +511,17 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element repeat attribute count "%s" is negative' % (attrs['count'], ))
             self.variable_scopes.append({ })
             self.repeat_depth[-1] += 1
+        elif 'collection' == name:
+            if 'name' not in attrs:
+                self.handleError('Element collection missing attribute name')
+            if attrs.get('visible', 'yes') not in self.YESNO:
+                self.handleError('Element collection attribute visible "%s" is not "yes" or "no"' % (attrs['visible'], ))
+            if not self.has_collection:
+                self.has_collection = True
+                if self.has_legacy_object:
+                    self.handleError('Layout contains collection as well as legacy backdrop/bezel elements')
+            self.variable_scopes.append({ })
+            self.collection_depth += 1
         elif 'param' == name:
             self.checkParameter(attrs)
             self.ignored_depth = 1
@@ -514,6 +529,8 @@ class LayoutChecker(Minifyer):
             self.checkBounds(attrs)
             if self.repeat_depth[-1]:
                 self.handleError('Element bounds inside repeat')
+            elif self.collection_depth:
+                self.handleError('Element bounds inside collection')
             self.ignored_depth = 1
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
@@ -521,7 +538,9 @@ class LayoutChecker(Minifyer):
 
     def groupViewEndHandler(self, name):
         self.variable_scopes.pop()
-        if self.repeat_depth[-1]:
+        if 'collection' == name:
+            self.collection_depth -= 1
+        elif self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
             self.repeat_depth.pop()
@@ -549,6 +568,9 @@ class LayoutChecker(Minifyer):
         self.ignored_depth = 0
         self.variable_scopes = [ ]
         self.repeat_depth = [ ]
+        self.collection_depth = 0
+        self.has_collection = False
+        self.has_legacy_object = False
         self.have_bounds = [ ]
         self.have_orientation = [ ]
         self.have_color = [ ]
@@ -567,6 +589,9 @@ class LayoutChecker(Minifyer):
         del self.ignored_depth
         del self.variable_scopes
         del self.repeat_depth
+        del self.collection_depth
+        del self.has_collection
+        del self.has_legacy_object
         del self.have_bounds
         del self.have_orientation
         del self.have_color

@@ -18,12 +18,12 @@ license:CC0
 		</rect>
 	</element>
 
-	<view name="Color_Overlay">
+	<view name="Color Overlay">
 		<screen index="0">
 			<bounds x="0" y="0" width="3" height="4" />
 		</screen>
-		<overlay element="overlay">
+		<element ref="overlay" blend="multiply">
 			<bounds x="0" y="0" width="3" height="4" />
-		</overlay>
+		</element>
 	</view>
 </mamelayout>

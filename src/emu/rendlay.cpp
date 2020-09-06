@@ -1116,7 +1116,7 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	{
 		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
-		resolve_bounds(local, m_groupnode, groupmap, seen, true, false, true);
+		resolve_bounds(local, m_groupnode, groupmap, seen, true, false, false, true);
 	}
 	seen.pop_back();
 }
@@ -1127,6 +1127,7 @@ void layout_group::resolve_bounds(
 		group_map &groupmap,
 		std::vector<layout_group const *> &seen,
 		bool empty,
+		bool collection,
 		bool repeat,
 		bool init)
 {
@@ -1216,16 +1217,16 @@ void layout_group::resolve_bounds(
 			environment local(env);
 			for (int i = 0; !m_bounds_resolved && (count > i); ++i)
 			{
-				resolve_bounds(local, *itemnode, groupmap, seen, empty, true, !i);
+				resolve_bounds(local, *itemnode, groupmap, seen, empty, false, true, !i);
 				local.increment_parameters();
 			}
 		}
-		else if (!strcmp(itemnode->get_name(), "vistoggle"))
+		else if (!strcmp(itemnode->get_name(), "collection"))
 		{
 			if (!env.get_attribute_string(*itemnode, "name", nullptr))
-				throw layout_syntax_error("vistoggle must have name attribute");
+				throw layout_syntax_error("collection must have name attribute");
 			environment local(env);
-			resolve_bounds(local, *itemnode, groupmap, seen, empty, false, true);
+			resolve_bounds(local, *itemnode, groupmap, seen, empty, true, false, true);
 		}
 		else
 		{
@@ -1241,7 +1242,7 @@ void layout_group::resolve_bounds(
 		m_bounds_resolved = resolved;
 	}
 
-	if (!repeat)
+	if (!collection && !repeat)
 		m_bounds_resolved = true;
 }
 
@@ -3364,12 +3365,12 @@ void layout_view::add_items(
 				local.increment_parameters();
 			}
 		}
-		else if (!strcmp(itemnode->get_name(), "vistoggle"))
+		else if (!strcmp(itemnode->get_name(), "collection"))
 		{
 			char const *name(env.get_attribute_string(*itemnode, "name", nullptr));
 			if (!name)
-				throw layout_syntax_error("vistoggle must have name attribute");
-			m_defvismask |= u32(env.get_attribute_bool(*itemnode, "enabled", true) ? 1 : 0) << m_vistoggles.size(); // TODO: make this less hacky
+				throw layout_syntax_error("collection must have name attribute");
+			m_defvismask |= u32(env.get_attribute_bool(*itemnode, "visible", true) ? 1 : 0) << m_vistoggles.size(); // TODO: make this less hacky
 			view_environment local(env, true);
 			m_vistoggles.emplace_back(name, local.visibility_mask());
 			add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, false, true);

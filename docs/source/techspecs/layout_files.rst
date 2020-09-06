@@ -610,6 +610,11 @@ screen
     zero (0).  If present, the ``tag`` attribute must be the tag path to the
     screen relative to the device that causes the layout to be loaded.  Screens
     are drawn in the order they appear in the layout file, from front to back.
+collection
+    Adds screens and/or items in a collection that can be shown or hidden by the
+    user (see :ref:`layout-parts-collections`).  The name of the collection is
+    specified using the required ``name`` attribute..  There is a limit of 32
+    collections per view.
 group
     Adds the content of the group to the view (see :ref:`layout-parts-groups`).
     The name of the group to add is specified using the required ``ref``
@@ -721,6 +726,46 @@ a mask of 0xb0 will result in the value being shifted four bits to the right).
 When handling mouse input, MAME treats all layout elements as being rectangular,
 and only activates the frontmost element whose area includes the location of the
 mouse pointer.
+
+
+.. _layout-parts-collections:
+
+Collections
+~~~~~~~~~~~
+
+Collections of screens and/or layout elements can be shown or hidden by the user
+as desired.  For example, a single view could include both displays and a
+clickable keypad, and allow the user to hide the keypad leaving only the
+displays visible.  Collections are created using ``collection`` elements inside
+``view``, ``group`` and other ``collection`` elements.
+
+A collection element must have a ``name`` attribute providing the display name
+for the collection.  Collection names should be unique within a view.  The
+initial visibility of a collection may be specified by providing a ``visible``
+attribute.  Set the ``visible`` attribute to ``yes`` if the collection should be
+initially visible, or ``no`` if it should be initially hidden.  Collections are
+initially visible by default.
+
+Here is an example demonstrating the use of collections to allow parts of a view
+to be hidden by the user::
+
+    <view name="LED Displays, CRT and Keypad">
+        <collection name="LED Displays">
+            <group ref="displays"><bounds x="240" y="0" width="320" height="47" /></group>
+        </collection>
+        <collection name="Keypad">
+            <group ref="keypad"><bounds x="650" y="57" width="148" height="140" /></group>
+        </collection>
+        <screen tag="screen"><bounds x="0" y="57" width="640" height="480" /></screen>
+    </view>
+
+
+A collection creates a nested parameter scope.  Any ``param`` elements inside
+the collection element set parameters in the local scope for the collection.
+See :ref:`layout-concepts-params` for more detail on parameters.  (Note that the
+collection’s name and default visibility are not part of its content, and any
+parameter references in the ``name`` and ``visible`` attributes themselves will
+be substituted using parameter values from the collection’s parent’s scope.)
 
 
 .. _layout-parts-groups:
