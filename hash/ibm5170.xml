@@ -10799,7 +10799,7 @@ license:CC0
 	</software>
 
 	<software name="kyrandia">
-		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia</description>
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia(v1.3, 3.5")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="version" value="1.3" />
@@ -10827,7 +10827,7 @@ license:CC0
 	</software>
 
 	<software name="kyrandiafr" cloneof="kyrandia">
-		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (France)</description>
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (v1.7, 3.5", France)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="version" value="1.7" />
@@ -10850,6 +10850,39 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandia525" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (v1.0, 5.25")</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.0" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="Legend of Kyrandia [Virgin] [1992] [5.25HD] [Disk 1 of 5].img" size="1228800" crc="3871517c" sha1="d9307326a1b9f540871b47c2fe4f3ea4211b2cd1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="Legend of Kyrandia [Virgin] [1992] [5.25HD] [Disk 2 of 5].img" size="1228800" crc="62ebe199" sha1="d690c493b2188df72ca6fd264efbc7a0f97d7e32"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="Legend of Kyrandia [Virgin] [1992] [5.25HD] [Disk 3 of 5].img" size="1228800" crc="b6e04063" sha1="1f8386bb8542ab9c5d86944a65c5c9ef4b73d362"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="Legend of Kyrandia [Virgin] [1992] [5.25HD] [Disk 4 of 5].img" size="1228800" crc="2a10e8a6" sha1="ab9ca5508ff1bff8898010b0cf148a434de0ab64"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="Legend of Kyrandia [Virgin] [1992] [5.25HD] [Disk 5 of 5].img" size="1228800" crc="2c699b5f" sha1="570cf0ef9ba63af6d584d832ab1cd0664ea0b5dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13005,7 +13038,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mkg">
+	<software name="mkg" cloneof="mk">
 		<description>Mortal Kombat (Germany)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -13036,6 +13069,57 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Mystic Towers (USA) (v1.11).img" size="1474560" crc="970fc40e" sha1="daa034e1c25cf77814d0df081e38dba95ee76139"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nascar">
+		<description>NASCAR Racing</description>
+		<year>1994</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Papyrus Design Group" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Racing [Virgin] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="91ee8f4c" sha1="d5d0f92a96981550e66c377fc83de39aa5b3e667"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Racing [Virgin] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="3fff8c1c" sha1="e93ca65b936aaef02819a075bcbb6c024e02cc97"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Racing [Virgin] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="4c3d54aa" sha1="5edfcd7428f7cf288368b1a8a1d3ddfd59299ef1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Racing [Virgin] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="e9f61570" sha1="8aec0c905be5906fbccdbffb4c89e46e465e7b4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nascarpck">
+		<description>NASCAR: Track Pack</description>
+		<year>1995</year>
+		<publisher>Virgin</publisher>
+		<info name="developer" value="Papyrus Design Group" />
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Track Pack [Virgin] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="ca20146a" sha1="506dd64243dd967c233130debea87436c7b96c62"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Track Pack [Virgin] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="e64e3271" sha1="a1def6a1717d2924cbc744ab87f9a64dc08beaa6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="NASCAR Track Pack [Virgin] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="cd3dd618" sha1="ec70eae383b37ca70b16f1ecc9efd6fa99300dd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14152,6 +14236,38 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Speed Racer in the Challenge of Racer X [Accolade] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="3492240a" sha1="d09314500a72cb24e314720c3e4e901aedd3e427"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssn21sea">
+		<description>SSN-21 SeaWolf</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SSN-21 Seawolf [Electronic Arts] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="f5c93c53" sha1="6e36e45728f2257ff55fc5f3d690e67c76424945"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SSN-21 Seawolf [Electronic Arts] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="a276a04b" sha1="baccd3e74a60a7beb2ee05d2925428b99e9bbaf0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SSN-21 Seawolf [Electronic Arts] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="60b5a110" sha1="14b3381364a610c1221c130de922001141d041e4"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SSN-21 Seawolf [Electronic Arts] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="79bcd67a" sha1="a73fc1adc630d5e1fb73accc016914a250618b0f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SSN-21 Seawolf [Electronic Arts] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="0a79fb4a" sha1="6098abb4edb7ace4345e8829ad6a3ec1c46eb9fe"/>
 			</dataarea>
 		</part>
 	</software>
