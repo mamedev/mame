@@ -716,6 +716,7 @@ private:
 			group_map &groupmap,
 			std::vector<layout_group const *> &seen,
 			bool empty,
+			bool collection,
 			bool repeat,
 			bool init);
 
