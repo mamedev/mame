@@ -62,22 +62,29 @@ uint8_t p2000t_state::p2000t_port_000f_r(offs_t offset)
 		return 0xff;
 }
 
-
 /*
     Input port 0x2x
 
     bit 0 - Printer input
     bit 1 - Printer ready
     bit 2 - Strap N (daisy/matrix)
-    bit 3 - Cassette write enabled
-    bit 4 - Cassette in position
-    bit 5 - Begin/end of tape
-    bit 6 - Cassette read clock
+    bit 3 - Cassette write enabled, 0 = Write enabled
+    bit 4 - Cassette in position,   0 = Cassette in position
+    bit 5 - Begin/end of tape       0 = Beginning or End of tap
+    bit 6 - Cassette read clock     Flips when a bit is available.
     bit 7 - Cassette read data
+
+	Note: bit 6 & 7 are swapped when the cassette is moving in reverse.
 */
 uint8_t p2000t_state::p2000t_port_202f_r()
 {
-	return (0xff);
+    uint8_t data = 0x00;
+    data |= !m_mdcr->wen() << 3;
+    data |= !m_mdcr->cip() << 4;
+    data |= !m_mdcr->bet() << 5;
+    data |= m_mdcr->rdc() << 6;
+    data |= !m_mdcr->rda() << 7;
+    return data;
 }
 
 
@@ -95,7 +102,11 @@ uint8_t p2000t_state::p2000t_port_202f_r()
 */
 void p2000t_state::p2000t_port_101f_w(uint8_t data)
 {
-	m_port_101f = data;
+    m_port_101f = data;
+    m_mdcr->wda(BIT(data, 0));
+    m_mdcr->wdc(BIT(data, 1));
+    m_mdcr->rev(BIT(data, 2));
+    m_mdcr->fwd(BIT(data, 3));
 }
 
 /*
