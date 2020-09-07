@@ -63,13 +63,6 @@ void electron_expansion_slot_device::device_start()
 	m_nmi_handler.resolve_safe();
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void electron_expansion_slot_device::device_reset()
-{
-}
 
 //-------------------------------------------------
 //  expbus_r - expansion data read

@@ -24,6 +24,8 @@ DEFINE_DEVICE_TYPE(ELECTRON_AP5, electron_ap5_device, "electron_ap5", "P.R.E.S. 
 
 void electron_ap5_device::device_add_mconfig(machine_config &config)
 {
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_romslot[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 14
 	m_romslot[0]->set_device_load(FUNC(electron_ap5_device::rom1_load));
@@ -34,7 +36,7 @@ void electron_ap5_device::device_add_mconfig(machine_config &config)
 	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
-	m_via->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* user port */
 	BBC_USERPORT_SLOT(config, m_userport, bbc_userport_devices, nullptr);
@@ -43,12 +45,12 @@ void electron_ap5_device::device_add_mconfig(machine_config &config)
 
 	/* 1mhz bus port */
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 16), bbc_1mhzbus_devices, nullptr);
-	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::nmi_w));
 
 	/* tube port */
 	BBC_TUBE_SLOT(config, m_tube, electron_tube_devices, nullptr);
-	m_tube->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_cartslot_device::irq_w));
+	m_tube->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 }
 
 //**************************************************************************
@@ -62,6 +64,7 @@ void electron_ap5_device::device_add_mconfig(machine_config &config)
 electron_ap5_device::electron_ap5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_AP5, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
+	, m_irqs(*this, "irqs")
 	, m_via(*this, "via6522")
 	, m_tube(*this, "tube")
 	, m_1mhzbus(*this, "1mhzbus")
