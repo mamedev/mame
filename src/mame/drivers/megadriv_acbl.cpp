@@ -8,6 +8,7 @@
         * Aladdin
         * Bare Knuckle II
         * Bare Knuckle III
+        * Bare Knuckle III / Sunset Riders
         * Jurassic Park
         * Mortal Kombat 3
         * Sonic The Hedgehog 2
@@ -154,10 +155,6 @@ Top Shooter PCB info
  Inputs by Mariusz Wojcieszek
 
  Top Shooter - (c)1995  - older board, look more like an actual hacked cart system, has an MCU
-
- Not Dumped
-
- Super Bubble Bobble (a bubble bobble rip-off from Sun Mixing, looks like it may be on this hardware)
 
 TOP SHOOTER - Sun Mixing Co. Ltd. 1995
 
@@ -369,19 +366,7 @@ uint16_t md_boot_state::barek2mb_r()
 	return 0x0000;
 }
 
-uint16_t md_boot_state::mk3mdb_dsw_r(offs_t offset)
-{
-	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return ioport(dswname[offset])->read();
-}
-
-uint16_t md_boot_state::ssf2mdb_dsw_r(offs_t offset)
-{
-	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return ioport(dswname[offset])->read();
-}
-
-uint16_t md_boot_state::srmdb_dsw_r(offs_t offset)
+uint16_t md_boot_state::dsw_r(offs_t offset)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
@@ -1023,6 +1008,18 @@ ROM_START( barek3mb )
 	ROM_LOAD16_BYTE( "2.u16", 0x200001, 0x080000,  CRC(bba4a585) SHA1(32c59729943d7b4c1a39f2a2b0dae9ce16991e9c) )
 ROM_END
 
+ROM_START( bk3ssrmb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.u15", 0x000000, 0x080000,  CRC(120a4b64) SHA1(7084fde0d08143f48f83d2afef30522d75c7889c) )
+	ROM_LOAD16_BYTE( "5.u14", 0x000001, 0x080000,  CRC(1eb625d3) SHA1(8f67ab874643b3eafe91768df84ea4a3b8a5fa82) )
+	ROM_LOAD16_BYTE( "2.u13", 0x100000, 0x080000,  CRC(af439685) SHA1(5cc55608355e11096c9fadb8d2460cf66704deec) )
+	ROM_LOAD16_BYTE( "6.u12", 0x100001, 0x080000,  CRC(24d31e12) SHA1(64c1b968e1ee5d0355d902e280f33e4466f27b07) )
+	ROM_LOAD16_BYTE( "3.u11", 0x200000, 0x080000,  CRC(dfa5c478) SHA1(079a9cad5c2252b2d65aa3c4dc9cba331078eeb9) )
+	ROM_LOAD16_BYTE( "7.u10", 0x200001, 0x080000,  CRC(bba4a585) SHA1(32c59729943d7b4c1a39f2a2b0dae9ce16991e9c) )
+	ROM_LOAD16_BYTE( "4.u9",  0x300000, 0x040000,  CRC(e5f1ab97) SHA1(0f4c527043f1272e75a996f4f7270c6ea4ed3c4d) )
+	ROM_LOAD16_BYTE( "8.u8",  0x300001, 0x040000,  CRC(32ee1048) SHA1(1b135c200b4440e95a7d1766b4b404ddd238872d) )
+ROM_END
+
 ROM_START( twinktmb ) // same PCB as sonic2mb, but in this one the PIC is populated
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(44424f8f) SHA1(e16318bfdf869765c821c264cf9a7e6c728f7073) )
@@ -1111,7 +1108,7 @@ void md_boot_state::init_mk3mdb()
 	rom[0x07] = 0x02;
 	rom[0x06] = 0x10;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::mk3mdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
 
 	init_megadriv();
 	// 6 button game, so overwrite 3 button io handlers
@@ -1127,7 +1124,7 @@ void md_boot_state::init_ssf2mdb()
 
 	membank("bank5")->set_base(memregion( "maincpu" )->base() + 0x400000 );
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::ssf2mdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
 
 	init_megadrij();
 	// 6 button game, so overwrite 3 button io handlers
@@ -1158,7 +1155,7 @@ void md_boot_state::init_srmdb()
 	rom[0x06] = 0xd2;
 	rom[0x07] = 0x00;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::srmdb_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
 
 	init_megadriv();
 }
@@ -1180,7 +1177,7 @@ void md_boot_state::init_topshoot()
 void md_boot_state::init_sbubsm()
 {
 	// needed to boot, somme kind of hardware ident?
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x400001, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400000_r))); 
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x400001, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400000_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x400002, 0x400003, read16smo_delegate(*this, FUNC(md_boot_state::sbubsm_400002_r)));
 
 	// these are shared RAM, MCU puts the inputs here
@@ -1214,6 +1211,36 @@ void md_boot_state::init_barek3()
 
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x380070, 0x380071, "COINS");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x380078, 0x380079, "DSW");
+
+	init_megadrij();
+}
+
+void md_boot_state::init_bk3ssrmb()
+{
+	uint8_t* rom = memregion("maincpu")->base();
+
+	for (int x = 0x00001; x < 0x80000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x] ^ 0xff, 3, 1, 6, 4, 7, 0, 2, 5);
+	}
+
+	for (int x = 0x80001; x < 0x100000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x], 3, 7, 0, 5, 1, 6, 2, 4);
+	}
+
+	for (int x = 0x100001; x < 0x300000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x], 1, 7, 6, 4, 5, 2, 3, 0);
+	}
+
+	for (int x = 0x300001; x < 0x380000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x] ^ 0xff, 3, 1, 6, 4, 7, 0, 2, 5);
+	}
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16sm_delegate(*this, FUNC(md_boot_state::dsw_r)));
+
 
 	init_megadrij();
 }
@@ -1264,5 +1291,6 @@ GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   R
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", 0 ) // flying wires going through the empty PIC space aren't completely understood
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
+GAME( 1994, bk3ssrmb, 0, megadrvb,     srmdb,    md_boot_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)", MACHINE_NOT_WORKING ) // currently boots as Bare Knuckle III, mechanism to switch game not found yet
 GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
 GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
