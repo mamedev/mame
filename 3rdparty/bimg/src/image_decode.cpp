@@ -27,7 +27,8 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4127) // warning C4127: conditional expression is constant
-BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4267) // warning C4267 : '=' : conversion from 'size_t' to 'unsigned short', possible loss of data
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4267) // warning C4267: '=' : conversion from 'size_t' to 'unsigned short', possible loss of data
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4334) // warning C4334: '<<' : result of 32 - bit shift implicitly converted to 64 bits(was 64 - bit shift intended ? )
 #define LODEPNG_NO_COMPILE_ENCODER
 #define LODEPNG_NO_COMPILE_DISK
 #define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
