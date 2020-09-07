@@ -82,8 +82,6 @@ protected:
 class bbc_tube_zep100w_device : public bbc_tube_zep100_device
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::DISK; }
-
 	bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -93,8 +91,6 @@ protected:
 class bbc_tube_zep100m_device : public bbc_tube_zep100_device
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::DISK; }
-
 	bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
