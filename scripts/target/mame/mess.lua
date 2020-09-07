@@ -2601,6 +2601,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "informer")
 files {
+	MAME_DIR .. "src/mame/drivers/informer_207_100.cpp",
 	MAME_DIR .. "src/mame/drivers/informer_207_376.cpp",
 	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.h",
