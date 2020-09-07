@@ -328,276 +328,277 @@ license:CC0
 
 
 	<view name="Monitor and Lamps">
-		<bezel name="lamp7" element="8" state="0">
-			<bounds x="150" y="0" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp7" element="BAR" state="0">
-			<bounds x="170" y="0" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp6" element="LIT" state="0">
-			<bounds x="190" y="0" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp5" element="£10" state="0">
-			<bounds x="210" y="0" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp15" element="7" state="0">
-			<bounds x="150" y="20" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp15" element="BAR" state="0">
-			<bounds x="170" y="20" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp14" element="LIT" state="0">
-			<bounds x="190" y="20" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp13" element="£5" state="0">
-			<bounds x="210" y="20" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp23" element="6" state="0">
-			<bounds x="150" y="40" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp23" element="BAR" state="0">
-			<bounds x="170" y="40" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp22" element="LIT" state="0">
-			<bounds x="190" y="40" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp21" element="£3" state="0">
-			<bounds x="210" y="40" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp31" element="5" state="0">
-			<bounds x="150" y="60" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp31" element="BAR" state="0">
-			<bounds x="170" y="60" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp30" element="LIT" state="0">
-			<bounds x="190" y="60" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp29" element="£2" state="0">
-			<bounds x="210" y="60" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp39" element="4" state="0">
-			<bounds x="150" y="80" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp39" element="BAR" state="0">
-			<bounds x="170" y="80" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp38" element="LIT" state="0">
-			<bounds x="190" y="80" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp37" element="£1" state="0">
-			<bounds x="210" y="80" width="20" height="20"/>
-		</bezel>
-
-
-		<bezel name="lamp47" element="3" state="0">
-			<bounds x="150" y="100" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp47" element="BAR" state="0">
-			<bounds x="170" y="100" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp46" element="LIT" state="0">
-			<bounds x="190" y="100" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp45" element="50p" state="0">
-			<bounds x="210" y="100" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp55" element="2" state="0">
-			<bounds x="150" y="120" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp55" element="BAR" state="0">
-			<bounds x="170" y="120" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp54" element="LIT" state="0">
-			<bounds x="190" y="120" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp53" element="20p" state="0">
-			<bounds x="210" y="120" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp63" element="1" state="0">
-			<bounds x="150" y="140" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp63" element="BAR" state="0">
-			<bounds x="170" y="140" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp62" element="LIT" state="0">
-			<bounds x="190" y="140" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp61" element="10p" state="0">
-			<bounds x="210" y="140" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp80" element="Q" state="0">
-			<bounds x="0" y="30" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp81" element="Q" state="0">
-			<bounds x="20" y="30" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp82" element="BAR" state="0">
-			<bounds x="40" y="30" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp83" element="Q" state="0">
-			<bounds x="60" y="30" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp84" element="Q" state="0">
-			<bounds x="80" y="30" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp85" element="Q" state="0">
-			<bounds x="100" y="30" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp86" element="BAR" state="0">
-			<bounds x="120" y="30" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp88" element="Q" state="0">
-			<bounds x="0" y="50" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp89" element="BAR" state="0">
-			<bounds x="20" y="50" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp90" element="Q" state="0">
-			<bounds x="40" y="50" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp91" element="Q" state="0">
-			<bounds x="60" y="50" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp92" element="BAR" state="0">
-			<bounds x="80" y="50" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp93" element="Q" state="0">
-			<bounds x="100" y="50" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp94" element="Q" state="0">
-			<bounds x="120" y="50" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp96" element="BAR" state="0">
-			<bounds x="0" y="70" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp97" element="Q" state="0">
-			<bounds x="20" y="70" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp98" element="Q" state="0">
-			<bounds x="40" y="70" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp99" element="BAR" state="0">
-			<bounds x="60" y="70" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp100" element="Q" state="0">
-			<bounds x="80" y="70" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp101" element="BAR" state="0">
-			<bounds x="100" y="70" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp102" element="Q" state="0">
-			<bounds x="120" y="70" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp104" element="BAR" state="0">
-			<bounds x="0" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp105" element="Q" state="0">
-			<bounds x="20" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp106" element="BAR" state="0">
-			<bounds x="40" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp107" element="Q" state="0">
-			<bounds x="60" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp108" element="Q" state="0">
-			<bounds x="80" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp109" element="Q" state="0">
-			<bounds x="100" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp110" element="BAR" state="0">
-			<bounds x="120" y="90" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp112" element="Q" state="0">
-			<bounds x="0" y="110" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp113" element="Q" state="0">
-			<bounds x="20" y="110" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp114" element="BAR" state="0">
-			<bounds x="40" y="110" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp115" element="Q" state="0">
-			<bounds x="60" y="110" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp116" element="BAR" state="0">
-			<bounds x="80" y="110" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp117" element="Q" state="0">
-			<bounds x="100" y="110" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp118" element="Q" state="0">
-			<bounds x="120" y="110" width="20" height="20"/>
-		</bezel>
-
-		<bezel name="lamp120" element="Q" state="0">
-			<bounds x="0" y="130" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp121" element="BAR" state="0">
-			<bounds x="20" y="130" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp122" element="Q" state="0">
-			<bounds x="40" y="130" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp123" element="Q" state="0">
-			<bounds x="60" y="130" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp124" element="BAR" state="0">
-			<bounds x="80" y="130" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp125" element="BAR" state="0">
-			<bounds x="100" y="130" width="20" height="20"/>
-		</bezel>
-		<bezel name="lamp126" element="Q" state="0">
-			<bounds x="120" y="130" width="20" height="20"/>
-		</bezel>
-
-
-		<bezel name="lamp25" element="COLLECT" inputtag="BLACK2" inputmask="0x40">
-			<bounds x="0" y="200" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp32" element="PASS" inputtag="BLACK1" inputmask="0x10">
-			<bounds x="0" y="220" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp33" element="A" inputtag="BLACK1" inputmask="0x08">
-			<bounds x="0" y="240" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp40" element="B" inputtag="BLACK1" inputmask="0x04">
-			<bounds x="0" y="260" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp42" element="C" inputtag="BLACK1" inputmask="0x02">
-			<bounds x="0" y="280" width="16" height="16" />
-		</bezel>
-
-		<bezel name="lamp24" element="START" inputtag="BLACK2" inputmask="0x80">
-			<bounds x="564" y="200" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp26" element="CONTINUE" inputtag="BLACK2" inputmask="0x10">
-			<bounds x="564" y="220" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp34" element="A" inputtag="BLACK2" inputmask="0x08">
-			<bounds x="564" y="240" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp41" element="B" inputtag="BLACK2" inputmask="0x04">
-			<bounds x="564" y="260" width="16" height="16" />
-		</bezel>
-		<bezel name="lamp48" element="C" inputtag="BLACK2" inputmask="0x02">
-			<bounds x="564" y="280" width="16" height="16" />
-		</bezel>
 		<screen index="0">
 			<bounds x="50" y="200" width="504" height="296" />
 		</screen>
+
+		<element name="lamp7" ref="8" state="0">
+			<bounds x="150" y="0" width="20" height="20"/>
+		</element>
+		<element name="lamp7" ref="BAR" state="0">
+			<bounds x="170" y="0" width="20" height="20"/>
+		</element>
+		<element name="lamp6" ref="LIT" state="0">
+			<bounds x="190" y="0" width="20" height="20"/>
+		</element>
+		<element name="lamp5" ref="£10" state="0">
+			<bounds x="210" y="0" width="20" height="20"/>
+		</element>
+
+		<element name="lamp15" ref="7" state="0">
+			<bounds x="150" y="20" width="20" height="20"/>
+		</element>
+		<element name="lamp15" ref="BAR" state="0">
+			<bounds x="170" y="20" width="20" height="20"/>
+		</element>
+		<element name="lamp14" ref="LIT" state="0">
+			<bounds x="190" y="20" width="20" height="20"/>
+		</element>
+		<element name="lamp13" ref="£5" state="0">
+			<bounds x="210" y="20" width="20" height="20"/>
+		</element>
+
+		<element name="lamp23" ref="6" state="0">
+			<bounds x="150" y="40" width="20" height="20"/>
+		</element>
+		<element name="lamp23" ref="BAR" state="0">
+			<bounds x="170" y="40" width="20" height="20"/>
+		</element>
+		<element name="lamp22" ref="LIT" state="0">
+			<bounds x="190" y="40" width="20" height="20"/>
+		</element>
+		<element name="lamp21" ref="£3" state="0">
+			<bounds x="210" y="40" width="20" height="20"/>
+		</element>
+
+		<element name="lamp31" ref="5" state="0">
+			<bounds x="150" y="60" width="20" height="20"/>
+		</element>
+		<element name="lamp31" ref="BAR" state="0">
+			<bounds x="170" y="60" width="20" height="20"/>
+		</element>
+		<element name="lamp30" ref="LIT" state="0">
+			<bounds x="190" y="60" width="20" height="20"/>
+		</element>
+		<element name="lamp29" ref="£2" state="0">
+			<bounds x="210" y="60" width="20" height="20"/>
+		</element>
+
+		<element name="lamp39" ref="4" state="0">
+			<bounds x="150" y="80" width="20" height="20"/>
+		</element>
+		<element name="lamp39" ref="BAR" state="0">
+			<bounds x="170" y="80" width="20" height="20"/>
+		</element>
+		<element name="lamp38" ref="LIT" state="0">
+			<bounds x="190" y="80" width="20" height="20"/>
+		</element>
+		<element name="lamp37" ref="£1" state="0">
+			<bounds x="210" y="80" width="20" height="20"/>
+		</element>
+
+
+		<element name="lamp47" ref="3" state="0">
+			<bounds x="150" y="100" width="20" height="20"/>
+		</element>
+		<element name="lamp47" ref="BAR" state="0">
+			<bounds x="170" y="100" width="20" height="20"/>
+		</element>
+		<element name="lamp46" ref="LIT" state="0">
+			<bounds x="190" y="100" width="20" height="20"/>
+		</element>
+		<element name="lamp45" ref="50p" state="0">
+			<bounds x="210" y="100" width="20" height="20"/>
+		</element>
+
+		<element name="lamp55" ref="2" state="0">
+			<bounds x="150" y="120" width="20" height="20"/>
+		</element>
+		<element name="lamp55" ref="BAR" state="0">
+			<bounds x="170" y="120" width="20" height="20"/>
+		</element>
+		<element name="lamp54" ref="LIT" state="0">
+			<bounds x="190" y="120" width="20" height="20"/>
+		</element>
+		<element name="lamp53" ref="20p" state="0">
+			<bounds x="210" y="120" width="20" height="20"/>
+		</element>
+
+		<element name="lamp63" ref="1" state="0">
+			<bounds x="150" y="140" width="20" height="20"/>
+		</element>
+		<element name="lamp63" ref="BAR" state="0">
+			<bounds x="170" y="140" width="20" height="20"/>
+		</element>
+		<element name="lamp62" ref="LIT" state="0">
+			<bounds x="190" y="140" width="20" height="20"/>
+		</element>
+		<element name="lamp61" ref="10p" state="0">
+			<bounds x="210" y="140" width="20" height="20"/>
+		</element>
+
+		<element name="lamp80" ref="Q" state="0">
+			<bounds x="0" y="30" width="20" height="20"/>
+		</element>
+		<element name="lamp81" ref="Q" state="0">
+			<bounds x="20" y="30" width="20" height="20"/>
+		</element>
+		<element name="lamp82" ref="BAR" state="0">
+			<bounds x="40" y="30" width="20" height="20"/>
+		</element>
+		<element name="lamp83" ref="Q" state="0">
+			<bounds x="60" y="30" width="20" height="20"/>
+		</element>
+		<element name="lamp84" ref="Q" state="0">
+			<bounds x="80" y="30" width="20" height="20"/>
+		</element>
+		<element name="lamp85" ref="Q" state="0">
+			<bounds x="100" y="30" width="20" height="20"/>
+		</element>
+		<element name="lamp86" ref="BAR" state="0">
+			<bounds x="120" y="30" width="20" height="20"/>
+		</element>
+
+		<element name="lamp88" ref="Q" state="0">
+			<bounds x="0" y="50" width="20" height="20"/>
+		</element>
+		<element name="lamp89" ref="BAR" state="0">
+			<bounds x="20" y="50" width="20" height="20"/>
+		</element>
+		<element name="lamp90" ref="Q" state="0">
+			<bounds x="40" y="50" width="20" height="20"/>
+		</element>
+		<element name="lamp91" ref="Q" state="0">
+			<bounds x="60" y="50" width="20" height="20"/>
+		</element>
+		<element name="lamp92" ref="BAR" state="0">
+			<bounds x="80" y="50" width="20" height="20"/>
+		</element>
+		<element name="lamp93" ref="Q" state="0">
+			<bounds x="100" y="50" width="20" height="20"/>
+		</element>
+		<element name="lamp94" ref="Q" state="0">
+			<bounds x="120" y="50" width="20" height="20"/>
+		</element>
+
+		<element name="lamp96" ref="BAR" state="0">
+			<bounds x="0" y="70" width="20" height="20"/>
+		</element>
+		<element name="lamp97" ref="Q" state="0">
+			<bounds x="20" y="70" width="20" height="20"/>
+		</element>
+		<element name="lamp98" ref="Q" state="0">
+			<bounds x="40" y="70" width="20" height="20"/>
+		</element>
+		<element name="lamp99" ref="BAR" state="0">
+			<bounds x="60" y="70" width="20" height="20"/>
+		</element>
+		<element name="lamp100" ref="Q" state="0">
+			<bounds x="80" y="70" width="20" height="20"/>
+		</element>
+		<element name="lamp101" ref="BAR" state="0">
+			<bounds x="100" y="70" width="20" height="20"/>
+		</element>
+		<element name="lamp102" ref="Q" state="0">
+			<bounds x="120" y="70" width="20" height="20"/>
+		</element>
+
+		<element name="lamp104" ref="BAR" state="0">
+			<bounds x="0" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp105" ref="Q" state="0">
+			<bounds x="20" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp106" ref="BAR" state="0">
+			<bounds x="40" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp107" ref="Q" state="0">
+			<bounds x="60" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp108" ref="Q" state="0">
+			<bounds x="80" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp109" ref="Q" state="0">
+			<bounds x="100" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp110" ref="BAR" state="0">
+			<bounds x="120" y="90" width="20" height="20"/>
+		</element>
+		<element name="lamp112" ref="Q" state="0">
+			<bounds x="0" y="110" width="20" height="20"/>
+		</element>
+		<element name="lamp113" ref="Q" state="0">
+			<bounds x="20" y="110" width="20" height="20"/>
+		</element>
+		<element name="lamp114" ref="BAR" state="0">
+			<bounds x="40" y="110" width="20" height="20"/>
+		</element>
+		<element name="lamp115" ref="Q" state="0">
+			<bounds x="60" y="110" width="20" height="20"/>
+		</element>
+		<element name="lamp116" ref="BAR" state="0">
+			<bounds x="80" y="110" width="20" height="20"/>
+		</element>
+		<element name="lamp117" ref="Q" state="0">
+			<bounds x="100" y="110" width="20" height="20"/>
+		</element>
+		<element name="lamp118" ref="Q" state="0">
+			<bounds x="120" y="110" width="20" height="20"/>
+		</element>
+
+		<element name="lamp120" ref="Q" state="0">
+			<bounds x="0" y="130" width="20" height="20"/>
+		</element>
+		<element name="lamp121" ref="BAR" state="0">
+			<bounds x="20" y="130" width="20" height="20"/>
+		</element>
+		<element name="lamp122" ref="Q" state="0">
+			<bounds x="40" y="130" width="20" height="20"/>
+		</element>
+		<element name="lamp123" ref="Q" state="0">
+			<bounds x="60" y="130" width="20" height="20"/>
+		</element>
+		<element name="lamp124" ref="BAR" state="0">
+			<bounds x="80" y="130" width="20" height="20"/>
+		</element>
+		<element name="lamp125" ref="BAR" state="0">
+			<bounds x="100" y="130" width="20" height="20"/>
+		</element>
+		<element name="lamp126" ref="Q" state="0">
+			<bounds x="120" y="130" width="20" height="20"/>
+		</element>
+
+
+		<element name="lamp25" ref="COLLECT" inputtag="BLACK2" inputmask="0x40">
+			<bounds x="0" y="200" width="16" height="16" />
+		</element>
+		<element name="lamp32" ref="PASS" inputtag="BLACK1" inputmask="0x10">
+			<bounds x="0" y="220" width="16" height="16" />
+		</element>
+		<element name="lamp33" ref="A" inputtag="BLACK1" inputmask="0x08">
+			<bounds x="0" y="240" width="16" height="16" />
+		</element>
+		<element name="lamp40" ref="B" inputtag="BLACK1" inputmask="0x04">
+			<bounds x="0" y="260" width="16" height="16" />
+		</element>
+		<element name="lamp42" ref="C" inputtag="BLACK1" inputmask="0x02">
+			<bounds x="0" y="280" width="16" height="16" />
+		</element>
+
+		<element name="lamp24" ref="START" inputtag="BLACK2" inputmask="0x80">
+			<bounds x="564" y="200" width="16" height="16" />
+		</element>
+		<element name="lamp26" ref="CONTINUE" inputtag="BLACK2" inputmask="0x10">
+			<bounds x="564" y="220" width="16" height="16" />
+		</element>
+		<element name="lamp34" ref="A" inputtag="BLACK2" inputmask="0x08">
+			<bounds x="564" y="240" width="16" height="16" />
+		</element>
+		<element name="lamp41" ref="B" inputtag="BLACK2" inputmask="0x04">
+			<bounds x="564" y="260" width="16" height="16" />
+		</element>
+		<element name="lamp48" ref="C" inputtag="BLACK2" inputmask="0x02">
+			<bounds x="564" y="280" width="16" height="16" />
+		</element>
 	</view>
 </mamelayout>

@@ -19,17 +19,17 @@ copyright-holders:Dirk Best
 
 	<group name="displays">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="0" top="0" right="1205" bottom="60" />
-		</bezel>
+		</element>
 
 		<!-- Forty multi-segment displays -->
 		<repeat count="40">
 			<param name="i" start="0" increment="1" />
 			<param name="x" start="5" increment="30" />
-			<bezel name="digit~i~" element="digit">
+			<element name="digit~i~" ref="digit">
 				<bounds x="~x~" y="5" width="25" height="50" />
-			</bezel>
+			</element>
 		</repeat>
 	</group>
 
@@ -40,12 +40,12 @@ copyright-holders:Dirk Best
 	</view>
 
 	<view name="Terminal Below">
-		<group ref="displays">
-			<bounds x="0" y="0" width="241" height="12" />
-		</group>
 		<screen index="0">
 			<bounds x="0" y="12" width="241" height="180.75" />
 		</screen>
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="12" />
+		</group>
 	</view>
 
 </mamelayout>

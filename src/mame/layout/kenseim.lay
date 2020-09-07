@@ -229,202 +229,202 @@ license:CC0
 			<bounds left="0" top="0" right="320" bottom="240" />
 		</screen>
 
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds x="0" y="240" width="320" height="5" />
-		</bezel>
-		<bezel element="static_yellow">
+		</element>
+		<element ref="static_yellow">
 			<bounds x="0" y="243" width="320" height="5" />
-		</bezel>
-		<bezel element="static_blue">
+		</element>
+		<element ref="static_blue">
 			<bounds x="0" y="246" width="320" height="40" />
-		</bezel>
+		</element>
 
-		<bezel element="static_white">
+		<element ref="static_white">
 			<bounds x="115" y="246" width="90" height="40" />
-		</bezel>
-		<bezel element="static_yellow">
+		</element>
+		<element ref="static_yellow">
 			<bounds x="115" y="275" width="90" height="5" />
-		</bezel>
+		</element>
 
-		<bezel element="static_pink">
+		<element ref="static_pink">
 			<bounds x="0" y="278" width="320" height="95" />
-		</bezel>
+		</element>
 
-		<bezel element="static_yellow">
+		<element ref="static_yellow">
 			<bounds x="0" y="243" width="2" height="130" />
-		</bezel>
-		<bezel element="static_yellow">
+		</element>
+		<element ref="static_yellow">
 			<bounds x="318" y="243" width="2" height="130" />
-		</bezel>
+		</element>
 
-		<bezel element="static_brown">
+		<element ref="static_brown">
 			<bounds x="130" y="290" width="60" height="3" />
-		</bezel>
-		<bezel element="static_brown">
+		</element>
+		<element ref="static_brown">
 			<bounds x="130" y="313" width="60" height="3" />
-		</bezel>
-		<bezel element="static_brown">
+		</element>
+		<element ref="static_brown">
 			<bounds x="130" y="336" width="60" height="3" />
-		</bezel>
-		<bezel element="static_brown">
+		</element>
+		<element ref="static_brown">
 			<bounds x="130" y="359" width="60" height="3" />
-		</bezel>
+		</element>
 
 
-	<!-- two "level gauge" powerbars on the bottom of the bezel -->
+	<!-- two "level gauge" powerbars on the bottom of the element -->
 
 	<!-- left powerbar -->
 
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds x="6" y="254" width="105" height="8" />
-		</bezel>
-		<bezel element="text_level_l">
+		</element>
+		<element ref="text_level_l">
 			<bounds x="7" y="263" width="100" height="8" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp1" element="powerled">
+		<element name="lamp1" ref="powerled">
 			<bounds x="10" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp2" element="powerled">
+		</element>
+		<element name="lamp2" ref="powerled">
 			<bounds x="20" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp3" element="powerled">
+		</element>
+		<element name="lamp3" ref="powerled">
 			<bounds x="30" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp4" element="powerled">
+		</element>
+		<element name="lamp4" ref="powerled">
 			<bounds x="40" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp5" element="powerled">
+		</element>
+		<element name="lamp5" ref="powerled">
 			<bounds x="50" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp6" element="powerled">
+		</element>
+		<element name="lamp6" ref="powerled">
 			<bounds x="60" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp7" element="powerled">
+		</element>
+		<element name="lamp7" ref="powerled">
 			<bounds x="70" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp8" element="powerled">
+		</element>
+		<element name="lamp8" ref="powerled">
 			<bounds x="80" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp9" element="powerled">
+		</element>
+		<element name="lamp9" ref="powerled">
 			<bounds x="90" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp10" element="powerled">
+		</element>
+		<element name="lamp10" ref="powerled">
 			<bounds x="100" y="256" width="7" height="4"/>
-		</bezel>
+		</element>
 
 	<!-- right powerbar -->
 
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds x="209" y="254" width="105" height="8" />
-		</bezel>
-		<bezel element="text_level_r">
+		</element>
+		<element ref="text_level_r">
 			<bounds x="213" y="263" width="100" height="8" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp11" element="powerled">
+		<element name="lamp11" ref="powerled">
 			<bounds x="303" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp12" element="powerled">
+		</element>
+		<element name="lamp12" ref="powerled">
 			<bounds x="293" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp13" element="powerled">
+		</element>
+		<element name="lamp13" ref="powerled">
 			<bounds x="283" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp14" element="powerled">
+		</element>
+		<element name="lamp14" ref="powerled">
 			<bounds x="273" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp15" element="powerled">
+		</element>
+		<element name="lamp15" ref="powerled">
 			<bounds x="263" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp16" element="powerled">
+		</element>
+		<element name="lamp16" ref="powerled">
 			<bounds x="253" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp17" element="powerled">
+		</element>
+		<element name="lamp17" ref="powerled">
 			<bounds x="243" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp18" element="powerled">
+		</element>
+		<element name="lamp18" ref="powerled">
 			<bounds x="233" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp19" element="powerled">
+		</element>
+		<element name="lamp19" ref="powerled">
 			<bounds x="223" y="256" width="7" height="4"/>
-		</bezel>
-		<bezel name="lamp20" element="powerled">
+		</element>
+		<element name="lamp20" ref="powerled">
 			<bounds x="213" y="256" width="7" height="4"/>
-		</bezel>
+		</element>
 
 
 	<!-- NOTE: on real cab, start buttons are on the front panel -->
 	<!-- start buttons -->
 
-		<bezel element="text_ryu">
+		<element ref="text_ryu">
 			<bounds x="118" y="254" width="24" height="6"/>
-		</bezel>
-		<bezel element="text_start">
+		</element>
+		<element ref="text_start">
 			<bounds x="118" y="261" width="24" height="6"/>
-		</bezel>
+		</element>
 
-		<bezel element="disk_black">
+		<element ref="disk_black">
 			<bounds x="138" y="251" width="19" height="19" />
-		</bezel>
-		<bezel name="startlamp1" element="startbutton" inputtag="CAB-IN" inputmask="0x02" >
+		</element>
+		<element name="startlamp1" ref="startbutton" inputtag="CAB-IN" inputmask="0x02" >
 			<bounds x="140" y="253" width="15" height="15"/>
-		</bezel>
+		</element>
 
-		<bezel element="text_chunli">
+		<element ref="text_chunli">
 			<bounds x="180" y="254" width="24" height="6"/>
-		</bezel>
-		<bezel element="text_start">
+		</element>
+		<element ref="text_start">
 			<bounds x="180" y="261" width="24" height="6"/>
-		</bezel>
+		</element>
 
-		<bezel element="disk_black">
+		<element ref="disk_black">
 			<bounds x="163" y="251" width="19" height="19" />
-		</bezel>
-		<bezel name="startlamp2" element="startbutton" inputtag="CAB-IN" inputmask="0x04">
+		</element>
+		<element name="startlamp2" ref="startbutton" inputtag="CAB-IN" inputmask="0x04">
 			<bounds x="165" y="253" width="15" height="15"/>
-		</bezel>
+		</element>
 
 
 	<!-- cpanel left moles -->
 
-		<bezel element="static_brown"><bounds x="30" y="320" width="50" height="25" /></bezel>
+		<element ref="static_brown"><bounds x="30" y="320" width="50" height="25" /></element>
 
-		<bezel element="disk_black"><bounds x="10.0" y="300" width="35" height="35" /></bezel>
-		<bezel element="disk_black"><bounds x="35.0" y="285" width="40" height="40" /></bezel>
-		<bezel element="disk_black"><bounds x="65.0" y="300" width="35" height="35" /></bezel>
+		<element ref="disk_black"><bounds x="10.0" y="300" width="35" height="35" /></element>
+		<element ref="disk_black"><bounds x="35.0" y="285" width="40" height="40" /></element>
+		<element ref="disk_black"><bounds x="65.0" y="300" width="35" height="35" /></element>
 
-		<bezel element="disk_black"><bounds x="10.0" y="330" width="35" height="35" /></bezel>
-		<bezel element="disk_black"><bounds x="37.5" y="325" width="35" height="35" /></bezel>
-		<bezel element="disk_black"><bounds x="65.0" y="330" width="35" height="35" /></bezel>
+		<element ref="disk_black"><bounds x="10.0" y="330" width="35" height="35" /></element>
+		<element ref="disk_black"><bounds x="37.5" y="325" width="35" height="35" /></element>
+		<element ref="disk_black"><bounds x="65.0" y="330" width="35" height="35" /></element>
 
-		<bezel name="molea_1" element="mole_sim_red" inputtag="MOLEA" inputmask="0x02" ><bounds x="15.0" y="305" width="25" height="25"/></bezel>
-		<bezel name="molea_0" element="mole_sim_red" inputtag="MOLEA" inputmask="0x01" ><bounds x="40.0" y="290" width="30" height="30"/></bezel> <!-- big mole -->
-		<bezel name="molea_2" element="mole_sim_red" inputtag="MOLEA" inputmask="0x04" ><bounds x="70.0" y="305" width="25" height="25"/></bezel>
+		<element name="molea_1" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x02" ><bounds x="15.0" y="305" width="25" height="25"/></element>
+		<element name="molea_0" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x01" ><bounds x="40.0" y="290" width="30" height="30"/></element> <!-- big mole -->
+		<element name="molea_2" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x04" ><bounds x="70.0" y="305" width="25" height="25"/></element>
 
-		<bezel name="molea_3" element="mole_sim_red" inputtag="MOLEA" inputmask="0x08" ><bounds x="15.0" y="335" width="25" height="25"/></bezel>
-		<bezel name="molea_4" element="mole_sim_red" inputtag="MOLEA" inputmask="0x10" ><bounds x="42.5" y="330" width="25" height="25"/></bezel>
-		<bezel name="molea_5" element="mole_sim_red" inputtag="MOLEA" inputmask="0x20" ><bounds x="70.0" y="335" width="25" height="25"/></bezel>
+		<element name="molea_3" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x08" ><bounds x="15.0" y="335" width="25" height="25"/></element>
+		<element name="molea_4" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x10" ><bounds x="42.5" y="330" width="25" height="25"/></element>
+		<element name="molea_5" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x20" ><bounds x="70.0" y="335" width="25" height="25"/></element>
 
 	<!-- cpanel right moles -->
 
-		<bezel element="static_brown"><bounds x="240" y="320" width="50" height="25" /></bezel>
+		<element ref="static_brown"><bounds x="240" y="320" width="50" height="25" /></element>
 
-		<bezel element="disk_black"><bounds x="220.0" y="300" width="35" height="35" /></bezel>
-		<bezel element="disk_black"><bounds x="245.0" y="285" width="40" height="40" /></bezel>
-		<bezel element="disk_black"><bounds x="275.0" y="300" width="35" height="35" /></bezel>
+		<element ref="disk_black"><bounds x="220.0" y="300" width="35" height="35" /></element>
+		<element ref="disk_black"><bounds x="245.0" y="285" width="40" height="40" /></element>
+		<element ref="disk_black"><bounds x="275.0" y="300" width="35" height="35" /></element>
 
-		<bezel element="disk_black"><bounds x="220.0" y="330" width="35" height="35" /></bezel>
-		<bezel element="disk_black"><bounds x="247.5" y="325" width="35" height="35" /></bezel>
-		<bezel element="disk_black"><bounds x="275.0" y="330" width="35" height="35" /></bezel>
+		<element ref="disk_black"><bounds x="220.0" y="330" width="35" height="35" /></element>
+		<element ref="disk_black"><bounds x="247.5" y="325" width="35" height="35" /></element>
+		<element ref="disk_black"><bounds x="275.0" y="330" width="35" height="35" /></element>
 
-		<bezel name="moleb_1" element="mole_sim_blu" inputtag="MOLEB" inputmask="0x02" ><bounds x="225.0" y="305" width="25" height="25"/></bezel>
-		<bezel name="moleb_0" element="mole_sim_blu" inputtag="MOLEB" inputmask="0x01" ><bounds x="250.0" y="290" width="30" height="30"/></bezel> <!-- big mole -->
-		<bezel name="moleb_2" element="mole_sim_blu" inputtag="MOLEB" inputmask="0x04" ><bounds x="280.0" y="305" width="25" height="25"/></bezel>
+		<element name="moleb_1" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x02" ><bounds x="225.0" y="305" width="25" height="25"/></element>
+		<element name="moleb_0" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x01" ><bounds x="250.0" y="290" width="30" height="30"/></element> <!-- big mole -->
+		<element name="moleb_2" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x04" ><bounds x="280.0" y="305" width="25" height="25"/></element>
 
-		<bezel name="moleb_3" element="mole_sim_blu" inputtag="MOLEB" inputmask="0x08" ><bounds x="225.0" y="335" width="25" height="25"/></bezel>
-		<bezel name="moleb_4" element="mole_sim_blu" inputtag="MOLEB" inputmask="0x10" ><bounds x="252.5" y="330" width="25" height="25"/></bezel>
-		<bezel name="moleb_5" element="mole_sim_blu" inputtag="MOLEB" inputmask="0x20" ><bounds x="280.0" y="335" width="25" height="25"/></bezel>
+		<element name="moleb_3" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x08" ><bounds x="225.0" y="335" width="25" height="25"/></element>
+		<element name="moleb_4" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x10" ><bounds x="252.5" y="330" width="25" height="25"/></element>
+		<element name="moleb_5" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x20" ><bounds x="280.0" y="335" width="25" height="25"/></element>
 
 	</view>
 </mamelayout>

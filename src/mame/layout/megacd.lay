@@ -24,13 +24,13 @@ Basic display of CD-ROM drive LEDs for the Sega MegaCD
 			<bounds left="0" right="400" top="0" bottom="300" />
 		</screen>
 
-		<bezel name="red_led" element="red_led">
+		<element name="red_led" ref="red_led">
 			<bounds x="8" y="312" width="17" height="9" />
-		</bezel>
+		</element>
 
-		<bezel name="green_led" element="green_led">
+		<element name="green_led" ref="green_led">
 			<bounds x="31" y="312" width="17" height="9" />
-		</bezel>
+		</element>
 	</view>
 
 </mamelayout>

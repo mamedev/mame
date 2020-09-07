@@ -12,18 +12,18 @@ LEDs for the Ericsson PC keyboard
 	<element name="led" defstate="0"><disk><color red="0.85" green="0.18" blue="0.16" /></disk></element>
 
 	<group name="caps">
-		<bezel element="led" name="kbled0"><bounds x="0" y="0" width="100" height="100" /></bezel>
-		<bezel element="text_caps"><bounds x="120" y="0" width="900" height="100" /></bezel>
+		<element ref="led" name="kbled0"><bounds x="0" y="0" width="100" height="100" /></element>
+		<element ref="text_caps"><bounds x="120" y="0" width="900" height="100" /></element>
 	</group>
 
 	<group name="num">
-		<bezel element="led" name="kbled1"><bounds x="0" y="0" width="100" height="100" /></bezel>
-		<bezel element="text_num"><bounds x="120" y="0" width="800" height="100" /></bezel>
+		<element ref="led" name="kbled1"><bounds x="0" y="0" width="100" height="100" /></element>
+		<element ref="text_num"><bounds x="120" y="0" width="800" height="100" /></element>
 	</group>
 
 	<group name="scroll">
-		<bezel element="led" name="kbled2"><bounds x="0" y="0" width="100" height="100" /></bezel>
-		<bezel element="text_scroll"><bounds x="120" y="0" width="1000" height="100" /></bezel>
+		<element ref="led" name="kbled2"><bounds x="0" y="0" width="100" height="100" /></element>
+		<element ref="text_scroll"><bounds x="120" y="0" width="1000" height="100" /></element>
 	</group>
 
 	<view name="Default Layout">

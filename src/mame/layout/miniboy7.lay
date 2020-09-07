@@ -79,67 +79,67 @@ Mini-Boy 7 control panel
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel element="cpanel">
+		<element ref="cpanel">
 			<bounds left="0" right="4" top="3" bottom="3.40" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel1">
+		<element ref="cpanel1">
 			<bounds left="0" right="4" top="3.01" bottom="3.39" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel2">
+		<element ref="cpanel2">
 			<bounds left="0" right="4" top="3.02" bottom="3.38" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel3">
+		<element ref="cpanel3">
 			<bounds left="0" right="4" top="3.03" bottom="3.37" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel4">
+		<element ref="cpanel4">
 			<bounds left="0" right="4" top="3.04" bottom="3.36" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel">
+		<element ref="cpanel">
 			<bounds left="0" right="4" top="3.05" bottom="3.35" />
-		</bezel>
+		</element>
 
 
 	<!-- define lamps -->
 
-		<bezel name="lamp0" element="buttonedge">
+		<element name="lamp0" ref="buttonedge">
 			<bounds x="3.18" y="3.08" width="0.50" height="0.24" />
-		</bezel>
-		<bezel name="lamp0" element="button">
+		</element>
+		<element name="lamp0" ref="button">
 			<bounds x="3.20" y="3.10" width="0.46" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp1" element="buttonedge">
+		<element name="lamp1" ref="buttonedge">
 			<bounds x="2.43" y="3.08" width="0.50" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="button">
+		</element>
+		<element name="lamp1" ref="button">
 			<bounds x="2.45" y="3.10" width="0.46" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp2" element="buttonedge">
+		<element name="lamp2" ref="buttonedge">
 			<bounds x="1.68" y="3.08" width="0.50" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="button">
+		</element>
+		<element name="lamp2" ref="button">
 			<bounds x="1.70" y="3.10" width="0.46" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp3" element="buttonedge">
+		<element name="lamp3" ref="buttonedge">
 			<bounds x="0.93" y="3.08" width="0.50" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="button">
+		</element>
+		<element name="lamp3" ref="button">
 			<bounds x="0.95" y="3.10" width="0.46" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="buttonedge">
+		<element name="lamp4" ref="buttonedge">
 			<bounds x="0.18" y="3.08" width="0.50" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="button">
+		</element>
+		<element name="lamp4" ref="button">
 			<bounds x="0.20" y="3.10" width="0.46" height="0.20" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

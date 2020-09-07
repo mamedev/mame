@@ -26,13 +26,15 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="0" right="20" top="4.6" bottom="33" />
 
-		<bezel element="static_white"><bounds x="6.6" y="4.59" width="6.8" height="3.81" /></bezel>
-		<bezel element="static_black"><bounds x="6.8" y="4.8" width="6.4" height="3.4" /></bezel>
-		<bezel element="text_score"><bounds x="2" y="5.75" width="4.6" height="1.5" /></bezel>
+		<collection name="Score Display">
+			<element ref="static_white"><bounds x="6.6" y="4.59" width="6.8" height="3.81" /></element>
+			<element ref="static_black"><bounds x="6.8" y="4.8" width="6.4" height="3.4" /></element>
+			<element ref="text_score"><bounds x="2" y="5.75" width="4.6" height="1.5" /></element>
 
-		<bezel name="digit9" element="digit"><bounds x="7" y="5" width="2" height="3" /></bezel>
-		<bezel name="digit8" element="digit"><bounds x="9" y="5" width="2" height="3" /></bezel>
-		<bezel name="digit7" element="digit"><bounds x="11" y="5" width="2" height="3" /></bezel>
+			<element name="digit9" ref="digit"><bounds x="7" y="5" width="2" height="3" /></element>
+			<element name="digit8" ref="digit"><bounds x="9" y="5" width="2" height="3" /></element>
+			<element name="digit7" ref="digit"><bounds x="11" y="5" width="2" height="3" /></element>
+		</collection>
 
 		<element ref="led" name="0.0"><bounds x="0.2"  y="10.1" width="2" height="2" /></element>
 		<element ref="led" name="0.1"><bounds x="3.8"  y="10.1" width="2" height="2" /></element>

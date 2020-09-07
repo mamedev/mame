@@ -76,9 +76,9 @@ license:CC0
 		</text>
 	</element>
 	<element name="vfd0">
-	<led14segsc>
+		<led14segsc>
 			<color red="0" green="0.6" blue="1.0" />
-	</led14segsc>
+		</led14segsc>
 	</element>
 
 	<view name="Adder and Lamps">

@@ -4,9 +4,6 @@ license:CC0
 -->
 
 <mamelayout version="2">
-	<element name="bezel">
-	</element>
-
 	<element name="dealspinstart" defstate="1">
 		<rect state="0">
 			<color red="0.5" green="0.5" blue="0.5" />
@@ -21,14 +18,12 @@ license:CC0
 	</element>
 
 	<view name="Set Chip Lamps">
+		<bounds left="0" top="0" right="340" bottom="310" />
 		<screen index="0">
 			<bounds left="10" top="40" right="330" bottom="240" />
 		</screen>
-		<bezel element="bezel">
-			<bounds left="0" top="0" right="340" bottom="310" />
-		</bezel>
-		<bezel name="pe_bnkb1" element="dealspinstart">
+		<element name="pe_bnkb1" ref="dealspinstart">
 			<bounds x="10" y="280" width="74" height="20" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

@@ -19,66 +19,66 @@ license:CC0
 		<bounds left="-1.2" right="56.2" top="-2.9" bottom="17.4" />
 		<screen index="0"><bounds x="0" y="0" width="48" height="17" /></screen>
 
-		<bezel element="text_score"><bounds x="22.6" y="-2.8" width="10" height="2.2" /></bezel>
-		<bezel element="text_warpl"><bounds x="-0.7" y="14.7" width="10" height="2.2" /></bezel>
-		<bezel element="text_warpr"><bounds x="49" y="14.7" width="10" height="2.2" /></bezel>
+		<element ref="text_score"><bounds x="22.6" y="-2.8" width="10" height="2.2" /></element>
+		<element ref="text_warpl"><bounds x="-0.7" y="14.7" width="10" height="2.2" /></element>
+		<element ref="text_warpr"><bounds x="49" y="14.7" width="10" height="2.2" /></element>
 
 	<!-- maze overlay -->
 
 		<!-- h1 -->
-		<bezel element="white"><bounds x="6.3" y="-0.3" width="42.5" height="0.2" /></bezel>
+		<element ref="white"><bounds x="6.3" y="-0.3" width="42.5" height="0.2" /></element>
 
 		<!-- h2 -->
-		<bezel element="white"><bounds x="11.2" y="3.2" width="4.5" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="20.4" y="3.2" width="14.3" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="39.4" y="3.2" width="4.5" height="0.2" /></bezel>
+		<element ref="white"><bounds x="11.2" y="3.2" width="4.5" height="0.2" /></element>
+		<element ref="white"><bounds x="20.4" y="3.2" width="14.3" height="0.2" /></element>
+		<element ref="white"><bounds x="39.4" y="3.2" width="4.5" height="0.2" /></element>
 
 		<!-- h3 -->
-		<bezel element="white"><bounds x="-1.2" y="6.7" width="5.1" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="6.3" y="6.7" width="4.7" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="15.9" y="6.7" width="9.2" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="30.1" y="6.7" width="9.2" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="44.1" y="6.7" width="4.7" height="0.2" /></bezel>
+		<element ref="white"><bounds x="-1.2" y="6.7" width="5.1" height="0.2" /></element>
+		<element ref="white"><bounds x="6.3" y="6.7" width="4.7" height="0.2" /></element>
+		<element ref="white"><bounds x="15.9" y="6.7" width="9.2" height="0.2" /></element>
+		<element ref="white"><bounds x="30.1" y="6.7" width="9.2" height="0.2" /></element>
+		<element ref="white"><bounds x="44.1" y="6.7" width="4.7" height="0.2" /></element>
 
 		<!-- h4 -->
-		<bezel element="white"><bounds x="-1.2" y="10.2" width="5.1" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="11.0" y="10.2" width="4.7" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="20.4" y="10.2" width="14.3" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="39.4" y="10.2" width="4.7" height="0.2" /></bezel>
+		<element ref="white"><bounds x="-1.2" y="10.2" width="5.1" height="0.2" /></element>
+		<element ref="white"><bounds x="11.0" y="10.2" width="4.7" height="0.2" /></element>
+		<element ref="white"><bounds x="20.4" y="10.2" width="14.3" height="0.2" /></element>
+		<element ref="white"><bounds x="39.4" y="10.2" width="4.7" height="0.2" /></element>
 
 		<!-- h5 -->
-		<bezel element="white"><bounds x="-1.2" y="13.7" width="5.1" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="5.5" y="13.7" width="1" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="25.3" y="13.7" width="4.6" height="0.2" /></bezel>
-		<bezel element="white"><bounds x="48.6" y="13.7" width="1" height="0.2" /></bezel>
+		<element ref="white"><bounds x="-1.2" y="13.7" width="5.1" height="0.2" /></element>
+		<element ref="white"><bounds x="5.5" y="13.7" width="1" height="0.2" /></element>
+		<element ref="white"><bounds x="25.3" y="13.7" width="4.6" height="0.2" /></element>
+		<element ref="white"><bounds x="48.6" y="13.7" width="1" height="0.2" /></element>
 
 		<!-- h6 -->
-		<bezel element="white"><bounds x="7.3" y="17.2" width="40.5" height="0.2" /></bezel>
+		<element ref="white"><bounds x="7.3" y="17.2" width="40.5" height="0.2" /></element>
 
 		<!-- v0 -->
-		<bezel element="white"><bounds x="3.7" y="6.7" width="0.2" height="7.2" /></bezel>
+		<element ref="white"><bounds x="3.7" y="6.7" width="0.2" height="7.2" /></element>
 
 		<!-- v1 -->
-		<bezel element="white"><bounds x="6.3" y="-0.3" width="0.2" height="14.2" /></bezel>
+		<element ref="white"><bounds x="6.3" y="-0.3" width="0.2" height="14.2" /></element>
 
 		<!-- v2 -->
-		<bezel element="white"><bounds x="11.0" y="10.2" width="0.2" height="3.5" /></bezel>
+		<element ref="white"><bounds x="11.0" y="10.2" width="0.2" height="3.5" /></element>
 
 		<!-- v4 -->
-		<bezel element="white"><bounds x="20.4" y="-0.3" width="0.2" height="3.7" /></bezel>
-		<bezel element="white"><bounds x="20.4" y="6.7" width="0.2" height="3.7" /></bezel>
-		<bezel element="white"><bounds x="20.4" y="13.9" width="0.2" height="3.5" /></bezel>
+		<element ref="white"><bounds x="20.4" y="-0.3" width="0.2" height="3.7" /></element>
+		<element ref="white"><bounds x="20.4" y="6.7" width="0.2" height="3.7" /></element>
+		<element ref="white"><bounds x="20.4" y="13.9" width="0.2" height="3.5" /></element>
 
 		<!-- v7 -->
-		<bezel element="white"><bounds x="34.5" y="-0.3" width="0.2" height="3.7" /></bezel>
-		<bezel element="white"><bounds x="34.5" y="6.7" width="0.2" height="3.7" /></bezel>
-		<bezel element="white"><bounds x="34.5" y="13.9" width="0.2" height="3.5" /></bezel>
+		<element ref="white"><bounds x="34.5" y="-0.3" width="0.2" height="3.7" /></element>
+		<element ref="white"><bounds x="34.5" y="6.7" width="0.2" height="3.7" /></element>
+		<element ref="white"><bounds x="34.5" y="13.9" width="0.2" height="3.5" /></element>
 
 		<!-- v9 -->
-		<bezel element="white"><bounds x="43.9" y="10.2" width="0.2" height="3.5" /></bezel>
+		<element ref="white"><bounds x="43.9" y="10.2" width="0.2" height="3.5" /></element>
 
 		<!-- v10 -->
-		<bezel element="white"><bounds x="48.6" y="-0.3" width="0.2" height="14.2" /></bezel>
+		<element ref="white"><bounds x="48.6" y="-0.3" width="0.2" height="14.2" /></element>
 
 	</view>
 </mamelayout>
