@@ -23,6 +23,7 @@
 #include "luaengine.h"
 #include "natkeyboard.h"
 #include "uiinput.h"
+#include "cheat.h"
 #include "pluginopts.h"
 #include "softlist.h"
 #include "inputdev.h"
@@ -238,6 +239,17 @@ namespace
 			return (*this)(text.c_str());
 		}
 
+		const char *operator()(T value) const
+		{
+			auto iter = std::find_if(
+				m_map.begin(),
+				m_map.end(),
+				[value](const auto &x) { return x.second == value; });
+			return iter == m_map.end()
+				? ""
+				: iter->first;
+		}
+
 	private:
 		std::array<std::pair<const char *, T>, SIZE>    m_map;
 	};
@@ -273,6 +285,15 @@ static const enum_parser<ui::text_layout::text_justify, 3> s_text_justify_parser
 	{ "left", ui::text_layout::LEFT },
 	{ "right", ui::text_layout::RIGHT },
 	{ "center", ui::text_layout::CENTER },
+};
+
+
+static const enum_parser<script_state, 4> s_cheat_script_state_parser =
+{
+	{ "off", SCRIPT_STATE_OFF },
+	{ "on", SCRIPT_STATE_ON },
+	{ "run", SCRIPT_STATE_RUN },
+	{ "change", SCRIPT_STATE_CHANGE }
 };
 
 
@@ -2750,6 +2771,79 @@ void lua_engine::initialize()
 	ui_type.set("set_aggressive_input_focus", [](mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); });
 	sol().registry().set_usertype("ui", ui_type);
 
+/*	cheat_parameter
+ *
+ * manager:cheat().entries[index].parameter
+ * cheat_parameter.value
+ * cheat_parameter.minimum
+ * cheat_parameter.maximum
+ * cheat_paramater.step
+ * cheat_parameter.items
+ */
+
+	auto cheat_parameter_type = sol().registry().create_simple_usertype<cheat_parameter>("new", sol::no_constructor);
+	cheat_parameter_type.set("value", sol::property(&cheat_parameter::value, &cheat_parameter::set_value));
+	cheat_parameter_type.set("minimum", sol::property([](cheat_parameter &param) { return (uint64_t)param.minimum(); }));
+	cheat_parameter_type.set("maximum", sol::property([](cheat_parameter &param) { return (uint64_t)param.maximum(); }));
+	cheat_parameter_type.set("step", sol::property([](cheat_parameter &param) { return (uint64_t)param.step(); }));
+	cheat_parameter_type.set("items", sol::property([this](cheat_parameter &param) {
+		sol::table table = sol().create_table();
+		for (const cheat_parameter_item &item : param.itemlist())
+			table[(uint64_t) item.value()] = item.text();
+		return table;
+		}));
+	sol().registry().set_usertype("cheat_parameter", cheat_parameter_type);
+
+/*  cheat_entry library
+ *
+ * manager:cheat().entries[index]
+ * cheat_entry:activate()
+ * cheat_entry.state
+ * cheat_entry.has_run_script
+ * cheat_entry.has_on_script
+ * cheat_entry.has_off_script
+ * cheat_entry.has_change_script
+ * cheat_entry.description
+ * cheat_entry.comment
+ */
+
+	auto cheat_entry_type = sol().registry().create_simple_usertype<cheat_entry>("new", sol::no_constructor);
+	cheat_entry_type.set("activate", [](cheat_entry &cheat) { cheat.activate(); });
+	cheat_entry_type.set("state", sol::property(
+		[](cheat_entry &entry) { return s_cheat_script_state_parser(entry.state()); },
+		[](cheat_entry &entry, const char *state_string)
+		{
+			script_state state = s_cheat_script_state_parser(state_string);
+			entry.set_state(state);
+		}));
+	cheat_entry_type.set("has_run_script", sol::property(&cheat_entry::has_run_script));
+	cheat_entry_type.set("has_on_script", sol::property(&cheat_entry::has_on_script));
+	cheat_entry_type.set("has_off_script", sol::property(&cheat_entry::has_off_script));
+	cheat_entry_type.set("has_change_script", sol::property(&cheat_entry::has_change_script));
+	cheat_entry_type.set("description", sol::property(&cheat_entry::description));
+	cheat_entry_type.set("comment", sol::property(&cheat_entry::comment));
+	cheat_entry_type.set("parameter", sol::property(&cheat_entry::parameter));
+	sol().registry().set_usertype("cheat_entry", cheat_entry_type);
+
+/*  cheat_manager library
+ *
+ * manager:cheat()
+ * cheat:reload()
+ * cheat.entries
+ * cheat.enabled
+ */
+
+	auto cheat_type = sol().registry().create_simple_usertype<cheat_manager>("new", sol::no_constructor);
+	cheat_type.set("reload", [](cheat_manager &cheat) { cheat.reload(); });
+	cheat_type.set("enabled", sol::property(&cheat_manager::enabled, &cheat_manager::set_enable));
+	cheat_type.set("entries", sol::property([this](cheat_manager &cheat) {
+		sol::table table = sol().create_table();
+		int index = 1;
+		for (const std::unique_ptr<cheat_entry> &entry : cheat.entries())
+			table[index++] = entry.get();
+		return table;
+		}));
+	sol().registry().set_usertype("cheat", cheat_type);
 
 /*  device_state_entry library
  *
@@ -2995,6 +3089,7 @@ void lua_engine::initialize()
  * manager:options() - core options
  * manager:plugins() - plugin options
  * manager:ui() - mame ui manager
+ * manager:cheat() - cheat manager
  */
 
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
@@ -3014,7 +3109,8 @@ void lua_engine::initialize()
 				}
 				return table;
 			},
-			"ui", &mame_machine_manager::ui);
+			"ui", &mame_machine_manager::ui,
+			"cheat", &mame_machine_manager::cheat);
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
 }

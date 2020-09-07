@@ -77,6 +77,36 @@ private:
 };
 
 
+// ======================> cheat_parameter_item
+
+// a single item in a parameter item list
+class cheat_parameter_item
+{
+public:
+	// construction/destruction
+	cheat_parameter_item(const char *text, uint64_t value, util::xml::data_node::int_format valformat)
+		: m_text(text)
+		, m_value(value, valformat)
+	{
+	}
+
+	// copyable/movable
+	cheat_parameter_item(cheat_parameter_item const &) = default;
+	cheat_parameter_item(cheat_parameter_item &&) = default;
+	cheat_parameter_item &operator=(cheat_parameter_item const &) = default;
+	cheat_parameter_item &operator=(cheat_parameter_item &&) = default;
+
+	// getters
+	number_and_format const &value() const { return m_value; }
+	char const *text() const { return m_text.c_str(); }
+
+private:
+	// internal state
+	std::string         m_text;     // name of the item
+	number_and_format   m_value;    // value of the item
+};
+
+
 // ======================> cheat_parameter
 
 // a parameter for a cheat, which can be set in the UI
@@ -96,6 +126,14 @@ public:
 	bool is_minimum() const { return (m_itemlist.empty() ? m_minval : m_itemlist.front().value()) == m_value; }
 	bool is_maximum() const { return (m_itemlist.empty() ? m_maxval : m_itemlist.back().value()) == m_value; }
 
+	// accessors
+	uint64_t value() const { return m_value; }
+	void set_value(uint64_t new_value) { m_value = new_value; }
+	const number_and_format &minimum() const { return m_minval; }
+	const number_and_format &maximum() const { return m_maxval; }
+	const number_and_format &step() const { return m_stepval; }
+	const std::vector<cheat_parameter_item> &itemlist() const { return m_itemlist; }
+
 	// state setters
 	bool set_minimum_state();
 	bool set_prev_state();
@@ -105,40 +143,13 @@ public:
 	void save(emu_file &cheatfile) const;
 
 private:
-	// a single item in a parameter item list
-	class item
-	{
-	public:
-		// construction/destruction
-		item(const char *text, uint64_t value, util::xml::data_node::int_format valformat)
-			: m_text(text)
-			, m_value(value, valformat)
-		{
-		}
-
-		// copyable/movable
-		item(item const &) = default;
-		item(item &&) = default;
-		item &operator=(item const &) = default;
-		item &operator=(item &&) = default;
-
-		// getters
-		number_and_format const &value() const { return m_value; }
-		char const *text() const { return m_text.c_str(); }
-
-	private:
-		// internal state
-		std::string         m_text;     // name of the item
-		number_and_format   m_value;    // value of the item
-	};
-
 	// internal state
 	number_and_format   m_minval;       // minimum value
 	number_and_format   m_maxval;       // maximum value
 	number_and_format   m_stepval;      // step value
 	uint64_t            m_value;        // live value of the parameter
 	std::string         m_curtext;      // holding for a value string
-	std::vector<item>   m_itemlist;     // list of items
+	std::vector<cheat_parameter_item>   m_itemlist;     // list of items
 };
 
 
@@ -240,6 +251,7 @@ public:
 	script_state state() const { return m_state; }
 	const char *description() const { return m_description.c_str(); }
 	const char *comment() const { return m_comment.c_str(); }
+	cheat_parameter *parameter() const { return m_parameter.get(); }
 
 	// script detection
 	bool has_run_script() const { return (m_run_script != nullptr); }
@@ -264,6 +276,7 @@ public:
 
 	// actions
 	bool activate();
+	bool set_state(script_state newstate);
 	bool select_default_state();
 	bool select_previous_state();
 	bool select_next_state();
@@ -277,7 +290,6 @@ public:
 
 private:
 	// internal helpers
-	bool set_state(script_state newstate);
 	std::unique_ptr<cheat_script> &script_for_state(script_state state);
 
 	// internal state

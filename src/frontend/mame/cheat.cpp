@@ -160,7 +160,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		util::xml::data_node::int_format const format(itemnode->get_attribute_int_format("value"));
 
 		// allocate and append a new item
-		item &curitem(*m_itemlist.emplace(m_itemlist.end(), itemnode->get_value(), value, format));
+		cheat_parameter_item &curitem(*m_itemlist.emplace(m_itemlist.end(), itemnode->get_value(), value, format));
 
 		// ensure the maximum expands to suit
 		m_maxval = std::max(m_maxval, curitem.value());
@@ -186,7 +186,7 @@ const char *cheat_parameter::text()
 	{
 		// if not, we're an item cheat
 		m_curtext = string_format("??? (%u)", uint64_t(m_value));
-		for (item const &curitem : m_itemlist)
+		for (cheat_parameter_item const &curitem : m_itemlist)
 		{
 			if (curitem.value() == m_value)
 			{
@@ -223,7 +223,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	{
 		// iterate over items
 		cheatfile.printf(">\n");
-		for (item const &curitem : m_itemlist)
+		for (cheat_parameter_item const &curitem : m_itemlist)
 			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem.value().format().c_str(), curitem.text());
 		cheatfile.printf("\t\t</parameter>\n");
 	}
@@ -264,7 +264,7 @@ bool cheat_parameter::set_prev_state()
 	else
 	{
 		// if not, we're an item cheat
-		std::vector<item>::const_iterator it;
+		std::vector<cheat_parameter_item>::const_iterator it;
 		for (it = m_itemlist.begin(); (m_itemlist.end() != it) && (it->value() != m_value); ++it) { }
 		if (m_itemlist.begin() != it)
 			m_value = std::prev(it)->value();
@@ -293,7 +293,7 @@ bool cheat_parameter::set_next_state()
 	else
 	{
 		// if not, we're an item cheat
-		std::vector<item>::const_iterator it;
+		std::vector<cheat_parameter_item>::const_iterator it;
 		for (it = m_itemlist.begin(); (m_itemlist.end() != it) && (it->value() != m_value); ++it) { }
 		if ((m_itemlist.end() != it) && (m_itemlist.end() != ++it))
 			m_value = it->value();
