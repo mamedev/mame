@@ -28,7 +28,6 @@
     ----------------
         Xilinx XC5210 FPGA
         Xilinx XC5204 FPGA
-		
 
 
 Konami 'NWK-TR' Hardware
@@ -42,8 +41,6 @@ Racing Jam                Konami   1998
 Racing Jam : Chapter 2    Konami   1998
 Thrill Drive              Konami   1998
 
-Note: Thrill Drive was released as a conversion kit for Racing Jam. The kit came with a rom swap for CPU and CG boards
-and a different network board containing a SOIC8 serial pic.
 
 PCB Layouts
 -----------
@@ -916,7 +913,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[0]->set_cpu_tag(m_dsp);
 	m_voodoo[0]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_0));
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_screen_tag("rscreen");
@@ -928,7 +925,7 @@ void nwktr_state::nwktr(machine_config &config)
 	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	lscreen.set_screen_update(FUNC(nwktr_state::screen_update_lscreen));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for unused screen from slave CG board
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for unused/debug screen from slave CG board
 	// resolution currently unknown, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	rscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	rscreen.set_screen_update(FUNC(nwktr_state::screen_update_rscreen));
@@ -994,7 +991,7 @@ void nwktr_state::init_racingj()
 void nwktr_state::init_thrilld()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base()); //...while this is not the case for thrilld
+	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base()); // ...while this is not the case for thrilld
 
 	init_nwktr();
 }
