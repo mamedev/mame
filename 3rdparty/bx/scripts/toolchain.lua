@@ -75,7 +75,6 @@ function toolchain(_buildDir, _libDir)
 			{ "orbis",           "Orbis"                      },
 			{ "riscv",           "RISC-V"                     },
 			{ "rpi",             "RaspberryPi"                },
-			{ "haiku",           "Haiku"                      },
 		},
 	}
 
