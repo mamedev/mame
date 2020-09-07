@@ -135,11 +135,14 @@ namespace netlist
 
 		// This is for core macro libraries
 		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h", content);
-#if 1
+#if 0
 		NETLIST_NAME(base_lib)(m_setup->parser());
+		//m_setup->parser().register_source<source_pattern_t>("../macro/modules/nlmod_{1}.cpp");
+		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
 		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp");
+		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp");
 		m_setup->parser().include("base_lib");
 #else
 		// FIXME: This is very slow - need optimized parsing scanning

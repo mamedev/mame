@@ -82,8 +82,8 @@ public:
 	template <typename T>
 	void write_sample_int(double sample)
 	{
-		const auto mmax(static_cast<double>(plib::numeric_limits<T>::max()));
-		const auto mmin(static_cast<double>(plib::numeric_limits<T>::min()));
+		constexpr auto mmax(static_cast<double>(plib::numeric_limits<T>::max()));
+		constexpr auto mmin(static_cast<double>(plib::numeric_limits<T>::min()));
 
 		sample *= mmax;
 		sample = std::max(mmin, sample);

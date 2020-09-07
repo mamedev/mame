@@ -116,7 +116,7 @@ DEPENDCC=$(CC)
 
 
 ifndef FAST
-FAST=0
+FAST=1
 endif
 
 ifeq ($(FAST),1)
@@ -138,6 +138,7 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/plib \
 			$(OBJ)/devices \
 			$(OBJ)/macro \
+			$(OBJ)/macro/modules \
 			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
@@ -147,6 +148,7 @@ DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
 DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
+DEVSOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -287,7 +289,8 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code" \
+		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
+		-Wno-missing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
 clang-5:

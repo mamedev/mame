@@ -45,6 +45,7 @@ namespace netlist
 		void net_include();
 		void net_local_source();
 		void net_external_source();
+		void net_lib_entry(bool is_local);
 		void net_register_dev();
 		void net_truthtable_start(const pstring &nlname);
 
@@ -75,6 +76,7 @@ namespace netlist
 		token_id_t m_tok_EXTERNAL_SOURCE;
 		token_id_t m_tok_LOCAL_SOURCE;
 		token_id_t m_tok_LOCAL_LIB_ENTRY;
+		token_id_t m_tok_EXTERNAL_LIB_ENTRY;
 		token_id_t m_tok_TRUTHTABLE_START;
 		token_id_t m_tok_TRUTHTABLE_END;
 		token_id_t m_tok_TRUTHTABLE_ENTRY;
