@@ -154,13 +154,15 @@ ROM_END
 
 void bbl380_state::init_ragc153()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
+#if 0 // probably done in software or by hardware DMA
+	uint8_t *ROM = memregion("spi")->base();
+	int size = memregion("spi")->bytes();
 
 	for (int i = 0; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0xe4;
 	}
+#endif
 }
 
 CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
