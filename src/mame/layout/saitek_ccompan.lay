@@ -580,13 +580,14 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-14" right="120" top="-1" bottom="88" />
 
-		<element ref="black2"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>
 		<element ref="cwhite"><bounds x="-1" y="-1" width="88.5" height="89" /></element>
-		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
 		<element ref="cwhite"><bounds x="87" y="-1" width="33" height="89" /></element>
 		<group ref="panel"><bounds x="88" y="28.7" width="31" height="59" /></group>
+
+		<element ref="black2"><bounds x="3.7" y="2.7" width="80.6" height="80.6" /></element>
+		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
 		<element ref="text_8"><bounds x="-0.4" y="7"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="-0.4" y="17" width="2" height="2" /></element>

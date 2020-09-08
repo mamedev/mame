@@ -1116,7 +1116,8 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	{
 		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
-		resolve_bounds(local, m_groupnode, groupmap, seen, true, false, false, true);
+		bool empty;
+		resolve_bounds(local, m_groupnode, groupmap, seen, empty, false, false, true);
 	}
 	seen.pop_back();
 }
@@ -1126,8 +1127,8 @@ void layout_group::resolve_bounds(
 		util::xml::data_node const &parentnode,
 		group_map &groupmap,
 		std::vector<layout_group const *> &seen,
-		bool empty,
-		bool collection,
+		bool &empty,
+		bool vistoggle,
 		bool repeat,
 		bool init)
 {
@@ -1242,7 +1243,7 @@ void layout_group::resolve_bounds(
 		m_bounds_resolved = resolved;
 	}
 
-	if (!collection && !repeat)
+	if (!vistoggle && !repeat)
 		m_bounds_resolved = true;
 }
 

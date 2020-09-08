@@ -132,7 +132,6 @@ ROMs -
 #include "emu.h"
 #include "includes/psikyo4.h"
 
-#include "rendlay.h"
 #include "speaker.h"
 
 
