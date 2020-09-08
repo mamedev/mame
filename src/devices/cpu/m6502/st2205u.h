@@ -79,6 +79,8 @@ protected:
 	virtual u8 st2xxx_lckr_mask() const override { return 0x3f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0xff; }
 	virtual unsigned st2xxx_lfr_clocks() const override;
+	virtual bool st2xxx_has_spi() const override { return true; }
+	virtual bool st2xxx_spi_iis() const override { return true; }
 	virtual u8 st2xxx_uctr_mask() const override { return 0x3f; }
 	virtual u8 st2xxx_bctr_mask() const override { return 0xb7; }
 

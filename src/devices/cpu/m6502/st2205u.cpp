@@ -155,6 +155,10 @@ void st2205u_device::device_start()
 	state_add(ST_LFRA, "LFRA", m_lfra).mask(0x3f);
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
+	state_add(ST_SCTR, "SCTR", m_sctr);
+	state_add(ST_SCKR, "SCKR", m_sckr).mask(0x7f);
+	state_add(ST_SSR, "SSR", m_ssr).mask(0x77);
+	state_add(ST_SMOD, "SMOD", m_smod).mask(0x0f);
 	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
 	state_add(ST_USR, "USR", m_usr).mask(0x7f);
 	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
@@ -731,6 +735,10 @@ void st2205u_device::int_map(address_map &map)
 	map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+	map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
+	map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
+	map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
+	map(0x0055, 0x0055).rw(FUNC(st2205u_device::smod_r), FUNC(st2205u_device::smod_w));
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));
 	map(0x0058, 0x0058).rw(FUNC(st2205u_device::dptrl_r), FUNC(st2205u_device::dptrl_w));
 	map(0x0059, 0x0059).rw(FUNC(st2205u_device::dptrh_r), FUNC(st2205u_device::dptrh_w));
