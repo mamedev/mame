@@ -33,7 +33,7 @@
 #include "emu.h"
 #include "st2205u.h"
 
-DEFINE_DEVICE_TYPE(ST2205U, st2205u_device, "st2205", "Sitronix ST2205U Integrated Microcontroller")
+DEFINE_DEVICE_TYPE(ST2205U, st2205u_device, "st2205u", "Sitronix ST2205U Integrated Microcontroller")
 
 st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: st2xxx_device(mconfig, ST2205U, tag, owner, clock,
@@ -110,9 +110,9 @@ void st2205u_device::device_start()
 	save_common_registers();
 	init();
 
-	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x87ff);
-	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x87ff);
-	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x8fff);
+	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x8fff);
+	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x8fff);
+	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x87ff);
 	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*mintf).brr).mask(0x9fff);
 	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
