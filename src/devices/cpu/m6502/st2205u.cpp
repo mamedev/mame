@@ -42,6 +42,8 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 					true)
 	, m_btc(0)
 	, m_tc_12bit{0}
+	, m_count_12bit{0}
+	, m_timer_12bit{nullptr}
 	, m_t4c(0)
 	, m_tien(0)
 	, m_dac_fifo{{0}}
@@ -78,11 +80,17 @@ void st2205u_device::device_start()
 	intf->irq_service = false;
 	intf->ram = make_unique_clear<u8[]>(0x8000);
 
+	m_timer_12bit[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t0_interrupt), this));
+	m_timer_12bit[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t1_interrupt), this));
+	m_timer_12bit[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t2_interrupt), this));
+	m_timer_12bit[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t3_interrupt), this));
+
 	init_base_timer(0x0040);
 	init_lcd_timer(0x0080);
 
 	save_item(NAME(m_btc));
 	save_item(NAME(m_tc_12bit));
+	save_item(NAME(m_count_12bit));
 	save_item(NAME(m_t4c));
 	save_item(NAME(m_tien));
 	save_item(NAME(m_dac_fifo));
@@ -134,6 +142,8 @@ void st2205u_device::device_start()
 	state_add(ST_BTEN, "BTEN", m_bten, [this](u8 data) { bten_w(data); });
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
+	for (int i = 0; i < 4; i++)
+		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
@@ -190,6 +200,9 @@ void st2205u_device::device_reset()
 	m_btc = 0;
 
 	std::fill(std::begin(m_tc_12bit), std::end(m_tc_12bit), 0);
+	std::fill(std::begin(m_count_12bit), std::end(m_count_12bit), 0);
+	for (auto &timer : m_timer_12bit)
+		timer->adjust(attotime::never);
 	m_t4c = 0;
 	m_tien = 0;
 
@@ -391,39 +404,6 @@ void st2205u_device::btc_w(u8 data)
 	m_btc = data;
 }
 
-u8 st2205u_device::tc_12bit_r(offs_t offset)
-{
-	return (m_tc_12bit[offset >> 1] >> (BIT(offset, 0) ? 8 : 0)) & 0x00ff;
-}
-
-void st2205u_device::tc_12bit_w(offs_t offset, u8 data)
-{
-	if (BIT(offset, 0))
-		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0x00ff) | u16(data) << 8;
-	else
-		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0xff00) | data;
-}
-
-u8 st2205u_device::t4c_r()
-{
-	return m_t4c;
-}
-
-void st2205u_device::t4c_w(u8 data)
-{
-	m_t4c = data;
-}
-
-u8 st2205u_device::tien_r()
-{
-	return m_tien;
-}
-
-void st2205u_device::tien_w(u8 data)
-{
-	m_tien = data;
-}
-
 u8 st2205u_device::psg_r(offs_t offset)
 {
 	u8 index = 0;
@@ -487,10 +467,157 @@ void st2205u_device::volm_w(offs_t offset, u8 data)
 
 void st2205u_device::st2xxx_tclk_start()
 {
+	for (int t = 0; t < 4; t++)
+		if (BIT(m_tien, t) && (m_tc_12bit[t] & 0x7000) < 0x6000)
+			timer_start_from_tclk(t);
 }
 
 void st2205u_device::st2xxx_tclk_stop()
 {
+	for (int t = 0; t < 4; t++)
+	{
+		if (BIT(m_tien, t) && (m_tc_12bit[t] & 0x7000) < 0x6000)
+		{
+			m_count_12bit[t] = timer_12bit_count(t);
+			m_timer_12bit[t]->adjust(attotime::never);
+		}
+	}
+}
+
+u32 st2205u_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 6);
+	if (mode < 3)
+		return 2 << mode;
+	else if (mode == 3)
+		return 32;
+	else if (mode == 4)
+		return 1024;
+	else
+		return 4096;
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t0_interrupt)
+{
+	m_ireq |= 0x0002;
+	update_irq_state();
+	timer_12bit_process(0);
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t1_interrupt)
+{
+	m_ireq |= 0x0004;
+	update_irq_state();
+	timer_12bit_process(1);
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t2_interrupt)
+{
+	m_ireq |= 0x0008;
+	update_irq_state();
+	timer_12bit_process(2);
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t3_interrupt)
+{
+	m_ireq |= 0x0010;
+	update_irq_state();
+	timer_12bit_process(3);
+}
+
+void st2205u_device::timer_12bit_process(int t)
+{
+	// Bit 7 of TnCH allows auto-reload
+	m_count_12bit[t] = BIT(m_tc_12bit[t], 15) ? m_tc_12bit[t] & 0x0fff : 0;
+
+	u8 tck = (m_tc_12bit[t] & 0x7000) >> 12;
+	if (tck < 6)
+		m_timer_12bit[t]->adjust(cycles_to_attotime((0x1000 - m_count_12bit[t]) * tclk_pres_div(tck)));
+	else if (tck == 7 && BIT(t, 0))
+		m_timer_12bit[t]->adjust(attotime::from_ticks(0x1000 - m_count_12bit[t], 32768));
+
+	// TODO: BGRCK & INTX sources
+}
+
+u16 st2205u_device::timer_12bit_count(int t) const
+{
+	u16 count = m_count_12bit[t];
+	if (BIT(m_tien, t))
+	{
+		u8 tck = (m_tc_12bit[t] & 0x7000) >> 12;
+		if (BIT(m_prs, 6) && tck < 6)
+			count = 0x0fff - (attotime_to_cycles(m_timer_12bit[t]->remaining()) / tclk_pres_div(tck));
+		else if (tck == 7 && BIT(t, 0))
+			count = 0x0fff - m_timer_12bit[t]->remaining().as_ticks(32768);
+	}
+
+	return count & 0x0fff;
+}
+
+void st2205u_device::timer_start_from_tclk(int t)
+{
+	u32 div = tclk_pres_div((m_tc_12bit[t] & 0x7000) >> 12);
+	m_timer_12bit[t]->adjust(cycles_to_attotime((0x0fff - m_count_12bit[t]) * div + div - (pres_count() & (div - 1))));
+}
+
+void st2205u_device::timer_start_from_oscx(int t)
+{
+	m_timer_12bit[t]->adjust(attotime::from_ticks(0x1000 - m_count_12bit[t], 32768));
+}
+
+u8 st2205u_device::tc_12bit_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return (timer_12bit_count(offset >> 1) | (m_tc_12bit[offset >> 1] & 0xf000)) >> 8;
+	else
+		return timer_12bit_count(offset >> 1) & 0x00ff;
+}
+
+void st2205u_device::tc_12bit_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0x00ff) | u16(data) << 8;
+	else
+		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0xff00) | data;
+}
+
+u8 st2205u_device::t4c_r()
+{
+	return m_t4c;
+}
+
+void st2205u_device::t4c_w(u8 data)
+{
+	m_t4c = data;
+}
+
+u8 st2205u_device::tien_r()
+{
+	return m_tien;
+}
+
+void st2205u_device::tien_w(u8 data)
+{
+	for (int t = 0; t < 4; t++)
+	{
+		if (BIT(m_tien, t) && !BIT(data, t))
+		{
+			m_count_12bit[t] = timer_12bit_count(t);
+			m_timer_12bit[t]->adjust(attotime::never);
+		}
+		else if (!BIT(m_tien, t) && BIT(data, t))
+		{
+			m_count_12bit[t] = m_tc_12bit[t] & 0x0fff;
+
+			u8 tck = (m_tc_12bit[t] & 0x7000) >> 12;
+			if (BIT(m_prs, 6) && tck < 6)
+				timer_start_from_tclk(t);
+			else if (tck == 7 && BIT(t, 0))
+				timer_start_from_oscx(t);
+		}
+	}
+
+	m_tien = data;
 }
 
 unsigned st2205u_device::st2xxx_lfr_clocks() const

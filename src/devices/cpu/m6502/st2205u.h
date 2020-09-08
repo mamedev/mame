@@ -116,6 +116,15 @@ private:
 	void brrh_w(u8 data);
 	u8 btc_r();
 	void btc_w(u8 data);
+	u32 tclk_pres_div(u8 mode) const;
+	TIMER_CALLBACK_MEMBER(t0_interrupt);
+	TIMER_CALLBACK_MEMBER(t1_interrupt);
+	TIMER_CALLBACK_MEMBER(t2_interrupt);
+	TIMER_CALLBACK_MEMBER(t3_interrupt);
+	void timer_12bit_process(int t);
+	u16 timer_12bit_count(int t) const;
+	void timer_start_from_tclk(int t);
+	void timer_start_from_oscx(int t);
 	u8 tc_12bit_r(offs_t offset);
 	void tc_12bit_w(offs_t offset, u8 data);
 	u8 t4c_r();
@@ -173,6 +182,8 @@ private:
 
 	u8 m_btc;
 	u16 m_tc_12bit[4];
+	u16 m_count_12bit[4];
+	emu_timer *m_timer_12bit[4];
 	u8 m_t4c;
 	u8 m_tien;
 	u16 m_dac_fifo[4][16];

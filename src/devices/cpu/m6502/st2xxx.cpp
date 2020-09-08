@@ -441,19 +441,6 @@ void st2xxx_device::btclr_all_w(u8 data)
 		m_btsr = 0;
 }
 
-u32 st2xxx_device::tclk_pres_div(u8 mode) const
-{
-	assert(mode < 8);
-	if (mode == 0)
-		return 0x10000;
-	else if (mode < 4)
-		return 0x20000 >> (mode * 2);
-	else if (mode == 4)
-		return 0x100;
-	else
-		return 0x8000 >> (mode * 2);
-}
-
 u16 st2xxx_device::pres_count() const
 {
 	return (m_pres_base + ((m_prs & 0x60) == 0x40 ? attotime_to_cycles(machine().time() - m_pres_started) : 0));

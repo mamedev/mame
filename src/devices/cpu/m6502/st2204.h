@@ -82,6 +82,7 @@ private:
 		u16 dmr;
 	};
 
+	u32 tclk_pres_div(u8 mode) const;
 	TIMER_CALLBACK_MEMBER(t0_interrupt);
 	TIMER_CALLBACK_MEMBER(t1_interrupt);
 	void timer_start_from_tclk(int t);

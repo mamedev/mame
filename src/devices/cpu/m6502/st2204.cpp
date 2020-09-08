@@ -281,6 +281,19 @@ unsigned st2204_device::st2xxx_bt_divider(int n) const
 		return 0;
 }
 
+u32 st2204_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 8);
+	if (mode == 0)
+		return 0x10000;
+	else if (mode < 4)
+		return 0x20000 >> (mode * 2);
+	else if (mode == 4)
+		return 0x100;
+	else
+		return 0x8000 >> (mode * 2);
+}
+
 TIMER_CALLBACK_MEMBER(st2204_device::t0_interrupt)
 {
 	m_ireq |= 0x004;
