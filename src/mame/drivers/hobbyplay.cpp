@@ -5,6 +5,17 @@
 Skeleton driver for early 80's slot machines manufactured by Hobby Play.
 Hobby Play did about eight different machines, but they're mostly unknown.
 
+Most Hobby Play slot machines (Gran Gol, etc.) use three 5x7 dot-matrix displays:
+
+  o o o o o    o o o o o    o o o o o
+  o o o o o    o o o o o    o o o o o
+  o o o o o    o o o o o    o o o o o
+  o o o o o    o o o o o    o o o o o
+  o o o o o    o o o o o    o o o o o
+  o o o o o    o o o o o    o o o o o
+  o o o o o    o o o o o    o o o o o
+
+
 PCB marked Hobby Play CIC 003 B
 
 Z80 CPU
