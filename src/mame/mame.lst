@@ -9714,6 +9714,7 @@ c64cp                           // Commodore 64C (PAL)
 c64g                            // Commodore 64G (PAL)
 c64gs                           // Commodore 64 Games System
 c64p                            // Commodore 64 (PAL)
+clipper                         //
 dx64                            // Commodore DX-64 - Prototype
 edu64                           // Commodore Educator 64
 pet64                           // Commodore PET 64

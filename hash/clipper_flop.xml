@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="clipper_flop" description="PDC Clipper disks">
+	<software name="system">
+		<description>System</description>
+		<year>1984</year>
+		<publisher>Professional Data Computer</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1.d64" size="174848" crc="0d179f77" sha1="3c40739a392efd2758f4ad9f8239cd38b4d69172"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="2.d64" size="174848" crc="3fe1ff92" sha1="fd80ea019c307e4a5f8dff1d4fce0d00017796cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="3.d64" size="174848" crc="530ad6ef" sha1="14d97c707438ddd4471d997202883d787b3926ea"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="4.d64" size="174848" crc="176883d9" sha1="94a473032073dc7e973a9c79aacc30ff4a812fcf"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
