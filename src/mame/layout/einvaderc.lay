@@ -23,8 +23,6 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="20" top="4.6" bottom="33.6" />
-
 		<collection name="Score Display">
 			<element ref="static_white"><bounds x="6.6" y="4.59" width="6.8" height="3.81" /></element>
 			<element ref="static_black"><bounds x="6.8" y="4.8" width="6.4" height="3.4" /></element>
