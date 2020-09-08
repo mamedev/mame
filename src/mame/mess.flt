@@ -253,7 +253,6 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
-emate.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
@@ -646,6 +645,7 @@ newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
+newton.cpp
 next.cpp
 nforcepc.cpp
 ngen.cpp

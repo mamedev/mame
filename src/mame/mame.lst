@@ -13043,9 +13043,6 @@ elf2                            //
 @source:elwro800.cpp
 elwro800                        //
 
-@source:emate.cpp
-emate                           // (c) 1997 Apple Computer
-
 @source:embargo.cpp
 embargo                         //
 
@@ -32242,6 +32239,18 @@ nws1580                         // Sony NEWS NWS-1580
 
 @source:news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
+
+@source:newton.cpp
+newtnotp
+newtonmp
+spi7000
+mp110
+mp120
+motmarco
+mp130
+emate
+mp2000
+mp2100
 
 @source:next.cpp
 next                            //
