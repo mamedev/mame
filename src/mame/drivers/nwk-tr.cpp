@@ -922,12 +922,12 @@ void nwktr_state::nwktr(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 001604 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
-	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
+	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
 	lscreen.set_screen_update(FUNC(nwktr_state::screen_update_lscreen));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for unused/debug screen from slave CG board
 	// resolution currently unknown, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
-	rscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
+	rscreen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
 	rscreen.set_screen_update(FUNC(nwktr_state::screen_update_rscreen));
 
 	PALETTE(config, m_palette).set_entries(65536);
