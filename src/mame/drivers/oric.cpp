@@ -17,19 +17,7 @@
     This driver originally by Paul Cook, rewritten by Kevin Thacker,
     re-rewritten by Olivier Galibert.
 
-    TODO
-    - Double-height characters don't seem to work (at least inside Basic).
-    - MT 06415
-    - MT 06438
-    - MT 05744
-    - Oric1 has numerous extra issues, but these are most likely due to bugs in the romset used.
-    --- Should say CAPS at start, but it doesn't appear until F2 pressed, or ^T twice
-    --- If CHR$(4) preceeds a double-height attribute, we should get double-height. Not working.
-    --- Protected column (^I) inconsistent
-    --- When printing with attributes:
-      - the foreground is always black, ignoring the chosen colour
-      - the background always goes black unless you specify something else.
-      - which means the examples in the user manual fail
+
 
 *****************************************************************************************************/
 
