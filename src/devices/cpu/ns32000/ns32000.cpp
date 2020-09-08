@@ -769,7 +769,7 @@ void ns32000_device::execute_run()
 						}
 					}
 					SP = m_fp;
-					m_fp = space(0).read_word_unaligned(SP);
+					m_fp = space(0).read_dword_unaligned(SP);
 					SP += 4;
 				}
 				m_pc += bytes;
