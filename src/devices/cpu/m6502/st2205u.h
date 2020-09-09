@@ -190,8 +190,10 @@ private:
 	u8 m_tien;
 	u16 m_dac_fifo[4][16];
 	u8 m_fifo_filled[4];
+	u8 m_fifo_pos[4];
 	u8 m_psgc;
 	u8 m_psgm;
+	u8 m_psg_on;
 	u8 m_psg_vol[4];
 	u8 m_psg_volm[2];
 	u8 m_lbuf;

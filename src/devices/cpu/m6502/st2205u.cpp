@@ -48,8 +48,10 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	, m_tien(0)
 	, m_dac_fifo{{0}}
 	, m_fifo_filled{0}
+	, m_fifo_pos{0}
 	, m_psgc(0)
 	, m_psgm(0)
+	, m_psg_on(0)
 	, m_psg_vol{0}
 	, m_psg_volm{0}
 	, m_lbuf(0)
@@ -96,8 +98,10 @@ void st2205u_device::device_start()
 	save_item(NAME(m_tien));
 	save_item(NAME(m_dac_fifo));
 	save_item(NAME(m_fifo_filled));
+	save_item(NAME(m_fifo_pos));
 	save_item(NAME(m_psgc));
 	save_item(NAME(m_psgm));
+	save_item(NAME(m_psg_on));
 	save_item(NAME(m_psg_vol));
 	save_item(NAME(m_psg_volm));
 	save_item(NAME(m_lbuf));
@@ -208,8 +212,10 @@ void st2205u_device::device_reset()
 	m_tien = 0;
 
 	std::fill(std::begin(m_fifo_filled), std::end(m_fifo_filled), 0);
+	std::fill(std::begin(m_fifo_pos), std::end(m_fifo_pos), 0);
 	m_psgc = 0;
 	m_psgm = 0;
+	m_psg_on = 0;
 	std::fill(std::begin(m_psg_vol), std::end(m_psg_vol), 0);
 	std::fill(std::begin(m_psg_volm), std::end(m_psg_volm), 0);
 
@@ -407,7 +413,7 @@ void st2205u_device::btc_w(u8 data)
 
 u8 st2205u_device::psg_r(offs_t offset)
 {
-	u8 index = 0;
+	u8 index = m_fifo_pos[offset >> 1];
 	if (BIT(offset, 0))
 	{
 		bool fwra = m_fifo_filled[offset >> 1] < 8;
@@ -421,7 +427,7 @@ void st2205u_device::psg_w(offs_t offset, u8 data)
 {
 	if (m_fifo_filled[offset >> 1] < 16)
 	{
-		u8 index = m_fifo_filled[offset >> 1]++;
+		u8 index = (m_fifo_pos[offset >> 1] + m_fifo_filled[offset >> 1]++) & 15;
 		m_dac_fifo[offset >> 1][index] = data | (BIT(offset, 0) ? 0x100 : 0);
 	}
 }
@@ -434,6 +440,7 @@ u8 st2205u_device::psgc_r()
 void st2205u_device::psgc_w(u8 data)
 {
 	m_psgc = data;
+	m_psg_on &= (data & 0xf0) >> 4;
 }
 
 u8 st2205u_device::psgm_r()
@@ -500,34 +507,53 @@ u32 st2205u_device::tclk_pres_div(u8 mode) const
 
 TIMER_CALLBACK_MEMBER(st2205u_device::t0_interrupt)
 {
-	m_ireq |= 0x0002;
-	update_irq_state();
 	timer_12bit_process(0);
 }
 
 TIMER_CALLBACK_MEMBER(st2205u_device::t1_interrupt)
 {
-	m_ireq |= 0x0004;
-	update_irq_state();
 	timer_12bit_process(1);
 }
 
 TIMER_CALLBACK_MEMBER(st2205u_device::t2_interrupt)
 {
-	m_ireq |= 0x0008;
-	update_irq_state();
 	timer_12bit_process(2);
 }
 
 TIMER_CALLBACK_MEMBER(st2205u_device::t3_interrupt)
 {
-	m_ireq |= 0x0010;
-	update_irq_state();
 	timer_12bit_process(3);
 }
 
 void st2205u_device::timer_12bit_process(int t)
 {
+	if (BIT(m_psgc, t + 4))
+	{
+		if (BIT(m_psg_on, t))
+			m_psg_on &= ~(1 << t);
+		else if (m_fifo_filled[t] != 0)
+		{
+			m_psg_on |= 1 << t;
+
+			u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
+			if (BIT(m_psgm, 2 * t + 1))
+				logerror("Playing ADPCM sample %c%02X on channel %d\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, t);
+			else
+				logerror("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
+
+			--m_fifo_filled[t];
+			m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;
+		}
+	}
+	// TODO: PCM has its own FIFO
+
+	// Timer interrupt is triggered when FIFO has more than 8 empty bytes
+	if (m_fifo_filled[t] < 8)
+	{
+		m_ireq |= 0x0002 << t;
+		update_irq_state();
+	}
+
 	// Bit 7 of TnCH allows auto-reload
 	m_count_12bit[t] = BIT(m_tc_12bit[t], 15) ? m_tc_12bit[t] & 0x0fff : 0;
 
