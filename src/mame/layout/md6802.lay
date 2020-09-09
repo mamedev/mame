@@ -179,7 +179,7 @@ Didact MD6802 layout
 	</group>
 
 	<group name="keyboard">
-		<backdrop element="pcb_color"><bounds left="0" top="0" right="289" bottom="327"/></backdrop>
+		<element ref="pcb_color"><bounds left="0" top="0" right="289" bottom="327"/></element>
 		<element ref="text_md6802_kb"><bounds x="20" y="10" width="112" height="8" /></element>
 		<element ref="text_terminal"><bounds x="10" y="208" width="26" height="6" /></element>
 
@@ -271,7 +271,7 @@ Didact MD6802 layout
 	</group>
 
 	<group name="cpuboard">
-		<backdrop element="pcb_color"><bounds left="0" top="0" right="390" bottom="242"/></backdrop>
+		<element ref="pcb_color"><bounds left="0" top="0" right="390" bottom="242"/></element>
 		<element ref="text_md6802_cpu"><bounds x="25" y="22" width="8" height="75" /><orientation rotate="90" /></element>
 
 		<group ref="eurofem"><bounds x="267" y="12" height="228" width="24" /><orientation rotate="90" /></group>
@@ -321,7 +321,7 @@ Didact MD6802 layout
 	</group>
 
 	<group name="breadboard">
-		<backdrop element="bb_color"><bounds left="0" top="0" right="1300" bottom="3720"/></backdrop>
+		<element ref="bb_color"><bounds left="0" top="0" right="1300" bottom="3720"/></element>
 		<repeat count="47">
 			<param name="y" start="400" increment="62" />
 			<param name="yh" start="405" increment="62" />
@@ -373,7 +373,7 @@ Didact MD6802 layout
 	</group>
 
 	<view name="Base Artwork">
-		<backdrop element="black"><bounds left="0" top="0" right="1211" bottom="551"/></backdrop>
+		<bounds left="0" top="0" right="1211" bottom="551"/>
 		<group ref="keyboard"><bounds x="0" y="31" width="400" height="450" /></group>
 		<group ref="cpuboard"><bounds x="405" y="92" width="540" height="338" /></group>
 		<group ref="breadboard"><bounds x="951" y="0" width="191" height="551" /></group>
