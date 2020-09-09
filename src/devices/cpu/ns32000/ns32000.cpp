@@ -214,7 +214,7 @@ s32 ns32000_device::displacement(unsigned &bytes)
 	return disp;
 }
 
-void ns32000_device::decode(addr_mode *mode, unsigned size, unsigned &bytes)
+void ns32000_device::decode(addr_mode *mode, unsigned imm_size, unsigned &bytes)
 {
 	bool scaled[] = { false, false };
 
@@ -272,11 +272,11 @@ void ns32000_device::decode(addr_mode *mode, unsigned size, unsigned &bytes)
 			break;
 		case 0x14:
 			// immediate
-			switch (size)
+			switch (imm_size)
 			{
-			case 0: mode[i].base = space(0).read_byte(m_pc + bytes); bytes += 1; break;
-			case 1: mode[i].base = swapendian_int16(space(0).read_word_unaligned(m_pc + bytes)); bytes += 2; break;
-			case 3: mode[i].base = swapendian_int32(space(0).read_dword_unaligned(m_pc + bytes)); bytes += 4; break;
+			case SIZE_B: mode[i].base = space(0).read_byte(m_pc + bytes); bytes += 1; break;
+			case SIZE_W: mode[i].base = swapendian_int16(space(0).read_word_unaligned(m_pc + bytes)); bytes += 2; break;
+			case SIZE_D: mode[i].base = swapendian_int32(space(0).read_dword_unaligned(m_pc + bytes)); bytes += 4; break;
 			}
 			mode[i].type = IMM;
 			break;
@@ -1258,8 +1258,8 @@ void ns32000_device::execute_run()
 				{
 					mode[1].rmw();
 
-					u32 const src1 = gen_read(mode[0], size);
-					u32 const src2 = gen_read(mode[1], size);
+					u32 const src1 = gen_read(mode[0], size) & size_mask[size];
+					u32 const src2 = gen_read(mode[1], size) & size_mask[size];
 
 					u32 const dest = src2 - src1 - (m_psr & PSR_C);
 					flags(src1, src2, dest, size, true);
@@ -1483,7 +1483,8 @@ void ns32000_device::execute_run()
 				addr_mode mode[] = { addr_mode((opword >> 11) & 31), addr_mode((opword >> 6) & 31) };
 				unsigned const size = opword & 3;
 
-				decode(mode, size, bytes);
+				// byte-size immediates for ROT, ASH and LSH
+				decode(mode, ((opword >> 2) & 10) ? size : SIZE_B, bytes);
 
 				switch ((opword >> 2) & 15)
 				{
@@ -1643,7 +1644,7 @@ void ns32000_device::execute_run()
 					//      gen,gen
 					//      read.i,write.i
 					{
-						u32 const src = gen_read(mode[0], size) & size_mask[size];
+						u32 const src = gen_read(mode[0], size);
 
 						gen_write(mode[1], size, src ^ 1U);
 					}

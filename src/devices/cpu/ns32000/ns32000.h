@@ -67,7 +67,7 @@ private:
 
 	// instruction decoding helpers
 	s32 displacement(unsigned &bytes);
-	void decode(addr_mode *mode, unsigned size, unsigned &bytes);
+	void decode(addr_mode *mode, unsigned imm_size, unsigned &bytes);
 
 	// operand read/write helpers
 	u32 ea(addr_mode const mode);
