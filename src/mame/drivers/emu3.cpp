@@ -6,8 +6,8 @@
 
 
     WIP
-     - hangs "checking floppy", probably ns32016 cpu bug
-     - debug port should activate on NMI
+     - scsi scan fails, selection code seems buggy
+     - debug port serial parameters aren't correct
 
 ***********************************************************************************************************************************/
 
@@ -49,7 +49,7 @@ public:
 		, m_lcdc(*this, "lcdc")
 		, m_fdc(*this, "fdc")
 		, m_fdd(*this, "fdc:0:35dd")
-		, m_hdc(*this, "scsi:7:ncr5380")
+		, m_hdc(*this, "scsi:0:ncr5380")
 		, m_pit(*this, "pit")
 		, m_scc(*this, "scc")
 		, m_ddt(*this, "ddt")
@@ -59,6 +59,8 @@ public:
 	}
 
 	void emu3(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
 	virtual void machine_start() override;
@@ -135,6 +137,7 @@ void emu3_state::emu3_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("bootprom", 0);
 	map(0x008000, 0x027fff).ram();
+	map(0x2c0000, 0x2c0000).rw(m_hdc, FUNC(ncr5380n_device::dma_r), FUNC(ncr5380n_device::dma_w));
 	map(0x300000, 0x30000f).rw(m_hdc, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0x390000, 0x390007).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x400000, 0xbfffff).ram();
@@ -154,6 +157,8 @@ void emu3_state::emu3_map(address_map &map)
 			for (unsigned i = 0; i < 16; i++)
 				m_led[i] = BIT(data, i);
 		}, "led_w");
+
+	map(0xde0060, 0xde007f).nopw(); // temporarily mute logging
 
 	map(0xeb0000, 0xeb0000).w(m_lcdc, FUNC(hd44780_device::control_w));
 	map(0xeb0002, 0xeb0002).r(m_lcdc, FUNC(hd44780_device::control_r));
@@ -219,22 +224,22 @@ void emu3_state::emu3(machine_config &config)
 	// scsi bus and devices
 	NSCSI_BUS(config, "scsi");
 
-	NSCSI_CONNECTOR(config, "scsi:0", emu_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:1", emu_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", emu_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", emu_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", emu_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", emu_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", emu_scsi_devices, nullptr);
-
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380N).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("ncr5380", NCR5380N).machine_config(
 		[this](device_t *device)
 		{
 			ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
 
 			adapter.irq_handler().set(*this, FUNC(emu3_state::irq_w<HDINT>));
 		});
+
+	NSCSI_CONNECTOR(config, "scsi:1", emu_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:2", emu_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", emu_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", emu_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", emu_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", emu_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7", emu_scsi_devices, nullptr);
 
 	SCC85230(config, m_scc, 16_MHz_XTAL / 4);
 	m_scc->out_int_callback().set(*this, FUNC(emu3_state::irq_w<SCCINT>)).invert();
@@ -263,7 +268,15 @@ void emu3_state::emu3(machine_config &config)
 	m_ddt->txd_handler().set(m_ddt_port, FUNC(rs232_port_device::write_txd)).invert();
 }
 
+INPUT_CHANGED_MEMBER(emu3_state::nmi_button)
+{
+	if (newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 static INPUT_PORTS_START(emu3)
+	PORT_START("ddt")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, emu3_state, nmi_button, 0)
 INPUT_PORTS_END
 
 ROM_START(emu3)
