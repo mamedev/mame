@@ -32,6 +32,12 @@
 #include <type_traits>
 #include <utility>
 
+#define LOG_GROUP_BOUNDS_RESOLUTION (1U << 1)
+
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION)
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
+
 
 
 /***************************************************************************
@@ -1116,7 +1122,7 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	{
 		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
-		bool empty;
+		bool empty(true);
 		resolve_bounds(local, m_groupnode, groupmap, seen, empty, false, false, true);
 	}
 	seen.pop_back();
@@ -1132,8 +1138,9 @@ void layout_group::resolve_bounds(
 		bool repeat,
 		bool init)
 {
+	LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Group '%s' resolve bounds empty=%s vistoggle=%s repeat=%s init=%s\n",
+			parentnode.get_attribute_string("name", ""), empty, vistoggle, repeat, init);
 	bool envaltered(false);
-	bool unresolved(true);
 	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); !m_bounds_resolved && itemnode; itemnode = itemnode->get_next_sibling())
 	{
 		if (!strcmp(itemnode->get_name(), "bounds"))
@@ -1144,13 +1151,10 @@ void layout_group::resolve_bounds(
 		}
 		else if (!strcmp(itemnode->get_name(), "param"))
 		{
+			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment altered%s, unresolving groups\n", envaltered ? " again" : "");
 			envaltered = true;
-			if (!unresolved)
-			{
-				unresolved = true;
-				for (group_map::value_type &group : groupmap)
-					group.second.set_bounds_unresolved();
-			}
+			for (group_map::value_type &group : groupmap)
+				group.second.set_bounds_unresolved();
 			if (!repeat)
 				env.set_parameter(*itemnode);
 			else
@@ -1171,6 +1175,9 @@ void layout_group::resolve_bounds(
 			else
 				union_render_bounds(m_bounds, itembounds);
 			empty = false;
+			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate item bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+					itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+					m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
@@ -1184,6 +1191,10 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference explicit bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+						itemnode->get_attribute_string("ref", ""),
+						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 			else
 			{
@@ -1208,6 +1219,10 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+						itemnode->get_attribute_string("ref", ""),
+						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 		}
 		else if (!strcmp(itemnode->get_name(), "repeat"))
@@ -1235,8 +1250,9 @@ void layout_group::resolve_bounds(
 		}
 	}
 
-	if (envaltered && !unresolved)
+	if (envaltered)
 	{
+		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment was altered, marking groups unresolved\n");
 		bool const resolved(m_bounds_resolved);
 		for (group_map::value_type &group : groupmap)
 			group.second.set_bounds_unresolved();
@@ -1244,7 +1260,11 @@ void layout_group::resolve_bounds(
 	}
 
 	if (!vistoggle && !repeat)
+	{
+		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Marking group '%s' bounds resolved\n",
+				parentnode.get_attribute_string("name", ""));
 		m_bounds_resolved = true;
+	}
 }
 
 
