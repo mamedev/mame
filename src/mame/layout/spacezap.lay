@@ -209,6 +209,8 @@ license:CC0
 
 
 	<view name="Color Overlay">
+		<bounds left="0" top="0" right="400" bottom="300" />
+
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
@@ -216,6 +218,5 @@ license:CC0
 		<element ref="overlay" blend="multiply">
 			<bounds x="-100" y="-150" width="600" height="600" />
 		</element>
-
 	</view>
 </mamelayout>

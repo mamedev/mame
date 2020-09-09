@@ -152,27 +152,40 @@ void vsmileb_state::vsmilebp(machine_config &config)
 
 ROM_START( vsmileb )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilebabybios.bin", 0x000000, 0x800000, CRC(58d4caa0) SHA1(0b636ff80fd7fc429d753a8beab2957f1e59cbde) )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios.bin",                0x000000, 0x800000, CRC(58d4caa0) SHA1(0b636ff80fd7fc429d753a8beab2957f1e59cbde) )
 ROM_END
 
 ROM_START( vsmilebs )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_spain_pooh.bin", 0x000000, 0x800000, CRC(a1926654) SHA1(a8ccbe29235bb44faef77b1e7d73a20221b005c2) )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_spain_pooh.bin",     0x000000, 0x800000, CRC(a1926654) SHA1(a8ccbe29235bb44faef77b1e7d73a20221b005c2) )
 ROM_END
 
 ROM_START( vsmilebsw )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_sweden.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_sweden.bin",         0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
 ROM_END
 
 ROM_START( vsmilebg )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_german_pooh.bin", 0x000000, 0x800000, CRC(22261569) SHA1(8918a905af4bb186beb5577b1d295d9c037584f7) )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_germany_pooh.bin",   0x000000, 0x800000, CRC(22261569) SHA1(8918a905af4bb186beb5577b1d295d9c037584f7) )
 ROM_END
 
-//    year, name,      parent,  compat, machine, input,   class,         init,       company, fullname,                                                                flags
-CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (USA)",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-// 'vsmilebs' and 'vsmilebg' have the Winnie the Pooh game in the BIOS ROM. This was supplied as a 'Romless cart' with the device, so probably triggers a switch, currently always banked in.
-CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with 'Aventuras en el Bosque de los Cien Acres')", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilebg,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Germany, with 'Puuhs Hundert-Morgen-Wald')",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( vsmilebf )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_france_pooh.bin",    0x000000, 0x800000, CRC(3dfa2acb) SHA1(9b3a34dae5475f0c82187cb0c62183b46344b7ad) )
+ROM_END
+
+ROM_START( vsmilebfp )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabybios_france_patoune.bin", 0x000000, 0x800000, CRC(57757602) SHA1(a7495e1c6b2edaeb63bf1c658575689304f15804) )
+ROM_END
+
+//    year, name,      parent,  compat, machine, input,   class,         init,       company, fullname,                                                                         flags
+CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (USA)",                                                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)",                                                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// These have a game in the BIOS ROM, supplied as a 'Romless cart' with the device, so probably triggers a switch. Currently always banked in.
+CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with 'Aventuras en el Bosque de los Cien Acres')",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebg,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Germany, with 'Puuhs Hundert-Morgen-Wald')",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebf,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (France, with 'Winnie et ses amis dans la Foret des Reves Bleus')", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebfp, vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (France, with 'En Ville avec l'ourson Patoune')",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -163,60 +163,59 @@ return layout, "v4dbltak"
 		<screen index="0">
 			<bounds x="0" y="0" width="504" height="296" />
 		</screen>
-		<bezel name="BANK" element="BANK" state="0">
+		<element name="BANK" ref="BANK" state="0">
 			<bounds x="505" y="180" width="40" height="15"/>
-		</bezel>
-		<bezel name="£" element="£" state="0">
+		</element>
+		<element name="£" ref="£" state="0">
 			<bounds x="505" y="200" width="8" height="15"/>
-		</bezel>
-		<bezel name="compoundled0" element="digit" state="0">
+		</element>
+		<element name="compoundled0" ref="digit" state="0">
 			<bounds x="515" y="200" width="8" height="15"/>
-		</bezel>
-		<bezel name="compoundled1" element="digit" state="0">
+		</element>
+		<element name="compoundled1" ref="digit" state="0">
 			<bounds x="525" y="200" width="8" height="15"/>
-		</bezel>
-		<bezel name="compoundled2" element="digit" state="0">
+		</element>
+		<element name="compoundled2" ref="digit" state="0">
 			<bounds x="535" y="200" width="8" height="15"/>
-		</bezel>
-		<bezel name="compoundled3" element="digit" state="0">
+		</element>
+		<element name="compoundled3" ref="digit" state="0">
 			<bounds x="545" y="200" width="8" height="15"/>
-		</bezel>
-		<bezel name="lamp24" element="COLLECT" state="0">
+		</element>
+		<element name="lamp24" ref="COLLECT" state="0">
 			<bounds x="0" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp25" element="HOLD" state="0">
+		</element>
+		<element name="lamp25" ref="HOLD" state="0">
 			<bounds x="50" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp26" element="HOLD" state="0">
+		</element>
+		<element name="lamp26" ref="HOLD" state="0">
 			<bounds x="100" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp32" element="HOLD" state="0">
+		</element>
+		<element name="lamp32" ref="HOLD" state="0">
 			<bounds x="150" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp33" element="HOLD" state="0">
+		</element>
+		<element name="lamp33" ref="HOLD" state="0">
 			<bounds x="200" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp34" element="HOLD" state="0">
+		</element>
+		<element name="lamp34" ref="HOLD" state="0">
 			<bounds x="250" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp40" element="TWIST" state="0">
+		</element>
+		<element name="lamp40" ref="TWIST" state="0">
 			<bounds x="300" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp41" element="STICK" state="0">
+		</element>
+		<element name="lamp41" ref="STICK" state="0">
 			<bounds x="350" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp42" element="SWOP" state="0">
+		</element>
+		<element name="lamp42" ref="SWOP" state="0">
 			<bounds x="400" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp48" element="DEAL" state="0">
+		</element>
+		<element name="lamp48" ref="DEAL" state="0">
 			<bounds x="450" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp50" element="SELECT" state="0">
+		</element>
+		<element name="lamp50" ref="SELECT" state="0">
 			<bounds x="500" y="300" width="40" height="15"/>
-		</bezel>
-		<bezel name="lamp63" element="LOSE" state="0">
+		</element>
+		<element name="lamp63" ref="LOSE" state="0">
 			<bounds x="505" y="250" width="40" height="15"/>
-		</bezel>
-
+		</element>
 	</view>
 </mamelayout>

@@ -8,12 +8,11 @@
 
 // these games were ported to unSP hardware at some point, see generaplus_gpl_unknown.cpp
 
-// BIOS calls are made very frequently to the undumped firmware.
-// The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from Flash and executing it from RAM at $0300.
+// BIOS calls are made very frequently to the firmware (undumped for bbl380).
+// The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from SPI and executing it from RAM at $0300.
 // A variant of this call ($60d2 in bbl380, $60e3 in ragc153 & dphh8630) is invoked with jsr.
 // For these calls, a 24-bit starting address is specified in $82:$81:$80, and the length in bytes is twice the number specified in $84:$83.
-// ST2205U cannot execute code directly from Flash, but has a built-in DMA-compatible NAND interface on Port F ($05).
-// The XOR used on ragc153 & dphh8630 is likely performed by the DMA controller.
+// There is a configurable XOR specified in $99 on ragc153 & dphh8630.
 // $6003 performs a table lookup, depositing a sequence of data at $008e.
 // $6000 is some sort of macro call with the X register as function selector
 // (X = $24 should display the character in $0102 on screen).
@@ -51,7 +50,7 @@ private:
 
 	void bbl380_map(address_map &map);
 
-	required_device<st2xxx_device> m_maincpu;
+	required_device<st2205u_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
@@ -88,7 +87,7 @@ void bbl380_state::lcdc_data_w(u8 data)
 
 void bbl380_state::bbl380_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("maincpu", 0); // FIXME: probably not directly mapped (ST2205U has serial Flash interface on port F)
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
 	map(0x600000, 0x600000).w(FUNC(bbl380_state::lcdc_command_w));
 	map(0x604000, 0x604000).rw(FUNC(bbl380_state::lcdc_data_r), FUNC(bbl380_state::lcdc_data_w));
 }
@@ -98,8 +97,9 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 8000000); // unknown clock; type guessed
+	ST2205U(config, m_maincpu, 8000000); // unknown clock; type close but not quite correct?
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
+	m_maincpu->set_alt_map();
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);
@@ -112,13 +112,15 @@ void bbl380_state::bbl380(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
-	// (unless the SoC's built-in one is used and the routines which program these are leftovers)
+	// (SoC's built-in LCDC is unused or nonexistent?)
 	// Several other LCDC models are identified by ragc153 and dphh8630
 }
 
 ROM_START( bbl380 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
+	ROM_LOAD( "bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS (addresses are different from other sets)
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "bbl 380 180 in 1.bin", 0x000000, 0x400000, CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad) BAD_DUMP )
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
 ROM_END
@@ -126,19 +128,25 @@ ROM_END
 
 ROM_START( ragc153 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ragc153_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS (addresses are different from bbl380)
+	ROM_LOAD( "st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941) ) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "25q32ams.bin", 0x000000, 0x400000, CRC(de328d73) SHA1(d17b97e9057be4add68b9f5a26e04c9f0a139673) ) // first 0x100 bytes would read as 0xff at regular speed, but give valid looking consistent data at a slower rate
 ROM_END
 
 ROM_START( dphh8630 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ragc153_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
+	ROM_LOAD( "st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941) ) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269) )
 ROM_END
 
 ROM_START( dgun2953 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "dgun2953_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
+	ROM_LOAD( "st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941) ) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "dg160_25x32v_ef3016.bin", 0x000000, 0x400000, CRC(2e993bac) SHA1(4b310e326a47df1980aeef38aa9a59018d7fe76f) )
 ROM_END
 
@@ -146,13 +154,15 @@ ROM_END
 
 void bbl380_state::init_ragc153()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
+#if 0 // probably done in software or by hardware DMA
+	uint8_t *ROM = memregion("spi")->base();
+	int size = memregion("spi")->bytes();
 
 	for (int i = 0; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0xe4;
 	}
+#endif
 }
 
 CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )

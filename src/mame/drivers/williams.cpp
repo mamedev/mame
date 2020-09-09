@@ -2350,7 +2350,7 @@ Solid Yellow (Green print) 3002-13 through 3002-24 - ROM type B, 2732
              |    Black print    |    Green print
  Part Number |  ROM#     Number  |  ROM#     Number
 -------------+-------------------+------------------
-A-5343-09700 | ROM 1A  - 3002-1  | ROM 1A  - 3002-13
+A-5343-09700 | ROM 1A  - 3002-1  | ROM 1B  - 3002-13
 A-5343-09701 | ROM 2A  - 3002-2  | ROM 2B  - 3002-14
 A-5343-09702 | ROM 3A  - 3002-3  | ROM 3B  - 3002-15
 A-5343-09703 | ROM 4A  - 3002-4  | ROM 4B  - 3002-16
@@ -2546,7 +2546,7 @@ ROM_START( robotronyo ) /* Yellow label / Red stripe & Black print or Yellow lab
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "2084_rom_10b_3005-10.a7", 0x0d000, 0x1000, CRC(4a9d5f52) SHA1(d5ae801e60ed829e7ef5c54a18aefca54eae827f) ) // originally printed as "A" ROMs, the A is overwitten with "B"
 	ROM_LOAD( "2084_rom_11b_3005-11.c7", 0x0e000, 0x1000, CRC(2afc5e7f) SHA1(f3405be9ad2287f3921e7dbd9c5313c91fa7f8d6) )
-	ROM_LOAD( "2084_rom_12b_3005-12.a7", 0x0f000, 0x1000, CRC(45da9202) SHA1(81b3b2a72a3c871e8d7b9348056622c90a20d876) )
+	ROM_LOAD( "2084_rom_12b_3005-12.e7", 0x0f000, 0x1000, CRC(45da9202) SHA1(81b3b2a72a3c871e8d7b9348056622c90a20d876) )
 	ROM_LOAD( "2084_rom_1b_3005-1.e4",   0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
 	ROM_LOAD( "2084_rom_2b_3005-2.c4",   0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
 	ROM_LOAD( "2084_rom_3b_3005-3.a4",   0x12000, 0x1000, CRC(67a369bc) SHA1(5a912d485e686de5e3175d3fc0e5daad36f4b836) )
@@ -2731,7 +2731,7 @@ Joust Manual Amendment No. 16P-3006-101-AMD-1 October 1982:
 ROMs changed in October 1982 as Instruction Manuals 16P-3006-101-T September 1982 & 16P-3006-101 October 1982 only mention Yellow-label ROMs.
   Only the 16P-3006-101-AMD-1 October 1982 Amendment and the 16P-3006-101 Revision A December 1982 manuals mention the new green label ROMs
 
-ROMs 3006-52 through 3006-63 have white labels with green stripe and are verified to 100% same data as ROMs 3006-13 through 3006-24 "green label" set.
+The "White labels with Green stripe" set (ROMs 3006-52 through 3006-63) contains the same data as the "Green label" set (ROMs 3006-13 through 3006-24).
 
 D-9144-3006 ROM Board Assembly:
 +----------------------------------------------+
@@ -2850,25 +2850,24 @@ Bubbles ROM labels are in this format:
 | BUBBLES ROM 1B     |   <-- Game name, ROM board number and ROM type (B is 2732)
 | (c) 1983 WILLIAMS  |
 | ELECTRONICS, INC.  |
-|     3012-1         |   <-- Williams game number & ROM number
+|    16-3012-1       |   <-- Williams game number & ROM number
 +--------------------+
 
-
-ROM | Board|  "B" ROMs |
- ## | Loc. |  label #  |  Part Number
-----+------+-----------+----------------
-  1 |  E4  |  3012-1   |  A-5343-10111-B
-  2 |  C4  |  3012-2   |  A-5343-10112-B
-  3 |  A4  |  3012-3   |  A-5343-10113-B
-  4 |  E5  |  3012-4   |  A-5343-10114-B
-  5 |  C5  |  3012-5   |  A-5343-10115-B
-  6 |  A5  |  3012-6   |  A-5343-10116-B
-  7 |  E6  |  3012-7   |  A-5343-10117-B
-  8 |  C6  |  3012-8   |  A-5343-10118-B
-  9 |  A6  |  3012-9   |  A-5343-10119-B
- 10 |  A7  |  3012-10  |  A-5343-10120-B
- 11 |  C7  |  3012-11  |  A-5343-10121-B
- 12 |  E7  |  3012-12  |  A-5343-10122-B
+ROM | Board|  "B" ROMs  |
+ ## | Loc. |  label #   |  Part Number
+----+------+------------+----------------
+  1 |  E4  | 16-3012-1  |  A-5343-10111-B
+  2 |  C4  | 16-3012-2  |  A-5343-10112-B
+  3 |  A4  | 16-3012-3  |  A-5343-10113-B
+  4 |  E5  | 16-3012-4  |  A-5343-10114-B
+  5 |  C5  | 16-3012-5  |  A-5343-10115-B
+  6 |  A5  | 16-3012-6  |  A-5343-10116-B
+  7 |  E6  | 16-3012-7  |  A-5343-10117-B
+  8 |  C6  | 16-3012-8  |  A-5343-10118-B
+  9 |  A6  | 16-3012-9  |  A-5343-10119-B
+ 10 |  A7  | 16-3012-10 |  A-5343-10120-B
+ 11 |  C7  | 16-3012-11 |  A-5343-10121-B
+ 12 |  E7  | 16-3012-12 |  A-5343-10122-B
 
 Instruction Manual 16-3012-101 states Brown labels
 
@@ -2952,7 +2951,7 @@ ROM_END
 
 /*
 
-Splat ROM labels are in this format:
+Splat! ROM labels are in this format:
 
 +--------------------+
 | SPLAT ROM 1B       |   <-- Game name, ROM board number and ROM type (B is 2732)

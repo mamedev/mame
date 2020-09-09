@@ -200,6 +200,7 @@ ozmawars2                       // Shin Nihon Kikaku (SNK)
 ozmawarsmr                      // bootleg (Model Racing)
 polaris                         // PS  (c) 1980 Taito
 polarisa                        // PS  (c) 1980 Taito
+polarisb                        // PS  (c) 1980 Taito
 polarisbr                       // PS  (c) 1981 Taito do Brasil
 polariso                        // PS  (c) 1980 Taito
 rollingc                        // Nichibutsu
@@ -9714,6 +9715,7 @@ c64cp                           // Commodore 64C (PAL)
 c64g                            // Commodore 64G (PAL)
 c64gs                           // Commodore 64 Games System
 c64p                            // Commodore 64 (PAL)
+clipper                         //
 dx64                            // Commodore DX-64 - Prototype
 edu64                           // Commodore Educator 64
 pet64                           // Commodore PET 64
@@ -10888,6 +10890,9 @@ knightsb3                       // bootleg
 sf2b                            // bootleg
 sf2b2                           // bootleg
 sf2ceb                          // bootleg
+sf2ceb2                         // bootleg
+sf2ceb3                         // bootleg
+sf2ceb4                         // bootleg
 sf2mdt                          // bootleg
 sf2mdta                         // bootleg
 sf2mdtb                         // bootleg
@@ -13042,9 +13047,6 @@ elf2                            //
 
 @source:elwro800.cpp
 elwro800                        //
-
-@source:emate.cpp
-emate                           // (c) 1997 Apple Computer
 
 @source:embargo.cpp
 embargo                         //
@@ -16709,8 +16711,14 @@ indy_4613                       // IP22: Indy, R4600, 133MHz
 indy_5015                       // IP22: Indy, R5000, 150MHz
 indigo2_4415                    // IP24: Indigo 2, R4400, 150MHz
 
+@source:informer_207_100.cpp
+in207100                        // Informer 207/100
+
 @source:informer_207_376.cpp
 in207376                        // Informer 207/376
+
+@source:informer_213ae.cpp
+in213ae                         // Informer 213 AE
 
 @source:instantm.cpp
 instantm                        //
@@ -20069,6 +20077,9 @@ maniach                         // TA-0017 (c) 1986 + Taito America license
 maniach2                        // TA-0017 (c) 1986 + Taito America license
 matmania                        // TA-0015 (c) 1985 + Taito America license
 
+@source:matrix.cpp
+matrix                          //
+
 @source:mattelchess.cpp
 mchess
 
@@ -22172,13 +22183,14 @@ megajet                         // 1993 Sega Mega Jet (Japan)
 aladmdb                         // MegaDrive-based hack
 barek2mb                        // MegaDrive-based hack
 barek3mb                        // MegaDrive-based hack
+bk3ssrmb                        // MegaDrive-based hack
 jparkmb                         // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
+sbubsm                          // (c) 1996 Sun Mixing
 sonic2mb                        // MegaDrive-based hack
 srmdb                           // MegaDrive-based hack
 ssf2mdb                         // MegaDrive-based hack
 topshoot                        // (c) 1995 Sun Mixing
-sbubsm                          // (c) 1996 Sun Mixing
 twinktmb                        // MegaDrive-based hack
 
 @source:megadriv_rad.cpp
@@ -32239,6 +32251,18 @@ nws1580                         // Sony NEWS NWS-1580
 @source:news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
 
+@source:newton.cpp
+newtnotp
+newtonmp
+spi7000
+mp110
+mp120
+motmarco
+mp130
+emate
+mp2000
+mp2100
+
 @source:next.cpp
 next                            //
 nextct                          //
@@ -39247,6 +39271,7 @@ runark                          // 1991.02 C74 (c) 1990 Taito Corporation (Japan
 solfigtr                        // 1991.?? C91 (c) 1991 Taito Corporation Japan (World)
 ssi                             // 1990.?? C64 (c) 1990 Taito Corporation Japan (World)
 ssia                            // 1990.?? C64 (c) 1990 Taito Corporation Japan (World)
+ssib                            // 1990.?? C64 (c) 1990 Taito Corporation Japan (World)
 thundfox                        // 1990.?? C28 (c) 1990 Taito Corporation Japan (World)
 thundfoxj                       // 1990.07 C28 (c) 1990 Taito Corporation (Japan)
 thundfoxu                       // 1990.06 C28 (c) 1990 Taito America Corporation (US)
@@ -41161,6 +41186,8 @@ vsmileb                         //
 vsmilebs                        //
 vsmilebsw                       //
 vsmilebg                        //
+vsmilebf                        //
+vsmilebfp                       //
 
 @source:vsmilepro.cpp
 vsmilpro
@@ -42831,6 +42858,7 @@ jetwave                         // GX678 (c)1996 Euro EAB
 jetwavej                        // GX678 (c)1996 Japan JAB
 midnrun                         // GX476 (c)1995 Europe EAA
 midnruna                        // GX477 (c)1995 Asia AAA
+midnruna2                       // GX477 (c)1995 Asia AAA
 midnrunj                        // GX477 (c)1995 Japan JAD
 waveshrk                        // GX678 (c)1996 USA UAB
 windheat                        // GX677 (c)1996 Europe EAA

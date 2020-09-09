@@ -446,17 +446,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="commstar">
-		<description>Commstar</description>
-		<year>1985</year>
-		<publisher>PACE</publisher>
-		<part name="rom" interface="electron_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="Commstar-E1.12.rom" size="16384" crc="61a1d49e" sha1="3776c972789cebacd1f92b6f3aa01c8b2c8bd505"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="e2p" supported="no">
 		<description>E2P Operating System (ROM)</description>
 		<year>1986</year>

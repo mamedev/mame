@@ -2601,7 +2601,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "informer")
 files {
+	MAME_DIR .. "src/mame/drivers/informer_207_100.cpp",
 	MAME_DIR .. "src/mame/drivers/informer_207_376.cpp",
+	MAME_DIR .. "src/mame/drivers/informer_213ae.cpp",
 	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.h",
 }
@@ -4346,7 +4348,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/e100.cpp",
 	MAME_DIR .. "src/mame/drivers/eacc.cpp",
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
-	MAME_DIR .. "src/mame/drivers/emate.cpp",
 	MAME_DIR .. "src/mame/drivers/epic14e.cpp",
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
@@ -4433,6 +4434,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mx2178.cpp",
 	MAME_DIR .. "src/mame/drivers/mycom.cpp",
 	MAME_DIR .. "src/mame/drivers/myvision.cpp",
+	MAME_DIR .. "src/mame/drivers/newton.cpp",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 	MAME_DIR .. "src/mame/drivers/notetaker.cpp",

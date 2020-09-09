@@ -70,10 +70,9 @@ TODO:
   then waits for 1 scanline, and reads Y again. It expects Y to change. Latching Y
   will also cause video glitches to look different on some games when compared
   to the real console, for example powerlrd.
-- ppp(the tetris game) does not work properly on PAL, is this homebrew NTSC-only,
-  or is PAL detection going wrong? It does look like PAL/NTSC detection is working,
-  see internal RAM $3D d7. So maybe it is due to inaccurate PAL video timing.
-  The game does mid-scanline video updates.
+- ppp(the tetris game) does not work properly on PAL, it does look like PAL/NTSC
+  detection is working, see internal RAM $3D d7. So maybe it is due to inaccurate
+  PAL video timing. The game does mid-scanline video updates.
 - g7400 probably has different video timing too (not same as g7000)
 - g7400 helicopt sometimes locks up at the sea level, timing related?
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,

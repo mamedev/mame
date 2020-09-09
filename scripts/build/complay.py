@@ -97,7 +97,6 @@ class LayoutChecker(Minifyer):
     VARPATTERN = re.compile('^.*~[0-9A-Za-z_]+~.*$')
     FLOATCHARS = re.compile('^.*[.eE].*$')
     SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
-    OBJECTS = frozenset(('backdrop', 'bezel'))
     ORIENTATIONS = frozenset((0, 90, 180, 270))
     YESNO = frozenset(('yes', 'no'))
     BLENDMODES = frozenset(('none', 'alpha', 'multiply', 'add'))
@@ -111,6 +110,8 @@ class LayoutChecker(Minifyer):
         self.views = { }
         self.referenced_elements = { }
         self.referenced_groups = { }
+        self.group_collections = { }
+        self.current_collections = None
 
     def formatLocation(self):
         return '%s:%d:%d' % (self.locator.getSystemId(), self.locator.getLineNumber(), self.locator.getColumnNumber())
@@ -320,6 +321,7 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element element attribute defstate "%s" is negative' % (attrs['defstate'], ))
             self.handlers.append((self.elementStartHandler, self.elementEndHandler))
         elif 'group' == name:
+            self.current_collections = { }
             if 'name' not in attrs:
                 self.handleError('Element group missing attribute name')
             else:
@@ -328,6 +330,8 @@ class LayoutChecker(Minifyer):
                     self.generated_group_names = True
                 if attrs['name'] not in self.groups:
                     self.groups[attrs['name']] = self.formatLocation()
+                    if not generated_name:
+                        self.group_collections[attrs['name']] = self.current_collections
                 elif not generated_name:
                     self.handleError('Element group has duplicate name (previous %s)' % (self.groups[attrs['name']], ))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
@@ -335,6 +339,7 @@ class LayoutChecker(Minifyer):
             self.repeat_depth.append(0)
             self.have_bounds.append(False)
         elif ('view' == name) and (not self.repeat_depth[-1]):
+            self.current_collections = { }
             if 'name' not in attrs:
                 self.handleError('Element view missing attribute name')
             else:
@@ -446,12 +451,11 @@ class LayoutChecker(Minifyer):
         self.handlers.pop()
 
     def groupViewStartHandler(self, name, attrs):
-        if (name in self.OBJECTS) or ('element' == name):
-            refattr = 'ref' if 'element' == name else 'element'
-            if refattr not in attrs:
-                self.handleError('Element %s missing attribute %s' % (name, refattr))
-            elif attrs[refattr] not in self.referenced_elements:
-                self.referenced_elements[attrs[refattr]] = self.formatLocation()
+        if 'element' == name:
+            if 'ref' not in attrs:
+                self.handleError('Element %s missing attribute ref' % (name, ))
+            elif attrs['ref'] not in self.referenced_elements:
+                self.referenced_elements[attrs['ref']] = self.formatLocation()
             if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
                 self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
             if 'inputtag' in attrs:
@@ -475,7 +479,7 @@ class LayoutChecker(Minifyer):
             if ('element' != name) and not self.has_legacy_object:
                 self.has_legacy_object = True
                 if self.has_collection:
-                    self.handleError('Layout contains collection as well as legacy backdrop/bezel elements')
+                    self.handleError('Layout contains collection as well as legacy backdrop elements')
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
             self.have_orientation.append(False)
@@ -497,8 +501,15 @@ class LayoutChecker(Minifyer):
         elif 'group' == name:
             if 'ref' not in attrs:
                 self.handleError('Element group missing attribute ref')
-            elif attrs['ref'] not in self.referenced_groups:
-                self.referenced_groups[attrs['ref']] = self.formatLocation()
+            else:
+                if attrs['ref'] not in self.referenced_groups:
+                    self.referenced_groups[attrs['ref']] = self.formatLocation()
+                if (not self.VARPATTERN.match(attrs['ref'])) and (attrs['ref'] in self.group_collections):
+                    for n, l in self.group_collections[attrs['ref']].items():
+                        if n not in self.current_collections:
+                            self.current_collections[n] = l
+                        else:
+                            self.handleError('Element group instantiates collection with duplicate name "%s" from %s (previous %s)' % (n, l, self.current_collections[n]))
             self.handlers.append((self.objectStartHandler, self.objectEndHandler))
             self.have_bounds.append(False)
             self.have_orientation.append(False)
@@ -514,12 +525,17 @@ class LayoutChecker(Minifyer):
         elif 'collection' == name:
             if 'name' not in attrs:
                 self.handleError('Element collection missing attribute name')
+            elif not self.VARPATTERN.match(attrs['name']):
+                if attrs['name'] not in self.current_collections:
+                    self.current_collections[attrs['name']] = self.formatLocation()
+                else:
+                    self.handleError('Element collection has duplicate name (previous %s)' % (self.current_collections[attrs['name']], ))
             if attrs.get('visible', 'yes') not in self.YESNO:
                 self.handleError('Element collection attribute visible "%s" is not "yes" or "no"' % (attrs['visible'], ))
             if not self.has_collection:
                 self.has_collection = True
                 if self.has_legacy_object:
-                    self.handleError('Layout contains collection as well as legacy backdrop/bezel elements')
+                    self.handleError('Layout contains collection as well as legacy backdrop elements')
             self.variable_scopes.append({ })
             self.collection_depth += 1
         elif 'param' == name:
@@ -543,6 +559,7 @@ class LayoutChecker(Minifyer):
         elif self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
+            self.current_collections = None
             self.repeat_depth.pop()
             self.have_bounds.pop()
             self.handlers.pop()
@@ -585,6 +602,8 @@ class LayoutChecker(Minifyer):
         self.views.clear()
         self.referenced_elements.clear()
         self.referenced_groups.clear()
+        self.group_collections.clear()
+        self.current_collections = None
         del self.handlers
         del self.ignored_depth
         del self.variable_scopes

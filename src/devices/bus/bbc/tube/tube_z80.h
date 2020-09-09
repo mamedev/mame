@@ -47,7 +47,7 @@ protected:
 private:
 	IRQ_CALLBACK_MEMBER( irq_callback );
 
-	required_device<cpu_device> m_z80;
+	required_device<z80_device> m_z80;
 	required_device<tube_device> m_ula;
 	required_memory_region m_rom;
 

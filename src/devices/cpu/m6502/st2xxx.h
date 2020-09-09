@@ -57,6 +57,10 @@ public:
 		ST_LFRA,
 		ST_LAC,
 		ST_LPWM,
+		ST_SCTR,
+		ST_SCKR,
+		ST_SSR,
+		ST_SMOD,
 		ST_UCTR,
 		ST_USR,
 		ST_IRCTR,
@@ -106,6 +110,8 @@ protected:
 	virtual u8 st2xxx_lckr_mask() const = 0;
 	virtual u8 st2xxx_lpwm_mask() const = 0;
 	virtual unsigned st2xxx_lfr_clocks() const = 0;
+	virtual bool st2xxx_has_spi() const = 0;
+	virtual bool st2xxx_spi_iis() const { return false; }
 	virtual u8 st2xxx_uctr_mask() const = 0;
 	virtual u8 st2xxx_bctr_mask() const = 0;
 
@@ -179,7 +185,6 @@ protected:
 	void btclr_w(u8 data);
 	void btclr_all_w(u8 data);
 
-	u32 tclk_pres_div(u8 mode) const;
 	u16 pres_count() const;
 	u8 prs_r();
 	void prs_w(u8 data);
@@ -211,6 +216,15 @@ protected:
 	void lac_w(u8 data);
 	u8 lpwm_r();
 	void lpwm_w(u8 data);
+
+	u8 sctr_r();
+	void sctr_w(u8 data);
+	u8 sckr_r();
+	void sckr_w(u8 data);
+	u8 ssr_r();
+	void ssr_w(u8 data);
+	u8 smod_r();
+	void smod_w(u8 data);
 
 	u8 uctr_r();
 	void uctr_w(u8 data);
@@ -278,6 +292,11 @@ protected:
 	u8 m_lpwm;
 	u16 m_lcd_ireq;
 	emu_timer *m_lcd_timer;
+
+	u8 m_sctr;
+	u8 m_sckr;
+	u8 m_ssr;
+	u8 m_smod;
 
 	u8 m_uctr;
 	u8 m_usr;

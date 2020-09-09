@@ -49,7 +49,7 @@ protected:
 	virtual void host_w(offs_t offset, uint8_t data) override;
 
 private:
-	required_device<ns32016_cpu_device> m_maincpu;
+	required_device<ns32016_device> m_maincpu;
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;

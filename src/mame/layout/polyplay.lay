@@ -84,7 +84,7 @@ license:CC0
 		</text>
 	</element>
 	<view name="Screen + Lights">
-		<collection name="Marquee" visible="no">
+		<collection name="Color Organ" visible="no">
 			<element name="lamp1" ref="red1" state="0">
 				<bounds x="7" y="0" width="1" height="1"/>
 			</element>

@@ -56,6 +56,7 @@ protected:
 	virtual u8 st2xxx_lckr_mask() const override { return 0x1f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0x3f; }
 	virtual unsigned st2xxx_lfr_clocks() const override;
+	virtual bool st2xxx_has_spi() const override { return true; }
 	virtual u8 st2xxx_uctr_mask() const override { return 0x0f; }
 	virtual u8 st2xxx_bctr_mask() const override { return 0x87; }
 
@@ -81,6 +82,7 @@ private:
 		u16 dmr;
 	};
 
+	u32 tclk_pres_div(u8 mode) const;
 	TIMER_CALLBACK_MEMBER(t0_interrupt);
 	TIMER_CALLBACK_MEMBER(t1_interrupt);
 	void timer_start_from_tclk(int t);

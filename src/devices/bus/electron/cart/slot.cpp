@@ -265,7 +265,7 @@ void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int 
 #include "peg400.h"
 //#include "pmse2p.h"
 #include "romp144.h"
-//#include "rs423.h"
+#include "rs423.h"
 #include "sndexp.h"
 #include "sndexp3.h"
 #include "sp64.h"
@@ -287,7 +287,7 @@ void electron_cart(device_slot_interface &device)
 	device.option_add_internal("peg400", ELECTRON_PEG400);
 	//device.option_add_internal("pmse2p", ELECTRON_PMSE2P);
 	device.option_add_internal("romp144", ELECTRON_ROMP144);
-	//device.option_add_internal("rs423", ELECTRON_RS423);
+	device.option_add_internal("rs423", ELECTRON_RS423);
 	device.option_add_internal("sndexp", ELECTRON_SNDEXP);
 	device.option_add_internal("sndexp3", ELECTRON_SNDEXP3);
 	device.option_add_internal("sp64", ELECTRON_SP64);

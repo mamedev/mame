@@ -740,8 +740,8 @@ displays visible.  Collections are created using ``collection`` elements inside
 ``view``, ``group`` and other ``collection`` elements.
 
 A collection element must have a ``name`` attribute providing the display name
-for the collection.  Collection names should be unique within a view.  The
-initial visibility of a collection may be specified by providing a ``visible``
+for the collection.  Collection names must be unique within a view.  The initial
+visibility of a collection may be specified by providing a ``visible``
 attribute.  Set the ``visible`` attribute to ``yes`` if the collection should be
 initially visible, or ``no`` if it should be initially hidden.  Collections are
 initially visible by default.

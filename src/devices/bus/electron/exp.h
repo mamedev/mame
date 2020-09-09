@@ -126,7 +126,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_electron_expansion_interface *m_card;
 

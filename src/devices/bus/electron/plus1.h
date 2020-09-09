@@ -12,6 +12,7 @@
 
 #include "exp.h"
 #include "machine/adc0844.h"
+#include "machine/input_merger.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/electron/cart/slot.h"
 #include "bus/generic/slot.h"
@@ -43,6 +44,7 @@ protected:
 	virtual uint8_t expbus_r(offs_t offset) override;
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
+	required_device<input_merger_device> m_irqs;
 	required_memory_region m_exp_rom;
 	required_device<electron_cartslot_device> m_cart_sk1;
 	required_device<electron_cartslot_device> m_cart_sk2;

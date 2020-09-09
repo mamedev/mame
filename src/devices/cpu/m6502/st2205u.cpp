@@ -33,7 +33,7 @@
 #include "emu.h"
 #include "st2205u.h"
 
-DEFINE_DEVICE_TYPE(ST2205U, st2205u_device, "st2205", "Sitronix ST2205U Integrated Microcontroller")
+DEFINE_DEVICE_TYPE(ST2205U, st2205u_device, "st2205u", "Sitronix ST2205U Integrated Microcontroller")
 
 st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: st2xxx_device(mconfig, ST2205U, tag, owner, clock,
@@ -42,12 +42,16 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 					true)
 	, m_btc(0)
 	, m_tc_12bit{0}
+	, m_count_12bit{0}
+	, m_timer_12bit{nullptr}
 	, m_t4c(0)
 	, m_tien(0)
 	, m_dac_fifo{{0}}
 	, m_fifo_filled{0}
+	, m_fifo_pos{0}
 	, m_psgc(0)
 	, m_psgm(0)
+	, m_psg_on(0)
 	, m_psg_vol{0}
 	, m_psg_volm{0}
 	, m_lbuf(0)
@@ -62,6 +66,7 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	, m_dmod{0}
 	, m_rctr(0)
 	, m_lvctr(0)
+	, m_alt_map(false)
 {
 }
 
@@ -78,17 +83,25 @@ void st2205u_device::device_start()
 	intf->irq_service = false;
 	intf->ram = make_unique_clear<u8[]>(0x8000);
 
+	m_timer_12bit[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t0_interrupt), this));
+	m_timer_12bit[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t1_interrupt), this));
+	m_timer_12bit[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t2_interrupt), this));
+	m_timer_12bit[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t3_interrupt), this));
+
 	init_base_timer(0x0040);
 	init_lcd_timer(0x0080);
 
 	save_item(NAME(m_btc));
 	save_item(NAME(m_tc_12bit));
+	save_item(NAME(m_count_12bit));
 	save_item(NAME(m_t4c));
 	save_item(NAME(m_tien));
 	save_item(NAME(m_dac_fifo));
 	save_item(NAME(m_fifo_filled));
+	save_item(NAME(m_fifo_pos));
 	save_item(NAME(m_psgc));
 	save_item(NAME(m_psgm));
+	save_item(NAME(m_psg_on));
 	save_item(NAME(m_psg_vol));
 	save_item(NAME(m_psg_volm));
 	save_item(NAME(m_lbuf));
@@ -110,9 +123,9 @@ void st2205u_device::device_start()
 	save_common_registers();
 	init();
 
-	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x87ff);
-	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x87ff);
-	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x8fff);
+	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x8fff);
+	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x8fff);
+	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x87ff);
 	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*mintf).brr).mask(0x9fff);
 	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
@@ -134,6 +147,8 @@ void st2205u_device::device_start()
 	state_add(ST_BTEN, "BTEN", m_bten, [this](u8 data) { bten_w(data); });
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
+	for (int i = 0; i < 4; i++)
+		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
@@ -155,6 +170,10 @@ void st2205u_device::device_start()
 	state_add(ST_LFRA, "LFRA", m_lfra).mask(0x3f);
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
+	state_add(ST_SCTR, "SCTR", m_sctr);
+	state_add(ST_SCKR, "SCKR", m_sckr).mask(0x7f);
+	state_add(ST_SSR, "SSR", m_ssr).mask(0x77);
+	state_add(ST_SMOD, "SMOD", m_smod).mask(0x0f);
 	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
 	state_add(ST_USR, "USR", m_usr).mask(0x7f);
 	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
@@ -186,12 +205,17 @@ void st2205u_device::device_reset()
 	m_btc = 0;
 
 	std::fill(std::begin(m_tc_12bit), std::end(m_tc_12bit), 0);
+	std::fill(std::begin(m_count_12bit), std::end(m_count_12bit), 0);
+	for (auto &timer : m_timer_12bit)
+		timer->adjust(attotime::never);
 	m_t4c = 0;
 	m_tien = 0;
 
 	std::fill(std::begin(m_fifo_filled), std::end(m_fifo_filled), 0);
+	std::fill(std::begin(m_fifo_pos), std::end(m_fifo_pos), 0);
 	m_psgc = 0;
 	m_psgm = 0;
+	m_psg_on = 0;
 	std::fill(std::begin(m_psg_vol), std::end(m_psg_vol), 0);
 	std::fill(std::begin(m_psg_volm), std::end(m_psg_volm), 0);
 
@@ -387,42 +411,9 @@ void st2205u_device::btc_w(u8 data)
 	m_btc = data;
 }
 
-u8 st2205u_device::tc_12bit_r(offs_t offset)
-{
-	return (m_tc_12bit[offset >> 1] >> (BIT(offset, 0) ? 8 : 0)) & 0x00ff;
-}
-
-void st2205u_device::tc_12bit_w(offs_t offset, u8 data)
-{
-	if (BIT(offset, 0))
-		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0x00ff) | u16(data) << 8;
-	else
-		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0xff00) | data;
-}
-
-u8 st2205u_device::t4c_r()
-{
-	return m_t4c;
-}
-
-void st2205u_device::t4c_w(u8 data)
-{
-	m_t4c = data;
-}
-
-u8 st2205u_device::tien_r()
-{
-	return m_tien;
-}
-
-void st2205u_device::tien_w(u8 data)
-{
-	m_tien = data;
-}
-
 u8 st2205u_device::psg_r(offs_t offset)
 {
-	u8 index = 0;
+	u8 index = m_fifo_pos[offset >> 1];
 	if (BIT(offset, 0))
 	{
 		bool fwra = m_fifo_filled[offset >> 1] < 8;
@@ -436,7 +427,7 @@ void st2205u_device::psg_w(offs_t offset, u8 data)
 {
 	if (m_fifo_filled[offset >> 1] < 16)
 	{
-		u8 index = m_fifo_filled[offset >> 1]++;
+		u8 index = (m_fifo_pos[offset >> 1] + m_fifo_filled[offset >> 1]++) & 15;
 		m_dac_fifo[offset >> 1][index] = data | (BIT(offset, 0) ? 0x100 : 0);
 	}
 }
@@ -449,6 +440,7 @@ u8 st2205u_device::psgc_r()
 void st2205u_device::psgc_w(u8 data)
 {
 	m_psgc = data;
+	m_psg_on &= (data & 0xf0) >> 4;
 }
 
 u8 st2205u_device::psgm_r()
@@ -483,10 +475,176 @@ void st2205u_device::volm_w(offs_t offset, u8 data)
 
 void st2205u_device::st2xxx_tclk_start()
 {
+	for (int t = 0; t < 4; t++)
+		if (BIT(m_tien, t) && (m_tc_12bit[t] & 0x7000) < 0x6000)
+			timer_start_from_tclk(t);
 }
 
 void st2205u_device::st2xxx_tclk_stop()
 {
+	for (int t = 0; t < 4; t++)
+	{
+		if (BIT(m_tien, t) && (m_tc_12bit[t] & 0x7000) < 0x6000)
+		{
+			m_count_12bit[t] = timer_12bit_count(t);
+			m_timer_12bit[t]->adjust(attotime::never);
+		}
+	}
+}
+
+u32 st2205u_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 6);
+	if (mode < 3)
+		return 2 << mode;
+	else if (mode == 3)
+		return 32;
+	else if (mode == 4)
+		return 1024;
+	else
+		return 4096;
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t0_interrupt)
+{
+	timer_12bit_process(0);
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t1_interrupt)
+{
+	timer_12bit_process(1);
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t2_interrupt)
+{
+	timer_12bit_process(2);
+}
+
+TIMER_CALLBACK_MEMBER(st2205u_device::t3_interrupt)
+{
+	timer_12bit_process(3);
+}
+
+void st2205u_device::timer_12bit_process(int t)
+{
+	if (BIT(m_psgc, t + 4))
+	{
+		if (BIT(m_psg_on, t))
+			m_psg_on &= ~(1 << t);
+		else if (m_fifo_filled[t] != 0)
+		{
+			m_psg_on |= 1 << t;
+
+			u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
+			if (BIT(m_psgm, 2 * t + 1))
+				logerror("Playing ADPCM sample %c%02X on channel %d\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, t);
+			else
+				logerror("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
+
+			--m_fifo_filled[t];
+			m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;
+		}
+	}
+	// TODO: PCM has its own FIFO
+
+	// Timer interrupt is triggered when FIFO has more than 8 empty bytes
+	if (m_fifo_filled[t] < 8)
+	{
+		m_ireq |= 0x0002 << t;
+		update_irq_state();
+	}
+
+	// Bit 7 of TnCH allows auto-reload
+	m_count_12bit[t] = BIT(m_tc_12bit[t], 15) ? m_tc_12bit[t] & 0x0fff : 0;
+
+	u8 tck = (m_tc_12bit[t] & 0x7000) >> 12;
+	if (tck < 6)
+		m_timer_12bit[t]->adjust(cycles_to_attotime((0x1000 - m_count_12bit[t]) * tclk_pres_div(tck)));
+	else if (tck == 7 && BIT(t, 0))
+		m_timer_12bit[t]->adjust(attotime::from_ticks(0x1000 - m_count_12bit[t], 32768));
+
+	// TODO: BGRCK & INTX sources
+}
+
+u16 st2205u_device::timer_12bit_count(int t) const
+{
+	u16 count = m_count_12bit[t];
+	if (BIT(m_tien, t))
+	{
+		u8 tck = (m_tc_12bit[t] & 0x7000) >> 12;
+		if (BIT(m_prs, 6) && tck < 6)
+			count = 0x0fff - (attotime_to_cycles(m_timer_12bit[t]->remaining()) / tclk_pres_div(tck));
+		else if (tck == 7 && BIT(t, 0))
+			count = 0x0fff - m_timer_12bit[t]->remaining().as_ticks(32768);
+	}
+
+	return count & 0x0fff;
+}
+
+void st2205u_device::timer_start_from_tclk(int t)
+{
+	u32 div = tclk_pres_div((m_tc_12bit[t] & 0x7000) >> 12);
+	m_timer_12bit[t]->adjust(cycles_to_attotime((0x0fff - m_count_12bit[t]) * div + div - (pres_count() & (div - 1))));
+}
+
+void st2205u_device::timer_start_from_oscx(int t)
+{
+	m_timer_12bit[t]->adjust(attotime::from_ticks(0x1000 - m_count_12bit[t], 32768));
+}
+
+u8 st2205u_device::tc_12bit_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return (timer_12bit_count(offset >> 1) | (m_tc_12bit[offset >> 1] & 0xf000)) >> 8;
+	else
+		return timer_12bit_count(offset >> 1) & 0x00ff;
+}
+
+void st2205u_device::tc_12bit_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0x00ff) | u16(data) << 8;
+	else
+		m_tc_12bit[offset >> 1] = (m_tc_12bit[offset >> 1] & 0xff00) | data;
+}
+
+u8 st2205u_device::t4c_r()
+{
+	return m_t4c;
+}
+
+void st2205u_device::t4c_w(u8 data)
+{
+	m_t4c = data;
+}
+
+u8 st2205u_device::tien_r()
+{
+	return m_tien;
+}
+
+void st2205u_device::tien_w(u8 data)
+{
+	for (int t = 0; t < 4; t++)
+	{
+		if (BIT(m_tien, t) && !BIT(data, t))
+		{
+			m_count_12bit[t] = timer_12bit_count(t);
+			m_timer_12bit[t]->adjust(attotime::never);
+		}
+		else if (!BIT(m_tien, t) && BIT(data, t))
+		{
+			m_count_12bit[t] = m_tc_12bit[t] & 0x0fff;
+
+			u8 tck = (m_tc_12bit[t] & 0x7000) >> 12;
+			if (BIT(m_prs, 6) && tck < 6)
+				timer_start_from_tclk(t);
+			else if (tck == 7 && BIT(t, 0))
+				timer_start_from_oscx(t);
+		}
+	}
+
+	m_tien = data;
 }
 
 unsigned st2205u_device::st2xxx_lfr_clocks() const
@@ -688,11 +846,21 @@ void st2205u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2205u_device::pctrl_r), FUNC(st2205u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2205u_device::pfc_r), FUNC(st2205u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
-	map(0x0010, 0x0017).rw(FUNC(st2205u_device::psg_r), FUNC(st2205u_device::psg_w));
-	map(0x0018, 0x001b).rw(FUNC(st2205u_device::vol_r), FUNC(st2205u_device::vol_w));
-	map(0x001c, 0x001d).rw(FUNC(st2205u_device::volm_r), FUNC(st2205u_device::volm_w));
-	map(0x001e, 0x001e).rw(FUNC(st2205u_device::psgc_r), FUNC(st2205u_device::psgc_w));
-	map(0x001f, 0x001f).rw(FUNC(st2205u_device::psgm_r), FUNC(st2205u_device::psgm_w));
+	if (m_alt_map)
+	{
+		map(0x0012, 0x0012).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
+		map(0x0013, 0x0013).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
+		map(0x0014, 0x0014).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
+		map(0x0015, 0x0015).rw(FUNC(st2205u_device::smod_r), FUNC(st2205u_device::smod_w));
+	}
+	else
+	{
+		map(0x0010, 0x0017).rw(FUNC(st2205u_device::psg_r), FUNC(st2205u_device::psg_w));
+		map(0x0018, 0x001b).rw(FUNC(st2205u_device::vol_r), FUNC(st2205u_device::vol_w));
+		map(0x001c, 0x001d).rw(FUNC(st2205u_device::volm_r), FUNC(st2205u_device::volm_w));
+		map(0x001e, 0x001e).rw(FUNC(st2205u_device::psgc_r), FUNC(st2205u_device::psgc_w));
+		map(0x001f, 0x001f).rw(FUNC(st2205u_device::psgm_r), FUNC(st2205u_device::psgm_w));
+	}
 	map(0x0020, 0x0027).rw(FUNC(st2205u_device::tc_12bit_r), FUNC(st2205u_device::tc_12bit_w));
 	map(0x0028, 0x0028).rw(FUNC(st2205u_device::tien_r), FUNC(st2205u_device::tien_w));
 	map(0x0029, 0x0029).rw(FUNC(st2205u_device::prs_r), FUNC(st2205u_device::prs_w));
@@ -716,21 +884,36 @@ void st2205u_device::int_map(address_map &map)
 	map(0x003d, 0x003d).rw(FUNC(st2205u_device::ireqh_r), FUNC(st2205u_device::ireqh_w));
 	map(0x003e, 0x003e).rw(FUNC(st2205u_device::ienal_r), FUNC(st2205u_device::ienal_w));
 	map(0x003f, 0x003f).rw(FUNC(st2205u_device::ienah_r), FUNC(st2205u_device::ienah_w));
-	map(0x0040, 0x0040).w(FUNC(st2205u_device::lssal_w));
-	map(0x0041, 0x0041).w(FUNC(st2205u_device::lssah_w));
-	map(0x0042, 0x0042).w(FUNC(st2205u_device::lvpw_w));
-	map(0x0043, 0x0043).rw(FUNC(st2205u_device::lxmax_r), FUNC(st2205u_device::lxmax_w));
-	map(0x0044, 0x0044).rw(FUNC(st2205u_device::lymax_r), FUNC(st2205u_device::lymax_w));
-	map(0x0045, 0x0045).rw(FUNC(st2205u_device::lpan_r), FUNC(st2205u_device::lpan_w));
-	map(0x0046, 0x0046).rw(FUNC(st2205u_device::lbuf_r), FUNC(st2205u_device::lbuf_w));
-	map(0x0047, 0x0047).rw(FUNC(st2205u_device::lctr_r), FUNC(st2205u_device::lctr_w));
-	map(0x0048, 0x0048).w(FUNC(st2205u_device::lckr_w));
-	map(0x0049, 0x0049).w(FUNC(st2205u_device::lfra_w));
-	map(0x004a, 0x004a).rw(FUNC(st2205u_device::lac_r), FUNC(st2205u_device::lac_w));
-	map(0x004b, 0x004b).rw(FUNC(st2205u_device::lpwm_r), FUNC(st2205u_device::lpwm_w));
-	map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
-	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
-	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+	if (m_alt_map)
+	{
+		map(0x0040, 0x0047).rw(FUNC(st2205u_device::psg_r), FUNC(st2205u_device::psg_w));
+		map(0x0048, 0x004b).rw(FUNC(st2205u_device::vol_r), FUNC(st2205u_device::vol_w));
+		map(0x004c, 0x004d).rw(FUNC(st2205u_device::volm_r), FUNC(st2205u_device::volm_w));
+		map(0x004e, 0x004e).rw(FUNC(st2205u_device::psgc_r), FUNC(st2205u_device::psgc_w));
+		map(0x004f, 0x004f).rw(FUNC(st2205u_device::psgm_r), FUNC(st2205u_device::psgm_w));
+	}
+	else
+	{
+		map(0x0040, 0x0040).w(FUNC(st2205u_device::lssal_w));
+		map(0x0041, 0x0041).w(FUNC(st2205u_device::lssah_w));
+		map(0x0042, 0x0042).w(FUNC(st2205u_device::lvpw_w));
+		map(0x0043, 0x0043).rw(FUNC(st2205u_device::lxmax_r), FUNC(st2205u_device::lxmax_w));
+		map(0x0044, 0x0044).rw(FUNC(st2205u_device::lymax_r), FUNC(st2205u_device::lymax_w));
+		map(0x0045, 0x0045).rw(FUNC(st2205u_device::lpan_r), FUNC(st2205u_device::lpan_w));
+		map(0x0046, 0x0046).rw(FUNC(st2205u_device::lbuf_r), FUNC(st2205u_device::lbuf_w));
+		map(0x0047, 0x0047).rw(FUNC(st2205u_device::lctr_r), FUNC(st2205u_device::lctr_w));
+		map(0x0048, 0x0048).w(FUNC(st2205u_device::lckr_w));
+		map(0x0049, 0x0049).w(FUNC(st2205u_device::lfra_w));
+		map(0x004a, 0x004a).rw(FUNC(st2205u_device::lac_r), FUNC(st2205u_device::lac_w));
+		map(0x004b, 0x004b).rw(FUNC(st2205u_device::lpwm_r), FUNC(st2205u_device::lpwm_w));
+		map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
+		map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
+		map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+		map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
+		map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
+		map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
+		map(0x0055, 0x0055).rw(FUNC(st2205u_device::smod_r), FUNC(st2205u_device::smod_w));
+	}
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));
 	map(0x0058, 0x0058).rw(FUNC(st2205u_device::dptrl_r), FUNC(st2205u_device::dptrl_w));
 	map(0x0059, 0x0059).rw(FUNC(st2205u_device::dptrh_r), FUNC(st2205u_device::dptrh_w));

@@ -10,7 +10,7 @@ license:CC0
 		</disk>
 		<text string="CREDIT" state="1">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 		</text>
 	</element>
 
@@ -19,8 +19,8 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="credit_led" element="credit_led">
+		<element name="credit_led" ref="credit_led" blend="add">
 			<bounds x="0.1" y="0.1" width="0.2" height="0.2" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

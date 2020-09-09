@@ -59,6 +59,8 @@ public:
 
 	st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_alt_map() { m_alt_map = true; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -79,6 +81,8 @@ protected:
 	virtual u8 st2xxx_lckr_mask() const override { return 0x3f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0xff; }
 	virtual unsigned st2xxx_lfr_clocks() const override;
+	virtual bool st2xxx_has_spi() const override { return true; }
+	virtual bool st2xxx_spi_iis() const override { return true; }
 	virtual u8 st2xxx_uctr_mask() const override { return 0x3f; }
 	virtual u8 st2xxx_bctr_mask() const override { return 0xb7; }
 
@@ -114,6 +118,15 @@ private:
 	void brrh_w(u8 data);
 	u8 btc_r();
 	void btc_w(u8 data);
+	u32 tclk_pres_div(u8 mode) const;
+	TIMER_CALLBACK_MEMBER(t0_interrupt);
+	TIMER_CALLBACK_MEMBER(t1_interrupt);
+	TIMER_CALLBACK_MEMBER(t2_interrupt);
+	TIMER_CALLBACK_MEMBER(t3_interrupt);
+	void timer_12bit_process(int t);
+	u16 timer_12bit_count(int t) const;
+	void timer_start_from_tclk(int t);
+	void timer_start_from_oscx(int t);
 	u8 tc_12bit_r(offs_t offset);
 	void tc_12bit_w(offs_t offset, u8 data);
 	u8 t4c_r();
@@ -171,12 +184,16 @@ private:
 
 	u8 m_btc;
 	u16 m_tc_12bit[4];
+	u16 m_count_12bit[4];
+	emu_timer *m_timer_12bit[4];
 	u8 m_t4c;
 	u8 m_tien;
 	u16 m_dac_fifo[4][16];
 	u8 m_fifo_filled[4];
+	u8 m_fifo_pos[4];
 	u8 m_psgc;
 	u8 m_psgm;
+	u8 m_psg_on;
 	u8 m_psg_vol[4];
 	u8 m_psg_volm[2];
 	u8 m_lbuf;
@@ -191,8 +208,10 @@ private:
 	u8 m_dmod[2];
 	u8 m_rctr;
 	u8 m_lvctr;
+
+	bool m_alt_map; // hack
 };
 
 DECLARE_DEVICE_TYPE(ST2205U, st2205u_device)
 
-#endif // MAME_MACHINE_M6502_ST2205_H
+#endif // MAME_MACHINE_M6502_ST2205U_H

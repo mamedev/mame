@@ -152,6 +152,9 @@ void st2204_device::device_start()
 	state_add(ST_LFRA, "LFRA", m_lfra).mask(0x3f);
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
+	state_add(ST_SCTR, "SCTR", m_sctr);
+	state_add(ST_SCKR, "SCKR", m_sckr).mask(0x7f);
+	state_add(ST_SSR, "SSR", m_ssr).mask(0x77);
 	state_add(ST_UCTR, "UCTR", m_uctr).mask(st2xxx_uctr_mask());
 	state_add(ST_USR, "USTR", m_usr).mask(0x7f);
 	state_add(ST_IRCTR, "IRCTR", m_irctr).mask(0xc7);
@@ -276,6 +279,19 @@ unsigned st2204_device::st2xxx_bt_divider(int n) const
 		return 16384 >> ((n & 1) * 2 + (n >> 1) * 5);
 	else
 		return 0;
+}
+
+u32 st2204_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 8);
+	if (mode == 0)
+		return 0x10000;
+	else if (mode < 4)
+		return 0x20000 >> (mode * 2);
+	else if (mode == 4)
+		return 0x100;
+	else
+		return 0x8000 >> (mode * 2);
 }
 
 TIMER_CALLBACK_MEMBER(st2204_device::t0_interrupt)
@@ -683,6 +699,9 @@ void st2204_device::common_map(address_map &map)
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	// PCL is listed as write-only in ST2202 specification, but DynamiDesk suggests otherwise
 	map(0x004e, 0x004e).rw(FUNC(st2204_device::pcl_r), FUNC(st2204_device::pcl_w));
+	map(0x0052, 0x0052).rw(FUNC(st2204_device::sctr_r), FUNC(st2204_device::sctr_w));
+	map(0x0053, 0x0053).rw(FUNC(st2204_device::sckr_r), FUNC(st2204_device::sckr_w));
+	map(0x0054, 0x0054).rw(FUNC(st2204_device::ssr_r), FUNC(st2204_device::ssr_w));
 	map(0x0060, 0x0060).rw(FUNC(st2204_device::uctr_r), FUNC(st2204_device::uctr_w));
 	map(0x0061, 0x0061).rw(FUNC(st2204_device::usr_r), FUNC(st2204_device::ustr_trg_w));
 	map(0x0062, 0x0062).rw(FUNC(st2204_device::irctr_r), FUNC(st2204_device::irctr_w));

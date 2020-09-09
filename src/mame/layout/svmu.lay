@@ -30,24 +30,24 @@ license:CC0
 	</element>
 
 	<view name="Default Layout">
-		<bezel element="background">
-			<bounds x="0" y="~scr0height~" width="~scr0width~" height="30" />
-		</bezel>
-		<bezel name="file_icon" element="file">
-			<bounds x="0" y="~scr0height~" width="80" height="30" />
-		</bezel>
-		<bezel name="game_icon" element="game">
-			<bounds x="85" y="~scr0height~" width="80" height="30" />
-		</bezel>
-		<bezel name="clock_icon" element="clock">
-			<bounds x="170" y="~scr0height~" width="100" height="30" />
-		</bezel>
-		<bezel name="flash_icon" element="flash">
-			<bounds x="275" y="~scr0height~" width="100" height="30" />
-		</bezel>
-
 		<screen index="0">
 			<bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" />
 		</screen>
+
+		<element ref="background">
+			<bounds x="0" y="~scr0height~" width="~scr0width~" height="30" />
+		</element>
+		<element name="file_icon" ref="file">
+			<bounds x="0" y="~scr0height~" width="80" height="30" />
+		</element>
+		<element name="game_icon" ref="game">
+			<bounds x="85" y="~scr0height~" width="80" height="30" />
+		</element>
+		<element name="clock_icon" ref="clock">
+			<bounds x="170" y="~scr0height~" width="100" height="30" />
+		</element>
+		<element name="flash_icon" ref="flash">
+			<bounds x="275" y="~scr0height~" width="100" height="30" />
+		</element>
 	</view>
 </mamelayout>
