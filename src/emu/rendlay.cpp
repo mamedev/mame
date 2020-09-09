@@ -1141,6 +1141,7 @@ void layout_group::resolve_bounds(
 	LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Group '%s' resolve bounds empty=%s vistoggle=%s repeat=%s init=%s\n",
 			parentnode.get_attribute_string("name", ""), empty, vistoggle, repeat, init);
 	bool envaltered(false);
+	bool unresolved(true);
 	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); !m_bounds_resolved && itemnode; itemnode = itemnode->get_next_sibling())
 	{
 		if (!strcmp(itemnode->get_name(), "bounds"))
@@ -1151,10 +1152,14 @@ void layout_group::resolve_bounds(
 		}
 		else if (!strcmp(itemnode->get_name(), "param"))
 		{
-			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment altered%s, unresolving groups\n", envaltered ? " again" : "");
 			envaltered = true;
-			for (group_map::value_type &group : groupmap)
-				group.second.set_bounds_unresolved();
+			if (!unresolved)
+			{
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment altered%s, unresolving groups\n", envaltered ? " again" : "");
+				unresolved = true;
+				for (group_map::value_type &group : groupmap)
+					group.second.set_bounds_unresolved();
+			}
 			if (!repeat)
 				env.set_parameter(*itemnode);
 			else
@@ -1219,6 +1224,7 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				unresolved = false;
 				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
 						itemnode->get_attribute_string("ref", ""),
 						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
@@ -1250,7 +1256,7 @@ void layout_group::resolve_bounds(
 		}
 	}
 
-	if (envaltered)
+	if (envaltered && !unresolved)
 	{
 		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment was altered, marking groups unresolved\n");
 		bool const resolved(m_bounds_resolved);
@@ -3391,6 +3397,11 @@ void layout_view::add_items(
 			char const *name(env.get_attribute_string(*itemnode, "name", nullptr));
 			if (!name)
 				throw layout_syntax_error("collection must have name attribute");
+
+			auto const found(std::find_if(m_vistoggles.begin(), m_vistoggles.end(), [name] (auto const &x) { return x.name() == name; }));
+			if (m_vistoggles.end() != found)
+				throw layout_syntax_error(util::string_format("duplicate collection name '%s'", name));
+
 			m_defvismask |= u32(env.get_attribute_bool(*itemnode, "visible", true) ? 1 : 0) << m_vistoggles.size(); // TODO: make this less hacky
 			view_environment local(env, true);
 			m_vistoggles.emplace_back(name, local.visibility_mask());
