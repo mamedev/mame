@@ -869,6 +869,68 @@ INPUT_PORTS_START( barek3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( bk3ssrmb )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("IN0")       // 3rd I/O port
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSWA") // PCB has three 8-dip banks, but only the first seems to influence game behaviour?
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSWA:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSWA:6,7,8")
+	PORT_DIPSETTING(    0x60, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:8")
+
+	PORT_START("DSWC")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWC:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWC:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWC:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWC:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWC:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWC:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWC:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWC:8")
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Machine Configuration
@@ -1291,6 +1353,6 @@ GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   R
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", 0 ) // flying wires going through the empty PIC space aren't completely understood
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
-GAME( 1994, bk3ssrmb, 0, megadrvb,     srmdb,    md_boot_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)", MACHINE_NOT_WORKING ) // currently boots as Bare Knuckle III, mechanism to switch game not found yet
+GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)", MACHINE_NOT_WORKING ) // currently boots as Bare Knuckle III, mechanism to switch game not found yet
 GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
 GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  ROT0, "bootleg / Sega",   "Jurassic Park (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
