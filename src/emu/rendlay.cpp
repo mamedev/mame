@@ -3305,11 +3305,6 @@ void layout_view::add_items(
 			else
 				env.set_repeat_parameter(*itemnode, init);
 		}
-		else if (!strcmp(itemnode->get_name(), "backdrop"))
-		{
-			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
-			m_has_art = true;
-		}
 		else if (!strcmp(itemnode->get_name(), "screen"))
 		{
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
@@ -3319,23 +3314,38 @@ void layout_view::add_items(
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
+		else if (!strcmp(itemnode->get_name(), "backdrop"))
+		{
+			if (layers.backdrops.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated backdrop element\n", name());
+			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
+		}
 		else if (!strcmp(itemnode->get_name(), "overlay"))
 		{
+			if (layers.overlays.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated overlay element\n", name());
 			layers.overlays.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "bezel"))
 		{
+			if (layers.bezels.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated bezel element\n", name());
 			layers.bezels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "cpanel"))
 		{
+			if (layers.cpanels.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated cpanel element\n", name());
 			layers.cpanels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "marquee"))
 		{
+			if (layers.marquees.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated marquee element\n", name());
 			layers.marquees.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}

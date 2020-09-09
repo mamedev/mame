@@ -97,7 +97,6 @@ class LayoutChecker(Minifyer):
     VARPATTERN = re.compile('^.*~[0-9A-Za-z_]+~.*$')
     FLOATCHARS = re.compile('^.*[.eE].*$')
     SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
-    OBJECTS = frozenset(('backdrop', ))
     ORIENTATIONS = frozenset((0, 90, 180, 270))
     YESNO = frozenset(('yes', 'no'))
     BLENDMODES = frozenset(('none', 'alpha', 'multiply', 'add'))
@@ -452,12 +451,11 @@ class LayoutChecker(Minifyer):
         self.handlers.pop()
 
     def groupViewStartHandler(self, name, attrs):
-        if (name in self.OBJECTS) or ('element' == name):
-            refattr = 'ref' if 'element' == name else 'element'
-            if refattr not in attrs:
-                self.handleError('Element %s missing attribute %s' % (name, refattr))
-            elif attrs[refattr] not in self.referenced_elements:
-                self.referenced_elements[attrs[refattr]] = self.formatLocation()
+        if 'element' == name:
+            if 'ref' not in attrs:
+                self.handleError('Element %s missing attribute ref' % (name, ))
+            elif attrs['ref'] not in self.referenced_elements:
+                self.referenced_elements[attrs['ref']] = self.formatLocation()
             if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
                 self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
             if 'inputtag' in attrs:
