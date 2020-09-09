@@ -1041,7 +1041,7 @@ void ns32000_device::execute_run()
 					mode[0].addr();
 
 					// FIXME: size != 3?
-					m_pc = gen_read(mode[0], size);
+					m_pc = ea(mode[0]);
 					break;
 				case 0x6:
 					// BISPSRi src
