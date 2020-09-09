@@ -46,7 +46,7 @@ public:
 		m_errors(0),
 
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader","tests"}), "run|validate|convert|listdevices|static|header|docheader|tests"),
+		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","listmodels","static","header","docheader","tests"}), "run|validate|convert|listdevices|listmodels|static|header|docheader|tests"),
 		opt_includes(*this, "I", "include",                 "Add the directory to the list of directories to be searched for header files. This option may be specified repeatedly."),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
@@ -194,6 +194,7 @@ private:
 	void create_header();
 	void create_docheader();
 
+	void listmodels();
 	void listdevices();
 
 	std::vector<pstring> m_defines;
@@ -1142,6 +1143,49 @@ void tool_app_t::listdevices()
 	}
 }
 
+void tool_app_t::listmodels()
+{
+	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist", opt_boostlib());
+
+	nt.log().verbose.set_enabled(false);
+	nt.log().info.set_enabled(false);
+	nt.log().warning.set_enabled(false);
+
+	nt.parser().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
+	nt.parser().include("dummy");
+	nt.setup().prepare_to_run();
+
+	using epair = std::pair<pstring, pstring>;
+
+	struct comp_s {
+	  bool operator() (const epair &i, const epair &j)
+	  {
+		  if (i.first < j.first)
+			  return true;
+		  if (i.first == j.first)
+			  return (i.second < j.second);
+		  return false;
+	  }
+	} comp;
+
+	std::vector<epair> elems;
+
+	for (auto & e : nt.setup().models().known_models())
+	{
+		auto model = nt.setup().models().get_model(e);
+
+		elems.push_back({model.type(), e});
+	}
+
+	std::sort(elems.begin(), elems.end(), comp);
+
+	for (auto & e : elems)
+	{
+		pstring out = plib::pfmt("{1:-15} {2}")(e.first, e.second);
+		pout("{}\n", out);
+	}
+}
+
 // -------------------------------------------------
 //    convert - convert spice et al to netlist
 // -------------------------------------------------
@@ -1259,6 +1303,8 @@ int tool_app_t::execute()
 		pstring cmd = opt_cmd.as_string();
 		if (cmd == "listdevices")
 			listdevices();
+		else if (cmd == "listmodels")
+			listmodels();
 		else if (cmd == "run")
 			run();
 		else if (cmd == "validate")

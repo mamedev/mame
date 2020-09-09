@@ -61,6 +61,14 @@ namespace netlist
 
 		model_t get_model(const pstring &model);
 
+		std::vector<pstring> known_models() const
+		{
+			std::vector<pstring> ret;
+			for (const auto &e : m_models)
+				ret.push_back(e.first);
+			return ret;
+		}
+
 	private:
 
 		void model_parse(const pstring &model, map_t &map);
