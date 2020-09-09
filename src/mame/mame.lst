@@ -41180,6 +41180,8 @@ vsmileb                         //
 vsmilebs                        //
 vsmilebsw                       //
 vsmilebg                        //
+vsmilebf                        //
+vsmilebfp                       //
 
 @source:vsmilepro.cpp
 vsmilpro
