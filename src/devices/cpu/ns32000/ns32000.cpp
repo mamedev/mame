@@ -17,7 +17,6 @@ DEFINE_DEVICE_TYPE(NS32032, ns32032_device, "ns32032", "National Semiconductor N
  *  - fetch/ea/data/rmw cycles
  *  - address translation/abort
  *  - floating point and other unimplemented instructions
- *      - format 5: cmpsi,skpsi
  *      - format 6: subp,addp
  *      - format 7: cmpm, dei
  *      - format 8: movus/movsu
@@ -1080,7 +1079,7 @@ void ns32000_device::execute_run()
 						SP -= 4;
 						space(0).write_dword_unaligned(SP, m_pc + bytes);
 
-						m_pc = gen_read(mode[0], size);
+						m_pc = ea(mode[0]);
 					}
 					break;
 				case 0xe:
@@ -1233,7 +1232,7 @@ void ns32000_device::execute_run()
 				// ADDR src,dest
 				//      gen,gen
 				//      addr,write.D
-				mode[1].addr();
+				mode[0].addr();
 
 				gen_write(mode[1], SIZE_D, ea(mode[0]));
 				m_pc += bytes;
@@ -1328,22 +1327,34 @@ void ns32000_device::execute_run()
 				bool const backward = BIT(opword, 8);
 				unsigned const uw = (opword >> 9) & 3;
 
-				// TODO: string instruction UW options, translation
-
 				switch ((opword >> 2) & 15)
 				{
 				case 0:
 					// MOVSi options
-					if (translate || uw)
-						fatalerror("unimplemented: movs options (%s)\n", machine().describe_context());
+					m_psr &= ~PSR_F;
 					while (m_r[0])
 					{
-						switch (size)
+						u32 data =
+							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[1]) :
+							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[1]) :
+							space(0).read_byte(m_r[1]);
+
+						if (translate)
+							data = space(0).read_byte(m_r[3] + u8(data));
+
+						bool const match = !((m_r[4] ^ data) & size_mask[size]);
+						if ((uw == 1 && !match) || (uw == 3 && match))
 						{
-						case 0: space(0).write_byte(m_r[2], space(0).read_byte(m_r[1])); break;
-						case 1: space(0).write_word_unaligned(m_r[2], space(0).read_word_unaligned(m_r[1])); break;
-						case 3: space(0).write_dword_unaligned(m_r[2], space(0).read_dword_unaligned(m_r[1])); break;
+							m_psr |= PSR_F;
+							break;
 						}
+
+						if (size == SIZE_D)
+							space(0).write_dword_unaligned(m_r[2], data);
+						else if (size == SIZE_W)
+							space(0).write_word_unaligned(m_r[2], data);
+						else
+							space(0).write_byte(m_r[2], data);
 
 						if (backward)
 						{
@@ -1362,7 +1373,60 @@ void ns32000_device::execute_run()
 					break;
 				case 1:
 					// CMPSi options
-					fatalerror("unimplemented: cmps (%s)\n", machine().describe_context());
+					m_psr |= PSR_Z;
+					m_psr &= ~(PSR_N | PSR_F | PSR_L);
+					while (m_r[0])
+					{
+						u32 src1 =
+							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[1]) :
+							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[1]) :
+							space(0).read_byte(m_r[1]);
+						u32 src2 =
+							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[2]) :
+							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[2]) :
+							space(0).read_byte(m_r[2]);
+
+						if (translate)
+							src1 = space(0).read_byte(m_r[3] + u8(src1));
+
+						bool const match = !((m_r[4] ^ src1) & size_mask[size]);
+						if ((uw == 1 && !match) || (uw == 3 && match))
+						{
+							m_psr |= PSR_F;
+							break;
+						}
+
+						if (src1 != src2)
+						{
+							m_psr &= ~PSR_Z;
+
+							if ((size == SIZE_D && s32(src1) > s32(src2))
+								|| ((size == SIZE_W && s16(src1) > s16(src2))
+									|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+								m_psr |= PSR_N;
+
+							if ((size == SIZE_D && u32(src1) > u32(src2))
+								|| ((size == SIZE_W && u16(src1) > u16(src2))
+									|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+								m_psr |= PSR_L;
+
+							break;
+						}
+
+						if (backward)
+						{
+							m_r[1] -= size + 1;
+							m_r[2] -= size + 1;
+						}
+						else
+						{
+							m_r[1] += size + 1;
+							m_r[2] += size + 1;
+						}
+
+						m_r[0]--;
+					}
+					m_pc += bytes;
 					break;
 				case 2:
 					// SETCFG cfglist
@@ -1377,7 +1441,32 @@ void ns32000_device::execute_run()
 					break;
 				case 3:
 					// SKPSi options
-					fatalerror("unimplemented: skps (%s)\n", machine().describe_context());
+					m_psr &= ~PSR_F;
+					while (m_r[0])
+					{
+						u32 data =
+							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[1]) :
+							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[1]) :
+							space(0).read_byte(m_r[1]);
+
+						if (translate)
+							data = space(0).read_byte(m_r[3] + u8(data));
+
+						bool const match = !((m_r[4] ^ data) & size_mask[size]);
+						if ((uw == 1 && !match) || (uw == 3 && match))
+						{
+							m_psr |= PSR_F;
+							break;
+						}
+
+						if (backward)
+							m_r[1] -= size + 1;
+						else
+							m_r[1] += size + 1;
+
+						m_r[0]--;
+					}
+					m_pc += bytes;
 					break;
 				default:
 					interrupt(UND, m_pc);
