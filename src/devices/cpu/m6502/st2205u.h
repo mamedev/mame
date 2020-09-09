@@ -59,6 +59,8 @@ public:
 
 	st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_alt_map() { m_alt_map = true; }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -204,6 +206,8 @@ private:
 	u8 m_dmod[2];
 	u8 m_rctr;
 	u8 m_lvctr;
+
+	bool m_alt_map; // hack
 };
 
 DECLARE_DEVICE_TYPE(ST2205U, st2205u_device)

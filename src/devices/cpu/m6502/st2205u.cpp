@@ -64,6 +64,7 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	, m_dmod{0}
 	, m_rctr(0)
 	, m_lvctr(0)
+	, m_alt_map(false)
 {
 }
 
@@ -819,11 +820,21 @@ void st2205u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2205u_device::pctrl_r), FUNC(st2205u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2205u_device::pfc_r), FUNC(st2205u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
-	map(0x0010, 0x0017).rw(FUNC(st2205u_device::psg_r), FUNC(st2205u_device::psg_w));
-	map(0x0018, 0x001b).rw(FUNC(st2205u_device::vol_r), FUNC(st2205u_device::vol_w));
-	map(0x001c, 0x001d).rw(FUNC(st2205u_device::volm_r), FUNC(st2205u_device::volm_w));
-	map(0x001e, 0x001e).rw(FUNC(st2205u_device::psgc_r), FUNC(st2205u_device::psgc_w));
-	map(0x001f, 0x001f).rw(FUNC(st2205u_device::psgm_r), FUNC(st2205u_device::psgm_w));
+	if (m_alt_map)
+	{
+		map(0x0012, 0x0012).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
+		map(0x0013, 0x0013).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
+		map(0x0014, 0x0014).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
+		map(0x0015, 0x0015).rw(FUNC(st2205u_device::smod_r), FUNC(st2205u_device::smod_w));
+	}
+	else
+	{
+		map(0x0010, 0x0017).rw(FUNC(st2205u_device::psg_r), FUNC(st2205u_device::psg_w));
+		map(0x0018, 0x001b).rw(FUNC(st2205u_device::vol_r), FUNC(st2205u_device::vol_w));
+		map(0x001c, 0x001d).rw(FUNC(st2205u_device::volm_r), FUNC(st2205u_device::volm_w));
+		map(0x001e, 0x001e).rw(FUNC(st2205u_device::psgc_r), FUNC(st2205u_device::psgc_w));
+		map(0x001f, 0x001f).rw(FUNC(st2205u_device::psgm_r), FUNC(st2205u_device::psgm_w));
+	}
 	map(0x0020, 0x0027).rw(FUNC(st2205u_device::tc_12bit_r), FUNC(st2205u_device::tc_12bit_w));
 	map(0x0028, 0x0028).rw(FUNC(st2205u_device::tien_r), FUNC(st2205u_device::tien_w));
 	map(0x0029, 0x0029).rw(FUNC(st2205u_device::prs_r), FUNC(st2205u_device::prs_w));
@@ -847,25 +858,36 @@ void st2205u_device::int_map(address_map &map)
 	map(0x003d, 0x003d).rw(FUNC(st2205u_device::ireqh_r), FUNC(st2205u_device::ireqh_w));
 	map(0x003e, 0x003e).rw(FUNC(st2205u_device::ienal_r), FUNC(st2205u_device::ienal_w));
 	map(0x003f, 0x003f).rw(FUNC(st2205u_device::ienah_r), FUNC(st2205u_device::ienah_w));
-	map(0x0040, 0x0040).w(FUNC(st2205u_device::lssal_w));
-	map(0x0041, 0x0041).w(FUNC(st2205u_device::lssah_w));
-	map(0x0042, 0x0042).w(FUNC(st2205u_device::lvpw_w));
-	map(0x0043, 0x0043).rw(FUNC(st2205u_device::lxmax_r), FUNC(st2205u_device::lxmax_w));
-	map(0x0044, 0x0044).rw(FUNC(st2205u_device::lymax_r), FUNC(st2205u_device::lymax_w));
-	map(0x0045, 0x0045).rw(FUNC(st2205u_device::lpan_r), FUNC(st2205u_device::lpan_w));
-	map(0x0046, 0x0046).rw(FUNC(st2205u_device::lbuf_r), FUNC(st2205u_device::lbuf_w));
-	map(0x0047, 0x0047).rw(FUNC(st2205u_device::lctr_r), FUNC(st2205u_device::lctr_w));
-	map(0x0048, 0x0048).w(FUNC(st2205u_device::lckr_w));
-	map(0x0049, 0x0049).w(FUNC(st2205u_device::lfra_w));
-	map(0x004a, 0x004a).rw(FUNC(st2205u_device::lac_r), FUNC(st2205u_device::lac_w));
-	map(0x004b, 0x004b).rw(FUNC(st2205u_device::lpwm_r), FUNC(st2205u_device::lpwm_w));
-	map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
-	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
-	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
-	map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
-	map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
-	map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
-	map(0x0055, 0x0055).rw(FUNC(st2205u_device::smod_r), FUNC(st2205u_device::smod_w));
+	if (m_alt_map)
+	{
+		map(0x0040, 0x0047).rw(FUNC(st2205u_device::psg_r), FUNC(st2205u_device::psg_w));
+		map(0x0048, 0x004b).rw(FUNC(st2205u_device::vol_r), FUNC(st2205u_device::vol_w));
+		map(0x004c, 0x004d).rw(FUNC(st2205u_device::volm_r), FUNC(st2205u_device::volm_w));
+		map(0x004e, 0x004e).rw(FUNC(st2205u_device::psgc_r), FUNC(st2205u_device::psgc_w));
+		map(0x004f, 0x004f).rw(FUNC(st2205u_device::psgm_r), FUNC(st2205u_device::psgm_w));
+	}
+	else
+	{
+		map(0x0040, 0x0040).w(FUNC(st2205u_device::lssal_w));
+		map(0x0041, 0x0041).w(FUNC(st2205u_device::lssah_w));
+		map(0x0042, 0x0042).w(FUNC(st2205u_device::lvpw_w));
+		map(0x0043, 0x0043).rw(FUNC(st2205u_device::lxmax_r), FUNC(st2205u_device::lxmax_w));
+		map(0x0044, 0x0044).rw(FUNC(st2205u_device::lymax_r), FUNC(st2205u_device::lymax_w));
+		map(0x0045, 0x0045).rw(FUNC(st2205u_device::lpan_r), FUNC(st2205u_device::lpan_w));
+		map(0x0046, 0x0046).rw(FUNC(st2205u_device::lbuf_r), FUNC(st2205u_device::lbuf_w));
+		map(0x0047, 0x0047).rw(FUNC(st2205u_device::lctr_r), FUNC(st2205u_device::lctr_w));
+		map(0x0048, 0x0048).w(FUNC(st2205u_device::lckr_w));
+		map(0x0049, 0x0049).w(FUNC(st2205u_device::lfra_w));
+		map(0x004a, 0x004a).rw(FUNC(st2205u_device::lac_r), FUNC(st2205u_device::lac_w));
+		map(0x004b, 0x004b).rw(FUNC(st2205u_device::lpwm_r), FUNC(st2205u_device::lpwm_w));
+		map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
+		map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
+		map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+		map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
+		map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
+		map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
+		map(0x0055, 0x0055).rw(FUNC(st2205u_device::smod_r), FUNC(st2205u_device::smod_w));
+	}
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));
 	map(0x0058, 0x0058).rw(FUNC(st2205u_device::dptrl_r), FUNC(st2205u_device::dptrl_w));
 	map(0x0059, 0x0059).rw(FUNC(st2205u_device::dptrh_r), FUNC(st2205u_device::dptrh_w));
