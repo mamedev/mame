@@ -10890,6 +10890,9 @@ knightsb3                       // bootleg
 sf2b                            // bootleg
 sf2b2                           // bootleg
 sf2ceb                          // bootleg
+sf2ceb2                         // bootleg
+sf2ceb3                         // bootleg
+sf2ceb4                         // bootleg
 sf2mdt                          // bootleg
 sf2mdta                         // bootleg
 sf2mdtb                         // bootleg
@@ -20073,6 +20076,9 @@ excthour                        // TA-0015 (c) 1985 + Taito license
 maniach                         // TA-0017 (c) 1986 + Taito America license
 maniach2                        // TA-0017 (c) 1986 + Taito America license
 matmania                        // TA-0015 (c) 1985 + Taito America license
+
+@source:matrix.cpp
+matrix                          //
 
 @source:mattelchess.cpp
 mchess
@@ -42852,6 +42858,7 @@ jetwave                         // GX678 (c)1996 Euro EAB
 jetwavej                        // GX678 (c)1996 Japan JAB
 midnrun                         // GX476 (c)1995 Europe EAA
 midnruna                        // GX477 (c)1995 Asia AAA
+midnruna2                       // GX477 (c)1995 Asia AAA
 midnrunj                        // GX477 (c)1995 Japan JAD
 waveshrk                        // GX678 (c)1996 USA UAB
 windheat                        // GX677 (c)1996 Europe EAA
