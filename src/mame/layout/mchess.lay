@@ -59,37 +59,31 @@ license:CC0
 <!-- groups -->
 
 	<group name="display">
-		<collection name="Bezel">
-			<element ref="cb_border"><bounds left="-3" right="83" top="-3" bottom="91.434" /></element>
-		</collection>
-
+		<element ref="cb_border"><bounds left="-3" right="83" top="-3" bottom="91.434" /></element>
 		<screen index="0"><bounds left="0" right="80" top="0" bottom="88.434" /></screen>
+		<element ref="cb_overlay" blend="multiply"><bounds left="0" right="80" top="0" bottom="88.434" /></element>
+		<element ref="blackb"><bounds left="79.9" right="80.1" top="-0.1" bottom="88.6" /></element>
+		<element ref="blackb"><bounds left="-0.1" right="80.1" top="88.1" bottom="88.534" /></element>
+		<element ref="blackb"><bounds x="-0.1" y="79.4" width="80.2" height="0.8" /></element>
 
-		<collection name="Overlay">
-			<element ref="cb_overlay" blend="multiply"><bounds left="0" right="80" top="0" bottom="88.434" /></element>
+		<repeat count="4">
+			<param name="left" start="0" increment="20" />
+			<param name="right" start="10" increment="20" />
 			<repeat count="4">
-				<param name="left" start="0" increment="20" />
-				<param name="right" start="10" increment="20" />
-				<repeat count="4">
-					<param name="top" start="9.96" increment="19.92" />
-					<param name="bottom" start="19.92" increment="19.92" />
-					<element ref="cb_mask" blend="multiply"><bounds left="~left~" right="~right~" top="~top~" bottom="~bottom~" /></element>
-				</repeat>
+				<param name="top" start="9.96" increment="19.92" />
+				<param name="bottom" start="19.92" increment="19.92" />
+				<element ref="cb_mask" blend="multiply"><bounds left="~left~" right="~right~" top="~top~" bottom="~bottom~" /></element>
 			</repeat>
+		</repeat>
+		<repeat count="4">
+			<param name="left" start="70" increment="-20" />
+			<param name="right" start="80" increment="-20" />
 			<repeat count="4">
-				<param name="left" start="70" increment="-20" />
-				<param name="right" start="80" increment="-20" />
-				<repeat count="4">
-					<param name="top" start="0" increment="19.92" />
-					<param name="bottom" start="9.96" increment="19.92" />
-					<element ref="cb_mask" blend="multiply"><bounds left="~left~" right="~right~" top="~top~" bottom="~bottom~" /></element>
-				</repeat>
+				<param name="top" start="0" increment="19.92" />
+				<param name="bottom" start="9.96" increment="19.92" />
+				<element ref="cb_mask" blend="multiply"><bounds left="~left~" right="~right~" top="~top~" bottom="~bottom~" /></element>
 			</repeat>
-
-			<element ref="blackb"><bounds left="79.9" right="80.1" top="-0.1" bottom="88.6" /></element>
-			<element ref="blackb"><bounds left="-0.1" right="80.1" top="88.1" bottom="88.534" /></element>
-			<element ref="blackb"><bounds x="-0.1" y="79.4" width="80.2" height="0.8" /></element>
-		</collection>
+		</repeat>
 	</group>
 
 	<group name="buttons">
