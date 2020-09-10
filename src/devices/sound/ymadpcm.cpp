@@ -440,10 +440,15 @@ void ymadpcm_b_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_b_channel::output(s32 &lsum, s32 &rsum) const
+void ymadpcm_b_channel::output(s32 &lsum, s32 &rsum, u8 rshift) const
 {
 	// do a linear interpolation between samples
 	s32 result = (m_prev_accum * ((m_position ^ 0xffff) + 1) + m_accumulator * m_position) >> 16;
+
+	// apply volume (level) in a linear fashion and reduce
+	result = (result * m_regs.level()) >> (8 + rshift);
+
+	// apply to left/right
 	if (m_regs.pan_left())
 		lsum += result;
 	if (m_regs.pan_right())
@@ -637,15 +642,15 @@ void ymadpcm_b_engine::clock(u8 chanmask)
 
 
 //-------------------------------------------------
-//  update - master update function
+//  output - master output function
 //-------------------------------------------------
 
-void ymadpcm_b_engine::output(s32 &lsum, s32 &rsum, u8 chanmask)
+void ymadpcm_b_engine::output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask)
 {
 	// compute the output of each channel
 	for (int chnum = 0; chnum < m_channel.size(); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->output(lsum, rsum);
+			m_channel[chnum]->output(lsum, rsum, rshift);
 }
 
 

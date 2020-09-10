@@ -255,7 +255,7 @@ public:
 	void clock();
 
 	// return the computed output value, with panning applied
-	void output(s32 &lsum, s32 &rsum) const;
+	void output(s32 &lsum, s32 &rsum, u8 rshift) const;
 
 	// return the status register
 	u8 status() const { return m_status; }
@@ -314,7 +314,7 @@ public:
 	void clock(u8 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 chanmask);
+	void output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask);
 
 	// read from the ADPCM-B registers
 	u8 read(u8 regnum) { return m_channel[0]->read(regnum); }

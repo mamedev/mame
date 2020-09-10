@@ -1665,7 +1665,7 @@ void ym2608_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		// mix in the ADPCM
 		m_adpcm_a.output(lsum, rsum, 0x3f);
-		m_adpcm_b.output(lsum, rsum, 0x01);
+		m_adpcm_b.output(lsum, rsum, 2, 0x01);
 
 		// YM2608 is stereo
 		if (lsum < -32768)
@@ -2040,7 +2040,7 @@ void ym2610_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		// mix in the ADPCM
 		m_adpcm_a.output(lsum, rsum, 0x3f);
-		m_adpcm_b.output(lsum, rsum, 0x01);
+		m_adpcm_b.output(lsum, rsum, 2, 0x01);
 
 		// YM2608 is stereo
 		if (lsum < -32768)
@@ -2083,9 +2083,6 @@ u8 ym2610_device::adpcm_b_read(offs_t offset)
 
 DEFINE_DEVICE_TYPE(YM2610, ym2610_device, "ym2610", "YM2610 OPNB")
 DEFINE_DEVICE_TYPE(YM2610B, ym2610b_device, "ym2610b", "YM2610 OPNB2")
-
-
-#include "ymadpcm.cpp"
 
 /*
 Test Bit Functions
