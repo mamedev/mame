@@ -1190,7 +1190,7 @@ void bbc_state::bbcb(machine_config &config)
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
-	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
+	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 
@@ -1608,7 +1608,7 @@ void bbcm_state::bbcm(machine_config &config)
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
-	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
+	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 
