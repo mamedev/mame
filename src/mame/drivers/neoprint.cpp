@@ -509,7 +509,7 @@ void neoprint_state::neoprint(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::neoprint_audio_io_map);
 
-	NEO_ZMC(config, "neo_zmc").set_default_rom_tag("audiocpu"); // from catridges, different config is possible?
+	NEO_ZMC(config, "neo_zmc").set_default_rom_tag("audiocpu"); // from catridges, different config without NEO-ZMC is possible/exists?
 
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -555,7 +555,7 @@ void neoprint_state::nprsp(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::neoprint_audio_io_map);
 
-	NEO_ZMC(config, "neo_zmc").set_default_rom_tag("audiocpu"); // from catridges, different config is possible?
+	NEO_ZMC(config, "neo_zmc").set_default_rom_tag("audiocpu"); // from catridges, different config without NEO-ZMC is possible/exists?
 
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

@@ -1304,7 +1304,7 @@ void neogeo_base_state::init_audio()
 
 	/* audio banking */
 	address_mask = (len - 0x10000 - 1) & 0x3ffff;
-	if (m_neo_zmc) // TODO: populated in cartridge, other configurations are possible?
+	if (m_neo_zmc) // TODO: populated in cartridge, other configurations without NEO-ZMC are possible/exists?
 	{
 		m_neo_zmc->space(0).unmap_read(0x00000, 0x7ffff);
 		m_neo_zmc->space(0).install_rom(0x00000, address_mask, (~address_mask) & 0x7ffff, &ROM[0x10000]);
