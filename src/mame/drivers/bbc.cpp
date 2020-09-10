@@ -1433,8 +1433,8 @@ void bbcbp_state::acw443(machine_config &config)
 	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 32016 co-processor */
-	//m_tube->set_default_option("32016");
-	//m_tube->set_fixed(true);
+	m_tube->set_default_option("32016l");
+	m_tube->set_fixed(true);
 
 	/* Acorn Winchester Disc 20MB */
 	m_1mhzbus->set_default_option("awhd");
