@@ -27,8 +27,8 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 	m_region_audio(*this, "^audiocpu"),
 	m_region_audiocrypt(*this, "^audiocrypt"),
 	m_region_spr(*this, "^sprites"),
-	m_region_ym(*this, "^ymsnd"),
-	m_region_ymd(*this, "^ymsnd.deltat")
+	m_region_ym(*this, "^ymsnd:adpcma"),
+	m_region_ymd(*this, "^ymsnd:adpcmb")
 {
 }
 
@@ -259,17 +259,17 @@ image_init_result neogeo_cart_slot_device::call_load()
 				memcpy(ROM8 + 0x10000, get_software_region("audiocpu"), len); // avoid reloading in XML, should just improve banking instead tho?
 			}
 
-			len = get_software_region_length("ymsnd");
+			len = get_software_region_length("ymsnd:adpcma");
 			m_cart->ym_alloc(len);
 			ROM8 = m_cart->get_ym_base();
-			memcpy(ROM8, get_software_region("ymsnd"), len);
+			memcpy(ROM8, get_software_region("ymsnd:adpcma"), len);
 
-			if (get_software_region("ymsnd.deltat") != nullptr)
+			if (get_software_region("ymsnd:adpcmb") != nullptr)
 			{
-				len = get_software_region_length("ymsnd.deltat");
+				len = get_software_region_length("ymsnd:adpcmb");
 				m_cart->ymdelta_alloc(len);
 				ROM8 = m_cart->get_ymdelta_base();
-				memcpy(ROM8, get_software_region("ymsnd.deltat"), len);
+				memcpy(ROM8, get_software_region("ymsnd:adpcmb"), len);
 			}
 			else
 			{

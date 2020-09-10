@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh,Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 
 #ifndef MAME_SOUND_YMOPN_H
 #define MAME_SOUND_YMOPN_H
@@ -7,129 +7,248 @@
 #pragma once
 
 #include "ay8910.h"
-#include "dirom.h"
-
-#define YMOPN_NEW_SOUND (0)
-
-class ymopn_device_base;
-
-DECLARE_DEVICE_TYPE(YM2203, ym2203_device);
-DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
-DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
-DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device);
 
 
-// ======================> ymopn_block_fnum
+// ======================> ymopn_registers
 
-class ymopn_block_fnum
+//
+// OPN register map:
+//
+//      System-wide registers:
+//           21 xxxxxxxx Test register
+//           22 ----x--- LFO enable (OPNA, OPNB, OPNB2, OPN2)
+//              -----xxx LFO rate (OPNA, OPNB, OPNB2, OPN2)
+//           24 xxxxxxxx Timer A value (upper 8 bits)
+//           25 ------xx Timer A value (lower 2 bits)
+//           26 xxxxxxxx Timer B value
+//           27 x------- CSM mode when timer A fires
+//              -x------ Mutli-frequency mode for channel #2
+//              --x----- Reset timer B
+//              ---x---- Reset timer A
+//              ----x--- Enable timer B
+//              -----x-- Enable timer A
+//              ------x- Load timer B
+//              -------x Load timer A
+//           28 x------- Key on/off operator 4
+//              -x------ Key on/off operator 3
+//              --x----- Key on/off operator 2
+//              ---x---- Key on/off operator 1
+//              -----x-- Upper channel select (OPNA, OPNB, OPNB2, OPN2)
+//              ------xx Channel select
+//
+//     Per-operator registers (channel in address bits 0-1, operator in bits 2-3)
+//        30-3F -xxx---- Detune value (0-7)
+//              ----xxxx Multiple value (0-15)
+//        40-4F -xxxxxxx Total level (0-127)
+//        50-5F xx------ Key scale rate (0-3)
+//              ---xxxxx Attack rate (0-31)
+//        60-6F x------- LFO AM enable (OPNA, OPNB, OPNB2, OPN2)
+//              ---xxxxx Decay rate (0-31)
+//        70-7F ---xxxxx Sustain rate (0-31)
+//        80-8F xxxx---- Sustain level (0-15)
+//              ----xxxx Release rate (0-15)
+//        90-9F ----x--- SSG-EG enable
+//              -----xxx SSG-EG envelope (0-7)
+//
+//     Per-channel registers (channel in address bits 0-1)
+//        A0-A3 xxxxxxxx Frequency number lower 8 bits
+//        A4-A7 --xxx--- Block (0-7)
+//              -----xxx Frequency number upper 3 bits
+//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
+//              -----xxx Operator connection algorithm (0-7)
+//        B4-B7 x------- Pan left (OPNA, OPNB, OPNB2, OPN2)
+//              -x------ Pan right (OPNA, OPNB, OPNB2, OPN2)
+//              --xx---- LFO AM shift (0-3)
+//              -----xxx LFO PM depth (0-7)
+//
+//     Special multi-frequency registers (channel implicitly #2; operator in address bits 0-1)
+//        A8-AB xxxxxxxx Frequency number lower 8 bits
+//        AC-AF --xxx--- Block (0-7)
+//              -----xxx Frequency number upper 3 bits
+//
+class ymopn_registers
 {
-public:
-	ymopn_block_fnum() : m_raw(0) { }
+	// private constructor to directly specify channel/operator bases
+	ymopn_registers(ymopn_registers const &src, u16 chbase, u16 opbase = 0) :
+		m_chbase(chbase),
+		m_opbase(opbase),
+		m_regdata(src.m_regdata)
+	{
+	}
 
-	void set(u16 raw) { m_raw = raw & 0x3fff; }
-
-	u8 block() const { return (m_raw >> 11) & 7; }
-	u16 fnum() const { return m_raw & 0x7ff; }
-
-	u8 keycode() const;
-	u32 fc(s32 offset = 0) const;
-
-	u16 m_raw;
-};
-
-
-// ======================> ymopn_3slot_state
-
-class ymopn_3slot_state
-{
-public:
-	ymopn_3slot_state() : m_upper(0) { }
-	void set_fnum(u8 chnum, u8 value) { m_blk_fnum[chnum].set((m_upper << 8) | value); }
-
-	ymopn_block_fnum m_blk_fnum[3]; // three 16-bit block/fnum values
-	u8 m_upper;            // upper 8-bit latch
-};
-
-
-// ======================> ymopn_slot
-
-class ymopn_slot
-{
 public:
 	// constructor
-	ymopn_slot(ymopn_device_base &opn);
+	ymopn_registers(std::vector<u8> &regdata) :
+		m_chbase(0),
+		m_opbase(0),
+		m_regdata(regdata)
+	{
+	}
 
-	// register for save states
-	void save(int index);
+u8 opbase() const { return m_opbase; }
+u8 chbase() const { return m_chbase; }
+u8 *regbase() const { return &m_regdata[0]; }
 
-	// reset the state
-	void reset();
+	// direct read/write access
+	u8 read(u16 index) { return m_regdata[index]; }
+	void write(u16 index, u8 data) { m_regdata[index] = data; }
 
-	// return the current volume, applying AM
-	u32 volume(u32 am) const { return m_total_level + m_envelope_volume + (am & m_am_mask); }
+	// create a new version of ourself with a different channel/operator base
+	ymopn_registers channel_registers(u8 chnum) { return ymopn_registers(*this, channel_offset(chnum)); }
+	ymopn_registers operator_registers(u8 opnum) { return ymopn_registers(*this, m_chbase, m_chbase + operator_offset(opnum)); }
 
-	// return whether the key is on or off
-	bool key() const { return (m_key != 0); }
+	// system-wide registers
+	u8 test() const           /*  8 bits */ { return m_regdata[0x21]; }
+	u8 lfo_enable() const     /*  3 bits */ { return BIT(m_regdata[0x22], 3); }
+	u8 lfo_rate() const       /*  3 bits */ { return BIT(m_regdata[0x22], 0, 3); }
+	u16 timer_a_value() const /* 10 bits */ { return (m_regdata[0x24] << 2) | BIT(m_regdata[0x25], 0, 2); }
+	u8 timer_b_value() const  /*  8 bits */ { return m_regdata[0x26]; }
+	u8 csm_enable() const     /*  1 bit  */ { return BIT(m_regdata[0x27], 7); }
+	u8 multi_freq() const     /*  1 bit  */ { return BIT(m_regdata[0x27], 6); }
+	u8 reset_timer_b() const  /*  1 bit  */ { return BIT(m_regdata[0x27], 5); }
+	u8 reset_timer_a() const  /*  1 bit  */ { return BIT(m_regdata[0x27], 4); }
+	u8 enable_timer_b() const /*  1 bit  */ { return BIT(m_regdata[0x27], 3); }
+	u8 enable_timer_a() const /*  1 bit  */ { return BIT(m_regdata[0x27], 2); }
+	u8 load_timer_b() const   /*  1 bit  */ { return BIT(m_regdata[0x27], 1); }
+	u8 load_timer_a() const   /*  1 bit  */ { return BIT(m_regdata[0x27], 0); }
+	u8 keyon_states() const   /*  4 bits */ { return BIT(m_regdata[0x28], 4, 4); }
+	u8 keyon_channel2() const /*  1 bit  */ { return BIT(m_regdata[0x28], 2); }
+	u8 keyon_channel() const  /*  2 bits */ { return BIT(m_regdata[0x28], 0, 2); }
 
-	// return the current phase
-	u32 phase() const { return m_phase; }
+	// per-channel registers
+	u16 block_fnum() const    /* 14 bits */ { return block_fnum(m_chbase + 0xa0, m_chbase + 0xa4); }
+	u8 feedback() const       /*  3 bits */ { return BIT(m_regdata[m_chbase + 0xb0], 3, 3); }
+	u8 algorithm() const      /*  3 bits */ { return BIT(m_regdata[m_chbase + 0xb0], 0, 3); }
+	u8 pan_left() const       /*  1 bit  */ { return BIT(m_regdata[m_chbase + 0xb4], 7); }
+	u8 pan_right() const      /*  1 bit  */ { return BIT(m_regdata[m_chbase + 0xb4], 6); }
+	u8 am_shift() const       /*  2 bits */ { return BIT(m_regdata[m_chbase + 0xb4], 4, 2); }
+	u8 pm_depth() const       /*  3 bits */ { return BIT(m_regdata[m_chbase + 0xb4], 0, 3); }
 
-	// parameter settings
-	void set_det_mul(u8 value);
-	void set_ar_ksr(u8 value);
-	void set_dr_am(u8 value);
-	void set_sr(u8 value);
-	void set_sl_rr(int value);
-	void set_tl(u8 value);
-	void set_ssg(u8 value);
+	// per-operator registers
+	u8 detune() const         /*  3 bits */ { return BIT(m_regdata[m_opbase + 0x30], 4, 3); }
+	u8 multiple() const       /*  4 bits */ { return BIT(m_regdata[m_opbase + 0x30], 0, 4); }
+	u8 total_level() const    /*  8 bits */ { return BIT(m_regdata[m_opbase + 0x40], 0, 7); }
+	u8 ksr() const            /*  2 bits */ { return BIT(m_regdata[m_opbase + 0x50], 6, 2); }
+	u8 attack_rate() const    /*  5 bits */ { return BIT(m_regdata[m_opbase + 0x50], 0, 5); }
+	u8 lfo_am_enable() const  /*  1 bit  */ { return BIT(m_regdata[m_opbase + 0x60], 7); }
+	u8 decay_rate() const     /*  5 bits */ { return BIT(m_regdata[m_opbase + 0x60], 0, 5); }
+	u8 sustain_rate() const   /*  5 bits */ { return BIT(m_regdata[m_opbase + 0x70], 0, 5); }
+	u8 sustain_level() const  /*  4 bits */ { return BIT(m_regdata[m_opbase + 0x80], 4, 4); }
+	u8 release_rate() const   /*  4 bits */ { return BIT(m_regdata[m_opbase + 0x80], 0, 4); }
+	u8 ssg_eg_enabled() const /*  1 bit  */ { return BIT(m_regdata[m_opbase + 0x90], 3); }
+	u8 ssg_eg_mode() const    /*  3 bits */ { return BIT(m_regdata[m_opbase + 0x90], 0, 3); }
 
-	// process a key on/off signals
-	void keyonoff(bool on);
+	// multi-frequency registers
+	u16 multi_block_fnum(u8 op) const /* 14 bits */ { return block_fnum(op + 0xa8, op + 0xac); }
 
-	// updates
-	void refresh_fc_eg(ymopn_block_fnum blk_fnum);
-	void update_phase_lfo(s32 lfo_pm, s32 pm_shift, ymopn_block_fnum blk_fnum);
-	void advance_eg(u32 eg_cnt);
+	// special helper for generically getting the attack/decay/statain/release rates
+	u8 adsr_rate(u8 state) const
+	{
+		// attack/decay/sustain are identical
+		if (state < 3)
+			return BIT(m_regdata[m_opbase + 0x50 + (state << 4)], 0, 5);
+
+		// release encodes 4 bits and expands them
+		else
+			return 2 * BIT(m_regdata[m_opbase + 0x80], 0, 4) + 1;
+	}
 
 private:
-	// set of basic parameters for each envelope generator phase
-	struct eg_params
+	// return a 14-bit block/fnum from two registers
+	u16 block_fnum(u16 index0, u16 index1) const
 	{
-		eg_params() : rate(0), shift(0), inctable(0) { }
-		u8 rate;              // raw rate value; kept for recalcs
-		u8 shift;             // bits to shift eg_count left to make 4.12
-		u8 inctable;          // index into the increment steps table
-	};
-	void update_eg_params(eg_params &params);
-	void update_eg_params_all();
+		return m_regdata[index0] | (BIT(m_regdata[index1], 0, 6) << 8);
+	}
+
+	// convert a channel number into a register offset
+	static u16 channel_offset(u8 chnum)
+	{
+		// channels 3-5 are accessed at +0x100
+		u16 offset = 0;
+		if (chnum >= 3)
+		{
+			offset = 0x100;
+			chnum -= 3;
+		}
+
+		// channel number goes into the low 2 bits
+		return offset | BIT(chnum, 0, 2);
+	}
+
+	// convert an operator number into a register offset
+	static u8 operator_offset(u8 opnum)
+	{
+		// operator index is swizzled, and goes into bits 2 & 3
+		return (BIT(opnum, 0) << 3) | (BIT(opnum, 1) << 2);
+	}
 
 	// internal state
-	ymopn_device_base &m_opn; // reference to base device
-	u8 m_detune;              // detune table index
-	u8 m_ksr_shift;           // key scale rate  :3-KSR
-	u8 m_attack_rate;         // attack rate
-	u8 m_decay_rate;          // decay rate
-	u8 m_sustain_rate;        // sustain rate
-	u8 m_release_rate;        // release rate
-	u8 m_ksr;                 // key scale rate  :kcode>>(3-KSR)
-	u8 m_multiply;            // multiple (multiply?)
+	u16 m_chbase;                  // base offset for channel-specific data
+	u16 m_opbase;                  // base offset for operator-specific data
+	std::vector<u8> &m_regdata;    // reference to the raw data
+};
 
-	// phase generator
-	u32 m_phase;              // phase counter
-	s32 m_phase_step;         // phase step
 
-	// envelope generator
-	u8 m_eg_state;            // phase type
-	eg_params m_eg_params[4]; // parameters for 4 EG phases
-	u32 m_total_level;        // total level: TL << 3
-	s32 m_volume;             // envelope counter
-	u32 m_sustain_level;      // sustain level:s_sl_table[SL]
-	u32 m_envelope_volume;    // current output from EG circuit (without AM from LFO)
+// ======================> ymopn_operator
 
-	u8 m_ssg;                 // SSG-EG waveform
-	u8 m_ssg_state;           // SSG-EG negated output; bit 1=negate, bit 0=have we swapped yet?
-	u8 m_key;                 // 0=last key was KEY OFF, 1=KEY ON
-	u32 m_am_mask;            // AM enable flag
+class ymopn_operator
+{
+	enum envelope_state : u8
+	{
+		ENV_ATTACK = 0,
+		ENV_DECAY = 1,
+		ENV_SUSTAIN = 2,
+		ENV_RELEASE = 3
+	};
+
+public:
+	// constructor
+	ymopn_operator(ymopn_registers regs);
+
+	// register for save states
+	void save(device_t &device, u8 index);
+
+	// reset the operator state
+	void reset();
+
+	// master clocking function
+	void clock(u32 env_counter, u8 lfo_counter, u8 pm_depth, u16 block_fnum);
+
+	// compute operator volume
+	s16 compute_volume(u16 modulation, u8 am_offset) const;
+
+	// key state control
+	void keyonoff(u8 on) { m_keyon = on; }
+	void keyon_csm() { m_csm_triggered = 1; }
+
+private:
+	// return the effective 6-bit rate after adjustments
+	u8 effective_rate(u8 rawrate, u8 keycode);
+
+	// start the attack phase
+	void start_attack(u8 keycode);
+
+	// start the release phase
+	void start_release();
+
+	// clock phases
+	void clock_keystate(u8 keystate, u8 keycode);
+	void clock_ssg_eg_state(u8 keycode);
+	void clock_envelope(u16 env_counter, u8 keycode);
+	void clock_phase(u8 lfo_counter, u8 pm_depth, u16 block_fnum);
+
+	// return effective attenuation of the envelope
+	u16 envelope_attenuation(u8 am_offset) const;
+
+	// internal state
+	u32 m_phase;                     // current phase value (10.10 format)
+	u16 m_env_attenuation;           // computed envelope attenuation (4.6 format)
+	envelope_state m_env_state;      // current envelope state
+	u8 m_ssg_inverted;               // non-zero if the output should be inverted (bit 0)
+	u8 m_key_state;                  // current key state: on or off (bit 0)
+	u8 m_keyon;                      // live key on state (bit 0)
+	u8 m_csm_triggered;              // true if a CSM key on has been triggered (bit 0)
+	ymopn_registers m_regs;          // operator-specific registers
 };
 
 
@@ -139,485 +258,286 @@ class ymopn_channel
 {
 public:
 	// constructor
-	ymopn_channel(ymopn_device_base &opn);
+	ymopn_channel(ymopn_registers regs);
 
-	// save state handling
-	void save(int index);
-	void post_load();
+	// register for save states
+	void save(device_t &device, u8 index);
 
-	// enable/disable
-	bool disabled() const { return m_disabled; }
-	void set_disabled(bool disabled) { m_disabled = disabled; }
-
-	// reset our state and all our owned slots
+	// reset the channel state
 	void reset();
 
-	// return a reference to the given slot; note that the indexing order is
-	// different than the expected order
-	ymopn_slot &slot(int index)
-	{
-		switch (index)
-		{
-			default:
-			case 0:	return m_slot1;
-			case 1:	return m_slot3;
-			case 2:	return m_slot2;
-			case 3:	return m_slot4;
-		}
-	}
-	ymopn_slot &slot1() { return m_slot1; }
-	ymopn_slot &slot2() { return m_slot2; }
-	ymopn_slot &slot3() { return m_slot3; }
-	ymopn_slot &slot4() { return m_slot4; }
+	// signal key on/off to our operators
+	void keyonoff(u8 states);
 
-	// return the computed output value, with panning applied
-	s32 output() const { return m_out_fm; }
-	s32 output_l() const { return BIT(m_pan, 1) ? output() : 0; }
-	s32 output_r() const { return BIT(m_pan, 0) ? output() : 0; }
+	// signal CSM key on to our operators
+	void keyon_csm();
 
-	// parameter settings
-	void set_three_slot_mode(ymopn_3slot_state *state);
-	void set_fnum(u8 upper, u8 value);
-	void set_lfo_shift_pan(u8 value);
-	void set_algorithm_feedback(u8 value);
+	// master clocking function
+	void clock(u32 env_counter, u8 lfo_counter, bool multi_freq);
 
-	// called to force a refresh of the parameters
-	void force_refresh() { m_refresh = true; }
-
-	// updates
-	void refresh_fc_eg();
-	void advance_eg(u32 eg_cnt);
-	void update(u32 lfo_am, u32 lfo_pm);
-	void csm_key_control();
+	// compute the channel output and add to the left/right output sums
+	void output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const;
 
 private:
-	// helpers
-	s32 op_calc(u32 phase, u32 env, s32 pm);
-	void set_connections(s32 *c1, s32 *c2, s32 *c3, s32 *c4, s32 *mem);
-	void setup_connection();
-
 	// internal state
-	ymopn_device_base &m_opn; // reference to base device
-	bool m_refresh;           // true if slots need a refresh
-	bool m_disabled;          // true of this channel is disabled
-	ymopn_slot m_slot1;       // four SLOTs (operators)
-	ymopn_slot m_slot2;       // four SLOTs (operators)
-	ymopn_slot m_slot3;       // four SLOTs (operators)
-	ymopn_slot m_slot4;       // four SLOTs (operators)
-
-	u8 m_algorithm;           // algorithm
-	u8 m_fb_shift;            // feedback shift
-	s32 m_op1_out[2];         // op1 output for feedback
-
-	s32 *m_connect1;          // SLOT1 output pointer
-	s32 *m_connect3;          // SLOT3 output pointer
-	s32 *m_connect2;          // SLOT2 output pointer
-	s32 *m_connect4;          // SLOT4 output pointer
-	s32 *m_mem_connect;       // where to put the delayed sample (MEM)
-	s32 m_mem_value;          // delayed sample (MEM) value
-
-	s32 m_pm_shift;           // PM shift
-	u8 m_am_shift;            // AM shift
-
-	ymopn_block_fnum m_blk_fnum; // current blk/fnum values
-
-	s32 m_m2, m_c1, m_c2;     // phase modulation input for slots 2,3,4
-	s32 m_mem;                // one sample delay memory
-	s32 m_out_fm;             // outputs of working channels
-	u8 m_pan;                 // pan values (bit 1 = left, bit 0 = right)
-
-	ymopn_3slot_state *m_3slot; // pointer to 3-slot state if active (or nullptr if not)
+	mutable s16 m_feedback[3];       // feedback memory for operator 1
+	ymopn_operator m_op1;            // operator 1
+	ymopn_operator m_op2;            // operator 2
+	ymopn_operator m_op3;            // operator 3
+	ymopn_operator m_op4;            // operator 4
+	ymopn_registers m_regs;          // channel-specific registers
 };
 
 
-// ======================> ymopn_adpcm_channel
+// ======================> ymopn_engine
 
-class ymopn_adpcm_channel
+class ymopn_engine
 {
-	static constexpr int FRAC_SHIFT = 16;
-	static constexpr u32 FRAC_ONE = 1 << FRAC_SHIFT;
-
 public:
-	// constructor
-	ymopn_adpcm_channel(ymopn_device_base &opn);
-
-	// save state handling
-	void save(int index);
-
-	// reset our status
-	void reset();
-
-	// return the computed output value, with panning applied
-	s32 output() const
+	enum : u8
 	{
-		int vol = m_instrument_level + m_total_level;
-		if (vol >= 63)
-			return 0;
-
-		s8 mul = 15 - (vol & 7);
-		u8 shift = 1 + (vol >> 3);
-		return ((m_adpcm_acc * mul) >> shift) & ~3;
-	}
-	s32 output_l() const { return BIT(m_pan, 1) ? output() : 0; }
-	s32 output_r() const { return BIT(m_pan, 0) ? output() : 0; }
-
-	// signal key on/off
-	void keyonoff(bool on);
-
-	// parameter setting
-	void set_volume_pan(u8 value);
-	void set_start_byte(u8 value, u8 shift) { m_start = (m_start & ~(0xff << shift)) | (value << shift); }
-	void set_end_byte(u8 value, u8 shift) { m_end = (m_end & ~(0xff << shift)) | (value << shift); }
-
-	// direct parameter setting
-	void set_tl(u8 value) { m_total_level = value; }
-	void set_start(u32 value) { m_start = value; m_addrshift = 1; }
-	void set_end(u32 value) { m_end = value; }
-	void set_step_divisor(u8 value) { m_step_divisor = value; }
-
-	// overall update
-	bool update();
-
-private:
-	// internal helpers
-	u32 start_address() const { return m_start << m_addrshift; }
-	u32 end_address() const { return ((m_end + 1) << m_addrshift) - 2; }
-
-	// internal state
-	ymopn_device_base &m_opn; // reference to base device
-	u8 m_total_level;         // total level
-	u8 m_instrument_level;    // instrument level
-	u8 m_flag;                // port state
-	u8 m_curbyte;             // current ROM data
-	u32 m_curaddress;         // current ROM address
-	u32 m_curfrac;            // current fractional address
-	u16 m_start;              // sample data start address
-	u16 m_end;                // sample data end address
-	s32 m_adpcm_acc;          // accumulator
-	s32 m_adpcm_step;         // step
-	u8 m_addrshift;           // address bits shift-left
-	u8 m_pan;                 // pan (bit 1=L, bit 0=R)
-	u8 m_step_divisor;        // step divisor
-};
-
-
-// ======================> ymopn_deltat_channel
-
-class ymopn_deltat_channel
-{
-	static constexpr int FRAC_SHIFT = 16;
-	static constexpr u32 FRAC_ONE = 1 << FRAC_SHIFT;
-	static constexpr s32 DELTA_MIN = 127;
-	static constexpr s32 DELTA_MAX = 24576;
-	static constexpr s32 DELTA_DEFAULT = DELTA_MIN;
-
-public:
-	static constexpr u8 STATUS_EOS = 0x01;
-	static constexpr u8 STATUS_BRDY = 0x02;
-	static constexpr u8 STATUS_BUSY = 0x04;
+		STATUS_TIMERA = 0x01,
+		STATUS_TIMERB = 0x02,
+		STATUS_BUSY = 0x80
+	};
 
 	// constructor
-	ymopn_deltat_channel(ymopn_device_base &opn);
+	ymopn_engine(device_t &device, bool six_channels);
 
-	// save state handling
-	void save(int index);
+	// register for save states
+	void save(device_t &device);
 
-	// reset the state
+	// reset the overall state
 	void reset();
 
-	// status
-	u8 status() const { return m_status; }
-	void status_set_reset(u8 set, u8 reset = 0);
+	// master clocking function
+	u32 clock(u8 chanmask);
 
-	// return the computed output value, with panning applied
-	s32 output() const { return (m_output * m_volume) >> 8; }
-	s32 output_l() const { return BIT(m_control2, 7) ? output() : 0; }
-	s32 output_r() const { return BIT(m_control2, 6) ? output() : 0; }
+	// compute sum of channel outputs
+	void output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const;
 
-	// parameter setting
-	void set_portstate(u8 value);
-	void set_pan_control2(u8 value, u8 shift_override = 0);
-	void set_start_byte(u8 value, u8 shift) { m_start = (m_start & ~(0xff << shift)) | (value << shift); }
-	void set_delta_byte(u8 value, u8 shift) { m_delta = (m_delta & ~(0xff << shift)) | (value << shift); }
-	void set_end_byte(u8 value, u8 shift) { m_end = (m_end & ~(0xff << shift)) | (value << shift); }
-	void set_limit_byte(u8 value, u8 shift) { m_limit = (m_limit & ~(0xff << shift)) | (value << shift); }
-	void set_volume(u8 value) { m_volume = value; }
+	// write to the OPN registers
+	void write(u16 regnum, u8 data);
 
-	// direct data access
-	void write_data(u8 value);
-	u8 read_data();
+	// return the current status
+	u8 status() const;
 
-	// overall update
-	bool update();
+	// set/reset bits in the status register, updating the IRQ status
+	void set_reset_status(u8 set, u8 reset) { m_status = (m_status | set) & ~reset; check_interrupts(); }
 
-private:
-	// internal helpers
-	u32 start_address() const { return m_start << m_addrshift; }
-	u32 end_address() const { return ((m_end + 1) << m_addrshift) - 2; }
-	u32 limit_address() const { return m_limit << m_addrshift; }
+	// set the IRQ mask
+	void set_irq_mask(u8 mask) { m_irq_mask = mask; check_interrupts(); }
 
-	// internal state
-	ymopn_device_base &m_opn; // reference to base device
+	// set the busy flag in the status register
+	void set_busy();
 
-	u32 m_curaddress;         // current ROM address, as a nibble index
-	u32 m_curfrac;            // current fractional address
-	u16 m_start;              // sample data start address
-	u16 m_limit;              // limit address
-	u16 m_end;                // end address
-	u16 m_delta;              // delta scale
-	s16 m_volume;             // current volume
-	s32 m_adpcm_acc;          // current accumulator
-	s32 m_prev_acc;           // previous accumulator
-	s32 m_adpcm_step;         // next forecast
-	s32 m_output;             // current interpolated output value
-	u8 m_curbyte;             // current rom data
-	u8 m_cpudata;             // current data from reg 08
-	u8 m_portstate;           // port status
-	u8 m_control2;            // control reg: SAMPLE, DA/AD, RAM TYPE (x8bit / x1bit), ROM/RAM
-	u8 m_addrshift;           // address bits shift-left
-	u8 m_memread;             // needed for reading/writing external memory
-	u8 m_pcm_busy;            // set when playing
-	u8 m_status;              // current status
-};
+	// return the current clock prescale
+	u8 clock_prescale() const { return m_clock_prescale; }
 
+	// set prescale factor (2/3/6)
+	void set_clock_prescale(u8 prescale) { m_clock_prescale = prescale; }
 
-// ======================> ymopn_device_base
-
-class ymopn_device_base : public ay8910_device
-{
-public:
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	// overridables
-	virtual u8 adpcm_read(offs_t address);
-	virtual u8 deltat_read(offs_t address);
-	virtual void deltat_write(offs_t address, u8 data);
-	virtual void deltat_status_change(u8 status);
-
-protected:
-	// status bits
-	static constexpr u8 STATUS_BUSY = 0x80;
-	static constexpr u8 STATUS_DELTAT_ZERO_2608 = 0x10;
-	static constexpr u8 STATUS_DELTAT_BRDY_2608 = 0x08;
-	static constexpr u8 STATUS_DELTAT_EOS_2608 = 0x04;
-	static constexpr u8 STATUS_TIMERB = 0x02;
-	static constexpr u8 STATUS_TIMERA = 0x01;
-
-	// constructor
-	ymopn_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
-
-	// return a reference to the given channel; if extended is true,
-	// return an extended channel, if currently enabled
-	ymopn_channel &channel(int index, bool extended = false)
-	{
-		if (extended && m_channel.size() > 3)
-			index += 3;
-		return *m_channel[index];
-	}
-
-	// return a reference to the channel with 3-slot support
-	ymopn_channel &three_slot_channel() { return channel(2); }
-
-	// return a reference to an ADPCM channel
-	ymopn_adpcm_channel &adpcm(int index) { return *m_adpcm_channel[index]; }
-
-	// return a reference to the delta-T channel
-	ymopn_deltat_channel &deltat() { return *m_deltat_channel; }
-
-	// status/IRQ handling
-	u8 status();
-	void status_set_reset(u8 set = 0, u8 reset = 0);
-	void set_irqmask(u8 flag);
-	void busy_set();
-
-	// OPN Mode Register Write
-	void set_mode(u8 value);
-
-	// writes to registers
-	void write_mode(u8 reg, u8 value);
-	void write_reg(u16 reg, u8 value);
-	void write_adpcm(u8 reg, u8 value);
-	void write_deltat(u8 reg, u8 value);
-
-	// prescale config
-	void prescaler_w(u8 addr);
-	void set_prescale(u8 sel);
-
-	// force an update
-	void stream_update() { m_stream->update(); }
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_post_load() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
-	virtual void device_clock_changed() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-#if (YMOPN_NEW_SOUND)
-	virtual void sound_stream_update_ex(sound_stream &stream, std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
-#else
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-#endif
-
-	enum
-	{
-		TIMER_A,
-		TIMER_B,
-		TIMER_IRQ_SYNC,
-		TIMER_WRITE_REG,
-		TIMER_WRITE_MODE,
-		TIMER_WRITE_ADPCM,
-		TIMER_WRITE_DELTAT
-	};
-
-	u8 m_adpcm_status;         // ADPCM status flag
-
 private:
-	// internal helpers
-	void init_tables();
-	attotime timer_a_period() const;
-	attotime timer_b_period() const;
+	// update the state of the given timer
+	void update_timer(u8 which, u8 enable);
+
+	// timer callback
+	TIMER_CALLBACK_MEMBER(timer_handler);
+
+	// check interrupts
+	void check_interrupts();
 
 	// internal state
-	ymopn_3slot_state m_3slot_state; // 3 slot mode state
-	std::vector<std::unique_ptr<ymopn_channel>> m_channel;
-	std::vector<std::unique_ptr<ymopn_adpcm_channel>> m_adpcm_channel;
-	std::unique_ptr<ymopn_deltat_channel> m_deltat_channel;
-
-	// envelope generator
-	u16 m_eg_count;            // EG counter
-	u8 m_eg_subcount;          // EG sub-counter
-
-	// LFO
-	u8 m_lfo_count;            // LFO counter
-	u8 m_lfo_subcount;         // LFO sub-counter
-	u8 m_lfo_submax;           // LFO sub-counter maximum value
-
-	u8 m_prescaler_sel;        // prescaler selector
-	u32 m_timer_prescaler;     // timer prescaler
-
-	attotime m_busy_expiry_time; // expiry time of the busy status
-	u8 m_irq;                  // interrupt level
-	u8 m_irqmask;              // irq mask
-	u8 m_status;               // status flag
-	u8 m_mode;                 // mode  CSM / 3SLOT
-	u8 m_fn_h;                 // freq latch
-
-	emu_timer *m_timer_a;      // timer a
-	u16 m_timer_a_value;       // timer a reset value
-	emu_timer *m_timer_b;      // timer b
-	u8 m_timer_b_value;        // timer b reset value
-
-	sound_stream *m_stream;    // sound stream
-	devcb_write_line m_irq_handler; // IRQ callback
+	device_t &m_device;              // reference to the owning device
+	u32 m_env_counter;               // envelope counter; low 2 bits are sub-counter
+	u8 m_lfo_subcounter;             // LFO sub-counter
+	u8 m_lfo_counter;                // LFO counter
+	u8 m_status;                     // current status register
+	u8 m_clock_prescale;             // prescale factor (2/3/6)
+	u8 m_irq_mask;                   // mask of which bits signal IRQs
+	u8 m_irq_state;                  // current IRQ state
+	attotime m_busy_end;             // end of the busy time
+	emu_timer *m_timer[2];           // our two timers
+	devcb_write_line m_irq_handler;  // IRQ callback
+ 	std::vector<std::unique_ptr<ymopn_channel>> m_channel; // channel pointers
+	std::vector<u8> m_regdata;       // raw register data
+	u8 m_fnum_latches[16];           // latches for fnum data
+	ymopn_registers m_regs;          // register accessor
 };
+
 
 
 // ======================> ym2203_device
 
-class ym2203_device : public ymopn_device_base
+DECLARE_DEVICE_TYPE(YM2203, ym2203_device);
+
+class ym2203_device : public ay8910_device
 {
 public:
+	// constructor
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// read/write access
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	// direct port access
 	u8 status_port_r() { return read(0); }
 	u8 read_port_r() { return read(1); }
 	void control_port_w(u8 data) { write(0, data); }
 	void write_port_w(u8 data) { write(1, data); }
 
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
+
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	// set a new prescale value and update clocks
+	void update_prescale(u8 newval);
+
 	// internal state
-	u8 m_address;              // address register
+	ymopn_engine m_opn;              // core OPN engine
+	sound_stream *m_stream;          // sound stream
+	u8 m_address;                    // address register
 };
 
 
 // ======================> ym2608_device
 
-class ym2608_device : public ymopn_device_base, public device_rom_interface<21>
+#include "ymadpcm.h"
+
+DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
+
+class ym2608_device : public ay8910_device, public device_rom_interface<21>
 {
+	enum : u8
+	{
+		STATUS_ADPCM_B_EOS = 0x04,
+		STATUS_ADPCM_B_BRDY = 0x08,
+		STATUS_ADPCM_B_ZERO = 0x10,
+		STATUS_ADPCM_B_PLAYING = 0x20
+	};
+
 public:
+	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// read/write access
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
+
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
+	// ROM device overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void rom_bank_updated() override;
 
-	// ymopn_base_device overrides
-	virtual u8 adpcm_read(offs_t address) override;
-	virtual u8 deltat_read(offs_t address) override;
-	virtual void deltat_write(offs_t address, u8 data) override;
-	virtual void deltat_status_change(u8 status) override;
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	// internal helpers
-	void irq_flag_write(u8 value);
-	void irq_mask_write(u8 value);
+	// set a new prescale value and update clocks
+	void update_prescale(u8 newval);
+
+	// combine ADPCM and OPN statuses
+	u8 combine_status();
+
+	// ADPCM read/write callbacks
+	u8 adpcm_a_read(offs_t address);
+	u8 adpcm_b_read(offs_t address);
+	void adpcm_b_write(offs_t address, u8 data);
 
 	// internal state
-	u16 m_address;             // address register
-	u8 m_2608_flagmask;        // flag mask
-	u8 m_2608_irqmask;         // IRQ mask
 	required_memory_region m_internal; // internal memory region
+	ymopn_engine m_opn;              // core OPN engine
+	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
+	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
+	sound_stream *m_stream;          // sound stream
+	u16 m_address;                   // address register
+	u8 m_irq_enable;                 // IRQ enable register
+	u8 m_flag_control;               // flag control register
 };
 
 
 // ======================> ym2610_device
 
-class ym2610_device : public ymopn_device_base, public device_memory_interface
+DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
+
+class ym2610_device : public ay8910_device, public device_memory_interface
 {
 public:
-	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type = YM2610);
+	// constructor
+	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2610, u8 opn_mask = 0x36);
 
+	// read/write access
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
+
+	// memory space configuration
 	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
-	// ymopn_base_device overrides
-	virtual u8 adpcm_read(offs_t address) override;
-	virtual u8 deltat_read(offs_t address) override;
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	// internal state
-	u16 m_address;             // address register
-	u8 m_2610_flagmask;        // flag mask
+	// ADPCM read/write callbacks
+	u8 adpcm_a_read(offs_t address);
+	u8 adpcm_b_read(offs_t address);
 
-	const address_space_config m_adpcm_a_config;
-	const address_space_config m_adpcm_b_config;
-	const std::string m_adpcm_b_region_name;
-	optional_memory_region m_adpcm_a_region;
-	optional_memory_region m_adpcm_b_region;
+	// internal state
+	address_space_config const m_adpcm_a_config; // address space 0 config (ADPCM-A)
+	address_space_config const m_adpcm_b_config; // address space 1 config (ADPCM-B)
+	std::string const m_adpcm_b_region_name; // name of ADPCM-B memory region
+	optional_memory_region m_adpcm_a_region; // ADPCM-A memory region
+	optional_memory_region m_adpcm_b_region; // ADPCM-B memory region
+	ymopn_engine m_opn;              // core OPN engine
+	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
+	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
+	sound_stream *m_stream;          // sound stream
+	u16 m_address;                   // address register
+	u8 const m_opn_mask;             // OPN channel mask
+	u8 m_eos_status;                 // end-of-sample signals
+	u8 m_flag_mask;                  // flag mask control
 };
 
 
 // ======================> ym2610b_device
 
+DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device);
+
 class ym2610b_device : public ym2610_device
 {
 public:
+	// constructor
 	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
+
 
 #endif // MAME_SOUND_YMOPN_H
