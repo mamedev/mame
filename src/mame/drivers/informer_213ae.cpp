@@ -171,7 +171,7 @@ void informer_213ae_state::informer_213ae(machine_config &config)
 	SCC8530N(config, m_scc, 0); // unknown clock
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_size(480, 234);
 	m_screen->set_visarea_full();
