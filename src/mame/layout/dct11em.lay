@@ -19,10 +19,10 @@ license:CC0
 	</element>
 
 	<view name="Default Layout">
-		<bounds left="0" top="0" right="274" bottom="350" />
+		<bounds left="0" top="0" right="320" bottom="328" />
 
 		<screen index="0">
-			<bounds x="0" y="0" width="362" height="262" />
+			<bounds x="0" y="0" width="320" height="240" />
 		</screen>
 
 		<element name="led0" ref="a_led">
@@ -31,10 +31,10 @@ license:CC0
 
 		<repeat count="2">
 			<param name="s" start="11" increment="-6" />
-			<param name="y" start="267" increment="40" />
+			<param name="y" start="245" increment="40" />
 			<repeat count="6">
 				<param name="n" start="~s~" increment="-1" />
-				<param name="x" start="10" increment="44" />
+				<param name="x" start="33" increment="44" />
 				<element name="digit~n~" ref="digit">
 					<bounds x="~x~" y="~y~" width="34" height="38" />
 				</element>
