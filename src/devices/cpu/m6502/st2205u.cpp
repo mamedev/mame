@@ -1121,7 +1121,7 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0006, 0x0006).rw(FUNC(st2302u_device::psc_r), FUNC(st2302u_device::psc_w));
 	map(0x0008, 0x000d).rw(FUNC(st2302u_device::pctrl_r), FUNC(st2302u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2302u_device::pfc_r), FUNC(st2302u_device::pfc_w));
-	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
+	map(0x000f, 0x000f).rw(FUNC(st2302u_device::pfd_r), FUNC(st2302u_device::pfd_w));
 	map(0x0012, 0x0012).rw(FUNC(st2302u_device::sctr_r), FUNC(st2302u_device::sctr_w));
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));
