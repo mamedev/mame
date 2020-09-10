@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(NS32032, ns32032_device, "ns32032", "National Semiconductor N
  *  - address translation/abort
  *  - floating point and other unimplemented instructions
  *      - format 6: subp,addp
- *      - format 7: cmpm, dei
+ *      - format 7: cmpm
  *      - format 8: movus/movsu
  *  - cascaded interrupts
  *  - instruction cycles
@@ -240,8 +240,13 @@ void ns32000_device::decode(addr_mode *mode, unsigned imm_size, unsigned &bytes)
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
 			// register
-			mode[i].base = m_r[mode[i].gen];
-			mode[i].type = scaled[i] ? MEM : REG;
+			if (scaled[i])
+			{
+				mode[i].base = m_r[mode[i].gen];
+				mode[i].type = MEM;
+			}
+			else
+				mode[i].type = REG;
 			break;
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
@@ -326,6 +331,10 @@ u32 ns32000_device::ea(addr_mode const mode)
 
 	switch (mode.type)
 	{
+	case REG:
+		base = m_r[mode.gen];
+		break;
+
 	case IND:
 		base = m_bus[12].read_dword_unaligned(mode.base);
 		break;
@@ -343,9 +352,9 @@ u32 ns32000_device::ea(addr_mode const mode)
 	return base + mode.disp;
 }
 
-u32 ns32000_device::gen_read(addr_mode mode, unsigned size)
+u64 ns32000_device::gen_read(addr_mode mode, unsigned size)
 {
-	u32 data = 0;
+	u64 data = 0;
 
 	switch (mode.type)
 	{
@@ -354,7 +363,10 @@ u32 ns32000_device::gen_read(addr_mode mode, unsigned size)
 		break;
 
 	case REG:
-		data = mode.base + mode.disp;
+		if (size == SIZE_Q)
+			data = (u64(m_r[mode.gen ^ 1]) << 32) | m_r[mode.gen ^ 0];
+		else
+			data = m_r[mode.gen] & size_mask[size];
 		break;
 
 	case TOS:
@@ -371,30 +383,32 @@ u32 ns32000_device::gen_read(addr_mode mode, unsigned size)
 		break;
 
 	default:
-		if (size)
-			if (size == 3)
-				data = space(0).read_dword_unaligned(ea(mode));
-			else
-				data = space(0).read_word_unaligned(ea(mode));
-		else
-			data = space(0).read_byte(ea(mode));
+		switch (size)
+		{
+		case SIZE_B: data = space(0).read_byte(ea(mode)); break;
+		case SIZE_W: data = space(0).read_word_unaligned(ea(mode)); break;
+		case SIZE_D: data = space(0).read_dword_unaligned(ea(mode)); break;
+		case SIZE_Q: data = space(0).read_qword_unaligned(ea(mode)); break;
+		}
 		break;
 	}
 
 	return data;
 }
 
-s32 ns32000_device::gen_read_sx(addr_mode mode, unsigned size)
+s64 ns32000_device::gen_read_sx(addr_mode mode, unsigned size)
 {
-	u32 const data = gen_read(mode, size);
+	u64 data = gen_read(mode, size);
 
-	if (size)
-		if (size == SIZE_D)
-			return s32(data);
-		else
-			return s16(data);
-	else
-		return s8(data);
+	switch (size)
+	{
+	case SIZE_B: data = s8(data); break;
+	case SIZE_W: data = s16(data); break;
+	case SIZE_D: data = s32(data); break;
+	case SIZE_Q: data = s64(data); break;
+	}
+
+	return data;
 }
 
 void ns32000_device::gen_write(addr_mode mode, unsigned size, u64 data)
@@ -402,7 +416,13 @@ void ns32000_device::gen_write(addr_mode mode, unsigned size, u64 data)
 	switch (mode.type)
 	{
 	case REG:
-		m_r[mode.gen] = (m_r[mode.gen] & ~size_mask[size]) | (data & size_mask[size]);
+		if (size == SIZE_Q)
+		{
+			m_r[mode.gen ^ 0] = u32(data);
+			m_r[mode.gen ^ 1] = data >> 32;
+		}
+		else
+			m_r[mode.gen] = (m_r[mode.gen] & ~size_mask[size]) | (data & size_mask[size]);
 		break;
 
 	case TOS:
@@ -426,7 +446,6 @@ void ns32000_device::gen_write(addr_mode mode, unsigned size, u64 data)
 		case SIZE_D: space(0).write_dword_unaligned(ea(mode), data); break;
 		case SIZE_Q: space(0).write_qword_unaligned(ea(mode), data); break;
 		}
-
 		break;
 	}
 }
@@ -846,17 +865,17 @@ void ns32000_device::execute_run()
 
 					m_psr &= ~(PSR_N | PSR_Z | PSR_L);
 
-					if ((size == 3 && s32(src1) > s32(src2))
-						|| ((size == 1 && s16(src1) > s16(src2))
-							|| ((size == 0 && s8(src1) > s8(src2)))))
+					if ((size == SIZE_D && s32(src1) > s32(src2))
+						|| ((size == SIZE_W && s16(src1) > s16(src2))
+							|| ((size == SIZE_B && s8(src1) > s8(src2)))))
 						m_psr |= PSR_N;
 
-					if ((src1 & size_mask[size]) == (src2 & size_mask[size]))
+					if (src1 == src2)
 						m_psr |= PSR_Z;
 
-					if ((size == 3 && u32(src1) > u32(src2))
-						|| ((size == 1 && u16(src1) > u16(src2))
-							|| ((size == 0 && u8(src1) > u8(src2)))))
+					if ((size == SIZE_D && u32(src1) > u32(src2))
+						|| ((size == SIZE_W && u16(src1) > u16(src2))
+							|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 						m_psr |= PSR_L;
 				}
 				m_pc += bytes;
@@ -950,25 +969,25 @@ void ns32000_device::execute_run()
 				{
 				case 0x0: // US
 					// TODO: user stack pointer?
-					m_sp1 = gen_read(mode[0], size) & size_mask[size];
+					m_sp1 = gen_read(mode[0], size);
 					m_pc += bytes;
 					break;
 				case 0x8: // FP
-					m_fp = gen_read(mode[0], size) & size_mask[size];
+					m_fp = gen_read(mode[0], size);
 					m_pc += bytes;
 					break;
 				case 0x9: // SP
-					SP = gen_read(mode[0], size) & size_mask[size];
+					SP = gen_read(mode[0], size);
 					m_pc += bytes;
 					break;
 				case 0xa: // SB
-					m_sb = gen_read(mode[0], size) & size_mask[size];
+					m_sb = gen_read(mode[0], size);
 					m_pc += bytes;
 					break;
 				case 0xd: // PSR
 					if (!(m_psr & PSR_U))
 					{
-						u32 const src = gen_read(mode[0], size) & size_mask[size];
+						u32 const src = gen_read(mode[0], size);
 
 						if (size == 0)
 							m_psr = (m_psr & 0xff00) | u8(src);
@@ -983,14 +1002,14 @@ void ns32000_device::execute_run()
 				case 0xe: // INTBASE
 					if (!(m_psr & PSR_U))
 					{
-						m_intbase = gen_read(mode[0], size) & size_mask[size];
+						m_intbase = gen_read(mode[0], size);
 						m_pc += bytes;
 					}
 					else
 						interrupt(ILL, m_pc);
 					break;
 				case 0xf: // MOD
-					m_mod = gen_read(mode[0], size) & size_mask[size];
+					m_mod = gen_read(mode[0], size);
 					m_pc += bytes;
 					break;
 				}
@@ -1140,17 +1159,17 @@ void ns32000_device::execute_run()
 
 					m_psr &= ~(PSR_N | PSR_Z | PSR_L);
 
-					if ((size == 3 && s32(src1) > s32(src2))
-						|| ((size == 1 && s16(src1) > s16(src2))
-							|| ((size == 0 && s8(src1) > s8(src2)))))
+					if ((size == SIZE_D && s32(src1) > s32(src2))
+						|| ((size == SIZE_W && s16(src1) > s16(src2))
+							|| ((size == SIZE_B && s8(src1) > s8(src2)))))
 						m_psr |= PSR_N;
 
-					if ((src1 & size_mask[size]) == (src2 & size_mask[size]))
+					if (src1 == src2)
 						m_psr |= PSR_Z;
 
-					if ((size == 3 && u32(src1) > u32(src2))
-						|| ((size == 1 && u16(src1) > u16(src2))
-							|| ((size == 0 && u8(src1) > u8(src2)))))
+					if ((size == SIZE_D && u32(src1) > u32(src2))
+						|| ((size == SIZE_W && u16(src1) > u16(src2))
+							|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 						m_psr |= PSR_L;
 				}
 				m_pc += bytes;
@@ -1218,8 +1237,8 @@ void ns32000_device::execute_run()
 				{
 					mode[1].rmw();
 
-					u32 const src1 = gen_read(mode[0], size) & size_mask[size];
-					u32 const src2 = gen_read(mode[1], size) & size_mask[size];
+					u32 const src1 = gen_read(mode[0], size);
+					u32 const src2 = gen_read(mode[1], size);
 
 					u32 const dest = src2 - src1;
 					flags(src1, src2, dest, size, true);
@@ -1258,8 +1277,8 @@ void ns32000_device::execute_run()
 				{
 					mode[1].rmw();
 
-					u32 const src1 = gen_read(mode[0], size) & size_mask[size];
-					u32 const src2 = gen_read(mode[1], size) & size_mask[size];
+					u32 const src1 = gen_read(mode[0], size);
+					u32 const src2 = gen_read(mode[1], size);
 
 					u32 const dest = src2 - src1 - (m_psr & PSR_C);
 					flags(src1, src2, dest, size, true);
@@ -1569,7 +1588,7 @@ void ns32000_device::execute_run()
 						mode[1].rmw();
 
 						s32 const count = gen_read_sx(mode[0], SIZE_B);
-						u32 const src = gen_read(mode[1], size) & size_mask[size];
+						u32 const src = gen_read(mode[1], size);
 
 						u32 const dest = (count < 0) ? (src >> -count) : (src << count);
 
@@ -1621,20 +1640,20 @@ void ns32000_device::execute_run()
 					{
 						u32 const src = gen_read(mode[0], size);
 
-						if (src & size_mask[size])
+						if (src)
 							m_psr |= PSR_C;
 						else
 							m_psr &= ~PSR_C;
 
 						if ((src ^ ~(size_mask[size] >> 1)) & size_mask[size])
 						{
-							m_psr |= PSR_F;
-							gen_write(mode[1], size, src);
+							m_psr &= ~PSR_F;
+							gen_write(mode[1], size, -src);
 						}
 						else
 						{
-							m_psr &= ~PSR_F;
-							gen_write(mode[1], size, -src);
+							m_psr |= PSR_F;
+							gen_write(mode[1], size, src);
 						}
 					}
 					m_pc += bytes;
@@ -1845,9 +1864,8 @@ void ns32000_device::execute_run()
 					//        read.[BW],write.D
 					{
 						u32 const src = gen_read(mode[0], size);
-						u32 const dest = src & size_mask[size];
 
-						gen_write(mode[1], SIZE_D, dest);
+						gen_write(mode[1], SIZE_D, src);
 					}
 					m_pc += bytes;
 					break;
@@ -1885,22 +1903,14 @@ void ns32000_device::execute_run()
 					//      read.i,rmw.2i
 					{
 						mode[1].rmw();
+						unsigned const size2 = size * 2 + 1;
 
 						u32 const src1 = gen_read(mode[0], size);
 						u32 const src2 = gen_read(mode[1], size);
 
-						u64 const dest = mulu_32x32(src1 & size_mask[size], src2 & size_mask[size]);
+						u64 const dest = mulu_32x32(src1, src2);
 
-						if (mode[1].type == REG)
-						{
-							unsigned const lo = mode[1].gen;
-							unsigned const hi = lo ^ 1;
-
-							m_r[lo] = (m_r[lo] & ~size_mask[size]) | (dest & size_mask[size]);
-							m_r[hi] = (m_r[hi] & ~size_mask[size]) | ((dest >> ((size + 1) * 8)) & size_mask[size]);
-						}
-						else
-							gen_write(mode[1], size * 2 + 1, dest);
+						gen_write(mode[1], size2, dest);
 					}
 					m_pc += bytes;
 					break;
@@ -1911,7 +1921,37 @@ void ns32000_device::execute_run()
 					// DEIi src,dest
 					//      gen,gen
 					//      read.i,rmw.2i
-					fatalerror("unimplemented: dei (%s)\n", machine().describe_context());
+					{
+						mode[1].rmw();
+						unsigned const size2 = size * 2 + 1;
+
+						u32 const src1 = gen_read(mode[0], size);
+						if (src1)
+						{
+							u64 const src2 = gen_read(mode[1], size2);
+
+							u32 const quotient = src2 / src1;
+							u32 const remainder = src2 % src1;
+
+							if (mode[1].type == REG)
+							{
+								m_r[mode[1].gen ^ 0] = (m_r[mode[1].gen ^ 0] & ~size_mask[size]) | (remainder & size_mask[size]);
+								m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | (quotient & size_mask[size]);
+							}
+							else
+								gen_write(mode[1], size2, (u64(quotient) << ((size + 1) * 8)) | remainder);
+
+							m_pc += bytes;
+						}
+						else
+						{
+							// restore stack pointer
+							if (mode[0].type == TOS)
+								SP -= size + 1;
+
+							interrupt(DVZ, m_pc);
+						}
+					}
 					break;
 				case 0xc:
 					// QUOi src,dest
@@ -2006,12 +2046,13 @@ void ns32000_device::execute_run()
 						{
 							s32 const src2 = gen_read_sx(mode[1], size);
 
-							div_t const dest = std::div(src2, src1);
+							s32 const quotient = src2 / src1;
+							s32 const remainder = src2 % src1;
 
-							if ((dest.quot < 0) && dest.rem)
-								gen_write(mode[1], size, dest.quot - 1);
+							if ((quotient < 0) && remainder)
+								gen_write(mode[1], size, quotient - 1);
 							else
-								gen_write(mode[1], size, dest.quot);
+								gen_write(mode[1], size, quotient);
 
 							m_pc += bytes;
 						}
@@ -2093,7 +2134,7 @@ void ns32000_device::execute_run()
 
 						s32 const offset = m_r[reg];
 						s32 const length = displacement(bytes);
-						u32 const src = gen_read(mode[0], size) & size_mask[size];
+						u32 const src = gen_read(mode[0], size);
 
 						u32 dest;
 						if (mode[1].type == REG)
@@ -2148,8 +2189,8 @@ void ns32000_device::execute_run()
 					//        reg,gen,gen
 					//            read.i,read.i
 					{
-						u32 const length = gen_read(mode[0], size) & size_mask[size];
-						u32 const index = gen_read(mode[1], size) & size_mask[size];
+						u32 const length = gen_read(mode[0], size);
+						u32 const index = gen_read(mode[1], size);
 
 						m_r[reg] = m_r[reg] * (length + 1) + index;
 					}
@@ -2162,7 +2203,7 @@ void ns32000_device::execute_run()
 						mode[1].rmw();
 
 						u32 const base = gen_read(mode[0], size);
-						u32 offset = gen_read(mode[1], SIZE_B) & size_mask[size];
+						u32 offset = gen_read(mode[1], SIZE_B);
 						unsigned const limit = (size + 1) * 8;
 
 						m_psr |= PSR_F;
