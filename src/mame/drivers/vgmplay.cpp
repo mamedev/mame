@@ -17,7 +17,7 @@
 #include "sound/ym2203.h"
 #include "sound/ym2608.h"
 #include "sound/ym2610.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 #include "sound/262intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"

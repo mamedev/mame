@@ -53,7 +53,7 @@ ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, d
 u8 ym2610_device::read(offs_t offset)
 {
 	u8 result = 0;
-	switch (offset & 1)
+	switch (offset & 3)
 	{
 		case 0:	// status port, YM2203 compatible
 			result = m_opn.status() & (ymopn_engine::STATUS_TIMERA | ymopn_engine::STATUS_TIMERB | ymopn_engine::STATUS_BUSY);

@@ -5,7 +5,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/i8251.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 #include "sound/multipcm.h"
 
 #pragma once

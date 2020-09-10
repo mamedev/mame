@@ -21,7 +21,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/315_5338a.h"
 #include "machine/pit8253.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 #include "speaker.h"
 
 

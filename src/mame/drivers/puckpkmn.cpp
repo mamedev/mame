@@ -48,7 +48,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 
 #include "includes/megadriv.h"
 #include "includes/megadriv_acbl.h"

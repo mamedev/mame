@@ -33,7 +33,7 @@ Also seem to be running on the same/similar hardware:
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
 #include "screen.h"

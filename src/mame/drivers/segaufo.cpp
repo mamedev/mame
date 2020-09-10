@@ -47,7 +47,7 @@
 #include "machine/315_5296.h"
 #include "machine/315_5338a.h"
 #include "machine/timer.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 #include "sound/upd7759.h"
 #include "speaker.h"
 
