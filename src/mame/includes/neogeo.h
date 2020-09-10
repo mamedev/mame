@@ -18,6 +18,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
+#include "machine/neo_zmc.h"
 #include "machine/ng_memcard.h"
 #include "video/neogeo_spr.h"
 
@@ -50,6 +51,7 @@ protected:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_memcard(*this, "memcard")
+		, m_neo_zmc(*this, "neo_zmc")
 		, m_systemlatch(*this, "systemlatch")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
@@ -72,7 +74,6 @@ protected:
 
 	uint16_t memcard_r(offs_t offset);
 	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t audio_cpu_bank_select_r(offs_t offset);
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
 	uint16_t unmapped_r(address_space &space);
 	uint16_t paletteram_r(offs_t offset);
@@ -125,6 +126,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
+	optional_device<neo_zmc_device> m_neo_zmc; // from cartridge
 	required_device<hc259_device> m_systemlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
@@ -138,7 +140,6 @@ protected:
 	optional_memory_region m_region_audiobios;
 	optional_memory_region m_region_audiocpu;
 	optional_memory_bank   m_bank_audio_main; // optional because of neocd
-	memory_bank           *m_bank_audio_cart[4];
 	memory_bank           *m_bank_cartridge;
 
 	optional_device<neogeo_ctrl_edge_port_device> m_edge;

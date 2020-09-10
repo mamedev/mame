@@ -4535,3 +4535,14 @@ if (MACHINES["SWIM3"]~=null) then
 		MAME_DIR .. "src/devices/machine/swim3.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/neo_zmc.h,MACHINES["NEO_ZMC"] = true
+---------------------------------------------------
+if (MACHINES["NEO_ZMC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/neo_zmc.cpp",
+		MAME_DIR .. "src/devices/machine/neo_zmc.h",
+	}
+end
