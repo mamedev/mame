@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// unknown 6502 based handhelds, possibly ST2205U architecture
+// unknown 6502 based handhelds, ST2205U or ST23XX architecture
 
 // the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
 // https://www.youtube.com/watch?v=NacY2WHd-CY
@@ -50,7 +50,7 @@ private:
 
 	void bbl380_map(address_map &map);
 
-	required_device<st2205u_device> m_maincpu;
+	required_device<st2xxx_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
@@ -97,9 +97,8 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 8000000); // unknown clock; type close but not quite correct?
+	ST2302U(config, m_maincpu, 8000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
-	m_maincpu->set_alt_map();
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);

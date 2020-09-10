@@ -186,17 +186,20 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_misc));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
-	save_item(NAME(m_lssa));
-	save_item(NAME(m_lvpw));
-	save_item(NAME(m_lxmax));
-	save_item(NAME(m_lymax));
-	if (st2xxx_lpan_mask() != 0)
-		save_item(NAME(m_lpan));
-	save_item(NAME(m_lctr));
-	save_item(NAME(m_lckr));
-	save_item(NAME(m_lfra));
-	save_item(NAME(m_lac));
-	save_item(NAME(m_lpwm));
+	if (st2xxx_lctr_mask() != 0)
+	{
+		save_item(NAME(m_lssa));
+		save_item(NAME(m_lvpw));
+		save_item(NAME(m_lxmax));
+		save_item(NAME(m_lymax));
+		if (st2xxx_lpan_mask() != 0)
+			save_item(NAME(m_lpan));
+		save_item(NAME(m_lctr));
+		save_item(NAME(m_lckr));
+		save_item(NAME(m_lfra));
+		save_item(NAME(m_lac));
+		save_item(NAME(m_lpwm));
+	}
 	if (st2xxx_has_spi())
 	{
 		save_item(NAME(m_sctr));
