@@ -35,11 +35,13 @@
 #include "machine/nvram.h"
 #include "machine/z80scc.h"
 #include "video/mc6845.h"
+#include "sound/beep.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/printer.h"
 #include "machine/informer_207_376_kbd.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -57,6 +59,7 @@ public:
 		m_palette(*this, "palette"),
 		m_scc(*this, "scc"),
 		m_acia(*this, "acia%u", 0U),
+		m_beep(*this, "beep"),
 		m_ram(*this, "ram"),
 		m_chargen(*this, "chargen"),
 		m_nmi_enabled(false)
@@ -75,6 +78,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<scc85c30_device> m_scc;
 	required_device_array<acia6850_device, 2> m_acia;
+	required_device<beep_device> m_beep;
 	required_shared_ptr<uint8_t> m_ram;
 	required_region_ptr<uint8_t> m_chargen;
 
@@ -84,6 +88,7 @@ private:
 
 	void vsync_w(int state);
 	void nmi_control_w(uint8_t data);
+	void unk_8400_w(uint8_t data);
 
 	bool m_nmi_enabled;
 };
@@ -98,7 +103,7 @@ void informer_207_376_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).ram().share("ram");
 	map(0x8000, 0x8000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x8400, 0x8400).lr8(NAME([] () { return 0xff; })).nopw(); // ?
+	map(0x8400, 0x8400).lr8(NAME([] () { return 0xff; })).w(FUNC(informer_207_376_state::unk_8400_w)); // ?
 	map(0x8802, 0x8803).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8804, 0x8805).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8c00, 0x8c00).w(FUNC(informer_207_376_state::nmi_control_w));
@@ -180,6 +185,16 @@ void informer_207_376_state::nmi_control_w(uint8_t data)
 	// -------0  unused?
 
 	m_nmi_enabled = bool(data & 0x06);
+}
+
+void informer_207_376_state::unk_8400_w(uint8_t data)
+{
+	// 7-------  beeper
+	// -6------  unknown
+	// --5-----  1=internal modem, 0=host rs232
+	// ---43210  unknown
+
+	m_beep->set_state(BIT(data, 7));
 }
 
 void informer_207_376_state::machine_start()
@@ -266,6 +281,10 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(informer_207_376_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(informer_207_376_state::vsync_w));
+
+	// sound
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beep", 500).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
 }
 
 
@@ -294,4 +313,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE           INPUT             CLASS                   INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1986, in207376, 0,       0,      informer_207_376, informer_207_376, informer_207_376_state, empty_init, "Informer", "Informer 207/376", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, in207376, 0,       0,      informer_207_376, informer_207_376, informer_207_376_state, empty_init, "Informer", "Informer 207/376", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
