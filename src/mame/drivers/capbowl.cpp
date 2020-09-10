@@ -93,7 +93,7 @@
 #include "machine/rescap.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"

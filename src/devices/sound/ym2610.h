@@ -1,0 +1,76 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+
+#ifndef MAME_SOUND_YM2610_H
+#define MAME_SOUND_YM2610_H
+
+#pragma once
+
+#include "ymopn.h"
+#include "ymadpcm.h"
+
+
+// ======================> ym2610_device
+
+DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
+
+class ym2610_device : public ay8910_device, public device_memory_interface
+{
+public:
+	// constructor
+	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2610, u8 opn_mask = 0x36);
+
+	// read/write access
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+
+	// configuration helpers
+	auto irq_handler() { return m_opn.irq_handler(); }
+
+	// memory space configuration
+	virtual space_config_vector memory_space_config() const override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
+
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+private:
+	// ADPCM read/write callbacks
+	u8 adpcm_a_read(offs_t address);
+	u8 adpcm_b_read(offs_t address);
+
+	// internal state
+	address_space_config const m_adpcm_a_config; // address space 0 config (ADPCM-A)
+	address_space_config const m_adpcm_b_config; // address space 1 config (ADPCM-B)
+	std::string const m_adpcm_b_region_name; // name of ADPCM-B memory region
+	optional_memory_region m_adpcm_a_region; // ADPCM-A memory region
+	optional_memory_region m_adpcm_b_region; // ADPCM-B memory region
+	ymopn_engine m_opn;              // core OPN engine
+	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
+	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
+	sound_stream *m_stream;          // sound stream
+	u16 m_address;                   // address register
+	u8 const m_opn_mask;             // OPN channel mask
+	u8 m_eos_status;                 // end-of-sample signals
+	u8 m_flag_mask;                  // flag mask control
+};
+
+
+// ======================> ym2610b_device
+
+DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device);
+
+class ym2610b_device : public ym2610_device
+{
+public:
+	// constructor
+	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+#endif // MAME_SOUND_YM2610_H

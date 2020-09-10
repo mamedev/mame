@@ -29,7 +29,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 
-#include "sound/ymopn.h"
+#include "sound/ym2608.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 

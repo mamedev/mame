@@ -24,7 +24,7 @@
 #include "machine/i8255.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

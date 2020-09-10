@@ -25,7 +25,7 @@ displayed.
 #include "cpu/nec/nec.h"
 #include "video/hd63484.h"
 #include "audio/seibu.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -1199,6 +1199,8 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 	files {
 		MAME_DIR .. "src/devices/sound/ay8910.cpp",
 		MAME_DIR .. "src/devices/sound/ay8910.h",
+		MAME_DIR .. "src/devices/sound/ym2203.cpp",
+		MAME_DIR .. "src/devices/sound/ym2203.h",
 		MAME_DIR .. "src/devices/sound/ymopn.cpp",
 		MAME_DIR .. "src/devices/sound/ymopn.h",
 	}
@@ -1209,6 +1211,8 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 	files {
 		MAME_DIR .. "src/devices/sound/ay8910.cpp",
 		MAME_DIR .. "src/devices/sound/ay8910.h",
+		MAME_DIR .. "src/devices/sound/ym2608.cpp",
+		MAME_DIR .. "src/devices/sound/ym2608.h",
 		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
 		MAME_DIR .. "src/devices/sound/ymadpcm.h",
 		MAME_DIR .. "src/devices/sound/ymopn.cpp",
@@ -1220,6 +1224,8 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 	files {
 		MAME_DIR .. "src/devices/sound/ay8910.cpp",
 		MAME_DIR .. "src/devices/sound/ay8910.h",
+		MAME_DIR .. "src/devices/sound/ym2610.cpp",
+		MAME_DIR .. "src/devices/sound/ym2610.h",
 		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
 		MAME_DIR .. "src/devices/sound/ymadpcm.h",
 		MAME_DIR .. "src/devices/sound/ymopn.cpp",

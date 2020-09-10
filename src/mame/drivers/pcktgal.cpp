@@ -18,7 +18,7 @@
 #include "includes/pcktgal.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/3812intf.h"
 #include "machine/deco222.h"
 #include "screen.h"

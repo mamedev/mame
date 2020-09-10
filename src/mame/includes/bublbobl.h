@@ -8,7 +8,7 @@
 #include "cpu/m6805/m68705.h"
 #include "machine/input_merger.h"
 #include "machine/gen_latch.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/3526intf.h"
 #include "emupal.h"
 #include "screen.h"

@@ -195,7 +195,7 @@ TODO:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/msm5205.h"
 
 #include "screen.h"

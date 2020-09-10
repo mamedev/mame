@@ -268,7 +268,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 
 #include "speaker.h"
 

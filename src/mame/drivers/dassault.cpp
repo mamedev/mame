@@ -214,7 +214,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/mb8421.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"

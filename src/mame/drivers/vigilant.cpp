@@ -28,7 +28,7 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/rstbuf.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
 #include "screen.h"

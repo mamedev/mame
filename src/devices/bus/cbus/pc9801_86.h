@@ -12,7 +12,7 @@
 #pragma once
 
 #include "bus/cbus/pc9801_cbus.h"
-#include "sound/ymopn.h"
+#include "sound/ym2608.h"
 #include "sound/dac.h"
 #include "pc9801_snd.h"
 

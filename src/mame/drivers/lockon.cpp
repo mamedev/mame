@@ -20,7 +20,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/rescap.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/flt_vol.h"
 #include "speaker.h"
 

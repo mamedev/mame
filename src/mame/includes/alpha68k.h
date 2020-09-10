@@ -13,7 +13,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"

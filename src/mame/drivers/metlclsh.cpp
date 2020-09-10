@@ -37,7 +37,7 @@ metlclsh:
 #include "includes/metlclsh.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/3526intf.h"
 #include "screen.h"
 #include "speaker.h"

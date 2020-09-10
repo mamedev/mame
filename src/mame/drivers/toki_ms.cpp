@@ -261,7 +261,7 @@ IC46->PAL16V8H 74LS393N 74LS368AP 74LS377B1|U||    |   |                        
 #include "speaker.h"
 #include "tilemap.h"
 #include "video/bufsprite.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/msm5205.h"
 
 

@@ -28,7 +28,7 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

@@ -329,7 +329,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
 #include "machine/upd4701.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "speaker.h"

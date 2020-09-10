@@ -21,7 +21,7 @@
 #include "includes/actfancr.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "emupal.h"

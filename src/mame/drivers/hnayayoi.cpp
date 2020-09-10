@@ -42,7 +42,7 @@ TODO:
 #include "includes/hnayayoi.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/msm5205.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"

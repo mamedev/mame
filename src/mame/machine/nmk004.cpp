@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "nmk004.h"
 
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/okim6295.h"
 
 

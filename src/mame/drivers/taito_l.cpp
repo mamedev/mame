@@ -66,8 +66,8 @@ puzznici note
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
 
-#include "sound/ymopn.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
+#include "sound/ym2610.h"
 #include "sound/msm5205.h"
 
 #include "screen.h"

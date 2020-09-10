@@ -18,7 +18,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/beep.h"
 #include "machine/bankdev.h"
 #include "emupal.h"

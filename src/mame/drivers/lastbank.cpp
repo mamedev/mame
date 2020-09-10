@@ -19,7 +19,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ymopn.h"
+#include "sound/ym2203.h"
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
