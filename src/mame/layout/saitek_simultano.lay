@@ -413,20 +413,6 @@ license:CC0
 	<view name="Internal Layout (Full)">
 		<bounds left="-13.5" right="132.5" top="-1" bottom="90" />
 
-		<group ref="display"><bounds x="96.5" y="13" width="23.6" height="30" /></group>
-
-		<element ref="ledro"><bounds x="88.5" y="34.5" width="2" height="1" /></element>
-		<element name="2.1" ref="ledrr" blend="add"><bounds x="88.5" y="34.5" width="2" height="1" /></element>
-		<element name="3.1" ref="ledrg" blend="add"><bounds x="88.5" y="34.5" width="2" height="1" /></element>
-
-		<element ref="text_p1"><bounds x="90.083" y="69.9" width="3" height="3" /></element>
-		<element ref="text_p2"><bounds x="96.749" y="69.9" width="3" height="3" /></element>
-		<element ref="text_p3"><bounds x="103.415" y="69.9" width="3" height="3" /></element>
-		<element ref="text_p4"><bounds x="110.081" y="69.9" width="3" height="3" /></element>
-		<element ref="text_p5"><bounds x="116.747" y="69.9" width="3" height="3" /></element>
-		<element ref="text_p6"><bounds x="123.413" y="69.9" width="3" height="3" /></element>
-		<element ref="cwhite" blend="multiply"><bounds x="90.083" y="69.9" width="40" height="3" /></element>
-
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
@@ -472,8 +458,14 @@ license:CC0
 
 	<!-- right side -->
 
+		<group ref="display"><bounds x="96.5" y="13" width="23.6" height="30" /></group>
+
 		<element name="2.0" ref="ledr"><bounds x="88.5" y="20.5" width="2" height="1" /></element>
 		<element name="3.0" ref="ledr"><bounds x="88.5" y="27.5" width="2" height="1" /></element>
+
+		<element ref="ledro"><bounds x="88.5" y="34.5" width="2" height="1" /></element>
+		<element name="2.1" ref="ledrr" blend="add"><bounds x="88.5" y="34.5" width="2" height="1" /></element>
+		<element name="3.1" ref="ledrg" blend="add"><bounds x="88.5" y="34.5" width="2" height="1" /></element>
 
 		<element ref="text_r1"><bounds x="91" y="20.2" width="7" height="1.5" /></element>
 		<element ref="text_r2"><bounds x="91" y="27.2" width="7" height="1.5" /></element>
@@ -496,6 +488,14 @@ license:CC0
 		<element ref="text_b13"><bounds x="104.5" y="62.6" width="7.5" height="2.1" /></element>
 		<element ref="text_b14"><bounds x="112.5" y="62.6" width="7.5" height="2.1" /></element>
 		<element ref="text_b15"><bounds x="120.5" y="63" width="7.5" height="1.5" /></element>
+
+		<element ref="text_p1"><bounds x="90.083" y="69.9" width="3" height="3" /></element>
+		<element ref="text_p2"><bounds x="96.749" y="69.9" width="3" height="3" /></element>
+		<element ref="text_p3"><bounds x="103.415" y="69.9" width="3" height="3" /></element>
+		<element ref="text_p4"><bounds x="110.081" y="69.9" width="3" height="3" /></element>
+		<element ref="text_p5"><bounds x="116.747" y="69.9" width="3" height="3" /></element>
+		<element ref="text_p6"><bounds x="123.413" y="69.9" width="3" height="3" /></element>
+		<element ref="cwhite" blend="multiply"><bounds x="90.083" y="69.9" width="40" height="3" /></element>
 
 		<element ref="button" inputtag="RESET" inputmask="0x01"><bounds x="88.5"  y="48.25" width="7.5" height="3" /></element>
 		<element ref="button" inputtag="IN.1" inputmask="0x02"><bounds x="96.5"  y="48.25" width="7.5" height="3" /></element>

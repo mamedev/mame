@@ -292,15 +292,6 @@ license:CC0
 	<group name="sb_ui">
 		<bounds x="0" y="0" width="10" height="81" />
 
-		<element ref="cwhite"><bounds x="1" y="48" width="8" height="4" /></element>
-		<element name="piece_ui13" ref="piece"><bounds x="1" y="48" width="4" height="4" /></element>
-		<element name="piece_ui14" ref="piece"><bounds x="5" y="48" width="4" height="4" /></element>
-		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x1000"><bounds x="1" y="48" width="4" height="4" /><color alpha="0.25" /></element>
-		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x2000"><bounds x="5" y="48" width="4" height="4" /><color alpha="0.25" /></element>
-		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="1"><bounds x="1" y="48" width="4" height="4" /></element>
-		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="1"><bounds x="5" y="48" width="4" height="4" /></element>
-		<element ref="wmask2" blend="multiply"><bounds x="1" y="48" width="8" height="4" /></element>
-
 		<!-- can click here to change board type -->
 		<element ref="hlub" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="0" y="1.5" width="10" height="5" /></element>
 
@@ -351,6 +342,15 @@ license:CC0
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0200"><bounds x="5" y="35" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0400"><bounds x="5" y="39" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0800"><bounds x="5" y="43" width="4" height="4" /><color alpha="0.25" /></element>
+
+		<element ref="cwhite"><bounds x="1" y="48" width="8" height="4" /></element>
+		<element name="piece_ui13" ref="piece"><bounds x="1" y="48" width="4" height="4" /></element>
+		<element name="piece_ui14" ref="piece"><bounds x="5" y="48" width="4" height="4" /></element>
+		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x1000"><bounds x="1" y="48" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x2000"><bounds x="5" y="48" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="1"><bounds x="1" y="48" width="4" height="4" /></element>
+		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="1"><bounds x="5" y="48" width="4" height="4" /></element>
+		<element ref="wmask2" blend="multiply"><bounds x="1" y="48" width="8" height="4" /></element>
 
 		<!-- hand -->
 		<element ref="text_uih1"><bounds x="0" y="54" width="10" height="2" /></element>
@@ -457,18 +457,17 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="0" right="102" top="-2" bottom="103" />
-		<group ref="panel"><bounds x="47.5" y="91.8" width="24.5" height="6.5" /></group>
 		<element ref="cblack"><bounds x="13" y="-2" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
 		<element ref="text_lcd"><bounds x="47.5" y="89" width="24.5" height="2" /></element>
+		<group ref="panel"><bounds x="47.5" y="91.8" width="24.5" height="6.5" /></group>
 		<group ref="buttons"><bounds x="77.5" y="88.5" width="13" height="13" /></group>
 
 		<group ref="sb_board"><bounds x="17.5" y="2.5" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="1.5" y="2" width="10" height="81" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="14.2" y="6.5" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="14.2" y="16.5" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="14.2" y="26.5" width="2" height="2" /></element>

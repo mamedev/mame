@@ -408,10 +408,9 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="1" right="129" top="0.5" bottom="90" />
 
-		<group ref="panel1"><bounds x="103.5" y="56.9" width="23" height="6.1" /></group>
+		<element ref="cwhite"><bounds x="19.5" y="2.5" width="81" height="81" /></element>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="14.2" y="7" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="14.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="14.2" y="27" width="2" height="2" /></element>
@@ -430,9 +429,7 @@ license:CC0
 		<element ref="text_g"><bounds x="84" y="86.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="94" y="86.5" width="2" height="2" /></element>
 
-		<element ref="cwhite"><bounds x="19.5" y="2.5" width="81" height="81" /></element>
-
-	<!-- chessboard leds -->
+		<!-- chessboard leds -->
 		<element name="led0" ref="ledr"><bounds x="24" y="85" width="2" height="1" /></element>
 		<element name="led1" ref="ledr"><bounds x="34" y="85" width="2" height="1" /></element>
 		<element name="led2" ref="ledr"><bounds x="44" y="85" width="2" height="1" /></element>
@@ -450,10 +447,12 @@ license:CC0
 		<element name="led14" ref="ledr"><bounds x="16.5" y="17.5" width="2" height="1" /></element>
 		<element name="led15" ref="ledr"><bounds x="16.5" y="7.5"  width="2" height="1" /></element>
 
-	<!-- LCD panel -->
-		<group ref="panel2"><bounds x="103" y="69" width="24" height="17" /></group>
-
 		<group ref="sb_board"><bounds x="20" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="2.5" y="3" width="10" height="80" /></group>
+
+		<!-- LCD panel -->
+		<group ref="panel1"><bounds x="103.5" y="56.9" width="23" height="6.1" /></group>
+		<group ref="panel2"><bounds x="103" y="69" width="24" height="17" /></group>
+
 	</view>
 </mamelayout>

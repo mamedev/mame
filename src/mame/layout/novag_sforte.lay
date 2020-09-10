@@ -393,13 +393,6 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-12" right="114" top="-1" bottom="88" />
 
-	<!-- lcd panel -->
-
-		<element ref="lcdw"><bounds x="86" y="8" width="25.25" height="5" /></element>
-		<screen tag="screen"><bounds x="86.5" y="9" width="24.25" height="3" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds x="86" y="8" width="25.25" height="5" /></element>
-		<element ref="lcda" blend="add"><bounds x="86" y="8" width="25.25" height="5" /></element>
-
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-11" y="3" width="10" height="80" /></group>
 
@@ -442,6 +435,13 @@ license:CC0
 		<element name="2.1" ref="ledr"><bounds x="58.5" y="84" width="1" height="2" /></element>
 		<element name="1.1" ref="ledr"><bounds x="68.5" y="84" width="1" height="2" /></element>
 		<element name="0.1" ref="ledr"><bounds x="78.5" y="84" width="1" height="2" /></element>
+
+	<!-- lcd panel -->
+
+		<element ref="lcdw"><bounds x="86" y="8" width="25.25" height="5" /></element>
+		<screen tag="screen"><bounds x="86.5" y="9" width="24.25" height="3" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="86" y="8" width="25.25" height="5" /></element>
+		<element ref="lcda" blend="add"><bounds x="86" y="8" width="25.25" height="5" /></element>
 
 	<!-- right side buttons -->
 
