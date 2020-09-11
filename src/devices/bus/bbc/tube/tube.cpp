@@ -113,6 +113,7 @@ void bbc_tube_devices(device_slot_interface &device)
 	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
 	device.option_add("z80w",   BBC_TUBE_Z80W);    /* Acorn ANC04 Z80 2nd processor (Winchester) */
 	device.option_add("32016",  BBC_TUBE_32016);   /* Acorn ANC05 32016 2nd processor */
+	device.option_add("32016l", BBC_TUBE_32016L);  /* Acorn Large 32016 2nd processor */
 	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("80286",  BBC_TUBE_80286);   /* Acorn 80286 2nd Processor */
 	//device.option_add("a500",   BBC_TUBE_A500);    /* Acorn A500 2nd Processor */
@@ -142,6 +143,7 @@ void bbc_extube_devices(device_slot_interface &device)
 	device.option_add("z80",    BBC_TUBE_Z80);      /* Acorn ANC04 Z80 2nd processor */
 	device.option_add("z80w",   BBC_TUBE_Z80W);     /* Acorn ANC04 Z80 2nd processor (Winchester) */
 	device.option_add("32016",  BBC_TUBE_32016);    /* Acorn ANC05 32016 2nd processor */
+	device.option_add("32016l", BBC_TUBE_32016L);   /* Acorn Large 32016 2nd processor */
 	device.option_add("arm",    BBC_TUBE_ARM);      /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("80286",  BBC_TUBE_80286);    /* Acorn 80286 2nd Processor */
 	device.option_add("pcplus", BBC_TUBE_PCPLUS);   /* Solidisk PC-Plus co-processor */
@@ -180,6 +182,7 @@ void electron_tube_devices(device_slot_interface &device)
 	device.option_add("6502",   BBC_TUBE_6502);    /* Acorn ANC01 6502 2nd processor */
 	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
 	device.option_add("32016",  BBC_TUBE_32016);   /* Acorn ANC05 32016 2nd processor */
+	device.option_add("32016l", BBC_TUBE_32016L);  /* Acorn Large 32016 2nd processor */
 	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */

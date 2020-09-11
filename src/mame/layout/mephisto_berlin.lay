@@ -392,10 +392,9 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="2" right="129" top="0.5" bottom="89" />
 
-		<group ref="panel1"><bounds x="103.5" y="56.9" width="23" height="6.1" /></group>
+		<element ref="cwhite"><bounds x="19.5" y="2.5" width="81" height="81" /></element>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="15.7" y="7" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="15.7" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="15.7" y="27" width="2" height="2" /></element>
@@ -413,12 +412,12 @@ license:CC0
 		<element ref="text_g"><bounds x="84" y="85.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="94" y="85.5" width="2" height="2" /></element>
 
-		<element ref="cwhite"><bounds x="19.5" y="2.5" width="81" height="81" /></element>
-
-	<!-- LCD panel -->
-		<group ref="panel2"><bounds x="103" y="72" width="24" height="13" /></group>
-
 		<group ref="sb_board"><bounds x="20" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="3.5" y="3" width="10" height="80" /></group>
+
+		<!-- LCD panel -->
+		<group ref="panel1"><bounds x="103.5" y="56.9" width="23" height="6.1" /></group>
+		<group ref="panel2"><bounds x="103" y="72" width="24" height="13" /></group>
+
 	</view>
 </mamelayout>

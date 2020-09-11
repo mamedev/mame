@@ -71,8 +71,8 @@ private:
 
 	// operand read/write helpers
 	u32 ea(addr_mode const mode);
-	u32 gen_read(addr_mode mode, unsigned size);
-	s32 gen_read_sx(addr_mode mode, unsigned size);
+	u64 gen_read(addr_mode mode, unsigned size);
+	s64 gen_read_sx(addr_mode mode, unsigned size);
 	void gen_write(addr_mode mode, unsigned size, u64 data);
 
 	// other execution helpers

@@ -799,6 +799,9 @@ license:CC0
 	<view name="Internal Layout (Board)">
 		<bounds left="21.5" right="100.5" top="18.5" bottom="88" />
 
+		<group ref="sb_board"><bounds x="33.5" y="21" width="64.5" height="64.5" /></group>
+		<group ref="sb_ui"><bounds x="22.5" y="21" width="8.06" height="64.5" /></group>
+
 		<repeat count="8">
 			<param name="x" start="33.5" increment="8.0625" />
 			<param name="i" start="1" increment="1" />
@@ -809,9 +812,6 @@ license:CC0
 			<param name="i" start="8" increment="-1" />
 			<element ref="text_hn~i~"><bounds x="31.3" y="~y~" width="2" height="1.6125" /></element>
 		</repeat>
-
-		<group ref="sb_board"><bounds x="33.5" y="21" width="64.5" height="64.5" /></group>
-		<group ref="sb_ui"><bounds x="22.5" y="21" width="8.06" height="64.5" /></group>
 	</view>
 
 </mamelayout>

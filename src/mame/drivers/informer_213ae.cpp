@@ -16,6 +16,10 @@
     TODO:
 	- Figure out the ASIC and how it's connected
 
+    Notes:
+    - Debug tricks: "b@42=ff" after startup to show setup screen 1
+      "bp 81a1" then "b@42=ff" and "a=02" after the break to show screen 2
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -71,6 +75,7 @@ private:
 void informer_213ae_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x3fff).ram();
 	map(0x6000, 0x6fff).ram().share("vram");
 	map(0x7000, 0x7fff).ram().share("aram");
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
@@ -91,27 +96,33 @@ INPUT_PORTS_END
 
 uint32_t informer_213ae_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 51; y++)
+	for (int y = 0; y < 26; y++)
 	{
 		for (int x = 0; x < 80; x++)
 		{
-			uint8_t code = m_vram[y * 80 + x];
-//			uint8_t attr = m_aram[y * 80 + x];
+			// screen memory starts at 0x6820
+			uint8_t code = m_vram[26 * 80 + y * 80 + x];
+//			uint8_t attr = m_aram[26 * 80 + y * 80 + x];
+
+			// but status line is at top of vram
+			if (y > 23)
+			{
+				code = m_vram[(y - 24) * 80 + x];
+//				attr = m_aram[(y - 24) * 80 + x];
+			}
 
 			// draw 9 lines
 			for (int i = 0; i < 9; i++)
 			{
 				uint8_t data = m_chargen[0x2000 | ((code << 4) + i)];
 
-				// 8 pixels of the character
-				bitmap.pix32(y * 9 + i, x * 8 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 6) = BIT(data, 1) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 8 + 7) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+				// 6 pixels of the character
+				bitmap.pix32(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix32(y * 9 + i, x * 6 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix32(y * 9 + i, x * 6 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix32(y * 9 + i, x * 6 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix32(y * 9 + i, x * 6 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix32(y * 9 + i, x * 6 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}
@@ -121,11 +132,11 @@ uint32_t informer_213ae_state::screen_update(screen_device &screen, bitmap_rgb32
 
 static const gfx_layout char_layout =
 {
-	8,9,
+	6,9,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0, 1, 2, 3, 4, 5 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
 	8*16
 };
@@ -160,9 +171,9 @@ void informer_213ae_state::informer_213ae(machine_config &config)
 	SCC8530N(config, m_scc, 0); // unknown clock
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_color(rgb_t::green());
-	m_screen->set_size(640, 480);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_color(rgb_t::amber());
+	m_screen->set_size(480, 234);
 	m_screen->set_visarea_full();
 	m_screen->set_refresh_hz(60);
 //	m_screen->set_raw(18.432_MHz_XTAL, 0, 0, 0, 0, 0, 0);

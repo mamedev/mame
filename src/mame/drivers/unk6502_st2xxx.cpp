@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// unknown 6502 based handhelds, possibly ST2205U architecture
+// unknown 6502 based handhelds, ST2205U or ST23XX architecture
 
 // the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
 // https://www.youtube.com/watch?v=NacY2WHd-CY
@@ -50,7 +50,7 @@ private:
 
 	void bbl380_map(address_map &map);
 
-	required_device<st2205u_device> m_maincpu;
+	required_device<st2xxx_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
@@ -97,9 +97,8 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 8000000); // unknown clock; type close but not quite correct?
+	ST2302U(config, m_maincpu, 8000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
-	m_maincpu->set_alt_map();
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);
@@ -125,6 +124,13 @@ ROM_START( bbl380 )
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
 ROM_END
 
+ROM_START( rhhc152 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941) ) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "152_mk25q32amg_ef4016.bin", 0x000000, 0x400000, CRC(5f553895) SHA1(cd21c6ff225e0455531f6b1d9f1c66a284948516) )
+ROM_END
 
 ROM_START( ragc153 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
@@ -166,7 +172,8 @@ void bbl380_state::init_ragc153()
 }
 
 CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
-CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IS_SKELETON )
+CONS( 200?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IS_SKELETON ) // looks like a mini GameBoy - 'Over 150 games' on box
+CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IS_SKELETON ) // looks like a Game & Watch
 CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "PCP", "PCP 8630 - 230-in-1 - Digital Pocket Hand Held System", MACHINE_IS_SKELETON ) // PCP isn't mentioned on packaging
 CONS( 200?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IS_SKELETON )
 

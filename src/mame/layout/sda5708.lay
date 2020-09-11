@@ -44,8 +44,6 @@ license:CC0
 	</element>
 
 	<view name="Default Layout">
-		<bounds left="0" top="0" right="150" bottom="20" />
-
 		<!-- generated with mechanical data from the data sheet -->
 		<repeat count="8"> <!-- 8 digits -->
 			<param name="digitno" start="1" increment="1" />

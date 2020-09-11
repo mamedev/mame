@@ -4,15 +4,19 @@
 
     Sitronix ST2XXX LCD MCUs
 
-    This extended SoC family combines a 65C02 CPU core (including the
-    Rockwell bit opcodes) with a wide variety of on-chip peripherals.
-    Features common to all besides internal RAM and ROM are parallel
-    ports, internal timers, a multi-level interrupt controller, LCD
-    controllers (of varying degrees of sophistication), R/C/slow XTAL
-    clock generators, power management and PSG channels for speaker
-    output. Each MCU also has numerous pins dedicated to LCD segment
-    drivers, an external bus addressing several MB of off-chip
-    memory using multiple chip select signals, or both.
+    This extended SoC family combines a W65C02S 8-bit CPU core
+    (including the Rockwell bit opcodes) with a wide variety of on-
+    chip peripherals. Common features besides internal RAM and ROM are
+    parallel ports, internal timers, a vectored interrupt controller,
+    LCD controllers (of varying degrees of sophistication), R/C/slow
+    XTAL clock generators, power management and PSG channels for
+    speaker output. Each MCU also has numerous pins dedicated to LCD
+    segment drivers (ST20XX, ST2104, ST2108), an external bus capable
+    of addressing several MB of off-chip memory using multiple chip
+    select signals (ST2100, ST22XX), or both (ST25XX, ST26XX). The
+    later ST23XX series, targeted mostly at digital greeting card
+    applications, eliminated on-chip LCD control but retained other
+    typical ST2XXX features.
 
     On all ST2XXX MCUs but the smallest single-chip ST20XX models,
     4000–7FFF (nominally program memory) and 8000–FFFF (nominally
@@ -22,6 +26,9 @@
     register for DMA reads from the 8000–FFFF area, and will also
     switch 4000–7FFF to a different bank during interrupt service if
     the IRREN bit in the SYS register is set.
+
+    At some time between 2010 and 2012, Sitronix spun off all of its
+    SoC product line to mCore Technology Corporation.
 
 **********************************************************************/
 
@@ -179,17 +186,20 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_misc));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
-	save_item(NAME(m_lssa));
-	save_item(NAME(m_lvpw));
-	save_item(NAME(m_lxmax));
-	save_item(NAME(m_lymax));
-	if (st2xxx_lpan_mask() != 0)
-		save_item(NAME(m_lpan));
-	save_item(NAME(m_lctr));
-	save_item(NAME(m_lckr));
-	save_item(NAME(m_lfra));
-	save_item(NAME(m_lac));
-	save_item(NAME(m_lpwm));
+	if (st2xxx_lctr_mask() != 0)
+	{
+		save_item(NAME(m_lssa));
+		save_item(NAME(m_lvpw));
+		save_item(NAME(m_lxmax));
+		save_item(NAME(m_lymax));
+		if (st2xxx_lpan_mask() != 0)
+			save_item(NAME(m_lpan));
+		save_item(NAME(m_lctr));
+		save_item(NAME(m_lckr));
+		save_item(NAME(m_lfra));
+		save_item(NAME(m_lac));
+		save_item(NAME(m_lpwm));
+	}
 	if (st2xxx_has_spi())
 	{
 		save_item(NAME(m_sctr));

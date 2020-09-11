@@ -653,6 +653,7 @@ ngen.cpp
 ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
+novag_cexpert.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp

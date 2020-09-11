@@ -121,7 +121,7 @@ void electron_state::electron64_opcodes(address_map &map)
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
-	if (!newval)
+	if (newval)
 	{
 		m_exp->reset();
 	}
@@ -251,6 +251,7 @@ void electron_state::electron(machine_config &config)
 {
 	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 

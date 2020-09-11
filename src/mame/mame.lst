@@ -32141,6 +32141,7 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 msiwwe
+msiwwea
 msidd
 msimpac
 msisinv
@@ -32518,9 +32519,12 @@ pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
+@source:novag_cexpert.cpp
+cexpert
+
 @source:novag_cforte.cpp
-cfortea                         //
-cforteb                         //
+cfortea
+cforteb
 
 @source:novag_const.cpp
 const
@@ -40848,6 +40852,7 @@ uts20                           //
 
 @source:unk6502_st2xxx.cpp
 bbl380
+rhhc152
 ragc153
 dphh8630
 dgun2953

@@ -55,6 +55,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -184,6 +185,7 @@ struct render_bounds
 	constexpr float width() const { return x1 - x0; }
 	constexpr float height() const { return y1 - y0; }
 	constexpr float aspect() const { return width() / height(); }
+	constexpr bool includes(float x, float y) const { return (x >= x0) && (x <= x1) && (y >= y0) && (y <= y1); }
 };
 
 
@@ -738,7 +740,7 @@ public:
 	using view_environment = emu::render::detail::view_environment;
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
-	using render_screen_list = std::list<std::reference_wrapper<screen_device>>;
+	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device> >;
 
 	/// \brief A single item in a view
 	///
@@ -769,8 +771,11 @@ public:
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
+
+		// interactivity
 		bool has_input() const { return bool(m_input_port); }
 		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
+		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
 		int state() const;
@@ -778,34 +783,37 @@ public:
 		// resolve tags, if any
 		void resolve_tags();
 
-		// setters
-		void set_blend_mode(int mode) { m_blend_mode = mode; }
-
 	private:
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
 		static render_bounds make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
 		static std::string make_input_tag(view_environment &env, util::xml::data_node const &itemnode);
 		static int get_blend_mode(view_environment &env, util::xml::data_node const &itemnode);
+		static unsigned get_input_shift(ioport_value mask);
 
 		// internal state
 		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
 		output_finder<>         m_output;           // associated output
 		bool const              m_have_output;      // whether we actually have an output
-		std::string const       m_input_tag;        // input tag of this item
 		ioport_port *           m_input_port;       // input port of this item
 		ioport_field const *    m_input_field;      // input port field of this item
 		ioport_value const      m_input_mask;       // input mask of this item
-		u8                      m_input_shift;      // input mask rightshift for raw (trailing 0s)
+		u8 const                m_input_shift;      // input mask rightshift for raw (trailing 0s)
 		bool const              m_input_raw;        // get raw data from input port
+		bool                    m_clickthrough;     // should click pass through to lower elements
 		screen_device *         m_screen;           // pointer to screen
 		int                     m_orientation;      // orientation of this item
 		render_bounds           m_bounds;           // bounds of the item
-		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
 		render_color            m_color;            // color of the item
 		int                     m_blend_mode;       // blending mode to use when drawing
 		u32                     m_visibility_mask;  // combined mask of parent visibility groups
+
+		// cold items
+		std::string const       m_input_tag;        // input tag of this item
+		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
+		bool const              m_has_clickthrough; // whether clickthrough was explicitly configured
 	};
 	using item_list = std::list<item>;
+	using item_ref_vector = std::vector<std::reference_wrapper<item> >;
 
 	/// \brief A subset of items in a view that can be hidden or shown
 	///
@@ -831,6 +839,36 @@ public:
 	};
 	using visibility_toggle_vector = std::vector<visibility_toggle>;
 
+	/// \brief An edge of an item in a view
+	class edge
+	{
+	public:
+		// construction/destruction
+		constexpr edge(unsigned index, float position, bool trailing)
+			: m_index(index)
+			, m_position(position)
+			, m_trailing(trailing)
+		{
+		}
+
+		// getters
+		constexpr unsigned index() const { return m_index; }
+		constexpr float position() const { return m_position; }
+		constexpr bool trailing() const { return m_trailing; }
+
+		// comparison
+		constexpr bool operator<(edge const &that) const
+		{
+			return std::make_tuple(m_position, m_trailing, m_index) < std::make_tuple(that.m_position, that.m_trailing, that.m_index);
+		}
+
+	private:
+		unsigned                m_index;            // index of item in some collection
+		float                   m_position;         // position of edge on given axis
+		bool                    m_trailing;         // false for edge at lower position on axis
+	};
+	using edge_vector = std::vector<edge>;
+
 	// construction/destruction
 	layout_view(
 			layout_environment &env,
@@ -842,14 +880,18 @@ public:
 	// getters
 	item_list &items() { return m_items; }
 	const std::string &name() const { return m_name; }
-	const render_screen_list &screens() const { return m_screens; }
 	size_t screen_count() const { return m_screens.size(); }
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
 	bool has_screen(screen_device &screen) const;
-	bool has_art() const { return m_has_art; }
-	u32 default_visibility_mask() const { return m_defvismask; }
+	const item_ref_vector &screen_items() const { return m_screen_items; }
+	const item_ref_vector &interactive_items() const { return m_interactive_items; }
+	const edge_vector &interactive_edges_x() const { return m_interactive_edges_x; }
+	const edge_vector &interactive_edges_y() const { return m_interactive_edges_y; }
+	const screen_ref_vector &screens() const { return m_screens; }
 	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
+	u32 default_visibility_mask() const { return m_defvismask; }
+	bool has_art() const { return m_has_art; }
 
 	// operations
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
@@ -877,15 +919,21 @@ private:
 	static std::string make_name(layout_environment &env, util::xml::data_node const &viewnode);
 
 	// internal state
-	std::string         m_name;             // name of the layout
-	render_screen_list  m_screens;          // list screens visible in current configuration
-	float               m_effaspect;        // X/Y of the layout in current configuration
-	render_bounds       m_bounds;           // computed bounds of the view in current configuration
-	render_bounds       m_expbounds;        // explicit bounds of the view
-	item_list           m_items;            // list of layout items
-	bool                m_has_art;          // true if the layout contains non-screen elements
-	u32                 m_defvismask;       // default visibility mask
-	visibility_toggle_vector m_vistoggles;
+	std::string                 m_name;             // name of the layout
+	float                       m_effaspect;        // X/Y of the layout in current configuration
+	render_bounds               m_bounds;           // computed bounds of the view in current configuration
+	item_list                   m_items;            // list of layout items
+	item_ref_vector             m_screen_items;     // visible items that represent screens to draw
+	item_ref_vector             m_interactive_items;// visible items that can accept pointer input
+	edge_vector                 m_interactive_edges_x;
+	edge_vector                 m_interactive_edges_y;
+	screen_ref_vector           m_screens;          // list screens visible in current configuration
+
+	// cold items
+	visibility_toggle_vector    m_vistoggles;       // collections of items that can be shown/hidden
+	render_bounds               m_expbounds;        // explicit bounds of the view
+	u32                         m_defvismask;       // default visibility mask
+	bool                        m_has_art;          // true if the layout contains non-screen elements
 };
 
 
@@ -1026,7 +1074,7 @@ private:
 	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
-	bool map_point_internal(s32 target_x, s32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask);
+	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
 
 	// config callbacks
 	void config_load(util::xml::data_node const &targetnode);
@@ -1067,6 +1115,7 @@ private:
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none
 	int                     m_orientation;              // orientation
 	render_layer_config     m_layerconfig;              // layer configuration
+	std::vector<bool>       m_hit_test;                 // used when mapping points to inputs
 	layout_view *           m_base_view;                // the view at the time of first frame
 	int                     m_base_orientation;         // the orientation at the time of first frame
 	render_layer_config     m_base_layerconfig;         // the layer configuration at the time of first frame

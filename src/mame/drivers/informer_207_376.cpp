@@ -30,16 +30,19 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
+#include "machine/pit8253.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/z80scc.h"
 #include "video/mc6845.h"
+#include "sound/beep.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/printer.h"
 #include "machine/informer_207_376_kbd.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -55,8 +58,10 @@ public:
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_pit(*this, "pit"),
 		m_scc(*this, "scc"),
 		m_acia(*this, "acia%u", 0U),
+		m_beep(*this, "beep"),
 		m_ram(*this, "ram"),
 		m_chargen(*this, "chargen"),
 		m_nmi_enabled(false)
@@ -73,8 +78,10 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pit8253_device> m_pit;
 	required_device<scc85c30_device> m_scc;
 	required_device_array<acia6850_device, 2> m_acia;
+	required_device<beep_device> m_beep;
 	required_shared_ptr<uint8_t> m_ram;
 	required_region_ptr<uint8_t> m_chargen;
 
@@ -84,6 +91,7 @@ private:
 
 	void vsync_w(int state);
 	void nmi_control_w(uint8_t data);
+	void unk_8400_w(uint8_t data);
 
 	bool m_nmi_enabled;
 };
@@ -98,10 +106,11 @@ void informer_207_376_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).ram().share("ram");
 	map(0x8000, 0x8000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x8400, 0x8400).lr8(NAME([] () { return 0xff; })).nopw(); // ?
+	map(0x8400, 0x8400).lr8(NAME([] () { return 0xff; })).w(FUNC(informer_207_376_state::unk_8400_w)); // ?
 	map(0x8802, 0x8803).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8804, 0x8805).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8c00, 0x8c00).w(FUNC(informer_207_376_state::nmi_control_w));
+	map(0x9000, 0x9003).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x9400, 0x9403).rw(m_scc, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w));
 	map(0x9c00, 0x9cff).ram().share("nvram");
 	map(0xa000, 0xffff).rom().region("maincpu", 0);
@@ -182,6 +191,16 @@ void informer_207_376_state::nmi_control_w(uint8_t data)
 	m_nmi_enabled = bool(data & 0x06);
 }
 
+void informer_207_376_state::unk_8400_w(uint8_t data)
+{
+	// 7-------  beeper
+	// -6------  unknown
+	// --5-----  1=internal modem, 0=host rs232
+	// ---43210  unknown
+
+	m_beep->set_state(BIT(data, 7));
+}
+
 void informer_207_376_state::machine_start()
 {
 	// register for save states
@@ -213,7 +232,15 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x X2212P
 
-	SCC85C30(config, m_scc, 0); // unknown clock
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(4915200 / 2);
+	m_pit->out_handler<0>().set(m_acia[1], FUNC(acia6850_device::write_txc));
+	m_pit->out_handler<0>().append(m_acia[1], FUNC(acia6850_device::write_rxc));
+	m_pit->set_clk<1>(4915200 / 2);
+	m_pit->out_handler<1>().set(m_acia[0], FUNC(acia6850_device::write_txc));
+	m_pit->out_handler<1>().append(m_acia[0], FUNC(acia6850_device::write_rxc));
+
+	SCC85C30(config, m_scc, 4915200);
 	m_scc->out_txda_callback().set("com1", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("com1", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("com1", FUNC(rs232_port_device::write_rts));
@@ -228,12 +255,6 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 
 	ACIA6850(config, m_acia[1], 0); // unknown clock
 	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source?
-	acia_clock.signal_handler().set(m_acia[0], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
 	com1.rxd_handler().set(m_scc, FUNC(scc85c30_device::rxa_w));
@@ -266,6 +287,10 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(informer_207_376_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(informer_207_376_state::vsync_w));
+
+	// sound
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beep", 500).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
 }
 
 
@@ -275,13 +300,17 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 
 ROM_START( in207376 )
 	ROM_REGION(0x6000, "maincpu", 0)
+	// M2764A F1
 	// 79590-023  376SNA V1.00  201C 7224  (our checksum: 7264)
-	ROM_LOAD("79590-023.bin", 0x0000, 0x2000, BAD_DUMP CRC(ed4ff488) SHA1(fdd95c520d0288ea483b5d2e8e6c8eecb04063c1))
+	ROM_LOAD("79590-023.z37", 0x0000, 0x2000, BAD_DUMP CRC(ed4ff488) SHA1(fdd95c520d0288ea483b5d2e8e6c8eecb04063c1))
+	// M27128AF1
 	// 79589-023  376 SNAV1.00  201C E86F  (checksum matches)
-	ROM_LOAD("79589-023.bin", 0x2000, 0x4000, CRC(cdfaf629) SHA1(1f21ef6848020726ef3d7ab05166ac8590d58476))
+	ROM_LOAD("79589-023.z36", 0x2000, 0x4000, CRC(cdfaf629) SHA1(1f21ef6848020726ef3d7ab05166ac8590d58476))
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD("chargen.bin", 0x0000, 0x1000, BAD_DUMP CRC(819e4b4e) SHA1(4937e49b2d91af993e8f65f5df1d6f729e775fc4))
+	// TMS2732AGL-25
+	// 79573-001 V1.00 376/8 CHAR. GEN.
+	ROM_LOAD("79573-001.z6", 0x0000, 0x1000, CRC(f704b827) SHA1(bcc56eeb8681c2bebe3a9f4b6b78c0373c06d875))
 ROM_END
 
 
@@ -290,4 +319,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE           INPUT             CLASS                   INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1986, in207376, 0,       0,      informer_207_376, informer_207_376, informer_207_376_state, empty_init, "Informer", "Informer 207/376", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, in207376, 0,       0,      informer_207_376, informer_207_376, informer_207_376_state, empty_init, "Informer", "Informer 207/376", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
