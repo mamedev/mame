@@ -30,6 +30,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
+#include "machine/pit8253.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
@@ -57,6 +58,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_pit(*this, "pit"),
 		m_scc(*this, "scc"),
 		m_acia(*this, "acia%u", 0U),
 		m_beep(*this, "beep"),
@@ -76,6 +78,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pit8253_device> m_pit;
 	required_device<scc85c30_device> m_scc;
 	required_device_array<acia6850_device, 2> m_acia;
 	required_device<beep_device> m_beep;
@@ -107,6 +110,7 @@ void informer_207_376_state::mem_map(address_map &map)
 	map(0x8802, 0x8803).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8804, 0x8805).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8c00, 0x8c00).w(FUNC(informer_207_376_state::nmi_control_w));
+	map(0x9000, 0x9003).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x9400, 0x9403).rw(m_scc, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w));
 	map(0x9c00, 0x9cff).ram().share("nvram");
 	map(0xa000, 0xffff).rom().region("maincpu", 0);
@@ -228,7 +232,15 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x X2212P
 
-	SCC85C30(config, m_scc, 0); // unknown clock
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(4915200 / 2);
+	m_pit->out_handler<0>().set(m_acia[1], FUNC(acia6850_device::write_txc));
+	m_pit->out_handler<0>().append(m_acia[1], FUNC(acia6850_device::write_rxc));
+	m_pit->set_clk<1>(4915200 / 2);
+	m_pit->out_handler<1>().set(m_acia[0], FUNC(acia6850_device::write_txc));
+	m_pit->out_handler<1>().append(m_acia[0], FUNC(acia6850_device::write_rxc));
+
+	SCC85C30(config, m_scc, 4915200);
 	m_scc->out_txda_callback().set("com1", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("com1", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("com1", FUNC(rs232_port_device::write_rts));
@@ -243,12 +255,6 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 
 	ACIA6850(config, m_acia[1], 0); // unknown clock
 	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source?
-	acia_clock.signal_handler().set(m_acia[0], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
 	com1.rxd_handler().set(m_scc, FUNC(scc85c30_device::rxa_w));
