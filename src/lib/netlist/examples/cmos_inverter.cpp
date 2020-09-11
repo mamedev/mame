@@ -7,7 +7,6 @@
 
 
 #include "netlist/devices/net_lib.h"
-#include "netlist/devices/net_lib.h"
 
 NETLIST_START(cmos_inverter)
 	/* Standard stuff */
@@ -18,7 +17,7 @@ NETLIST_START(cmos_inverter)
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 5000)
+	PARAM(Solver.NR_LOOPS, 50)
 	PARAM(Solver.METHOD, "MAT_CR")
 	ANALOG_INPUT(V5, 5)
 

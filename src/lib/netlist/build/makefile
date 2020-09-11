@@ -144,11 +144,12 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/prg \
 			$(OBJ)/generated \
 
+MODULESOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
 DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
 DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
-DEVSOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
+DEVSOURCES += $(MODULESOURCES)
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -160,6 +161,7 @@ CORESOURCES := \
 	$(SRC)/nl_factory.cpp \
 	$(SRC)/tools/nl_convert.cpp \
 	$(SRC)/generated/static_solvers.cpp \
+	$(SRC)/generated/nlm_modules_lib.cpp \
 
 MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
 
@@ -362,6 +364,10 @@ $(SRC)/generated/lib_entries.hxx: $(DEVSOURCES)
 $(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_devinc.py $^ > $@
+
+$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+	@echo creating $@
+	$(PYTHON) create_modules.py $^ > $@
 
 .PHONY: generated
 generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h

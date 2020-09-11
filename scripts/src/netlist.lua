@@ -205,7 +205,6 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_base_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_ttl74xx_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_cd4xxx_lib.cpp",
-		MAME_DIR .. "src/lib/netlist/macro/nlm_modules_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_opamp_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_otheric_lib.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_roms_lib.cpp",
@@ -215,4 +214,5 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/generated/static_solvers.cpp",
 		MAME_DIR .. "src/lib/netlist/generated/nld_devinc.h",
 		MAME_DIR .. "src/lib/netlist/generated/lib_entries.hxx",
+		MAME_DIR .. "src/lib/netlist/generated/nlm_modules_lib.cpp",
 	}
