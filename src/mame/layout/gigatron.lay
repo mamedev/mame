@@ -16,17 +16,17 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="30" width="640" height="480" />
 		</screen>
-		<bezel name="blinken1" element="led">
+		<element name="blinken1" ref="led">
 			<bounds x="15" y="15" width="10" height="10" />
-		</bezel>
-		<bezel name="blinken2" element="led">
+		</element>
+		<element name="blinken2" ref="led">
 			<bounds x="30" y="15" width="10" height="10" />
-		</bezel>
-		<bezel name="blinken3" element="led">
+		</element>
+		<element name="blinken3" ref="led">
 			<bounds x="45" y="15" width="10" height="10" />
-		</bezel>
-		<bezel name="blinken4" element="led">
+		</element>
+		<element name="blinken4" ref="led">
 			<bounds x="60" y="15" width="10" height="10" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

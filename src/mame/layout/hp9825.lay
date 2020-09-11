@@ -22,9 +22,9 @@ Hewlett-Packard 9825 Layout
 
 	<view name="32-char display">
 		<bounds x="-5" y="0" width="289" height="7"/>
-		<bezel name="run_light" element="run_light">
+		<element name="run_light" ref="run_light">
 			<bounds x="-5" y="2" width="2" height="2"/>
-		</bezel>
+		</element>
 		<!-- 32 5x7 characters -->
 		<repeat count="32">
 			<param name="digitidx" start="0" increment="1" />
@@ -32,9 +32,9 @@ Hewlett-Packard 9825 Layout
 			<!-- Each of the 7 rows in a character -->
 			<repeat count="7">
 				<param name="rowidx" start="0" increment="1" />
-				<bezel name="char_~digitidx~_~rowidx~" element="dotmatrix5dot" state="0">
+				<element name="char_~digitidx~_~rowidx~" ref="dotmatrix5dot" state="0">
 					<bounds x="~digit_x~" y="~rowidx~" width="5" height="1" />
-				</bezel>
+				</element>
 			</repeat>
 		</repeat>
 	</view>

@@ -31,6 +31,7 @@ public:
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
 	virtual s32 read_as_relative(input_item_modifier modifier) override;
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
+	virtual bool item_check_axis(input_item_modifier modifier) override;
 
 	// steadykey helper
 	bool steadykey_changed();
@@ -56,6 +57,7 @@ public:
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
 	virtual s32 read_as_relative(input_item_modifier modifier) override;
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
+	virtual bool item_check_axis(input_item_modifier modifier) override;
 };
 
 
@@ -72,6 +74,7 @@ public:
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
 	virtual s32 read_as_relative(input_item_modifier modifier) override;
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
+	virtual bool item_check_axis(input_item_modifier modifier) override;
 };
 
 
@@ -699,6 +702,26 @@ input_device_item::~input_device_item()
 }
 
 
+//-------------------------------------------------
+//  check_axis - see if axis has moved far enough
+//  to trigger a read when polling
+//-------------------------------------------------
+
+bool input_device_item::check_axis(input_item_modifier modifier)
+{
+	// if we've already reported this one, don't bother
+	if (m_memory == INVALID_AXIS_VALUE)
+		return false;
+
+	if (item_check_axis(modifier))
+	{
+		m_memory = INVALID_AXIS_VALUE;
+		return true;
+	}
+
+	return false;
+}
+
 
 //**************************************************************************
 //  INPUT DEVICE SWITCH ITEM
@@ -770,6 +793,17 @@ s32 input_device_switch_item::read_as_absolute(input_item_modifier modifier)
 {
 	// no translation to absolute
 	return 0;
+}
+
+
+//-------------------------------------------------
+//  item_check_axis - see if axis has moved far
+//  enough to trigger a read when polling
+//-------------------------------------------------
+
+bool input_device_switch_item::item_check_axis(input_item_modifier modifier)
+{
+	return false;
 }
 
 
@@ -847,6 +881,20 @@ s32 input_device_relative_item::read_as_absolute(input_item_modifier modifier)
 {
 	// no translation to absolute
 	return 0;
+}
+
+
+//-------------------------------------------------
+//  item_check_axis - see if axis has moved far
+//  enough to trigger a read when polling
+//-------------------------------------------------
+
+bool input_device_relative_item::item_check_axis(input_item_modifier modifier)
+{
+	s32 curval = read_as_relative(modifier);
+
+	// for relative axes, look for ~20 pixels movement
+	return std::abs(curval - memory()) > 20 * INPUT_RELATIVE_PER_PIXEL;
 }
 
 
@@ -946,4 +994,23 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 	if (modifier == ITEM_MODIFIER_NEG)
 		result = std::max(-result, 0) * 2 + INPUT_ABSOLUTE_MIN;
 	return result;
+}
+
+
+//-------------------------------------------------
+//  item_check_axis - see if axis has moved far
+//  enough to trigger a read when polling
+//-------------------------------------------------
+
+bool input_device_absolute_item::item_check_axis(input_item_modifier modifier)
+{
+	// ignore min/max for lightguns
+	// so the selection will not be affected by a gun going out of range
+	s32 curval = read_as_absolute(modifier);
+	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN &&
+		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
+		return false;
+
+	// for absolute axes, look for 25% of maximum
+	return std::abs(curval - memory()) > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4;
 }

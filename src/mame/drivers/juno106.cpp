@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "audio/mb63h114.h"
 //#include "bus/midi/midi.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/nvram.h"
@@ -19,6 +20,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_modulecpu(*this, "modulecpu")
+		, m_mac(*this, "mac")
 		, m_pit(*this, "pit%u", 1U)
 	{
 	}
@@ -44,6 +46,7 @@ private:
 
 	required_device<upd7810_device> m_maincpu;
 	required_device<upd7810_device> m_modulecpu;
+	optional_device<mb63h114_device> m_mac;
 	required_device_array<pit8253_device, 2> m_pit;
 };
 
@@ -66,6 +69,7 @@ void juno106_state::dcom_w(u8 data)
 
 void juno106_state::rhythm_w(offs_t offset, u8 data)
 {
+	m_mac->xst_w(offset & 0xff);
 }
 
 void juno106_state::module_pit_w(offs_t offset, u8 data)
@@ -130,7 +134,7 @@ void juno106_state::mks7(machine_config &config)
 
 	config.device_remove("nvram"); // no battery or external RAM
 
-	//MB63H114(config, "mac", 1.6_MHz_XTAL);
+	MB63H114(config, "mac", 1.6_MHz_XTAL);
 }
 
 ROM_START(juno106)

@@ -809,8 +809,8 @@ ROM_START( bingor1 )    // Strings: Big Roll / Bingo Roll / 1991 AWR / 1992 Rose
 	ROM_LOAD16_BYTE( "bingo turbo l.bin", 0x000000, 0x10000, CRC(86b10566) SHA1(5f74b250ced3574feffdc40b6ed013ec5a0c2c97) )
 	ROM_LOAD16_BYTE( "bingo turbo h.bin", 0x000001, 0x10000, CRC(7e18f9d7) SHA1(519b65d6812a3762e3215f4918c834d5a444b28a) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) // protection?
-	ROM_LOAD( "pic16c54b.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+	ROM_REGION( 0x20000, "pic", 0 ) // protection? (only fragment dumped)
+	ROM_LOAD( "pic16c54b.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) BAD_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "bingor1_24c04a.bin", 0x000000, 0x200, CRC(b169df46) SHA1(ebafc81c6918aae9daa6b90df16161751cfd2590) )
@@ -825,8 +825,8 @@ ROM_START( bingor2 )    // Strings: Euro Bingo / 1988-1992 Rosenauer Electronic 
 	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
 	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x10000, CRC(4eec39ad) SHA1(4201d5ec207d30dcac9813dd6866d2b61c168e75) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) // protection
-	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+	ROM_REGION( 0x20000, "pic", 0 ) // protection (only fragment dumped)
+	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) BAD_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "bingor2_24c04a.bin", 0x000000, 0x200, CRC(a7c87036) SHA1(f7d6161bbfdcdc50212f6b71eb2cbbbb18548cc6) )
@@ -841,8 +841,8 @@ ROM_START( bingor3 )    // Strings: 1995-1997 Paloma Elektronik / 2002 Paloma El
 	ROM_LOAD16_BYTE( "bsg-11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
 	ROM_LOAD16_BYTE( "bsg-11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) // protection
-	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) )
+	ROM_REGION( 0x20000, "pic", 0 ) // protection (only fragment dumped)
+	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) BAD_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "bingor3_24c04a.bin",     0x000000, 0x200, CRC(7a5eb172) SHA1(12d2fc96049427ef1a8acf47242b41b2095d28b6) )
@@ -859,8 +859,8 @@ ROM_START( bingor4 )    // Strings: 1995-1997 Paloma Elektronik / 2002 Paloma El
 	ROM_LOAD16_BYTE( "bingo roll grafik l.bin", 0x000000, 0x10000, CRC(3e753e13) SHA1(011b5f530e54332be194830c0a1d2ec31425017a) )
 	ROM_LOAD16_BYTE( "bingo roll grafik h.bin", 0x000001, 0x10000, CRC(4eec39ad) SHA1(4201d5ec207d30dcac9813dd6866d2b61c168e75) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) // protection?
-	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) )
+	ROM_REGION( 0x20000, "pic", 0 ) // protection? (only fragment dumped)
+	ROM_LOAD( "pic16c54c.bin", 0x000, 0x200, CRC(21e8a699) SHA1(8a22292fa3669105d52a9d681d5be345fcfe6607) BAD_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "bingor4_24c04a.bin", 0x000000, 0x200, CRC(38cf70a9) SHA1(ba9a1640200963e2d58d761edc13a24fa5ef44c2) )
@@ -882,8 +882,8 @@ ROM_START( bingor5 )    // BellStar V3.  Strings: 1995-1997 Paloma Elektronik / 
 	ROM_LOAD16_BYTE( "b.s.grafik_11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
 	ROM_LOAD16_BYTE( "b.s.grafik_11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) // protection?
-	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) )
+	ROM_REGION( 0x20000, "pic", 0 ) // protection? (only fragment dumped)
+	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) BAD_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "bingor5_24c04a.bin", 0x000000, 0x200, CRC(fcff2d26) SHA1(aec1ddd38149404741a057c74bf84bfb4a8e4aa1) )

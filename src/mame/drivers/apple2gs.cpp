@@ -108,6 +108,7 @@
 #include "bus/a2bus/byte8251.h"
 //#include "bus/a2bus/hostram.h"
 //#include "bus/a2bus/ramfast.h"
+#include "bus/a2bus/uthernet.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4576,6 +4577,7 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
 //  device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
+	device.option_add("uthernet", A2BUS_UTHERNET);  /* CMS Apple II SCSI Card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

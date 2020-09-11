@@ -253,7 +253,6 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
-emate.cpp
 emma2.cpp
 emu2.cpp
 emu3.cpp
@@ -420,6 +419,9 @@ imsai.cpp
 indiana.cpp
 indigo.cpp
 indy_indigo2.cpp
+informer_207_100.cpp
+informer_207_376.cpp
+informer_213ae.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
@@ -644,12 +646,14 @@ newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
 news_r3k.cpp
+newton.cpp
 next.cpp
 nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
+novag_cexpert.cpp
 novag_cforte.cpp
 novag_const.cpp
 novag_diablo.cpp
@@ -810,6 +814,7 @@ roland_s50.cpp
 roland_sc55.cpp
 roland_sc88.cpp
 roland_tb303.cpp
+roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp
 roland_tr909.cpp
@@ -1062,6 +1067,7 @@ vip.cpp
 vis.cpp
 vixen.cpp
 vk100.cpp
+votrhv.cpp
 votrpss.cpp
 votrtnt.cpp
 vp415.cpp
@@ -1069,6 +1075,7 @@ vp60.cpp
 vsmile.cpp
 vsmileb.cpp
 vsmilepro.cpp
+vt_unknown.cpp
 vt100.cpp
 vt1682.cpp
 vt220.cpp

@@ -11,10 +11,10 @@
 #include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
-#include "pstrutil.h"
 
 #include <array>
 #include <memory>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -85,7 +85,7 @@ namespace plib {
 		{
 			if ((SIZE < 0 && size > SIZEABS())
 				|| (SIZE > 0 && size != SIZEABS()))
-				throw pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+				throw pexception(pfmt("parray: size error: {1} > {2}")(size, SIZE));
 		}
 
 		template <int X = SIZE >
@@ -94,7 +94,7 @@ namespace plib {
 		{
 			if ((SIZE < 0 && size > SIZEABS())
 				|| (SIZE > 0 && size != SIZEABS()))
-				throw pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+				throw pexception(pfmt("parray: size error: {1} > {2}")(size, SIZE));
 			m_a.fill(val);
 		}
 

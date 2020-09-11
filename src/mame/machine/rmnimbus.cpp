@@ -191,7 +191,7 @@ void rmnimbus_state::external_int(uint8_t vector, bool state)
 uint8_t rmnimbus_state::cascade_callback()
 {
 	m_maincpu->int0_w(0);
-	return m_vector;
+	return !m_vector ? m_z80sio->m1_r() : m_vector;
 }
 
 void rmnimbus_state::machine_reset()
@@ -987,7 +987,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
 	if(LOG_SIO)
 		logerror("SIO Interrupt state=%02X\n",state);
 
-	external_int(m_z80sio->m1_r(), state);
+	external_int(0, state);
 }
 
 /* Floppy disk */

@@ -45,24 +45,24 @@ license:CC0
 			<color red="0" green="0" blue="0" />
 		</rect>
 	</element>
-	<view name="Color_Overlay">
-		<backdrop name="pit1" element="pit">
+	<view name="Backdrop">
+		<element ref="pit">
 			<bounds x="270" y="330" width="190" height="190" />
 			<color alpha=".8" />
-		</backdrop>
-		<backdrop name="pit2" element="pit">
+		</element>
+		<element ref="pit">
 			<bounds x="580" y="270" width="190" height="190" />
 			<color alpha=".8" />
-		</backdrop>
-		<backdrop name="p1start" element="p1start">
+		</element>
+		<element ref="p1start">
 			<bounds x="75" y="75" width="130" height="130" />
 			<color alpha=".4" />
-		</backdrop>
-		<backdrop name="p2start" element="p2start">
+		</element>
+		<element ref="p2start">
 			<bounds x="825" y="580" width="130" height="130" />
 			<color alpha=".4" />
-		</backdrop>
-		<screen index="0">
+		</element>
+		<screen index="0" blend="add">
 			<bounds x="0" y="0" width="1024" height="768" />
 		</screen>
 	</view>

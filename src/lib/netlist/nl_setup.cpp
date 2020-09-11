@@ -12,6 +12,7 @@
 #include "nl_setup.h"
 #include "plib/penum.h"
 #include "plib/pstonum.h"
+#include "plib/pstrutil.h"
 #include "plib/putil.h"
 
 #include "solver/nld_solver.h"
@@ -39,7 +40,7 @@ namespace netlist
 
 	void nlparse_t::register_dip_alias_arr(const pstring &terms)
 	{
-		std::vector<pstring> list(plib::psplit(terms,", "));
+		const auto list(plib::psplit(terms,pstring(", ")));
 		if (list.empty() || (list.size() % 2) == 1)
 		{
 			log().fatal(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1(build_fqn("")));
@@ -93,7 +94,7 @@ namespace netlist
 
 		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(), {key, f});
 
-		auto paramlist = plib::psplit(f->param_desc(), ",");
+		auto paramlist = plib::psplit(f->param_desc(), ',');
 
 		if (!params_and_connections.empty())
 		{
@@ -169,7 +170,7 @@ namespace netlist
 
 	void nlparse_t::register_link_arr(const pstring &terms)
 	{
-		std::vector<pstring> list(plib::psplit(terms,", "));
+		const auto list(plib::psplit(terms,pstring(", ")));
 		if (list.size() < 2)
 		{
 			log().fatal(MF_NET_C_NEEDS_AT_LEAST_2_TERMINAL());
@@ -206,7 +207,7 @@ namespace netlist
 		m_namespace_stack.pop();
 	}
 
-	void nlparse_t::register_param(const pstring &param, const nl_fptype value)
+	void nlparse_t::register_param_fp(const pstring &param, const nl_fptype value)
 	{
 		if (plib::abs(value - plib::floor(value)) > nlconst::magic(1e-30)
 			|| plib::abs(value) > nlconst::magic(1e9))
@@ -247,7 +248,7 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::defparam(const pstring &name, const pstring &def)
+	void nlparse_t::register_defparam(const pstring &name, const pstring &def)
 	{
 		// strip " from stringified strings
 		pstring val(def);
@@ -358,7 +359,7 @@ namespace netlist
 		return parser.parse(tokens, name);
 	}
 
-	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
+	bool nlparse_t::parse_stream(plib::istream_uptr &&istrm, const pstring &name)
 	{
 #if 0
 		auto key = istrm.filename();
@@ -369,28 +370,22 @@ namespace netlist
 		}
 		else
 		{
-			//printf("searching %s\n", name.c_str());
-			plib::ppreprocessor y(m_includes, &m_defines);
-			y.process(std::move(istrm), istrm.filename());
-
-			auto abc = std::make_unique<std::stringstream>();
-			plib::copystream(*abc, y);
+			auto preprocessed = std::make_unique<std::stringstream>(
+					plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), istrm.filename()));
 
 			parser_t::token_store &st = m_source_cache[key];
 			parser_t parser(*this);
-			parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), key), st);
+			parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), key), st);
 			return parser.parse(st, name);
 		}
 #else
-		plib::ppreprocessor y(m_includes, &m_defines);
-		y.process(std::move(istrm), istrm.filename());
-
-		auto abc = std::make_unique<std::stringstream>();
-		plib::copystream(*abc, y);
+		const auto filename = istrm.filename();
+		auto preprocessed = std::make_unique<std::stringstream>(putf8string(
+				plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), filename)));
 
 		parser_t::token_store st;
 		parser_t parser(*this);
-		parser.parse_tokens(plib::psource_t::stream_ptr(std::move(abc), istrm.filename()), st);
+		parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), filename), st);
 		return parser.parse(st, name);
 #endif
 	}
@@ -461,13 +456,13 @@ namespace netlist
 	// Sources
 	// ----------------------------------------------------------------------------------------
 
-	plib::psource_t::stream_ptr nlparse_t::get_data_stream(const pstring &name)
+	plib::istream_uptr nlparse_t::get_data_stream(const pstring &name)
 	{
 		auto strm = m_sources.get_stream<source_data_t>(name);
 		if (!strm.empty())
 			return strm;
 		log().warning(MW_DATA_1_NOT_FOUND(name));
-		return plib::psource_t::stream_ptr();
+		return plib::istream_uptr();
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -1310,7 +1305,7 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 	// FIMXE: Not optimal
 	remainder = plib::left(remainder, remainder.size() - 1);
 
-	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
+	const auto pairs(plib::psplit(remainder,' ', true));
 	for (const pstring &pe : pairs)
 	{
 		auto pose = pe.find('=');
@@ -1552,7 +1547,7 @@ void setup_t::prepare_to_run()
 
 	if (!envlog.empty())
 	{
-		std::vector<pstring> loglist(plib::psplit(envlog, ":"));
+		const auto loglist(plib::psplit(envlog, ':'));
 		m_parser.register_dynamic_log_devices(loglist);
 	}
 
@@ -1707,44 +1702,44 @@ bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 	return (!strm.empty()) ? setup.parse_stream(std::move(strm), name) : false;
 }
 
-source_string_t::stream_ptr source_string_t::stream(const pstring &name)
+plib::istream_uptr source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	source_string_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str), name);
-	ret.stream().imbue(std::locale::classic());
+	plib::istream_uptr ret(std::make_unique<std::istringstream>(putf8string(m_str)), name);
+	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
+plib::istream_uptr source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	source_mem_t::stream_ptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
-	ret.stream().imbue(std::locale::classic());
+	plib::istream_uptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
+	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-source_file_t::stream_ptr source_file_t::stream(const pstring &name)
+plib::istream_uptr source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
 	if (f->is_open())
 	{
-		return stream_ptr(std::move(f), m_filename);
+		return plib::istream_uptr(std::move(f), m_filename);
 	}
-	else
-		return stream_ptr();
+
+	return plib::istream_uptr();
 }
 
-source_file_t::stream_ptr source_pattern_t::stream(const pstring &name)
+plib::istream_uptr source_pattern_t::stream(const pstring &name)
 {
 	pstring filename = plib::pfmt(m_pattern)(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{
-		return stream_ptr(std::move(f), filename);
+		return plib::istream_uptr(std::move(f), filename);
 	}
-	else
-		return stream_ptr();
+
+	return plib::istream_uptr();
 }
 
 
@@ -1759,10 +1754,10 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-source_proc_t::stream_ptr source_proc_t::stream(const pstring &name)
+plib::istream_uptr source_proc_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return stream_ptr();
+	return plib::istream_uptr();
 }
 
 bool source_token_t::parse(nlparse_t &setup, const pstring &name)
@@ -1776,10 +1771,10 @@ bool source_token_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-source_proc_t::stream_ptr source_token_t::stream(const pstring &name)
+plib::istream_uptr source_token_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return stream_ptr();
+	return plib::istream_uptr();
 }
 
 } // namespace netlist

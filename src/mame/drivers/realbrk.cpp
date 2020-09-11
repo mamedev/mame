@@ -36,7 +36,7 @@ Notes:
 
 To Do:
 
-- Priorities (e.g during the intro, there are two black bands in the backround
+- Priorities (e.g during the intro, there are two black bands in the background
   that should obscure sprites).
 - Sometimes sprites are shrunk to end up overlapping the background image
   in the tilemaps, but they are a few pixels off

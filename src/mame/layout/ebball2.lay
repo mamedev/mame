@@ -70,147 +70,147 @@ license:CC0
 
 	<view name="Internal Layout">
 		<bounds left="0" right="100" top="0" bottom="114" />
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="0" right="100" top="0" bottom="114" />
-		</bezel>
+		</element>
 
-	<!-- outer bezel -->
+	<!-- outer element -->
 
-		<bezel element="text_count"><bounds x="16" y="2" width="8" height="3" /></bezel>
+		<element ref="text_count"><bounds x="16" y="2" width="8" height="3" /></element>
 
-		<bezel element="text_s"><bounds x="12.5" y="7.2" width="2" height="2.5" /></bezel>
-		<bezel name="4.0" element="led"><bounds x="16" y="7" width="3" height="3" /></bezel>
-		<bezel name="4.1" element="led"><bounds x="20" y="7" width="3" height="3" /></bezel>
+		<element ref="text_s"><bounds x="12.5" y="7.2" width="2" height="2.5" /></element>
+		<element name="4.0" ref="led"><bounds x="16" y="7" width="3" height="3" /></element>
+		<element name="4.1" ref="led"><bounds x="20" y="7" width="3" height="3" /></element>
 
-		<bezel element="text_b"><bounds x="12.5" y="11.2" width="2" height="2.5" /></bezel>
-		<bezel name="5.0" element="led"><bounds x="16" y="11" width="3" height="3" /></bezel>
-		<bezel name="5.1" element="led"><bounds x="20" y="11" width="3" height="3" /></bezel>
-		<bezel name="5.2" element="led"><bounds x="24" y="11" width="3" height="3" /></bezel>
+		<element ref="text_b"><bounds x="12.5" y="11.2" width="2" height="2.5" /></element>
+		<element name="5.0" ref="led"><bounds x="16" y="11" width="3" height="3" /></element>
+		<element name="5.1" ref="led"><bounds x="20" y="11" width="3" height="3" /></element>
+		<element name="5.2" ref="led"><bounds x="24" y="11" width="3" height="3" /></element>
 
-		<bezel element="text_o"><bounds x="12.5" y="15.2" width="2" height="2.5" /></bezel>
-		<bezel name="4.2" element="led"><bounds x="16" y="15" width="3" height="3" /></bezel>
-		<bezel name="4.3" element="led"><bounds x="20" y="15" width="3" height="3" /></bezel>
+		<element ref="text_o"><bounds x="12.5" y="15.2" width="2" height="2.5" /></element>
+		<element name="4.2" ref="led"><bounds x="16" y="15" width="3" height="3" /></element>
+		<element name="4.3" ref="led"><bounds x="20" y="15" width="3" height="3" /></element>
 
-		<bezel element="text_inning"><bounds x="52" y="2" width="12" height="3" /></bezel>
-		<bezel element="text_visitor"><bounds x="66" y="2" width="13" height="3" /></bezel>
-		<bezel element="text_home2"><bounds x="82" y="2" width="13" height="3" /></bezel>
+		<element ref="text_inning"><bounds x="52" y="2" width="12" height="3" /></element>
+		<element ref="text_visitor"><bounds x="66" y="2" width="13" height="3" /></element>
+		<element ref="text_home2"><bounds x="82" y="2" width="13" height="3" /></element>
 
-		<bezel element="static_white2"><bounds x="79.5" y="2" width="0.5" height="16" /></bezel>
+		<element ref="static_white2"><bounds x="79.5" y="2" width="0.5" height="16" /></element>
 
-		<bezel name="digit0" element="digit"><bounds x="54" y="7" width="7.333" height="11" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="70" y="7" width="7.333" height="11" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="86" y="7" width="7.333" height="11" /></bezel>
+		<element name="digit0" ref="digit"><bounds x="54" y="7" width="7.333" height="11" /></element>
+		<element name="digit1" ref="digit"><bounds x="70" y="7" width="7.333" height="11" /></element>
+		<element name="digit2" ref="digit"><bounds x="86" y="7" width="7.333" height="11" /></element>
 
-		<bezel name="3.3" element="led"><bounds x="66" y="7" width="3" height="3" /></bezel>
-		<bezel name="3.2" element="led"><bounds x="82" y="7" width="3" height="3" /></bezel>
+		<element name="3.3" ref="led"><bounds x="66" y="7" width="3" height="3" /></element>
+		<element name="3.2" ref="led"><bounds x="82" y="7" width="3" height="3" /></element>
 
-		<bezel name="3.1" element="led"><bounds x="66" y="13" width="3" height="3" /></bezel>
-		<bezel name="3.0" element="led"><bounds x="82" y="13" width="3" height="3" /></bezel>
+		<element name="3.1" ref="led"><bounds x="66" y="13" width="3" height="3" /></element>
+		<element name="3.0" ref="led"><bounds x="82" y="13" width="3" height="3" /></element>
 
 
 	<!-- board -->
 
-		<bezel element="disk_green"><bounds x="-5" y="25" width="110" height="110" /></bezel>
-		<bezel element="static_black"><bounds x="-10" y="75" width="120" height="65" /></bezel>
-		<bezel element="disk_bg"><bounds x="15" y="45" width="70" height="70" /></bezel>
-		<bezel element="static_black"><bounds x="0" y="85" width="100" height="40" /></bezel>
-		<bezel element="static_bg"><bounds x="15" y="75" width="70" height="26" /></bezel>
-		<bezel element="disk_bg"><bounds x="40" y="91" width="20" height="20" /></bezel>
+		<element ref="disk_green"><bounds x="-5" y="25" width="110" height="110" /></element>
+		<element ref="static_black"><bounds x="-10" y="75" width="120" height="65" /></element>
+		<element ref="disk_bg"><bounds x="15" y="45" width="70" height="70" /></element>
+		<element ref="static_black"><bounds x="0" y="85" width="100" height="40" /></element>
+		<element ref="static_bg"><bounds x="15" y="75" width="70" height="26" /></element>
+		<element ref="disk_bg"><bounds x="40" y="91" width="20" height="20" /></element>
 
 	<!-- top edge -->
 
-		<bezel element="disk_black"><bounds x="-1.3" y="44.7" width="10" height="10" /></bezel>
-		<bezel element="disk_black"><bounds x="91.3" y="44.7" width="10" height="10" /></bezel>
-		<bezel name="8.1" element="led"><bounds x="2.2" y="48.2" width="3" height="3" /></bezel>
-		<bezel name="8.5" element="led"><bounds x="94.8" y="48.2" width="3" height="3" /></bezel>
-		<bezel element="text_single"><bounds x="2.2" y="44.5" width="3" height="2.5" /></bezel>
-		<bezel element="text_single"><bounds x="94.8" y="44.5" width="3" height="2.5" /></bezel>
+		<element ref="disk_black"><bounds x="-1.3" y="44.7" width="10" height="10" /></element>
+		<element ref="disk_black"><bounds x="91.3" y="44.7" width="10" height="10" /></element>
+		<element name="8.1" ref="led"><bounds x="2.2" y="48.2" width="3" height="3" /></element>
+		<element name="8.5" ref="led"><bounds x="94.8" y="48.2" width="3" height="3" /></element>
+		<element ref="text_single"><bounds x="2.2" y="44.5" width="3" height="2.5" /></element>
+		<element ref="text_single"><bounds x="94.8" y="44.5" width="3" height="2.5" /></element>
 
-		<bezel element="disk_black"><bounds x="18.5" y="26.5" width="10" height="10" /></bezel>
-		<bezel element="disk_black"><bounds x="71.5" y="26.5" width="10" height="10" /></bezel>
-		<bezel name="8.2" element="led"><bounds x="22" y="30" width="3" height="3" /></bezel>
-		<bezel name="8.4" element="led"><bounds x="75" y="30" width="3" height="3" /></bezel>
-		<bezel element="text_triple"><bounds x="22" y="26.3" width="3" height="2.5" /></bezel>
-		<bezel element="text_double"><bounds x="75" y="26.3" width="3" height="2.5" /></bezel>
+		<element ref="disk_black"><bounds x="18.5" y="26.5" width="10" height="10" /></element>
+		<element ref="disk_black"><bounds x="71.5" y="26.5" width="10" height="10" /></element>
+		<element name="8.2" ref="led"><bounds x="22" y="30" width="3" height="3" /></element>
+		<element name="8.4" ref="led"><bounds x="75" y="30" width="3" height="3" /></element>
+		<element ref="text_triple"><bounds x="22" y="26.3" width="3" height="2.5" /></element>
+		<element ref="text_double"><bounds x="75" y="26.3" width="3" height="2.5" /></element>
 
-		<bezel element="disk_white2"><bounds x="45" y="20" width="10" height="10" /></bezel>
-		<bezel element="disk_black"><bounds x="45.5" y="20.5" width="9" height="9" /></bezel>
-		<bezel name="8.3" element="led"><bounds x="48.5" y="23.5" width="3" height="3" /></bezel>
-		<bezel element="text_home"><bounds x="36" y="21.5" width="8" height="2.5" /></bezel>
-		<bezel element="text_run"><bounds x="56.5" y="21.5" width="8" height="2.5" /></bezel>
+		<element ref="disk_white2"><bounds x="45" y="20" width="10" height="10" /></element>
+		<element ref="disk_black"><bounds x="45.5" y="20.5" width="9" height="9" /></element>
+		<element name="8.3" ref="led"><bounds x="48.5" y="23.5" width="3" height="3" /></element>
+		<element ref="text_home"><bounds x="36" y="21.5" width="8" height="2.5" /></element>
+		<element ref="text_run"><bounds x="56.5" y="21.5" width="8" height="2.5" /></element>
 
 	<!-- field -->
 
-		<bezel element="field_guy"><bounds x="13" y="48.5" width="3" height="3" /></bezel>
-		<bezel element="disk_bg"><bounds x="12" y="52" width="5" height="5" /></bezel>
-		<bezel name="7.4" element="led"><bounds x="13" y="53" width="3" height="3" /></bezel>
+		<element ref="field_guy"><bounds x="13" y="48.5" width="3" height="3" /></element>
+		<element ref="disk_bg"><bounds x="12" y="52" width="5" height="5" /></element>
+		<element name="7.4" ref="led"><bounds x="13" y="53" width="3" height="3" /></element>
 
-		<bezel element="field_guy"><bounds x="48.5" y="31.5" width="3" height="3" /></bezel>
-		<bezel element="disk_bg"><bounds x="47.5" y="35" width="5" height="5" /></bezel>
-		<bezel name="7.5" element="led"><bounds x="48.5" y="36" width="3" height="3" /></bezel>
+		<element ref="field_guy"><bounds x="48.5" y="31.5" width="3" height="3" /></element>
+		<element ref="disk_bg"><bounds x="47.5" y="35" width="5" height="5" /></element>
+		<element name="7.5" ref="led"><bounds x="48.5" y="36" width="3" height="3" /></element>
 
-		<bezel element="field_guy"><bounds x="84" y="48.5" width="3" height="3" /></bezel>
-		<bezel element="disk_bg"><bounds x="83" y="52" width="5" height="5" /></bezel>
-		<bezel name="8.0" element="led"><bounds x="84" y="53" width="3" height="3" /></bezel>
+		<element ref="field_guy"><bounds x="84" y="48.5" width="3" height="3" /></element>
+		<element ref="disk_bg"><bounds x="83" y="52" width="5" height="5" /></element>
+		<element name="8.0" ref="led"><bounds x="84" y="53" width="3" height="3" /></element>
 
 	<!-- pitcher -->
 
-		<bezel element="pitcher"><bounds x="48.5" y="66.5" width="3" height="3" /></bezel>
-		<bezel element="static_white"><bounds x="46" y="71" width="0.5" height="18.5" /></bezel>
-		<bezel element="static_white"><bounds x="53.5" y="71" width="0.5" height="18.5" /></bezel>
+		<element ref="pitcher"><bounds x="48.5" y="66.5" width="3" height="3" /></element>
+		<element ref="static_white"><bounds x="46" y="71" width="0.5" height="18.5" /></element>
+		<element ref="static_white"><bounds x="53.5" y="71" width="0.5" height="18.5" /></element>
 
-		<bezel name="5.3" element="led"><bounds x="48.5" y="70.5" width="3" height="3" /></bezel>
-		<bezel name="0.7" element="led"><bounds x="48.5" y="76" width="3" height="3" /></bezel>
-		<bezel name="1.7" element="led"><bounds x="48.5" y="81.5" width="3" height="3" /></bezel>
-		<bezel name="2.7" element="led"><bounds x="48.5" y="87" width="3" height="3" /></bezel>
+		<element name="5.3" ref="led"><bounds x="48.5" y="70.5" width="3" height="3" /></element>
+		<element name="0.7" ref="led"><bounds x="48.5" y="76" width="3" height="3" /></element>
+		<element name="1.7" ref="led"><bounds x="48.5" y="81.5" width="3" height="3" /></element>
+		<element name="2.7" ref="led"><bounds x="48.5" y="87" width="3" height="3" /></element>
 
-		<bezel name="9.7" element="led"><bounds x="45" y="92.5" width="3" height="3" /></bezel>
-		<bezel name="9.0" element="led"><bounds x="52" y="92.5" width="3" height="3" /></bezel>
+		<element name="9.7" ref="led"><bounds x="45" y="92.5" width="3" height="3" /></element>
+		<element name="9.0" ref="led"><bounds x="52" y="92.5" width="3" height="3" /></element>
 
 	<!-- bases -->
 
-		<bezel element="base_guy"><bounds x="70" y="58" width="3" height="3" /></bezel>
-		<bezel name="7.3" element="led"><bounds x="70" y="62" width="3" height="3" /></bezel>
+		<element ref="base_guy"><bounds x="70" y="58" width="3" height="3" /></element>
+		<element name="7.3" ref="led"><bounds x="70" y="62" width="3" height="3" /></element>
 
-		<bezel element="base_guy"><bounds x="61" y="49" width="3" height="3" /></bezel>
-		<bezel name="7.2" element="led"><bounds x="61" y="53" width="3" height="3" /></bezel>
+		<element ref="base_guy"><bounds x="61" y="49" width="3" height="3" /></element>
+		<element name="7.2" ref="led"><bounds x="61" y="53" width="3" height="3" /></element>
 
-		<bezel element="base_guy"><bounds x="36" y="49" width="3" height="3" /></bezel>
-		<bezel name="7.1" element="led"><bounds x="36" y="53" width="3" height="3" /></bezel>
+		<element ref="base_guy"><bounds x="36" y="49" width="3" height="3" /></element>
+		<element name="7.1" ref="led"><bounds x="36" y="53" width="3" height="3" /></element>
 
-		<bezel element="base_guy"><bounds x="27" y="58" width="3" height="3" /></bezel>
-		<bezel name="7.0" element="led"><bounds x="27" y="62" width="3" height="3" /></bezel>
+		<element ref="base_guy"><bounds x="27" y="58" width="3" height="3" /></element>
+		<element name="7.0" ref="led"><bounds x="27" y="62" width="3" height="3" /></element>
 
-		<bezel element="static_white"><bounds x="72" y="72" width="6" height="6" /></bezel>
-		<bezel element="static_bg"><bounds x="72.5" y="72.5" width="5" height="5" /></bezel>
-		<bezel name="6.0" element="led"><bounds x="73.5" y="73.5" width="3" height="3" /></bezel>
+		<element ref="static_white"><bounds x="72" y="72" width="6" height="6" /></element>
+		<element ref="static_bg"><bounds x="72.5" y="72.5" width="5" height="5" /></element>
+		<element name="6.0" ref="led"><bounds x="73.5" y="73.5" width="3" height="3" /></element>
 
-		<bezel element="static_white"><bounds x="47" y="47" width="6" height="6" /></bezel>
-		<bezel element="static_bg"><bounds x="47.5" y="47.5" width="5" height="5" /></bezel>
-		<bezel name="6.1" element="led"><bounds x="48.5" y="48.5" width="3" height="3" /></bezel>
+		<element ref="static_white"><bounds x="47" y="47" width="6" height="6" /></element>
+		<element ref="static_bg"><bounds x="47.5" y="47.5" width="5" height="5" /></element>
+		<element name="6.1" ref="led"><bounds x="48.5" y="48.5" width="3" height="3" /></element>
 
-		<bezel element="static_white"><bounds x="22" y="72" width="6" height="6" /></bezel>
-		<bezel element="static_bg"><bounds x="22.5" y="72.5" width="5" height="5" /></bezel>
-		<bezel name="6.2" element="led"><bounds x="23.5" y="73.5" width="3" height="3" /></bezel>
+		<element ref="static_white"><bounds x="22" y="72" width="6" height="6" /></element>
+		<element ref="static_bg"><bounds x="22.5" y="72.5" width="5" height="5" /></element>
+		<element name="6.2" ref="led"><bounds x="23.5" y="73.5" width="3" height="3" /></element>
 
 	<!-- home -->
 
-		<bezel element="static_white"><bounds x="47" y="97" width="6" height="3" /></bezel>
-		<bezel element="disk_white"><bounds x="47" y="97" width="6" height="6" /></bezel>
-		<bezel element="static_bg"><bounds x="47.5" y="97.5" width="5" height="2.51" /></bezel>
-		<bezel element="disk_bg"><bounds x="47.5" y="97.5" width="5" height="5" /></bezel>
+		<element ref="static_white"><bounds x="47" y="97" width="6" height="3" /></element>
+		<element ref="disk_white"><bounds x="47" y="97" width="6" height="6" /></element>
+		<element ref="static_bg"><bounds x="47.5" y="97.5" width="5" height="2.51" /></element>
+		<element ref="disk_bg"><bounds x="47.5" y="97.5" width="5" height="5" /></element>
 
-		<bezel element="text_b2"><bounds x="42.5" y="108.3" width="3" height="2.5" /></bezel>
-		<bezel name="9.5" element="led"><bounds x="42.5" y="98.5" width="3" height="3" /></bezel>
-		<bezel name="9.4" element="led"><bounds x="42.5" y="104" width="3" height="3" /></bezel>
+		<element ref="text_b2"><bounds x="42.5" y="108.3" width="3" height="2.5" /></element>
+		<element name="9.5" ref="led"><bounds x="42.5" y="98.5" width="3" height="3" /></element>
+		<element name="9.4" ref="led"><bounds x="42.5" y="104" width="3" height="3" /></element>
 
-		<bezel element="text_s2"><bounds x="48.5" y="108.3" width="3" height="2.5" /></bezel>
-		<bezel name="6.3" element="led"><bounds x="48.5" y="98.5" width="3" height="3" /></bezel>
-		<bezel name="9.3" element="led"><bounds x="48.5" y="104" width="3" height="3" /></bezel>
+		<element ref="text_s2"><bounds x="48.5" y="108.3" width="3" height="2.5" /></element>
+		<element name="6.3" ref="led"><bounds x="48.5" y="98.5" width="3" height="3" /></element>
+		<element name="9.3" ref="led"><bounds x="48.5" y="104" width="3" height="3" /></element>
 
-		<bezel element="text_b2"><bounds x="54.5" y="108.3" width="3" height="2.5" /></bezel>
-		<bezel name="9.1" element="led"><bounds x="54.5" y="98.5" width="3" height="3" /></bezel>
-		<bezel name="9.2" element="led"><bounds x="54.5" y="104" width="3" height="3" /></bezel>
+		<element ref="text_b2"><bounds x="54.5" y="108.3" width="3" height="2.5" /></element>
+		<element name="9.1" ref="led"><bounds x="54.5" y="98.5" width="3" height="3" /></element>
+		<element name="9.2" ref="led"><bounds x="54.5" y="104" width="3" height="3" /></element>
 
 	</view>
 </mamelayout>

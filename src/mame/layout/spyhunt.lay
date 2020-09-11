@@ -99,31 +99,44 @@ license:CC0
 	</element>
 
 
+	<group name="lamps">
+		<bounds x="0" y="0" width="480" height="25" />
+
+		<element name="lamp1" ref="lamp_miss">
+			<bounds x="5" y="0" width="60" height="25" />
+		</element>
+		<element name="lamp0" ref="lamp_oil">
+			<bounds x="72" y="0" width="59" height="25" />
+		</element>
+		<element name="lamp2" ref="lamp_van">
+			<bounds x="172" y="0" width="85" height="25" />
+		</element>
+		<element name="lamp3" ref="lamp_smoke">
+			<bounds x="295" y="0" width="93" height="25" />
+		</element>
+		<element name="lamp4" ref="lamp_gun">
+			<bounds x="390" y="0" width="90" height="25" />
+		</element>
+	</group>
+
+
 	<view name="Lamps + Shifter-R">
 		<screen index="0">
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		<collection name="Lamps">
+			<group ref="lamps">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="446" y="574" width="32" height="64" />
-			<color alpha="0.6" />
-		</bezel>
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="446" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+		</collection>
 	</view>
 
 	<view name="Lamps + Shifter-L">
@@ -131,26 +144,18 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		<collection name="Lamps">
+			<group ref="lamps">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="2" y="574" width="32" height="64" />
-			<color alpha="0.6" />
-		</bezel>
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="2" y="574" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+		</collection>
 	</view>
 
 	<view name="Lamps + Widescreen Shifter-R">
@@ -158,26 +163,17 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		<collection name="Lamps">
+			<group ref="lamps">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="496" y="574" width="32" height="64" />
-			<color alpha="0.65" />
-		</bezel>
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="496" y="574" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 
 	<view name="Lamps + Widescreen Shifter-L">
@@ -185,26 +181,17 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		<collection name="Lamps">
+			<group ref="lamps">
+				<bounds x="0" y="641" width="480" height="25" />
+			</group>
+		</collection>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="-48" y="574" width="32" height="64" />
-			<color alpha="0.65" />
-		</bezel>
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="-48" y="574" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 
 	<view name="Widescreen Lamps and Shifter-R">
@@ -212,26 +199,29 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="494" y="430" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="493" y="455" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="494" y="480" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="492" y="505" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="494" y="530" width="90" height="25" />
-		</bezel>
+		<collection name="Lamps">
+			<element name="lamp1" ref="lamp_miss">
+				<bounds x="494" y="430" width="60" height="25" />
+			</element>
+			<element name="lamp0" ref="lamp_oil">
+				<bounds x="493" y="455" width="59" height="25" />
+			</element>
+			<element name="lamp2" ref="lamp_van">
+				<bounds x="494" y="480" width="85" height="25" />
+			</element>
+			<element name="lamp3" ref="lamp_smoke">
+				<bounds x="492" y="505" width="93" height="25" />
+			</element>
+			<element name="lamp4" ref="lamp_gun">
+				<bounds x="494" y="530" width="90" height="25" />
+			</element>
+		</collection>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="496" y="574" width="32" height="64" />
-			<color alpha="0.65" />
-		</bezel>
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="496" y="574" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 
 	<view name="Widescreen Lamps and Shifter-L">
@@ -239,26 +229,29 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="-70" y="430" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="-69" y="455" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="-95" y="480" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="-102" y="505" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="-100" y="530" width="90" height="25" />
-		</bezel>
+		<collection name="Lamps">
+			<element name="lamp1" ref="lamp_miss">
+				<bounds x="-70" y="430" width="60" height="25" />
+			</element>
+			<element name="lamp0" ref="lamp_oil">
+				<bounds x="-69" y="455" width="59" height="25" />
+			</element>
+			<element name="lamp2" ref="lamp_van">
+				<bounds x="-95" y="480" width="85" height="25" />
+			</element>
+			<element name="lamp3" ref="lamp_smoke">
+				<bounds x="-102" y="505" width="93" height="25" />
+			</element>
+			<element name="lamp4" ref="lamp_gun">
+				<bounds x="-100" y="530" width="90" height="25" />
+			</element>
+		</collection>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
-			<bounds x="-48" y="574" width="32" height="64" />
-			<color alpha="0.65" />
-		</bezel>
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
+				<bounds x="-48" y="574" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
 
 	<view name="Vertical Widescreen Lamps + Shifter-R">
@@ -266,26 +259,13 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		<group ref="lamps">
+			<bounds x="0" y="641" width="480" height="25" />
+		</group>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
+		<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
 			<bounds x="446" y="667" width="32" height="64" />
-			<color alpha="0.65" />
-		</bezel>
+		</element>
 	</view>
 
 	<view name="Vertical Widescreen Lamps + Shifter-L">
@@ -293,47 +273,12 @@ license:CC0
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		<group ref="lamps">
+			<bounds x="0" y="641" width="480" height="25" />
+		</group>
 
-		<bezel element="shifter" inputtag="ssio:IP0" inputmask="0x10">
+		<element ref="shifter" inputtag="ssio:IP0" inputmask="0x10">
 			<bounds x="2" y="667" width="32" height="64" />
-			<color alpha="0.65" />
-		</bezel>
-	</view>
-
-	<view name="Lamps">
-		<screen index="0">
-			<bounds x="0" y="0" width="480" height="640" />
-		</screen>
-
-		<bezel name="lamp1" element="lamp_miss">
-			<bounds x="5" y="641" width="60" height="25" />
-		</bezel>
-		<bezel name="lamp0" element="lamp_oil">
-			<bounds x="72" y="641" width="59" height="25" />
-		</bezel>
-		<bezel name="lamp2" element="lamp_van">
-			<bounds x="172" y="641" width="85" height="25" />
-		</bezel>
-		<bezel name="lamp3" element="lamp_smoke">
-			<bounds x="295" y="641" width="93" height="25" />
-		</bezel>
-		<bezel name="lamp4" element="lamp_gun">
-			<bounds x="390" y="641" width="90" height="25" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

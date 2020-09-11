@@ -67,6 +67,22 @@ protected:
 	void main_map(address_map &map);
 };
 
+class atetris_bartop_state : public atetris_state
+{
+public:
+	atetris_bartop_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atetris_state(mconfig, type, tag)
+	{
+	}
+
+	void atetrisbp(machine_config &config);
+
+private:
+	void output_w(uint8_t data);
+
+	void atetrisbp_map(address_map &map);
+};
+
 class atetris_mcu_state : public atetris_state
 {
 public:

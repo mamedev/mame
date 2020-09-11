@@ -64,49 +64,49 @@ MC68705 programmer layout
 	</element>
 
 	<view name="Default Layout">
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="0" top="0" right="190" bottom="200" />
-		</bezel>
+		</element>
 
-		<bezel name="address" element="address">
+		<element name="address" ref="address">
 			<bounds x="10" y="10" width="170" height="15" />
-		</bezel>
-		<bezel name="digit2" element="red_digit">
+		</element>
+		<element name="digit2" ref="red_digit">
 			<bounds x="10" y="30" width="50" height="80" />
-		</bezel>
-		<bezel name="digit1" element="red_digit">
+		</element>
+		<element name="digit1" ref="red_digit">
 			<bounds x="70" y="30" width="50" height="80" />
-		</bezel>
-		<bezel name="digit0" element="red_digit">
+		</element>
+		<element name="digit0" ref="red_digit">
 			<bounds x="130" y="30" width="50" height="80" />
-		</bezel>
+		</element>
 
-		<bezel name="programmed" element="programmed">
+		<element name="programmed" ref="programmed">
 			<bounds x="10" y="120" width="80" height="10" />
-		</bezel>
-		<bezel name="led1" element="red_led">
+		</element>
+		<element name="led1" ref="red_led">
 			<bounds x="42" y="135" width="15" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="verified" element="verified">
+		<element name="verified" ref="verified">
 			<bounds x="100" y="120" width="80" height="10" />
-		</bezel>
-		<bezel name="led0" element="green_led">
+		</element>
+		<element name="led0" ref="green_led">
 			<bounds x="132" y="135" width="15" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="reset" element="reset">
+		<element name="reset" ref="reset">
 			<bounds x="10" y="160" width="80" height="10" />
-		</bezel>
-		<bezel name="led2" element="red_led">
+		</element>
+		<element name="led2" ref="red_led">
 			<bounds x="42" y="175" width="15" height="15" />
-		</bezel>
+		</element>
 
-		<bezel name="vpp" element="vpp">
+		<element name="vpp" ref="vpp">
 			<bounds x="100" y="160" width="80" height="10" />
-		</bezel>
-		<bezel name="led3" element="red_led">
+		</element>
+		<element name="led3" ref="red_led">
 			<bounds x="132" y="175" width="15" height="15" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

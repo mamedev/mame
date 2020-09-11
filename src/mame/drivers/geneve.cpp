@@ -384,13 +384,13 @@ void geneve_state::memmap_setaddress(address_map &map)
     The TMS9901 is fully decoded, no mirroring, so we have 32 bits for it,
     and the rest goes to the board (and from there to the PEB)
     TMS9995 has a full 15-bit CRU bit address space (attached to A0-A14)
+
+    We cannot use the map because there is a least one card (sidmaster) that
+    activates itself when no other device is selected.
 */
 void geneve_state::crumap(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(geneve_state::cruread), FUNC(geneve_state::cruwrite));
-	map(0x1ee0, 0x1eff).w(m_gatearray, FUNC(bus::ti99::internal::geneve_gate_array_device::cru_ctrl_write));
-	map(0x13c0, 0x13cf).w(m_gatearray, FUNC(bus::ti99::internal::geneve_gate_array_device::cru_sstep_write));
-	map(0x0000, 0x003f).rw(m_tms9901, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
 }
 
 static INPUT_PORTS_START(geneve_common)
@@ -818,18 +818,36 @@ void geneve_state::write_pfm(offs_t offset, uint8_t data)
     CRU handling
 *****************************************************************************/
 
-// TODO: change peribox::cruwrite to make this obsolete
-
 void geneve_state::cruwrite(offs_t offset, uint8_t data)
 {
-	m_peribox->cruwrite(offset << 1, data);
+	offs_t cruaddr = offset << 1;
+
+	// 9901 access: 0000..003e (fully decoded)
+	if ((cruaddr & 0xffc0)==0)
+		m_tms9901->write(offset & 0x1f, data);
+
+	// Gate array: 13c0..13ce (Single step), write only
+	if ((cruaddr & 0xfff0)==0x13c0)
+		m_gatearray->cru_sstep_write(offset, data);
+
+	// Gate array: 1ee0..1efe (mirror of 9995-internal flags), write only
+	if ((cruaddr & 0xffe0)==0x1ee0)
+		m_gatearray->cru_ctrl_write(offset, data);
+
+	// Rest of the system
+	m_peribox->cruwrite(cruaddr, data);
 }
 
 uint8_t geneve_state::cruread(offs_t offset)
 {
+	offs_t cruaddr = offset << 1;
 	uint8_t value = 0;
+	// 9901 access: 0000..003e (fully decoded)
+	if ((cruaddr & 0xffc0)==0)
+		value = m_tms9901->read(offset & 0x3f);
+
 	// Propagate the CRU access to external devices
-	m_peribox->crureadz(offset << 1, &value);
+	m_peribox->crureadz(cruaddr, &value);
 	return value;
 }
 

@@ -158,6 +158,8 @@ Adder hardware:
 #include "video/bfm_dm01.h"
 #include "machine/steppers.h"
 
+#include "machine/bfm_comn.h"
+
 #include "machine/bfm_bd1.h"  // vfd
 #include "machine/meters.h"
 #include "machine/rescap.h"
@@ -177,7 +179,6 @@ Adder hardware:
 #include "sc2_vfd.lh"
 #include "sc2_dmd.lh"
 #include "drwho.lh"
-#include "machine/bfm_comn.h"
 
 #include "sc2ptytm1.lh"
 #include "sc2cpe.lh"

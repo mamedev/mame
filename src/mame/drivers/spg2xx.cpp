@@ -1885,8 +1885,7 @@ ROM_END
 
 ROM_START( hotwhl2p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	// this needed to be reconstructed from 80 reads of the device, so isn't 100% trusted
-	ROM_LOAD16_WORD_SWAP( "hotwheels.bin", 0x000000, 0x400000, BAD_DUMP CRC(f3520b74) SHA1(02a53558d68cf3640a9ab09514cd6cebff8b30af) )
+	ROM_LOAD16_WORD_SWAP( "hotwheels.bin", 0x000000, 0x400000, CRC(f3520b74) SHA1(02a53558d68cf3640a9ab09514cd6cebff8b30af) )
 ROM_END
 
 
@@ -2009,7 +2008,7 @@ CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_s
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
 // there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
-CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
 

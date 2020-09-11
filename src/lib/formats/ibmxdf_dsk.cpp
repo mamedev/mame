@@ -32,8 +32,6 @@
 
 #include "ibmxdf_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 
 ibmxdf_format::ibmxdf_format() : wd177x_format(formats)
 {
@@ -196,8 +194,10 @@ bool ibmxdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 			int total_size = 200000000/tf.cell_size;
 			int remaining_size = total_size - current_size;
-			if(remaining_size < 0)
-				throw emu_fatalerror("ibmxdf_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
+			if(remaining_size < 0) {
+				osd_printf_error("ibmxdf_format: Incorrect track layout, max_size=%d, current_size=%d\n", total_size, current_size);
+				return false;
+			}
 
 			// Fixup the end gap
 			desc[end_gap_index].p2 = remaining_size / 16;

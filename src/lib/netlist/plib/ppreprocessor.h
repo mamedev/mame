@@ -11,7 +11,8 @@
 #include "pstream.h"
 #include "pstring.h"
 
-#include "putil.h" // psource_t
+#include "psource.h"
+#include "putil.h"
 
 #include <istream>
 #include <unordered_map>
@@ -19,7 +20,7 @@
 
 namespace plib {
 
-	class ppreprocessor : public std::istream
+	class ppreprocessor
 	{
 	public:
 
@@ -41,32 +42,11 @@ namespace plib {
 
 		using defines_map_type = std::unordered_map<pstring, define_t>;
 
-		explicit ppreprocessor(psource_collection_t<> &sources, defines_map_type *defines = nullptr);
+		explicit ppreprocessor(psource_collection_t &sources, defines_map_type *defines = nullptr);
 
-		PCOPYASSIGN(ppreprocessor, delete)
-		ppreprocessor &operator=(ppreprocessor &&src) = delete;
+		PCOPYASSIGNMOVE(ppreprocessor, delete)
 
-		ppreprocessor(ppreprocessor &&s) noexcept
-		: std::istream(new readbuffer(this))
-		, m_defines(std::move(s.m_defines))
-		, m_sources(s.m_sources)
-		, m_expr_sep(std::move(s.m_expr_sep))
-		, m_if_flag(s.m_if_flag)
-		, m_if_level(s.m_if_level)
-		, m_stack(std::move(s.m_stack))
-		, m_outbuf(std::move(s.m_outbuf))
-		, m_pos(s.m_pos)
-		, m_state(s.m_state)
-		, m_line(std::move(s.m_line))
-		, m_comment(s.m_comment)
-		, m_debug_out(s.m_debug_out)
-		{
-		}
-
-		~ppreprocessor() override
-		{
-			delete rdbuf();
-		}
+		~ppreprocessor() = default;
 
 		/// \brief process stream
 		///
@@ -76,51 +56,16 @@ namespace plib {
 		/// and pass this to ppreprocessor.
 		///
 		template <typename T>
-		ppreprocessor & process(T &&istrm, const pstring &filename)
+		pstring process(T &&istrm, const pstring &filename)
 		{
+			m_outbuf.clear();
 			m_stack.emplace_back(input_context(istrm.release_stream(),plib::util::path(filename), filename));
 			process_stack();
-			return *this;
+			return m_outbuf;
 		}
 
 		[[noreturn]] void error(const pstring &err) noexcept(false);
 
-	protected:
-
-		class readbuffer : public std::streambuf
-		{
-		public:
-			explicit readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf()
-			{ setg(nullptr, nullptr, nullptr); }
-			readbuffer(readbuffer &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
-			PCOPYASSIGN(readbuffer, delete)
-			readbuffer &operator=(readbuffer &&src) = delete;
-			~readbuffer() override = default;
-
-			int_type underflow() override
-			{
-				if (this->gptr() == this->egptr())
-				{
-					// clang reports sign error - weird
-					std::size_t bytes = m_strm->m_outbuf.size() - narrow_cast<std::size_t>(m_strm->m_pos);
-
-					if (bytes > m_buf.size())
-						bytes = m_buf.size();
-					std::copy(m_strm->m_outbuf.c_str() + m_strm->m_pos, m_strm->m_outbuf.c_str() + m_strm->m_pos + bytes, m_buf.data());
-					this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
-
-					m_strm->m_pos += narrow_cast<long>(bytes);
-				}
-
-				return this->gptr() == this->egptr()
-					 ? std::char_traits<char>::eof()
-					 : std::char_traits<char>::to_int_type(*this->gptr());
-			}
-
-		private:
-			ppreprocessor *m_strm;
-			std::array<char_type, 1024> m_buf;
-		};
 		define_t *get_define(const pstring &name);
 		pstring replace_macros(const pstring &line);
 
@@ -139,11 +84,11 @@ namespace plib {
 		string_list tokenize(const pstring &str, const string_list &sep, bool remove_ws, bool concat);
 		static bool is_valid_token(const pstring &str);
 
-		std::pair<pstring,bool> process_line(pstring line);
-		pstring process_comments(pstring line);
+		std::pair<pstring,bool> process_line(const pstring &line_in);
+		pstring process_comments(const pstring &line);
 
 		defines_map_type m_defines;
-		psource_collection_t<> &m_sources;
+		psource_collection_t &m_sources;
 		string_list m_expr_sep;
 
 		std::uint_least64_t m_if_flag; // 63 if levels
@@ -169,8 +114,7 @@ namespace plib {
 
 		// vector used as stack because we need to loop through stack
 		std::vector<input_context> m_stack;
-		std::string m_outbuf;
-		std::istream::pos_type m_pos;
+		pstring m_outbuf;
 		state_e m_state;
 		pstring m_line;
 		bool m_comment;

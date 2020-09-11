@@ -1,18 +1,114 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nld_system.c
+ * nld_system.cpp
  *
  */
 
 #include "solver/nld_solver.h"
-#include "solver/nld_matrix_solver.h"
 #include "nlid_system.h"
+#include "solver/nld_matrix_solver.h"
+
+#include "plib/pstrutil.h"
 
 namespace netlist
 {
 namespace devices
 {
+
+	// -----------------------------------------------------------------------------
+	// extclock
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(extclock)
+	{
+		NETLIB_CONSTRUCTOR(extclock)
+		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
+		, m_pattern(*this, "PATTERN", "1,1")
+		, m_offset(*this, "OFFSET", nlconst::zero())
+		, m_feedback(*this, "FB", NETLIB_DELEGATE(first))
+		, m_Q(*this, "Q")
+		, m_cnt(*this, "m_cnt", 0)
+		, m_off(*this, "m_off", netlist_time::zero())
+		{
+			m_inc[0] = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
+
+			connect("FB", "Q");
+
+			netlist_time base = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
+			std::vector<pstring> pat(plib::psplit(m_pattern(),','));
+			m_off = netlist_time::from_fp(m_offset());
+
+			std::array<std::int64_t, 32> pati = { 0 };
+
+			m_size = static_cast<std::uint8_t>(pat.size());
+			netlist_time::mult_type total = 0;
+			for (unsigned i=0; i<m_size; i++)
+			{
+				pati[i] = plib::pstonum<std::int64_t>(pat[i]);
+				total += pati[i];
+			}
+			netlist_time ttotal = netlist_time::zero();
+			auto sm1 = static_cast<uint8_t>(m_size - 1);
+			for (unsigned i=0; i < sm1; i++)
+			{
+				m_inc[i] = base * pati[i];
+				ttotal += m_inc[i];
+			}
+			m_inc[sm1] = base * total - ttotal;
+
+		}
+
+		NETLIB_RESETI()
+		{
+			m_cnt = 0;
+			m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
+			m_feedback.set_delegate(NETLIB_DELEGATE(first));
+		}
+		//NETLIB_UPDATE_PARAMI();
+
+	private:
+
+		NETLIB_HANDLERI(clk2)
+		{
+			m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
+			if (++m_cnt >= m_size)
+				m_cnt = 0;
+		}
+
+		NETLIB_HANDLERI(clk2_pow2)
+		{
+			m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt]);
+			m_cnt = (++m_cnt) & (m_size-1);
+		}
+
+		NETLIB_HANDLERI(first)
+		{
+			m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off());
+			m_off = netlist_time::zero();
+			if (++m_cnt >= m_size)
+				m_cnt = 0;
+
+			// continue with optimized clock handlers ....
+
+			if ((m_size & (m_size-1)) == 0) // power of 2?
+				m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2_pow2, this));
+			else
+				m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2, this));
+		}
+
+
+		param_fp_t m_freq;
+		param_str_t m_pattern;
+		param_fp_t m_offset;
+
+		logic_input_t m_feedback;
+		logic_output_t m_Q;
+		state_var_u8 m_cnt;
+		std::uint8_t m_size;
+		state_var<netlist_time> m_off;
+		std::array<netlist_time, 32> m_inc;
+	};
 
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 	NETLIB_DEVICE_IMPL(nc_pin,              "NC_PIN",                 "")

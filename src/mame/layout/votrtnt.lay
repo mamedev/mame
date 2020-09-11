@@ -12,8 +12,8 @@ license:CC0
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="1" top="1" right="10" bottom="5" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

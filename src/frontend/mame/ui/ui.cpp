@@ -9,28 +9,38 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "mame.h"
-#include "emuopts.h"
-#include "mameopts.h"
-#include "video/vector.h"
-#include "machine/laserdsc.h"
-#include "drivenum.h"
-#include "natkeyboard.h"
-#include "render.h"
-#include "luaengine.h"
-#include "cheat.h"
-#include "rendfont.h"
-#include "uiinput.h"
 #include "ui/ui.h"
-#include "ui/info.h"
-#include "ui/menu.h"
-#include "ui/mainmenu.h"
+
+#include "luaengine.h"
+#include "infoxml.h"
+#include "mame.h"
 #include "ui/filemngr.h"
+#include "ui/info.h"
+#include "ui/mainmenu.h"
+#include "ui/menu.h"
 #include "ui/sliders.h"
 #include "ui/state.h"
 #include "ui/viewgfx.h"
+
 #include "imagedev/cassette.h"
+#include "machine/laserdsc.h"
+#include "video/vector.h"
+
+#include "config.h"
+#include "emuopts.h"
+#include "mameopts.h"
+#include "drivenum.h"
+#include "natkeyboard.h"
+#include "render.h"
+#include "cheat.h"
+#include "rendfont.h"
+#include "romload.h"
+#include "uiinput.h"
+
 #include "../osd/modules/lib/osdobj_common.h"
+
+#include <chrono>
+#include <type_traits>
 
 
 /***************************************************************************
@@ -168,6 +178,11 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_show(false)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
+	, m_machine_info()
+	, m_unemulated_features()
+	, m_imperfect_features()
+	, m_last_launch_time(std::time_t(-1))
+	, m_last_warning_time(std::time_t(-1))
 { }
 
 mame_ui_manager::~mame_ui_manager()
@@ -177,6 +192,7 @@ mame_ui_manager::~mame_ui_manager()
 void mame_ui_manager::init()
 {
 	load_ui_options();
+
 	// initialize the other UI bits
 	ui::menu::init(machine(), options());
 	ui_gfx_init(machine());
@@ -192,8 +208,12 @@ void mame_ui_manager::init()
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((ARRAY_LENGTH(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
-	// request a callback upon exiting
+	// request notification callbacks
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mame_ui_manager::exit, this));
+	machine().configuration().config_register(
+			"ui_warnings",
+			config_load_delegate(&mame_ui_manager::config_load, this),
+			config_save_delegate(&mame_ui_manager::config_save, this));
 
 	// create mouse bitmap
 	uint32_t *dst = &m_mouse_bitmap.pix32(0);
@@ -228,6 +248,78 @@ void mame_ui_manager::exit()
 	{
 		machine().render().font_free(m_font);
 		m_font = nullptr;
+	}
+}
+
+
+//-------------------------------------------------
+//  config_load - load configuration data
+//-------------------------------------------------
+
+void mame_ui_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+{
+	// make sure it's relevant and there's data available
+	if (config_type::GAME == cfg_type)
+	{
+		m_unemulated_features.clear();
+		m_imperfect_features.clear();
+		if (!parentnode)
+		{
+			m_last_launch_time = std::time_t(-1);
+			m_last_warning_time = std::time_t(-1);
+		}
+		else
+		{
+			m_last_launch_time = std::time_t(parentnode->get_attribute_int("launched", -1));
+			m_last_warning_time = std::time_t(parentnode->get_attribute_int("warned", -1));
+			for (util::xml::data_node const *node = parentnode->get_first_child(); node; node = node->get_next_sibling())
+			{
+				if (!std::strcmp(node->get_name(), "feature"))
+				{
+					char const *const device = node->get_attribute_string("device", nullptr);
+					char const *const feature = node->get_attribute_string("type", nullptr);
+					char const *const status = node->get_attribute_string("status", nullptr);
+					if (device && *device && feature && *feature && status && *status)
+					{
+						if (!std::strcmp(status, "unemulated"))
+							m_unemulated_features.emplace(device, feature);
+						else if (!std::strcmp(status, "imperfect"))
+							m_imperfect_features.emplace(device, feature);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  config_save - save configuration data
+//-------------------------------------------------
+
+void mame_ui_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+{
+	// only save system-level configuration when times are valid
+	if ((config_type::GAME == cfg_type) && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time))
+	{
+		parentnode->set_attribute_int("launched", static_cast<long long>(m_last_launch_time));
+		parentnode->set_attribute_int("warned", static_cast<long long>(m_last_warning_time));
+
+		for (auto const &feature : m_unemulated_features)
+		{
+			util::xml::data_node *const feature_node = parentnode->add_child("feature", nullptr);
+			feature_node->set_attribute("device", feature.first.c_str());
+			feature_node->set_attribute("type", feature.second.c_str());
+			feature_node->set_attribute("status", "unemulated");
+		}
+
+		for (auto const &feature : m_imperfect_features)
+		{
+			util::xml::data_node *const feature_node = parentnode->add_child("feature", nullptr);
+			feature_node->set_attribute("device", feature.first.c_str());
+			feature_node->set_attribute("type", feature.second.c_str());
+			feature_node->set_attribute("status", "imperfect");
+		}
 	}
 }
 
@@ -335,7 +427,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				messagebox_text = machine_info().game_info_string();
 			if (!messagebox_text.empty())
 			{
-				messagebox_text.append("\n\nPress any key to continue");
+				messagebox_text.append(_("\n\nPress any key to continue"));
 				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
 			}
 			break;
@@ -343,11 +435,75 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		case 1:
 			messagebox_text = machine_info().warnings_string();
 			m_has_warnings = !messagebox_text.empty();
-			if (m_has_warnings && show_warnings)
+			if (show_warnings)
 			{
-				messagebox_text.append("\n\nPress any key to continue");
-				set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
-				messagebox_backcolor = machine_info().warnings_color();
+				bool need_warning = m_has_warnings;
+				if (machine_info().has_severe_warnings() || !m_has_warnings)
+				{
+					// critical warnings - no need to persist stuff
+					m_unemulated_features.clear();
+					m_imperfect_features.clear();
+					m_last_launch_time = std::time_t(-1);
+					m_last_warning_time = std::time_t(-1);
+				}
+				else
+				{
+					// non-critical warnings - map current unemulated/imperfect features
+					device_feature_set unemulated_features, imperfect_features;
+					for (device_t &device : device_iterator(machine().root_device()))
+					{
+						device_t::feature_type unemulated = device.type().unemulated_features();
+						for (std::underlying_type_t<device_t::feature_type> feature = 1U; unemulated; feature <<= 1)
+						{
+							if (unemulated & feature)
+							{
+								char const *const name = info_xml_creator::feature_name(device_t::feature_type(feature));
+								if (name)
+									unemulated_features.emplace(device.type().shortname(), name);
+								unemulated &= device_t::feature_type(~feature);
+							}
+						}
+						device_t::feature_type imperfect = device.type().imperfect_features();
+						for (std::underlying_type_t<device_t::feature_type> feature = 1U; imperfect; feature <<= 1)
+						{
+							if (imperfect & feature)
+							{
+								char const *const name = info_xml_creator::feature_name(device_t::feature_type(feature));
+								if (name)
+									imperfect_features.emplace(device.type().shortname(), name);
+								imperfect &= device_t::feature_type(~feature);
+							}
+						}
+					}
+
+					// machine flags can cause warnings, too
+					if (machine_info().machine_flags() & machine_flags::NO_COCKTAIL)
+						unemulated_features.emplace(machine().root_device().type().shortname(), "cocktail");
+
+					// if the warnings match what was shown sufficiently recently, it's skippable
+					if ((unemulated_features != m_unemulated_features) || (imperfect_features != m_imperfect_features))
+					{
+						m_last_launch_time = std::time_t(-1);
+					}
+					else if (!machine().rom_load().warnings() && (std::time_t(-1) != m_last_launch_time) && (std::time_t(-1) != m_last_warning_time) && options().skip_warnings())
+					{
+						auto const now = std::chrono::system_clock::now();
+						if (((std::chrono::system_clock::from_time_t(m_last_launch_time) + std::chrono::hours(7 * 24)) >= now) && ((std::chrono::system_clock::from_time_t(m_last_warning_time) + std::chrono::hours(14 * 24)) >= now))
+							need_warning = false;
+					}
+
+					// update the information to save out
+					m_unemulated_features = std::move(unemulated_features);
+					m_imperfect_features = std::move(imperfect_features);
+					if (need_warning)
+						m_last_warning_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+				}
+				if (need_warning)
+				{
+					messagebox_text.append(_("\n\nPress any key to continue"));
+					set_handler(ui_callback_type::MODAL, std::bind(&mame_ui_manager::handler_messagebox_anykey, this, _1));
+					messagebox_backcolor = machine_info().warnings_color();
+				}
 			}
 			break;
 
@@ -359,8 +515,8 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				warning << _("This driver requires images to be loaded in the following device(s): ");
 
 				output_joined_collection(mandatory_images,
-					[&warning](const std::reference_wrapper<const std::string> &img)    { warning << "\"" << img.get() << "\""; },
-					[&warning]()                                                        { warning << ","; });
+						[&warning](const std::reference_wrapper<const std::string> &img)    { warning << "\"" << img.get() << "\""; },
+						[&warning]()                                                        { warning << ","; });
 
 				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.str().c_str());
 			}
@@ -381,6 +537,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
 		machine().video().frame_update();
 	}
+
+	// update last launch time if this was a run that was eligible for emulation warnings
+	if (m_has_warnings && show_warnings && !machine().scheduled_event_pending())
+		m_last_launch_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	// if we're the empty driver, force the menus on
 	if (ui::menu::stack_has_special_main_menu(machine()))
@@ -2107,7 +2267,7 @@ void mame_ui_manager::load_ui_options()
 	{
 		try
 		{
-			options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
+			options().parse_ini_file((util::core_file &)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
 		}
 		catch (options_exception &)
 		{

@@ -83,36 +83,33 @@ license:CC0
 			<color red="0.1" green="1.0" blue="0.1" />
 		</text>
 	</element>
-	<view name="Screen only">
-		<screen index="0">
-			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
-	</view>
 	<view name="Screen + Lights">
-		<backdrop name="lamp1" element="red1" state="0">
-			<bounds x="7" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp2" element="blue1" state="0">
-			<bounds x="6" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp3" element="yellow1" state="0">
-			<bounds x="5" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp4" element="green1" state="0">
-			<bounds x="4" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp1" element="red2" state="0">
-			<bounds x="3" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp2" element="blue2" state="0">
-			<bounds x="2" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp3" element="yellow2" state="0">
-			<bounds x="1" y="0" width="1" height="1"/>
-		</backdrop>
-		<backdrop name="lamp4" element="green2" state="0">
-			<bounds x="0" y="0" width="1" height="1"/>
-		</backdrop>
+		<collection name="Color Organ" visible="no">
+			<element name="lamp1" ref="red1" state="0">
+				<bounds x="7" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp2" ref="blue1" state="0">
+				<bounds x="6" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp3" ref="yellow1" state="0">
+				<bounds x="5" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp4" ref="green1" state="0">
+				<bounds x="4" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp1" ref="red2" state="0">
+				<bounds x="3" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp2" ref="blue2" state="0">
+				<bounds x="2" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp3" ref="yellow2" state="0">
+				<bounds x="1" y="0" width="1" height="1"/>
+			</element>
+			<element name="lamp4" ref="green2" state="0">
+				<bounds x="0" y="0" width="1" height="1"/>
+			</element>
+		</collection>
 		<screen index="0">
 			<bounds x="0" y="1" width="8" height="6" />
 		</screen>

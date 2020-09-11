@@ -12,6 +12,8 @@
 #ifndef MAME_VIDEO_ATARIRLE_H
 #define MAME_VIDEO_ATARIRLE_H
 
+#include "memarray.h"
+
 
 //**************************************************************************
 //  CONSTANTS

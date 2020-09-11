@@ -275,191 +275,190 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-	<led7seg>
-		<color red="1.0" green="0.0" blue="0.0" />
-	</led7seg>
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
 	</element>
 
 
 	<view name="Monitor and Lamps">
-		<bezel name="lamp85" element="TRAIL1">
-			<bounds x="50" y="10" width="252" height="60" />
-		</bezel>
-		<bezel name="lamp85" element="TRAIL2">
-			<bounds x="252" y="10" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp85" element="TRAIL3">
-			<bounds x="332" y="10" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp85" element="TRAIL4">
-			<bounds x="412" y="10" width="80" height="60" />
-		</bezel>
-		<bezel name="digit14" element="digit">
-			<bounds x="100" y="10" width="40" height="60" />
-		</bezel>
-		<bezel name="digit15" element="digit">
-			<bounds x="140" y="10" width="40" height="60" />
-		</bezel>
-		<bezel name="lamp85" element="GET">
-			<bounds x="50" y="10" width="50" height="60" />
-		</bezel>
-		<bezel name="GEMS" element="GEMS">
-			<bounds x="180" y="10" width="72" height="60" />
-		</bezel>
-		<bezel name="£5" element="£5">
-			<bounds x="252" y="10" width="80" height="60" />
-		</bezel>
-		<bezel name="£10" element="£10">
-			<bounds x="332" y="10" width="80" height="60" />
-		</bezel>
-		<bezel name="£20" element="£20">
-			<bounds x="412" y="10" width="80" height="60" />
-		</bezel>
-
-		<bezel name="lamp93" element="TRAIL1">
-			<bounds x="50" y="70" width="252" height="60" />
-		</bezel>
-		<bezel name="lamp93" element="TRAIL2">
-			<bounds x="252" y="70" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp93" element="TRAIL3">
-			<bounds x="332" y="70" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp93" element="TRAIL4">
-			<bounds x="412" y="70" width="80" height="60" />
-		</bezel>
-		<bezel name="digit12" element="digit">
-			<bounds x="100" y="70" width="40" height="60" />
-		</bezel>
-		<bezel name="digit13" element="digit">
-			<bounds x="140" y="70" width="40" height="60" />
-		</bezel>
-		<bezel name="lamp93" element="GET">
-			<bounds x="50" y="70" width="50" height="60" />
-		</bezel>
-		<bezel name="GEMS" element="GEMS">
-			<bounds x="180" y="70" width="72" height="60" />
-		</bezel>
-		<bezel name="£2" element="£2">
-			<bounds x="252" y="70" width="80" height="60" />
-		</bezel>
-		<bezel name="£4" element="£4">
-			<bounds x="332" y="70" width="80" height="60" />
-		</bezel>
-		<bezel name="£6" element="£6">
-			<bounds x="412" y="70" width="80" height="60" />
-		</bezel>
-
-		<bezel name="lamp101" element="TRAIL1">
-			<bounds x="50" y="130" width="252" height="60" />
-		</bezel>
-		<bezel name="lamp101" element="TRAIL2">
-			<bounds x="252" y="130" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp101" element="TRAIL3">
-			<bounds x="332" y="130" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp101" element="TRAIL4">
-			<bounds x="412" y="130" width="80" height="60" />
-		</bezel>
-		<bezel name="digit10" element="digit">
-			<bounds x="100" y="130" width="40" height="60" />
-		</bezel>
-		<bezel name="digit11" element="digit">
-			<bounds x="140" y="130" width="40" height="60" />
-		</bezel>
-		<bezel name="lamp101" element="GET">
-			<bounds x="50" y="130" width="50" height="60" />
-		</bezel>
-		<bezel name="GEMS" element="GEMS">
-			<bounds x="180" y="130" width="72" height="60" />
-		</bezel>
-		<bezel name="£1" element="£1">
-			<bounds x="252" y="130" width="80" height="60" />
-		</bezel>
-		<bezel name="£2" element="£2">
-			<bounds x="332" y="130" width="80" height="60" />
-		</bezel>
-		<bezel name="£3" element="£3">
-			<bounds x="412" y="130" width="80" height="60" />
-		</bezel>
-
-		<bezel name="lamp109" element="TRAIL1">
-			<bounds x="50" y="190" width="252" height="60" />
-		</bezel>
-		<bezel name="lamp109" element="TRAIL2">
-			<bounds x="252" y="190" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp109" element="TRAIL3">
-			<bounds x="332" y="190" width="80" height="60" />
-		</bezel>
-		<bezel name="lamp109" element="TRAIL4">
-			<bounds x="412" y="190" width="80" height="60" />
-		</bezel>
-		<bezel name="digit8" element="digit">
-			<bounds x="100" y="190" width="40" height="60" />
-		</bezel>
-		<bezel name="digit9" element="digit">
-			<bounds x="140" y="190" width="40" height="60" />
-		</bezel>
-		<bezel name="lamp109" element="GET">
-			<bounds x="50" y="190" width="50" height="60" />
-		</bezel>
-		<bezel name="GEMS" element="GEMS">
-			<bounds x="180" y="190" width="72" height="60" />
-		</bezel>
-		<bezel name="FREEGAME" element="FREEGAME">
-			<bounds x="252" y="190" width="80" height="60" />
-		</bezel>
-		<bezel name="50P" element="50P">
-			<bounds x="332" y="190" width="80" height="60" />
-		</bezel>
-		<bezel name="£1" element="£1">
-			<bounds x="412" y="190" width="80" height="60" />
-		</bezel>
-
-		<bezel name="lamp25" element="COLLECT" inputtag="BLACK2" inputmask="0x40">
-			<bounds x="0" y="310" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp32" element="RED" inputtag="BLACK1" inputmask="0x10">
-			<bounds x="0" y="360" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp34" element="YELLOW" inputtag="BLACK1" inputmask="0x08">
-			<bounds x="0" y="410" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp41" element="GREEN" inputtag="BLACK1" inputmask="0x04">
-			<bounds x="0" y="460" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp48" element="PLAY" inputtag="BLACK1" inputmask="0x02">
-			<bounds x="0" y="510" width="48" height="50" />
-		</bezel>
-
-		<bezel name="lamp24" element="START" inputtag="BLACK2" inputmask="0x80">
-			<bounds x="560" y="310" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp26" element="RED" inputtag="BLACK2" inputmask="0x10">
-			<bounds x="560" y="360" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp33" element="YELLOW" inputtag="BLACK2" inputmask="0x08">
-			<bounds x="560" y="410" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp40" element="GREEN" inputtag="BLACK2" inputmask="0x04">
-			<bounds x="560" y="460" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp42" element="HELP" inputtag="BLACK2" inputmask="0x02">
-			<bounds x="564" y="510" width="48" height="50" />
-		</bezel>
-		<bezel name="lamp51" element="FREEZE" inputtag="ORANGE1" inputmask="0x10">
-			<bounds x="250" y="560" width="50" height="50" />
-		</bezel>
-
-		<bezel name="lamp35" element="GO" inputtag="ORANGE1" inputmask="0x40">
-			<bounds x="300" y="560" width="50" height="50" />
-		</bezel>
-
 		<screen index="0">
 			<bounds x="50" y="260" width="504" height="296" />
 		</screen>
 
+		<element name="lamp85" ref="TRAIL1">
+			<bounds x="50" y="10" width="252" height="60" />
+		</element>
+		<element name="lamp85" ref="TRAIL2">
+			<bounds x="252" y="10" width="80" height="60" />
+		</element>
+		<element name="lamp85" ref="TRAIL3">
+			<bounds x="332" y="10" width="80" height="60" />
+		</element>
+		<element name="lamp85" ref="TRAIL4">
+			<bounds x="412" y="10" width="80" height="60" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds x="100" y="10" width="40" height="60" />
+		</element>
+		<element name="digit15" ref="digit">
+			<bounds x="140" y="10" width="40" height="60" />
+		</element>
+		<element name="lamp85" ref="GET">
+			<bounds x="50" y="10" width="50" height="60" />
+		</element>
+		<element name="GEMS" ref="GEMS">
+			<bounds x="180" y="10" width="72" height="60" />
+		</element>
+		<element name="£5" ref="£5">
+			<bounds x="252" y="10" width="80" height="60" />
+		</element>
+		<element name="£10" ref="£10">
+			<bounds x="332" y="10" width="80" height="60" />
+		</element>
+		<element name="£20" ref="£20">
+			<bounds x="412" y="10" width="80" height="60" />
+		</element>
+
+		<element name="lamp93" ref="TRAIL1">
+			<bounds x="50" y="70" width="252" height="60" />
+		</element>
+		<element name="lamp93" ref="TRAIL2">
+			<bounds x="252" y="70" width="80" height="60" />
+		</element>
+		<element name="lamp93" ref="TRAIL3">
+			<bounds x="332" y="70" width="80" height="60" />
+		</element>
+		<element name="lamp93" ref="TRAIL4">
+			<bounds x="412" y="70" width="80" height="60" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds x="100" y="70" width="40" height="60" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds x="140" y="70" width="40" height="60" />
+		</element>
+		<element name="lamp93" ref="GET">
+			<bounds x="50" y="70" width="50" height="60" />
+		</element>
+		<element name="GEMS" ref="GEMS">
+			<bounds x="180" y="70" width="72" height="60" />
+		</element>
+		<element name="£2" ref="£2">
+			<bounds x="252" y="70" width="80" height="60" />
+		</element>
+		<element name="£4" ref="£4">
+			<bounds x="332" y="70" width="80" height="60" />
+		</element>
+		<element name="£6" ref="£6">
+			<bounds x="412" y="70" width="80" height="60" />
+		</element>
+
+		<element name="lamp101" ref="TRAIL1">
+			<bounds x="50" y="130" width="252" height="60" />
+		</element>
+		<element name="lamp101" ref="TRAIL2">
+			<bounds x="252" y="130" width="80" height="60" />
+		</element>
+		<element name="lamp101" ref="TRAIL3">
+			<bounds x="332" y="130" width="80" height="60" />
+		</element>
+		<element name="lamp101" ref="TRAIL4">
+			<bounds x="412" y="130" width="80" height="60" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds x="100" y="130" width="40" height="60" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds x="140" y="130" width="40" height="60" />
+		</element>
+		<element name="lamp101" ref="GET">
+			<bounds x="50" y="130" width="50" height="60" />
+		</element>
+		<element name="GEMS" ref="GEMS">
+			<bounds x="180" y="130" width="72" height="60" />
+		</element>
+		<element name="£1" ref="£1">
+			<bounds x="252" y="130" width="80" height="60" />
+		</element>
+		<element name="£2" ref="£2">
+			<bounds x="332" y="130" width="80" height="60" />
+		</element>
+		<element name="£3" ref="£3">
+			<bounds x="412" y="130" width="80" height="60" />
+		</element>
+
+		<element name="lamp109" ref="TRAIL1">
+			<bounds x="50" y="190" width="252" height="60" />
+		</element>
+		<element name="lamp109" ref="TRAIL2">
+			<bounds x="252" y="190" width="80" height="60" />
+		</element>
+		<element name="lamp109" ref="TRAIL3">
+			<bounds x="332" y="190" width="80" height="60" />
+		</element>
+		<element name="lamp109" ref="TRAIL4">
+			<bounds x="412" y="190" width="80" height="60" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds x="100" y="190" width="40" height="60" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds x="140" y="190" width="40" height="60" />
+		</element>
+		<element name="lamp109" ref="GET">
+			<bounds x="50" y="190" width="50" height="60" />
+		</element>
+		<element name="GEMS" ref="GEMS">
+			<bounds x="180" y="190" width="72" height="60" />
+		</element>
+		<element name="FREEGAME" ref="FREEGAME">
+			<bounds x="252" y="190" width="80" height="60" />
+		</element>
+		<element name="50P" ref="50P">
+			<bounds x="332" y="190" width="80" height="60" />
+		</element>
+		<element name="£1" ref="£1">
+			<bounds x="412" y="190" width="80" height="60" />
+		</element>
+
+		<element name="lamp25" ref="COLLECT" inputtag="BLACK2" inputmask="0x40">
+			<bounds x="0" y="310" width="48" height="50" />
+		</element>
+		<element name="lamp32" ref="RED" inputtag="BLACK1" inputmask="0x10">
+			<bounds x="0" y="360" width="48" height="50" />
+		</element>
+		<element name="lamp34" ref="YELLOW" inputtag="BLACK1" inputmask="0x08">
+			<bounds x="0" y="410" width="48" height="50" />
+		</element>
+		<element name="lamp41" ref="GREEN" inputtag="BLACK1" inputmask="0x04">
+			<bounds x="0" y="460" width="48" height="50" />
+		</element>
+		<element name="lamp48" ref="PLAY" inputtag="BLACK1" inputmask="0x02">
+			<bounds x="0" y="510" width="48" height="50" />
+		</element>
+
+		<element name="lamp24" ref="START" inputtag="BLACK2" inputmask="0x80">
+			<bounds x="560" y="310" width="48" height="50" />
+		</element>
+		<element name="lamp26" ref="RED" inputtag="BLACK2" inputmask="0x10">
+			<bounds x="560" y="360" width="48" height="50" />
+		</element>
+		<element name="lamp33" ref="YELLOW" inputtag="BLACK2" inputmask="0x08">
+			<bounds x="560" y="410" width="48" height="50" />
+		</element>
+		<element name="lamp40" ref="GREEN" inputtag="BLACK2" inputmask="0x04">
+			<bounds x="560" y="460" width="48" height="50" />
+		</element>
+		<element name="lamp42" ref="HELP" inputtag="BLACK2" inputmask="0x02">
+			<bounds x="564" y="510" width="48" height="50" />
+		</element>
+		<element name="lamp51" ref="FREEZE" inputtag="ORANGE1" inputmask="0x10">
+			<bounds x="250" y="560" width="50" height="50" />
+		</element>
+
+		<element name="lamp35" ref="GO" inputtag="ORANGE1" inputmask="0x40">
+			<bounds x="300" y="560" width="50" height="50" />
+		</element>
 	</view>
 </mamelayout>

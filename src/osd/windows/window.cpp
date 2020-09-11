@@ -312,6 +312,7 @@ win_window_info::win_window_info(
 		m_target(nullptr),
 		m_targetview(0),
 		m_targetorient(0),
+		m_targetvismask(0),
 		m_lastclicktime(std::chrono::system_clock::time_point::min()),
 		m_lastclickx(0),
 		m_lastclicky(0),
@@ -790,6 +791,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	window->m_targetview = window->m_target->view();
 	window->m_targetorient = window->m_target->orientation();
 	window->m_targetlayerconfig = window->m_target->layer_config();
+	window->m_targetvismask = window->m_target->visibility_mask();
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -859,20 +861,19 @@ void win_window_info::destroy()
 
 void win_window_info::update()
 {
-	int targetview, targetorient;
-	render_layer_config targetlayerconfig;
-
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// see if the target has changed significantly in window mode
-	targetview = m_target->view();
-	targetorient = m_target->orientation();
-	targetlayerconfig = m_target->layer_config();
-	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig)
+	unsigned const targetview = m_target->view();
+	int const targetorient = m_target->orientation();
+	render_layer_config const targetlayerconfig = m_target->layer_config();
+	u32 const targetvismask = m_target->visibility_mask();
+	if (targetview != m_targetview || targetorient != m_targetorient || targetlayerconfig != m_targetlayerconfig || targetvismask != m_targetvismask)
 	{
 		m_targetview = targetview;
 		m_targetorient = targetorient;
 		m_targetlayerconfig = targetlayerconfig;
+		m_targetvismask = targetvismask;
 
 		// in window mode, reminimize/maximize
 		if (!fullscreen())

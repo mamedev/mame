@@ -200,7 +200,7 @@ public:
 		{
 			if (m_e[i].need_more)
 			{
-				pstring line;
+				putf8string line;
 				m_e[i].eof = !r[i].readline(line);
 				if (!m_e[i].eof)
 				{
@@ -247,6 +247,7 @@ public:
 			more = readmore(readers);
 		}
 	}
+
 
 private:
 	callback_type m_cb;
@@ -490,7 +491,8 @@ public:
 private:
 	void write(const pstring &line)
 	{
-		m_fo.write(line.c_str(), static_cast<std::streamsize>(plib::strlen(line.c_str())));
+		const putf8string u8line(line);
+		m_fo.write(u8line.c_str(), static_cast<std::streamsize>(plib::strlen(u8line.c_str())));
 	}
 
 	std::size_t m_channels;
@@ -552,7 +554,8 @@ public:
 private:
 	void write(const pstring &line)
 	{
-		m_fo.write(line.c_str(), static_cast<std::streamsize>(plib::strlen(line.c_str())));
+		const putf8string u8line(line);
+		m_fo.write(u8line.c_str(), static_cast<std::streamsize>(plib::strlen(u8line.c_str())));
 	}
 
 	double m_last_time;

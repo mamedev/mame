@@ -139,13 +139,38 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 
 
 //-------------------------------------------------
+//  has_warnings - returns true if the system has
+//  issues that warrant a yellow/red message
+//-------------------------------------------------
+
+bool machine_static_info::has_warnings() const
+{
+	return (machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS)) || unemulated_features() || imperfect_features();
+}
+
+
+//-------------------------------------------------
+//  has_severe_warnings - returns true if the
+//  system has issues that warrant a red message
+//-------------------------------------------------
+
+bool machine_static_info::has_severe_warnings() const
+{
+	return
+			(machine_flags() & MACHINE_ERRORS) ||
+			(unemulated_features() & (device_t::feature::PROTECTION | device_t::feature::GRAPHICS | device_t::feature::SOUND)) ||
+			(imperfect_features() & device_t::feature::PROTECTION);
+}
+
+
+//-------------------------------------------------
 //  status_color - returns suitable colour for
 //  driver status box
 //-------------------------------------------------
 
 rgb_t machine_static_info::status_color() const
 {
-	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
+	if (has_severe_warnings())
 		return UI_RED_COLOR;
 	else if ((machine_flags() & MACHINE_WARNINGS & ~::machine_flags::REQUIRES_ARTWORK) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
@@ -161,7 +186,7 @@ rgb_t machine_static_info::status_color() const
 
 rgb_t machine_static_info::warnings_color() const
 {
-	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
+	if (has_severe_warnings())
 		return UI_RED_COLOR;
 	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;

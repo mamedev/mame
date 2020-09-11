@@ -480,6 +480,7 @@ MACHINES["COP452"] = true
 MACHINES["CR589"] = true
 MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
+MACHINES["CS8900A"] = true
 MACHINES["CXD1095"] = true
 MACHINES["DP8390"] = true
 MACHINES["DP83932C"] = true
@@ -1226,6 +1227,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ibm6580",
 		"ie15",
 		"imp",
+		"informer",
 		"intel",
 		"interpro",
 		"interton",
@@ -2597,6 +2599,15 @@ files {
 	MAME_DIR .. "src/mame/drivers/ie15.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "informer")
+files {
+	MAME_DIR .. "src/mame/drivers/informer_207_100.cpp",
+	MAME_DIR .. "src/mame/drivers/informer_207_376.cpp",
+	MAME_DIR .. "src/mame/drivers/informer_213ae.cpp",
+	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.h",
+}
+
 createMESSProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
@@ -3059,6 +3070,7 @@ files {
 	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.h",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.cpp",
+	MAME_DIR .. "src/mame/drivers/vt_unknown.cpp",
 	MAME_DIR .. "src/mame/drivers/compmahj.cpp",
 }
 
@@ -3080,6 +3092,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "novag")
 files {
+	MAME_DIR .. "src/mame/drivers/novag_cexpert.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_cforte.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_const.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_diablo.cpp",
@@ -3336,6 +3349,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_sc55.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_sc88.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tb303.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_tr505.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr606.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr707.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_tr909.cpp",
@@ -3344,6 +3358,8 @@ files {
 	MAME_DIR .. "src/mame/audio/bu3905.h",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.cpp",
 	MAME_DIR .. "src/mame/audio/jx8p_synth.h",
+	MAME_DIR .. "src/mame/audio/mb63h114.cpp",
+	MAME_DIR .. "src/mame/audio/mb63h114.h",
 	MAME_DIR .. "src/mame/machine/mb62h195.cpp",
 	MAME_DIR .. "src/mame/machine/mb62h195.h",
 	MAME_DIR .. "src/mame/machine/mb63h149.cpp",
@@ -4123,6 +4139,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "votrax")
 files {
+	MAME_DIR .. "src/mame/drivers/votrhv.cpp",
 	MAME_DIR .. "src/mame/drivers/votrpss.cpp",
 	MAME_DIR .. "src/mame/drivers/votrtnt.cpp",
 }
@@ -4332,7 +4349,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/e100.cpp",
 	MAME_DIR .. "src/mame/drivers/eacc.cpp",
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
-	MAME_DIR .. "src/mame/drivers/emate.cpp",
 	MAME_DIR .. "src/mame/drivers/epic14e.cpp",
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
@@ -4419,6 +4435,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mx2178.cpp",
 	MAME_DIR .. "src/mame/drivers/mycom.cpp",
 	MAME_DIR .. "src/mame/drivers/myvision.cpp",
+	MAME_DIR .. "src/mame/drivers/newton.cpp",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 	MAME_DIR .. "src/mame/drivers/notetaker.cpp",

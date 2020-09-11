@@ -65,14 +65,14 @@ parser_t::parser_t(nlparse_t &setup)
 
 }
 
-bool parser_t::parse(plib::psource_t::stream_ptr &&strm, const pstring &nlname)
+bool parser_t::parse(plib::istream_uptr &&strm, const pstring &nlname)
 {
 	token_store tokstor;
 	parse_tokens(std::move(strm), tokstor);
 	return parse(tokstor, nlname);
 }
 
-void parser_t::parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tokstor)
+void parser_t::parse_tokens(plib::istream_uptr &&strm, token_store &tokstor)
 {
 	plib::putf8_reader u8reader(strm.release_stream());
 	m_tokenizer.append_to_store(&u8reader, tokstor);
@@ -88,7 +88,7 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 	{
 		// FIXME: line numbers in cached local netlists are wrong
 		//        need to process raw tokens here.
-		token_t token = get_token();
+		token_t token = get_token_raw();
 		if (token.is_type(token_type::ENDOFFILE))
 		{
 			return false;
@@ -96,13 +96,13 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 
 		if (token.is(m_tok_NETLIST_END) || token.is(m_tok_TRUTHTABLE_END))
 		{
-			require_token(m_tok_paren_left);
 			if (!in_nl)
 				error (MF_PARSER_UNEXPECTED_1(token.str()));
 			else
 			{
 				in_nl = false;
 			}
+			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 
 			m_cur_local->push_back(token);
@@ -131,11 +131,10 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			// create a new cached local store
 			m_local.emplace(name.str(), token_store());
 			m_cur_local = &m_local[name.str()];
-			m_cur_local->push_back(token_t(token_type::LINEMARKER));
 			auto sl = sourceloc();
-			auto num = plib::pfmt("{1}")(sl.line());
-			m_cur_local->push_back(token_t(token_type::NUMBER, num));
-			m_cur_local->push_back(token_t(token_type::STRING, sl.file_name()));
+			auto li = plib::pfmt("# {1} \"{2}\"")(sl.line(), sl.file_name());
+
+			m_cur_local->push_back(token_t(token_type::LINEMARKER, li));
 			m_cur_local->push_back(token);
 			m_cur_local->push_back(token_t(m_tok_paren_left));
 			m_cur_local->push_back(name);
@@ -152,7 +151,8 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 		}
 		else if (!in_nl)
 		{
-			if (!token.is(m_tok_static))
+			if (!token.is(m_tok_static) && !token.is_type(token_type::SOURCELINE)
+					&& !token.is_type(token_type::LINEMARKER))
 				error(MF_EXPECTED_NETLIST_START_1(token.str()));
 		}
 		else
@@ -464,14 +464,14 @@ void parser_t::netdev_defparam()
 	if (tok.is_type(token_type::STRING))
 	{
 		m_setup.log().debug("Parser: DefParam: {1} {2}\n", param, tok.str());
-		m_setup.defparam(param, tok.str());
+		m_setup.register_defparam(param, tok.str());
 		require_token(m_tok_paren_right);
 	}
 	else
 	{
 		auto val = stringify_expression(tok);
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
-		m_setup.defparam(param, val);
+		m_setup.register_defparam(param, val);
 		require_token(tok, m_tok_paren_right);
 	}
 }

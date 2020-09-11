@@ -480,7 +480,7 @@ static NETLIST_START(MM5837_DIP)
 		A.VDD,  /*   VDD |1  ++  8| NC */ NC.I,
 		A.VGG,  /*   VGG |2      7| NC */ NC.I,
 		A.OUT,  /*   OUT |3      6| NC */ NC.I,
-		A.VSS,  /*   VSS |4      5| NC */ NC.I,
+		A.VSS,  /*   VSS |4      5| NC */ NC.I
 				/*       +--------+    */
 	)
 NETLIST_END()

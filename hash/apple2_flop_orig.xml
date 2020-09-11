@@ -8025,12 +8025,12 @@ license:CC0
 	</software>
 
 	<software name="covetmir">
-		<description>The Coveted Mirror</description>
+		<description>The Coveted Mirror (1985 Polarware rerelease)</description>
 		<year>1985</year>
 		<publisher>Polarware</publisher>
 		<info name="release" value="2019-10-14"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- This re-release requires a 64K Apple II+ or later;
+		<!-- This rerelease requires a 64K Apple II+ or later;
 		the optional double hi-res graphics mode requires a
 		128K Apple //e or later. -->
 
@@ -14292,4 +14292,305 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="jaws">
+		<description>Jaws</description>
+		<year>1989</year>
+		<publisher>Box Office Software</publisher>
+		<info name="release" value="2020-08-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234773">
+				<rom name="jaws disk 1a.woz" size="234773" crc="50d7a4e8" sha1="dafe4e8b9444bf28a167068927e18e762d63a8a2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234773">
+				<rom name="jaws disk 1b.woz" size="234773" crc="8a74d51d" sha1="6da767736dcb06e45286b316576f5c8aa9876429"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="234773">
+				<rom name="jaws disk 2.woz" size="234773" crc="bb00a1ad" sha1="fe4a37a98a26fd7c95b6f0f035e51167b302b6d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dawnpatr">
+		<description>Dawn Patrol</description>
+		<year>1982</year>
+		<publisher>TSR Hobbies</publisher>
+		<info name="release" value="2020-08-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="dawn patrol.woz" size="234789" crc="3981ccee" sha1="ba0e9ace3e77e2a010a92fc67416df4b107f0899"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thesmino">
+		<description>Theseus and the Minotaur</description>
+		<year>1982</year>
+		<publisher>TSR Hobbies</publisher>
+		<info name="release" value="2020-08-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="theseus and the minotaur.woz" size="234785" crc="c32d7469" sha1="32a7328c9f28664a31730906d6adba5377cd02c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungeon">
+		<description>Dungeon!</description>
+		<year>1982</year>
+		<publisher>TSR Hobbies</publisher>
+		<info name="release" value="2020-08-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="dungeon.woz" size="234769" crc="7017c553" sha1="5986b985ae5a4f22f2c072a0b28697ca64bc128c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="covmir83">
+		<description>The Coveted Mirror (1983 Penguin Software release)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2020-08-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234809">
+				<rom name="the coveted mirror side a.woz" size="234809" crc="fa4eac65" sha1="a43525a878343733ab90eff7e96239759b6dd8b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="the coveted mirror side b (boot).woz" size="234809" crc="8be720f9" sha1="79bee46d21b133bfcb3463f26e455bceb44f90e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wircppnc">
+		<description>Write It Right! Capitalization and Punctuation</description>
+		<year>1990</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-08-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234848">
+				<rom name="write it right- punctuation and capitalization.woz" size="234848" crc="8d8a1f89" sha1="86ae9ecb8079e717f12a8f35a7d554ca4b5c9a1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valdaygr">
+		<description>Valentine's Day Grump</description>
+		<year>1985</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2020-08-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234751">
+				<rom name="valentine's day grump.woz" size="234751" crc="cf60a469" sha1="3136cf10752f3b854e373161647106ecb670fd95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qstnba">
+		<description>NBA (Version 1.0)</description>
+		<year>1988</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2020-08-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="nba.woz" size="234774" crc="b4f2589d" sha1="dad93bfa9fa468d6a37434bcb20d9c18751318e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panzstrk">
+		<description>Panzer Strike! (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2020-08-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - West"/>
+			<dataarea name="flop" size="234815">
+				<rom name="panzer strike disk 1a - west.woz" size="234815" crc="b0e546b0" sha1="fde7cfaa28cbd480a70d4a37a9ff54b3cb2761dc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - East"/>
+			<dataarea name="flop" size="234815">
+				<rom name="panzer strike disk 1b - east.woz" size="234815" crc="e2731f0e" sha1="6413c2e15da56afab5d89c5bee62caddbbad4d74"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Africa"/>
+			<dataarea name="flop" size="234817">
+				<rom name="panzer strike disk 2a - africa.woz" size="234817" crc="16f4c98f" sha1="4969af2b1bd8475121190badddb135ef3ac6a20e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenarios"/>
+			<dataarea name="flop" size="234820">
+				<rom name="panzer strike disk 2b - scenarios.woz" size="234820" crc="84882a5f" sha1="1ad24f21431dbb1da0bfcd4a8f0cc8ad3616cda2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polquest">
+		<description>Police Quest</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2020-08-22"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 1a.woz" size="234970" crc="af6389b9" sha1="098b10886ffa2cc01da6008f52297ec4a71a6af0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 1b.woz" size="234970" crc="e5d4d151" sha1="65a3383ec512de44b9830d442adc738d49f1fb33"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 2a.woz" size="234970" crc="050ae097" sha1="e0eb70b68dfc07af663d594458b481b78788953f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 2b.woz" size="234970" crc="4c51dc70" sha1="1a29eee6b9441fe54cbb5b167378058a5748eaa4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 3a.woz" size="234970" crc="955120d0" sha1="2929945e36ec04e573ff0e5dbeaa67354e5c4126"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 3b.woz" size="234970" crc="cef66bad" sha1="ab85b4f8ac965c680f53cf0f648c293f65ec900f"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 4a.woz" size="234970" crc="a1a74c19" sha1="fd9b2073fd115b230ef5511e11bdcd07c94192df"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="234970">
+				<rom name="police quest disk 4b.woz" size="234970" crc="9d1e12cf" sha1="a1ae7c97eabf5b352792f52eb1cb53f8a4d7c4fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techncop">
+		<description>Techno Cop</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="release" value="2020-08-22"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234792">
+				<rom name="techno cop side a.woz" size="234792" crc="8050f753" sha1="2532dc1c50d2123bd33659959399a6dfaa2d1c1e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234792">
+				<rom name="techno cop side b.woz" size="234792" crc="361e587f" sha1="00734f0ef8fedbaf86403a91179b6946f4ac18cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibbler">
+		<description>Nibbler</description>
+		<year>1984</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-08-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Note: due to its use of undocumented 6502 opcodes, this disk image
+		may not boot in some emulators. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88344">
+				<rom name="nibbler.woz" size="88344" crc="2014db10" sha1="d6d4caa6c2ea1aaf845b2fa07a7a5299261025cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midmalad">
+		<description>Midnight Malady</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2020-08-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248084">
+				<rom name="midnight malady.woz" size="248084" crc="e5a4d95e" sha1="8b6370623049bf6d2312d2706fbb6e2da28c3b54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alfr32">
+		<description>Alf (Version 3.2)</description>
+		<year>1987</year>
+		<publisher>Box Office Software</publisher>
+		<info name="release" value="2020-08-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="alf v3.2.woz" size="234776" crc="9b1f0d3a" sha1="843429f5246704372b77ec382278eda0c81acb49"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

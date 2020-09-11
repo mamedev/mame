@@ -1190,7 +1190,7 @@ void bbc_state::bbcb(machine_config &config)
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
-	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
+	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 
@@ -1433,8 +1433,8 @@ void bbcbp_state::acw443(machine_config &config)
 	m_wd_fdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 32016 co-processor */
-	//m_tube->set_default_option("32016");
-	//m_tube->set_fixed(true);
+	m_tube->set_default_option("32016l");
+	m_tube->set_fixed(true);
 
 	/* Acorn Winchester Disc 20MB */
 	m_1mhzbus->set_default_option("awhd");
@@ -1608,7 +1608,7 @@ void bbcm_state::bbcm(machine_config &config)
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
-	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
+	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
 

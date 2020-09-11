@@ -80,6 +80,8 @@ ioport_constructor electron_romboxp_device::device_input_ports() const
 
 void electron_romboxp_device::device_add_mconfig(machine_config &config)
 {
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set([this](int state) { m_centronics_busy = state; });
@@ -98,10 +100,10 @@ void electron_romboxp_device::device_add_mconfig(machine_config &config)
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart[0], DERIVED_CLOCK(1, 1), electron_cart, nullptr); // ROM SLOT 0/1
-	m_cart[0]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_cart[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_cart[0]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 	ELECTRON_CARTSLOT(config, m_cart[1], DERIVED_CLOCK(1, 1), electron_cart, nullptr); // ROM SLOT 2/3
-	m_cart[1]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_cart[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_cart[1]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 }
 
@@ -121,6 +123,7 @@ const tiny_rom_entry *electron_romboxp_device::device_rom_region() const
 electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_ROMBOXP, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
+	, m_irqs(*this, "irqs")
 	, m_exp_rom(*this, "exp_rom")
 	, m_rom(*this, "rom%u", 1)
 	, m_cart(*this, "cart%u", 1)

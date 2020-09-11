@@ -1,10 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-// These all have some kind of startup check
-// the Virtual Interactive 'Vi' probably also fits here
-//
-// The WiWi could also run NES games; SunPlus hardware was in the cartridge, it was a 'fake' system.
+/* These all have some kind of startup check
+   the Virtual Interactive 'Vi' probably also fits here
+
+   The WiWi could also run NES games; SunPlus hardware was in the cartridge, it was a 'fake' system.
+
+	---
+
+	some of these are just checking a external timer on a port, I think this is one of the SPG features
+	so might need making more generic.
+*/
+
+
 
 #include "emu.h"
 #include "includes/spg2xx.h"
@@ -70,6 +78,23 @@ protected:
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
+
+class spg2xx_game_ddmsup_state : public spg2xx_game_marc101_state
+{
+public:
+	spg2xx_game_ddmsup_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_marc101_state(mconfig, type, tag)
+	{ }
+
+	void ddmsup(machine_config &config);
+
+protected:
+
+//	virtual uint16_t portb_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+//	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
 
 class spg2xx_game_marc250_state : public spg2xx_game_marc101_state
 {
@@ -182,6 +207,17 @@ void spg2xx_game_guitrbus_state::guitrbus(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_guitrbus_state::porta_w));
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_guitrbus_state::portb_w));
 }
+
+void spg2xx_game_ddmsup_state::ddmsup(machine_config &config)
+{
+	spg2xx(config);
+
+//	m_maincpu->portb_in().set(FUNC(spg2xx_game_ddmsup_state::portb_r));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_ddmsup_state::porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_ddmsup_state::porta_w));
+//	m_maincpu->portb_out().set(FUNC(spg2xx_game_ddmsup_state::portb_w));
+}
+
 
 
 // are these Port A behaviors related to IO A Special mode on the SoC?
@@ -359,6 +395,34 @@ void spg2xx_game_marc250_state::porta_w(offs_t offset, uint16_t data, uint16_t m
 			m_pulse_timer->adjust(attotime::from_hz(6), 0, attotime::from_hz(6));
 			m_pulse_timer2->adjust(attotime::from_hz(12), 0, attotime::from_hz(12));
 		}
+	}
+
+	m_prev_porta = data;
+}
+
+void spg2xx_game_ddmsup_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	if (data & 0x4000)
+	{
+		m_pulse_timer->adjust(attotime::from_hz(6), 0, attotime::from_hz(6));
 	}
 
 	m_prev_porta = data;
@@ -608,6 +672,40 @@ static INPUT_PORTS_START( guitrbus )
 
 	PORT_START("P2")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+
+
+static INPUT_PORTS_START( ddmsup )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("P1 Pad Up") PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P1 Pad Left") PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Pad Right") PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("P1 Pad Down") PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Pad Up-Left")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Pad Up-Right")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Pad Down-Left")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Pad Down-Right")
+	PORT_BIT( 0x1c00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED ) // must toggle at rate measured by code for ddmsup
+	PORT_BIT( 0xc000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("P2 Pad Up") PORT_PLAYER(2) PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P2 Pad Left") PORT_PLAYER(2) PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P2 Pad Right") PORT_PLAYER(2) PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("P2 Pad Down") PORT_PLAYER(2) PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Pad Up-Left") PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Pad Up-Right") PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 Pad Down-Left") PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 Pad Down-Right") PORT_PLAYER(2)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -893,6 +991,17 @@ ROM_START( guitrbus )
 	ROM_LOAD16_WORD_SWAP( "winfunguitar.bin", 0x000000, 0x400000, CRC(17419a27) SHA1(19377fcd18b08d3ae8e20de0244b3aaef1b5a66a) )
 ROM_END
 
+ROM_START( ddmsup )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dancemaniasupreme.bin", 0x000000, 0x800000, CRC(4066a36b) SHA1(1fc8553b03b81bc02c3fcbcdafa2e54d1f2c2306) )
+ROM_END
+
+ROM_START( ddmmeg12 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doubledancemania.bin", 0x000000, 0x800000, CRC(fcffb21e) SHA1(802a3c2d6bcbd729b9a483d42d912ca8b9abdccd) )
+ROM_END
+
+
 // box marked 'Wireless game console' 'Drahtlose Spielekonsole' 87 Sports games included : 18 hyper sports games, 69 arcade games.
 // Unit marked 'Hamy System' 'WiWi'
 // actually a cartridge, but all hardware is in the cart, overriding any internal hardware entirely.  see nes_vt.cp 'mc_sp69' for the '69 arcade game' part
@@ -905,6 +1014,10 @@ CONS( 200?, foxsport, 0,        0, rad_skat, wiwi18,  spg2xx_game_wiwi18_state, 
 // thtere is another 'Drahtlose Spielekonsole 48-in-1' with '11 hyper sports games' (including Running) which are clearly SunPlus and would fit here, with the 37 non-hyper sports games presumably again being a NES/Famiclone cart
 
 CONS( 2014, marc101,     0,        0, marc101, m489,  spg2xx_game_marc101_state, empty_init, "Millennium 2000 GmbH", "Millennium Arcade 101 (M489) (Game Station 2 101-in-1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, ddmsup,      0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state, empty_init,    "Senario", "Double Dance Mania: Supreme / Dance Supreme", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // titlescreen is just 'Dance Supreme'
+
+CONS( 200?, ddmmeg12,    0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state,  empty_init,    "Senario",  "Double Dance Mania: Mega 12",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

@@ -103,11 +103,12 @@ static const o2_slot slot_list[] =
 
 static int o2_get_pcb_id(const char *slot)
 {
-	for (auto & elem : slot_list)
-	{
-		if (!core_stricmp(elem.slot_option, slot))
-			return elem.pcb_id;
-	}
+	if (slot)
+		for (auto & elem : slot_list)
+		{
+			if (!core_stricmp(elem.slot_option, slot))
+				return elem.pcb_id;
+		}
 
 	return 0;
 }
@@ -138,13 +139,12 @@ image_init_result o2_cart_slot_device::call_load()
 			load_software_region("exrom", m_cart->m_exrom);
 			load_software_region("voice", m_cart->m_voice);
 
-			const char *pcb_name = get_feature("slot");
-			if (pcb_name)
-				m_type = o2_get_pcb_id(pcb_name);
+			m_type = o2_get_pcb_id(get_feature("slot"));
 
 			// Videopac+ determines whether the screen should have a border, with a gate connected
 			// to the cartridge B pin. This way, old Videopac games can still run in full screen.
-			m_b = bool(strtoul(get_feature("b_pin"), nullptr, 0)) ? 1 : 0;
+			const char *b_pin = get_feature("b_pin");
+			m_b = b_pin && strtoul(b_pin, nullptr, 0) ? 1 : 0;
 		}
 		else
 		{

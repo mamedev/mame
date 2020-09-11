@@ -50,7 +50,6 @@
 
 // memory and address spaces
 #include "emumem.h"
-#include "memarray.h"
 
 // machine-wide utilities
 #include "romentry.h"

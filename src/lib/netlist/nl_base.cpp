@@ -26,11 +26,6 @@ namespace netlist
 	// callbacks_t
 	// ----------------------------------------------------------------------------------------
 
-	std::unique_ptr<plib::dynlib_base> callbacks_t:: static_solver_lib() const
-	{
-		return std::make_unique<plib::dynlib_static>(nullptr);
-	}
-
 	// ----------------------------------------------------------------------------------------
 	// queue_t
 	// ----------------------------------------------------------------------------------------
@@ -108,14 +103,11 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	netlist_state_t::netlist_state_t(const pstring &name,
-		host_arena::unique_ptr<callbacks_t> &&callbacks)
-	: m_callbacks(std::move(callbacks)) // Order is important here
-	, m_log(*m_callbacks)
+		plib::plog_delegate logger)
+	: m_log(logger)
 	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
-		m_lib = m_callbacks->static_solver_lib();
-
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);
 		// create the run interface
 		m_netlist = plib::make_unique<netlist_t>(m_pool, *this, name);
@@ -161,6 +153,11 @@ namespace netlist
 		m_setup->parser().include("base_lib");
 #endif
 #endif
+	}
+
+	void netlist_state_t::set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib)
+	{
+		m_lib = std::move(lib);
 	}
 
 
@@ -908,7 +905,7 @@ namespace netlist
 	}
 
 
-	plib::psource_t::stream_ptr param_data_t::stream()
+	plib::istream_uptr param_data_t::stream()
 	{
 		return device().state().parser().get_data_stream(str());
 	}

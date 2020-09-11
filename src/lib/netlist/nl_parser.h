@@ -25,9 +25,9 @@ namespace netlist
 
 		parser_t(nlparse_t &setup);
 
-		bool parse(plib::psource_t::stream_ptr &&strm, const pstring &nlname);
+		bool parse(plib::istream_uptr &&strm, const pstring &nlname);
 		bool parse(const token_store &tokstor, const pstring &nlname);
-		void parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tokstor);
+		void parse_tokens(plib::istream_uptr &&strm, token_store &tokstor);
 
 	protected:
 		void parse_netlist(const pstring &nlname);

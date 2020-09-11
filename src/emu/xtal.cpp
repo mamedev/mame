@@ -289,6 +289,7 @@ const double XTAL::known_xtals[] = {
 	 19'602'000, /* 19.602_MHz_XTAL        Ampex 210+ 80-column display clock */
 	 19'660'800, /* 19.6608_MHz_XTAL       Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	 19'661'400, /* 19.6614_MHz_XTAL       Wyse WY-30 */
+	 19'718'400, /* 19.7184_MHz_XTAL       Informer 207/100 */
 	 19'923'000, /* 19.923_MHz_XTAL        Cinematronics vectors */
 	 19'968'000, /* 19.968_MHz_XTAL        Used mostly by some Taito games */
 	 20'000'000, /* 20_MHz_XTAL            - */

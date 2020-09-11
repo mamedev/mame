@@ -19,29 +19,29 @@ license:CC0
 	<view name="3D Scope Straight View">
 		<!-- parallel-eyed -->
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<bezel name="shutter" element="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></bezel>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
 
 		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
-		<bezel name="shutter" element="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></bezel>
+		<element name="shutter" ref="shutter2"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
 	</view>
 
 	<view name="3D Scope Cross View">
 		<!-- cross-eyed -->
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<bezel name="shutter" element="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></bezel>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
 
 		<screen index="0"><bounds left="4.03" top="0" right="8.03" bottom="3" /></screen>
-		<bezel name="shutter" element="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></bezel>
+		<element name="shutter" ref="shutter1"><bounds left="4.03" top="0" right="8.03" bottom="3" /></element>
 	</view>
 
 	<view name="3D Scope Left">
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<bezel name="shutter" element="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></bezel>
+		<element name="shutter" ref="shutter1"><bounds left="0" top="0" right="4" bottom="3" /></element>
 	</view>
 
 	<view name="3D Scope Right">
 		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
-		<bezel name="shutter" element="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></bezel>
+		<element name="shutter" ref="shutter2"><bounds left="0" top="0" right="4" bottom="3" /></element>
 	</view>
 
 </mamelayout>

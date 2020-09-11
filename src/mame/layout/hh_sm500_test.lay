@@ -19,9 +19,9 @@ license:CC0
 
 	<view name="Test Layout">
 		<bounds left="0" right="10" top="0" bottom="10" />
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="0" right="10" top="0" bottom="10" />
-		</bezel>
+		</element>
 
 		<!-- max 9*4*2 matrix -->
 
@@ -32,14 +32,14 @@ license:CC0
 			<repeat count="4">
 				<param name="x" start="0" increment="1" />
 				<param name="p" start="0" increment="1" />
-				<bezel name="~y~.~x~.0" element="led"><bounds x="~p~" y="~y~" width="0.5" height="0.5" /></bezel>
+				<element name="~y~.~x~.0" ref="led"><bounds x="~p~" y="~y~" width="0.5" height="0.5" /></element>
 			</repeat>
 
 			<!-- h2 -->
 			<repeat count="4">
 				<param name="x" start="0" increment="1" />
 				<param name="p" start="5" increment="1" />
-				<bezel name="~y~.~x~.1" element="led"><bounds x="~p~" y="~y~" width="0.5" height="0.5" /></bezel>
+				<element name="~y~.~x~.1" ref="led"><bounds x="~p~" y="~y~" width="0.5" height="0.5" /></element>
 			</repeat>
 		</repeat>
 

@@ -17,9 +17,10 @@ TODO:
 - add rom names from pcbs (lack of)
 - add serials for radiola and jopacs
 
-Undumped:
+Undumped (or dumped but not public):
 - Spaans          (spanish to dutch translator)
 - Crazy Horses
+- Des Chiffres et des Lettres
 - misc. homebrew cartridges
 
 Protos:
@@ -69,6 +70,7 @@ There is an Odyssey³ Command Center Voice Module, could be differences to relea
 
 Europe:
 - Melrep
+- G7400 service test cartridge
 
 Do Videopac+/Odyssey3 versions exist?:
 - Syracuse (France)
@@ -2570,7 +2572,7 @@ Official VP+ upgaded versions (simply adds a background picture):
 		</part>
 	</software>
 
-	<software name="ppp">
+	<software name="ppp" supported="partial">
 		<description>Puzzle Piece Panic!</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>

@@ -191,72 +191,72 @@ with clickable button.lamps + coin in.
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel element="cpanel">
+		<element ref="cpanel">
 			<bounds left="0" right="4" top="3" bottom="3.34" />
-		</bezel>
+		</element>
 
-		<bezel element="cpanel2">
+		<element ref="cpanel2">
 			<bounds left="0" right="4" top="3" bottom="3.17" />
-		</bezel>
+		</element>
 
-		<bezel element="coinin_plate" inputtag="IN2" inputmask="0x01">
+		<element ref="coinin_plate" inputtag="IN2" inputmask="0x01">
 			<bounds x="0.10" y="3.05" width="0.15" height="0.24" />
-		</bezel>
+		</element>
 
-		<bezel element="coinin_hole" inputtag="IN2" inputmask="0x01">
+		<element ref="coinin_hole" inputtag="IN2" inputmask="0x01">
 			<bounds x="0.16" y="3.08" width="0.03" height="0.14" />
-		</bezel>
+		</element>
 
 <!-- define lamps -->
 
-		<bezel name="lamp0" element="hold_b" inputtag="IN0" inputmask="0x02">
+		<element name="lamp0" ref="hold_b" inputtag="IN0" inputmask="0x02">
 			<bounds x="0.55" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp0" element="hold1" inputtag="IN0" inputmask="0x02">
+		</element>
+		<element name="lamp0" ref="hold1" inputtag="IN0" inputmask="0x02">
 			<bounds x="0.57" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp1" element="hold_b" inputtag="IN1" inputmask="0x01">
+		<element name="lamp1" ref="hold_b" inputtag="IN1" inputmask="0x01">
 			<bounds x="1.00" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp1" element="hold2" inputtag="IN1" inputmask="0x01">
+		</element>
+		<element name="lamp1" ref="hold2" inputtag="IN1" inputmask="0x01">
 			<bounds x="1.02" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp2" element="hold_b" inputtag="IN1" inputmask="0x02">
+		<element name="lamp2" ref="hold_b" inputtag="IN1" inputmask="0x02">
 			<bounds x="1.45" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp2" element="hold3" inputtag="IN1" inputmask="0x02">
+		</element>
+		<element name="lamp2" ref="hold3" inputtag="IN1" inputmask="0x02">
 			<bounds x="1.47" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp3" element="hold_b" inputtag="IN0" inputmask="0x80">
+		<element name="lamp3" ref="hold_b" inputtag="IN0" inputmask="0x80">
 			<bounds x="1.90" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp3" element="hold4" inputtag="IN0" inputmask="0x80">
+		</element>
+		<element name="lamp3" ref="hold4" inputtag="IN0" inputmask="0x80">
 			<bounds x="1.92" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp4" element="hold_b" inputtag="IN0" inputmask="0x10">
+		<element name="lamp4" ref="hold_b" inputtag="IN0" inputmask="0x10">
 			<bounds x="2.35" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp4" element="hold5" inputtag="IN0" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="hold5" inputtag="IN0" inputmask="0x10">
 			<bounds x="2.37" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp5" element="bet_b" inputtag="IN0" inputmask="0x04">
+		<element name="lamp5" ref="bet_b" inputtag="IN0" inputmask="0x04">
 			<bounds x="3.10" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp5" element="bet" inputtag="IN0" inputmask="0x04">
+		</element>
+		<element name="lamp5" ref="bet" inputtag="IN0" inputmask="0x04">
 			<bounds x="3.12" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp6" element="start_b" inputtag="IN0" inputmask="0x08">
+		<element name="lamp6" ref="start_b" inputtag="IN0" inputmask="0x08">
 			<bounds x="3.55" y="3.05" width="0.35" height="0.24" />
-		</bezel>
-		<bezel name="lamp6" element="start" inputtag="IN0" inputmask="0x08">
+		</element>
+		<element name="lamp6" ref="start" inputtag="IN0" inputmask="0x08">
 			<bounds x="3.57" y="3.07" width="0.31" height="0.20" />
-		</bezel>
+		</element>
 
 	</view>
 </mamelayout>

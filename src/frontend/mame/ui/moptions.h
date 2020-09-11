@@ -38,6 +38,7 @@
 #define OPTION_UI_PATH                "ui_path"
 
 // core misc options
+#define OPTION_SKIP_WARNINGS          "skip_warnings"
 #define OPTION_REMEMBER_LAST          "remember_last"
 #define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
 #define OPTION_FORCED4X3              "forced4x3"
@@ -102,6 +103,7 @@ public:
 	const char *ui_path() const { return value(OPTION_UI_PATH); }
 
 	// Misc options
+	bool skip_warnings() const { return bool_value(OPTION_SKIP_WARNINGS); }
 	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
 	bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }

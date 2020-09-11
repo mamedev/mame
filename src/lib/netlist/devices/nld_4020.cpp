@@ -46,10 +46,10 @@ namespace netlist
 	namespace devices
 	{
 
-	template <unsigned _TotalBits, unsigned _LiveBitmask>
+	template <unsigned TotalBits, unsigned LiveBitmask>
 	NETLIB_OBJECT(CD4020_sub)
 	{
-		static_assert((_LiveBitmask >> _TotalBits) == 0, "Live bitmask too large");
+		static_assert((LiveBitmask >> TotalBits) == 0, "Live bitmask too large");
 
 		NETLIB_CONSTRUCTOR_MODEL(CD4020_sub, "CD4XXX")
 		, m_IP(*this, "IP", NETLIB_DELEGATE(ip))
@@ -79,8 +79,8 @@ namespace netlist
 				m_cnt = 0;
 				m_IP.inactivate();
 				/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-				for (unsigned i = 0; i < _TotalBits; i++)
-					if (((_LiveBitmask >> i) & 1) != 0)
+				for (unsigned i = 0; i < TotalBits; i++)
+					if (((LiveBitmask >> i) & 1) != 0)
 						m_Q[i].push(0, reset_time);
 			}
 			else
@@ -100,13 +100,13 @@ namespace netlist
 					NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 			};
 
-			for (unsigned i = 0; i < _TotalBits; i++)
-				if (((_LiveBitmask >> i) & 1) != 0)
+			for (unsigned i = 0; i < TotalBits; i++)
+				if (((LiveBitmask >> i) & 1) != 0)
 					m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 		}
 		logic_input_t m_IP;
 		logic_input_t m_RESET;
-		object_array_t<logic_output_t, _TotalBits> m_Q;
+		object_array_t<logic_output_t, TotalBits> m_Q;
 
 		state_var<unsigned> m_cnt;
 		nld_power_pins m_supply;
