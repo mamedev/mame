@@ -1578,8 +1578,13 @@ ROM_START( vtboxing )
 ROM_END
 
 ROM_START( msiwwe )
-	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // the first half of this ROM is unused code from the Ms. Pac-Man game!
 	ROM_LOAD( "wrestlemania_es29lv160fb_004a2249.bin", 0x00000, 0x200000, CRC(f524382d) SHA1(0c8d1c29c76e3e3c58018354f1eca9445c9ab945) )
+ROM_END
+
+ROM_START( msiwwea )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "wrestlemania_en29lv800bb_007f225b.bin", 0x00000, 0x100000, CRC(52102de3) SHA1(f858ad18e05d3de24dfab4c98798efb4d30e2987) )
 ROM_END
 
 ROM_START( msidd )
@@ -2116,8 +2121,10 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
-// 2 box variations exist, one with Randy Savage in purple attire, the other with him in green, it is unknown if that is any indication of software revision.  This was dumped from a unit with purple on the box.
-CONS( 2017, msiwwe,     0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// 2 box variations exist, one with Randy Savage in purple attire and another with green, this was dumped from a unit with purple on the box.
+CONS( 2017, msiwwe,     0,      0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// this one was dumped from the version with Randy Savage in green, the box was much larger than the other one.  This one also has new theme music for the adjusted roster.
+CONS( 2017, msiwwea,    msiwwe, 0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2017, msidd,      0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

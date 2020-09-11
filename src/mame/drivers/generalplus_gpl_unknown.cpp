@@ -3,8 +3,10 @@
 
 // these contain the similar game selections to the games in unk6502_st2xxx.cpp but on updated hardware
 
-// These use SPI ROMs and unSP2.0 instructions, so will be GeneralPlus branded parts, not SunPlus
-// possibly the framebuffer based video ones rather than the ones with tile layers
+/* These use SPI ROMs and unSP2.0 instructions, so will be GeneralPlus branded parts, not SunPlus
+   this might just be a GPL16250 with the video features bypassed as the sprite/palette banking is still
+   used, but the RAM treated as work buffers
+*/
 
 /*
 
@@ -317,9 +319,7 @@ static INPUT_PORTS_START( pcp8718 )
 	PORT_DIPSETTING(      0x8000, "8000" )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2:0001" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0001, "0001" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // causes lag if state is inverted, investigate
 	PORT_DIPNAME( 0x0002, 0x0002, "P2:0002" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0002, "0002" )
@@ -1101,7 +1101,7 @@ WRITE_LINE_MEMBER(pcp8718_state::screen_vblank)
 void pcp8718_state::pcp8718(machine_config &config)
 {
 
-	UNSP_20(config, m_maincpu, 100000000); // unknown CPU, unsp20 based, must be clocked ~100Mhz, maybe higher (or cycles per instruction needs to be lower for unSP 2.0)
+	UNSP_20(config, m_maincpu, 96000000); // unknown CPU, unsp20 based, 96Mhz is listed as the maximum for most unSP2.0 chips, and appears correct here
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcp8718_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
