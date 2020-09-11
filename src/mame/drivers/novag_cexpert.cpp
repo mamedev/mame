@@ -5,7 +5,7 @@
 
 Novag Constellation Expert (model 853)
 
-The u3 ROM contains this message: (it's David Kittinger's company)
+The u3 ROM contains the following message (it's David Kittinger's company):
 Copyright (c) 1985, Intelligent Heuristic Programming, Inc
 
 Hardware notes:
@@ -14,8 +14,7 @@ Hardware notes:
 - 64+8 leds, magnet sensors chessboard
 - ports for optional printer and chess clock
 
-TODO:
-- based on a copy-paste of cforte driver, need to finish it and make internal artwork
+I/O is again similar to supercon
 
 ******************************************************************************/
 
@@ -30,7 +29,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "novag_cexpert.lh" // clickable
+#include "novag_cexpert.lh" // clickable
 
 
 namespace {
@@ -152,7 +151,7 @@ u8 cexpert_state::input2_r()
 
 void cexpert_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram(); //.share("nvram");
+	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x1000, 0x1000).nopw(); // accessory?
 	map(0x1100, 0x1100).nopw(); // "
 	map(0x1200, 0x1200).rw(FUNC(cexpert_state::input2_r), FUNC(cexpert_state::mux_w));
@@ -169,35 +168,35 @@ void cexpert_state::main_map(address_map &map)
 static INPUT_PORTS_START( cexpert )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Player/Player / Gambit/Large / King")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Player/Player / Gambit Book / King")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Verify/Set Up / Pro-Op")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Random/Tour/Normal / Training Level / Queen")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Verify / Set Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Best Move/Random / Training Level / Queen")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Change Color / Time Control / Priority")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Change Color")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Sound / Depth Search / Bishop")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Flip Display / Clear Board / Clear Book")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Clear Board / Tournament Book")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Solve Mate / Infinite / Knight")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Print Moves / Print Evaluations / Print Book")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Print Moves / Print Evaluations")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Print Board / Interface / Rook")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Trace Forward / Auto Play / No/End")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Trace Forward / Auto Play")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
 
 	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint / Next Best / Yes/Start")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint / Next Best")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Set Level")
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Go / ->")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Take Back / Restore / <-")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Go")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Take Back / Restore")
 INPUT_PORTS_END
 
 
@@ -217,16 +216,16 @@ void cexpert_state::cexpert(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15200)); // active for 15.2us
 	TIMER(config, "irq_off").configure_periodic(FUNC(cexpert_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
-	//m_board->set_nvram_enable(true);
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	//config.set_default_layout(layout_novag_cexpert);
+	config.set_default_layout(layout_novag_cexpert);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -255,4 +254,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  CMP MACHINE  INPUT    STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1985, cexpert, 0,       0, cexpert, cexpert, cexpert_state, empty_init, "Novag", "Constellation Expert", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, cexpert, 0,       0, cexpert, cexpert, cexpert_state, empty_init, "Novag", "Constellation Expert", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
