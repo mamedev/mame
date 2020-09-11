@@ -284,7 +284,7 @@ struct putf_traits<1, CT>
 
 	static constexpr code_t code(const mem_t *p) noexcept
 	{
-		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret)
+		const auto *p1 = reinterpret_cast<const unsigned char *>(p); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 		return ((*p1 & 0x80) == 0x00) ? *p1 : // NOLINT
 			   ((*p1 & 0xE0) == 0xC0) ? static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f)) : // NOLINT
 			   ((*p1 & 0xF0) == 0xE0) ? static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0)) : // NOLINT
@@ -463,7 +463,7 @@ pstring_t<F>::pstring_t(C *string)
 {
 	m_str.clear();
 	putf8string utf8(string);
-	for (auto &c : utf8)
+	for (const auto &c : utf8)
 		*this += c;
 }
 

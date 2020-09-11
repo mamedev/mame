@@ -64,12 +64,14 @@ namespace plib {
 		}
 		istream_uptr(const istream_uptr &) = delete;
 		istream_uptr &operator=(const istream_uptr &) = delete;
-		istream_uptr(istream_uptr &&rhs) /*noexcept*/
+		istream_uptr(istream_uptr &&rhs)
 		{
 			m_strm = std::move(rhs.m_strm);
-			m_filename = rhs.m_filename;
+			m_filename = std::move(rhs.m_filename);
 		}
 		istream_uptr &operator=(istream_uptr &&) /*noexcept*/ = delete;
+
+		~istream_uptr() = default;
 
 		std::istream * operator ->() noexcept { return m_strm.get(); }
 		std::istream & operator *() noexcept { return *m_strm; }

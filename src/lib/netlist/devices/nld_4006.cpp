@@ -100,7 +100,7 @@ namespace netlist
 			auto d = m_supply.VCC()() - m_supply.GND()();
 			if (d > 0.1) // avoid unrealistic values
 			{
-				m_tp = netlist_time::from_nsec(923.0 / d + 13.0); // calculated from datasheet
+				m_tp = netlist_time::from_nsec(gsl::narrow_cast<unsigned>(923.0 / d + 13.0)); // calculated from datasheet
 			}
 		}
 
