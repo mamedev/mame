@@ -136,7 +136,7 @@ void gcm394_game_state::porta_w(uint16_t data)
 
 void gcm394_game_state::base(machine_config &config)
 {
-	GCM394(config, m_maincpu, 96000000/2, m_screen);
+	GCM394(config, m_maincpu, 96000000, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(gcm394_game_state::portc_r));

@@ -188,6 +188,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 		if (mode & 0x2000)
 		{
 			write_space(dest, val & 0xFF);
+			dest += destdelta;
 			write_space(dest, val >> 8);
 		}
 		else

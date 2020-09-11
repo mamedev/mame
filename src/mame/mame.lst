@@ -32141,6 +32141,7 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 msiwwe
+msiwwea
 msidd
 msimpac
 msisinv
@@ -40851,6 +40852,7 @@ uts20                           //
 
 @source:unk6502_st2xxx.cpp
 bbl380
+rhhc152
 ragc153
 dphh8630
 dgun2953
