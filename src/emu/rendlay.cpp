@@ -33,8 +33,9 @@
 #include <utility>
 
 #define LOG_GROUP_BOUNDS_RESOLUTION (1U << 1)
+#define LOG_INTERACTIVE_ITEMS       (1U << 2)
 
-//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION)
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS)
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -3060,8 +3061,8 @@ layout_view::layout_view(
 	: m_name(make_name(env, viewnode))
 	, m_effaspect(1.0f)
 	, m_items()
-	, m_has_art(false)
 	, m_defvismask(0U)
+	, m_has_art(false)
 {
 	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
@@ -3122,7 +3123,7 @@ layout_view::layout_view(
 	{
 		// screens (-1) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 		for (item &backdrop : layers.backdrops)
-			backdrop.set_blend_mode(BLENDMODE_ADD);
+			backdrop.m_blend_mode = BLENDMODE_ADD;
 		m_items.splice(m_items.end(), layers.screens);
 		m_items.splice(m_items.end(), layers.overlays);
 		m_items.splice(m_items.end(), layers.backdrops);
@@ -3137,7 +3138,7 @@ layout_view::layout_view(
 		for (item &screen : layers.screens)
 		{
 			if (screen.blend_mode() == -1)
-				screen.set_blend_mode(BLENDMODE_ADD);
+				screen.m_blend_mode = BLENDMODE_ADD;
 		}
 		m_items.splice(m_items.end(), layers.backdrops);
 		m_items.splice(m_items.end(), layers.screens);
@@ -3180,9 +3181,13 @@ bool layout_view::has_screen(screen_device &screen) const
 
 void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 {
-	// reset the bounds
+	// reset the bounds and collected active items
 	render_bounds scrbounds{ 0.0f, 0.0f, 0.0f, 0.0f };
 	m_bounds = scrbounds;
+	m_screen_items.clear();
+	m_interactive_items.clear();
+	m_interactive_edges_x.clear();
+	m_interactive_edges_y.clear();
 	m_screens.clear();
 
 	// loop over items and filter by visibility mask
@@ -3200,7 +3205,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 			first = false;
 
 			// accumulate visible screens and their bounds bounds
-			if (curitem.m_screen)
+			if (curitem.screen())
 			{
 				if (scrfirst)
 					scrbounds = curitem.m_rawbounds;
@@ -3208,9 +3213,14 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 					union_render_bounds(scrbounds, curitem.m_rawbounds);
 				scrfirst = false;
 
-				// accumulate the screens in use while we're scanning
-				m_screens.emplace_back(*curitem.m_screen);
+				// accumulate active screens
+				m_screen_items.emplace_back(curitem);
+				m_screens.emplace_back(*curitem.screen());
 			}
+
+			// accumulate interactive elements
+			if (!curitem.clickthrough() || curitem.has_input())
+				m_interactive_items.emplace_back(curitem);
 		}
 	}
 
@@ -3239,8 +3249,8 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// determine the scale/offset for normalization
 	float const xoffs = m_bounds.x0;
 	float const yoffs = m_bounds.y0;
-	float const xscale = (target_bounds.x1 - target_bounds.x0) / (m_bounds.x1 - m_bounds.x0);
-	float const yscale = (target_bounds.y1 - target_bounds.y0) / (m_bounds.y1 - m_bounds.y0);
+	float const xscale = target_bounds.width() / m_bounds.width();
+	float const yscale = target_bounds.height() / m_bounds.height();
 
 	// normalize all the item bounds
 	for (item &curitem : items())
@@ -3249,6 +3259,32 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 		curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
 		curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
 		curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
+	}
+
+	// sort edges of interactive items
+	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
+			name(), m_interactive_items.size());
+	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
+	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
+	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
+	{
+		item &curitem(m_interactive_items[i]);
+		LOGMASKED(LOG_INTERACTIVE_ITEMS, "%u: (%s %s %s %s) hasinput=%s clickthrough=%s\n",
+				i, curitem.bounds().x0, curitem.bounds().y0, curitem.bounds().x1, curitem.bounds().y1, curitem.has_input(), curitem.clickthrough());
+		m_interactive_edges_x.emplace_back(i, curitem.bounds().x0, false);
+		m_interactive_edges_x.emplace_back(i, curitem.bounds().x1, true);
+		m_interactive_edges_y.emplace_back(i, curitem.bounds().y0, false);
+		m_interactive_edges_y.emplace_back(i, curitem.bounds().y1, true);
+	}
+	std::sort(m_interactive_edges_x.begin(), m_interactive_edges_x.end());
+	std::sort(m_interactive_edges_y.begin(), m_interactive_edges_y.end());
+
+	if (VERBOSE & LOG_INTERACTIVE_ITEMS)
+	{
+		for (edge const &e : m_interactive_edges_x)
+			LOGMASKED(LOG_INTERACTIVE_ITEMS, "x=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
+		for (edge const &e : m_interactive_edges_y)
+			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 	}
 }
 
@@ -3469,25 +3505,25 @@ layout_view::item::item(
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
-	, m_input_tag(make_input_tag(env, itemnode))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
-	, m_input_shift(0)
-	, m_input_raw(0 != env.get_attribute_int(itemnode, "inputraw", 0))
+	, m_input_shift(get_input_shift(m_input_mask))
+	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
+	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
-	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 	, m_visibility_mask(env.visibility_mask())
+	, m_input_tag(make_input_tag(env, itemnode))
+	, m_rawbounds(make_bounds(env, itemnode, trans))
+	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
-	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1)
-		m_input_shift++;
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -3544,24 +3580,22 @@ int layout_view::item::state() const
 		// if configured to track an output, fetch its value
 		return m_output;
 	}
-	else if (!m_input_tag.empty())
+	else if (m_input_port)
 	{
 		// if configured to an input, fetch the input value
-		if (m_input_port)
+		if (m_input_raw)
 		{
-			if (m_input_raw)
-			{
-				return (m_input_port->read() & m_input_mask) >> m_input_shift;
-			}
-			else
-			{
-				ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
-				if (field)
-					return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
-			}
+			return (m_input_port->read() & m_input_mask) >> m_input_shift;
+		}
+		else
+		{
+			ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
+			if (field)
+				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
 
+	// default to zero
 	return 0;
 }
 
@@ -3584,6 +3618,7 @@ void layout_view::item::resolve_tags()
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
 		if (m_input_port)
 		{
+			// if there's a matching unconditional field, cache it
 			for (ioport_field &field : m_input_port->fields())
 			{
 				if (field.mask() & m_input_mask)
@@ -3593,6 +3628,10 @@ void layout_view::item::resolve_tags()
 					break;
 				}
 			}
+
+			// if clickthrough isn't explicitly configured, having an I/O port implies false
+			if (!m_has_clickthrough)
+				m_clickthrough = false;
 		}
 	}
 }
@@ -3677,6 +3716,22 @@ int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_nod
 		return BLENDMODE_RGB_MULTIPLY;
 	else
 		return BLENDMODE_ALPHA;
+}
+
+
+//---------------------------------------------
+//  get_input_shift - shift to right-align LSB
+//---------------------------------------------
+
+unsigned layout_view::item::get_input_shift(ioport_value mask)
+{
+	unsigned result(0U);
+	while (mask && !BIT(mask, 0))
+	{
+		++result;
+		mask >>= 1;
+	}
+	return result;
 }
 
 

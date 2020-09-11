@@ -1447,21 +1447,115 @@ render_primitive_list &render_target::get_primitives()
 
 bool render_target::map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y)
 {
-	ioport_port *input_port;
-	ioport_value input_mask;
-	return map_point_internal(target_x, target_y, &container, container_x, container_y, input_port, input_mask);
+	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
+
+	// explicitly check for the UI container
+	if (&container == &m_manager.ui_container())
+	{
+		// this hit test went against the UI container
+		if ((target_f.first >= 0.0f) && (target_f.first < 1.0f) && (target_f.second >= 0.0f) && (target_f.second < 1.0f))
+		{
+			// this point was successfully mapped
+			container_x = float(target_x) / m_width;
+			container_y = float(target_y) / m_height;
+			return true;
+		}
+	}
+	else
+	{
+		if (m_orientation & ORIENTATION_FLIP_X)
+			target_f.first = 1.0f - target_f.first;
+		if (m_orientation & ORIENTATION_FLIP_Y)
+			target_f.second = 1.0f - target_f.second;
+		if (m_orientation & ORIENTATION_SWAP_XY)
+			std::swap(target_f.first, target_f.second);
+
+		// try to find the right container
+		auto const &items(current_view().screen_items());
+		auto const found(std::find_if(
+					items.begin(),
+					items.end(),
+					[&container] (layout_view::item &item) { return &item.screen()->container() == &container; }));
+		if (items.end() != found)
+		{
+			layout_view::item &item(*found);
+			if (item.bounds().includes(target_f.first, target_f.second))
+			{
+				// point successfully mapped
+				container_x = (target_f.first - item.bounds().x0) / item.bounds().width();
+				container_y = (target_f.second - item.bounds().y0) / item.bounds().height();
+				return true;
+			}
+		}
+	}
+
+	// default to point not mapped
+	container_x = container_y = -1.0f;
+	return false;
 }
 
 
 //-------------------------------------------------
 //  map_point_input - attempts to map a point on
-//  the specified render_target to the specified
-//  container, if possible
+//  the specified render_target to an input port
+//  field, if possible
 //-------------------------------------------------
 
 bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
-	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);
+	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
+	if (m_orientation & ORIENTATION_FLIP_X)
+		target_f.first = 1.0f - target_f.first;
+	if (m_orientation & ORIENTATION_FLIP_Y)
+		target_f.second = 1.0f - target_f.second;
+	if (m_orientation & ORIENTATION_SWAP_XY)
+		std::swap(target_f.first, target_f.second);
+
+	auto const &items(current_view().interactive_items());
+	m_hit_test.resize(items.size() * 2);
+	std::fill(m_hit_test.begin(), m_hit_test.end(), false);
+
+	for (auto const &edge : current_view().interactive_edges_x())
+	{
+		if ((edge.position() > target_f.first) || ((edge.position() == target_f.first) && edge.trailing()))
+			break;
+		else
+			m_hit_test[edge.index()] = !edge.trailing();
+	}
+
+	for (auto const &edge : current_view().interactive_edges_y())
+	{
+		if ((edge.position() > target_f.second) || ((edge.position() == target_f.second) && edge.trailing()))
+			break;
+		else
+			m_hit_test[items.size() + edge.index()] = !edge.trailing();
+	}
+
+	for (unsigned i = 0; items.size() > i; ++i)
+	{
+		if (m_hit_test[i] && m_hit_test[items.size() + i])
+		{
+			layout_view::item &item(items[i]);
+			if (item.has_input())
+			{
+				// point successfully mapped
+				input_port = item.input_tag_and_mask(input_mask);
+				input_x = (target_f.first - item.bounds().x0) / item.bounds().width();
+				input_y = (target_f.second - item.bounds().y0) / item.bounds().height();
+				return true;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+
+	// default to point not mapped
+	input_port = nullptr;
+	input_mask = 0;
+	input_x = input_y = -1.0f;
+	return false;
 }
 
 
@@ -1528,6 +1622,8 @@ void render_target::resolve_tags()
 		for (layout_view &view : file.views())
 		{
 			view.resolve_tags();
+			if (&current_view() == &view)
+				view.recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
 		}
 	}
 }
@@ -2468,7 +2564,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 //  mapping points
 //-------------------------------------------------
 
-bool render_target::map_point_internal(s32 target_x, s32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask)
+std::pair<float, float> render_target::map_point_internal(s32 target_x, s32 target_y)
 {
 	// compute the visible width/height
 	s32 viswidth, visheight;
@@ -2476,65 +2572,14 @@ bool render_target::map_point_internal(s32 target_x, s32 target_y, render_contai
 
 	// create a root transform for the target
 	object_transform root_xform;
-	root_xform.xoffs = (float)(m_width - viswidth) / 2;
-	root_xform.yoffs = (float)(m_height - visheight) / 2;
-
-	// default to point not mapped
-	mapped_x = -1.0;
-	mapped_y = -1.0;
-	mapped_input_port = nullptr;
-	mapped_input_mask = 0;
+	root_xform.xoffs = float(m_width - viswidth) / 2;
+	root_xform.yoffs = float(m_height - visheight) / 2;
 
 	// convert target coordinates to float
-	float target_fx = (float)(target_x - root_xform.xoffs) / viswidth;
-	float target_fy = (float)(target_y - root_xform.yoffs) / visheight;
-	if (m_manager.machine().ui().is_menu_active())
-	{
-		target_fx = (float)target_x / m_width;
-		target_fy = (float)target_y / m_height;
-	}
-	// explicitly check for the UI container
-	if (container != nullptr && container == &m_manager.ui_container())
-	{
-		// this hit test went against the UI container
-		if (target_fx >= 0.0f && target_fx < 1.0f && target_fy >= 0.0f && target_fy < 1.0f)
-		{
-			// this point was successfully mapped
-			mapped_x = (float)target_x / m_width;
-			mapped_y = (float)target_y / m_height;
-			return true;
-		}
-		return false;
-	}
-
-	// iterate over items in the view
-	for (layout_view::item &item : current_view().items())
-	{
-		if ((visibility_mask() & item.visibility_mask()) != item.visibility_mask())
-			continue;
-
-		bool checkit;
-
-		// if we're looking for a particular container, verify that we have the right one
-		if (container != nullptr)
-			checkit = (item.screen() != nullptr && &item.screen()->container() == container);
-
-		// otherwise, assume we're looking for an input
-		else
-			checkit = item.has_input();
-
-		// this target is worth looking at; now check the point
-		if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
-		{
-			// point successfully mapped
-			mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
-			mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
-			mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
-			return true;
-		}
-	}
-
-	return false;
+	if (!m_manager.machine().ui().is_menu_active())
+		return std::make_pair(float(target_x - root_xform.xoffs) / viswidth, float(target_y - root_xform.yoffs) / visheight);
+	else
+		return std::make_pair(float(target_x) / m_width, float(target_y) / m_height);
 }
 
 
@@ -2556,18 +2601,12 @@ layout_view *render_target::view_by_index(unsigned index)
 
 int render_target::view_index(layout_view &targetview) const
 {
-	// find the first named match
-	int index = 0;
-
-	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file const &file : m_filelist)
-		for (layout_view const &view : file.views())
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
-			{
-				if (&targetview == &view)
-					return index;
-				index++;
-			}
+	// return index of view, or zero if not found
+	for (int index = 0; m_views.size() > index; ++index)
+	{
+		if (&m_views[index].first.get() == &targetview)
+			return index;
+	}
 	return 0;
 }
 
