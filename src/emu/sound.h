@@ -60,6 +60,9 @@ constexpr u32 SAMPLE_RATE_INVALID = 0xffffffff;
 constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xfffffffe;
 constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
 
+// anything below this sample rate is effectively treated as "off"
+constexpr u32 SAMPLE_RATE_MINIMUM = 50;
+
 
 
 //**************************************************************************

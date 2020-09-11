@@ -88,9 +88,10 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	if (rate == m_sample_rate)
 		return;
 
-	// translate a rate of 0 to a rate of 1 to make the math work out
-	if (rate == 0)
-		rate = 1;
+	// force resampling off if coming to or from an invalid rate
+	sound_assert(rate >= SAMPLE_RATE_MINIMUM - 1);
+	if (rate < SAMPLE_RATE_MINIMUM || m_sample_rate < SAMPLE_RATE_MINIMUM)
+		resample = false;
 
 	// note the time and period of the current buffer (end_time is AFTER the final sample)
 	attotime prevperiod = sample_period();
@@ -117,8 +118,10 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 		if (!new_rate_higher)
 			backfill_downsample(&buffer[0], buffered_samples, newend, newperiod);
 		else
+		{
 			for (int index = 0; index < buffered_samples; index++)
 				buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
+		}
 	}
 
 	// ensure our buffer is large enough to hold a full second at the new rate
@@ -130,7 +133,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	m_sample_attos = newperiod.attoseconds();
 
 	// compute the new end sample index based on the buffer time
-	m_end_sample = (rate != 0) ? time_to_buffer_index(prevend, false, true) : 0;
+	m_end_sample = time_to_buffer_index(prevend, false, true);
 
 	// if the new rate is higher, upsample from our temporary buffer;
 	// otherwise just copy our previously-downsampled data
@@ -145,8 +148,10 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 		if (new_rate_higher)
 			backfill_upsample(&buffer[0], buffered_samples, prevend, prevperiod);
 		else
+		{
 			for (int index = 0; index < buffered_samples; index++)
 				m_buffer[clamp_index(m_end_sample - 1 - index)] = buffer[index];
+		}
 	}
 
 	// if not resampling, clear the buffer
@@ -526,7 +531,7 @@ void sound_stream_input::apply_sample_rate_changes(u32 updatenum, u32 downstream
 sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, sound_stream_flags flags) :
 	m_device(device),
 	m_next(nullptr),
-	m_sample_rate((sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
+	m_sample_rate((sample_rate < SAMPLE_RATE_MINIMUM) ? (SAMPLE_RATE_MINIMUM - 1) : (sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
 	m_pending_sample_rate(SAMPLE_RATE_INVALID),
 	m_last_sample_rate_update(0),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
@@ -712,7 +717,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 		// skip if nothing to do
 		u32 samples = m_output_view[0].samples();
 		sound_assert(samples >= 0);
-		if (samples != 0)
+		if (samples != 0 && m_sample_rate >= SAMPLE_RATE_MINIMUM)
 		{
 			sound_assert(!synchronous() || samples == 1);
 
@@ -744,8 +749,8 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 				m_output[outindex].m_buffer.flush_wav();
 #endif
 		}
-		g_profiler.stop();
 	}
+	g_profiler.stop();
 
 	// return the requested view
 	return read_stream_view(m_output[outputnum].view(start, end));
@@ -762,6 +767,11 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 	// grab the new rate and invalidate
 	u32 new_rate = (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate;
 	m_pending_sample_rate = SAMPLE_RATE_INVALID;
+
+	// clamp to the minimum - 1 (anything below minimum means "off" and
+	// will not call the sound callback at all)
+	if (new_rate < SAMPLE_RATE_MINIMUM)
+		new_rate = SAMPLE_RATE_MINIMUM - 1;
 
 	// if we're input adaptive, override with the rate of our input
 	if (input_adaptive() && m_input.size() > 0 && m_input[0].valid())
