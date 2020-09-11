@@ -504,7 +504,7 @@ copyright-holders:Roberto Lavarone
 			<bounds x="724" y="74" width="375" height="480" />
 		</element>
 
-		<screen index="0">
+		<screen index="0" blend="add">
 			<bounds x="65" y="74" width="640" height="480" />
 		</screen>
 
