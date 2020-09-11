@@ -5,11 +5,20 @@
 #include "ymopn.h"
 
 //
-// Special thanks to:
-//   Nemesis for lots of excellent research on the YM2612
-//   David Viens and Hubert Lamontagne for additional details and documentation
+// This emulator is written from the ground-up based on analysis and deduction
+// by Nemesis, particularly in this thread:
 //
-// Search for QUESTION to find areas where I am unsure
+//    https://gendev.spritesmind.net/forum/viewtopic.php?f=24&t=386
+//
+// The core assumption is that these details apply to all OPN variants unless
+// otherwise proven incorrect. The fine details of this implementation have
+// also been cross-checked against Nemesis' implementation in his Exodus
+// emulator.
+//
+// Operator and channel summing/mixing code is largely based off of research
+// done by David Viens and Hubert Lamontagne.
+//
+// Search for QUESTION to find areas where I am unsure.
 //
 // ===================================================================================
 //
@@ -775,7 +784,9 @@ void ymopn_channel::clock(u32 env_counter, u8 lfo_counter, bool multi_freq)
 
 //-------------------------------------------------
 //  output - combine the operators according to the
-//  specified algorithm, returning a 14-bit sum
+//  specified algorithm, returning a sum according
+//  to the rshift and clipmax parameters, which
+//  vary between different OPN implementations
 //-------------------------------------------------
 
 void ymopn_channel::output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const

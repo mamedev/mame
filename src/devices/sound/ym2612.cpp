@@ -5,6 +5,12 @@
 #include "ym2612.h"
 
 
+// the YM2612/YM3438 just timeslice the output among all channels
+// instead of summing them; turn this on to simulate (may create
+// audible issues)
+#define MULTIPLEX_YM2612_YM3438_OUTPUT (0)
+
+
 DEFINE_DEVICE_TYPE(YM2612, ym2612_device, "ym2612", "YM2612 OPN2")
 DEFINE_DEVICE_TYPE(YM3438, ym3438_device, "ym3438", "YM3438 OPN2C")
 DEFINE_DEVICE_TYPE(YMF276, ymf276_device, "ymf276", "YMF276 OPN2L")
@@ -25,10 +31,8 @@ ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, dev
 	m_stream(nullptr),
 	m_address(0),
 	m_dac_data(0),
-	m_dac_enable(0)
-#if MULTIPLEX_YM2612_YM3438_OUTPUT
-	,m_channel(0)
-#endif
+	m_dac_enable(0),
+	m_channel(0)
 {
 }
 
@@ -80,7 +84,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 
 			// DAC data
 			if (m_address == 0x2a)
-				m_dac_data = (m_dac_data & ~0x1fe) | (value << 1);
+				m_dac_data = (m_dac_data & ~0x1fe) | ((value ^ 0x80) << 1);
 
 			// DAC enable
 			else if (m_address == 0x2b)
@@ -126,11 +130,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 void ym2612_device::device_start()
 {
 	// create our stream
-#if MULTIPLEX_YM2612_YM3438_OUTPUT
-	m_stream = stream_alloc(0, 2, clock() / (4 * 6));
-#else
 	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
-#endif
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -139,9 +139,7 @@ void ym2612_device::device_start()
 	save_item(YMOPN_NAME(m_address));
 	save_item(YMOPN_NAME(m_dac_data));
 	save_item(YMOPN_NAME(m_dac_enable));
-#if MULTIPLEX_YM2612_YM3438_OUTPUT
 	save_item(YMOPN_NAME(m_channel));
-#endif
 
 	// save the the engines
 	m_opn.save(*this);
@@ -159,9 +157,7 @@ void ym2612_device::device_reset()
 
 	// reset our internal state
 	m_dac_enable = 0;
-#if MULTIPLEX_YM2612_YM3438_OUTPUT
 	m_channel = 0;
-#endif
 }
 
 
@@ -171,11 +167,7 @@ void ym2612_device::device_reset()
 
 void ym2612_device::device_clock_changed()
 {
-#if MULTIPLEX_YM2612_YM3438_OUTPUT
-	m_stream->set_sample_rate(clock() / (4 * 6));
-#else
-	m_stream->set_sample_rate(clock() / (4 * 6 * 6));
-#endif
+	m_stream->set_sample_rate(clock() / (4 * 6 * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : 6)));
 }
 
 
@@ -196,94 +188,69 @@ void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void ym2612_device::sound_stream_update_common(stream_sample_t *outl, stream_sample_t *outr, int samples, bool discontinuity)
 {
-	// mask off channel 6 if DAC is enabled
-	u8 const opn_mask = m_dac_enable ? 0x1f : 0x3f;
-
-#if MULTIPLEX_YM2612_YM3438_OUTPUT
-
 	// iterate over all target samples
-	for (int sampindex = 0; sampindex < samples; sampindex++)
+	s32 lsum = 0, rsum = 0;
+	for (int sampindex = 0; sampindex < samples; )
 	{
 		// clock the OPN when we hit channel 0
 		if (m_channel == 0)
-			m_opn.clock(opn_mask);
-
-		// update the OPN content; OPN2 is 9-bit with intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		if (m_channel == 5 && m_dac_enable)
-			lsum = rsum = m_dac_data;
-		else
-			m_opn.output(lsum, rsum, 5, 256, 1 << m_channel);
-
-		// hiccup in the DAC means that there is a larger gap between 0 and -1
-		if (discontinuity)
 		{
-			if (lsum < 0)
-				lsum--;
-			if (rsum < 0)
-				rsum--;
+			lsum = rsum = 0;
+			m_opn.clock(0x3f);
 		}
 
-		// shift up to 16 bits
-		lsum <<= 7;
-		rsum <<= 7;
+		// update the OPN content; OPN2 is 9-bit with intermediate clipping
+		s32 lchan = 0, rchan = 0;
+		if (m_channel != 5 || !m_dac_enable)
+			m_opn.output(lchan, rchan, 5, 256, 1 << m_channel);
+		else
+			lchan = rchan = s16(m_dac_data << 7) >> 7;
 
-		// YM2612 is stereo
-		outl[sampindex] = lsum;
-		outr[sampindex] = rsum;
+		// hiccup in the internal YM2612 DAC means that there is a rather large
+		// step between 0 and -1 (close to 6x the normal step); the approximation
+		// below gives a reasonable estimation of this discontinuity, which was
+		// fixed in the YM3438
+		if (discontinuity)
+		{
+			if (lchan < 0)
+				lchan -= 2;
+			else
+				lchan += 3;
+			if (rchan < 0)
+				rchan -= 2;
+			else
+				rchan += 3;
+		}
 
-		// next channel
+		// if multiplexing, just scale to 16 bits and output
+		if (MULTIPLEX_YM2612_YM3438_OUTPUT)
+		{
+			outl[sampindex] = lchan << 7;
+			outr[sampindex] = rchan << 7;
+			sampindex++;
+		}
+
+		// if not, accumulate the sums
+		else
+		{
+			lsum += lchan;
+			rsum += rchan;
+
+			// on the last channel, output and reset the sums
+			if (m_channel == 5)
+			{
+				outl[sampindex] = (lsum << 7) / 6;
+				outr[sampindex] = (rsum << 7) / 6;
+				sampindex++;
+				lsum = rsum = 0;
+			}
+		}
+
+		// advance to the next channel
 		m_channel++;
 		if (m_channel >= 6)
 			m_channel = 0;
 	}
-
-#else
-
-	// iterate over all target samples
-	for (int sampindex = 0; sampindex < samples; sampindex++)
-	{
-		// clock the OPN
-		m_opn.clock(opn_mask);
-
-		// update the OPN content; OPN2 is 9-bit with intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		m_opn.output(lsum, rsum, 5, 256, opn_mask);
-
-		// add in DAC if enabled
-		if (m_dac_enable)
-		{
-			lsum += m_dac_data;
-			rsum += m_dac_data;
-		}
-
-		// hiccup in the DAC means that there is a larger gap between 0 and -1
-		if (discontinuity)
-		{
-			if (lsum < 0)
-				lsum--;
-			if (rsum < 0)
-				rsum--;
-		}
-
-		// shift back up to 14 bits
-		lsum <<= 5;
-		rsum <<= 5;
-
-		// OPN2 is stereo
-		if (lsum < -32768)
-			lsum = -32768;
-		else if (lsum > 32767)
-			lsum = 32767;
-		if (rsum < -32768)
-			rsum = -32768;
-		else if (rsum > 32767)
-			rsum = 32767;
-		outl[sampindex] = lsum;
-		outr[sampindex] = rsum;
-	}
-
-#endif
 }
 
 

@@ -9,12 +9,6 @@
 #include "ymopn.h"
 
 
-// the YM2612/YM3438 just timeslice the output among all channels
-// instead of summing them; turn this on to simulate (may create
-// audible issues)
-#define MULTIPLEX_YM2612_YM3438_OUTPUT (0)
-
-
 // ======================> ym2612_device
 
 DECLARE_DEVICE_TYPE(YM2612, ym2612_device);
@@ -42,6 +36,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal helpers
+	bool multiplexed() const { return BIT(m_channel, 7); }
 	void sound_stream_update_common(stream_sample_t *outl, stream_sample_t *outr, int samples, bool discontinuity);
 
 	// internal state
@@ -50,9 +45,7 @@ protected:
 	u16 m_address;                   // address register
 	u16 m_dac_data;                  // 9-bit DAC data
 	u8 m_dac_enable;                 // DAC enabled?
-#if (MULTIPLEX_YM2612_YM3438_OUTPUT)
 	u8 m_channel;                    // current multiplexed channel
-#endif
 };
 
 
