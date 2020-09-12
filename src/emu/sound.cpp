@@ -332,7 +332,7 @@ void stream_buffer::backfill_upsample(sample_t const *src, int samples, attotime
 			break;
 
 		// write this sample, and back up to the next sample time
-		put(m_end_sample - 1 - dstindex, src[srcindex]);
+		put(clamp_index(m_end_sample - 1 - dstindex), src[srcindex]);
 		time -= sample_period();
 	}
 }

@@ -39,6 +39,17 @@
 	which is in the future, because it knows it will hold that last
 	sample until 1.0s.
 
+	Sound generation callbacks are presented with a std::vector of inputs
+	and outputs. The vectors contain objects of read_stream_view and
+	write_stream_view respectively, which wrap access to a circular buffer
+	of samples. Sound generation callbacks are expected to fill all the
+	samples described by the outputs' write_stream_view objects. At the
+	moment, all outputs have the same sample rate, so the number of samples
+	that need to be generated will be consistent across all outputs.
+
+	By default, the inputs will have been resampled to match the output
+	sample rate, unless otherwise specified.
+
 ***************************************************************************/
 
 #pragma once
@@ -89,8 +100,11 @@ constexpr u32 SAMPLE_RATE_MINIMUM = 50;
 
 class stream_buffer
 {
+	// stream_buffer is a largely internal class, not directly accessed
+	// outside of the classes below
 	friend class read_stream_view;
 	friend class write_stream_view;
+	friend class sound_stream_output;
 
 public:
 	using sample_t = float;
@@ -106,15 +120,16 @@ public:
 	// return the current sample rate
 	u32 sample_rate() const { return m_sample_rate; }
 
+	// set a new sample rate
+	void set_sample_rate(u32 rate, bool resample);
+
+private:
 	// return the current sample period in attoseconds
 	attoseconds_t sample_period_attoseconds() const { return m_sample_attos; }
 	attotime sample_period() const { return attotime(0, m_sample_attos); }
 
 	// return the attotime of the current end of buffer
 	attotime end_time() const { return index_time(m_end_sample); }
-
-	// set a new sample rate
-	void set_sample_rate(u32 rate, bool resample);
 
 	// set the ending time (for forced resyncs; generally not used)
 	void set_end_time(attotime time)
@@ -126,7 +141,8 @@ public:
 	// read the sample at the given index (clamped); should be valid in all cases
 	sample_t get(s32 index) const
 	{
-		sample_t value = m_buffer[clamp_index(index)];
+		sound_assert(u32(index) < m_sample_rate);
+		sample_t value = m_buffer[index];
 #if (SOUND_DEBUG)
 		sound_assert(!std::isnan(value));
 #endif
@@ -136,17 +152,10 @@ public:
 	// write the sample at the given index (clamped)
 	void put(s32 index, sample_t data)
 	{
-		m_buffer[clamp_index(index)] = data;
+		sound_assert(u32(index) < m_sample_rate);
+		m_buffer[index] = data;
 	}
 
-#if (SOUND_DEBUG)
-	// for debugging, provide an interface to write a WAV stream
-	void open_wav(char const *filename);
-	void flush_wav();
-	void close_wav();
-#endif
-
-private:
 	// clamp an index to the size of the buffer; allows for indexing +/- one
 	// buffers' worth of range
 	u32 clamp_index(s32 index) const
@@ -179,6 +188,13 @@ private:
 	std::vector<sample_t> m_buffer;       // vector of actual buffer data
 
 #if (SOUND_DEBUG)
+public:
+	// for debugging, provide an interface to write a WAV stream
+	void open_wav(char const *filename);
+	void flush_wav();
+	void close_wav();
+
+private:
 	// internal debugging state
 	wav_file *m_wav_file = nullptr;       // pointer to the current WAV file
 	u32 m_last_written = 0;               // last written sample index
@@ -279,7 +295,8 @@ public:
 		sound_assert(u32(index) < samples());
 		if (u32(index) >= samples())
 			return 0;
-		return m_buffer->get(m_start + index) * m_gain;
+		index = m_buffer->clamp_index(m_start + index);
+		return m_buffer->get(index) * m_gain;
 	}
 
 	// safely fetch a raw sample from the buffer; if you use this, you need to
@@ -289,7 +306,8 @@ public:
 		sound_assert(u32(index) < samples());
 		if (u32(index) >= samples())
 			return 0;
-		return m_buffer->get(m_start + index);
+		index = m_buffer->clamp_index(m_start + index);
+		return m_buffer->get(index);
 	}
 
 protected:
@@ -338,7 +356,10 @@ public:
 	{
 		sound_assert(u32(index) < samples());
 		if (u32(index) < samples())
-			m_buffer->put(m_start + index, sample);
+		{
+			index = m_buffer->clamp_index(m_start + index);
+			m_buffer->put(index, sample);
+		}
 	}
 
 	// safely add a gain-applied sample to the buffer
@@ -346,7 +367,10 @@ public:
 	{
 		sound_assert(u32(index) < samples());
 		if (u32(index) < samples())
-			m_buffer->put(m_start + index, m_buffer->get(m_start + index) + sample);
+		{
+			index = m_buffer->clamp_index(m_start + index);
+			m_buffer->put(index, m_buffer->get(index) + sample);
+		}
 	}
 
 	// fill part of the view with the given value
