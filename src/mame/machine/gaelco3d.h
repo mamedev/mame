@@ -30,11 +30,11 @@ public:
 	void data_w(uint8_t data);
 	uint8_t data_r();
 	DECLARE_WRITE_LINE_MEMBER(rts_w);
-	/* Set to 1 during transmit, 0 for receive */
+	// Set to 1 during transmit, 0 for receive
 	DECLARE_WRITE_LINE_MEMBER(tr_w);
 
 
-	/* Big questions marks, related to serial i/o */
+	// Big questions marks, related to serial i/o
 
 	/* Not used in surfplnt, but in radikalb
 	 * Set at beginning of transfer sub, cleared at end
@@ -42,8 +42,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(unknown_w);
 
 
-	/* only used in radikalb, set at beginning of receive isr, cleared at end */
+	// only used in radikalb, set at beginning of receive isr, cleared at end
 	DECLARE_WRITE_LINE_MEMBER(irq_enable);
+
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 
 protected:
 	// device-level overrides
