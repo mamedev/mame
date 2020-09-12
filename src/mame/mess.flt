@@ -642,6 +642,7 @@ nes.cpp
 nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
+nes_vt_newer.cpp
 newbrain.cpp
 news_38xx.cpp
 news_68k.cpp
