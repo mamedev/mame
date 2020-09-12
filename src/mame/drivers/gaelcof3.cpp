@@ -34,10 +34,16 @@
   The PCBs were inside two "Coche de Bomberos" kiddie rides from CMC Cresmatic (https://www.recreativas.org/coche-de-bomberos-6022-cresmatic).
   Anyway, the hardware is generic enough to serve any basic kiddie ride.
 
-  The only dumped ROM on the PCB is the Oki sound samples. There are three different versions dumped (from different machines):
+  There are three different versions dumped (from different machines):
      -"Susanita" - Based on the song composed by Rafael Pérez Botija.
      -"El auto feo" - Based on the song composed by Enrique Fischer 'Pipo Pescador'.
      -"Hola Don Pepito" - Based on the song composed by Ramón del Rivero.
+
+  The PIC16C56 from Hola Don Pepito has been decapped. It is believed it has the same contents for all games.
+
+  TODO:
+  inputs;
+  Oki hook up is possibly more complex.
 */
 
 #include "emu.h"
@@ -57,40 +63,47 @@ public:
 	void gaelcof3(machine_config &config);
 
 private:
-	required_device<cpu_device>     m_maincpu;
+	required_device<pic16c56_device> m_maincpu;
 };
 
 
-static INPUT_PORTS_START( gaelcof3 )
+static INPUT_PORTS_START( gaelcof3 ) // defined as buttons only for easier testing
 	PORT_START("IN0")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
 	PORT_START("DSW1") // only 6 switches
-	PORT_DIPNAME( 0x01, 0x01, "DSW1-1" )        PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x30, "25 Pesetas" )
+	PORT_DIPSETTING(    0x20, "100 Pesetas" )
+	PORT_DIPSETTING(    0x10, "50 Pesetas" )
+	PORT_DIPSETTING(    0x00, "200 Pesetas" )
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW1:5,4,3")
+	PORT_DIPSETTING(    0x0e, "42 seconds" )
+	PORT_DIPSETTING(    0x0c, "56 seconds" )
+	PORT_DIPSETTING(    0x0a, "70 seconds" )
+	PORT_DIPSETTING(    0x08, "84 seconds" )
+	PORT_DIPSETTING(    0x06, "98 seconds" )
+	PORT_DIPSETTING(    0x04, "112 seconds" )
+	PORT_DIPSETTING(    0x02, "126 seconds" )
+	PORT_DIPSETTING(    0x00, "140 seconds" )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1-2" )        PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW1-3" )        PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1-4" )        PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1-5" )        PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1-6" )        PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )
 INPUT_PORTS_END
 
 
 void gaelcof3_state::gaelcof3(machine_config &config)
 {
 	PIC16C56(config, m_maincpu, 4000000); // clock not confirmed
+	m_maincpu->read_a().set_ioport("IN0");
+	m_maincpu->write_a().set([this] (uint8_t data) { logerror("port A write: %02x\n", data); });
+	m_maincpu->read_b().set_ioport("DSW1");
+	m_maincpu->write_b().set("oki", FUNC(okim6295_device::write));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -99,24 +112,26 @@ void gaelcof3_state::gaelcof3(machine_config &config)
 
 
 ROM_START( autopapa )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "pic16c56.u3", 0x000, 0x800, NO_DUMP )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	// this was decapped and dumped for donpepito, should be the same but marking it as bad dump for overcautiousness
+	ROM_LOAD( "pic16c56.u3", 0x0000, 0x1fff, BAD_DUMP CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "autopapa.u1", 0x00000, 0x40000, CRC(a3e5607e) SHA1(24a9c79edec7b2f7f64b622240f2ad8f3ffa29ca) )
 ROM_END
 
 ROM_START( donpepito )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "pic16c56.u3", 0x000, 0x800, NO_DUMP )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "don_pepito.u1", 0x00000, 0x40000, CRC(574fcd14) SHA1(a23f1eb6d2cef5aa07df3a553fe1d33803648f43) )
 ROM_END
 
 ROM_START( susanita )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "pic16c56.u3", 0x000, 0x800, NO_DUMP )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	// this was decapped and dumped for donpepito, should be the same but marking it as bad dump for overcautiousness
+	ROM_LOAD( "pic16c56.u3", 0x0000, 0x1fff, BAD_DUMP CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "susanita.u1", 0x00000, 0x40000, CRC(766868cb) SHA1(eb42dc46b865bc448052d9d67c840e51c49ce49a) )
