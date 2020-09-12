@@ -370,7 +370,7 @@ $(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
 	$(PYTHON) create_modules.py $^ > $@
 
 .PHONY: generated
-generated: ../generated/lib_entries.hxx ../generated/nld_devinc.h
+generated: $(SRC)/generated/lib_entries.hxx $(SRC)/generated/nld_devinc.h $(SRC)/generated/nlm_modules_lib.cpp
 
 #-------------------------------------------------
 # clang tidy

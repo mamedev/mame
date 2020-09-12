@@ -288,6 +288,12 @@
     <ClCompile Include="..\devices\nld_9321.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\generated\nlm_modules_lib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_RTEST.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nl_errstr.h">
