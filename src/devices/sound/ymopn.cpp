@@ -11,9 +11,11 @@
 //    https://gendev.spritesmind.net/forum/viewtopic.php?f=24&t=386
 //
 // The core assumption is that these details apply to all OPN variants unless
-// otherwise proven incorrect. The fine details of this implementation have
-// also been cross-checked against Nemesis' implementation in his Exodus
-// emulator.
+// otherwise proven incorrect.
+//
+// The fine details of this implementation have also been cross-checked against
+// Nemesis' implementation in his Exodus emulator, as well as Alexey Khokholov's
+// "Nuked" implementation based off die shots.
 //
 // Operator and channel summing/mixing code is largely based off of research
 // done by David Viens and Hubert Lamontagne.
@@ -116,7 +118,7 @@
 inline u16 abs_sin_attenuation(u16 input)
 {
 	// the values here are stored as 4.8 logarithmic values for 1/4 phase
-	// this matches the internal format of the OPN chip
+	// this matches the internal format of the OPN chip, extracted from the die
 	static u16 const s_sin_table[256] =
 	{
 		0x859,0x6c3,0x607,0x58b,0x52e,0x4e4,0x4a6,0x471,0x443,0x41a,0x3f5,0x3d3,0x3b5,0x398,0x37e,0x365,
@@ -155,31 +157,30 @@ inline u16 abs_sin_attenuation(u16 input)
 
 inline u16 attenuation_to_volume(u16 input)
 {
-	// this table contains the 11-bit values stored on-chip, but here
-	// they are left-shifted by 2 bits to save a runtime shift in
-	// calculating the final value
+	// the values here are 10-bit mantissas with an implied leading bit
+	// this matches the internal format of the OPN chip, extracted from the die
 	static u16 const s_power_table[256] =
 	{
-		0x1fe8,0x1fd4,0x1fbc,0x1fa8,0x1f90,0x1f7c,0x1f68,0x1f50,0x1f3c,0x1f24,0x1f10,0x1efc,0x1ee4,0x1ed0,0x1eb8,0x1ea4,
-		0x1e90,0x1e7c,0x1e64,0x1e50,0x1e3c,0x1e28,0x1e10,0x1dfc,0x1de8,0x1dd4,0x1dc0,0x1da8,0x1d94,0x1d80,0x1d6c,0x1d58,
-		0x1d44,0x1d30,0x1d1c,0x1d08,0x1cf4,0x1ce0,0x1ccc,0x1cb8,0x1ca4,0x1c90,0x1c7c,0x1c68,0x1c54,0x1c40,0x1c2c,0x1c18,
-		0x1c08,0x1bf4,0x1be0,0x1bcc,0x1bb8,0x1ba4,0x1b94,0x1b80,0x1b6c,0x1b58,0x1b48,0x1b34,0x1b20,0x1b10,0x1afc,0x1ae8,
-		0x1ad4,0x1ac4,0x1ab0,0x1aa0,0x1a8c,0x1a78,0x1a68,0x1a54,0x1a44,0x1a30,0x1a20,0x1a0c,0x19fc,0x19e8,0x19d8,0x19c4,
-		0x19b4,0x19a0,0x1990,0x197c,0x196c,0x195c,0x1948,0x1938,0x1924,0x1914,0x1904,0x18f0,0x18e0,0x18d0,0x18c0,0x18ac,
-		0x189c,0x188c,0x1878,0x1868,0x1858,0x1848,0x1838,0x1824,0x1814,0x1804,0x17f4,0x17e4,0x17d4,0x17c0,0x17b0,0x17a0,
-		0x1790,0x1780,0x1770,0x1760,0x1750,0x1740,0x1730,0x1720,0x1710,0x1700,0x16f0,0x16e0,0x16d0,0x16c0,0x16b0,0x16a0,
-		0x1690,0x1680,0x1670,0x1664,0x1654,0x1644,0x1634,0x1624,0x1614,0x1604,0x15f8,0x15e8,0x15d8,0x15c8,0x15bc,0x15ac,
-		0x159c,0x158c,0x1580,0x1570,0x1560,0x1550,0x1544,0x1534,0x1524,0x1518,0x1508,0x14f8,0x14ec,0x14dc,0x14d0,0x14c0,
-		0x14b0,0x14a4,0x1494,0x1488,0x1478,0x146c,0x145c,0x1450,0x1440,0x1430,0x1424,0x1418,0x1408,0x13fc,0x13ec,0x13e0,
-		0x13d0,0x13c4,0x13b4,0x13a8,0x139c,0x138c,0x1380,0x1370,0x1364,0x1358,0x1348,0x133c,0x1330,0x1320,0x1314,0x1308,
-		0x12f8,0x12ec,0x12e0,0x12d4,0x12c4,0x12b8,0x12ac,0x12a0,0x1290,0x1284,0x1278,0x126c,0x1260,0x1250,0x1244,0x1238,
-		0x122c,0x1220,0x1214,0x1208,0x11f8,0x11ec,0x11e0,0x11d4,0x11c8,0x11bc,0x11b0,0x11a4,0x1198,0x118c,0x1180,0x1174,
-		0x1168,0x115c,0x1150,0x1144,0x1138,0x112c,0x1120,0x1114,0x1108,0x10fc,0x10f0,0x10e4,0x10d8,0x10cc,0x10c0,0x10b4,
-		0x10a8,0x10a0,0x1094,0x1088,0x107c,0x1070,0x1064,0x1058,0x1050,0x1044,0x1038,0x102c,0x1020,0x1018,0x100c,0x1000
+		0x000,0x003,0x006,0x008,0x00b,0x00e,0x011,0x014,0x016,0x019,0x01c,0x01f,0x022,0x025,0x028,0x02a,
+		0x02d,0x030,0x033,0x036,0x039,0x03c,0x03f,0x042,0x045,0x048,0x04b,0x04e,0x051,0x054,0x057,0x05a,
+		0x05d,0x060,0x063,0x066,0x069,0x06c,0x06f,0x072,0x075,0x078,0x07b,0x07e,0x082,0x085,0x088,0x08b,
+		0x08e,0x091,0x094,0x098,0x09b,0x09e,0x0a1,0x0a4,0x0a8,0x0ab,0x0ae,0x0b1,0x0b5,0x0b8,0x0bb,0x0be,
+		0x0c2,0x0c5,0x0c8,0x0cc,0x0cf,0x0d2,0x0d6,0x0d9,0x0dc,0x0e0,0x0e3,0x0e7,0x0ea,0x0ed,0x0f1,0x0f4,
+		0x0f8,0x0fb,0x0ff,0x102,0x106,0x109,0x10c,0x110,0x114,0x117,0x11b,0x11e,0x122,0x125,0x129,0x12c,
+		0x130,0x134,0x137,0x13b,0x13e,0x142,0x146,0x149,0x14d,0x151,0x154,0x158,0x15c,0x160,0x163,0x167,
+		0x16b,0x16f,0x172,0x176,0x17a,0x17e,0x181,0x185,0x189,0x18d,0x191,0x195,0x199,0x19c,0x1a0,0x1a4,
+		0x1a8,0x1ac,0x1b0,0x1b4,0x1b8,0x1bc,0x1c0,0x1c4,0x1c8,0x1cc,0x1d0,0x1d4,0x1d8,0x1dc,0x1e0,0x1e4,
+		0x1e8,0x1ec,0x1f0,0x1f5,0x1f9,0x1fd,0x201,0x205,0x209,0x20e,0x212,0x216,0x21a,0x21e,0x223,0x227,
+		0x22b,0x230,0x234,0x238,0x23c,0x241,0x245,0x249,0x24e,0x252,0x257,0x25b,0x25f,0x264,0x268,0x26d,
+		0x271,0x276,0x27a,0x27f,0x283,0x288,0x28c,0x291,0x295,0x29a,0x29e,0x2a3,0x2a8,0x2ac,0x2b1,0x2b5,
+		0x2ba,0x2bf,0x2c4,0x2c8,0x2cd,0x2d2,0x2d6,0x2db,0x2e0,0x2e5,0x2e9,0x2ee,0x2f3,0x2f8,0x2fd,0x302,
+		0x306,0x30b,0x310,0x315,0x31a,0x31f,0x324,0x329,0x32e,0x333,0x338,0x33d,0x342,0x347,0x34c,0x351,
+		0x356,0x35b,0x360,0x365,0x36a,0x370,0x375,0x37a,0x37f,0x384,0x38a,0x38f,0x394,0x399,0x39f,0x3a4,
+		0x3a9,0x3ae,0x3b4,0x3b9,0x3bf,0x3c4,0x3c9,0x3cf,0x3d4,0x3da,0x3df,0x3e4,0x3ea,0x3ef,0x3f5,0x3fa
 	};
 
 	// look up the fractional part, then shift by the whole
-	return s_power_table[input & 0xff] >> (input >> 8);
+	return ((s_power_table[~input & 0xff] | 0x400) << 2) >> (input >> 8);
 }
 
 
@@ -217,35 +218,55 @@ inline u8 attenuation_increment(u8 rate, u8 index)
 
 
 //-------------------------------------------------
-//  lfo_pm_phase_adjustment - given a 3-bit PM
-//  depth value and a 5-bit phase counter index,
-//  return a 6-bit signed phase displacement
+//  lfo_pm_phase_adjustment - given the 7 most
+//  significant frequency number bits, plus a 3-bit
+//  PM depth value and a 5-bit phase counter index,
+//  return a signed PM adjustment to the frequency;
+//  algorithm written to match Nuked behavior
 //-------------------------------------------------
 
-inline s8 lfo_pm_phase_adjustment(u8 pm_depth, u8 pm_counter)
+inline s16 lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_depth, u8 pm_counter)
 {
-	static u8 const s_lfo_pm_phase_adjustment[8][8] =
+	// this table encodes 2 shift values to apply to the top 7 bits
+	// of fnum; it is effectively a cheap multiply by a constant
+	// value containing 0-2 bits
+	static u8 const s_lfo_pm_shifts[8][8] =
 	{
-		{  0,  0,  0,  0,  0,  0,  0,  0 },
-		{  0,  0,  0,  0,  1,  1,  1,  1 },
-		{  0,  0,  0,  1,  1,  1,  2,  2 },
-		{  0,  0,  1,  1,  2,  2,  3,  3 },
-		{  0,  0,  1,  2,  2,  2,  3,  4 },
-		{  0,  0,  2,  3,  4,  4,  5,  6 },
-		{  0,  0,  4,  6,  8,  8, 10, 12 },
-		{  0,  0,  8, 12, 16, 16, 20, 24 }
+		{ 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77 },
+		{ 0x77, 0x77, 0x77, 0x77, 0x72, 0x72, 0x72, 0x72 },
+		{ 0x77, 0x77, 0x77, 0x72, 0x72, 0x72, 0x17, 0x17 },
+		{ 0x77, 0x77, 0x72, 0x72, 0x17, 0x17, 0x12, 0x12 },
+		{ 0x77, 0x77, 0x72, 0x17, 0x17, 0x17, 0x12, 0x07 },
+		{ 0x77, 0x77, 0x17, 0x12, 0x07, 0x07, 0x02, 0x01 },
+		{ 0x77, 0x77, 0x17, 0x12, 0x07, 0x07, 0x02, 0x01 },
+		{ 0x77, 0x77, 0x17, 0x12, 0x07, 0x07, 0x02, 0x01 }
 	};
+
+	// every 8 cycles the PM counter inverts phase
 	if (BIT(pm_counter, 3))
 		pm_counter ^= 7;
-	s8 result = s_lfo_pm_phase_adjustment[pm_depth][pm_counter & 7];
-	return BIT(pm_counter, 4) ? -result : result;
+
+	// look up the relevant shifts
+	u8 const shifts = s_lfo_pm_shifts[pm_depth][BIT(pm_counter, 0, 3)];
+
+	// compute the adjustment
+	s16 adjust = (fnum_bits >> BIT(shifts, 0, 4)) + (fnum_bits >> BIT(shifts, 4, 4));
+	if (pm_depth > 5)
+		adjust <<= pm_depth - 5;
+	adjust >>= 2;
+
+	// every 16 cycles it inverts sign
+	return BIT(pm_counter, 4) ? -adjust : adjust;
 }
 
 
 //-------------------------------------------------
 //  detune_adjustment - given a 5-bit key code
 //  value and a 3-bit detune parameter, return a
-//  6-bit signed phase displacement
+//  6-bit signed phase displacement; this table
+//  has been verified against Nuked's equations,
+//  but the equations are rather complicated, so
+//  we'll keep the simplicity of the table
 //-------------------------------------------------
 
 inline s8 detune_adjustment(u8 detune, u8 keycode)
@@ -481,8 +502,8 @@ void ymopn_operator::clock_keystate(u8 keystate, u8 keycode)
 
 void ymopn_operator::clock_ssg_eg_state(u8 keycode)
 {
-	// work only happens once the attenuation is greater than half
-	if (m_env_attenuation < 0x200)
+	// work only happens once the attenuation crosses above 0x200
+	if (!BIT(m_env_attenuation, 9))
 		return;
 
 	// 8 SSG-EG modes:
@@ -601,33 +622,34 @@ void ymopn_operator::clock_envelope(u16 env_counter, u8 keycode)
 
 
 //-------------------------------------------------
-//  clock_phase - clock the 10.10 phase value
+//  clock_phase - clock the 10.10 phase value; this
+//  logic has been verified against the Nuked phase
+//  generator
 //-------------------------------------------------
 
 void ymopn_operator::clock_phase(u8 lfo_counter, u8 pm_depth, u16 block_fnum)
 {
-	u16 fnum = BIT(block_fnum, 0, 11);
-	u8 block = BIT(block_fnum, 11, 3);
-
-	// adjust the block_fnum by the LFO
+	// extract frequency number and adjust by LFO
+	u16 fnum = BIT(block_fnum, 0, 11) << 1;
 	if (pm_depth != 0)
 	{
-		// PM goes at 1/4 frequency of LFO, so shift it down 2 bits
-		fnum += (lfo_pm_phase_adjustment(pm_depth, lfo_counter >> 2) * s16(fnum)) >> 9;
-		fnum &= 0x7ff;
-		block_fnum = fnum | (block << 11);
+		// apply the phase adjustment based on the upper 7 bits
+		// of FNUM and the PM depth parameters
+		fnum += lfo_pm_phase_adjustment(BIT(block_fnum, 4, 7), pm_depth, lfo_counter >> 2);
+
+		// keep fnum to 12 bits
+		fnum &= 0xfff;
 	}
 
-	// apply block shift to compute phase step; block 0 is a right shift
-	// by 1, so do this little dance to make it work for all 8 values
-	u32 phase_step = (fnum << 6) >> (block ^ 7);
+	// apply block shift to compute phase step
+	u8 block = BIT(block_fnum, 11, 3);
+	u32 phase_step = (fnum << block) >> 2;
 
-	// apply detune based on the adjusted fnum
-	u8 keycode = block_fnum_to_keycode(block_fnum);
-	phase_step += detune_adjustment(m_regs.detune(), keycode);
+	// apply detune based on the keycode
+	phase_step += detune_adjustment(m_regs.detune(), block_fnum_to_keycode(block_fnum));
 
 	// clamp to 17 bits in case detune overflows
-	// (may be specific to YM2612 -- need to verify)
+	// QUESTION: is this specific to the YM2612/3438?
 	phase_step &= 0x1ffff;
 
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
@@ -792,16 +814,15 @@ void ymopn_channel::clock(u32 env_counter, u8 lfo_counter, bool multi_freq)
 void ymopn_channel::output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const
 {
 	// skip if both pans are clear; no need to do all this work for nothing
-	// this is also how we "disable" a channel (for example in the YM2610)
 	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
 		return;
 
 	// AM modulation amount is the same across all operators; compute it once
-	static u8 const s_am_shift[4] = { 8, 3, 1, 0 };
+	u8 am_shift = (1 << (m_regs.am_shift() ^ 3)) - 1;
 	u8 am_value = lfo_counter & 0x3f;
 	if (BIT(lfo_counter, 6))
 		am_value ^= 0x3f;
-	u8 am_offset = (am_value << 1) >> s_am_shift[m_regs.am_shift()];
+	u8 am_offset = (am_value << 1) >> am_shift;
 
 	// Algorithms:
 	//    0: O1 -> O2 -> O3 -> O4 -> out
@@ -1003,7 +1024,7 @@ u32 ymopn_engine::clock(u8 chanmask)
 	// now update the state of all the channels and operators
 	for (int chnum = 0; chnum < m_channel.size(); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->clock(m_env_counter, m_lfo_counter, chnum == 2 && m_regs.multi_freq());
+			m_channel[chnum]->clock(m_env_counter, m_lfo_counter, chnum == 2 && m_regs.csm_multi_freq() != 0);
 
 	// QUESTION: seems weird to update LFO AFTER the channel updates (where it is
 	// consumed for PM), but BEFORE the output calculcations (where it is
@@ -1165,7 +1186,7 @@ TIMER_CALLBACK_MEMBER(ymopn_engine::timer_handler)
 	 	set_reset_status(STATUS_TIMERB, 0);
 
 	// if timer A fired in CSM mode, signal it
-	if (param == 0 && m_regs.csm_enable())
+	if (param == 0 && m_regs.csm_multi_freq() == 2)
 		m_channel[2]->keyon_csm();
 
 	// reset

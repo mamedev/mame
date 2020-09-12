@@ -26,8 +26,7 @@
 //           24 xxxxxxxx Timer A value (upper 8 bits)
 //           25 ------xx Timer A value (lower 2 bits)
 //           26 xxxxxxxx Timer B value
-//           27 x------- CSM mode when timer A fires
-//              -x------ Mutli-frequency mode for channel #2
+//           27 xx------ CSM/Multi-frequency mode for channel #2
 //              --x----- Reset timer B
 //              ---x---- Reset timer A
 //              ----x--- Enable timer B
@@ -108,8 +107,7 @@ u8 *regbase() const { return &m_regdata[0]; }
 	u8 lfo_rate() const       /*  3 bits */ { return BIT(m_regdata[0x22], 0, 3); }
 	u16 timer_a_value() const /* 10 bits */ { return (m_regdata[0x24] << 2) | BIT(m_regdata[0x25], 0, 2); }
 	u8 timer_b_value() const  /*  8 bits */ { return m_regdata[0x26]; }
-	u8 csm_enable() const     /*  1 bit  */ { return BIT(m_regdata[0x27], 7); }
-	u8 multi_freq() const     /*  1 bit  */ { return BIT(m_regdata[0x27], 6); }
+	u8 csm_multi_freq() const /*  2 bits */ { return BIT(m_regdata[0x27], 6, 2); }
 	u8 reset_timer_b() const  /*  1 bit  */ { return BIT(m_regdata[0x27], 5); }
 	u8 reset_timer_a() const  /*  1 bit  */ { return BIT(m_regdata[0x27], 4); }
 	u8 enable_timer_b() const /*  1 bit  */ { return BIT(m_regdata[0x27], 3); }
