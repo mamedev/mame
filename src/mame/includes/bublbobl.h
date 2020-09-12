@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/m6805/m68705.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/input_merger.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
@@ -185,6 +186,22 @@ protected:
 	uint8_t     m_port_b_out;
 	uint16_t    m_address;
 	uint8_t     m_latch;
+};
+
+
+class bub8749_state : public bublbobl_state
+{
+public:
+	bub8749_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bublbobl_state(mconfig, type, tag)
+		, m_mcu(*this, "mcu")
+	{
+	}
+
+	void bub8749(machine_config &config);
+
+protected:
+	required_device<i8749_device> m_mcu;
 };
 
 #endif // MAME_INCLUDES_BUBLBOBL_H
