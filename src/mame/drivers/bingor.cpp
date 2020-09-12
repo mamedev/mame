@@ -912,8 +912,8 @@ ROM_START( bingor6 )    // Strings: 1988-1992 AWR Hard & Soft Austria.
 	ROM_LOAD16_BYTE( "turbo_l.bin", 0x000000, 0x10000, CRC(86b10566) SHA1(5f74b250ced3574feffdc40b6ed013ec5a0c2c97) )
 	ROM_LOAD16_BYTE( "turbo_h.bin", 0x000001, 0x10000, CRC(7e18f9d7) SHA1(519b65d6812a3762e3215f4918c834d5a444b28a) )
 
-	ROM_REGION( 0x20000, "pic", 0 ) // protection?
-	ROM_LOAD( "pic16c54rc.bin", 0x000, 0x400, NO_DUMP )
+	ROM_REGION( 0x1fff, "pic", 0 ) // decapped, protection?
+	ROM_LOAD( "pic16c54rc.bin", 0x0000, 0x1fff, CRC(857e8f5a) SHA1(59666b76ec87f3a736f6c7c8f43e63913f53fbfd) )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )  // eeprom
 	ROM_LOAD( "bingor6_24c04a.bin", 0x000000, 0x200, CRC(9d271c5f) SHA1(8ac5c4848fb8d9a156ba760324022839fefcbb72) )
