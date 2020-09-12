@@ -77,7 +77,7 @@ GFXDECODE_END
 
 void nes_vt_newer_state::nes_vt_newer(machine_config &config)
 {
-	M6502(config, m_maincpu, 8000000); // unknown, assumed to be a 6502 based CPU as it has NES games, but could be emulating them (like the S+Core units, assuming this isn't one)
+	M6502(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_newer_state::nes_vt_newer_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
