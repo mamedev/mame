@@ -30,7 +30,7 @@ namespace netlist
 		void parse_tokens(plib::istream_uptr &&strm, token_store &tokstor);
 
 	protected:
-		void parse_netlist(const pstring &nlname);
+		void parse_netlist();
 		void net_alias();
 		void dippins();
 		void netdev_param();
