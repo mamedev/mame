@@ -11878,6 +11878,7 @@ debutm
 @source:dec0.cpp
 automat                         // bootleg
 baddudes                        // EI (c) 1988 Data East USA (US)
+bandit                          // (c) 1989 Data East USA (US)
 birdtry                         // EK (c) 1988 Data East Corporation (Japan)
 birdtrya                        // EK (c) 1988 Data East Corporation (Japan)
 bouldash                        // (c) 1990 Data East Corporation (World)
@@ -11892,8 +11893,8 @@ ffantasyb                       // EX (c) 1989 Data East Corporation (World)
 ffantasybl                      // bootleg
 hbarrel                         // EC (c) 1987 Data East Corporation (World)
 hbarrelu                        // (c) 1987 Data East USA (US)
-bandit                          // (c) 1989 Data East USA (US)
 hippodrm                        // EW (c) 1989 Data East USA (US)
+mastbond                        // bootleg
 midres                          // (c) 1989 Data East Corporation (World)
 midresb                         // bootleg
 midresbj                        // bootleg
