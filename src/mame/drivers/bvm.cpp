@@ -85,4 +85,4 @@ ROM_START(bvm20f1e)
 	ROM_LOAD("541d-27c256.ic108", 0x8000, 0x8000, CRC(9da347f9) SHA1(413096830bdcae6404e9d686abb56e60d58bdc2f))
 ROM_END
 
-SYST(1998, bvm20f1e, 0, 0, bvm, bvm, bvm_state, empty_init, "Sony", "Trinitron Color Video Monitor BVM-20F1E / BVM-20F1U", MACHINE_IS_SKELETON)
+SYST(1998, bvm20f1e, 0, 0, bvm, bvm, bvm_state, empty_init, "Sony", "Trinitron Color Video Monitor BVM-20F1E", MACHINE_IS_SKELETON)
