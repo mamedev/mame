@@ -9518,6 +9518,9 @@ busicom                         //
 @source:buster.cpp
 buster                          // (c) 1987 Marian Electronics Ltd.
 
+@source:bvm.cpp
+bvm20f1e                        //
+
 @source:bw12.cpp
 bw12                            //
 bw14                            //

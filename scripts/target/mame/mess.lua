@@ -3631,6 +3631,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "sony")
 files {
+	MAME_DIR .. "src/mame/drivers/bvm.cpp",
 	MAME_DIR .. "src/mame/drivers/pockstat.cpp",
 	MAME_DIR .. "src/mame/drivers/psx.cpp",
 	MAME_DIR .. "src/mame/machine/psxcd.cpp",
