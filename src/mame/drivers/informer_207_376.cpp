@@ -13,7 +13,6 @@
     - X2212P NVRAM
 
     TODO:
-	- Redump bad ROMs
 	- Dump keyboard controller and emulate it (currently HLE'd)
 	- Problably needs improvements to at least the Z80SCC to
 	  properly support synchrous modes
@@ -88,11 +87,13 @@ private:
 	void mem_map(address_map &map);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void vsync_w(int state);
 	void nmi_control_w(uint8_t data);
 	void unk_8400_w(uint8_t data);
 
+	bool m_display_enabled;
 	bool m_nmi_enabled;
 };
 
@@ -150,6 +151,10 @@ MC6845_UPDATE_ROW( informer_207_376_state::crtc_update_row )
 		if (x == cursor_x)
 			data = 0xff;
 
+		// the line above the status bar seems to be hardcoded
+		if (y == 273)
+			data = 0xff;
+
 		// draw 8 pixels of the character
 		bitmap.pix32(y, x * 8 + 7) = pen[BIT(data, 0)];
 		bitmap.pix32(y, x * 8 + 6) = pen[BIT(data, 1)];
@@ -160,6 +165,16 @@ MC6845_UPDATE_ROW( informer_207_376_state::crtc_update_row )
 		bitmap.pix32(y, x * 8 + 1) = pen[BIT(data, 6)];
 		bitmap.pix32(y, x * 8 + 0) = pen[BIT(data, 7)];
 	}
+}
+
+uint32_t informer_207_376_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (m_display_enabled)
+		m_crtc->screen_update(screen, bitmap, cliprect);
+	else
+		bitmap.fill(rgb_t::black(), cliprect);
+
+	return 0;
 }
 
 static const gfx_layout char_layout =
@@ -196,19 +211,24 @@ void informer_207_376_state::unk_8400_w(uint8_t data)
 	// 7-------  beeper
 	// -6------  unknown
 	// --5-----  1=internal modem, 0=host rs232
-	// ---43210  unknown
+	// ---43---  unknown
+	// -----2--  display enabled?
+	// ------10  unknown
 
 	m_beep->set_state(BIT(data, 7));
+	m_display_enabled = bool(BIT(data, 2));
 }
 
 void informer_207_376_state::machine_start()
 {
 	// register for save states
+	save_item(NAME(m_display_enabled));
 	save_item(NAME(m_nmi_enabled));
 }
 
 void informer_207_376_state::machine_reset()
 {
+	m_display_enabled = false;
 	m_nmi_enabled = false;
 }
 
@@ -224,7 +244,7 @@ void printer_devices(device_slot_interface &device)
 
 void informer_207_376_state::informer_207_376(machine_config &config)
 {
-	MC6809(config, m_maincpu, 36_MHz_XTAL / 4); // unknown clock
+	MC6809(config, m_maincpu, 36_MHz_XTAL / 4); // unknown clock divisor
 	m_maincpu->set_addrmap(AS_PROGRAM, &informer_207_376_state::mem_map);
 
 	input_merger_device &cpu_irq(INPUT_MERGER_ANY_HIGH(config, "cpu_irq"));
@@ -233,14 +253,14 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x X2212P
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(4915200 / 2);
+	m_pit->set_clk<0>(2.457600_MHz_XTAL);
 	m_pit->out_handler<0>().set(m_acia[1], FUNC(acia6850_device::write_txc));
 	m_pit->out_handler<0>().append(m_acia[1], FUNC(acia6850_device::write_rxc));
-	m_pit->set_clk<1>(4915200 / 2);
+	m_pit->set_clk<1>(2.457600_MHz_XTAL);
 	m_pit->out_handler<1>().set(m_acia[0], FUNC(acia6850_device::write_txc));
 	m_pit->out_handler<1>().append(m_acia[0], FUNC(acia6850_device::write_rxc));
 
-	SCC85C30(config, m_scc, 4915200);
+	SCC85C30(config, m_scc, 0); // externally clocked?
 	m_scc->out_txda_callback().set("com1", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("com1", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("com1", FUNC(rs232_port_device::write_rts));
@@ -249,11 +269,11 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	m_scc->out_rtsb_callback().set("com2", FUNC(rs232_port_device::write_rts));
 	m_scc->out_int_callback().set("cpu_irq", FUNC(input_merger_device::in_w<0>));
 
-	ACIA6850(config, m_acia[0], 0); // unknown clock
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set("kbd", FUNC(informer_207_376_kbd_hle_device::rx_w));
 	m_acia[0]->irq_handler().set("cpu_irq", FUNC(input_merger_device::in_w<1>));
 
-	ACIA6850(config, m_acia[1], 0); // unknown clock
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
@@ -275,7 +295,7 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(14400000, 800, 0, 640, 300, 0, 286); // unknown clock
-	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	m_screen->set_screen_update(FUNC(informer_207_376_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -301,15 +321,15 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 ROM_START( in207376 )
 	ROM_REGION(0x6000, "maincpu", 0)
 	// M2764A F1
-	// 79590-023  376SNA V1.00  201C 7224  (our checksum: 7264)
-	ROM_LOAD("79590-023.z37", 0x0000, 0x2000, BAD_DUMP CRC(ed4ff488) SHA1(fdd95c520d0288ea483b5d2e8e6c8eecb04063c1))
+	// 79590-023  376SNA V1.00  201C 7224  (checksum matches)
+	ROM_LOAD("79590-023.z37", 0x0000, 0x2000, CRC(61d49637) SHA1(aabcd55af88ff0b6a198eef04a88f58cc8f65dcc))
 	// M27128AF1
 	// 79589-023  376 SNAV1.00  201C E86F  (checksum matches)
 	ROM_LOAD("79589-023.z36", 0x2000, 0x4000, CRC(cdfaf629) SHA1(1f21ef6848020726ef3d7ab05166ac8590d58476))
 
 	ROM_REGION(0x1000, "chargen", 0)
 	// TMS2732AGL-25
-	// 79573-001 V1.00 376/8 CHAR. GEN.
+	// 79573-001  V1.00 376/8  CHAR. GEN.
 	ROM_LOAD("79573-001.z6", 0x0000, 0x1000, CRC(f704b827) SHA1(bcc56eeb8681c2bebe3a9f4b6b78c0373c06d875))
 ROM_END
 
