@@ -275,7 +275,7 @@ void ym2610_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		if ((m_adpcm_b.status(0) & ymadpcm_b_channel::STATUS_EOS) != 0)
 			m_eos_status |= 0x80;
 
-		// update the OPN content; OPNA is 13-bit with no intermediate clipping
+		// update the OPN content; OPNB is 13-bit with no intermediate clipping
 		s32 lsum = 0, rsum = 0;
 		m_opn.output(lsum, rsum, 1, 32767, m_opn_mask);
 		lsum <<= 1;

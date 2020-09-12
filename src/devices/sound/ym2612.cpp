@@ -194,12 +194,9 @@ void ym2612_device::sound_stream_update_common(stream_sample_t *outl, stream_sam
 	{
 		// clock the OPN when we hit channel 0
 		if (m_channel == 0)
-		{
-			lsum = rsum = 0;
 			m_opn.clock(0x3f);
-		}
 
-		// update the OPN content; OPN2 is 9-bit with intermediate clipping
+		// update the current OPN channel; OPN2 is 9-bit with intermediate clipping
 		s32 lchan = 0, rchan = 0;
 		if (m_channel != 5 || !m_dac_enable)
 			m_opn.output(lchan, rchan, 5, 256, 1 << m_channel);
@@ -236,7 +233,7 @@ void ym2612_device::sound_stream_update_common(stream_sample_t *outl, stream_sam
 			lsum += lchan;
 			rsum += rchan;
 
-			// on the last channel, output and reset the sums
+			// on the last channel, output the average and reset the sums
 			if (m_channel == 5)
 			{
 				outl[sampindex] = (lsum << 7) / 6;
@@ -317,21 +314,21 @@ void ymf276_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	for (int sampindex = 0; sampindex < samples; sampindex++)
 	{
 		// clock the OPN
-		m_opn.clock(opn_mask);
+		m_opn.clock(0x3f);
 
 		// update the OPN content; OPN2L is 14-bit with intermediate clipping
 		s32 lsum = 0, rsum = 0;
 		m_opn.output(lsum, rsum, 0, 8191, opn_mask);
 
-		// shifted down 1 bits after mixer
+		// shifted down 1 bit after mixer
 		lsum >>= 1;
 		rsum >>= 1;
 
 		// add in DAC if enabled
 		if (m_dac_enable)
 		{
-			lsum += m_dac_data << 4;
-			rsum += m_dac_data << 4;
+			lsum += s16(m_dac_data << 7) >> 3;
+			rsum += s16(m_dac_data << 7) >> 3;
 		}
 
 		// YMF3438 is stereo

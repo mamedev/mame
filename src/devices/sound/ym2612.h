@@ -36,7 +36,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal helpers
-	bool multiplexed() const { return BIT(m_channel, 7); }
 	void sound_stream_update_common(stream_sample_t *outl, stream_sample_t *outr, int samples, bool discontinuity);
 
 	// internal state
