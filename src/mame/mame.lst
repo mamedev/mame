@@ -13688,6 +13688,7 @@ superbug                        // 009115-009467    1977/09 [6800]
 bbprot                          // unfinished prototype
 fitfight                        // bootleg of Art of Fighting
 histryma                        // bootleg of Fighter's History
+histryma2                       // bootleg of Fighter's History
 hotmindff                       // (c) Playmark
 
 @source:fk1.cpp
