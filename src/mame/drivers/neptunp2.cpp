@@ -268,6 +268,6 @@ ROM_START( mexlindo )
 	ROM_LOAD( "24c16_it7_0,05.u10",  0x000, 0x800, CRC(d84a3fae) SHA1(56e743a74d1934a6c6d99dc3dbbf6172c30e58a9) )
 ROM_END
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, mexlindo,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Gigames?", "Mexico Lindo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, rockroll,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // year taken from parts' manual and sticker on PCB
+GAME( 2003, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
+GAME( 2004, mexlindo,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Mexico Lindo",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
+GAME( 1999, rockroll,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from parts' manual and sticker on PCB
