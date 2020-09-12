@@ -115,25 +115,25 @@ static INPUT_PORTS_START( nes_vt )
 INPUT_PORTS_END
 
 ROM_START( dgun2561 )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
 ROM_END
 
 ROM_START( dgun2593 )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_REGION( 0x8000000, "maincpu", 0 )
 	ROM_LOAD( "dreamgear300.bin", 0x00000, 0x8000000, CRC(4fe0ed02) SHA1(a55590557bacca65ed9a17c5bcf0a4e5cb223126) )
 ROM_END
 
 
 
 ROM_START( rtvgc300 )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_REGION( 0x8000000, "maincpu", 0 )
 	// some of the higher address lines might be swapped
 	ROM_LOAD( "lexibook300.bin", 0x00000, 0x4000000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
 ROM_END
 
 ROM_START( rtvgc300fz )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_REGION( 0x8000000, "maincpu", 0 )
 	// some of the higher address lines might be swapped
 	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
 ROM_END
@@ -141,84 +141,84 @@ ROM_END
 // The maximum address space a VT chip can see is 32MB, so these 64MB roms are actually 2 programs (there are vectors in the first half and the 2nd half)
 // there must be a bankswitch bit that switches the whole 32MB space.  Loading the 2nd half in Star Wars does actually boot straight to a game.
 ROM_START( lxcmcy )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	ROM_LOAD( "lxcmcy.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
 ROM_END
 
 ROM_START( lxcmcysw )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	ROM_LOAD( "jl2365swr-1.u2", 0x2000000, 0x2000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
 	ROM_CONTINUE(0x0000000, 0x2000000)
 ROM_END
 
 ROM_START( lxcmcyfz )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x4000000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
 ROM_END
 
 ROM_START( lxcmcydp )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "cyberarcade-disneyprincess.bin", 0x00000, 0x4000000, CRC(05946f81) SHA1(33eea2b70f5427e7613c836b8a08148731fac231) )
 ROM_END
 
 ROM_START( lxcmcysp )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "lexibookspiderman.bin", 0x00000, 0x4000000, CRC(ef6e8847) SHA1(0012df193c52fd48595d85886fd431619c5d5e3e) )
 ROM_END
 
 ROM_START( lxcmcycr )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	ROM_LOAD( "lexibook cars.bin", 0x00000, 0x4000000, CRC(198fe11b) SHA1(5e35caa3fc319ec69812c187a3ec89f01749f749) )
 ROM_END
 
 ROM_START( lxcmcypp )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
 	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )
 ROM_END
 
 ROM_START( lxcmc250 )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_REGION( 0x4000000, "maincpu", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
 ROM_END
 
 ROM_START( lxccminn )
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
+	ROM_REGION( 0x4000000, "maincpu", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
 	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
 	ROM_IGNORE(0x4000000)
 ROM_END
 
 ROM_START( lxccplan )
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
+	ROM_REGION( 0x4000000, "maincpu", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
 	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
 	ROM_IGNORE(0x4000000)
 ROM_END
 
 ROM_START( red5mam )
-	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_REGION( 0x8000000, "maincpu", 0 )
 	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(0c0a0ecd) SHA1(2dfd8437de17fc9975698f1933dd81fbac78466d) )
 ROM_END
 
 
 ROM_START( denv150 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
 ROM_END
 
 
 ROM_START( zonefusn )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
 ROM_END
 
 void nes_vt_newer_state::init_lxcmcypp()
 {
-	int size = memregion("mainrom")->bytes()/2;
-	uint16_t* ROM = (uint16_t*)memregion("mainrom")->base();
+	int size = memregion("maincpu")->bytes()/2;
+	uint16_t* ROM = (uint16_t*)memregion("maincpu")->base();
 
 	for (int i = 0; i < size; i++)
 	{
