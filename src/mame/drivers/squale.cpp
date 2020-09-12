@@ -65,8 +65,8 @@ S a b c   Save memory to tape  (a = start, b = end, c = exec)
 KEYBOARD
 - When started, the Lock is engaged, so numbers appear as symbols. Hitting
   Shift will unlock this and return the keyboard to normal.
-- To use the natural keyboard, you must start with the emulated keyboard,
-  hit Shift, then use the tab menu to choose the natural keyboard.
+- To use the natural keyboard, hit > (or some other shifted character),
+  then proceed as normal.
 - To paste, use the emulated keyboard and hit Shift, then do the paste.
 - The monitor command-line cannot handle the arrow keys or Del correctly.
 - It is thought that the BASIC cartridge has better keyboard handling.
@@ -861,7 +861,7 @@ void squale_state::squale(machine_config &config)
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	SOFTWARE_LIST(config, "flop525_list").set_original("squale");
+	//SOFTWARE_LIST(config, "flop525_list").set_original("squale_flop");   // list does not exist
 
 	/* Cartridge slot */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load));
