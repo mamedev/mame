@@ -11,14 +11,18 @@ DEFINE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device, "ng_fatfury_prot", "N
 
 fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NG_FATFURY2_PROT, tag, owner, clock),
-	m_prot_data(0)
+	m_pro_ct0(*this, "pro_ct0")
 {
 }
 
 
+void fatfury2_prot_device::device_add_mconfig(machine_config &config)
+{
+	ALPHA_8921(config, m_pro_ct0, 0); // PRO-CT0 or SNK-9201
+}
+
 void fatfury2_prot_device::device_start()
 {
-	save_item(NAME(m_prot_data));
 }
 
 void fatfury2_prot_device::device_reset()
@@ -33,69 +37,27 @@ void fatfury2_prot_device::device_reset()
 /* 0x2xxxxx range. There are several checks all around the code. */
 uint16_t fatfury2_prot_device::protection_r(offs_t offset)
 {
-	uint16_t res = m_prot_data >> 24;
-
-	switch (offset)
-	{
-		case 0x55550/2:
-		case 0xffff0/2:
-		case 0x00000/2:
-		case 0xff000/2:
-		case 0x36000/2:
-		case 0x36008/2:
-			return res;
-
-		case 0x36004/2:
-		case 0x3600c/2:
-			return ((res & 0xf0) >> 4) | ((res & 0x0f) << 4);
-
-		default:
-			logerror("unknown protection read at %s, offset %08x\n", machine().describe_context(), offset << 1);
-			return 0;
-	}
+	m_pro_ct0->even_w(BIT(offset, 1));
+	m_pro_ct0->h_w(BIT(offset, 2));
+	u8 gad = m_pro_ct0->gad_r();
+	u8 gbd = m_pro_ct0->gbd_r();
+	return (BIT(gbd, 0, 2) << 6) | (BIT(gbd, 2, 2) << 4) | (BIT(gad, 0, 2) << 6) | (BIT(gad, 2, 2) << 4);
 }
 
 
 void fatfury2_prot_device::protection_w(offs_t offset, uint16_t data)
 {
-	switch (offset)
-	{
-		case 0x11112/2: /* data == 0x1111; expects 0xff000000 back */
-			m_prot_data = 0xff000000;
-			break;
+	// /PORTOEL connected into PRO-CT0 CLK pin
+	m_pro_ct0->clk_w(true);
 
-		case 0x33332/2: /* data == 0x3333; expects 0x0000ffff back */
-			m_prot_data = 0x0000ffff;
-			break;
+	m_pro_ct0->load_w(BIT(offset, 0)); // A1
+	m_pro_ct0->even_w(BIT(offset, 1)); // A2
+	m_pro_ct0->h_w(BIT(offset, 2)); // A3
 
-		case 0x44442/2: /* data == 0x4444; expects 0x00ff0000 back */
-			m_prot_data = 0x00ff0000;
-			break;
+	// C16-31 = A4-A19, C0-C15 = D0-D15
+	m_pro_ct0->c_w((u32(bitswap<16>(BIT(offset, 3, 16), 15, 13, 11, 9, 14, 12, 10, 8, 7, 5, 3, 1, 6, 4, 2, 0)) << 16) |
+		bitswap<16>(data, 15, 13, 11, 9, 14, 12, 10, 8, 7, 5, 3, 1, 6, 4, 2, 0));
 
-		case 0x55552/2: /* data == 0x5555; read back from 55550, ffff0, 00000, ff000 */
-			m_prot_data = 0xff00ff00;
-			break;
-
-		case 0x56782/2: /* data == 0x1234; read back from 36000 *or* 36004 */
-			m_prot_data = 0xf05a3601;
-			break;
-
-		case 0x42812/2: /* data == 0x1824; read back from 36008 *or* 3600c */
-			m_prot_data = 0x81422418;
-			break;
-
-		case 0x55550/2:
-		case 0xffff0/2:
-		case 0xff000/2:
-		case 0x36000/2:
-		case 0x36004/2:
-		case 0x36008/2:
-		case 0x3600c/2:
-			m_prot_data <<= 8;
-			break;
-
-		default:
-			logerror("unknown protection write at %s, offset %08x, data %02x\n", machine().describe_context(), offset, data);
-			break;
-	}
+	// release /PORTOEL
+	m_pro_ct0->clk_w(false);
 }

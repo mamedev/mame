@@ -4535,3 +4535,14 @@ if (MACHINES["SWIM3"]~=null) then
 		MAME_DIR .. "src/devices/machine/swim3.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/alpha_8921.h,MACHINES["ALPHA_8921"] = true
+---------------------------------------------------
+if (MACHINES["ALPHA_8921"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/alpha_8921.cpp",
+		MAME_DIR .. "src/devices/machine/alpha_8921.h",
+	}
+end
