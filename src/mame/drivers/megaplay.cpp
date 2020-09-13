@@ -241,7 +241,6 @@ static INPUT_PORTS_START ( mp_gaxe2 )
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 7") PORT_CODE(KEYCODE_K)
 INPUT_PORTS_END
 
-#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START ( mp_col3 )
 	PORT_INCLUDE( megaplay )
 
@@ -263,7 +262,6 @@ static INPUT_PORTS_START ( mp_col3 )
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 6") PORT_CODE(KEYCODE_J)
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6201 bit 7") PORT_CODE(KEYCODE_K)
 INPUT_PORTS_END
-#endif
 
 static INPUT_PORTS_START ( mp_twc )
 	PORT_INCLUDE( megaplay )
@@ -1030,4 +1028,4 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, init_megaplay, ROT0, "Sega", "Gunstar Heroes (Mega Play)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega", "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega", "Columns III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, mp_col3,  mplay_state, init_megaplay, ROT0, "Sega", "Columns III (Mega Play)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
