@@ -1282,7 +1282,10 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
-			throw nl_exception(MF_MODEL_NOT_FOUND("xx" + model));
+		{
+			throw nl_exception(MF_MODEL_NOT_FOUND(pstring("xx") + model));
+		}
+
 		model = i->second;
 	}
 	pstring xmodel = plib::left(model, pos);
