@@ -426,6 +426,7 @@ VIDEOS["BT431"] = true
 --------------------------------------------------
 
 MACHINES["AKIKO"] = true
+MACHINES["ALPHA_8921"] = true
 MACHINES["AM2901B"] = true
 MACHINES["AUTOCONFIG"] = true
 MACHINES["BUSMOUSE"] = true
