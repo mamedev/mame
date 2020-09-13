@@ -450,22 +450,22 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 
 DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 
-multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MULTIPCM, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_slots(nullptr),
-		m_cur_slot(0),
-		m_address(0),
-		m_rate(0),
-		m_attack_step(nullptr),
-		m_decay_release_step(nullptr),
-		m_freq_step_table(nullptr),
-		m_left_pan_table(nullptr),
-		m_right_pan_table(nullptr),
-		m_linear_to_exp_volume(nullptr),
-		m_total_level_steps(nullptr)
+multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MULTIPCM, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_slots(nullptr),
+	m_cur_slot(0),
+	m_address(0),
+	m_rate(0),
+	m_attack_step(nullptr),
+	m_decay_release_step(nullptr),
+	m_freq_step_table(nullptr),
+	m_left_pan_table(nullptr),
+	m_right_pan_table(nullptr),
+	m_linear_to_exp_volume(nullptr),
+	m_total_level_steps(nullptr)
 {
 }
 
@@ -577,16 +577,16 @@ void multipcm_device::device_start()
 	// Slots
 	m_slots = make_unique_clear<slot_t []>(28);
 
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_regs), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_playing), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_base), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_offset), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_step), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_pan), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_total_level), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_dest_total_level), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_total_level_step), 28);
-	save_pointer(STRUCT_MEMBER(m_slots.get(), m_prev_sample), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_regs), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_playing), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_base), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_offset), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_pan), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_prev_sample), 28);
 
 	for (int32_t slot = 0; slot < 28; ++slot)
 	{
