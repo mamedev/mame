@@ -299,8 +299,12 @@ u8 block_fnum_to_keycode(u16 block_fnum)
 	u8 keycode = (block_fnum >> 9) & 0x1e;
 
 	// lowest bit is determined by a mix of next lower FNUM bits
-	keycode |= BIT(0xfe80, (block_fnum >> 7) & 15);
-	return keycode;
+	// according to this equation from the YM2608 manual:
+	//
+	//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
+	//
+	// for speed, we just look it up in a 16-bit constant
+	return keycode | BIT(0xfe80, BIT(block_fnum, 7, 4));
 }
 
 
@@ -450,7 +454,25 @@ void ymopn_operator::start_attack(u8 keycode)
 	if (effective_rate(m_regs.attack_rate(), keycode) >= 62)
 		m_env_attenuation = 0;
 
-printf("KeyOn %X: fnum=%04X fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d ssg=%X adsr=%02X/%02X/%02X/%X sl=%X pan=%d%d\n", m_regs.opbase(), m_regs.block_fnum(), m_regs.feedback(), m_regs.algorithm(), m_regs.detune(), m_regs.multiple(), m_regs.total_level(), m_regs.ksr(), m_regs.ssg_eg_enabled() * 8 + m_regs.ssg_eg_mode(), m_regs.attack_rate(), m_regs.decay_rate(), m_regs.sustain_rate(), m_regs.release_rate(), m_regs.sustain_level(), m_regs.pan_left(), m_regs.pan_right());
+printf("KeyOn %X: fnum=%04X fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d ssg=%X adsr=%02X/%02X/%02X/%X sl=%X pan=%d%d am=%d pm=%d\n",
+	m_regs.opbase(),
+	m_regs.block_fnum(),
+	m_regs.feedback(),
+	m_regs.algorithm(),
+	m_regs.detune(),
+	m_regs.multiple(),
+	m_regs.total_level(),
+	m_regs.ksr(),
+	m_regs.ssg_eg_enabled() * 8 + m_regs.ssg_eg_mode(),
+	m_regs.attack_rate(),
+	m_regs.decay_rate(),
+	m_regs.sustain_rate(),
+	m_regs.release_rate(),
+	m_regs.sustain_level(),
+	m_regs.pan_left(),
+	m_regs.pan_right(),
+	(m_regs.lfo_am_enable() && m_regs.lfo_enable()) ? m_regs.am_shift() : 0,
+	m_regs.lfo_enable() ? m_regs.pm_depth() : 0);
 }
 
 
@@ -677,12 +699,12 @@ u16 ymopn_operator::envelope_attenuation(u8 am_offset) const
 	if (m_ssg_inverted)
 		result = (0x200 - result) & 0x3ff;
 
-	// add in total level
-	result += m_regs.total_level() << 3;
-
 	// add in LFO AM modulation
 	if (m_regs.lfo_am_enable())
 		result += am_offset;
+
+	// add in total level
+	result += m_regs.total_level() << 3;
 
 	// clamp to max and return
 	return (result < 0x400) ? result : 0x3ff;
