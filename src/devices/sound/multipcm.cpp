@@ -577,16 +577,16 @@ void multipcm_device::device_start()
 	// Slots
 	m_slots = make_unique_clear<slot_t []>(28);
 
-	save_pointer(STRUCT_MEMBER(m_slots, m_regs), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_playing), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_base), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_offset), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_step), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_pan), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_prev_sample), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_regs), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_playing), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_base), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_offset), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_pan), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_dest_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_total_level_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots.get(), m_prev_sample), 28);
 
 	for (int32_t slot = 0; slot < 28; ++slot)
 	{
