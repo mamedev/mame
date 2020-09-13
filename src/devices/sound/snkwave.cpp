@@ -44,7 +44,7 @@ void snkwave_device::device_start()
 	m_sample_rate = m_external_clock >> CLOCK_SHIFT;
 
 	/* get stream channels */
-	m_stream = stream_alloc(0, 1, m_sample_rate);
+	m_stream = stream_alloc_legacy(0, 1, m_sample_rate);
 
 	/* reset all the voices */
 	m_frequency = 0;
@@ -60,11 +60,11 @@ void snkwave_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests
+//  sound_stream_update_legacy - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 
-void snkwave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void snkwave_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 

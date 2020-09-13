@@ -214,7 +214,7 @@ void vlm5030_device::device_start()
 	device_reset();
 	m_phase = PH_IDLE;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440);
+	m_channel = stream_alloc_legacy(0, 1, clock() / 440);
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_pin_BSY));
@@ -491,10 +491,10 @@ if( m_interp_step != 1)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vlm5030_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int buf_count=0;
 	int interp_effect;

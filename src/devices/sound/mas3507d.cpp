@@ -29,7 +29,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 void mas3507d_device::device_start()
 {
 	current_rate = 44100;
-	stream = stream_alloc(0, 2, current_rate);
+	stream = stream_alloc_legacy(0, 2, current_rate);
 	cb_sample.resolve();
 }
 
@@ -290,7 +290,7 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 	case 0x0032f: logerror("MAS3507D: OutputConfig = %05x\n", val); break;
 	case 0x107f8:
 		logerror("MAS3507D: left->left   gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
-		stream->set_output_gain(0, gain_to_percentage(val));
+		set_output_gain(0, gain_to_percentage(val));
 		break;
 	case 0x107f9:
 		logerror("MAS3507D: left->right  gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
@@ -300,7 +300,7 @@ void mas3507d_device::mem_write(int bank, uint32_t adr, uint32_t val)
 		break;
 	case 0x107fb:
 		logerror("MAS3507D: right->right gain = %05x (%d dB, %f%%)\n", val, gain_to_db(val), gain_to_percentage(val));
-		stream->set_output_gain(1, gain_to_percentage(val));
+		set_output_gain(1, gain_to_percentage(val));
 		break;
 	default: logerror("MAS3507D: %d:%04x = %05x\n", bank, adr, val); break;
 	}
@@ -359,7 +359,7 @@ void mas3507d_device::fill_buffer()
 	}
 }
 
-void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int scount)
+void mas3507d_device::append_buffer(stream_sample_t * const *outputs, int &pos, int scount)
 {
 	if(!sample_count)
 		return;
@@ -400,7 +400,7 @@ void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int sco
 	total_frame_count += s1;
 }
 
-void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int csamples)
+void mas3507d_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int csamples)
 {
 	int pos = 0;
 

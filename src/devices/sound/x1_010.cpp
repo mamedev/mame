@@ -119,7 +119,7 @@ void x1_010_device::device_start()
 	LOG_SOUND("masterclock = %d rate = %d\n", clock(), m_rate);
 
 	/* get stream channels */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc_legacy(0, 2, m_rate);
 
 	m_reg = make_unique_clear<u8[]>(0x2000);
 	m_HI_WORD_BUF = make_unique_clear<u8[]>(0x2000);
@@ -204,10 +204,10 @@ void x1_010_device::word_w(offs_t offset, u16 data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void x1_010_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// mixer buffer zero clear
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));

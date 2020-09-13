@@ -229,6 +229,22 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
+// netlist_mame_sound_input_buffer
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_sound_input_buffer : public read_stream_view
+{
+public:
+	netlist_mame_sound_input_buffer() :
+		read_stream_view() { }
+
+	netlist_mame_sound_input_buffer(read_stream_view const &src) :
+		read_stream_view(src) { }
+
+	stream_buffer::sample_t operator[](std::size_t index) { return get(index); }
+};
+
+// ----------------------------------------------------------------------------------------
 // netlist_mame_sound_device
 // ----------------------------------------------------------------------------------------
 
@@ -266,13 +282,14 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	//virtual void device_reset() override;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
 	std::map<std::size_t, nld_sound_in *> m_in;
+	std::vector<netlist_mame_sound_input_buffer> m_inbuffer;
 	sound_stream *m_stream;
 	attotime m_cur_time;
 	uint32_t m_sound_clock;
@@ -593,7 +610,7 @@ public:
 		m_buffer.clear();
 	}
 
-	void sound_update_fill(std::size_t samples, stream_sample_t *target);
+	void sound_update_fill(write_stream_view &target);
 
 	void set_sample_time(netlist::netlist_time t) { m_sample_time = t; }
 
@@ -608,7 +625,7 @@ private:
 	uint32_t                     m_channel;
 	const char *                 m_out_name;
 
-	std::vector<stream_sample_t> m_buffer;
+	std::vector<stream_buffer::sample_t> m_buffer;
 	double                       m_cur;
 
 	netlist::netlist_time        m_sample_time;

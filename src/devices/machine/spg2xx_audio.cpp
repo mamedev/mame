@@ -76,7 +76,7 @@ void spg2xx_audio_device::device_start()
 	m_audio_beat = timer_alloc(TIMER_BEAT);
 	m_audio_beat->adjust(attotime::never);
 
-	m_stream = stream_alloc(0, 2, 281250/4);
+	m_stream = stream_alloc_legacy(0, 2, 281250/4);
 
 	m_channel_debug = -1;
 
@@ -887,7 +887,7 @@ void spg2xx_audio_device::audio_w(offs_t offset, uint16_t data)
 	}
 }
 
-void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void spg2xx_audio_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *out_l = outputs[0];
 	stream_sample_t *out_r = outputs[1];

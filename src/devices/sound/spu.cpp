@@ -444,7 +444,7 @@ struct spu_device::voiceinfo
 //
 //
 
-class stream_buffer
+class spu_stream_buffer
 {
 public:
 	struct stream_marker
@@ -466,7 +466,7 @@ public:
 	stream_marker *marker_head,
 								*marker_tail;
 
-	stream_buffer(const unsigned int _sector_size,
+	spu_stream_buffer(const unsigned int _sector_size,
 								const unsigned int _num_sectors)
 		:   head(0),
 			tail(0),
@@ -481,7 +481,7 @@ public:
 		memset(&buffer[0], 0, buffer_size);
 	}
 
-	~stream_buffer()
+	~spu_stream_buffer()
 	{
 		flush_all();
 	}
@@ -969,8 +969,8 @@ void spu_device::device_start()
 	voice=new voiceinfo [24];
 	spu_ram=new unsigned char [spu_ram_size];
 
-	xa_buffer=new stream_buffer(xa_sector_size,xa_buffer_sectors);
-	cdda_buffer=new stream_buffer(cdda_sector_size,cdda_buffer_sectors);
+	xa_buffer=new spu_stream_buffer(xa_sector_size,xa_buffer_sectors);
+	cdda_buffer=new spu_stream_buffer(cdda_sector_size,cdda_buffer_sectors);
 
 	init_stream();
 
@@ -1093,7 +1093,7 @@ void spu_device::init_stream()
 {
 	const unsigned int hz=44100;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, hz);
+	m_stream = stream_alloc_legacy(0, 2, hz);
 
 	rev=new reverb(hz);
 
@@ -2761,7 +2761,7 @@ void spu_device::update_timing()
 //
 //
 
-void spu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void spu_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int16_t temp[44100], *src;
@@ -3034,7 +3034,7 @@ bool spu_device::play_cdda(const unsigned int sector, const unsigned char *cdda)
 		flip[i] = flip[i+1];
 		flip[i+1] = temp;
 	}
-	// this should be done in generate but sound_stream_update may not be called frequently enough
+	// this should be done in generate but sound_stream_update_legacy may not be called frequently enough
 	if(((spureg.irq_addr << 3) < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
 		m_irq_handler(1);
 

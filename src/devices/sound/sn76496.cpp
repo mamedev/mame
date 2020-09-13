@@ -233,7 +233,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_handler.resolve_safe();
 
-	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate);
+	m_sound = stream_alloc(0, (m_stereo? 2:1), sample_rate);
 
 	for (i = 0; i < 4; i++) m_volume[i] = 0;
 
@@ -369,16 +369,17 @@ inline bool sn76496_base_device::in_noise_mode()
 	return ((m_register[6] & 4)!=0);
 }
 
-void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i;
-	stream_sample_t *lbuffer = outputs[0];
-	stream_sample_t *rbuffer = (m_stereo)? outputs[1] : nullptr;
+	auto *lbuffer = &outputs[0];
+	auto *rbuffer = m_stereo ? &outputs[1] : nullptr;
 
 	int16_t out;
 	int16_t out2 = 0;
 
-	while (samples > 0)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	for (int sampindex = 0; sampindex < lbuffer->samples(); sampindex++)
 	{
 		// clock chip once
 		if (m_current_clock > 0) // not ready for new divided clock
@@ -444,9 +445,9 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 		if (m_negate) { out = -out; out2 = -out2; }
 
-		*(lbuffer++) = out;
-		if (m_stereo) *(rbuffer++) = out2;
-		samples--;
+		lbuffer->put(sampindex, stream_buffer::sample_t(out) * sample_scale);
+		if (m_stereo)
+			rbuffer->put(sampindex, stream_buffer::sample_t(out2) * sample_scale);
 	}
 }
 

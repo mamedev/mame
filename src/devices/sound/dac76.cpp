@@ -51,7 +51,7 @@ dac76_device::dac76_device(const machine_config &mconfig, const char *tag, devic
 void dac76_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate() * 8);
+	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate() * 8);
 
 	// register for save states
 	save_item(NAME(m_chord));
@@ -71,11 +71,11 @@ void dac76_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void dac76_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dac76_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// get current output level
 	int step_size = (2 << m_chord);

@@ -59,7 +59,7 @@ arcadia_sound_device::arcadia_sound_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 void arcadia_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, UVI_PAL*OSAMP);
+	m_channel = stream_alloc_legacy(0, 1, UVI_PAL*OSAMP);
 	m_lfsr    = LFSR_INIT;
 	m_tval    = 1;
 	logerror("arcadia_sound start\n");
@@ -76,11 +76,11 @@ void arcadia_sound_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void arcadia_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i;
 	stream_sample_t *buffer = outputs[0];

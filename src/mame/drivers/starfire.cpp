@@ -457,8 +457,8 @@ void fireone_state::fireone(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_l", "R64.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume_r", "R65.DIAL");
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(100000.0, 0.0);
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(100000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(100000.0 / 32768.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(100000.0 / 32768.0, 0.0);
 }
 
 void starfire_state::starfire(machine_config &config)

@@ -34,7 +34,7 @@ namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, co
 void namco_163_sound_device::device_start()
 {
 	m_ram = make_unique_clear<u8[]>(0x80);
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 15);
+	m_stream = stream_alloc_legacy(0, 1, clock() / 15);
 
 	save_pointer(NAME(m_ram), 0x80);
 	save_item(NAME(m_reg_addr));
@@ -143,7 +143,7 @@ u8 namco_163_sound_device::data_r()
 }
 
 
-void namco_163_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void namco_163_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	std::fill_n(&outputs[0][0], samples, 0);
 

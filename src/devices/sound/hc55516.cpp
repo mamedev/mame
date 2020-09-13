@@ -115,7 +115,7 @@ void hc55516_device::start_common(uint8_t _shiftreg_mask, int _active_clock_hi)
 	m_last_clock_state = 0;
 
 	/* create the stream */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
+	m_channel = stream_alloc_legacy(0, 1, SAMPLE_RATE);
 
 	save_item(NAME(m_last_clock_state));
 	save_item(NAME(m_digit));
@@ -241,10 +241,10 @@ int hc55516_device::clock_state_r()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void hc55516_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void hc55516_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	int i;
@@ -301,12 +301,12 @@ void hc55516_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			*buffer++ = sample;
 }
 
-void mc3417_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mc3417_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	hc55516_device::sound_stream_update(stream, inputs, outputs, samples);
+	hc55516_device::sound_stream_update_legacy(stream, inputs, outputs, samples);
 }
 
-void mc3418_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mc3418_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	hc55516_device::sound_stream_update(stream, inputs, outputs, samples);
+	hc55516_device::sound_stream_update_legacy(stream, inputs, outputs, samples);
 }

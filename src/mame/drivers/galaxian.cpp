@@ -6129,7 +6129,7 @@ void galaxian_state::konami_sound_1x_ay8910(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "konami:cin1", 1, "R_AY3D_B.R");
 	NETLIST_STREAM_INPUT(config, "konami:cin2", 2, "R_AY3D_C.R");
 
-	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(1.0 / 0.05, 0.0);
 }
 
 
@@ -6186,7 +6186,7 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "konami:cin3", 3, "R_AY3C_A.R");
 	NETLIST_STREAM_INPUT(config, "konami:cin4", 4, "R_AY3C_B.R");
 	NETLIST_STREAM_INPUT(config, "konami:cin5", 5, "R_AY3C_C.R");
-	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(1.0 / 0.05, 0.0);
 }
 
 

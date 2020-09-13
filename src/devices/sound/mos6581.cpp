@@ -199,7 +199,7 @@ void mos6581_device::device_start()
 	m_read_poty.resolve_safe(0xff);
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	// initialize SID engine
 	m_token->device = this;
@@ -235,11 +235,11 @@ void mos6581_device::device_post_load()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mos6581_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	m_token->fill_buffer(outputs[0], samples);
 }

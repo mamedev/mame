@@ -159,7 +159,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_volume_shift(0)
 	, m_volume_acc_shift(0)
 	, m_current_page(0)
-	, m_active_voices(0)
+	, m_active_voices(0x1f)
 	, m_mode(0)
 	, m_irqv(0x80)
 	, m_voice_index(0)
@@ -249,7 +249,7 @@ void es5506_device::device_start()
 		channels = m_channels;
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
 	if (m_region0 && !has_configured_map(0))
@@ -378,7 +378,7 @@ void es5505_device::device_start()
 		channels = m_channels;
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
 	if (m_region0 && !has_configured_map(0))
@@ -1022,7 +1022,7 @@ inline void es550x_device::generate_irq(es550x_voice *voice, int v)
 
 ***********************************************************************************************/
 
-void es5506_device::generate_samples(s32 **outputs, int offset, int samples)
+void es5506_device::generate_samples(s32 * const *outputs, int offset, int samples)
 {
 	// skip if nothing to do
 	if (!samples)
@@ -1067,7 +1067,7 @@ void es5506_device::generate_samples(s32 **outputs, int offset, int samples)
 	}
 }
 
-void es5505_device::generate_samples(s32 **outputs, int offset, int samples)
+void es5505_device::generate_samples(s32 * const *outputs, int offset, int samples)
 {
 	// skip if nothing to do
 	if (!samples)
@@ -2123,10 +2123,10 @@ u16 es5505_device::read(offs_t offset)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es550x_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 #if ES5506_MAKE_WAVS
 	// start the logging once we have a sample rate

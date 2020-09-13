@@ -283,35 +283,25 @@ void vgmviz_device::cycle_viz_mode()
 //  audio stream and process as necessary
 //-------------------------------------------------
 
-void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vgmviz_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// clear output buffers
-	for (int output = 0; output < m_outputs; output++)
-		std::fill_n(outputs[output], samples, 0);
+	// call the normal interface to actually mix
+	device_mixer_interface::sound_stream_update(stream, inputs, outputs);
 
-	m_current_rate = stream.sample_rate();
-
-	// loop over samples
-	const u8 *outmap = &m_outputmap[0];
-
-	// for each input, add it to the appropriate output
-	for (int pos = 0; pos < samples; pos++)
+	// now consume the outputs
+	for (int pos = 0; pos < outputs[0].samples(); pos++)
 	{
-		for (int inp = 0; inp < m_auto_allocated_inputs; inp++)
+		for (int i = 0; i < outputs.size(); i++)
 		{
-			outputs[outmap[inp]][pos] += inputs[inp][pos];
-		}
-
-		for (int i = 0; i < m_outputs; i++)
-		{
-			const float sample = (float)(int16_t)outputs[i][pos] / 65336.0f;
+			// Original code took 16-bit sample / 65536.0 instead of 32768.0, so multiply by 0.5 here but is it necessary?
+			const float sample = outputs[i].get(pos) * 0.5f;
 			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = sample + 0.5f;
 		}
 
 		switch (m_viz_mode)
 		{
 		default:
-			update_waveform(outputs);
+			update_waveform();
 			break;
 		case VIZ_WATERFALL:
 		case VIZ_RAW_SPEC:
@@ -325,7 +315,7 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		case VIZ_TOP_SPEC4:
 		case VIZ_TOP_SPEC8:
 		case VIZ_TOP_SPEC16:
-			update_fft(outputs);
+			update_fft();
 			break;
 		}
 	}
@@ -336,7 +326,7 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //  update_waveform - perform a wave-style update
 //-------------------------------------------------
 
-void vgmviz_device::update_waveform(stream_sample_t **outputs)
+void vgmviz_device::update_waveform()
 {
 	m_history_length++;
 	m_audio_count[m_audio_fill_index]++;
@@ -355,7 +345,7 @@ void vgmviz_device::update_waveform(stream_sample_t **outputs)
 //  update_fft - keep the FFT up-to-date
 //-------------------------------------------------
 
-void vgmviz_device::update_fft(stream_sample_t **outputs)
+void vgmviz_device::update_fft()
 {
 	m_audio_count[m_audio_fill_index]++;
 	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)

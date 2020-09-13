@@ -232,7 +232,7 @@ public:
 	uint32_t              m_stream_in_number;
 	stream_sample_t     *m_ptr;         /* current in ptr for stream */
 private:
-	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	void stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples);
 
 	double      m_gain;             /* node gain */
 	double      m_offset;           /* node offset */

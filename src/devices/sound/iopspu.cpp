@@ -89,7 +89,7 @@ void iop_spu_device::dma_done(int bank)
 	core.m_status &= ~STATUS_DMA_ACTIVE;
 }
 
-void iop_spu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void iop_spu_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// TODO
 }

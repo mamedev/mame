@@ -62,7 +62,7 @@ asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t 
 void asc_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
+	m_stream = stream_alloc_legacy(0, 2, 22257);
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -113,11 +113,11 @@ void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, 
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void asc_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int i, ch;

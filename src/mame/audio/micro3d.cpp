@@ -182,7 +182,7 @@ micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const 
 void micro3d_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_filter.init(machine().sample_rate());
 
 	m_noise_filters[0].configure(2.7e3 + 2.7e3, 1.0e-6);
@@ -206,10 +206,10 @@ void micro3d_sound_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void micro3d_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	lp_filter *iir = &m_filter;
 	float pan_l, pan_r;

@@ -34,7 +34,7 @@ void msm5232_device::device_start()
 
 	init(clock(), rate);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
+	m_stream = stream_alloc_legacy(0, 11, rate);
 
 	/* register with the save state system */
 	save_item(NAME(m_EN_out16));
@@ -725,10 +725,10 @@ void msm5232_device::set_clock(int clock)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void msm5232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void msm5232_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buf1 = outputs[0];
 	stream_sample_t *buf2 = outputs[1];

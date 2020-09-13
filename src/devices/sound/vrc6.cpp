@@ -45,7 +45,7 @@ vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, d
 
 void vrc6snd_device::device_start()
 {
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = stream_alloc_legacy(0, 1, clock());
 
 	m_freqctrl = m_pulsectrl[0] = m_pulsectrl[1] = 0;
 	m_pulsefrql[0] = m_pulsefrql[1] = m_pulsefrqh[0] = m_pulsefrqh[1] = 0;
@@ -89,11 +89,11 @@ void vrc6snd_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vrc6snd_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	std::fill_n(&outputs[0][0], samples, 0);
 

@@ -148,7 +148,7 @@ void vr0sound_device::device_start()
 	for (auto &elem : m_channel)
 		elem.Cache = &m_fbcache;
 
-	m_stream = stream_alloc(0, 2, clock() / 972); // TODO : Correct source / divider?
+	m_stream = stream_alloc_legacy(0, 2, clock() / 972); // TODO : Correct source / divider?
 
 	save_item(STRUCT_MEMBER(m_channel, CurSAddr));
 	save_item(STRUCT_MEMBER(m_channel, EnvVol));
@@ -208,11 +208,11 @@ device_memory_interface::space_config_vector vr0sound_device::memory_space_confi
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests
+//  sound_stream_update_legacy - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 
-void vr0sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vr0sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	VR0_RenderAudio(samples, outputs[0], outputs[1]);
 }

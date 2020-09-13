@@ -670,7 +670,7 @@ void mario_state::mario_audio(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, m_audio_snd7, "SOUND7.IN", 0);
 	NETLIST_INT_INPUT(config, m_audio_dac, "DAC.VAL", 0, 255);
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(150000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(150000.0 / 32768.0, 0.0);
 #endif
 }
 

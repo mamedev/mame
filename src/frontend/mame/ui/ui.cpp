@@ -1524,7 +1524,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		int32_t maxval = 2000;
 		int32_t defval = 1000;
 
-		std::string str = string_format(_("%1$s Volume"), info.stream->input_name(info.inputnum));
+		std::string str = string_format(_("%1$s Volume"), info.stream->input(info.inputnum).name());
 		m_sliders.push_back(slider_alloc(SLIDER_ID_MIXERVOL + item, str.c_str(), 0, defval, maxval, 20, (void *)(uintptr_t)item));
 	}
 
@@ -1762,13 +1762,13 @@ int32_t mame_ui_manager::slider_mixervol(running_machine &machine, void *arg, in
 		return 0;
 	if (newval != SLIDER_NOCHANGE)
 	{
-		int32_t curval = floor(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
+		int32_t curval = floor(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
 		if (newval > curval && (newval - curval) <= 4) newval += 4; // round up on increment
-		info.stream->set_user_gain(info.inputnum, (float)newval * 0.001f);
+		info.stream->input(info.inputnum).set_user_gain((float)newval * 0.001f);
 	}
 	if (str)
-		*str = string_format("%4.2f", info.stream->user_gain(info.inputnum));
-	return floorf(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
+		*str = string_format("%4.2f", info.stream->input(info.inputnum).user_gain());
+	return floorf(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
 }
 
 

@@ -112,7 +112,7 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 void okim9810_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc_legacy(0, 2, clock());
 
 	// save state stuff
 	save_item(NAME(m_TMP_register));
@@ -214,7 +214,7 @@ void okim9810_device::rom_bank_updated()
 //  our sound stream
 //-------------------------------------------------
 
-void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim9810_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// reset the output streams
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -613,7 +613,7 @@ okim9810_device::okim_voice::okim_voice()
 //-------------------------------------------------
 
 void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
-													stream_sample_t **buffers,
+													stream_sample_t * const *buffers,
 													int samples,
 													const uint8_t global_volume,
 													const uint8_t filter_type)
