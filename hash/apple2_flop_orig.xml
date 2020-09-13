@@ -14593,4 +14593,104 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lstninja">
+		<description>The Last Ninja</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-09-09"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241963">
+				<rom name="the last ninja side a.woz" size="241963" crc="4d69494d" sha1="97257c4b5442ee755af32e63882bd45cb157e320"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241963">
+				<rom name="the last ninja side b.woz" size="241963" crc="30b9cde9" sha1="4dea3ed244c8ecf2ffc44e796b643d83c5d8b974"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cntralnc">
+		<description>Centauri Alliance</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2020-09-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="234852">
+				<rom name="centauri alliance disk 1a - program.woz" size="234852" crc="fa11e457" sha1="45b56d9fc178334c47f0ea2947f8ec184a9d002b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Roster"/>
+			<dataarea name="flop" size="234851">
+				<rom name="centauri alliance disk 1b - roster.woz" size="234851" crc="5ef9c3ea" sha1="3e6b47520a9acd70805a32b8dda47df7f12c9ec6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenario 1"/>
+			<dataarea name="flop" size="234855">
+				<rom name="centauri alliance disk 2a - scenario 1.woz" size="234855" crc="c06b5bdb" sha1="9b100db35d8288bc37ffd442b06166f7a460ff14"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenario 2"/>
+			<dataarea name="flop" size="234855">
+				<rom name="centauri alliance disk 2b - scenario 2.woz" size="234855" crc="e1c88f5b" sha1="a15e0d8f55218b3ccb4419a893f43af11acb8a0a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Scenario 3"/>
+			<dataarea name="flop" size="234855">
+				<rom name="centauri alliance disk 3a - scenario 3.woz" size="234855" crc="7b09e5bc" sha1="ae559226790a2be8368d165dd7940b761c77f35c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Scenario 4"/>
+			<dataarea name="flop" size="234855">
+				<rom name="centauri alliance disk 3b - scenario 4.woz" size="234855" crc="f3d9a9f9" sha1="1f9a1511f334e2a4db6e286e558f328e1e32a196"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agalxsc">
+		<description>Apple Galaxian (StarCraft)</description>
+		<year>1980</year>
+		<publisher>StarCraft</publisher>
+		<info name="release" value="2020-09-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- The game was later re-released by Broderbund Software. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="95008">
+				<rom name="apple galaxian (starcraft).woz" size="95008" crc="146cab96" sha1="895197a33636e2a9f38a35bddc9ebc9b43963f08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="applwrld">
+		<description>Apple World</description>
+		<year>1980</year>
+		<publisher>United Software of America</publisher>
+		<info name="release" value="2020-09-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- It requires a 13-sector drive. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241458">
+				<rom name="apple world.woz" size="241458" crc="46bbd2e3" sha1="83fdc389c10a68a8d27a0719bbd4a54c2c678e81"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

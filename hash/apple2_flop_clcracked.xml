@@ -5441,31 +5441,37 @@ license:CC0
 		<info name="release" value="2017-01-17"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) boot.dsk" size="143360" crc="6575734c" sha1="91de6b82846f547963388541a1b9472d81c41219" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Roster"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) roster.dsk" size="143360" crc="e258fb1e" sha1="daf12471584e5a6c3fc3e501e9334adb35c38ea7" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Scenario 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 1.dsk" size="143360" crc="4d026cd8" sha1="c9f610fd2a6d08a4ee5bf3fa46f260ed56984121" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Scenario 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 2.dsk" size="143360" crc="0d976331" sha1="b6830cb95028bce75ca509964eb701ff5b96f7c2" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Scenario 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 3.dsk" size="143360" crc="5ed890de" sha1="518301730baaef9fa2cbde4cecf73bd3c35b6353" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Scenario 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="centauri alliance (4am crack) scenery 4.dsk" size="143360" crc="f0926edf" sha1="8bf06e1dc19fcc9be58e0bf0b5c24819a688b64d" />
 			</dataarea>
