@@ -6,7 +6,7 @@ This thing is a generic helper for PWM(strobed) display elements, to prevent fli
 and optionally handle perceived brightness levels.
 
 Common usecase is to call matrix(selmask, datamask), a collision between the 2 masks
-implies a powered-on display element (eg, a LED, or VFD sprite). The maximum matrix
+implies a powered-on display element (eg. a LED, or VFD sprite). The maximum matrix
 size is 64 by 64, simply due to uint64_t constraints. If a larger size is needed,
 create an array of pwm_display_device.
 
