@@ -318,7 +318,9 @@ u8 st2xxx_device::pdata_r(offs_t offset)
 void st2xxx_device::pdata_w(offs_t offset, u8 data)
 {
 	// Set output state (CMOS or open drain) or activate/deactive pullups for input pins
-	if (data != m_pdata[offset])
+
+	// HACK, writes here are done before/after SPI accesses to reset SPI state? value doesn't need to change in order to reset state? graphics in ragc153 'parachute' and 'raiden' broken otherwise.
+	//if (data != m_pdata[offset])
 	{
 		m_pdata[offset] = data;
 		m_out_port_cb[offset](0, data, m_pctrl[offset]);

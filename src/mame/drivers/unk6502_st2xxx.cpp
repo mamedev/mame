@@ -291,7 +291,7 @@ void bbl380_state::lcdc_data_w(u8 data)
 	}
 	else if (m_command == 0x2c)
 	{
-		m_displaybuffer[((m_posx + (m_posy * 0x400))) & 0x3fffff] = data;
+		m_displaybuffer[((m_posx + (m_posy * 0x400))) & 0x1ffff] = data;
 
 		m_posx++;
 		if (m_posx > ((m_posmaxx << 1) + 1))
