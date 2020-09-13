@@ -24,6 +24,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/neo_zmc.h"
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
 #include "sound/2610intf.h"
@@ -48,11 +49,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_neo_zmc(*this, "neo_zmc"),
 		m_generic_paletteram_16(*this, "paletteram")
 	{ }
 
 	void neoprint(machine_config &config);
+	void neoprint_zmc(machine_config &config);
 	void nprsp(machine_config &config);
+	void nprsp_zmc(machine_config &config);
 
 	void init_98best44();
 	void init_npmillen();
@@ -77,6 +81,7 @@ private:
 	void audio_command_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint8_t audio_command_r();
 	void audio_result_w(uint8_t data);
+	uint8_t zmc_bank_r(offs_t offset);
 	void nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nprsp_bank_w(uint8_t data);
 	uint16_t rom_window_r(offs_t offset);
@@ -86,6 +91,8 @@ private:
 
 	void neoprint_audio_io_map(address_map &map);
 	void neoprint_audio_map(address_map &map);
+	void neoprint_zmc_audio_io_map(address_map &map);
+	void neoprint_zmc_audio_map(address_map &map);
 	void neoprint_map(address_map &map);
 	void nprsp_map(address_map &map);
 
@@ -98,6 +105,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<neo_zmc_device> m_neo_zmc;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 
 	uint8_t m_audio_result;
@@ -256,6 +264,14 @@ void neoprint_state::audio_result_w(uint8_t data)
 	m_audio_result = data;
 }
 
+uint8_t neoprint_state::zmc_bank_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_neo_zmc->bank_w(offset & 0xff03);
+
+	return 0;
+}
+
 void neoprint_state::neoprint_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -356,12 +372,15 @@ void neoprint_state::nprsp_map(address_map &map)
 
 void neoprint_state::neoprint_audio_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();//.bankr(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK);
-//  map(0x8000, 0xbfff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3);
-//  map(0xc000, 0xdfff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2);
-//  map(0xe000, 0xefff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1);
-//  map(0xf000, 0xf7ff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0);
+	map(0x0000, 0xf7ff).rom();// connected to cartridge
 	map(0xf800, 0xffff).ram();
+}
+
+void neoprint_state::neoprint_zmc_audio_map(address_map &map)
+{
+	neoprint_audio_map(map);
+	map(0x0000, 0xf7ff).unmapr();
+	map(0x0000, 0xf7ff).m(m_neo_zmc, FUNC(neo_zmc_core_device::map));
 }
 
 
@@ -377,13 +396,17 @@ void neoprint_state::neoprint_audio_io_map(address_map &map)
 	/*map(0x00, 0x00).mirror(0xff00).rw(FUNC(neoprint_state::audio_command_r), FUNC(neoprint_state::audio_cpu_clear_nmi_w));*/  /* may not and NMI clear */
 	map(0x00, 0x00).mirror(0xff00).r(FUNC(neoprint_state::audio_command_r)).nopw();
 	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+//  map(0x08, 0x0b).select(0xfff0) // connected to cartridge (SDRD0)
 //  map(0x08, 0x08).mirror(0xff00); /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-//  map(0x08, 0x08).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_f000_f7ff_r));
-//  map(0x09, 0x09).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_e000_efff_r));
-//  map(0x0a, 0x0a).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_c000_dfff_r));
-//  map(0x0b, 0x0b).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_8000_bfff_r));
+//  map(0x0c, 0x0f).select(0xfff0) // connected to cartridge (SDRD1)
 	map(0x0c, 0x0c).mirror(0xff00).w(FUNC(neoprint_state::audio_result_w));
 //  map(0x18, 0x18).mirror(0xff00); /* write - NMI disable? (the data written doesn't matter) */
+}
+
+void neoprint_state::neoprint_zmc_audio_io_map(address_map &map)
+{
+	neoprint_audio_io_map(map);
+	map(0x08, 0x0b).mirror(0x00f0).select(0xff00).r(FUNC(neoprint_state::zmc_bank_r));
 }
 
 static INPUT_PORTS_START( neoprint )
@@ -543,6 +566,17 @@ void neoprint_state::neoprint(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
+// Neo Print cartridge with NEO-ZMC
+void neoprint_state::neoprint_zmc(machine_config &config)
+{
+	neoprint(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_zmc_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::neoprint_zmc_audio_io_map);
+
+	NEO_ZMC(config, m_neo_zmc);
+	m_neo_zmc->set_default_rom_tag("audiocpu");
+}
+
 MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 {
 	m_bank_val = 0;
@@ -587,6 +621,17 @@ void neoprint_state::nprsp(machine_config &config)
 	ymsnd.add_route(0, "rspeaker", 0.60);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
+}
+
+// Neo Print Special cartridge with NEO-ZMC
+void neoprint_state::nprsp_zmc(machine_config &config)
+{
+	nprsp(config);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_zmc_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::neoprint_zmc_audio_io_map);
+
+	NEO_ZMC(config, m_neo_zmc);
+	m_neo_zmc->set_default_rom_tag("audiocpu");
 }
 
 
@@ -905,17 +950,17 @@ void neoprint_state::init_npotogib()
 	ROM[0x3f4e/2] = 0x4e71; //ROM checksum
 }
 
-GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npscv1,      0,        neoprint,    neoprint, neoprint_state, init_npscv1,   ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npcramen,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Chicken Ramen (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npsprgv4,    0,        neoprint,    neoprint, neoprint_state, init_npsprgv4, ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npskv,       0,        neoprint,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npotogib,    0,        neoprint,    neoprint, neoprint_state, init_npotogib, ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npusagif,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Usagi Frame (Japan) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, neoprint,    0,        neoprint_zmc,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint_zmc,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npscv1,      0,        neoprint_zmc,    neoprint, neoprint_state, init_npscv1,   ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcramen,    0,        neoprint_zmc,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Chicken Ramen (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npsprgv4,    0,        neoprint_zmc,    neoprint, neoprint_state, init_npsprgv4, ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npskv,       0,        neoprint_zmc,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npotogib,    0,        neoprint_zmc,    neoprint, neoprint_state, init_npotogib, ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npusagif,    0,        neoprint_zmc,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Usagi Frame (Japan) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint_zmc,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, npsprg98,    0,        neoprint_zmc,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npmillen,    0,        neoprint_zmc,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npfpit,      0,        neoprint_zmc,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, nprsp,       0,        nprsp_zmc,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npssr2,      0,        nprsp_zmc,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
