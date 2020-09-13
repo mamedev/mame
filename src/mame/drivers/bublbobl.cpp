@@ -265,11 +265,6 @@ TODO:
   accesses done by the sound CPU to the YM2203 I/O ports. At the very least, there
   could be some filters.
 
- There are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
- is protected against reading and the main code only differs by 1 byte from
- Bubble Bobble.  If the MCU were to be dumped that would also make for
- interesting comparisons.
-
 ***************************************************************************/
 
 #include "emu.h"
