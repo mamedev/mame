@@ -278,6 +278,8 @@ private:
 	u8 dmem_r(offs_t offset);
 	void dmem_w(offs_t offset, u8 data);
 
+	u8 unknown_7b_r();
+
 	void int_map(address_map &map);
 };
 

@@ -46,6 +46,8 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this)
 	, m_out_port_cb(*this)
+	, m_spi_in_port_cb(*this)
+	, m_spi_out_port_cb(*this)
 	, m_prr_mask(data_bits <= 14 ? 0 : ((u16(1) << (data_bits - 14)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_drr_mask(data_bits <= 15 ? 0 : ((u16(1) << (data_bits - 15)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_pdata{0}
@@ -100,6 +102,9 @@ void st2xxx_device::device_resolve_objects()
 {
 	m_in_port_cb.resolve_all_safe(0xff);
 	m_out_port_cb.resolve_all_safe();
+
+	m_spi_in_port_cb.resolve_safe(0xff);
+	m_spi_out_port_cb.resolve_safe();
 }
 
 TIMER_CALLBACK_MEMBER(st2xxx_device::bt_interrupt)
@@ -773,6 +778,16 @@ void st2xxx_device::lpwm_w(u8 data)
 	m_lpwm = data & st2xxx_lpwm_mask();
 }
 
+u8 st2xxx_device::spi_r()
+{
+	return m_spi_in_port_cb();
+}
+
+void st2xxx_device::spi_w(u8 data)
+{
+	m_spi_out_port_cb(data);
+}
+
 u8 st2xxx_device::sctr_r()
 {
 	return m_sctr;
@@ -799,7 +814,9 @@ void st2xxx_device::sckr_w(u8 data)
 
 u8 st2xxx_device::ssr_r()
 {
-	return m_ssr | 0x88;
+	// HACK
+	return 0xff;
+	//return m_ssr | 0x88;
 }
 
 void st2xxx_device::ssr_w(u8 data)

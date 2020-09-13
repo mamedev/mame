@@ -28,14 +28,16 @@
 class bbl380_state : public driver_device
 {
 public:
-	bbl380_state(const machine_config &mconfig, device_type type, const char *tag) :
+	bbl380_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_spirom(*this, "spi"),
+		m_io_p1(*this, "IN0"),
+		m_io_p2(*this, "IN1")
 	{ }
 
-	void bbl380(machine_config &config);
+	void bbl380(machine_config& config);
 	void init_ragc153();
 
 private:
@@ -46,69 +48,400 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	void bbl380_map(address_map &map);
+	void bbl380_map(address_map& map);
 
 	required_device<st2xxx_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+
+	enum menustate : const int
+	{
+	   MENU_READY_FOR_COMMAND = 0,
+
+	   MENU_COMMAND_00_IN,
+	   MENU_COMMAND_02_IN,
+	   MENU_COMMAND_04_IN,
+	   MENU_COMMAND_05_IN
+	};
+
+	menustate m_menustate;
+
+	u8 m_bit10state;
+	u8 m_latchdata;
+	int m_latchpos;
+	u8 m_latchinbit;
+	u8 m_menupos;
+
+	u8 input_r();
+	u8 input2_r();
+	void tx_menu_cmd(u8 data);
+	void output_w(u8 data);
+	void output2_w(u8 data);
+
+	u8 m_displaybuffer[256*256*2];
+	int m_posx, m_posy;
+	int m_posminx, m_posmaxx;
+	int m_posminy, m_posmaxy;
+	int m_command;
+	int m_commandstep;
+
+	enum spistate : const int
+	{
+		SPI_STATE_READY = 0,
+		SPI_STATE_WAITING_HIGH_ADDR = 1,
+		SPI_STATE_WAITING_MID_ADDR = 2,
+		SPI_STATE_WAITING_LOW_ADDR = 3,
+		SPI_STATE_WAITING_DUMMY1_ADDR = 4,
+		SPI_STATE_WAITING_DUMMY2_ADDR = 5,
+		SPI_STATE_READING = 6,
+	};
+
+	spistate m_spistate;
+	u32 m_spiaddress;
+	int m_delay;
+
+	void spi_w(u8 data);
+	u8 spi_r();
+
+	required_region_ptr<u8> m_spirom;
+	required_ioport m_io_p1;
+	required_ioport m_io_p2;
 };
 
-uint32_t bbl380_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u8 bbl380_state::input_r()
 {
+	return m_io_p1->read();
+}
+
+u8 bbl380_state::input2_r()
+{
+	u8 dat = (m_bit10state << 4) | (m_latchinbit << 3);
+	dat |= m_io_p2->read() & 0xe7;
+
+	return dat;
+}
+
+void bbl380_state::tx_menu_cmd(u8 data)
+{
+	if (m_menustate == MENU_READY_FOR_COMMAND)
+	{
+		if (data == 0x00)
+		{
+			m_menustate = MENU_COMMAND_00_IN;
+		}
+		else if (data == 0x09)
+		{
+			// ..
+		}
+		else if (data == 0x02)
+		{
+			// set
+			m_menustate = MENU_COMMAND_02_IN;
+		}
+		else if (data == 0x04)
+		{
+			// add
+			m_menustate = MENU_COMMAND_04_IN;
+		}
+		else if (data == 0x05)
+		{
+			// sub
+			m_menustate = MENU_COMMAND_05_IN;
+		}
+		else
+		{
+			logerror("sending %02x unknown command\n", data);
+		}
+	}
+	else if (m_menustate == MENU_COMMAND_00_IN)
+	{
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_02_IN)
+	{
+		m_menupos = data - 0x08;
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_04_IN)
+	{
+		m_menupos += (data - 0x09);
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_05_IN)
+	{
+		if (data != 0xf0)
+			m_menupos -= (data - 0x0b);
+		else
+			m_menupos -= (data - 0x0a); // dphh8630 when pressing 'right' on final menu page
+
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+}
+
+void bbl380_state::output_w(u8 data)
+{
+	m_spistate = SPI_STATE_READY;
+}
+
+void bbl380_state::output2_w(u8 data)
+{
+	if (data & 0x40)
+	{
+		if (data & 0x04)
+		{
+			m_bit10state = 1;
+		}
+		else
+		{
+			m_bit10state = 0;
+			m_latchdata <<= 1;
+			m_latchdata |= ((data & 0x08) >> 3);
+			m_latchinbit = (m_menupos >> (7 - m_latchpos)) & 1;
+			m_latchpos++;
+
+			if (m_latchpos == 8)
+			{
+				m_latchpos = 0;
+				tx_menu_cmd(m_latchdata);
+			}
+		}
+	}
+	else
+	{
+		m_latchpos = 0;
+		m_latchdata = 0;
+	}
+}
+
+uint32_t bbl380_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 128; y++)
+	{
+		uint32_t* dst = &bitmap.pix32(y);
+
+		for (int x = 0; x < 160; x++)
+		{
+			int count = (y * 0x200) + x;
+
+			u16 dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
+
+			int b = ((dat >> 0) & 0x1f) << 3;
+			int g = ((dat >> 5) & 0x3f) << 2;
+			int r = ((dat >> 11) & 0x1f) << 3;
+
+			dst[x] = (r << 16) | (g << 8) | (b << 0);
+		}
+	}
+
 	return 0;
 }
 
 void bbl380_state::machine_start()
 {
+	m_menupos = 0x01;
 }
 
 void bbl380_state::machine_reset()
 {
+	m_bit10state = 0;
+	m_menustate = MENU_READY_FOR_COMMAND;
 }
 
 void bbl380_state::lcdc_command_w(u8 data)
 {
-	logerror("%s: LCDC command $%02X\n", machine().describe_context(), data);
+	m_command = data;
+	m_commandstep = 0;
+
+	if (m_command == 0x2c)
+	{
+		m_posx = m_posminx << 1;
+		m_posy = m_posminy;
+	}
 }
 
 u8 bbl380_state::lcdc_data_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%s: LCDC data read\n", machine().describe_context());
 	return 0;
 }
 
 void bbl380_state::lcdc_data_w(u8 data)
 {
-	logerror("%s: LCDC data $%02X\n", machine().describe_context(), data);
+	if (m_command == 0x2b)
+	{
+		switch (m_commandstep)
+		{
+		case 0: m_posminy = data << 8 | (m_posminy & 0xff); break;
+		case 1: m_posminy = (m_posminy & 0xff00) | data; break;
+		case 2: m_posmaxy = data << 8 | (m_posmaxy & 0xff); break;
+		case 3: m_posmaxy = (m_posmaxy & 0xff00) | data; break;
+		}
+		m_commandstep++;
+	}
+	else if (m_command == 0x2a)
+	{
+		switch (m_commandstep)
+		{
+		case 0: m_posminx = data << 8 | (m_posminx & 0xff); break;
+		case 1: m_posminx = (m_posminx & 0xff00) | data; break;
+		case 2: m_posmaxx = data << 8 | (m_posmaxx & 0xff); break;
+		case 3: m_posmaxx = (m_posmaxx & 0xff00) | data; break;
+		}
+		m_commandstep++;
+	}
+	else if (m_command == 0x2c)
+	{
+		m_displaybuffer[((m_posx + (m_posy * 0x400))) & 0x3fffff] = data;
+
+		m_posx++;
+		if (m_posx > ((m_posmaxx << 1) + 1))
+		{
+			m_posx = m_posminx << 1;
+			m_posy++;
+
+			if (m_posy > m_posmaxy)
+			{
+				m_posy = m_posminy;
+			}
+		}
+	}
 }
+
+void bbl380_state::spi_w(u8 data)
+{
+	switch (m_spistate)
+	{
+	case SPI_STATE_READY:
+	{
+		if (data == 0x03)
+		{
+			m_spistate = SPI_STATE_WAITING_HIGH_ADDR;
+		}
+		else
+		{
+			logerror("%s: invalid state request %02x\n", machine().describe_context(), data);
+		}
+		break;
+	}
+
+	case SPI_STATE_WAITING_HIGH_ADDR:
+	{
+		m_spiaddress = (m_spiaddress & 0xff00ffff) | data << 16;
+		m_spistate = SPI_STATE_WAITING_MID_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_MID_ADDR:
+	{
+		m_spiaddress = (m_spiaddress & 0xffff00ff) | data << 8;
+		m_spistate = SPI_STATE_WAITING_LOW_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_LOW_ADDR:
+	{
+		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
+		m_spistate = SPI_STATE_READING;
+		m_delay = 2;
+		break;
+	}
+
+	case SPI_STATE_READING:
+	{
+		// writes when in read mode clock in data?
+		m_delay = 1;
+		break;
+	}
+
+	case SPI_STATE_WAITING_DUMMY1_ADDR:
+	{
+		m_spistate = SPI_STATE_WAITING_DUMMY2_ADDR;
+		break;
+	}
+
+	case SPI_STATE_WAITING_DUMMY2_ADDR:
+	{
+	//  m_spistate = SPI_STATE_READY;
+		break;
+	}
+
+	}
+}
+
+u8 bbl380_state::spi_r()
+{
+	switch (m_spistate)
+	{
+	case SPI_STATE_READING:
+	{
+		if (m_delay>0)
+		{
+			m_delay--;
+			return 0x00;
+		}
+		else
+		{
+			u8 dat = m_spirom[m_spiaddress & 0x3fffff];
+			//logerror("%s: reading SPI %02x from SPI Address %08x\n", machine().describe_context(), dat, m_spiaddress);
+			m_spiaddress++;
+			return dat;
+		}
+	}
+
+	default:
+	{
+		//logerror("%s: reading FIFO in unknown state\n", machine().describe_context() );
+		return 0x00;
+	}
+	}
+
+	return 0x00;
+}
+
 
 void bbl380_state::bbl380_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
-	map(0x600000, 0x600000).w(FUNC(bbl380_state::lcdc_command_w));
-	map(0x604000, 0x604000).rw(FUNC(bbl380_state::lcdc_data_r), FUNC(bbl380_state::lcdc_data_w));
+	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
+	map(0x1800000,0x1800000).w(FUNC(bbl380_state::lcdc_command_w));
+	map(0x1804000,0x1804000).rw(FUNC(bbl380_state::lcdc_data_r), FUNC(bbl380_state::lcdc_data_w));
 }
 
 static INPUT_PORTS_START( bbl380 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // maybe ON/OFF
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SOUND")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input2_r
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input2_r
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 8000000); // unknown clock; type not confirmed
+	ST2302U(config, m_maincpu, 24000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
+	m_maincpu->in_pa_callback().set(FUNC(bbl380_state::input_r));
+	m_maincpu->in_pb_callback().set(FUNC(bbl380_state::input2_r));
+	m_maincpu->out_pa_callback().set(FUNC(bbl380_state::output_w));
+	m_maincpu->out_pb_callback().set(FUNC(bbl380_state::output2_w));
+	m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r));
+	m_maincpu->spi_out_callback().set(FUNC(bbl380_state::spi_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(132, 162);
-	m_screen->set_visarea(0, 132-1, 0, 162-1);
+	m_screen->set_size(160, 128);
+	m_screen->set_visarea(0, 160-1, 0, 128-1);
 	m_screen->set_screen_update(FUNC(bbl380_state::screen_update));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
@@ -160,8 +493,9 @@ ROM_END
 
 void bbl380_state::init_ragc153()
 {
-#if 0 // probably done in software or by hardware DMA
-	uint8_t *ROM = memregion("spi")->base();
+	// this is done in software on the machine
+#if 0
+	u8 *ROM = memregion("spi")->base();
 	int size = memregion("spi")->bytes();
 
 	for (int i = 0; i < size; i++)
@@ -171,9 +505,9 @@ void bbl380_state::init_ragc153()
 #endif
 }
 
-CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
-CONS( 200?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Handheld Console 152-in-1", MACHINE_IS_SKELETON ) // looks like a mini GameBoy - 'Over 150 games' on box
-CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_IS_SKELETON ) // looks like a Game & Watch
-CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "PCP", "PCP 8630 - 230-in-1 - Digital Pocket Hand Held System", MACHINE_IS_SKELETON ) // PCP isn't mentioned on packaging
-CONS( 200?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_IS_SKELETON )
+CONS( 200?, bbl380,        0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, rhhc152,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Handheld Console 152-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // looks like a mini GameBoy - 'Over 150 games' on box
+CONS( 200?, ragc153,       0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "Orb", "Retro Arcade Game Controller 153-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // looks like a Game & Watch
+CONS( 200?, dphh8630,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "<unknown>", "Digital Pocket Hand Held System 230-in-1 - Model 8630 / Model 8633", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // sometimes sold as PCP.  Model 8630/8633 are same ROM, different case
+CONS( 200?, dgun2953,      0,       0,      bbl380,   bbl380, bbl380_state, init_ragc153, "dreamGEAR", "My Arcade Gamer Mini 160-in-1 (DGUN-2953)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

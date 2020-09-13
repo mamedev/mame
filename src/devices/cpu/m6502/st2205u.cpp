@@ -926,8 +926,25 @@ u8 st2205u_base_device::dcnth_r()
 
 void st2205u_base_device::dcnth_w(u8 data)
 {
-	m_dcnt[m_dctr >> 1] = (m_dcnt[m_dctr >> 1] & 0x7f00) | data;
-	// TODO: start DMA here
+	m_dcnt[m_dctr >> 1] = (data & 0x7f) << 8 | (m_dcnt[m_dctr >> 1] & 0x00ff);
+
+	// start DMA
+
+	// this is incomplete
+
+	int source = m_dptr[0];
+	int dest = m_dptr[1];
+	int length = m_dcnt[0] << 1;
+
+	address_space& mem = this->space(AS_PROGRAM);
+
+	for (int i = 0; i < length; i++)
+	{
+		uint8_t byte = mem.read_byte(source);
+		mem.write_byte(dest, byte);
+		source++;
+		dest++;
+	}
 }
 
 u8 st2205u_base_device::dctr_r()
@@ -1114,6 +1131,11 @@ void st2205u_device::int_map(address_map &map)
 	map(0x8000, 0xffff).rw(FUNC(st2205u_device::dmem_r), FUNC(st2205u_device::dmem_w));
 }
 
+u8 st2302u_device::unknown_7b_r()
+{
+	return 0xff;
+}
+
 void st2302u_device::int_map(address_map &map)
 {
 	base_map(map);
@@ -1122,6 +1144,7 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2302u_device::pctrl_r), FUNC(st2302u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2302u_device::pfc_r), FUNC(st2302u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2302u_device::pfd_r), FUNC(st2302u_device::pfd_w));
+	map(0x0010, 0x0011).rw(FUNC(st2302u_device::spi_r), FUNC(st2302u_device::spi_w));
 	map(0x0012, 0x0012).rw(FUNC(st2302u_device::sctr_r), FUNC(st2302u_device::sctr_w));
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));
@@ -1132,6 +1155,9 @@ void st2302u_device::int_map(address_map &map)
 	map(0x004c, 0x004d).rw(FUNC(st2302u_device::volm_r), FUNC(st2302u_device::volm_w));
 	map(0x004e, 0x004e).rw(FUNC(st2302u_device::psgc_r), FUNC(st2302u_device::psgc_w));
 	map(0x004f, 0x004f).rw(FUNC(st2302u_device::psgm_r), FUNC(st2302u_device::psgm_w));
+
+	map(0x007b, 0x007b).r(FUNC(st2302u_device::unknown_7b_r)); // (?)
+
 	map(0x0080, 0x07ff).ram();
 	map(0x4000, 0x7fff).rw(FUNC(st2302u_device::pmem_r), FUNC(st2302u_device::pmem_w));
 	map(0x8000, 0xffff).rw(FUNC(st2302u_device::dmem_r), FUNC(st2302u_device::dmem_w));
