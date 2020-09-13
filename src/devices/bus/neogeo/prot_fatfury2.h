@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "machine/alpha_8921.h"
+
 DECLARE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device)
 
 
@@ -19,10 +21,12 @@ public:
 	void protection_w(offs_t offset, uint16_t data);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint32_t     m_prot_data;
+private:
+	required_device<alpha_8921_device> m_pro_ct0; // PRO-CT0 or SNK-9201
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_FATFURY2_H

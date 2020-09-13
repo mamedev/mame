@@ -1763,32 +1763,32 @@ void win_window_info::adjust_window_position_after_major_change()
 		// constrain the existing size to the aspect ratio
 		if (video_config.keepaspect)
 			newrect = constrain_to_aspect_ratio(newrect, WMSZ_BOTTOMRIGHT);
+
+		// restrict the window to one monitor and avoid toolbars if possible
+		HMONITOR const nearest_monitor = MonitorFromWindow(platform_window(), MONITOR_DEFAULTTONEAREST);
+		if (NULL != nearest_monitor)
+		{
+			MONITORINFO info;
+			std::memset(&info, 0, sizeof(info));
+			info.cbSize = sizeof(info);
+			if (GetMonitorInfo(nearest_monitor, &info))
+			{
+				if (newrect.right() > info.rcWork.right)
+					newrect = newrect.move_by(info.rcWork.right - newrect.right(), 0);
+				if (newrect.bottom() > info.rcWork.bottom)
+					newrect = newrect.move_by(0, info.rcWork.bottom - newrect.bottom());
+				if (newrect.left() < info.rcWork.left)
+					newrect = newrect.move_by(info.rcWork.left - newrect.left(), 0);
+				if (newrect.top() < info.rcWork.top)
+					newrect = newrect.move_by(0, info.rcWork.top - newrect.top());
+			}
+		}
 	}
 	else
 	{
 		// in full screen, make sure it covers the primary display
 		std::shared_ptr<osd_monitor_info> monitor = monitor_from_rect(nullptr);
 		newrect = monitor->position_size();
-	}
-
-	// restrict the window to one monitor and avoid toolbars if possible
-	HMONITOR const nearest_monitor = MonitorFromWindow(platform_window(), MONITOR_DEFAULTTONEAREST);
-	if (NULL != nearest_monitor)
-	{
-		MONITORINFO info;
-		std::memset(&info, 0, sizeof(info));
-		info.cbSize = sizeof(info);
-		if (GetMonitorInfo(nearest_monitor, &info))
-		{
-			if (newrect.right() > info.rcWork.right)
-				newrect = newrect.move_by(info.rcWork.right - newrect.right(), 0);
-			if (newrect.bottom() > info.rcWork.bottom)
-				newrect = newrect.move_by(0, info.rcWork.bottom - newrect.bottom());
-			if (newrect.left() < info.rcWork.left)
-				newrect = newrect.move_by(info.rcWork.left - newrect.left(), 0);
-			if (newrect.top() < info.rcWork.top)
-				newrect = newrect.move_by(0, info.rcWork.top - newrect.top());
-		}
 	}
 
 	// adjust the position if different

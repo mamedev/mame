@@ -9481,6 +9481,7 @@ bbredux                         // bootleg / hack
 boblbobl                        // bootleg
 boblcave                        // hack
 bub68705                        // bootleg
+bub8749                         // bootleg
 bublboblp                       // Prototype (c) 1986 Taito Corporation
 bublbobl                        // A78 (c) 1986 Taito Corporation
 bublbobl1                       // A78 (c) 1986 Taito Corporation
@@ -9516,6 +9517,9 @@ busicom                         //
 
 @source:buster.cpp
 buster                          // (c) 1987 Marian Electronics Ltd.
+
+@source:bvm.cpp
+bvm20f1e                        //
 
 @source:bw12.cpp
 bw12                            //
@@ -11233,12 +11237,14 @@ cps3booto2                      // bootleg
 cps3bs32                        //
 cps3bs32a                       //
 jojo                            // 28/01/1999 (c) 1998 (Euro)
-jojoba                          // 27/09/1999 (c) 1999 (Japan)
+jojoba                          // 27/09/1999 (c) 1999 (Euro)
+jojobaj                         // 27/09/1999 (c) 1999 (Japan)
+jojobajr1                       // 13/09/1999 (c) 1999 (Japan)
 jojoban                         // 27/09/1999 (c) 1999 (Japan)
 jojobane                        // 27/09/1999 (c) 1999 (Euro)
 jojobaner1                      // 13/09/1999 (c) 1999 (Euro)
 jojobanr1                       // 13/09/1999 (c) 1999 (Japan)
-jojobar1                        // 13/09/1999 (c) 1999 (Japan)
+jojobar1                        // 13/09/1999 (c) 1999 (Euro)
 jojoj                           // 28/01/1999 (c) 1998 (Japan)
 jojojr1                         // 08/01/1999 (c) 1998 (Japan)
 jojojr2                         // 02/12/1998 (c) 1998 (Japan)
@@ -11878,6 +11884,7 @@ debutm
 @source:dec0.cpp
 automat                         // bootleg
 baddudes                        // EI (c) 1988 Data East USA (US)
+bandit                          // (c) 1989 Data East USA (US)
 birdtry                         // EK (c) 1988 Data East Corporation (Japan)
 birdtrya                        // EK (c) 1988 Data East Corporation (Japan)
 bouldash                        // (c) 1990 Data East Corporation (World)
@@ -11892,8 +11899,8 @@ ffantasyb                       // EX (c) 1989 Data East Corporation (World)
 ffantasybl                      // bootleg
 hbarrel                         // EC (c) 1987 Data East Corporation (World)
 hbarrelu                        // (c) 1987 Data East USA (US)
-bandit                          // (c) 1989 Data East USA (US)
 hippodrm                        // EW (c) 1989 Data East USA (US)
+mastbond                        // bootleg
 midres                          // (c) 1989 Data East Corporation (World)
 midresb                         // bootleg
 midresbj                        // bootleg
@@ -13686,6 +13693,7 @@ superbug                        // 009115-009467    1977/09 [6800]
 bbprot                          // unfinished prototype
 fitfight                        // bootleg of Art of Fighting
 histryma                        // bootleg of Fighter's History
+histryma2                       // bootleg of Fighter's History
 hotmindff                       // (c) Playmark
 
 @source:fk1.cpp
@@ -14015,7 +14023,8 @@ wrally2a                        // (c) 1995 - Ref 950510
 footbpow                        // (c) 1999 - Ref 000208
 radikalb                        // (c) 1998 - Ref ???
 radikalba                       // (c) 1998 - Ref ???
-speedup                         // (c) 1996 - Ref ???
+speedup                         // (c) 1996 - Ref 961022 (main) + 961029 (ROMs)
+speedup12                       // (c) 1996 - Ref ???
 speedup10                       // (c) 1996 - Ref ???
 surfplnt                        // (c) 1997 - Ref 971223
 surfplnt40                      // (c) 1997 - Ref 970514
@@ -18990,6 +18999,7 @@ mariorou
 @source:konmedal68k.cpp
 dobouchn
 kattobas
+konslot
 koropens
 kzaurus
 pwrchanc
@@ -19509,6 +19519,7 @@ lkage                           // A54 (c) 1984 Taito Corporation
 lkageb                          // bootleg
 lkageb2                         // bootleg
 lkageb3                         // bootleg
+lkageb4                         // bootleg
 lkageo                          // A54 (c) 1984 Taito Corporation
 lkageoo                         // A54 (c) 1984 Taito Corporation
 
@@ -22999,6 +23010,7 @@ gwinner                         // (c) 1983 Reben
 luckyplr                        // (c) 1981 Cirsa
 minisupf                        // (c) 1981 Cirsa
 msbamby                         // (c) 198? Automatics Pasqual
+unkslot                         // (c) 198? MGA or Costa Net?
 
 @source:missile.cpp
 mcombat                         // bootleg
@@ -31232,6 +31244,7 @@ motoxgov2a                      // November 1997
 motoxgov2a2                     // November 1997
 panicprk                        // May 1998
 panicprkj                       // May 1998
+panicprkj2                      // May 1998
 raceon                          // Race On - September 1998
 rapidrvr                        // December 1997
 rapidrvrp                       // December 1997 (prototype)
@@ -32097,6 +32110,7 @@ npssr2                          //
 npusagif                        //
 
 @source:neptunp2.cpp
+mexlindo                        //
 neptunp2                        //
 rockroll                        //
 

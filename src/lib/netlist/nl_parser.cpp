@@ -120,7 +120,7 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			if (token.is(m_tok_NETLIST_START) && (name.str() == nlname || nlname.empty()))
 			{
 				require_token(m_tok_paren_right);
-				parse_netlist(name.str());
+				parse_netlist();
 				return true;
 			}
 			if (token.is(m_tok_TRUTHTABLE_START) && name.str() == nlname)
@@ -165,7 +165,7 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 	}
 }
 
-void parser_t::parse_netlist(const pstring &nlname)
+void parser_t::parse_netlist()
 {
 	while (true)
 	{

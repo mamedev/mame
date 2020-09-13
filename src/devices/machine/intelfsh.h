@@ -30,6 +30,7 @@ public:
 		FLASH_AMD_29F800T,
 		FLASH_AMD_29F800B_16BIT,
 		FLASH_AMD_29LV200T,
+		FLASH_CAT28F020,
 		FLASH_SHARP_LH28F016S,
 		FLASH_SHARP_LH28F016S_16BIT,
 		FLASH_INTEL_E28F008SA,
@@ -365,6 +366,12 @@ public:
 	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class cat28f020_device : public intelfsh8_device
+{
+public:
+	cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(INTEL_28F016S5,        intel_28f016s5_device)
@@ -406,5 +413,6 @@ DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
 DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)
 DECLARE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device)
+DECLARE_DEVICE_TYPE(CAT28F020,             cat28f020_device)
 
 #endif // MAME_MACHINE_INTELFSH_H

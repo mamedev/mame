@@ -1949,6 +1949,7 @@ void lua_engine::initialize()
  *
  * ioport:count_players() - get count of player controllers
  * ioport:type_group(type, player)
+ * ioport:type_seq(type, player, seqtype) - get input sequence for ioport type/player
  *
  * ioport.ports[] - ioports table (k=tag, v=ioport_port)
  */
@@ -1965,6 +1966,9 @@ void lua_engine::initialize()
 				port_table[port.second->tag()] = port.second.get();
 			return port_table;
 		}));
+	ioport_manager_type.set("type_seq", [](ioport_manager &m, ioport_type type, int player, input_seq_type seqtype) {
+			return sol::make_user(m.type_seq(type, player, seqtype));
+		});
 	sol().registry().set_usertype("ioport", ioport_manager_type);
 
 

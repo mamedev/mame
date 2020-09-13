@@ -44,13 +44,10 @@
 
 
 
-// not really found anywhere, just took the 5239 and changed the
-// breakdown voltage to 5.1 according to the datasheet
-#define D_1N5231(name) ZDIODE(name, "D(BV=5.1 IBV=0.020 NBV=1)")
+#define D_1N5231(name) ZDIODE(name, "1N5231")
 #define D_1N914(name) DIODE(name, "1N914")
 
-// SPICE model taken from https://www.onsemi.com/support/design-resources/models?rpn=2N4403
-#define Q_2N4403(name) QBJT_EB(name, "PNP(Is=650.6E-18 Xti=3 Eg=1.11 Vaf=115.7 Bf=216.2 Ne=1.829 Ise=58.72f Ikf=1.079 Xtb=1.5 Br=3.578 Nc=2 Isc=0 Ikr=0 Rc=.715 Cjc=14.76p Mjc=.5383 Vjc=.75 Fc=.5 Cje=19.82p Mje=.3357 Vje=.75 Tr=111.6n Tf=603.7p Itf=.65 Vtf=5 Xtf=1.7 Rb=10)")
+#define Q_2N4403(name) QBJT_EB(name, "2N4403")
 
 // JFET transistors not supported, but this should do the trick
 #define Q_2N4093(name) MOSFET(name, "NMOS(VTO=-1 CAPMOD=0)")

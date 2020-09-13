@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 
 void gaelco3d_state::machine_start()
 {
-	/* Save state support */
+	// Save state support
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_analog_ports));
 	save_item(NAME(m_framenum));
@@ -193,7 +193,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 {
 	m_framenum = 0;
 
-	/* boot the ADSP chip */
+	// Boot the ADSP chip
 	uint16_t *src = (uint16_t *)memregion("user1")->base();
 	for (int i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
@@ -204,7 +204,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 	m_adsp_bank->configure_entries(0, 256, memregion("user1")->base(), 0x4000);
 	m_adsp_bank->set_entry(0);
 
-	/* keep the TMS32031 halted until the code is ready to go */
+	// Keep the TMS32031 halted until the code is ready to go
 	m_tms->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -259,8 +259,8 @@ uint16_t gaelco3d_state::eeprom_data_r(offs_t offset, uint16_t mem_mask)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		/* bit 0 is clock */
-		/* bit 1 active */
+		// bit 0 is clock
+		// bit 1 active
 		result &= ~uint32_t(gaelco_serial_device::EXT_STATUS_MASK);
 		result |= m_serial->status_r();
 	}
@@ -314,7 +314,7 @@ READ_LINE_MEMBER(gaelco3d_state::analog_bit_r)
 
 WRITE_LINE_MEMBER(gaelco3d_state::analog_port_clock_w)
 {
-	/* a zero/one combo is written here to clock the next analog port bit */
+	// A zero/one combo is written here to clock the next analog port bit
 	if (!state)
 	{
 		m_analog_ports[0] <<= 1;
@@ -327,7 +327,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::analog_port_clock_w)
 
 WRITE_LINE_MEMBER(gaelco3d_state::analog_port_latch_w)
 {
-	/* a zero is written here to read the analog ports, and a one is written when finished */
+	// A zero is written here to read the analog ports, and a one is written when finished
 	if (!state)
 	{
 		m_analog_ports[0] = m_analog[0].read_safe(0);
@@ -405,8 +405,8 @@ void gaelco3d_state::tms_iack_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(gaelco3d_state::tms_reset_w)
 {
-	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
-	/* it does not ever appear to be touched after that */
+	/* this is set to 0 while data is uploaded, then set to $ffff after it is done.
+	   It does not ever appear to be touched after that */
 	if (LOG)
 		logerror("%06X:tms_reset_w = %d\n", m_maincpu->pc(), state);
 	m_tms->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
@@ -415,8 +415,8 @@ WRITE_LINE_MEMBER(gaelco3d_state::tms_reset_w)
 
 WRITE_LINE_MEMBER(gaelco3d_state::tms_irq_w)
 {
-	/* this is written twice, 0,1, in quick succession */
-	/* done after uploading, and after modifying the comm area */
+	/* This is written twice, 0,1, in quick succession.
+	   Done after uploading, and after modifying the comm area */
 	if (LOG)
 		logerror("%06X:tms_irq_w = %d\n", m_maincpu->pc(), state);
 	m_tms->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
@@ -435,7 +435,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::tms_control3_w)
  *
  *************************************/
 
-/* These are some of the control registers. We don't use them all */
+// These are some of the control registers. We don't use them all
 enum
 {
 	S1_AUTOBUF_REG = 15,
@@ -475,7 +475,7 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 	switch (offset)
 	{
 		case SYSCONTROL_REG:
-			/* see if SPORT1 got disabled */
+			// See if SPORT1 got disabled
 			if ((data & 0x0800) == 0)
 			{
 				for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
@@ -486,7 +486,7 @@ void gaelco3d_state::adsp_control_w(offs_t offset, uint16_t data)
 			break;
 
 		case S1_AUTOBUF_REG:
-			/* autobuffer off: nuke the timer, and disable the DAC */
+			// Autobuffer off: nuke the timer, and disable the DAC
 			if ((data & 0x0002) == 0)
 			{
 				for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
@@ -523,10 +523,10 @@ void gaelco3d_state::adsp_rombank_w(offs_t offset, uint16_t data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 {
-	/* get the index register */
+	// Get the index register
 	int reg = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
 
-	/* copy the current data into the buffer */
+	// Copy the current data into the buffer
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
 	if (m_adsp_incs)
 	{
@@ -534,66 +534,66 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 			m_dmadac[i]->transfer(i, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[reg - 0x3800]);
 	}
 
-	/* increment it */
+	// Increment it
 	reg += m_adsp_size;
 
-	/* check for wrapping */
+	// Check for wrapping
 	if (reg >= m_adsp_ireg_base + m_adsp_size)
 	{
-		/* reset the base pointer */
+		// Reset the base pointer
 		reg = m_adsp_ireg_base;
 
-		/* generate the (internal, thats why the pulse) irq */
+		// Generate the (internal, thats why the pulse) IRQ
 		m_adsp->pulse_input_line(ADSP2105_IRQ1, m_adsp->minimum_quantum_time());
 	}
 
-	/* store it */
+	// Store it
 	m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, reg);
 }
 
 void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 {
-	/* check if it's for SPORT1 */
+	// Check if it's for SPORT1
 	if (offset != 1)
 		return;
 
-	/* check if SPORT1 is enabled */
-	if (m_adsp_control_regs[SYSCONTROL_REG] & 0x0800) /* bit 11 */
+	// Check if SPORT1 is enabled
+	if (m_adsp_control_regs[SYSCONTROL_REG] & 0x0800) // bit 11
 	{
-		/* we only support autobuffer here (which is what this thing uses), bail if not enabled */
-		if (m_adsp_control_regs[S1_AUTOBUF_REG] & 0x0002) /* bit 1 */
+		// We only support autobuffer here (which is what this thing uses), bail if not enabled
+		if (m_adsp_control_regs[S1_AUTOBUF_REG] & 0x0002) // bit 1
 		{
-			/* get the autobuffer registers */
+			// Get the autobuffer registers
 			int     mreg, lreg;
 			uint16_t  source;
 			attotime sample_period;
 
 			m_adsp_ireg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
 			mreg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
-			mreg |= m_adsp_ireg & 0x04; /* msb comes from ireg */
+			mreg |= m_adsp_ireg & 0x04; // msb comes from ireg
 			lreg = m_adsp_ireg;
 
-			/* now get the register contents in a more legible format */
-			/* we depend on register indexes to be continuous (which is the case in our core) */
+			/* Now get the register contents in a more legible format.
+			   We depend on register indexes to be continuous (which is the case in our core) */
 			source = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
 			m_adsp_incs = m_adsp->state_int(ADSP2100_M0 + mreg);
 			m_adsp_size = m_adsp->state_int(ADSP2100_L0 + lreg);
 
-			/* get the base value, since we need to keep it around for wrapping */
+			// Get the base value, since we need to keep it around for wrapping
 			source -= m_adsp_incs;
 
-			/* make it go back one so we don't lose the first sample */
+			// Make it go back one so we don't lose the first sample
 			m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, source);
 
-			/* save it as it is now */
+			// Save it as it is now
 			m_adsp_ireg_base = source;
 
-			/* calculate how long until we generate an interrupt */
+			// Calculate how long until we generate an interrupt
 
-			/* period per each bit sent */
+			// Period per each bit sent
 			sample_period = attotime::from_hz(m_adsp->clock()) * (2 * (m_adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
-			/* now put it down to samples, so we know what the channel frequency has to be */
+			// Now put it down to samples, so we know what the channel frequency has to be
 			sample_period *= 16 * SOUND_CHANNELS;
 
 			for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
@@ -602,7 +602,7 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 				m_dmadac[i]->enable(1);
 			}
 
-			/* fire off a timer which will hit every half-buffer */
+			// Fire off a timer which will hit every half-buffer
 			sample_period = (sample_period * m_adsp_size) / (SOUND_CHANNELS * m_adsp_incs);
 
 			m_adsp_autobuffer_timer->adjust(sample_period, 0, sample_period);
@@ -613,11 +613,11 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 			logerror( "ADSP SPORT1: trying to transmit and autobuffer not enabled!\n" );
 	}
 
-	/* if we get there, something went wrong. Disable playing */
+	// If we get there, something went wrong. Disable playing
 	for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 		m_dmadac[i]->enable(0);
 
-	/* remove timer */
+	// Remove timer
 	m_adsp_autobuffer_timer->reset();
 }
 
@@ -632,19 +632,19 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 
 WRITE_LINE_MEMBER(gaelco3d_state::radikalb_lamp_w)
 {
-	/* arbitrary data written */
+	// Arbitrary data written
 	logerror("%06X:unknown_127_w = %d\n", m_maincpu->pc(), state);
 }
 
 WRITE_LINE_MEMBER(gaelco3d_state::unknown_137_w)
 {
-	/* only written $00 or $ff */
+	// Only written $00 or $ff
 	logerror("%06X:unknown_137_w = %d\n", m_maincpu->pc(), state);
 }
 
 WRITE_LINE_MEMBER(gaelco3d_state::unknown_13a_w)
 {
-	/* only written $0000 or $0001 */
+	// Only written $0000 or $0001
 	logerror("%06X:unknown_13a_w = %04X\n", m_maincpu->pc(), state);
 }
 
@@ -704,8 +704,8 @@ void gaelco3d_state::tms_map(address_map &map)
 
 void gaelco3d_state::adsp_program_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("adsp_ram_base");       /* 1k words internal RAM */
-	map(0x37ff, 0x37ff).nopr();                         /* speedup hammers this for no apparent reason */
+	map(0x0000, 0x03ff).ram().share("adsp_ram_base");   // 1k words internal RAM
+	map(0x37ff, 0x37ff).nopr();                         // speedup hammers this for no apparent reason
 }
 
 void gaelco3d_state::adsp_data_map(address_map &map)
@@ -714,7 +714,7 @@ void gaelco3d_state::adsp_data_map(address_map &map)
 	map(0x0000, 0x1fff).bankr("adspbank");
 	map(0x2000, 0x2000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).umask16(0x00ff);
 	map(0x2000, 0x2000).w(FUNC(gaelco3d_state::sound_status_w));
-	map(0x3800, 0x39ff).ram().share("adsp_fastram");    /* 512 words internal RAM */
+	map(0x3800, 0x39ff).ram().share("adsp_fastram");    // 512 words internal RAM
 	map(0x3fe0, 0x3fff).w(FUNC(gaelco3d_state::adsp_control_w)).share("adsp_regs");
 }
 
@@ -899,7 +899,7 @@ INPUT_PORTS_END
 
 void gaelco3d_state::gaelco3d(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, 15000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
@@ -944,10 +944,10 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_adsp, ADSP2115_IRQ2);
 
-	/* video hardware */
+	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
 	m_screen->set_size(576, 432);
 	m_screen->set_visarea(0, 575, 0, 431);
 	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));
@@ -955,7 +955,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: front mono
@@ -969,7 +969,7 @@ void gaelco3d_state::gaelco3d2(machine_config &config)
 {
 	gaelco3d(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68EC020(config.replace(), m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main020_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
@@ -993,11 +993,11 @@ void gaelco3d_state::footbpow(machine_config &config)
  *************************************/
 
 ROM_START( speedup )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "sup10.bin", 0x000000, 0x80000, CRC(07e70bae) SHA1(17013d859ec075e12518b094040a056d850b3271) )
-	ROM_LOAD16_BYTE( "sup15.bin", 0x000001, 0x80000, CRC(7947c28d) SHA1(46efb56d0f7fe2e92d0d04dcd2f130aef3be436d) )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_10_2.2.ic10", 0x000000, 0x80000, CRC(ee781e64) SHA1(d90fa9319982fa389c2032e13d59850971078006) )
+	ROM_LOAD16_BYTE( "sup_15_2.2.ic15", 0x000001, 0x80000, CRC(1b8ff9d2) SHA1(4939b45844de962d2b93be058b44c09e366cf8db) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "sup25.bin", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1013,17 +1013,43 @@ ROM_START( speedup )
 	ROM_REGION( 0x0080000, "gfx2", 0 )
 	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
 	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
-	/* these 2 are copies of the previous 2 */
+	// These 2 are copies of the previous 2
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
+ROM_END
+
+ROM_START( speedup12 )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup10.bin", 0x000000, 0x80000, CRC(07e70bae) SHA1(17013d859ec075e12518b094040a056d850b3271) )
+	ROM_LOAD16_BYTE( "sup15.bin", 0x000001, 0x80000, CRC(7947c28d) SHA1(46efb56d0f7fe2e92d0d04dcd2f130aef3be436d) )
+
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup25.bin", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) )
+
+	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_LOAD32_WORD( "sup32.bin", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) )
+	ROM_LOAD32_WORD( "sup33.bin", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_LOAD( "sup12.bin", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) )
+	ROM_LOAD( "sup14.bin", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) )
+	ROM_LOAD( "sup11.bin", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) )
+	ROM_LOAD( "sup13.bin", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) )
+
+	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
+	// These 2 are copies of the previous 2
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
 ROM_END
 
 ROM_START( speedup10 )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "ic10_1.00", 0x000000, 0x80000, CRC(24ed8f48) SHA1(59d59e2a0b2fb7aed5320167960129819adedd9a) ) /* hand written labels IC10 1.00 */
-	ROM_LOAD16_BYTE( "ic15_1.00", 0x000001, 0x80000, CRC(b3fda7f1) SHA1(e77ef3cb46be0767476f65dcc8d4fc12550be4a3) ) /* hand written labels IC50 1.00 */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "ic10_1.00", 0x000000, 0x80000, CRC(24ed8f48) SHA1(59d59e2a0b2fb7aed5320167960129819adedd9a) ) // Handwritten labels IC10 1.00
+	ROM_LOAD16_BYTE( "ic15_1.00", 0x000001, 0x80000, CRC(b3fda7f1) SHA1(e77ef3cb46be0767476f65dcc8d4fc12550be4a3) ) // Handwritten labels IC50 1.00
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "sup25.bin", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1039,20 +1065,20 @@ ROM_START( speedup10 )
 	ROM_REGION( 0x0080000, "gfx2", 0 )
 	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
 	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
-	/* these 2 are copies of the previous 2 */
+	// These 2 are copies of the previous 2
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
 ROM_END
 
 
 ROM_START( surfplnt )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "surfplnt.u5",  0x000000, 0x80000, CRC(c96e0a18) SHA1(b313d02d1d1bff8717b3d798e6ae681baefc1061) )
 	ROM_LOAD16_BYTE( "surfplnt.u11", 0x000001, 0x80000, CRC(99211d2d) SHA1(dee5b157489ce9c6988c8eec92fa91fff60d521c) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "surfplnt.u13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls.18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1070,7 +1096,7 @@ ROM_START( surfplnt )
 	ROM_LOAD( "surfplnt.u20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "surfplnt.u21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
 	ROM_LOAD( "surfplnt.u22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
-	/* these 4 are copies of the previous 4 */
+	// These 4 are copies of the previous 4
 //  ROM_LOAD( "surfplnt.u27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 //  ROM_LOAD( "surfplnt.u28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 //  ROM_LOAD( "surfplnt.u29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1078,13 +1104,13 @@ ROM_START( surfplnt )
 ROM_END
 
 ROM_START( surfplnt40 )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "surfpl40.u5",  0x000000, 0x80000, CRC(572e0343) SHA1(badb08a5a495611b5fd2d821d4299348b2c9f308) )
 	ROM_LOAD16_BYTE( "surfpl40.u11", 0x000001, 0x80000, CRC(6056edaa) SHA1(9bc2df54d1367b9d58272a8f506e523e74110361) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "surfplnt.u13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls.18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1102,7 +1128,7 @@ ROM_START( surfplnt40 )
 	ROM_LOAD( "surfplnt.u20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "surfplnt.u21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
 	ROM_LOAD( "surfplnt.u22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
-	/* these 4 are copies of the previous 4 */
+	// These 4 are copies of the previous 4
 //  ROM_LOAD( "surfplnt.u27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 //  ROM_LOAD( "surfplnt.u28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 //  ROM_LOAD( "surfplnt.u29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1111,13 +1137,13 @@ ROM_END
 
 
 ROM_START( radikalb )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
 	ROM_LOAD32_BYTE( "rab.6",  0x000000, 0x80000, CRC(ccac98c5) SHA1(43a30caf9880f48aba79676f9e746fdc6258139d) )
 	ROM_LOAD32_BYTE( "rab.12", 0x000001, 0x80000, CRC(26199506) SHA1(1b7b44895aa296eab8061ae85cbb5b0d30119dc7) )
 	ROM_LOAD32_BYTE( "rab.14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab19.ic19", 0x000003, 0x80000, CRC(c2d4fcb2) SHA1(8e389d1479ba084e5363aef9c797c65ca7f355d2) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data */
 	ROM_LOAD( "rab.23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1140,7 +1166,7 @@ ROM_START( radikalb )
 	ROM_LOAD( "rab.25", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 	ROM_LOAD( "rab.26", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
 	ROM_LOAD( "rab.27", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) )
-	/* these 4 are copies of the previous 4 */
+	// These 4 are copies of the previous 4
 //  ROM_LOAD( "rab.32", 0x0000000, 0x020000, CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) )
 //  ROM_LOAD( "rab.33", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 //  ROM_LOAD( "rab.34", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
@@ -1148,13 +1174,13 @@ ROM_START( radikalb )
 ROM_END
 
 ROM_START( radikalba )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
 	ROM_LOAD32_BYTE( "rab.6",  0x000000, 0x80000, CRC(ccac98c5) SHA1(43a30caf9880f48aba79676f9e746fdc6258139d) )
 	ROM_LOAD32_BYTE( "rab.12", 0x000001, 0x80000, CRC(26199506) SHA1(1b7b44895aa296eab8061ae85cbb5b0d30119dc7) )
 	ROM_LOAD32_BYTE( "rab.14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab.19", 0x000003, 0x80000, CRC(2631bd61) SHA1(57331ad49e7284b82073f696049de109b7683b03) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "rab.23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1177,7 +1203,7 @@ ROM_START( radikalba )
 	ROM_LOAD( "rab.25", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 	ROM_LOAD( "rab.26", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
 	ROM_LOAD( "rab.27", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) )
-	/* these 4 are copies of the previous 4 */
+	// These 4 are copies of the previous 4
 //  ROM_LOAD( "rab.32", 0x0000000, 0x020000, CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) )
 //  ROM_LOAD( "rab.33", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 //  ROM_LOAD( "rab.34", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
@@ -1186,13 +1212,13 @@ ROM_END
 
 
 ROM_START( footbpow )
-	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
 	ROM_LOAD32_BYTE( "fop_7.ic7",   0x000000, 0x80000, CRC(a2d7ec69) SHA1(27e4f3d27882152244c0f9d5a984e0f1bd7b7d3f) )
 	ROM_LOAD32_BYTE( "fop_12.ic12", 0x000001, 0x80000, CRC(443caf77) SHA1(2b0c6dccee28fb3caa0b2493f59ddbd29897aed9) )
 	ROM_LOAD32_BYTE( "fop_13.ic13", 0x000002, 0x80000, CRC(57723eda) SHA1(09972b09444b6704dcc966033bfab61ea57d0cd0) )
 	ROM_LOAD32_BYTE( "fop_19.ic19", 0x000003, 0x80000, CRC(aa59cd2d) SHA1(7cc6edfd0896e4d2c881b16d5ad07361bdeff11d) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1210,7 +1236,7 @@ ROM_START( footbpow )
 	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
 	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
-	/* these 4 are copies of the previous 4 */
+	// These 4 are copies of the previous 4
 //  ROM_LOAD( "fop_34.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
 //  ROM_LOAD( "fop_35.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
 //  ROM_LOAD( "fop_36.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
@@ -1224,13 +1250,14 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.20)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (Version 1.2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (Version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

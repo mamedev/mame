@@ -208,7 +208,18 @@ ROM_START( gwinner )
 	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, NO_DUMP )
 ROM_END
 
+ROM_START( unkslot )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "tms2564jl.bin", 0x0000, 0x2000, CRC(43fa54fb) SHA1(2e0d0883deb20d68e46d3c5c5c98508c9b5d5411) )
+	ROM_LOAD( "d2764d.bin",    0x2000, 0x1000, CRC(b7c55fc2) SHA1(2dfcc35821971c27178522afe9db1d18e12b3a42) ) // 1xxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "n83s23n.bin",   0x00, 0x20, CRC(ea598b2c) SHA1(c0d6367ed2381a4a0f22780773ff4777569e88ab) )
+ROM_END
+
+
 GAME( 1981, minisupf, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, luckyplr, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Cirsa",              "Lucky Player",      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, msbamby,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, unkslot,  0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "<unknown>",          "unknown MGA or Costa Net slot machine",     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1983, gwinner,  0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_IS_SKELETON_MECHANICAL )
