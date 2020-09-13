@@ -83,7 +83,7 @@ public:
 	// stream creation
 	sound_stream *stream_alloc_legacy(int inputs, int outputs, int sample_rate);
 	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
-	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate, sound_stream_flags resampler);
+	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate, sound_stream_flags flags);
 
 	// helpers
 	int inputs() const;

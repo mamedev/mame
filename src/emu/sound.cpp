@@ -119,8 +119,12 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 			backfill_downsample(&buffer[0], buffered_samples, newend, newperiod);
 		else
 		{
+			u32 end = m_end_sample;
 			for (int index = 0; index < buffered_samples; index++)
-				buffer[index] = m_buffer[clamp_index(m_end_sample - 1 - index)];
+			{
+				end = prev_index(end);
+				buffer[index] = get(end);
+			}
 		}
 	}
 
@@ -142,21 +146,25 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 #if (SOUND_DEBUG)
 		// for aggressive debugging, fill the buffer with NANs to catch anyone
 		// reading beyond what we resample below
-		std::fill_n(&m_buffer[0], m_buffer.size(), NAN);
+		fill(NAN);
 #endif
 
 		if (new_rate_higher)
 			backfill_upsample(&buffer[0], buffered_samples, prevend, prevperiod);
 		else
 		{
+			u32 end = m_end_sample;
 			for (int index = 0; index < buffered_samples; index++)
-				m_buffer[clamp_index(m_end_sample - 1 - index)] = buffer[index];
+			{
+				end = prev_index(end);
+				put(end, buffer[index]);
+			}
 		}
 	}
 
 	// if not resampling, clear the buffer
 	else
-		std::fill_n(&m_buffer[0], m_buffer.size(), 0);
+		fill(0);
 }
 
 
@@ -244,7 +252,7 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow
 {
 	// compute the sample index within the second
 	int sample = (time.attoseconds() + (round_up ? (m_sample_attos - 1) : 0)) / m_sample_attos;
-	sound_assert(sample >= 0 && sample <= m_sample_rate);
+	sound_assert(sample >= 0 && sample <= size());
 
 	// if the time is past the current end, make it the end
 	if (time.seconds() > m_end_second || (time.seconds() == m_end_second && sample > m_end_sample))
@@ -255,9 +263,9 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow
 		m_end_second = time.m_seconds;
 
 		// due to round_up, we could tweak over the line into the next second
-		if (sample >= m_sample_rate)
+		if (sample >= size())
 		{
-			m_end_sample -= m_sample_rate;
+			m_end_sample -= size();
 			m_end_second++;
 		}
 	}
@@ -288,11 +296,13 @@ void stream_buffer::backfill_downsample(sample_t *dest, int samples, attotime ne
 	{
 		u32 srcindex = time_to_buffer_index(time, false);
 #if (SOUND_DEBUG)
+		// multiple resamples can occur before clearing out old NaNs so
+		// neuter them for this specific case
 		if (std::isnan(m_buffer[srcindex]))
 			dest[dstindex] = 0;
 		else
 #endif
-			dest[dstindex] = m_buffer[srcindex];
+			dest[dstindex] = get(srcindex);
 		time -= newperiod;
 	}
 	for ( ; dstindex < samples; dstindex++)
@@ -317,7 +327,9 @@ void stream_buffer::backfill_upsample(sample_t const *src, int samples, attotime
 	prevend -= prevperiod;
 
 	// loop until we run out of buffered data
-	for (int srcindex = 0, dstindex = 0; ; dstindex++)
+	u32 end = m_end_sample;
+	int srcindex = 0;
+	while (1)
 	{
 		// if our backfill time is before the current buffered sample time,
 		// back up until we have a sample that covers this time
@@ -331,8 +343,11 @@ void stream_buffer::backfill_upsample(sample_t const *src, int samples, attotime
 		if (srcindex >= samples)
 			break;
 
-		// write this sample, and back up to the next sample time
-		put(clamp_index(m_end_sample - 1 - dstindex), src[srcindex]);
+		// write this sample at the pevious position
+		end = prev_index(end);
+		put(end, src[srcindex]);
+
+		// back up to the next sample time
 		time -= sample_period();
 	}
 }
@@ -565,16 +580,9 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
 		sound_stream_output *resampler = nullptr;
-		int resampler_type = flags & STREAM_RESAMPLER_MASK;
-		if (resampler_type != STREAM_RESAMPLER_NONE)
+		if ((flags & STREAM_DISABLE_INPUT_RESAMPLING) == 0)
 		{
-			switch (resampler_type)
-			{
-				default:
-				case STREAM_RESAMPLER_DEFAULT:
-					m_resampler_list.push_back(std::make_unique<default_resampler_stream>(m_device));
-					break;
-			}
+			m_resampler_list.push_back(std::make_unique<default_resampler_stream>(m_device));
 			resampler = &m_resampler_list.back()->m_output[0];
 		}
 
@@ -966,7 +974,7 @@ read_stream_view sound_stream::empty_view(attotime start, attotime end)
 //-------------------------------------------------
 
 default_resampler_stream::default_resampler_stream(device_t &device) :
-	sound_stream(device, 1, 1, 0, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_RESAMPLER_NONE),
+	sound_stream(device, 1, 1, 0, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_DISABLE_INPUT_RESAMPLING),
 	m_max_latency(0)
 {
 	// create a name

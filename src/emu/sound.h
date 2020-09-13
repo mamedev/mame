@@ -100,15 +100,18 @@ constexpr u32 SAMPLE_RATE_MINIMUM = 50;
 
 class stream_buffer
 {
-	// stream_buffer is a largely internal class, not directly accessed
+	// stream_buffer is an internal class, not directly accessed
 	// outside of the classes below
 	friend class read_stream_view;
 	friend class write_stream_view;
+	friend class sound_stream;
 	friend class sound_stream_output;
 
 public:
+	// the one public bit is the sample type
 	using sample_t = float;
 
+private:
 	// constructor/destructor
 	stream_buffer(u32 sample_rate = 48000);
 	~stream_buffer();
@@ -123,7 +126,6 @@ public:
 	// set a new sample rate
 	void set_sample_rate(u32 rate, bool resample);
 
-private:
 	// return the current sample period in attoseconds
 	attoseconds_t sample_period_attoseconds() const { return m_sample_attos; }
 	attotime sample_period() const { return attotime(0, m_sample_attos); }
@@ -138,10 +140,14 @@ private:
 		m_end_sample = u32(time.attoseconds() / m_sample_attos);
 	}
 
+	// return the effective buffer size; currently it is a full second of audio
+	// at the current sample rate, but this maybe change in the future
+	u32 size() const { return m_sample_rate; }
+
 	// read the sample at the given index (clamped); should be valid in all cases
 	sample_t get(s32 index) const
 	{
-		sound_assert(u32(index) < m_sample_rate);
+		sound_assert(u32(index) < size());
 		sample_t value = m_buffer[index];
 #if (SOUND_DEBUG)
 		sound_assert(!std::isnan(value));
@@ -152,21 +158,28 @@ private:
 	// write the sample at the given index (clamped)
 	void put(s32 index, sample_t data)
 	{
-		sound_assert(u32(index) < m_sample_rate);
+		sound_assert(u32(index) < size());
 		m_buffer[index] = data;
 	}
+
+	// simple helpers to step indexes
+	u32 next_index(u32 index) { index++; return (index == size()) ? 0 : index; }
+	u32 prev_index(u32 index) { return (index == 0) ? (size() - 1) : (index - 1); }
 
 	// clamp an index to the size of the buffer; allows for indexing +/- one
 	// buffers' worth of range
 	u32 clamp_index(s32 index) const
 	{
 		if (index < 0)
-			index += m_sample_rate;
-		else if (index >= m_sample_rate)
-			index -= m_sample_rate;
-		sound_assert(index >= 0 && index < m_sample_rate);
+			index += size();
+		else if (index >= size())
+			index -= size();
+		sound_assert(index >= 0 && index < size());
 		return index;
 	}
+
+	// fill the buffer with the given value
+	void fill(sample_t value) { std::fill_n(&m_buffer[0], m_buffer.size(), value); }
 
 	// return the attotime of a given index within the buffer
 	attotime index_time(s32 index) const;
@@ -183,7 +196,7 @@ private:
 	// internal state
 	u32 m_end_second;                     // current full second of the buffer end
 	u32 m_end_sample;                     // current sample number within the final second
-	u32 m_sample_rate;                    // sample rate of the data in teh buffer
+	u32 m_sample_rate;                    // sample rate of the data in the buffer
 	attoseconds_t m_sample_attos;         // pre-computed attoseconds per sample
 	std::vector<sample_t> m_buffer;       // vector of actual buffer data
 
@@ -293,9 +306,9 @@ public:
 	sample_t get(s32 index) const
 	{
 		sound_assert(u32(index) < samples());
-		if (u32(index) >= samples())
-			return 0;
-		index = m_buffer->clamp_index(m_start + index);
+		index += m_start;
+		if (index >= m_buffer->size())
+			index -= m_buffer->size();
 		return m_buffer->get(index) * m_gain;
 	}
 
@@ -304,9 +317,9 @@ public:
 	sample_t getraw(s32 index) const
 	{
 		sound_assert(u32(index) < samples());
-		if (u32(index) >= samples())
-			return 0;
-		index = m_buffer->clamp_index(m_start + index);
+		index += m_start;
+		if (index >= m_buffer->size())
+			index -= m_buffer->size();
 		return m_buffer->get(index);
 	}
 
@@ -317,7 +330,7 @@ protected:
 		// ensure that end is always greater than start; we'll
 		// wrap to the buffer length as needed
 		if (m_end < m_start && m_buffer != nullptr)
-			m_end += m_buffer->sample_rate();
+			m_end += m_buffer->size();
 		sound_assert(m_end >= m_start);
 	}
 
@@ -355,22 +368,20 @@ public:
 	void put(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
-		if (u32(index) < samples())
-		{
-			index = m_buffer->clamp_index(m_start + index);
-			m_buffer->put(index, sample);
-		}
+		index += m_start;
+		if (index >= m_buffer->size())
+			index -= m_buffer->size();
+		m_buffer->put(index, sample);
 	}
 
 	// safely add a gain-applied sample to the buffer
 	void add(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
-		if (u32(index) < samples())
-		{
-			index = m_buffer->clamp_index(m_start + index);
-			m_buffer->put(index, m_buffer->get(index) + sample);
-		}
+		index += m_start;
+		if (index >= m_buffer->size())
+			index -= m_buffer->size();
+		m_buffer->put(index, m_buffer->get(index) + sample);
 	}
 
 	// fill part of the view with the given value
@@ -378,8 +389,12 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		for (s32 index = 0; index < count; index++)
-			put(start + index, value);
+		u32 index = start + m_start;
+		for (s32 sampindex = 0; sampindex < count; sampindex++)
+		{
+			m_buffer->put(index, value);
+			index = m_buffer->next_index(index);
+		}
 	}
 	void fill(sample_t value, s32 start) { fill(value, start, samples() - start); }
 	void fill(sample_t value) { fill(value, 0, samples()); }
@@ -389,8 +404,12 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		for (s32 index = 0; index < count; index++)
-			put(start + index, src.get(start + index));
+		u32 index = start + m_start;
+		for (s32 sampindex = 0; sampindex < count; sampindex++)
+		{
+			m_buffer->put(index, src.get(start + sampindex));
+			index = m_buffer->next_index(index);
+		}
 	}
 	void copy(read_stream_view const &src, s32 start) { copy(src, start, samples() - start); }
 	void copy(read_stream_view const &src) { copy(src, 0, samples()); }
@@ -400,8 +419,12 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		for (s32 index = 0; index < count; index++)
-			add(start + index, src.get(start + index));
+		u32 index = start + m_start;
+		for (s32 sampindex = 0; sampindex < count; sampindex++)
+		{
+			m_buffer->put(index, m_buffer->get(index) + src.get(start + sampindex));
+			index = m_buffer->next_index(index);
+		}
 	}
 	void add(read_stream_view const &src, s32 start) { add(src, start, samples() - start); }
 	void add(read_stream_view const &src) { add(src, 0, samples()); }
@@ -524,20 +547,17 @@ using stream_update_delegate = delegate<void (sound_stream &stream, std::vector<
 
 enum sound_stream_flags : u32
 {
-	//
-	// specify which resampler to use for inputs:
-	//
-	//    STREAM_RESAMPLER_DEFAULT = classic MAME resampler
-	//
-	//    STREAM_RESAMPLER_NONE = no resampler; update handler must handle
-	//        inputs of differing sample rates
-	//
-	STREAM_RESAMPLER_MASK = 0x0f,
-		STREAM_RESAMPLER_DEFAULT = 0,
-		STREAM_RESAMPLER_NONE = 1,
+	// default is no special flags
+	STREAM_DEFAULT_FLAGS = 0x00,
 
 	// specify that updates should be forced to one sample at a time, in real time
-	STREAM_SYNCHRONOUS = 0x10,
+	// this implicitly creates a timer that runs at the stream's output frequency
+	// so only use when strictly necessary
+	STREAM_SYNCHRONOUS = 0x01,
+
+	// specify that input streams should not be resampled; stream update handler
+	// must be able to accommodate multiple strams of differing input rates
+	STREAM_DISABLE_INPUT_RESAMPLING = 0x02
 };
 
 
@@ -552,8 +572,8 @@ class sound_stream
 
 public:
 	// construction/destruction
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_RESAMPLER_DEFAULT);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_legacy_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
 	virtual ~sound_stream();
 
 	// simple getters
@@ -714,7 +734,7 @@ public:
 	sound_stream *stream_alloc_legacy(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_legacy_delegate callback);
 
 	// allocate a new stream with a new-style callback
-	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags resampler = STREAM_RESAMPLER_DEFAULT);
+	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
 
 	// begin recording a WAV file if options has requested it
 	void start_recording();
