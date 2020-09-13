@@ -261,7 +261,7 @@ u8 sensorboard_device::read_sensor(u8 x, u8 y)
 	if (m_magnets)
 	{
 		u8 piece = read_piece(x, y);
-		u8 state = (piece != 0 && pos != m_handpos && pos != m_droppos) ? 1 : 0;
+		u8 state = (piece != 0 && (m_inp_ui->read() & 2 || (pos != m_handpos && pos != m_droppos))) ? 1 : 0;
 
 		// piece recognition: return piece id
 		if (m_inductive)
