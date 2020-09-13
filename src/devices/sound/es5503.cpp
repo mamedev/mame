@@ -201,7 +201,7 @@ void es5503_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 	mixp = &mix[0];
 	for (i = 0; i < samples; i++)
 		for (int chan = 0; chan < output_channels; chan++)
-			outputs[chan][i] = (*mixp++)>>1;
+			outputs[chan][i] = (*mixp++)>>3;
 }
 
 
