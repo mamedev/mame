@@ -1193,17 +1193,17 @@ void ioport_field::frame_update(ioport_value &result)
 
 
 //-------------------------------------------------
-//  crosshair_position - compute the crosshair
+//  crosshair_read - compute the crosshair
 //  position
 //-------------------------------------------------
 
-void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty)
+float ioport_field::crosshair_read()
 {
-	double value = m_live->analog->crosshair_read();
+	float value = m_live->analog->crosshair_read();
 
 	// apply the scale and offset
 	if (m_crosshair_scale < 0)
-		value = -(1.0 - value) * m_crosshair_scale;
+		value = -(1.0f - value) * m_crosshair_scale;
 	else
 		value *= m_crosshair_scale;
 	value += m_crosshair_offset;
@@ -1212,29 +1212,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 	if (!m_crosshair_mapper.isnull())
 		value = m_crosshair_mapper(value);
 
-	// handle X axis
-	if (m_crosshair_axis == CROSSHAIR_AXIS_X)
-	{
-		x = value;
-		gotx = true;
-		if (m_crosshair_altaxis != 0)
-		{
-			y = m_crosshair_altaxis;
-			goty = true;
-		}
-	}
-
-	// handle Y axis
-	else
-	{
-		y = value;
-		goty = true;
-		if (m_crosshair_altaxis != 0)
-		{
-			x = m_crosshair_altaxis;
-			gotx = true;
-		}
-	}
+	return value;
 }
 
 
@@ -1962,30 +1940,6 @@ int ioport_manager::count_players() const noexcept
 				max_player = field.player() + 1;
 
 	return max_player;
-}
-
-
-//-------------------------------------------------
-//  crosshair_position - return the extracted
-//  crosshair values for the given player
-//-------------------------------------------------
-
-bool ioport_manager::crosshair_position(int player, float &x, float &y)
-{
-	// read all the lightgun values
-	bool gotx = false, goty = false;
-	for (auto &port : m_portlist)
-		for (ioport_field &field : port.second->fields())
-			if (field.player() == player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
-			{
-				field.crosshair_position(x, y, gotx, goty);
-
-				// if we got both, stop
-				if (gotx && goty)
-					break;
-			}
-
-	return (gotx && goty);
 }
 
 

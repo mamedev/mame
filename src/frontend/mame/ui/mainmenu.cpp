@@ -228,7 +228,7 @@ void menu_main::handle()
 			break;
 
 		case VIDEO_OPTIONS:
-			menu::stack_push<menu_video_options>(ui(), container(), machine().render().first_target());
+			menu::stack_push<menu_video_options>(ui(), container(), *machine().render().first_target());
 			break;
 
 		case CROSSHAIR:

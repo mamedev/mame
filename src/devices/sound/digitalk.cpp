@@ -541,10 +541,10 @@ void digitalker_device::digitalker_step()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void digitalker_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *sout = outputs[0];
 	int cpos = 0;
@@ -655,7 +655,7 @@ void digitalker_device::digitalker_register_for_save()
 
 void digitalker_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, clock()/4);
+	m_stream = stream_alloc_legacy(0, 1, clock()/4);
 	m_dac_index = 128;
 	m_data = 0xff;
 	m_cs = m_cms = m_wr = 1;

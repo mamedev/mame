@@ -5,8 +5,6 @@
  *
  */
 
-#include "nld_schmitt.h"
-
 #include "analog/nlid_twoterm.h"
 #include "nl_base.h"
 #include "nl_errstr.h"

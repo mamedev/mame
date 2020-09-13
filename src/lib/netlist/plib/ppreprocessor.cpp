@@ -13,14 +13,12 @@ namespace plib {
 	// A simple preprocessor
 	// ----------------------------------------------------------------------------------------
 
-	ppreprocessor::ppreprocessor(psource_collection_t<> &sources, defines_map_type *defines)
-	: std::istream(new readbuffer(this))
-	, m_sources(sources)
+	ppreprocessor::ppreprocessor(psource_collection_t &sources, defines_map_type *defines)
+	: m_sources(sources)
 	, m_if_flag(0)
 	, m_if_seen(0)
 	, m_elif(0)
 	, m_if_level(0)
-	, m_pos(0)
 	, m_state(PROCESS)
 	, m_comment(false)
 	{
@@ -88,7 +86,7 @@ namespace plib {
 		///
 		/// \return next token
 		///
-		pstring next()
+		const pstring &next()
 		{
 			skip_ws();
 			if (m_pos >= m_tokens.size())
@@ -100,21 +98,21 @@ namespace plib {
 		///
 		/// \return next token
 		///
-		pstring next_ws()
+		const pstring &next_ws()
 		{
 			if (m_pos >= m_tokens.size())
 				error("unexpected end of line");
 			return m_tokens[m_pos++];
 		}
 
-		pstring peek_ws()
+		const pstring &peek_ws()
 		{
 			if (m_pos >= m_tokens.size())
 				error("unexpected end of line");
 			return m_tokens[m_pos];
 		}
 
-		pstring last()
+		const pstring &last()
 		{
 			if (m_pos == 0)
 				error("no last token at beginning of line");
@@ -128,12 +126,12 @@ namespace plib {
 			return (m_pos >= m_tokens.size());
 		}
 
-		void error(pstring err)
+		void error(const pstring &err)
 		{
 			m_parent->error(err);
 		}
 	private:
-		L m_tokens;
+		const L m_tokens;
 		PP *m_parent;
 		std::size_t m_pos;
 	};
@@ -294,7 +292,7 @@ namespace plib {
 
 	bool ppreprocessor::is_valid_token(const pstring &str)
 	{
-		if (str.length() == 0)
+		if (str.empty())
 			return false;
 		pstring::value_type c(str.at(0));
 		return ((c>='a' && c<='z') || (c>='A' && c<='Z') || c == '_');
@@ -399,6 +397,7 @@ namespace plib {
 		return ret;
 	}
 
+#if 0
 	pstring ppreprocessor::process_comments(pstring line)
 	{
 		bool in_string = false;
@@ -440,12 +439,64 @@ namespace plib {
 		}
 		return ret;
 	}
-
-	std::pair<pstring,bool> ppreprocessor::process_line(pstring line)
+#else
+	pstring ppreprocessor::process_comments(const pstring &line)
 	{
-		bool line_cont = plib::right(line, 1) == "\\";
-		if (line_cont)
-			line = plib::left(line, line.size() - 1);
+		bool in_string = false;
+
+		pstring ret = "";
+		for (auto c = line.begin(); c != line.end(); )
+		{
+			if (!m_comment)
+			{
+				if (*c == '"')
+				{
+					in_string = !in_string;
+					ret += *c;
+				}
+				else if (in_string && *c == '\\')
+				{
+					ret += *c;
+					++c;
+					if (c == line.end())
+						break;
+					ret += *c;
+				}
+				else if (!in_string && *c == '/')
+				{
+					++c;
+					if (c == line.end())
+						break;
+					if (*c == '*')
+						m_comment = true;
+					else if (*c == '/')
+						break;
+					else
+						ret += *c;
+				}
+				else
+					ret += *c;
+			}
+			else
+				if (*c == '*')
+				{
+					c++;
+					if (c == line.end())
+						break;
+					if (*c == '/')
+						m_comment = false;
+				}
+			c++;
+		}
+		return ret;
+	}
+#endif
+
+	std::pair<pstring,bool> ppreprocessor::process_line(const pstring &line_in)
+	{
+		bool line_cont = plib::right(line_in, 1) == "\\";
+
+		pstring line = line_cont ? plib::left(line_in, line_in.size() - 1) : line_in;
 
 		if (m_state == LINE_CONTINUATION)
 			m_line += line;
@@ -462,10 +513,10 @@ namespace plib {
 
 		line = process_comments(m_line);
 
-		pstring lt = plib::trim(plib::replace_all(line, "\t", " "));
+		pstring lt = plib::trim(plib::replace_all(line, '\t', ' '));
 		if (plib::startsWith(lt, "#"))
 		{
-			string_list lti(psplit(lt, " ", true));
+			string_list lti(psplit(lt, ' ', true));
 			if (lti[0] == "#if")
 			{
 				m_if_level++;
@@ -674,23 +725,23 @@ namespace plib {
 
 	void ppreprocessor::push_out(const pstring &s)
 	{
-		m_outbuf += decltype(m_outbuf)(s.c_str());
+		m_outbuf += s;
 		if (m_debug_out)
-			std::cerr << s;
+			std::cerr << putf8string(s);
 	}
 
 	void ppreprocessor::process_stack()
 	{
 		while (!m_stack.empty())
 		{
-			pstring line;
+			putf8string line;
 			pstring linemarker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
 			push_out(linemarker);
 			bool last_skipped=false;
 			while (m_stack.back().m_reader.readline(line))
 			{
 				m_stack.back().m_lineno++;
-				auto r(process_line(line));
+				auto r(process_line(pstring(line)));
 				if (r.second)
 				{
 					if (last_skipped)

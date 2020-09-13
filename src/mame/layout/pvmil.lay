@@ -59,17 +59,17 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="led0" element="red_led_p1">
+		<element name="led0" ref="red_led_p1">
 			<bounds x="0.45" y="3.00" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="led1" element="red_led_p2">
+		</element>
+		<element name="led1" ref="red_led_p2">
 			<bounds x="1.45" y="3.00" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="led2" element="red_led_p3">
+		</element>
+		<element name="led2" ref="red_led_p3">
 			<bounds x="2.45" y="3.00" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="led3" element="red_led_p4">
+		</element>
+		<element name="led3" ref="red_led_p4">
 			<bounds x="3.45" y="3.00" width="0.10" height="0.10" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

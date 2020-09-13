@@ -59,8 +59,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_pre_save() override;
-	virtual void device_post_load() override;
 
 private:
 	output_finder<0x40, 0x40> m_out_x;
@@ -90,8 +88,6 @@ private:
 	double m_bri[0x40][0x41];
 	attotime m_update_time;
 	attotime m_acc[0x40][0x41];
-	attoseconds_t m_acc_attos[0x40][0x41];
-	seconds_t m_acc_secs[0x40][0x41];
 
 	emu_timer *m_frame_timer;
 	TIMER_CALLBACK_MEMBER(frame_tick);

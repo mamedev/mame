@@ -563,10 +563,10 @@ void ymf271_device::set_feedback(int slotnum, int64_t inp)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf271_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i, j;
 	int op;
@@ -1748,7 +1748,7 @@ void ymf271_device::device_start()
 	init_state();
 
 	m_mix_buffer.resize(m_master_clock/(384/4));
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_master_clock/384);
+	m_stream = stream_alloc_legacy(0, 4, m_master_clock/384);
 }
 
 //-------------------------------------------------

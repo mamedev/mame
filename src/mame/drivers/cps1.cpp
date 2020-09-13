@@ -13826,7 +13826,7 @@ void cps_state::varthb2_cps_a_w(offs_t offset, uint16_t data)
 
 /*
     A note regarding bootlegs:
-    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into separate
     derived classes and source files.
 
     Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
@@ -13839,8 +13839,8 @@ void cps_state::varthb2_cps_a_w(offs_t offset, uint16_t data)
     *2 this is original configuration, but non-Capcom (usually single-board) hardware.
 
 
-    This file currently contains games in first and last catergories.
-    Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first catergory will remain here.
+    This file currently contains games in first and last categories.
+    Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first category will remain here.
 */
 
 

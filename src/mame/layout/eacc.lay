@@ -59,81 +59,81 @@ Electronics Australia Car Computer
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="31" top="70" right="640" bottom="240" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds left="41" top="115" right="89" bottom="195" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds left="111" top="115" right="159" bottom="195" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds left="181" top="115" right="229" bottom="195" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds left="251" top="115" right="299" bottom="195" />
-		</bezel>
+		</element>
 
-		<bezel name="led0" element="red_led">
+		<element name="led0" ref="red_led">
 			<bounds left="350" right="365" top="80" bottom="95" />
-		</bezel>
-		<bezel name="led1" element="red_led">
+		</element>
+		<element name="led1" ref="red_led">
 			<bounds left="400" right="415" top="80" bottom="95" />
-		</bezel>
-		<bezel name="led2" element="red_led">
+		</element>
+		<element name="led2" ref="red_led">
 			<bounds left="450" right="465" top="80" bottom="95" />
-		</bezel>
-		<bezel name="led3" element="red_led">
+		</element>
+		<element name="led3" ref="red_led">
 			<bounds left="500" right="515" top="80" bottom="95" />
-		</bezel>
-		<bezel name="led4" element="red_led">
+		</element>
+		<element name="led4" ref="red_led">
 			<bounds left="550" right="565" top="80" bottom="95" />
-		</bezel>
-		<bezel name="led5" element="red_led">
+		</element>
+		<element name="led5" ref="red_led">
 			<bounds left="600" right="615" top="80" bottom="95" />
-		</bezel>
-		<bezel name="led7" element="red_led">
+		</element>
+		<element name="led7" ref="red_led">
 			<bounds left="500" right="515" top="170" bottom="185" />
-		</bezel>
-		<bezel name="led6" element="red_led">
+		</element>
+		<element name="led6" ref="red_led">
 			<bounds left="550" right="565" top="170" bottom="185" />
-		</bezel>
-		<bezel element="blue_button" inputtag="X2" inputmask="0x02"><bounds left="348" right="367" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button" inputtag="X3" inputmask="0x02"><bounds left="398" right="417" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button" inputtag="X0" inputmask="0x04"><bounds left="448" right="467" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button" inputtag="X1" inputmask="0x04"><bounds left="498" right="517" top="105" bottom="124" /></bezel>
-		<bezel element="blue_button" inputtag="X2" inputmask="0x04"><bounds left="548" right="567" top="105" bottom="124" /></bezel>
-		<bezel element="red_button" inputtag="X0" inputmask="0x02"><bounds left="598" right="617" top="105" bottom="124" /></bezel>
-		<bezel element="red_button" inputtag="X1" inputmask="0x01"><bounds left="348" right="367" top="195" bottom="214" /></bezel>
-		<bezel element="green_button" inputtag="X0" inputmask="0x01"><bounds left="398" right="417" top="195" bottom="214" /></bezel>
-		<bezel element="green_button" inputtag="X2" inputmask="0x01"><bounds left="448" right="467" top="195" bottom="214" /></bezel>
-		<bezel element="white_button" inputtag="X3" inputmask="0x01"><bounds left="498" right="517" top="195" bottom="214" /></bezel>
-		<bezel element="white_button" inputtag="X3" inputmask="0x04"><bounds left="548" right="567" top="195" bottom="214" /></bezel>
-		<bezel element="red_button" inputtag="X1" inputmask="0x02"><bounds left="598" right="617" top="195" bottom="214" /></bezel>
-		<bezel element="L0"><bounds left="369" right="383" top="108" bottom="122" /></bezel>
-		<bezel element="L1"><bounds left="419" right="433" top="108" bottom="122" /></bezel>
-		<bezel element="L2"><bounds left="469" right="483" top="108" bottom="122" /></bezel>
-		<bezel element="L3"><bounds left="519" right="533" top="108" bottom="122" /></bezel>
-		<bezel element="L4"><bounds left="569" right="583" top="108" bottom="122" /></bezel>
-		<bezel element="L5"><bounds left="369" right="383" top="198" bottom="212" /></bezel>
-		<bezel element="L6"><bounds left="419" right="433" top="198" bottom="212" /></bezel>
-		<bezel element="L7"><bounds left="469" right="483" top="198" bottom="212" /></bezel>
-		<bezel element="L8"><bounds left="519" right="533" top="198" bottom="212" /></bezel>
-		<bezel element="L9"><bounds left="569" right="583" top="198" bottom="212" /></bezel>
-		<bezel element="LM"><bounds left="619" right="633" top="108" bottom="122" /></bezel>
-		<bezel element="T0"><bounds left="330" right="390" top="126" bottom="140" /></bezel>
-		<bezel element="T1"><bounds left="380" right="440" top="126" bottom="140" /></bezel>
-		<bezel element="T2"><bounds left="430" right="490" top="126" bottom="140" /></bezel>
-		<bezel element="T3"><bounds left="480" right="540" top="126" bottom="140" /></bezel>
-		<bezel element="T4"><bounds left="530" right="590" top="126" bottom="140" /></bezel>
-		<bezel element="T5"><bounds left="330" right="385" top="216" bottom="230" /></bezel>
-		<bezel element="T7"><bounds left="380" right="490" top="216" bottom="230" /></bezel>
-		<bezel element="T8"><bounds left="480" right="535" top="216" bottom="230" /></bezel>
-		<bezel element="T9"><bounds left="530" right="585" top="216" bottom="230" /></bezel>
-		<bezel element="TM"><bounds left="580" right="635" top="126" bottom="140" /></bezel>
-		<bezel element="TN"><bounds left="580" right="635" top="216" bottom="230" /></bezel>
-		<bezel element="P0"><bounds left="40" right="300" top="75" bottom="105" /></bezel>
-		<bezel element="P1"><bounds left="40" right="300" top="205" bottom="235" /></bezel>
+		</element>
+		<element ref="blue_button" inputtag="X2" inputmask="0x02"><bounds left="348" right="367" top="105" bottom="124" /></element>
+		<element ref="blue_button" inputtag="X3" inputmask="0x02"><bounds left="398" right="417" top="105" bottom="124" /></element>
+		<element ref="blue_button" inputtag="X0" inputmask="0x04"><bounds left="448" right="467" top="105" bottom="124" /></element>
+		<element ref="blue_button" inputtag="X1" inputmask="0x04"><bounds left="498" right="517" top="105" bottom="124" /></element>
+		<element ref="blue_button" inputtag="X2" inputmask="0x04"><bounds left="548" right="567" top="105" bottom="124" /></element>
+		<element ref="red_button" inputtag="X0" inputmask="0x02"><bounds left="598" right="617" top="105" bottom="124" /></element>
+		<element ref="red_button" inputtag="X1" inputmask="0x01"><bounds left="348" right="367" top="195" bottom="214" /></element>
+		<element ref="green_button" inputtag="X0" inputmask="0x01"><bounds left="398" right="417" top="195" bottom="214" /></element>
+		<element ref="green_button" inputtag="X2" inputmask="0x01"><bounds left="448" right="467" top="195" bottom="214" /></element>
+		<element ref="white_button" inputtag="X3" inputmask="0x01"><bounds left="498" right="517" top="195" bottom="214" /></element>
+		<element ref="white_button" inputtag="X3" inputmask="0x04"><bounds left="548" right="567" top="195" bottom="214" /></element>
+		<element ref="red_button" inputtag="X1" inputmask="0x02"><bounds left="598" right="617" top="195" bottom="214" /></element>
+		<element ref="L0"><bounds left="369" right="383" top="108" bottom="122" /></element>
+		<element ref="L1"><bounds left="419" right="433" top="108" bottom="122" /></element>
+		<element ref="L2"><bounds left="469" right="483" top="108" bottom="122" /></element>
+		<element ref="L3"><bounds left="519" right="533" top="108" bottom="122" /></element>
+		<element ref="L4"><bounds left="569" right="583" top="108" bottom="122" /></element>
+		<element ref="L5"><bounds left="369" right="383" top="198" bottom="212" /></element>
+		<element ref="L6"><bounds left="419" right="433" top="198" bottom="212" /></element>
+		<element ref="L7"><bounds left="469" right="483" top="198" bottom="212" /></element>
+		<element ref="L8"><bounds left="519" right="533" top="198" bottom="212" /></element>
+		<element ref="L9"><bounds left="569" right="583" top="198" bottom="212" /></element>
+		<element ref="LM"><bounds left="619" right="633" top="108" bottom="122" /></element>
+		<element ref="T0"><bounds left="330" right="390" top="126" bottom="140" /></element>
+		<element ref="T1"><bounds left="380" right="440" top="126" bottom="140" /></element>
+		<element ref="T2"><bounds left="430" right="490" top="126" bottom="140" /></element>
+		<element ref="T3"><bounds left="480" right="540" top="126" bottom="140" /></element>
+		<element ref="T4"><bounds left="530" right="590" top="126" bottom="140" /></element>
+		<element ref="T5"><bounds left="330" right="385" top="216" bottom="230" /></element>
+		<element ref="T7"><bounds left="380" right="490" top="216" bottom="230" /></element>
+		<element ref="T8"><bounds left="480" right="535" top="216" bottom="230" /></element>
+		<element ref="T9"><bounds left="530" right="585" top="216" bottom="230" /></element>
+		<element ref="TM"><bounds left="580" right="635" top="126" bottom="140" /></element>
+		<element ref="TN"><bounds left="580" right="635" top="216" bottom="230" /></element>
+		<element ref="P0"><bounds left="40" right="300" top="75" bottom="105" /></element>
+		<element ref="P1"><bounds left="40" right="300" top="205" bottom="235" /></element>
 	</view>
 </mamelayout>

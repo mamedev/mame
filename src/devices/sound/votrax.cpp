@@ -127,11 +127,11 @@ void votrax_sc01_device::inflection_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests
+//  sound_stream_update_legacy - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 
-void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void votrax_sc01_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for(int i=0; i<samples; i++) {
 		m_sample_count++;
@@ -168,7 +168,7 @@ void votrax_sc01_device::device_start()
 	m_mainclock = clock();
 	m_sclock = m_mainclock / 18.0;
 	m_cclock = m_mainclock / 36.0;
-	m_stream = stream_alloc(0, 1, m_sclock);
+	m_stream = stream_alloc_legacy(0, 1, m_sclock);
 	m_timer = timer_alloc();
 
 	// reset outputs

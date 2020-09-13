@@ -98,10 +98,10 @@ namespace solver
 			// During extended validation there is no reason to check for
 			// differences in the generated code since during
 			// extended validation this will be different (and non-functional)
-			if (!this->state().is_extended_validation() && this->state().lib().isLoaded())
+			if (!this->state().is_extended_validation() && this->state().static_solver_lib().isLoaded())
 			{
 				pstring symname = static_compile_name();
-				m_proc.load(this->state().lib(), symname);
+				m_proc.load(this->state().static_solver_lib(), symname);
 				if (m_proc.resolved())
 				{
 					this->state().log().info("External static solver {1} found ...", symname);
@@ -313,7 +313,7 @@ namespace solver
 		generate_code(strm);
 		strm.writeline("}\n");
 		// some compilers (_WIN32, _WIN64, mac osx) need an explicit cast
-		return std::pair<pstring, pstring>(name, pstring(t.str()));
+		return std::pair<pstring, pstring>(name, putf8string(t.str()));
 	}
 
 	template <typename FT, int SIZE>

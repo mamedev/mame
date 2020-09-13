@@ -36,10 +36,10 @@ license:CC0
 			<param name="ap1_x" start="10.1" increment="11" />
 			<param name="ap2_x" start="10.5" increment="11" />
 
-			<bezel name="digit~i~" element="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></bezel>
-			<bezel name="~i~.14" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
-			<bezel name="~i~.15" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
-			<bezel name="~i~.15" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
+			<element name="digit~i~" ref="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></element>
+			<element name="~i~.14" ref="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></element>
+			<element name="~i~.15" ref="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></element>
+			<element name="~i~.15" ref="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></element>
 		</repeat>
 
 	</view>

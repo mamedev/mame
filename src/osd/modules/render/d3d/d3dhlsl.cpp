@@ -2431,7 +2431,7 @@ void uniform::update()
 		}
 		case CU_SCREEN_COUNT:
 		{
-			int screen_count = win->target()->current_view()->screen_count();
+			int screen_count = win->target()->current_view().screen_count();
 			m_shader->set_int("ScreenCount", screen_count);
 			break;
 		}

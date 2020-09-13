@@ -5,8 +5,6 @@
 Mr Do!
 driver by Nicola Salmoria
 
-Updated 02/2010 with proper XTAL values thanks to Oliver_A
-
 PCB Model: 8201
 Main Clock: XTAL = 8.2 MHz
 Video clock: XTAL = 19.6 MHz
@@ -17,6 +15,10 @@ VBlank duration: 1/VSYNC * (70/262) = 4457 us
 
 The manual for this model clearly shows above values in 'Misc' parts listings.
 There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
+
+Sound chips have custom label "U8106". Or "8106" or unlabeled with the original
+label scratched off. They are presumedly SN76489. Note that Lady Bug's PCB S/N
+is also 8106 and has the same sound chips.
 
 ***************************************************************************/
 
@@ -56,8 +58,8 @@ void mrdo_state::main_map(address_map &map)
 	map(0x8800, 0x8fff).ram().w(FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
 	map(0x9000, 0x90ff).writeonly().share("spriteram");
 	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w)); // screen flip + playfield priority
-	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::write));
-	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::write));
+	map(0x9801, 0x9801).w("sn1", FUNC(sn76489_device::write));
+	map(0x9802, 0x9802).w("sn2", FUNC(sn76489_device::write));
 	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
@@ -177,7 +179,7 @@ GFXDECODE_END
 void mrdo_state::mrdo(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, MAIN_CLOCK/2);  // Verified
+	Z80(config, m_maincpu, MAIN_CLOCK/2); // Verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &mrdo_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mrdo_state::irq0_line_hold));
 
@@ -193,9 +195,8 @@ void mrdo_state::mrdo(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	U8106(config, "u8106_1", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // sn76489-equivalent?, Verified
-
-	U8106(config, "u8106_2", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // sn76489-equivalent?, Verified
+	SN76489(config, "sn1", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // Verified
+	SN76489(config, "sn2", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // Verified
 }
 
 void mrdo_state::mrlo(machine_config &config)

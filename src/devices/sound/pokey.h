@@ -193,7 +193,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void execute_run() override;
 
@@ -306,7 +306,7 @@ private:
 	uint32_t m_poly5[0x1f];
 	uint32_t m_poly9[0x1ff];
 	uint32_t m_poly17[0x1ffff];
-	uint32_t m_voltab[0x10000];
+	stream_buffer::sample_t m_voltab[0x10000];
 
 	output_type m_output_type;
 	double m_r_pullup;

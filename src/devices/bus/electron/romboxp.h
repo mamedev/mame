@@ -13,6 +13,7 @@
 #define MAME_BUS_ELECTRON_ROMBOXP_H
 
 #include "exp.h"
+#include "machine/input_merger.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/electron/cart/slot.h"
 #include "bus/generic/slot.h"
@@ -50,6 +51,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom4_load) { return load_rom(image, m_rom[3]); }
 
+	required_device<input_merger_device> m_irqs;
 	required_memory_region m_exp_rom;
 	required_device_array<generic_slot_device, 4> m_rom;
 	required_device_array<electron_cartslot_device, 2> m_cart;

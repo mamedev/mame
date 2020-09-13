@@ -22,7 +22,6 @@
  *
  */
 
-#include "nld_7485.h"
 #include "nl_base.h"
 
 namespace netlist

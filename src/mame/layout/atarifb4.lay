@@ -60,35 +60,35 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<bezel name="0.0" element="out">
+		<element name="0.0" ref="out">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="0.1" element="in">
+		</element>
+		<element name="0.1" ref="in">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="0.2" element="bomb">
+		</element>
+		<element name="0.2" ref="bomb">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="0.3" element="down">
+		</element>
+		<element name="0.3" ref="down">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="1.0" element="kick">
+		</element>
+		<element name="1.0" ref="kick">
 			<bounds x="0" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.0" element="out">
+		</element>
+		<element name="2.0" ref="out">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.1" element="in">
+		</element>
+		<element name="2.1" ref="in">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.2" element="bomb">
+		</element>
+		<element name="2.2" ref="bomb">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="2.3" element="down">
+		</element>
+		<element name="2.3" ref="down">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
-		<bezel name="1.2" element="kick">
+		</element>
+		<element name="1.2" ref="kick">
 			<bounds x="2" y="-0.2" width="2" height="0.2" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

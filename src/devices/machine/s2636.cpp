@@ -203,7 +203,7 @@ void s2636_device::device_start()
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intack));
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
 	save_item(NAME(m_sample_cnt));
 	save_item(NAME(m_sound_lvl));
 
@@ -447,10 +447,10 @@ void s2636_device::write_intack(int state)
 
 
 //-------------------------------------------------
-//  sound_stream_update - generate audio output
+//  sound_stream_update_legacy - generate audio output
 //-------------------------------------------------
 
-void s2636_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void s2636_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	while (samples--)

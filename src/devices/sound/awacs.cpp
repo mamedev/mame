@@ -42,7 +42,7 @@ awacs_device::awacs_device(const machine_config &mconfig, const char *tag, devic
 void awacs_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22050);
+	m_stream = stream_alloc_legacy(0, 2, 22050);
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -82,11 +82,11 @@ void awacs_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void awacs_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void awacs_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int offset = (m_buffer_num == 0) ? m_dma_offset_0 : m_dma_offset_1;

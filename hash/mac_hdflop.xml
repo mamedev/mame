@@ -38,6 +38,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gayblade" supported="no">
+		<description>GayBlade</description>
+		<year>1992</year>
+		<publisher>RJBest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gayblade disk.img" size="1474560" crc="4723aa7b" sha1="998664937a591a0cde8aee7219dcbdb2dc1ba482"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="losttime" supported="no">
 		<description>Lost in Time - Parts 1 &amp; 2</description>
 		<year>1994</year>

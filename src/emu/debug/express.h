@@ -73,6 +73,8 @@ public:
 		DIVIDE_BY_ZERO,
 		OUT_OF_MEMORY,
 		INVALID_PARAM_COUNT,
+		TOO_FEW_PARAMS,
+		TOO_MANY_PARAMS,
 		UNBALANCED_QUOTES,
 		TOO_MANY_STRINGS,
 		INVALID_MEMORY_SIZE,
@@ -83,9 +85,10 @@ public:
 	};
 
 	// construction/destruction
-	expression_error(error_code code, int offset = 0)
+	expression_error(error_code code, int offset = 0, int num = 0)
 		: m_code(code),
-			m_offset(offset) { }
+			m_offset(offset),
+			m_num(num) { }
 
 	// operators
 	operator error_code() const { return m_code; }
@@ -93,12 +96,13 @@ public:
 	// getters
 	error_code code() const { return m_code; }
 	int offset() const { return m_offset; }
-	const char *code_string() const;
+	std::string code_string() const;
 
 private:
 	// internal state
 	error_code          m_code;
 	int                 m_offset;
+	int                 m_num;
 };
 
 
@@ -228,7 +232,7 @@ public:
 	parsed_expression &operator=(parsed_expression &&src) = default;
 
 	// getters
-	bool is_empty() const { return (m_tokenlist.count() == 0); }
+	bool is_empty() const { return m_tokenlist.empty(); }
 	const char *original_string() const { return m_original_string.c_str(); }
 	symbol_table &symbols() const { return m_symtable.get(); }
 
@@ -347,7 +351,7 @@ private:
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
 	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
-	void normalize_operator(parse_token *prevtoken, parse_token &thistoken);
+	void normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen);
 	void infix_to_postfix();
 
 	// execution helpers
@@ -365,7 +369,7 @@ private:
 	std::reference_wrapper<symbol_table> m_symtable;    // symbol table
 	int                 m_default_base;                 // default base
 	std::string         m_original_string;              // original string (prior to parsing)
-	simple_list<parse_token> m_tokenlist;               // token list
+	std::list<parse_token> m_tokenlist;                 // token list
 	std::list<std::string> m_stringlist;                // string list
 	std::deque<parse_token> m_token_stack;              // token stack (used during execution)
 };

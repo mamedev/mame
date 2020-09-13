@@ -36,7 +36,8 @@ namespace netlist
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<std::pair<pstring, device_arena::owned_ptr<core_device_t>>>;
-		netlist_state_t(const pstring &name, host_arena::unique_ptr<callbacks_t> &&callbacks);
+
+		netlist_state_t(const pstring &name, plib::plog_delegate logger);
 
 		PCOPYASSIGNMOVE(netlist_state_t, delete)
 
@@ -92,7 +93,15 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib_base &lib() const noexcept { return *m_lib; }
+		plib::dynlib_base &static_solver_lib() const noexcept { return *m_lib; }
+
+		/// \brief provide library with static solver implementations.
+		///
+		/// By default no static solvers are provided since these are
+		/// determined by the specific use case. You can pass such a collection
+		/// of symbols with this method.
+		///
+		void set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib);
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -252,7 +261,6 @@ namespace netlist
 		device_arena::unique_ptr<netlist_t>        m_netlist;
 		std::unique_ptr<plib::dynlib_base>         m_lib;
 		plib::state_manager_t                      m_state;
-		host_arena::unique_ptr<callbacks_t>        m_callbacks;
 		log_type                                   m_log;
 
 		// FIXME: should only be available during device construcion

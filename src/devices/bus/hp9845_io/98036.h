@@ -87,7 +87,7 @@ private:
 	void update_irq();
 	void uart_rd();
 	void uart_wr();
-	void write_uart(bool cmd , uint8_t data);
+	void write_uart(bool cmd, uint8_t data);
 };
 
 // device type definitions

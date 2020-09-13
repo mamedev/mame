@@ -22,7 +22,6 @@
  *        is not a "real" bus driver, it simply outputs 0 if the chip is not enabled.
  */
 
-#include "nld_74365.h"
 #include "nl_base.h"
 
 namespace netlist

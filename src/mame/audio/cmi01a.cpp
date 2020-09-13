@@ -132,7 +132,7 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 }
 
 
-void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cmi01a_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	if (m_run)
 	{
@@ -175,7 +175,7 @@ void cmi01a_device::device_start()
 	m_zx_timer->adjust(attotime::never);
 	m_eosi_timer->adjust(attotime::never);
 
-	m_stream = stream_alloc(0, 1, 44100);
+	m_stream = stream_alloc_legacy(0, 1, 44100);
 
 	m_ptm->set_external_clocks(clock() / 8, clock() / 4, clock() / 4);
 

@@ -1272,6 +1272,7 @@ endif
 ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_LLVM)/bin/clang -dumpversion 2> /dev/null))
 
 #-------------------------------------------------
 # android-arm
@@ -1281,7 +1282,7 @@ $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_ARM
 	$(error ANDROID_NDK_ARM is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm
 android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
@@ -1296,7 +1297,7 @@ $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile: makefile $(SCRIPTS) $(GENI
 ifndef ANDROID_NDK_ARM64
 	$(error ANDROID_NDK_ARM64 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm64
 android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
@@ -1311,7 +1312,7 @@ $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X86
 	$(error ANDROID_NDK_X86 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
 
 .PHONY: android-x86
 android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
@@ -1326,7 +1327,7 @@ $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef ANDROID_NDK_X64
 	$(error ANDROID_NDK_X64 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
 
 .PHONY: android-x64
 android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile

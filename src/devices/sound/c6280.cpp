@@ -42,7 +42,7 @@
 
 #include <algorithm>
 
-void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c6280_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	const u8 lmal = (m_balance >> 4) & 0x0f;
 	const u8 rmal = (m_balance >> 0) & 0x0f;
@@ -319,7 +319,7 @@ void c6280_device::device_start()
 	m_lfo_control = 0;
 	memset(m_channel, 0, sizeof(channel) * 8);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc_legacy(0, 2, clock());
 
 	/* Make volume table */
 	/* PSG has 48dB volume range spread over 32 steps */

@@ -18,26 +18,26 @@ Simple layout for Little Casino (color) and clones
 		</rect>
 	</element>
 	<view name="Buttons">
-		<backdrop element="background">
+		<element ref="background">
 			<bounds x="0" y="0" width="640" height="580" />
-		</backdrop>
+		</element>
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<cpanel name="button_0" element="button" inputtag="Q" inputmask="0x01">
+		<element name="button_0" ref="button" inputtag="Q" inputmask="0x01">
 			<bounds x="80" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_1" element="button" inputtag="Q" inputmask="0x02">
+		</element>
+		<element name="button_1" ref="button" inputtag="Q" inputmask="0x02">
 			<bounds x="180" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_2" element="button" inputtag="Q" inputmask="0x04">
+		</element>
+		<element name="button_2" ref="button" inputtag="Q" inputmask="0x04">
 			<bounds x="280" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_3" element="button" inputtag="Q" inputmask="0x08">
+		</element>
+		<element name="button_3" ref="button" inputtag="Q" inputmask="0x08">
 			<bounds x="380" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="button_4" element="button" inputtag="Q" inputmask="0x10">
+		</element>
+		<element name="button_4" ref="button" inputtag="Q" inputmask="0x10">
 			<bounds x="480" y="505" width="70" height="35" />
-		</cpanel>
+		</element>
 	</view>
 </mamelayout>

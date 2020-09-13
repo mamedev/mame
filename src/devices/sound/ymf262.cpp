@@ -2618,7 +2618,7 @@ void ymf262_set_update_handler(void *chip, OPL3_UPDATEHANDLER UpdateHandler, dev
 ** '**buffers' is table of 4 pointers to the buffers: CH.A, CH.B, CH.C and CH.D
 ** 'length' is the number of samples that should be generated
 */
-void ymf262_update_one(void *_chip, OPL3SAMPLE **buffers, int length)
+void ymf262_update_one(void *_chip, OPL3SAMPLE * const *buffers, int length)
 {
 	int i;
 	OPL3        *chip  = (OPL3 *)_chip;

@@ -466,6 +466,14 @@ void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
+void m72_state::airduelm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	static const int a[16] = {
+		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
+		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m_audio->set_sample_start(a[data & 0xff]);
+}
+
 void m72_state::dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[28] = {
@@ -522,7 +530,7 @@ running, but they have not been derived from the real 8751 code.
 #define CODE_LEN 96
 #define CRC_LEN 18
 
-/* Battle Chopper / Mr. Heli */
+/* Battle Chopper (World, M72 hardware) */
 static const u8 bchopper_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
@@ -546,7 +554,7 @@ static const u8 bchopper_code[CODE_LEN] =
 static const u8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
 												0x54,0x91,0x94,0xeb, 0x00,0x00 };
 
-/* Ninja Spirit */
+/* Ninja Spirit (World, M72 hardware) */
 static const u8 nspirit_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
@@ -568,17 +576,8 @@ static const u8 nspirit_code[CODE_LEN] =
 };
 static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
-/*
-// these are for the world set where we have the mcu anyway...
-static const u8 imgfight_crc[CRC_LEN] =  {  0xf8,0x91,0xc0,0x58, 0x04,0x33,0xb6,0xc5,
-                                                0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
-// these are for the japan set where we have the mcu anyway...
-static const u8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
-                                                0xbf,0x37,0x92,0x94, 0x00,0x00 };
-*/
-
-/* Dragon Breed */
+/* Dragon Breed (World, M72 hardware) */
 static const u8 dbreedm72_code[CODE_LEN] =
 {
 	0xea,0x6c,0x00,0x00,0x00    // jmp  0000:$006c
@@ -586,6 +585,29 @@ static const u8 dbreedm72_code[CODE_LEN] =
 static const u8 dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
+/* Air Duel (World, M72 hardware) */
+static const u8 airduelm72_code[CODE_LEN] =
+{
+	0xea,0x4d,0x0b,0x00,0x00    // jmp  0000:$0b4d
+};
+static const u8 airduelm72_crc[CRC_LEN] =     { 0x54,0x81,0xe6,0x8a, 0xc9,0x12,0xcc,0xea,
+												0x00,0x00 };
+
+/*
+// Actual MCU is dumped, information for Air Duel (Japan, M72 hardware) for reference:
+static const u8 airduelm72_code[CODE_LEN] =
+{
+	0x68,0x00,0xd0,             // push 0d000h
+	0x1f,                       // pop ds
+	// the game checks for
+	// "This game can only be played in Japan..." message in the video text buffer
+	// the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
+	0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
+	0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
+};
+static const u8 airduelm72j_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
+												0x00,0x00 };
+*/
 
 /* Daiku no Gensan */
 static const u8 dkgenm72_code[CODE_LEN] =
@@ -651,6 +673,12 @@ void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dbreedm72_sample_trigger_w)));
+}
+
+void m72_state::init_airduelm72()
+{
+	install_protection_handler(airduelm72_code,airduelm72_crc);
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::airduelm72_sample_trigger_w)));
 }
 
 void m72_state::init_dkgenm72()
@@ -3405,7 +3433,7 @@ ROM_START( dbreedm72 )
 	ROM_LOAD( "db_c-v0.ic44",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
 ROM_END
 
-ROM_START( dbreedm72j )
+ROM_START( dbreedjm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "db_c-h3.ic43",  0x00001, 0x20000, CRC(43425d67) SHA1(a87339bf299f7e84b9a181f3827278f64a6a29ea) )
 	ROM_LOAD16_BYTE( "db_c-l3.ic34",  0x00000, 0x20000, CRC(9c1abc85) SHA1(6c73fbec12a7795e327381d886a87bca09a7dff0) )
@@ -3476,6 +3504,44 @@ ROM_END
 
 
 ROM_START( airduelm72 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ad-c-h0-c.ic40", 0x00001, 0x20000, CRC(6467ed0f) SHA1(3b6db463168edec0e42247e4d913d9d7615061c1) )
+	ROM_LOAD16_BYTE( "ad-c-l0-c.ic37", 0x00000, 0x20000, CRC(b90c4ffd) SHA1(c95998244c52e95f6612013c23051b293423946f) )
+	ROM_LOAD16_BYTE( "ad-c-h3.ic43",   0x40001, 0x20000, CRC(9f7cfca3) SHA1(becf827aa7749c54f1c435ea224e1fd9c8b3f5f9) )
+	ROM_RELOAD(                        0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "ad-c-l3.ic34",   0x40000, 0x20000, CRC(9dd343f7) SHA1(9f499936b6d3807aa5b5c18e9811c73c9a2c99f9) )
+	ROM_RELOAD(                        0xc0000, 0x20000 )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "ad_c-pr-c.ic1", 0x00000, 0x01000, NO_DUMP ) // i8751 MCU labeled  AD C-PR-C
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "ad-00.ic53", 0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )
+	ROM_LOAD( "ad-10.ic51", 0x20000, 0x20000, CRC(9865856b) SHA1(b18a06899ae29d45e2351594df544220f3f4485a) )
+	ROM_LOAD( "ad-20.ic49", 0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
+	ROM_LOAD( "ad-30.ic47", 0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "ad-a0.ic21", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles #1
+	ROM_LOAD( "ad-a1.ic22", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
+	ROM_LOAD( "ad-a2.ic20", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
+	ROM_LOAD( "ad-a3.ic23", 0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "ad-b0.ic26", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  // tiles #2
+	ROM_LOAD( "ad-b1.ic27", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
+	ROM_LOAD( "ad-b2.ic25", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
+	ROM_LOAD( "ad-b3.ic24", 0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
+
+	ROM_REGION( 0x20000, "samples", 0 )
+	ROM_LOAD( "ad-v0.ic44", 0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
+
+	ROM_REGION( 0x104, "pals", 0 )
+	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x104, NO_DUMP ) // unknown type of PAL
+ROM_END
+
+
+ROM_START( airdueljm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ad-c-h0.ic40", 0x00001, 0x20000, CRC(12140276) SHA1(f218c5f2e6795b6295dea064817d7d6b1a7762b6) )
 	ROM_LOAD16_BYTE( "ad-c-l0.ic37", 0x00000, 0x20000, CRC(4ac0b91d) SHA1(97e2f633181cd5c25927fd0e2988af2acdb3f388) )
@@ -4320,10 +4386,10 @@ GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state, empty_
 GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
@@ -4337,14 +4403,15 @@ GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_state, init_m
 
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // fails rom check as "ROM NG  1  2" if used with japanese mcu rom (World version?)
-GAME( 1989, dbreedm72j,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 
-GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 
 /* M81 */
 GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -4384,5 +4451,5 @@ GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     m72_state, empty_
 GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 /* bootlegs, unique hw */
-GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -117,7 +117,7 @@ void astrocade_io_device::device_start()
 		m_bitswap[i] = bitswap<8>(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
-	m_stream = stream_alloc(0, 1, clock());
+	m_stream = stream_alloc_legacy(0, 1, clock());
 
 	/* reset state */
 	device_reset();
@@ -126,10 +126,10 @@ void astrocade_io_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void astrocade_io_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void astrocade_io_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *dest = outputs[0];
 	uint16_t noise_state;

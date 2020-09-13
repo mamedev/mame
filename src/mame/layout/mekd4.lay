@@ -218,90 +218,98 @@ license:CC0
 
 	<group name="displays">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="0" top="0" right="482.0" bottom="70" />
-		</bezel>
-		<bezel name="digit7" element="digit">
+		</element>
+		<element name="digit7" ref="digit">
 			<bounds left="5.5" top="20" right="30.5" bottom="50" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds left="63.5" top="20" right="88.5" bottom="50" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds left="121.5" top="20" right="146.5" bottom="50" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds left="179.5" top="20" right="204.5" bottom="50" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds left="257.5" top="20" right="282.5" bottom="50" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds left="315.5" top="20" right="340.5" bottom="50" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds left="393.5" top="20" right="418.5" bottom="50" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds left="451.5" top="20" right="476.5" bottom="50" />
-		</bezel>
+		</element>
 	</group>
 
 	<group name="keypad">
-		<bezel element="background">
+		<element ref="background">
 			<bounds x="0" y="0" width="7.1" height="6.70" />
-		</bezel>
+		</element>
 
-		<cpanel element="btn_rst" inputtag="RESET" inputmask="0x01"><bounds x="0.35" y="0.15" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_fs" inputtag="COL0" inputmask="0x10"><bounds x="1.70" y="0.15" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_fc" inputtag="COL1" inputmask="0x10"><bounds x="3.05" y="0.15" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_pl" inputtag="COL2" inputmask="0x10"><bounds x="4.40" y="0.15" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_tb" inputtag="COL3" inputmask="0x10"><bounds x="5.75" y="0.15" width="1.0" height="1.0" /></cpanel>
+		<element ref="btn_rst" inputtag="RESET" inputmask="0x01"><bounds x="0.35" y="0.15" width="1.0" height="1.0" /></element>
+		<element ref="btn_fs" inputtag="COL0" inputmask="0x10"><bounds x="1.70" y="0.15" width="1.0" height="1.0" /></element>
+		<element ref="btn_fc" inputtag="COL1" inputmask="0x10"><bounds x="3.05" y="0.15" width="1.0" height="1.0" /></element>
+		<element ref="btn_pl" inputtag="COL2" inputmask="0x10"><bounds x="4.40" y="0.15" width="1.0" height="1.0" /></element>
+		<element ref="btn_tb" inputtag="COL3" inputmask="0x10"><bounds x="5.75" y="0.15" width="1.0" height="1.0" /></element>
 
-		<cpanel element="btn_7" inputtag="COL0" inputmask="0x08"><bounds x="0.35" y="1.50" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_8" inputtag="COL1" inputmask="0x08"><bounds x="1.70" y="1.50" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_9" inputtag="COL2" inputmask="0x08"><bounds x="3.05" y="1.50" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_a" inputtag="COL3" inputmask="0x08"><bounds x="4.40" y="1.50" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_m" inputtag="COL0" inputmask="0x20"><bounds x="5.75" y="1.50" width="1.0" height="1.0" /></cpanel>
+		<element ref="btn_7" inputtag="COL0" inputmask="0x08"><bounds x="0.35" y="1.50" width="1.0" height="1.0" /></element>
+		<element ref="btn_8" inputtag="COL1" inputmask="0x08"><bounds x="1.70" y="1.50" width="1.0" height="1.0" /></element>
+		<element ref="btn_9" inputtag="COL2" inputmask="0x08"><bounds x="3.05" y="1.50" width="1.0" height="1.0" /></element>
+		<element ref="btn_a" inputtag="COL3" inputmask="0x08"><bounds x="4.40" y="1.50" width="1.0" height="1.0" /></element>
+		<element ref="btn_m" inputtag="COL0" inputmask="0x20"><bounds x="5.75" y="1.50" width="1.0" height="1.0" /></element>
 
-		<cpanel element="btn_4" inputtag="COL0" inputmask="0x04"><bounds x="0.35" y="2.85" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_5" inputtag="COL1" inputmask="0x04"><bounds x="1.70" y="2.85" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_6" inputtag="COL2" inputmask="0x04"><bounds x="3.05" y="2.85" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_b" inputtag="COL3" inputmask="0x04"><bounds x="4.40" y="2.85" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_ex" inputtag="COL1" inputmask="0x20"><bounds x="5.75" y="2.85" width="1.0" height="1.0" /></cpanel>
+		<element ref="btn_4" inputtag="COL0" inputmask="0x04"><bounds x="0.35" y="2.85" width="1.0" height="1.0" /></element>
+		<element ref="btn_5" inputtag="COL1" inputmask="0x04"><bounds x="1.70" y="2.85" width="1.0" height="1.0" /></element>
+		<element ref="btn_6" inputtag="COL2" inputmask="0x04"><bounds x="3.05" y="2.85" width="1.0" height="1.0" /></element>
+		<element ref="btn_b" inputtag="COL3" inputmask="0x04"><bounds x="4.40" y="2.85" width="1.0" height="1.0" /></element>
+		<element ref="btn_ex" inputtag="COL1" inputmask="0x20"><bounds x="5.75" y="2.85" width="1.0" height="1.0" /></element>
 
-		<cpanel element="btn_1" inputtag="COL0" inputmask="0x02"><bounds x="0.35" y="4.20" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_2" inputtag="COL1" inputmask="0x02"><bounds x="1.70" y="4.20" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_3" inputtag="COL2" inputmask="0x02"><bounds x="3.05" y="4.20" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_c" inputtag="COL3" inputmask="0x02"><bounds x="4.40" y="4.20" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_rd" inputtag="COL2" inputmask="0x20"><bounds x="5.75" y="4.20" width="1.0" height="1.0" /></cpanel>
+		<element ref="btn_1" inputtag="COL0" inputmask="0x02"><bounds x="0.35" y="4.20" width="1.0" height="1.0" /></element>
+		<element ref="btn_2" inputtag="COL1" inputmask="0x02"><bounds x="1.70" y="4.20" width="1.0" height="1.0" /></element>
+		<element ref="btn_3" inputtag="COL2" inputmask="0x02"><bounds x="3.05" y="4.20" width="1.0" height="1.0" /></element>
+		<element ref="btn_c" inputtag="COL3" inputmask="0x02"><bounds x="4.40" y="4.20" width="1.0" height="1.0" /></element>
+		<element ref="btn_rd" inputtag="COL2" inputmask="0x20"><bounds x="5.75" y="4.20" width="1.0" height="1.0" /></element>
 
-		<cpanel element="btn_0" inputtag="COL0" inputmask="0x01"><bounds x="0.35" y="5.55" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_f" inputtag="COL1" inputmask="0x01"><bounds x="1.70" y="5.55" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_e" inputtag="COL2" inputmask="0x01"><bounds x="3.05" y="5.55" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_d" inputtag="COL3" inputmask="0x01"><bounds x="4.40" y="5.55" width="1.0" height="1.0" /></cpanel>
-		<cpanel element="btn_go" inputtag="COL3" inputmask="0x20"><bounds x="5.75" y="5.55" width="1.0" height="1.0" /></cpanel>
+		<element ref="btn_0" inputtag="COL0" inputmask="0x01"><bounds x="0.35" y="5.55" width="1.0" height="1.0" /></element>
+		<element ref="btn_f" inputtag="COL1" inputmask="0x01"><bounds x="1.70" y="5.55" width="1.0" height="1.0" /></element>
+		<element ref="btn_e" inputtag="COL2" inputmask="0x01"><bounds x="3.05" y="5.55" width="1.0" height="1.0" /></element>
+		<element ref="btn_d" inputtag="COL3" inputmask="0x01"><bounds x="4.40" y="5.55" width="1.0" height="1.0" /></element>
+		<element ref="btn_go" inputtag="COL3" inputmask="0x20"><bounds x="5.75" y="5.55" width="1.0" height="1.0" /></element>
 	</group>
 
 
-	<view name="LED Displays, Terminal and Keypad" index="0">
-		<group ref="displays"><bounds x="0" y="0" width="320" height="47" /></group>
-		<group ref="keypad"><bounds x="406" y="0" width="148" height="140" /></group>
-		<screen index="0"><bounds x="0" y="160" width="640" height="480" /></screen>
+	<view name="LED Displays, Terminal and Keypad">
+		<collection name="LED Displays">
+			<group ref="displays"><bounds x="240" y="0" width="320" height="47" /></group>
+		</collection>
+		<collection name="Keypad">
+			<group ref="keypad"><bounds x="650" y="57" width="148" height="140" /></group>
+		</collection>
+		<screen index="0"><bounds x="0" y="57" width="640" height="480" /></screen>
 	</view>
 
-	<view name="LED Displays, CRT and Keypad" index="1">
-		<group ref="displays"><bounds x="0" y="0" width="320" height="47" /></group>
-		<group ref="keypad"><bounds x="406" y="0" width="148" height="140" /></group>
-		<screen index="1"><bounds x="0" y="160" width="640" height="480" /></screen>
+	<view name="LED Displays, CRT and Keypad">
+		<collection name="LED Displays">
+			<group ref="displays"><bounds x="240" y="0" width="320" height="47" /></group>
+		</collection>
+		<collection name="Keypad">
+			<group ref="keypad"><bounds x="650" y="57" width="148" height="140" /></group>
+		</collection>
+		<screen tag="screen"><bounds x="0" y="57" width="640" height="480" /></screen>
 	</view>
 
-	<view name="LED Displays and Keypad" index="2">
+	<view name="LED Displays and Keypad">
 		<group ref="displays"><bounds x="0" y="0" width="320" height="47" /></group>
 		<group ref="keypad"><bounds x="112" y="57" width="171" height="161" /></group>
 	</view>
 
-	<view name="LED Displays" index="3">
+	<view name="LED Displays">
 		<group ref="displays"><bounds x="0" y="0" width="320" height="47" /></group>
 	</view>
 

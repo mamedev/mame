@@ -51,8 +51,18 @@ B-6196 : First Book of Wizzard Programs
 Creativision carts were universal (Japanese NTSC dumps turned out to be the same as worldwide PAL ones).
 
 
-USAGE: Carts generally start up in attract mode, so press F10, then Z (unless otherwise noted),
-       wait for intro music to end. Shift is the usual "fire" key.
+USAGE: Carts generally start up in attract mode, so to play:
+       - press F10
+       - Make any adjustments, such as starting level, number of players etc with the action keys
+       - Press R to begin (there may a short tune first)
+       - On older machines (crvision, wizzard etc) action keys are Shift and Ctrl.
+       - On newer machines (laser2001, manager), the action buttons are Ctrl and Alt.
+
+NOTE that the BASIC carts will load on the newer machines, but the keyboard is incompatible. You must
+         use the inbuilt BASIC instead.
+
+NOTE that all our versions of astropin have a corruption of the right flipper that appears when you press R,
+     and the BASIC carts have a corruption of the @ symbol. Both of these are most likely original issues.
 
 -->
 <softwarelist name="crvision" description="V-Tech Creativision cartridges">
@@ -62,7 +72,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8008" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
@@ -76,7 +86,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8014" />
-		<info name="usage" value="Press F10 then Z. T to launch ball." />
+		<info name="usage" value="Press F10 then R. R to launch ball." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -90,7 +100,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8014" />
-		<info name="usage" value="Press F10 then Z. T to launch ball." />
+		<info name="usage" value="Press F10 then R. R to launch ball." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -108,7 +118,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8014" />
-		<info name="usage" value="Press F10 then Z. T to launch ball." />
+		<info name="usage" value="Press F10 then R. R to launch ball." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -122,7 +132,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8006" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -136,7 +146,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8006" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -152,6 +162,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -167,6 +178,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -182,6 +194,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -196,6 +209,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8011" />
+		<info name="usage" value="Not for manager or lasr2001" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -227,7 +241,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8001" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
@@ -241,7 +255,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8001" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
@@ -255,7 +269,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8013" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -270,7 +284,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8013" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -284,7 +298,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8020" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom10k" />
 			<dataarea name="rom" size="10240">
@@ -299,7 +313,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8020" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -314,7 +328,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8015" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -328,7 +342,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8015" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -358,7 +372,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8005" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -373,7 +387,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8005" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -386,7 +400,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<description>Planet Defender (8k Cart, Bad?)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -400,7 +414,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8009" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -414,7 +428,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8009" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -429,7 +443,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8009" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -445,7 +459,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8017" />
-		<info name="usage" value="Press F10 then Z. If the ball goes out-of-bounds, press Right-Shift." />
+		<info name="usage" value="Press F10 then R. If the ball goes out-of-bounds, press Right-Shift." />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom12k" />
 			<dataarea name="rom" size="12288">
@@ -460,7 +474,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8003" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
@@ -473,7 +487,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<description>Stone Age</description>
 		<year>1984</year>
 		<publisher>Video Technology Ltd.</publisher>
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -487,7 +501,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8002" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -502,7 +516,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8002" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -516,7 +530,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -532,7 +546,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -546,7 +560,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -561,7 +575,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -575,7 +589,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -590,7 +604,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom6k" />
 			<dataarea name="rom" size="6144">
@@ -606,7 +620,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
-		<info name="usage" value="Press F10 then Z" />
+		<info name="usage" value="Press F10 then R" />
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
@@ -618,7 +632,7 @@ USAGE: Carts generally start up in attract mode, so press F10, then Z (unless ot
 	<!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
 	    on the real machine. It was dumped and released to the public in ~2002,
 	    when FunnyMu emulator (written by Paul Hayter) was released -->
-	<software name="hapmon" supported="partial"><!-- drops keystrokes, need instructions -->
+	<software name="hapmon"><!-- need instructions -->
 		<description>Hapmon</description>
 		<year>198?</year>
 		<publisher>Richard Hayter</publisher>

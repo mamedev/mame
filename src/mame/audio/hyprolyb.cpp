@@ -82,11 +82,11 @@ void hyprolyb_adpcm_device::vck_callback( int st )
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void hyprolyb_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void hyprolyb_adpcm_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	fatalerror("sound_stream_update_legacy called; not applicable to legacy sound devices\n");
 }

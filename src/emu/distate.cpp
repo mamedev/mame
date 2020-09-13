@@ -139,6 +139,36 @@ void device_state_entry::format_from_mask()
 
 
 //-------------------------------------------------
+//  value - return the current value as a u64
+//-------------------------------------------------
+
+u64 device_state_entry::value() const
+{
+	// call the exporter before we do anything
+	if ((m_flags & DSF_EXPORT) != 0)
+		m_device_state->state_export(*this);
+
+	// pick up the value
+	return entry_value() & m_datamask;
+}
+
+
+//-------------------------------------------------
+//  dvalue - return the current value as a double
+//-------------------------------------------------
+
+double device_state_entry::dvalue() const
+{
+	// call the exporter before we do anything
+	if ((m_flags & DSF_EXPORT) != 0)
+		m_device_state->state_export(*this);
+
+	// pick up the value
+	return entry_dvalue();
+}
+
+
+//-------------------------------------------------
 //  entry_baseptr - return a pointer to where the
 //  data lives (if applicable)
 //-------------------------------------------------
@@ -178,7 +208,7 @@ double device_state_entry::entry_dvalue() const
 std::string device_state_entry::format(const char *string, bool maxout) const
 {
 	std::string dest;
-	u64 result = value();
+	u64 result = entry_value() & m_datamask;
 
 	// parse the format
 	bool leadzero = false;
@@ -360,6 +390,37 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 
 
 //-------------------------------------------------
+//  to_string - return the value of the given
+//  piece of indexed state as a string
+//-------------------------------------------------
+
+std::string device_state_entry::to_string() const
+{
+	// get the custom string if needed
+	std::string custom;
+	if ((m_flags & DSF_CUSTOM_STRING) != 0)
+		m_device_state->state_string_export(*this, custom);
+	else if ((m_flags & DSF_FLOATING_POINT) != 0)
+		custom = string_format("%-12G", entry_dvalue());
+
+	// ask the entry to format itself
+	return format(custom.c_str());
+}
+
+
+//-------------------------------------------------
+//  max_length - return the maximum length of the
+//  given state as a string
+//-------------------------------------------------
+
+int device_state_entry::max_length() const
+{
+	// ask the entry to format itself maximally
+	return format("", true).length();
+}
+
+
+//-------------------------------------------------
 //  set_value - set the value from a u64
 //-------------------------------------------------
 
@@ -376,6 +437,10 @@ void device_state_entry::set_value(u64 value) const
 
 	// store the value
 	entry_set_value(value);
+
+	// call the importer to finish up
+	if ((m_flags & DSF_IMPORT) != 0)
+		m_device_state->state_import(*this);
 }
 
 
@@ -389,6 +454,10 @@ void device_state_entry::set_dvalue(double value) const
 
 	// store the value
 	entry_set_dvalue(value);
+
+	// call the importer to finish up
+	if ((m_flags & DSF_IMPORT) != 0)
+		m_device_state->state_import(*this);
 }
 
 
@@ -408,16 +477,6 @@ void device_state_entry::entry_set_value(u64 value) const
 void device_state_entry::entry_set_dvalue(double value) const
 {
 	set_value(u64(value));
-}
-
-
-//-------------------------------------------------
-//  set_value - set the value from a string
-//-------------------------------------------------
-
-void device_state_entry::set_value(const char *string) const
-{
-	// not implemented
 }
 
 
@@ -446,110 +505,6 @@ device_state_interface::device_state_interface(const machine_config &mconfig, de
 
 device_state_interface::~device_state_interface()
 {
-}
-
-
-//-------------------------------------------------
-//  state_int - return the value of the given piece
-//  of indexed state as a u64
-//-------------------------------------------------
-
-u64 device_state_interface::state_int(int index)
-{
-	// nullptr or out-of-range entry returns 0
-	const device_state_entry *entry = state_find_entry(index);
-	if (entry == nullptr)
-		return 0;
-
-	// call the exporter before we do anything
-	if (entry->needs_export())
-		state_export(*entry);
-
-	// pick up the value
-	return entry->value();
-}
-
-
-//-------------------------------------------------
-//  state_string - return the value of the given
-//  pieces of indexed state as a string
-//-------------------------------------------------
-
-std::string device_state_interface::state_string(int index) const
-{
-	// nullptr or out-of-range entry returns bogus string
-	const device_state_entry *entry = state_find_entry(index);
-	if (entry == nullptr)
-		return std::string("???");
-
-	// get the custom string if needed
-	std::string custom;
-	if (entry->needs_custom_string())
-		state_string_export(*entry, custom);
-	else if (entry->is_float())
-		custom = string_format("%-12G", entry->dvalue());
-
-	// ask the entry to format itself
-	return entry->format(custom.c_str());
-}
-
-
-//-------------------------------------------------
-//  state_string_max_length - return the maximum
-//  length of the given state string
-//-------------------------------------------------
-
-int device_state_interface::state_string_max_length(int index)
-{
-	// nullptr or out-of-range entry returns bogus string
-	const device_state_entry *entry = state_find_entry(index);
-	if (entry == nullptr)
-		return 3;
-
-	// ask the entry to format itself maximally
-	return entry->format("", true).length();
-}
-
-
-//-------------------------------------------------
-//  set_state_int - set the value of the given
-//  piece of indexed state from a u64
-//-------------------------------------------------
-
-void device_state_interface::set_state_int(int index, u64 value)
-{
-	// nullptr or out-of-range entry is a no-op
-	const device_state_entry *entry = state_find_entry(index);
-	if (entry == nullptr)
-		return;
-
-	// set the value
-	entry->set_value(value);
-
-	// call the importer to finish up
-	if (entry->needs_import())
-		state_import(*entry);
-}
-
-
-//-------------------------------------------------
-//  set_state - set the value of the given piece
-//  of indexed state from a string
-//-------------------------------------------------
-
-void device_state_interface::set_state_string(int index, const char *string)
-{
-	// nullptr or out-of-range entry is a no-op
-	const device_state_entry *entry = state_find_entry(index);
-	if (entry == nullptr)
-		return;
-
-	// set the value
-	entry->set_value(string);
-
-	// call the importer to finish up
-	if (entry->needs_import())
-		state_import(*entry);
 }
 
 
@@ -625,25 +580,4 @@ void device_state_interface::interface_post_start()
 	// make sure we got something during startup
 	if (m_state_list.size() == 0)
 		throw emu_fatalerror("No state registered for device '%s' that supports it!", device().tag());
-}
-
-
-//-------------------------------------------------
-//  state_find_entry - return a pointer to the
-//  state entry for the given index
-//-------------------------------------------------
-
-const device_state_entry *device_state_interface::state_find_entry(int index) const
-{
-	// use fast lookup if possible
-	if (index >= FAST_STATE_MIN && index <= FAST_STATE_MAX)
-		return m_fast_state[index - FAST_STATE_MIN];
-
-	// otherwise, scan the first
-	for (auto &entry : m_state_list)
-		if (entry->m_index == index)
-			return entry.get();
-
-	// handle failure by returning nullptr
-	return nullptr;
 }

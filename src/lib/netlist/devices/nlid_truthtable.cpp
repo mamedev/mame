@@ -112,8 +112,6 @@ namespace devices
 			m_ign = (1<<m_NI)-1;
 		}
 
-	private:
-
 		template<bool doOUT>
 		void process() noexcept
 		{
@@ -377,12 +375,12 @@ namespace devices
 
 		pstring header = desc[0];
 
-		std::vector<pstring> io(plib::psplit(header,"|"));
+		std::vector<pstring> io(plib::psplit(header,'|'));
 		// checks
 		nl_assert_always(io.size() == 2, "too many '|'");
-		std::vector<pstring> inout(plib::psplit(io[0], ","));
+		std::vector<pstring> inout(plib::psplit(io[0], ','));
 		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-		std::vector<pstring> outputs(plib::psplit(io[1], ","));
+		std::vector<pstring> outputs(plib::psplit(io[1], ','));
 		nl_assert_always(outputs.size() == m_NO, "output count wrong");
 
 #if !USE_TT_ALTERNATIVE
@@ -582,14 +580,14 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 
 	while (!ttline.empty())
 	{
-		std::vector<pstring> io(plib::psplit(ttline,"|"));
+		std::vector<pstring> io(plib::psplit(ttline,'|'));
 		// checks
 		nl_assert_always(io.size() == 3, "io.count mismatch");
-		std::vector<pstring> inout(plib::psplit(io[0], ","));
+		std::vector<pstring> inout(plib::psplit(io[0], ','));
 		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
-		std::vector<pstring> out(plib::psplit(io[1], ","));
+		std::vector<pstring> out(plib::psplit(io[1], ','));
 		nl_assert_always(out.size() == m_NO, "output count not matching");
-		std::vector<pstring> times(plib::psplit(io[2], ","));
+		std::vector<pstring> times(plib::psplit(io[2], ','));
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		tt_bitset val = 0;
@@ -700,7 +698,7 @@ namespace factory
 			ENTRY(12, props);
 			default:
 				pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
-				nl_assert_always(false, msg.c_str());
+				nl_assert_always(false, putf8string(msg).c_str());
 		}
 		ret->m_desc = desc.desc;
 		ret->m_family_name = (!desc.family.empty() ? desc.family : pstring(config::DEFAULT_LOGIC_FAMILY()));

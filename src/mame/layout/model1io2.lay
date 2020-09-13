@@ -30,20 +30,20 @@ license:CC0
 	</view>
 
 	<view name="Diagnostic">
-		<backdrop element="background">
+		<element ref="background">
 			<bounds x="0" y="0" width="496" height="419" />
-		</backdrop>
+		</element>
 		<screen tag="screen">
 			<bounds left="0" top="0" right="496" bottom="384" />
 		</screen>
 		<screen tag="ioboard:screen">
 			<bounds left="8" top="392" right="129" bottom="411" />
 		</screen>
-		<cpanel name="led_comm_err" element="led_red">
+		<element name="led_comm_err" ref="led_red">
 			<bounds x="141" y="399" width="5" height="5" />
-		</cpanel>
-		<cpanel element="text_comm_err">
+		</element>
+		<element ref="text_comm_err">
 			<bounds x="145" y="398" width="40" height="7" />
-		</cpanel>
+		</element>
 	</view>
 </mamelayout>

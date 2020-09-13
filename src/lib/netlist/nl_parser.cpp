@@ -44,6 +44,7 @@ parser_t::parser_t(nlparse_t &setup)
 	m_tok_INCLUDE = m_tokenizer.register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = m_tokenizer.register_token("LOCAL_SOURCE");
 	m_tok_LOCAL_LIB_ENTRY = m_tokenizer.register_token("LOCAL_LIB_ENTRY");
+	m_tok_EXTERNAL_LIB_ENTRY = m_tokenizer.register_token("EXTERNAL_LIB_ENTRY");
 	m_tok_SUBMODEL = m_tokenizer.register_token("SUBMODEL");
 	m_tok_NETLIST_START = m_tokenizer.register_token("NETLIST_START");
 	m_tok_NETLIST_END = m_tokenizer.register_token("NETLIST_END");
@@ -65,14 +66,14 @@ parser_t::parser_t(nlparse_t &setup)
 
 }
 
-bool parser_t::parse(plib::psource_t::stream_ptr &&strm, const pstring &nlname)
+bool parser_t::parse(plib::istream_uptr &&strm, const pstring &nlname)
 {
 	token_store tokstor;
 	parse_tokens(std::move(strm), tokstor);
 	return parse(tokstor, nlname);
 }
 
-void parser_t::parse_tokens(plib::psource_t::stream_ptr &&strm, token_store &tokstor)
+void parser_t::parse_tokens(plib::istream_uptr &&strm, token_store &tokstor)
 {
 	plib::putf8_reader u8reader(strm.release_stream());
 	m_tokenizer.append_to_store(&u8reader, tokstor);
@@ -88,7 +89,7 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 	{
 		// FIXME: line numbers in cached local netlists are wrong
 		//        need to process raw tokens here.
-		token_t token = get_token();
+		token_t token = get_token_raw();
 		if (token.is_type(token_type::ENDOFFILE))
 		{
 			return false;
@@ -96,13 +97,13 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 
 		if (token.is(m_tok_NETLIST_END) || token.is(m_tok_TRUTHTABLE_END))
 		{
-			require_token(m_tok_paren_left);
 			if (!in_nl)
 				error (MF_PARSER_UNEXPECTED_1(token.str()));
 			else
 			{
 				in_nl = false;
 			}
+			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 
 			m_cur_local->push_back(token);
@@ -119,7 +120,7 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			if (token.is(m_tok_NETLIST_START) && (name.str() == nlname || nlname.empty()))
 			{
 				require_token(m_tok_paren_right);
-				parse_netlist(name.str());
+				parse_netlist();
 				return true;
 			}
 			if (token.is(m_tok_TRUTHTABLE_START) && name.str() == nlname)
@@ -131,17 +132,18 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			// create a new cached local store
 			m_local.emplace(name.str(), token_store());
 			m_cur_local = &m_local[name.str()];
-			m_cur_local->push_back(token_t(token_type::LINEMARKER));
 			auto sl = sourceloc();
-			auto num = plib::pfmt("{1}")(sl.line());
-			m_cur_local->push_back(token_t(token_type::NUMBER, num));
-			m_cur_local->push_back(token_t(token_type::STRING, sl.file_name()));
+			auto li = plib::pfmt("# {1} \"{2}\"")(sl.line(), sl.file_name());
+
+			m_cur_local->push_back(token_t(token_type::LINEMARKER, li));
 			m_cur_local->push_back(token);
 			m_cur_local->push_back(token_t(m_tok_paren_left));
 			m_cur_local->push_back(name);
 			//m_cur_local->push_back(token_t(m_tok_paren_right));
 			in_nl = true;
 		}
+		// FIXME: do we really need this going forward ? there should be no need
+		//        for NETLIST_EXTERNAL in netlist files
 		else if (token.is(m_tok_NETLIST_EXTERNAL))
 		{
 			if (in_nl)
@@ -152,7 +154,8 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 		}
 		else if (!in_nl)
 		{
-			if (!token.is(m_tok_static))
+			if (!token.is(m_tok_static) && !token.is_type(token_type::SOURCELINE)
+					&& !token.is_type(token_type::LINEMARKER))
 				error(MF_EXPECTED_NETLIST_START_1(token.str()));
 		}
 		else
@@ -162,7 +165,7 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 	}
 }
 
-void parser_t::parse_netlist(const pstring &nlname)
+void parser_t::parse_netlist()
 {
 	while (true)
 	{
@@ -197,17 +200,10 @@ void parser_t::parse_netlist(const pstring &nlname)
 			net_local_source();
 		else if (token.is(m_tok_EXTERNAL_SOURCE))
 			net_external_source();
-		//else if (token.is(m_tok_TRUTHTABLE_START))
-		//  net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
-		{
-			require_token(m_tok_paren_left);
-			pstring name(get_identifier());
-			register_local_as_source(name);
-			// FIXME: Need to pass in parameter definition FIXME: get line number right
-			m_setup.register_lib_entry(name, "", plib::source_location("parser: " + nlname, 1));
-			require_token(m_tok_paren_right);
-		}
+			net_lib_entry(true);
+		else if (token.is(m_tok_EXTERNAL_LIB_ENTRY))
+			net_lib_entry(false);
 		else if (token.is(m_tok_TRUTHTABLE_ENTRY))
 		{
 			require_token(m_tok_paren_left);
@@ -230,6 +226,21 @@ void parser_t::parse_netlist(const pstring &nlname)
 		else
 			device(token.str());
 	}
+}
+
+void parser_t::net_lib_entry(bool is_local)
+{
+	require_token(m_tok_paren_left);
+	pstring name(get_identifier());
+
+	if (is_local)
+		register_local_as_source(name);
+	else if (m_local.find(name) != m_local.end())
+		error(MF_EXTERNAL_SOURCE_IS_LOCAL_1(name));
+
+	// FIXME: Need to pass in parameter definition FIXME: get line number right
+	m_setup.register_lib_entry(name, "", sourceloc());
+	require_token(m_tok_paren_right);
 }
 
 void parser_t::net_truthtable_start(const pstring &nlname)
@@ -282,7 +293,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truthtable_create(desc, def_param, plib::source_location(nlname, 1));
+			m_setup.truthtable_create(desc, def_param, sourceloc());
 			return;
 		}
 	}
@@ -355,9 +366,7 @@ void parser_t::register_local_as_source(const pstring &name)
 {
 	auto p = m_local.find(name);
 	if (p != m_local.end())
-	{
 		m_setup.register_source<source_token_t>(name, p->second);
-	}
 	else
 		error(MF_LOCAL_SOURCE_NOT_FOUND_1(name));
 }
@@ -464,14 +473,14 @@ void parser_t::netdev_defparam()
 	if (tok.is_type(token_type::STRING))
 	{
 		m_setup.log().debug("Parser: DefParam: {1} {2}\n", param, tok.str());
-		m_setup.defparam(param, tok.str());
+		m_setup.register_defparam(param, tok.str());
 		require_token(m_tok_paren_right);
 	}
 	else
 	{
 		auto val = stringify_expression(tok);
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
-		m_setup.defparam(param, val);
+		m_setup.register_defparam(param, val);
 		require_token(tok, m_tok_paren_right);
 	}
 }

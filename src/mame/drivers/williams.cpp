@@ -1946,7 +1946,7 @@ ROM_START( defender )
 	ROM_LOAD( "defend.6",     0x16000, 0x0800, CRC(65f4efd1) SHA1(a960fd1559ed74b81deba434391e49fc6ec389ca) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder.2",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
@@ -1968,7 +1968,7 @@ ROM_START( defenderg )
 	ROM_LOAD( "defeng06.bin", 0x16000, 0x0800, CRC(3af34c05) SHA1(71f3ced06a373fa4805c856bd9fc97760787a920) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
@@ -1988,7 +1988,7 @@ ROM_START( defenderb )
 	ROM_LOAD( "defeng06.bin", 0x16000, 0x0800, CRC(3af34c05) SHA1(71f3ced06a373fa4805c856bd9fc97760787a920) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
@@ -2009,7 +2009,7 @@ ROM_START( defenderw )
 	ROM_LOAD( "rom6.bin",     0x16000, 0x0800, CRC(43d42a1b) SHA1(b13d59940646451c00b49bbe4a41b9e2df4d7758) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
@@ -2087,7 +2087,7 @@ ROM_START( zero )
 	ROM_LOAD( "zero-18", 0x16000, 0x1000, CRC(e99d5679) SHA1(b4344a32aed6cc64284661c03993a59718289c82) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 ROM_END
 
 ROM_START( zero2 )
@@ -2135,7 +2135,7 @@ ROM_START( startrkd )
 	ROM_LOAD( "st_rom7.bin",     0x16000, 0x0800, CRC(43d42a1b) SHA1(b13d59940646451c00b49bbe4a41b9e2df4d7758) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "video_sound_rom_1.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 ROM_END
 
 ROM_START( defence )
@@ -2326,74 +2326,243 @@ ROM_START( jin )
 ROM_END
 
 
-ROM_START( stargate )
+/*
+
+Stargate ROM labels are in this format:
+
++--------------------+
+| STARGATE ROM 1-A   |   <-- Game name, ROM board number and ROM type (A is 2532, B is 2732)
+| (c) 1982 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|     3002-1         |   <-- Williams game number & ROM number
++--------------------+
+
++--------------------+
+| Video Sound Rom 2  |
+| (c) 1981 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|         STD. 744   |
++--------------------+
+
+Solid Yellow (Black print) 3002-1  through 3002-12 - ROM type A, 2532
+Solid Yellow (Green print) 3002-13 through 3002-24 - ROM type B, 2732 
+
+             |    Black print    |    Green print
+ Part Number |  ROM#     Number  |  ROM#     Number
+-------------+-------------------+------------------
+A-5343-09700 | ROM 1A  - 3002-1  | ROM 1B  - 3002-13
+A-5343-09701 | ROM 2A  - 3002-2  | ROM 2B  - 3002-14
+A-5343-09702 | ROM 3A  - 3002-3  | ROM 3B  - 3002-15
+A-5343-09703 | ROM 4A  - 3002-4  | ROM 4B  - 3002-16
+A-5343-09704 | ROM 5A  - 3002-5  | ROM 5B  - 3002-17
+A-5343-09705 | ROM 6A  - 3002-6  | ROM 6B  - 3002-18
+A-5343-09706 | ROM 7A  - 3002-7  | ROM 7B  - 3002-19
+A-5343-09707 | ROM 8A  - 3002-8  | ROM 8B  - 3002-20
+A-5343-09708 | ROM 9A  - 3002-9  | ROM 9B  - 3002-21
+A-5343-09709 | ROM 10A - 3002-10 | ROM 10B - 3002-22
+A-5343-09710 | ROM 11A - 3002-11 | ROM 11B - 3002-23
+A-5343-09711 | ROM 12A - 3002-12 | ROM 12B - 3002-24
+
+D-8729-3002 ROM Board Assembly:
++-----------------------------------------------+
+|        2J3                           2J4      |
+|               +---------------+               |
+|               | 6821 PIA @ 1C |               |
+|2              +---------------+             L |
+|J    4049BP    7420N       7474     SN7425N  E |
+|2      7474    74LS139N    7411PC   SN7404N  D |
+|  +----------+    +----------+    +----------+ |
+|  | ROM3  4A |    | ROM2  4C |    | ROM1  4E | |
+|  +----------+    +----------+    +----------+ |
+|  +----------+    +----------+    +----------+ |
+|  | ROM6  5A |    | ROM5  5C |    | ROM4  5E | |
+|  +----------+    +----------+    +----------+ |
+|  +----------+    +----------+    +----------+ |
+|W | ROM9  6A |  W | ROM8  6C |    | ROM7  6E | |
+|2 +----------+  4 +----------+    +----------+ |
+|  +----------+    +----------+    +----------+ |
+|w | ROM10 7A |  W | ROM11 7C |    | ROM12 7E | |
+|1 +----------+  3 +----------+    +----------+ |
+|                          +------------------+ |
+|                          |  2J1  connector  | |
++--------------------------+------------------+-+
+
+Wire W2 & W4 with Zero Ohm resistors for 2532 ROMs
+Wire W1 & W3 with Zero Ohm resistors for 2732 ROMs
+
+*/
+ROM_START( stargate ) /* "B" ROMs labeled 3002-13 through 3002-24, identical data */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "10",         0x0d000, 0x1000, CRC(60b07ff7) SHA1(ba833f48ddfc1bd04ddb41b1d1c840d66ee7da30) )
-	ROM_LOAD( "11",         0x0e000, 0x1000, CRC(7d2c5daf) SHA1(6ca39f493eb8b370154ad46ef01976d352c929e1) )
-	ROM_LOAD( "12",         0x0f000, 0x1000, CRC(a0396670) SHA1(c46872550e0ca031453c6513f8f0448ecc9b5572) )
-	ROM_LOAD( "01",         0x10000, 0x1000, CRC(88824d18) SHA1(f003a5a9319c4eb8991fa2aae3f10c72d6b8e81a) )
-	ROM_LOAD( "02",         0x11000, 0x1000, CRC(afc614c5) SHA1(087c6da93318e8dc922d3d22e0a2af7b9759701c) )
-	ROM_LOAD( "03",         0x12000, 0x1000, CRC(15077a9d) SHA1(7badb4318b208f49d7fa65e915d0aa22a1e37915) )
-	ROM_LOAD( "04",         0x13000, 0x1000, CRC(a8b4bf0f) SHA1(6b4d47c2899fe9f14f9dab5928499f12078c437d) )
-	ROM_LOAD( "05",         0x14000, 0x1000, CRC(2d306074) SHA1(54f871983699113e31bb756d4ca885c26c2d66b4) )
-	ROM_LOAD( "06",         0x15000, 0x1000, CRC(53598dde) SHA1(54b02d944caf95283c9b6f0160e75ea8c4ccc97b) )
-	ROM_LOAD( "07",         0x16000, 0x1000, CRC(23606060) SHA1(a487ffcd4920d1056b87469735f7e1002f6a2e49) )
-	ROM_LOAD( "08",         0x17000, 0x1000, CRC(4ec490c7) SHA1(8726ebaf048db9608dfe365bf434ed5ca9452db7) )
-	ROM_LOAD( "09",         0x18000, 0x1000, CRC(88187b64) SHA1(efacc4a6d4b2af9a236c9d520de6d605c79cc5a8) )
+	ROM_LOAD( "stargate_rom_10-a_3002-10.a7", 0x0d000, 0x1000, CRC(60b07ff7) SHA1(ba833f48ddfc1bd04ddb41b1d1c840d66ee7da30) )
+	ROM_LOAD( "stargate_rom_11-a_3002-11.c7", 0x0e000, 0x1000, CRC(7d2c5daf) SHA1(6ca39f493eb8b370154ad46ef01976d352c929e1) )
+	ROM_LOAD( "stargate_rom_12-a_3002-12.e7", 0x0f000, 0x1000, CRC(a0396670) SHA1(c46872550e0ca031453c6513f8f0448ecc9b5572) )
+	ROM_LOAD( "stargate_rom_1-a_3002-1.e4",   0x10000, 0x1000, CRC(88824d18) SHA1(f003a5a9319c4eb8991fa2aae3f10c72d6b8e81a) )
+	ROM_LOAD( "stargate_rom_2-a_3002-2.c4",   0x11000, 0x1000, CRC(afc614c5) SHA1(087c6da93318e8dc922d3d22e0a2af7b9759701c) )
+	ROM_LOAD( "stargate_rom_3-a_3002-3.a4",   0x12000, 0x1000, CRC(15077a9d) SHA1(7badb4318b208f49d7fa65e915d0aa22a1e37915) )
+	ROM_LOAD( "stargate_rom_4-a_3002-4.e5",   0x13000, 0x1000, CRC(a8b4bf0f) SHA1(6b4d47c2899fe9f14f9dab5928499f12078c437d) )
+	ROM_LOAD( "stargate_rom_5-a_3002-5.c5",   0x14000, 0x1000, CRC(2d306074) SHA1(54f871983699113e31bb756d4ca885c26c2d66b4) )
+	ROM_LOAD( "stargate_rom_6-a_3002-6.a5",   0x15000, 0x1000, CRC(53598dde) SHA1(54b02d944caf95283c9b6f0160e75ea8c4ccc97b) )
+	ROM_LOAD( "stargate_rom_7-a_3002-7.e6",   0x16000, 0x1000, CRC(23606060) SHA1(a487ffcd4920d1056b87469735f7e1002f6a2e49) )
+	ROM_LOAD( "stargate_rom_8-a_3002-8.c6",   0x17000, 0x1000, CRC(4ec490c7) SHA1(8726ebaf048db9608dfe365bf434ed5ca9452db7) )
+	ROM_LOAD( "stargate_rom_9-a_3002-9.a6",   0x18000, 0x1000, CRC(88187b64) SHA1(efacc4a6d4b2af9a236c9d520de6d605c79cc5a8) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sg.snd",      0xf800, 0x0800, CRC(2fcf6c4d) SHA1(9c4334ac3ff15d94001b22fc367af40f9deb7d57) )
+	ROM_LOAD( "video_sound_rom_2_std_744.ic12", 0xf800, 0x0800, CRC(2fcf6c4d) SHA1(9c4334ac3ff15d94001b22fc367af40f9deb7d57) ) // P/N A-5342-09809
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.5",   0x0200, 0x0200, CRC(f921c5fe) SHA1(9cebb8bb935315101d248140d1b4503993ebdf8a) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_5.3c", 0x0200, 0x0200, CRC(f921c5fe) SHA1(9cebb8bb935315101d248140d1b4503993ebdf8a) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09695
 ROM_END
 
+/*
 
-ROM_START( robotron )
+Robotron 2084 ROM labels are in this format:
+
++--------------------+
+| 2084 ROM 1-A       |   <-- Game name, ROM board number and ROM type (A is 2532, B is 2732)
+| (c) 1982 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|     3005-1         |   <-- Williams game number & ROM number
++--------------------+
+
++--------------------+
+| Video Sound Rom 3  |
+| (c) 1981 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|         STD. 767   |
++--------------------+
+
+Yellow/Red (black print) 3005-1  through 3005-12 - ROM type B, 2732 (jumpers W1 & W3) (the "A" is overwitten with "B")
+Yellow/Red (green print) 3005-13 through 3005-24 - ROM type B, 2732 (jumpers W1 & W3)
+Solid Blue               3005-13 through 3005-24 - ROM type B, 2732 (jumpers W1 & W3)
+
+It's been confirmed that the Yellow labeled ROMs 3005-1 through 3005-12 are itentical to yellow labeled ROMs 3005-13 through 3005-24
+Yellow labels ROMs 3005-1 through 3005-12 are known to be labeled as "A" type ROMs with the A overwitten with "B"
+
+NOTE: Blue labels and later Yellow labels with red stripe share the SAME 3005-x numbers but have different data!
+
+           | Y/R Black | Y/R Green |Solid Blue |
+ROM | Board|  "A" ROMs |  "B" ROMs |  "B" ROMs |
+ ## | Loc. |  label #  |  label #  |  label #  |
+----+------+-----------+-----------+-----------+
+  1 |  E4  |  3005-1   |  3005-13  |  3005-13  |
+  2 |  C4  |  3005-2   |  3005-14  |  3005-14  |
+  3 |  A4  |  3005-3   |  3005-15  |  3005-15  |
+  4 |  E5  |  3005-4   |  3005-16  |  3005-16  |
+  5 |  C5  |  3005-5   |  3005-17  |  3005-17  |
+  6 |  A5  |  3005-6   |  3005-18  |  3005-18  |
+  7 |  E6  |  3005-7   |  3005-19  |  3005-19  |
+  8 |  C6  |  3005-8   |  3005-20  |  3005-20  |
+  9 |  A6  |  3005-9   |  3005-21  |  3005-21  |
+ 10 |  A7  |  3005-10  |  3005-22  |  3005-22  |
+ 11 |  C7  |  3005-11  |  3005-23  |  3005-23  |
+ 12 |  E7  |  3005-12  |  3005-24  |  3005-24  |
+----+------+-----------+-----------+-----------+
+
+        |      Red label or        |
+        | Yellow with red stripe   |    Solid Blue labeled
+ ROM #  | Part Number     Number   |  Part Number    Number
+--------+--------------------------+------------------------
+ROM 1B  |  A-5343-09898   3005-1   |  A-5343-09945   3005-13
+ROM 2B  |  A-5343-09899   3005-2   |  A-5343-09946   3005-14
+ROM 3B  |  A-5343-09900   3005-3   |  A-5343-09947   3005-15
+ROM 4B  |  A-5343-09901   3005-4   |  A-5343-09948   3005-16
+ROM 5B  |  A-5343-09902   3005-5   |  A-5343-09949   3005-17
+ROM 6B  |  A-5343-09903   3005-6   |  A-5343-09950   3005-18
+ROM 7B  |  A-5343-09904   3005-7   |  A-5343-09951   3005-19
+ROM 8B  |  A-5343-09905   3005-8   |  A-5343-09952   3005-20
+ROM 9B  |  A-5343-09906   3005-9   |  A-5343-09953   3005-21
+ROM 10B |  A-5343-09907   3005-10  |  A-5343-09954   3005-22
+ROM 11B |  A-5343-09908   3005-11  |  A-5343-09955   3005-23
+ROM 12B |  A-5343-09909   3005-12  |  A-5343-09956   3005-24
+
+Robotron 2084 Manual No. 16P-3005-101 May 1982:
+  - Current Robotron games use blue-label ROMs.  Earlier games have either yellow or red-labels ROMs, which are interchangable
+      and may be mixed in the same game. DO NOT attempt to mix blue-label ROMs with red or yellow-label ROMs.
+
+D-9144-3005 ROM Board Assembly:
++----------------------------------------------+
+|       2J3                           2J4      |
+|              +---------------+               |
+|              | 6821 PIA @ 1B |               |
+|2             +---------------+             L |
+|J   4049BP    7420N       7474     SN7425N  E |
+|2     7474    74LS139N    7411PC   SN7404N  D |
+| +----------+    +----------+    +----------+ |
+| | ROM3  4A |    | ROM2  4C |    | ROM1  4E | |
+| +----------+    +----------+    +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM6  5A |WW  | ROM5  5C |WW  | ROM4  5E | |
+| +----------+12  +----------+34  +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM9  6A |    | ROM8  6C |    | ROM7  6E | |
+| +----------+    +----------+    +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM10 7A |    | ROM11 7C |    | ROM12 7E | |
+| +----------+    +----------+    +----------+ |
+| +------------------+            +----------+ |
+| | VTI 8220  VL2001 |  74LS245N  |  74154N  | |
+| +------------------+            +----------+ |
+| +------------------+  74LS244N               |
+| | VTI 8220  VL2001 |    +------------------+ |
+| +------------------+    |  2J1  connector  | |
++-------------------------+------------------+-+
+
+Connectors:
+2J1 40 pin ribbon cable connetor
+2J2  6 pin header (KEY pin 4)
+2J3 10 pin header (KEY pin 9)
+2J4  9 pin header (KEY pin 1)
+
+LED - 7Seg LED display
+
+Wired W1 & W3 with Zero Ohm resistors for 2732 ROMs
+
+*/
+ROM_START( robotron ) /* Solid Blue labels, "B" type ROMs labeled 3005-13 through 3005-24 */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "robotron.sba", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
-	ROM_LOAD( "robotron.sbb", 0x0e000, 0x1000, CRC(7e3c1b87) SHA1(f8c6cbe3688f256f41a121255fc08f575f6a4b4f) )
-	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
-	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
-	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
-	ROM_LOAD( "robotron.sb3", 0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
-	ROM_LOAD( "robotron.sb4", 0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
-	ROM_LOAD( "robotron.sb5", 0x14000, 0x1000, CRC(62691e77) SHA1(79b4680ce19bd28882ae823f0e7b293af17cbb91) )
-	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
-	ROM_LOAD( "robotron.sb7", 0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
-	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
-	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+	ROM_LOAD( "2084_rom_10b_3005-22.a7", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
+	ROM_LOAD( "2084_rom_11b_3005-23.c7", 0x0e000, 0x1000, CRC(7e3c1b87) SHA1(f8c6cbe3688f256f41a121255fc08f575f6a4b4f) )
+	ROM_LOAD( "2084_rom_12b_3005-24.e7", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "2084_rom_1b_3005-13.e4",  0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) ) // == 2084_rom_1b_3005-1.e4
+	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
+	ROM_LOAD( "2084_rom_3b_3005-15.a4",  0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
+	ROM_LOAD( "2084_rom_4b_3005-16.e5",  0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
+	ROM_LOAD( "2084_rom_5b_3005-17.c5",  0x14000, 0x1000, CRC(62691e77) SHA1(79b4680ce19bd28882ae823f0e7b293af17cbb91) )
+	ROM_LOAD( "2084_rom_6b_3005-18.a5",  0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "2084_rom_7b_3005-19.e6",  0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) ) // == 2084_rom_7b_3005-7.e6
+	ROM_LOAD( "2084_rom_8b_3005-20.c6",  0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) ) // == 2084_rom_8b_3005-8.c6
+	ROM_LOAD( "2084_rom_9b_3005-21.a6",  0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) ) // == 2084_rom_9b_3005-9.a6
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( robotronyo )
+ROM_START( robotronyo ) /* Yellow label / Red stripe & Black print or Yellow label / Red stripe & Green print "B" type ROMs numbered 3005-13 through 3005-24 */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "robotron.yoa", 0x0d000, 0x1000, CRC(4a9d5f52) SHA1(d5ae801e60ed829e7ef5c54a18aefca54eae827f) )
-	ROM_LOAD( "robotron.yob", 0x0e000, 0x1000, CRC(2afc5e7f) SHA1(f3405be9ad2287f3921e7dbd9c5313c91fa7f8d6) )
-	ROM_LOAD( "robotron.yoc", 0x0f000, 0x1000, CRC(45da9202) SHA1(81b3b2a72a3c871e8d7b9348056622c90a20d876) )
-	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
-	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
-	ROM_LOAD( "robotron.yo3", 0x12000, 0x1000, CRC(67a369bc) SHA1(5a912d485e686de5e3175d3fc0e5daad36f4b836) )
-	ROM_LOAD( "robotron.yo4", 0x13000, 0x1000, CRC(b0de677a) SHA1(02013e00513dd74e878a01791cbcca92712e2c80) )
-	ROM_LOAD( "robotron.yo5", 0x14000, 0x1000, CRC(24726007) SHA1(8b4ed881f64e3ce73ac1a9ae2c184721c1ab37cc) )
-	ROM_LOAD( "robotron.yo6", 0x15000, 0x1000, CRC(028181a6) SHA1(41c4d9ece2ae8a103b7151fc4ff576796303318d) )
-	ROM_LOAD( "robotron.yo7", 0x16000, 0x1000, CRC(4dfcceae) SHA1(46fe1b1162d6054eb502852d065fc2e8c694b09d) )
-	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
-	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+	ROM_LOAD( "2084_rom_10b_3005-10.a7", 0x0d000, 0x1000, CRC(4a9d5f52) SHA1(d5ae801e60ed829e7ef5c54a18aefca54eae827f) ) // originally printed as "A" ROMs, the A is overwitten with "B"
+	ROM_LOAD( "2084_rom_11b_3005-11.c7", 0x0e000, 0x1000, CRC(2afc5e7f) SHA1(f3405be9ad2287f3921e7dbd9c5313c91fa7f8d6) )
+	ROM_LOAD( "2084_rom_12b_3005-12.e7", 0x0f000, 0x1000, CRC(45da9202) SHA1(81b3b2a72a3c871e8d7b9348056622c90a20d876) )
+	ROM_LOAD( "2084_rom_1b_3005-1.e4",   0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
+	ROM_LOAD( "2084_rom_2b_3005-2.c4",   0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
+	ROM_LOAD( "2084_rom_3b_3005-3.a4",   0x12000, 0x1000, CRC(67a369bc) SHA1(5a912d485e686de5e3175d3fc0e5daad36f4b836) )
+	ROM_LOAD( "2084_rom_4b_3005-4.e5",   0x13000, 0x1000, CRC(b0de677a) SHA1(02013e00513dd74e878a01791cbcca92712e2c80) )
+	ROM_LOAD( "2084_rom_5b_3005-5.c5",   0x14000, 0x1000, CRC(24726007) SHA1(8b4ed881f64e3ce73ac1a9ae2c184721c1ab37cc) )
+	ROM_LOAD( "2084_rom_6b_3005-6.a5",   0x15000, 0x1000, CRC(028181a6) SHA1(41c4d9ece2ae8a103b7151fc4ff576796303318d) )
+	ROM_LOAD( "2084_rom_7b_3005-7.e6",   0x16000, 0x1000, CRC(4dfcceae) SHA1(46fe1b1162d6054eb502852d065fc2e8c694b09d) )
+	ROM_LOAD( "2084_rom_8b_3005-8.c6",   0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
+	ROM_LOAD( "2084_rom_9b_3005-9.a6",   0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 ROM_START( robotronun )
@@ -2407,39 +2576,39 @@ ROM_START( robotronun )
 	ROM_LOAD( "roboun11.4b",  0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
 	ROM_LOAD( "roboun11.5b",  0x14000, 0x1000, CRC(62691e77) SHA1(79b4680ce19bd28882ae823f0e7b293af17cbb91) )
 	ROM_LOAD( "roboun11.6b",  0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
-	ROM_LOAD( "roboun11.7b",  0x16000, 0x1000, CRC(8981a43b) SHA1(8ecab99093d42cb66e177dfa7cf7e352667930ca) )
+	ROM_LOAD( "roboun11.7b",  0x16000, 0x1000, CRC(8981a43b) SHA1(8ecab99093d42cb66e177dfa7cf7e352667930ca) ) //
 	ROM_LOAD( "roboun11.8b",  0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
 	ROM_LOAD( "roboun11.9b",  0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "roboun11.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( robotron87 )
+ROM_START( robotron87 ) /* Patch by Christian Gingras in 1987 fixing 7 bugs, AKA "Shot in the corner" bug fix */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "robotron.sba", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
-	ROM_LOAD( "fixrobo.sbb",  0x0e000, 0x1000, CRC(e83a2eda) SHA1(4a62fcd2f91dfb609c3d2c300bd9e6cb60edf52e) ) //
-	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
-	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
-	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
-	ROM_LOAD( "robotron.sb3", 0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
-	ROM_LOAD( "robotron.sb4", 0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
-	ROM_LOAD( "fixrobo.sb5",  0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) //
-	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
-	ROM_LOAD( "robotron.sb7", 0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
-	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
-	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+	ROM_LOAD( "2084_rom_10b_3005-22.a7", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
+	ROM_LOAD( "fixrobo_rom_11b.c7",      0x0e000, 0x1000, CRC(e83a2eda) SHA1(4a62fcd2f91dfb609c3d2c300bd9e6cb60edf52e) ) //
+	ROM_LOAD( "2084_rom_12b_3005-24.e7", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "2084_rom_1b_3005-13.e4",  0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
+	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
+	ROM_LOAD( "2084_rom_3b_3005-15.a4",  0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
+	ROM_LOAD( "2084_rom_4b_3005-16.e5",  0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
+	ROM_LOAD( "fixrobo_rom_5b.c5",       0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) // fixes the enforcer explosion “reset” bug
+	ROM_LOAD( "2084_rom_6b_3005-18.a5",  0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "2084_rom_7b_3005-19.e6",  0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
+	ROM_LOAD( "2084_rom_8b_3005-20.c6",  0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
+	ROM_LOAD( "2084_rom_9b_3005-21.a6",  0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 
 //  ROM_REGION( 0x800, "patch", 0 ) // the bugfix was distributed as the following patches, we don't need them for emulation, but list them here for reference.
 //  ROM_LOAD( "fixrobo1.pat",   0x000, 0x6d1, CRC(38f81254) SHA1(7ea140c08bfd9947a7f3e769b24d5e8351525e4f) )
@@ -2448,48 +2617,48 @@ ROM_END
 
 ROM_START( robotron12 )
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "robotron.sba", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
-	ROM_LOAD( "fixrobo.sbb",  0x0e000, 0x1000, CRC(e83a2eda) SHA1(4a62fcd2f91dfb609c3d2c300bd9e6cb60edf52e) ) //
-	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
-	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
-	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
-	ROM_LOAD( "wave201.sb3",  0x12000, 0x1000, CRC(85eb583e) SHA1(b6c4280415515de6f56b358206dc3bd93a12bfce) ) // wave201 patch
-	ROM_LOAD( "robotron.sb4", 0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
-	ROM_LOAD( "fixrobo.sb5",  0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) //
-	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
-	ROM_LOAD( "robotron.sb7", 0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
-	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
-	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+	ROM_LOAD( "2084_rom_10b_3005-22.a7", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
+	ROM_LOAD( "fixrobo_rom_11b.c7",      0x0e000, 0x1000, CRC(e83a2eda) SHA1(4a62fcd2f91dfb609c3d2c300bd9e6cb60edf52e) ) //
+	ROM_LOAD( "2084_rom_12b_3005-24.e7", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "2084_rom_1b_3005-13.e4",  0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
+	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
+	ROM_LOAD( "wave201.a4",              0x12000, 0x1000, CRC(85eb583e) SHA1(b6c4280415515de6f56b358206dc3bd93a12bfce) ) // wave 201 patch
+	ROM_LOAD( "2084_rom_4b_3005-16.e5",  0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
+	ROM_LOAD( "fixrobo_rom_5b.c5",       0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) // fixes the enforcer explosion “reset” bug
+	ROM_LOAD( "2084_rom_6b_3005-18.a5",  0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "2084_rom_7b_3005-19.e6",  0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
+	ROM_LOAD( "2084_rom_8b_3005-20.c6",  0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
+	ROM_LOAD( "2084_rom_9b_3005-21.a6",  0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
-ROM_START( robotrontd )
+ROM_START( robotrontd ) /* Tie-Die version starts with a "Solid Blue label" set */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "tiedie.sba",   0x0d000, 0x1000, CRC(952bea55) SHA1(80f51d8e7ec62518afad7e56a47e0756f83f813c) ) //
-	ROM_LOAD( "tiedie.sbb",   0x0e000, 0x1000, CRC(4c05fd3c) SHA1(0d727458454826fd8222e4022b755d686ccb065f) ) //
-	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
-	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
-	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
-	ROM_LOAD( "robotron.sb3", 0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
-	ROM_LOAD( "tiedie.sb4",   0x13000, 0x1000, CRC(e8238019) SHA1(0ce29f4bf6bdee677c8e80c2d5e66fc556ba349f) ) //
-	ROM_LOAD( "fixrobo.sb5",  0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) //
-	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
-	ROM_LOAD( "tiedie.sb7",   0x16000, 0x1000, CRC(3ecf4620) SHA1(3c670a1f8df35d18451c82f220a02448bf5ef5ac) ) //
-	ROM_LOAD( "tiedie.sb8",   0x17000, 0x1000, CRC(752d7a46) SHA1(85dd58d14d527ca75d6c546d6271bf8ee5a82c8c) ) //
-	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+	ROM_LOAD( "tiedie_rom_10b.a7",       0x0d000, 0x1000, CRC(952bea55) SHA1(80f51d8e7ec62518afad7e56a47e0756f83f813c) )
+	ROM_LOAD( "tiedie_rom_11b.c7",       0x0e000, 0x1000, CRC(4c05fd3c) SHA1(0d727458454826fd8222e4022b755d686ccb065f) )
+	ROM_LOAD( "2084_rom_12b_3005-24.e7", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "2084_rom_1b_3005-13.e4",  0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) ) // == 2084_rom_1b_3005-1.e4
+	ROM_LOAD( "2084_rom_2b_3005-14.c4",  0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) ) // == 2084_rom_2b_3005-2.c4
+	ROM_LOAD( "2084_rom_3b_3005-15.a4",  0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
+	ROM_LOAD( "tiedie_rom_4b.e5",        0x13000, 0x1000, CRC(e8238019) SHA1(0ce29f4bf6bdee677c8e80c2d5e66fc556ba349f) )
+	ROM_LOAD( "fixrobo_rom_5b.c5",       0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) // fixes the enforcer explosion “reset” bug
+	ROM_LOAD( "2084_rom_6b_3005-18.a5",  0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "tiedie_rom_7b.e6",        0x16000, 0x1000, CRC(3ecf4620) SHA1(3c670a1f8df35d18451c82f220a02448bf5ef5ac) )
+	ROM_LOAD( "tiedie_rom_8b.c6",        0x17000, 0x1000, CRC(752d7a46) SHA1(85dd58d14d527ca75d6c546d6271bf8ee5a82c8c) )
+	ROM_LOAD( "2084_rom_9b_3005-21.a6",  0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) ) // == 2084_rom_9b_3005-9.a6
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+	ROM_LOAD( "video_sound_rom_3_std_767.ic12", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) ) // P/N A-5342-09910
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 
@@ -2562,7 +2731,7 @@ Joust Manual Amendment No. 16P-3006-101-AMD-1 October 1982:
 ROMs changed in October 1982 as Instruction Manuals 16P-3006-101-T September 1982 & 16P-3006-101 October 1982 only mention Yellow-label ROMs.
   Only the 16P-3006-101-AMD-1 October 1982 Amendment and the 16P-3006-101 Revision A December 1982 manuals mention the new green label ROMs
 
-ROMs 3006-52 through 3006-63 have white labels with green stripe, they are different from the ROMs 3006-13 through 3006-24 white label with green stripe
+The "White labels with Green stripe" set (ROMs 3006-52 through 3006-63) contains the same data as the "Green label" set (ROMs 3006-13 through 3006-24).
 
 D-9144-3006 ROM Board Assembly:
 +----------------------------------------------+
@@ -2604,7 +2773,7 @@ Wire W1 & W3 with Zero Ohm resistors for 2732 ROMs
 Wire W2 & W4 with Zero Ohm resistors for 2532 ROMs
 
 */
-ROM_START( joust ) /* Solid green labels */
+ROM_START( joust ) /* Solid green labels - contains the same data as the white label with green stripe 3006-52 through 3006-63 set */
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "joust_rom_10b_3006-22.a7", 0x0d000, 0x1000, CRC(3f1c4f89) SHA1(90864a8ab944df45287bf0f68ad3a85194077a82) )
 	ROM_LOAD( "joust_rom_11b_3006-23.c7", 0x0e000, 0x1000, CRC(ea48b359) SHA1(6d38003d56bebeb1f5b4d2287d587342847aa195) ) // == joust_rom_11a_3006-11.c7
@@ -2673,7 +2842,43 @@ ROM_START( joustr ) /* Solid red labels */
 	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
+/*
 
+Bubbles ROM labels are in this format:
+
++--------------------+
+| BUBBLES ROM 1B     |   <-- Game name, ROM board number and ROM type (B is 2732)
+| (c) 1983 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|    16-3012-1       |   <-- Williams game number & ROM number
++--------------------+
+
+ROM | Board|  "B" ROMs  |
+ ## | Loc. |  label #   |  Part Number
+----+------+------------+----------------
+  1 |  E4  | 16-3012-1  |  A-5343-10111-B
+  2 |  C4  | 16-3012-2  |  A-5343-10112-B
+  3 |  A4  | 16-3012-3  |  A-5343-10113-B
+  4 |  E5  | 16-3012-4  |  A-5343-10114-B
+  5 |  C5  | 16-3012-5  |  A-5343-10115-B
+  6 |  A5  | 16-3012-6  |  A-5343-10116-B
+  7 |  E6  | 16-3012-7  |  A-5343-10117-B
+  8 |  C6  | 16-3012-8  |  A-5343-10118-B
+  9 |  A6  | 16-3012-9  |  A-5343-10119-B
+ 10 |  A7  | 16-3012-10 |  A-5343-10120-B
+ 11 |  C7  | 16-3012-11 |  A-5343-10121-B
+ 12 |  E7  | 16-3012-12 |  A-5343-10122-B
+
+Instruction Manual 16-3012-101 states Brown labels
+
+Observed, but currently unverified, sets include:
+  Red Label "B" ROMs numbers 16-3012-13 through 16-3012-24
+  Red Label "B" ROMs numbers 16-3012-40 through 16-3012-51
+  Red Label "B" ROMs numbers 16-3012-52 through 16-3012-63
+
+Uses a standard D-9144 ROM Board Assembly, see Joust or Robotron above
+
+*/
 ROM_START( bubbles )
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "bubbles.10b", 0x0d000, 0x1000, CRC(26e7869b) SHA1(db428e79fc325ae3c8cab460267c27cdbc35a3bd) )
@@ -2689,12 +2894,12 @@ ROM_START( bubbles )
 	ROM_LOAD( "bubbles.8b",  0x17000, 0x1000, CRC(4fd23d8d) SHA1(9d71caa30bc3f4151789279d21651e5a4fe4a484) )
 	ROM_LOAD( "bubbles.9b",  0x18000, 0x1000, CRC(b48559fb) SHA1(551a49a12353044dbbf28dba2bd860c2d00c50bd) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) )
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
+	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) ) // Drawing Set 16-3012-103 states "Video Sound ROM 8"
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 ROM_START( bubblesr )
@@ -2712,12 +2917,12 @@ ROM_START( bubblesr )
 	ROM_LOAD( "bubblesr.8b",  0x17000, 0x1000, CRC(598b9bd6) SHA1(993cc3fac58310d0e617e58e3a0753002b987df1) )
 	ROM_LOAD( "bubbles.9b",   0x18000, 0x1000, CRC(b48559fb) SHA1(551a49a12353044dbbf28dba2bd860c2d00c50bd) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) )
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
+	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) ) // Drawing Set 16-3012-103 states "Video Sound ROM 8"
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 ROM_START( bubblesp )
@@ -2735,36 +2940,66 @@ ROM_START( bubblesp )
 	ROM_LOAD( "bub_prot.8b",  0x17000, 0x1000, CRC(96fb19c8) SHA1(3b1720e5efe2adc1f633216419bdf00c7e7b817d) )
 	ROM_LOAD( "bub_prot.9b",  0x18000, 0x1000, CRC(be7e1028) SHA1(430b33c8d83ee6756a3ef9298792b71066c88326) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) )
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
+	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) ) // Drawing Set 16-3012-103 states "Video Sound ROM 8"
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 
-ROM_START( splat )
+/*
+
+Splat! ROM labels are in this format:
+
++--------------------+
+| SPLAT ROM 1B       |   <-- Game name, ROM board number and ROM type (B is 2732)
+| (c) 1983 WILLIAMS  |
+| ELECTRONICS, INC.  |
+|    16-3011-1       |   <-- Williams game number & ROM number
++--------------------+
+
+ROM | Board|  "B" ROMs  |
+ ## | Loc. |  label #   |  Part Number
+----+------+------------+----------------
+  1 |  E4  | 16-3011-1  |  A-5343-10071-B
+  2 |  C4  | 16-3011-2  |  A-5343-10072-B
+  3 |  A4  | 16-3011-3  |  A-5343-10073-B
+  4 |  E5  | 16-3011-4  |  A-5343-10074-B
+  5 |  C5  | 16-3011-5  |  A-5343-10075-B
+  6 |  A5  | 16-3011-6  |  A-5343-10076-B
+  7 |  E6  | 16-3011-7  |  A-5343-10077-B
+  8 |  C6  | 16-3011-8  |  A-5343-10078-B
+  9 |  A6  | 16-3011-9  |  A-5343-10079-B
+ 10 |  A7  | 16-3011-10 |  A-5343-10080-B
+ 11 |  C7  | 16-3011-11 |  A-5343-10081-B
+ 12 |  E7  | 16-3011-12 |  A-5343-10082-B
+
+Uses a standard D-9144 ROM Board Assembly, see Joust or Robotron above
+
+*/
+ROM_START( splat ) /* Solid Brown labels */
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "splat.10",    0x0d000, 0x1000, CRC(d1a1f632) SHA1(de4f5ba2b92c47757dfd2ca810bf8f87338223f7) )
-	ROM_LOAD( "splat.11",    0x0e000, 0x1000, CRC(ca8cde95) SHA1(8e12f6d9eaf397646691ec5d02963b32973cb32e) )
-	ROM_LOAD( "splat.12",    0x0f000, 0x1000, CRC(5bee3e60) SHA1(b4ee99fb6c353093faf1e088bab82fec66e785bc) )
-	ROM_LOAD( "splat.01",    0x10000, 0x1000, CRC(1cf26e48) SHA1(6ba4de6cc7d1359ed450da7bae1000552373f873) )
-	ROM_LOAD( "splat.02",    0x11000, 0x1000, CRC(ac0d4276) SHA1(710aba98909d5d63c4b9b08579021f9c026b3111) )
-	ROM_LOAD( "splat.03",    0x12000, 0x1000, CRC(74873e59) SHA1(727c9da682fd10353f3969ef02e9f1826d8cb77a) )
-	ROM_LOAD( "splat.04",    0x13000, 0x1000, CRC(70a7064e) SHA1(7e6440585462b68b62d6d571d83635bf17149f1a) )
-	ROM_LOAD( "splat.05",    0x14000, 0x1000, CRC(c6895221) SHA1(6f88ba8ac72d9301760d6e2512549f70b5373c65) )
-	ROM_LOAD( "splat.06",    0x15000, 0x1000, CRC(ea4ab7fd) SHA1(288a361691a7f147ff3346627a10531d613ad017) )
-	ROM_LOAD( "splat.07",    0x16000, 0x1000, CRC(82fd8713) SHA1(c4d42b111a0357700ac2bf700117d75ffb3c5be5) )
-	ROM_LOAD( "splat.08",    0x17000, 0x1000, CRC(7dded1b4) SHA1(73df546dd60870f63a8c3deffea2b2d13149a48b) )
-	ROM_LOAD( "splat.09",    0x18000, 0x1000, CRC(71cbfe5a) SHA1(bf22bedeceffdccc340637098070b32e9c13cf68) )
+	ROM_LOAD( "splat_rom_10b_16-3011-10.a7", 0x0d000, 0x1000, CRC(d1a1f632) SHA1(de4f5ba2b92c47757dfd2ca810bf8f87338223f7) )
+	ROM_LOAD( "splat_rom_11b_16-3011-11.c7", 0x0e000, 0x1000, CRC(ca8cde95) SHA1(8e12f6d9eaf397646691ec5d02963b32973cb32e) )
+	ROM_LOAD( "splat_rom_12b_16-3011-12.e7", 0x0f000, 0x1000, CRC(5bee3e60) SHA1(b4ee99fb6c353093faf1e088bab82fec66e785bc) )
+	ROM_LOAD( "splat_rom_1b_16-3011-1.e4",   0x10000, 0x1000, CRC(1cf26e48) SHA1(6ba4de6cc7d1359ed450da7bae1000552373f873) )
+	ROM_LOAD( "splat_rom_2b_16-3011-2.c4",   0x11000, 0x1000, CRC(ac0d4276) SHA1(710aba98909d5d63c4b9b08579021f9c026b3111) )
+	ROM_LOAD( "splat_rom_3b_16-3011-3.a4",   0x12000, 0x1000, CRC(74873e59) SHA1(727c9da682fd10353f3969ef02e9f1826d8cb77a) )
+	ROM_LOAD( "splat_rom_4b_16-3011-4.e5",   0x13000, 0x1000, CRC(70a7064e) SHA1(7e6440585462b68b62d6d571d83635bf17149f1a) )
+	ROM_LOAD( "splat_rom_5b_16-3011-5.c5",   0x14000, 0x1000, CRC(c6895221) SHA1(6f88ba8ac72d9301760d6e2512549f70b5373c65) )
+	ROM_LOAD( "splat_rom_6b_16-3011-6.a5",   0x15000, 0x1000, CRC(ea4ab7fd) SHA1(288a361691a7f147ff3346627a10531d613ad017) )
+	ROM_LOAD( "splat_rom_7b_16-3011-7.e6",   0x16000, 0x1000, CRC(82fd8713) SHA1(c4d42b111a0357700ac2bf700117d75ffb3c5be5) )
+	ROM_LOAD( "splat_rom_8b_16-3011-8.c6",   0x17000, 0x1000, CRC(7dded1b4) SHA1(73df546dd60870f63a8c3deffea2b2d13149a48b) )
+	ROM_LOAD( "splat_rom_9b_16-3011-9.a6",   0x18000, 0x1000, CRC(71cbfe5a) SHA1(bf22bedeceffdccc340637098070b32e9c13cf68) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "splat.snd",   0xf000, 0x1000, CRC(a878d5f3) SHA1(f3347a354cb54ca228fe0971f0ae3bc778e2aecf) )
+	ROM_LOAD( "video_sound_rom_13_std.ic12", 0xf000, 0x1000, CRC(a878d5f3) SHA1(f3347a354cb54ca228fe0971f0ae3bc778e2aecf) ) // Instruction Manual 16-3011-101 states "ROM 13" P/N A-5342-10127
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 
@@ -2817,7 +3052,7 @@ ROM_START( sinistar ) // rev. 3
 	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
 	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
 	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "video_sound_rom_9_std.808",         0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+	ROM_LOAD( "video_sound_rom_9_std.808.ic12",    0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
 /*
     ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
@@ -2825,12 +3060,12 @@ ROM_START( sinistar ) // rev. 3
     ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
     ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
     ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-    ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
+    ROM_LOAD( "video_sound_rom_10_std.ic12",       0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
 */
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder PROM 4 - Horizontal - 7641-5 BPROM
-	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder PROM 6 - Vertical - 7641-5 BPROM
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 ROM_START( sinistar2 ) // rev. 2
@@ -2852,7 +3087,7 @@ ROM_START( sinistar2 ) // rev. 2
 	ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
 	ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
 	ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-	ROM_LOAD( "video_sound_rom_9_std.808",         0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
+	ROM_LOAD( "video_sound_rom_9_std.808.ic12",    0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
 /*
     ROM_REGION( 0x10000, "soundcpu_b", 0 ) // Stereo sound requires 2nd sound board as used in the cockpit version
@@ -2860,12 +3095,12 @@ ROM_START( sinistar2 ) // rev. 2
     ROM_LOAD( "3004_speech_ic5_r1_16-3004-50.ic5", 0xc000, 0x1000, CRC(cf3b5ffd) SHA1(d5d51c550581c9d46ab331dd4fd32541a2ef598e) )
     ROM_LOAD( "3004_speech_ic6_r1_16-3004-51.ic6", 0xd000, 0x1000, CRC(ff8d2645) SHA1(16fa2a602acbbc182dd96bab113ab18356f3daf0) )
     ROM_LOAD( "3004_speech_ic4_r1_16-3004-49.ic4", 0xe000, 0x1000, CRC(4b56a626) SHA1(44430cd5c110ec751b0bfb8ae99b26d443350db1) )
-    ROM_LOAD( "sinistar_stereo_18-a.ic12",         0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
+    ROM_LOAD( "video_sound_rom_10_std.ic12",       0xf000, 0x1000, CRC(b5c70082) SHA1(643af087b57da3a71c68372c79c5777e0c1fbef7) ) // not sure if all speech ROMs need to be here too
 */
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder PROM 4 - Horizontal - 7641-5 BPROM
-	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder PROM 6 - Vertical - 7641-5 BPROM
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 ROM_START( sinistarp ) // solid pink labels - 1982 AMOA prototype
@@ -2890,8 +3125,8 @@ ROM_START( sinistarp ) // solid pink labels - 1982 AMOA prototype
 	ROM_LOAD( "video_sound_rom_9_std.808", 0xf000, 0x1000, CRC(b82f4ddb) SHA1(c70c7dd6e88897920d7709a260f27810f66aade1) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "a-5342-09694.3c",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Decoder ROM 4 - Horizontal - 7641-5 BPROM
-	ROM_LOAD( "a-5342-09821.3g",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Decoder ROM 6 - Vertical - 7641-5 BPROM
+	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
+	ROM_LOAD( "decoder_rom_6.3c", 0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // Universal Vertical decoder ROM - 7641-5 BPROM - P/N A-5342-09821
 ROM_END
 
 

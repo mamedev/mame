@@ -3,8 +3,8 @@
 
 #include "palloc.h"
 #include "pstonum.h"
+#include "pstrutil.h"
 #include "ptokenizer.h"
-#include "putil.h"
 
 namespace plib {
 
@@ -48,8 +48,10 @@ namespace plib {
 		if (m_px == m_cur_line.end())
 		{
 			//++m_source_location.back();
-			if (m_strm->readline_lf(m_cur_line))
+			putf8string line;
+			if (m_strm->readline_lf(line))
 			{
+				m_cur_line = pstring(line);
 				m_px = m_cur_line.begin();
 				if (*m_px != '#')
 					m_token_queue->push_back(token_t(token_type::SOURCELINE, m_cur_line));
@@ -138,6 +140,52 @@ namespace plib {
 		return ret;
 	}
 
+	bool ptoken_reader::process_line_token(const token_t &tok)
+	{
+		if (tok.is_type(token_type::LINEMARKER))
+		{
+			bool benter(false);
+			bool bexit(false);
+			pstring file;
+			unsigned lineno(0);
+
+			auto sp = psplit(tok.str(), ' ');
+			//printf("%d %s\n", (int) sp.size(), ret.str().c_str());
+
+			bool err = false;
+			lineno = pstonum_ne<unsigned>(sp[1], err);
+			if (err)
+				error(MF_EXPECTED_LINENUM_GOT_1(tok.str()));
+			if (sp[2].substr(0,1) != "\"")
+				error(MF_EXPECTED_FILENAME_GOT_1(tok.str()));
+			file = sp[2].substr(1, sp[2].length() - 2);
+
+			for (std::size_t i = 3; i < sp.size(); i++)
+			{
+				if (sp[i] == "1")
+					benter = true;
+				if (sp[i] == "2")
+					bexit = true;
+				// FIXME: process flags; actually only 1 (file enter) and 2 (after file exit)
+			}
+			if (bexit) // pop the last location
+				m_source_location.pop_back();
+			if (!benter) // new location!
+				m_source_location.pop_back();
+			m_source_location.emplace_back(plib::source_location(file, lineno));
+			return true;
+		}
+
+		if (tok.is_type(token_type::SOURCELINE))
+		{
+			m_line = tok.str();
+			++m_source_location.back();
+			return true;
+		}
+
+		return false;
+	}
+
 	ptoken_reader::token_t ptoken_reader::get_token()
 	{
 		token_t ret = get_token_queue();
@@ -147,41 +195,8 @@ namespace plib {
 				return ret;
 
 			//printf("%s\n", ret.str().c_str());
-			if (ret.is_type(token_type::LINEMARKER))
+			if (process_line_token(ret))
 			{
-				bool benter(false);
-				bool bexit(false);
-				pstring file;
-				unsigned lineno(0);
-
-				ret = get_token_queue();
-				if (!ret.is_type(token_type::NUMBER))
-					error(MF_EXPECTED_LINENUM_GOT_1(ret.str()));
-				lineno = pstonum<unsigned>(ret.str());
-				ret = get_token_queue();
-				if (!ret.is_type(token_type::STRING))
-					error(MF_EXPECTED_FILENAME_GOT_1(ret.str()));
-				file = ret.str();
-				ret = get_token_queue();
-				while (ret.is_type(token_type::NUMBER))
-				{
-					if (ret.str() == "1")
-						benter = true;
-					if (ret.str() == "2")
-						bexit = true;
-					// FIXME: process flags; actually only 1 (file enter) and 2 (after file exit)
-					ret = get_token_queue();
-				}
-				if (bexit) // pop the last location
-					m_source_location.pop_back();
-				if (!benter) // new location!
-					m_source_location.pop_back();
-				m_source_location.emplace_back(plib::source_location(file, lineno - 1));
-			}
-			else if (ret.is_type(token_type::SOURCELINE))
-			{
-				m_line = ret.str();
-				++m_source_location.back();
 				ret = get_token_queue();
 			}
 			else
@@ -189,6 +204,13 @@ namespace plib {
 				return ret;
 			}
 		}
+	}
+
+	ptoken_reader::token_t ptoken_reader::get_token_raw()
+	{
+		token_t ret = get_token_queue();
+		process_line_token(ret);
+		return ret;
 	}
 
 	ptoken_reader::token_t ptokenizer::get_token_internal()
@@ -204,8 +226,18 @@ namespace plib {
 			}
 		}
 		if (m_support_line_markers && c == '#')
-			return token_t(token_type::LINEMARKER, "#");
-
+		{
+			pstring lm("#");
+			do
+			{
+				c = getc();
+				if (eof())
+					return token_t(token_type::ENDOFFILE);
+				if (c == '\r' || c == '\n')
+					return token_t(token_type::LINEMARKER, lm);
+				lm += c;
+			} while (true);
+		}
 		if (m_number_chars_start.find(c) != pstring::npos)
 		{
 			// read number while we receive number or identifier chars

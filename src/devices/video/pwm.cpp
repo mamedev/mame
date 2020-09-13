@@ -6,7 +6,7 @@ This thing is a generic helper for PWM(strobed) display elements, to prevent fli
 and optionally handle perceived brightness levels.
 
 Common usecase is to call matrix(selmask, datamask), a collision between the 2 masks
-implies a powered-on display element (eg, a LED, or VFD sprite). The maximum matrix
+implies a powered-on display element (eg. a LED, or VFD sprite). The maximum matrix
 size is 64 by 64, simply due to uint64_t constraints. If a larger size is needed,
 create an array of pwm_display_device.
 
@@ -112,8 +112,7 @@ void pwm_display_device::device_start()
 
 	save_item(NAME(m_bri));
 	save_item(NAME(m_update_time));
-	save_item(NAME(m_acc_attos));
-	save_item(NAME(m_acc_secs));
+	save_item(NAME(m_acc));
 }
 
 void pwm_display_device::device_reset()
@@ -123,29 +122,6 @@ void pwm_display_device::device_reset()
 
 	schedule_frame();
 	m_update_time = machine().time();
-}
-
-
-
-//-------------------------------------------------
-//  custom savestate handling (MAME doesn't save array of attotime)
-//-------------------------------------------------
-
-void pwm_display_device::device_pre_save()
-{
-	for (int y = 0; y < ARRAY_LENGTH(m_acc); y++)
-		for (int x = 0; x < ARRAY_LENGTH(m_acc[0]); x++)
-		{
-			m_acc_attos[y][x] = m_acc[y][x].attoseconds();
-			m_acc_secs[y][x] = m_acc[y][x].seconds();
-		}
-}
-
-void pwm_display_device::device_post_load()
-{
-	for (int y = 0; y < ARRAY_LENGTH(m_acc); y++)
-		for (int x = 0; x < ARRAY_LENGTH(m_acc[0]); x++)
-			m_acc[y][x] = attotime(m_acc_secs[y][x], m_acc_attos[y][x]);
 }
 
 

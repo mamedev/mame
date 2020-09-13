@@ -79,99 +79,100 @@ Basic display of disk drive LEDs for the Sharp X680x0
 	</element>
 
 	<view name="Disk Drive and Keyboard LEDs">
-		<bezel name="drv0text" element="drv0">
-			<bounds left="0" right="59" top="0" bottom="30" />
-		</bezel>
-		<bezel name="ctrl_drv0" element="ctrl_led">
-			<bounds left="40" right="54" top="31" bottom="45" />
-		</bezel>
-		<bezel name="access_drv0" element="access_led">
-			<bounds left="0" right="14" top="31" bottom="45" />
-		</bezel>
-		<bezel name="eject_drv0" element="eject_led">
-			<bounds left="20" right="34" top="31" bottom="45" />
-		</bezel>
-		<bezel name="drv1text" element="drv1">
-			<bounds left="0" right="59" top="70" bottom="100" />
-		</bezel>
-		<bezel name="ctrl_drv1" element="ctrl_led">
-			<bounds left="40" right="54" top="101" bottom="115" />
-		</bezel>
-		<bezel name="access_drv1" element="access_led">
-			<bounds left="0" right="14" top="101" bottom="115" />
-		</bezel>
-		<bezel name="eject_drv1" element="eject_led">
-			<bounds left="20" right="34" top="101" bottom="115" />
-		</bezel>
-		<bezel name="drv2text" element="drv2">
-			<bounds left="0" right="59" top="140" bottom="170" />
-		</bezel>
-		<bezel name="ctrl_drv2" element="ctrl_led">
-			<bounds left="40" right="54" top="171" bottom="185" />
-		</bezel>
-		<bezel name="access_drv2" element="access_led">
-			<bounds left="0" right="14" top="171" bottom="185" />
-		</bezel>
-		<bezel name="eject_drv2" element="eject_led">
-			<bounds left="20" right="34" top="171" bottom="185" />
-		</bezel>
-		<bezel name="drv3text" element="drv3">
-			<bounds left="0" right="59" top="210" bottom="240" />
-		</bezel>
-		<bezel name="ctrl_drv3" element="ctrl_led">
-			<bounds left="40" right="54" top="241" bottom="255" />
-		</bezel>
-		<bezel name="access_drv3" element="access_led">
-			<bounds left="0" right="14" top="241" bottom="255" />
-		</bezel>
-		<bezel name="eject_drv3" element="eject_led">
-			<bounds left="20" right="34" top="241" bottom="255" />
-		</bezel>
 		<screen index="0">
 			<bounds x="61" y="0" width="1024" height="768" />
 		</screen>
-		<bezel name="kana_text" element="kana">
+
+		<element name="drv0text" ref="drv0">
+			<bounds left="0" right="59" top="0" bottom="30" />
+		</element>
+		<element name="ctrl_drv0" ref="ctrl_led">
+			<bounds left="40" right="54" top="31" bottom="45" />
+		</element>
+		<element name="access_drv0" ref="access_led">
+			<bounds left="0" right="14" top="31" bottom="45" />
+		</element>
+		<element name="eject_drv0" ref="eject_led">
+			<bounds left="20" right="34" top="31" bottom="45" />
+		</element>
+		<element name="drv1text" ref="drv1">
+			<bounds left="0" right="59" top="70" bottom="100" />
+		</element>
+		<element name="ctrl_drv1" ref="ctrl_led">
+			<bounds left="40" right="54" top="101" bottom="115" />
+		</element>
+		<element name="access_drv1" ref="access_led">
+			<bounds left="0" right="14" top="101" bottom="115" />
+		</element>
+		<element name="eject_drv1" ref="eject_led">
+			<bounds left="20" right="34" top="101" bottom="115" />
+		</element>
+		<element name="drv2text" ref="drv2">
+			<bounds left="0" right="59" top="140" bottom="170" />
+		</element>
+		<element name="ctrl_drv2" ref="ctrl_led">
+			<bounds left="40" right="54" top="171" bottom="185" />
+		</element>
+		<element name="access_drv2" ref="access_led">
+			<bounds left="0" right="14" top="171" bottom="185" />
+		</element>
+		<element name="eject_drv2" ref="eject_led">
+			<bounds left="20" right="34" top="171" bottom="185" />
+		</element>
+		<element name="drv3text" ref="drv3">
+			<bounds left="0" right="59" top="210" bottom="240" />
+		</element>
+		<element name="ctrl_drv3" ref="ctrl_led">
+			<bounds left="40" right="54" top="241" bottom="255" />
+		</element>
+		<element name="access_drv3" ref="access_led">
+			<bounds left="0" right="14" top="241" bottom="255" />
+		</element>
+		<element name="eject_drv3" ref="eject_led">
+			<bounds left="20" right="34" top="241" bottom="255" />
+		</element>
+		<element name="kana_text" ref="kana">
 			<bounds left="0" right="40" top="300" bottom="314" />
-		</bezel>
-		<bezel name="key_led_kana" element="access_led">
+		</element>
+		<element name="key_led_kana" ref="access_led">
 			<bounds left="40" right="54" top="300" bottom="314" />
-		</bezel>
-		<bezel name="romaji_text" element="romaji">
+		</element>
+		<element name="romaji_text" ref="romaji">
 			<bounds left="0" right="40" top="330" bottom="344" />
-		</bezel>
-		<bezel name="key_led_romaji" element="access_led">
+		</element>
+		<element name="key_led_romaji" ref="access_led">
 			<bounds left="40" right="54" top="330" bottom="344" />
-		</bezel>
-		<bezel name="code_text" element="code">
+		</element>
+		<element name="code_text" ref="code">
 			<bounds left="0" right="40" top="360" bottom="374" />
-		</bezel>
-		<bezel name="key_led_code" element="access_led">
+		</element>
+		<element name="key_led_code" ref="access_led">
 			<bounds left="40" right="54" top="360" bottom="374" />
-		</bezel>
-		<bezel name="caps_text" element="caps">
+		</element>
+		<element name="caps_text" ref="caps">
 			<bounds left="0" right="40" top="390" bottom="404" />
-		</bezel>
-		<bezel name="key_led_caps" element="access_led">
+		</element>
+		<element name="key_led_caps" ref="access_led">
 			<bounds left="40" right="54" top="390" bottom="404" />
-		</bezel>
-		<bezel name="insert_text" element="insert">
+		</element>
+		<element name="insert_text" ref="insert">
 			<bounds left="0" right="40" top="420" bottom="434" />
-		</bezel>
-		<bezel name="key_led_insert" element="access_led">
+		</element>
+		<element name="key_led_insert" ref="access_led">
 			<bounds left="40" right="54" top="420" bottom="434" />
-		</bezel>
-		<bezel name="hiragana_text" element="hiragana">
+		</element>
+		<element name="hiragana_text" ref="hiragana">
 			<bounds left="0" right="40" top="450" bottom="464" />
-		</bezel>
-		<bezel name="key_led_hiragana" element="access_led">
+		</element>
+		<element name="key_led_hiragana" ref="access_led">
 			<bounds left="40" right="54" top="450" bottom="464" />
-		</bezel>
-		<bezel name="fullsize_text" element="fullsize">
+		</element>
+		<element name="fullsize_text" ref="fullsize">
 			<bounds left="0" right="40" top="480" bottom="494" />
-		</bezel>
-		<bezel name="key_led_fullsize" element="access_led">
+		</element>
+		<element name="key_led_fullsize" ref="access_led">
 			<bounds left="40" right="54" top="480" bottom="494" />
-		</bezel>
+		</element>
 	</view>
 
 </mamelayout>

@@ -52,7 +52,6 @@
  *
  */
 
-#include "nld_7490.h"
 #include "nl_base.h"
 
 namespace netlist

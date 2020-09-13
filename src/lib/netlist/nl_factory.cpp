@@ -45,7 +45,7 @@ namespace factory {
 
 	bool list_t::exists(const pstring &name) const noexcept
 	{
-		for (auto & e : *this)
+		for (const auto & e : *this)
 			if (e->name() == name)
 				return true;
 		return false;

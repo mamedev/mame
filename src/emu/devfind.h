@@ -15,6 +15,7 @@
 
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -1063,11 +1064,11 @@ public:
 	// dynamic allocation of a shared pointer
 	void allocate(u32 entries)
 	{
-		assert(m_allocated.empty());
-		m_allocated.resize(entries);
-		this->m_target = &m_allocated[0];
+		assert(!m_allocated);
+		m_allocated = std::make_unique<PointerType []>(entries);
+		this->m_target = m_allocated.get();
 		m_bytes = entries * sizeof(PointerType);
-		this->m_base.get().save_item(m_allocated, this->m_tag);
+		this->m_base.get().save_pointer(m_allocated, this->m_tag, entries);
 	}
 
 private:
@@ -1086,7 +1087,7 @@ private:
 	// internal state
 	u8 const m_width;
 	size_t m_bytes;
-	std::vector<PointerType> m_allocated;
+	std::unique_ptr<PointerType []> m_allocated;
 };
 
 template <typename PointerType> using optional_shared_ptr = shared_ptr_finder<PointerType, false>;

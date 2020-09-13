@@ -209,7 +209,7 @@ void vboysnd_device::device_start()
 {
 	uint32_t rate = clock() / 120;
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
+	m_stream = stream_alloc_legacy(0, 2, rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
@@ -265,11 +265,11 @@ void vboysnd_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vboysnd_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int len, i, j, channel;

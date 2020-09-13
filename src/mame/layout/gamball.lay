@@ -302,212 +302,212 @@ license:CC0
 	</element>
 
 	<view name="Gamball AWP Simulated Video (No Artwork)">
-		<backdrop name="lamp8" element="reellamp" state="0">
+		<element name="lamp8" ref="reellamp" state="0">
 			<bounds x="85" y="491.3333" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp16" element="reellamp" state="0">
+		</element>
+		<element name="lamp16" ref="reellamp" state="0">
 			<bounds x="85" y="520.6666" width="49" height="29.3333"/>
-		</backdrop>
+		</element>
 
-		<backdrop name="sreel1" element="SteppersReel1" state="0">
+		<element name="sreel1" ref="SteppersReel1" state="0">
 			<bounds x="85" y="463" width="49" height="87.9999"/>
-		</backdrop>
+		</element>
 
-		<backdrop name="blk" element="bezelblock" state="0">
+		<element name="blk" ref="bezelblock" state="0">
 			<bounds x="85" y="463" width="49" height="29.3333"/>
-		</backdrop>
+		</element>
 
-		<backdrop name="lamp26" element="cancol" state="0" inputtag="BLACK2" inputmask="0x04">
+		<element name="lamp26" ref="cancol" state="0" inputtag="BLACK2" inputmask="0x04">
 			<bounds x="10" y="560" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="lamp32" element="hold" state="0" inputtag="BLACK2" inputmask="0x08">
+		</element>
+		<element name="lamp32" ref="hold" state="0" inputtag="BLACK2" inputmask="0x08">
 			<bounds x="85" y="560" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="lamp33" element="hold" state="0" inputtag="BLACK2" inputmask="0x10">
+		</element>
+		<element name="lamp33" ref="hold" state="0" inputtag="BLACK2" inputmask="0x10">
 			<bounds x="161" y="560" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="lamp34" element="hold" state="0" inputtag="BLACK2" inputmask="0x20">
+		</element>
+		<element name="lamp34" ref="hold" state="0" inputtag="BLACK2" inputmask="0x20">
 			<bounds x="236" y="560" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="lamp40" element="hold" state="0" inputtag="BLACK2" inputmask="0x40">
+		</element>
+		<element name="lamp40" ref="hold" state="0" inputtag="BLACK2" inputmask="0x40">
 			<bounds x="311" y="560" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="lamp41" element="start" state="0" inputtag="BLACK2" inputmask="0x80">
+		</element>
+		<element name="lamp41" ref="start" state="0" inputtag="BLACK2" inputmask="0x80">
 			<bounds x="386" y="560" width="50" height="30"/>
-		</backdrop>
-		<backdrop name="repeat" element="repeat" state="0">
+		</element>
+		<element name="repeat" ref="repeat" state="0">
 			<bounds x="35" y="481.3333" width="20" height="10"/>
-		</backdrop>
-		<backdrop name="lamp105" element="yes" state="0">
+		</element>
+		<element name="lamp105" ref="yes" state="0">
 			<bounds x="35" y="491.3333" width="20" height="10"/>
-		</backdrop>
-		<backdrop name="lamp106" element="no" state="0">
+		</element>
+		<element name="lamp106" ref="no" state="0">
 			<bounds x="35" y="501.3333" width="16" height="10"/>
-		</backdrop>
+		</element>
 
-		<backdrop name="lamp36" element="nudge" state="0">
+		<element name="lamp36" ref="nudge" state="0">
 			<bounds x="365" y="491.3333" width="20" height="10"/>
-		</backdrop>
-		<backdrop name="lamp28" element="now" state="0">
+		</element>
+		<element name="lamp28" ref="now" state="0">
 			<bounds x="367" y="501.3333" width="16" height="10"/>
-		</backdrop>
+		</element>
 
-		<backdrop name="lamp4" element="3" state="0">
+		<element name="lamp4" ref="3" state="0">
 			<bounds x="365" y="512" width="8" height="9"/>
-		</backdrop>
-		<backdrop name="lamp12" element="2" state="0">
+		</element>
+		<element name="lamp12" ref="2" state="0">
 			<bounds x="372" y="512" width="8" height="9"/>
-		</backdrop>
-		<backdrop name="lamp20" element="1" state="0">
+		</element>
+		<element name="lamp20" ref="1" state="0">
 			<bounds x="379" y="512" width="8" height="9"/>
-		</backdrop>
-		<backdrop name="lamp1" element="reellamp" state="0">
+		</element>
+		<element name="lamp1" ref="reellamp" state="0">
 			<bounds x="161" y="463" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp9" element="reellamp" state="0">
+		</element>
+		<element name="lamp9" ref="reellamp" state="0">
 			<bounds x="161" y="491.3333" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp17" element="reellamp" state="0">
+		</element>
+		<element name="lamp17" ref="reellamp" state="0">
 			<bounds x="161" y="520.6666" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="sreel2" element="SteppersReel2" state="96">
+		</element>
+		<element name="sreel2" ref="SteppersReel2" state="96">
 			<bounds x="161" y="463" width="49" height="87.9999"/>
-		</backdrop>
-		<backdrop name="lamp2" element="reellamp" state="0">
+		</element>
+		<element name="lamp2" ref="reellamp" state="0">
 			<bounds x="236" y="463" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp10" element="reellamp" state="0">
+		</element>
+		<element name="lamp10" ref="reellamp" state="0">
 			<bounds x="236" y="491.333" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp18" element="reellamp" state="0">
+		</element>
+		<element name="lamp18" ref="reellamp" state="0">
 			<bounds x="236" y="520.6666" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="sreel3" element="SteppersReel3" state="96">
+		</element>
+		<element name="sreel3" ref="SteppersReel3" state="96">
 			<bounds x="236" y="463" width="49" height="87.9999"/>
-		</backdrop>
-		<backdrop name="lamp3" element="reellamp" state="0">
+		</element>
+		<element name="lamp3" ref="reellamp" state="0">
 			<bounds x="311" y="463" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp11" element="reellamp" state="0">
+		</element>
+		<element name="lamp11" ref="reellamp" state="0">
 			<bounds x="311" y="491.3333" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="lamp19" element="reellamp" state="0">
+		</element>
+		<element name="lamp19" ref="reellamp" state="0">
 			<bounds x="311" y="520.6666" width="49" height="29.3333"/>
-		</backdrop>
-		<backdrop name="sreel4" element="SteppersReel4" state="96">
+		</element>
+		<element name="sreel4" ref="SteppersReel4" state="96">
 			<bounds x="311" y="463" width="49" height="87.9999"/>
-		</backdrop>
-		<backdrop name="lamp68" element="1" state="0">
+		</element>
+		<element name="lamp68" ref="1" state="0">
 			<bounds x="64" y="310" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp69" element="2" state="0">
+		</element>
+		<element name="lamp69" ref="2" state="0">
 			<bounds x="94" y="310" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp70" element="3" state="0">
+		</element>
+		<element name="lamp70" ref="3" state="0">
 			<bounds x="124" y="310" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp71" element="4" state="0">
+		</element>
+		<element name="lamp71" ref="4" state="0">
 			<bounds x="154" y="310" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp72" element="5" state="0">
+		</element>
+		<element name="lamp72" ref="5" state="0">
 			<bounds x="64" y="330" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp73" element="6" state="0">
+		</element>
+		<element name="lamp73" ref="6" state="0">
 			<bounds x="94" y="330" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp74" element="7" state="0">
+		</element>
+		<element name="lamp74" ref="7" state="0">
 			<bounds x="124" y="330" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp75" element="8" state="0">
+		</element>
+		<element name="lamp75" ref="8" state="0">
 			<bounds x="154" y="330" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp76" element="9" state="0">
+		</element>
+		<element name="lamp76" ref="9" state="0">
 			<bounds x="64" y="350" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp77" element="10" state="0">
+		</element>
+		<element name="lamp77" ref="10" state="0">
 			<bounds x="94" y="350" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp78" element="11" state="0">
+		</element>
+		<element name="lamp78" ref="11" state="0">
 			<bounds x="124" y="350" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp79" element="12" state="0">
+		</element>
+		<element name="lamp79" ref="12" state="0">
 			<bounds x="154" y="350" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp42" element="hi" state="0" inputtag="BLACK1" inputmask="0x01">
+		</element>
+		<element name="lamp42" ref="hi" state="0" inputtag="BLACK1" inputmask="0x01">
 			<bounds x="85" y="430" width="30" height="20"/>
-		</backdrop>
-		<backdrop name="lamp48" element="lo" state="0" inputtag="BLACK1" inputmask="0x02">
+		</element>
+		<element name="lamp48" ref="lo" state="0" inputtag="BLACK1" inputmask="0x02">
 			<bounds x="311" y="430" width="30" height="20"/>
-		</backdrop>
+		</element>
 
-		<backdrop name="digit3" element="digit" state="0">
+		<element name="digit3" ref="digit" state="0">
 			<bounds x="308" y="280" width="8" height="10"/>
-		</backdrop>
-		<backdrop name="digit4" element="digit" state="0">
+		</element>
+		<element name="digit4" ref="digit" state="0">
 			<bounds x="316" y="280" width="8" height="10"/>
-		</backdrop>
-		<backdrop name="digit5" element="digit" state="0">
+		</element>
+		<element name="digit5" ref="digit" state="0">
 			<bounds x="300" y="250" width="8" height="10"/>
-		</backdrop>
-		<backdrop name="digit6" element="digit" state="0">
+		</element>
+		<element name="digit6" ref="digit" state="0">
 			<bounds x="308" y="250" width="8" height="10"/>
-		</backdrop>
-		<backdrop name="digit7" element="digit" state="0">
+		</element>
+		<element name="digit7" ref="digit" state="0">
 			<bounds x="316" y="250" width="8" height="10"/>
-		</backdrop>
-		<backdrop name="BANK" element="bank" state="0">
+		</element>
+		<element name="BANK" ref="bank" state="0">
 			<bounds x="332" y="250" width="16" height="10"/>
-		</backdrop>
-		<backdrop name="CREDIT" element="credit" state="0">
+		</element>
+		<element name="CREDIT" ref="credit" state="0">
 			<bounds x="332" y="280" width="20" height="12"/>
-		</backdrop>
-		<backdrop name="vfd0" element="vfd0" state="0">
+		</element>
+		<element name="vfd0" ref="vfd0" state="0">
 			<bounds x="17" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd1" element="vfd0" state="0">
+		</element>
+		<element name="vfd1" ref="vfd0" state="0">
 			<bounds x="24" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd2" element="vfd0" state="0">
+		</element>
+		<element name="vfd2" ref="vfd0" state="0">
 			<bounds x="31" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd3" element="vfd0" state="0">
+		</element>
+		<element name="vfd3" ref="vfd0" state="0">
 			<bounds x="38" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd4" element="vfd0" state="0">
+		</element>
+		<element name="vfd4" ref="vfd0" state="0">
 			<bounds x="45" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd5" element="vfd0" state="0">
+		</element>
+		<element name="vfd5" ref="vfd0" state="0">
 			<bounds x="52" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd6" element="vfd0" state="0">
+		</element>
+		<element name="vfd6" ref="vfd0" state="0">
 			<bounds x="59" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd7" element="vfd0" state="0">
+		</element>
+		<element name="vfd7" ref="vfd0" state="0">
 			<bounds x="66" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd8" element="vfd0" state="0">
+		</element>
+		<element name="vfd8" ref="vfd0" state="0">
 			<bounds x="73" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd9" element="vfd0" state="0">
+		</element>
+		<element name="vfd9" ref="vfd0" state="0">
 			<bounds x="80" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd10" element="vfd0" state="0">
+		</element>
+		<element name="vfd10" ref="vfd0" state="0">
 			<bounds x="87" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd11" element="vfd0" state="0">
+		</element>
+		<element name="vfd11" ref="vfd0" state="0">
 			<bounds x="94" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd12" element="vfd0" state="0">
+		</element>
+		<element name="vfd12" ref="vfd0" state="0">
 			<bounds x="101" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd13" element="vfd0" state="0">
+		</element>
+		<element name="vfd13" ref="vfd0" state="0">
 			<bounds x="108" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd14" element="vfd0" state="0">
+		</element>
+		<element name="vfd14" ref="vfd0" state="0">
 			<bounds x="115" y="280" width="7" height="24"/>
-		</backdrop>
-		<backdrop name="vfd15" element="vfd0" state="0">
+		</element>
+		<element name="vfd15" ref="vfd0" state="0">
 			<bounds x="122" y="280" width="7" height="24"/>
-		</backdrop>
+		</element>
 	</view>
 </mamelayout>

@@ -23,7 +23,6 @@
  *
  */
 
-#include "nld_74193.h"
 #include "nl_base.h"
 
 namespace netlist

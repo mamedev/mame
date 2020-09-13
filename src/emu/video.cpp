@@ -138,7 +138,7 @@ video_manager::video_manager(running_machine &machine)
 			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			viewnode->set_attribute("name", util::xml::normalize_string(util::string_format("s%1$u", i).c_str()));
+			viewnode->set_attribute("name", util::string_format("s%1$u", i).c_str());
 			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 			if (!screennode)
 				throw emu_fatalerror("Couldn't create XML node??");

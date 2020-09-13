@@ -27,9 +27,9 @@ license:CC0
 	</element>
 
 	<element name="digit" defstate="0">
-	<led7seg>
-		<color red="1.0" green="0.0" blue="0.0" />
-	</led7seg>
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
 	</element>
 	<element name="P1" defstate="0">
 		<text string="Player 1" state="0">
@@ -59,45 +59,45 @@ license:CC0
 	</element>
 
 	<view name="Monitor and Lamps">
-		<bezel name="lamp41" element="ESCAPE" inputtag="BLACK2" inputmask="0x40">
+		<element name="lamp41" ref="ESCAPE" inputtag="BLACK2" inputmask="0x40">
 			<bounds x="514" y="267" width="30" height="30" />
-		</bezel>
-		<bezel name="P1" element="P1">
+		</element>
+		<element name="P1" ref="P1">
 			<bounds x="508" y="180" width="20" height="12" />
-		</bezel>
-		<bezel name="P2" element="P2">
+		</element>
+		<element name="P2" ref="P2">
 			<bounds x="530" y="180" width="20" height="12" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds x="510" y="200" width="5" height="10" />
-		</bezel>
-		<bezel name="digit7" element="digit">
+		</element>
+		<element name="digit7" ref="digit">
 			<bounds x="516" y="200" width="5" height="10" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds x="532" y="200" width="5" height="10" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds x="538" y="200" width="5" height="10" />
-		</bezel>
-		<bezel name="P3" element="P3">
+		</element>
+		<element name="P3" ref="P3">
 			<bounds x="508" y="220" width="20" height="12" />
-		</bezel>
-		<bezel name="P4" element="P4">
+		</element>
+		<element name="P4" ref="P4">
 			<bounds x="530" y="220" width="20" height="12" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds x="510" y="240" width="5" height="10" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds x="516" y="240" width="5" height="10" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds x="532" y="240" width="5" height="10" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="538" y="240" width="5" height="10" />
-		</bezel>
+		</element>
 		<screen index="0">
 			<bounds x="0" y="0" width="504" height="296" />
 		</screen>

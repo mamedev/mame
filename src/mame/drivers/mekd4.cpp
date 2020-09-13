@@ -239,28 +239,32 @@ FS 0 to F
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/input_merger.h"
-#include "machine/bankdev.h"
-#include "machine/6821pia.h"
-#include "machine/6850acia.h"
-#include "machine/mc14411.h"
-#include "machine/clock.h"
-#include "machine/timer.h"
-#include "sound/wave.h"
-#include "speaker.h"
+
 #include "bus/rs232/rs232.h"
-#include "mekd4.lh"
+#include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/bankdev.h"
+#include "machine/clock.h"
+#include "machine/input_merger.h"
+#include "machine/mc14411.h"
+#include "machine/timer.h"
+#include "sound/wave.h"
 #include "video/pwm.h"
 
 // MEK68R2
 #include "machine/terminal.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
-#include "screen.h"
 #include "render.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "mekd4.lh"
+
 
 class mekd4_state : public driver_device
 {

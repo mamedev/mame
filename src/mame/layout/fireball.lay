@@ -19,13 +19,6 @@ license:CC0
 		</rect>
 	</element>
 
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-	</element>
-
 	<element name="P0"><text string="Score"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Ball"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P2"><text string="On board"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -46,101 +39,99 @@ license:CC0
 	<view name="Default Layout">
 
 		<!-- Background -->
-		<backdrop element="background">
-			<bounds left="0" top="20" right="360" bottom="150" />
-		</backdrop>
+		<bounds left="0" top="20" right="360" bottom="150" />
 
 		<!-- LEDs -->
 
 		<!-- Player Score -->
-		<bezel name="digit1" element="digit">
+		<element name="digit1" ref="digit">
 			<bounds left="10" top="45" right="44" bottom="84" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds left="54" top="45" right="88" bottom="84" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds left="98" top="45" right="132" bottom="84" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds left="142" top="45" right="176" bottom="84" />
-		</bezel>
+		</element>
 
 		<!-- Balls -->
-		<bezel name="digit3" element="digit">
+		<element name="digit3" ref="digit">
 			<bounds left="230" top="45" right="264" bottom="84" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds left="274" top="45" right="308" bottom="84" />
-		</bezel>
+		</element>
 
 		<!-- Onboard -->
-		<bezel name="digit7" element="digit">
+		<element name="digit7" ref="digit">
 			<bounds left="330" top="65" right="350" bottom="84" />
-		</bezel>
+		</element>
 
 		<!-- Game Lamp -->
-		<bezel name="Hopper1" element="red_led">
+		<element name="Hopper1" ref="red_led">
 			<bounds x="10" y="110" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="Hopper2" element="red_led">
+		<element name="Hopper2" ref="red_led">
 			<bounds x="50" y="110" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="Hopper3" element="red_led">
+		<element name="Hopper3" ref="red_led">
 			<bounds x="90" y="110" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="Title" element="red_led">
+		<element name="Title" ref="red_led">
 			<bounds x="10" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="GameOver" element="red_led">
+		<element name="GameOver" ref="red_led">
 			<bounds x="50" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="Credit" element="red_led">
+		<element name="Credit" ref="red_led">
 			<bounds x="90" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="SS" element="red_led">
+		<element name="SS" ref="red_led">
 			<bounds x="130" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="C_LOCK" element="red_led">
+		<element name="C_LOCK" ref="red_led">
 			<bounds x="170" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="SV" element="red_led">
+		<element name="SV" ref="red_led">
 			<bounds x="210" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="FBV" element="red_led">
+		<element name="FBV" ref="red_led">
 			<bounds x="250" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel name="RV" element="red_led">
+		<element name="RV" ref="red_led">
 			<bounds x="290" y="140" width="30" height="5" />
-		</bezel>
+		</element>
 
-		<bezel element="P0"><bounds left="71" right="115" top="30" bottom="42" /></bezel>
-		<bezel element="P1"><bounds left="247" right="288" top="30" bottom="42" /></bezel>
-		<bezel element="P2"><bounds left="330" right="350" top="50" bottom="62" /></bezel>
+		<element ref="P0"><bounds left="71" right="115" top="30" bottom="42" /></element>
+		<element ref="P1"><bounds left="247" right="288" top="30" bottom="42" /></element>
+		<element ref="P2"><bounds left="330" right="350" top="50" bottom="62" /></element>
 
-		<bezel element="P3"><bounds left="10" right="40" top="90" bottom="104" /></bezel>
-		<bezel element="P4"><bounds left="50" right="80" top="90" bottom="104" /></bezel>
-		<bezel element="P5"><bounds left="90" right="120" top="90" bottom="104" /></bezel>
+		<element ref="P3"><bounds left="10" right="40" top="90" bottom="104" /></element>
+		<element ref="P4"><bounds left="50" right="80" top="90" bottom="104" /></element>
+		<element ref="P5"><bounds left="90" right="120" top="90" bottom="104" /></element>
 
-		<bezel element="P6"><bounds left="10" right="40" top="120" bottom="134" /></bezel>
-		<bezel element="P7"><bounds left="50" right="80" top="120" bottom="134" /></bezel>
-		<bezel element="P8"><bounds left="90" right="120" top="120" bottom="134" /></bezel>
-		<bezel element="P9"><bounds left="130" right="160" top="120" bottom="134" /></bezel>
+		<element ref="P6"><bounds left="10" right="40" top="120" bottom="134" /></element>
+		<element ref="P7"><bounds left="50" right="80" top="120" bottom="134" /></element>
+		<element ref="P8"><bounds left="90" right="120" top="120" bottom="134" /></element>
+		<element ref="P9"><bounds left="130" right="160" top="120" bottom="134" /></element>
 
-		<bezel element="P10"><bounds left="170" right="200" top="120" bottom="134" /></bezel>
-		<bezel element="P11"><bounds left="210" right="240" top="120" bottom="134" /></bezel>
-		<bezel element="P12"><bounds left="250" right="280" top="120" bottom="134" /></bezel>
-		<bezel element="P13"><bounds left="290" right="320" top="120" bottom="134" /></bezel>
+		<element ref="P10"><bounds left="170" right="200" top="120" bottom="134" /></element>
+		<element ref="P11"><bounds left="210" right="240" top="120" bottom="134" /></element>
+		<element ref="P12"><bounds left="250" right="280" top="120" bottom="134" /></element>
+		<element ref="P13"><bounds left="290" right="320" top="120" bottom="134" /></element>
 
 	</view>
 </mamelayout>

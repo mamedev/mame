@@ -21,7 +21,7 @@
 constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(min, val)); }
 
 
-void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void huc6230_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for (int i = 0; i < samples; i++)
 	{
@@ -172,7 +172,7 @@ void huc6230_device::device_start()
 
 	m_vca_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 6);
+	m_stream = stream_alloc_legacy(2, 2, clock() / 6);
 	m_adpcm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(huc6230_device::adpcm_timer),this));
 
 	for (int i = 0; i < 2; i++)

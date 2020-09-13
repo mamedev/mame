@@ -122,7 +122,7 @@ void dave_device::device_start()
 	 the volumes are mixed internally and output as left and right volume */
 
 	/* 3 tone channels + 1 noise channel */
-	m_sound_stream_var = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_sound_stream_var = stream_alloc_legacy(0, 2, machine().sample_rate());
 }
 
 
@@ -187,10 +187,10 @@ device_memory_interface::space_config_vector dave_device::memory_space_config() 
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dave_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer1, *buffer2;
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,

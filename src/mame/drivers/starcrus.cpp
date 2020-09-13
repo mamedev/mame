@@ -172,7 +172,7 @@ void starcrus_state::starcrus(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "sound_nl:noise_volume", "R23.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:volume", "R75.DIAL");
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "R77.2").set_mult_offset(100000.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "R77.2").set_mult_offset(100000.0 / 32768.0, 0.0);
 }
 
 /***************************************************************************

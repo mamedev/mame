@@ -2,10 +2,16 @@
 // copyright-holders:
 /*******************************************************************************
 
-    Skeleton driver for "EuroByte Electronics & Multimedia IASA" EuroPlay
-    (http://www.eurobyte.com.gr/gb_europlay.htm), sold in Spain by Sleic / Petaco
-    as Star Touch / EuroPlay 2001.
-
+	Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
+	games, sold in Spain by Sleic / Petaco.
+	
+	-----+----------------------------+------+----------------------------------
+	Dump | Game                       | Year | Notes
+	-----+----------------------------+------+----------------------------------
+	NO   | Superchip                  | 1999 |
+	NO   | Star Touch                 | 2000 |
+	YES  | Star Touch / EuroPlay 2001 | 2001 | Original Game: http://www.eurobyte.com.gr/gb_europlay.htm
+	
     Hardware overview:
     MB Soyo M5EH or similar (e.g. Biostar M5ATD)
     16384 KB RAM
@@ -16,7 +22,7 @@
     S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
     Parallel port dongle HASP4
     Creative Video Blaster camera (parallel port)
-    HDD Samsung SV0322A or other IDE HDD with similar capacity.
+    HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
 
 *******************************************************************************/
 

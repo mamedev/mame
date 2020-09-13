@@ -384,6 +384,30 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 		</part>
 	</software>
 
+	<software name="commstar110" cloneof="commstar">
+		<description>Commstar E1.10</description>
+		<year>1985</year>
+		<publisher>PACE</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="rs423" />
+			<dataarea name="rom" size="16384">
+				<rom name="Commstar-E1.10.rom" size="16384" crc="e64f26a5" sha1="b39287ab6809ca0c1ef71dfdc10e717154141557"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar">
+		<description>Commstar E1.12</description>
+		<year>1985</year>
+		<publisher>PACE</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="rs423" />
+			<dataarea name="rom" size="16384">
+				<rom name="Commstar-E1.12.rom" size="16384" crc="61a1d49e" sha1="3776c972789cebacd1f92b6f3aa01c8b2c8bd505"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cumana100" cloneof="cumana" supported="partial">
 		<description>Cumana Floppy Disc System v1.00</description>
 		<year>1985</year>
@@ -449,14 +473,27 @@ This list contains all known cartridges for the Acorn Electron. The Acorn Plus 1
 		</part>
 	</software>
 
-	<software name="romp144">
-		<description>ROMPlus-144</description>
+	<software name="romp144_21" cloneof="romp144">
+		<description>ROMPlus-144 v2.1</description>
 		<year>1988</year>
 		<publisher>JAFA Systems</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="romp144" />
 			<dataarea name="rom" size="8192">
-				<rom name="romplus144-v3.00.rom" size="8192" crc="2f738bff" sha1="682603274a5f8b36c4b1a43e44ede5235a92383c"/>
+				<rom name="romplus144-v2.1.rom" size="8192" crc="25c2503c" sha1="1eb89f06337f48f6f9bab8351541a6db48d6f573"/>
+			</dataarea>
+			<dataarea name="ram" size="32768" />
+		</part>
+	</software>
+
+	<software name="romp144">
+		<description>ROMPlus-144 v3.0</description>
+		<year>1988</year>
+		<publisher>JAFA Systems</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="romp144" />
+			<dataarea name="rom" size="8192">
+				<rom name="romplus144-v3.0.rom" size="8192" crc="2f738bff" sha1="682603274a5f8b36c4b1a43e44ede5235a92383c"/>
 			</dataarea>
 			<dataarea name="ram" size="32768" />
 		</part>

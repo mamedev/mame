@@ -101,7 +101,7 @@ namespace plib {
 	template <typename NT>
 	void pfunction<NT>::compile_postfix(const pstring &expr, const inputs_container &inputs) noexcept(false)
 	{
-		std::vector<pstring> cmds(plib::psplit(expr, " "));
+		std::vector<pstring> cmds(plib::psplit(expr, ' '));
 		compile_postfix(inputs, cmds, expr);
 	}
 

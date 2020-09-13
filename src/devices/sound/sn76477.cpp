@@ -203,7 +203,7 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 
 void sn76477_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	if (clock() > 0)
 	{
@@ -1698,10 +1698,10 @@ void sn76477_device::state_save_register()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sn76477_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	double one_shot_cap_charging_step;
 	double one_shot_cap_discharging_step;

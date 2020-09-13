@@ -12,8 +12,6 @@
 
 #include "formats/d64_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 
 d64_format::d64_format()
 {
@@ -246,8 +244,10 @@ bool d64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			floppy_image_format_t::desc_e *desc = this->get_sector_desc(f, current_size, sector_count, id1, id2, gap2);
 
 			int remaining_size = total_size - current_size;
-			if(remaining_size < 0)
-				throw emu_fatalerror("d64_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
+			if(remaining_size < 0) {
+				osd_printf_error("d64_format: Incorrect track layout, max_size=%d, current_size=%d\n", total_size, current_size);
+				return false;
+			}
 
 			this->fix_end_gap(desc, remaining_size);
 

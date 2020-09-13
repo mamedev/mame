@@ -64,7 +64,7 @@ void qsound_hle_device::rom_bank_updated()
 
 void qsound_hle_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
+	m_stream = stream_alloc_legacy(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
 
 	init_register_map();
 
@@ -158,10 +158,10 @@ void qsound_hle_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void qsound_hle_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void qsound_hle_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// Clear the buffers
 	std::fill_n(outputs[0], samples, 0);

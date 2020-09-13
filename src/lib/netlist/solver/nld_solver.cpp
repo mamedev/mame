@@ -55,14 +55,14 @@ namespace devices
 		const netlist_time_ext now(exec().time());
 		const std::size_t nthreads = m_params.m_parallel() < 2 ? 1 : std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 		const netlist_time_ext sched(now + (nthreads <= 1 ? netlist_time_ext::zero() : netlist_time_ext::from_nsec(100)));
-		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp;
-		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt;
+		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp; //NOLINT
+		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt; //NOLINT
 		std::size_t p=0;
 
-		while (m_queue.size() > 0)
+		while (!m_queue.empty())
 		{
-			auto t = m_queue.top().exec_time();
-			auto o = m_queue.top().object();
+			const auto t = m_queue.top().exec_time();
+			auto *o = m_queue.top().object();
 			if (t != now)
 				if (t > sched)
 					break;
@@ -72,7 +72,7 @@ namespace devices
 
 		// FIXME: Disabled for now since parallel processing will decrease performance
 		//        for tested applications. More testing required here
-		if (1 || nthreads < 2)
+		if (true || nthreads < 2)
 		{
 			if (!KEEP_STATS)
 			{
@@ -112,7 +112,7 @@ namespace devices
 				tmp[i]->update_inputs();
 			}
 		}
-		if (m_queue.size() > 0)
+		if (!m_queue.empty())
 			m_Q_step.net().toggle_and_push_to_queue(m_queue.top().exec_time() - now);
 	}
 

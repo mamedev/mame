@@ -458,8 +458,23 @@ ROM_START( dobouchn )
 	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
 ROM_END
 
+// GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
+// at 1st boot press Service1 to initialise NVRAM
+ROM_START( konslot )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "669-a05-2n.bin", 0x000000, 0x080000, CRC(3330848e) SHA1(24c2ac03fe5d099659081d1f9611c707c746c768) )
+
+	ROM_REGION( 0x80000, "k056832", 0 )
+	ROM_LOAD( "669-a06-14n.bin", 0x000000, 0x080000, CRC(b058fa04) SHA1(b277e814f1814d8892ccc5279f75bff0eec678b5) )
+
+	ROM_REGION( 0x80000, "ymz", 0 )
+	ROM_LOAD( "669-a01-2d.bin", 0x000000, 0x080000, CRC(08438dad) SHA1(b4ef8fc37deca5b6537cc581fc99968c86e6ec2c) )
+ROM_END
+
+
 GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dobouchn, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, konslot,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Unknown Konami slot medal game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

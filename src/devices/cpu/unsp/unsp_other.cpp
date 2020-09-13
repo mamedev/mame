@@ -350,7 +350,9 @@ bool unsp_device::do_basic_alu_ops(const uint16_t &op0, uint32_t &lres, uint16_t
 		return false;
 
 	default:
-		fatalerror("UNSP: illegal ALU optype %02x at %04x\n", op0, UNSP_LPC);
+		// pcp87xx 'Elevator Action' explicitly jumps into the middle of an earlier opcode (off-by-one error in the code)
+		// It looks like the illegal op should have no meaningful effect so just log rather than fatalerroring
+		logerror("UNSP: illegal ALU optype %02x at %04x\n", op0, UNSP_LPC);
 		return false;
 	}
 

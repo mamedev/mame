@@ -32,7 +32,7 @@ namespace plib
 	struct aligned_arena;
 	class dynlib_base;
 
-	template<class T, bool debug_enabled>
+	template<bool debug_enabled>
 	class plog_base;
 
 	struct plog_level;
@@ -164,36 +164,7 @@ namespace netlist
 		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
-	/// \brief Interface definition for netlist callbacks into calling code
-	///
-	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
-	/// constructor. Netlist does processing during construction and thus needs
-	/// the object passed completely constructed.
-	///
-	class callbacks_t
-	{
-	public:
-
-		callbacks_t() = default;
-		virtual ~callbacks_t() = default;
-
-		PCOPYASSIGNMOVE(callbacks_t, default)
-
-		/// \brief logging callback.
-		///
-		virtual void vlog(const plib::plog_level &l, const pstring &ls) const noexcept = 0;
-
-		/// \brief provide library with static solver implementations.
-		///
-		/// By default no static solvers are provided since these are
-		/// determined by the specific use case. It is up to the implementor
-		/// of a callbacks_t implementation to optionally provide such a collection
-		/// of symbols.
-		///
-		virtual std::unique_ptr<plib::dynlib_base> static_solver_lib() const;
-	};
-
-	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
+	using log_type =  plib::plog_base<NL_DEBUG>;
 
 	//============================================================
 	//  Types needed by various includes

@@ -69,10 +69,10 @@ license:CC0
 	<group name="main">
 		<bounds left="-2" right="48" top="46.5" bottom="124" />
 
-		<bezel name="digit0" element="digit"><bounds x="15" y="88" width="4" height="6" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="19" y="88" width="4" height="6" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="23" y="88" width="4" height="6" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="27" y="88" width="4" height="6" /></bezel>
+		<element name="digit0" ref="digit"><bounds x="15" y="88" width="4" height="6" /></element>
+		<element name="digit1" ref="digit"><bounds x="19" y="88" width="4" height="6" /></element>
+		<element name="digit2" ref="digit"><bounds x="23" y="88" width="4" height="6" /></element>
+		<element name="digit3" ref="digit"><bounds x="27" y="88" width="4" height="6" /></element>
 
 		<!-- buttons -->
 		<element ref="orange"><bounds x="0"  y="100" width="4" height="4" /></element>
@@ -146,41 +146,41 @@ license:CC0
 		<element ref="hl" blend="multiply" inputtag="RESET" inputmask="0x01"><bounds x="42" y="90" width="4" height="4" /></element>
 
 		<!-- labels -->
-		<bezel element="text_a"><bounds x="0"  y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_b"><bounds x="6"  y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_c"><bounds x="12" y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_d"><bounds x="18" y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_e"><bounds x="24" y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_f"><bounds x="30" y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_g"><bounds x="36" y="114.5" width="4" height="1.9" /></bezel>
-		<bezel element="text_h"><bounds x="42" y="114.5" width="4" height="1.9" /></bezel>
+		<element ref="text_a"><bounds x="0"  y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_b"><bounds x="6"  y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_c"><bounds x="12" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_d"><bounds x="18" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_e"><bounds x="24" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_f"><bounds x="30" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_g"><bounds x="36" y="114.5" width="4" height="1.9" /></element>
+		<element ref="text_h"><bounds x="42" y="114.5" width="4" height="1.9" /></element>
 
-		<bezel element="text_1"><bounds x="0"  y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_2"><bounds x="6"  y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_3"><bounds x="12" y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_4"><bounds x="18" y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_5"><bounds x="24" y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_6"><bounds x="30" y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_7"><bounds x="36" y="121.4" width="4" height="1.9" /></bezel>
-		<bezel element="text_8"><bounds x="42" y="121.4" width="4" height="1.9" /></bezel>
+		<element ref="text_1"><bounds x="0"  y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_2"><bounds x="6"  y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_3"><bounds x="12" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_4"><bounds x="18" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_5"><bounds x="24" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_6"><bounds x="30" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_7"><bounds x="36" y="121.4" width="4" height="1.9" /></element>
+		<element ref="text_8"><bounds x="42" y="121.4" width="4" height="1.9" /></element>
 
-		<bezel element="text_l00"><bounds x="40" y="88.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l02"><bounds x="4"  y="97.3" width="8" height="1.1" /></bezel>
-		<bezel element="text_l03"><bounds x="16" y="97.3" width="8" height="1.1" /></bezel>
+		<element ref="text_l00"><bounds x="40" y="88.5" width="8" height="1.1" /></element>
+		<element ref="text_l02"><bounds x="4"  y="97.3" width="8" height="1.1" /></element>
+		<element ref="text_l03"><bounds x="16" y="97.3" width="8" height="1.1" /></element>
 
-		<bezel element="text_l11"><bounds x="-2" y="98.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l12"><bounds x="4"  y="98.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l13"><bounds x="16" y="98.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l14"><bounds x="22" y="98.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l15"><bounds x="34" y="98.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l16"><bounds x="40" y="98.5" width="8" height="1.1" /></bezel>
+		<element ref="text_l11"><bounds x="-2" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_l12"><bounds x="4"  y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_l13"><bounds x="16" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_l14"><bounds x="22" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_l15"><bounds x="34" y="98.5" width="8" height="1.1" /></element>
+		<element ref="text_l16"><bounds x="40" y="98.5" width="8" height="1.1" /></element>
 
-		<bezel element="text_l21"><bounds x="-2" y="105.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l22"><bounds x="4"  y="105.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l23"><bounds x="16" y="105.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l24"><bounds x="22" y="105.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l25"><bounds x="34" y="105.5" width="8" height="1.1" /></bezel>
-		<bezel element="text_l26"><bounds x="40" y="105.5" width="8" height="1.1" /></bezel>
+		<element ref="text_l21"><bounds x="-2" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_l22"><bounds x="4"  y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_l23"><bounds x="16" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_l24"><bounds x="22" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_l25"><bounds x="34" y="105.5" width="8" height="1.1" /></element>
+		<element ref="text_l26"><bounds x="40" y="105.5" width="8" height="1.1" /></element>
 	</group>
 
 

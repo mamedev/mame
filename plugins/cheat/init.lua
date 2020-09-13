@@ -897,7 +897,7 @@ function cheat.startplugin()
 		return list
 	end
 
-	_G.ce = ce
+	_G.emu.plugin.cheat = ce
 
 end
 

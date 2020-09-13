@@ -74,7 +74,7 @@ void k005289_device::device_start()
 {
 	/* get stream channels */
 	m_rate = clock() / CLOCK_DIVIDER;
-	m_stream = stream_alloc(0, 1, m_rate);
+	m_stream = stream_alloc_legacy(0, 1, m_rate);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer = std::make_unique<short[]>(2 * m_rate);
@@ -101,10 +101,10 @@ void k005289_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k005289_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	short *mix;

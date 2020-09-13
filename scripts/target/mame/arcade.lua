@@ -388,6 +388,7 @@ VIDEOS["VRENDER0"] = true
 
 MACHINES["ACORN_VIDC"] = true
 MACHINES["AKIKO"] = true
+MACHINES["ALPHA_8921"] = true
 --MACHINES["AM2901B"] = true
 MACHINES["ARM_IOMD"] = true
 MACHINES["AUTOCONFIG"] = true
@@ -4899,6 +4900,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/headonb.cpp",
 	MAME_DIR .. "src/mame/drivers/highvdeo.cpp",
 	MAME_DIR .. "src/mame/drivers/hitpoker.cpp",
+	MAME_DIR .. "src/mame/drivers/hobbyplay.cpp",
 	MAME_DIR .. "src/mame/drivers/homedata.cpp",
 	MAME_DIR .. "src/mame/includes/homedata.h",
 	MAME_DIR .. "src/mame/video/homedata.cpp",
@@ -4948,6 +4950,7 @@ files {
 	MAME_DIR .. "src/mame/includes/malzak.h",
 	MAME_DIR .. "src/mame/video/malzak.cpp",
 	MAME_DIR .. "src/mame/drivers/marywu.cpp",
+	MAME_DIR .. "src/mame/drivers/matrix.cpp",
 	MAME_DIR .. "src/mame/drivers/mcatadv.cpp",
 	MAME_DIR .. "src/mame/includes/mcatadv.h",
 	MAME_DIR .. "src/mame/video/mcatadv.cpp",

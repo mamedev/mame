@@ -27,7 +27,7 @@ void xavix_sound_device::device_start()
 	m_readregs_cb.resolve_safe(0xff);
 	m_readsamples_cb.resolve_safe(0x80);
 
-	m_stream = stream_alloc(0, 2, 163840);
+	m_stream = stream_alloc_legacy(0, 2, 163840);
 }
 
 void xavix_sound_device::device_reset()
@@ -43,7 +43,7 @@ void xavix_sound_device::device_reset()
 }
 
 
-void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void xavix_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));

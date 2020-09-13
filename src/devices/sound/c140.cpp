@@ -125,7 +125,7 @@ void c140_device::device_start()
 	m_int1_callback.resolve_safe();
 	m_int1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c140_device::int1_on), this));
 
-	m_stream = stream_alloc(0, 2, m_sample_rate);
+	m_stream = stream_alloc_legacy(0, 2, m_sample_rate);
 
 	// make decompress pcm table (Verified from Wii Virtual Console Arcade Starblade)
 	for (int i = 0; i < 256; i++)
@@ -217,10 +217,10 @@ void c140_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c140_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	s32   dt;
 
@@ -337,7 +337,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	}
 }
 
-void c219_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c219_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	s32   dt;
 

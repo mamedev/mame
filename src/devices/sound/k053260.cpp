@@ -115,7 +115,7 @@ void k053260_device::device_start()
 	m_sh1_cb.resolve_safe();
 	m_sh2_cb.resolve_safe();
 
-	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
+	m_stream = stream_alloc_legacy( 0, 2, clock() / CLOCKS_PER_SAMPLE );
 
 	/* register with the save state system */
 	save_item(NAME(m_portdata));
@@ -310,10 +310,10 @@ static constexpr s32 MAXOUT = 0x7fff;
 static constexpr s32 MINOUT = -0x8000;
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k053260_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	if (m_mode & 2)
 	{
@@ -429,7 +429,7 @@ void k053260_device::KDSC_Voice::update_pan_volume()
 void k053260_device::KDSC_Voice::key_on()
 {
 	m_position = m_kadpcm ? 1 : 0; // for kadpcm low bit is nybble offset, so must start at 1 due to preincrement
-	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
+	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update_legacy
 	m_output = 0;
 	m_playing = true;
 	if (LOG) m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x:%x, loop = %s, %s\n",

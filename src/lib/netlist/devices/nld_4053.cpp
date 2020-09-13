@@ -23,8 +23,6 @@
  */
 
 
-#include "nld_4053.h"
-
 #include "analog/nlid_twoterm.h"
 #include "solver/nld_solver.h"
 
@@ -61,7 +59,8 @@ namespace netlist
 	private:
 		NETLIB_HANDLERI(controls)
 		{
-			bool newx = false, newy = false;
+			bool newx = false;
+			bool newy = false;
 			if (!on(m_inhibit, m_inhibit_state))
 			{
 				if (!on(m_select, m_select_state))

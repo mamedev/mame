@@ -180,7 +180,7 @@ void rf5c400_device::device_start()
 	save_item(STRUCT_MEMBER(m_channels, env_step));
 	save_item(STRUCT_MEMBER(m_channels, env_scale));
 
-	m_stream = stream_alloc(0, 2, clock() / 384);
+	m_stream = stream_alloc_legacy(0, 2, clock() / 384);
 }
 
 //-------------------------------------------------
@@ -195,10 +195,10 @@ void rf5c400_device::device_clock_changed()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void rf5c400_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i, ch;
 	uint64_t end, loop;

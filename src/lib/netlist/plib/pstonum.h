@@ -27,11 +27,11 @@ namespace plib
 	// ----------------------------------------------------------------------------------------
 
 	template <typename T, typename S>
-	T pstonum_locale(const std::locale &loc, const S &arg, std::size_t *idx)
+	T pstonum_locale(const std::locale &loc, const S &arg, bool *err)
 	{
 		std::stringstream ss;
 		ss.imbue(loc);
-		ss << arg;
+		ss << putf8string(arg);
 		auto len(ss.tellp());
 		T x(constants<T>::zero());
 		if (ss >> x)
@@ -39,10 +39,10 @@ namespace plib
 			auto pos(ss.tellg());
 			if (pos == decltype(pos)(-1))
 				pos = len;
-			*idx = narrow_cast<std::size_t>(pos);
+			*err = (pos != len);
 		}
 		else
-			*idx = constants<std::size_t>::zero();
+			*err = true;
 		return x;
 	}
 
@@ -53,10 +53,10 @@ namespace plib
 	struct pstonum_helper<T, std::enable_if_t<plib::is_integral<T>::value && plib::is_signed<T>::value>>
 	{
 		template <typename S>
-		long long operator()(std::locale loc, const S &arg, std::size_t *idx)
+		long long operator()(std::locale loc, const S &arg, bool *err)
 		{
 			//return std::stoll(arg, idx);
-			return pstonum_locale<long long>(loc, arg, idx);
+			return pstonum_locale<long long>(loc, arg, err);
 		}
 	};
 
@@ -64,10 +64,10 @@ namespace plib
 	struct pstonum_helper<T, std::enable_if_t<plib::is_integral<T>::value && !plib::is_signed<T>::value>>
 	{
 		template <typename S>
-		unsigned long long operator()(std::locale loc, const S &arg, std::size_t *idx)
+		unsigned long long operator()(std::locale loc, const S &arg, bool *err)
 		{
 			//return std::stoll(arg, idx);
-			return pstonum_locale<unsigned long long>(loc, arg, idx);
+			return pstonum_locale<unsigned long long>(loc, arg, err);
 		}
 	};
 
@@ -75,9 +75,9 @@ namespace plib
 	struct pstonum_helper<T, std::enable_if_t<std::is_floating_point<T>::value>>
 	{
 		template <typename S>
-		long double operator()(std::locale loc, const S &arg, std::size_t *idx)
+		long double operator()(std::locale loc, const S &arg, bool *err)
 		{
-			return pstonum_locale<long double>(loc, arg, idx);
+			return pstonum_locale<long double>(loc, arg, err);
 		}
 	};
 
@@ -87,9 +87,9 @@ namespace plib
 	{
 		// FIXME: use strtoflt128 from quadmath.h
 		template <typename S>
-		FLOAT128 operator()(std::locale loc, const S &arg, std::size_t *idx)
+		FLOAT128 operator()(std::locale loc, const S &arg, bool *err)
 		{
-			return narrow_cast<FLOAT128>(pstonum_locale<long double>(loc, arg, idx));
+			return narrow_cast<FLOAT128>(pstonum_locale<long double>(loc, arg, err));
 		}
 	};
 #endif
@@ -97,21 +97,19 @@ namespace plib
 	template<typename T, typename S>
 	T pstonum(const S &arg, const std::locale &loc = std::locale::classic()) noexcept(false)
 	{
-		decltype(arg.c_str()) cstr = arg.c_str();
-		std::size_t idx(0);
-		auto ret = pstonum_helper<T>()(loc, cstr, &idx);
+		bool err(false);
+		auto ret = pstonum_helper<T>()(loc, arg, &err);
+		if (err)
+			throw pexception(pstring("Error converting string to number: ") + pstring(arg));
+
 		using ret_type = decltype(ret);
 		if (ret >= narrow_cast<ret_type>(plib::numeric_limits<T>::lowest())
 			&& ret <= narrow_cast<ret_type>(plib::numeric_limits<T>::max()))
 		{
-			if (cstr[idx] != 0)
-				throw pexception(pstring("Continuation after numeric value ends: ") + pstring(cstr));
+			return narrow_cast<T>(ret);
 		}
-		else
-		{
-			throw pexception(pstring("Out of range: ") + pstring(cstr));
-		}
-		return narrow_cast<T>(ret);
+
+		throw pexception(pstring("Out of range: ") + pstring(arg));
 	}
 
 	template<typename R, typename T>

@@ -104,6 +104,7 @@ public:
 	void nes_vt_2mb(machine_config& config);
 	void nes_vt_1mb_baddma(machine_config& config);
 	void nes_vt_2mb_baddma(machine_config& config);
+	void nes_vt_4mb_baddma(machine_config& config);
 	void nes_vt_4mb(machine_config& config);
 	void nes_vt_8mb(machine_config& config);
 	void nes_vt_16mb(machine_config& config);
@@ -797,6 +798,13 @@ void nes_vt_state::nes_vt_2mb_baddma(machine_config& config)
 	m_soc->force_bad_dma();
 }
 
+void nes_vt_state::nes_vt_4mb_baddma(machine_config& config)
+{
+	nes_vt_4mb(config);
+	m_soc->force_bad_dma();
+}
+
+
 void nes_vt_state::nes_vt_4mb(machine_config& config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -1163,6 +1171,21 @@ static INPUT_PORTS_START( nes_vt_msi )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_vt_msi_mm2 )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("IO1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1555,13 +1578,23 @@ ROM_START( vtboxing )
 ROM_END
 
 ROM_START( msiwwe )
-	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // the first half of this ROM is unused code from the Ms. Pac-Man game!
 	ROM_LOAD( "wrestlemania_es29lv160fb_004a2249.bin", 0x00000, 0x200000, CRC(f524382d) SHA1(0c8d1c29c76e3e3c58018354f1eca9445c9ab945) )
+ROM_END
+
+ROM_START( msiwwea )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "wrestlemania_en29lv800bb_007f225b.bin", 0x00000, 0x100000, CRC(52102de3) SHA1(f858ad18e05d3de24dfab4c98798efb4d30e2987) )
 ROM_END
 
 ROM_START( msidd )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "doubledragon_m29w160eb_00202249.bin", 0x00000, 0x200000, CRC(44df5bb6) SHA1(a984aa1644d2d313d4263afdfed1cd64009f1137) )
+ROM_END
+
+ROM_START( msimm2 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "megaman2_s99jl032hbt1_001227e_readas_s29jl032h.bin", 0x00000, 0x400000, CRC(f537a053) SHA1(bd9353df34c0c0ee7d0e5e9808fc36f1a5eecc22) )
 ROM_END
 
 ROM_START( msimpac )
@@ -1572,6 +1605,11 @@ ROM_END
 ROM_START( msisinv )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "spaceinvaders_en29lv800bb_007f225b.bin", 0x00000, 0x100000, CRC(e444d129) SHA1(33742bc3a6250337cc42b73812e797023818282a) )
+ROM_END
+
+ROM_START( msifrog )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "frogger_39vf3201_00bf235b.bin", 0x00000, 0x400000, CRC(c46c29c0) SHA1(b8f26445c2086b97db8ee98bf36dff9d63ca414b) )
 ROM_END
 
 ROM_START( sudopptv )
@@ -1865,6 +1903,11 @@ ROM_START( timetp36 )
 	ROM_LOAD( "36in1.bin", 0x00000, 0x400000, CRC(e2fb8a6c) SHA1(163d257dd0e6dc19c8fab19cc363ea8be659c40a) )
 ROM_END
 
+ROM_START( timetp7 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "gm802m.bin", 0x00000, 0x200000, CRC(2ab17abf) SHA1(8e7818043f8e670a35f8dbaebe318b872d95f3ca) )
+ROM_END
+
 ROM_START( ddrstraw )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
@@ -2075,14 +2118,25 @@ CONS( 200?, vtsndtest, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
 CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
 
-CONS( 2017, msiwwe,     0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// MSI Entertainment games (MSI previously operated as Majesco Entertainment)
+
+// There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
+// 2 box variations exist, one with Randy Savage in purple attire and another with green, this was dumped from a unit with purple on the box.
+CONS( 2017, msiwwe,     0,      0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// this one was dumped from the version with Randy Savage in green, the box was much larger than the other one.  This one also has new theme music for the adjusted roster.
+CONS( 2017, msiwwea,    msiwwe, 0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2017, msidd,      0,  0,  nes_vt_2mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2016, msimpac,    0,  0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+CONS( 2017, msimm2,     0,  0,  nes_vt_4mb_baddma, nes_vt_msi_mm2, nes_vt_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
+
 CONS( 2016, msisinv,    0,  0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// This is from the version with the same case type as the above MSI units.
+// MSI also issued a version in the original Majesco shell but with the updated case logos and boot logos in the software, the software on that revision might match this one.
+CONS( 2016, msifrog,    0,  0,  nes_vt_4mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing issues, mode change issues
 
 // MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
 
@@ -2119,8 +2173,10 @@ CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing
 // silver 'N64' type controller design
 CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
- // needs PCM samples, Y button is not mapped (not used by any of the games?)
+ // needs PCM samples, Y button is not mapped (not used by any of the games? some sources indicate it's just a hardware autofire button)
 CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, timetp7,   0, 0,  nes_vt_pal_2mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 7-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)

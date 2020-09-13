@@ -1078,6 +1078,8 @@ if (BUSES["ELECTRON_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/cart/peg400.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/romp144.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/romp144.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/rs423.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/rs423.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp3.cpp",
@@ -2374,6 +2376,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/byte8251.h",
 		MAME_DIR .. "src/devices/bus/a2bus/cmsscsi.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/cmsscsi.h",
+		MAME_DIR .. "src/devices/bus/a2bus/uthernet.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/uthernet.h",
 	}
 end
 
@@ -3250,6 +3254,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/pgram.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/sidmaster.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/sidmaster.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/ti_32kmem.cpp",

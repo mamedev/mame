@@ -39,7 +39,7 @@ void segapcm_device::device_start()
 
 	std::fill(&m_ram[0], &m_ram[0x800], 0xff);
 
-	m_stream = stream_alloc(0, 2, clock() / 128);
+	m_stream = stream_alloc_legacy(0, 2, clock() / 128);
 
 	save_item(NAME(m_low));
 	save_pointer(NAME(m_ram), 0x800);
@@ -68,10 +68,10 @@ void segapcm_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void segapcm_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	/* clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));

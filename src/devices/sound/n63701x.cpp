@@ -46,7 +46,7 @@ namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const ch
 
 void namco_63701x_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock()/1000);
+	m_stream = stream_alloc_legacy(0, 2, clock()/1000);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -61,10 +61,10 @@ void namco_63701x_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void namco_63701x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void namco_63701x_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int ch;
 

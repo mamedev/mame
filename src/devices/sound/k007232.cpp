@@ -86,7 +86,7 @@ void k007232_device::device_start()
 	for (auto & elem : m_wreg)
 		elem = 0;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/128);
+	m_stream = stream_alloc_legacy(0, 2, clock()/128);
 
 	save_item(STRUCT_MEMBER(m_channel, vol));
 	save_item(STRUCT_MEMBER(m_channel, addr));
@@ -206,10 +206,10 @@ void k007232_device::set_bank(int chan_a_bank, int chan_b_bank)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k007232_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));

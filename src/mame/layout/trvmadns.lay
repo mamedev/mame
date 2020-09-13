@@ -27,29 +27,29 @@ Simple layout for Trivia Madness
 		<text string="START"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<view name="Buttons">
-		<backdrop element="background">
+		<element ref="background">
 			<bounds x="0" y="0" width="640" height="640" />
-		</backdrop>
+		</element>
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<cpanel name="0.0" element="button" inputtag="IN0" inputmask="0x01">
+		<element name="0.0" ref="button" inputtag="IN0" inputmask="0x01">
 			<bounds x="80" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="0.1" element="button" inputtag="IN0" inputmask="0x02">
+		</element>
+		<element name="0.1" ref="button" inputtag="IN0" inputmask="0x02">
 			<bounds x="180" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="0.2" element="button" inputtag="IN0" inputmask="0x04">
+		</element>
+		<element name="0.2" ref="button" inputtag="IN0" inputmask="0x04">
 			<bounds x="280" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="0.3" element="button" inputtag="IN0" inputmask="0x08">
+		</element>
+		<element name="0.3" ref="button" inputtag="IN0" inputmask="0x08">
 			<bounds x="380" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="0.4" element="button" inputtag="IN0" inputmask="0x10">
+		</element>
+		<element name="0.4" ref="button" inputtag="IN0" inputmask="0x10">
 			<bounds x="480" y="505" width="70" height="35" />
-		</cpanel>
-		<cpanel name="0.6" element="start" inputtag="IN0" inputmask="0x40">
+		</element>
+		<element name="0.6" ref="start" inputtag="IN0" inputmask="0x40">
 			<bounds x="250" y="565" width="130" height="35" />
-		</cpanel>
+		</element>
 	</view>
 </mamelayout>

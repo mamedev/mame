@@ -35,11 +35,10 @@
  *
  *  Naming conventions follow SYC datasheet
  *
- *  FIXME: Timing depends on VDD-VSS
+ *  FIXME: Timing depends on VDD-VSS - partially done
  *
  */
 
-#include "nld_4006.h"
 #include "nl_base.h"
 
 namespace netlist
@@ -57,7 +56,8 @@ namespace netlist
 		, m_Q(*this, {"D1P4", "D1P4S", "D2P4", "D2P5", "D3P4", "D4P4", "D4P5"})
 		, m_d(*this, "m_d", 0)
 		, m_last_clock(*this, "m_last_clock", 0)
-		, m_supply(*this)
+		, m_tp(*this, "m_tp", netlist_time::from_nsec(200))
+		, m_supply(*this, NETLIB_DELEGATE(vdd_vss))
 		{
 		}
 
@@ -71,18 +71,18 @@ namespace netlist
 				m_d[2] >>= 1;
 				m_d[3] >>= 1;
 				// falling, output all but D1P4S
-				m_Q[0].push(m_d[0] & 1, netlist_time::from_nsec(200));
-				m_Q[2].push((m_d[1] >> 1) & 1, netlist_time::from_nsec(200)); // D2 + 4
-				m_Q[3].push( m_d[1]       & 1, netlist_time::from_nsec(200)); // D2 + 5
-				m_Q[4].push( m_d[2]       & 1, netlist_time::from_nsec(200)); // D3 + 4
-				m_Q[5].push((m_d[3] >> 1) & 1, netlist_time::from_nsec(200)); // D4 + 4
-				m_Q[6].push( m_d[3]       & 1, netlist_time::from_nsec(200)); // D5 + 5
+				m_Q[0].push(m_d[0] & 1, m_tp);
+				m_Q[2].push((m_d[1] >> 1) & 1, m_tp); // D2 + 4
+				m_Q[3].push( m_d[1]       & 1, m_tp); // D2 + 5
+				m_Q[4].push( m_d[2]       & 1, m_tp); // D3 + 4
+				m_Q[5].push((m_d[3] >> 1) & 1, m_tp); // D4 + 4
+				m_Q[6].push( m_d[3]       & 1, m_tp); // D5 + 5
 				m_last_clock = m_CLOCK();
 			}
 			else if (!m_last_clock && m_CLOCK())
 			{
 				// rising, output D1P4S
-				m_Q[1].push(m_d[0] & 1, netlist_time::from_nsec(200));
+				m_Q[1].push(m_d[0] & 1, m_tp);
 				m_last_clock = m_CLOCK();
 			}
 			else
@@ -94,11 +94,21 @@ namespace netlist
 			}
 		}
 
+		NETLIB_HANDLERI(vdd_vss)
+		{
+			auto d = m_supply.VCC()() - m_supply.GND()();
+			if (d > 0.1) // avoid unrealistic values
+			{
+				m_tp = netlist_time::from_nsec(gsl::narrow_cast<unsigned>(923.0 / d + 13.0)); // calculated from datasheet
+			}
+		}
+
 		logic_input_t m_CLOCK;
 		object_array_t<logic_input_t, 4>  m_I;
 		object_array_t<logic_output_t, 7> m_Q;
 		state_container<std::array<uint8_t, 4>> m_d;
 		state_var<netlist_sig_t> m_last_clock;
+		state_var<netlist_time> m_tp; // propagation time
 		nld_power_pins m_supply;
 	};
 
