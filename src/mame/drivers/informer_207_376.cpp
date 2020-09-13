@@ -152,7 +152,7 @@ MC6845_UPDATE_ROW( informer_207_376_state::crtc_update_row )
 			data = 0xff;
 
 		// the line above the status bar seems to be hardcoded
-		if (y == 273)
+		if (y == 274)
 			data = 0xff;
 
 		// draw 8 pixels of the character
@@ -294,14 +294,14 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
-	m_screen->set_raw(14400000, 800, 0, 640, 300, 0, 286); // unknown clock
+	m_screen->set_raw(36_MHz_XTAL / 2.5, 800, 0, 640, 300, 0, 286);
 	m_screen->set_screen_update(FUNC(informer_207_376_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
-	MC6845(config, m_crtc, 1800000); // unknown clock
+	MC6845(config, m_crtc, 36_MHz_XTAL / 20);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
