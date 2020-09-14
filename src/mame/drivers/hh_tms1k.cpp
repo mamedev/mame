@@ -5887,7 +5887,7 @@ INPUT_PORTS_END
 void starwbc_state::starwbc(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=47pF
+	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=51K, C=47pF
 	m_maincpu->k().set(FUNC(starwbc_state::read_k));
 	m_maincpu->r().set(FUNC(starwbc_state::write_r));
 	m_maincpu->o().set(FUNC(starwbc_state::write_o));
