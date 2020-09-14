@@ -1717,19 +1717,6 @@ if (BUSES["O2"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/bus/p2000/mdcr.h,BUSES["P2000"] = true
----------------------------------------------------
-
-if (BUSES["P2000"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/p2000/mdcr.cpp",
-		MAME_DIR .. "src/devices/bus/p2000/mdcr.h",
-		MAME_DIR .. "src/devices/bus/p2000/phase_decoder.cpp",
-		MAME_DIR .. "src/devices/bus/p2000/phase_decoder.h",
-	}
-end
 
 ---------------------------------------------------
 --

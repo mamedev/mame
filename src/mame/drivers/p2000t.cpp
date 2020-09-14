@@ -247,7 +247,7 @@ void p2000t_state::p2000t(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* the mini cassette driver */
-    MDCR_PORT(config, MDCR_PORT_TAG, p2000_mdcr_devices, "mdcr");
+	MDCR(config, m_mdcr, 0);
 }
 
 
