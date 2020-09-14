@@ -265,11 +265,6 @@ TODO:
   accesses done by the sound CPU to the YM2203 I/O ports. At the very least, there
   could be some filters.
 
- There are also Bubble Bobble bootlegs with a P8749H MCU, however the MCU
- is protected against reading and the main code only differs by 1 byte from
- Bubble Bobble.  If the MCU were to be dumped that would also make for
- interesting comparisons.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -1864,7 +1859,7 @@ ROM_START( bub68705 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
 ROM_END
 
-ROM_START( bub8749 ) // all ROMs match bublbobl1 but for the MCU, which is different. 2-PCB set probably comes from Italy
+ROM_START( bub8749 ) // All ROMs match bublbobl1 but for the MCU, which is different. 2-PCB set probably comes from Italy
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "6-27256.bin",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
 	// ROMs banked at 8000-bfff
@@ -1897,7 +1892,7 @@ ROM_START( bub8749 ) // all ROMs match bublbobl1 but for the MCU, which is diffe
 	// 0x70000-0x7ffff empty
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "6301-in",        0x0000, 0x0100, BAD_DUMP CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    // video timing, not dumped for this set
+	ROM_LOAD( "6301-in",        0x00000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) ) // Video timing
 
 	// Located on CPU/Sound Board
 	ROM_REGION( 0x0003, "plds", 0 )

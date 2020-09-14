@@ -1171,7 +1171,7 @@ void lua_engine::initialize()
 	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
 			if(!item.base || (offset >= item.count))
 				return sol::make_object(sol(), sol::nil);
-			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.size * item.stride * (offset / item.valcount));
+			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			uint64_t ret = 0;
 			switch(item.size)
 			{
@@ -1199,7 +1199,6 @@ void lua_engine::initialize()
 			else
 			{
 				const uint32_t blocksize = item.size * item.valcount;
-				const uint32_t bytestride = item.size * item.stride;
 				uint32_t remaining = buff->get_len();
 				uint8_t *dest = reinterpret_cast<uint8_t *>(buff->get_ptr());
 				while(remaining)
@@ -1207,7 +1206,7 @@ void lua_engine::initialize()
 					const uint32_t blockno = offset / blocksize;
 					const uint32_t available = blocksize - (offset % blocksize);
 					const uint32_t chunk = (available < remaining) ? available : remaining;
-					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * bytestride) + (offset % blocksize);
+					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
 					std::memcpy(dest, source, chunk);
 					offset += chunk;
 					remaining -= chunk;
@@ -1219,7 +1218,7 @@ void lua_engine::initialize()
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
 			if(!item.base || (offset >= item.count))
 				return;
-			void *const data = reinterpret_cast<uint8_t *>(item.base) + (item.size * item.stride * (offset / item.valcount));
+			void *const data = reinterpret_cast<uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			switch(item.size)
 			{
 				case 1:

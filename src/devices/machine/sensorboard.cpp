@@ -49,9 +49,10 @@ To prevent the possibility of a piece/sensor having opposite states (iow: piece
 selected but sensor deactivated, the button is not clicked when dropping a piece
 at the same position it was before.
 
-Hold CTRL while clicking to activate the piece but ignore the sensor beneath it.
-Hold SHIFT while clicking to activate the sensor but ignore the piece (sidenote:
-it will invert the sensor state for magnet boards).
+Hold CTRL while clicking to activate the piece but ignore the sensor beneath it,
+on magnet boards this only applies during piece capture. Hold SHIFT while clicking
+to activate the sensor but ignore the piece, on magnet boards it will invert the
+sensor state instead.
 
 */
 
@@ -261,7 +262,7 @@ u8 sensorboard_device::read_sensor(u8 x, u8 y)
 	if (m_magnets)
 	{
 		u8 piece = read_piece(x, y);
-		u8 state = (piece != 0 && pos != m_handpos && pos != m_droppos) ? 1 : 0;
+		u8 state = (piece != 0 && pos != m_handpos && (m_inp_ui->read() & 2 || pos != m_droppos)) ? 1 : 0;
 
 		// piece recognition: return piece id
 		if (m_inductive)

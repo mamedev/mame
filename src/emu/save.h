@@ -171,10 +171,9 @@ public:
 	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, ElementType StructType::*element, const char *valname)
 	{
 		static_assert(std::is_base_of<StructType, typename array_unwrap<ItemType>::underlying_type>::value, "Called save_item on a non-matching struct member pointer!");
-		static_assert(!(sizeof(typename array_unwrap<ItemType>::underlying_type) % sizeof(typename array_unwrap<ElementType>::underlying_type)), "Called save_item on an unaligned struct member!");
 		static_assert(!std::is_pointer<ElementType>::value, "Called save_item on a struct member pointer!");
 		static_assert(is_atom<typename array_unwrap<ElementType>::underlying_type>::value, "Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, array_unwrap<ElementType>::ptr(array_unwrap<ItemType>::ptr(value)->*element), array_unwrap<ElementType>::SIZE, array_unwrap<ElementType>::SAVE_COUNT, array_unwrap<ItemType>::SAVE_COUNT, sizeof(typename array_unwrap<ItemType>::underlying_type) / sizeof(typename array_unwrap<ElementType>::underlying_type));
+		save_memory(device, module, tag, index, valname, array_unwrap<ElementType>::ptr(array_unwrap<ItemType>::ptr(value)->*element), array_unwrap<ElementType>::SIZE, array_unwrap<ElementType>::SAVE_COUNT, array_unwrap<ItemType>::SAVE_COUNT, sizeof(typename array_unwrap<ItemType>::underlying_type));
 	}
 
 	// templatized wrapper for pointers
@@ -188,28 +187,25 @@ public:
 	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, ElementType StructType::*element, const char *valname, u32 count)
 	{
 		static_assert(std::is_base_of<StructType, typename array_unwrap<ItemType>::underlying_type>::value, "Called save_pointer on a non-matching struct member pointer!");
-		static_assert(!(sizeof(typename array_unwrap<ItemType>::underlying_type) % sizeof(typename array_unwrap<ElementType>::underlying_type)), "Called save_pointer on an unaligned struct member!");
 		static_assert(!std::is_pointer<ElementType>::value, "Called save_pointer on a struct member pointer!");
 		static_assert(is_atom<typename array_unwrap<ElementType>::underlying_type>::value, "Called save_pointer on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, array_unwrap<ElementType>::ptr(array_unwrap<ItemType>::ptr(value[0])->*element), array_unwrap<ElementType>::SIZE, array_unwrap<ElementType>::SAVE_COUNT, array_unwrap<ItemType>::SAVE_COUNT * count, sizeof(typename array_unwrap<ItemType>::underlying_type) / sizeof(typename array_unwrap<ElementType>::underlying_type));
+		save_memory(device, module, tag, index, valname, array_unwrap<ElementType>::ptr(array_unwrap<ItemType>::ptr(value[0])->*element), array_unwrap<ElementType>::SIZE, array_unwrap<ElementType>::SAVE_COUNT, array_unwrap<ItemType>::SAVE_COUNT * count, sizeof(typename array_unwrap<ItemType>::underlying_type));
 	}
 
 	// templatized wrapper for std::unique_ptr
 	template <typename ItemType>
-	void save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
 	{
-		static_assert(is_atom<typename array_unwrap<ItemType>::underlying_type>::value, "Called save_pointer on a non-fundamental type!");
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
 
 	template <typename ItemType, typename StructType, typename ElementType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, ElementType StructType::*element, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, ElementType StructType::*element, const char *valname, u32 count)
 	{
 		static_assert(std::is_base_of<StructType, typename array_unwrap<ItemType>::underlying_type>::value, "Called save_pointer on a non-matching struct member pointer!");
-		static_assert(!(sizeof(typename array_unwrap<ItemType>::underlying_type) % sizeof(typename array_unwrap<ElementType>::underlying_type)), "Called save_pointer on an unaligned struct member!");
 		static_assert(!std::is_pointer<ElementType>::value, "Called save_pointer on a struct member pointer!");
 		static_assert(is_atom<typename array_unwrap<ElementType>::underlying_type>::value, "Called save_pointer on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, array_unwrap<ElementType>::ptr(array_unwrap<ItemType>::ptr(value[0])->*element), array_unwrap<ElementType>::SIZE, array_unwrap<ElementType>::SAVE_COUNT, array_unwrap<ItemType>::SAVE_COUNT * count, sizeof(typename array_unwrap<ItemType>::underlying_type) / sizeof(typename array_unwrap<ElementType>::underlying_type));
+		save_memory(device, module, tag, index, valname, array_unwrap<ElementType>::ptr(array_unwrap<ItemType>::ptr(value[0])->*element), array_unwrap<ElementType>::SIZE, array_unwrap<ElementType>::SAVE_COUNT, array_unwrap<ItemType>::SAVE_COUNT * count, sizeof(typename array_unwrap<ItemType>::underlying_type));
 	}
 
 	// templatized wrapper for std::vector

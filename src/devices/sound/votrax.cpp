@@ -127,17 +127,17 @@ void votrax_sc01_device::inflection_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle update requests
+//  sound_stream_update - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 
-void votrax_sc01_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void votrax_sc01_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for(int i=0; i<samples; i++) {
+	for(int i=0; i<outputs[0].samples(); i++) {
 		m_sample_count++;
 		if(m_sample_count & 1)
 			chip_update();
-		outputs[0][i] = analog_calc();
+		outputs[0].put(i, analog_calc());
 	}
 }
 
@@ -168,7 +168,7 @@ void votrax_sc01_device::device_start()
 	m_mainclock = clock();
 	m_sclock = m_mainclock / 18.0;
 	m_cclock = m_mainclock / 36.0;
-	m_stream = stream_alloc_legacy(0, 1, m_sclock);
+	m_stream = stream_alloc(0, 1, m_sclock);
 	m_timer = timer_alloc();
 
 	// reset outputs
@@ -568,7 +568,7 @@ void votrax_sc01_device::filters_commit(bool force)
 					 m_filt_fa, m_filt_va, m_filt_fc, m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3);
 }
 
-stream_sample_t votrax_sc01_device::analog_calc()
+stream_buffer::sample_t votrax_sc01_device::analog_calc()
 {
 	// Voice-only path.
 	// 1. Pick up the pitch wave
@@ -632,7 +632,7 @@ stream_sample_t votrax_sc01_device::analog_calc()
 	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b);
 	shift_hist(vn, m_vn_6);
 
-	return int(vn*50000);
+	return vn*1.5;
 }
 
 /*

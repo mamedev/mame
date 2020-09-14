@@ -416,7 +416,7 @@ inline save_error save_manager::do_write(T check_space, U write_block, V start_h
 	{
 		const u32 blocksize = entry->m_typesize * entry->m_typecount;
 		const u8 *data = reinterpret_cast<const u8 *>(entry->m_data);
-		for (u32 b = 0; entry->m_blockcount > b; ++b, data += (entry->m_typesize * entry->m_stride))
+		for (u32 b = 0; entry->m_blockcount > b; ++b, data += entry->m_stride)
 			if (!write_block(data, blocksize))
 				return STATERR_WRITE_ERROR;
 	}
@@ -460,7 +460,7 @@ inline save_error save_manager::do_read(T check_length, U read_block, V start_he
 	{
 		const u32 blocksize = entry->m_typesize * entry->m_typecount;
 		u8 *data = reinterpret_cast<u8 *>(entry->m_data);
-		for (u32 b = 0; entry->m_blockcount > b; ++b, data += (entry->m_typesize * entry->m_stride))
+		for (u32 b = 0; entry->m_blockcount > b; ++b, data += entry->m_stride)
 			if (!read_block(data, blocksize))
 				return STATERR_READ_ERROR;
 
@@ -984,7 +984,7 @@ save_manager::state_entry::state_entry(void *data, const char *name, device_t *d
 void save_manager::state_entry::flip_data()
 {
 	u8 *data = reinterpret_cast<u8 *>(m_data);
-	for (u32 b = 0; m_blockcount > b; ++b, data += (m_typesize * m_stride))
+	for (u32 b = 0; m_blockcount > b; ++b, data += m_stride)
 	{
 		u16 *data16;
 		u32 *data32;

@@ -237,20 +237,20 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_pump->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_pump->add_route(0, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_pump->add_route(1, *this, 0.5, AUTO_ALLOC_INPUT, 1);
 
 	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
 	m_ensoniq->set_addrmap(0, &taito_en_device::en_otis_map);
 	m_ensoniq->set_addrmap(1, &taito_en_device::en_otis_map);
 	m_ensoniq->set_channels(4);
-	m_ensoniq->add_route(0, "pump", 1.0, 0);
-	m_ensoniq->add_route(1, "pump", 1.0, 1);
-	m_ensoniq->add_route(2, "pump", 1.0, 2);
-	m_ensoniq->add_route(3, "pump", 1.0, 3);
-	m_ensoniq->add_route(4, "pump", 1.0, 4);
-	m_ensoniq->add_route(5, "pump", 1.0, 5);
-	m_ensoniq->add_route(6, "pump", 1.0, 6);
-	m_ensoniq->add_route(7, "pump", 1.0, 7);
+	m_ensoniq->add_route(0, "pump", 0.18, 0);
+	m_ensoniq->add_route(1, "pump", 0.18, 1);
+	m_ensoniq->add_route(2, "pump", 0.18, 2);
+	m_ensoniq->add_route(3, "pump", 0.18, 3);
+	m_ensoniq->add_route(4, "pump", 0.18, 4);
+	m_ensoniq->add_route(5, "pump", 0.18, 5);
+	m_ensoniq->add_route(6, "pump", 0.18, 6);
+	m_ensoniq->add_route(7, "pump", 0.18, 7);
 }
