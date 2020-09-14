@@ -8,15 +8,16 @@
 
     Hardware:
     - M6809
+	- 8253 PIT
     - Z80SCC 8530
-    - 6850 ACIA (up to 4)
-    - X2212P NVRAM
+    - 2x 6850 ACIA (up to 4)
+    - 2x X2212P NOVRAM
 
     TODO:
 	- Dump keyboard controller and emulate it (currently HLE'd)
 	- Problably needs improvements to at least the Z80SCC to
 	  properly support synchrous modes
-    - Figure out unknown reads/writes to the memory
+    - Figure out the unknown bits at 0x8400
 	- Verify NMI hookup
 	- Verify clock speeds
 
@@ -32,7 +33,7 @@
 #include "machine/pit8253.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
-#include "machine/nvram.h"
+#include "machine/x2212.h"
 #include "machine/z80scc.h"
 #include "video/mc6845.h"
 #include "sound/beep.h"
@@ -54,6 +55,7 @@ public:
 	informer_207_376_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_novram(*this, "novram%u", 0U),
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -62,8 +64,7 @@ public:
 		m_acia(*this, "acia%u", 0U),
 		m_beep(*this, "beep"),
 		m_ram(*this, "ram"),
-		m_chargen(*this, "chargen"),
-		m_nmi_enabled(false)
+		m_chargen(*this, "chargen")
 	{ }
 
 	void informer_207_376(machine_config &config);
@@ -74,6 +75,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<x2212_device, 2> m_novram;
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -86,15 +88,14 @@ private:
 
 	void mem_map(address_map &map);
 
-	MC6845_UPDATE_ROW(crtc_update_row);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void vsync_w(int state);
-	void nmi_control_w(uint8_t data);
 	void unk_8400_w(uint8_t data);
+	void crt_brightness_w(uint8_t data);
+	uint8_t novram_r(address_space &space, offs_t offset);
+	void novram_w(offs_t offset, uint8_t data);
+	uint8_t novram_recall_r();
 
-	bool m_display_enabled;
-	bool m_nmi_enabled;
+	MC6845_UPDATE_ROW(crtc_update_row);
+	void vsync_w(int state);
 };
 
 
@@ -110,10 +111,11 @@ void informer_207_376_state::mem_map(address_map &map)
 	map(0x8400, 0x8400).lr8(NAME([] () { return 0xff; })).w(FUNC(informer_207_376_state::unk_8400_w)); // ?
 	map(0x8802, 0x8803).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8804, 0x8805).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x8c00, 0x8c00).w(FUNC(informer_207_376_state::nmi_control_w));
+	map(0x8c00, 0x8c00).w(FUNC(informer_207_376_state::crt_brightness_w));
 	map(0x9000, 0x9003).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x9400, 0x9403).rw(m_scc, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w));
-	map(0x9c00, 0x9cff).ram().share("nvram");
+	map(0x9800, 0x9800).r(FUNC(informer_207_376_state::novram_recall_r));
+	map(0x9c00, 0x9cff).rw(FUNC(informer_207_376_state::novram_r), FUNC(informer_207_376_state::novram_w));
 	map(0xa000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -130,9 +132,16 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
+void informer_207_376_state::crt_brightness_w(uint8_t data)
+{
+	// unknown algorithm for the brightness
+	// default value is 4, range is 0 (off) to 15 (brightest)
+	m_screen->set_brightness(256 - (256 / ((data & 0x0f) + 1)));
+}
+
 void informer_207_376_state::vsync_w(int state)
 {
-	if (m_nmi_enabled && state == 1)
+	if (state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -167,16 +176,6 @@ MC6845_UPDATE_ROW( informer_207_376_state::crtc_update_row )
 	}
 }
 
-uint32_t informer_207_376_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	if (m_display_enabled)
-		m_crtc->screen_update(screen, bitmap, cliprect);
-	else
-		bitmap.fill(rgb_t::black(), cliprect);
-
-	return 0;
-}
-
 static const gfx_layout char_layout =
 {
 	8,11,
@@ -197,39 +196,45 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-void informer_207_376_state::nmi_control_w(uint8_t data)
-{
-	// 76543---  unused?
-	// -----21-  nmi enable?
-	// -------0  unused?
-
-	m_nmi_enabled = bool(data & 0x06);
-}
-
 void informer_207_376_state::unk_8400_w(uint8_t data)
 {
 	// 7-------  beeper
 	// -6------  unknown
 	// --5-----  1=internal modem, 0=host rs232
 	// ---43---  unknown
-	// -----2--  display enabled?
+	// -----2--  unknown
 	// ------10  unknown
 
 	m_beep->set_state(BIT(data, 7));
-	m_display_enabled = bool(BIT(data, 2));
+}
+
+uint8_t informer_207_376_state::novram_r(address_space &space, offs_t offset)
+{
+	return (m_novram[0]->read(space, offset) << 4) | (m_novram[1]->read(space, offset) & 0x0f);
+}
+
+void informer_207_376_state::novram_w(offs_t offset, uint8_t data)
+{
+	m_novram[0]->write(offset, data >> 4);
+	m_novram[1]->write(offset, data & 0x0f);
+}
+
+uint8_t informer_207_376_state::novram_recall_r()
+{
+	m_novram[0]->recall(1);
+	m_novram[1]->recall(1);
+	m_novram[0]->recall(0);
+	m_novram[1]->recall(0);
+
+	return 0xff;
 }
 
 void informer_207_376_state::machine_start()
 {
-	// register for save states
-	save_item(NAME(m_display_enabled));
-	save_item(NAME(m_nmi_enabled));
 }
 
 void informer_207_376_state::machine_reset()
 {
-	m_display_enabled = false;
-	m_nmi_enabled = false;
 }
 
 
@@ -250,7 +255,8 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	input_merger_device &cpu_irq(INPUT_MERGER_ANY_HIGH(config, "cpu_irq"));
 	cpu_irq.output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x X2212P
+	X2212(config, "novram0");
+	X2212(config, "novram1");
 
 	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2.457600_MHz_XTAL);
@@ -272,6 +278,8 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set("kbd", FUNC(informer_207_376_kbd_hle_device::rx_w));
 	m_acia[0]->irq_handler().set("cpu_irq", FUNC(input_merger_device::in_w<1>));
+	m_acia[0]->rts_handler().set(m_novram[0], FUNC(x2212_device::store)).invert();
+	m_acia[0]->rts_handler().append(m_novram[1], FUNC(x2212_device::store)).invert();
 
 	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
@@ -295,7 +303,7 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(36_MHz_XTAL / 2.5, 800, 0, 640, 300, 0, 286);
-	m_screen->set_screen_update(FUNC(informer_207_376_state::screen_update));
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
