@@ -1528,10 +1528,24 @@ void sound_manager::update(void *ptr, int param)
 
 	g_profiler.start(PROFILER_SOUND);
 
+	// determine the duration of this update
+	attotime update_period = machine().time() - m_last_update;
+	sound_assert(update_period.seconds() == 0);
+
+	// use that to compute the number of samples we need from the speakers
+	attoseconds_t sample_rate_attos = HZ_TO_ATTOSECONDS(machine().sample_rate());
+	m_samples_this_update = update_period.attoseconds() / sample_rate_attos;
+
+	// recompute the end time to an even sample boundary
+	attotime endtime = m_last_update + attotime(0, m_samples_this_update * sample_rate_attos);
+
+	// clear out the mix bufers
+	std::fill_n(&m_leftmix[0], m_samples_this_update, 0);
+	std::fill_n(&m_rightmix[0], m_samples_this_update, 0);
+
 	// force all the speaker streams to generate the proper number of samples
-	m_samples_this_update = 0;
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
-		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_last_update, endtime, m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// determine the maximum in this section
 	stream_buffer::sample_t curmax = 0;
@@ -1633,13 +1647,8 @@ void sound_manager::update(void *ptr, int param)
 	for (auto &stream : m_orphan_stream_list)
 		stream.first->update();
 
-	// see if we ticked over to the next second
-	attotime curtime = machine().time();
-	if (curtime.seconds() != m_last_update.seconds())
-		sound_assert(curtime.seconds() == m_last_update.seconds() + 1);
-
 	// remember the update time
-	m_last_update = curtime;
+	m_last_update = endtime;
 	m_update_number++;
 
 	// apply sample rate changes
