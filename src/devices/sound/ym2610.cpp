@@ -251,17 +251,18 @@ void ym2610_device::device_clock_changed()
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ym2610_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// if this is not our stream, pass it on
 	if (&stream != m_stream)
 	{
-		ay8910_device::sound_stream_update(stream, inputs, outputs, samples);
+		ay8910_device::sound_stream_update(stream, inputs, outputs);
 		return;
 	}
 
 	// iterate over all target samples
-	for (int sampindex = 0; sampindex < samples; sampindex++)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the OPN
 		u32 env_counter = m_opn.clock(m_opn_mask);
@@ -294,8 +295,8 @@ void ym2610_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			rsum = -32768;
 		else if (rsum > 32767)
 			rsum = 32767;
-		outputs[0][sampindex] = lsum;
-		outputs[1][sampindex] = rsum;
+		outputs[0].put(sampindex, stream_buffer::sample_t(lsum) * sample_scale);
+		outputs[1].put(sampindex, stream_buffer::sample_t(rsum) * sample_scale);
 	}
 }
 

@@ -47,14 +47,14 @@ inline s16 linear_to_fp(s32 value)
 //  clamping
 //-------------------------------------------------
 
-inline s16 fp_to_linear(s16 value)
+inline stream_buffer::sample_t fp_to_linear(s16 value)
 {
 	s32 result = (value >> 3) << BIT(value, 0, 3);
 	if (result < -32768)
 		result = -32768;
 	else if (result > 32767)
 		result = 32767;
-	return result;
+	return stream_buffer::sample_t(result) * (1.0 / 32768.0);
 }
 
 
@@ -192,12 +192,12 @@ void ym2203_device::device_clock_changed()
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ym2203_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2203_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// if this is not our stream, pass it on
 	if (&stream != m_stream)
 	{
-		ay8910_device::sound_stream_update(stream, inputs, outputs, samples);
+		ay8910_device::sound_stream_update(stream, inputs, outputs);
 		return;
 	}
 
@@ -208,7 +208,7 @@ void ym2203_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	m_opn.write(0xb6, 0x80);	// pan left, disable LFO
 
 	// iterate over all target samples
-	for (int sampindex = 0; sampindex < samples; sampindex++)
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
 		m_opn.clock(0x07);
@@ -219,7 +219,7 @@ void ym2203_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPN is mono, so only the left sum matters
-		outputs[0][sampindex] = fp_to_linear(linear_to_fp(lsum));
+		outputs[0].put(sampindex, fp_to_linear(linear_to_fp(lsum)));
 	}
 }
 

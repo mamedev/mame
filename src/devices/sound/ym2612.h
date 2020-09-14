@@ -33,10 +33,10 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal helpers
-	void sound_stream_update_common(stream_sample_t *outl, stream_sample_t *outr, int samples, bool discontinuity);
+	void sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity);
 
 	// internal state
 	ymopn_engine m_opn;              // core OPN engine
@@ -60,7 +60,7 @@ public:
 
 protected:
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 
@@ -79,7 +79,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 };
 
 

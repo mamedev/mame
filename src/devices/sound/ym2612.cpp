@@ -175,9 +175,9 @@ void ym2612_device::device_clock_changed()
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2612_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	sound_stream_update_common(outputs[0], outputs[1], samples, true);
+	sound_stream_update_common(outputs[0], outputs[1], true);
 }
 
 
@@ -186,11 +186,14 @@ void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //  update function among subclasses
 //-------------------------------------------------
 
-void ym2612_device::sound_stream_update_common(stream_sample_t *outl, stream_sample_t *outr, int samples, bool discontinuity)
+void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity)
 {
+	constexpr stream_buffer::sample_t sample_divider = MULTIPLEX_YM2612_YM3438_OUTPUT ? 1.0 : 6.0;
+	stream_buffer::sample_t sample_scale = 1.0 / (sample_divider * (discontinuity ? 260.0 : 256.0));
+
 	// iterate over all target samples
 	s32 lsum = 0, rsum = 0;
-	for (int sampindex = 0; sampindex < samples; )
+	for (int sampindex = 0; sampindex < outl.samples(); )
 	{
 		// clock the OPN when we hit channel 0
 		if (m_channel == 0)
@@ -222,8 +225,8 @@ void ym2612_device::sound_stream_update_common(stream_sample_t *outl, stream_sam
 		// if multiplexing, just scale to 16 bits and output
 		if (MULTIPLEX_YM2612_YM3438_OUTPUT)
 		{
-			outl[sampindex] = lchan << 7;
-			outr[sampindex] = rchan << 7;
+			outl.put(sampindex, stream_buffer::sample_t(lchan) * sample_scale);
+			outr.put(sampindex, stream_buffer::sample_t(rchan) * sample_scale);
 			sampindex++;
 		}
 
@@ -236,8 +239,8 @@ void ym2612_device::sound_stream_update_common(stream_sample_t *outl, stream_sam
 			// on the last channel, output the average and reset the sums
 			if (m_channel == 5)
 			{
-				outl[sampindex] = (lsum << 7) / 6;
-				outr[sampindex] = (rsum << 7) / 6;
+				outl.put(sampindex, stream_buffer::sample_t(lsum) * sample_scale);
+				outr.put(sampindex, stream_buffer::sample_t(rsum) * sample_scale);
 				sampindex++;
 				lsum = rsum = 0;
 			}
@@ -270,9 +273,9 @@ ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, dev
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ym3438_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym3438_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	sound_stream_update_common(outputs[0], outputs[1], samples, false);
+	sound_stream_update_common(outputs[0], outputs[1], false);
 }
 
 
@@ -305,13 +308,14 @@ void ymf276_device::device_clock_changed()
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ymf276_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// mask off channel 6 if DAC is enabled
 	u8 const opn_mask = m_dac_enable ? 0x1f : 0x3f;
 
 	// iterate over all target samples
-	for (int sampindex = 0; sampindex < samples; sampindex++)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the OPN
 		m_opn.clock(0x3f);
@@ -340,8 +344,8 @@ void ymf276_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			rsum = -32768;
 		else if (rsum > 32767)
 			rsum = 32767;
-		outputs[0][sampindex] = lsum;
-		outputs[1][sampindex] = rsum;
+		outputs[0].put(sampindex, stream_buffer::sample_t(lsum) * sample_scale);
+		outputs[1].put(sampindex, stream_buffer::sample_t(rsum) * sample_scale);
 	}
 }
 

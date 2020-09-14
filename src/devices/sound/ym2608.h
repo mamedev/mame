@@ -46,7 +46,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// set a new prescale value and update clocks
