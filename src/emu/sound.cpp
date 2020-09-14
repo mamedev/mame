@@ -498,8 +498,8 @@ read_stream_view sound_stream_input::update(attotime start, attotime end)
 	bool resampled = false;
 	if (m_resampler_source != nullptr)
 	{
-		// if sample rates differ, then yet
-		if (m_owner->sample_rate() != m_native_source->stream().sample_rate())
+		// if sample rates differ, then yes
+		if (m_owner->sample_rate() != m_native_source->buffer_sample_rate())
 			resampled = true;
 
 		// if not, keep the resampler's end time up to date
@@ -552,6 +552,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
+	m_resampling_disabled((flags & STREAM_DISABLE_INPUT_RESAMPLING) != 0),
 	m_sync_timer(nullptr),
 	m_input(inputs),
 	m_input_array(inputs),
@@ -580,7 +581,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	{
 		// allocate a resampler stream if needed, and get a pointer to its output
 		sound_stream_output *resampler = nullptr;
-		if ((flags & STREAM_DISABLE_INPUT_RESAMPLING) == 0)
+		if (!m_resampling_disabled)
 		{
 			m_resampler_list.push_back(std::make_unique<default_resampler_stream>(m_device));
 			resampler = &m_resampler_list.back()->m_output[0];
@@ -736,6 +737,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 					m_input_view[inputnum] = m_input[inputnum].update(update_start, end);
 				else
 					m_input_view[inputnum] = empty_view(update_start, end);
+				sound_assert(m_resampling_disabled || m_input_view[inputnum].sample_rate() == m_sample_rate);
 			}
 
 #if (SOUND_DEBUG)

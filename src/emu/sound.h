@@ -455,6 +455,7 @@ public:
 	attotime end_time() const { return m_buffer.end_time(); }
 	u32 index() const { return m_index; }
 	stream_buffer::sample_t gain() const { return m_gain; }
+	u32 buffer_sample_rate() const { return m_buffer.sample_rate(); }
 
 	// simple setters
 	void set_gain(float gain) { m_gain = gain; }
@@ -580,9 +581,10 @@ public:
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
 	std::string name() const { return m_name; }
-	bool synchronous() const { return m_synchronous; }
 	bool input_adaptive() const { return m_input_adaptive || m_synchronous; }
 	bool output_adaptive() const { return m_output_adaptive; }
+	bool synchronous() const { return m_synchronous; }
+	bool resampling_disabled() const { return m_resampling_disabled; }
 
 	// input and output getters
 	u32 input_count() const { return m_input.size(); }
@@ -654,6 +656,7 @@ private:
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
+	bool m_resampling_disabled;                    // is resampling of input streams disabled?
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
 
 	// input information
