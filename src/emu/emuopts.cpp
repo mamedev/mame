@@ -212,6 +212,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_CONSOLE,                                    "0",         OPTION_BOOLEAN,    "enable emulator Lua console" },
 	{ OPTION_PLUGINS,                                    "1",         OPTION_BOOLEAN,    "enable Lua plugin support" },
 	{ OPTION_PLUGIN,                                     nullptr,     OPTION_STRING,     "list of plugins to enable" },
+	{ OPTION_PLUGIN_OPTIONAL,                            nullptr,     OPTION_STRING,     "list of plugins to enable optionally" },
 	{ OPTION_NO_PLUGIN,                                  nullptr,     OPTION_STRING,     "list of plugins to disable" },
 
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "HTTP SERVER OPTIONS" },

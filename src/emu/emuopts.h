@@ -188,6 +188,7 @@
 #define OPTION_CONSOLE              "console"
 #define OPTION_PLUGINS              "plugins"
 #define OPTION_PLUGIN               "plugin"
+#define OPTION_PLUGIN_OPTIONAL      "plugin_optional"
 #define OPTION_NO_PLUGIN            "noplugin"
 
 #define OPTION_LANGUAGE             "language"
@@ -470,6 +471,7 @@ public:
 	bool plugins() const { return bool_value(OPTION_PLUGINS); }
 
 	const char *plugin() const { return value(OPTION_PLUGIN); }
+	const char *plugin_optional() const { return value(OPTION_PLUGIN_OPTIONAL); }
 	const char *no_plugin() const { return value(OPTION_NO_PLUGIN); }
 
 	const char *language() const { return value(OPTION_LANGUAGE); }

@@ -166,6 +166,14 @@ void mame_machine_manager::start_luaengine()
 			p->m_start = true;
 		}
 
+		// process optional includes
+		for (const std::string &incl : split(options().plugin_optional(), ','))
+		{
+			plugin *p = m_plugins->find(incl);
+			if (p)
+				p->m_start = true;
+		}
+
 		// process excludes
 		for (const std::string &excl : split(options().no_plugin(), ','))
 		{
