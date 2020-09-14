@@ -2582,7 +2582,7 @@ static INPUT_PORTS_START( zn6b )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( zn4w )
+static INPUT_PORTS_START( tgm )
 	PORT_INCLUDE( zn6b )
 
 	PORT_MODIFY("P1")
@@ -2600,8 +2600,8 @@ static INPUT_PORTS_START( zn4w )
 	/* Tetris: The Grand Master uses 6-button kick harness for debug inputs */
 	PORT_START("DEBUG")
 	PORT_CONFNAME( 0x01, 0x00, "Enable Debug Inputs" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_MODIFY("P3")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
@@ -5250,7 +5250,7 @@ GAME( 1998, sfex2j,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, R
 GAME( 1998, plsmaswd,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (USA 980316)",         MACHINE_IMPERFECT_SOUND )
 GAME( 1998, plsmaswda, plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (Asia 980316)",        MACHINE_IMPERFECT_SOUND )
 GAME( 1998, stargld2,  plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)",   MACHINE_IMPERFECT_SOUND )
-GAME( 1998, tgmj,      coh3002c, coh3002c,    zn4w,     zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
+GAME( 1998, tgmj,      coh3002c, coh3002c,    tgm,      zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Euro 980914)",                              MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (USA 980914)",                               MACHINE_IMPERFECT_SOUND )
 GAME( 1998, kikaioh,   techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_IMPERFECT_SOUND )
