@@ -569,7 +569,11 @@ function cheat.startplugin()
 		end
 		cheat.set_index = set_index;
 		cheat.set_value = function(cheat, value)
-			local idx, chg = cheat:set_index((value / cheat.parameter.step) + 1)
+			local idx = (value / cheat.parameter.step) + 1
+			local chg = false
+			if math.integer(idx) == idx then
+				idx, chg = cheat:set_index(idx)
+			end
 			return cheat.parameter.value, chg
 		end
 		cheat.get_index = function(cheat) return cheat.parameter.index end
