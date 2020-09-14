@@ -384,8 +384,7 @@ DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP-1 Central Processor")
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PDP1, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, -2) // data is actually 18 bits wide
-	, m_extern_iot(64, iot_delegate(*this))
-	, m_read_binary_word(*this)
+	, m_extern_iot(*this)
 	, m_io_sc_callback(*this)
 {
 	m_program_config.m_is_octal = true;
@@ -541,7 +540,6 @@ void pdp1_device::device_start()
 		if (m_extern_iot[i].isnull())
 			m_extern_iot[i] = iot_delegate(*this, FUNC(pdp1_device::null_iot));
 	}
-	m_read_binary_word.resolve();
 	m_io_sc_callback.resolve();
 	m_extend_support = extend_support;
 	m_hw_mul_div = hw_mul_div;
@@ -773,15 +771,19 @@ void pdp1_device::execute_run()
 
 
 		if ((! m_run) && (! m_rim))
+		{
+			debugger_instruction_hook(PC);
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
+		}
 		else if (m_rim)
 		{
 			switch (m_rim_step)
 			{
 			case 0:
 				/* read first word as instruction */
-				if (!m_read_binary_word.isnull())
-					m_read_binary_word();        /* data will be transferred to IO register */
+				MB = 0;
+				/* data will be transferred to IO register in response to RPB */
+				m_extern_iot[2](2, 0, 1, IO, AC);
 				m_rim_step = 1;
 				m_ios = 0;
 				break;
@@ -825,8 +827,9 @@ void pdp1_device::execute_run()
 
 			case 2:
 				/* read second word as data */
-				if (!m_read_binary_word.isnull())
-					m_read_binary_word();        /* data will be transferred to IO register */
+				MB = 0;
+				/* data will be transferred to IO register in response to RPB */
+				m_extern_iot[2](2, 0, 1, IO, AC);
 				m_rim_step = 3;
 				m_ios = 0;
 				break;
