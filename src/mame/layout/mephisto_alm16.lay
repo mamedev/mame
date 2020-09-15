@@ -293,12 +293,12 @@ license:CC0
 		<bounds x="0" y="0" width="10" height="81" />
 
 		<!-- can click here to change board type -->
-		<element ref="hlub" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="0" y="1.5" width="10" height="5" /></element>
+		<element ref="hlub" inputtag="FAKE" inputmask="0x01" inputraw="yes"><bounds x="0" y="1.5" width="10" height="5" /></element>
 
 		<element ref="cblack"><bounds x="0" y="0" width="10" height="1" /></element>
 		<element ref="cblack"><bounds x="0" y="7" width="10" height="1" /></element>
 		<element ref="cblack"><bounds x="0" y="80" width="10" height="1" /></element>
-		<element ref="text_uit1" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="0" y="2" width="10" height="2" /></element>
+		<element ref="text_uit1" inputtag="FAKE" inputmask="0x01" inputraw="yes"><bounds x="0" y="2" width="10" height="2" /></element>
 		<element ref="text_uit2"><bounds x="0" y="4" width="10" height="2" /></element>
 
 		<!-- board -->
@@ -348,8 +348,8 @@ license:CC0
 		<element name="piece_ui14" ref="piece"><bounds x="5" y="48" width="4" height="4" /></element>
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x1000"><bounds x="1" y="48" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x2000"><bounds x="5" y="48" width="4" height="4" /><color alpha="0.25" /></element>
-		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="1"><bounds x="1" y="48" width="4" height="4" /></element>
-		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="1"><bounds x="5" y="48" width="4" height="4" /></element>
+		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="yes"><bounds x="1" y="48" width="4" height="4" /></element>
+		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="yes"><bounds x="5" y="48" width="4" height="4" /></element>
 		<element ref="wmask2" blend="multiply"><bounds x="1" y="48" width="8" height="4" /></element>
 
 		<!-- hand -->

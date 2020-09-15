@@ -138,10 +138,10 @@ license:CC0
 
 		<element ref="text_dif"><bounds x="21.2" y="6.6" width="7.6" height="0.75" /></element>
 		<element ref="static_black"><bounds x="23.5" y="7.5" width="3.0" height="0.7" /></element>
-		<element ref="switch1" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="23.4" y="7.4" width="0.9" height="0.9" /></element>
-		<element ref="switch2" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="24.166" y="7.4" width="0.9" height="0.9" /></element>
-		<element ref="switch3" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="24.933" y="7.4" width="0.9" height="0.9" /></element>
-		<element ref="switch4" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="25.7" y="7.4" width="0.9" height="0.9" /></element>
+		<element ref="switch1" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="23.4" y="7.4" width="0.9" height="0.9" /></element>
+		<element ref="switch2" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="24.166" y="7.4" width="0.9" height="0.9" /></element>
+		<element ref="switch3" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="24.933" y="7.4" width="0.9" height="0.9" /></element>
+		<element ref="switch4" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="25.7" y="7.4" width="0.9" height="0.9" /></element>
 		<element ref="text_1"><bounds x="23.4" y="8.3" width="0.9" height="0.75" /></element>
 		<element ref="text_2"><bounds x="24.166" y="8.3" width="0.9" height="0.75" /></element>
 		<element ref="text_3"><bounds x="24.933" y="8.3" width="0.9" height="0.75" /></element>

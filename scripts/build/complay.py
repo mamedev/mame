@@ -219,10 +219,6 @@ class LayoutChecker(Minifyer):
                 self.variable_scopes[-1][attrs['name']] = False
 
     def checkBounds(self, attrs):
-        if self.have_bounds[-1]:
-            self.handleError('Duplicate element bounds')
-        else:
-            self.have_bounds[-1] = True
         left = self.checkFloatAttribute('bounds', attrs, 'left', 0.0)
         top = self.checkFloatAttribute('bounds', attrs, 'top', 0.0)
         right = self.checkFloatAttribute('bounds', attrs, 'right', 1.0)
@@ -258,8 +254,14 @@ class LayoutChecker(Minifyer):
         if self.checkIntAttribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
             self.handleError('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
         for name in ('swapxy', 'flipx', 'flipy'):
-            if attrs.get(name, 'no') not in self.YESNO:
+            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['yesno'])):
                 self.handleError('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
+
+    def checkColor(self, attrs):
+        self.checkColorChannel(attrs, 'red')
+        self.checkColorChannel(attrs, 'green')
+        self.checkColorChannel(attrs, 'blue')
+        self.checkColorChannel(attrs, 'alpha')
 
     def checkColorChannel(self, attrs, name):
         channel = self.checkFloatAttribute('color', attrs, name, None)
@@ -268,7 +270,7 @@ class LayoutChecker(Minifyer):
 
     def checkTag(self, tag, element, attr):
         if '' == tag:
-            self.handleError('Element %s attribute %s is empty', (element, attr))
+            self.handleError('Element %s attribute %s is empty' % (element, attr))
         else:
             if tag.find('^') >= 0:
                 self.handleError('Element %s attribute %s "%s" contains parent device reference' % (element, attr, tag))
@@ -278,12 +280,22 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element %s attribute %s "%s" contains double separator' % (element, attr, tag))
 
     def checkComponent(self, name, attrs):
-        state = self.checkIntAttribute(name, attrs, 'state', None)
-        if (state is not None) and (0 > state):
-            self.handleError('Element %s attribute state "%s" is negative' % (name, attrs['state']))
+        statemask = self.checkIntAttribute(name, attrs, 'statemask', None)
+        stateval = self.checkIntAttribute(name, attrs, 'state', None)
+        if stateval is not None:
+            if 0 > stateval:
+                self.handleError('Element %s attribute state "%s" is negative' % (name, attrs['state']))
+            if (statemask is not None) and (stateval & ~statemask):
+                self.handleError('Element %s attribute state "%s" has bits set that are clear in attribute statemask "%s"' % (name, attrs['state'], attrs['statemask']))
         self.handlers.append((self.componentStartHandler, self.componentEndHandler))
-        self.have_bounds.append(False)
-        self.have_color.append(False)
+        self.have_bounds.append({ })
+        self.have_color.append({ })
+
+    def startObject(self):
+        self.handlers.append((self.objectStartHandler, self.objectEndHandler))
+        self.have_bounds.append(None)
+        self.have_orientation.append(False)
+        self.have_color.append(None)
 
     def rootStartHandler(self, name, attrs):
         if 'mamelayout' != name:
@@ -337,7 +349,7 @@ class LayoutChecker(Minifyer):
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
             self.repeat_depth.append(0)
-            self.have_bounds.append(False)
+            self.have_bounds.append(None)
         elif ('view' == name) and (not self.repeat_depth[-1]):
             self.current_collections = { }
             if 'name' not in attrs:
@@ -350,7 +362,7 @@ class LayoutChecker(Minifyer):
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
             self.repeat_depth.append(0)
-            self.have_bounds.append(False)
+            self.have_bounds.append(None)
         elif 'repeat' == name:
             if 'count' not in attrs:
                 self.handleError('Element repeat missing attribute count')
@@ -433,16 +445,25 @@ class LayoutChecker(Minifyer):
 
     def componentStartHandler(self, name, attrs):
         if 'bounds' == name:
+            state = self.checkIntAttribute(name, attrs, 'state', 0)
+            if state is not None:
+                if 0 > state:
+                    self.handleError('Element bounds attribute state "%s" is negative' % (attrs['state'], ))
+                if state in self.have_bounds[-1]:
+                    self.handleError('Duplicate bounds for state %d (previous %s)' % (state, self.have_bounds[-1][state]))
+                else:
+                    self.have_bounds[-1][state] = self.formatLocation()
             self.checkBounds(attrs)
         elif 'color' == name:
-            if self.have_color[-1]:
-                self.handleError('Duplicate color element')
-            else:
-                self.have_color[-1] = True
-            self.checkColorChannel(attrs, 'red')
-            self.checkColorChannel(attrs, 'green')
-            self.checkColorChannel(attrs, 'blue')
-            self.checkColorChannel(attrs, 'alpha')
+            state = self.checkIntAttribute(name, attrs, 'state', 0)
+            if state is not None:
+                if 0 > state:
+                    self.handleError('Element color attribute state "%s" is negative' % (attrs['state'], ))
+                if state in self.have_color[-1]:
+                    self.handleError('Duplicate color for state %d (previous %s)' % (state, self.have_color[-1][state]))
+                else:
+                    self.have_color[-1][state] = self.formatLocation()
+            self.checkColor(attrs)
         self.ignored_depth = 1
 
     def componentEndHandler(self, name):
@@ -464,25 +485,21 @@ class LayoutChecker(Minifyer):
                 self.checkTag(attrs['inputtag'], name, 'inputtag')
             elif 'inputmask' in attrs:
                 self.handleError('Element %s has inputmask attribute without inputtag attribute' % (name, ))
-            inputraw = self.checkIntAttribute(name, attrs, 'inputraw', None)
-            if (inputraw is not None):
+            inputraw = None
+            if 'inputraw' in attrs:
+                if (attrs['inputraw'] not in self.YESNO) and (not self.VARPATTERN.match(attrs['inputraw'])):
+                    self.handleError('Element %s attribute inputraw "%s" is not "yes" or "no"' % (name, attrs['inputraw']))
+                else:
+                    inputraw = 'yes' == attrs['inputraw']
                 if 'inputmask' not in attrs:
                     self.handleError('Element %s has inputraw attribute without inputmask attribute' % (name, ))
                 if 'inputtag' not in attrs:
                     self.handleError('Element %s has inputraw attribute without inputtag attribute' % (name, ))
-                if ((0 > inputraw) or (1 < inputraw)):
-                    self.handleError('Element %s attribute inputraw "%s" not in valid range 0-1' % (name, attrs['inputraw']))
             inputmask = self.checkIntAttribute(name, attrs, 'inputmask', None)
             if (inputmask is not None) and (0 == inputmask):
                 if (inputraw is None) or (0 == inputraw):
                     self.handleError('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
-            if ('element' != name) and not self.has_legacy_object:
-                self.has_legacy_object = True
-                if self.has_collection:
-                    self.handleError('Layout contains collection as well as legacy backdrop elements')
-            self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-            self.have_bounds.append(False)
-            self.have_orientation.append(False)
+            self.startObject();
         elif 'screen' == name:
             if 'index' in attrs:
                 index = self.checkIntAttribute(name, attrs, 'index', None)
@@ -495,9 +512,7 @@ class LayoutChecker(Minifyer):
                 self.checkTag(tag, name, 'tag')
                 if self.BADTAGPATTERN.search(tag):
                     self.handleError('Element screen attribute tag "%s" contains invalid characters' % (tag, ))
-            self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-            self.have_bounds.append(False)
-            self.have_orientation.append(False)
+            self.startObject();
         elif 'group' == name:
             if 'ref' not in attrs:
                 self.handleError('Element group missing attribute ref')
@@ -510,9 +525,7 @@ class LayoutChecker(Minifyer):
                             self.current_collections[n] = l
                         else:
                             self.handleError('Element group instantiates collection with duplicate name "%s" from %s (previous %s)' % (n, l, self.current_collections[n]))
-            self.handlers.append((self.objectStartHandler, self.objectEndHandler))
-            self.have_bounds.append(False)
-            self.have_orientation.append(False)
+            self.startObject();
         elif 'repeat' == name:
             if 'count' not in attrs:
                 self.handleError('Element repeat missing attribute count')
@@ -532,16 +545,16 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element collection has duplicate name (previous %s)' % (self.current_collections[attrs['name']], ))
             if attrs.get('visible', 'yes') not in self.YESNO:
                 self.handleError('Element collection attribute visible "%s" is not "yes" or "no"' % (attrs['visible'], ))
-            if not self.has_collection:
-                self.has_collection = True
-                if self.has_legacy_object:
-                    self.handleError('Layout contains collection as well as legacy backdrop elements')
             self.variable_scopes.append({ })
             self.collection_depth += 1
         elif 'param' == name:
             self.checkParameter(attrs)
             self.ignored_depth = 1
         elif 'bounds' == name:
+            if self.have_bounds[-1] is not None:
+                self.handleError('Duplicate element bounds (previous %s)' % (self.have_bounds[-1], ))
+            else:
+                self.have_bounds[-1] = self.formatLocation()
             self.checkBounds(attrs)
             if self.repeat_depth[-1]:
                 self.handleError('Element bounds inside repeat')
@@ -566,14 +579,25 @@ class LayoutChecker(Minifyer):
 
     def objectStartHandler(self, name, attrs):
         if 'bounds' == name:
+            if self.have_bounds[-1] is not None:
+                self.handleError('Duplicate element bounds (previous %s)' % (self.have_bounds[-1], ))
+            else:
+                self.have_bounds[-1] = self.formatLocation()
             self.checkBounds(attrs)
         elif 'orientation' == name:
             self.checkOrientation(attrs)
+        if 'color' == name:
+            if self.have_color[-1] is not None:
+                self.handleError('Duplicate element color (previous %s)' % (self.have_color[-1], ))
+            else:
+                self.have_color[-1] = self.formatLocation()
+            self.checkColor(attrs)
         self.ignored_depth = 1
 
     def objectEndHandler(self, name):
         self.have_bounds.pop()
         self.have_orientation.pop()
+        self.have_color.pop()
         self.handlers.pop()
 
     def setDocumentLocator(self, locator):
@@ -586,8 +610,6 @@ class LayoutChecker(Minifyer):
         self.variable_scopes = [ ]
         self.repeat_depth = [ ]
         self.collection_depth = 0
-        self.has_collection = False
-        self.has_legacy_object = False
         self.have_bounds = [ ]
         self.have_orientation = [ ]
         self.have_color = [ ]
@@ -609,8 +631,6 @@ class LayoutChecker(Minifyer):
         del self.variable_scopes
         del self.repeat_depth
         del self.collection_depth
-        del self.has_collection
-        del self.has_legacy_object
         del self.have_bounds
         del self.have_orientation
         del self.have_color

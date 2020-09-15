@@ -18,7 +18,7 @@ license:CC0
 		<repeat count="22">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="0" increment="19" />
-			<element name="vfd0" ref="vfd0">
+			<element name="vfd~n~" ref="vfd0">
 				<bounds x="~x~" y="0" width="18" height="23" />
 			</element>
 		</repeat>

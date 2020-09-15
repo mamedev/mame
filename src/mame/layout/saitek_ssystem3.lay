@@ -206,8 +206,8 @@ license:CC0
 	<group name="lcd1">
 		<bounds x="-1" y="3" width="18" height="8" />
 		<screen index="0" blend="alpha"><bounds x="0" y="4" width="15.8" height="6" /></screen>
-		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="1"><bounds x="-1" y="3" width="18" height="8" /></element>
-		<element ref="lcd_bg" blend="multiply" inputtag="IN.4" inputmask="0x02" inputraw="1"><bounds x="-1" y="3" width="18" height="8" /></element>
+		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="-1" y="3" width="18" height="8" /></element>
+		<element ref="lcd_bg" blend="multiply" inputtag="IN.4" inputmask="0x02" inputraw="yes"><bounds x="-1" y="3" width="18" height="8" /></element>
 	</group>
 
 
@@ -262,8 +262,8 @@ license:CC0
 		<screen index="1" blend="alpha"><bounds x="9.8" y="10" width="106" height="108" /></screen>
 		<element ref="lcd_cb" blend="multiply"><bounds x="1.5" y="2.9" width="122.6" height="122.1" /></element>
 
-		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="1"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
-		<element ref="lcd2m" blend="multiply" inputtag="IN.4" inputmask="0x04" inputraw="1"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<element ref="nothing" blend="add" inputtag="IN.4" inputmask="0x00" inputraw="yes"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
+		<element ref="lcd2m" blend="multiply" inputtag="IN.4" inputmask="0x04" inputraw="yes"><bounds x="6.2" y="7.6" width="113.3" height="112.8" /></element>
 	</group>
 
 
@@ -275,8 +275,8 @@ license:CC0
 
 		<element ref="brown"><bounds x="-2" y="12" width="52" height="6" /></element>
 
-		<element ref="switch" inputtag="IN.4" inputmask="0x02" inputraw="1"><bounds x="30.0" y="5.5" width="1.2" height="2.4" /></element>
-		<element ref="switch" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="34.4" y="5.5" width="1.2" height="2.4" /></element>
+		<element ref="switch" inputtag="IN.4" inputmask="0x02" inputraw="yes"><bounds x="30.0" y="5.5" width="1.2" height="2.4" /></element>
+		<element ref="switch" inputtag="IN.4" inputmask="0x01" inputraw="yes"><bounds x="34.4" y="5.5" width="1.2" height="2.4" /></element>
 		<element ref="switch" inputtag="IN.3" inputmask="0x01"><bounds x="38.8" y="5.5" width="1.2" height="2.4" /><orientation rotate="180" /></element>
 		<element ref="text_u1"><bounds x="28.0" y="8.2" width="5.2" height="0.9" /></element>
 		<element ref="text_u2"><bounds x="32.4" y="8.2" width="5.2" height="0.9" /></element>
@@ -376,8 +376,8 @@ license:CC0
 			<element ref="text_a~i~"><bounds x="~x~" y="17.2" width="1.5" height="0.9" /></element>
 		</repeat>
 
-		<element ref="switch2" inputtag="IN.6" inputmask="0x01" inputraw="1"><bounds x="36" y="24" width="4" height="5" /></element>
-		<element ref="switch2" inputtag="IN.4" inputmask="0x04" inputraw="1"><bounds x="42" y="24" width="4" height="5" /></element>
+		<element ref="switch2" inputtag="IN.6" inputmask="0x01" inputraw="yes"><bounds x="36" y="24" width="4" height="5" /></element>
+		<element ref="switch2" inputtag="IN.4" inputmask="0x04" inputraw="yes"><bounds x="42" y="24" width="4" height="5" /></element>
 
 		<element ref="text_cu1"><bounds x="35" y="21.9" width="6" height="0.9" /></element>
 		<element ref="text_cu2"><bounds x="35" y="22.9" width="6" height="0.9" /></element>
