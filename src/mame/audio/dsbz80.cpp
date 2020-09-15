@@ -85,7 +85,7 @@ void dsbz80_device::device_start()
 	m_rxd_handler.resolve_safe();
 	uint8_t *rom_base = machine().root_device().memregion("mpeg")->base();
 	decoder = new mpeg_audio(rom_base, mpeg_audio::L2, false, 0);
-	machine().sound().stream_alloc(*this, 0, 2, 32000);
+	stream_alloc_legacy(0, 2, 32000);
 }
 
 //-------------------------------------------------
@@ -232,7 +232,7 @@ void dsbz80_device::mpeg_stereo_w(uint8_t data)
 	mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }
 
-void dsbz80_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dsbz80_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *out_l = outputs[0];
 	stream_sample_t *out_r = outputs[1];

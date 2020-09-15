@@ -658,11 +658,11 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 								}
 
 								newcode.field[fieldnum] = &field;
-								if (m_keycode_map.end() == found) 
+								if (m_keycode_map.end() == found)
 								{
-									keycode_map_list map_list;
-									map_list.emplace_back(newcode);
-									m_keycode_map.emplace(code, map_list);
+									keycode_map_entries entries;
+									entries.emplace_back(newcode);
+									m_keycode_map.emplace(code, std::move(entries));
 								}
 								else
 									found->second.emplace_back(newcode);
@@ -678,6 +678,15 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 				}
 			}
 		}
+	}
+
+	// sort mapping entries by shift state
+	for (auto &mapping : m_keycode_map)
+	{
+		std::sort(
+				mapping.second.begin(),
+				mapping.second.end(),
+				[] (keycode_map_entry const &x, keycode_map_entry const &y) { return x.shift < y.shift; });
 	}
 }
 
@@ -880,9 +889,10 @@ std::string natural_keyboard::unicode_to_string(char32_t ch) const
 const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t ch) const
 {
 	keycode_map::const_iterator const found(m_keycode_map.find(ch));
-	if (m_keycode_map.end() == found) return nullptr;
-	for(const keycode_map_entry &entry : found->second)
-	{	
+	if (m_keycode_map.end() == found)
+		return nullptr;
+	for (keycode_map_entry const &entry : found->second)
+	{
 		if (entry.condition.eval())
 			return &entry;
 	}
@@ -912,7 +922,7 @@ void natural_keyboard::dump(std::ostream &str) const
 		{
 			// identify the keys used
 			for (std::size_t field = 0; (entry.field.size() > field) && entry.field[field]; ++field)
-			    util::stream_format(str, "%s'%s'", first ? "" : ", ", entry.field[field]->name());
+				util::stream_format(str, "%s'%s'", first ? "" : ", ", entry.field[field]->name());
 
 			// carriage return
 			str << '\n';

@@ -54,7 +54,7 @@ private:
 
 class qbus_device : public device_t,
 	public device_memory_interface,
-    public device_z80daisy_interface
+	public device_z80daisy_interface
 {
 public:
 	// construction/destruction

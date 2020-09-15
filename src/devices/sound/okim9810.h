@@ -87,7 +87,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
@@ -98,7 +98,7 @@ protected:
 	public:
 		okim_voice();
 		void generate_audio(device_rom_interface &rom,
-							stream_sample_t **buffers,
+							stream_sample_t * const *buffers,
 							int samples,
 							const uint8_t global_volume,
 							const uint8_t filter_type);

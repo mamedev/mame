@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "bus/ti99/ti99defs.h"
+#define TI99_IOPORT_TAG      "ioport"
 
 namespace bus { namespace ti99 { namespace internal {
 

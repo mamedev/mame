@@ -1814,37 +1814,29 @@ static const uint8_t printer_font[]= {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
-void busicom_state::video_start()
-{
-}
-
 uint32_t busicom_state::screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x, b, j;
 	//34x44
-	for (y = 0; y < 11; y++)
+	for (u8 y = 0; y < 11; y++)
 	{
 		uint8_t col = 8 * m_printer_line_color[y];
-		for (x = 0; x < 17; x++)
+		for (u8 x = 0; x < 17; x++)
 		{
 			uint8_t chr = m_printer_line[y][x];
-			for (j = 0; j < 44; j++) {
-				for (b = 0; b < 34; b++)
-				{
+			for (u8 j = 0; j < 44; j++)
+			{
+				for (u8 b = 0; b < 34; b++)
 					bitmap.pix16((y*44)+j, x*40+b) =  printer_font[44*34 * chr + j*34 + b] + col ;
-				}
-				for (b = 34; b < 40; b++)
-				{
-					bitmap.pix16((y*44)+j, x*40+b) =  0;
-				}
 
+				for (u8 b = 34; b < 40; b++)
+					bitmap.pix16((y*44)+j, x*40+b) =  0;
 			}
 		}
 	}
 	return 0;
 }
-static constexpr uint8_t color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 
+static constexpr uint8_t color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 static constexpr uint8_t color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 
 void busicom_state::busicom_palette(palette_device &palette) const

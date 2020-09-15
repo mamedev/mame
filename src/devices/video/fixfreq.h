@@ -123,7 +123,7 @@ struct fixedfreq_monitor_state
 	fixedfreq_monitor_state(fixedfreq_monitor_desc &desc, fixedfreq_monitor_intf &intf)
 	: m_desc(desc),
 	m_intf(intf),
-	m_last_sync(0),
+	m_last_sync_val(0),
 	m_col(0),
 	m_last_x(0),
 	m_last_y(0),
@@ -131,6 +131,8 @@ struct fixedfreq_monitor_state
 	m_line_time(time_type(0)),
 	m_last_hsync_time(time_type(0)),
 	m_last_vsync_time(time_type(0)),
+	m_last_line_duration(time_type(0)),
+	m_last_field_time(time_type(0)),
 	m_vsync_filter(0),
 	m_sig_vsync(0),
 	m_sig_composite(0),
@@ -145,7 +147,7 @@ struct fixedfreq_monitor_state
 		// FIXME: once moved to netlist this may no longer be necessary.
 		//        Only copies constructor init
 
-		m_last_sync = 0.0;
+		m_last_sync_val = 0.0;
 		m_col = rgb_t(0,0,0);
 		m_last_x = 0;
 		m_last_y = 0;
@@ -177,18 +179,11 @@ struct fixedfreq_monitor_state
 
 	void reset()
 	{
-		m_last_sync = 0;
+		m_last_sync_val = 0;
 		m_col = 0;
 		m_last_x = 0;
 		m_last_y = 0;
-		//m_last_sync_time = time_type(0);
-		//m_line_time = time_type(0);
-		//m_last_hsync_time = time_type(0);
-		//m_last_vsync_time = time_type(0);
-		//m_clock_period = time_type(0);
 		m_vsync_filter = 0;
-		//m_vsync_threshold = 0;
-		//m_vsync_filter_timeconst = 0;
 		m_sig_vsync = 0;
 		m_sig_composite = 0;
 		m_sig_field = 0;
@@ -206,7 +201,7 @@ struct fixedfreq_monitor_state
 	const fixedfreq_monitor_desc &m_desc;
 	fixedfreq_monitor_intf &m_intf;
 
-	double m_last_sync;
+	double m_last_sync_val;
 	uint32_t m_col;
 	float m_last_x;
 	int m_last_y;
@@ -214,6 +209,9 @@ struct fixedfreq_monitor_state
 	time_type m_line_time;
 	time_type m_last_hsync_time;
 	time_type m_last_vsync_time;
+
+	time_type m_last_line_duration;
+	time_type m_last_field_time;
 
 	/* sync separator */
 	double m_vsync_filter;
@@ -240,6 +238,7 @@ public:
 	fixedfreq_device &set_monitor_clock(uint32_t clock) { m_monitor.m_monitor_clock = clock; return *this;}
 	fixedfreq_device &set_fieldcount(int count) { m_monitor.m_fieldcount = count; return *this; }
 	fixedfreq_device &set_threshold(double threshold) { m_monitor.m_sync_threshold = threshold; return *this; }
+	fixedfreq_device &set_vsync_threshold(double threshold) { m_monitor.m_vsync_threshold = threshold; return *this; }
 	fixedfreq_device &set_gain(double gain) { m_monitor.m_gain = gain; return *this; }
 	fixedfreq_device &set_horz_params(int visible, int frontporch, int sync, int backporch)
 	{

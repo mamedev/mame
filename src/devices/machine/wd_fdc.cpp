@@ -203,11 +203,13 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		intrq_cond = 0;
 		live_abort();
 	} else if(state && !mr) {
-		// trigger a restore after everything else is reset too, in particular the floppy device itself
-		// CHECKME: WD1770/72 supposedly may not perform RESTORE after reset
-		status |= S_BUSY;
-		sub_state = INITIAL_RESTORE;
-		t_gen->adjust(attotime::zero);
+		// WD1770/72 (supposedly) not perform RESTORE after reset
+		if (!motor_control) {
+			// trigger a restore after everything else is reset too, in particular the floppy device itself
+			status |= S_BUSY;
+			sub_state = INITIAL_RESTORE;
+			t_gen->adjust(attotime::zero);
+		}
 		mr = true;
 	}
 }
@@ -979,6 +981,8 @@ void wd_fdc_device_base::interrupt_start()
 
 	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
 	{
+		motor_timeout = 0;
+
 		if (head_control)
 			set_hld();
 
@@ -2956,7 +2960,7 @@ int wd2797_device::calc_sector_size(uint8_t size, uint8_t command) const
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1770, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
 	has_enmf = false;
@@ -2974,7 +2978,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	const static int wd1772_step_times[4] = { 12000, 24000, 4000, 6000 };
 
 	step_times = wd1772_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
@@ -3000,7 +3004,7 @@ int wd1772_device::settle_time() const
 wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1773, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;

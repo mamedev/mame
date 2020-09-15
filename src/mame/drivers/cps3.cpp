@@ -120,6 +120,8 @@ Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G 
 
 JoJo no Kimyou na Bouken: Mirai e no Isan            1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0   CAP-JJM-110  990913
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-1   CAP-JJM-120  990927
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE  X          CAP-JJM0A0  CAP-JJM-0   CAP-JJM-110  990913
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE  X          CAP-JJM0A0  CAP-JJM-1   CAP-JJM-120  990927
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990913
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990927
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
@@ -2820,6 +2822,14 @@ ROM_END
 
 ROM_START( jojoba )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) )
+ROM_END
+
+ROM_START( jojobaj )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
 	DISK_REGION( "scsi:1:cdrom" )
@@ -2827,6 +2837,14 @@ ROM_START( jojoba )
 ROM_END
 
 ROM_START( jojobar1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojoba_euro.29f400.u2", 0x000000, 0x080000, CRC(63cc8800) SHA1(f0c7e6abb205a16dab7a114e017b193521071a4b) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
+ROM_END
+
+ROM_START( jojobajr1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
@@ -3968,12 +3986,14 @@ GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
 // 990927
-GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", GAME_FLAGS )
+GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927)", GAME_FLAGS )
+GAME( 1999, jojobaj,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", GAME_FLAGS )
 GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", GAME_FLAGS )
 GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", GAME_FLAGS )
 
 // 990913
-GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_FLAGS )
+GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913)", GAME_FLAGS )
+GAME( 1999, jojobajr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_FLAGS )
 GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_FLAGS )
 GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_FLAGS )
 

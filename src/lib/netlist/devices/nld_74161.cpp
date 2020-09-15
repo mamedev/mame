@@ -23,7 +23,6 @@ namespace netlist
 	{
 
 		NETLIB_DEVICE_IMPL(74161,     "TTL_74161",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
-		NETLIB_DEVICE_IMPL(74161_dip, "TTL_74161_DIP", "")
 		// FIXME: This happens on copy/paste
 		NETLIB_DEVICE_IMPL(74161_fixme, "TTL_74161_FIXME", "+A,+B,+C,+D,+CLRQ,+LOADQ,+CLK,+ENP,+ENT,@VCC,@GND")
 

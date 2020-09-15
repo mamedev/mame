@@ -32,7 +32,7 @@ void esq_5505_5510_pump_device::device_start()
 {
 	logerror("Clock = %d\n", clock());
 
-	m_stream = machine().sound().stream_alloc(*this, 8, 2, clock());
+	m_stream = stream_alloc_legacy(8, 2, clock());
 	m_timer = timer_alloc(0);
 	m_timer->enable(false);
 
@@ -73,7 +73,7 @@ void esq_5505_5510_pump_device::device_clock_changed()
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 }
 
-void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void esq_5505_5510_pump_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	if (samples != 1) {
 		logerror("Pump: request for %d samples\n", samples);

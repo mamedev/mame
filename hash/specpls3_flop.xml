@@ -645,7 +645,7 @@ license:CC0
 	</software>
 
 <!--
-	<software name="ledstorm">
+    <software name="ledstorm">
 -->
 <!-- SPS (CAPS) release 3585 -->
 <!--
@@ -1012,7 +1012,7 @@ license:CC0
 	</software>
 
 <!--
-	<software name="rockhams">
+    <software name="rockhams">
 -->
 <!-- SPS (CAPS) release 3607 -->
 <!--
@@ -1451,7 +1451,7 @@ license:CC0
 	</software>
 
 <!--
-	<software name="tigeroad">
+    <software name="tigeroad">
 -->
 <!-- SPS (CAPS) release 3625 -->
 <!--

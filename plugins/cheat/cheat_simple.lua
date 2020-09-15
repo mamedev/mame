@@ -92,13 +92,20 @@ function codefuncs.nes_gg(desc, code)
 	if #code == 6 then
 		addr = ((value >> 4) & 7) | ((value >> 8) & 0x78) | ((value >> 12) & 0x80) | ((value << 8) & 0x700) | ((value << 4) & 0x7800)
 		newval = ((value >> 20) & 7) | (value & 8) | ((value >> 12) & 0x70) | ((value >> 16) & 0x80)
+		if manager:machine():memory().regions[":nes_slot:cart:prg_rom"].size > 32768 then
+			emu.print_verbose("warning: gamegenie 6 char code with banked rom " .. desc)
+		end
 		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8)
 	elseif #code == 8 then
 		addr = ((value >> 12) & 7) | ((value >> 16) & 0x78) | ((value >> 20) & 0x80) | (value & 0x700) | ((value >> 4) & 0x7800)
 		newval = ((value >> 28) & 7) | (value & 8) | ((value >> 20) & 0x70) | ((value >> 24) & 0x80)
 		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | (value & 0x80)
-		-- assume 8K banks, 32K also common but is an easy multiple of 8K
-		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp)
+		-- try 32K banks then 8K
+		local status, cheat = pcall(prepare_rom_cheat, desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 32768, comp)
+		if not status then
+			cheat = prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp)
+		end
+		return cheat
 	else
 		error("error game genie cheat incorrect length " .. desc)
 	end

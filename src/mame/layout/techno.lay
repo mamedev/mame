@@ -12,122 +12,111 @@ copyright-holders:Robbbert
 		</led16seg>
 	</element>
 
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
-	</element>
-
 	<view name="Default Layout">
-
-		<!-- Background -->
-		<backdrop element="background">
-			<bounds left="0" top="35" right="714" bottom="154" />
-		</backdrop>
+		<bounds left="0" top="35" right="714" bottom="154" />
 
 		<!-- LEDs -->
 
 		<!-- Top Row -->
 
-		<bezel name="digit0" element="digit">
+		<element name="digit0" ref="digit">
 			<bounds left="10" top="45" right="44" bottom="84" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds left="54" top="45" right="88" bottom="84" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds left="98" top="45" right="132" bottom="84" />
-		</bezel>
-		<bezel name="digit7" element="digit">
+		</element>
+		<element name="digit7" ref="digit">
 			<bounds left="142" top="45" right="176" bottom="84" />
-		</bezel>
-		<bezel name="digit12" element="digit">
+		</element>
+		<element name="digit12" ref="digit">
 			<bounds left="186" top="45" right="220" bottom="84" />
-		</bezel>
-		<bezel name="digit13" element="digit">
+		</element>
+		<element name="digit13" ref="digit">
 			<bounds left="230" top="45" right="264" bottom="84" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds left="274" top="45" right="308" bottom="84" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds left="318" top="45" right="352" bottom="84" />
-		</bezel>
-		<bezel name="digit8" element="digit">
+		</element>
+		<element name="digit8" ref="digit">
 			<bounds left="362" top="45" right="396" bottom="84" />
-		</bezel>
-		<bezel name="digit9" element="digit">
+		</element>
+		<element name="digit9" ref="digit">
 			<bounds left="406" top="45" right="440" bottom="84" />
-		</bezel>
-		<bezel name="digit14" element="digit">
+		</element>
+		<element name="digit14" ref="digit">
 			<bounds left="450" top="45" right="484" bottom="84" />
-		</bezel>
-		<bezel name="digit15" element="digit">
+		</element>
+		<element name="digit15" ref="digit">
 			<bounds left="494" top="45" right="528" bottom="84" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds left="538" top="45" right="572" bottom="84" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds left="582" top="45" right="616" bottom="84" />
-		</bezel>
-		<bezel name="digit10" element="digit">
+		</element>
+		<element name="digit10" ref="digit">
 			<bounds left="626" top="45" right="660" bottom="84" />
-		</bezel>
-		<bezel name="digit11" element="digit">
+		</element>
+		<element name="digit11" ref="digit">
 			<bounds left="670" top="45" right="704" bottom="84" />
-		</bezel>
+		</element>
 
 		<!-- Bottom Row -->
 
-		<bezel name="digit30" element="digit">
+		<element name="digit30" ref="digit">
 			<bounds left="10" top="105" right="44" bottom="144" />
-		</bezel>
-		<bezel name="digit31" element="digit">
+		</element>
+		<element name="digit31" ref="digit">
 			<bounds left="54" top="105" right="88" bottom="144" />
-		</bezel>
-		<bezel name="digit36" element="digit">
+		</element>
+		<element name="digit36" ref="digit">
 			<bounds left="98" top="105" right="132" bottom="144" />
-		</bezel>
-		<bezel name="digit37" element="digit">
+		</element>
+		<element name="digit37" ref="digit">
 			<bounds left="142" top="105" right="176" bottom="144" />
-		</bezel>
-		<bezel name="digit42" element="digit">
+		</element>
+		<element name="digit42" ref="digit">
 			<bounds left="186" top="105" right="220" bottom="144" />
-		</bezel>
-		<bezel name="digit43" element="digit">
+		</element>
+		<element name="digit43" ref="digit">
 			<bounds left="230" top="105" right="264" bottom="144" />
-		</bezel>
-		<bezel name="digit32" element="digit">
+		</element>
+		<element name="digit32" ref="digit">
 			<bounds left="274" top="105" right="308" bottom="144" />
-		</bezel>
-		<bezel name="digit33" element="digit">
+		</element>
+		<element name="digit33" ref="digit">
 			<bounds left="318" top="105" right="352" bottom="144" />
-		</bezel>
-		<bezel name="digit38" element="digit">
+		</element>
+		<element name="digit38" ref="digit">
 			<bounds left="362" top="105" right="396" bottom="144" />
-		</bezel>
-		<bezel name="digit39" element="digit">
+		</element>
+		<element name="digit39" ref="digit">
 			<bounds left="406" top="105" right="440" bottom="144" />
-		</bezel>
-		<bezel name="digit44" element="digit">
+		</element>
+		<element name="digit44" ref="digit">
 			<bounds left="450" top="105" right="484" bottom="144" />
-		</bezel>
-		<bezel name="digit45" element="digit">
+		</element>
+		<element name="digit45" ref="digit">
 			<bounds left="494" top="105" right="528" bottom="144" />
-		</bezel>
-		<bezel name="digit34" element="digit">
+		</element>
+		<element name="digit34" ref="digit">
 			<bounds left="538" top="105" right="572" bottom="144" />
-		</bezel>
-		<bezel name="digit35" element="digit">
+		</element>
+		<element name="digit35" ref="digit">
 			<bounds left="582" top="105" right="616" bottom="144" />
-		</bezel>
-		<bezel name="digit40" element="digit">
+		</element>
+		<element name="digit40" ref="digit">
 			<bounds left="626" top="105" right="660" bottom="144" />
-		</bezel>
-		<bezel name="digit41" element="digit">
+		</element>
+		<element name="digit41" ref="digit">
 			<bounds left="670" top="105" right="704" bottom="144" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

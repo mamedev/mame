@@ -18,6 +18,16 @@
  *
  * Set C=0 to disable filter
  *
+ * FLT_RC_LOWPASS_@C:
+ *
+ * signal >--R1--+----> amp
+ *               |
+ *               C
+ *               |
+ *              GND
+ *
+ * Set C=0 to disable filter
+ *
  * FLT_RC_HIGHPASS:
  *
  * signal >--C---+----> amp
@@ -53,8 +63,9 @@ public:
 	enum
 	{
 		LOWPASS      = 0,
-		HIGHPASS     = 1,
-		AC           = 2
+		LOWPASS_2C   = 2,
+		HIGHPASS     = 3,
+		AC           = 4
 	};
 
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -66,6 +77,16 @@ public:
 		m_R1 = R1;
 		m_R2 = R2;
 		m_R3 = R3;
+		m_C = C;
+		return *this;
+	}
+
+	filter_rc_device &set_lowpass(double R, double C)
+	{
+		m_type = LOWPASS_2C;
+		m_R1 = R;
+		m_R2 = 0;
+		m_R3 = 0;
 		m_C = C;
 		return *this;
 	}
@@ -88,7 +109,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 private:
 	void recalc();

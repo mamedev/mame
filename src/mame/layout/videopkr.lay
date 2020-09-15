@@ -125,115 +125,61 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp0" element="L0">
+		<element name="lamp0" ref="L0">
 			<bounds x="0.02313" y="3.12" width="0.5" height="0.30" />
-		</bezel>
-		<bezel name="lamp0" element="L1">
+		</element>
+		<element name="lamp0" ref="L1">
 			<bounds x="0.5694" y="3.12" width="0.5" height="0.30" />
-		</bezel>
-		<bezel name="lamp1" element="L2">
+		</element>
+		<element name="lamp1" ref="L2">
 			<bounds x="1.112" y="3.12" width="0.35" height="0.30" />
-		</bezel>
-		<bezel name="lamp1" element="L3">
+		</element>
+		<element name="lamp1" ref="L3">
 			<bounds x="1.508" y="3.12" width="0.35" height="0.30" />
-		</bezel>
-		<bezel name="lamp2" element="L4">
+		</element>
+		<element name="lamp2" ref="L4">
 			<bounds x="1.904" y="3.12" width="0.35" height="0.30" />
-		</bezel>
-		<bezel name="lamp2" element="L5">
+		</element>
+		<element name="lamp2" ref="L5">
 			<bounds x="2.3" y="3.12" width="0.35" height="0.30" />
-		</bezel>
-		<bezel name="lamp2" element="L6">
+		</element>
+		<element name="lamp2" ref="L6">
 			<bounds x="2.697" y="3.12" width="0.35" height="0.30" />
-		</bezel>
-		<bezel name="lamp3" element="L7">
+		</element>
+		<element name="lamp3" ref="L7">
 			<bounds x="3.093" y="3.12" width="0.5" height="0.30" />
-		</bezel>
-		<bezel name="" element="BX">
+		</element>
+		<element name="" ref="BX">
 			<bounds x="3.99" y="3.00" width="0.01" height="0.45" />
-		</bezel>
+		</element>
 
-		<bezel name="" element="BZ">
+		<element name="" ref="BZ">
 			<bounds x="0.01" y="3.01" width="0.42" height="0.10" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="DSKV">
+		<element name="lamp7" ref="DSKV">
 			<bounds x="0.02" y="3.02" width="0.08" height="0.08" />
-		</bezel>
-		<bezel name="lamp5" element="DSKR">
+		</element>
+		<element name="lamp5" ref="DSKR">
 			<bounds x="0.12" y="3.02" width="0.08" height="0.08" />
-		</bezel>
-		<bezel name="lamp6" element="DSKR">
+		</element>
+		<element name="lamp6" ref="DSKR">
 			<bounds x="0.22" y="3.02" width="0.08" height="0.08" />
-		</bezel>
-		<bezel name="lamp13" element="DSKA">
+		</element>
+		<element name="lamp13" ref="DSKA">
 			<bounds x="0.32" y="3.02" width="0.08" height="0.08" />
-		</bezel>
+		</element>
 
-		<bezel name="digit0" element="Dig1">
-			<bounds x="3.92" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit1" element="Dig1">
-			<bounds x="3.87" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit2" element="Dig1">
-			<bounds x="3.82" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit3" element="Dig1">
-			<bounds x="3.77" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit4" element="Dig1">
-			<bounds x="3.72" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit5" element="Dig1">
-			<bounds x="3.67" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit6" element="Dig1">
-			<bounds x="3.62" y="3.12" width="0.05" height="0.06" />
-		</bezel>
-
-		<bezel name="digit7" element="Dig1">
-			<bounds x="3.92" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit8" element="Dig1">
-			<bounds x="3.87" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit9" element="Dig1">
-			<bounds x="3.82" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit10" element="Dig1">
-			<bounds x="3.77" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit11" element="Dig1">
-			<bounds x="3.72" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit12" element="Dig1">
-			<bounds x="3.67" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit13" element="Dig1">
-			<bounds x="3.62" y="3.2" width="0.05" height="0.06" />
-		</bezel>
-
-		<bezel name="digit14" element="Dig1">
-			<bounds x="3.92" y="3.28" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit15" element="Dig1">
-			<bounds x="3.87" y="3.28" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit16" element="Dig1">
-			<bounds x="3.82" y="3.28" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit17" element="Dig1">
-			<bounds x="3.77" y="3.28" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit18" element="Dig1">
-			<bounds x="3.72" y="3.28" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit19" element="Dig1">
-			<bounds x="3.67" y="3.28" width="0.05" height="0.06" />
-		</bezel>
-		<bezel name="digit20" element="Dig1">
-			<bounds x="3.62" y="3.28" width="0.05" height="0.06" />
-		</bezel>
+		<repeat count="3">
+			<param name="y" start="3.12" increment="0.08" />
+			<param name="b" start="0" increment="7" />
+			<repeat count="7">
+				<param name="x" start="3.92" increment="-0.05" />
+				<param name="d" start="~b~" increment="1" />
+				<element name="digit~d~" ref="Dig1">
+					<bounds x="~x~" y="~y~" width="0.05" height="0.06" />
+				</element>
+			</repeat>
+		</repeat>
 	</view>
 </mamelayout>

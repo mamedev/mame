@@ -131,6 +131,10 @@ public:
 	// construction/destruction
 	function_symbol_entry(symbol_table &table, const char *name, int minparams, int maxparams, symbol_table::execute_func execute);
 
+	// getters
+	u16 minparams() const { return m_minparams; }
+	u16 maxparams() const { return m_maxparams; }
+
 	// symbol access
 	virtual bool is_lval() const override;
 	virtual u64 value() const override;
@@ -157,7 +161,7 @@ private:
 //  given expression error
 //-------------------------------------------------
 
-const char *expression_error::code_string() const
+std::string expression_error::code_string() const
 {
 	switch (m_code)
 	{
@@ -173,6 +177,8 @@ const char *expression_error::code_string() const
 		case DIVIDE_BY_ZERO:        return "divide by zero";
 		case OUT_OF_MEMORY:         return "out of memory";
 		case INVALID_PARAM_COUNT:   return "invalid number of parameters";
+		case TOO_FEW_PARAMS:        return util::string_format("too few parameters (at least %d required)", m_num);
+		case TOO_MANY_PARAMS:       return util::string_format("too many parameters (no more than %d accepted)", m_num);
 		case UNBALANCED_QUOTES:     return "unbalanced quotes";
 		case TOO_MANY_STRINGS:      return "too many strings";
 		case INVALID_MEMORY_SIZE:   return "invalid memory size (b/w/d/q expected)";
@@ -283,7 +289,7 @@ void integer_symbol_entry::set_value(u64 newvalue)
 	if (m_setter != nullptr)
 		m_setter(newvalue);
 	else
-		throw emu_fatalerror("Symbol '%s' is read-only", m_name.c_str());
+		throw emu_fatalerror("Symbol '%s' is read-only", m_name);
 }
 
 
@@ -321,7 +327,7 @@ bool function_symbol_entry::is_lval() const
 
 u64 function_symbol_entry::value() const
 {
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name.c_str());
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name);
 }
 
 
@@ -331,7 +337,7 @@ u64 function_symbol_entry::value() const
 
 void function_symbol_entry::set_value(u64 newvalue)
 {
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name.c_str());
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name);
 }
 
 
@@ -342,9 +348,9 @@ void function_symbol_entry::set_value(u64 newvalue)
 u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 {
 	if (numparams < m_minparams)
-		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.c_str(), m_minparams);
+		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name, m_minparams);
 	if (numparams > m_maxparams)
-		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name.c_str(), m_maxparams);
+		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name, m_maxparams);
 	return m_execute(numparams, paramlist);
 }
 
@@ -1083,7 +1089,7 @@ void parsed_expression::parse(const char *expression)
 {
 	// copy the string and reset our parsing state
 	m_original_string.assign(expression);
-	m_tokenlist.reset();
+	m_tokenlist.clear();
 	m_stringlist.clear();
 
 	// first parse the tokens into the token array in order
@@ -1218,7 +1224,8 @@ void parsed_expression::parse_string_into_tokens()
 			break;
 
 		// initialize the current token object
-		parse_token &token = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+		m_tokenlist.emplace_back(string - stringstart);
+		parse_token &token = m_tokenlist.back();
 
 		// switch off the first character
 		switch (tolower(u8(string[0])))
@@ -1489,7 +1496,8 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 			// if this is a function symbol, synthesize an execute function operator
 			if (symbol->is_function())
 			{
-				parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+				m_tokenlist.emplace_back(string - stringstart);
+				parse_token &newtoken = m_tokenlist.back();
 				newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
 			}
 			return;
@@ -1688,7 +1696,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 //  ambiguities based on neighboring tokens
 //-------------------------------------------------
 
-void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &thistoken)
+void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen)
 {
 	parse_token *nexttoken = thistoken.next();
 	switch (thistoken.optype())
@@ -1724,15 +1732,15 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 		case TVL_SUBTRACT:
 			// Assume we're unary if we are the first token, or if the previous token is not
 			// a symbol, a number, or a right parenthesis
-			if (prevtoken == nullptr || (!prevtoken->is_symbol() && !prevtoken->is_number() && !prevtoken->is_operator(TVL_RPAREN)))
+			if (prevtoken == nullptr || (!prevtoken->is_symbol() && !prevtoken->is_number() && !was_rparen))
 				thistoken.configure_operator(thistoken.is_operator(TVL_ADD) ? TVL_UPLUS : TVL_UMINUS, 2);
 			break;
 
 		// Determine if , refers to a function parameter
 		case TVL_COMMA:
-			for (auto lookback = m_token_stack.rbegin(); lookback != m_token_stack.rend(); ++lookback)
+			for (auto lookback = stack.begin(); lookback != stack.end(); ++lookback)
 			{
-				parse_token &peek = *lookback;
+				const parse_token &peek = *lookback;
 
 				// if we hit an execute function operator, or else a left parenthesis that is
 				// already tagged, then tag us as well
@@ -1754,51 +1762,63 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 
 void parsed_expression::infix_to_postfix()
 {
-	simple_list<parse_token> stack;
+	std::list<parse_token> stack;
+	parse_token *prev = nullptr;
+
+	// this flag is used to avoid looking back at a closing parenthesis that was already destroyed
+	bool was_rparen = false;
 
 	// loop over all the original tokens
-	parse_token *prev = nullptr;
-	parse_token *next;
-	for (parse_token *token = m_tokenlist.detach_all(); token != nullptr; prev = token, token = next)
+	std::list<parse_token>::iterator next;
+	std::list<parse_token> origlist = std::move(m_tokenlist);
+	m_tokenlist.clear();
+	for (std::list<parse_token>::iterator token = origlist.begin(); token != origlist.end(); token = next)
 	{
 		// pre-determine our next token
-		next = token->next();
+		next = std::next(token);
 
 		// if the character is an operand, append it to the result string
 		if (token->is_number() || token->is_symbol() || token->is_string())
-			m_tokenlist.append(*token);
+		{
+			m_tokenlist.splice(m_tokenlist.end(), origlist, token);
+
+			// remember this as the previous token
+			prev = &*token;
+			was_rparen = false;
+		}
 
 		// if this is an operator, process it
 		else if (token->is_operator())
 		{
 			// normalize the operator based on neighbors
-			normalize_operator(prev, *token);
+			normalize_operator(prev, *token, stack, was_rparen);
+			was_rparen = false;
 
 			// if the token is an opening parenthesis, push it onto the stack.
 			if (token->is_operator(TVL_LPAREN))
-				stack.prepend(*token);
+				stack.splice(stack.begin(), origlist, token);
 
 			// if the token is a closing parenthesis, pop all operators until we
 			// reach an opening parenthesis and append them to the result string,
-			// discaring the open parenthesis
+			// discarding the open parenthesis
 			else if (token->is_operator(TVL_RPAREN))
 			{
-				// loop until we find our matching opener
-				parse_token *popped;
-				while ((popped = stack.detach_head()) != nullptr)
-				{
-					if (popped->is_operator(TVL_LPAREN))
-						break;
-					m_tokenlist.append(*popped);
-				}
+				// find our matching opener
+				std::list<parse_token>::iterator lparen = std::find_if(stack.begin(), stack.end(),
+					[] (const parse_token &token) { return token.is_operator(TVL_LPAREN); }
+				);
 
 				// if we didn't find an open paren, it's an error
-				if (popped == nullptr)
+				if (lparen == stack.end())
 					throw expression_error(expression_error::UNBALANCED_PARENS, token->offset());
 
+				// move the stacked operators to the end of the new list
+				m_tokenlist.splice(m_tokenlist.end(), stack, stack.begin(), lparen);
+
 				// free ourself and our matching opening parenthesis
-				global_free(token);
-				global_free(popped);
+				origlist.erase(token);
+				stack.erase(lparen);
+				was_rparen = true;
 			}
 
 			// if the token is an operator, pop operators until we reach an opening parenthesis,
@@ -1809,8 +1829,8 @@ void parsed_expression::infix_to_postfix()
 				int our_precedence = token->precedence();
 
 				// loop until we can't peek at the stack anymore
-				parse_token *peek;
-				while ((peek = stack.first()) != nullptr)
+				std::list<parse_token>::iterator peek;
+				for (peek = stack.begin(); peek != stack.end(); ++peek)
 				{
 					// break if any of the above conditions are true
 					if (peek->is_operator(TVL_LPAREN))
@@ -1818,28 +1838,29 @@ void parsed_expression::infix_to_postfix()
 					int stack_precedence = peek->precedence();
 					if (stack_precedence > our_precedence || (stack_precedence == our_precedence && peek->right_to_left()))
 						break;
-
-					// pop this token
-					m_tokenlist.append(*stack.detach_head());
 				}
 
+				// move the stacked operands to the end of the new list
+				m_tokenlist.splice(m_tokenlist.end(), stack, stack.begin(), peek);
+
 				// push the new operator
-				stack.prepend(*token);
+				stack.splice(stack.begin(), origlist, token);
 			}
+
+			if (!was_rparen)
+				prev = &*token;
 		}
 	}
 
-	// finish popping the stack
-	parse_token *popped;
-	while ((popped = stack.detach_head()) != nullptr)
-	{
-		// it is an error to have a left parenthesis still on the stack
-		if (popped->is_operator(TVL_LPAREN))
-			throw expression_error(expression_error::UNBALANCED_PARENS, popped->offset());
+	// it is an error to have a left parenthesis still on the stack
+	std::list<parse_token>::iterator lparen = std::find_if(stack.begin(), stack.end(),
+		[] (const parse_token &token) { return token.is_operator(TVL_LPAREN); }
+	);
+	if (lparen != stack.end())
+		throw expression_error(expression_error::UNBALANCED_PARENS, lparen->offset());
 
-		// pop this token
-		m_tokenlist.append(*popped);
-	}
+	// pop all remaining tokens
+	m_tokenlist.splice(m_tokenlist.end(), stack, stack.begin(), stack.end());
 }
 
 
@@ -2271,8 +2292,14 @@ void parsed_expression::execute_function(parse_token &token)
 	if (paramcount == MAX_FUNCTION_PARAMS)
 		throw expression_error(expression_error::INVALID_PARAM_COUNT, token.offset());
 
-	// execute the function and push the result
+	// validate parameters
 	function_symbol_entry *function = downcast<function_symbol_entry *>(symbol);
+	if (paramcount < function->minparams())
+		throw expression_error(expression_error::TOO_FEW_PARAMS, token.offset(), function->minparams());
+	if (paramcount > function->maxparams())
+		throw expression_error(expression_error::TOO_MANY_PARAMS, token.offset(), function->maxparams());
+
+	// execute the function and push the result
 	parse_token result(token.offset());
 	result.configure_number(function->execute(paramcount, &funcparams[MAX_FUNCTION_PARAMS - paramcount]));
 	push_token(result);

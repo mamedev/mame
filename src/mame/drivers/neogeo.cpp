@@ -1727,7 +1727,7 @@ void ngarcade_base_state::neogeo_main_map(address_map &map)
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
 	map(0x300001, 0x300001).mirror(0x01fffe).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x300080, 0x300081).mirror(0x01ff7e).portr("TEST");
-	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO/COIN");
+	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO_COIN");
 	map(0x380000, 0x380001).mirror(0x01fffe).portr("SYSTEM");
 	map(0x800000, 0x800fff).r(FUNC(ngarcade_base_state::unmapped_r)); // memory card mapped here if present
 	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
@@ -1841,7 +1841,7 @@ INPUT_PORTS_START( neogeo )
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(neogeo_base_state, get_memcard_status)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match
 
-	PORT_START("AUDIO/COIN")
+	PORT_START("AUDIO_COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // coin 1 (combined) or P1 coin 1 (separate) for BIOS that supports it
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) // coin 2 (combined) or P2 coin 1 (separate) for BIOS that supports it
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1866,7 +1866,7 @@ static INPUT_PORTS_START( neogeo_mvs )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_4)
 
-	PORT_MODIFY("AUDIO/COIN")
+	PORT_MODIFY("AUDIO_COIN")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 ) // P1 coin 2 (separate) for BIOS that supports it
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 ) // P2 coin 2 (separate) for BIOS that supports it
 
@@ -1877,7 +1877,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( neogeo_mvs6 )
 	PORT_INCLUDE( neogeo_mvs )
 
-	PORT_MODIFY("AUDIO/COIN")
+	PORT_MODIFY("AUDIO_COIN")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) // sense: 6-slot
 INPUT_PORTS_END
 
@@ -3017,7 +3017,7 @@ static INPUT_PORTS_START( vliner )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* this bit is used.. */
 
-	PORT_MODIFY("AUDIO/COIN")
+	PORT_MODIFY("AUDIO_COIN")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN5")
@@ -3093,7 +3093,7 @@ ROM_START( bstars ) /* MVS VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "002-pg.p1", 0x000000, 0x080000, CRC(c100b5f5) SHA1(4cea9f29ad67288c3eccfa4cf961ee9782e49165) ) /* MB834200 */
 	/* also found set with P1 on maskrom with chip label 002-P1 */
-	
+
 	NEO_SFIX_128K( "002-s1.s1", CRC(1a7fd0c6) SHA1(3fc701b7afddab369ddf9dedfbc5e1aaf80b8af3) ) /* MB831000 */
 
 	NEO_BIOS_AUDIO_256K( "002-m1.m1", CRC(4ecaa4ee) SHA1(50abfb8eed6cb4887393089f9ccc76f306ef69b5) ) /* MB832000 */
@@ -3107,7 +3107,7 @@ ROM_START( bstars ) /* MVS VERSION */
 	ROM_REGION( 0x080000, "cslot1:ymsnd.deltat", 0 )
 	ROM_LOAD( "002-v21.v21", 0x000000, 0x080000, CRC(04a733d1) SHA1(84159368c0f6de2c3b8121227201cd3422455cf6) ) /* MB834000 */
 	/* also found set with different chip labels on V11 and V21 locations; chip labels are : 002-V1 and 002-V2 */
-	
+
 	ROM_REGION( 0x300000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "002-c1.c1", 0x000000, 0x080000, CRC(aaff2a45) SHA1(c91ee72d1d74514df8ec44fca703409d92158ae3) ) /* Plane 0,1 */ /* MB834200 */
 	ROM_LOAD16_BYTE( "002-c2.c2", 0x000001, 0x080000, CRC(3ba0f7e4) SHA1(f023b134b9c7994f477867307d2732026033501d) ) /* Plane 2,3 */ /* MB834200 */
@@ -3412,7 +3412,7 @@ ROM_START( ncombat ) /* MVS VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "009-p1.p1", 0x000000, 0x080000, CRC(b45fcfbf) SHA1(3872147dda2d1ba905d35f4571065d87b1958b4a) ) /* TC534200 */
 	/* also found set with P1 on TC534200 with chip label 009-PG1 */
-	
+
 	NEO_SFIX_128K( "009-s1.s1", CRC(d49afee8) SHA1(77615f12edf08ae8f1353f7a056a8f3a50d3ebdc) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "009-m1.m1", CRC(b5819863) SHA1(6f2309d51531052dbf7d712993c9e35649db0d84) ) /* TC531001 */
@@ -3601,7 +3601,7 @@ ROM_START( kotmh ) /* AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "016-hp1.p1",0x000000, 0x080000, CRC(b774621e) SHA1(7684b2e07163aec68cd083ef1d8900f855f6cb42) ) /* TC534200 */
 	ROM_LOAD16_WORD_SWAP( "016-p2.p2", 0x080000, 0x020000, CRC(12afdc2b) SHA1(3a95f5910cbb9f17e63ddece995c6e120fa2f622) ) /* TC531024 */
 	/* also found sets with P1 on TC534200 and P2 on TC531024 with chip labels 016-P1 and 016-P2 */
-	
+
 	NEO_SFIX_128K( "016-s1.s1", CRC(1a2eeeb3) SHA1(8d2b96d395020197bc59294b6b0c8d62b1d8d4dd) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "016-m1.m1", CRC(9da9ca10) SHA1(88b915827d529f39c365d3e41197d5461e07a085) ) /* TC531001 */
@@ -7673,7 +7673,7 @@ ROM_END
  NEO-MVS PROGGSC / NEO-MVS CHA256
 ****************************************/
 
-/* The location test version uses socketed EPROMs on the PROG board, flash chips on adapter boards for the C ROMs and EPROMs for M1 and S1 on the CHA. 
+/* The location test version uses socketed EPROMs on the PROG board, flash chips on adapter boards for the C ROMs and EPROMs for M1 and S1 on the CHA.
 It has a piece of cardboard between the 2 boards to avoid shorts because the socketed flash adapter boards are a bit too high and could get shorted with traces on the PROG board. */
 
 ROM_START( ghostlop ) /* Prototype */
@@ -9728,7 +9728,7 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS ONLY RELEASE */
 	/* Encrypted */
 	NEO_BIOS_AUDIO_ENCRYPTED_512K( "m1.m1", CRC(c7853ccd) SHA1(1b7a4c5093cf0fe3861ce44fd1d3b30c71ad0abe) ) /* mask rom TC534000 */
 	/* M1 on eprom with sticker; chip label is M1 */
-	
+
 	ROM_REGION( 0x400000, "cslot1:ymsnd", 0 )
 	/* Encrypted */
 	ROM_LOAD( "267-v1.v1", 0x000000, 0x400000, CRC(e2e8e917) SHA1(7f412d55aebff3d38a225a88c632916295ab0584) ) /* mask rom TC5332204 */

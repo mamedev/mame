@@ -62,8 +62,8 @@
                 the High School Musical part has its own test mode which tests a different part of the ROM, use the same code but after selecting the game from menu
 
 
-	--- the individual CS spaces could (and probably should?) be done with a bunch of extra memory spaces rather than the cs0_r / cs0_w etc. but that would mean yet
-	    another trip through the memory system for almost everything and at ~100Mhz that is slow.
+    --- the individual CS spaces could (and probably should?) be done with a bunch of extra memory spaces rather than the cs0_r / cs0_w etc. but that would mean yet
+        another trip through the memory system for almost everything and at ~100Mhz that is slow.
 
 */
 
@@ -136,7 +136,7 @@ void gcm394_game_state::porta_w(uint16_t data)
 
 void gcm394_game_state::base(machine_config &config)
 {
-	GCM394(config, m_maincpu, 96000000/2, m_screen);
+	GCM394(config, m_maincpu, 96000000, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(gcm394_game_state::portc_r));

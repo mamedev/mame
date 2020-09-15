@@ -2,9 +2,10 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /*********************************************************************
 
-    debugger.c
+    debugger.cpp
 
     Front-end debugger interfaces.
+
 *********************************************************************/
 
 #include "emu.h"

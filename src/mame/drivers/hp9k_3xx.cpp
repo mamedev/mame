@@ -331,6 +331,8 @@ void hp9k3xx_state::hp9k300(machine_config &config)
 	ptm.irq_callback().set_inputline("maincpu", M68K_IRQ_6);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("hp9k3xx_flop");
+	SOFTWARE_LIST(config, "cdrom_list").set_original("hp9k3xx_cdrom");
+	SOFTWARE_LIST(config, "hdd_list").set_original("hp9k3xx_hdd");
 	config.set_default_layout(layout_hp9k_3xx);
 }
 

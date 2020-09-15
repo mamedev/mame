@@ -128,7 +128,7 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 	}
 }
 
-void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es5503_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	static int32_t mix[(44100/60)*2*8];
 	int32_t *mixp;
@@ -201,7 +201,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	mixp = &mix[0];
 	for (i = 0; i < samples; i++)
 		for (int chan = 0; chan < output_channels; chan++)
-			outputs[chan][i] = (*mixp++)>>1;
+			outputs[chan][i] = (*mixp++)>>3;
 }
 
 
@@ -224,7 +224,7 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
 	output_rate = (clock() / 8) / (2 + oscsenabled);
-	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate);
+	m_stream = stream_alloc_legacy(0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;

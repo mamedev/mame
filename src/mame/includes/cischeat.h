@@ -169,7 +169,7 @@ public:
 	void motor_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t analog_r();
 	void output_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	
+
 	void armchmp2(machine_config &config);
 	void armchmp2_map(address_map &map);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);

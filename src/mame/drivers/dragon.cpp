@@ -193,12 +193,12 @@ static INPUT_PORTS_START( dragon200e )
 	PORT_INCLUDE(dragon200e_keyboard)
 	PORT_INCLUDE(coco_joystick)
 	PORT_INCLUDE(coco_analog_control)
-INPUT_PORTS_END
 
-MC6847_GET_CHARROM_MEMBER( dragon200e_state::char_rom_r )
-{
-	return m_char_rom->base()[(ch * 12 + line) & 0xfff];
-}
+	PORT_START("LK1")
+	PORT_CONFNAME(0x01, 0x01, "Inverse Video")
+	PORT_CONFSETTING(0x00, "Inverse")
+	PORT_CONFSETTING(0x01, "Normal")
+INPUT_PORTS_END
 
 void dragon_cart(device_slot_interface &device)
 {
@@ -379,6 +379,7 @@ void dragon200e_state::dragon200e(machine_config &config)
 	dragon64(config);
 	// video hardware
 	m_vdg->set_get_char_rom(FUNC(dragon200e_state::char_rom_r));
+	m_vdg->input_callback().set(FUNC(dragon200e_state::sam_read));
 }
 
 void d64plus_state::d64plus(machine_config &config)
@@ -542,7 +543,7 @@ COMP( 1982, dragon32,   0,        0,      dragon32,   dragon,     dragon_state, 
 COMP( 1983, dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64",                      0 )
 COMP( 19??, dragon64h,  dragon32, 0,      dragon64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd",              "Dragon 64 (HD6309E CPU)",        MACHINE_UNOFFICIAL )
 COMP( 1985, dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     empty_init, "Eurohard S.A.",                "Dragon 200",                     0 )
-COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                   MACHINE_NOT_WORKING )
+COMP( 1985, dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   empty_init, "Eurohard S.A.",                "Dragon 200-E",                   0 )
 COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      empty_init, "Dragon Data Ltd / Compusense", "Dragon 64 Plus",                 0 )
 COMP( 1983, tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC)",          0 )
 COMP( 19??, tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC; HD6309E)", MACHINE_UNOFFICIAL )

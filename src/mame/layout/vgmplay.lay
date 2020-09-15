@@ -125,127 +125,131 @@ license:CC0
 	</element>
 
 	<group name="activity">
-		<cpanel element="backdrop"><bounds x="0" y="0" width="60" height="34" /></cpanel>
+		<element ref="backdrop"><bounds x="0" y="0" width="60" height="34" /></element>
 
-		<cpanel name="led_act_0" element="act_led"><bounds x="1" y="1" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_1" element="act_led"><bounds x="1" y="4" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_2" element="act_led"><bounds x="1" y="7" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_3" element="act_led"><bounds x="1" y="10" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_4" element="act_led"><bounds x="1" y="13" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_5" element="act_led"><bounds x="1" y="16" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_6" element="act_led"><bounds x="1" y="19" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_7" element="act_led"><bounds x="1" y="22" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_8" element="act_led"><bounds x="1" y="25" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_9" element="act_led"><bounds x="1" y="28" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_10" element="act_led"><bounds x="1" y="31" width="2" height="2" /></cpanel>
+		<element name="led_act_0" ref="act_led"><bounds x="1" y="1" width="2" height="2" /></element>
+		<element name="led_act_1" ref="act_led"><bounds x="1" y="4" width="2" height="2" /></element>
+		<element name="led_act_2" ref="act_led"><bounds x="1" y="7" width="2" height="2" /></element>
+		<element name="led_act_3" ref="act_led"><bounds x="1" y="10" width="2" height="2" /></element>
+		<element name="led_act_4" ref="act_led"><bounds x="1" y="13" width="2" height="2" /></element>
+		<element name="led_act_5" ref="act_led"><bounds x="1" y="16" width="2" height="2" /></element>
+		<element name="led_act_6" ref="act_led"><bounds x="1" y="19" width="2" height="2" /></element>
+		<element name="led_act_7" ref="act_led"><bounds x="1" y="22" width="2" height="2" /></element>
+		<element name="led_act_8" ref="act_led"><bounds x="1" y="25" width="2" height="2" /></element>
+		<element name="led_act_9" ref="act_led"><bounds x="1" y="28" width="2" height="2" /></element>
+		<element name="led_act_10" ref="act_led"><bounds x="1" y="31" width="2" height="2" /></element>
 
-		<cpanel name="led_act_11" element="act_led"><bounds x="16" y="1" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_12" element="act_led"><bounds x="16" y="4" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_13" element="act_led"><bounds x="16" y="7" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_14" element="act_led"><bounds x="16" y="10" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_15" element="act_led"><bounds x="16" y="13" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_16" element="act_led"><bounds x="16" y="16" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_17" element="act_led"><bounds x="16" y="19" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_18" element="act_led"><bounds x="16" y="22" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_19" element="act_led"><bounds x="16" y="25" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_20" element="act_led"><bounds x="16" y="28" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_21" element="act_led"><bounds x="16" y="31" width="2" height="2" /></cpanel>
+		<element name="led_act_11" ref="act_led"><bounds x="16" y="1" width="2" height="2" /></element>
+		<element name="led_act_12" ref="act_led"><bounds x="16" y="4" width="2" height="2" /></element>
+		<element name="led_act_13" ref="act_led"><bounds x="16" y="7" width="2" height="2" /></element>
+		<element name="led_act_14" ref="act_led"><bounds x="16" y="10" width="2" height="2" /></element>
+		<element name="led_act_15" ref="act_led"><bounds x="16" y="13" width="2" height="2" /></element>
+		<element name="led_act_16" ref="act_led"><bounds x="16" y="16" width="2" height="2" /></element>
+		<element name="led_act_17" ref="act_led"><bounds x="16" y="19" width="2" height="2" /></element>
+		<element name="led_act_18" ref="act_led"><bounds x="16" y="22" width="2" height="2" /></element>
+		<element name="led_act_19" ref="act_led"><bounds x="16" y="25" width="2" height="2" /></element>
+		<element name="led_act_20" ref="act_led"><bounds x="16" y="28" width="2" height="2" /></element>
+		<element name="led_act_21" ref="act_led"><bounds x="16" y="31" width="2" height="2" /></element>
 
-		<cpanel name="led_act_22" element="act_led"><bounds x="31" y="1" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_23" element="act_led"><bounds x="31" y="4" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_24" element="act_led"><bounds x="31" y="7" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_25" element="act_led"><bounds x="31" y="10" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_26" element="act_led"><bounds x="31" y="13" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_27" element="act_led"><bounds x="31" y="16" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_28" element="act_led"><bounds x="31" y="19" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_29" element="act_led"><bounds x="31" y="22" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_30" element="act_led"><bounds x="31" y="25" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_31" element="act_led"><bounds x="31" y="28" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_32" element="act_led"><bounds x="31" y="31" width="2" height="2" /></cpanel>
+		<element name="led_act_22" ref="act_led"><bounds x="31" y="1" width="2" height="2" /></element>
+		<element name="led_act_23" ref="act_led"><bounds x="31" y="4" width="2" height="2" /></element>
+		<element name="led_act_24" ref="act_led"><bounds x="31" y="7" width="2" height="2" /></element>
+		<element name="led_act_25" ref="act_led"><bounds x="31" y="10" width="2" height="2" /></element>
+		<element name="led_act_26" ref="act_led"><bounds x="31" y="13" width="2" height="2" /></element>
+		<element name="led_act_27" ref="act_led"><bounds x="31" y="16" width="2" height="2" /></element>
+		<element name="led_act_28" ref="act_led"><bounds x="31" y="19" width="2" height="2" /></element>
+		<element name="led_act_29" ref="act_led"><bounds x="31" y="22" width="2" height="2" /></element>
+		<element name="led_act_30" ref="act_led"><bounds x="31" y="25" width="2" height="2" /></element>
+		<element name="led_act_31" ref="act_led"><bounds x="31" y="28" width="2" height="2" /></element>
+		<element name="led_act_32" ref="act_led"><bounds x="31" y="31" width="2" height="2" /></element>
 
-		<cpanel name="led_act_33" element="act_led"><bounds x="46" y="1" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_34" element="act_led"><bounds x="46" y="4" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_35" element="act_led"><bounds x="46" y="7" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_36" element="act_led"><bounds x="46" y="10" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_37" element="act_led"><bounds x="46" y="13" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_38" element="act_led"><bounds x="46" y="16" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_39" element="act_led"><bounds x="46" y="19" width="2" height="2" /></cpanel>
-		<cpanel name="led_act_40" element="act_led"><bounds x="46" y="22" width="2" height="2" /></cpanel>
+		<element name="led_act_33" ref="act_led"><bounds x="46" y="1" width="2" height="2" /></element>
+		<element name="led_act_34" ref="act_led"><bounds x="46" y="4" width="2" height="2" /></element>
+		<element name="led_act_35" ref="act_led"><bounds x="46" y="7" width="2" height="2" /></element>
+		<element name="led_act_36" ref="act_led"><bounds x="46" y="10" width="2" height="2" /></element>
+		<element name="led_act_37" ref="act_led"><bounds x="46" y="13" width="2" height="2" /></element>
+		<element name="led_act_38" ref="act_led"><bounds x="46" y="16" width="2" height="2" /></element>
+		<element name="led_act_39" ref="act_led"><bounds x="46" y="19" width="2" height="2" /></element>
+		<element name="led_act_40" ref="act_led"><bounds x="46" y="22" width="2" height="2" /></element>
 
-		<cpanel element="act_label_sn76496"><bounds x="4" y="1.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym2413"><bounds x="4" y="4.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym2612"><bounds x="4" y="7.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym2151"><bounds x="4" y="10.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_segapcm"><bounds x="4" y="13.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_rf5c68"><bounds x="4" y="16.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym2203"><bounds x="4" y="19.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym2608"><bounds x="4" y="22.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym2610"><bounds x="4" y="25.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym3812"><bounds x="4" y="28.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ym3526"><bounds x="4" y="31.2" width="10" height="1.6" /></cpanel>
+		<element ref="act_label_sn76496"><bounds x="4" y="1.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym2413"><bounds x="4" y="4.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym2612"><bounds x="4" y="7.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym2151"><bounds x="4" y="10.2" width="10" height="1.6" /></element>
+		<element ref="act_label_segapcm"><bounds x="4" y="13.2" width="10" height="1.6" /></element>
+		<element ref="act_label_rf5c68"><bounds x="4" y="16.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym2203"><bounds x="4" y="19.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym2608"><bounds x="4" y="22.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym2610"><bounds x="4" y="25.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym3812"><bounds x="4" y="28.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ym3526"><bounds x="4" y="31.2" width="10" height="1.6" /></element>
 
-		<cpanel element="act_label_y8950"><bounds x="19" y="1.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ymf262"><bounds x="19" y="4.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ymf278b"><bounds x="19" y="7.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ymf271"><bounds x="19" y="10.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ymz280b"><bounds x="19" y="13.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_rf5c164"><bounds x="19" y="16.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_pwm"><bounds x="19" y="19.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ay8910"><bounds x="19" y="22.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_gameboy"><bounds x="19" y="25.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_nesapu"><bounds x="19" y="28.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_multipcm"><bounds x="19" y="31.2" width="10" height="1.6" /></cpanel>
+		<element ref="act_label_y8950"><bounds x="19" y="1.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ymf262"><bounds x="19" y="4.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ymf278b"><bounds x="19" y="7.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ymf271"><bounds x="19" y="10.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ymz280b"><bounds x="19" y="13.2" width="10" height="1.6" /></element>
+		<element ref="act_label_rf5c164"><bounds x="19" y="16.2" width="10" height="1.6" /></element>
+		<element ref="act_label_pwm"><bounds x="19" y="19.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ay8910"><bounds x="19" y="22.2" width="10" height="1.6" /></element>
+		<element ref="act_label_gameboy"><bounds x="19" y="25.2" width="10" height="1.6" /></element>
+		<element ref="act_label_nesapu"><bounds x="19" y="28.2" width="10" height="1.6" /></element>
+		<element ref="act_label_multipcm"><bounds x="19" y="31.2" width="10" height="1.6" /></element>
 
-		<cpanel element="act_label_upd7759"><bounds x="34" y="1.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_okim6258"><bounds x="34" y="4.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_okim6295"><bounds x="34" y="7.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_k051649"><bounds x="34" y="10.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_k054539"><bounds x="34" y="13.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_c6280"><bounds x="34" y="16.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_c140"><bounds x="34" y="19.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_k053260"><bounds x="34" y="22.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_pokey"><bounds x="34" y="25.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_qsound"><bounds x="34" y="28.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_scsp"><bounds x="34" y="31.2" width="10" height="1.6" /></cpanel>
+		<element ref="act_label_upd7759"><bounds x="34" y="1.2" width="10" height="1.6" /></element>
+		<element ref="act_label_okim6258"><bounds x="34" y="4.2" width="10" height="1.6" /></element>
+		<element ref="act_label_okim6295"><bounds x="34" y="7.2" width="10" height="1.6" /></element>
+		<element ref="act_label_k051649"><bounds x="34" y="10.2" width="10" height="1.6" /></element>
+		<element ref="act_label_k054539"><bounds x="34" y="13.2" width="10" height="1.6" /></element>
+		<element ref="act_label_c6280"><bounds x="34" y="16.2" width="10" height="1.6" /></element>
+		<element ref="act_label_c140"><bounds x="34" y="19.2" width="10" height="1.6" /></element>
+		<element ref="act_label_k053260"><bounds x="34" y="22.2" width="10" height="1.6" /></element>
+		<element ref="act_label_pokey"><bounds x="34" y="25.2" width="10" height="1.6" /></element>
+		<element ref="act_label_qsound"><bounds x="34" y="28.2" width="10" height="1.6" /></element>
+		<element ref="act_label_scsp"><bounds x="34" y="31.2" width="10" height="1.6" /></element>
 
-		<cpanel element="act_label_wswan"><bounds x="49" y="1.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_vsu_vue"><bounds x="49" y="4.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_saa1099"><bounds x="49" y="7.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_es5503"><bounds x="49" y="10.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_es5505"><bounds x="49" y="13.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_x1_010"><bounds x="49" y="16.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_c352"><bounds x="49" y="19.2" width="10" height="1.6" /></cpanel>
-		<cpanel element="act_label_ga20"><bounds x="49" y="22.2" width="10" height="1.6" /></cpanel>
+		<element ref="act_label_wswan"><bounds x="49" y="1.2" width="10" height="1.6" /></element>
+		<element ref="act_label_vsu_vue"><bounds x="49" y="4.2" width="10" height="1.6" /></element>
+		<element ref="act_label_saa1099"><bounds x="49" y="7.2" width="10" height="1.6" /></element>
+		<element ref="act_label_es5503"><bounds x="49" y="10.2" width="10" height="1.6" /></element>
+		<element ref="act_label_es5505"><bounds x="49" y="13.2" width="10" height="1.6" /></element>
+		<element ref="act_label_x1_010"><bounds x="49" y="16.2" width="10" height="1.6" /></element>
+		<element ref="act_label_c352"><bounds x="49" y="19.2" width="10" height="1.6" /></element>
+		<element ref="act_label_ga20"><bounds x="49" y="22.2" width="10" height="1.6" /></element>
 	</group>
 
 	<group name="lights">
-		<cpanel element="static_black2"><bounds x="0"  y="4" width="11" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="12" y="4" width="11" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="24" y="4" width="11" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="36" y="4" width="11" height="5" /></cpanel>
-		<cpanel element="static_black2"><bounds x="48" y="4" width="11" height="5" /></cpanel>
 
-		<cpanel element="text_l1"><bounds x="0"  y="5" width="11" height="3.5" /></cpanel>
-		<cpanel element="text_l2"><bounds x="12" y="5" width="11" height="3.5" /></cpanel>
-		<cpanel element="text_l3"><bounds x="24" y="5" width="11" height="3.5" /></cpanel>
-		<cpanel element="text_l4"><bounds x="36" y="5" width="11" height="3.5" /></cpanel>
-		<cpanel element="text_l5"><bounds x="48" y="5" width="11" height="3.5" /></cpanel>
-
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0"  y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="12" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0004"><bounds x="24" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0008"><bounds x="36" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
-		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="48" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
-
-		<group ref="activity"><bounds x="0" y="21" width="60" height="34" /></group>
 	</group>
 
 	<view name="Full View">
-		<group ref="lights"><bounds x="0" y="0" width="60" height="55" /></group>
-		<screen index="0"><bounds x="60" y="0" width="60" height="55" /></screen>
-	</view>
+		<collection name="Controls">
+			<element ref="static_black2"><bounds x="0"  y="4" width="11" height="5" /></element>
+			<element ref="static_black2"><bounds x="12" y="4" width="11" height="5" /></element>
+			<element ref="static_black2"><bounds x="24" y="4" width="11" height="5" /></element>
+			<element ref="static_black2"><bounds x="36" y="4" width="11" height="5" /></element>
+			<element ref="static_black2"><bounds x="48" y="4" width="11" height="5" /></element>
 
-	<view name="Lights + Controls">
-		<group ref="lights"><bounds x="0" y="0" width="60" height="55" /></group>
+			<element ref="text_l1"><bounds x="0"  y="5" width="11" height="3.5" /></element>
+			<element ref="text_l2"><bounds x="12" y="5" width="11" height="3.5" /></element>
+			<element ref="text_l3"><bounds x="24" y="5" width="11" height="3.5" /></element>
+			<element ref="text_l4"><bounds x="36" y="5" width="11" height="3.5" /></element>
+			<element ref="text_l5"><bounds x="48" y="5" width="11" height="3.5" /></element>
+
+			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0"  y="4" width="11" height="5" /><color alpha="0.15" /></element>
+			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="12" y="4" width="11" height="5" /><color alpha="0.15" /></element>
+			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0004"><bounds x="24" y="4" width="11" height="5" /><color alpha="0.15" /></element>
+			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0008"><bounds x="36" y="4" width="11" height="5" /><color alpha="0.15" /></element>
+			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="48" y="4" width="11" height="5" /><color alpha="0.15" /></element>
+		</collection>
+
+		<collection name="Activity Lights">
+			<group ref="activity"><bounds x="0" y="21" width="60" height="34" /></group>
+		</collection>
+
+		<collection name="Visualizer">
+			<screen index="0"><bounds x="60" y="0" width="60" height="55" /></screen>
+			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0020"><bounds x="60" y="0" width="60" height="55" /><color alpha="0" /></element>
+		</collection>
 	</view>
 </mamelayout>

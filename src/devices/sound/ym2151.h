@@ -75,7 +75,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void calculate_timers();
 	virtual void write_reg(int r, int v);
@@ -247,8 +247,6 @@ private:
 	*   after it has been taken from frequency-deltas table.
 	*/
 	int32_t       dt1_freq[8*32];         /* 8 DT1 levels, 32 KC values */
-
-	uint32_t      noise_tab[32];          /* 17bit Noise Generator periods */
 
 	// internal state
 	sound_stream *         m_stream;

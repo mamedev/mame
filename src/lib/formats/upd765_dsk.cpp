@@ -10,8 +10,6 @@
 
 #include "formats/upd765_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 
 upd765_format::upd765_format(const format *_formats) : file_header_skip_bytes(0), file_footer_skip_bytes(0), formats(_formats)
 {
@@ -192,8 +190,7 @@ bool upd765_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 	int current_size;
 	int end_gap_index;
 
-	switch (f.encoding)
-	{
+	switch(f.encoding) {
 	case floppy_image::FM:
 		desc = get_desc_fm(f, current_size, end_gap_index);
 		break;
@@ -205,8 +202,10 @@ bool upd765_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 	int total_size = 200000000/f.cell_size;
 	int remaining_size = total_size - current_size;
-	if(remaining_size < 0)
-		throw emu_fatalerror("upd765_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
+	if(remaining_size < 0) {
+		osd_printf_error("upd765_format: Incorrect track layout, max_size=%d, current_size=%d\n", total_size, current_size);
+		return false;
+	}
 
 	// Fixup the end gap
 	desc[end_gap_index].p2 = remaining_size / 16;

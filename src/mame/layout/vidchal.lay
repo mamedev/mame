@@ -21,17 +21,17 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="0" right="60" top="-2" bottom="25" />
 
-		<bezel name="digit4" element="digit"><bounds x="0" y="10" width="10" height="15" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="10" y="10" width="10" height="15" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="20" y="10" width="10" height="15" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="30" y="10" width="10" height="15" /></bezel>
-		<bezel name="digit0" element="digit"><bounds x="40" y="10" width="10" height="15" /></bezel>
-		<bezel name="digit5" element="digit"><bounds x="50" y="10" width="10" height="15" /></bezel>
+		<element name="digit4" ref="digit"><bounds x="0" y="10" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="10" y="10" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="20" y="10" width="10" height="15" /></element>
+		<element name="digit1" ref="digit"><bounds x="30" y="10" width="10" height="15" /></element>
+		<element name="digit0" ref="digit"><bounds x="40" y="10" width="10" height="15" /></element>
+		<element name="digit5" ref="digit"><bounds x="50" y="10" width="10" height="15" /></element>
 
 		<!-- 3 leds reflected inside gun barrel -->
-		<bezel name="6.a" element="led"><bounds x="28" y="-1.5" width="4" height="4" /></bezel>
-		<bezel name="6.a" element="led"><bounds x="30" y="2" width="4" height="4" /></bezel>
-		<bezel name="6.a" element="led"><bounds x="26" y="2" width="4" height="4" /></bezel>
+		<element name="6.a" ref="led"><bounds x="28" y="-1.5" width="4" height="4" /></element>
+		<element name="6.a" ref="led"><bounds x="30" y="2" width="4" height="4" /></element>
+		<element name="6.a" ref="led"><bounds x="26" y="2" width="4" height="4" /></element>
 
 	</view>
 </mamelayout>

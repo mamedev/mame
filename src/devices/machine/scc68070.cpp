@@ -32,7 +32,7 @@ TODO:
 #define LOG_MMU         (1 << 5)
 #define LOG_IRQS        (1 << 6)
 #define LOG_UNKNOWN     (1 << 7)
-#define LOG_MORE_UART	(1 << 8)
+#define LOG_MORE_UART   (1 << 8)
 #define LOG_ALL         (LOG_I2C | LOG_UART | LOG_TIMERS | LOG_DMA | LOG_MMU | LOG_IRQS | LOG_UNKNOWN)
 
 #define VERBOSE         (0)

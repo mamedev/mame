@@ -2,16 +2,11 @@
 // copyright-holders:Wilbert Pol
 /*******************************************************************
 
-Toshiba TLCS-900/H emulation
-
-This code only supports the 900/H mode which is needed for Neogeo
-Pocket emulation. The 900 and 900/M modes are not supported yet.
-
+Toshiba TLCS-900 emulation
 
 TODO:
-- review cycle counts
 - implement the remaining internal mcu features (serial transfer, etc)
-- add support for 900 and 900/M modes
+- add support for 900 minimum and normal modes
 
 *******************************************************************/
 
@@ -20,13 +15,48 @@ TODO:
 #include "dasm900.h"
 
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
-	m_am8_16(0)
+	m_am8_16(0),
+	m_mnemonic_80(s_mnemonic_80),
+	m_mnemonic_88(s_mnemonic_88),
+	m_mnemonic_90(s_mnemonic_90),
+	m_mnemonic_98(s_mnemonic_98),
+	m_mnemonic_a0(s_mnemonic_a0),
+	m_mnemonic_b0(s_mnemonic_b0),
+	m_mnemonic_b8(s_mnemonic_b8),
+	m_mnemonic_c0(s_mnemonic_c0),
+	m_mnemonic_c8(s_mnemonic_c8),
+	m_mnemonic_d0(s_mnemonic_d0),
+	m_mnemonic_d8(s_mnemonic_d8),
+	m_mnemonic_e0(s_mnemonic_e0),
+	m_mnemonic_e8(s_mnemonic_e8),
+	m_mnemonic_f0(s_mnemonic_f0),
+	m_mnemonic(s_mnemonic)
 {
 }
 
-device_memory_interface::space_config_vector tlcs900h_device::memory_space_config() const
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	tlcs900_device(mconfig, type, tag, owner, clock)
+{
+	m_mnemonic_80 = s_mnemonic_80;
+	m_mnemonic_88 = s_mnemonic_88;
+	m_mnemonic_90 = s_mnemonic_90;
+	m_mnemonic_98 = s_mnemonic_98;
+	m_mnemonic_a0 = s_mnemonic_a0;
+	m_mnemonic_b0 = s_mnemonic_b0;
+	m_mnemonic_b8 = s_mnemonic_b8;
+	m_mnemonic_c0 = s_mnemonic_c0;
+	m_mnemonic_c8 = s_mnemonic_c8;
+	m_mnemonic_d0 = s_mnemonic_d0;
+	m_mnemonic_d8 = s_mnemonic_d8;
+	m_mnemonic_e0 = s_mnemonic_e0;
+	m_mnemonic_e8 = s_mnemonic_e8;
+	m_mnemonic_f0 = s_mnemonic_f0;
+	m_mnemonic = s_mnemonic;
+}
+
+device_memory_interface::space_config_vector tlcs900_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
@@ -34,7 +64,7 @@ device_memory_interface::space_config_vector tlcs900h_device::memory_space_confi
 }
 
 
-std::unique_ptr<util::disasm_interface> tlcs900h_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs900_device::create_disassembler()
 {
 	return std::make_unique<tlcs900_disassembler>();
 }
@@ -49,7 +79,7 @@ std::unique_ptr<util::disasm_interface> tlcs900h_device::create_disassembler()
 #define FLAG_SF     0x80
 
 
-inline uint8_t tlcs900h_device::RDOP()
+inline uint8_t tlcs900_device::RDOP()
 {
 	uint8_t data;
 
@@ -73,7 +103,7 @@ inline uint8_t tlcs900h_device::RDOP()
 }
 
 
-void tlcs900h_device::device_start()
+void tlcs900_device::device_start()
 {
 	m_program = &space( AS_PROGRAM );
 
@@ -167,6 +197,18 @@ void tlcs900h_device::device_start()
 	set_icountptr(m_icount);
 }
 
+void tlcs900_device::device_reset()
+{
+	m_pc.d = 0x00008000;
+	/* system mode, iff set to 111, min mode, register bank 0 */
+	m_sr.d = 0xF000;
+	m_regbank = 0;
+	m_xssp.d = 0x0100;
+	m_halted = 0;
+	m_check_irqs = 0;
+	m_prefetch_clear = true;
+}
+
 void tlcs900h_device::device_reset()
 {
 	m_pc.b.l = RDMEM( 0xFFFF00 );
@@ -183,7 +225,7 @@ void tlcs900h_device::device_reset()
 }
 
 
-void tlcs900h_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void tlcs900_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -207,9 +249,10 @@ void tlcs900h_device::state_string_export(const device_state_entry &entry, std::
 
 
 #include "900tbl.hxx"
+#include "900htbl.hxx"
 
 
-void tlcs900h_device::execute_run()
+void tlcs900_device::execute_run()
 {
 	do
 	{
@@ -232,7 +275,7 @@ void tlcs900h_device::execute_run()
 		else
 		{
 			m_op = RDOP();
-			inst = &s_mnemonic[m_op];
+			inst = &m_mnemonic[m_op];
 			prepare_operands( inst );
 
 			/* Execute the instruction */

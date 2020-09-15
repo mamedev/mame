@@ -238,7 +238,7 @@ VIDEO_START_MEMBER(redalert_state,redalert)
 VIDEO_START_MEMBER(redalert_state,demoneye)
 {
 	VIDEO_START_CALL_MEMBER( redalert );
-	
+
 	save_pointer(NAME(m_demoneye_bitmap_reg), 4);
 	save_item(NAME(m_demoneye_bitmap_yoffs));
 }
@@ -330,18 +330,18 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_rg
  *************************************/
 
 /*
-	[0]
-	xxxx xxxx X position
+    [0]
+    xxxx xxxx X position
     [1]
-	-??x ---- tile bank * 0x20 (?)
-	---- xx-- <used, unknown purpose>
-	---- --x- (1) 8x8 tile width 4, (0) 4x4
-	---- ---x enable layer
-	[2]
-	---- x--- boss second form, <unknown purpose>
-	---- --xx tile bank * 0x100 (?)
-	[3]
-	---- --xx <3 on normal/first form boss, 1 on second form>
+    -??x ---- tile bank * 0x20 (?)
+    ---- xx-- <used, unknown purpose>
+    ---- --x- (1) 8x8 tile width 4, (0) 4x4
+    ---- ---x enable layer
+    [2]
+    ---- x--- boss second form, <unknown purpose>
+    ---- --xx tile bank * 0x100 (?)
+    [3]
+    ---- --xx <3 on normal/first form boss, 1 on second form>
 */
 void redalert_state::demoneye_bitmap_layer_w(offs_t offset, uint8_t data)
 {
@@ -412,12 +412,12 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 			charmap_data_2 = charmap_data_2 << 1;
 		}
 	}
-	
+
 	u8 x = m_demoneye_bitmap_reg[0];
 	u8 y = m_demoneye_bitmap_yoffs;
 	u8 control = m_demoneye_bitmap_reg[1];
 
-	
+
 	if(control&1)
 	{
 		// TODO: pinpoint what the unknown bits are for (more zooming? color offset?)
@@ -427,7 +427,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 		int base = 0x1400;
 		base += (control & 0x10) ? 0x20 : 0;
 		base += (m_demoneye_bitmap_reg[2] & 3) * 0x100;
-		
+
 		for(int x_block=0; x_block<8; ++x_block)
 		{
 			for(int y_block=0; y_block<8; ++y_block)
@@ -444,7 +444,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 							int ccc = ((l0&0x80)>>5) | ((l1&0x80)>>6) | ((l2&0x80)>>7);
 							if(ccc)
 							{
-								// both are clearly reversed, 
+								// both are clearly reversed,
 								// cfr. boss first form (when opens the eye)
 								// or second form (follows player position)
 								int y_dst = 8*width - (y_block*8+iy);
@@ -459,7 +459,7 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 						}
 					}
 				}
-			
+
 				base+=8;
 			}
 		}

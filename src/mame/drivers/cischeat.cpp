@@ -626,6 +626,24 @@ void cischeat_state::scudhamm_map(address_map &map)
 
 /**************************************************************************
                             Arm Champs II
+
+The Arm Champs II start-up arm movement and info
+---------------------------------------------------------------------
+At power-on, the arm moves left, then right then to center and stops.
+The center position is 0000.
+Note when the arm is at 0000 (center) the center limit switch is not
+on. It comes on when the arm is moved just off center (+-0002 or greater
+away from center) and stays on as long as the arm is not on
+0001-0000-FFFF (both left and right side). When the arm hits the
+left/right limit, both center and that left or right limit switch is on.
+
+Full movement to left limit switch is 0000-0040 (0x41h) and full right
+limit switch movement is 0000-FFC2 (0x3eh). Obviously the pot and arm
+are not 100% accurate and there's a small amount of slop between the
+arm shaft / motor mechanism and the pot.
+The limit switches are triggered just before the full movement.
+For the purpose of MAME emulation it can be rounded off so both sides
+move +- 0x40h.
 **************************************************************************/
 
 uint16_t armchamp2_state::motor_status_r()
@@ -690,7 +708,7 @@ void armchamp2_state::armchmp2_map(address_map &map)
 	map(0x100000, 0x100001).portr("IN2").w(FUNC(armchamp2_state::scudhamm_oki_bank_w));
 	map(0x100004, 0x100005).portr("DSW"); // DSW
 	map(0x100008, 0x100009).portr("IN0").w(FUNC(armchamp2_state::output_w));
-	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write)); 
+	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x100010, 0x100011).rw(FUNC(armchamp2_state::motor_status_r), FUNC(armchamp2_state::motor_command_w));
 	// same hookup as acommand, most notably the "Arm Champs II" voice sample on title screen playbacks on oki1 mirror
 	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
@@ -2108,7 +2126,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 16) // clears a flag, sprite end DMA? 
+	if(scanline == 16) // clears a flag, sprite end DMA?
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -2129,10 +2147,10 @@ void cischeat_state::scudhamm(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// measured values for Arm Champs II: VSync: 59.1784Hz, HSync: 15082.0 kHz
 	m_screen->set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
-//	m_screen->set_refresh_hz(30); //TODO: wrong!
-//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
-//	m_screen->set_size(256, 256);
-//	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
+//  m_screen->set_refresh_hz(30); //TODO: wrong!
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+//  m_screen->set_size(256, 256);
+//  m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
 	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
 	m_screen->set_palette(m_palette);
 

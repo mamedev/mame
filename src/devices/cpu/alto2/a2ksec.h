@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2KSEC_H_
-#define _A2KSEC_H_
+#ifndef MAME_CPU_ALTO2_A2KSEC_H
+#define MAME_CPU_ALTO2_A2KSEC_H
 //! BUS source for disk sector task
 enum {
 	bs_ksec_read_kstat  = bs_task_3,            //!< bus source: read disk status register
@@ -44,5 +44,5 @@ void f1_early_ksec_block(void);                 //!< block ksec task
 void init_ksec(int task = task_ksec);           //!< initialize the disk sector task
 void exit_ksec();                               //!< deinitialize the disk sector task
 void reset_ksec();                              //!< reset the disk sector task
-#endif // _A2KSEC_H_
+#endif // MAME_CPU_ALTO2_A2KSEC_H
 #endif  // ALTO2_DEFINE_CONSTANTS

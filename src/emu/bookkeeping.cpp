@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /*********************************************************************
 
-    bookkeeping.c
+    bookkeeping.cpp
 
     Bookkeeping simple machine functions.
 

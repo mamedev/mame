@@ -16,6 +16,7 @@
     - Legend
     - Rushing Beat
     - Venom & Spider-Man - Separation Anxiety
+    - Wild Guns
 
     Not dumped:
     - Final Fight 3
@@ -32,6 +33,8 @@ TODO:
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
  - venom    : gfx glitches on second level
+ - wldgunsb : dipswitches
+ - wldgunsb : sometimes continue counter doesn't start from '9', verify if protection is involved.
 
 ***************************************************************************
 
@@ -172,6 +175,7 @@ public:
 	void init_legendsb();
 	void init_rushbets();
 	void init_venom();
+	void init_wldgunsb();
 
 private:
 	std::unique_ptr<int8_t[]> m_shared_ram;
@@ -188,6 +192,12 @@ private:
 	uint8_t rushbets_75axxx_r(offs_t offset);
 	uint8_t rushbets_5b8e3c_r();
 	uint8_t sharedram2_r(offs_t offset);
+	uint8_t wldgunsb_722262_r();
+	uint8_t wldgunsb_723364_r();
+	uint8_t wldgunsb_721197_r();
+	uint8_t wldgunsb_72553b_r();
+	uint8_t wldgunsb_72443a_r();
+
 	void sharedram2_w(offs_t offset, uint8_t data);
 	uint8_t snesb_dsw1_r();
 	uint8_t snesb_dsw2_r();
@@ -286,7 +296,6 @@ void snesb_state::sharedram2_w(offs_t offset, uint8_t data)
 }
 
 /* Rushing Beat Shura */
-
 uint8_t snesb_state::rushbets_75axxx_r(offs_t offset)
 {
 /* protection checks */
@@ -308,6 +317,37 @@ uint8_t snesb_state::rushbets_5b8e3c_r()
 {
 	/* protection check */
 	return ++m_cnt;
+}
+
+/* Wild Guns */
+uint8_t snesb_state::wldgunsb_722262_r()
+{
+	// PC 2e2f6
+	return 0x2b;
+} 
+
+uint8_t snesb_state::wldgunsb_723364_r()
+{
+	// PC b983
+	return 0x93;
+}
+
+uint8_t snesb_state::wldgunsb_721197_r()
+{
+	// PC 2e30c
+	return 0xe4;
+}
+
+uint8_t snesb_state::wldgunsb_72553b_r()
+{
+	// PC 2e216
+	return 0xbf;
+}
+
+uint8_t snesb_state::wldgunsb_72443a_r()
+{
+	// PC 2e322
+	return 0x66;
 }
 
 /* Generic read handlers for Dip Switches and coins inputs */
@@ -797,6 +837,17 @@ static INPUT_PORTS_START( venom )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wldgunsb )
+	PORT_INCLUDE( venom )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 INPUT_PORTS_END
 
 void snesb_state::kinstb(machine_config &config)
@@ -1354,6 +1405,84 @@ void snesb_state::init_venom()
 	init_snes();
 }
 
+void snesb_state::init_wldgunsb()
+{
+	uint8_t *src = memregion("user7")->base();
+	uint8_t *dst = memregion("user3")->base();
+
+	static uint8_t address_tab_high[0x20] = {
+		0x0b, 0x1d, 0x05, 0x15, 0x09, 0x19, 0x04, 0x13, 0x02, 0x1f, 0x07, 0x17, 0x0d, 0x11, 0x0a, 0x1a,
+		0x14, 0x0e, 0x18, 0x06, 0x1e, 0x01, 0x10, 0x0c, 0x1b, 0x0f, 0x16, 0x00, 0x12, 0x08, 0x1c, 0x03 
+	};
+
+	static uint8_t address_tab_low[0x40] = {
+		0x14, 0x1d, 0x11, 0x3c, 0x0a, 0x29, 0x2d, 0x2e, 0x30, 0x32, 0x16, 0x36, 0x05, 0x25, 0x26, 0x37,
+		0x20, 0x21, 0x27, 0x28, 0x33, 0x34, 0x23, 0x12, 0x1e, 0x1f, 0x3b, 0x24, 0x2c, 0x35, 0x38, 0x39,
+		0x3d, 0x0c, 0x2a, 0x0d, 0x22, 0x18, 0x19, 0x1a, 0x03, 0x08, 0x04, 0x3a, 0x0b, 0x0f, 0x15, 0x17,
+		0x1b, 0x13, 0x00, 0x1c, 0x2b, 0x01, 0x06, 0x2f, 0x07, 0x09, 0x02, 0x31, 0x10, 0x0e, 0x3f, 0x3e
+	};
+
+	static const uint8_t data_low[16] = {
+		0x30, 0xa8, 0x80, 0xb0, 0x90, 0x00, 0x20, 0xa0, 0x08, 0xb8, 0x38, 0x18, 0x88, 0x10, 0x28, 0x98
+	};
+
+	static const uint8_t data_high[16] = {
+		0x05, 0x43, 0x40, 0x45, 0x44, 0x00, 0x01, 0x41, 0x02, 0x47, 0x07, 0x06, 0x42, 0x04, 0x03, 0x46
+	};
+
+	for (int i = 0; i < 0x100000; i++)
+	{
+		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
+
+		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+
+		if (i >= 0x00000 && i < 0x10000) {
+			dst[i] = bitswap<8>(dst[i], 3, 1, 7, 0, 6, 4, 5, 2) ^ 0xff;
+		}
+
+		if (i >= 0x10000 && i < 0x20000) {
+			dst[i] = bitswap<8>(dst[i], 4, 7, 3, 2, 0, 1, 6, 5);
+		}
+
+		if (i >= 0x20000 && i < 0x30000) {
+			dst[i] = bitswap<8>(dst[i], 6, 0, 7, 1, 4, 3, 5, 2) ^ 0xff;
+		}
+
+		if (i >= 0x30000 && i < 0x40000) {
+			dst[i] = bitswap<8>(dst[i], 0, 2, 6, 4, 1, 5, 7, 3);
+		}
+	}
+
+	// boot vector
+	dst[0x7ffc] = 0x40;
+	dst[0x7ffd] = 0x80;
+
+	m_shared_ram = std::make_unique<int8_t[]>(0x22);
+	//m_shared_ram2 = std::make_unique<int8_t[]>(0x22);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
+	//m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770072, 0x770072, read8smo_delegate(*this, FUNC(snesb_state::snesb_dsw2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8smo_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+	
+	// protection overlays
+	// counter (PC=0x2dfe7 / 0x2dfee)
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7bf45b, 0x7bf45b, read8smo_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
+
+	// these reads with a LDA but discards the upper 8-bit values
+	// POST
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x722262, 0x722262, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_722262_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x723363, 0x723363, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_723364_r)));
+	// in-game
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x721197, 0x721197, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_721197_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x72553b, 0x72553b, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_72553b_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x72443a, 0x72443a, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_72443a_r)));
+
+	init_snes();
+}
+
+
 ROM_START( kinstb )
 	ROM_REGION( 0x400000, "user3", 0 )
 	ROM_LOAD( "1.u14", 0x000000, 0x100000, CRC(70889919) SHA1(1451714cbdacb7f6ced2bc7afa478ad7264cf3b7) )
@@ -1522,6 +1651,16 @@ ROM_START( venom )
 	ROM_LOAD( "u34.bin", 0x280000, 0x0080000, CRC(7a09c9e0) SHA1(794965d5501ec0e21f1f3a8cb8fd66f913d42760) )
 ROM_END
 
+ROM_START( wldgunsb )
+	ROM_REGION( 0x100000, "user3", ROMREGION_ERASEFF )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x100000, "user7", 0 )
+	ROM_LOAD( "c19.bin", 0x000000, 0x080000, CRC(59df0dc8) SHA1(d18b7f204ad4e0fcd64c2e2a25d60b64930419e7) )
+	ROM_LOAD( "c20.bin", 0x080000, 0x080000, CRC(62ae4acb) SHA1(62aa320bcc7eeedb00c70baa909ac0230256c9a4) )
+ROM_END
+
 GAME( 199?, kinstb,       0,       kinstb,         kinstb,   snesb_state, init_kinstb,   ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, ffight2b,     0,       ffight2b,       ffight2b, snesb_state, init_ffight2b, ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, iron,         0,       kinstb,         iron,     snesb_state, init_iron,     ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -1532,3 +1671,4 @@ GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_e
 GAME( 1996, legendsb,     0,       kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rushbets,     0,       kinstb,         rushbets, snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,       kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, wldgunsb,     0,       kinstb,         wldgunsb, snesb_state, init_wldgunsb, ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version

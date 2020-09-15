@@ -12,6 +12,7 @@
 #pragma once
 
 
+// Note: the numbers here are offsets from the WPC device base address, which is 0x3FB0 on the WPC_AN hardware
 /* A = Alpha-numeric
  * M = DMD
  * F = Fliptronics

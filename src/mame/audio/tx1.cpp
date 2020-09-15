@@ -111,7 +111,7 @@ void tx1_sound_device::device_start()
 
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << TX1_FRAC) / (double)machine().sample_rate();
 
 	/* Compute the engine resistor weights */
@@ -356,10 +356,10 @@ static inline void update_engine(int eng[4])
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tx1_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
@@ -662,7 +662,7 @@ void buggyboy_sound_device::device_start()
 		m_eng_voltages[i] = combine_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << 24) / (double)machine().sample_rate();
 }
 
@@ -763,10 +763,10 @@ void buggyboy_sound_device::ym2_b_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void buggyboy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	/* This is admittedly a bit of a hack job... */
 

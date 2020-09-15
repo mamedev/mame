@@ -377,9 +377,7 @@ void mystwarr_state::viostorm_map(address_map &map)
 	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr();     // watchdog lives here
 	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
-	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
-	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
-	map(0x304000, 0x3041ff).ram();
+	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x6000);
 	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
 	map(0x330000, 0x331fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }

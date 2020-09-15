@@ -798,527 +798,527 @@
 	</element>
 
 	<view name="AWP Simulated Video">
-		<backdrop element="backdrop_colour">
+		<element ref="backdrop_colour">
 			<bounds x="0" y="0" width="794" height="515">
 			</bounds>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="262" y="292" width="80" height="140">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp0" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp0" ref="reel_lamp_layer_0" state="0">
 			<bounds x="262.0000" y="292.0000" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp0" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp0" ref="reel_lamp_layer_1" state="0">
 			<bounds x="265.3333" y="293.9445" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp0" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp0" ref="reel_lamp_layer_2" state="0">
 			<bounds x="268.6667" y="295.8889" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp0" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp0" ref="reel_lamp_layer_3" state="0">
 			<bounds x="272.0000" y="297.8333" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp0" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp0" ref="reel_lamp_layer_4" state="0">
 			<bounds x="275.3333" y="299.7778" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp0" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp0" ref="reel_lamp_layer_5" state="0">
 			<bounds x="278.6667" y="301.7222" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp8" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp8" ref="reel_lamp_layer_0" state="0">
 			<bounds x="262.0000" y="338.6667" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp8" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp8" ref="reel_lamp_layer_1" state="0">
 			<bounds x="265.3333" y="340.6111" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp8" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp8" ref="reel_lamp_layer_2" state="0">
 			<bounds x="268.6667" y="342.5555" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp8" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp8" ref="reel_lamp_layer_3" state="0">
 			<bounds x="272.0000" y="344.5000" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp8" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp8" ref="reel_lamp_layer_4" state="0">
 			<bounds x="275.3333" y="346.4444" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp8" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp8" ref="reel_lamp_layer_5" state="0">
 			<bounds x="278.6667" y="348.3889" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp16" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp16" ref="reel_lamp_layer_0" state="0">
 			<bounds x="262.0000" y="385.3333" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp16" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp16" ref="reel_lamp_layer_1" state="0">
 			<bounds x="265.3333" y="387.2778" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp16" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp16" ref="reel_lamp_layer_2" state="0">
 			<bounds x="268.6667" y="389.2222" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp16" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp16" ref="reel_lamp_layer_3" state="0">
 			<bounds x="272.0000" y="391.1667" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp16" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp16" ref="reel_lamp_layer_4" state="0">
 			<bounds x="275.3333" y="393.1111" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp16" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp16" ref="reel_lamp_layer_5" state="0">
 			<bounds x="278.6667" y="395.0556" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="sreel1" element="reel0" state="0">
+		</element>
+		<element name="sreel1" ref="reel0" state="0">
 			<bounds x="262" y="292" width="80" height="140">
 			</bounds>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="359" y="293" width="80" height="140">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp1" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp1" ref="reel_lamp_layer_0" state="0">
 			<bounds x="359.0000" y="293.0000" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp1" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp1" ref="reel_lamp_layer_1" state="0">
 			<bounds x="362.3333" y="294.9445" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp1" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp1" ref="reel_lamp_layer_2" state="0">
 			<bounds x="365.6667" y="296.8889" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp1" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp1" ref="reel_lamp_layer_3" state="0">
 			<bounds x="369.0000" y="298.8333" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp1" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp1" ref="reel_lamp_layer_4" state="0">
 			<bounds x="372.3333" y="300.7778" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp1" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp1" ref="reel_lamp_layer_5" state="0">
 			<bounds x="375.6667" y="302.7222" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp9" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp9" ref="reel_lamp_layer_0" state="0">
 			<bounds x="359.0000" y="339.6667" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp9" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp9" ref="reel_lamp_layer_1" state="0">
 			<bounds x="362.3333" y="341.6111" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp9" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp9" ref="reel_lamp_layer_2" state="0">
 			<bounds x="365.6667" y="343.5555" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp9" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp9" ref="reel_lamp_layer_3" state="0">
 			<bounds x="369.0000" y="345.5000" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp9" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp9" ref="reel_lamp_layer_4" state="0">
 			<bounds x="372.3333" y="347.4444" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp9" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp9" ref="reel_lamp_layer_5" state="0">
 			<bounds x="375.6667" y="349.3889" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp17" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp17" ref="reel_lamp_layer_0" state="0">
 			<bounds x="359.0000" y="386.3333" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp17" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp17" ref="reel_lamp_layer_1" state="0">
 			<bounds x="362.3333" y="388.2778" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp17" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp17" ref="reel_lamp_layer_2" state="0">
 			<bounds x="365.6667" y="390.2222" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp17" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp17" ref="reel_lamp_layer_3" state="0">
 			<bounds x="369.0000" y="392.1667" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp17" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp17" ref="reel_lamp_layer_4" state="0">
 			<bounds x="372.3333" y="394.1111" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp17" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp17" ref="reel_lamp_layer_5" state="0">
 			<bounds x="375.6667" y="396.0556" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="sreel2" element="reel1" state="0">
+		</element>
+		<element name="sreel2" ref="reel1" state="0">
 			<bounds x="359" y="293" width="80" height="140">
 			</bounds>
-		</backdrop>
-		<backdrop element="reel_background">
+		</element>
+		<element ref="reel_background">
 			<bounds x="455" y="293" width="80" height="140">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp2" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp2" ref="reel_lamp_layer_0" state="0">
 			<bounds x="455.0000" y="293.0000" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp2" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp2" ref="reel_lamp_layer_1" state="0">
 			<bounds x="458.3333" y="294.9445" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp2" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp2" ref="reel_lamp_layer_2" state="0">
 			<bounds x="461.6667" y="296.8889" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp2" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp2" ref="reel_lamp_layer_3" state="0">
 			<bounds x="465.0000" y="298.8333" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp2" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp2" ref="reel_lamp_layer_4" state="0">
 			<bounds x="468.3333" y="300.7778" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp2" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp2" ref="reel_lamp_layer_5" state="0">
 			<bounds x="471.6667" y="302.7222" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp10" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp10" ref="reel_lamp_layer_0" state="0">
 			<bounds x="455.0000" y="339.6667" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp10" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp10" ref="reel_lamp_layer_1" state="0">
 			<bounds x="458.3333" y="341.6111" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp10" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp10" ref="reel_lamp_layer_2" state="0">
 			<bounds x="461.6667" y="343.5555" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp10" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp10" ref="reel_lamp_layer_3" state="0">
 			<bounds x="465.0000" y="345.5000" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp10" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp10" ref="reel_lamp_layer_4" state="0">
 			<bounds x="468.3333" y="347.4444" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp10" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp10" ref="reel_lamp_layer_5" state="0">
 			<bounds x="471.6667" y="349.3889" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp18" element="reel_lamp_layer_0" state="0">
+		</element>
+		<element name="lamp18" ref="reel_lamp_layer_0" state="0">
 			<bounds x="455.0000" y="386.3333" width="80.0000" height="46.6667">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp18" element="reel_lamp_layer_1" state="0">
+		</element>
+		<element name="lamp18" ref="reel_lamp_layer_1" state="0">
 			<bounds x="458.3333" y="388.2778" width="73.3333" height="42.7778">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp18" element="reel_lamp_layer_2" state="0">
+		</element>
+		<element name="lamp18" ref="reel_lamp_layer_2" state="0">
 			<bounds x="461.6667" y="390.2222" width="66.6667" height="38.8889">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp18" element="reel_lamp_layer_3" state="0">
+		</element>
+		<element name="lamp18" ref="reel_lamp_layer_3" state="0">
 			<bounds x="465.0000" y="392.1667" width="60.0000" height="35.0000">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp18" element="reel_lamp_layer_4" state="0">
+		</element>
+		<element name="lamp18" ref="reel_lamp_layer_4" state="0">
 			<bounds x="468.3333" y="394.1111" width="53.3333" height="31.1111">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp18" element="reel_lamp_layer_5" state="0">
+		</element>
+		<element name="lamp18" ref="reel_lamp_layer_5" state="0">
 			<bounds x="471.6667" y="396.0556" width="46.6667" height="27.2222">
 			</bounds>
-		</backdrop>
-		<backdrop name="sreel3" element="reel2" state="0">
+		</element>
+		<element name="sreel3" ref="reel2" state="0">
 			<bounds x="455" y="293" width="80" height="140">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp86" element="lamp_86_1_border" state="0">
+		</element>
+		<element name="lamp86" ref="lamp_86_1_border" state="0">
 			<bounds x="579" y="330" width="47" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp86" element="lamp_86_1" state="0">
+		</element>
+		<element name="lamp86" ref="lamp_86_1" state="0">
 			<bounds x="581" y="332" width="43" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp71" element="lamp_71_1_border" state="0">
+		</element>
+		<element name="lamp71" ref="lamp_71_1_border" state="0">
 			<bounds x="580" y="291" width="149" height="32">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp71" element="lamp_71_1" state="0">
+		</element>
+		<element name="lamp71" ref="lamp_71_1" state="0">
 			<bounds x="582" y="293" width="145" height="28">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp78" element="lamp_78_1_border" state="0">
+		</element>
+		<element name="lamp78" ref="lamp_78_1_border" state="0">
 			<bounds x="632" y="329" width="47" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp78" element="lamp_78_1" state="0">
+		</element>
+		<element name="lamp78" ref="lamp_78_1" state="0">
 			<bounds x="634" y="331" width="43" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp70" element="lamp_70_1_border" state="0">
+		</element>
+		<element name="lamp70" ref="lamp_70_1_border" state="0">
 			<bounds x="684" y="329" width="47" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp70" element="lamp_70_1" state="0">
+		</element>
+		<element name="lamp70" ref="lamp_70_1" state="0">
 			<bounds x="686" y="331" width="43" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp94" element="lamp_94_1_border" state="0">
+		</element>
+		<element name="lamp94" ref="lamp_94_1_border" state="0">
 			<bounds x="80" y="70" width="122" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp94" element="lamp_94_1" state="0">
+		</element>
+		<element name="lamp94" ref="lamp_94_1" state="0">
 			<bounds x="82" y="72" width="118" height="38">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp93" element="lamp_93_1_border" state="0">
+		</element>
+		<element name="lamp93" ref="lamp_93_1_border" state="0">
 			<bounds x="80" y="23" width="122" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp93" element="lamp_93_1" state="0">
+		</element>
+		<element name="lamp93" ref="lamp_93_1" state="0">
 			<bounds x="82" y="25" width="118" height="38">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp101" element="lamp_101_1_border" state="0">
+		</element>
+		<element name="lamp101" ref="lamp_101_1_border" state="0">
 			<bounds x="80" y="116" width="122" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp101" element="lamp_101_1" state="0">
+		</element>
+		<element name="lamp101" ref="lamp_101_1" state="0">
 			<bounds x="82" y="118" width="118" height="38">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp25" element="colour_button_49_border" state="0" inputtag="BLACK2" inputmask="0x02">
+		</element>
+		<element name="lamp25" ref="colour_button_49_border" state="0" inputtag="BLACK2" inputmask="0x02">
 			<bounds x="164" y="445" width="77" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp25" element="colour_button_49" state="0" inputtag="BLACK2" inputmask="0x02">
+		</element>
+		<element name="lamp25" ref="colour_button_49" state="0" inputtag="BLACK2" inputmask="0x02">
 			<bounds x="166" y="447" width="73" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp40" element="colour_button_50_border" state="0" inputtag="BLACK2" inputmask="0x40">
+		</element>
+		<element name="lamp40" ref="colour_button_50_border" state="0" inputtag="BLACK2" inputmask="0x40">
 			<bounds x="549" y="445" width="77" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp40" element="colour_button_50" state="0" inputtag="BLACK2" inputmask="0x40">
+		</element>
+		<element name="lamp40" ref="colour_button_50" state="0" inputtag="BLACK2" inputmask="0x40">
 			<bounds x="551" y="447" width="73" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp41" element="colour_button_51_border" state="0" inputtag="BLACK2" inputmask="0x80">
+		</element>
+		<element name="lamp41" ref="colour_button_51_border" state="0" inputtag="BLACK2" inputmask="0x80">
 			<bounds x="639" y="444" width="92" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp41" element="colour_button_51" state="0" inputtag="BLACK2" inputmask="0x80">
+		</element>
+		<element name="lamp41" ref="colour_button_51" state="0" inputtag="BLACK2" inputmask="0x80">
 			<bounds x="641" y="446" width="88" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp26" element="colour_button_52_border" state="0" inputtag="BLACK2" inputmask="0x04">
+		</element>
+		<element name="lamp26" ref="colour_button_52_border" state="0" inputtag="BLACK2" inputmask="0x04">
 			<bounds x="265" y="445" width="77" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp26" element="colour_button_52" state="0" inputtag="BLACK2" inputmask="0x04">
+		</element>
+		<element name="lamp26" ref="colour_button_52" state="0" inputtag="BLACK2" inputmask="0x04">
 			<bounds x="267" y="447" width="73" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp32" element="colour_button_53_border" state="0" inputtag="BLACK2" inputmask="0x08">
+		</element>
+		<element name="lamp32" ref="colour_button_53_border" state="0" inputtag="BLACK2" inputmask="0x08">
 			<bounds x="361" y="445" width="77" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp32" element="colour_button_53" state="0" inputtag="BLACK2" inputmask="0x08">
+		</element>
+		<element name="lamp32" ref="colour_button_53" state="0" inputtag="BLACK2" inputmask="0x08">
 			<bounds x="363" y="447" width="73" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp33" element="colour_button_54_border" state="0" inputtag="BLACK2" inputmask="0x10">
+		</element>
+		<element name="lamp33" ref="colour_button_54_border" state="0" inputtag="BLACK2" inputmask="0x10">
 			<bounds x="456" y="445" width="77" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp33" element="colour_button_54" state="0" inputtag="BLACK2" inputmask="0x10">
+		</element>
+		<element name="lamp33" ref="colour_button_54" state="0" inputtag="BLACK2" inputmask="0x10">
 			<bounds x="458" y="447" width="73" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp34" element="colour_button_55_border" state="0" inputtag="BLACK2" inputmask="0x20">
+		</element>
+		<element name="lamp34" ref="colour_button_55_border" state="0" inputtag="BLACK2" inputmask="0x20">
 			<bounds x="101" y="167" width="77" height="47">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp34" element="colour_button_55" state="0" inputtag="BLACK2" inputmask="0x20">
+		</element>
+		<element name="lamp34" ref="colour_button_55" state="0" inputtag="BLACK2" inputmask="0x20">
 			<bounds x="103" y="169" width="73" height="43">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_56_border" state="0" inputtag="AUX2" inputmask="0x40">
+		</element>
+		<element name="lamp57" ref="colour_button_56_border" state="0" inputtag="AUX2" inputmask="0x40">
 			<bounds x="654" y="12" width="52" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_56" state="0" inputtag="AUX2" inputmask="0x40">
+		</element>
+		<element name="lamp57" ref="colour_button_56" state="0" inputtag="AUX2" inputmask="0x40">
 			<bounds x="656" y="14" width="48" height="32">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_57_border" state="0" inputtag="AUX2" inputmask="0x20">
+		</element>
+		<element name="lamp57" ref="colour_button_57_border" state="0" inputtag="AUX2" inputmask="0x20">
 			<bounds x="671" y="52" width="36" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_57" state="0" inputtag="AUX2" inputmask="0x20">
+		</element>
+		<element name="lamp57" ref="colour_button_57" state="0" inputtag="AUX2" inputmask="0x20">
 			<bounds x="673" y="54" width="32" height="32">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_58_border" state="0" inputtag="AUX2" inputmask="0x10">
+		</element>
+		<element name="lamp57" ref="colour_button_58_border" state="0" inputtag="AUX2" inputmask="0x10">
 			<bounds x="634" y="52" width="36" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_58" state="0" inputtag="AUX2" inputmask="0x10">
+		</element>
+		<element name="lamp57" ref="colour_button_58" state="0" inputtag="AUX2" inputmask="0x10">
 			<bounds x="636" y="54" width="32" height="32">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_59_border" state="0" inputtag="DIL2" inputmask="0x08">
+		</element>
+		<element name="lamp57" ref="colour_button_59_border" state="0" inputtag="DIL2" inputmask="0x08">
 			<bounds x="597" y="52" width="36" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_59" state="0" inputtag="DIL2" inputmask="0x08">
+		</element>
+		<element name="lamp57" ref="colour_button_59" state="0" inputtag="DIL2" inputmask="0x08">
 			<bounds x="599" y="54" width="32" height="32">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_60_border" state="0" inputtag="AUX2" inputmask="0x80">
+		</element>
+		<element name="lamp57" ref="colour_button_60_border" state="0" inputtag="AUX2" inputmask="0x80">
 			<bounds x="596" y="12" width="52" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="lamp57" element="colour_button_60" state="0" inputtag="AUX2" inputmask="0x80">
+		</element>
+		<element name="lamp57" ref="colour_button_60" state="0" inputtag="AUX2" inputmask="0x80">
 			<bounds x="598" y="14" width="48" height="32">
 			</bounds>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="681" y="218" width="30" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop name="digit7" element="led_digit_red">
+		</element>
+		<element name="digit7" ref="led_digit_red">
 			<bounds x="681" y="218" width="30" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="681" y="218" width="30" height="42">
 			</bounds>
 			<color alpha="0.1">
 			</color>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="651" y="218" width="30" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop name="digit6" element="led_digit_red">
+		</element>
+		<element name="digit6" ref="led_digit_red">
 			<bounds x="651" y="218" width="30" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="651" y="218" width="30" height="42">
 			</bounds>
 			<color alpha="0.1">
 			</color>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="621" y="218" width="30" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop name="digit5" element="led_digit_red">
+		</element>
+		<element name="digit5" ref="led_digit_red">
 			<bounds x="621" y="218" width="30" height="42">
 			</bounds>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="621" y="218" width="30" height="42">
 			</bounds>
 			<color alpha="0.1">
 			</color>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="626" y="125" width="28" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="digit3" element="led_digit_red">
+		</element>
+		<element name="digit3" ref="led_digit_red">
 			<bounds x="626" y="125" width="28" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="626" y="125" width="28" height="36">
 			</bounds>
 			<color alpha="0.1">
 			</color>
-		</backdrop>
-		<backdrop element="led_digit_rect_black">
+		</element>
+		<element ref="led_digit_rect_black">
 			<bounds x="654" y="125" width="28" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop name="digit4" element="led_digit_red">
+		</element>
+		<element name="digit4" ref="led_digit_red">
 			<bounds x="654" y="125" width="28" height="36">
 			</bounds>
-		</backdrop>
-		<backdrop element="led_digit_rect_red">
+		</element>
+		<element ref="led_digit_rect_red">
 			<bounds x="654" y="125" width="28" height="36">
 			</bounds>
 			<color alpha="0.1">
 			</color>
-		</backdrop>
-		<backdrop name="label9" element="label_9">
+		</element>
+		<element name="label9" ref="label_9">
 			<bounds x="437" y="175" width="14" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label10" element="label_10">
+		</element>
+		<element name="label10" ref="label_10">
 			<bounds x="350" y="177" width="14" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label11" element="label_11">
+		</element>
+		<element name="label11" ref="label_11">
 			<bounds x="437" y="94" width="14" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label12" element="label_12">
+		</element>
+		<element name="label12" ref="label_12">
 			<bounds x="350" y="93" width="14" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label22" element="label_22">
+		</element>
+		<element name="label22" ref="label_22">
 			<bounds x="553" y="383" width="197" height="22">
 			</bounds>
-		</backdrop>
-		<backdrop name="label25" element="label_25">
+		</element>
+		<element name="label25" ref="label_25">
 			<bounds x="153" y="247" width="66" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label26" element="label_26">
+		</element>
+		<element name="label26" ref="label_26">
 			<bounds x="158" y="395" width="49" height="22">
 			</bounds>
-		</backdrop>
-		<backdrop name="label27" element="label_27">
+		</element>
+		<element name="label27" ref="label_27">
 			<bounds x="158" y="360" width="49" height="22">
 			</bounds>
-		</backdrop>
-		<backdrop name="label28" element="label_28">
+		</element>
+		<element name="label28" ref="label_28">
 			<bounds x="159" y="322" width="49" height="22">
 			</bounds>
-		</backdrop>
-		<backdrop name="label29" element="label_29">
+		</element>
+		<element name="label29" ref="label_29">
 			<bounds x="157" y="284" width="54" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label33" element="label_33">
+		</element>
+		<element name="label33" ref="label_33">
 			<bounds x="586" y="211" width="27" height="56">
 			</bounds>
-		</backdrop>
-		<backdrop name="label37" element="label_37">
+		</element>
+		<element name="label37" ref="label_37">
 			<bounds x="621" y="186" width="59" height="24">
 			</bounds>
-		</backdrop>
-		<backdrop name="label38" element="label_38">
+		</element>
+		<element name="label38" ref="label_38">
 			<bounds x="605" y="408" width="91" height="26">
 			</bounds>
-		</backdrop>
-		<backdrop name="label39" element="label_39">
+		</element>
+		<element name="label39" ref="label_39">
 			<bounds x="625" y="101" width="52" height="19">
 			</bounds>
-		</backdrop>
+		</element>
 	</view>
 </mamelayout>

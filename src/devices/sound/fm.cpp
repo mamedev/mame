@@ -2727,7 +2727,7 @@ static inline void YM2608IRQMaskWrite(FM_OPN *OPN, ym2608_state *F2608, int v)
 }
 
 /* Generate samples for one of the YM2608s */
-void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2608_update_one(void *chip, FMSAMPLE * const *buffer, int length)
 {
 	ym2608_state *F2608 = (ym2608_state *)chip;
 	FM_OPN *OPN   = &F2608->OPN;
@@ -3275,7 +3275,7 @@ int ym2608_timer_over(void *chip,int c)
 /* YM2610(OPNB) */
 
 /* Generate samples for one of the YM2610s */
-void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2610_update_one(void *chip, FMSAMPLE * const *buffer, int length)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
@@ -3411,7 +3411,7 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 
 #if BUILD_YM2610B
 /* Generate samples for one of the YM2610Bs */
-void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2610b_update_one(void *chip, FMSAMPLE * const *buffer, int length)
 {
 	ym2610_state *F2610 = (ym2610_state *)chip;
 	FM_OPN *OPN   = &F2610->OPN;

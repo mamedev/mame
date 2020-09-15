@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "unicode.h"
-
 #include <algorithm>
 #include <limits>
 #include <memory>

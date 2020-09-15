@@ -207,10 +207,10 @@ namespace plib
 		static constexpr ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
 		static constexpr internal_type resolution() noexcept { return RES; }
 
-		constexpr internal_type in_nsec() const noexcept { return m_time / (RES / UINT64_C(1000000000)); }
-		constexpr internal_type in_usec() const noexcept { return m_time / (RES / UINT64_C(   1000000)); }
-		constexpr internal_type in_msec() const noexcept { return m_time / (RES / UINT64_C(      1000)); }
-		constexpr internal_type in_sec()  const noexcept { return m_time / (RES / UINT64_C(         1)); }
+		constexpr internal_type in_nsec() const noexcept { return m_time / (RES / INT64_C(1000000000)); }
+		constexpr internal_type in_usec() const noexcept { return m_time / (RES / INT64_C(   1000000)); }
+		constexpr internal_type in_msec() const noexcept { return m_time / (RES / INT64_C(      1000)); }
+		constexpr internal_type in_sec()  const noexcept { return m_time / (RES / INT64_C(         1)); }
 
 	private:
 		template <typename FT>

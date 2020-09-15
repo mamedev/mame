@@ -7,12 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/m6809/m6809.h"
-#include "audio/dcs.h"
-#include "includes/midtunit.h"
 #include "includes/midxunit.h"
-#include "midwayic.h"
 
 #define LOG_IO      (1 << 0)
 #define LOG_UART    (1 << 1)
@@ -29,14 +24,14 @@
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_cmos_r(offs_t offset)
+uint8_t midxunit_state::midxunit_cmos_r(offs_t offset)
 {
-	return m_nvram[offset];
+	return m_nvram_data[offset];
 }
 
-void midxunit_state::midxunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_cmos_w(offs_t offset, uint8_t data)
 {
-	COMBINE_DATA(m_nvram+offset);
+	m_nvram_data[offset] = data;
 }
 
 
@@ -105,10 +100,10 @@ WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_status_r()
+uint32_t midxunit_state::midxunit_status_r()
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (m_midway_serial_pic->status_r() << 1) | (m_adc_int ? 1 : 0);
+	return (m_pic_status << 1) | (m_adc_int ? 1 : 0);
 }
 
 
@@ -127,14 +122,9 @@ WRITE_LINE_MEMBER(midxunit_state::midxunit_dcs_output_full)
 }
 
 
-uint16_t midxunit_state::midxunit_uart_r(offs_t offset)
+uint8_t midxunit_state::midxunit_uart_r(offs_t offset)
 {
-	int result = 0;
-
-	/* convert to a byte offset */
-	if (offset & 1)
-		return 0;
-	offset /= 2;
+	uint8_t result = 0;
 
 	/* switch off the offset */
 	switch (offset)
@@ -152,7 +142,7 @@ uint16_t midxunit_state::midxunit_uart_r(offs_t offset)
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
 			else
 			{
-				int temp = midxunit_sound_state_r();
+				int temp = m_dcs->control_r();
 				result |= (temp & 0x800) >> 9;
 				result |= (~temp & 0x400) >> 10;
 				machine().scheduler().synchronize();
@@ -167,7 +157,11 @@ uint16_t midxunit_state::midxunit_uart_r(offs_t offset)
 
 			/* non-loopback case: read from the DCS system */
 			else
-				result = midxunit_sound_r();
+			{
+				LOGMASKED(LOG_SOUND, "%08X:Sound read\n", m_maincpu->pc());
+
+				result = m_dcs->data_r();
+			}
 			break;
 
 		case 5: /* register 5 seems to be like 3, but with in/out swapped */
@@ -179,7 +173,7 @@ uint16_t midxunit_state::midxunit_uart_r(offs_t offset)
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
 			else
 			{
-				int temp = midxunit_sound_state_r();
+				int temp = m_dcs->control_r();
 				result |= (temp & 0x800) >> 11;
 				result |= (~temp & 0x400) >> 8;
 				machine().scheduler().synchronize();
@@ -196,14 +190,8 @@ uint16_t midxunit_state::midxunit_uart_r(offs_t offset)
 }
 
 
-void midxunit_state::midxunit_uart_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_uart_w(offs_t offset, uint8_t data)
 {
-	/* convert to a byte offset, ignoring MSB writes */
-	if ((offset & 1) || !ACCESSING_BITS_0_7)
-		return;
-	offset /= 2;
-	data &= 0xff;
-
 	/* switch off the offset */
 	switch (offset)
 	{
@@ -215,7 +203,7 @@ void midxunit_state::midxunit_uart_w(offs_t offset, uint16_t data, uint16_t mem_
 
 			/* non-loopback case: send to the DCS system */
 			else
-				midxunit_sound_w(0, data, mem_mask);
+				m_dcs->data_w(data);
 			break;
 
 		case 5: /* register 5 write seems to reset things */
@@ -253,12 +241,19 @@ void midxunit_state::machine_start()
 	m_gun_recoil.resolve();
 	m_gun_led.resolve();
 
+	m_nvram_data = std::make_unique<uint8_t[]>(0x2000);
+	m_nvram->set_base(m_nvram_data.get(), 0x2000);
+
 	save_item(NAME(m_cmos_write_enable));
 	save_item(NAME(m_iodata));
-	save_item(NAME(m_ioshuffle));
 	save_item(NAME(m_uart));
-	save_item(NAME(m_security_bits));
 	save_item(NAME(m_adc_int));
+	save_pointer(NAME(m_nvram_data), 0x2000);
+
+	save_item(NAME(m_pic_command));
+	save_item(NAME(m_pic_data));
+	save_item(NAME(m_pic_clk));
+	save_item(NAME(m_pic_status));
 }
 
 void midxunit_state::machine_reset()
@@ -267,9 +262,10 @@ void midxunit_state::machine_reset()
 	m_dcs->reset_w(0);
 	m_dcs->reset_w(1);
 
-	/* reset I/O shuffling */
-	for (int i = 0; i < 16; i++)
-		m_ioshuffle[i] = i % 8;
+	m_pic_command = 0;
+	m_pic_data = 0;
+	m_pic_clk = 0;
+	m_pic_status = 0;
 
 	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::midxunit_dcs_output_full)), write_line_delegate(*this));
 }
@@ -282,59 +278,49 @@ void midxunit_state::machine_reset()
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_security_r()
+uint32_t midxunit_state::midxunit_security_r()
 {
-	return m_midway_serial_pic->read();
+	return m_pic_data;
 }
 
-void midxunit_state::midxunit_security_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_security_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_security_bits = data & 0x0f;
+		m_pic_command = data & 0x0f;
 }
 
 
-void midxunit_state::midxunit_security_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::midxunit_security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset == 0 && ACCESSING_BITS_0_7)
-		m_midway_serial_pic->write(((~data & 2) << 3) | m_security_bits);
+	if (ACCESSING_BITS_0_7)
+		m_pic_clk = BIT(data, 1);
 }
 
 
 
 /*************************************
  *
- *  Sound write handlers
+ *  DMA registers (inverted word select)
  *
  *************************************/
 
-uint16_t midxunit_state::midxunit_sound_r()
+uint32_t midxunit_state::midxunit_dma_r(offs_t offset, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_SOUND, "%08X:Sound read\n", m_maincpu->pc());
+	uint32_t result = 0;
 
-	return m_dcs->data_r() & 0xff;
+	if (ACCESSING_BITS_16_31)
+		result |= m_video->midtunit_dma_r(offset * 2);
+	if (ACCESSING_BITS_0_15)
+		result |= uint32_t(m_video->midtunit_dma_r(offset * 2 + 1)) << 16;
+
+	return result;
 }
 
 
-uint16_t midxunit_state::midxunit_sound_state_r()
+void midxunit_state::midxunit_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	return m_dcs->control_r();
-}
-
-
-void midxunit_state::midxunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	/* check for out-of-bounds accesses */
-	if (offset)
-	{
-		LOGMASKED(LOG_SOUND | LOG_UNKNOWN, "%s: Unexpected write to sound (hi) = %04X\n", machine().describe_context(), data);
-		return;
-	}
-
-	/* call through based on the sound type */
-	if (ACCESSING_BITS_0_7)
-	{
-		LOGMASKED(LOG_SOUND, "%s: Sound write = %04X\n", machine().describe_context(), data);
-		m_dcs->data_w(data & 0xff);
-	}
+	if (ACCESSING_BITS_16_31)
+		m_video->midtunit_dma_w(offset * 2, data & 0xffff);
+	if (ACCESSING_BITS_0_15)
+		m_video->midtunit_dma_w(offset * 2 + 1, data >> 16);
 }

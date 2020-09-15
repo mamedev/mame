@@ -11,13 +11,8 @@
 
 #include "emu.h"
 #include "includes/radio86.h"
-
 #include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
-#include "machine/i8255.h"
-
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 #include "formats/rk_cas.h"
@@ -26,13 +21,12 @@
 /* Address maps */
 void radio86_state::radio86_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0x7fff).ram();  // RAM
-	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	//map(0xa000, 0xa003).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
-	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf000, 0xffff).rom();  // System ROM
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0x8003).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	//map(0xa000, 0xa003).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xc000, 0xc001).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom().region("maincpu",0);  // System ROM
 }
 
 void radio86_state::radio86_io(address_map &map)
@@ -49,63 +43,58 @@ void radio86_state::rk7007_io(address_map &map)
 
 void radio86_state::radio86rom_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0x7fff).ram();  // RAM
-	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	map(0xa000, 0xa003).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
-	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf000, 0xffff).rom();  // System ROM
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0x8003).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xa000, 0xa003).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xc000, 0xc001).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom().region("maincpu",0);  // System ROM
 }
 
 void radio86_state::radio86ram_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0xdfff).ram();  // RAM
+	map(0x0000, 0xdfff).ram().share("mainram");
 	map(0xe000, 0xe7ff).rom();  // System ROM page 2
 	map(0xe800, 0xf5ff).ram();  // RAM
-	map(0xf700, 0xf703).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf780, 0xf7bf).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)); // video
-	map(0xf684, 0xf687).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf700, 0xf703).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf780, 0xf7bf).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)); // video
+	map(0xf684, 0xf687).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf688, 0xf688).w(FUNC(radio86_state::radio86_pagesel));
-	map(0xf800, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf800, 0xffff).rom();  // System ROM page 1
+	map(0xf800, 0xffff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf800, 0xffff).rom().region("maincpu",0);  // System ROM page 1
 }
 
 void radio86_state::radio86_16_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0x3fff).ram();  // RAM
+	map(0x0000, 0x3fff).ram().share("mainram");
 	map(0x4000, 0x7fff).r(FUNC(radio86_state::radio_cpu_state_r));
-	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	//map(0xa000, 0xa003).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
-	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf000, 0xffff).rom();  // System ROM
+	map(0x8000, 0x8003).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	//map(0xa000, 0xa003).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xc000, 0xc001).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom().region("maincpu",0);  // System ROM
 }
 
 
 void radio86_state::mikron2_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0x7fff).ram();  // RAM
-	map(0xc000, 0xc003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
-	//map(0xc100, 0xc103).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
-	map(0xc200, 0xc201).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
-	map(0xc300, 0xc3ff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf000, 0xffff).rom();  // System ROM
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0xc000, 0xc003).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
+	//map(0xc100, 0xc103).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
+	map(0xc200, 0xc201).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
+	map(0xc300, 0xc3ff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom().region("maincpu",0);  // System ROM
 }
 
 void radio86_state::impuls03_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
-	map(0x1000, 0x7fff).ram();  // RAM
-	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	map(0xa000, 0xbfff).rom();  // Basic ROM
-	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
-	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
-	map(0xf000, 0xffff).rom();  // System ROM
+	map(0x0000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0x8003).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xa000, 0xbfff).rom().region("maincpu",0x1000);  // Basic ROM
+	map(0xc000, 0xc001).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom().region("maincpu",0);  // System ROM
 }
 
 /* Input ports */
@@ -456,7 +445,7 @@ static const gfx_layout radio86_charlayout =
 };
 
 static GFXDECODE_START( gfx_radio86 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, radio86_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, radio86_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -468,32 +457,32 @@ void radio86_state::radio86(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86_mem);
 	m_maincpu->set_addrmap(AS_IO, &radio86_state::radio86_io);
 
-	I8255(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
-	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255(config, m_ppi1);
+	m_ppi1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi1->in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	m_ppi1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	i8275_device &crtc(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	i8275_device &crtc(I8275(config, "crtc", XTAL(16'000'000) / 12));
 	crtc.set_character_width(6);
 	crtc.set_display_callback(FUNC(radio86_state::display_pixels));
-	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
+	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_raw(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_radio86);
 	PALETTE(config, m_palette, FUNC(radio86_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
 
-	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
-	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
-	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
-	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
-	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
-	m_dma8257->set_reverse_rw_mode(1);
+	I8257(config, m_dma, XTAL(16'000'000) / 9);
+	m_dma->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
+	m_dma->set_reverse_rw_mode(1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rkr_cassette_formats);
@@ -510,10 +499,10 @@ void radio86_state::kr03(machine_config &config)
 	radio86(config);
 	/* basic machine hardware */
 
-	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::kr03_8255_portb_r2));
-	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
-	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	m_ppi1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi1->in_pb_callback().set(FUNC(radio86_state::kr03_8255_portb_r2));
+	m_ppi1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 }
 
 void radio86_state::radio16(machine_config &config)
@@ -529,10 +518,10 @@ void radio86_state::radiorom(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86rom_mem);
 
-	I8255(config, m_ppi8255_2);
-	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86rom_romdisk_porta_r));
-	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
-	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
+	I8255(config, m_ppi2);
+	m_ppi2->in_pa_callback().set(FUNC(radio86_state::radio86rom_romdisk_porta_r));
+	m_ppi2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
+	m_ppi2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "radio86_cart", "bin,rom");
 
@@ -545,10 +534,10 @@ void radio86_state::radioram(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &radio86_state::radio86ram_mem);
 
-	I8255(config, m_ppi8255_2);
-	m_ppi8255_2->in_pa_callback().set(FUNC(radio86_state::radio86ram_romdisk_porta_r));
-	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
-	m_ppi8255_2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
+	I8255(config, m_ppi2);
+	m_ppi2->in_pa_callback().set(FUNC(radio86_state::radio86ram_romdisk_porta_r));
+	m_ppi2->out_pb_callback().set(FUNC(radio86_state::radio86_romdisk_portb_w));
+	m_ppi2->out_pc_callback().set(FUNC(radio86_state::radio86_romdisk_portc_w));
 }
 
 void radio86_state::rk7007(machine_config &config)
@@ -593,107 +582,119 @@ void radio86_state::impuls03(machine_config &config)
 
 /* ROM definition */
 ROM_START( radio86 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios.rom", 0xf800, 0x0800, CRC(bf1ceea5) SHA1(8f3d472203e550e9854dd79e1f44628635581ed0))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bios.rom", 0x0800, 0x0800, CRC(bf1ceea5) SHA1(8f3d472203e550e9854dd79e1f44628635581ed0))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radio4k )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios4k.rom", 0xf000, 0x1000, CRC(2ac9d864) SHA1(296716c6cddc9dd31d500ba421aa807c45757cfd))
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bios4k.rom", 0x0000, 0x1000, CRC(2ac9d864) SHA1(296716c6cddc9dd31d500ba421aa807c45757cfd))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( spektr01 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "spektr001.rom", 0xf800, 0x0800, CRC(5a38e6d5) SHA1(799c3bbe2a9f08f3aba55379cc093329048350ff))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "spektr001.rom", 0x0800, 0x0800, CRC(5a38e6d5) SHA1(799c3bbe2a9f08f3aba55379cc093329048350ff))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION(0x0800, "chargen",0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radio16 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "rk86.16k", 0xf800, 0x0800, CRC(fd8a4caf) SHA1(90d6af571049a7c8748eac03541e921eac3f70c5))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "rk86.16k", 0x0800, 0x0800, CRC(fd8a4caf) SHA1(90d6af571049a7c8748eac03541e921eac3f70c5))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radiorom )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "32k", "32 KB rom disk")
-	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(0))
+	ROMX_LOAD( "radiorom.rom", 0x0800, 0x0800, CRC(b5cdeab7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "64k", "64 KB rom disk")
-	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(1))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROMX_LOAD( "radiorom.64",  0x0800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(1))
+	ROM_COPY( "maincpu", 0x0800, 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( radioram )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "r86-1.bin", 0xf800, 0x0800, CRC(7e7ab7cb) SHA1(fedb00b6b8fbe1167faba3e4611b483f800e6934))
+	ROM_LOAD( "r86-1.bin", 0x0800, 0x0800, CRC(7e7ab7cb) SHA1(fedb00b6b8fbe1167faba3e4611b483f800e6934))
+	ROM_RELOAD( 0x0000, 0x0800 )
 	ROM_LOAD( "r86-2.bin", 0xe000, 0x0800, CRC(955f0616) SHA1(d2b9f960558bdcb60074091fc79d1ad56c313586))
 	ROM_LOAD( "romdisk.bin", 0x10000, 0x10000, CRC(43c0279b) SHA1(bc1dfd9bdbce39460616e2158f5d96279d0af3cf))
-	ROM_REGION(0x0800, "gfx1",0)
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( rk7007 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ms7007.rom", 0xf800, 0x0800, CRC(002811dc) SHA1(4529eb72198c49af77fbcd7833bcd06a1cf9b1ac))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ms7007.rom", 0x0800, 0x0800, CRC(002811dc) SHA1(4529eb72198c49af77fbcd7833bcd06a1cf9b1ac))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( rk700716 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ms7007.16k", 0xf800, 0x0800, CRC(5268d7b6) SHA1(efd69d8456b8cf8b37f33237153c659725608528))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ms7007.16k", 0x0800, 0x0800, CRC(5268d7b6) SHA1(efd69d8456b8cf8b37f33237153c659725608528))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( mikron2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mikron2.bin", 0xf800, 0x0800, CRC(2cd79bb4) SHA1(501df47e65aaa8f4ce27751bc2a7e7089e2e888c))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mikron2.bin", 0x0800, 0x0800, CRC(2cd79bb4) SHA1(501df47e65aaa8f4ce27751bc2a7e7089e2e888c))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 
 ROM_START( kr03 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "kr03-dd17.rf2", 0xf800, 0x0800, CRC(ac2e24d5) SHA1(a1317a261bfd55b3b37109b14d1391308dee04de))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "kr03-dd17.rf2", 0x0800, 0x0800, CRC(ac2e24d5) SHA1(a1317a261bfd55b3b37109b14d1391308dee04de))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("kr03-dd12.rf2", 0x0000, 0x0800, CRC(085f4259) SHA1(11c5829b072a00961ad936c26559fb63bf2dc896))
 ROM_END
 
 ROM_START( impuls03 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "imp03bas.rom", 0xa000, 0x2000, CRC(b13b2de4) SHA1(9af8c49d72ca257bc34cad3c62e530730929702e))
-	ROM_LOAD( "imp03mon.rom", 0xf800, 0x0800, CRC(8c591ce4) SHA1(8e8e9cba6b3123d74218b92f4b4210606ba53376))
-	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_REGION(0x0800, "gfx1",0)
+	ROM_REGION( 0x3000, "maincpu", 0 )
+	ROM_LOAD( "imp03bas.rom", 0x1000, 0x2000, CRC(b13b2de4) SHA1(9af8c49d72ca257bc34cad3c62e530730929702e))
+	ROM_LOAD( "imp03mon.rom", 0x0800, 0x0800, CRC(8c591ce4) SHA1(8e8e9cba6b3123d74218b92f4b4210606ba53376))
+	ROM_RELOAD( 0x0000, 0x0800 )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT           COMPANY        FULLNAME                       FLAGS
-COMP( 1986, radio86,  0,       0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK",                  0 )
-COMP( 1986, radio16,  radio86, 0,      radio16,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        0 )
-COMP( 1986, kr03,     radio86, 0,      kr03,     kr03,    radio86_state, init_radio86,  "Elektronika", "KR-03",                       0 )
-COMP( 1986, radio4k,  radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         0 )
-COMP( 1986, radiorom, radio86, 0,      radiorom, radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       0 )
-COMP( 1986, radioram, radio86, 0,      radioram, radio86, radio86_state, init_radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   0 )
-COMP( 1986, spektr01, radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Spektr-001",                  0 )
-COMP( 1986, rk7007,   radio86, 0,      rk7007,   ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007)",         0 )
-COMP( 1986, rk700716, radio86, 0,      rk700716, ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", 0 )
-COMP( 1986, mikron2,  radio86, 0,      mikron2,  radio86, radio86_state, init_radio86,  "<unknown>",   "Mikron-2",                    0 )
-COMP( 1986, impuls03, radio86, 0,      impuls03, radio86, radio86_state, init_radio86,  "<unknown>",   "Impuls-03",                   0 )
+COMP( 1986, radio86,  0,       0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, radio16,  radio86, 0,      radio16,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (16K RAM)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1986, kr03,     radio86, 0,      kr03,     kr03,    radio86_state, init_radio86,  "Elektronika", "KR-03",                       MACHINE_SUPPORTS_SAVE )
+COMP( 1986, radio4k,  radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (4K ROM)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1986, radiorom, radio86, 0,      radiorom, radio86, radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (ROM-Disk)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1986, radioram, radio86, 0,      radioram, radio86, radio86_state, init_radioram, "<unknown>",   "Radio-86RK (ROM/RAM Disk)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, spektr01, radio86, 0,      radio86,  radio86, radio86_state, init_radio86,  "<unknown>",   "Spektr-001",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, rk7007,   radio86, 0,      rk7007,   ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1986, rk700716, radio86, 0,      rk700716, ms7007,  radio86_state, init_radio86,  "<unknown>",   "Radio-86RK (MS7007 16K RAM)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mikron2,  radio86, 0,      mikron2,  radio86, radio86_state, init_radio86,  "<unknown>",   "Mikron-2",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, impuls03, radio86, 0,      impuls03, radio86, radio86_state, init_radio86,  "<unknown>",   "Impuls-03",                   MACHINE_SUPPORTS_SAVE )

@@ -111,6 +111,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_indervid(*this, "inder_vid"),
+			m_sample_rom(*this, "samples"),
 			m_ldac(*this, "ldac"),
 			m_rdac(*this, "rdac"),
 			m_soundframe(0)
@@ -121,11 +122,15 @@ public:
 
 	void init_littlerb();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(frame_step_r);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<inder_vid_device> m_indervid;
+	required_region_ptr<uint8_t> m_sample_rom;
 
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
@@ -133,39 +138,47 @@ private:
 	uint16_t m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
 
-	void littlerb_l_sound_w(uint16_t data);
-	void littlerb_r_sound_w(uint16_t data);
+	void l_sound_w(uint16_t data);
+	void r_sound_w(uint16_t data);
 	uint8_t sound_data_shift();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_step_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_cb);
 
-	void littlerb_main(address_map &map);
+	void main(address_map &map);
 };
 
+void littlerb_state::machine_start()
+{
+	save_item(NAME(m_sound_index_l));
+	save_item(NAME(m_sound_index_r));
+	save_item(NAME(m_sound_pointer_l));
+	save_item(NAME(m_sound_pointer_r));
+	save_item(NAME(m_soundframe));
+}
 
-/* could be slightly different (timing wise, directly related to the irqs), but certainly they smoked some bad pot for this messy way ... */
+// could be slightly different (timing wise, directly related to the irqs), but certainly they smoked some bad pot for this messy way ...
 uint8_t littlerb_state::sound_data_shift()
 {
 	return ((m_soundframe % 16) == 0) ? 8 : 0;
 }
 
-/* l is SFX, r is BGM (they doesn't seem to share the same data ROM) */
-void littlerb_state::littlerb_l_sound_w(uint16_t data)
+// l is SFX, r is BGM (they don't seem to share the same data ROM)
+void littlerb_state::l_sound_w(uint16_t data)
 {
 	m_sound_index_l = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_l = 0;
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
-void littlerb_state::littlerb_r_sound_w(uint16_t data)
+void littlerb_state::r_sound_w(uint16_t data)
 {
 	m_sound_index_r = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_r = 0;
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
-void littlerb_state::littlerb_main(address_map &map)
+void littlerb_state::main(address_map &map)
 {
 	map(0x000008, 0x000017).nopw();
 	map(0x000020, 0x00002f).nopw();
@@ -176,16 +189,16 @@ void littlerb_state::littlerb_main(address_map &map)
 
 	map(0x700000, 0x700007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
-	map(0x740000, 0x740001).w(FUNC(littlerb_state::littlerb_l_sound_w));
-	map(0x760000, 0x760001).w(FUNC(littlerb_state::littlerb_r_sound_w));
+	map(0x740000, 0x740001).w(FUNC(littlerb_state::l_sound_w));
+	map(0x760000, 0x760001).w(FUNC(littlerb_state::r_sound_w));
 	map(0x780000, 0x780001).nopw(); // generic outputs
 	map(0x7c0000, 0x7c0001).portr("DSW");
 	map(0x7e0000, 0x7e0001).portr("P1");
 	map(0x7e0002, 0x7e0003).portr("P2");
 }
 
-/* guess according to DASM code and checking the gameplay speed, could be different */
-CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
+// guess according to DASM code and checking the gameplay speed, could be different
+CUSTOM_INPUT_MEMBER(littlerb_state::frame_step_r)
 {
 	uint32_t ret = m_soundframe;
 
@@ -193,7 +206,7 @@ CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
 }
 
 static INPUT_PORTS_START( littlerb )
-	PORT_START("DSW")   /* 16bit */
+	PORT_START("DSW")   // 16bit
 	PORT_DIPNAME( 0x0003, 0x0001, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(      0x0003, "2" )
 	PORT_DIPSETTING(      0x0001, "3" )
@@ -239,7 +252,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-	PORT_START("P1")    /* 16bit */
+	PORT_START("P1")    // 16bit
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -255,9 +268,9 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPNAME( 0x1000, 0x1000, "???"  )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(littlerb_state, littlerb_frame_step_r)
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(littlerb_state, frame_step_r)
 
-	PORT_START("P2")    /* 16bit */
+	PORT_START("P2")    // 16bit
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -270,19 +283,17 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::sound_cb)
 {
-	uint8_t *sample_rom = memregion("samples")->base();
-
-	m_ldac->write(sample_rom[m_sound_pointer_l | (m_sound_index_l << 10) | 0x40000]);
-	m_rdac->write(sample_rom[m_sound_pointer_r | (m_sound_index_r << 10) | 0x00000]);
+	m_ldac->write(m_sample_rom[m_sound_pointer_l | (m_sound_index_l << 10) | 0x40000]);
+	m_rdac->write(m_sample_rom[m_sound_pointer_r | (m_sound_index_r << 10) | 0x00000]);
 	m_sound_pointer_l++;
 	m_sound_pointer_l&=0x3ff;
 	m_sound_pointer_r++;
 	m_sound_pointer_r&=0x3ff;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::sound_step_cb)
 {
 	m_soundframe++;
 }
@@ -290,13 +301,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
 void littlerb_state::littlerb(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(16'000'000)/2); // 10MHz rated part, near 16Mhz XTAL
-	m_maincpu->set_addrmap(AS_PROGRAM, &littlerb_state::littlerb_main);
+	m_maincpu->set_addrmap(AS_PROGRAM, &littlerb_state::main);
 
 	INDER_VIDEO(config, m_indervid, 0); // XTAL(40'000'000)
 
 	// TODO: not accurate - driven by XTAL(6'000'000)?
-	TIMER(config, "step_timer").configure_periodic(FUNC(littlerb_state::littlerb_sound_step_cb), attotime::from_hz(7500/150));
-	TIMER(config, "sound_timer").configure_periodic(FUNC(littlerb_state::littlerb_sound_cb), attotime::from_hz(7500));
+	TIMER(config, "step_timer").configure_periodic(FUNC(littlerb_state::sound_step_cb), attotime::from_hz(7500/150));
+	TIMER(config, "sound_timer").configure_periodic(FUNC(littlerb_state::sound_cb), attotime::from_hz(7500));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -309,11 +320,11 @@ void littlerb_state::littlerb(machine_config &config)
 }
 
 ROM_START( littlerb )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tch_1.u53", 0x00001, 0x80000, CRC(172fbc13) SHA1(cd165ca0d0546e2634cf182dc98004cbfb02cf9f) )
 	ROM_LOAD16_BYTE( "tch_2.u29", 0x00000, 0x80000, CRC(b2fb1d61) SHA1(9a9d7176c241928d07af651e5f7f21d4f019701d) )
 
-	ROM_REGION( 0x80000, "samples", 0 ) /* sound samples */
+	ROM_REGION( 0x80000, "samples", 0 )
 	ROM_LOAD( "tch_3.u26", 0x40000, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
 	ROM_LOAD( "tch_4.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
@@ -325,4 +336,4 @@ void littlerb_state::init_littlerb()
 	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
 }
 
-GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, init_littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, init_littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

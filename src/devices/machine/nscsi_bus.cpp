@@ -630,6 +630,10 @@ void nscsi_full_device::scsi_unknown_command()
 void nscsi_full_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
+	case SC_REZERO:
+		LOG("command REZERO\n");
+		scsi_status_complete(SS_GOOD);
+		break;
 	case SC_REQUEST_SENSE:
 		LOG("command REQUEST SENSE alloc=%d\n", scsi_cmdbuf[4]);
 		scsi_data_in(SBUF_SENSE, scsi_cmdbuf[4] ? std::min(scsi_cmdbuf[4], u8(sizeof(scsi_sense_buffer))) : 4);

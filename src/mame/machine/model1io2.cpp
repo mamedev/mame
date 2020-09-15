@@ -386,7 +386,7 @@ ioport_value model1io2_device::analog3_r()
 
 
 //**************************************************************************
-//  FGPA (Virtua Cop)
+//  FPGA (Virtua Cop)
 //**************************************************************************
 
 uint8_t model1io2_device::fpga_r(offs_t offset)

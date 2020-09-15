@@ -27,8 +27,9 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "odyssey2cart")
-	, m_rom(nullptr)
-	, m_rom_size(0)
+	, m_rom(*this, "rom")
+	, m_exrom(*this, "exrom")
+	, m_voice(*this, "voice")
 {
 }
 
@@ -39,29 +40,6 @@ device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig
 
 device_o2_cart_interface::~device_o2_cart_interface()
 {
-}
-
-//-------------------------------------------------
-//  rom_alloc - alloc the space for the cart
-//-------------------------------------------------
-
-void device_o2_cart_interface::rom_alloc(uint32_t size, const char *tag)
-{
-	if (m_rom == nullptr)
-	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(O2SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
-		m_rom_size = size;
-	}
-}
-
-
-//-------------------------------------------------
-//  ram_alloc - alloc the space for the ram
-//-------------------------------------------------
-
-void device_o2_cart_interface::ram_alloc(uint32_t size)
-{
-	m_ram.resize(size);
 }
 
 
@@ -78,6 +56,7 @@ o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const ch
 	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
 	, m_type(O2_STD)
 	, m_cart(nullptr)
+	, m_b(0)
 {
 }
 
@@ -114,19 +93,22 @@ struct o2_slot
 static const o2_slot slot_list[] =
 {
 	{ O2_STD,      "o2_rom" },
-	{ O2_ROM12,    "o2_rom12" },
-	{ O2_ROM16,    "o2_rom16" },
+	{ O2_4IN1,     "o2_4in1" },
+	{ O2_RALLY,    "o2_rally" },
+	{ O2_KTAA,     "o2_ktaa" },
 	{ O2_CHESS,    "o2_chess" },
+	{ O2_HOMECOMP, "o2_homecomp" },
 	{ O2_VOICE,    "o2_voice" }
 };
 
 static int o2_get_pcb_id(const char *slot)
 {
-	for (auto & elem : slot_list)
-	{
-		if (!core_stricmp(elem.slot_option, slot))
-			return elem.pcb_id;
-	}
+	if (slot)
+		for (auto & elem : slot_list)
+		{
+			if (!core_stricmp(elem.slot_option, slot))
+				return elem.pcb_id;
+		}
 
 	return 0;
 }
@@ -151,35 +133,35 @@ image_init_result o2_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		m_cart->rom_alloc(size, tag());
-
-		if (!loaded_through_softlist())
-			fread(m_cart->get_rom_base(), size);
-		else
-			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
-
-		if (!loaded_through_softlist())
+		if (loaded_through_softlist())
 		{
-			m_type = O2_STD;
-			if (size == 12288)
-				m_type = O2_ROM12;
-			if (size == 16384)
-				m_type = O2_ROM16;
+			load_software_region("rom", m_cart->m_rom);
+			load_software_region("exrom", m_cart->m_exrom);
+			load_software_region("voice", m_cart->m_voice);
+
+			m_type = o2_get_pcb_id(get_feature("slot"));
+
+			// Videopac+ determines whether the screen should have a border, with a gate connected
+			// to the cartridge B pin. This way, old Videopac games can still run in full screen.
+			const char *b_pin = get_feature("b_pin");
+			m_b = b_pin && strtoul(b_pin, nullptr, 0) ? 1 : 0;
 		}
 		else
 		{
-			const char *pcb_name = get_feature("slot");
-			if (pcb_name)
-				m_type = o2_get_pcb_id(pcb_name);
+			uint32_t size = length();
+			fread(m_cart->m_rom, size);
+
+			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		}
 
-		//printf("Type: %s\n", o2_get_slot(m_type));
-
-		return image_init_result::PASS;
+		if (m_cart->get_rom_size() > 0)
+		{
+			m_cart->cart_init();
+			return image_init_result::PASS;
+		}
 	}
 
-	return image_init_result::PASS;
+	return image_init_result::FAIL;
 }
 
 
@@ -193,13 +175,7 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 	{
 		const char *slot_string;
 		uint32_t size = hook.image_file()->size();
-		int type = O2_STD;
-
-		if (size == 12288)
-			type = O2_ROM12;
-		if (size == 16384)
-			type = O2_ROM16;
-
+		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		slot_string = o2_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
@@ -231,7 +207,7 @@ uint8_t o2_cart_slot_device::read_rom0c(offs_t offset)
 }
 
 /*-------------------------------------------------
- io_write
+ io
  -------------------------------------------------*/
 
 void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
@@ -240,16 +216,42 @@ void o2_cart_slot_device::io_write(offs_t offset, uint8_t data)
 		m_cart->io_write(offset, data);
 }
 
+uint8_t o2_cart_slot_device::io_read(offs_t offset)
+{
+	if (m_cart)
+		return m_cart->io_read(offset);
+	else
+		return 0xff;
+}
+
+int o2_cart_slot_device::b_read()
+{
+	if (m_cart)
+	{
+		int b = m_cart->b_read();
+		const bool override = b != -1;
+		return override ? b : m_b;
+	}
+	else
+		return 0;
+}
+
 
 #include "bus/odyssey2/rom.h"
+#include "bus/odyssey2/4in1.h"
+#include "bus/odyssey2/rally.h"
+#include "bus/odyssey2/ktaa.h"
 #include "bus/odyssey2/chess.h"
+#include "bus/odyssey2/homecomp.h"
 #include "bus/odyssey2/voice.h"
 
 void o2_cart(device_slot_interface &device)
 {
-	device.option_add_internal("o2_rom",    O2_ROM_STD);
-	device.option_add_internal("o2_rom12",  O2_ROM_12K);
-	device.option_add_internal("o2_rom16",  O2_ROM_16K);
-	device.option_add_internal("o2_chess",  O2_ROM_CHESS);
-	device.option_add_internal("o2_voice",  O2_ROM_VOICE);
+	device.option_add_internal("o2_rom",      O2_ROM_STD);
+	device.option_add_internal("o2_4in1",     O2_ROM_4IN1);
+	device.option_add_internal("o2_rally",    O2_ROM_RALLY);
+	device.option_add_internal("o2_ktaa",     O2_ROM_KTAA);
+	device.option_add_internal("o2_chess",    O2_ROM_CHESS);
+	device.option_add_internal("o2_homecomp", O2_ROM_HOMECOMP);
+	device.option_add_internal("o2_voice",    O2_ROM_VOICE);
 }

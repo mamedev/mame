@@ -23,7 +23,6 @@
 #include "machine/applefdc.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
-#include "machine/mackbd.h"
 #include "machine/macrtc.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
@@ -35,10 +34,6 @@
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
-#define MACKBD_TAG "mackbd"
-
-// uncomment to run i8021 keyboard in original Mac/512(e)/Plus
-//#define MAC_USE_EMULATED_KBD (1)
 
 // model helpers
 #define ADB_IS_BITBANG  ((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
@@ -81,7 +76,6 @@ public:
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_fdc(*this, "fdc"),
-		m_mackbd(*this, MACKBD_TAG),
 		m_rtc(*this, "rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
@@ -98,9 +92,10 @@ public:
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac")
 	{
+		m_rom_size = 0;
+		m_rom_ptr = nullptr;
 	}
 
-	void add_mackbd(machine_config &config);
 	void add_scsi(machine_config &config, bool cdrom = false);
 	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
 	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
@@ -265,7 +260,6 @@ private:
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
 	required_device<applefdc_base_device> m_fdc;
-	optional_device<mackbd_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -274,16 +268,6 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	/* for Egret and CUDA streaming MCU commands, command types */
-	enum mac_streaming_t
-	{
-		MCU_STREAMING_NONE = 0,
-		MCU_STREAMING_PRAMRD,
-		MCU_STREAMING_PRAMWR,
-		MCU_STREAMING_WRAMRD,
-		MCU_STREAMING_WRAMWR
-	};
 
 	enum
 	{
@@ -309,24 +293,6 @@ private:
 	bool m_main_buffer;
 	int m_snd_vol;
 
-#ifndef MAC_USE_EMULATED_KBD
-	/* used to store the reply to most keyboard commands */
-	int m_keyboard_reply;
-
-	/* Keyboard communication in progress? */
-	int m_kbd_comm;
-	int m_kbd_receive;
-	/* timer which is used to time out inquiry */
-	emu_timer *m_inquiry_timeout;
-
-	int m_kbd_shift_reg;
-	int m_kbd_shift_count;
-
-	/* keycode buffer (used for keypad/arrow key transition) */
-	int m_keycode_buf[2];
-	int m_keycode_buf_index;
-#endif
-
 	/* keyboard matrix to detect transition - macadb needs to stop relying on this */
 	int m_key_matrix[7];
 
@@ -343,7 +309,7 @@ private:
 	int32_t m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
 	int32_t m_adb_state, m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
 	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
-	int32_t m_adb_streaming, m_adb_stream_ptr;
+	int32_t m_adb_stream_ptr;
 	int32_t m_adb_linestate;
 	bool  m_adb_srqflag;
 #define kADBKeyBufSize 32
@@ -528,6 +494,9 @@ private:
 	optional_device<palette_device> m_palette;
 	optional_device<dac_8bit_pwm_device> m_dac;
 
+	uint32_t m_rom_size;
+	uint32_t *m_rom_ptr;
+
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
 
@@ -555,10 +524,6 @@ private:
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
-#ifndef MAC_USE_EMULATED_KBD
-	TIMER_CALLBACK_MEMBER(kbd_clock);
-	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
-#endif
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
@@ -566,7 +531,6 @@ private:
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
 	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
 	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
-	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	uint8_t mac_via_in_a();
 	uint8_t mac_via_in_b();
@@ -595,10 +559,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 	void dafb_recalc_ints();
 	void set_scc_waitrequest(int waitrequest);
-	int scan_keyboard();
-	void keyboard_init();
-	void kbd_shift_out(int data);
-	void keyboard_receive(int val);
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);

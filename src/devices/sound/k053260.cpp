@@ -65,21 +65,20 @@ static constexpr int CLOCKS_PER_SAMPLE = 64;
 
 // device type definition
 DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "K053260 KDSC")
-    ;
 
 
 // Pan multipliers.  Set according to integer angles in degrees, amusingly.
 // Exact precision hard to know, the floating point-ish output format makes
 // comparisons iffy.  So we used a 1.16 format.
 const int k053260_device::pan_mul[8][2] = {
-    {     0,     0 }, // No sound for pan 0
-    { 65536,     0 }, //  0 degrees
-    { 59870, 26656 }, // 24 degrees
-    { 53684, 37950 }, // 35 degrees
-    { 46341, 46341 }, // 45 degrees
-    { 37950, 53684 }, // 55 degrees
-    { 26656, 59870 }, // 66 degrees
-    {     0, 65536 }  // 90 degrees
+	{     0,     0 }, // No sound for pan 0
+	{ 65536,     0 }, //  0 degrees
+	{ 59870, 26656 }, // 24 degrees
+	{ 53684, 37950 }, // 35 degrees
+	{ 46341, 46341 }, // 45 degrees
+	{ 37950, 53684 }, // 55 degrees
+	{ 26656, 59870 }, // 66 degrees
+	{     0, 65536 }  // 90 degrees
 };
 
 
@@ -116,7 +115,7 @@ void k053260_device::device_start()
 	m_sh1_cb.resolve_safe();
 	m_sh2_cb.resolve_safe();
 
-	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
+	m_stream = stream_alloc_legacy( 0, 2, clock() / CLOCKS_PER_SAMPLE );
 
 	/* register with the save state system */
 	save_item(NAME(m_portdata));
@@ -210,7 +209,7 @@ u8 k053260_device::read(offs_t offset)
 
 		case 0x2e: // read ROM
 			if (m_mode & 1)
-				ret = m_voice[0].read_rom();
+				ret = m_voice[0].read_rom(!(machine().side_effects_disabled()));
 			else
 				logerror("%s: Attempting to read K053260 ROM without mode bit set\n", machine().describe_context());
 			break;
@@ -311,10 +310,10 @@ static constexpr s32 MAXOUT = 0x7fff;
 static constexpr s32 MINOUT = -0x8000;
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k053260_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	if (m_mode & 2)
 	{
@@ -430,7 +429,7 @@ void k053260_device::KDSC_Voice::update_pan_volume()
 void k053260_device::KDSC_Voice::key_on()
 {
 	m_position = m_kadpcm ? 1 : 0; // for kadpcm low bit is nybble offset, so must start at 1 due to preincrement
-	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
+	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update_legacy
 	m_output = 0;
 	m_playing = true;
 	if (LOG) m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x:%x, loop = %s, %s\n",
@@ -494,11 +493,12 @@ void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
 	outputs[1] += (m_output * m_pan_volume[1]) >> 15;
 }
 
-u8 k053260_device::KDSC_Voice::read_rom()
+u8 k053260_device::KDSC_Voice::read_rom(bool side_effects)
 {
 	u32 offs = m_start + m_position;
 
-	m_position = (m_position + 1) & 0xffff;
+	if (side_effects)
+		m_position = (m_position + 1) & 0xffff;
 
 	return m_device.read_byte(offs);
 }

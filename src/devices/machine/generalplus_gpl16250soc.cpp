@@ -188,6 +188,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 		if (mode & 0x2000)
 		{
 			write_space(dest, val & 0xFF);
+			dest += destdelta;
 			write_space(dest, val >> 8);
 		}
 		else
@@ -212,10 +213,10 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 
 	// what is it waiting for when we need these? (needed on some service mode screens)
 	//if (mem.read_word(0x3f368) == 0x4840)
-	//	mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
+	//  mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
 	//if (mem.read_word(0x4d8d4) == 0x4840)
-	//	mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
+	//  mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
 
 	// clear params after operation

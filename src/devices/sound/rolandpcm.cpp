@@ -61,7 +61,7 @@ void mb87419_mb87420_device::device_start()
 	m_clock = clock() / 2;
 	m_rate = m_clock / 512; // usually 32 KHz
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc_legacy(0, 2, m_rate);
 
 	logerror("Roland PCM: Clock %u, Rate %u\n", m_clock, m_rate);
 }
@@ -266,10 +266,10 @@ void mb87419_mb87420_device::write(offs_t offset, u8 data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void mb87419_mb87420_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mb87419_mb87420_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));

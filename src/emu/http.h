@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-http.cpp
+    http.h
 
-HTTP server handling
+    HTTP server handling
 
 ***************************************************************************/
 

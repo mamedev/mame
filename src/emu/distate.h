@@ -43,7 +43,6 @@ enum
 // class describing a single item of exposed device state
 class device_state_entry
 {
-	friend class device_state_interface;
 public:
 	// construction/destruction
 	device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev);
@@ -73,6 +72,18 @@ public:
 	device_state_interface *parent_state() const {return m_device_state;}
 	const std::string &format_string() const { return m_format; }
 
+	// return the current value
+	u64 value() const;
+	double dvalue() const;
+
+	// return the current value as a string
+	std::string to_string() const;
+	int max_length() const;
+
+	// set the current value
+	void set_value(u64 value) const;
+	void set_dvalue(double value) const;
+
 protected:
 	// device state flags
 	static constexpr u8 DSF_NOSHOW          = 0x01; // don't display this entry in the registers view
@@ -84,28 +95,17 @@ protected:
 	static constexpr u8 DSF_READONLY        = 0x40; // set if this entry does not permit writes
 	static constexpr u8 DSF_FLOATING_POINT  = 0x80; // set if this entry represents a floating-point value
 
-	// helpers
-	bool needs_custom_string() const { return ((m_flags & DSF_CUSTOM_STRING) != 0); }
-	void format_from_mask();
-
-	// return the current value -- only for our friends who handle export
-	bool needs_export() const { return ((m_flags & DSF_EXPORT) != 0); }
-	u64 value() const { return entry_value() & m_datamask; }
-	double dvalue() const { return entry_dvalue(); }
-	std::string format(const char *string, bool maxout = false) const;
-
-	// set the current value -- only for our friends who handle import
-	bool needs_import() const { return ((m_flags & DSF_IMPORT) != 0); }
-	void set_value(u64 value) const;
-	void set_dvalue(double value) const;
-	void set_value(const char *string) const;
-
 	// overrides
 	virtual void *entry_baseptr() const;
 	virtual u64 entry_value() const;
 	virtual void entry_set_value(u64 value) const;
 	virtual double entry_dvalue() const;
 	virtual void entry_set_dvalue(double value) const;
+
+private:
+	// helpers
+	void format_from_mask();
+	std::string format(const char *string, bool maxout = false) const;
 
 	// statics
 	static const u64 k_decimal_divisor[20];      // divisors for outputting decimal values
@@ -195,18 +195,47 @@ private:
 };
 
 
-// ======================> device_state_register
+// ======================> device_latched_functional_state_register
 
 // class template representing a state register of a specific width
 template<class ItemType>
-class device_pseudo_state_register : public device_state_entry
+class device_latched_functional_state_register : public device_state_entry
+{
+public:
+	typedef typename std::function<void (ItemType)> setter_func;
+
+	// construction/destruction
+	device_latched_functional_state_register(int index, const char *symbol, ItemType &data, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
+			m_data(data),
+			m_setter(std::move(setter))
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual void *entry_baseptr() const override { return &m_data; }
+	virtual u64 entry_value() const override { return m_data; }
+	virtual void entry_set_value(u64 value) const override { m_setter(value); }
+
+private:
+	ItemType &              m_data;                 // reference to where the data lives
+	setter_func             m_setter;               // function to store the data
+};
+
+
+// ======================> device_functional_state_register
+
+// class template representing a state register of a specific width
+template<class ItemType>
+class device_functional_state_register : public device_state_entry
 {
 public:
 	typedef typename std::function<ItemType ()> getter_func;
 	typedef typename std::function<void (ItemType)> setter_func;
 
 	// construction/destruction
-	device_pseudo_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
+	device_functional_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
 		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
 			m_getter(std::move(getter)),
 			m_setter(std::move(setter))
@@ -223,12 +252,41 @@ private:
 	setter_func             m_setter;               // function to store the data
 };
 
+template<>
+class device_functional_state_register<double> : public device_state_entry
+{
+public:
+	typedef typename std::function<double ()> getter_func;
+	typedef typename std::function<void (double)> setter_func;
+
+	// construction/destruction
+	device_functional_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
+			m_getter(std::move(getter)),
+			m_setter(std::move(setter))
+	{
+	}
+
+protected:
+	// device_state_entry overrides
+	virtual u64 entry_value() const override { return u64(m_getter()); }
+	virtual void entry_set_value(u64 value) const override { m_setter(double(value)); }
+	virtual double entry_dvalue() const override { return m_getter(); }
+	virtual void entry_set_dvalue(double value) const override { m_setter(value); }
+
+private:
+	getter_func             m_getter;               // function to retrieve the data
+	setter_func             m_setter;               // function to store the data
+};
+
 
 // ======================> device_state_interface
 
 // class representing interface-specific live state
 class device_state_interface : public device_interface
 {
+	friend class device_state_entry;
+
 public:
 	// construction/destruction
 	device_state_interface(const machine_config &mconfig, device_t &device);
@@ -238,17 +296,15 @@ public:
 	const std::vector<std::unique_ptr<device_state_entry>> &state_entries() const { return m_state_list; }
 
 	// state getters
-	u64 state_int(int index);
-	std::string state_string(int index) const;
-	int state_string_max_length(int index);
+	u64 state_int(int index) { const device_state_entry *entry = state_find_entry(index); return (entry == nullptr) ? 0 : entry->value(); }
+	std::string state_string(int index) const { const device_state_entry *entry = state_find_entry(index); return (entry == nullptr) ? std::string("???") : entry->to_string(); }
 	offs_t pc() { return state_int(STATE_GENPC); }
 	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
 	offs_t sp() { return state_int(STATE_GENSP); }
 	u64 flags() { return state_int(STATE_GENFLAGS); }
 
 	// state setters
-	void set_state_int(int index, u64 value);
-	void set_state_string(int index, const char *string);
+	void set_state_int(int index, u64 value) { const device_state_entry *entry = state_find_entry(index); if (entry != nullptr) entry->set_value(value); }
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 
 	// find the entry for a given index
@@ -267,19 +323,29 @@ public: // protected eventually
 		return state_add(std::make_unique<device_state_register<ItemType>>(index, symbol, data, this));
 	}
 
-	// add a new state pseudo-register item (template argument must be explicit)
-	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
-					typename device_pseudo_state_register<ItemType>::getter_func &&getter,
-					typename device_pseudo_state_register<ItemType>::setter_func &&setter)
+	// add a new state register item using functional setter
+	template<class ItemType> device_state_entry &state_add(int index, const char *symbol, ItemType &data,
+					typename device_latched_functional_state_register<ItemType>::setter_func &&setter)
 	{
 		assert(symbol != nullptr);
-		return state_add(std::make_unique<device_pseudo_state_register<ItemType>>(index, symbol, std::move(getter), std::move(setter), this));
+		return state_add(std::make_unique<device_latched_functional_state_register<ItemType>>(index, symbol, data, std::move(setter), this));
 	}
+
+	// add a new state register item using functional getter and setter (template argument must be explicit)
 	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
-					typename device_pseudo_state_register<ItemType>::getter_func &&getter)
+					typename device_functional_state_register<ItemType>::getter_func &&getter,
+					typename device_functional_state_register<ItemType>::setter_func &&setter)
 	{
 		assert(symbol != nullptr);
-		return state_add(std::make_unique<device_pseudo_state_register<ItemType>>(index, symbol, std::move(getter), [](ItemType){}, this)).readonly();
+		return state_add(std::make_unique<device_functional_state_register<ItemType>>(index, symbol, std::move(getter), std::move(setter), this));
+	}
+
+	// add a new read-only state register item using functional getter (template argument must be explicit)
+	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
+					typename device_functional_state_register<ItemType>::getter_func &&getter)
+	{
+		assert(symbol != nullptr);
+		return state_add(std::make_unique<device_functional_state_register<ItemType>>(index, symbol, std::move(getter), [](ItemType){}, this)).readonly();
 	}
 
 	device_state_entry &state_add(std::unique_ptr<device_state_entry> &&entry);
@@ -309,5 +375,31 @@ protected:
 
 // iterator
 typedef device_interface_iterator<device_state_interface> state_interface_iterator;
+
+
+
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
+
+//-------------------------------------------------
+//  state_find_entry - return a pointer to the
+//  state entry for the given index
+//-------------------------------------------------
+
+inline const device_state_entry *device_state_interface::state_find_entry(int index) const
+{
+	// use fast lookup if possible
+	if (index >= FAST_STATE_MIN && index <= FAST_STATE_MAX)
+		return m_fast_state[index - FAST_STATE_MIN];
+
+	// otherwise, scan the first
+	for (auto &entry : m_state_list)
+		if (entry->index() == index)
+			return entry.get();
+
+	// handle failure by returning nullptr
+	return nullptr;
+}
 
 #endif  /* MAME_EMU_DISTATE_H */

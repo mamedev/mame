@@ -26,6 +26,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 	{ }
@@ -40,12 +41,12 @@ private:
 	void mem_map(address_map &map);
 
 	u8 m_framecnt;
-	bool m_rom_in_map;
 	void machine_start() override;
 	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -54,13 +55,13 @@ private:
 void k8915_state::k8915_a8_w(u8 data)
 {
 // seems to switch ram and rom around.
-	m_rom_in_map = (data == 0x87) ? 0 : 1;
+	m_bank1->set_entry((data == 0x87) ? 0 : 1);
 }
 
 void k8915_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0x0000, 0x0fff).ram().share("mainram").bankr("bank1");
 	map(0x1000, 0x17ff).ram().share("videoram");
 	map(0x1800, 0xffff).ram();
 }
@@ -79,13 +80,14 @@ INPUT_PORTS_END
 
 void k8915_state::machine_reset()
 {
-	m_rom_in_map = 1;
+	m_bank1->set_entry(1);
 }
 
 void k8915_state::machine_start()
 {
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_framecnt));
-	save_item(NAME(m_rom_in_map));
 }
 
 u32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

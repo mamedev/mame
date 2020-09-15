@@ -45,7 +45,7 @@ void dmadac_sound_device::device_start()
 	m_volume = 0x100;
 
 	/* allocate a stream channel */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, DEFAULT_SAMPLE_RATE);
+	m_channel = stream_alloc_legacy(0, 1, DEFAULT_SAMPLE_RATE);
 
 	/* register with the save state system */
 	save_item(NAME(m_bufin));
@@ -205,10 +205,10 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dmadac_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *output = outputs[0];
 	int16_t *source = m_buffer.get();

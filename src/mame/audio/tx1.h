@@ -73,7 +73,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	void tx1_sound_io(address_map &map);
 	void tx1_sound_prg(address_map &map);
@@ -111,7 +111,7 @@ protected:
 	double m_weights0[4] = { 0, 0, 0, 0 };
 	double m_weights1[3] = { 0, 0, 0 };
 	double m_weights2[3] = { 0, 0, 0 };
-	int m_eng0[4] = { 0, 0, 0, 0 };;
+	int m_eng0[4] = { 0, 0, 0, 0 };
 	int m_eng1[4] = { 0, 0, 0, 0 };
 	int m_eng2[4] = { 0, 0, 0, 0 };
 
@@ -155,7 +155,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	void ym1_a_w(uint8_t data);
 

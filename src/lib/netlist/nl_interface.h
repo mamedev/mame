@@ -12,6 +12,7 @@
 
 #include "nl_base.h"
 #include "nl_setup.h"
+#include "core/setup.h"
 
 #include <memory>
 #include <array>
@@ -32,31 +33,29 @@ namespace netlist
 		/// The following code is an example on how to add the device to
 		/// the netlist factory.
 		///
-		/// 	const pstring pin(m_in);
-		/// 	pstring dname = pstring("OUT_") + pin;
+		///     const pstring pin(m_in);
+		///     pstring dname = pstring("OUT_") + pin;
 		///
-		/// 	const auto lambda = [this](auto &in, netlist::nl_fptype val)
-		/// 	{
-		/// 		this->cpu()->update_icount(in.exec().time());
-		/// 		this->m_delegate(val, this->cpu()->local_time());
-		/// 		this->cpu()->check_mame_abort_slice();
-		/// 	};
+		///     const auto lambda = [this](auto &in, netlist::nl_fptype val)
+		///     {
+		///         this->cpu()->update_icount(in.exec().time());
+		///         this->m_delegate(val, this->cpu()->local_time());
+		///         this->cpu()->check_mame_abort_slice();
+		///     };
 		///
-		/// 	using lb_t = decltype(lambda);
-		/// 	using cb_t = netlist::interface::NETLIB_NAME(analog_callback)<lb_t>;
+		///     using lb_t = decltype(lambda);
+		///     using cb_t = netlist::interface::NETLIB_NAME(analog_callback)<lb_t>;
 		///
-		/// 	parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
-		/// 		netlist::factory::properties("-", PSOURCELOC()), 1e-6, std::forward<lb_t>(lambda));
+		///     parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
+		///         netlist::factory::properties("-", PSOURCELOC()), 1e-6, std::forward<lb_t>(lambda));
 		///
 
 		template <typename FUNC>
-		class NETLIB_NAME(analog_callback) : public device_t
+		NETLIB_OBJECT(analog_callback)
 		{
 		public:
-			NETLIB_NAME(analog_callback)(netlist_state_t &anetlist,
-				const pstring &name, nl_fptype threshold, FUNC &&func)
-				: device_t(anetlist, name)
-				, m_in(*this, "IN")
+			NETLIB_CONSTRUCTOR_EX(analog_callback, nl_fptype threshold, FUNC &&func)
+				, m_in(*this, "IN", NETLIB_DELEGATE(in))
 				, m_threshold(threshold)
 				, m_last(*this, "m_last", 0)
 				, m_func(func)
@@ -68,7 +67,7 @@ namespace netlist
 				m_last = 0.0;
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(in)
 			{
 				const nl_fptype cur = m_in();
 				if (plib::abs(cur - m_last) > m_threshold)
@@ -98,17 +97,16 @@ namespace netlist
 		/// analog callback device instead.
 
 		template <typename FUNC>
-		class NETLIB_NAME(logic_callback) : public device_t
+		NETLIB_OBJECT(logic_callback)
 		{
 		public:
-			NETLIB_NAME(logic_callback)(netlist_state_t &anetlist, const pstring &name, FUNC &&func)
-				: device_t(anetlist, name)
-				, m_in(*this, "IN")
+			NETLIB_CONSTRUCTOR_EX(logic_callback, FUNC &&func)
+				, m_in(*this, "IN", NETLIB_DELEGATE(in))
 				, m_func(func)
 			{
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(in)
 			{
 				const netlist_sig_t cur = m_in();
 				m_func(*this, cur);
@@ -121,54 +119,50 @@ namespace netlist
 
 		/// \brief Set parameters to buffers contents at regular intervals
 		///
-		/// This devices will set up to N parameters from buffers passed to the device.
+		/// This device will update a parameter from a buffers passed to the device.
 		/// It is the responsibility of the controlling application to ensure that
-		/// buffers filled at regular intervals.
+		/// the buffer is filled at regular intervals.
 		///
 		/// \tparam T The buffer type
 		/// \tparam N Maximum number of supported buffers
 		///
-		template <typename T, std::size_t N>
-		class NETLIB_NAME(buffered_param_setter) : public device_t
+		template <typename T>
+		NETLIB_OBJECT(buffered_param_setter)
 		{
 		public:
 
-			static const int MAX_INPUT_CHANNELS = N;
-
-			NETLIB_NAME(buffered_param_setter)(netlist_state_t &anetlist, const pstring &name)
-			: device_t(anetlist, name)
+			NETLIB_CONSTRUCTOR(buffered_param_setter)
 			, m_sample_time(netlist_time::zero())
-			, m_feedback(*this, "FB") // clock part
+			, m_feedback(*this, "FB", NETLIB_DELEGATE(feedback)) // clock part
 			, m_Q(*this, "Q")
 			, m_pos(0)
 			, m_samples(0)
-			, m_num_channels(0)
-			, m_param_names(*this, 0, "CHAN{}", "")
-			, m_param_mults(*this, 0, "MULT{}", 1.0)
-			, m_param_offsets(*this, 0, "OFFSET{}", 0.0)
+			, m_param_name(*this, "CHAN", "")
+			, m_param_mult(*this, "MULT", 1.0)
+			, m_param_offset(*this, "OFFSET", 0.0)
+			, m_param(nullptr)
+			, m_id(*this, "ID", 0)
 			{
-				connect(m_feedback, m_Q);
+				connect("FB", "Q");
+				m_buffer = nullptr;
 			}
 
 		protected:
 			NETLIB_RESETI()
 			{
-				m_pos = 0;
-				for (auto & elem : m_buffers)
-					elem = nullptr;
 			}
 
-			NETLIB_UPDATEI()
+			NETLIB_HANDLERI(feedback)
 			{
 				if (m_pos < m_samples)
 				{
-					for (std::size_t i=0; i<m_num_channels; i++)
-					{
-						if (m_buffers[i] == nullptr)
-							break; // stop, called outside of stream_update
-						const nl_fptype v = m_buffers[i][m_pos];
-						m_params[i]->set(v * m_param_mults[i]() + m_param_offsets[i]());
-					}
+						// check if called outside of stream_update
+						if (m_buffer != nullptr)
+						{
+							const nl_fptype v = (*m_buffer)[m_pos];
+							//m_params[i]->set(v * m_param_mults[i]() + m_param_offsets[i]());
+							m_param_setter(v * m_param_mult() + m_param_offset());
+						}
 				}
 				else
 				{
@@ -191,34 +185,35 @@ namespace netlist
 			{
 				m_pos = 0;
 				m_sample_time = sample_time;
-				for (std::size_t i = 0; i < MAX_INPUT_CHANNELS; i++)
+				if (m_param_name() != pstring(""))
 				{
-					if (m_param_names[i]() != pstring(""))
-					{
-						if (i != m_num_channels)
-							state().log().fatal("sound input numbering has to be sequential!");
-						m_num_channels++;
-						m_params[i] = dynamic_cast<param_fp_t *>(
-							&state().setup().find_param(m_param_names[i]()).param()
-						);
-					}
+					param_t *p = &state().setup().find_param(m_param_name()).param();
+					m_param = p;
+					if (dynamic_cast<param_fp_t *>(p) != nullptr)
+						m_param_setter = setter_t(&NETLIB_NAME(buffered_param_setter)::setter<param_fp_t>, this);
+					else if (dynamic_cast<param_logic_t *>(p) != nullptr)
+						m_param_setter = setter_t(&NETLIB_NAME(buffered_param_setter)::setter<param_logic_t>, this);
 				}
 			}
 
-			void buffer_reset(netlist_time sample_time, std::size_t num_samples, T **inputs)
+			void buffer_reset(netlist_time sample_time, std::size_t num_samples, T *inputs)
 			{
 				m_samples = num_samples;
 				m_sample_time = sample_time;
 				m_pos = 0;
-				for (std::size_t i=0; i < m_num_channels; i++)
-				{
-					m_buffers[i] = inputs[i];
-				}
+				m_buffer = inputs;
 			}
 
-			int num_channels() { return m_num_channels; }
-
+			std::size_t id() const { return m_id; }
 		private:
+			using setter_t = plib::pmfp<void,nl_fptype>;
+
+			template <typename S>
+			void setter(nl_fptype v)
+			{
+				static_cast<S *>(m_param)->set(v);
+			}
+
 			netlist_time m_sample_time;
 
 			logic_input_t m_feedback;
@@ -226,13 +221,14 @@ namespace netlist
 
 			std::size_t m_pos;
 			std::size_t m_samples;
-			std::size_t m_num_channels;
 
-			object_array_t<param_str_t, MAX_INPUT_CHANNELS> m_param_names;
-			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_mults;
-			object_array_t<param_fp_t, MAX_INPUT_CHANNELS>  m_param_offsets;
-			std::array<param_fp_t *, MAX_INPUT_CHANNELS>             m_params;
-			std::array<T *, MAX_INPUT_CHANNELS> 	                          m_buffers;
+			param_str_t m_param_name;
+			param_fp_t  m_param_mult;
+			param_fp_t  m_param_offset;
+			param_t *   m_param;
+			setter_t    m_param_setter;
+			T *         m_buffer;
+			param_num_t<std::size_t> m_id;
 		};
 
 	} // namespace interface

@@ -53,6 +53,7 @@ public:
 
 	auto out_busreq_callback() { return m_out_busreq_cb.bind(); }
 	auto out_int_callback() { return m_out_int_cb.bind(); }
+	auto out_ieo_callback() { return m_out_ieo_cb.bind(); }
 	auto out_bao_callback() { return m_out_bao_cb.bind(); }
 	auto in_mreq_callback() { return m_in_mreq_cb.bind(); }
 	auto out_mreq_callback() { return m_out_mreq_cb.bind(); }
@@ -62,6 +63,7 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER(iei_w) { m_iei = state; interrupt_check(); }
 	DECLARE_WRITE_LINE_MEMBER(rdy_w);
 	DECLARE_WRITE_LINE_MEMBER(wait_w);
 	DECLARE_WRITE_LINE_MEMBER(bai_w);
@@ -94,6 +96,7 @@ private:
 	// internal state
 	devcb_write_line   m_out_busreq_cb;
 	devcb_write_line   m_out_int_cb;
+	devcb_write_line   m_out_ieo_cb;
 	devcb_write_line   m_out_bao_cb;
 	devcb_read8        m_in_mreq_cb;
 	devcb_write8       m_out_mreq_cb;
@@ -125,6 +128,7 @@ private:
 	uint8_t m_latch;
 
 	// interrupts
+	bool m_iei;
 	int m_ip;                   // interrupt pending
 	int m_ius;                  // interrupt under service
 	uint8_t m_vector;             // interrupt vector

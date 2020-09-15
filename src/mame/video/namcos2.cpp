@@ -70,6 +70,8 @@ void namcos2_state::create_shadow_table()
 void namcos2_state::video_start()
 {
 	create_shadow_table();
+
+	save_item(NAME(m_gfx_ctrl));
 }
 
 void namcos2_state::apply_clip(rectangle &clip, const rectangle &cliprect)

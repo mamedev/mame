@@ -10,13 +10,22 @@
 
 #pragma once
 
+#include "audio/dcs.h"
+#include "cpu/tms34010/tms34010.h"
 #include "machine/midwayic.h"
+#include "video/midtunit.h"
+#include "emupal.h"
 
-class midwunit_state : public midtunit_state
+class midwunit_state : public driver_device
 {
 public:
 	midwunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: midtunit_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_video(*this, "video")
+		, m_dcs(*this, "dcs")
+		, m_palette(*this, "palette")
+		, m_gfxrom(*this, "gfxrom")
 		, m_midway_serial_pic(*this, "serial_security_sim")
 		, m_midway_serial_pic_emu(*this, "serial_security")
 		, m_nvram(*this, "nvram")
@@ -53,11 +62,17 @@ private:
 	uint16_t midwunit_sound_r();
 	uint16_t midwunit_sound_state_r();
 	void midwunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void umk3_palette_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void umk3_palette_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void wwfmania_io_0_w(uint16_t data);
 
 	void init_mk3_common();
 	void main_map(address_map &map);
+
+	required_device<tms340x0_device> m_maincpu;
+	required_device<midtunit_video_device> m_video;
+	required_device<dcs_audio_device> m_dcs;
+	required_device<palette_device> m_palette;
+	required_memory_region m_gfxrom;
 
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic_emu_device> m_midway_serial_pic_emu;

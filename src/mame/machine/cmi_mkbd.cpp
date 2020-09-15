@@ -56,6 +56,7 @@ cmi_music_keyboard_device::cmi_music_keyboard_device(const machine_config &mconf
 	, m_dp3(*this, "dp3")
 	, m_keypad_a_port(*this, "KEYPAD_A")
 	, m_keypad_b_port(*this, "KEYPAD_B")
+	, m_analog(*this, "ANALOG")
 	, m_key_mux_ports{ { *this, "KEY_%u_0", 0 }, { *this, "KEY_%u_1", 0 }, { *this, "KEY_%u_2", 0 }, { *this, "KEY_%u_3", 0 } }
 	, m_digit(*this, "digit%u", 0U)
 {
@@ -128,20 +129,6 @@ void cmi_music_keyboard_device::cmi10_u20_a_w(u8 data)
 
 void cmi_music_keyboard_device::cmi10_u20_b_w(u8 data)
 {
-	// connected to alphanumeric display control lines
-	u8 const addr = bitswap<2>(data, 0, 1);
-
-	m_dp1->ce_w(BIT(data, 6));
-	m_dp1->cu_w(BIT(data, 7));
-	m_dp1->addr_w(addr);
-
-	m_dp2->ce_w(BIT(data, 4));
-	m_dp2->cu_w(BIT(data, 5));
-	m_dp2->addr_w(addr);
-
-	m_dp3->ce_w(BIT(data, 2));
-	m_dp3->cu_w(BIT(data, 3));
-	m_dp3->addr_w(addr);
 }
 
 READ_LINE_MEMBER( cmi_music_keyboard_device::cmi10_u20_cb1_r )
@@ -159,10 +146,30 @@ READ_LINE_MEMBER( cmi_music_keyboard_device::cmi10_u20_cb1_r )
 
 WRITE_LINE_MEMBER( cmi_music_keyboard_device::cmi10_u20_cb2_w )
 {
-	// connected to alphanumeric display write strobe
+	uint8_t data = m_cmi10_pia_u20->a_output() & 0x7f;
+	uint8_t b_port = m_cmi10_pia_u20->b_output();
+	int addr = (BIT(b_port, 0) << 1) | BIT(b_port, 1);
+
+	/* DP1 */
+	m_dp1->ce_w(BIT(b_port, 6));
+	m_dp1->cu_w(BIT(b_port, 7));
 	m_dp1->wr_w(state);
+	m_dp1->addr_w(addr);
+	m_dp1->data_w(data);
+
+	/* DP2 */
+	m_dp2->ce_w(BIT(b_port, 4));
+	m_dp2->cu_w(BIT(b_port, 5));
 	m_dp2->wr_w(state);
+	m_dp2->addr_w(addr);
+	m_dp2->data_w(data);
+
+	/* DP3 */
+	m_dp3->ce_w(BIT(b_port, 2));
+	m_dp3->cu_w(BIT(b_port, 3));
 	m_dp3->wr_w(state);
+	m_dp3->addr_w(addr);
+	m_dp3->data_w(data);
 }
 
 template <unsigned N> void cmi_music_keyboard_device::update_dp(offs_t offset, u16 data)
@@ -194,9 +201,9 @@ u8 cmi_music_keyboard_device::cmi10_u21_a_r()
 		u8 keyval;
 		int state = 1;
 
-		if (mux == 0 && key == 3)
+		if (module == 1 && mux == 2 && key == 3)
 		{
-			//keyval = input_port_read(device->machine, "ANALOG");
+			keyval = m_analog->read();
 
 			/* Unpressed */
 			if (keyval <= 0)
@@ -234,6 +241,18 @@ u8 cmi_music_keyboard_device::cmi10_u21_a_r()
 		data |= BIT(keyval, key) << module;
 	}
 
+	/* Now do KD7 */
+	{
+		int bit = 0;
+
+		if (BIT(sel, 3))
+			bit = BIT(m_keypad_a_port->read(), sel & 7);
+		else if (!BIT(sel, 4))
+			bit = BIT(m_keypad_b_port->read(), sel & 7);
+
+		data |= (bit && BIT(sel, 7)) << 7;
+	}
+
 	return data;
 #endif
 }
@@ -243,13 +262,9 @@ WRITE_LINE_MEMBER( cmi_music_keyboard_device::kbd_acia_int )
 	m_kbd_acia_irq = state;
 
 	if (m_kbd_acia_irq)
-	{
 		m_cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	}
 	else if (!m_cmi_acia_irq)
-	{
 		m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
 }
 
 WRITE_LINE_MEMBER( cmi_music_keyboard_device::cmi_acia_int )
@@ -435,6 +450,9 @@ static INPUT_PORTS_START(cmi_music_keyboard)
 
 	PORT_START("KEY_2_3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")
+
+	PORT_START("ANALOG")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_MINMAX(0, 128) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
 INPUT_PORTS_END
 
 ioport_constructor cmi_music_keyboard_device::device_input_ports() const

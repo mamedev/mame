@@ -50,7 +50,7 @@ void ks0164_device::device_start()
 		space().install_rom(0, rend, ((1 << 23) - 1) ^ rmask, m_mem_region->base());
 	}
 
-	m_stream = stream_alloc(0, 2, clock()/3/2/2/32);
+	m_stream = stream_alloc_legacy(0, 2, clock()/3/2/2/32);
 	space().cache(m_mem_cache);
 	m_timer = timer_alloc(0);
 
@@ -134,15 +134,6 @@ u8 ks0164_device::mpu401_status_r()
 	if(m_mpu_status & MPUS_RX_FULL)
 		res |= 0x40;
 
-	static std::string pc;
-	static u8 pr;
-
-	std::string cc = machine().describe_context();
-	if(pc != cc || pr != res) {
-		//      logerror("status read %02x (%s)\n", res, cc);
-		pc = cc;
-		pr = res;
-	}
 	return res;
 }
 
@@ -377,7 +368,7 @@ u16 ks0164_device::uncomp_8_16(u8 value)
 	return o;
 }
 
-void ks0164_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ks0164_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for(int sample = 0; sample != samples; sample++) {
 		s32 suml = 0, sumr = 0;

@@ -1,12 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Nigel Barnes
-/***************************************************************************
+/***********************************************************************************
 
     Shine/1
 
     TODO: everything to be verified.
 
-****************************************************************************/
+The system rom has an inbuilt monitor program - unknown how to access it.
+
+The floppy disk is accessed via an "expansion" socket on the back. Inbuilt commands
+such as DIR [1|2], RENAME, ERASE, PROT, XFER look interesting. The DIR command does
+multiple reads of 0x9E00.
+
+There's a DIN socket for cassette. Commands BAUD, SAVE, LOAD appear to be the ones
+but the syntax has yet to be worked out. BAUD [0-9] is allowed but what is it doing?
+
+
+************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -35,21 +45,21 @@ public:
 		, m_via(*this, "via%u", 0)
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0)
-		, m_cassette(*this, "cassette")
 		, m_centronics(*this, "centronics")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
 		, m_irqs(*this, "irqs")
-		, m_y(*this, "Y%u", 0)
+		, m_y(*this, "Y%u", 0U)
 		, m_video_ram(*this, "video_ram")
 	{ }
 
-	virtual void machine_start() override;
-	void shine_mem(address_map &map);
-
 	void shine(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	void shine_mem(address_map &map);
 	uint8_t via0_pa_r();
 	void via0_pb_w(uint8_t data);
 	void floppy_w(uint8_t data);
@@ -61,7 +71,6 @@ private:
 	required_device_array<via6522_device, 2> m_via;
 	required_device<fd1771_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
@@ -70,7 +79,7 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* keyboard state */
-	int m_keylatch;
+	u8 m_keylatch;
 };
 
 
@@ -84,7 +93,7 @@ void shine_state::shine_mem(address_map &map)
 	map(0x9800, 0x980f).m(m_via[1], FUNC(via6522_device::map));
 	map(0x9c00, 0x9c03).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
 	map(0x9d00, 0x9d00).w(FUNC(shine_state::floppy_w));
-	map(0xb000, 0xffff).rom();
+	map(0xb000, 0xffff).rom().region("maincpu",0);
 }
 
 
@@ -258,6 +267,7 @@ void shine_state::shine(machine_config &config)
 	m_via[0]->readpa_handler().set(FUNC(shine_state::via0_pa_r));
 	m_via[0]->writepb_handler().set(FUNC(shine_state::via0_pb_w));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	m_via[0]->cb2_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	VIA6522(config, m_via[1], 1000000);
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
@@ -276,14 +286,14 @@ void shine_state::shine(machine_config &config)
 
 
 ROM_START( shine )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("basic_plus.ic58", 0xb000, 0x1000, CRC(c75d9675) SHA1(eecc12533aa33c7744e1ea1fde56883739ac7436))
-	ROM_LOAD("disco-dk2.ic59",  0xc000, 0x1000, CRC(b9230d50) SHA1(3975e5850356c035cd1963e0fbca1e980463ee01))
-	ROM_LOAD("d3.ic62",         0xd000, 0x1000, CRC(7c88e219) SHA1(93003715bb82d63b6d4f673f89eae59c73f2945e))
-	ROM_LOAD("e3.ic61",         0xe000, 0x1000, CRC(5a1624e9) SHA1(b4fbc983c646d4e70dda878d5dd75e45408522a9))
-	ROM_LOAD("f3.ic60",         0xf000, 0x1000, CRC(1549ca2f) SHA1(5b011cdca0121a550af956b6d4580544942459ce))
+	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_LOAD("basic_plus.ic58", 0x0000, 0x1000, CRC(c75d9675) SHA1(eecc12533aa33c7744e1ea1fde56883739ac7436))
+	ROM_LOAD("disco-dk2.ic59",  0x1000, 0x1000, CRC(b9230d50) SHA1(3975e5850356c035cd1963e0fbca1e980463ee01))
+	ROM_LOAD("d3.ic62",         0x2000, 0x1000, CRC(7c88e219) SHA1(93003715bb82d63b6d4f673f89eae59c73f2945e))
+	ROM_LOAD("e3.ic61",         0x3000, 0x1000, CRC(5a1624e9) SHA1(b4fbc983c646d4e70dda878d5dd75e45408522a9))
+	ROM_LOAD("f3.ic60",         0x4000, 0x1000, CRC(1549ca2f) SHA1(5b011cdca0121a550af956b6d4580544942459ce))
 ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                  FULLNAME    FLAGS */
-COMP( 1983, shine,  0,      0,      shine,    shine,  shine_state,  empty_init,  "Lorenzon Elettronica",  "Shine/1",  MACHINE_NOT_WORKING )
+COMP( 1983, shine,  0,      0,      shine,    shine,  shine_state,  empty_init,  "Lorenzon Elettronica",  "Shine/1", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

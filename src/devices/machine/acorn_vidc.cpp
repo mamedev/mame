@@ -416,7 +416,7 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 
 	m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
 	m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);
-	//printf("%d %f %f\n",channel,m_lspeaker->input_gain(channel),m_rspeaker->input_gain(channel));
+	//printf("%d %f %f\n",channel,m_lspeaker->input(channel).gain(),m_rspeaker->input(channel).gain());
 }
 
 

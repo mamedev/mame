@@ -133,6 +133,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cop452.h,MACHINES["COP452"] = true
+---------------------------------------------------
+
+if (MACHINES["COP452"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cop452.cpp",
+		MAME_DIR .. "src/devices/machine/cop452.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/machine/cr511b.h,MACHINES["CR511B"] = true
 ---------------------------------------------------
 
@@ -1008,6 +1021,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cs8900a.h,MACHINES["CS8900A"] = true
+---------------------------------------------------
+
+if (MACHINES["CS8900A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cs8900a.cpp",
+		MAME_DIR .. "src/devices/machine/cs8900a.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/machine/cxd1095.h,MACHINES["CXD1095"] = true
 ---------------------------------------------------
 
@@ -1223,6 +1249,26 @@ if (MACHINES["ER2055"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/er2055.cpp",
 		MAME_DIR .. "src/devices/machine/er2055.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/exorterm.h,MACHINES["EXORTERM"] = true
+---------------------------------------------------
+
+if (MACHINES["EXORTERM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/exorterm.cpp",
+		MAME_DIR .. "src/devices/machine/exorterm.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/exorterm.cpp", GEN_DIR .. "emu/layout/exorterm155.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "exorterm155"),
 	}
 end
 
@@ -1500,6 +1546,18 @@ if (MACHINES["ICM7170"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/icm7170.cpp",
 		MAME_DIR .. "src/devices/machine/icm7170.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ibm21s850.h,MACHINES["IBM21S850"] = true
+---------------------------------------------------
+
+if (MACHINES["IBM21S850"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
+		MAME_DIR .. "src/devices/machine/ibm21s850.h",
 	}
 end
 
@@ -1806,6 +1864,18 @@ if (MACHINES["M3002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/m3002.cpp",
 		MAME_DIR .. "src/devices/machine/m3002.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/m68sfdc.h,MACHINES["M68SFDC"] = true
+---------------------------------------------------
+
+if (MACHINES["M68SFDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m68sfdc.cpp",
+		MAME_DIR .. "src/devices/machine/m68sfdc.h",
 	}
 end
 
@@ -2758,6 +2828,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sa1110.h,MACHINES["SA1110"] = true
+---------------------------------------------------
+
+if (MACHINES["SA1110"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sa1110.cpp",
+		MAME_DIR .. "src/devices/machine/sa1110.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/saa1043.h,MACHINES["SAA1043"] = true
 ---------------------------------------------------
 
@@ -3136,6 +3218,18 @@ if (MACHINES["TMS9914"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tms9914.cpp",
 		MAME_DIR .. "src/devices/machine/tms9914.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tsb12lv01a.h,MACHINES["TSB12LV01A"] = true
+---------------------------------------------------
+
+if (MACHINES["TSB12LV01A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tsb12lv01a.cpp",
+		MAME_DIR .. "src/devices/machine/tsb12lv01a.h",
 	}
 end
 
@@ -4439,5 +4533,16 @@ if (MACHINES["SWIM3"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/swim3.cpp",
 		MAME_DIR .. "src/devices/machine/swim3.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/alpha_8921.h,MACHINES["ALPHA_8921"] = true
+---------------------------------------------------
+if (MACHINES["ALPHA_8921"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/alpha_8921.cpp",
+		MAME_DIR .. "src/devices/machine/alpha_8921.h",
 	}
 end

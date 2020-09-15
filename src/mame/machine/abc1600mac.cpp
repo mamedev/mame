@@ -116,7 +116,8 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_page_ram(*this, "page_ram"),
 	m_watchdog(*this, "watchdog"),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_task(0)
+	m_task(0),
+	m_cause(0)
 {
 }
 

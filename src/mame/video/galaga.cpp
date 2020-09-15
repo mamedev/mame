@@ -229,9 +229,9 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_starfield->draw_starfield(bitmap,cliprect,0);
+	m_starfield->draw_starfield(bitmap,cliprect, 0);
 	draw_sprites(bitmap,cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
 	return 0;
 }
 

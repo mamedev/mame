@@ -45,6 +45,7 @@ public:
 		, m_int_timer_right(*this, "int_timer_right")
 		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
+		, m_spr_gfxdecode(*this, "spr_gfxdecode.%u", 0U)
 		, m_screen(*this, "screen.%u", 0U)
 		, m_palette(*this, "palette.%u", 0U)
 		, m_tilemap(*this, "tilemap.%u", 0U)
@@ -149,7 +150,6 @@ private:
 	DECLARE_MACHINE_RESET(sailormn);
 	DECLARE_VIDEO_START(spr_4bpp);
 	DECLARE_VIDEO_START(spr_8bpp);
-	DECLARE_VIDEO_START(korokoro);
 	DECLARE_VIDEO_START(ppsatan);
 	void cave_palette(palette_device &palette);
 	void dfeveron_palette(palette_device &palette);
@@ -176,8 +176,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	void update_irq_state();
 	void unpack_sprites(int chip);
-	void ddp_unpack_sprites(int chip);
-	void esprade_unpack_sprites(int chip);
 	void sailormn_unpack_tiles(int chip);
 
 	virtual void machine_start() override;
@@ -238,6 +236,9 @@ private:
 	bitmap_ind16 m_sprite_zbuf[4];
 	u16       m_sprite_zbuf_baseval;
 
+	std::unique_ptr<u8[]> m_sprite_gfx[4];
+	offs_t                m_sprite_gfx_mask[4];
+
 	int       m_num_sprites[4];
 
 	int       m_spriteram_bank[4];
@@ -253,7 +254,6 @@ private:
 	int       m_kludge;
 	emu_timer *m_vblank_end_timer;
 
-	u16       m_sprite_base_pal;
 	u16       m_sprite_granularity;
 	u32       m_max_sprite_clk[4]; // max usable clock for sprites
 
@@ -290,6 +290,7 @@ private:
 	optional_device<timer_device> m_int_timer_right;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
+	optional_device_array<gfxdecode_device, 4> m_spr_gfxdecode;
 	optional_device_array<screen_device, 4> m_screen;
 	optional_device_array<palette_device, 4> m_palette;
 	optional_device_array<tilemap038_device, 4> m_tilemap;
@@ -302,7 +303,7 @@ private:
 
 	inline void tilemap_draw(int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 priority, u32 priority2, int GFX);
 	void set_pens(int chip);
-	void vh_start(u16 sprcol_base, u16 sprcol_granularity);
+	void vh_start(u16 sprcol_granularity);
 	void get_sprite_info_cave(int chip);
 	void get_sprite_info_donpachi(int chip);
 	void sprite_init();

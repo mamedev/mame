@@ -120,7 +120,7 @@ void es1373_device::device_start()
 	add_map(0x40, M_IO, FUNC(es1373_device::map));
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100/2);
+	m_stream = stream_alloc_legacy(0, 2, 44100/2);
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
@@ -230,13 +230,13 @@ void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
-void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void es1373_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	if (m_dac1.enable) {
-		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag());
+		logerror("%s: sound_stream_update_legacy DAC1 not implemented yet\n", tag());
 	}
 
 	if (m_dac2.enable) {
@@ -245,7 +245,7 @@ void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 	if (m_adc.enable) {
 		if (m_adc.format!=SCTRL_16BIT_MONO) {
-			logerror("%s: sound_stream_update Only SCTRL_16BIT_MONO recorded supported\n", tag());
+			logerror("%s: sound_stream_update_legacy Only SCTRL_16BIT_MONO recorded supported\n", tag());
 		} else {
 			for (int i=0; i<samples; i++) {
 				if (m_adc.buf_count<=m_adc.buf_size) {
@@ -345,7 +345,7 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, stream_s
 			}
 			if (LOG_ES_FILE && m_tempCount<1000000) {
 				m_tempCount++;
-				//logerror("es1373_device::sound_stream_update count: %i samp16: %X\n", i, samp16);
+				//logerror("es1373_device::sound_stream_update_legacy count: %i samp16: %X\n", i, samp16);
 				//if (LOG_ES_FILE && m_eslog)
 					//fprintf(m_eslog, "%i\n", samp16);
 			}

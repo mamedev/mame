@@ -55,7 +55,7 @@ public:
 private:
 	virtual void machine_reset() override;
 
-	void _6802_mem(address_map &map);
+	void mem_map(address_map &map);
 
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
@@ -81,13 +81,13 @@ private:
       x   1   1   x     *   *   *   *     *   *   *   *     *   *   *   *    R  ROM (2332 4kx8 Mask ROM, inside potted brick)
 */
 
-void votrtnt_state::_6802_mem(address_map &map)
+void votrtnt_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).mirror(0x9c00).ram(); /* RAM, 2114*2 (0x400 bytes) mirrored 4x */
 	map(0x2000, 0x2001).mirror(0x9ffe).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x4000, 0x4000).mirror(0x9fff).w(m_votrax, FUNC(votrax_sc01_device::write));
-	map(0x6000, 0x6fff).mirror(0x9000).rom(); /* ROM in potted block */
+	map(0x6000, 0x6fff).mirror(0x9000).rom().region("maincpu",0); /* ROM in potted block */
 }
 
 
@@ -141,7 +141,7 @@ void votrtnt_state::votrtnt(machine_config &config)
 	/* basic machine hardware */
 	M6802(config, m_maincpu, 2.4576_MHz_XTAL);  // 2.4576MHz XTAL, verified; divided by 4 inside the MC6802
 	m_maincpu->set_ram_enable(false);
-	m_maincpu->set_addrmap(AS_PROGRAM, &votrtnt_state::_6802_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &votrtnt_state::mem_map);
 
 	/* video hardware */
 	//config.set_default_layout(layout_votrtnt);
@@ -173,8 +173,8 @@ void votrtnt_state::votrtnt(machine_config &config)
 ******************************************************************************/
 
 ROM_START(votrtnt)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("cn49752n.bin", 0x6000, 0x1000, CRC(a44e1af3) SHA1(af83b9e84f44c126b24ee754a22e34ca992a8d3d)) /* 2332 mask rom inside potted brick */
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("cn49752n.bin", 0x0000, 0x1000, CRC(a44e1af3) SHA1(af83b9e84f44c126b24ee754a22e34ca992a8d3d)) /* 2332 mask rom inside potted brick */
 ROM_END
 
 
@@ -183,4 +183,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY   FULLNAME        FLAGS
-COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, empty_init, "Votrax", "Type 'N Talk", 0 )
+COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, empty_init, "Votrax", "Type 'N Talk", MACHINE_SUPPORTS_SAVE )

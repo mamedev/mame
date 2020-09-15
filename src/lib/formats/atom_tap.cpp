@@ -10,7 +10,7 @@
 
 /*
 
-    http://beebwiki.jonripley.com/Acorn_cassette_format#Atom
+    http://beebwiki.mdfs.net/Acorn_cassette_format#Atom
 
     The Atom supports the System series format (as a 'nameless file') and its own format. The data consists of files separated
     by carrier breaks and the appropriate leaders and trailers, and further subdivided into blocks separated by inter-block gaps.
@@ -21,7 +21,7 @@
         One end of file name marker byte (&0D).
         Block flag, one byte.
         Block number, two bytes, high byte first.
-        Data block length ? 1, one byte.
+        Data block length - 1, one byte.
         Execution address, two bytes, high byte first.
         Load address, two bytes, high byte first.
         Data, 0 to 256 bytes.

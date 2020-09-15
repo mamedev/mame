@@ -29,24 +29,24 @@
         - MK5089N - DTMF generator
         - ...
 
-	high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
+    high-resolution motherboard photo (enough to read chip numbers): http://deltacxx.insomnia247.nl/gridcompass/motherboard.jpg
 
-	differences between models:
-	- Compass 110x do not have GRiDROM slots.
-	- Compass II (112x, 113x) have 4 of them.
-	- Compass II 113x have 512x256 screen size
-	- Compass 11x9 have 512K ram
-	- Compass II have DMA addresses different from Compass 110x
+    differences between models:
+    - Compass 110x do not have GRiDROM slots.
+    - Compass II (112x, 113x) have 4 of them.
+    - Compass II 113x have 512x256 screen size
+    - Compass 11x9 have 512K ram
+    - Compass II have DMA addresses different from Compass 110x
 
     to do:
 
     - keyboard: decode and add the rest of keycodes
-	    keycode table can be found here on page A-2:
-	    http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
+        keycode table can be found here on page A-2:
+        http://deltacxx.insomnia247.nl/gridcompass/large_files/Yahoo%20group%20backup/RuGRiD-Laptop/files/6_GRiD-OS-Programming/3_GRiD-OS-Reference.pdf
     - EAROM, RTC
     - serial port (incomplete), modem (incl. DTMF generator)
-	- proper custom DMA logic timing
-	- implement units other than 1101
+    - proper custom DMA logic timing
+    - implement units other than 1101
 
     missing dumps:
 
@@ -56,9 +56,9 @@
     - external floppy and hard disk (2101, 2102)
 
     to boot CCOS 3.0.1:
-	- convert GRIDOS.IMD to IMG format
+    - convert GRIDOS.IMD to IMG format
     - create zero-filled 384K bubble memory image and attach it as -memcard
-	- attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
+    - attach floppy with `-ieee_grid grid2102 -flop GRIDOS.IMG`
     - use grid1101 with 'ccos' ROM
 
 ***************************************************************************/
@@ -112,6 +112,8 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
 	{ }
+
+	static constexpr feature_type unemulated_features() { return feature::WAN; }
 
 	void grid1129(machine_config &config);
 	void grid1131(machine_config &config);
@@ -620,7 +622,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_TYPE_COMPUTER | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_LAN )
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS )
 COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IS_SKELETON )
 COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IS_SKELETON )
 COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )

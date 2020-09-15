@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
-main.cpp
+    main.cpp
 
-Controls execution of the core MAME system.
+    Controls execution of the core MAME system.
 
 ***************************************************************************/
 

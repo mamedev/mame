@@ -14,17 +14,17 @@ license:CC0
 			<bounds x="10" y="40" width="128" height="9" />
 		</screen>
 
-		<bezel name="digit3" element="digit">
+		<element name="digit3" ref="digit">
 			<bounds x="25" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds x="45" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="85" y="10"  width="15" height="22" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds x="105" y="10"  width="15" height="22" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

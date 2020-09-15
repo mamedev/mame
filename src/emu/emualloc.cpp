@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    emualloc.c
+    emualloc.cpp
 
     Memory allocation helpers for the core emulator.
 

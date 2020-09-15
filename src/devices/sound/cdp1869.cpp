@@ -400,7 +400,7 @@ void cdp1869_device::device_start()
 	m_bkg = 0;
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	// initialize other
 	m_tonediv = 0;
@@ -506,11 +506,11 @@ void cdp1869_device::cdp1869_palette(palette_device &palette) const
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdp1869_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));

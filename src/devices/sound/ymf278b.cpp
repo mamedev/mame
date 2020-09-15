@@ -212,10 +212,10 @@ void ymf278b_device::compute_envelope(YMF278BSlot *slot)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymf278b_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i, j;
 	YMF278BSlot *slot;
@@ -1009,7 +1009,7 @@ void ymf278b_device::device_start()
 		m_slots[i].num = i;
 	}
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 6, m_rate);
+	m_stream = stream_alloc_legacy(0, 6, m_rate);
 	m_mix_buffer.resize(m_rate*4,0);
 
 	// rate tables

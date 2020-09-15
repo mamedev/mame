@@ -77,7 +77,6 @@ puzznici note
 void taitol_state::state_register()
 {
 	save_item(NAME(m_last_irq_level));
-	save_item(NAME(m_main_high));
 }
 
 void taitol_2cpu_state::state_register()
@@ -94,7 +93,6 @@ void fhawk_state::state_register()
 	taitol_2cpu_state::state_register();
 
 	save_item(NAME(m_slave_rombank));
-	save_item(NAME(m_slave_high));
 }
 
 void champwr_state::state_register()
@@ -119,7 +117,6 @@ MACHINE_START_MEMBER(taitol_state, taito_l)
 void taitol_state::taito_machine_reset()
 {
 	m_last_irq_level = 0;
-	m_main_high = 0;
 }
 
 void taitol_2cpu_state::taito_machine_reset()
@@ -134,7 +131,6 @@ void fhawk_state::taito_machine_reset()
 	m_slave_rombank = 0;
 	m_slave_bnk->set_entry(m_slave_rombank);
 
-	m_slave_high = 0;
 	m_audio_bnk->set_entry(1);
 }
 
@@ -202,38 +198,10 @@ void taitol_state::irq_enable_w(u8 data)
 }
 
 
-void taitol_state::rombankswitch_w(u8 data)
-{
-	if (m_vdp->rom_bank_r() != data)
-	{
-		if (data > m_main_high)
-		{
-			m_main_high = data;
-			logerror("New rom size : %x\n", (m_main_high + 1) * 0x2000);
-		}
-
-		//logerror("robs %d, %02x (%04x)\n", offset, data, m_main_cpu->pc());
-		m_vdp->rom_bank_w(data);
-	}
-}
-
 void fhawk_state::slave_rombank_w(u8 data)
 {
-	data &= 0xf;
-
-	if (m_slave_rombank != data)
-	{
-		if (data > m_slave_high)
-		{
-			m_slave_high = data;
-			logerror("New rom2 size : %x\n", (m_slave_high + 1) * 0x4000);
-		}
-
-		//logerror("robs2 %02x (%04x)\n", data, m_main_cpu->pc());
-
-		m_slave_rombank = data;
-		m_slave_bnk->set_entry(m_slave_rombank);
-	}
+	m_slave_rombank = data & 0xf;
+	m_slave_bnk->set_entry(m_slave_rombank);
 }
 
 u8 fhawk_state::slave_rombank_r()
@@ -313,10 +281,10 @@ void taitol_state::common_banks_map(address_map &map)
 {
 	map(0x0000, 0xfdff).m(m_vdp, FUNC(tc0090lvc_device::cpu_map));
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0090lvc_device::vregs_r), FUNC(tc0090lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(m_vdp, FUNC(tc0090lvc_device::irq_vector_r), FUNC(tc0090lvc_device::irq_vector_w));
-	map(0xff03, 0xff03).r(m_vdp, FUNC(tc0090lvc_device::irq_enable_r)).w(FUNC(taitol_state::irq_enable_w));
-	map(0xff04, 0xff07).rw(m_vdp, FUNC(tc0090lvc_device::ram_bank_r), FUNC(tc0090lvc_device::ram_bank_w));
-	map(0xff08, 0xff08).r(m_vdp, FUNC(tc0090lvc_device::rom_bank_r)).w(FUNC(taitol_state::rombankswitch_w));
+	map(0xff00, 0xff02).mirror(0x00f0).rw(m_vdp, FUNC(tc0090lvc_device::irq_vector_r), FUNC(tc0090lvc_device::irq_vector_w));
+	map(0xff03, 0xff03).mirror(0x00f0).r(m_vdp, FUNC(tc0090lvc_device::irq_enable_r)).w(FUNC(taitol_state::irq_enable_w));
+	map(0xff04, 0xff07).mirror(0x00f0).rw(m_vdp, FUNC(tc0090lvc_device::ram_bank_r), FUNC(tc0090lvc_device::ram_bank_w));
+	map(0xff08, 0xff08).mirror(0x00f0).rw(m_vdp, FUNC(tc0090lvc_device::rom_bank_r), FUNC(tc0090lvc_device::rom_bank_w));
 }
 
 void fhawk_state::fhawk_map(address_map &map)
@@ -379,10 +347,10 @@ void taitol_2cpu_state::raimais_3_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).nopw(); /* pan */
-	map(0xe600, 0xe600).nopw(); /* ? */
-	map(0xee00, 0xee00).nopw(); /* ? */
-	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xe400, 0xe403).nopw(); // pan
+	map(0xe600, 0xe600).nopw(); // ?
+	map(0xee00, 0xee00).nopw(); // ?
+	map(0xf000, 0xf000).nopw(); // ?
 	map(0xf200, 0xf200).w(FUNC(taitol_2cpu_state::sound_bankswitch_w));
 }
 
@@ -448,7 +416,7 @@ void taitol_1cpu_state::puzznic_map(address_map &map)
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb800, 0xb800).rw("mcu", FUNC(arkanoid_68705p3_device::data_r), FUNC(arkanoid_68705p3_device::data_w));
 	map(0xb801, 0xb801).rw(FUNC(taitol_1cpu_state::mcu_control_r), FUNC(taitol_1cpu_state::mcu_control_w));
-	map(0xbc00, 0xbc00).nopw();    // Control register, function unknown
+	map(0xbc00, 0xbc00).nopw(); // Control register, function unknown
 }
 
 /* bootleg, doesn't have the MCU */
@@ -460,7 +428,7 @@ void taitol_1cpu_state::puzznici_map(address_map &map)
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb801, 0xb801).r(FUNC(taitol_1cpu_state::mcu_control_r));
 //  map(0xb801, 0xb801).w(FUNC(taitol_1cpu_state::mcu_control_w));
-	map(0xbc00, 0xbc00).nopw();    // Control register, function unknown
+	map(0xbc00, 0xbc00).nopw(); // Control register, function unknown
 }
 
 
@@ -469,8 +437,8 @@ void taitol_1cpu_state::plotting_map(address_map &map)
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
-	map(0xa800, 0xa800).nopw();    // Watchdog or interrupt ack
-	map(0xb800, 0xb800).nopw();    // Control register, function unknown
+	map(0xa800, 0xa800).nopw(); // Watchdog or interrupt ack
+	map(0xb800, 0xb800).nopw(); // Control register, function unknown
 }
 
 
@@ -480,15 +448,8 @@ void taitol_1cpu_state::palamed_map(address_map &map)
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa003).rw(m_ymsnd, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa800, 0xa803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xb000, 0xb000).nopw();    // Control register, function unknown (copy of 8822)
+	map(0xb000, 0xb000).nopw(); // Control register, function unknown (copy of 8822)
 	map(0xb001, 0xb001).nopr(); // Watchdog or interrupt ack (value ignored in cachat)
-}
-
-
-void taitol_1cpu_state::cachat_map(address_map &map)
-{
-	palamed_map(map);
-	map(0xfff8, 0xfff8).r(m_vdp, FUNC(tc0090lvc_device::rom_bank_r)).w(FUNC(taitol_1cpu_state::rombankswitch_w));
 }
 
 
@@ -497,10 +458,7 @@ void horshoes_state::horshoes_map(address_map &map)
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
-	map(0xa800, 0xa800).select(0x000c).lr8(NAME(
-										   [this](offs_t offset) {
-											   return m_upd4701->read_xy(offset >> 2);
-										   }));
+	map(0xa800, 0xa800).select(0x000c).lr8(NAME([this](offs_t offset) { return m_upd4701->read_xy(offset >> 2); }));
 	map(0xa802, 0xa802).r(m_upd4701, FUNC(upd4701_device::reset_x_r));
 	map(0xa803, 0xa803).r(m_upd4701, FUNC(upd4701_device::reset_y_r));
 	map(0xb801, 0xb801).nopr(); // Watchdog or interrupt ack
@@ -1585,9 +1543,6 @@ void taitol_1cpu_state::cachat(machine_config &config)
 {
 	palamed(config);
 
-	/* basic machine hardware */
-	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::cachat_map);
-
 	// NEC D70155C for inputs, instead TMP8255AP-5
 }
 
@@ -1690,7 +1645,7 @@ ROM_START( raimaisjo )
 ROM_END
 
 ROM_START( fhawk )
-	ROM_REGION( 0xa0000, "tc0090lvc", 0 )
+	ROM_REGION( 0x100000, "tc0090lvc", ROMREGION_ERASEFF )
 	ROM_LOAD( "b70-11.ic3", 0x00000, 0x20000, CRC(7d9f7583) SHA1(d8fa7c66a81fb356fa9c72f377bfc31b1837eafb) )
 	ROM_LOAD( "b70-03.ic2", 0x20000, 0x80000, CRC(42d5a9b8) SHA1(10714fe95c372cec12376e615a9abe213aff12bc) )
 
@@ -1706,7 +1661,7 @@ ROM_START( fhawk )
 ROM_END
 
 ROM_START( fhawkj )
-	ROM_REGION( 0xa0000, "tc0090lvc", 0 )
+	ROM_REGION( 0x100000, "tc0090lvc", ROMREGION_ERASEFF )
 	ROM_LOAD( "b70-07.ic3", 0x00000, 0x20000, CRC(939114af) SHA1(66218536dcb3b34ffa01d3c9c2fee365d91cfe00) )
 	ROM_LOAD( "b70-03.ic2", 0x20000, 0x80000, CRC(42d5a9b8) SHA1(10714fe95c372cec12376e615a9abe213aff12bc) )
 

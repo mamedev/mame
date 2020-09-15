@@ -43,7 +43,7 @@ namespace plib {
 		const char* what() const noexcept override { return m_text.c_str(); }
 
 	private:
-		pstring m_text;
+		putf8string m_text;
 	};
 
 	class file_e : public plib::pexception

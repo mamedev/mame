@@ -2,20 +2,18 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DEC PC11 paper tape reader and punch controller (punch not implemented)
+    DEC PC11 paper tape reader and punch controller (punch not implemented)
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_QBUS_PC11_H
+#define MAME_BUS_QBUS_PC11_H
+
 #pragma once
-
-#ifndef __PC11__
-#define __PC11__
-
-#include "emu.h"
 
 #include "qbus.h"
 
-#include "includes/pdp11.h"
+#include "machine/pdp11.h"
 #include "softlist_dev.h"
 
 

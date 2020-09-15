@@ -27,7 +27,6 @@ public:
 	bishi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
 		m_k055555(*this, "k055555"),
@@ -45,16 +44,12 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 
 	void bishi(machine_config &config);
-	void dobouchn(machine_config &config);
 	void main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 private:
-	/* memory pointers */
-	uint8_t *    m_ram;
-
 	/* misc */
 	uint16_t     m_cur_control;
 	uint16_t     m_cur_control2;
@@ -64,7 +59,6 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
 	required_device<k056832_device> m_k056832;
 	required_device<k054338_device> m_k054338;
 	required_device<k055555_device> m_k055555;

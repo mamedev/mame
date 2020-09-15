@@ -154,6 +154,7 @@ void h8_dma_channel_device::device_reset()
 	mar[0] = mar[1] = 0;
 	ioar[0] = ioar[1] = 0;
 	etcr[0] = etcr[1] = 0;
+	dtcr[0] = dtcr[1] = 0;
 	fae = sae = false;
 	dta = dte = dtie = 0;
 }

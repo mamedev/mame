@@ -402,7 +402,7 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		if( op1 == 0xcb )
 		{
 			offset = (int8_t) params.r8(pos++);
-			op1 = params.r8(pos++); /* fourth byte from opbase.ram! */
+			op1 = opcodes.r8(pos++); // M1 fetch, unlike Z80
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];
@@ -413,7 +413,7 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		if( op1 == 0xcb )
 		{
 			offset = (int8_t) params.r8(pos++);
-			op1 = params.r8(pos++); /* fourth byte from opbase.ram! */
+			op1 = opcodes.r8(pos++); // M1 fetch, unlike Z80
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];

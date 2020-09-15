@@ -99,6 +99,13 @@ Adaptec AHA-1540CF/1542CF Installation Guide
 http://download.adaptec.com/pdfs/installation_guides/aha1540cf_ig.pdf
  */
 
+/*
+Adaptec QFP ASICs
+— AHA-1540/42C: AIC-???? (covered by sticker)
+— AHA-1540/42CP: AIC-7970Q
+— AHA-1540/42CF: AIC-3370P, AIC-???? (covered by sticker)
+*/
+
 #include "emu.h"
 #include "aha1542c.h"
 #include "cpu/z80/z80.h"
@@ -141,7 +148,7 @@ http://download.adaptec.com/pdfs/installation_guides/aha1540cf_ig.pdf
 #define CMD_NOP         0x00    // No operation
 #define CMD_MBINIT      0x01    // mailbox initialization
 #define CMD_START_SCSI  0x02    // Start SCSI command
-#define CMD_BIOSCMD     0x03    // undocumented BIOS conmmand (shadow RAM etc.)
+#define CMD_BIOSCMD     0x03    // undocumented BIOS command (shadow RAM etc.)
 #define CMD_INQUIRY     0x04    // Adapter inquiry
 #define CMD_EMBOI       0x05    // enable Mailbox Out Interrupt
 #define CMD_SELTIMEOUT  0x06    // Set SEL timeout

@@ -42,26 +42,26 @@ license:CC0
 		<screen index="0">
 			<bounds x="61" y="0" width="751" height="480" />
 		</screen>
-		<bezel name="red_led" element="rled">
+		<element name="red_led" ref="rled">
 			<bounds x="15" y="3" width="10" height="10" />
-		</bezel>
-		<bezel name="yellow_led" element="yled">
+		</element>
+		<element name="yellow_led" ref="yled">
 			<bounds x="15" y="18" width="10" height="10" />
-		</bezel>
-		<bezel name="green_led" element="gled">
+		</element>
+		<element name="green_led" ref="gled">
 			<bounds x="15" y="33" width="10" height="10" />
-		</bezel>
-		<bezel name="label0" element="DRIVE0">
+		</element>
+		<element name="label0" ref="DRIVE0">
 			<bounds x="0" y="60" width="15" height="16" />
-		</bezel>
-		<bezel name="drive0_led" element="gled">
+		</element>
+		<element name="drive0_led" ref="gled">
 			<bounds x="15" y="63" width="10" height="10" />
-		</bezel>
-		<bezel name="label1" element="DRIVE1">
+		</element>
+		<element name="label1" ref="DRIVE1">
 			<bounds x="0" y="74" width="15" height="16" />
-		</bezel>
-		<bezel name="drive1_led" element="gled">
+		</element>
+		<element name="drive1_led" ref="gled">
 			<bounds x="15" y="79" width="10" height="10" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

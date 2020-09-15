@@ -918,7 +918,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 
 	MC68681(config, m_duart68681, DUART_CLOCK);
 	m_duart68681->irq_cb().set(FUNC(maygayv1_state::duart_irq_handler));
-	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));;
+	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));         // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));         // scan SL lines

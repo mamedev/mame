@@ -622,7 +622,7 @@ void mos6560_device::sound_start()
 {
 	int i;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
@@ -888,10 +888,10 @@ void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mos6560_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i, v;
 	stream_sample_t *buffer = outputs[0];

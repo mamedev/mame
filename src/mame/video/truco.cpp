@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi, Roberto Fresca
 /***************************************************************************
 
-  video.c
+  Truco-Tron
 
   Functions to emulate the video hardware of the machine.
 
@@ -28,7 +28,7 @@ void truco_state::truco_palette(palette_device &palette) const
 			b >>= 1;
 		}
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

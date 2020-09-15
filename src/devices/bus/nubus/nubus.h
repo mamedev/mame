@@ -20,32 +20,83 @@
 
 class nubus_device;
 
-class nubus_slot_device : public device_t, public device_slot_interface
+// ======================> device_nubus_card_interface
+
+// class representing interface-specific live nubus card
+class device_nubus_card_interface : public device_interface
+{
+	friend class nubus_device;
+	template <class ElementType> friend class simple_list;
+public:
+	// construction/destruction
+	virtual ~device_nubus_card_interface();
+
+	device_nubus_card_interface *next() const { return m_next; }
+
+	void set_nubus_device();
+
+	// helper functions for card devices
+	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
+
+	uint32_t get_slotspace() { return 0xf0000000 | (m_slot<<24); }
+	uint32_t get_super_slotspace() { return m_slot<<28; }
+
+	void raise_slot_irq();
+	void lower_slot_irq();
+
+	// inline configuration
+	void set_nubus_tag(nubus_device *nubus, const char *slottag) { m_nubus = nubus; m_nubus_slottag = slottag; }
+
+protected:
+	device_nubus_card_interface(const machine_config &mconfig, device_t &device);
+	virtual void interface_pre_start() override;
+
+	int slotno() const { assert(m_nubus); return m_slot; }
+	nubus_device &nubus() { assert(m_nubus); return *m_nubus; }
+
+private:
+	nubus_device *m_nubus;
+	const char *m_nubus_slottag;
+	int m_slot;
+	std::vector<uint8_t> m_declaration_rom;
+	device_nubus_card_interface *m_next;
+};
+
+class nubus_slot_device : public device_t, public device_single_card_slot_interface<device_nubus_card_interface>
 {
 public:
 	// construction/destruction
-	template <typename T>
-	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
+	template <typename T, typename U>
+	nubus_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *nbtag, U &&opts, const char *dflt)
 		: nubus_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
-		set_nubus_slot(nbtag, tag);
+		set_nubus_slot(std::forward<T>(nbtag), tag);
 	}
 
 	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	void set_nubus_slot(const char *tag, const char *slottag) { m_nubus_tag = tag; m_nubus_slottag = slottag; }
+	template <typename T>
+	void set_nubus_slot(T &&tag, const char *slottag)
+	{
+		m_nubus.set_tag(std::forward<T>(tag));
+		m_nubus_slottag = slottag;
+	}
+
 protected:
 	nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// configuration
-	const char *m_nubus_tag, *m_nubus_slottag;
+	required_device<nubus_device> m_nubus;
+	const char *m_nubus_slottag;
 };
 
 // device type definition
@@ -104,51 +155,18 @@ protected:
 	simple_list<device_nubus_card_interface> m_device_list;
 };
 
+inline void device_nubus_card_interface::raise_slot_irq()
+{
+	nubus().set_irq_line(m_slot, ASSERT_LINE);
+}
+
+inline void device_nubus_card_interface::lower_slot_irq()
+{
+	nubus().set_irq_line(m_slot, CLEAR_LINE);
+}
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(NUBUS, nubus_device)
-
-// ======================> device_nubus_card_interface
-
-// class representing interface-specific live nubus card
-class device_nubus_card_interface : public device_interface
-{
-	friend class nubus_device;
-	template <class ElementType> friend class simple_list;
-public:
-	// construction/destruction
-	virtual ~device_nubus_card_interface();
-
-	device_nubus_card_interface *next() const { return m_next; }
-
-	void set_nubus_device();
-
-	// helper functions for card devices
-	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-
-	uint32_t get_slotspace() { return 0xf0000000 | (m_slot<<24); }
-	uint32_t get_super_slotspace() { return m_slot<<28; }
-
-	void raise_slot_irq() { nubus().set_irq_line(m_slot, ASSERT_LINE); }
-	void lower_slot_irq() { nubus().set_irq_line(m_slot, CLEAR_LINE); }
-
-	// inline configuration
-	void set_nubus_tag(const char *tag, const char *slottag) { m_nubus_tag = tag; m_nubus_slottag = slottag; }
-
-protected:
-	device_nubus_card_interface(const machine_config &mconfig, device_t &device);
-	virtual void interface_pre_start() override;
-
-	int slotno() const { assert(m_nubus); return m_slot; }
-	nubus_device &nubus() { assert(m_nubus); return *m_nubus; }
-
-private:
-	nubus_device  *m_nubus;
-	const char *m_nubus_tag, *m_nubus_slottag;
-	int m_slot;
-	std::vector<uint8_t> m_declaration_rom;
-	device_nubus_card_interface *m_next;
-};
 
 #endif  // MAME_BUS_NUBUS_NUBUS_H

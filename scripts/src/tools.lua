@@ -593,7 +593,6 @@ end
 
 links {
 	"formats",
-	"emu",
 	"utils",
 	ext_lib("expat"),
 	"7z",
@@ -638,7 +637,6 @@ end
 
 links {
 	"formats",
-	"emu",
 	"utils",
 	ext_lib("expat"),
 	"7z",

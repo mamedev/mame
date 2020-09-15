@@ -106,7 +106,7 @@ VIDEO_START_MEMBER(m72_state,m72)
 	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 
 	//m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
-	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj japan warning to look correct
+	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj Japan warning to look correct
 
 	memset(m_spriteram->buffer(),0,m_spriteram->bytes());
 
@@ -149,22 +149,22 @@ VIDEO_START_MEMBER(m72_state,hharry)
 	m_bg_tilemap->set_scrolldy(-128,16);
 }
 
-VIDEO_START_MEMBER(m72_state,imgfightj)
+VIDEO_START_MEMBER(m72_state,imgfight)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for japan message
+	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for RAM/ROM & Japan message
 }
 
 VIDEO_START_MEMBER(m72_state,nspiritj)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for japan message
+	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message
 }
 
 VIDEO_START_MEMBER(m72_state,mrheli)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for japan message
+	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
 }
 
 

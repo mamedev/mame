@@ -42,7 +42,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
@@ -81,7 +81,7 @@ private:
 		inline void key_off();
 		inline void play(stream_sample_t *outputs);
 		inline bool playing() { return m_playing; }
-		inline u8 read_rom();
+		inline u8 read_rom(bool side_effects);
 
 	private:
 		// pointer to owning device

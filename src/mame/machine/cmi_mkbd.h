@@ -76,6 +76,7 @@ private:
 
 	required_ioport m_keypad_a_port;
 	required_ioport m_keypad_b_port;
+	required_ioport m_analog;
 
 	required_ioport_array<3> m_key_mux_ports[4];
 

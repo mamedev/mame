@@ -229,7 +229,7 @@ void qs1000_device::device_start()
 	// The QS1000 operates at 24MHz. Creating a stream at that rate
 	// would be overkill so we opt for a fraction of that rate which
 	// gives reasonable results
-	m_stream = stream_alloc(0, 2, clock() / 32);
+	m_stream = stream_alloc_legacy(0, 2, clock() / 32);
 
 	// Resolve CPU port callbacks
 	m_in_p1_cb.resolve_safe(0);
@@ -466,9 +466,9 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update -
+//  sound_stream_update_legacy -
 //-------------------------------------------------
-void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void qs1000_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// Rset the output stream
 	memset(outputs[0], 0x0, samples * sizeof(*outputs[0]));

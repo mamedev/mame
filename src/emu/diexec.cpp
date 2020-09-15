@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    diexec.c
+    diexec.cpp
 
     Device execution interfaces.
 

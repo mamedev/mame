@@ -20,10 +20,8 @@ class xmen_state : public driver_device
 public:
 	xmen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_xmen6p_spriteramleft(*this, "spriteramleft"),
-		m_xmen6p_spriteramright(*this, "spriteramright"),
-		m_xmen6p_tilemapleft(*this, "tilemapleft"),
-		m_xmen6p_tilemapright(*this, "tilemapright"),
+		m_xmen6p_spriteram(*this, "spriteram%u", 0),
+		m_xmen6p_tilemap(*this, "tilemap%u", 0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k054539(*this, "k054539"),
@@ -49,14 +47,13 @@ private:
 	/* for xmen6p */
 	std::unique_ptr<bitmap_ind16> m_screen_right;
 	std::unique_ptr<bitmap_ind16> m_screen_left;
-	optional_shared_ptr<uint16_t> m_xmen6p_spriteramleft;
-	optional_shared_ptr<uint16_t> m_xmen6p_spriteramright;
-	optional_shared_ptr<uint16_t> m_xmen6p_tilemapleft;
-	optional_shared_ptr<uint16_t> m_xmen6p_tilemapright;
-	uint16_t *   m_k053247_ram;
+	optional_shared_ptr_array<uint16_t, 2> m_xmen6p_spriteram;
+	optional_shared_ptr_array<uint16_t, 4> m_xmen6p_tilemap;
+	uint16_t * m_k053247_ram;
+	bool       m_xmen6p_tilemap_select;
 
 	/* misc */
-	uint8_t       m_vblank_irq_mask;
+	uint8_t    m_vblank_irq_mask;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

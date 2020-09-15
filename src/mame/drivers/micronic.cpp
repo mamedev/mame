@@ -2,7 +2,11 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-    Micronics 1000
+    Micronic 1000
+
+    This is a small handheld CP/M computer with a 4x8 keypad and a 128x64
+    LCD display. It was produced by Victor Micronic Ltd, a UK subsidiary
+    of Datronic AB.
 
     06/2010 (Sandro Ronco)
     - ROM/RAM banking
@@ -18,9 +22,10 @@
     The display shows "TESTING..." for about 2 min before showing the information screen
 
     More info:
-    http://www.philpem.me.uk/elec/micronic/
-    http://members.lycos.co.uk/leeedavison/z80/micronic/index.html
-    http://reocities.com/SiliconValley/Port/8052/
+    http://web.archive.org/web/20180104024745/http://www.philpem.me.uk/elec/micronic/
+    http://web.archive.org/web/20080411235036/http://members.lycos.co.uk:80/leeedavison/z80/micronic/index.html
+    https://geocities.restorativland.org/SiliconValley/Port/8052/
+    https://www.cbronline.com/news/victor_micronic_has_the_m1000_handheld_computer_terminal/
 
 ****************************************************************************/
 
@@ -395,4 +400,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME         FLAGS
-COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

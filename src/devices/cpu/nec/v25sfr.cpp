@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "v25.h"
-#include "v25priv.h"
+#include "v25priv.ipp"
 
 void v25_common_device::ida_sfr_map(address_map &map)
 {

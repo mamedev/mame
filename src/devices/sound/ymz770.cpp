@@ -77,7 +77,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 void ymz770_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sclock);
+	m_stream = stream_alloc_legacy(0, 2, m_sclock);
 
 	for (auto & channel : m_channels)
 	{
@@ -178,11 +178,11 @@ void ymz770_device::device_reset()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymz770_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 

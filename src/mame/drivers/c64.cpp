@@ -193,6 +193,7 @@ public:
 	c64c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag)
 	{ }
+
 	void pal_c(machine_config &config);
 	void ntsc_c(machine_config &config);
 };
@@ -212,6 +213,18 @@ public:
 	uint8_t cia1_pb_r();
 	void pal_gs(machine_config &config);
 };
+
+
+class clipper_state : public c64_state
+{
+public:
+	clipper_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c64_state(mconfig, type, tag)
+	{ }
+
+	void clipper(machine_config &config);
+};
+
 
 struct dasm_zeropage_data
 {
@@ -849,6 +862,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( c64gs )
 	// no keyboard
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( clipper )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( clipper )
+	PORT_INCLUDE( c64 )
+	// TODO extra keys
 INPUT_PORTS_END
 
 
@@ -1867,6 +1890,21 @@ void c64gs_state::pal_gs(machine_config &config)
 }
 
 
+//-------------------------------------------------
+//  machine_config( clipper )
+//-------------------------------------------------
+
+void clipper_state::clipper(machine_config &config)
+{
+	pal(config);
+
+	// TODO extra hardware
+
+	// software list
+	SOFTWARE_LIST(config, "flop525").set_original("clipper_flop");
+}
+
+
 
 //**************************************************************************
 //  ROMS
@@ -2184,27 +2222,56 @@ ROM_START( c64gs )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( clipper )
+//-------------------------------------------------
+
+ROM_START( clipper )
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "kernal.bin", 0x0000, 0x2000, CRC(13ca39ca) SHA1(d668e7980887a5b90fad693eba35fac49c7ad941) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "chr_gen.bin", 0x0000, 0x1000, CRC(a675a239) SHA1(9ad11a5de5bd7e43c43e985b31bed7ca96101fc5) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
+
+	ROM_REGION( 0x4000, "fdc", 0 )
+	ROM_LOAD( "fdc.bin", 0x0000, 0x2000, CRC(44b0b1fc) SHA1(effcf165cb4ea32540a8a8c12781303dc36fa4b2) )
+	ROM_LOAD( "fdc_12.bin", 0x2000, 0x2000, CRC(397a2219) SHA1(7eefcc871a805f45be4ba016fe9fc7d25318c431) )
+
+	ROM_REGION( 0x6000, "sb", 0 )
+	ROM_LOAD( "sb1.bin", 0x0000, 0x2000, CRC(400040be) SHA1(b290216f49b24355a1a2b25adfa96709c5d9c049) )
+	ROM_LOAD( "sb2.bin", 0x2000, 0x2000, CRC(a3d7177a) SHA1(0f50381aecf3c5ea03cce358a3325b3e06939c37) )
+	ROM_LOAD( "sb3.bin", 0x4000, 0x2000, CRC(7b1fc6c6) SHA1(900fe4be8d6348bf68dbda0c7ecefc84bda51202) )
+
+	ROM_REGION( 0x1000, "thdr", 0 )
+	ROM_LOAD( "thdr5.bin", 0x0000, 0x1000, CRC(b4296e62) SHA1(4b6edadbb810c409ece77d5834568fcc2e0bbd61) )
+ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                        FULLNAME                                   FLAGS
-COMP( 1982, c64,      0,      0,      ntsc,    c64,   c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 (NTSC)",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64_jp,   c64,    0,      ntsc,    c64,   c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 (Japan)",                    MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64p,     c64,    0,      pal,     c64,   c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 (PAL)",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64_se,   c64,    0,      pal,     c64sw, c64_state,   empty_init, "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pet64,    c64,    0,      pet64,   c64,   c64_state,   empty_init, "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1983, edu64,    c64,    0,      pet64,   c64,   c64_state,   empty_init, "Commodore Business Machines", "Educator 64 (NTSC)",                      MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1984, sx64,     c64,    0,      ntsc_sx, c64,   sx64_state,  empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",             MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sx64p,    c64,    0,      pal_sx,  c64,   sx64_state,  empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",              MACHINE_SUPPORTS_SAVE )
-COMP( 1984, vip64,    c64,    0,      pal_sx,  c64sw, sx64_state,  empty_init, "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,   sx64_state,  empty_init, "Commodore Business Machines", "DX-64 (NTSC)",                            MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,   sx64_state,  empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64c,     c64,    0,      ntsc_c,  c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (NTSC)",                    MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64cp,    c64,    0,      pal_c,   c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (PAL)",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw, c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (Spain)",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64c_se,  c64,    0,      pal_c,   c64sw, c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64g,     c64,    0,      pal_c,   c64,   c64c_state,  empty_init, "Commodore Business Machines", "Commodore 64G (PAL)",                     MACHINE_SUPPORTS_SAVE )
-CONS( 1990, c64gs,    c64,    0,      pal_gs,  c64gs, c64gs_state, empty_init, "Commodore Business Machines", "Commodore 64 Games System (PAL)",         MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                        FULLNAME                                   FLAGS
+COMP( 1982, c64,      0,      0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (NTSC)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64_jp,   c64,    0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (Japan)",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64p,     c64,    0,      pal,     c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (PAL)",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64_se,   c64,    0,      pal,     c64sw,   c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pet64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1983, edu64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "Educator 64 (NTSC)",                      MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1984, sx64,     c64,    0,      ntsc_sx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",             MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sx64p,    c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, vip64,    c64,    0,      pal_sx,  c64sw,   sx64_state,    empty_init, "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "DX-64 (NTSC)",                            MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, clipper,  c64,    0,      clipper, clipper, clipper_state, empty_init, "Professional Data Computer",  "Clipper",                                 MACHINE_NOT_WORKING )
+COMP( 1986, c64c,     c64,    0,      ntsc_c,  c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (NTSC)",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64cp,    c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (PAL)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (Spain)",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64c_se,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64g,     c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64G (PAL)",                     MACHINE_SUPPORTS_SAVE )
+CONS( 1990, c64gs,    c64,    0,      pal_gs,  c64gs,   c64gs_state,   empty_init, "Commodore Business Machines", "Commodore 64 Games System (PAL)",         MACHINE_SUPPORTS_SAVE )
 

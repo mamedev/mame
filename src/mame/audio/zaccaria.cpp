@@ -472,14 +472,14 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	 * The 5200 output is a current source providing between 0 and 1.5mA.
 	 * This is explained in detail in the datasheet.
 	 */
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(750e-6 / 16384.0, 750e-6);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(2.0 * 750e-6, 750e-6);
 	/* DAC
 	 * The 1408 output is a current sink providing between 0 and 2.0mA.
 	 * This is explained in detail in the datasheet.
 	 */
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3 / 32768.0, 1e-3);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3, 1e-3);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0 / 32768.0, 0.0); // FIXME: no clue what numbers to use here
 
 	// Potentiometers
 	NETLIST_ANALOG_INPUT(config, "sound_nl:pot1", "P1.DIAL");

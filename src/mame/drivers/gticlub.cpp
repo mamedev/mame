@@ -461,7 +461,7 @@ void gticlub_state::sysreg_w(offs_t offset, uint8_t data)
 	{
 		case 0:
 		case 1:
-			m_pcb_digit[offset] = bitswap<8>(~data,7,0,1,2,3,4,5,6) & 0x7f;
+			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
 			break;
 
 		case 3:
@@ -599,8 +599,8 @@ void gticlub_state::gn680_memmap(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl_w));
-//	map(0x310000, 0x311fff).nopw(); //056230 regs?
-//	map(0x312000, 0x313fff).nopw(); //056230 ram?
+//  map(0x310000, 0x311fff).nopw(); //056230 regs?
+//  map(0x312000, 0x313fff).nopw(); //056230 ram?
 }
 
 /*****************************************************************************/
@@ -993,13 +993,11 @@ void gticlub_state::gticlub(machine_config &config)
 
 	K001006(config, m_k001006_1, 0);
 	m_k001006_1->set_gfx_region("gfx1");
-	m_k001006_1->set_tex_layout(1);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
 	K001006(config, m_k001006_2, 0);
 	m_k001006_2->set_gfx_region("gfx1");
-	m_k001006_2->set_tex_layout(1);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);

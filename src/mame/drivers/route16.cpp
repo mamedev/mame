@@ -1101,6 +1101,28 @@ ROM_START( routex )
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
+ROM_START( routexa )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "r1.bin", 0x0000, 0x0800, CRC(78c819c8) SHA1(41951aef3ad8be53aadb17892b5b3e13be61b50f) ) // unique
+	ROM_LOAD( "r2.bin", 0x0800, 0x0800, CRC(3ec52fe5) SHA1(451969b5caedd665231ef78cf262679d6d4c8507) )
+	ROM_LOAD( "r3.bin", 0x1000, 0x0800, CRC(a8e92871) SHA1(68a709c14309d2b617997b76ae9d7b80fd326f39) )
+	ROM_LOAD( "r4.bin", 0x1800, 0x0800, CRC(a0fc9fc5) SHA1(7013750c1b3d403b12eac10282a930538ed9c73e) )
+	ROM_LOAD( "r5.bin", 0x2000, 0x0800, CRC(2fef7653) SHA1(ba3477da249ca402d096704e57ea638fde6abe9c) )
+	ROM_LOAD( "r6.bin", 0x2800, 0x0800, CRC(a39ef648) SHA1(866095d9880b60b01f7ca66b332f5f6c4b41a5ac) )
+	ROM_LOAD( "r7.bin", 0x3000, 0x0800, CRC(2aeb3102) SHA1(7398dd43b1717aef8dc18210758db9fa828bd92e) ) // unique, FIXED BITS (010x011011111111) and 1ST AND 2ND HALF IDENTICAL, but confirmed on two different PCBs
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "r8.bin",  0x0000, 0x0800, CRC(fef605f3) SHA1(bfbffa0ded3e285c034f0ad832864021ef3f2256) ) // unique
+	ROM_LOAD( "r9.bin",  0x0800, 0x0800, CRC(d0d6c189) SHA1(75cec891e20cf05aae354c8950857aea83c6dadc) )
+	ROM_LOAD( "r10.bin", 0x1000, 0x0800, CRC(defc5797) SHA1(aec8179e647de70016e0e63b720f932752adacc1) )
+	ROM_LOAD( "r11.bin", 0x1800, 0x0800, CRC(88d94a66) SHA1(163e952ada7c05110d1f1c681bd57d3b9ea8866e) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Intersil IM5623CPE proms compatible with 82s129
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // top bitmap
+	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // bottom bitmap
+ROM_END
+
 ROM_START( speakres )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "speakres.1",   0x0000, 0x0800, CRC(6026e4ea) SHA1(77975620b489f10e5b5de834e812c2802315e889) )
@@ -1364,7 +1386,8 @@ GAME( 1981, route16a, route16,  route16,  route16a, route16_state, init_route16a
 GAME( 1981, route16b, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
 GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routexa,  route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )

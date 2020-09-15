@@ -160,6 +160,7 @@ void ncr539x_device::device_reset()
 	m_control1 = m_control2 = m_control3 = m_control4 = 0;
 	m_chipid_available = false;
 	m_chipid_lock = false;
+	m_fifo_internal_state = 0;
 
 	m_out_irq_cb(CLEAR_LINE);
 	m_out_drq_cb(CLEAR_LINE);

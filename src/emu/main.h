@@ -43,16 +43,16 @@ class emulator_info
 {
 public:
 	// construction/destruction
-	emulator_info() {};
+	emulator_info() = default;
 
-	static const char * get_appname();
-	static const char * get_appname_lower();
-	static const char * get_configname();
-	static const char * get_copyright();
-	static const char * get_copyright_info();
-	static const char * get_bare_build_version();
-	static const char * get_build_version();
-	static void display_ui_chooser(running_machine& machine);
+	static const char *get_appname();
+	static const char *get_appname_lower();
+	static const char *get_configname();
+	static const char *get_copyright();
+	static const char *get_copyright_info();
+	static const char *get_bare_build_version();
+	static const char *get_build_version();
+	static void display_ui_chooser(running_machine &machine);
 	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
 	static void draw_user_interface(running_machine& machine);

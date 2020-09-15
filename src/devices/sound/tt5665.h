@@ -63,7 +63,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
@@ -74,14 +74,14 @@ private:
 	{
 	public:
 		tt5665_voice();
-		void generate_adpcm(device_rom_interface &rom, stream_sample_t *buffer);
+		void generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer, int index);
 
-		oki_adpcm_state m_adpcm;        // current ADPCM state
+		oki_adpcm_state m_adpcm;          // current ADPCM state
 		bool            m_playing;
-		offs_t          m_base_offset;  // pointer to the base memory location
-		u32             m_sample;       // current sample number
-		u32             m_count;        // total samples to play
-		s8              m_volume;       // output volume
+		offs_t          m_base_offset;    // pointer to the base memory location
+		u32             m_sample;         // current sample number
+		u32             m_count;          // total samples to play
+		stream_buffer::sample_t m_volume; // output volume
 	};
 
 	// configuration state
@@ -94,12 +94,12 @@ private:
 	tt5665_voice    m_voice[TT5665_VOICES * 2]; // separated voice for left and right output
 	s32             m_command;
 	sound_stream*   m_stream;
-	stream_sample_t m_daol_output;
+	stream_buffer::sample_t m_daol_output;
 	int             m_daol_timing;
 
 	inline int freq_divider() const { return m_ss_state ? 136 : 170; }
 
-	static const u8 s_volume_table[16];
+	static const stream_buffer::sample_t s_volume_table[16];
 };
 
 

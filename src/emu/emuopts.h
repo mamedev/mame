@@ -111,6 +111,7 @@
 // core vector options
 #define OPTION_BEAM_WIDTH_MIN       "beam_width_min"
 #define OPTION_BEAM_WIDTH_MAX       "beam_width_max"
+#define OPTION_BEAM_DOT_SIZE        "beam_dot_size"
 #define OPTION_BEAM_INTENSITY_WEIGHT   "beam_intensity_weight"
 #define OPTION_FLICKER              "flicker"
 
@@ -118,6 +119,7 @@
 #define OPTION_SAMPLERATE           "samplerate"
 #define OPTION_SAMPLES              "samples"
 #define OPTION_VOLUME               "volume"
+#define OPTION_SPEAKER_REPORT       "speaker_report"
 
 // core input options
 #define OPTION_COIN_LOCKOUT         "coin_lockout"
@@ -390,6 +392,7 @@ public:
 	// core vector options
 	float beam_width_min() const { return float_value(OPTION_BEAM_WIDTH_MIN); }
 	float beam_width_max() const { return float_value(OPTION_BEAM_WIDTH_MAX); }
+	float beam_dot_size() const { return float_value(OPTION_BEAM_DOT_SIZE); }
 	float beam_intensity_weight() const { return float_value(OPTION_BEAM_INTENSITY_WEIGHT); }
 	float flicker() const { return float_value(OPTION_FLICKER); }
 
@@ -397,6 +400,7 @@ public:
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
 	bool samples() const { return bool_value(OPTION_SAMPLES); }
 	int volume() const { return int_value(OPTION_VOLUME); }
+	int speaker_report() const { return int_value(OPTION_SPEAKER_REPORT); }
 
 	// core input options
 	bool coin_lockout() const { return bool_value(OPTION_COIN_LOCKOUT); }

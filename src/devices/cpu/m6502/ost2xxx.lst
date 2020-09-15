@@ -3,7 +3,7 @@
 # m65c02 opcodes, with a twist
 
 brk_st_imp
-	if(irq_taken || nmi_state) {
+	if(irq_taken || nmi_pending) {
 		read_pc_noinc();
 	} else {
 		read_pc();
@@ -12,13 +12,13 @@ brk_st_imp
 	dec_SP();
 	write(SP, PC);
 	dec_SP();
-	write(SP, irq_taken || nmi_state ? P & ~F_B : P);
+	write(SP, irq_taken || nmi_pending ? P & ~F_B : P);
 	dec_SP();
 	set_irq_service(true);
-	if(irq_taken && nmi_state) { // NMI is not present on actual parts
+	if(irq_taken && nmi_pending) { // NMI is not present on actual parts
 		PC = read_vector(0x7ffa);
 		PC = set_h(PC, read_vector(0x7ffb));
-		nmi_state = false;
+		nmi_pending = false;
 	} else if(irq_taken) {
 		TMP = acknowledge_irq();
 		PC = read_vector(0x7ff8 - (TMP << 1));

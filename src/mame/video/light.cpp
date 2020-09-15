@@ -314,7 +314,7 @@ void light_video_device::do_rex_command()
 		const uint32_t end_x = m_lg1.m_x_end_i;
 		const uint32_t end_y = m_lg1.m_y_end_i;
 		const uint32_t src_start_x = start_x + (m_lg1.m_xy_move >> 16);
-		const uint32_t src_start_y = start_y + (uint16_t)m_lg1.m_xy_move;;
+		const uint32_t src_start_y = start_y + (uint16_t)m_lg1.m_xy_move;
 
 		LOGMASKED(LOG_REX, "LG1: Command %08x: Block copy from %d,%d-%d,%d inclusive.\n", m_lg1.m_command, start_x, start_y, end_x, end_y);
 		if (copy)

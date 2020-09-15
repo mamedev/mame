@@ -10,8 +10,8 @@
 
 #include "pconfig.h"
 #include "pgsl.h"
-#include "pmath.h"
-#include "pstring.h"
+#include "pgsl.h"
+#include "pmath.h"  // FIXME: only uses lcm ... move to ptypes.
 #include "ptypes.h"
 
 #include <algorithm>
@@ -245,14 +245,18 @@ namespace plib {
 		static /*constexpr*/ const std::size_t align_size = ALIGN;
 		using arena_type = ARENA;
 
-		static_assert(align_size >= alignof(T) && (align_size % alignof(T)) == 0,
+		static_assert(align_size >= alignof(T),
+			"ALIGN must be greater than alignof(T) and a multiple");
+		static_assert((align_size % alignof(T)) == 0,
 			"ALIGN must be greater than alignof(T) and a multiple");
 
 		arena_allocator() noexcept
 		: m_a(arena_type::instance())
 		{ }
 
-		//~arena_allocator() noexcept = default;
+		~arena_allocator() noexcept = default;
+
+		PCOPYASSIGNMOVE(arena_allocator, default)
 
 		explicit arena_allocator(arena_type & a) noexcept : m_a(a)
 		{
@@ -415,7 +419,7 @@ namespace plib {
 		#if (PUSE_ALIGNED_ALLOCATION)
 		#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 			return _aligned_malloc(size, alignment);
-		#elif defined(__APPLE__)
+		#elif defined(__APPLE__) || defined(__ANDROID__)
 			void* p;
 			if (::posix_memalign(&p, alignment, size) != 0) {
 				p = nullptr;
@@ -435,8 +439,13 @@ namespace plib {
 			//unused_var(size);
 			dec_alloc_stat(size);
 			#if (PUSE_ALIGNED_ALLOCATION)
+				#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
+				_aligned_free(ptr);
+				#else
 				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 				::free(ptr);
+				#endif
 			#else
 				::operator delete(ptr);
 			#endif
@@ -614,13 +623,11 @@ namespace plib {
 	struct align_traits : public align_traits_base<T, has_align<T>::value>
 	{};
 
-	template <typename BASEARENA = aligned_arena, std::size_t PAGESIZE = 1024>
-	class paged_arena : public arena_base<paged_arena<BASEARENA, PAGESIZE>, true, true>
+	template <typename BASEARENA = aligned_arena, std::size_t PG_SIZE = 1024>
+	class paged_arena : public arena_base<paged_arena<BASEARENA, PG_SIZE>, true, true>
 	{
 	public:
-		paged_arena()
-		{
-		}
+		paged_arena() = default;
 
 		PCOPYASSIGNMOVE(paged_arena, delete)
 
@@ -629,13 +636,13 @@ namespace plib {
 		static void *allocate(size_t align, size_t size)
 		{
 			plib::unused_var(align);
-			//size = ((size + PAGESIZE - 1) / PAGESIZE) * PAGESIZE;
-			return arena().allocate(PAGESIZE, size);
+			//size = ((size + PG_SIZE - 1) / PG_SIZE) * PG_SIZE;
+			return arena().allocate(PG_SIZE, size);
 		}
 
 		static void deallocate(void *ptr, size_t size) noexcept
 		{
-			//size = ((size + PAGESIZE - 1) / PAGESIZE) * PAGESIZE;
+			//size = ((size + PG_SIZE - 1) / PG_SIZE) * PG_SIZE;
 			arena().deallocate(ptr, size);
 		}
 

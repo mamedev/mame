@@ -54,12 +54,14 @@
 float vector_options::s_flicker = 0.0f;
 float vector_options::s_beam_width_min = 0.0f;
 float vector_options::s_beam_width_max = 0.0f;
+float vector_options::s_beam_dot_size = 0.0f;
 float vector_options::s_beam_intensity_weight = 0.0f;
 
 void vector_options::init(emu_options& options)
 {
 	s_beam_width_min = options.beam_width_min();
 	s_beam_width_max = options.beam_width_max();
+	s_beam_dot_size = options.beam_dot_size();
 	s_beam_intensity_weight = options.beam_intensity_weight();
 	s_flicker = options.flicker();
 }
@@ -175,6 +177,10 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		// normalize width
 		beam_width *= 1.0f / (float)VECTOR_WIDTH_DENOM;
+
+		// apply point scale for points
+		if (lastx == curpoint->x && lasty == curpoint->y)
+			beam_width *= vector_options::s_beam_dot_size;
 
 		coords.x0 = ((float)lastx - xoffs) * xscale;
 		coords.y0 = ((float)lasty - yoffs) * yscale;

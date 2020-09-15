@@ -16,10 +16,10 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="10" y="0" width="10" height="15" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="20" y="0" width="10" height="15" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="30" y="0" width="10" height="15" /></bezel>
+		<element name="digit0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
+		<element name="digit1" ref="digit"><bounds x="10" y="0" width="10" height="15" /></element>
+		<element name="digit2" ref="digit"><bounds x="20" y="0" width="10" height="15" /></element>
+		<element name="digit3" ref="digit"><bounds x="30" y="0" width="10" height="15" /></element>
 
 	</view>
 </mamelayout>

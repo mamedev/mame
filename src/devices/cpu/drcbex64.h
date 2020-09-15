@@ -69,7 +69,7 @@ private:
 
 		// construction
 		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
-		be_parameter(const be_parameter &param) : m_type(param.m_type), m_value(param.m_value) { }
+		be_parameter(be_parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
 		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		be_parameter(drcbe_x64 &drcbe, const uml::parameter &param, uint32_t allowed);
 
@@ -80,8 +80,8 @@ private:
 		static inline be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
 
 		// operators
-		bool operator==(const be_parameter &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
-		bool operator!=(const be_parameter &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
+		bool operator==(be_parameter const &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
+		bool operator!=(be_parameter const &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
 
 		// getters
 		be_parameter_type type() const { return m_type; }
@@ -102,8 +102,8 @@ private:
 		// helpers
 		Gp select_register(Gp defreg) const;
 		Xmm select_register(Xmm defreg) const;
-		template <typename T> T select_register(T defreg, const be_parameter &checkparam) const;
-		template <typename T> T select_register(T defreg, const be_parameter &checkparam, const be_parameter &checkparam2) const;
+		template <typename T> T select_register(T defreg, be_parameter const &checkparam) const;
+		template <typename T> T select_register(T defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
 
 	private:
 		// private constructor
@@ -115,13 +115,13 @@ private:
 	};
 
 	// helpers
-	Mem MABS(const void *ptr, const uint32_t size = 0);
+	Mem MABS(const void *ptr, const uint32_t size = 0) const { return Mem(rbp, offset_from_rbp(ptr), size); }
 	bool short_immediate(int64_t immediate) const { return (int32_t)immediate == immediate; }
 	void normalize_commutative(be_parameter &inner, be_parameter &outer);
-	int32_t offset_from_rbp(const void *ptr);
-	Gp get_base_register_and_offset(Assembler &a, void *target, Gp reg, int32_t &offset);
-	void emit_smart_call_r64(Assembler &a, x86code *target, Gp reg);
-	void emit_smart_call_m64(Assembler &a, x86code **target);
+	int32_t offset_from_rbp(const void *ptr) const;
+	Gp get_base_register_and_offset(Assembler &a, void *target, Gp const &reg, int32_t &offset);
+	void smart_call_r64(Assembler &a, x86code *target, Gp const &reg);
+	void smart_call_m64(Assembler &a, x86code **target);
 
 	static void debug_log_hashjmp(offs_t pc, int mode);
 	static void debug_log_hashjmp_fail();
@@ -204,69 +204,31 @@ private:
 	void op_fcopyi(Assembler &a, const uml::instruction &inst);
 	void op_icopyf(Assembler &a, const uml::instruction &inst);
 
-	// 32-bit code emission helpers
-	void emit_mov_r32_p32(Assembler &a, Gp reg, const be_parameter &param);
-	void emit_movsx_r64_p32(Assembler &a, Gp reg, const be_parameter &param);
-	void emit_mov_r32_p32_keepflags(Assembler &a, Gp reg, const be_parameter &param);
-	void emit_mov_m32_p32(Assembler &a, Mem memref, const be_parameter &param);
-	void emit_mov_p32_r32(Assembler &a, const be_parameter &param, Gp reg);
-	void emit_add_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_add_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_adc_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_adc_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sub_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_sub_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sbb_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_sbb_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_and_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_and_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_test_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_test_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_or_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_or_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_xor_r32_p32(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_xor_m32_p32(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_shift_p32(Assembler &a, const Inst::Id opcode, Operand op1, const be_parameter &param);
+	// alu and shift operation helpers
+	static bool ones(u64 const value, unsigned const size) noexcept { return (size == 4) ? u32(value) == 0xffffffffU : value == 0xffffffff'ffffffffULL; }
+	void alu_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param, std::function<bool(Assembler &a, Operand const &dst, be_parameter const &src)> optimize = [](Assembler &a, Operand dst, be_parameter const &src) { return false; });
+	void shift_op_param(Assembler &a, Inst::Id const opcode, Operand const &dst, be_parameter const &param);
 
-	// 64-bit code emission helpers
-	void emit_mov_r64_imm(Assembler &a, Gp reg, uint64_t imm);
-	void emit_mov_r64_p64(Assembler &a, Gp reg, const be_parameter &param);
-	void emit_mov_r64_p64_keepflags(Assembler &a, Gp reg, const be_parameter &param);
-	void emit_mov_p64_r64(Assembler &a, const be_parameter &param, Gp reg);
-	void emit_add_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_add_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_adc_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_adc_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sub_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_sub_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sbb_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_sbb_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_and_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_and_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_test_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_test_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_or_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_or_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_xor_r64_p64(Assembler &a, Gp reg, const be_parameter &param, const uml::instruction &inst);
-	void emit_xor_m64_p64(Assembler &a, Mem memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_shift_p64(Assembler &a, const Inst::Id opcode, Operand op1, const be_parameter &param);
+	// parameter helpers
+	void mov_reg_param(Assembler &a, Gp const &reg, be_parameter const &param, bool const keepflags = false);
+	void mov_param_reg(Assembler &a, be_parameter const &param, Gp const &reg);
+	void mov_mem_param(Assembler &a, Mem const &memref, be_parameter const &param);
 
-	// floating-point code emission helpers
-	void emit_movss_r128_p32(Assembler &a, Xmm reg, const be_parameter &param);
-	void emit_movss_p32_r128(Assembler &a, const be_parameter &param, Xmm reg);
-	void emit_movsd_r128_p64(Assembler &a, Xmm reg, const be_parameter &param);
-	void emit_movsd_p64_r128(Assembler &a, const be_parameter &param, Xmm reg);
+	// special-case move helpers
+	void movsx_r64_p32(Assembler &a, Gp const &reg, be_parameter const &param);
+	void mov_r64_imm(Assembler &a, Gp const &reg, uint64_t const imm);
+
+	// floating-point helpers
+	void movss_r128_p32(Assembler &a, Xmm const &reg, be_parameter const &param);
+	void movss_p32_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
+	void movsd_r128_p64(Assembler &a, Xmm const &reg, be_parameter const &param);
+	void movsd_p64_r128(Assembler &a, be_parameter const &param, Xmm const &reg);
 
 	size_t emit(CodeHolder &ch);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
 	drc_map_variables       m_map;                  // code map
-	drc_label_list          m_labels;               // label list
 	x86log_context *        m_log;                  // logging
 	FILE *                  m_log_asmjit;
 
@@ -314,14 +276,5 @@ private:
 } // namespace drc
 
 using drc::drcbe_x64;
-
-class ThrowableErrorHandler : public ErrorHandler
-{
-public:
-	void handleError(Error err, const char *message, BaseEmitter *origin) override
-	{
-		throw emu_fatalerror("asmjit error %d: %s", err, message);
-	}
-};
 
 #endif /* MAME_DEVICES_CPU_DRCBEX64_H */

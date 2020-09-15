@@ -18,7 +18,6 @@
         0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
         0xfffff0 - 0xffffff     Auto Vector
 
-
     Interrupts:
         M68K:
             Level 1 from VIA
@@ -42,11 +41,20 @@
           when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
           a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
 
+	TODO:
+		- SE and Classic to own driver
+		- Portable and PowerBook 100 to own driver
+		- Remaining PowerBooks to own driver
+		- Quadra 700 to own driver
+		- V8 and friends to own driver
+		- LC3 / LC520 / IIvx / IIvi to own driver
+
 ****************************************************************************/
 
 
 #include "emu.h"
 #include "includes/mac.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
@@ -727,7 +735,7 @@ void mac_state::maciifx_map(address_map &map)
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
 void mac_state::macpb140_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x01f00000);
 	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x01f00000);
@@ -744,7 +752,7 @@ void mac_state::macpb140_map(address_map &map)
 
 void mac_state::macpb160_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -762,7 +770,7 @@ void mac_state::macpb160_map(address_map &map)
 
 void mac_state::macpb165c_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -785,7 +793,7 @@ void mac_state::macpb165c_map(address_map &map)
 
 void mac_state::macpd210_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50f00000, 0x50f01fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w));
@@ -805,7 +813,7 @@ void mac_state::macpd210_map(address_map &map)
 
 void mac_state::quadra700_map(address_map &map)
 {
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
+	map(0x40000000, 0x400fffff).r(FUNC(mac_state::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00fc0000);
 	map(0x50002000, 0x50003fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00fc0000);
@@ -927,17 +935,6 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, bool super_wo
 
 	SCC8530(config, m_scc, C7M);
 	m_scc->intrq_callback().set(FUNC(mac_state::set_scc_interrupt));
-}
-
-void mac_state::add_mackbd(machine_config &config)
-{
-#ifdef MAC_USE_EMULATED_KBD
-	MACKBD(config, m_mackbd, 0);
-	m_mackbd->dataout_handler().set(m_via, FUNC(via6522_device::write_cb2));
-	m_mackbd->clkout_handler().set(FUNC(mac_state::mac_kbd_clk_in));
-#else
-	MACKBD(config, m_mackbd, 0);
-#endif
 }
 
 void mac_state::add_scsi(machine_config &config, bool cdrom)
@@ -1067,7 +1064,6 @@ void mac_state::mac512ke_base(machine_config &config)
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_via_out_cb2));
 	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
 	RAM(config, m_ram);
@@ -1077,7 +1073,6 @@ void mac_state::mac512ke_base(machine_config &config)
 void mac_state::mac512ke(machine_config &config)
 {
 	mac512ke_base(config);
-	add_mackbd(config);
 }
 
 void mac_state::add_macplus_additions(machine_config &config)
@@ -1135,7 +1130,6 @@ void mac_state::macplus(machine_config &config)
 {
 	mac512ke_base(config);
 	add_macplus_additions(config);
-	add_mackbd(config);
 }
 
 void mac_state::macse(machine_config &config)
@@ -1195,7 +1189,6 @@ void mac_state::macprtb(machine_config &config)
 	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_pmu));
 	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a_pmu));
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_pmu));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_via_out_cb2));
 	m_via1->irq_handler().set(FUNC(mac_state::mac_via_irq));
 
 	RAM(config, m_ram);

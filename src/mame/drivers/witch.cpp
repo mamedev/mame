@@ -1044,8 +1044,7 @@ ROM_START( witch )
 ROM_END
 
 
-/* Witch (With ranking) */
-ROM_START( witchb )
+ROM_START( witchb ) /* Witch (With ranking) */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "x.u5", 0x00000, 0x20000, CRC(d0818777) SHA1(a6232fef84bec3cfb4a6122a48e96e7b7950e013) )
 
@@ -1087,6 +1086,27 @@ ROM_START( witchs ) /* this set has (c)1992 Sega / Vic Tokai in the roms */
 ROM_END
 
 
+ROM_START( witchstar ) /* Licensed for Korea */
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "7_excellent.u5", 0x00000, 0x20000, CRC(303c3a6d) SHA1(38983b0925d2a018b6718b3af5e95cf91b1850d6) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "8_excellent.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "6_excellent.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "5_excellent.a1", 0x00000, 0x40000,  CRC(257dc030) SHA1(ada08c3f8e93fd00d4ec7d152cdcf49c130be08e) )
+
+	ROM_REGION( 0x40000, "essnd", 0 )
+	ROM_LOAD( "9_excellent.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
+ROM_END
+
+
 ROM_START( pbchmp95 ) /* Licensed for Germany? */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x00000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
@@ -1106,6 +1126,7 @@ ROM_START( pbchmp95 ) /* Licensed for Germany? */
 	ROM_REGION( 0x100, "prom", 0 )
 	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
 ROM_END
+
 
 ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -1139,8 +1160,9 @@ void witch_state::init_witch()
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8sm_delegate(*this, FUNC(witch_state::prot_read_700x)));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch (with ranking)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Sega license)", "Witch (Sega license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou,  0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System",                     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witch,     0,     witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,    witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch (with ranking)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,    witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Sega license)",             "Witch (Sega license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, witchstar, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Fovis Korea Co. Ltd.",                 "Witch Star", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pbchmp95,  witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten",                 "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )

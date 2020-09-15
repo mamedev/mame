@@ -12,12 +12,13 @@
 // External panel support
 //**************************************************************************
 
+#include <list>
 #include <mutex>
 #include <set>
 #include <sstream>
 #include <string>
 #include <thread>
-#include <list>
+
 
 namespace esqpanel {
 

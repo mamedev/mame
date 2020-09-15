@@ -76,7 +76,7 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gaelco_gae1_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	/* fill all data needed */
 	for (int j = 0; j < samples; j++)
@@ -253,7 +253,7 @@ void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_
 void gaelco_gae1_device::device_start()
 {
 	u32 rate = clock() / 128;
-	m_stream = stream_alloc(0, 2, rate);
+	m_stream = stream_alloc_legacy(0, 2, rate);
 
 	/* init volume table */
 	for (int vol = 0; vol < VOLUME_LEVELS; vol++)

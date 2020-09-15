@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    divideo.c
+    divideo.cpp
 
     Device video interfaces.
 

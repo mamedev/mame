@@ -64,7 +64,7 @@ cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, d
 void cdp1863_device::device_start()
 {
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	// register for state saving
 	save_item(NAME(m_clock1));
@@ -77,11 +77,11 @@ void cdp1863_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
+//  sound_stream_update_legacy - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdp1863_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));

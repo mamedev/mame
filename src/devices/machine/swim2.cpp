@@ -35,7 +35,7 @@ void swim2_device::device_reset()
 	m_param_idx = 0;
 	memset(m_param, 0, sizeof(m_param));
 	m_floppy = nullptr;
-	
+
 	m_devsel_cb(0);
 	m_sel35_cb(true);
 	m_hdsel_cb(false);
@@ -88,7 +88,7 @@ u8 swim2_device::read(offs_t offset)
 		u8 r = m_param[m_param_idx];
 		m_param_idx = (m_param_idx + 1) & 15;
 		return r;
-	}		
+	}
 	case 0x4: case 0xc:
 		return m_phases;
 	case 0x5: case 0xd:
@@ -124,7 +124,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		m_param[m_param_idx] = data;
 		m_param_idx = (m_param_idx + 1) & 3;
 		break;
-	}		
+	}
 	case 0x4: {
 		m_phases = data;
 		update_phases();

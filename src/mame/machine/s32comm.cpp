@@ -133,6 +133,8 @@ void s32comm_device::device_reset()
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
+
+	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 }
 
 uint8_t s32comm_device::zfg_r(offs_t offset)

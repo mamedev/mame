@@ -62,6 +62,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_beep(*this, "beeper")
 		, m_io_dsw(*this, "DSW")
 	{ }
@@ -77,7 +78,6 @@ private:
 	u8 keyboard_r(offs_t offset);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	bool m_rom_in_map;
 	bool m_kbd_ack;
 	bool m_vdp_int;
 	u8 m_term_data;
@@ -86,13 +86,14 @@ private:
 	required_device<tms9995_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<beep_device>    m_beep;
 	required_ioport m_io_dsw;
 };
 
 void cortex_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
+	map(0x0000, 0x7fff).ram().share("mainram").bankr("bank1");
 	map(0x8000, 0xefff).ram();
 	map(0xf100, 0xf11f).ram(); // memory mapping unit
 	map(0xf120, 0xf121).rw("crtc", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
@@ -159,7 +160,7 @@ WRITE_LINE_MEMBER( cortex_state::keyboard_ack_w )
 
 WRITE_LINE_MEMBER( cortex_state::romsw_w )
 {
-	m_rom_in_map = state ? 0 : 1;
+	m_bank1->set_entry(state ? 0 : 1);
 }
 
 WRITE_LINE_MEMBER( cortex_state::vdp_int_w )
@@ -176,7 +177,8 @@ void cortex_state::kbd_put(u8 data)
 
 void cortex_state::machine_start()
 {
-	save_item(NAME(m_rom_in_map));
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_kbd_ack));
 	save_item(NAME(m_vdp_int));
 	save_item(NAME(m_term_data));
@@ -187,7 +189,7 @@ void cortex_state::machine_reset()
 	m_kbd_ack = 1;
 	m_vdp_int = 0;
 	m_beep->set_state(0);
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 	m_maincpu->ready_line(ASSERT_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
 }

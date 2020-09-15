@@ -148,13 +148,13 @@ protected:
 	void leave_halt();
 	uint8_t in(uint16_t port);
 	void out(uint16_t port, uint8_t value);
-	uint8_t rm(uint16_t addr);
+	virtual uint8_t rm(uint16_t addr);
 	void rm16(uint16_t addr, PAIR &r);
-	void wm(uint16_t addr, uint8_t value);
+	virtual void wm(uint16_t addr, uint8_t value);
 	void wm16(uint16_t addr, PAIR &r);
-	uint8_t rop();
-	uint8_t arg();
-	uint16_t arg16();
+	virtual uint8_t rop();
+	virtual uint8_t arg();
+	virtual uint16_t arg16();
 	void eax();
 	void eay();
 	void pop(PAIR &r);
@@ -229,6 +229,7 @@ protected:
 	void otdr();
 	void ei();
 
+	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
 
@@ -299,9 +300,9 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
-	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	virtual void check_interrupts() override;
 	void take_interrupt_nsc800();
 	uint8_t m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
 };

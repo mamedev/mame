@@ -16,10 +16,11 @@ class s11b_state : public s11a_state
 public:
 	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: s11a_state(mconfig, type, tag)
-		, m_bg_hc55516(*this, "hc55516_bg")
 	{ }
 
+	void s11b_base(machine_config &config);
 	void s11b(machine_config &config);
+	void s11b_jokerz(machine_config &config);
 
 	void init_s11b();
 	void init_s11b_invert();
@@ -29,21 +30,11 @@ public:
 	void pia2c_pb_w(uint8_t data);
 	void pia34_pa_w(uint8_t data);
 
-	void bg_speech_clock_w(uint8_t data);
-	void bg_speech_digit_w(uint8_t data);
-
 protected:
 	void set_invert(bool inv) { m_invert = inv; }
 
 private:
 	DECLARE_MACHINE_RESET(s11b);
-
-	void s11b_audio_map(address_map &map);
-	void s11b_bg_map(address_map &map);
-	void s11b_main_map(address_map &map);
-
-	optional_device<hc55516_device> m_bg_hc55516;
-
 
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
 };

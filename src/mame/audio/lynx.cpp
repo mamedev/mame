@@ -172,7 +172,7 @@ void lynx_sound_device::init()
 
 void lynx_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_mixer_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
 	m_timer_delegate.resolve();
 	init();
@@ -182,7 +182,7 @@ void lynx_sound_device::device_start()
 
 void lynx2_sound_device::device_start()
 {
-	m_mixer_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_mixer_channel = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_usec_per_sample = 1000000 / machine().sample_rate();
 	m_timer_delegate.resolve();
 	init();
@@ -467,10 +467,10 @@ void lynx_sound_device::write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void lynx_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int v;
 	stream_sample_t *buffer = outputs[0];
@@ -488,10 +488,10 @@ void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void lynx2_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void lynx2_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int v;

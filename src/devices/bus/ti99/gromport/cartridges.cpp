@@ -136,10 +136,24 @@ void ti99_cartridge_device::prepare_cartridge()
 	}
 
 	m_pcb->m_rom_size = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
+	m_pcb->m_bank_mask = 0;
+
 	if (m_pcb->m_rom_size > 0)
 	{
 		if (m_pcb->m_rom_size > 0x200000) fatalerror("Cartridge ROM size exceeding 2 MiB");
 		LOGMASKED(LOG_CONFIG, "rom size=0x%04x\n", m_pcb->m_rom_size);
+
+		// Determine the bank mask for flexible ROM sizes in gromemu
+		int rsizet = m_pcb->m_rom_size;
+		int msizet = 0x2000;
+
+		while (msizet < rsizet)
+		{
+			m_pcb->m_bank_mask = (m_pcb->m_bank_mask<<1) | 1;
+			msizet <<= 1;
+		}
+		LOGMASKED(LOG_CONFIG, "rom bank mask=0x%04x\n", m_pcb->m_bank_mask);
+
 		regr = memregion(CARTROM_TAG);
 		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), rom_ptr, m_pcb->m_rom_size);
@@ -158,6 +172,11 @@ void ti99_cartridge_device::prepare_cartridge()
 			regr = memregion(CARTROM_TAG);
 			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
 			memcpy(regr->base() + 0x2000, rom_ptr, rom2_length);
+
+			// Configurations with ROM1+ROM2 have exactly two banks; only
+			// the first 8K are used from ROM1.
+			m_pcb->m_bank_mask = 1;
+			LOGMASKED(LOG_CONFIG, "rom bank mask=0x0001 (using rom/rom2)\n");
 		}
 	}
 
@@ -1270,23 +1289,16 @@ void ti99_pagedcru_cartridge::cruwrite(offs_t offset, uint8_t data)
     will deliver the address when reading.
   - No wait states. Reading is generally faster than with real GROMs.
   - No wrapping at 8K boundaries.
-  - Two pages of ROM at address 6000
-
-  If any of these fails, the cartridge will crash, so we'll see.
+  - One or two ROM sockets; if one socket, the standard bank switch scheme is
+    used
 
   Typical cartridges: Third-party cartridges
 
   For the sake of simplicity, we register GROMs like the other PCB types, but
   we implement special access methods for the GROM space.
 
-  Still not working:
-     rxb1002 (Set page to 1 (6372 <- 00), lockup)
-     rxb237 (immediate reset)
-     rxbv555 (repeating reset on Master Title Screen)
-     superxb (lockup, fix: add RAM at 7c00)
-
   Super-MiniMemory is also included here. We assume a RAM area at addresses
-  7000-7fff for this cartridge.
+  7000-7fff for this cartridge if the RAM option is used.
 
 
   GROM space
@@ -1296,10 +1308,22 @@ void ti99_pagedcru_cartridge::cruwrite(offs_t offset, uint8_t data)
   ROM space
   6000         7000        7fff
   |             |             |
-  |========== ROM1 ===========|     Bank 0    write to 6000, 6004, ... 7ffc
+  |========== ROM1 ===========|     Bank 0
   |             |             |
-  |========== ROM2 ===========|     Bank 1    write to 6002, 6006, ... 7ffe
+  |========== ROM2 ===========|     Bank 1
+  ...                       ...
+  |========== ROMn ===========|     Bank n-1
 
+  Depending on the number of banks, a number of address bits is used to select
+  the bank:
+
+  Write to 011x xxxx xxxx xxx0 -> Set bank number to xxxxxxxxxxxx
+
+  The number xxxxxxxxxxxx has just enough bits to encode the highest bank number.
+  Higher bits are ignored.
+
+  If rom2_socket is used, we assume that rom_socket and rom2_socket contain
+  8K ROM each, so we have exactly two banks, regardless of the ROM length.
 
 ******************************************************************************/
 
@@ -1349,7 +1373,9 @@ void ti99_gromemu_cartridge::write(offs_t offset, uint8_t data)
 			}
 			return; // no paging
 		}
-		m_rom_page = (offset >> 1) & 1;
+
+		m_rom_page = (offset >> 1) & m_bank_mask;
+
 		if ((offset & 1)==0)
 			LOGMASKED(LOG_BANKSWITCH, "Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}

@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="ibm5170_hdd" description="IBM PC/AT hard disk images">
+	<!--
+	Unless otherwise specified, all images are based on default installs of the
+	corresponding ibm5150 or ibm5170 sets. BIOS should be able to autodetect the
+	hard drive, if not set it up as Type 47 with C/H/S of 1015/16/63.
+	-->
+
+	<software name="drdos6">
+		<description>DR DOS 6.0</description>
+		<year>1991</year>
+		<publisher>Digital Research</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="drdos6" sha1="4421e76e30a4f83a73684a879212041aa860a3d9" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos5">
+		<description>MS-DOS (Version 5.00)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos5" sha1="2c585ce9193b5420bfe4f6fca591226bf69a8664" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos6">
+		<description>MS-DOS (Version 6.00)</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos6" sha1="b90a3e039ba35234124e7cd9a3793b36cad6fa0c" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="msdos622">
+		<description>MS-DOS (Version 6.22)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos622" sha1="ceaa0a963ae2b301c8d799e3f7c733f13eebe8bc" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nvldos51">
+		<description>Novell DR Multiuser DOS Release 5.1</description>
+		<year>1992</year>
+		<publisher>Novell</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="nvldos51" sha1="06b08d107a1d7272008805dbda33e59244c5364d" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nvldos7">
+		<description>Novell DOS 7</description>
+		<year>1994</year>
+		<publisher>Novell</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="nvldos7" sha1="c3f67f44c015141a09d6aeb104847b9bc90a0fd7" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos63">
+		<description>PC DOS (Version 6.3)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos63" sha1="6811617bf057b35ea5879a1cabb1001f5606c0e2" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos2k">
+		<description>IBM PC DOS 2000</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="pcdos2k" sha1="96addad58a341c5ac005bbec700e7e52e2ae091f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win30">
+		<description>Microsoft Windows Version 3.0</description>
+		<year>1990</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="win30" sha1="64c7099b65b6561c8e346d240796bf4c00d381ab" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win31">
+		<description>Windows Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="win31" sha1="15a7f0cee36fb8c80b1f378375c70b6dc94d531d" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

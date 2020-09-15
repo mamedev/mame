@@ -42,8 +42,12 @@ protected:
 
 private:
 	required_device<adsp2181_device>    m_cpu;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
+	required_device<timer_device>       m_reg_timer;
+	required_device<timer_device>       m_dma_timer;
 	required_shared_ptr<uint32_t>       m_adsp_pram;
 	required_memory_bank                m_adsp_data_bank;
+	required_region_ptr<uint8_t>        m_rom;
 
 	uint32_t m_adsp_snd_pf0;
 
@@ -59,15 +63,11 @@ private:
 	address_space *m_data;
 
 	uint16_t        m_control_regs[32];
-	uint8_t*        m_rom;
 
 
 	/* sound output */
 	uint16_t        m_size[2];
 	uint16_t        m_incs[2];
-	dmadac_sound_device *m_dmadac[2];
-	timer_device    *m_reg_timer[2];
-	timer_device    *m_sport_timer;
 	uint32_t        m_ireg[2];
 	uint16_t        m_ireg_base[2];
 
@@ -75,10 +75,10 @@ private:
 	uint32_t        m_rom_bank;
 	uint32_t        m_dmovlay_val;
 
+	std::unique_ptr<uint16_t[]> m_banked_ram;
+
 	required_device<generic_latch_16_device> m_data_in;
 	required_device<generic_latch_16_device> m_data_out;
-
-	timer_device *m_dma_timer;
 
 	void adsp_sound_tx_callback(offs_t offset, uint32_t data);
 

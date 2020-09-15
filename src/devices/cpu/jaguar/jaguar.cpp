@@ -11,8 +11,8 @@
       Currently implementation is similar to single stepping
       with single cycle
     - Implement and acknowlodge remain registers;
-	- Improve delay slot display in debugger (highlight current instruction 
-	  doesn't work but instruction hook does);
+    - Improve delay slot display in debugger (highlight current instruction
+      doesn't work but instruction hook does);
 
 ***************************************************************************/
 
@@ -265,7 +265,7 @@ void jaguar_cpu_device::check_irqs()
 	latch &= mask;
 	if (latch == 0)
 		return;
-	
+
 	/* determine which interrupt */
 	for (int i = 0; i < 6; i++)
 		if (latch & (1 << i))
@@ -371,7 +371,7 @@ void jaguar_cpu_device::device_start()
 	save_item(NAME(m_imask));
 	save_item(NAME(m_div_remainder));
 	save_item(NAME(m_div_offset));
-	
+
 	save_item(NAME(m_io_end));
 	save_item(NAME(m_io_pc));
 	save_item(NAME(m_io_status));
@@ -1292,10 +1292,10 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 	map(0x00, 0x03).rw(FUNC(jaguar_cpu_device::flags_r), FUNC(jaguar_cpu_device::flags_w));
 	map(0x04, 0x07).w(FUNC(jaguar_cpu_device::matrix_control_w));
 	map(0x08, 0x0b).w(FUNC(jaguar_cpu_device::matrix_address_w));
-//	map(0x0c, 0x0f) endian
+//  map(0x0c, 0x0f) endian
 	map(0x10, 0x13).w(FUNC(jaguar_cpu_device::pc_w));
 	map(0x14, 0x17).rw(FUNC(jaguar_cpu_device::status_r), FUNC(jaguar_cpu_device::control_w));
-//	map(0x18, 0x1b) implementation specific
+//  map(0x18, 0x1b) implementation specific
 	map(0x1c, 0x1f).rw(FUNC(jaguar_cpu_device::div_remainder_r), FUNC(jaguar_cpu_device::div_control_w));
 }
 
@@ -1327,11 +1327,11 @@ void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 	// clear imask only on bit 3 clear (1 has no effect)
 	if ((m_flags & 0x08) == 0)
 		m_imask = false;
-	
+
 	// update int latch & mask
 	m_int_mask = (m_flags >> 4) & 0x1f;
 	m_int_latch &= ~((m_flags >> 9) & 0x1f);
-	
+
 	// TODO: move to specific handler
 	if (m_isdsp)
 	{
@@ -1370,11 +1370,11 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 
 /*
  * Data Organization Register
- * Note: The canonical way to set this up from 68k is $00070007, 
+ * Note: The canonical way to set this up from 68k is $00070007,
  * so that Power-On endianness doesn't matter. 1=Big Endian
  * ---- -x-- Instruction endianness
  * ---- --x- Pixel endianness (GPU only)
- * ----	---x I/O endianness
+ * ---- ---x I/O endianness
  */
 // TODO: just log if anything farts for now, change to bit struct once we have something to test out
 void jaguar_cpu_device::end_w(offs_t offset, u32 data, u32 mem_mask)
@@ -1400,7 +1400,7 @@ void jaguardsp_cpu_device::dsp_end_w(offs_t offset, u32 data, u32 mem_mask)
  * y ---- -xxx xx-- ---- interrupt latch (y is DSP specific) (r/o)
  * - ---- ---- --0- ---- <unused>
  * - ---- ---- ---x x--- single step regs
- * - ---- ---- ---- -x-- GPUINT0 or DSPINT0 
+ * - ---- ---- ---- -x-- GPUINT0 or DSPINT0
  * - ---- ---- ---- --x- Host interrupt (w/o)
  * - ---- ---- ---- ---x GPUGO or DSPGO flag
  *
@@ -1428,19 +1428,19 @@ void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 	bool new_go = BIT(m_io_status, 0);
 	if (new_go != m_go)
 		go_w(new_go);
-	
+
 	if (BIT(m_io_status, 1))
 		m_cpu_interrupt(ASSERT_LINE);
-	
+
 	// TODO: following does nothing if set by itself, or acts as a trap?
 	if (BIT(m_io_status, 2))
 	{
 		m_int_latch |= 1;
 		check_irqs();
 	}
-	
+
 	// TODO: single step handling
-	
+
 	m_bus_hog = BIT(m_io_status, 11);
 	// TODO: protect/protectse uses this, why?
 	if (m_bus_hog == true)

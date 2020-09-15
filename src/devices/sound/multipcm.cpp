@@ -450,22 +450,22 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 
 DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 
-multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MULTIPCM, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_slots(nullptr),
-		m_cur_slot(0),
-		m_address(0),
-		m_rate(0),
-		m_attack_step(nullptr),
-		m_decay_release_step(nullptr),
-		m_freq_step_table(nullptr),
-		m_left_pan_table(nullptr),
-		m_right_pan_table(nullptr),
-		m_linear_to_exp_volume(nullptr),
-		m_total_level_steps(nullptr)
+multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MULTIPCM, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_slots(nullptr),
+	m_cur_slot(0),
+	m_address(0),
+	m_rate(0),
+	m_attack_step(nullptr),
+	m_decay_release_step(nullptr),
+	m_freq_step_table(nullptr),
+	m_left_pan_table(nullptr),
+	m_right_pan_table(nullptr),
+	m_linear_to_exp_volume(nullptr),
+	m_total_level_steps(nullptr)
 {
 }
 
@@ -479,7 +479,7 @@ void multipcm_device::device_start()
 	const float clock_divider = 180.0f;
 	m_rate = (float)clock() / clock_divider;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = stream_alloc_legacy(0, 2, m_rate);
 
 	// Volume + pan table
 	m_left_pan_table = make_unique_clear<int32_t[]>(0x800);
@@ -677,10 +677,10 @@ void multipcm_device::dump_sample(slot_t &slot)
 #endif
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int32_t samples)
+void multipcm_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int32_t samples)
 {
 	stream_sample_t  *datap[2];
 

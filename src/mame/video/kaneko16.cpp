@@ -28,8 +28,8 @@ void kaneko16_state::video_start()
 /* Fill the bitmap with a single colour. This is wrong, but will work most of
    the times. To do it right, each pixel should be drawn with pen 0
    of the bottomost tile that covers it (which is pretty tricky to do) */
-template<class _BitmapClass>
-void kaneko16_state::fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+void kaneko16_state::fill_bitmap(BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int pen = 0;
 
@@ -41,7 +41,7 @@ void kaneko16_state::fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect
 		}
 	}
 
-	typename _BitmapClass::pixel_t *dest;
+	typename BitmapClass::pixel_t *dest;
 	(void)dest; // shut up Visual Studio
 	if (sizeof(*dest) == 2)
 	{
@@ -55,8 +55,8 @@ void kaneko16_state::fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect
 }
 
 
-template<class _BitmapClass>
-u32 kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+u32 kaneko16_state::screen_update_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

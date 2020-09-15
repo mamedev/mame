@@ -508,7 +508,7 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		desc_pc_sector sects[256];
 
 		for(int i=0; i<m_sector_count.back(); i++) {
-			uint8_t stype		 = img[pos++];
+			uint8_t stype        = img[pos++];
 			sects[i].track       = m_tnum.back().size() ? m_tnum.back()[i] : m_track.back();
 			sects[i].head        = m_hnum.back().size() ? m_hnum.back()[i] : m_head.back();
 			sects[i].sector      = m_snum.back()[i];
@@ -629,7 +629,7 @@ bool imd_format::save(io_generic* io, floppy_image* image)
 				mode = 1;
 				io_generic_write(io, &mode, pos++, 1);
 				io_generic_write(io, &sdata, pos, actual_size);
-				pos	+= actual_size;
+				pos += actual_size;
 			}
 		}
 	}

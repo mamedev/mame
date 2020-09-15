@@ -14,6 +14,7 @@
 #include "parray.h"
 #include "pconfig.h"
 #include "pmath.h"
+#include "pmatrix2d.h"
 #include "pomp.h"
 #include "pstate.h"
 #include "ptypes.h"
@@ -62,7 +63,7 @@ namespace plib
 		, A(n*n)
 		, nz_num(0)
 		//, nzbd(n * (n+1) / 2)
-		, nzbd(n)
+		, m_nzbd(n, n)
 		, m_size(n)
 		{
 			for (std::size_t i=0; i<n+1; i++)
@@ -148,10 +149,17 @@ namespace plib
 
 			for (std::size_t k=0; k < size(); k++)
 			{
+#if 0
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
-						nzbd[k].push_back(narrow_cast<C>(j));
-				nzbd[k].push_back(0); // end of sequence
+						m_nzbd[k].push_back(narrow_cast<C>(j));
+				m_nzbd[k].push_back(0); // end of sequence
+#else
+				for (std::size_t j=k + 1; j < size(); j++)
+					if (f[j][k] < FILL_INFINITY)
+						m_nzbd.set(k, m_nzbd.colcount(k), narrow_cast<C>(j));
+				m_nzbd.set(k, m_nzbd.colcount(k), 0); // end of sequence
+#endif
 			}
 
 		}
@@ -241,10 +249,13 @@ namespace plib
 				A[k] = src.A[k];
 		}
 
+		index_type * nzbd(std::size_t row) { return m_nzbd[row]; }
+		std::size_t nzbd_count(std::size_t row) { return m_nzbd.colcount(row) - 1; }
 	protected:
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
-		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
+		//parray<std::vector<index_type>, N > m_nzbd;    // Support for gaussian elimination
+		pmatrix2d_vrl<index_type> m_nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
 		std::size_t m_size;
@@ -309,8 +320,8 @@ namespace plib
 				std::size_t pi = base::diag[i];
 				auto f = reciprocal(base::A[pi++]);
 				const std::size_t piie = base::row_idx[i+1];
-				const auto &nz = base::nzbd[i];
 
+				const auto *nz = base::m_nzbd[i];
 				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
 				{
 					// proceed to column i

@@ -468,7 +468,7 @@ void elan_eu3a14vid_device::draw_background_ramlayer(screen_device& screen, bitm
 	// this register use is questionable
 	if (m_ramtilecfg[0] & 0x80)
 	{
-		int rtm_size;;
+		int rtm_size;
 		int rtm_pagewidth;
 		int rtm_pageheight;
 		int rtm_yscroll;

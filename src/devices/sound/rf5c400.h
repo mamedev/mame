@@ -21,6 +21,8 @@ class rf5c400_device : public device_t,
 					   public device_rom_interface<25, 1, 0, ENDIANNESS_LITTLE>
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // unemulated and/or unverified effects and envelopes
+
 	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint16_t rf5c400_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -29,9 +31,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;

@@ -143,7 +143,7 @@ void chaos_state::kbd_put(u8 data)
 
 void chaos_state::machine_start()
 {
-	save_item(NAME(m_term_data));;
+	save_item(NAME(m_term_data));
 }
 
 void chaos_state::machine_reset()

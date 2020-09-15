@@ -118,7 +118,7 @@ void gic_device::device_start()
 	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	// allocate the audio stream
-	m_stream = stream_alloc( 0, 1, clock()/(2*228) );
+	m_stream = stream_alloc_legacy( 0, 1, clock()/(2*228) );
 
 	m_ram.resolve_safe(0xff);
 }
@@ -252,7 +252,7 @@ void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 #define GIC_AUDIO_BYTE 0x96
 
-void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gic_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 

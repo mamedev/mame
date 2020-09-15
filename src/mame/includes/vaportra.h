@@ -57,7 +57,7 @@ private:
 
 	uint8_t irq6_ack_r();
 	void irq6_ack_w(uint8_t data);
-	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);;
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void palette_ext_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 

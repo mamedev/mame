@@ -165,7 +165,7 @@ namespace sol {
 			static void set_fx(lua_State* L, Args&&... args) {
 				lua_CFunction freefunc = function_detail::call<meta::unqualified_t<Fx>>;
 
-				stack::push<user<Fx>>(L, std::forward<Args>(args)...);
+				stack::push_specific<user<Fx>>(L, std::forward<Args>(args)...);
 				stack::push(L, c_closure(freefunc, 1));
 			}
 
@@ -181,7 +181,7 @@ namespace sol {
 		struct pusher<function_arguments<T, Args...>> {
 			template <std::size_t... I, typename FP>
 			static int push_func(std::index_sequence<I...>, lua_State* L, FP&& fp) {
-				return stack::push<T>(L, detail::forward_get<I>(fp.arguments)...);
+				return stack::push_specific<T>(L, detail::forward_get<I>(fp.arguments)...);
 			}
 
 			static int push(lua_State* L, const function_arguments<T, Args...>& fp) {
@@ -235,13 +235,13 @@ namespace sol {
 		struct pusher<protect_t<T>> {
 			static int push(lua_State* L, protect_t<T>&& pw) {
 				lua_CFunction cf = call_detail::call_user<void, false, false, protect_t<T>>;
-				int closures = stack::push<user<protect_t<T>>>(L, std::move(pw.value));
+				int closures = stack::push_specific<user<protect_t<T>>>(L, std::move(pw.value));
 				return stack::push(L, c_closure(cf, closures));
 			}
 
 			static int push(lua_State* L, const protect_t<T>& pw) {
 				lua_CFunction cf = call_detail::call_user<void, false, false, protect_t<T>>;
-				int closures = stack::push<user<protect_t<T>>>(L, pw.value);
+				int closures = stack::push_specific<user<protect_t<T>>>(L, pw.value);
 				return stack::push(L, c_closure(cf, closures));
 			}
 		};
@@ -314,7 +314,7 @@ namespace sol {
 			template <typename C>
 			static int push(lua_State* L, C&& c) {
 				lua_CFunction cf = call_detail::call_user<T, false, false, constructor_wrapper<Fxs...>>;
-				int closures = stack::push<user<constructor_wrapper<Fxs...>>>(L, std::forward<C>(c));
+				int closures = stack::push_specific<user<constructor_wrapper<Fxs...>>>(L, std::forward<C>(c));
 				return stack::push(L, c_closure(cf, closures));
 			}
 		};
@@ -331,7 +331,7 @@ namespace sol {
 		struct pusher<detail::tagged<T, destructor_wrapper<Fx>>> {
 			static int push(lua_State* L, destructor_wrapper<Fx> c) {
 				lua_CFunction cf = call_detail::call_user<T, false, false, destructor_wrapper<Fx>>;
-				int closures = stack::push<user<T>>(L, std::move(c));
+				int closures = stack::push_specific<user<T>>(L, std::move(c));
 				return stack::push(L, c_closure(cf, closures));
 			}
 		};

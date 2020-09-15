@@ -53,15 +53,15 @@ private:
 	void coin_w(uint8_t data);
 	void led_w(uint8_t data);
 	void cus115_w(offs_t offset, uint8_t data);
-	void videoram1_w(offs_t offset, uint8_t data);;
-	void videoram2_w(offs_t offset, uint8_t data);;
-	void tilebank_select_w(offs_t offset, uint8_t data);;
-	void scroll0_w(offs_t offset, uint8_t data);;
-	void scroll1_w(offs_t offset, uint8_t data);;
-	void scroll2_w(offs_t offset, uint8_t data);;
-	void scroll3_w(offs_t offset, uint8_t data);;
-	void backcolor_w(uint8_t data);;
-	void spriteram_w(offs_t offset, uint8_t data);;
+	void videoram1_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void tilebank_select_w(offs_t offset, uint8_t data);
+	void scroll0_w(offs_t offset, uint8_t data);
+	void scroll1_w(offs_t offset, uint8_t data);
+	void scroll2_w(offs_t offset, uint8_t data);
+	void scroll3_w(offs_t offset, uint8_t data);
+	void backcolor_w(uint8_t data);
+	void spriteram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

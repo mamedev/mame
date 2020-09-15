@@ -130,7 +130,7 @@ namespace
 		virtual void device_start() override;
 
 		// sound stream update overrides
-		virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+		virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 	private:
 		sound_stream*  m_stream;
@@ -535,17 +535,17 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 
 void cocossc_sac_device::device_start()
 {
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(1, 1, machine().sample_rate());
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cocossc_sac_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	stream_sample_t *src = inputs[0];
+	stream_sample_t const *src = inputs[0];
 	stream_sample_t *dst = outputs[0];
 
 	double n = samples;

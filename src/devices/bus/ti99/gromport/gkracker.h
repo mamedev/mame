@@ -8,7 +8,6 @@
 #define MAME_BUS_TI99_GROMPORT_GKRACKER_H
 
 #pragma once
-#include "bus/ti99/ti99defs.h"
 #include "cartridges.h"
 
 namespace bus { namespace ti99 { namespace gromport {

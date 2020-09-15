@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="sgi_mips_hdd" description="Hard disk images for SGI MIPS">
+
+	<!--
+	IRIX requires a valid eaddr and high resolution mode. Before first boot,
+	enter the PROM command monitor and check printenv. If required settings are
+	missing, run
+	    setenv -f eaddr 08:00:69:12:34:56
+	to set the Ethernet interface address, and
+	    setenv monitor h
+	to enable high resolution mode (1280x1024), then power cycle.
+
+	Unless otherwise specified, all images are based on default installs of the
+	corresponding sgi_mips sets.
+	-->
+
+	<software name="irix_5_2">
+		<description>IRIX 5.2</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_5_2" sha1="e32910287c9f9ca5b4efe6a328a7c71bdbaed235" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_5_3">
+		<description>IRIX 5.3</description>
+		<year>1994</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_5_3" sha1="22de8751b85fd5f5ff002657e0f475cce719ee52" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_2">
+		<description>IRIX 6.2</description>
+		<year>1996</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_6_2" sha1="d5ebffe77590551ff18d3107751983b62e059af3" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5">
+		<description>IRIX 6.5</description>
+		<year>1998</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_6_5" sha1="87ab8431fb9be519d05343f6fc735a1730cff49d" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="irix_6_5_22">
+		<description>IRIX 6.5.22</description>
+		<year>2003</year>
+		<publisher>SGI</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="irix_6_5_22" sha1="02a015321dc31a08a08ff4751687bc474583190a" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -13,6 +13,11 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "vsmile.lh"
+
+#define VERBOSE (1)
+#include "logmacro.h"
+
 /************************************
  *
  *  Common
@@ -54,6 +59,11 @@ void vsmile_state::machine_start()
 {
 	vsmile_base_state::machine_start();
 
+	m_redled.resolve();
+	m_yellowled.resolve();
+	m_blueled.resolve();
+	m_greenled.resolve();
+
 	save_item(NAME(m_ctrl_rts));
 	save_item(NAME(m_ctrl_select));
 }
@@ -82,6 +92,25 @@ void vsmile_state::uart_rx(uint8_t data)
 	//printf("Ctrl Rx: %02x\n", data);
 	m_ctrl[0]->data_w(data);
 	m_ctrl[1]->data_w(data);
+
+	//TODO: should be moved to pad code somehow
+	if ((data & 0xF0) == 0x60)
+	{
+		if (m_ctrl_select[0])
+		{
+			m_redled[0] = BIT(data, 3);
+			m_yellowled[0] = BIT(data, 2);
+			m_blueled[0] = BIT(data, 1);
+			m_greenled[0] = BIT(data, 0);
+		}
+		if (m_ctrl_select[1])
+		{
+			m_redled[1] = BIT(data, 3);
+			m_yellowled[1] = BIT(data, 2);
+			m_blueled[1] = BIT(data, 1);
+			m_greenled[1] = BIT(data, 0);
+		}
+	}
 }
 
 uint16_t vsmile_state::portb_r()
@@ -91,8 +120,9 @@ uint16_t vsmile_state::portb_r()
 
 void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (BIT(mem_mask, 4))
-		m_cart->set_cs2(BIT(data, 4));
+	LOG("%s: portb_w: %04x & %04x (bit 1: %d & %d)\n", machine().describe_context(), data, mem_mask, BIT(data, 1), BIT(mem_mask, 1));
+	if (BIT(mem_mask, 1) && m_cart && m_cart->exists())
+		m_cart->set_cs2(BIT(~data, 1));
 }
 
 uint16_t vsmile_state::portc_r()
@@ -241,6 +271,8 @@ static void vsmile_cart(device_slot_interface &device)
 
 void vsmile_base_state::vsmile_base(machine_config &config)
 {
+	config.set_default_layout(layout_vsmile);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
@@ -269,6 +301,7 @@ void vsmile_state::vsmile(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_maincpu->portb_in().set(FUNC(vsmile_state::portb_r));
+	m_maincpu->portb_out().set(FUNC(vsmile_state::portb_w));
 	m_maincpu->portc_in().set(FUNC(vsmile_state::portc_r));
 	m_maincpu->portc_out().set(FUNC(vsmile_state::portc_w));
 	m_maincpu->uart_tx().set(FUNC(vsmile_state::uart_rx));
@@ -323,9 +356,22 @@ ROM_END
 
 ROM_START( vsmilem )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5) ) // from a Spanish unit (but doesn't seem region specific)
+	ROM_SYSTEM_BIOS( 0, "bios0", "bios0" )
+	ROMX_LOAD( "vsmilemotion.bin", 0x000000, 0x200000, CRC(60fa5426) SHA1(91e0b7b44b975df65095d6ee622436d65fb1aca5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) ) // from a Spanish unit (but doesn't seem region specific)
+
+	/* This ROM doesn't show the 'Motion' logo at all, but was dumped from a Motion unit
+
+	    Console says "Vtech V.Smile V-motion Active Learning System"
+	    "FCC ID 62R-0788, IC 1135D-0788" "53-36600-056-080"
+	    melted into plastic "VT8281"
+	    The PCB has the code 35-078800-001-103_708979-2.
+	*/
+	ROM_SYSTEM_BIOS( 1, "bios1", "bios1" )
+	ROMX_LOAD( "vmotionbios.bin", 0x000000, 0x200000, CRC(427087ea) SHA1(dc9eaa55f4a0047b6069ef73beea86d26f0f5394), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // from a US unit
+
 ROM_END
 
-//    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
-CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmilem, vsmilem_state, empty_init, "VTech", "V.Smile Motion",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+//    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,         flags
+CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmilem, vsmilem_state, empty_init, "VTech", "V.Smile Motion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    device.h
+    device.ipp
 
     Device interface functions.
 

@@ -57,6 +57,7 @@ using util::BIT;
 #include "cpu/h8/h8hd.h"
 #include "cpu/h8/h8s2000d.h"
 #include "cpu/h8/h8s2600d.h"
+#include "cpu/h16/h16dasm.h"
 #include "cpu/h8500/h8500dasm.h"
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
@@ -399,6 +400,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "h8s2000",         be,  0, []() -> util::disasm_interface * { return new h8s2000_disassembler; } },
 	{ "h8s2600",         be,  0, []() -> util::disasm_interface * { return new h8s2600_disassembler; } },
 	{ "h8500",           be,  0, []() -> util::disasm_interface * { return new h8500_disassembler; } },
+	{ "h16",             be,  0, []() -> util::disasm_interface * { return new h16_disassembler; } },
 	{ "hc11",            be,  0, []() -> util::disasm_interface * { return new hc11_disassembler; } },
 	{ "hcd62121",        le,  0, []() -> util::disasm_interface * { return new hcd62121_disassembler; } },
 	{ "hd61700",         le, -1, []() -> util::disasm_interface * { return new hd61700_disassembler; } },
@@ -481,8 +483,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "nsc8105",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(8105); } },
 	{ "pace",            le, -1, []() -> util::disasm_interface * { return new pace_disassembler; } },
 	{ "patinho_feio",    le,  0, []() -> util::disasm_interface * { return new patinho_feio_disassembler; } },
-	{ "pdp1",            be,  0, []() -> util::disasm_interface * { return new pdp1_disassembler; } },
-	{ "pdp8",            be,  0, []() -> util::disasm_interface * { return new pdp8_disassembler; } },
+	{ "pdp1",            be, -2, []() -> util::disasm_interface * { return new pdp1_disassembler; } },
+	{ "pdp8",            be, -1, []() -> util::disasm_interface * { return new pdp8_disassembler; } },
 	{ "pic16",           le, -1, []() -> util::disasm_interface * { return new pic16_disassembler; } },
 	{ "pic16c5x",        le, -1, []() -> util::disasm_interface * { return new pic16c5x_disassembler; } },
 	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },

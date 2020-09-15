@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    rendutil.c
+    rendutil.cpp
 
     Core rendering utilities.
 

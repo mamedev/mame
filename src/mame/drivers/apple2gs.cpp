@@ -79,6 +79,7 @@
 #include "bus/a2bus/a2memexp.h"
 #include "bus/a2bus/a2scsi.h"
 #include "bus/a2bus/a2hsscsi.h"
+#include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2softcard.h"
 #include "bus/a2bus/a2videoterm.h"
@@ -106,6 +107,8 @@
 //#include "bus/a2bus/pc_xporter.h"
 #include "bus/a2bus/byte8251.h"
 //#include "bus/a2bus/hostram.h"
+//#include "bus/a2bus/ramfast.h"
+#include "bus/a2bus/uthernet.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1572,7 +1575,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	{
 		m_vbl = true;
 
-		/* VBL interrupt */
+		// check for ctrl-reset
+		if ((m_kbspecial->read() & 0x88) == 0x88)
+		{
+			m_maincpu->reset();
+		}
+
+		// VBL interrupt
 		if ((m_inten & 0x08) && !(m_intflag & INTFLAG_VBL))
 		{
 			m_intflag |= INTFLAG_VBL;
@@ -2204,11 +2213,11 @@ uint8_t apple2gs_state::c000_r(offs_t offset)
 				}
 				if (temp & 0x10)    // open apple/command
 				{
-					ret |= 0x40;
+					ret |= 0x80;
 				}
 				if (temp & 0x20)    // option
 				{
-					ret |= 0x80;
+					ret |= 0x40;
 				}
 				// keypad is a little rough right now
 				if (m_lastchar >= 0x28 && m_lastchar <= 0x2d)
@@ -2341,7 +2350,7 @@ uint8_t apple2gs_state::c000_r(offs_t offset)
 		case 0x61:  // button 0 or Open Apple
 			return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x62:  // button 1 or Solid Apple
+		case 0x62:  // button 1 or Option
 			return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // button 2 or SHIFT key
@@ -4504,7 +4513,7 @@ INPUT_PORTS_START( apple2gs )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
 	PORT_START("adb_mouse_x")
@@ -4566,6 +4575,9 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 //  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
+//  device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
+	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
+	device.option_add("uthernet", A2BUS_UTHERNET);  /* CMS Apple II SCSI Card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -4615,8 +4627,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
-	APPLE2_COMMON(config, m_a2common, A2GS_14M);
-	m_a2common->set_GS_cputag(m_maincpu);
+	APPLE2_COMMON(config, m_a2common, A2GS_14M).set_GS_cputag(m_maincpu);
 
 //  APPLE2_HOST(config, m_a2host, A2GS_14M);
 //  m_a2host->set_cputag(m_maincpu);

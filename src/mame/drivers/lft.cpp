@@ -45,7 +45,6 @@ public:
 	void lft(machine_config &config);
 
 private:
-
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
@@ -128,7 +127,6 @@ ROM_START( lft1510 )
 	ROM_LOAD16_BYTE( "1510lfod", 0x2001, 0x1000, CRC(ba8c23fc) SHA1(d4b82f69fccd653b31e7bd05ee884b323ff0007b) )
 	ROM_IGNORE(0x1000)
 ROM_END
-
 
 /* Driver */
 

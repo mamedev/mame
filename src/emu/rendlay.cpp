@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    rendlay.c
+    rendlay.cpp
 
     Core rendering layout parser and manager.
 
@@ -31,6 +31,13 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#define LOG_GROUP_BOUNDS_RESOLUTION (1U << 1)
+#define LOG_INTERACTIVE_ITEMS       (1U << 2)
+
+//#define VERBOSE (LOG_GROUP_BOUNDS_RESOLUTION | LOG_INTERACTIVE_ITEMS)
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#include "logmacro.h"
 
 
 
@@ -518,6 +525,39 @@ private:
 		return expand(str, str + strlen(str));
 	}
 
+	int parse_int(char const *begin, char const *end, int defvalue)
+	{
+		std::istringstream stream;
+		stream.imbue(f_portable_locale);
+		int result;
+		if (begin[0] == '$')
+		{
+			stream.str(std::string(begin + 1, end));
+			unsigned uvalue;
+			stream >> std::hex >> uvalue;
+			result = int(uvalue);
+		}
+		else if ((begin[0] == '0') && ((begin[1] == 'x') || (begin[1] == 'X')))
+		{
+			stream.str(std::string(begin + 2, end));
+			unsigned uvalue;
+			stream >> std::hex >> uvalue;
+			result = int(uvalue);
+		}
+		else if (begin[0] == '#')
+		{
+			stream.str(std::string(begin + 1, end));
+			stream >> result;
+		}
+		else
+		{
+			stream.str(std::string(begin, end));
+			stream >> result;
+		}
+
+		return stream ? result : defvalue;
+	}
+
 	std::string parameter_name(util::xml::data_node const &node)
 	{
 		char const *const attrib(node.get_attribute_string("name", nullptr));
@@ -547,8 +587,15 @@ private:
 	bool m_cached = false;
 
 public:
-	explicit layout_environment(device_t &device) : m_device(device) { }
-	explicit layout_environment(layout_environment &next) : m_device(next.m_device), m_next(&next) { }
+	explicit layout_environment(device_t &device)
+		: m_device(device)
+	{
+	}
+	explicit layout_environment(layout_environment &next)
+		: m_device(next.m_device)
+		, m_next(&next)
+	{
+	}
 	layout_environment(layout_environment const &) = delete;
 
 	device_t &device() { return m_device; }
@@ -706,35 +753,7 @@ public:
 
 		// similar to what XML nodes do
 		std::pair<char const *, char const *> const expanded(expand(attrib));
-		std::istringstream stream;
-		stream.imbue(f_portable_locale);
-		int result;
-		if (expanded.first[0] == '$')
-		{
-			stream.str(std::string(expanded.first + 1, expanded.second));
-			unsigned uvalue;
-			stream >> std::hex >> uvalue;
-			result = int(uvalue);
-		}
-		else if ((expanded.first[0] == '0') && ((expanded.first[1] == 'x') || (expanded.first[1] == 'X')))
-		{
-			stream.str(std::string(expanded.first + 2, expanded.second));
-			unsigned uvalue;
-			stream >> std::hex >> uvalue;
-			result = int(uvalue);
-		}
-		else if (expanded.first[0] == '#')
-		{
-			stream.str(std::string(expanded.first + 1, expanded.second));
-			stream >> result;
-		}
-		else
-		{
-			stream.str(std::string(expanded.first, expanded.second));
-			stream >> result;
-		}
-
-		return stream ? result : defvalue;
+		return parse_int(expanded.first, expanded.second, defvalue);
 	}
 
 	float get_attribute_float(util::xml::data_node const &node, char const *name, float defvalue)
@@ -749,6 +768,23 @@ public:
 		stream.imbue(f_portable_locale);
 		float result;
 		return (stream >> result) ? result : defvalue;
+	}
+
+	bool get_attribute_bool(util::xml::data_node const &node, char const *name, bool defvalue)
+	{
+		char const *const attrib(node.get_attribute_string(name, nullptr));
+		if (!attrib)
+			return defvalue;
+
+		// first try yes/no strings
+		std::pair<char const *, char const *> const expanded(expand(attrib));
+		if (!std::strcmp("yes", expanded.first) || !std::strcmp("true", expanded.first))
+			return true;
+		if (!std::strcmp("no", expanded.first) || !std::strcmp("false", expanded.first))
+			return false;
+
+		// fall back to integer parsing
+		return parse_int(expanded.first, expanded.second, defvalue ? 1 : 0) != 0;
 	}
 
 	void parse_bounds(util::xml::data_node const *node, render_bounds &result)
@@ -826,14 +862,48 @@ public:
 		case 270:   result = ROT270;    break;
 		default:    throw layout_syntax_error(util::string_format("invalid rotate attribute %d", rotate));
 		}
-		if (!std::strcmp("yes", get_attribute_string(*node, "swapxy", "no")))
+		if (get_attribute_bool(*node, "swapxy", false))
 			result ^= ORIENTATION_SWAP_XY;
-		if (!std::strcmp("yes", get_attribute_string(*node, "flipx", "no")))
+		if (get_attribute_bool(*node, "flipx", false))
 			result ^= ORIENTATION_FLIP_X;
-		if (!std::strcmp("yes", get_attribute_string(*node, "flipy", "no")))
+		if (get_attribute_bool(*node, "flipy", false))
 			result ^= ORIENTATION_FLIP_Y;
 		return result;
 	}
+};
+
+
+class view_environment : public layout_environment
+{
+private:
+	view_environment *const m_next_view = nullptr;
+	char const *const m_name;
+	u32 const m_visibility_mask = 0U;
+	unsigned m_next_visibility_bit = 0U;
+
+public:
+	view_environment(layout_environment &next, char const *name)
+		: layout_environment(next)
+		, m_name(name)
+	{
+	}
+	view_environment(view_environment &next, bool visibility)
+		: layout_environment(next)
+		, m_next_view(&next)
+		, m_name(next.m_name)
+		, m_visibility_mask(next.m_visibility_mask | (u32(visibility ? 1 : 0) << next.m_next_visibility_bit))
+		, m_next_visibility_bit(next.m_next_visibility_bit + (visibility ? 1 : 0))
+	{
+		if (32U < m_next_visibility_bit)
+			throw layout_syntax_error(util::string_format("view '%s' contains too many visibility toggles", m_name));
+	}
+	~view_environment()
+	{
+		if (m_next_view)
+			m_next_view->m_next_visibility_bit = m_next_visibility_bit;
+	}
+
+	u32 visibility_mask() const { return m_visibility_mask; }
 };
 
 } } } // namespace emu::render::detail
@@ -1053,7 +1123,8 @@ void layout_group::resolve_bounds(environment &env, group_map &groupmap, std::ve
 	{
 		set_render_bounds_xy(m_bounds, 0.0F, 0.0F, 1.0F, 1.0F);
 		environment local(env);
-		resolve_bounds(local, m_groupnode, groupmap, seen, true, false, true);
+		bool empty(true);
+		resolve_bounds(local, m_groupnode, groupmap, seen, empty, false, false, true);
 	}
 	seen.pop_back();
 }
@@ -1063,10 +1134,13 @@ void layout_group::resolve_bounds(
 		util::xml::data_node const &parentnode,
 		group_map &groupmap,
 		std::vector<layout_group const *> &seen,
-		bool empty,
+		bool &empty,
+		bool vistoggle,
 		bool repeat,
 		bool init)
 {
+	LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Group '%s' resolve bounds empty=%s vistoggle=%s repeat=%s init=%s\n",
+			parentnode.get_attribute_string("name", ""), empty, vistoggle, repeat, init);
 	bool envaltered(false);
 	bool unresolved(true);
 	for (util::xml::data_node const *itemnode = parentnode.get_first_child(); !m_bounds_resolved && itemnode; itemnode = itemnode->get_next_sibling())
@@ -1082,6 +1156,7 @@ void layout_group::resolve_bounds(
 			envaltered = true;
 			if (!unresolved)
 			{
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment altered%s, unresolving groups\n", envaltered ? " again" : "");
 				unresolved = true;
 				for (group_map::value_type &group : groupmap)
 					group.second.set_bounds_unresolved();
@@ -1106,6 +1181,9 @@ void layout_group::resolve_bounds(
 			else
 				union_render_bounds(m_bounds, itembounds);
 			empty = false;
+			LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate item bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+					itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+					m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
@@ -1119,6 +1197,10 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference explicit bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+						itemnode->get_attribute_string("ref", ""),
+						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 			else
 			{
@@ -1143,6 +1225,11 @@ void layout_group::resolve_bounds(
 				else
 					union_render_bounds(m_bounds, itembounds);
 				empty = false;
+				unresolved = false;
+				LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Accumulate group '%s' reference computed bounds (%s %s %s %s) -> (%s %s %s %s)\n",
+						itemnode->get_attribute_string("ref", ""),
+						itembounds.x0, itembounds.y0, itembounds.x1, itembounds.y1,
+						m_bounds.x0, m_bounds.y0, m_bounds.x1, m_bounds.y1);
 			}
 		}
 		else if (!strcmp(itemnode->get_name(), "repeat"))
@@ -1153,9 +1240,16 @@ void layout_group::resolve_bounds(
 			environment local(env);
 			for (int i = 0; !m_bounds_resolved && (count > i); ++i)
 			{
-				resolve_bounds(local, *itemnode, groupmap, seen, empty, true, !i);
+				resolve_bounds(local, *itemnode, groupmap, seen, empty, false, true, !i);
 				local.increment_parameters();
 			}
+		}
+		else if (!strcmp(itemnode->get_name(), "collection"))
+		{
+			if (!env.get_attribute_string(*itemnode, "name", nullptr))
+				throw layout_syntax_error("collection must have name attribute");
+			environment local(env);
+			resolve_bounds(local, *itemnode, groupmap, seen, empty, true, false, true);
 		}
 		else
 		{
@@ -1165,14 +1259,19 @@ void layout_group::resolve_bounds(
 
 	if (envaltered && !unresolved)
 	{
+		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Environment was altered, marking groups unresolved\n");
 		bool const resolved(m_bounds_resolved);
 		for (group_map::value_type &group : groupmap)
 			group.second.set_bounds_unresolved();
 		m_bounds_resolved = resolved;
 	}
 
-	if (!repeat)
+	if (!vistoggle && !repeat)
+	{
+		LOGMASKED(LOG_GROUP_BOUNDS_RESOLUTION, "Marking group '%s' bounds resolved\n",
+				parentnode.get_attribute_string("name", ""));
 		m_bounds_resolved = true;
+	}
 }
 
 
@@ -2244,7 +2343,7 @@ protected:
 
 			int endpos = basey+ourheight/num_shown;
 
-			// only render the symbol / text if it's atually in view because the code is SLOW
+			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.top()) && (basey <= bounds.bottom()))
 			{
 				while (1)
@@ -2403,7 +2502,7 @@ private:
 
 			int endpos = basex+(ourwidth/num_shown);
 
-			// only render the symbol / text if it's atually in view because the code is SLOW
+			// only render the symbol / text if it's actually in view because the code is SLOW
 			if ((endpos >= bounds.left()) && (basex <= bounds.right()))
 			{
 				while (1)
@@ -2955,29 +3054,76 @@ struct layout_view::layer_lists { item_list backdrops, screens, overlays, bezels
 //-------------------------------------------------
 
 layout_view::layout_view(
-		environment &env,
+		layout_environment &env,
 		util::xml::data_node const &viewnode,
 		element_map &elemmap,
 		group_map &groupmap)
 	: m_name(make_name(env, viewnode))
-	, m_aspect(1.0f)
-	, m_scraspect(1.0f)
+	, m_effaspect(1.0f)
 	, m_items()
+	, m_defvismask(0U)
 	, m_has_art(false)
 {
 	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
-	environment local(env);
+	view_environment local(env, m_name.c_str());
 	layer_lists layers;
 	local.set_parameter("viewname", std::string(m_name));
 	add_items(layers, local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
+
+	// can't support legacy layers and modern visibility toggles at the same time
+	if (!m_vistoggles.empty() && (!layers.backdrops.empty() || !layers.overlays.empty() || !layers.bezels.empty() || !layers.cpanels.empty() || !layers.marquees.empty()))
+		throw layout_syntax_error("view contains visibility toggles as well as legacy backdrop, overlay, bezel, cpanel and/or marquee elements");
+
+	// create visibility toggles for legacy layers
+	u32 mask(1U);
+	if (!layers.backdrops.empty())
+	{
+		m_vistoggles.emplace_back("Backdrops", mask);
+		for (item &backdrop : layers.backdrops)
+			backdrop.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.overlays.empty())
+	{
+		m_vistoggles.emplace_back("Overlays", mask);
+		for (item &overlay : layers.overlays)
+			overlay.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.bezels.empty())
+	{
+		m_vistoggles.emplace_back("Bezels", mask);
+		for (item &bezel : layers.bezels)
+			bezel.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.cpanels.empty())
+	{
+		m_vistoggles.emplace_back("Control Panels", mask);
+		for (item &cpanel : layers.cpanels)
+			cpanel.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
+	if (!layers.marquees.empty())
+	{
+		m_vistoggles.emplace_back("Backdrops", mask);
+		for (item &marquee : layers.marquees)
+			marquee.m_visibility_mask = mask;
+		m_defvismask |= mask;
+		mask <<= 1;
+	}
 
 	// deal with legacy element groupings
 	if (!layers.overlays.empty() || (layers.backdrops.size() <= 1))
 	{
 		// screens (-1) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 		for (item &backdrop : layers.backdrops)
-			backdrop.set_blend_mode(BLENDMODE_ADD);
+			backdrop.m_blend_mode = BLENDMODE_ADD;
 		m_items.splice(m_items.end(), layers.screens);
 		m_items.splice(m_items.end(), layers.overlays);
 		m_items.splice(m_items.end(), layers.backdrops);
@@ -2992,7 +3138,7 @@ layout_view::layout_view(
 		for (item &screen : layers.screens)
 		{
 			if (screen.blend_mode() == -1)
-				screen.set_blend_mode(BLENDMODE_ADD);
+				screen.m_blend_mode = BLENDMODE_ADD;
 		}
 		m_items.splice(m_items.end(), layers.backdrops);
 		m_items.splice(m_items.end(), layers.screens);
@@ -3002,7 +3148,7 @@ layout_view::layout_view(
 	}
 
 	// calculate metrics
-	recompute(render_layer_config());
+	recompute(default_visibility_mask(), false);
 	for (group_map::value_type &group : groupmap)
 		group.second.set_bounds_unresolved();
 }
@@ -3024,7 +3170,7 @@ layout_view::~layout_view()
 
 bool layout_view::has_screen(screen_device &screen) const
 {
-	return std::find_if(m_screens.begin(), m_screens.end(), [&screen](auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
+	return std::find_if(m_screens.begin(), m_screens.end(), [&screen] (auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
 }
 
 
@@ -3033,36 +3179,48 @@ bool layout_view::has_screen(screen_device &screen) const
 //  ratio of a view and all of its contained items
 //-------------------------------------------------
 
-void layout_view::recompute(render_layer_config layerconfig)
+void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 {
-	// reset the bounds
-	m_bounds.x0 = m_bounds.y0 = m_bounds.x1 = m_bounds.y1 = 0.0f;
-	m_scrbounds.x0 = m_scrbounds.y0 = m_scrbounds.x1 = m_scrbounds.y1 = 0.0f;
+	// reset the bounds and collected active items
+	render_bounds scrbounds{ 0.0f, 0.0f, 0.0f, 0.0f };
+	m_bounds = scrbounds;
+	m_screen_items.clear();
+	m_interactive_items.clear();
+	m_interactive_edges_x.clear();
+	m_interactive_edges_y.clear();
 	m_screens.clear();
 
-	// loop over all layers
+	// loop over items and filter by visibility mask
 	bool first = true;
 	bool scrfirst = true;
 	for (item &curitem : m_items)
 	{
-		// accumulate bounds
-		if (first)
-			m_bounds = curitem.m_rawbounds;
-		else
-			union_render_bounds(m_bounds, curitem.m_rawbounds);
-		first = false;
-
-		// accumulate screen bounds
-		if (curitem.m_screen)
+		if ((visibility_mask & curitem.visibility_mask()) == curitem.visibility_mask())
 		{
-			if (scrfirst)
-				m_scrbounds = curitem.m_rawbounds;
+			// accumulate bounds
+			if (first)
+				m_bounds = curitem.m_rawbounds;
 			else
-				union_render_bounds(m_scrbounds, curitem.m_rawbounds);
-			scrfirst = false;
+				union_render_bounds(m_bounds, curitem.m_rawbounds);
+			first = false;
 
-			// accumulate the screens in use while we're scanning
-			m_screens.emplace_back(*curitem.m_screen);
+			// accumulate visible screens and their bounds bounds
+			if (curitem.screen())
+			{
+				if (scrfirst)
+					scrbounds = curitem.m_rawbounds;
+				else
+					union_render_bounds(scrbounds, curitem.m_rawbounds);
+				scrfirst = false;
+
+				// accumulate active screens
+				m_screen_items.emplace_back(curitem);
+				m_screens.emplace_back(*curitem.screen());
+			}
+
+			// accumulate interactive elements
+			if (!curitem.clickthrough() || curitem.has_input())
+				m_interactive_items.emplace_back(curitem);
 		}
 	}
 
@@ -3070,36 +3228,29 @@ void layout_view::recompute(render_layer_config layerconfig)
 	if (m_expbounds.x1 > m_expbounds.x0)
 		m_bounds = m_expbounds;
 
-	// if we're handling things normally, the target bounds are (0,0)-(1,1)
 	render_bounds target_bounds;
-	if (!layerconfig.zoom_to_screen() || m_screens.empty())
+	if (!zoom_to_screen || scrfirst)
 	{
-		// compute the aspect ratio of the view
-		m_aspect = (m_bounds.x1 - m_bounds.x0) / (m_bounds.y1 - m_bounds.y0);
-
+		// if we're handling things normally, the target bounds are (0,0)-(1,1)
+		m_effaspect = ((m_bounds.x1 > m_bounds.x0) && (m_bounds.y1 > m_bounds.y0)) ? m_bounds.aspect() : 1.0f;
 		target_bounds.x0 = target_bounds.y0 = 0.0f;
 		target_bounds.x1 = target_bounds.y1 = 1.0f;
 	}
-
-	// if we're cropping, we want the screen area to fill (0,0)-(1,1)
 	else
 	{
-		// compute the aspect ratio of the screen
-		m_scraspect = (m_scrbounds.x1 - m_scrbounds.x0) / (m_scrbounds.y1 - m_scrbounds.y0);
-
-		float targwidth = (m_bounds.x1 - m_bounds.x0) / (m_scrbounds.x1 - m_scrbounds.x0);
-		float targheight = (m_bounds.y1 - m_bounds.y0) / (m_scrbounds.y1 - m_scrbounds.y0);
-		target_bounds.x0 = (m_bounds.x0 - m_scrbounds.x0) / (m_bounds.x1 - m_bounds.x0) * targwidth;
-		target_bounds.y0 = (m_bounds.y0 - m_scrbounds.y0) / (m_bounds.y1 - m_bounds.y0) * targheight;
-		target_bounds.x1 = target_bounds.x0 + targwidth;
-		target_bounds.y1 = target_bounds.y0 + targheight;
+		// if we're cropping, we want the screen area to fill (0,0)-(1,1)
+		m_effaspect = ((scrbounds.x1 > scrbounds.x0) && (scrbounds.y1 > scrbounds.y0)) ? scrbounds.aspect() : 1.0f;
+		target_bounds.x0 = (m_bounds.x0 - scrbounds.x0) / scrbounds.width();
+		target_bounds.y0 = (m_bounds.y0 - scrbounds.y0) / scrbounds.height();
+		target_bounds.x1 = target_bounds.x0 + (m_bounds.width() / scrbounds.width());
+		target_bounds.y1 = target_bounds.y0 + (m_bounds.height() / scrbounds.height());
 	}
 
 	// determine the scale/offset for normalization
-	float xoffs = m_bounds.x0;
-	float yoffs = m_bounds.y0;
-	float xscale = (target_bounds.x1 - target_bounds.x0) / (m_bounds.x1 - m_bounds.x0);
-	float yscale = (target_bounds.y1 - target_bounds.y0) / (m_bounds.y1 - m_bounds.y0);
+	float const xoffs = m_bounds.x0;
+	float const yoffs = m_bounds.y0;
+	float const xscale = target_bounds.width() / m_bounds.width();
+	float const yscale = target_bounds.height() / m_bounds.height();
 
 	// normalize all the item bounds
 	for (item &curitem : items())
@@ -3108,6 +3259,32 @@ void layout_view::recompute(render_layer_config layerconfig)
 		curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
 		curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
 		curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
+	}
+
+	// sort edges of interactive items
+	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
+			name(), m_interactive_items.size());
+	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
+	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
+	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
+	{
+		item &curitem(m_interactive_items[i]);
+		LOGMASKED(LOG_INTERACTIVE_ITEMS, "%u: (%s %s %s %s) hasinput=%s clickthrough=%s\n",
+				i, curitem.bounds().x0, curitem.bounds().y0, curitem.bounds().x1, curitem.bounds().y1, curitem.has_input(), curitem.clickthrough());
+		m_interactive_edges_x.emplace_back(i, curitem.bounds().x0, false);
+		m_interactive_edges_x.emplace_back(i, curitem.bounds().x1, true);
+		m_interactive_edges_y.emplace_back(i, curitem.bounds().y0, false);
+		m_interactive_edges_y.emplace_back(i, curitem.bounds().y1, true);
+	}
+	std::sort(m_interactive_edges_x.begin(), m_interactive_edges_x.end());
+	std::sort(m_interactive_edges_y.begin(), m_interactive_edges_y.end());
+
+	if (VERBOSE & LOG_INTERACTIVE_ITEMS)
+	{
+		for (edge const &e : m_interactive_edges_x)
+			LOGMASKED(LOG_INTERACTIVE_ITEMS, "x=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
+		for (edge const &e : m_interactive_edges_y)
+			LOGMASKED(LOG_INTERACTIVE_ITEMS, "y=%s %c%u\n", e.position(), e.trailing() ? ']' : '[', e.index());
 	}
 }
 
@@ -3129,7 +3306,7 @@ void layout_view::resolve_tags()
 
 void layout_view::add_items(
 		layer_lists &layers,
-		environment &env,
+		view_environment &env,
 		util::xml::data_node const &parentnode,
 		element_map &elemmap,
 		group_map &groupmap,
@@ -3164,11 +3341,6 @@ void layout_view::add_items(
 			else
 				env.set_repeat_parameter(*itemnode, init);
 		}
-		else if (!strcmp(itemnode->get_name(), "backdrop"))
-		{
-			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
-			m_has_art = true;
-		}
 		else if (!strcmp(itemnode->get_name(), "screen"))
 		{
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
@@ -3178,23 +3350,38 @@ void layout_view::add_items(
 			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
+		else if (!strcmp(itemnode->get_name(), "backdrop"))
+		{
+			if (layers.backdrops.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated backdrop element\n", name());
+			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
+		}
 		else if (!strcmp(itemnode->get_name(), "overlay"))
 		{
+			if (layers.overlays.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated overlay element\n", name());
 			layers.overlays.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "bezel"))
 		{
+			if (layers.bezels.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated bezel element\n", name());
 			layers.bezels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "cpanel"))
 		{
+			if (layers.cpanels.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated cpanel element\n", name());
 			layers.cpanels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "marquee"))
 		{
+			if (layers.marquees.empty())
+				osd_printf_warning("Warning: layout view '%s' contains deprecated marquee element\n", name());
 			layers.marquees.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
 			m_has_art = true;
 		}
@@ -3202,7 +3389,7 @@ void layout_view::add_items(
 		{
 			char const *ref(env.get_attribute_string(*itemnode, "ref", nullptr));
 			if (!ref)
-				throw layout_syntax_error("nested group must have ref attribute");
+				throw layout_syntax_error("group instantiation must have ref attribute");
 
 			group_map::iterator const found(groupmap.find(ref));
 			if (groupmap.end() == found)
@@ -3225,7 +3412,7 @@ void layout_view::add_items(
 				grouptrans = found->second.make_transform(grouporient, trans);
 			}
 
-			environment local(env);
+			view_environment local(env, false);
 			add_items(
 					layers,
 					local,
@@ -3244,12 +3431,27 @@ void layout_view::add_items(
 			int const count(env.get_attribute_int(*itemnode, "count", -1));
 			if (0 >= count)
 				throw layout_syntax_error("repeat must have positive integer count attribute");
-			environment local(env);
+			view_environment local(env, false);
 			for (int i = 0; count > i; ++i)
 			{
 				add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, true, !i);
 				local.increment_parameters();
 			}
+		}
+		else if (!strcmp(itemnode->get_name(), "collection"))
+		{
+			char const *name(env.get_attribute_string(*itemnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("collection must have name attribute");
+
+			auto const found(std::find_if(m_vistoggles.begin(), m_vistoggles.end(), [name] (auto const &x) { return x.name() == name; }));
+			if (m_vistoggles.end() != found)
+				throw layout_syntax_error(util::string_format("duplicate collection name '%s'", name));
+
+			m_defvismask |= u32(env.get_attribute_bool(*itemnode, "visible", true) ? 1 : 0) << m_vistoggles.size(); // TODO: make this less hacky
+			view_environment local(env, true);
+			m_vistoggles.emplace_back(name, local.visibility_mask());
+			add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, false, true);
 		}
 		else
 		{
@@ -3264,7 +3466,7 @@ void layout_view::add_items(
 	}
 }
 
-std::string layout_view::make_name(environment &env, util::xml::data_node const &viewnode)
+std::string layout_view::make_name(layout_environment &env, util::xml::data_node const &viewnode)
 {
 	char const *const name(env.get_attribute_string(viewnode, "name", nullptr));
 	if (!name)
@@ -3294,7 +3496,7 @@ std::string layout_view::make_name(environment &env, util::xml::data_node const 
 //-------------------------------------------------
 
 layout_view::item::item(
-		environment &env,
+		view_environment &env,
 		util::xml::data_node const &itemnode,
 		element_map &elemmap,
 		int orientation,
@@ -3303,24 +3505,25 @@ layout_view::item::item(
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
-	, m_input_tag(make_input_tag(env, itemnode))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
-	, m_input_shift(0)
-	, m_input_raw(0 != env.get_attribute_int(itemnode, "inputraw", 0))
+	, m_input_shift(get_input_shift(m_input_mask))
+	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
+	, m_clickthrough(env.get_attribute_bool(itemnode, "clickthrough", "yes"))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
-	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
+	, m_visibility_mask(env.visibility_mask())
+	, m_input_tag(make_input_tag(env, itemnode))
+	, m_rawbounds(make_bounds(env, itemnode, trans))
+	, m_has_clickthrough(env.get_attribute_string(itemnode, "clickthrough", "")[0])
 {
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
-	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1)
-		m_input_shift++;
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -3377,24 +3580,22 @@ int layout_view::item::state() const
 		// if configured to track an output, fetch its value
 		return m_output;
 	}
-	else if (!m_input_tag.empty())
+	else if (m_input_port)
 	{
 		// if configured to an input, fetch the input value
-		if (m_input_port)
+		if (m_input_raw)
 		{
-			if (m_input_raw)
-			{
-				return (m_input_port->read() & m_input_mask) >> m_input_shift;
-			}
-			else
-			{
-				ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
-				if (field)
-					return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
-			}
+			return (m_input_port->read() & m_input_mask) >> m_input_shift;
+		}
+		else
+		{
+			ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
+			if (field)
+				return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
 
+	// default to zero
 	return 0;
 }
 
@@ -3417,6 +3618,7 @@ void layout_view::item::resolve_tags()
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
 		if (m_input_port)
 		{
+			// if there's a matching unconditional field, cache it
 			for (ioport_field &field : m_input_port->fields())
 			{
 				if (field.mask() & m_input_mask)
@@ -3426,6 +3628,10 @@ void layout_view::item::resolve_tags()
 					break;
 				}
 			}
+
+			// if clickthrough isn't explicitly configured, having an I/O port implies false
+			if (!m_has_clickthrough)
+				m_clickthrough = false;
 		}
 	}
 }
@@ -3435,7 +3641,7 @@ void layout_view::item::resolve_tags()
 //  find_element - find element definition
 //---------------------------------------------
 
-layout_element *layout_view::item::find_element(environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
+layout_element *layout_view::item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
 	char const *const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element", nullptr));
 	if (!name)
@@ -3455,7 +3661,7 @@ layout_element *layout_view::item::find_element(environment &env, util::xml::dat
 //---------------------------------------------
 
 render_bounds layout_view::item::make_bounds(
-		environment &env,
+		view_environment &env,
 		util::xml::data_node const &itemnode,
 		layout_group::transform const &trans)
 {
@@ -3474,7 +3680,7 @@ render_bounds layout_view::item::make_bounds(
 //  make_input_tag - get absolute input tag
 //---------------------------------------------
 
-std::string layout_view::item::make_input_tag(environment &env, util::xml::data_node const &itemnode)
+std::string layout_view::item::make_input_tag(view_environment &env, util::xml::data_node const &itemnode)
 {
 	char const *tag(env.get_attribute_string(itemnode, "inputtag", nullptr));
 	return tag ? env.device().subtag(tag) : std::string();
@@ -3485,7 +3691,7 @@ std::string layout_view::item::make_input_tag(environment &env, util::xml::data_
 //  get_blend_mode - explicit or implicit blend
 //---------------------------------------------
 
-int layout_view::item::get_blend_mode(environment &env, util::xml::data_node const &itemnode)
+int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_node const &itemnode)
 {
 	// see if there's a blend mode attribute
 	char const *const mode(env.get_attribute_string(itemnode, "blend", nullptr));
@@ -3510,6 +3716,39 @@ int layout_view::item::get_blend_mode(environment &env, util::xml::data_node con
 		return BLENDMODE_RGB_MULTIPLY;
 	else
 		return BLENDMODE_ALPHA;
+}
+
+
+//---------------------------------------------
+//  get_input_shift - shift to right-align LSB
+//---------------------------------------------
+
+unsigned layout_view::item::get_input_shift(ioport_value mask)
+{
+	unsigned result(0U);
+	while (mask && !BIT(mask, 0))
+	{
+		++result;
+		mask >>= 1;
+	}
+	return result;
+}
+
+
+
+//**************************************************************************
+//  LAYOUT VIEW VISIBILITY TOGGLE
+//**************************************************************************
+
+//-------------------------------------------------
+//  visibility_toggle - constructor
+//-------------------------------------------------
+
+layout_view::visibility_toggle::visibility_toggle(std::string &&name, u32 mask)
+	: m_name(std::move(name))
+	, m_mask(mask)
+{
+	assert(mask);
 }
 
 
@@ -3548,7 +3787,7 @@ layout_file::layout_file(device_t &device, util::xml::data_node const &rootnode,
 		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
 		{
 			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
-			// e.g. intlc44 and intlc440 have a terminal on the tty port by default and have a view with the front panel with the terminal screen
+			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
 			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
 			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
 			try

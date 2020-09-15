@@ -35,7 +35,7 @@
     ADPCM data and volume is compatible with OKI MSM6295, but some Command
 	byte is slightly different.
 
-	Compares to other Tontek OKI MSM6295 variations:
+	Compares to other Tontek OKI MSM6295 derivatives:
 	|--------------------|-----------------|-----------------|-----------------|
 	| Part number        |     TT5665      |     TT6297      |     TT6298      |
 	|--------------------|-----------------|-----------------|-----------------|
@@ -88,24 +88,24 @@
 DEFINE_DEVICE_TYPE(TT5665, tt5665_device, "tt5665", "Tontek TT5665 ADPCM Voice Synthesis LSI")
 
 // same as MSM6295
-const u8 tt5665_device::s_volume_table[16] =
+const stream_buffer::sample_t tt5665_device::s_volume_table[16] =
 {
-	0x20,   //   0 dB
-	0x16,   //  -3.2 dB
-	0x10,   //  -6.0 dB
-	0x0b,   //  -9.2 dB
-	0x08,   // -12.0 dB
-	0x06,   // -14.5 dB
-	0x04,   // -18.0 dB
-	0x03,   // -20.5 dB
-	0x02,   // -24.0 dB
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
+	stream_buffer::sample_t(0x20) / stream_buffer::sample_t(0x20),   //   0 dB
+	stream_buffer::sample_t(0x16) / stream_buffer::sample_t(0x20),   //  -3.2 dB
+	stream_buffer::sample_t(0x10) / stream_buffer::sample_t(0x20),   //  -6.0 dB
+	stream_buffer::sample_t(0x0b) / stream_buffer::sample_t(0x20),   //  -9.2 dB
+	stream_buffer::sample_t(0x08) / stream_buffer::sample_t(0x20),   // -12.0 dB
+	stream_buffer::sample_t(0x06) / stream_buffer::sample_t(0x20),   // -14.5 dB
+	stream_buffer::sample_t(0x04) / stream_buffer::sample_t(0x20),   // -18.0 dB
+	stream_buffer::sample_t(0x03) / stream_buffer::sample_t(0x20),   // -20.5 dB
+	stream_buffer::sample_t(0x02) / stream_buffer::sample_t(0x20),   // -24.0 dB
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
+	stream_buffer::sample_t(0x00) / stream_buffer::sample_t(0x20),
 };
 
 
@@ -125,7 +125,7 @@ tt5665_device::tt5665_device(const machine_config &mconfig, const char *tag, dev
 	, m_s0_s1_state(0)
 	, m_command(-1)
 	, m_stream(nullptr)
-	, m_daol_output(0)
+	, m_daol_output(0.0)
 	, m_daol_timing(0)
 {
 }
@@ -151,7 +151,7 @@ void tt5665_device::device_start()
 		m_ss_state = 0;
 
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / freq_divider());
+	m_stream = stream_alloc(0, 2, clock() / freq_divider());
 
 	save_item(NAME(m_command));
 	save_item(NAME(m_ss_state));
@@ -210,35 +210,37 @@ void tt5665_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-void tt5665_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// reset the output stream
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 	bool update_daol = false;
 
 	// iterate over voices and accumulate sample data
 	// loop while we still have samples to generate
-	for (int s = 0; s < samples; s++)
+	for (int s = 0; s < outputs[0].samples(); s++)
 	{
 		// adjust DAOL clock timing
 		m_daol_timing--;
 		if (m_daol_timing <= 0)
 		{
 			update_daol = true;
-			m_daol_output = 0;
+			m_daol_output = 0.0;
 		}
+		stream_buffer::sample_t daor_output = 0.0;
 
 		for (int b = 0; b < TT5665_VOICES; b++)
 		{
 			// refresh DAOL output
 			if (update_daol)
-				m_voice[b].generate_adpcm(*this, &m_daol_output);
+				m_voice[b].generate_adpcm(*this, &m_daol_output, s);
 
 			// refresh DAOR output
-			m_voice[b + 4].generate_adpcm(*this, &outputs[1][s]);
+			m_voice[b + 4].generate_adpcm(*this, &daor_output, s);
 		}
-		outputs[0][s] = m_daol_output;
+		outputs[0].put(s, m_daol_output);
+		outputs[1].put(s, daor_output);
 		if (update_daol)
 		{
 			update_daol = false;
@@ -295,7 +297,7 @@ u8 tt5665_device::read()
 	// set the bit to 1 if something is playing on a given channel
 	m_stream->update();
 	for (int voicenum = 0; voicenum < TT5665_VOICES; voicenum++)
-		if (m_voice[voicenum].m_playing || m_voice[voicenum + 4].m_playing)
+		if (m_voice[voicenum].m_playing || m_voice[voicenum + 4].m_playing) // TODO: all or DAOL/DAOR only?
 			result |= 1 << voicenum;
 
 	return result;
@@ -323,10 +325,11 @@ void tt5665_device::write(u8 command)
 		{
 			tt5665_voice &voice = m_voice[voicemask + (b * 4)];
 
+			const int sample_ind = (basemask << 7) | m_command;
 			if (!voice.m_playing) // TODO: Same as MSM6295?
 			{
 				// determine the start/stop positions
-				offs_t base = ((basemask << 7) | m_command) * 8;
+				offs_t base = sample_ind * 8;
 
 				offs_t start = read_byte(base + 0) << 16;
 				start |= read_byte(base + 1) << 8;
@@ -354,12 +357,12 @@ void tt5665_device::write(u8 command)
 				// invalid samples go here
 				else
 				{
-					logerror("Requested to play invalid sample %02x\n", m_command);
+					logerror("Requested to play invalid sample %04x\n", sample_ind);
 				}
 			}
 			else
 			{
-				logerror("Requested to play sample %02x on non-stopped voice\n", m_command);
+				logerror("Requested to play sample %04x on non-stopped voice\n", sample_ind);
 			}
 
 			// reset the command
@@ -411,18 +414,19 @@ tt5665_device::tt5665_voice::tt5665_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, stream_sample_t *buffer)
+void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer, int index)
 {
 	// skip if not active
 	if (!m_playing)
 		return;
 
 	// fetch the next sample byte
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 2048.0;
 	int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 	// output to the buffer, scaling by the volume
 	// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767
-	*buffer += m_adpcm.clock(nibble) * m_volume / 2;
+	*buffer += m_adpcm.clock(nibble) * sample_scale * m_volume;
 
 	// next!
 	if (++m_sample >= m_count)

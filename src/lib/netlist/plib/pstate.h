@@ -8,7 +8,6 @@
 /// \file pstate.h
 ///
 
-#include "palloc.h"
 #include "pstring.h"
 #include "ptypes.h"
 
@@ -54,7 +53,7 @@ public:
 				plib::is_floating_point<T>::value);
 	}
 
-	class callback_t
+	struct callback_t
 	{
 	public:
 		using list_t = std::vector<callback_t *>;
@@ -200,7 +199,6 @@ private:
 	{
 		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
 	}
-
 
 	template<typename C>
 	std::enable_if_t<!(plib::is_integral<C>::value || std::is_enum<C>::value

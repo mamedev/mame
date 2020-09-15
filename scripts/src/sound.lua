@@ -1592,6 +1592,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/rp2c33_snd.h,SOUNDS["RP2C33_SOUND"] = true
+---------------------------------------------------
+
+if (SOUNDS["RP2C33_SOUND"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/rp2c33_snd.cpp",
+		MAME_DIR .. "src/devices/sound/rp2c33_snd.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/sound/tt5665.h,SOUNDS["TT5665"] = true
 ---------------------------------------------------
 

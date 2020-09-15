@@ -5,7 +5,9 @@ license:CC0
 -->
 <softwarelist name="laser2001_cart" description="V-Tech Laser 2001 / Salora Manager cartridges">
 
-	<software name="disk">
+	<!-- MAME rejects this device with the message
+	Unknown slot option 'disk' in slot 'cartslot' -->
+	<software name="disk" supported="no">
 		<description>Disk Drive</description>
 		<year>198?</year>
 		<publisher>Salora</publisher>

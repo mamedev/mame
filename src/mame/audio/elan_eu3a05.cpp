@@ -54,7 +54,7 @@ void elan_eu3a05_sound_device::map(address_map &map)
 void elan_eu3a05_sound_device::device_start()
 {
 	m_space_read_cb.resolve_safe(0);
-	m_stream = stream_alloc(0, 1, 8000);
+	m_stream = stream_alloc_legacy(0, 1, 8000);
 
 	m_sound_end_cb.resolve_all_safe();
 
@@ -92,10 +92,10 @@ void elan_eu3a05_sound_device::device_reset()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void elan_eu3a05_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));

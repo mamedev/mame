@@ -169,7 +169,7 @@ void okim6376_device::device_start()
 	m_ch2_update = 0;
 	m_st_pulses = 0;
 	/* generate the name and create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / m_divisor);
+	m_stream = stream_alloc_legacy(0, 1, get_sample_rate());
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)
@@ -250,6 +250,18 @@ offs_t okim6650_device::get_start_position(int channel)
 	// max address space is 64Mbit
 	return (read_byte(base+1) << 16 | read_byte(base+2) << 8 | read_byte(base+3)) & 0x7fffff;
 }
+
+
+u32 okim6376_device::get_sample_rate()
+{
+	return clock() / m_divisor;
+}
+
+u32 okim6650_device::get_sample_rate()
+{
+	return clock() / 64 / m_divisor;
+}
+
 
 
 void okim6376_device::oki_process(int channel, int command)
@@ -433,12 +445,7 @@ void okim6376_device::okim6376_state_save_register()
 
 void okim6376_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / m_divisor);
-}
-
-void okim6650_device::device_clock_changed()
-{
-	m_stream->set_sample_rate(clock() / 64 / m_divisor);
+	m_stream->set_sample_rate(get_sample_rate());
 }
 
 
@@ -571,10 +578,10 @@ void okim6376_device::write(uint8_t data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void okim6376_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int i;
 

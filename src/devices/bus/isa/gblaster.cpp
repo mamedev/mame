@@ -72,12 +72,12 @@ void isa8_gblaster_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SAA1099(config, m_saa1099_1, 7159090);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
-	SAA1099(config, m_saa1099_2, 7159090);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_1->add_route(0, "lspeaker", 0.50);
+	m_saa1099_1->add_route(1, "rspeaker", 0.50);
+	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_2->add_route(0, "lspeaker", 0.50);
+	m_saa1099_2->add_route(1, "rspeaker", 0.50);
 }
 
 //**************************************************************************

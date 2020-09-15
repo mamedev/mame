@@ -37,7 +37,7 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 
 void filter_rc_device::device_start()
 {
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(1, 1, machine().sample_rate());
 	recalc();
 
 	save_item(NAME(m_k));
@@ -51,18 +51,19 @@ void filter_rc_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void filter_rc_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	stream_sample_t *src = inputs[0];
+	stream_sample_t const *src = inputs[0];
 	stream_sample_t *dst = outputs[0];
 	int memory = m_memory;
 
 	switch (m_type)
 	{
 		case LOWPASS:
+		case LOWPASS_2C:
 			while (samples--)
 			{
 				memory += ((*src++ - memory) * m_k) / 0x10000;
@@ -93,9 +94,20 @@ void filter_rc_device::recalc()
 			{
 				/* filter disabled */
 				m_k = 0x10000;
+				m_memory = 0x0;
 				return;
 			}
 			Req = (m_R1 * (m_R2 + m_R3)) / (m_R1 + m_R2 + m_R3);
+			break;
+		case LOWPASS_2C:
+			if (m_C == 0.0)
+			{
+				/* filter disabled */
+				m_k = 0x10000;
+				m_memory = 0x0;
+				return;
+			}
+			Req = m_R1;
 			break;
 		case HIGHPASS:
 		case AC:
