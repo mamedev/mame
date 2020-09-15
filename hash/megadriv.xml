@@ -12551,7 +12551,7 @@ but dumps still have to be confirmed.
 
 	<software name="chester">
 		<description>Chester Cheetah - Too Cool to Fool (USA)</description>
-		<year>1993/year>
+		<year>1993</year>
 		<publisher>Kaneko</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
