@@ -50,15 +50,7 @@ private:
 
 	void update_counter_0_timer();
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
-	void poly17_init();
 	DECLARE_WRITE_LINE_MEMBER(set_counter_0_ff);
-	inline void noise_gen_chip(int chip, int count, short *buffer);
-	CEM3394_EXT_INPUT(noise_gen_0);
-	CEM3394_EXT_INPUT(noise_gen_1);
-	CEM3394_EXT_INPUT(noise_gen_2);
-	CEM3394_EXT_INPUT(noise_gen_3);
-	CEM3394_EXT_INPUT(noise_gen_4);
-	CEM3394_EXT_INPUT(noise_gen_5);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -78,9 +70,6 @@ private:
 	bool m_counter_0_out;
 	bool m_counter_0_timer_active;
 
-	// random number generator states
-	uint8_t m_poly17[POLY17_SIZE + 1];
-
 	// CEM3394 DAC control states
 	uint16_t m_dac_value;
 	uint8_t m_dac_register;
@@ -88,9 +77,6 @@ private:
 
 	// sound CPU 6850 states
 	bool m_uint;
-
-	// noise generator states
-	uint32_t m_noise_position[6];
 };
 
 DECLARE_DEVICE_TYPE(SENTE6VB, sente6vb_device)

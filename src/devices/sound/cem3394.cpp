@@ -19,23 +19,36 @@
 #include <algorithm>
 
 
-/* waveform generation parameters */
+// use 0.25 as the base volume for pulses
+static constexpr double PULSE_VOLUME = 0.25;
+
+// sawtooth is 27% larger than pulses
+static constexpr double SAWTOOTH_VOLUME = PULSE_VOLUME * 1.27f;
+
+// triangle is 27% larger than sawtooth
+static constexpr double TRIANGLE_VOLUME = SAWTOOTH_VOLUME * 1.27f;
+
+// external input is unknown but let's make it the same as the pulse
+static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
+
+
+// waveform generation parameters
 #define ENABLE_PULSE        1
 #define ENABLE_TRIANGLE     1
 #define ENABLE_SAWTOOTH     1
 #define ENABLE_EXTERNAL     1
 
 
-/* pulse shaping parameters */
-/* examples: */
-/*    hat trick - skidding ice sounds too loud if minimum width is too big */
-/*    snake pit - melody during first level too soft if minimum width is too small */
-/*    snake pit - bonus counter at the end of level */
-/*    snacks'n jaxson - laugh at end of level is too soft if minimum width is too small */
+// pulse shaping parameters
+// examples:
+//    hat trick - skidding ice sounds too loud if minimum width is too big
+//    snake pit - melody during first level too soft if minimum width is too small
+//    snake pit - bonus counter at the end of level
+//    snacks'n jaxson - laugh at end of level is too soft if minimum width is too small
 
 #define LIMIT_WIDTH         1
-#define MINIMUM_WIDTH       0.25
-#define MAXIMUM_WIDTH       0.75
+#define MINIMUM_WIDTH       0.2
+#define MAXIMUM_WIDTH       0.8
 
 
 /********************************************************************************
@@ -97,13 +110,6 @@
 #define WAVE_SAWTOOTH       2
 #define WAVE_PULSE          4
 
-// keep lots of fractional bits
-#define FRACTION_BITS       28
-#define FRACTION_ONE        (1 << FRACTION_BITS)
-#define FRACTION_ONE_D      ((double)(1 << FRACTION_BITS))
-#define FRACTION_MASK       (FRACTION_ONE - 1)
-#define FRACTION_MULT(a,b)  (((a) >> (FRACTION_BITS / 2)) * ((b) >> (FRACTION_BITS - FRACTION_BITS / 2)))
-
 
 // device type definition
 DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voice")
@@ -116,208 +122,143 @@ DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voic
 //  cem3394_device - constructor
 //-------------------------------------------------
 
-cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CEM3394, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_ext_cb(*this),
-		m_stream(nullptr),
-		m_vco_zero_freq(0.0),
-		m_filter_zero_freq(0.0),
-		m_wave_select(0),
-		m_volume(0),
-		m_mixer_internal(0),
-		m_mixer_external(0),
-		m_position(0),
-		m_step(0),
-		m_filter_position(0),
-		m_filter_step(0),
-		m_modulation_depth(0),
-		m_last_ext(0),
-		m_pulse_width(0),
-		m_inv_sample_rate(0.0),
-		m_sample_rate(0),
-		m_mixer_buffer(nullptr),
-		m_external_buffer(nullptr)
+cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CEM3394, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_vco_zero_freq(500.0),
+	m_filter_zero_freq(1300.0),
+	m_values{0},
+	m_wave_select(0),
+	m_volume(0),
+	m_mixer_internal(0),
+	m_mixer_external(0),
+	m_vco_position(0),
+	m_vco_step(0),
+	m_filter_frequency(1300),
+	m_filter_modulation(0),
+	m_filter_resonance(0),
+	m_filter_in{0},
+	m_filter_out{0},
+	m_pulse_width(0),
+	m_inv_sample_rate(1.0/48000.0)
 {
-	std::fill(std::begin(m_values), std::end(m_values), 0.0);
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - generate sound to the mix buffer in mono
+//  sound_stream_update - generate sound to the mix
+//  buffer in mono
 //-------------------------------------------------
 
-void cem3394_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+double cem3394_device::filter(double input, double cutoff)
 {
-	int int_volume = (m_volume * m_mixer_internal) / 256;
-	int ext_volume = (m_volume * m_mixer_external) / 256;
-	uint32_t step = m_step, position, end_position = 0;
-	stream_sample_t *buffer = outputs[0];
-	int16_t *mix, *ext;
-	int i;
+	// clamp cutoff to useful range, 20Hz-20kHz
+	cutoff = std::max(std::min(cutoff, 20000.0), 20.0);
 
-	/* external volume is effectively 0 if no external function */
-	if (m_ext_cb.isnull() || !ENABLE_EXTERNAL)
-		ext_volume = 0;
+	// clamp resonance to 0.95 to prevent infinite gain
+	double r = 4.0 * std::min(m_filter_resonance, 0.95);
 
-	/* adjust the volume for the filter */
-	if (step > m_filter_step)
-		int_volume /= step - m_filter_step;
+	double g = 2 * M_PI * cutoff;
+	double zc = g / tan(g/2 * m_inv_sample_rate);
 
-	/* bail if nothing's going on */
-	if (int_volume == 0 && ext_volume == 0)
+	double gzc = zc / g;
+	double gzc2 = gzc * gzc;
+	double gzc3 = gzc2 * gzc;
+	double gzc4 = gzc3 * gzc;
+	double r1 = 1 + r;
+
+	double a0 = r1;
+	double a1 = 4 * r1;
+	double a2 = 6 * r1;
+	double a3 = 4 * r1;
+	double a4 = r1;
+
+	double b0 =      r1 + 4 * gzc + 6 * gzc2 + 4 * gzc3 + gzc4;
+	double b1 = 4 * (r1 + 2 * gzc            - 2 * gzc3 - gzc4);
+	double b2 = 6 * (r1           - 2 * gzc2            + gzc4);
+	double b3 = 4 * (r1 - 2 * gzc            + 2 * gzc3 - gzc4);
+	double b4 =      r1 - 4 * gzc + 6 * gzc2 - 4 * gzc3 + gzc4;
+
+	double output = (input * a0
+					+  m_filter_in[0] * a1 +  m_filter_in[1] * a2 +  m_filter_in[2] * a3 +  m_filter_in[3] * a4
+					- m_filter_out[0] * b1 - m_filter_out[1] * b2 - m_filter_out[2] * b3 - m_filter_out[3] * b4) / b0;
+
+//	sound_assert(!std::isnan(output));
+//	sound_assert(output >= -1.5 && output <= 1.5);
+	if (output < -1.5 || output > 1.5 || std::isnan(output))
 	{
-		memset(buffer, 0, sizeof(*buffer) * samples);
-		return;
+		if (m_filter_out[0] > -1.5 && m_filter_out[0] < 1.5)
+			printf("cutoff: %6.0f res: %.5f output: %.5f\n", cutoff, m_filter_resonance, output);
 	}
+	if (std::isnan(output)) output = 0;
 
-	/* if there's external stuff, fetch and process it now */
-	if (ext_volume != 0)
+	m_filter_in[3] = m_filter_in[2];
+	m_filter_in[2] = m_filter_in[1];
+	m_filter_in[1] = m_filter_in[0];
+	m_filter_in[0] = input;
+
+	m_filter_out[3] = m_filter_out[2];
+	m_filter_out[2] = m_filter_out[1];
+	m_filter_out[1] = m_filter_out[0];
+	m_filter_out[0] = output;
+
+	if (output < -1.0)
+		output = -1.0;
+	else if (output > 1.0)
+		output = 1.0;
+	return output;
+}
+
+void cem3394_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	auto &external = inputs[0];
+	auto &buffer = outputs[0];
+
+	if (m_wave_select == 0 && m_mixer_external == 0)
+		logerror("%f V didn't cut it\n", m_values[WAVE_SELECT]);
+
+	// loop over samples
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		uint32_t fposition = m_filter_position, fstep = m_filter_step, depth;
-		int16_t last_ext = m_last_ext;
+		// get the current VCO position and step it forward
+		double vco_position = m_vco_position;
+		m_vco_position += m_vco_step;
 
-		/* fetch the external data */
-		m_ext_cb(samples, m_external_buffer.get());
+		// clamp VCO position to a fraction
+		if (m_vco_position >= 1.0)
+			m_vco_position -= floor(m_vco_position);
 
-		/* compute the modulation depth, and adjust fstep to the maximum frequency */
-		/* we lop off 13 bits of depth so that we can multiply by stepadjust, below, */
-		/* which has 13 bits of precision */
-		depth = FRACTION_MULT(fstep, m_modulation_depth);
-		fstep += depth;
-		depth >>= 13;
-
-		/* "apply" the filter: note this is pretty cheesy; it basically just downsamples the
-		   external sample to filter_freq by allowing only 2 transitions for every cycle */
-		for (i = 0, ext = m_external_buffer.get(), position = m_position; i < samples; i++, ext++)
-		{
-			uint32_t newposition;
-			int32_t stepadjust;
-
-			/* update the position and compute the adjustment from a triangle wave */
-			if (position & (1 << (FRACTION_BITS - 1)))
-				stepadjust = 0x2000 - ((position >> (FRACTION_BITS - 14)) & 0x1fff);
-			else
-				stepadjust = (position >> (FRACTION_BITS - 14)) & 0x1fff;
-			position += step;
-
-			/* if we cross a half-step boundary, allow the next byte of the external input */
-			newposition = fposition + fstep - (stepadjust * depth);
-			if ((newposition ^ fposition) & ~(FRACTION_MASK >> 1))
-				last_ext = *ext;
-			else
-				*ext = last_ext;
-			fposition = newposition & FRACTION_MASK;
-		}
-
-		/* update the final filter values */
-		m_filter_position = fposition;
-		m_last_ext = last_ext;
-	}
-
-	/* if there's internal stuff, generate it */
-	if (int_volume != 0)
-	{
-		if (m_wave_select == 0 && !ext_volume)
-			logerror("%f V didn't cut it\n", m_values[WAVE_SELECT]);
-
-		/* handle the pulse component; it maxes out at 0x1932, which is 27% smaller than */
-		/* the sawtooth (since the value is constant, this is the best place to have an */
-		/* odd value for volume) */
+		// handle the pulse component; might need some more thought here
+		double result = 0;
 		if (ENABLE_PULSE && (m_wave_select & WAVE_PULSE))
-		{
-			uint32_t pulse_width = m_pulse_width;
+			if (vco_position < m_pulse_width)
+				result += PULSE_VOLUME * m_mixer_internal;
 
-			/* if the width is wider than the step, we're guaranteed to hit it once per cycle */
-			if (pulse_width >= step)
-			{
-				for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
-				{
-					if (position < pulse_width)
-						*mix = 0x1932;
-					else
-						*mix = 0x0000;
-					position = (position + step) & FRACTION_MASK;
-				}
-			}
-
-			/* otherwise, we compute a volume and watch for cycle boundary crossings */
-			else
-			{
-				int16_t volume = 0x1932 * pulse_width / step;
-				for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
-				{
-					uint32_t newposition = position + step;
-					if ((newposition ^ position) & ~FRACTION_MASK)
-						*mix = volume;
-					else
-						*mix = 0x0000;
-					position = newposition & FRACTION_MASK;
-				}
-			}
-			end_position = position;
-		}
-
-		/* otherwise, clear the mixing buffer */
-		else
-			memset(m_mixer_buffer.get(), 0, sizeof(int16_t) * samples);
-
-		/* handle the sawtooth component; it maxes out at 0x2000, which is 27% larger */
-		/* than the pulse */
+		// handle the sawtooth component
 		if (ENABLE_SAWTOOTH && (m_wave_select & WAVE_SAWTOOTH))
-		{
-			for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
-			{
-				*mix += ((position >> (FRACTION_BITS - 14)) & 0x3fff) - 0x2000;
-				position += step;
-			}
-			end_position = position & FRACTION_MASK;
-		}
+			result += SAWTOOTH_VOLUME * m_mixer_internal * vco_position;
 
-		/* handle the triangle component; it maxes out at 0x2800, which is 25% larger */
-		/* than the sawtooth (should be 27% according to the specs, but 25% saves us */
-		/* a multiplication) */
+		// always compute the triangle waveform which is also used for filter modulation
+		double triangle = 2.0 * vco_position;
+		if (triangle > 1.0)
+			triangle = 2.0 - triangle;
+
+		// handle the triangle component
 		if (ENABLE_TRIANGLE && (m_wave_select & WAVE_TRIANGLE))
-		{
-			for (i = 0, mix = m_mixer_buffer.get(), position = m_position; i < samples; i++, mix++)
-			{
-				int16_t value;
-				if (position & (1 << (FRACTION_BITS - 1)))
-					value = 0x2000 - ((position >> (FRACTION_BITS - 14)) & 0x1fff);
-				else
-					value = (position >> (FRACTION_BITS - 14)) & 0x1fff;
-				*mix += value + (value >> 2);
-				position += step;
-			}
-			end_position = position & FRACTION_MASK;
-		}
+			result += TRIANGLE_VOLUME * m_mixer_internal * triangle;
 
-		/* update the final position */
-		m_position = end_position;
-	}
+		// compute extension input (for Bally/Sente this is the noise)
+		if (ENABLE_EXTERNAL)
+			result += EXTERNAL_VOLUME * m_mixer_external * external.get(sampindex);
 
-	/* mix it down */
-	mix = m_mixer_buffer.get();
-	ext = m_external_buffer.get();
-	{
-		/* internal + external */
-		if (ext_volume != 0 && int_volume != 0)
-		{
-			for (i = 0; i < samples; i++, mix++, ext++)
-				*buffer++ = (*mix * int_volume + *ext * ext_volume) / 128;
-		}
-		/* internal only */
-		else if (int_volume != 0)
-		{
-			for (i = 0; i < samples; i++, mix++)
-				*buffer++ = *mix * int_volume / 128;
-		}
-		/* external only */
-		else
-		{
-			for (i = 0; i < samples; i++, ext++)
-				*buffer++ = *ext * ext_volume / 128;
-		}
+		// compute the modulated filter frequency and apply the filter
+		// modulation tracks the VCO triangle
+		double filter_freq = m_filter_frequency * (1 + m_filter_modulation * (triangle - 0.5));
+		result = filter(result, filter_freq);
+
+		// write the sample
+		buffer.put(sampindex, result * m_volume);
 	}
 }
 
@@ -328,51 +269,49 @@ void cem3394_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 
 void cem3394_device::device_start()
 {
-	/* copy global parameters */
-	m_sample_rate = SAMPLE_RATE;
-	m_inv_sample_rate = 1.0 / (double)m_sample_rate;
+	// compute a sample rate
+	// VCO can range up to pow(2, 4.0/.75) = ~40.3 * zero-voltage-freq (ZVF)
+	int sample_rate = m_vco_zero_freq * pow(2, 4.0 / 0.75) * 5;
+	m_inv_sample_rate = 1.0 / double(sample_rate);
 
-	/* allocate stream channels, 1 per chip */
-	m_stream = stream_alloc_legacy(0, 1, m_sample_rate);
-
-	m_ext_cb.resolve();
-
-	/* allocate memory for a mixer buffer and external buffer (1 second should do it!) */
-	m_mixer_buffer = std::make_unique<int16_t[]>(m_sample_rate);
-	m_external_buffer = std::make_unique<int16_t[]>(m_sample_rate);
+	// allocate stream channels, 1 per chip, with one external input
+	m_stream = stream_alloc(1, 1, sample_rate);
 
 	save_item(NAME(m_values));
 	save_item(NAME(m_wave_select));
+
 	save_item(NAME(m_volume));
 	save_item(NAME(m_mixer_internal));
 	save_item(NAME(m_mixer_external));
-	save_item(NAME(m_position));
-	save_item(NAME(m_step));
-	save_item(NAME(m_filter_position));
-	save_item(NAME(m_filter_step));
-	save_item(NAME(m_modulation_depth));
-	save_item(NAME(m_last_ext));
+
+	save_item(NAME(m_vco_position));
+	save_item(NAME(m_vco_step));
+
+	save_item(NAME(m_filter_frequency));
+	save_item(NAME(m_filter_modulation));
+	save_item(NAME(m_filter_resonance));
+
 	save_item(NAME(m_pulse_width));
 }
 
 
 double cem3394_device::compute_db(double voltage)
 {
-	/* assumes 0.0 == full off, 4.0 == full on, with linear taper, as described in the datasheet */
+	// assumes 0.0 == full off, 4.0 == full on, with linear taper, as described in the datasheet
 
-	/* above 4.0, maximum volume */
+	// above 4.0, maximum volume
 	if (voltage >= 4.0)
 		return 0.0;
 
-	/* below 0.0, minimum volume */
+	// below 0.0, minimum volume
 	else if (voltage <= 0.0)
 		return 90.0;
 
-	/* between 2.5 and 4.0, linear from 20dB to 0dB */
+	// between 2.5 and 4.0, linear from 20dB to 0dB
 	else if (voltage >= 2.5)
 		return (4.0 - voltage) * (1.0 / 1.5) * 20.0;
 
-	/* between 0.0 and 2.5, exponential to 20dB */
+	// between 0.0 and 2.5, exponential to 20dB
 	else
 	{
 		double temp = 20.0 * pow(2.0, 2.5 - voltage);
@@ -382,33 +321,33 @@ double cem3394_device::compute_db(double voltage)
 }
 
 
-uint32_t cem3394_device::compute_db_volume(double voltage)
+stream_buffer::sample_t cem3394_device::compute_db_volume(double voltage)
 {
 	double temp;
 
-	/* assumes 0.0 == full off, 4.0 == full on, with linear taper, as described in the datasheet */
+	// assumes 0.0 == full off, 4.0 == full on, with linear taper, as described in the datasheet
 
-	/* above 4.0, maximum volume */
+	// above 4.0, maximum volume
 	if (voltage >= 4.0)
-		return 256;
+		return 1.0;
 
-	/* below 0.0, minimum volume */
+	// below 0.0, minimum volume
 	else if (voltage <= 0.0)
 		return 0;
 
-	/* between 2.5 and 4.0, linear from 20dB to 0dB */
+	// between 2.5 and 4.0, linear from 20dB to 0dB
 	else if (voltage >= 2.5)
 		temp = (4.0 - voltage) * (1.0 / 1.5) * 20.0;
 
-	/* between 0.0 and 2.5, exponential to 20dB */
+	// between 0.0 and 2.5, exponential to 20dB
 	else
 	{
 		temp = 20.0 * pow(2.0, 2.5 - voltage);
 		if (temp < 50.0) return 0;
 	}
 
-	/* convert from dB to volume and return */
-	return (uint32_t)(256.0 * pow(0.891251, temp));
+	// convert from dB to volume and return
+	return powf(0.891251f, temp);
 }
 
 
@@ -416,24 +355,24 @@ void cem3394_device::set_voltage(int input, double voltage)
 {
 	double temp;
 
-	/* don't do anything if no change */
+	// don't do anything if no change
 	if (voltage == m_values[input])
 		return;
 	m_values[input] = voltage;
 
-	/* update the stream first */
+	// update the stream first
 	m_stream->update();
 
-	/* switch off the input */
+	// switch off the input
 	switch (input)
 	{
-		/* frequency varies from -4.0 to +4.0, at 0.75V/octave */
+		// frequency varies from -4.0 to +4.0, at 0.75V/octave
 		case VCO_FREQUENCY:
 			temp = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
-			m_step = (uint32_t)(temp * m_inv_sample_rate * FRACTION_ONE_D);
+			m_vco_step = temp * m_inv_sample_rate;
 			break;
 
-		/* wave select determines triangle/sawtooth enable */
+		// wave select determines triangle/sawtooth enable
 		case WAVE_SELECT:
 			m_wave_select &= ~(WAVE_TRIANGLE | WAVE_SAWTOOTH);
 			if (voltage >= -0.5 && voltage <= -0.2)
@@ -444,7 +383,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_wave_select |= WAVE_SAWTOOTH;
 			break;
 
-		/* pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100% */
+		// pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100%
 		case PULSE_WIDTH:
 			if (voltage < 0.0)
 			{
@@ -453,21 +392,20 @@ void cem3394_device::set_voltage(int input, double voltage)
 			}
 			else
 			{
-				temp = voltage * 0.5;
+				m_pulse_width = voltage * 0.5;
 				if (LIMIT_WIDTH)
-					temp = MINIMUM_WIDTH + (MAXIMUM_WIDTH - MINIMUM_WIDTH) * temp;
-				m_pulse_width = (uint32_t)(temp * FRACTION_ONE_D);
+					m_pulse_width = MINIMUM_WIDTH + (MAXIMUM_WIDTH - MINIMUM_WIDTH) * m_pulse_width;
 				m_wave_select |= WAVE_PULSE;
 			}
 			break;
 
-		/* final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB */
+		// final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB
 		case FINAL_GAIN:
 			m_volume = compute_db_volume(voltage);
 			break;
 
-		/* mixer balance is a pan between the external input and the internal input */
-		/* 0.0 is equal parts of both; positive values favor external, negative favor internal */
+		// mixer balance is a pan between the external input and the internal input
+		// 0.0 is equal parts of both; positive values favor external, negative favor internal
 		case MIXER_BALANCE:
 			if (voltage >= 0.0)
 			{
@@ -481,25 +419,29 @@ void cem3394_device::set_voltage(int input, double voltage)
 			}
 			break;
 
-		/* filter frequency varies from -4.0 to +4.0, at 0.375V/octave */
+		// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
 		case FILTER_FREQENCY:
-			temp = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
-			m_filter_step = (uint32_t)(temp * m_inv_sample_rate * FRACTION_ONE_D);
+			m_filter_frequency = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 			break;
 
-		/* modulation depth is 0.01 at 0V and 2.0 at 3.5V; how it grows from one to the other */
-		/* is still unclear at this point */
+		// modulation depth is 0.01*freq at 0V and 2.0*freq at 3.5V
 		case MODULATION_AMOUNT:
 			if (voltage < 0.0)
-				m_modulation_depth = (uint32_t)(0.01 * FRACTION_ONE_D);
+				m_filter_modulation = 0.01;
 			else if (voltage > 3.5)
-				m_modulation_depth = (uint32_t)(2.00 * FRACTION_ONE_D);
+				m_filter_modulation = 1.99;
 			else
-				m_modulation_depth = (uint32_t)(((voltage * (1.0 / 3.5)) * 1.99 + 0.01) * FRACTION_ONE_D);
+				m_filter_modulation = (voltage * (1.0 / 3.5)) * 1.98 + 0.01;
 			break;
 
-		/* this is not yet implemented */
+		// this is not yet implemented
 		case FILTER_RESONANCE:
+			if (voltage < 0.0)
+				m_filter_resonance = 0.0;
+			else if (voltage > 2.5)
+				m_filter_resonance = 1.0;
+			else
+				m_filter_resonance = voltage * (1.0 / 2.5);
 			break;
 	}
 }
@@ -535,9 +477,9 @@ double cem3394_device::get_parameter(int input)
 			if (voltage < 0.0)
 				return 0.01;
 			else if (voltage > 3.5)
-				return 2.0;
+				return 1.99;
 			else
-				return (voltage * (1.0 / 3.5)) * 1.99 + 0.01;
+				return (voltage * (1.0 / 3.5)) * 1.98 + 0.01;
 
 		case FILTER_RESONANCE:
 			if (voltage < 0.0)
