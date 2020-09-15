@@ -234,10 +234,10 @@ void tt5665_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		{
 			// refresh DAOL output
 			if (update_daol)
-				m_voice[b].generate_adpcm(*this, &m_daol_output, s);
+				m_voice[b].generate_adpcm(*this, &m_daol_output);
 
 			// refresh DAOR output
-			m_voice[b + 4].generate_adpcm(*this, &daor_output, s);
+			m_voice[b + 4].generate_adpcm(*this, &daor_output);
 		}
 		outputs[0].put(s, m_daol_output);
 		outputs[1].put(s, daor_output);
@@ -414,7 +414,7 @@ tt5665_device::tt5665_voice::tt5665_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer, int index)
+void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer)
 {
 	// skip if not active
 	if (!m_playing)

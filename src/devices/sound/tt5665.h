@@ -74,7 +74,7 @@ private:
 	{
 	public:
 		tt5665_voice();
-		void generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer, int index);
+		void generate_adpcm(device_rom_interface &rom, stream_buffer::sample_t *buffer);
 
 		oki_adpcm_state m_adpcm;          // current ADPCM state
 		bool            m_playing;
