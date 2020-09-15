@@ -13,106 +13,24 @@
 
 #define VERBOSE     (0)
 
-
-#define NUM_PENS    (0x1000)
-
-/*************************************
- *
- *  Palette handling
- *
- *************************************/
-
-void neogeo_base_state::create_rgb_lookups()
-{
-	static const int resistances[] = {3900, 2200, 1000, 470, 220};
-
-	/* compute four sets of weights - with or without the pulldowns -
-	   ensuring that we use the same scaler for all */
-	double weights_normal[5];
-	double scaler = compute_resistor_weights(0, 255, -1,
-											5, resistances, weights_normal, 0, 0,
-											0, nullptr, nullptr, 0, 0,
-											0, nullptr, nullptr, 0, 0);
-
-	double weights_dark[5];
-	compute_resistor_weights(0, 255, scaler,
-							5, resistances, weights_dark, 8200, 0,
-							0, nullptr, nullptr, 0, 0,
-							0, nullptr, nullptr, 0, 0);
-
-	double weights_shadow[5];
-	compute_resistor_weights(0, 255, scaler,
-							5, resistances, weights_shadow, 150, 0,
-							0, nullptr, nullptr, 0, 0,
-							0, nullptr, nullptr, 0, 0);
-
-	double weights_dark_shadow[5];
-	compute_resistor_weights(0, 255, scaler,
-							5, resistances, weights_dark_shadow, 1.0 / ((1.0 / 8200) + (1.0 / 150)), 0,
-							0, nullptr, nullptr, 0, 0,
-							0, nullptr, nullptr, 0, 0);
-
-	for (int i = 0; i < 32; i++)
-	{
-		int i4 = (i >> 4) & 1;
-		int i3 = (i >> 3) & 1;
-		int i2 = (i >> 2) & 1;
-		int i1 = (i >> 1) & 1;
-		int i0 = (i >> 0) & 1;
-		m_palette_lookup[i][0] = combine_weights(weights_normal, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][1] = combine_weights(weights_dark, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][2] = combine_weights(weights_shadow, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][3] = combine_weights(weights_dark_shadow, i0, i1, i2, i3, i4);
-	}
-}
-
 void neogeo_base_state::set_pens()
 {
-	const pen_t *pen_base = m_palette->pens() + m_palette_bank + (m_screen_shadow ? 0x2000 : 0);
-	m_sprgen->set_pens(pen_base);
-	m_bg_pen = pen_base + 0xfff;
+	m_sprgen->set_pens(m_palette->pens());
+	m_bg_pen = m_palette->pens() + m_palette->get_backdrop_pen();
 }
 
 
 WRITE_LINE_MEMBER(neogeo_base_state::set_screen_shadow)
 {
-	m_screen_shadow = state;
+	m_palette->set_shadow(state);
 	set_pens();
 }
 
 
 WRITE_LINE_MEMBER(neogeo_base_state::set_palette_bank)
 {
-	m_palette_bank = state ? 0x1000 : 0;
+	m_palette->set_bank(state);
 	set_pens();
-}
-
-
-uint16_t neogeo_base_state::paletteram_r(offs_t offset)
-{
-	return m_paletteram[m_palette_bank + offset];
-}
-
-
-void neogeo_base_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	offset += m_palette_bank;
-	data = COMBINE_DATA(&m_paletteram[offset]);
-
-	int dark = data >> 15;
-	int r = ((data >> 14) & 0x1) | ((data >> 7) & 0x1e);
-	int g = ((data >> 13) & 0x1) | ((data >> 3) & 0x1e);
-	int b = ((data >> 12) & 0x1) | ((data << 1) & 0x1e);
-
-	m_palette->set_pen_color(offset,
-								m_palette_lookup[r][dark],
-								m_palette_lookup[g][dark],
-								m_palette_lookup[b][dark]); // normal
-
-	m_palette->set_pen_color(offset + 0x2000,
-								m_palette_lookup[r][dark+2],
-								m_palette_lookup[g][dark+2],
-								m_palette_lookup[b][dark+2]); // shadow
 }
 
 
@@ -124,17 +42,6 @@ void neogeo_base_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void neogeo_base_state::video_start()
 {
-	create_rgb_lookups();
-
-	m_paletteram.resize(0x1000 * 2, 0);
-
-	m_screen_shadow = 0;
-	m_palette_bank = 0;
-
-	save_item(NAME(m_paletteram));
-	save_item(NAME(m_screen_shadow));
-	save_item(NAME(m_palette_bank));
-
 	set_pens();
 }
 

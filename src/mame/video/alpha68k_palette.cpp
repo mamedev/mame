@@ -8,7 +8,6 @@
     - URL reference: https://wiki.neogeodev.org/index.php?title=Palettes
 
     TODO:
-    - Make mods to support NeoGeo HW (palette bank, shadows);
     - Are alpha68k.cpp/snk68.cpp with or without shadows?
     - Reference color, research exact consequences about this wiki claim:
       "It always has to be pure black ($8000)(*) otherwise monitors won't
@@ -28,7 +27,7 @@
 #include "emu.h"
 #include "alpha68k_palette.h"
 #include "video/resnet.h"
-
+#include <algorithm>
 
 
 //**************************************************************************
@@ -37,6 +36,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(ALPHA68K_PALETTE, alpha68k_palette_device, "alpha68k_palette", "Alpha Denshi Palette device")
+DEFINE_DEVICE_TYPE(NEOGEO_PALETTE,   neogeo_palette_device,   "neogeo_palette",   "Neo Geo Palette device")
 
 
 //**************************************************************************
@@ -47,9 +47,27 @@ DEFINE_DEVICE_TYPE(ALPHA68K_PALETTE, alpha68k_palette_device, "alpha68k_palette"
 //  alpha68k_palette_device - constructor
 //-------------------------------------------------
 
-alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ALPHA68K_PALETTE, tag, owner, clock)
+alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
+{
+	std::fill(std::begin(m_sync_color_shift), std::end(m_sync_color_shift), 0);
+}
+
+alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: alpha68k_palette_device(mconfig, ALPHA68K_PALETTE, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  neogeo_palette_device - constructor
+//-------------------------------------------------
+
+neogeo_palette_device::neogeo_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: alpha68k_palette_device(mconfig, NEOGEO_PALETTE, tag, owner, clock)
+	, m_bank(false)
+	, m_bankaddr(0)
+	, m_shadow(false)
 {
 }
 
@@ -108,19 +126,28 @@ void alpha68k_palette_device::create_rgb_lookups()
 
 void alpha68k_palette_device::device_start()
 {
-	m_paletteram.resize(m_entries);
+	m_paletteram.resize(m_entries, 0);
 
 	create_rgb_lookups();
 	save_item(NAME(m_paletteram));
+	save_item(NAME(m_sync_color_shift));
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void alpha68k_palette_device::device_reset()
+void neogeo_palette_device::device_start()
 {
+	m_paletteram.resize(m_entries * 2, 0); // 2 banks of palettes
+	for (int i = 0; i < m_entries; i++) // initialize colors
+	{
+		update_color(i, i);
+		update_color(i, i + m_entries);
+	}
+
+	create_rgb_lookups();
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_sync_color_shift));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_bankaddr));
+	save_item(NAME(m_shadow));
 }
 
 
@@ -133,34 +160,91 @@ uint16_t alpha68k_palette_device::read(offs_t offset)
 	return m_paletteram[offset];
 }
 
-inline void alpha68k_palette_device::set_color_entry(u16 offset, u16 pal_data, int shift)
+inline void alpha68k_palette_device::set_color_entry(u16 offset)
 {
+	const u16 pal_data = m_paletteram[offset];
+
 	int dark = pal_data >> 15;
 	int r = ((pal_data >> 14) & 0x1) | ((pal_data >> 7) & 0x1e);
 	int g = ((pal_data >> 13) & 0x1) | ((pal_data >> 3) & 0x1e);
 	int b = ((pal_data >> 12) & 0x1) | ((pal_data << 1) & 0x1e);
 
-	r >>= shift;
-	g >>= shift;
-	b >>= shift;
+	r >>= m_sync_color_shift[0];
+	g >>= m_sync_color_shift[0];
+	b >>= m_sync_color_shift[0];
 
 	set_pen_color(offset, m_palette_lookup[r][dark], m_palette_lookup[g][dark], m_palette_lookup[b][dark]);
+	// TODO: Shadow is used?
 }
 
 void alpha68k_palette_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
-	u16 pal_data = m_paletteram[offset];
-	set_color_entry(offset, pal_data, 0);
+	update_color(offset, offset);
+}
 
+inline void alpha68k_palette_device::update_color(u16 entry, u16 offset)
+{
 	// reference color
-	if (offset == 0)
+	if (entry == 0)
 	{
 		// TODO: actual behaviour, needs HW tests.
-		bool is_sync_color = (pal_data & 0x7fff) == 0;
+		bool is_sync_color = (m_paletteram[offset] & 0x7fff) == 0;
 		int sync_color_shift = is_sync_color ? 0 : 2;
-
-		for (int i=0; i<m_entries; i++)
-			set_color_entry(i, m_paletteram[i], sync_color_shift);
+		if (m_sync_color_shift[0] != sync_color_shift)
+		{
+			m_sync_color_shift[0] = sync_color_shift;
+			for (int i=1; i<m_entries; i++)
+				set_color_entry(i);
+		}
 	}
+	set_color_entry(offset);
+}
+
+uint16_t neogeo_palette_device::read(offs_t offset)
+{
+	return m_paletteram[m_bankaddr + offset];
+}
+
+inline void neogeo_palette_device::set_color_entry(u16 offset)
+{
+	const u16 pal_data = m_paletteram[offset];
+
+	int dark = (pal_data >> 15);
+	int r = ((pal_data >> 14) & 0x1) | ((pal_data >> 7) & 0x1e);
+	int g = ((pal_data >> 13) & 0x1) | ((pal_data >> 3) & 0x1e);
+	int b = ((pal_data >> 12) & 0x1) | ((pal_data << 1) & 0x1e);
+
+	r >>= m_sync_color_shift[m_bank];
+	g >>= m_sync_color_shift[m_bank];
+	b >>= m_sync_color_shift[m_bank];
+
+	set_pen_color(offset, m_palette_lookup[r][dark], m_palette_lookup[g][dark], m_palette_lookup[b][dark]); // normal
+	set_pen_color(offset + (m_entries << 1), m_palette_lookup[r][dark+2], m_palette_lookup[g][dark+2], m_palette_lookup[b][dark+2]); // shadow
+}
+
+void neogeo_palette_device::write(offs_t offset, u16 data, u16 mem_mask)
+{
+	int entry = offset;
+	offset += m_bankaddr;
+	COMBINE_DATA(&m_paletteram[offset]);
+	update_color(entry, offset);
+}
+
+inline void neogeo_palette_device::update_color(u16 entry, u16 offset)
+{
+	// reference color
+	if (entry == 0)
+	{
+		// TODO: actual behaviour, needs HW tests.
+		bool is_sync_color = (m_paletteram[offset] & 0x7fff) == 0;
+		int sync_color_shift = is_sync_color ? 0 : 2;
+		if (m_sync_color_shift[m_bank] != sync_color_shift)
+		{
+			m_sync_color_shift[m_bank] = sync_color_shift;
+			for (int i=1; i<m_entries; i++)
+				set_color_entry(m_bankaddr + i);
+		}
+	}
+	set_color_entry(offset);
 }
