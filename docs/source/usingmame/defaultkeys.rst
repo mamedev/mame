@@ -107,7 +107,7 @@ and saving/loading save states.
 
     Palette/colortable mode:
 
-    * **[** **]** - switch between palette and colortable modes.
+    * **[** **]** - switch between palette devices.
     * **Up**/**Down** - scroll up/down one line at a time.
     * **Page Up**/**Page Down** - scroll up/down one page at a time.
     * **Home**/**End** - move to top/bottom of list.
@@ -156,8 +156,9 @@ and saving/loading save states.
     menu to determine which save state you wish to load.
 
     *Note that the save state feature is not supported for a large number of
-    drivers. If support is not enabled for a given driver, you will receive a
-    warning when attempting to save or load.*
+    drivers. If a given driver is not known to work perfectly, you will
+    receive a warning that the save state may not be valid when attempting to
+    save or load.*
 **Shift+F7**
     Create a save state. Requires an additional keypress to identify the state,
     similar to the load option above. If an existing save state is present, it
@@ -331,7 +332,7 @@ the standard keyboard configuration.
 **4**
     Player 4 start or 4 players mode
 **Backspace**
-    Bill 1 (For machines with a bill receptor, typically gambling)
+    Bill 1 (For machines that have a bill receptor/note reader)
 **9**
     Service 1 (Service buttons are typically used to give free credits or to
     navigate the internal operator service menus)
@@ -341,11 +342,11 @@ the standard keyboard configuration.
     Service 3
 **=** (not numeric keypad)
     Service 4
-**Ctrl**/**Mouse B0**/**Gun 1 Button 0**
+**Ctrl**
     Mahjong Kan
-**Alt**/**Mouse B2**/**Gun 1 Button 1**
+**Alt**
     Mahjong Pon
-**Spacebar**/**Mouse B1**/**Joystick 1 Button 1**
+**Spacebar**
     Mahjong Chi
 **Shift**
     Mahjong Reach
@@ -423,45 +424,99 @@ the standard keyboard configuration.
     Coin slot 4
 **1**
     Player 1 start or 1 player mode
-**2**
-    Deal
-**3**
-    Double Up
-**4**
-    Take Score
 **Backspace**
-    Bill 1 (For machines with a bill receptor, typically gambling)
+    Bill 1 (For machines that have a bill receptor/note reader)
+**Q**
+    Key In
+**W**
+    Key Out
 **9**
     Service 1 (Service buttons are typically used to give free credits or to
     navigate the internal operator service menus)
 **0**
     Service 2
+    Book-Keeping (for machines that have this functionality)
 **-** (not numeric keypad)
     Service 3
 **=** (not numeric keypad)
     Service 4
+**2**
+    Deal
 **L**
     Stand
 **M**
     Bet
-**A**
-    High
-**D**
-    Half Gamble
 **I**
     Payout
 **O**
     Door
+**D**
+    Half Gamble
+**3**
+    Double Up
+**4**
+    Take Score
+**A**
+    High
+**S**
+    Low
+
+.. _default-blackjack-keys:
+
+Default Blackjack Keys
+======================
+
+All the keys below are fully configurable in the user interface. This list shows
+the standard keyboard configuration.
+
+
+**5**
+    Coin slot 1
+**6**
+    Coin slot 2
+**7**
+    Coin slot 3
+**8**
+    Coin slot 4
+**1**
+    Player 1 start or 1 player mode
+**Backspace**
+    Bill 1 (For machines that have a bill receptor/note reader)
 **Q**
     Key In
 **W**
     Key Out
+**9**
+    Service 1 (Service buttons are typically used to give free credits or to
+    navigate the internal operator service menus)
+**0**
+    Service 2
+    Book-Keeping (for machines that have this functionality)
+**-** (not numeric keypad)
+    Service 3
+**=** (not numeric keypad)
+    Service 4
+**2**
+    Deal
+**L**
+    Stand
+**M**
+    Bet
+**I**
+    Payout
+**O**
+    Door
+**D**
+    Half Gamble
+**3**
+    Double Up
+**4**
+    Take Score
+**A**
+    High
 **S**
     Low
-**9**
-    Service
-**0**
-    Book-Keeping
+
 
 .. _default-poker-keys:
 
@@ -472,6 +527,8 @@ All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 
+**2**
+    Deal
 **Z**
     Hold 1
 **X**
