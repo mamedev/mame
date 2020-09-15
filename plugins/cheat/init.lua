@@ -580,7 +580,7 @@ function cheat.startplugin()
 		cheat.get_value = function(cheat) return cheat.parameter.value end
 		cheat.get_text = function(cheat)
 			if cheat.parameter.item then
-				return cheat.parameter.item[cheat.parameter.index]
+				return cheat.parameter.item[cheat.parameter.index].text
 			else
 				return cheat.parameter.value
 			end
@@ -761,8 +761,8 @@ function cheat.startplugin()
 			end
 		elseif event == "right" then
 			if cheat.parameter then
-				local idx, chd = cheat:set_index(cheat:get_index() + 1)
-				return chd
+				local idx, chg = cheat:set_index(cheat:get_index() + 1)
+				return chg
 			else
 				if not cheat:is_oneshot() then
 					local state, chg = cheat:set_enabled(true)
@@ -906,7 +906,45 @@ function cheat.startplugin()
 	end
 
 	function ce.get(index)
-		return cheats[index]
+		local cheat = cheats[index]
+		if not cheat then
+			return nil
+		end
+		local intf = {
+			get_enabled = function() return cheat:get_enabled() end,
+			set_enabled = function(status) return cheat:set_enabled(status) end,
+			desc = cheat.desc,
+			is_oneshot = cheat:is_oneshot(),
+			comment = cheat.comment,
+			get_hotkeys = function() if cheat.hotkeys then return cheat.hotkeys.keys end return nil end,
+			set_hotkeys = function(seq) cheat.hotkeys = { pressed = false, keys = manager:machine():input():seq_clean(seq) } end
+		}
+		if cheat.script then
+			intf.script = {}
+			if cheat.script.on then intf.script.on = true end
+			if cheat.script.off then intf.script.off = true end
+			if cheat.script.run then intf.script.run = true end
+			if cheat.script.change then intf.script.change = true end
+		end
+
+		if cheat.parameter then
+			intf.parameter = {}
+			intf.get_value = function() return cheat:get_value() end
+			intf.set_value = function(value) return cheat:set_value(value) end
+			intf.get_index = function() return cheat:get_index() end
+			intf.set_index = function(index) return cheat:set_index(index) end
+			intf.parameter.min = cheat.parameter.min
+			intf.parameter.max = cheat.parameter.max
+			intf.parameter.step = cheat.parameter.step
+			if cheat.parameter.item then
+				intf.parameter.item = {}
+				for idx, item in pairs(cheat.parameter.item) do
+					intf.parameter.item[idx].text = cheat.parameter.item[idx].text
+					intf.parameter.item[idx].value = cheat.parameter.item[idx].value
+				end
+			end
+		end
+		return intf 
 	end
 
 	function ce.list()
