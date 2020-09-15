@@ -209,7 +209,7 @@ void emu3_state::emu3(machine_config &config)
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(*this, FUNC(emu3_state::irq_w<FDCINT>));
 	m_fdc->set_disable_motor_control(true);
-	m_fdc->sso_wr_callback().set([this](int state) {});
+	//m_fdc->sso_wr_callback().set([this](int state) {});
 	m_fdc->dden_w(0);
 
 	FLOPPY_CONNECTOR(config, "fdc:0", emu3_floppies, "35dd", floppy_image_device::default_floppy_formats);
