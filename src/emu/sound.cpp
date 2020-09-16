@@ -865,6 +865,10 @@ void sound_stream::sample_rate_changed()
 
 void sound_stream::postload()
 {
+	// set the end time of all of our streams to now
+	for (auto &output : m_output)
+		output.set_end_time(m_device.machine().time());
+
 	// recompute the sample rate information
 	sample_rate_changed();
 }

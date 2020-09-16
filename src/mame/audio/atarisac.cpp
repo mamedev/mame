@@ -254,7 +254,7 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	// TODO: determine exact frequency (controlled by a PAL16R4)
 
 	GENERIC_LATCH_8(config, m_datin);
-	m_datin->data_pending_callback().set_inputline(m_daccpu, M68K_IRQ_4);
+	m_datin->data_pending_callback().set_inputline(m_daccpu, M68K_IRQ_2);
 	m_datin->set_separate_acknowledge(true);
 
 	GENERIC_LATCH_8(config, m_datout);

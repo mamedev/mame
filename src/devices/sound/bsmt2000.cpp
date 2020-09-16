@@ -116,7 +116,7 @@ void bsmt2000_device::device_start()
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
 	// internally at 24MHz the max output sample rate is 32kHz
 	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
-	m_stream = stream_alloc_legacy(0, 2, clock() / 128);
+	m_stream = stream_alloc(0, 2, clock() / 128);
 
 	// register for save states
 	save_item(NAME(m_register_select));
@@ -171,18 +171,16 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle update requests
+//  sound_stream_update - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 
-void bsmt2000_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void bsmt2000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// just fill with current left/right values
-	for (int samp = 0; samp < samples; samp++)
-	{
-		outputs[0][samp] = m_left_data;
-		outputs[1][samp] = m_right_data;
-	}
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	outputs[0].fill(stream_buffer::sample_t(m_left_data) * sample_scale);
+	outputs[1].fill(stream_buffer::sample_t(m_right_data) * sample_scale);
 }
 
 

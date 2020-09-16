@@ -102,10 +102,10 @@ license:CC0
 
 		<element ref="text_game"><bounds x="85" y="115" width="8" height="2.5" /></element>
 		<element ref="text_sw"><bounds x="93" y="115" width="2.5" height="2.5" /></element>
-		<element ref="switch_game" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="93" y="115" width="4" height="2.5" /></element>
+		<element ref="switch_game" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="93" y="115" width="4" height="2.5" /></element>
 
 		<element ref="text_skill"><bounds x="110" y="115" width="8" height="2.5" /></element>
 		<element ref="text_sw"><bounds x="118" y="115" width="2.5" height="2.5" /></element>
-		<element ref="switch_skill" inputtag="IN.1" inputmask="0x07" inputraw="1"><bounds x="118" y="115" width="4" height="2.5" /></element>
+		<element ref="switch_skill" inputtag="IN.1" inputmask="0x07" inputraw="yes"><bounds x="118" y="115" width="4" height="2.5" /></element>
 	</view>
 </mamelayout>

@@ -10,7 +10,7 @@ license:CC0
 		<rect state="0">
 			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 1">
+		<text string="STOP 1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.2" width="1" height="0.6" />
 		</text>
@@ -23,7 +23,7 @@ license:CC0
 		<rect state="0">
 			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 2">
+		<text string="STOP 2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
@@ -40,7 +40,7 @@ license:CC0
 		<rect state="0">
 			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 3">
+		<text string="STOP 3">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>

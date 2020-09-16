@@ -199,9 +199,9 @@ license:CC0
 		<element ref="disk_black"><bounds x="8.5" y="18.9" width="0.5" height="0.5" /></element>
 		<element ref="static_black"><bounds x="7.8" y="18.9" width="1.0" height="0.5" /></element>
 
-		<element ref="switch1" inputtag="IN.2" inputmask="0x07" inputraw="1"><bounds x="7.55" y="18.85" width="0.6" height="0.6" /></element>
-		<element ref="switch2" inputtag="IN.2" inputmask="0x07" inputraw="1"><bounds x="8.00" y="18.85" width="0.6" height="0.6" /></element>
-		<element ref="switch3" inputtag="IN.2" inputmask="0x07" inputraw="1"><bounds x="8.45" y="18.85" width="0.6" height="0.6" /></element>
+		<element ref="switch1" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="7.55" y="18.85" width="0.6" height="0.6" /></element>
+		<element ref="switch2" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="8.00" y="18.85" width="0.6" height="0.6" /></element>
+		<element ref="switch3" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="8.45" y="18.85" width="0.6" height="0.6" /></element>
 
 	</view>
 </mamelayout>

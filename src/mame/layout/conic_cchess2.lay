@@ -467,8 +467,8 @@ license:CC0
 		<element ref="brown" blend="add"><bounds x="0" y="-1.2" width="88" height="18.5" /></element>
 		<element ref="bmask" blend="multiply"><bounds x="0" y="-1.2" width="88" height="18.5" /></element>
 
-		<element ref="switch" inputtag="IN.0" inputmask="0x0c" inputraw="1"><bounds x="22.5" y="2.3" width="3.5" height="11.4" /></element>
-		<element ref="switch" inputtag="IN.1" inputmask="0x03" inputraw="1"><bounds x="30.5" y="2.3" width="3.5" height="11.4" /></element>
+		<element ref="switch" inputtag="IN.0" inputmask="0x0c" inputraw="yes"><bounds x="22.5" y="2.3" width="3.5" height="11.4" /></element>
+		<element ref="switch" inputtag="IN.1" inputmask="0x03" inputraw="yes"><bounds x="30.5" y="2.3" width="3.5" height="11.4" /></element>
 		<element ref="but_dw" inputtag="RESET" inputmask="0x01"><bounds x="15.5" y="10.3" width="2.7" height="2.7" /></element>
 
 		<element ref="but_dw" inputtag="IN.4" inputmask="0x02"><bounds x="40.5" y="3" width="2.7" height="2.7" /></element>

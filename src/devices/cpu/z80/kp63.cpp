@@ -381,7 +381,7 @@ void kp63_device::write(offs_t offset, u8 data)
 				n,
 				s_count_modes[BIT(data, 2, 2)],
 				BIT(data, 1) ? 4 : BIT(data, 0) ? 16 : 256,
-				(data == 0x03) == 0x03 ? "effective" : "ignored",
+				(data & 0x03) == 0x03 ? "effective" : "ignored",
 				BIT(data, 4) ? 'H' : 'L');
 		m_status[n] = data & c_mode_mask;
 

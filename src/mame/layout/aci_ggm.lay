@@ -242,104 +242,104 @@ license:CC0
 		<element ref="brown" blend="add"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
 		<element ref="brown" blend="add"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
-		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
-		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
-		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
-		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
-		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
-		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
 		<!-- boris overlay -->
-		<element ref="text_boris01" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
-		<element ref="text_boris02" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
-		<element ref="text_boris03" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
-		<element ref="text_boris04" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="0.5" width="3.3" height="1.7" /></element>
-		<element ref="text_boris05" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
+		<element ref="text_boris01" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_boris02" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris03" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris04" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="0.5" width="3.3" height="1.7" /></element>
+		<element ref="text_boris05" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
 
-		<element ref="text_boris06a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.25" width="2.8" height="0.8" /></element>
-		<element ref="text_boris06b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.95" width="2.8" height="0.8" /></element>
-		<element ref="text_boris07" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_boris08" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_boris09" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_boris10" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
+		<element ref="text_boris06a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.9" y="4.25" width="2.8" height="0.8" /></element>
+		<element ref="text_boris06b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.9" y="4.95" width="2.8" height="0.8" /></element>
+		<element ref="text_boris07" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_boris08" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_boris09" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_boris10" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
 
-		<element ref="text_boris11" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
-		<element ref="text_boris12" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_boris13" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_boris14" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_boris15" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_boris11" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_boris12" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris13" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris14" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris15" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
 
-		<element ref="text_boris16" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
-		<element ref="text_boris17" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>
-		<element ref="text_boris18" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="1.7" /></element>
-		<element ref="text_boris19" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
-		<element ref="text_boris20" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_boris16" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_boris17" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_boris18" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_boris19" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_boris20" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
 
 		<!-- morphy overlay -->
-		<element ref="text_morphy01" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
-		<element ref="text_morphy02" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy03" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy04" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="1.0" width="3.3" height="0.8" /></element>
-		<element ref="text_morphy05" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy01" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy02" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy03" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy04" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy05" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
 
-		<element ref="text_morphy06a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.25" width="2.8" height="0.8" /></element>
-		<element ref="text_morphy06b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.95" width="2.8" height="0.8" /></element>
-		<element ref="text_morphy07" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy08" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy09" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy10" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy06a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.9" y="4.25" width="2.8" height="0.8" /></element>
+		<element ref="text_morphy06b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.9" y="4.95" width="2.8" height="0.8" /></element>
+		<element ref="text_morphy07" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy08" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy09" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy10" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
 
-		<element ref="text_morphy11" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
-		<element ref="text_morphy12" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy13" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy14" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy15" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy11" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy12" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy13" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy14" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy15" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
 
-		<element ref="text_morphy16" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
-		<element ref="text_morphy17" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>
-		<element ref="text_morphy18" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="1.7" /></element>
-		<element ref="text_morphy19" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
-		<element ref="text_morphy20" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy16" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy17" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_morphy18" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_morphy19" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy20" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
 
 		<!-- steinitz overlay -->
-		<element ref="red_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="16.15" y="7.15" width="3.2" height="2.7" /></element>
-		<element ref="brown_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="16.3" y="7.3" width="2.9" height="2.4" /></element>
+		<element ref="red_s3" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="16.15" y="7.15" width="3.2" height="2.7" /></element>
+		<element ref="brown_s3" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="16.3" y="7.3" width="2.9" height="2.4" /></element>
 
-		<element ref="green_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="0.15" y="10.65" width="3.2" height="2.7" /></element>
-		<element ref="brown_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="0.3" y="10.8" width="2.9" height="2.4" /></element>
+		<element ref="green_s3" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="0.15" y="10.65" width="3.2" height="2.7" /></element>
+		<element ref="brown_s3" inputtag="IN.6" inputmask="0x0f" inputraw="yes"><bounds x="0.3" y="10.8" width="2.9" height="2.4" /></element>
 
-		<element ref="text_steinitz01a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="0.5" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz01b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="1.5" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz02" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz03" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz04a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="0.5" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz04b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="1.5" width="3.3" height="1.1" /></element>
-		<element ref="text_steinitz05" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz01a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="0.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz01b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="1.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz02" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz03" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz04a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="0.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz04b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="1.5" width="3.3" height="1.1" /></element>
+		<element ref="text_steinitz05" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
 
-		<element ref="text_steinitz06a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="3.75" width="2.8" height="0.8" /></element>
-		<element ref="text_steinitz06b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.45" width="2.8" height="0.8" /></element>
-		<element ref="text_steinitz06c" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="5.4" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz07" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz08" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz09" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz10a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="4.0" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz10b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="5.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz06a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.9" y="3.75" width="2.8" height="0.8" /></element>
+		<element ref="text_steinitz06b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.9" y="4.45" width="2.8" height="0.8" /></element>
+		<element ref="text_steinitz06c" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="5.4" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz07" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz08" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz09" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz10a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="4.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz10b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="5.0" width="3.3" height="0.8" /></element>
 
-		<element ref="text_steinitz11a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="7.5" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz11b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="8.5" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz12" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz13" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz14" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz15" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz11a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="7.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz11b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="8.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz12" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz13" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz14" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz15" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
 
-		<element ref="text_steinitz16" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="11.0" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz17a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz17b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="12.0" width="3.3" height="1.1" /></element>
-		<element ref="text_steinitz18a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="10.25" width="3.3" height="1.5" /></element>
-		<element ref="text_steinitz18b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="10.8" width="3.3" height="1.5" /></element>
-		<element ref="text_steinitz18c" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="12.2" width="3.3" height="0.8" /></element>
-		<element ref="text_steinitz19" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
-		<element ref="text_steinitz20" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz16" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="11.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz17a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz17b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="12.0" width="3.3" height="1.1" /></element>
+		<element ref="text_steinitz18a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="10.25" width="3.3" height="1.5" /></element>
+		<element ref="text_steinitz18b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="10.8" width="3.3" height="1.5" /></element>
+		<element ref="text_steinitz18c" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="12.2" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz19" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz20" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
 
 		<!-- input highlights -->
 		<element ref="hl" inputtag="IN.3" inputmask="0x08"><bounds x="0"  y="0" width="3.5" height="3" /><color alpha="0.22" /></element>
