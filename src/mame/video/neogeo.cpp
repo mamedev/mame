@@ -13,10 +13,12 @@
 
 #define VERBOSE     (0)
 
+
 void neogeo_base_state::set_pens()
 {
-	m_sprgen->set_pens(m_palette->pens());
-	m_bg_pen = m_palette->pens() + m_palette->get_backdrop_pen();
+	const pen_t *pen_base = m_palette->pens();
+	m_sprgen->set_pens(pen_base);
+	m_bg_pen = pen_base + m_palette->get_backdrop_pen();
 }
 
 
@@ -29,7 +31,7 @@ WRITE_LINE_MEMBER(neogeo_base_state::set_screen_shadow)
 
 WRITE_LINE_MEMBER(neogeo_base_state::set_palette_bank)
 {
-	m_palette->set_bank(state);
+	m_palette->set_bank(state ? 1 : 0);
 	set_pens();
 }
 

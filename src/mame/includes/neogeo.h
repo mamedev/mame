@@ -122,7 +122,7 @@ protected:
 	required_device<neosprite_optimized_device> m_sprgen;
 
 	required_device<screen_device> m_screen;
-	optional_device<neogeo_palette_device> m_palette;
+	optional_device<alpha68k_palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
 	required_device<hc259_device> m_systemlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -199,12 +199,6 @@ private:
 	uint16_t get_video_control();
 
 	required_device<input_merger_device> m_audionmi;
-
-	// color/palette related
-	std::vector<uint16_t> m_paletteram;
-	uint8_t      m_palette_lookup[32][4];
-	int          m_screen_shadow;
-	int          m_palette_bank;
 };
 
 

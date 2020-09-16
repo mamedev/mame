@@ -1715,7 +1715,7 @@ void neogeo_base_state::base_main_map(address_map &map)
 	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(FUNC(neogeo_base_state::video_register_r));
 	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(FUNC(neogeo_base_state::video_register_w));
 	map(0x3e0000, 0x3fffff).r(FUNC(neogeo_base_state::unmapped_r));
-	map(0x400000, 0x401fff).mirror(0x3fe000).rw(m_palette, FUNC(neogeo_palette_device::read), FUNC(neogeo_palette_device::write));
+	map(0x400000, 0x401fff).mirror(0x3fe000).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 }
 
 void ngarcade_base_state::neogeo_main_map(address_map &map)
@@ -1942,7 +1942,10 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	m_screen->set_screen_update(FUNC(neogeo_base_state::screen_update));
 
 	/* 4096 colors * two banks * normal and shadow */
-	NEOGEO_PALETTE(config, m_palette, 0).set_entries(4096);
+	ALPHA68K_PALETTE(config, m_palette, 0);
+	m_palette->set_entries(4096);
+	m_palette->set_banknum(2);
+	m_palette->set_has_shadow(true);
 
 	NEOGEO_SPRITE_OPTIMZIED(config, m_sprgen, 0).set_screen(m_screen);
 
