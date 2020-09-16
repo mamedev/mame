@@ -55,6 +55,7 @@ alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, 
 	, m_entries(4096)
 	, m_bank(0)
 	, m_bank_base(0)
+	, m_shadow(false)
 	, m_shadow_base(m_entries)
 {
 }
