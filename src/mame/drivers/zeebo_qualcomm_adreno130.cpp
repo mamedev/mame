@@ -22,7 +22,7 @@ System was launched in 2009, but discontinued shortly after.
 
 Games were downloaded to NAND, but once the online store was closed the games could
 no longer be downloaded, leaving no way to get them back onto the system after
-after a factory restore or similar.
+doing a factory restore or similar.
 
 ----
 
