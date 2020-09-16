@@ -291,7 +291,7 @@ function cheat.startplugin()
 	end
 
 	local function bpset(cheat, dev, addr, func)
-		if cheat:is_oneshot() then
+		if cheat.is_oneshot then
 			error("bpset not permitted in oneshot cheat")
 			return
 		end
@@ -300,7 +300,7 @@ function cheat.startplugin()
 	end
 
 	local function wpset(cheat, dev, space, wptype, addr, len, func)
-		if cheat:is_oneshot() then
+		if cheat.is_oneshot then
 			error("wpset not permitted in oneshot cheat")
 			return
 		end
@@ -367,7 +367,7 @@ function cheat.startplugin()
 	end
 
 	local function input_run(cheat, list)
-		if not cheat:is_oneshot() then
+		if not cheat.is_oneshot then
 			cheat.enabled = false
 			error("input_run only allowed in one shot cheats")
 			return
@@ -393,7 +393,7 @@ function cheat.startplugin()
 
 	-- return is current state, ui change
 	local function set_enabled(cheat, state)
-		if cheat:is_oneshot() then
+		if cheat.is_oneshot then
 			if state then
 				if cheat.parameter and cheat.script.change and cheat.parameter.index ~= 0 then
 					param_calc(cheat.parameter)
@@ -436,7 +436,7 @@ function cheat.startplugin()
 			end
 			param_calc(param)
 			cheat.cheat_env.param = param.value
-			if not cheat:is_oneshot() then
+			if not cheat.is_oneshot then
 				run_if(cheat, cheat.script.change)
 			end
 		end
@@ -462,7 +462,7 @@ function cheat.startplugin()
 		cheat.enabled = false
 		cheat.set_enabled = set_enabled;
 		cheat.get_enabled = function(cheat) return cheat.enabled end
-		cheat.is_oneshot = function(cheat) return cheat.script and not cheat.script.run and not cheat.script.off end
+		cheat.is_oneshot = cheat.script and not cheat.script.run and not cheat.script.off
 
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -578,13 +578,6 @@ function cheat.startplugin()
 		end
 		cheat.get_index = function(cheat) return cheat.parameter.index end
 		cheat.get_value = function(cheat) return cheat.parameter.value end
-		cheat.get_text = function(cheat)
-			if cheat.parameter.item then
-				return cheat.parameter.item[cheat.parameter.index].text
-			else
-				return cheat.parameter.value
-			end
-		end
 		param.min = tonumber(param.min) or 0
 		param.max = tonumber(param.max) or #param.item
 		param.step = tonumber(param.step) or 1
@@ -664,7 +657,7 @@ function cheat.startplugin()
 					end
 					menu[num][2] = ""
 					menu[num][3] = "off"
-				elseif cheat:is_oneshot() then
+				elseif cheat.is_oneshot then
 					menu[num][2] = _("Set")
 					menu[num][3] = 0
 				else
@@ -678,7 +671,7 @@ function cheat.startplugin()
 				end
 			else
 				if cheat.parameter.index == 0 then
-					if cheat:is_oneshot() then
+					if cheat.is_oneshot then
 						menu[num][2] = _("Set")
 					else
 						menu[num][2] = _("Off")
@@ -754,7 +747,7 @@ function cheat.startplugin()
 				local idx, chg = cheat:set_index(cheat:get_index() - 1)
 				return chg
 			else
-				if not cheat:is_oneshot() then
+				if not cheat.is_oneshot then
 					return cheat:set_enabled(false)
 				end
 				return false
@@ -764,17 +757,23 @@ function cheat.startplugin()
 				local idx, chg = cheat:set_index(cheat:get_index() + 1)
 				return chg
 			else
-				if not cheat:is_oneshot() then
+				if not cheat.is_oneshot then
 					local state, chg = cheat:set_enabled(true)
 					return chg
 				end
 				return false
 			end
 		elseif event == "select" then
-			if cheat:is_oneshot() then
+			if cheat.is_oneshot then
 				cheat:set_enabled(true)
 				if cheat.parameter and cheat.script.change and cheat:get_index() ~= 0 then
-					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, cheat:get_text()))
+					local itemtext
+					if cheat.parameter.item then
+						itemtext = cheat.parameter.item[cheat.parameter.index].text
+					else
+						itemtext = cheat.parameter.value
+					end
+					manager:machine():popmessage(string.format(_("Activated: %s = %s"), cheat.desc, itemtext))
 				elseif not cheat.parameter and cheat.script.on then
 					manager:machine():popmessage(string.format(_("Activated: %s"), cheat.desc))
 				end
@@ -830,7 +829,7 @@ function cheat.startplugin()
 			if cheat.hotkeys and cheat.hotkeys.keys then
 				if manager:machine():input():seq_pressed(cheat.hotkeys.keys) then
 					if not cheat.hotkeys.pressed then
-						if cheat:is_oneshot() then
+						if cheat.is_oneshot then
 							if not run_if(cheat, cheat.script.change) then
 								run_if(cheat, cheat.script.on)
 							end
@@ -914,7 +913,7 @@ function cheat.startplugin()
 			get_enabled = function() return cheat:get_enabled() end,
 			set_enabled = function(status) return cheat:set_enabled(status) end,
 			desc = cheat.desc,
-			is_oneshot = cheat:is_oneshot(),
+			is_oneshot = cheat.is_oneshot,
 			comment = cheat.comment,
 			get_hotkeys = function() if cheat.hotkeys then return cheat.hotkeys.keys end return nil end,
 			set_hotkeys = function(seq) cheat.hotkeys = { pressed = false, keys = manager:machine():input():seq_clean(seq) } end
