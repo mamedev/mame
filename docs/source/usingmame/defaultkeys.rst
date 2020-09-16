@@ -412,9 +412,9 @@ Default Gambling Keys
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
-Note that many gambling games use a buttons for multiple functions.  For example
-a slots game may use the Start button to stop all reels, lacking a dedicated
-Stop All Reels button, or a poker game may use the hold buttons to control the
+Note that many gambling games use buttons for multiple functions.  For example a
+slots game may use the Start button to stop all reels, lacking a dedicated Stop
+All Reels button, or a poker game may use the hold buttons to control the
 double-up bonus game, lacking dedicated Take Score, Double Up, High and Low
 buttons.
 
