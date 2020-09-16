@@ -35,7 +35,7 @@ Language:
 |   XX   | 80-084005(FR)     | Sporti'Folies                                                                             |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                                              |
 |   XX   | 80-084007(SP)     | Action Manía                                                                              |
-|        | 80-084008(CN)     | 英语运动园                                                                                 |
+|   XX   | 80-084008(CN)     | 英语运动园                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   **   | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version, same ROM as 80-084020(US))    |
@@ -329,6 +329,20 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="84007 G.u1" size="8388608" crc="c14a04d2" sha1="6db09fd90f88773aafd5d95c4ea403dacddc9e58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnmniamcn" cloneof="actnmniam6">
+		<description>Yingyu Yundongyuan (China)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084008(CHN)" />
+		<info name="alt_title" value="英语运动园"/>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="[80-084008(CHN)] (Yingyu Yundongyuan) [Action Mania] (CN).bin" size="0x800000" crc="e9fab386" sha1="9f2b3ab9c3c217ae50c398a6ea080141efabc1fc" />
 			</dataarea>
 		</part>
 	</software>
