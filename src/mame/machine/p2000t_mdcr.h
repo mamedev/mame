@@ -22,93 +22,6 @@
 #pragma once
 
 #include "imagedev/cassette.h"
-#include <queue>
-
-/// \brief A Phase Decoder used in a Philips MDCR220 Mini Cassette Recorder
-///
-/// A phase decoder is capable of converting a signal stream into a
-/// a series of bits that go together with a clock signal. This phase
-/// decoder is conform to what you would find in an Philips MDCR220
-///
-/// Signals are converted into bits whenever the line signal
-/// changes from low to high and vice versa on a clock signal.
-///
-/// A transition on a clock boundary from low to high is a 1.
-/// A transition on a clock boundary from high to low is a 0
-/// An intermediate transition halfway between the clock boundary
-/// can occur when there are consecutive 0s or 1s. See the example
-/// below where the clock is marked by a |
-///
-///          1    0    1    1    0    0
-///   RDA:  _|----|____|--__|----|__--|__--
-///   RDC:  _|-___|-___|-___|-___|-___|-___
-///          ^                      ^
-///          |-- clock signal       |-- intermediate transition.
-///
-/// This particular phase decoder expects a signal of
-/// 1010 1010 which is used to derive the clock T.
-/// after a reset.
-class phase_decoder
-{
-	using time_in_seconds = double;
-	using timed_bit       = std::pair<bool, time_in_seconds>;
-	using timing_queue    = std::queue<timed_bit>;
-
-public:
-	/// Creates a phase decoder with the given tolerance.
-	phase_decoder(double tolerance = 0.15);
-
-	/// \brief read clock that is high when a bit is available at read_data.
-	///
-	/// A clock that will be true when there is a read is possible.
-	/// The read clock will return true if a bit can be read, and is
-	/// a timed signal.
-	///
-	/// Keep in mind that read_clock can be high for quite a while!
-	/// so you should check that it goes low before doing another read.
-	///
-	/// If the clock runs on time T then the readclock should be high for:
-	/// - a minimum of 0,55T
-	/// - ideal        0,75T
-	/// - a maximum of 0,95T
-	bool read_clock();
-
-	/// The current bit, only valid when read_clock is true.
-	bool read_data();
-
-	/// Pulls the bit out of the queue.
-	bool pull_bit();
-
-	/// The current derived clock period.
-	time_in_seconds clock_period() { return m_clock_period; }
-
-	/// Returns true if a new bit can be read (i.e. read_clock() == true)
-	bool signal(bool state, double delay);
-
-	/// Reset the clock state, the system will now need to resynchronize on 0xAA.
-	void reset();
-
-private:
-	// add a bit and reset the current clock.
-	void add_bit(bool bit);
-
-	// tries to sync up the signal and calculate the clockperiod.
-	bool sync_signal(bool state);
-
-	// y * (1 - tolerance) < x < y * (1 + tolerance)
-	bool within_tolerance(double x, double y);
-
-	bool m_last_signal;
-	double m_tolerance;
-	int m_needs_sync;
-	timing_queue m_bit_queue;
-	time_in_seconds m_last_signal_time;
-	time_in_seconds m_current_clock;
-	time_in_seconds m_clock_period;
-
-	static constexpr int SYNCBITS    = 7;
-	static constexpr int QUEUE_DELAY = 2;
-};
 
 /// \brief Models a MCR220 Micro Cassette Recorder
 ///
@@ -160,11 +73,80 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	/// \brief A Phase Decoder used in a Philips MDCR220 Mini Cassette Recorder
+	///
+	/// A phase decoder is capable of converting a signal stream into a
+	/// a series of bits that go together with a clock signal. This phase
+	/// decoder is conform to what you would find in an Philips MDCR220
+	///
+	/// Signals are converted into bits whenever the line signal
+	/// changes from low to high and vice versa on a clock signal.
+	///
+	/// A transition on a clock boundary from low to high is a 1.
+	/// A transition on a clock boundary from high to low is a 0
+	/// An intermediate transition halfway between the clock boundary
+	/// can occur when there are consecutive 0s or 1s. See the example
+	/// below where the clock is marked by a |
+	///
+	///          1    0    1    1    0    0
+	///   RDA:  _|----|____|--__|----|__--|__--
+	///   RDC:  _|-___|-___|-___|-___|-___|-___
+	///          ^                      ^
+	///          |-- clock signal       |-- intermediate transition.
+	///
+	/// This particular phase decoder expects a signal of
+	/// 1010 1010 which is used to derive the clock T.
+	/// after a reset.
+	class phase_decoder
+	{
+		using time_in_seconds = double;
+
+	public:
+		/// Creates a phase decoder with the given tolerance.
+		phase_decoder(double tolerance = 0.15);
+
+		/// Pulls the bit out of the queue.
+		bool pull_bit();
+
+		/// Returns true if a new bit can be read, you can now pull the bit.
+		bool signal(bool state, double delay);
+
+		/// Reset the clock state, the system will now need to resynchronize on 0xAA.
+		void reset();
+
+	private:
+		// add a bit and reset the current clock.
+		void add_bit(bool bit);
+
+		// tries to sync up the signal and calculate the clockperiod.
+		bool sync_signal(bool state);
+
+		// y * (1 - tolerance) < x < y * (1 + tolerance)
+		bool within_tolerance(double x, double y);
+
+		double m_tolerance;
+
+		static constexpr int SYNCBITS    = 7;
+		static constexpr int QUEUE_DELAY = 2;
+
+	public:
+		// Needed for save state.
+		bool m_last_signal{ false };
+		int m_needs_sync{ SYNCBITS };
+		uint8_t m_bit_queue{ 0 };
+		uint8_t m_bit_place{ 0 };
+		time_in_seconds m_current_clock{ 0 };
+		time_in_seconds m_clock_period{ 0 };
+	};
+
+
 	void write_bit(bool bit);
 	void rewind();
 	void forward();
@@ -179,13 +161,16 @@ private:
 
 	bool m_recording{ false };
 	double m_fwd_pulse_time{ 0 };
+	double m_last_tape_time{ 0 };
+	double m_save_tape_time{ 0 };
+
 	required_device<cassette_image_device> m_cassette;
 	phase_decoder m_phase_decoder;
 
 	// timers
 	emu_timer *m_read_timer;
-	double m_last_tape_time{ 0 };
 };
+
 
 DECLARE_DEVICE_TYPE(MDCR, mdcr_device)
 

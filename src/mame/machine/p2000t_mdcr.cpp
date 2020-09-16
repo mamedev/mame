@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#include "p2000t_mdcr.h"
 #include "emu.h"
+#include "p2000t_mdcr.h"
 #include "formats/p2000t_cas.h"
 
 DEFINE_DEVICE_TYPE(MDCR, mdcr_device, "mdcr", "Philips Mini DCR")
@@ -103,6 +103,33 @@ void mdcr_device::device_start()
 {
 	m_read_timer = timer_alloc();
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+
+	save_item(NAME(m_fwd));
+	save_item(NAME(m_rev));
+	save_item(NAME(m_rdc));
+	save_item(NAME(m_rda));
+	save_item(NAME(m_wda));
+	save_item(NAME(m_recording));
+	save_item(NAME(m_fwd_pulse_time));
+	save_item(NAME(m_last_tape_time));
+	save_item(NAME(m_save_tape_time));
+	// Phase decoder
+	save_item(STRUCT_MEMBER(m_phase_decoder, m_last_signal));
+	save_item(STRUCT_MEMBER(m_phase_decoder, m_needs_sync));
+	save_item(STRUCT_MEMBER(m_phase_decoder, m_bit_queue));
+	save_item(STRUCT_MEMBER(m_phase_decoder, m_bit_place));
+	save_item(STRUCT_MEMBER(m_phase_decoder, m_current_clock));
+	save_item(STRUCT_MEMBER(m_phase_decoder, m_clock_period));
+}
+
+void mdcr_device::device_pre_save()
+{
+	m_save_tape_time = m_cassette->get_position();
+}
+
+void mdcr_device::device_post_load()
+{
+	m_cassette->seek(m_save_tape_time, SEEK_SET);
 }
 
 void mdcr_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -184,42 +211,23 @@ void p2000_mdcr_devices(device_slot_interface &device)
 // phase_decoder
 //
 
-phase_decoder::phase_decoder(double tolerance)
+mdcr_device::phase_decoder::phase_decoder(double tolerance)
 : m_tolerance(tolerance)
 {
 	reset();
 }
 
-bool phase_decoder::read_clock()
+bool mdcr_device::phase_decoder::pull_bit()
 {
-	if (m_bit_queue.empty())
+	if (m_bit_place == 0)
 		return false;
-
-	// Note that this can be 0 when we read the first ever bit.
-	timed_bit bit = m_bit_queue.front();
-	return m_current_clock < (bit.second * 0.75);
+	auto res = BIT(m_bit_queue, 0);
+	m_bit_place--;
+	m_bit_queue >>= 1;
+	return res;
 }
 
-bool phase_decoder::read_data()
-{
-	if (m_bit_queue.empty())
-		return false;
-
-	return m_bit_queue.front().first;
-};
-
-bool phase_decoder::pull_bit()
-{
-	if (m_bit_queue.empty())
-	{
-		return false;
-	}
-	auto bit = m_bit_queue.front().first;
-	m_bit_queue.pop();
-	return bit;
-}
-
-bool phase_decoder::signal(bool state, double delay)
+bool mdcr_device::phase_decoder::signal(bool state, double delay)
 {
 	m_current_clock += delay;
 	if (state == m_last_signal)
@@ -253,55 +261,45 @@ bool phase_decoder::signal(bool state, double delay)
 
 	// We went out of sync, our clock is wayyy out of bounds.
 	if (m_current_clock > m_clock_period)
-	{
 		reset();
-	}
 
 	// We are likely halfway in our clock signal..
 	return false;
 };
 
-void phase_decoder::reset()
+void mdcr_device::phase_decoder::reset()
 {
-	m_last_signal      = false;
-	m_last_signal_time = {};
-	m_current_clock    = {};
-	m_clock_period     = {};
-	m_needs_sync       = SYNCBITS;
+	m_last_signal   = false;
+	m_current_clock = {};
+	m_clock_period  = {};
+	m_needs_sync    = SYNCBITS;
 }
 
-void phase_decoder::add_bit(bool bit)
+void mdcr_device::phase_decoder::add_bit(bool bit)
 {
-	m_bit_queue.push(std::make_pair(bit, m_clock_period));
-	if (m_bit_queue.size() > QUEUE_DELAY)
-	{
-		m_bit_queue.pop();
-	}
+	if (bit)
+		m_bit_queue |= bit << m_bit_place;
+	else
+		m_bit_queue &= ~(bit << m_bit_place);
+
+	if (m_bit_place <= QUEUE_DELAY)
+		m_bit_place++;
+
 	m_current_clock = {};
 }
 
-bool phase_decoder::sync_signal(bool state)
+bool mdcr_device::phase_decoder::sync_signal(bool state)
 {
 	m_needs_sync--;
 	if (m_needs_sync == SYNCBITS - 1)
 	{
-		// First bit!
+		// We can only synchronize when we go up
+		// on the first bit.
 		if (state)
-		{
-			// We can only synchronize when we go up
-			// on the first bit.
 			add_bit(true);
-		}
 		return false;
 	}
-	if (m_needs_sync == SYNCBITS - 2)
-	{
-		static_assert(SYNCBITS >= 2, "Need at least 2 bits to synchronize!");
-		// Update the clock period of the bit we just added to the queue.
-		m_clock_period            = m_current_clock;
-		m_bit_queue.back().second = m_clock_period;
-	}
-	if (!within_tolerance(m_current_clock, m_clock_period))
+	if (m_clock_period != 0 && !within_tolerance(m_current_clock, m_clock_period))
 	{
 		// Clock is way off!
 		reset();
@@ -309,14 +307,14 @@ bool phase_decoder::sync_signal(bool state)
 	}
 
 	// We've derived a clock period, we will use the average.
-	auto div       = SYNCBITS - m_needs_sync;
+	auto div       = SYNCBITS - m_needs_sync - 1;
 	m_clock_period = ((div - 1) * m_clock_period + m_current_clock) / div;
 	add_bit(state);
 	return true;
 }
 
 // y * (1 - tolerance) < x < y * (1 + tolerance)
-bool phase_decoder::within_tolerance(double x, double y)
+bool mdcr_device::phase_decoder::within_tolerance(double x, double y)
 {
 	assert(m_tolerance > 0 && m_tolerance < 1);
 	return (y * (1 - m_tolerance)) < x && x < (y * (1 + m_tolerance));
