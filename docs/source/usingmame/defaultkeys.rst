@@ -321,6 +321,10 @@ the standard keyboard configuration.
     Coin slot 3
 **8**
     Coin slot 4
+**Backspace**
+    Bill 1 (For machines that have a bill receptor/note reader)
+**Y**
+    Player 1 Mahjong/Hanafuda Flip Flop
 **1**
     Player 1 start or 1 player mode
 **2**
@@ -331,17 +335,16 @@ the standard keyboard configuration.
     Mahjong Bet
 **4**
     Player 4 start or 4 players mode
+**Right Ctrl**
+    Player 1 Mahjong/Hanafuda Take Score
+**Right Shift**
+    Player 1 Mahjong/Hanafuda Double Up
+**Enter**
+    Player 1 Mahjong/Hanafuda Big
 **Backspace**
-    Bill 1 (For machines that have a bill receptor/note reader)
-**9**
-    Service 1 (Service buttons are typically used to give free credits or to
-    navigate the internal operator service menus)
-**0**
-    Service 2
-**-** (not numeric keypad)
-    Service 3
-**=** (not numeric keypad)
-    Service 4
+    Player 1 Mahjong/Hanafuda Small
+**Right Alt**
+    Player 1 Mahjong/Hanafuda Last Chance
 **Ctrl**
     Mahjong Kan
 **Alt**
@@ -378,31 +381,27 @@ the standard keyboard configuration.
     Player 1 Mahjong L
 **M**
     Player 1 Mahjong M
+
+    Player 1 Hanafuda Yes
 **N**
     Player 1 Mahjong N
+
+    Player 1 Hanafuda No
 **O**
     Player 1 Taiwanese Mahjong O
-**P**
+**Semicolon**
     Player 1 Taiwanese Mahjong P
 **Q**
     Player 1 Taiwanese Mahjong Q
-**Right Alt**
-    Player 1 Mahjong/Hanafuda Last Chance
-**Right Ctrl**
-    Player 1 Mahjong/Hanafuda Take Score
-**Right Shift**
-    Player 1 Mahjong/Hanafuda Double Up
-**Y**
-    Player 1 Mahjong/Hanafuda Flip/Flop
-**Enter**
-    Player 1 Mahjong/Hanafuda Big
-**Backspace**
-    Player 1 Mahjong/Hanafuda Small
 **9**
     Service 1 (Service buttons are typically used to give free credits or to
     navigate the internal operator service menus)
 **0**
-    Book-Keeping
+    Service 2
+**-** (not numeric keypad)
+    Service 3
+**=** (not numeric keypad)
+    Service 4
 
 
 .. _default-gambling-keys:
@@ -413,6 +412,12 @@ Default Gambling Keys
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
+Note that many gambling games use a buttons for multiple functions.  For example
+a slots game may use the Start button to stop all reels, lacking a dedicated
+Stop All Reels button, or a poker game may use the hold buttons to control the
+double-up bonus game, lacking dedicated Take Score, Double Up, High and Low
+buttons.
+
 
 **5**
     Coin slot 1
@@ -422,10 +427,10 @@ the standard keyboard configuration.
     Coin slot 3
 **8**
     Coin slot 4
-**1**
-    Player 1 start or 1 player mode
 **Backspace**
     Bill 1 (For machines that have a bill receptor/note reader)
+**I**
+    Payout
 **Q**
     Key In
 **W**
@@ -440,93 +445,58 @@ the standard keyboard configuration.
     Service 3
 **=** (not numeric keypad)
     Service 4
+**M**
+    Bet
+**1**
+    Player 1 start or 1 player mode
 **2**
     Deal
 **L**
     Stand
-**M**
-    Bet
-**I**
-    Payout
-**O**
-    Door
-**D**
-    Half Gamble
-**3**
-    Double Up
 **4**
     Take Score
+**3**
+    Double Up
+**D**
+    Half Gamble
 **A**
     High
 **S**
     Low
+**O**
+    Door
+**0**
+    Book-Keeping
+
 
 .. _default-blackjack-keys:
 
 Default Blackjack Keys
-======================
+----------------------
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 
-**5**
-    Coin slot 1
-**6**
-    Coin slot 2
-**7**
-    Coin slot 3
-**8**
-    Coin slot 4
 **1**
     Player 1 start or 1 player mode
-**Backspace**
-    Bill 1 (For machines that have a bill receptor/note reader)
-**Q**
-    Key In
-**W**
-    Key Out
-**9**
-    Service 1 (Service buttons are typically used to give free credits or to
-    navigate the internal operator service menus)
-**0**
-    Service 2
-    Book-Keeping (for machines that have this functionality)
-**-** (not numeric keypad)
-    Service 3
-**=** (not numeric keypad)
-    Service 4
 **2**
     Deal
 **L**
     Stand
-**M**
-    Bet
-**I**
-    Payout
-**O**
-    Door
-**D**
-    Half Gamble
-**3**
-    Double Up
-**4**
-    Take Score
-**A**
-    High
-**S**
-    Low
 
 
 .. _default-poker-keys:
 
 Default Poker Keys
-==================
+------------------
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 
+**1**
+    Player 1 start or 1 player mode
 **2**
     Deal
 **Z**
@@ -541,19 +511,19 @@ the standard keyboard configuration.
     Hold 5
 **N**
     Cancel
-**1**
-    Bet
 
 
 .. _default-slots-keys:
 
 Default Slots Keys
-==================
+------------------
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 
+**1**
+    Player 1 start or 1 player mode
 **X**
     Stop Reel 1
 **C**
@@ -564,6 +534,7 @@ the standard keyboard configuration.
     Stop Reel 4
 **Z**
     Stop All Reels
+
 
 .. _default-computer-keys:
 

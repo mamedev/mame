@@ -217,13 +217,13 @@ enum ioport_type
 		IPT_MAHJONG_CHI,
 		IPT_MAHJONG_REACH,
 		IPT_MAHJONG_RON,
+		IPT_MAHJONG_FLIP_FLOP,
 		IPT_MAHJONG_BET,
-		IPT_MAHJONG_LAST_CHANCE,
 		IPT_MAHJONG_SCORE,
 		IPT_MAHJONG_DOUBLE_UP,
-		IPT_MAHJONG_FLIP_FLOP,
 		IPT_MAHJONG_BIG,
 		IPT_MAHJONG_SMALL,
+		IPT_MAHJONG_LAST_CHANCE,
 
 	IPT_MAHJONG_LAST,
 
@@ -256,15 +256,15 @@ enum ioport_type
 	//  IPT_GAMBLE_DOOR4,
 	//  IPT_GAMBLE_DOOR5,
 
+		IPT_GAMBLE_PAYOUT,  // player
+		IPT_GAMBLE_BET,     // player
+		IPT_GAMBLE_DEAL,    // player
+		IPT_GAMBLE_STAND,   // player
+		IPT_GAMBLE_TAKE,    // player
+		IPT_GAMBLE_D_UP,    // player
+		IPT_GAMBLE_HALF,    // player
 		IPT_GAMBLE_HIGH,    // player
 		IPT_GAMBLE_LOW,     // player
-		IPT_GAMBLE_HALF,    // player
-		IPT_GAMBLE_DEAL,    // player
-		IPT_GAMBLE_D_UP,    // player
-		IPT_GAMBLE_TAKE,    // player
-		IPT_GAMBLE_STAND,   // player
-		IPT_GAMBLE_BET,     // player
-		IPT_GAMBLE_PAYOUT,  // player
 
 		// poker-specific inputs
 		IPT_POKER_HOLD1,
@@ -273,7 +273,6 @@ enum ioport_type
 		IPT_POKER_HOLD4,
 		IPT_POKER_HOLD5,
 		IPT_POKER_CANCEL,
-		IPT_POKER_BET,
 
 		// slot-specific inputs
 		IPT_SLOT_STOP1,
