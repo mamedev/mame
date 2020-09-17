@@ -1411,7 +1411,7 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/adam_cas.h,FORMATS["ADAM_CAS"] = true
+--@src/lib/formats/p2000t_cas.h,FORMATS["P2000T_CAS"] = true
 --------------------------------------------------
 
 if (FORMATS["P2000T_CAS"]~=null  or _OPTIONS["with-tools"]) then
