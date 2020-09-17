@@ -4,7 +4,8 @@
 
     Prehistoric Isle in 1930 (World)        (c) 1989 SNK
     Prehistoric Isle in 1930 (USA)          (c) 1989 SNK
-    Genshi-Tou 1930's (Japan)               (c) 1989 SNK
+    原始島(Wonsido) 1930's (Korea)           (c) 1989 SNK / Victor
+    原始島(Genshitō) 1930's (Japan)          (c) 1989 SNK
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
@@ -396,9 +397,9 @@ ROM_END
 
 /******************************************************************************/
 
-
+//原始島(Shared Title GFX for Japan and Korea set, JP: げんしとう-Genshitō; KR: 원시도-Wonsido)/Prehistoric Isle in 1930(English)
 GAME( 1989, prehisle,  0,        prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1989, prehisleu, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, prehislek, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gensitou,  prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Genshi-Tou 1930's",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehislek, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK (Victor license)", "Wonsido 1930's (Korea)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gensitou,  prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Genshitou 1930's",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1989, prehisleb, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "bootleg",              "Prehistoric Isle in 1930 (World, bootleg)", MACHINE_SUPPORTS_SAVE )
