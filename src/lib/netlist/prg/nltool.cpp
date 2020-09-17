@@ -694,18 +694,22 @@ void tool_app_t::static_compile()
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_out()));
 
 		sout << "#include \"plib/pdynlib.h\"\n\n";
+		sout << "#if !defined(__EMSCRIPTEN__)\n\n";
 		for (auto &e : map)
 		{
 			sout << "// " << putf8string(e.second.m_module) << "\n";
 			sout << putf8string(e.second.m_code);
 		}
+		sout << "#endif\n\n";
 		sout << "extern const plib::dynlib_static_sym nl_static_solver_syms[];\n";
 		sout << "const plib::dynlib_static_sym nl_static_solver_syms[] = {\n";
+		sout << "#if !defined(__EMSCRIPTEN__)\n\n";
 		for (auto &e : map)
 		{
 			sout << "// " << putf8string(e.second.m_module) << "\n";
 			sout << "\t{\"" << putf8string(e.first) << "\", reinterpret_cast<void *>(&" << putf8string(e.first) << ")},\n";
 		}
+		sout << "#endif\n\n";
 		sout << "{\"\", nullptr}\n";
 		sout << "};\n";
 

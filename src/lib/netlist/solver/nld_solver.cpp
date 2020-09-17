@@ -227,6 +227,7 @@ namespace devices
 		std::size_t net_count = nets.size();
 		switch (net_count)
 		{
+#if !defined(__EMSCRIPTEN__)
 			case 1:
 				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, device_arena>(*this, sname, nets, params);
 			case 2:
@@ -243,6 +244,7 @@ namespace devices
 				return create_solver<FT, 7>(7, sname, params, nets);
 			case 8:
 				return create_solver<FT, 8>(8, sname, params, nets);
+#endif
 			default:
 				log().info(MI_NO_SPECIFIC_SOLVER(net_count));
 				if (net_count <= 16)

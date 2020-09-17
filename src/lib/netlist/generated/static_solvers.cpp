@@ -1,5 +1,7 @@
 #include "plib/pdynlib.h"
 
+#if !defined(__EMSCRIPTEN__)
+
 // elim
 static void nl_gcr_11c2ae166b240b6e_10_double_double(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
@@ -72411,8 +72413,12 @@ static void nl_gcr_feae15b80dd73620_7_double_double(double * __restrict V, const
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
+#endif
+
 extern const plib::dynlib_static_sym nl_static_solver_syms[];
 const plib::dynlib_static_sym nl_static_solver_syms[] = {
+#if !defined(__EMSCRIPTEN__)
+
 // elim
 	{"nl_gcr_11c2ae166b240b6e_10_double_double", reinterpret_cast<void *>(&nl_gcr_11c2ae166b240b6e_10_double_double)},
 // tankbatt
@@ -72809,5 +72815,7 @@ const plib::dynlib_static_sym nl_static_solver_syms[] = {
 	{"nl_gcr_fd2796828f1ebd00_36_double_double", reinterpret_cast<void *>(&nl_gcr_fd2796828f1ebd00_36_double_double)},
 // starfire
 	{"nl_gcr_feae15b80dd73620_7_double_double", reinterpret_cast<void *>(&nl_gcr_feae15b80dd73620_7_double_double)},
+#endif
+
 {"", nullptr}
 };
