@@ -137,6 +137,11 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 				if (m_fifo_cap_a < 0x1ff)
 				{
 					m_regs[R_FIFOSTAT-0x800] |= 1;  // fifo A less than half full
+
+					if (m_fifo_cap_a == 0)   // fifo A fully empty
+					{
+						m_regs[R_FIFOSTAT-0x800] |= 2;  // fifo A empty
+					}
 				}
 			}
 			break;
