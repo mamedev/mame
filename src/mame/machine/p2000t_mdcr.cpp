@@ -137,7 +137,7 @@ void mdcr_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	if (!m_recording && m_cassette->motor_on())
 	{
 		// Account for moving backwards.
-		auto delay = abs(m_cassette->get_position() - m_last_tape_time);
+		auto delay = std::abs(m_cassette->get_position() - m_last_tape_time);
 
 		// Decode the signal using the fake phase decode circuit
 		bool newBit = m_phase_decoder.signal((m_cassette->input() > +0.04), delay);
