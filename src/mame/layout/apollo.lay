@@ -7,9 +7,9 @@ license:CC0
 
 <mamelayout version="2">
 
-	<element name="internal_led"> <disk> <color red="1.0" green="1.0" blue="1.0" /> </disk> </element>
-	<element name="external_led"> <disk> <color red="0.666" green="0.555" blue="0.0" /> </disk> </element>
-	<element name="power_led"> <disk> <color red="0.0" green="1.0" blue="0.0" /> </disk> </element>
+	<element name="internal_led"> <disk state="0"> <color red="1.0" green="1.0" blue="1.0" /> </disk> </element>
+	<element name="external_led"> <disk state="0"> <color red="0.666" green="0.555" blue="0.0" /> </disk> </element>
+	<element name="power_led"> <disk state="0"> <color red="0.0" green="1.0" blue="0.0" /> </disk> </element>
 
 	<element name="label_a"> <text string="A"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
 	<element name="label_b"> <text string="B"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>

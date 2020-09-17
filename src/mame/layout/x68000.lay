@@ -8,17 +8,17 @@ Basic display of disk drive LEDs for the Sharp X680x0
 <mamelayout version="2">
 
 	<element name="access_led">
-		<disk>
+		<disk state="0">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 	<element name="ctrl_led">
-		<disk>
+		<disk state="0">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</disk>
 	</element>
 	<element name="eject_led">
-		<disk>
+		<disk state="0">
 			<color red="0.5" green="0.0" blue="0.0" />
 		</disk>
 	</element>
