@@ -16727,7 +16727,8 @@ in207100                        // Informer 207/100
 @source:informer_207_376.cpp
 in207376                        // Informer 207/376
 
-@source:informer_213ae.cpp
+@source:informer_213.cpp
+in213                           // Informer 213
 in213ae                         // Informer 213 AE
 
 @source:instantm.cpp
