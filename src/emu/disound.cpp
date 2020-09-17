@@ -497,6 +497,13 @@ void device_mixer_interface::interface_post_load()
 
 void device_mixer_interface::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// special case: single input, single output, same rate
+	if (inputs.size() == 1 && outputs.size() == 1 && inputs[0].sample_rate() == outputs[0].sample_rate())
+	{
+		outputs[0] = inputs[0];
+		return;
+	}
+
 	// reset the clear flags
 	std::fill(std::begin(m_output_clear), std::end(m_output_clear), false);
 

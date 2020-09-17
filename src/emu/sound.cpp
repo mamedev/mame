@@ -415,6 +415,29 @@ std::string sound_stream_output::name() const
 }
 
 
+//-------------------------------------------------
+//  optimize_resampler - optimize resamplers by
+//  either returning the native rate or another
+//  input's resampler if they can be reused
+//-------------------------------------------------
+
+sound_stream_output &sound_stream_output::optimize_resampler(sound_stream_output *input_resampler)
+{
+	// if no resampler, or if the resampler rate matches our rate, return ourself
+	if (input_resampler == nullptr || buffer_sample_rate() == input_resampler->buffer_sample_rate())
+		return *this;
+
+	// scan our list of resamplers to see if there's another match
+	for (auto &resampler : m_resampler_list)
+		if (resampler->buffer_sample_rate() == input_resampler->buffer_sample_rate())
+			return *resampler;
+
+	// add the input to our list and return the one we were given back
+	m_resampler_list.push_back(input_resampler);
+	return *input_resampler;
+}
+
+
 
 //**************************************************************************
 //  SOUND STREAM INPUT
@@ -494,22 +517,15 @@ read_stream_view sound_stream_input::update(attotime start, attotime end)
 	// shouldn't get here unless valid
 	sound_assert(valid());
 
-	// determine if we need to use the resampler
-	bool resampled = false;
-	if (m_resampler_source != nullptr)
-	{
-		// if sample rates differ, then yes
-		if (m_owner->sample_rate() != m_native_source->buffer_sample_rate())
-			resampled = true;
+	// pick an optimized resampler
+	sound_stream_output &source = m_native_source->optimize_resampler(m_resampler_source);
 
-		// if not, keep the resampler's end time up to date
-		else
-			m_resampler_source->set_end_time(end);
-	}
+	// if not using our own resampler, keep it up to date in case we need to invoke it later
+	if (m_resampler_source != nullptr && &source != m_resampler_source)
+		m_resampler_source->set_end_time(end);
 
 	// update the source, returning a view of the needed output over the start and end times
-	sound_stream_output &source = resampled ? *m_resampler_source : *m_native_source;
-	return source.stream().update_view(start, end, source.index()).set_gain(m_gain * m_user_gain * m_native_source->gain());
+	return source.stream().update_view(start, end, source.index()).apply_gain(m_gain * m_user_gain * m_native_source->gain());
 }
 
 
@@ -763,7 +779,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	g_profiler.stop();
 
 	// return the requested view
-	return read_stream_view(m_output[outputnum].view(start, end));
+	return read_stream_view(m_output_view[outputnum], start);
 }
 
 
@@ -822,16 +838,16 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 //-------------------------------------------------
 
 #if (SOUND_DEBUG)
-void sound_stream::print_graph_recursive(int indent)
+void sound_stream::print_graph_recursive(int indent, int index)
 {
-	osd_printf_info("%c %*s%s @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", name().c_str(), sample_rate());
+	osd_printf_info("%c %*s%s Ch.%d @ %d\n", m_callback.isnull() ? ' ' : '!', indent, "", name().c_str(), index + m_output_base, sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 		{
 			if (m_input[index].m_resampler_source != nullptr)
-				m_input[index].m_resampler_source->stream().print_graph_recursive(indent + 2);
+				m_input[index].m_resampler_source->stream().print_graph_recursive(indent + 2, m_input[index].m_resampler_source->index());
 			else
-				m_input[index].m_native_source->stream().print_graph_recursive(indent + 2);
+				m_input[index].m_native_source->stream().print_graph_recursive(indent + 2, m_input[index].m_native_source->index());
 		}
 }
 #endif
@@ -1011,13 +1027,8 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 		return;
 	}
 
-	// if we have equal sample rates, we just need to copy
-	auto numsamples = output.samples();
-	if (input.sample_rate() == output.sample_rate())
-	{
-		output.copy(input);
-		return;
-	}
+	// optimize_resampler ensures we should not have equal sample rates
+	sound_assert(input.sample_rate() != output.sample_rate());
 
 	// compute the stepping value and the inverse
 	stream_buffer::sample_t step = stream_buffer::sample_t(input.sample_rate()) / stream_buffer::sample_t(output.sample_rate());
@@ -1036,6 +1047,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	// clamp the latency to the start (only relevant at the beginning)
 	s32 dstindex = 0;
 	attotime output_start = output.start_time();
+	auto numsamples = output.samples();
 	while (latency > output_start && dstindex < numsamples)
 	{
 		output.put(dstindex++, 0);
@@ -1383,10 +1395,10 @@ void sound_manager::reset()
 		// dump the sound graph when we start up
 		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
 		{
-			int dummy;
-			sound_stream *output = speaker.output_to_stream_output(0, dummy);
-			if (output)
-				output->print_graph_recursive(0);
+			int index;
+			sound_stream *output = speaker.output_to_stream_output(0, index);
+			if (output != nullptr)
+				output->print_graph_recursive(0, index);
 		}
 
 		// dump the orphan list as well

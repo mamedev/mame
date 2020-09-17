@@ -359,7 +359,7 @@ public:
 	}
 
 	// constructor that converts from a read_stream_view
-	write_stream_view(read_stream_view &src) :
+	write_stream_view(read_stream_view const &src) :
 		read_stream_view(src)
 	{
 	}
@@ -472,12 +472,16 @@ public:
 	// resync the buffer to the given end time
 	void set_end_time(attotime end) { m_buffer.set_end_time(end); }
 
+	// attempt to optimize resamplers by reusing them where possible
+	sound_stream_output &optimize_resampler(sound_stream_output *input_resampler);
+
 private:
 	// internal state
 	sound_stream *m_stream;               // owning stream
 	stream_buffer m_buffer;               // output buffer
 	u32 m_index;                          // output index within the stream
 	stream_buffer::sample_t m_gain;       // gain to apply to the output
+	std::vector<sound_stream_output *> m_resampler_list; // list of resamplers we're connected to
 };
 
 
@@ -616,7 +620,7 @@ public:
 
 #if (SOUND_DEBUG)
 	// print one level of the sound graph and recursively tell our inputs to do the same
-	void print_graph_recursive(int indent);
+	void print_graph_recursive(int indent, int index);
 #endif
 
 protected:
