@@ -14,7 +14,6 @@
 #include "plib/pstring.h"
 
 #include "nl_config.h"
-#include "nl_parser.h"
 #include "nltypes.h"
 
 #include <initializer_list>
@@ -229,7 +228,7 @@ namespace netlist
 
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::istream_uptr &&istrm, const pstring &name);
-		bool parse_tokens(const parser_t::token_store &tokens, const pstring &name);
+		bool parse_tokens(const plib::detail::token_store &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)

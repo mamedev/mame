@@ -22,22 +22,6 @@
 
 #include <memory>
 
-// FIXME: Move to ptypes
-namespace plib
-{
-	// FORWARD declarations
-	template <typename BASEARENA, std::size_t MINALIGN>
-	class mempool_arena;
-
-	struct aligned_arena;
-	class dynlib_base;
-
-	template<bool debug_enabled>
-	class plog_base;
-
-	struct plog_level;
-} // namespace plib
-
 namespace netlist
 {
 	// -----------------------------------------------------------------------------
