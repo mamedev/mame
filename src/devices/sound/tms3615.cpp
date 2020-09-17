@@ -57,7 +57,7 @@ void tms3615_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	int samplerate = buffer8.sample_rate();
 
 	constexpr stream_buffer::sample_t VMAX = 1.0f / stream_buffer::sample_t(TMS3615_TONES);
-	for (int sampindex = 0; sampindex < buffer8.samples(); sampindex++)
+	while (!buffer8.done())
 	{
 		stream_buffer::sample_t sum8 = 0, sum16 = 0;
 
@@ -94,8 +94,8 @@ void tms3615_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			}
 		}
 
-		buffer8.put(sampindex, sum8);
-		buffer16.put(sampindex, sum16);
+		buffer8.put(sum8);
+		buffer16.put(sum16);
 	}
 }
 

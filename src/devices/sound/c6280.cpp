@@ -55,6 +55,10 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	for (int ch = 0; ch < 6; ch++)
 	{
 		channel *chan = &m_channel[ch];
+
+		outputs[0].reset();
+		outputs[1].reset();
+
 		/* Only look at enabled channels */
 		if (chan->control & 0x80)
 		{
@@ -77,7 +81,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			{
 				/* Noise mode */
 				const u32 step = (chan->noise_control & 0x1f) ^ 0x1f;
-				for (int i = 0; i < outputs[0].samples(); i += 1)
+				while (!outputs[0].done())
 				{
 					s16 data = BIT(chan->noise_seed, 0) ? 0x1f : 0;
 					chan->noise_counter--;
@@ -88,18 +92,18 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 						// based on Charles MacDonald's research
 						chan->noise_seed = (seed >> 1) | ((BIT(seed, 0) ^ BIT(seed, 1) ^ BIT(seed, 11) ^ BIT(seed, 12) ^ BIT(seed, 17)) << 17);
 					}
-					outputs[0].add(i, stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
-					outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
+					outputs[0].add(stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
+					outputs[1].add(stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
 				}
 			}
 			else
 			if (chan->control & 0x40)
 			{
 				/* DDA mode */
-				for (int i = 0; i < outputs[0].samples(); i++)
+				while (!outputs[0].done())
 				{
-					outputs[0].add(i, stream_buffer::sample_t(s16(vll * (chan->dda - 16))) * sample_scale);
-					outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (chan->dda - 16))) * sample_scale);
+					outputs[0].add(stream_buffer::sample_t(s16(vll * (chan->dda - 16))) * sample_scale);
+					outputs[1].add(stream_buffer::sample_t(s16(vlr * (chan->dda - 16))) * sample_scale);
 				}
 			}
 			else
@@ -112,7 +116,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 						channel *lfo_srcchan = &m_channel[1];
 						channel *lfo_dstchan = &m_channel[0];
 						const u16 lfo_step = lfo_srcchan->frequency ? lfo_srcchan->frequency : 0x1000;
-						for (int i = 0; i < outputs[0].samples(); i += 1)
+						while (!outputs[0].done())
 						{
 							s32 step = lfo_dstchan->frequency ? lfo_dstchan->frequency : 0x1000;
 							if (m_lfo_control & 0x80) // reset LFO
@@ -138,8 +142,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 								lfo_dstchan->tick = step;
 								lfo_dstchan->index = (lfo_dstchan->index + 1) & 0x1f;
 							}
-							outputs[0].add(i, stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
-							outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
+							outputs[0].add(stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
+							outputs[1].add(stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
 						}
 					}
 				}
@@ -147,7 +151,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				{
 					/* Waveform mode */
 					const u32 step = chan->frequency ? chan->frequency : 0x1000;
-					for (int i = 0; i < outputs[0].samples(); i += 1)
+					while (!outputs[0].done())
 					{
 						const s16 data = chan->waveform[chan->index];
 						chan->tick--;
@@ -156,8 +160,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 							chan->tick = step;
 							chan->index = (chan->index + 1) & 0x1f;
 						}
-						outputs[0].add(i, stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
-						outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
+						outputs[0].add(stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
+						outputs[1].add(stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
 					}
 				}
 			}

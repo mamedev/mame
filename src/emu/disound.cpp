@@ -512,9 +512,9 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, std::vect
 		int outputnum = m_outputmap[inputnum];
 		auto &output = outputs[outputnum];
 		if (!m_output_clear[outputnum])
-			output.copy(input);
+			output.copy_indexed(0, input);
 		else
-			output.add(input);
+			output.add_indexed(0, input);
 
 		m_output_clear[outputnum] = true;
 	}
@@ -522,5 +522,5 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, std::vect
 	// clear anything unused
 	for (int outputnum = 0; outputnum < m_outputs; outputnum++)
 		if (!m_output_clear[outputnum])
-			outputs[outputnum].fill(0);
+			outputs[outputnum].fill_indexed(0, 0);
 }

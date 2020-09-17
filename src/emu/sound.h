@@ -239,6 +239,7 @@ public:
 		m_buffer(buffer),
 		m_end(end),
 		m_start(start),
+		m_offset(0),
 		m_gain(gain)
 	{
 		normalize_start_end();
@@ -275,6 +276,7 @@ public:
 		m_start = rhs.m_start;
 		m_end = rhs.m_end;
 		m_gain = rhs.m_gain;
+		m_offset = 0;
 		normalize_start_end();
 		return *this;
 	}
@@ -292,6 +294,18 @@ public:
 	// return the number of samples represented by the buffer
 	u32 samples() const { return m_end - m_start; }
 
+	// return the current offset within the buffer
+	s32 offset() const { return m_offset; }
+
+	// return the number of samples remaining from the current offset
+	s32 remaining() const { return samples() - m_offset; }
+
+	// (re)set the current offset within the buffer
+	read_stream_view const &reset(s32 offset = 0) const { m_offset = offset; return *this; }
+
+	// return true if we've consumed all the samples in the view
+	bool done() const { return m_offset >= samples(); }
+
 	// return the starting or ending time of the buffer
 	attotime start_time() const { return m_buffer->index_time(m_start); }
 	attotime end_time() const { return m_buffer->index_time(m_end); }
@@ -303,7 +317,7 @@ public:
 	read_stream_view &apply_gain(float gain) { m_gain *= gain; return *this; }
 
 	// safely fetch a gain-scaled sample from the buffer
-	sample_t get(s32 index) const
+	sample_t get_indexed(s32 index) const
 	{
 		sound_assert(u32(index) < samples());
 		index += m_start;
@@ -314,7 +328,7 @@ public:
 
 	// safely fetch a raw sample from the buffer; if you use this, you need to
 	// apply the gain yourself for correctness
-	sample_t getraw(s32 index) const
+	sample_t getraw_indexed(s32 index) const
 	{
 		sound_assert(u32(index) < samples());
 		index += m_start;
@@ -322,6 +336,10 @@ public:
 			index -= m_buffer->size();
 		return m_buffer->get(index);
 	}
+
+	// non-indexed versions of the above that use the implied offset
+	sample_t get() const { sound_assert(m_offset < samples()); return get_indexed(m_offset++); }
+	sample_t getraw() const { sound_assert(m_offset < samples()); return getraw_indexed(m_offset++); }
 
 protected:
 	// normalize start/end
@@ -338,6 +356,7 @@ protected:
 	stream_buffer *m_buffer;              // pointer to the stream buffer we're viewing
 	s32 m_end;                            // ending sample index (always >= start)
 	s32 m_start;                          // starting sample index
+	mutable s32 m_offset;                 // current read/write offset
 	sample_t m_gain;                      // overall gain factor
 };
 
@@ -364,8 +383,11 @@ public:
 	{
 	}
 
+	// (re)set the current offset within the buffer
+	write_stream_view &reset(s32 offset = 0) { m_offset = offset; return *this; }
+
 	// safely write a gain-applied sample to the buffer
-	void put(s32 index, sample_t sample)
+	void put_indexed(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
 		index += m_start;
@@ -375,7 +397,7 @@ public:
 	}
 
 	// safely add a gain-applied sample to the buffer
-	void add(s32 index, sample_t sample)
+	void add_indexed(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
 		index += m_start;
@@ -385,9 +407,9 @@ public:
 	}
 
 	// fill part of the view with the given value
-	void fill(sample_t value, s32 start, s32 count)
+	s32 fill_indexed(s32 start, sample_t value, s32 count = -1)
 	{
-		if (start + count > samples())
+		if (count < 0 || start + count > samples())
 			count = samples() - start;
 		u32 index = start + m_start;
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
@@ -395,39 +417,51 @@ public:
 			m_buffer->put(index, value);
 			index = m_buffer->next_index(index);
 		}
+		return count;
 	}
-	void fill(sample_t value, s32 start) { fill(value, start, samples() - start); }
-	void fill(sample_t value) { fill(value, 0, samples()); }
 
 	// copy data from another view
-	void copy(read_stream_view const &src, s32 start, s32 count)
+	s32 copy_indexed(s32 start, read_stream_view const &src, s32 srcstart = -1, s32 count = -1)
 	{
-		if (start + count > samples())
+		if (count < 0 || start + count > samples())
 			count = samples() - start;
+		if (srcstart < 0)
+			srcstart = start;
+		if (srcstart + count > src.samples())
+			count = src.samples() - srcstart;
 		u32 index = start + m_start;
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
-			m_buffer->put(index, src.get(start + sampindex));
+			m_buffer->put(index, src.get_indexed(srcstart + sampindex));
 			index = m_buffer->next_index(index);
 		}
+		return count;
 	}
-	void copy(read_stream_view const &src, s32 start) { copy(src, start, samples() - start); }
-	void copy(read_stream_view const &src) { copy(src, 0, samples()); }
 
 	// add data from another view to our current values
-	void add(read_stream_view const &src, s32 start, s32 count)
+	s32 add_indexed(s32 start, read_stream_view const &src, s32 srcstart = -1, s32 count = -1)
 	{
-		if (start + count > samples())
+		if (count < 0 || start + count > samples())
 			count = samples() - start;
+		if (srcstart < 0)
+			srcstart = start;
+		if (srcstart + count > src.samples())
+			count = src.samples() - srcstart;
 		u32 index = start + m_start;
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
-			m_buffer->put(index, m_buffer->get(index) + src.get(start + sampindex));
+			m_buffer->put(index, m_buffer->get(index) + src.get_indexed(start + sampindex));
 			index = m_buffer->next_index(index);
 		}
+		return count;
 	}
-	void add(read_stream_view const &src, s32 start) { add(src, start, samples() - start); }
-	void add(read_stream_view const &src) { add(src, 0, samples()); }
+
+	// non-indexed versions of the above that use the implied offset
+	void put(sample_t sample) { sound_assert(m_offset < samples()); put_indexed(m_offset++, sample); }
+	void add(sample_t sample) { sound_assert(m_offset < samples()); add_indexed(m_offset++, sample); }
+	s32 fill(sample_t value, s32 count = -1) { m_offset += count = fill_indexed(m_offset, value, count); return count; }
+	s32 copy(read_stream_view const &src, s32 count = -1) { count = copy_indexed(m_offset, src, m_offset, count); m_offset += count; src.reset(src.offset() + count); return count; }
+	s32 add(read_stream_view const &src, s32 count = -1) { count = add_indexed(m_offset, src, m_offset, count); m_offset += count; src.reset(src.offset() + count); return count; }
 };
 
 

@@ -18,8 +18,8 @@
 void cdda_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	get_audio_data(outputs[0], outputs[1]);
-	m_audio_volume[0] = outputs[0].get(0);
-	m_audio_volume[1] = outputs[1].get(0);
+	m_audio_volume[0] = outputs[0].get_indexed(0);
+	m_audio_volume[1] = outputs[1].get_indexed(0);
 }
 
 //-------------------------------------------------
@@ -165,7 +165,7 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 	int16_t *audio_cache = (int16_t *) m_audio_cache.get();
 
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-	for (int sampindex = 0; sampindex < bufL.samples(); )
+	while (!bufL.done())
 	{
 		/* if no file, audio not playing, audio paused, or out of disc data,
 		   just zero fill */
@@ -177,12 +177,12 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 				m_audio_ended_normally = true;
 			}
 
-			bufL.fill(0, sampindex);
-			bufR.fill(0, sampindex);
+			bufL.fill(0);
+			bufR.fill(0);
 			return;
 		}
 
-		int samples = bufL.samples() - sampindex;
+		int samples = bufL.remaining();
 		if (samples > m_audio_samples)
 		{
 			samples = m_audio_samples;
@@ -191,11 +191,10 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 		for (i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
-			bufL.put(sampindex + i, stream_buffer::sample_t(s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ))) * sample_scale); m_audio_bptr++;
-			bufR.put(sampindex + i, stream_buffer::sample_t(s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ))) * sample_scale); m_audio_bptr++;
+			bufL.put(stream_buffer::sample_t(s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ))) * sample_scale); m_audio_bptr++;
+			bufR.put(stream_buffer::sample_t(s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ))) * sample_scale); m_audio_bptr++;
 		}
 
-		sampindex += samples;
 		m_audio_samples -= samples;
 
 		if (m_audio_samples == 0)

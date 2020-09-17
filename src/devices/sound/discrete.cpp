@@ -1079,7 +1079,6 @@ void discrete_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)
 	{
 		(*node)->m_inview = &inputs[(*node)->m_stream_in_number];
-		(*node)->m_inview_sample = 0;
 	}
 
 	/* just process it */

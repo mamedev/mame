@@ -825,10 +825,10 @@ void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &tar
 	if (target.samples() < m_buffer.size())
 		osd_printf_warning("sound %s: samples %d less bufsize %d\n", name(), target.samples(), m_buffer.size());
 
-	int sampindex;
-	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
-		target.put(sampindex, m_buffer[sampindex]);
-	target.fill(m_cur, sampindex);
+	int sampindex = 0;
+	while (!target.done() && sampindex < m_buffer.size())
+		target.put(m_buffer[sampindex++]);
+	target.fill(m_cur);
 }
 
 

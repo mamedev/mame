@@ -327,14 +327,14 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		auto &dest1 = outputs[0];
 		auto &dest2 = outputs[1];
 		constexpr stream_buffer::sample_t sample_scale = 8.0 / 32768.0;
-		for (int i = 0; i < samples; i++)
+		while (!dest1.done())
 		{
 			stream_buffer::sample_t val;
 
 			val = stream_buffer::sample_t(*lmix++) * sample_scale;
-			dest1.put(i, limit(val));
+			dest1.put(limit(val));
 			val = stream_buffer::sample_t(*rmix++) * sample_scale;
-			dest2.put(i, limit(val));
+			dest2.put(limit(val));
 		}
 	}
 }
@@ -466,14 +466,14 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		auto &dest1 = outputs[0];
 		auto &dest2 = outputs[1];
 		constexpr stream_buffer::sample_t sample_scale = 8.0 / 32768.0;
-		for (int i = 0; i < samples; i++)
+		while (!dest1.done())
 		{
 			stream_buffer::sample_t val;
 
 			val = stream_buffer::sample_t(*lmix++) * sample_scale;
-			dest1.put(i, limit(val));
+			dest1.put(limit(val));
 			val = stream_buffer::sample_t(*rmix++) * sample_scale;
-			dest2.put(i, limit(val));
+			dest2.put(limit(val));
 		}
 	}
 }

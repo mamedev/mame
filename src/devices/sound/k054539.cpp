@@ -125,7 +125,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	}
 
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-	for(int sample = 0; sample != outputs[0].samples(); sample++) {
+	while (!outputs[0].done()) {
 		double lval, rval;
 		if(!(flags & DISABLE_REVERB))
 			lval = rval = rbase[reverb_pos];
@@ -303,8 +303,8 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				}
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0].put(sample, stream_buffer::sample_t(lval) * sample_scale);
-		outputs[1].put(sample, stream_buffer::sample_t(rval) * sample_scale);
+		outputs[0].put(stream_buffer::sample_t(lval) * sample_scale);
+		outputs[1].put(stream_buffer::sample_t(rval) * sample_scale);
 	}
 }
 

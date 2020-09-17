@@ -237,9 +237,9 @@ void namco_audio_device::build_decoded_waveform(uint8_t *rgnbase)
 /* generate sound by oversampling */
 uint32_t namco_audio_device::namco_update_one(write_stream_view &buffer, const int16_t *wave, uint32_t counter, uint32_t freq)
 {
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	while (!buffer.done())
 	{
-		buffer.add(sampindex, stream_buffer::sample_t(wave[WAVEFORM_POSITION(counter)]) * sample_scale);
+		buffer.add(stream_buffer::sample_t(wave[WAVEFORM_POSITION(counter)]) * sample_scale);
 		counter += freq;
 	}
 
@@ -672,8 +672,8 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 		/* loop over each voice and add its contribution */
 		for (sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
 		{
-			auto &lmix = outputs[0];
-			auto &rmix = outputs[1];
+			auto &lmix = outputs[0].reset();
+			auto &rmix = outputs[1].reset();
 			int lv = voice->volume[0];
 			int rv = voice->volume[1];
 
@@ -699,13 +699,13 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 						if (voice->noise_state)
 						{
-							lmix.add(i, stream_buffer::sample_t(l_noise_data) * sample_scale);
-							rmix.add(i, stream_buffer::sample_t(r_noise_data) * sample_scale);
+							lmix.add(stream_buffer::sample_t(l_noise_data) * sample_scale);
+							rmix.add(stream_buffer::sample_t(r_noise_data) * sample_scale);
 						}
 						else
 						{
-							lmix.add(i, stream_buffer::sample_t(-l_noise_data) * sample_scale);
-							rmix.add(i, stream_buffer::sample_t(-r_noise_data) * sample_scale);
+							lmix.add(stream_buffer::sample_t(-l_noise_data) * sample_scale);
+							rmix.add(stream_buffer::sample_t(-r_noise_data) * sample_scale);
 						}
 
 						if (hold)
@@ -779,6 +779,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 		/* loop over each voice and add its contribution */
 		for (voice = m_channel_list; voice < m_last_channel; voice++)
 		{
+			buffer.reset();
 			int v = voice->volume[0];
 			if (voice->noise_sw)
 			{
@@ -791,17 +792,16 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 					uint32_t delta = f << 4;
 					uint32_t c = voice->noise_counter;
 					int16_t noise_data = OUTPUT_LEVEL(0x07 * (v >> 1));
-					int i;
 
 					/* add our contribution */
-					for (i = 0; i < buffer.samples(); i++)
+					while (!buffer.done())
 					{
 						int cnt;
 
 						if (voice->noise_state)
-							buffer.add(i, stream_buffer::sample_t(noise_data) * sample_scale);
+							buffer.add(stream_buffer::sample_t(noise_data) * sample_scale);
 						else
-							buffer.add(i, stream_buffer::sample_t(-noise_data) * sample_scale);
+							buffer.add(stream_buffer::sample_t(-noise_data) * sample_scale);
 
 						if (hold)
 						{

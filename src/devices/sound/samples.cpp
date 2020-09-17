@@ -334,7 +334,7 @@ void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				double endpos = chan.source_len;
 				const int16_t *sample = chan.source;
 
-				for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+				while (!buffer.done())
 				{
 					// do a linear interp on the sample
 					double pos_floor = floor(chan.pos);
@@ -343,7 +343,7 @@ void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 					stream_buffer::sample_t sample1 = stream_buffer::sample_t(sample[ipos++]);
 					stream_buffer::sample_t sample2 = stream_buffer::sample_t(sample[(ipos + 1) % chan.source_len]);
-					buffer.put(sampindex, sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
+					buffer.put(sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
 
 					// advance
 					chan.pos += step;
@@ -357,7 +357,7 @@ void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_
 						{
 							chan.source = nullptr;
 							chan.source_num = -1;
-							buffer.fill(0, sampindex);
+							buffer.fill(0);
 							break;
 						}
 					}

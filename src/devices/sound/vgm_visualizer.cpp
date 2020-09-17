@@ -289,12 +289,12 @@ void vgmviz_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	device_mixer_interface::sound_stream_update(stream, inputs, outputs);
 
 	// now consume the outputs
-	for (int pos = 0; pos < outputs[0].samples(); pos++)
+	while (!outputs[0].done())
 	{
 		for (int i = 0; i < outputs.size(); i++)
 		{
 			// Original code took 16-bit sample / 65536.0 instead of 32768.0, so multiply by 0.5 here but is it necessary?
-			const float sample = outputs[i].get(pos) * 0.5f;
+			const float sample = outputs[i].get() * 0.5f;
 			m_audio_buf[m_audio_fill_index][i][m_audio_count[m_audio_fill_index]] = sample + 0.5f;
 		}
 

@@ -279,9 +279,9 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			signal = 1.0;
 		}
 
-		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+		while (!buffer.done())
 		{
-			buffer.put(sampindex, signal);
+			buffer.put(signal);
 			incr -= frequency;
 			while( incr < 0 )
 			{

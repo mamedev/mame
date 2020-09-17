@@ -738,12 +738,11 @@ void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	uint32_t pos = m_pos;
 
 	/* loop until done */
-	u32 index = 0;
 	if (m_state != STATE_IDLE)
-		for ( ; index < outputs[0].samples(); index++)
+		while (!outputs[0].done())
 		{
 			/* store the current sample */
-			outputs[0].put(index, sample);
+			outputs[0].put(sample);
 
 			/* advance by the number of clocks/output sample */
 			pos += step;
@@ -775,8 +774,7 @@ void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 
 	/* if we got out early, just zap the rest of the buffer */
-	for (; index < outputs[0].samples(); index++)
-		outputs[0].put(index, 0);
+	outputs[0].fill(0);
 
 	/* flush the state back */
 	m_clocks_left = clocks_left;

@@ -1234,7 +1234,7 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 	int i;
 
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / stream_buffer::sample_t(32768 << SHIFT);
-	for (int s = 0; s < bufl.samples(); ++s)
+	while (!bufl.done())
 	{
 		s32 smpl = 0, smpr = 0;
 
@@ -1275,7 +1275,7 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 		{
 			if (EFSDL(i + 16)) // 16,17 for EXTS
 			{
-				m_DSP.EXTS[i] = s16(inputs[i].get(s) * 32767.0);
+				m_DSP.EXTS[i] = s16(inputs[i].get() * 32767.0);
 				u32 Enc = ((EFPAN(i + 16)) << 0x8) | ((EFSDL(i + 16)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1293,8 +1293,8 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 			smpr = clip16(smpr >> 3);
 		}
 
-		bufl.put(s, stream_buffer::sample_t(smpl * m_LPANTABLE[MVOL() << 0xd]) * sample_scale);
-		bufr.put(s, stream_buffer::sample_t(smpr * m_LPANTABLE[MVOL() << 0xd]) * sample_scale);
+		bufl.put(stream_buffer::sample_t(smpl * m_LPANTABLE[MVOL() << 0xd]) * sample_scale);
+		bufr.put(stream_buffer::sample_t(smpr * m_LPANTABLE[MVOL() << 0xd]) * sample_scale);
 	}
 }
 

@@ -208,7 +208,7 @@ void stream_buffer::flush_wav()
 
 		// convert and fill
 		for (int sampindex = 0; sampindex < cursamples; sampindex++)
-			buffer[sampindex] = s16(view.get(samplebase + sampindex) * 32768.0);
+			buffer[sampindex] = s16(view.get_indexed(samplebase + sampindex) * 32768.0);
 
 		// write to the WAV
 		wav_add_data_16(m_wav_file, buffer, cursamples);
@@ -743,7 +743,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 #if (SOUND_DEBUG)
 			// clear each output view to NANs before we call the callback
 			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
-				m_output_view[outindex].fill(NAN);
+				m_output_view[outindex].fill_indexed(0, NAN);
 #endif
 
 			// if we have an extended callback, that's all we need
@@ -753,7 +753,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 			// make sure everything was overwritten
 			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
 				for (int sampindex = 0; sampindex < m_output_view[outindex].samples(); sampindex++)
-					m_output_view[outindex].get(sampindex);
+					m_output_view[outindex].get_indexed(sampindex);
 
 			for (unsigned int outindex = 0; outindex < m_output.size(); outindex++)
 				m_output[outindex].m_buffer.flush_wav();
@@ -934,7 +934,7 @@ void sound_stream::stream_update_legacy(sound_stream &stream, std::vector<read_s
 		{
 			stream_sample_t *dest = inputptr[inputnum];
 			for (int index = 0; index < cursamples; index++)
-				dest[index] = stream_sample_t(inputs[inputnum].get(baseindex + index) * stream_buffer::sample_t(32768.0));
+				dest[index] = stream_sample_t(inputs[inputnum].get_indexed(baseindex + index) * stream_buffer::sample_t(32768.0));
 		}
 
 		// run the callback
@@ -945,7 +945,7 @@ void sound_stream::stream_update_legacy(sound_stream &stream, std::vector<read_s
 		{
 			stream_sample_t *src = outputptr[outputnum];
 			for (int index = 0; index < cursamples; index++)
-				outputs[outputnum].put(baseindex + index, stream_buffer::sample_t(src[index]) * stream_buffer::sample_t(1.0 / 32768.0));
+				outputs[outputnum].put_indexed(baseindex + index, stream_buffer::sample_t(src[index]) * stream_buffer::sample_t(1.0 / 32768.0));
 		}
 	}
 }
@@ -1012,7 +1012,6 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	}
 
 	// if we have equal sample rates, we just need to copy
-	auto numsamples = output.samples();
 	if (input.sample_rate() == output.sample_rate())
 	{
 		output.copy(input);
@@ -1034,14 +1033,13 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	attotime latency = latency_samples * input.sample_period();
 
 	// clamp the latency to the start (only relevant at the beginning)
-	s32 dstindex = 0;
 	attotime output_start = output.start_time();
-	while (latency > output_start && dstindex < numsamples)
+	while (latency > output_start && !output.done())
 	{
-		output.put(dstindex++, 0);
+		output.put(0);
 		output_start += output.sample_period();
 	}
-	if (dstindex >= numsamples)
+	if (output.done())
 		return;
 
 	// create a rebased input buffer around the adjusted start time
@@ -1055,15 +1053,14 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	sound_assert(srcpos <= 1.0f);
 
 	// input is undersampled: point sample except where our sample period covers a boundary
-	s32 srcindex = 0;
 	if (step < 1.0)
 	{
-		stream_buffer::sample_t cursample = rebased.get(srcindex++);
-		for ( ; dstindex < numsamples; dstindex++)
+		stream_buffer::sample_t cursample = rebased.get();
+		while (!output.done())
 		{
 			// if still within the current sample, just replicate
 			if (srcpos <= 1.0)
-				output.put(dstindex, cursample);
+				output.put(cursample);
 
 			// if crossing a sample boundary, blend with the neighbor
 			else
@@ -1071,19 +1068,18 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 				srcpos -= 1.0;
 				sound_assert(srcpos <= step + 1e-5);
 				stream_buffer::sample_t prevsample = cursample;
-				cursample = rebased.get(srcindex++);
-				output.put(dstindex, stepinv * (prevsample * (step - srcpos) + srcpos * cursample));
+				cursample = rebased.get();
+				output.put(stepinv * (prevsample * (step - srcpos) + srcpos * cursample));
 			}
 			srcpos += step;
 		}
-		sound_assert(srcindex <= rebased.samples());
 	}
 
 	// input is oversampled: sum the energy
 	else
 	{
-		float cursample = rebased.get(srcindex++);
-		for ( ; dstindex < numsamples; dstindex++)
+		float cursample = rebased.get();
+		while (!output.done())
 		{
 			// compute the partial first sample and advance
 			stream_buffer::sample_t scale = 1.0 - srcpos;
@@ -1093,18 +1089,17 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 			stream_buffer::sample_t remaining = step - scale;
 			while (remaining >= 1.0)
 			{
-				sample += rebased.get(srcindex++);
+				sample += rebased.get();
 				remaining -= 1.0;
 			}
 
 			// add in the final partial sample
-			cursample = rebased.get(srcindex++);
+			cursample = rebased.get();
 			sample += cursample * remaining;
-			output.put(dstindex, sample * stepinv);
+			output.put(sample * stepinv);
 
 			// our position is now the remainder
 			srcpos = remaining;
-			sound_assert(srcindex <= rebased.samples());
 		}
 	}
 }
