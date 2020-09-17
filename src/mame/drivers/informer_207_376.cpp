@@ -18,7 +18,6 @@
 	- Problably needs improvements to at least the Z80SCC to
 	  properly support synchrous modes
     - Figure out the unknown bits at 0x8400
-	- Verify NMI hookup
 	- Verify clock speeds
 
     Notes:
@@ -31,8 +30,8 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
 #include "machine/pit8253.h"
-#include "machine/clock.h"
 #include "machine/input_merger.h"
+#include "machine/ripple_counter.h"
 #include "machine/x2212.h"
 #include "machine/z80scc.h"
 #include "video/mc6845.h"
@@ -95,7 +94,6 @@ private:
 	uint8_t novram_recall_r();
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void vsync_w(int state);
 };
 
 
@@ -135,17 +133,8 @@ INPUT_PORTS_END
 void informer_207_376_state::crt_brightness_w(uint8_t data)
 {
 	// unknown algorithm for the brightness
-	// default value is 4, range is 0 (off) to 15 (brightest)
+	// default value is 6, range is 0 (off) to 15 (brightest)
 	m_screen->set_brightness(256 - (256 / ((data & 0x0f) + 1)));
-}
-
-void informer_207_376_state::vsync_w(int state)
-{
-	if (state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
 }
 
 MC6845_UPDATE_ROW( informer_207_376_state::crtc_update_row )
@@ -255,8 +244,8 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	input_merger_device &cpu_irq(INPUT_MERGER_ANY_HIGH(config, "cpu_irq"));
 	cpu_irq.output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	X2212(config, "novram0");
-	X2212(config, "novram1");
+	X2212(config, m_novram[0]);
+	X2212(config, m_novram[1]);
 
 	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2.457600_MHz_XTAL);
@@ -265,6 +254,11 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	m_pit->set_clk<1>(2.457600_MHz_XTAL);
 	m_pit->out_handler<1>().set(m_acia[0], FUNC(acia6850_device::write_txc));
 	m_pit->out_handler<1>().append(m_acia[0], FUNC(acia6850_device::write_rxc));
+	m_pit->out_handler<1>().append("nmi_clk", FUNC(ripple_counter_device::clock_w));
+
+	ripple_counter_device &nmi_clk(RIPPLE_COUNTER(config, "nmi_clk")); // CD4020BE
+	nmi_clk.set_stages(14);
+	nmi_clk.count_out_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).bit(13); // Q14
 
 	SCC85C30(config, m_scc, 0); // externally clocked?
 	m_scc->out_txda_callback().set("com1", FUNC(rs232_port_device::write_txd));
@@ -314,7 +308,6 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(informer_207_376_state::crtc_update_row));
-	m_crtc->out_vsync_callback().set(FUNC(informer_207_376_state::vsync_w));
 
 	// sound
 	SPEAKER(config, "mono").front_center();
