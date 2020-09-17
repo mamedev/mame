@@ -40,6 +40,8 @@ public:
 
 	virtual void menu_reset() { }
 
+	virtual void request_quit() { m_machine.schedule_exit(); };
+
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
 
 protected:

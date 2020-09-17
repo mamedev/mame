@@ -236,7 +236,7 @@ public:
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
-	void request_quit();
+	virtual void request_quit() override;
 	void draw_fps_counter(render_container &container);
 	void draw_timecode_counter(render_container &container);
 	void draw_timecode_total(render_container &container);
