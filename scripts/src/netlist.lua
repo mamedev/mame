@@ -203,6 +203,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_roms_lib.cpp",
 
 		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_RTEST.cpp",
+		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_NE556_DIP.cpp",
+		MAME_DIR .. "src/lib/netlist/macro/modules/nlmod_ICL8038_DIP.cpp",
 
 		MAME_DIR .. "src/lib/netlist/generated/static_solvers.cpp",
 		MAME_DIR .. "src/lib/netlist/generated/nld_devinc.h",
