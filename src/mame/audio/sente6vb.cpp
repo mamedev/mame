@@ -98,9 +98,9 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		while (!outputs[0].done())
+		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 		{
-			outputs[0].put(BIT(m_noise_state, 0) ? 1.0 : 0.0);
+			outputs[0].put(sampindex, BIT(m_noise_state, 0) ? 1.0 : 0.0);
 			m_noise_state = (m_noise_state >> 1) | ((BIT(m_noise_state, 0) ^ BIT(m_noise_state, 3)) << 16);
 		}
 	}

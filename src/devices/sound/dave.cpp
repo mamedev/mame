@@ -206,7 +206,7 @@ void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	auto &buffer2 = outputs[1];
 
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / (4.0 * 32768.0);
-	while (!buffer1.done())
+	for (int sampindex = 0; sampindex < buffer1.samples(); sampindex++)
 	{
 		int vol[4];
 
@@ -264,8 +264,8 @@ void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		left_volume = output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6];
 		right_volume = output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7];
 
-		buffer1.put(stream_buffer::sample_t(left_volume) * sample_scale);
-		buffer2.put(stream_buffer::sample_t(right_volume) * sample_scale);
+		buffer1.put(sampindex, stream_buffer::sample_t(left_volume) * sample_scale);
+		buffer2.put(sampindex, stream_buffer::sample_t(right_volume) * sample_scale);
 	}
 }
 

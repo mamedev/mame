@@ -259,12 +259,12 @@ void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	if (!m_pwm_mode)
 	{
 		constexpr stream_buffer::sample_t sample_scale = 1.0 / 128.0;
-		while (!output.done())
-			output.put(stream_buffer::sample_t(next()) * sample_scale);
+		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
+			output.put(sampindex, stream_buffer::sample_t(next()) * sample_scale);
 	}
 	else
 	{
-		while (!output.done())
+		for (int sampindex = 0; sampindex < output.samples(); )
 		{
 			// see where we're at in the current PWM cycle
 			if (m_pwm_index >= PWM_CLOCKS)
@@ -291,8 +291,14 @@ void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				remaining = PWM_CLOCKS - m_pwm_index;
 			}
 
+			// clamp to the number of samples requested and advance the counters
+			if (remaining > output.samples() - sampindex)
+				remaining = output.samples() - sampindex;
+			m_pwm_index += remaining;
+
 			// fill the output
-			m_pwm_index += outputs[0].fill(value, remaining);
+			while (remaining-- != 0)
+				outputs[0].put(sampindex++, value);
 		}
 	}
 }

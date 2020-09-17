@@ -219,7 +219,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		logerror("%f V didn't cut it\n", m_values[WAVE_SELECT]);
 
 	// loop over samples
-	while (!buffer.done())
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		// get the current VCO position and step it forward
 		double vco_position = m_vco_position;
@@ -250,7 +250,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 		// compute extension input (for Bally/Sente this is the noise)
 		if (ENABLE_EXTERNAL)
-			result += EXTERNAL_VOLUME * m_mixer_external * external.get();
+			result += EXTERNAL_VOLUME * m_mixer_external * external.get(sampindex);
 
 		// compute the modulated filter frequency and apply the filter
 		// modulation tracks the VCO triangle
@@ -258,7 +258,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		result = filter(result, filter_freq);
 
 		// write the sample
-		buffer.put(result * m_volume);
+		buffer.put(sampindex, result * m_volume);
 	}
 }
 

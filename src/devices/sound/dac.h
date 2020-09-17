@@ -87,12 +87,12 @@ protected:
 
 	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		while (!outputs[0].done())
+		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
-			double const vref_pos = inputs[DAC_VREF_POS_INPUT].get() * this->m_gain;
-			double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get() * this->m_gain;
+			double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
+			double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
 			stream_buffer::sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code);
-			outputs[0].put(vout);
+			outputs[0].put(samp, vout);
 		}
 	}
 };
@@ -107,20 +107,20 @@ protected:
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
-			while (!outputs[0].done())
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get() * this->m_gain;
+				double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
 				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ ~(~0U << bits));
-				outputs[0].put(vout);
+				outputs[0].put(samp, vout);
 			}
 		}
 		else
 		{
-			while (!outputs[0].done())
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_pos = inputs[DAC_VREF_POS_INPUT].get() * this->m_gain;
+				double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
 				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
-				outputs[0].put(vout);
+				outputs[0].put(samp, vout);
 			}
 		}
 	}
@@ -134,12 +134,12 @@ protected:
 
 	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		while (!outputs[0].done())
+		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
-			double const vref_pos = inputs[DAC_VREF_POS_INPUT].get() * this->m_gain;
-			double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get() * this->m_gain;
+			double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
+			double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
 			stream_buffer::sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code ^ (1 << (bits - 1)));
-			outputs[0].put(vout);
+			outputs[0].put(samp, vout);
 		}
 	}
 };
@@ -154,20 +154,20 @@ protected:
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
-			while (!outputs[0].done())
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get() * this->m_gain;
+				double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
 				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ (1 << (bits - 1)));
-				outputs[0].put(vout);
+				outputs[0].put(samp, vout);
 			}
 		}
 		else
 		{
-			while (!outputs[0].done())
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_pos = inputs[DAC_VREF_POS_INPUT].get() * this->m_gain;
+				double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
 				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
-				outputs[0].put(vout);
+				outputs[0].put(samp, vout);
 			}
 		}
 	}

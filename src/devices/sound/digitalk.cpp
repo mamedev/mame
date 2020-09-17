@@ -547,20 +547,26 @@ void digitalker_device::digitalker_step()
 void digitalker_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	auto &sout = outputs[0];
+	int cpos = 0;
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-	while (!sout.done()) {
+	while(cpos != sout.samples()) {
 		if(m_zero_count == 0 && m_dac_index == 128)
 			digitalker_step();
 
 		if(m_zero_count) {
-			m_zero_count -= sout.fill(0, m_zero_count);
+			int n = sout.samples() - cpos;
+			if(n > m_zero_count)
+				n = m_zero_count;
+			sout.fill(0, cpos, n);
+			cpos += n;
+			m_zero_count -= n;
 
 		} else if(m_dac_index != 128) {
-			while(!sout.done() && m_dac_index != 128) {
+			while(cpos != sout.samples() && m_dac_index != 128) {
 				stream_buffer::sample_t v = stream_buffer::sample_t(m_dac[m_dac_index]) * sample_scale;
 				int pp = m_pitch_pos;
-				while(!sout.done() && pp != m_pitch) {
-					sout.put(v);
+				while(cpos != sout.samples() && pp != m_pitch) {
+					sout.put(cpos++, v);
 					pp++;
 				}
 				if(pp == m_pitch) {
@@ -571,7 +577,7 @@ void digitalker_device::sound_stream_update(sound_stream &stream, std::vector<re
 			}
 
 		} else {
-			sout.fill(0);
+			sout.fill(0, cpos);
 			break;
 		}
 	}

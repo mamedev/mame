@@ -182,7 +182,7 @@ void okim6295_device::sound_stream_update(sound_stream &stream, std::vector<read
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_adpcm(*this, outputs[0].reset());
+		elem.generate_adpcm(*this, outputs[0]);
 }
 
 
@@ -352,7 +352,7 @@ void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, writ
 
 		// output to the buffer, scaling by the volume
 		// signal in range -2048..2047
-		buffer.add(m_adpcm.clock(nibble) * sample_scale * m_volume);
+		buffer.add(sampindex, m_adpcm.clock(nibble) * sample_scale * m_volume);
 
 		// next!
 		if (++m_sample >= m_count)

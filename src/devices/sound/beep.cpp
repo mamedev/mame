@@ -83,9 +83,9 @@ void beep_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	}
 
 	/* fill in the sample */
-	while (!buffer.done())
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		buffer.put(signal);
+		buffer.put(sampindex, signal);
 		incr -= clock;
 		while( incr < 0 )
 		{

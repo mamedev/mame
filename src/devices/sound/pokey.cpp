@@ -702,11 +702,11 @@ void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
 
-		while (!buffer.done())
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			buffer.put(m_out_filter);
+			buffer.put(sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == OPAMP_C_TO_GROUND)
@@ -734,11 +734,11 @@ void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-1.0 / (m_cap * m_r_pullup) * m_clock_period.as_double());
 
-		while (!buffer.done())
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			buffer.put(m_out_filter);
+			buffer.put(sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == DISCRETE_VAR_R)

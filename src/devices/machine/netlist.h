@@ -241,7 +241,7 @@ public:
 	netlist_mame_sound_input_buffer(read_stream_view const &src) :
 		read_stream_view(src) { }
 
-	stream_buffer::sample_t operator[](std::size_t index) { return get_indexed(index); }
+	stream_buffer::sample_t operator[](std::size_t index) { return get(index); }
 };
 
 // ----------------------------------------------------------------------------------------

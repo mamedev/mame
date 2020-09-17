@@ -118,12 +118,13 @@ public:
 		/* Add gain to the output and put into the buffers */
 		/* Clipping will be handled by the main sound system */
 		double val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
-		m_outview->put(val * (1.0 / 32768.0));
+		m_outview->put(m_outview_sample++, val * (1.0 / 32768.0));
 	}
 	virtual int max_output(void) override { return 0; }
-	virtual void set_output_ptr(write_stream_view &view) override { m_outview = &view; m_outview->reset(); }
+	virtual void set_output_ptr(write_stream_view &view) override { m_outview = &view; m_outview_sample = 0; }
 private:
 	write_stream_view     *m_outview;
+	u32                    m_outview_sample;
 };
 
 DISCRETE_CLASS(dso_csvlog, 0,
@@ -231,6 +232,7 @@ public:
 //protected:
 	uint32_t              m_stream_in_number;
 	read_stream_view const *m_inview;         /* current in ptr for stream */
+	uint32_t              m_inview_sample;
 private:
 	void stream_generate(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 

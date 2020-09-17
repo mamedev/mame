@@ -133,11 +133,11 @@ void votrax_sc01_device::inflection_w(uint8_t data)
 
 void votrax_sc01_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	while (!outputs[0].done()) {
+	for(int i=0; i<outputs[0].samples(); i++) {
 		m_sample_count++;
 		if(m_sample_count & 1)
 			chip_update();
-		outputs[0].put(analog_calc());
+		outputs[0].put(i, analog_calc());
 	}
 }
 

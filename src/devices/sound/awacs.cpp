@@ -96,10 +96,10 @@ void awacs_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	if (m_playback_enable)
 	{
-		while (!outL.done())
+		for (int i = 0; i < outL.samples(); i++)
 		{
-			outL.put(stream_buffer::sample_t(s16(m_dma_space->read_word(offset + m_play_ptr))) * sample_scale);
-			outR.put(stream_buffer::sample_t(s16(m_dma_space->read_word(offset + m_play_ptr + 2))) * sample_scale);
+			outL.put(i, stream_buffer::sample_t(s16(m_dma_space->read_word(offset + m_play_ptr))) * sample_scale);
+			outR.put(i, stream_buffer::sample_t(s16(m_dma_space->read_word(offset + m_play_ptr + 2))) * sample_scale);
 			m_play_ptr += 4;
 		}
 

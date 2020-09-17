@@ -745,11 +745,11 @@ void i8244_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	u8 volume = m_vdc.s.sound & 0xf;
 	stream_buffer::sample_t sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0.5;
 
-	while (!outputs[0].done())
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		// clock duty cycle
 		m_sh_duty = (m_sh_duty + 1) & 0xf;
-		outputs[0].put((m_sh_duty < volume) ? sample_on : 0.0);
+		outputs[0].put(i, (m_sh_duty < volume) ? sample_on : 0.0);
 	}
 }
 

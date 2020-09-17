@@ -74,9 +74,9 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 	if (machine().options().speaker_report() != 0)
 	{
 		u32 samples_per_bucket = m_mixer_stream->sample_rate() / BUCKETS_PER_SECOND;
-		while (!view.done())
+		for (int sample = 0; sample < expected_samples; sample++)
 		{
-			m_current_max = std::max(m_current_max, fabsf(view.get()));
+			m_current_max = std::max(m_current_max, fabsf(view.get(sample)));
 			if (++m_samples_this_bucket >= samples_per_bucket)
 			{
 				m_max_sample.push_back(m_current_max);
@@ -84,7 +84,6 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 				m_samples_this_bucket = 0;
 			}
 		}
-		view.reset();
 	}
 
 	// mix if sound is enabled
@@ -94,7 +93,7 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 		if (m_x == 0)
 			for (int sample = 0; sample < expected_samples; sample++)
 			{
-				stream_buffer::sample_t cursample = view.get();
+				stream_buffer::sample_t cursample = view.get(sample);
 				leftmix[sample] += cursample;
 				rightmix[sample] += cursample;
 			}
@@ -102,12 +101,12 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 		// if the speaker is to the left, send only to the left
 		else if (m_x < 0)
 			for (int sample = 0; sample < expected_samples; sample++)
-				leftmix[sample] += view.get();
+				leftmix[sample] += view.get(sample);
 
 		// if the speaker is to the right, send only to the right
 		else
 			for (int sample = 0; sample < expected_samples; sample++)
-				rightmix[sample] += view.get();
+				rightmix[sample] += view.get(sample);
 	}
 }
 

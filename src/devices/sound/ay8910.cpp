@@ -1086,10 +1086,12 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	tone_t *tone;
 	envelope_t *envelope;
 
+	int samples = outputs[0].samples();
+
 	/* hack to prevent us from hanging when starting filtered outputs */
 	if (!m_ready)
 	{
-		for (int chan = 0; chan < outputs.size(); chan++)
+		for (int chan = 0; chan < m_streams; chan++)
 			outputs[chan].fill(0);
 	}
 
@@ -1101,7 +1103,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	/* is 1, not 0, and can be modulated changing the volume. */
 
 	/* buffering loop */
-	while (!outputs[0].done())
+	for (int sampindex = 0; sampindex < samples; sampindex++)
 	{
 		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
@@ -1197,38 +1199,38 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						{
 							env_volume >>= 1;
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-								outputs[chan].put(m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+								outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 							else
-								outputs[chan].put(m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+								outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 						}
 						else
 						{
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-								outputs[chan].put(m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+								outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 							else
-								outputs[chan].put(m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+								outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 						}
 					}
 					else
 					{
 						if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-							outputs[chan].put(m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+							outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 						else
-							outputs[chan].put(m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+							outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 					}
 				}
 				else
 				{
 					if (is_expanded_mode())
-						outputs[chan].put(m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
+						outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
 					else
-						outputs[chan].put(m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
+						outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
 				}
 			}
 		}
 		else
 		{
-			outputs[0].put(mix_3D());
+			outputs[0].put(sampindex, mix_3D());
 		}
 	}
 }

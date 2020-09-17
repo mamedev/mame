@@ -119,7 +119,7 @@ void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, 
 
 void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int ch;
+	int i, ch;
 	static uint32_t wtoffs[2] = { 0, 0x200 };
 
 	auto &outL = outputs[0];
@@ -149,7 +149,7 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 		case 1: // FIFO mode
 		{
 			constexpr stream_buffer::sample_t sample_scale = 64.0 / 32768.0;
-			while (!outL.done())
+			for (i = 0; i < outL.samples(); i++)
 			{
 				int8_t smpll, smplr;
 
@@ -234,8 +234,8 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 						break;
 				}
 
-				outL.put(stream_buffer::sample_t(smpll) * sample_scale);
-				outR.put(stream_buffer::sample_t(smplr) * sample_scale);
+				outL.put(i, stream_buffer::sample_t(smpll) * sample_scale);
+				outR.put(i, stream_buffer::sample_t(smplr) * sample_scale);
 			}
 			break;
 		}
@@ -243,7 +243,7 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 		case 2: // wavetable mode
 		{
 			constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 4.0);
-			while (!outL.done())
+			for (i = 0; i < outL.samples(); i++)
 			{
 				int32_t mixL, mixR;
 				int8_t smpl;
@@ -269,8 +269,8 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 					mixR += smpl*256;
 				}
 
-				outL.put(stream_buffer::sample_t(mixL) * sample_scale);
-				outR.put(stream_buffer::sample_t(mixR) * sample_scale);
+				outL.put(i, stream_buffer::sample_t(mixL) * sample_scale);
+				outR.put(i, stream_buffer::sample_t(mixR) * sample_scale);
 			}
 			break;
 		}

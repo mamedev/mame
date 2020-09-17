@@ -250,7 +250,10 @@ DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
 	if (EXPECTED(m_inview))
-		set_output(0,  m_inview->get() * 32768.0 * m_gain + m_offset);
+	{
+		set_output(0,  m_inview->get(m_inview_sample) * 32768.0 * m_gain + m_offset);
+		m_inview_sample++;
+	}
 	else
 		set_output(0,  0);
 }
