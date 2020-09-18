@@ -119,7 +119,6 @@ private:
 	std::string             m_symbol;               // symbol for display; all lower-case version for expressions
 	std::string             m_format;               // supported formats
 	bool                    m_default_format;       // true if we are still using default format
-	u64                     m_sizemask;             // mask derived from the data size
 };
 
 
