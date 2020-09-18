@@ -141,6 +141,7 @@ public:
 
 	void nes_vt_vh2009(machine_config& config);
 	void nes_vt_vh2009_1mb(machine_config& config);
+	void nes_vt_vh2009_2mb_alt(machine_config& config);
 	void nes_vt_vh2009_4mb(machine_config& config);
 	void nes_vt_vh2009_8mb(machine_config& config);
 
@@ -1359,6 +1360,12 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_1mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_1mbyte);
 }
 
+void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_2mb_alt(machine_config& config)
+{
+	nes_vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title, but causes some games to have black palette, needs proper switching!
+}
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
 	nes_vt_vh2009(config);
@@ -1739,6 +1746,11 @@ ROM_END
 ROM_START( mc_sp69 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
+ROM_END
+
+ROM_START( vsmaxx17 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "vsmaxx17.bin", 0x00000, 0x200000, CRC(f3fccbb9) SHA1(8b70b10d28f03e72f6b35199001955033a65fd5d) )  // M6MG3D641RB
 ROM_END
 
 ROM_START( polmega )
@@ -2251,7 +2263,8 @@ CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 200?, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb_alt,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_NOT_WORKING ) // from a Green unit, '17 Classic & Racing Game'
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )

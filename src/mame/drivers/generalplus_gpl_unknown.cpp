@@ -1,77 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// these contain the similar game selections to the games in unk6502_st2xxx.cpp but on updated hardware
+/* These contain a  similar game selections to the devices in unk6502_st2xxx.cpp but on updated hardware
 
-/* These use SPI ROMs and unSP2.0 instructions, so will be GeneralPlus branded parts, not SunPlus
-   this might just be a GPL16250 with the video features bypassed as the sprite/palette banking is still
-   used, but the RAM treated as work buffers
-*/
+   The hardware appears to be an abuse of the GPL16250 SoC. The palette and sprite banks are used, but as work-ram
+   rather than for their intended purpose, and the rest of the GPL16250 video hardware is either entirely bypassed
+   or doesn't exist.  All video is software rendered and output directly to the LCD Controller.
 
-/*
+   The coding of these is similar to the unk6502_st2xxx.cpp too, with all game specific function calls being loaded
+   on the fly from the SPI to a tiny portion of work RAM, with graphics likewise being loaded and decompressed for
+   every draw call.
+*/ 
 
-for pcp8728 long jumps are done indirect via a call to RAM
-
-990c 20ec       r4 = 20ec
-d9dd            [1d] = r4
-990c 0007       r4 = 0007
-d9de            [1e] = r4
-fe80 28f7       goto 0028f7
-
-the code to handle this is copied in at startup.
-
-Almost all function calls in the game are handled via a call to RAM which copies data inline from SPI for execution
-these calls manage their own stack, and copying back the caller function on return etc.
-
-The largest function in RAM at any one time is ~0x600 bytes.
-
-This appears to be incredibly inefficient but the system can't execute directly from SPI ROM, and doesn't have any
-RAM outside of the small area internal to the Sunplus SoC
-
-Graphics likewise appear to be loaded pixel by pixel from the SPI to framebuffer every single time there is a draw
-call.  Sound is almost certainly handled in the same way.
-
-There is a missing internal ROM that acts as bootstrap and provides some basic functions.  It is at least 0x1000
-words in size, with the lowest call being to 0xf000.  It is potentially larger than this.
-
-The internal ROM will also need to provide trampolining for the interrupts, there is a single pointer near the
-start of the SPI ROM '02000A: 0041 0002' which points to 20041 (assuming you map the SPI ROM base as word address
-0x20000, so that the calls to get code align with ROM addresses)
-
-The function pointed to for the interrupt has the same form of the other functions that get loaded into RAM via
-calls to functions in the RAM area.
-
---------------------------------------------------------
-
-BIOS (internal ROM) calls:
-
-0xf000 - copy dword from SPI using provided pointer
-
-0xf56f - unknown, after some time, done with PC = f56f, only in one place
-
-0xf58f - unknown, soon after startup (only 1 call)
-
-00f7a0 - unknown - 3 calls
-
-0xf931 - unknown, just one call
-
-00fa1d - unknown, just one call
-
-0xfb26 - unknown, after some time (done with pc = fb26 and calls)
-
-0xfb4f - unknown, just one call
-
-0xfbbf - unknown, 3 calls
-
-code currently goes off the rails after some of these unhandled calls (one to f56f?)
-
---
-
-use 'go 2938' to get to the inline code these load on the fly
-
-the first piece of code copied appears to attempt to checksum the internal BIOS!
-
-*/
 
 #include "emu.h"
 
@@ -103,12 +43,11 @@ public:
 		m_screen(*this, "screen"),
 		m_spirom(*this, "spi"),
 		m_io_p1(*this, "IN0"),
-		m_io_p2(*this, "IN1")
+		m_io_p2(*this, "IN1"),
+		m_logger_address(0)
 	{ }
 
 	void pcp8718(machine_config &config);
-
-	void spi_init();
 
 private:
 	virtual void machine_start() override;
@@ -125,18 +64,6 @@ private:
 
 	void map(address_map &map);
 
-	uint16_t simulate_f000_r(offs_t offset);
-
-	uint16_t ramcall_2060_logger_r();
-	uint16_t ramcall_2189_logger_r();
-
-	uint16_t ramcall_2434_logger_r();
-
-	uint16_t ramcall_2829_logger_r();
-	uint16_t ramcall_287a_logger_r();
-	uint16_t ramcall_28f7_logger_r();
-	uint16_t ramcall_2079_logger_r();
-
 
 	required_region_ptr<uint8_t> m_spirom;
 
@@ -146,6 +73,10 @@ private:
 
 	void unk_7860_w(uint16_t data);
 	uint16_t m_7860;
+
+	void unk_7862_w(uint16_t data);
+	void unk_7863_w(uint16_t data);
+
 
 	void unk_7868_w(uint16_t data);
 	uint16_t unk_7868_r();
@@ -232,10 +163,33 @@ private:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 
-	uint16_t m_stored_gamenum;
-	int m_addval;
-
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+	int m_logger_address;
+
+	int m_latchinbit;
+	void tx_menu_cmd(uint8_t command);
+
+	int m_bit10state;
+	int	m_latchdata;
+
+	int m_latchpos;
+	int m_menupos;
+	uint8_t m_datain;
+
+	enum menustate : const int
+	{
+	   MENU_READY_FOR_COMMAND = 0,
+
+	   MENU_COMMAND_00_IN,
+	   MENU_COMMAND_01_IN,
+	   MENU_COMMAND_02_IN,
+	   MENU_COMMAND_03_IN,
+	   MENU_COMMAND_04_IN,
+	   MENU_COMMAND_05_IN,
+	};
+
+	menustate m_menustate;
 };
 
 uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -323,15 +277,11 @@ static INPUT_PORTS_START( pcp8718 )
 	PORT_DIPNAME( 0x0002, 0x0002, "P2:0002" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0002, "0002" )
-	PORT_DIPNAME( 0x0004, 0x0004, "Show Vs in Test Mode" )
+	PORT_DIPNAME( 0x0004, 0x0000, "Show Vs in Test Mode" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0004, "0004" )
-	PORT_DIPNAME( 0x0008, 0x0008, "P2:0008" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0008, "0008" )
-	PORT_DIPNAME( 0x0010, 0x0010, "P2:0010" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0010, "0010" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input handler
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input handler
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SOUND")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -356,36 +306,173 @@ uint16_t pcp8718_state::unk_7abf_r()
 
 uint16_t pcp8718_state::unk_7860_r()
 {
-	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: unk_7860_r (IO port)\n", machine().describe_context());
+	uint16_t ret = (m_io_p2->read() & 0xffe7);
 
-	uint16_t ret = (m_io_p2->read() & 0xfff7);
-
-	if ((m_7860 & 0x20))
+	if (m_bit10state)
 		ret |= 0x08;
+
+	if (m_latchinbit)
+		ret |= 0x10;
 
 	return ret;
 }
 
+void pcp8718_state::tx_menu_cmd(uint8_t command)
+{
+	// additions and subtractions here are likely also meant to be done as high byte and low byte
+	if (m_menustate == MENU_READY_FOR_COMMAND)
+	{
+		if (command == 0x00)
+		{
+			m_menustate = MENU_COMMAND_00_IN;
+			m_datain = m_menupos & 0xff;;
+		}
+		else if (command == 0x01)
+		{
+			m_menustate = MENU_COMMAND_01_IN;
+			m_datain = (m_menupos >> 8) & 0xff;
+		}
+		else if (command == 0x02)
+		{
+			m_menustate = MENU_COMMAND_02_IN;
+		}
+		else if (command == 0x03)
+		{
+			m_menustate = MENU_COMMAND_03_IN;
+		}
+		else if (command == 0x04)
+		{	
+			m_menustate = MENU_COMMAND_04_IN;
+		}
+		else if (command == 0x05)
+		{	
+			m_menustate = MENU_COMMAND_05_IN;
+		}
+		else if (command == 0x09)
+		{	
+			// ...
+		}
+		else if ((command) == 0x10)
+		{
+			// this is followed by 0x1b, written if you try to move right off last entry
+			m_menupos = 0x00;
+		}
+		else if (command == 0x30)
+		{	
+			m_menupos++;
+		}
+		else if (command == 0x37)
+		{	
+			m_menupos--;
+		}
+		else if (command == 0x39)
+		{	
+			m_menupos-=4;
+		}
+		else if (command == 0x2c)
+		{
+			m_menupos = 0x01;
+		}
+		else
+		{
+			LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"tx_menu_cmd %02x (unknown)\n", command);
+		}
+	}
+	else if (m_menustate == MENU_COMMAND_00_IN)
+	{
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_01_IN)
+	{
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_02_IN)
+	{
+		m_menupos = (m_menupos & 0xff00) | ((command-0x8) & 0xff);
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_03_IN)
+	{
+		m_menupos = (m_menupos & 0x00ff) | (((command-0x9) & 0xff)<<8);
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_04_IN)
+	{
+		if (command == 0x0d)
+			m_menupos += 4;
+		else if (command == 0x0a)
+			m_menupos += 0;
+		// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
+		// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
+		else if (command == 0x1e)
+			m_menupos += 0x310;
+
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+	else if (m_menustate == MENU_COMMAND_05_IN)
+	{
+		// used if you try to scroll down past the and the value becomes too large
+		// actually writes 0x313 split into 2 commands, so the 2nd write to 0x05 with param then instead 0b/16 sequence of writes instead of 26/0c subtracts from the high byte?
+		if (command == 0x0b)
+		{
+			m_menupos -= 0xdc;
+		}
+		else if (command == 0x0e)
+		{
+			m_menupos -= 0x314;
+		}	
+
+		m_menustate = MENU_READY_FOR_COMMAND;
+	}
+}
+
 void pcp8718_state::unk_7860_w(uint16_t data)
 {
-	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: unk_7860_w %04x (IO port)\n", machine().describe_context(), data);
+	if (data & 0x20)
+	{
+		m_bit10state = 1;
+	}
+	else
+	{
+		m_bit10state = 0;
+		m_latchdata <<= 1;
+		m_latchdata |= ((data & 0x10) >> 4);
+		m_latchinbit = (m_datain >> (7 - m_latchpos)) & 1;
+		m_latchpos++;
+
+		if (m_latchpos == 8)
+		{
+			m_latchpos = 0;
+			tx_menu_cmd(m_latchdata);
+		}
+	}
+
 	m_7860 = data;
 }
 
+void pcp8718_state::unk_7862_w(uint16_t data)
+{
+}
+
+void pcp8718_state::unk_7863_w(uint16_t data)
+{
+	// probably port direction (or 7862 is?)
+	if (data == 0x3cf7)
+	{
+		m_latchpos = 0;
+	}
+}
 
 uint16_t pcp8718_state::unk_780f_r()
 {
 	return 0x0002;
 }
 
-
-
 uint16_t pcp8718_state::spi_misc_control_r()
 {
 	LOGMASKED(LOG_GPL_UNKNOWN,"%06x: spi_misc_control_r\n", machine().describe_context());
 	return 0x0000;
 }
-
 
 uint16_t pcp8718_state::spi_rx_fifo_r()
 {
@@ -516,7 +603,7 @@ uint8_t pcp8718_state::spi_process_rx()
 	case SPI_STATE_READING:
 	case SPI_STATE_READING_FAST:
 	{
-		uint8_t dat = m_spirom[m_spiaddress & 0x3fffff];
+		uint8_t dat = m_spirom[m_spiaddress & 0x7fffff];
 
 		// hack internal BIOS checksum check
 		//if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
@@ -666,8 +753,6 @@ void pcp8718_state::system_dma_params_channel0_w(offs_t offset, uint16_t data)
 		{
 			LOGMASKED(LOG_GPL_UNKNOWN,"%06x: system_dma_params_channel0_w %01x %04x (DMA Mode)\n", machine().describe_context(), offset, data);
 
-#if 1
-
 			uint16_t mode = m_dmaregs[0];
 			uint32_t source = m_dmaregs[1] | (m_dmaregs[4] << 16);
 			uint32_t dest = m_dmaregs[2] | (m_dmaregs[5] << 16) ;
@@ -702,7 +787,7 @@ void pcp8718_state::system_dma_params_channel0_w(offs_t offset, uint16_t data)
 					source++;
 				}
 			}
-#endif
+
 			break;
 		}
 		case 1:
@@ -786,8 +871,8 @@ void pcp8718_state::map(address_map &map)
 
 
 	map(0x007860, 0x007860).rw(FUNC(pcp8718_state::unk_7860_r),FUNC(pcp8718_state::unk_7860_w));
-	map(0x007862, 0x007862).nopw();
-	map(0x007863, 0x007863).nopw();
+	map(0x007862, 0x007862).w(FUNC(pcp8718_state::unk_7862_w));
+	map(0x007863, 0x007863).w(FUNC(pcp8718_state::unk_7863_w));
 
 	map(0x007868, 0x007868).rw(FUNC(pcp8718_state::unk_7868_r), FUNC(pcp8718_state::unk_7868_w));
 
@@ -861,215 +946,14 @@ void pcp8718_state::lcd_w(uint16_t data)
 	}
 }
 
-uint16_t pcp8718_state::simulate_f000_r(offs_t offset)
-{
-	if (!machine().side_effects_disabled())
-	{
-		uint16_t pc = m_maincpu->state_int(UNSP_PC);
-		uint16_t sr = m_maincpu->state_int(UNSP_SR);
-		int realpc = (pc | (sr << 16)) & 0x003fffff;
-
-		if ((offset + 0xf000) == (realpc))
-		{
-			//LOGMASKED(LOG_GPL_UNKNOWN,"simulate_f000_r reading BIOS area (for BIOS call?) %04x\n", offset);
-			return m_mainrom[offset];
-		}
-		else
-		{
-			//LOGMASKED(LOG_GPL_UNKNOWN,"simulate_f000_r reading BIOS area (for checksum?) %04x\n", offset);
-			return m_mainrom[offset];
-		}
-	}
-	return m_mainrom[offset];
-}
-
-uint16_t pcp8718_state::ramcall_2060_logger_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x2060 in RAM (set SPI to read mode, set address, do dummy FIFO reads)\n");
-	}
-	return m_mainram[0x2060];
-}
-
-uint16_t pcp8718_state::ramcall_2189_logger_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x2189 in RAM (unknown)\n");
-	}
-	return m_mainram[0x2189];
-}
-
-
-uint16_t pcp8718_state::ramcall_2829_logger_r()
-{
-	// this in turn calls 28f7 but has restore logic too
-	if (!machine().side_effects_disabled())
-	{
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x2829 in RAM (load+call function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
-	}
-	return m_mainram[0x2829];
-}
-
-
-uint16_t pcp8718_state::ramcall_287a_logger_r()
-{
-	// this transmits to a device, then reads back the result, needed for menu navigation?!
-	// TODO: data should transmit etc. over bits in the I/O ports, this is HLE, although
-	// most of this code will end up in a simulation handler for whatever this device is
-
-	if (!machine().side_effects_disabled())
-	{
-		if (m_maincpu->pc() == 0x287a)
-		{
-			// 1d = command, 1e = param?
-			int command = m_mainram[0x1d] & 0xff;
-			int param = m_mainram[0x1e] & 0xff;
-
-			if ((command) == 0x00)  // request result  low
-			{
-				m_maincpu->set_state_int(UNSP_R1, m_stored_gamenum & 0xff);
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x (request result low)\n", command);
-			}
-			else if ((command) == 0x01) // request result  high
-			{
-				m_maincpu->set_state_int(UNSP_R1, (m_stored_gamenum>>8) & 0xff);
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x (request result high)\n", command);
-			}
-			else if ((command) == 0x02)
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data low)\n", command, param);
-				m_stored_gamenum = (m_stored_gamenum & 0xff00) | (m_mainram[0x1e] & 0x00ff);
-			}
-			else if ((command) == 0x03)
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set data high)\n", command, param);
-				m_stored_gamenum = (m_stored_gamenum & 0x00ff) | ((m_mainram[0x1e] & 0x00ff) << 8);
-			}
-			else if ((command) == 0x04)
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set add value)\n", command, param);
-				// used with down
-				if (param == 0x03)
-					m_addval = 4;
-				else if (param == 0x00)
-					m_addval = 0;
-
-				// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
-				// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
-				if (param == 0x14)
-					m_addval = 0x314;
-
-			}
-			else if ((command) == 0x05)
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x %02x (set subtract value)\n", command, param);
-
-				// used if you try to scroll down past the and the value becomes too large
-				// actually writes 0x313 split into 2 commands, so the 2nd write to 0x05 with param then instead 0b/16 sequence of writes instead of 26/0c subtracts from the high byte?
-				if (param == 0x13)
-					m_addval = -0x314; // why 314, it writes 313
-
-			}
-			else if ((command) == 0x10)
-			{
-				// this is followed by 0x1b, written if you try to move right off last entry
-				m_stored_gamenum = 0x00;
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x (reset value)\n", command);
-			}
-			else if (command == 0x26)
-			{
-				// used in direction handlers after writing the first command
-				m_stored_gamenum += m_addval;
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
-			}
-			else if (command == 0x30)
-			{
-				// used with right
-				m_addval = 1;
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
-				// 26/0c called after this, then another fixed command value, then 0b/16
-				// unlike commands 04/05 there's no parameter byte written here, must be derived from the command? 
-			}
-			else if (command == 0x37)
-			{
-				// used with left
-				m_addval = -1;
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
-				// 26/0c called after this, then another fixed command value, then 0b/16
-				// unlike commands 04/05 there's no parameter byte written here, must be derived from the command? 
-			}
-			else if (command == 0x39)
-			{
-				// used with up
-				m_addval = -4;
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
-				// 26/0c called after this, then another fixed command value, then 0b/16
-				// unlike commands 04/05 there's no parameter byte written here, must be derived from the command? 
-			}
-			else
-			{
-				LOGMASKED(LOG_GPL_UNKNOWN_SELECT_SIM,"call to 0x287a in RAM (transmit / receive) %02x\n", command);
-			}
-
-			// hack retf
-			return 0x9a90;
-		}
-	}
-	return m_mainram[0x287a];
-}
-
-uint16_t pcp8718_state::ramcall_28f7_logger_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		// no  restore logic?
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x28f7 in RAM (load+GO TO function from SPI address %08x)\n", (m_mainram[0x1e] << 16) | m_mainram[0x1d]);
-	}
-	return m_mainram[0x28f7];
-}
-
-uint16_t pcp8718_state::ramcall_2079_logger_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x2079 in RAM (maybe drawing related?)\n"); // called in the 'dummy' loop that doesn't actually draw? and other places? as well as after the actual draw command below in the real loop
-	}
-	return m_mainram[0x2079];
-}
-
-uint16_t pcp8718_state::ramcall_2434_logger_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		LOGMASKED(LOG_GPL_UNKNOWN,"call to 0x2434 in RAM (drawing related?)\n"); // [1d] as the tile / sprite number, [1e] as xpos, [1f] as ypos, [20] as 0. [21] as ff in some title drawing calls
-	}
-	return m_mainram[0x2434];
-}
 
 void pcp8718_state::machine_start()
 {
 }
 
+
 void pcp8718_state::machine_reset()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xffff, read16sm_delegate(*this, FUNC(pcp8718_state::simulate_f000_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2060, 0x2060, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2060_logger_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2079, 0x2079, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2079_logger_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2189, 0x2189, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2189_logger_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2434, 0x2434, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2434_logger_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2829, 0x2829, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_2829_logger_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x287a, 0x287a, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_287a_logger_r)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x28f7, 0x28f7, read16smo_delegate(*this, FUNC(pcp8718_state::ramcall_28f7_logger_r)));
-
 	m_spistate = SPI_STATE_READY;
 	m_spiaddress = 0;
 
@@ -1082,6 +966,12 @@ void pcp8718_state::machine_reset()
 	m_lastlcdcommand = 0;
 
 	m_78a1 = 0;
+
+// first menu index is stored here
+//	m_spirom[0x16000] = gamenum & 0xff;
+//	m_spirom[0x16001] = (gamenum>>8) & 0xff;
+
+	m_menupos = 0;
 }
 
 WRITE_LINE_MEMBER(pcp8718_state::screen_vblank)
@@ -1110,7 +1000,6 @@ void pcp8718_state::pcp8718(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 320-1, 0*8, 240-1);
 	m_screen->set_screen_update(FUNC(pcp8718_state::screen_update));
-	//m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(pcp8718_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
@@ -1136,22 +1025,26 @@ ROM_START( pcp8728 )
 	ROM_LOAD( "pcp 8728 788 in 1.bin", 0x000000, 0x400000, CRC(60115f21) SHA1(e15c39f11e442a76fae3823b6d510178f6166926) )
 ROM_END
 
+ROM_START( bkid218 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "internal.rom", 0x000000, 0x2000, CRC(ea119561) SHA1(a2680577e20fe1155efc40a5781cf1ec80ccec3a) )
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "218n1_25q64csig_c84017.bin", 0x000000, 0x800000, CRC(94f35dbd) SHA1(a1bd6defd2465ae14753cd83be5c31f99e9158ec) )
+ROM_END
+
 ROM_START( unkunsp )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
 
-	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF ) // this simply maps at 200000, and contains jumps to lower areas that suggest even the ROM/internal RAM mapping is very different
 	ROM_LOAD( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
 
-void pcp8718_state::spi_init()
-{
-}
+CONS( 200?, pcp8718,      0,       0,      pcp8718,   pcp8718, pcp8718_state, empty_init, "PCP", "PCP 8718 - HD 360 Degrees Rocker Palm Eyecare Console - 788 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, pcp8728,      0,       0,      pcp8718,   pcp8718, pcp8718_state, empty_init, "PCP", "PCP 8728 - 788 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // what name was this sold under?
+CONS( 200?, bkid218,      0,       0,      pcp8718,   pcp8718, pcp8718_state, empty_init, "BornKid", "Handheld Game Console BC-19 - 218 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-
-CONS( 200?, pcp8718,      0,       0,      pcp8718,   pcp8718, pcp8718_state, spi_init, "PCP", "PCP 8718 - HD 360 Degrees Rocker Palm Eyecare Console - 788 in 1", MACHINE_IS_SKELETON )
-CONS( 200?, pcp8728,      0,       0,      pcp8718,   pcp8718, pcp8718_state, spi_init, "PCP", "PCP 8728 - 788 in 1", MACHINE_IS_SKELETON ) // what name was this sold under?
-
-// maybe different hardware, first 0x2000 bytes in ROM is blank, so bootstrap pointers aren't there at least
+// different hardware, first 0x2000 bytes in ROM are blank, maps fully in RAM at 200000
 CONS( 200?, unkunsp,      0,       0,      pcp8718,   pcp8718, pcp8718_state, empty_init, "<unknown>", "unknown unSP-based handheld", MACHINE_IS_SKELETON )
