@@ -126,7 +126,7 @@ namespace devices
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_DEVICE_IMPL(CD4076,     "CD4076",        "+D1,+D2,+D3,+D4,+ID1,+ID2,+OD1,+OD2,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(CD4076,     "CD4076",        "+I1,+I2,+I3,+I4,+ID1,+ID2,+OD1,+OD2,@VCC,@GND")
 
 } // namespace devices
 } // namespace netlist

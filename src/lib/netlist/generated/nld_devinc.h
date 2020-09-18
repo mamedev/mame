@@ -191,7 +191,7 @@
 // Source: ../devices/nld_4076.cpp
 // ---------------------------------------------------------------------
 
-// usage       : CD4076(name, D1, D2, D3, D4, ID1, ID2, OD1, OD2)
+// usage       : CD4076(name, I1, I2, I3, I4, ID1, ID2, OD1, OD2)
 // auto connect: VCC, GND
 #define CD4076(...)                                                   \
 	NET_REGISTER_DEVEXT(CD4076, __VA_ARGS__)
