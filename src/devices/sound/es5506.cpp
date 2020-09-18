@@ -106,7 +106,6 @@ static constexpr u32 FINE_FILTER_BIT = 16;
 static constexpr u32 FILTER_BIT      = 12;
 static constexpr u32 FILTER_SHIFT    = FINE_FILTER_BIT - FILTER_BIT;
 
-static constexpr u32 MAX_SAMPLE_CHUNK    = 10000;
 static constexpr u32 ULAW_MAXBITS        = 8;
 
 namespace {
@@ -163,9 +162,6 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	, m_mode(0)
 	, m_irqv(0x80)
 	, m_voice_index(0)
-	, m_scratch(nullptr)
-	, m_ulaw_lookup(nullptr)
-	, m_volume_lookup(nullptr)
 #if ES5506_MAKE_WAVS
 	, m_wavraw(nullptr)
 #endif
@@ -208,9 +204,6 @@ void es550x_device::device_start()
 	m_sample_rate_changed_cb.resolve();
 	m_irqv = 0x80;
 
-	// allocate memory
-	m_scratch = make_unique_clear<s32[]>(2 * MAX_SAMPLE_CHUNK);
-
 	// register save
 	save_item(NAME(m_sample_rate));
 
@@ -219,8 +212,6 @@ void es550x_device::device_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_irqv));
 	save_item(NAME(m_voice_index));
-
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
 
 	save_item(STRUCT_MEMBER(m_voice, control));
 	save_item(STRUCT_MEMBER(m_voice, freqcount));
@@ -249,7 +240,7 @@ void es5506_device::device_start()
 		channels = m_channels;
 
 	// create the stream
-	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
 	if (m_region0 && !has_configured_map(0))
@@ -378,7 +369,7 @@ void es5505_device::device_start()
 		channels = m_channels;
 
 	// create the stream
-	m_stream = stream_alloc_legacy(0, 2 * channels, clock() / (16*32));
+	m_stream = stream_alloc(0, 2 * channels, clock() / (16*32));
 
 	// initialize the regions
 	if (m_region0 && !has_configured_map(0))
@@ -455,7 +446,7 @@ void es550x_device::update_internal_irq_state()
 void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 mantissa_bit)
 {
 	// allocate ulaw lookup table
-	m_ulaw_lookup = make_unique_clear<s16[]>(1 << ULAW_MAXBITS);
+	m_ulaw_lookup.resize(1 << ULAW_MAXBITS);
 
 	// generate ulaw lookup table
 	for (int i = 0; i < (1 << ULAW_MAXBITS); i++)
@@ -465,11 +456,11 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 		u32 mantissa = (rawval << 3) & 0xffff;
 
 		if (exponent == 0)
-			m_ulaw_lookup[i] = (s16)mantissa >> 7;
+			m_ulaw_lookup[i] = s16(mantissa) >> 7;
 		else
 		{
 			mantissa = (mantissa >> 1) | (~mantissa & 0x8000);
-			m_ulaw_lookup[i] = (s16)mantissa >> (7 - exponent);
+			m_ulaw_lookup[i] = s16(mantissa) >> (7 - exponent);
 		}
 	}
 
@@ -477,7 +468,7 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 	m_volume_shift = total_volume_bit - volume_bit;
 	const u32 volume_len = 1 << volume_bit;
 	// allocate volume lookup table
-	m_volume_lookup = make_unique_clear<u32[]>(volume_len);
+	m_volume_lookup.resize(volume_len);
 
 	// generate volume lookup table
 	const u32 exponent_shift = 1 << exponent_bit;
@@ -831,7 +822,7 @@ inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u64 &accum
 
 ***********************************************************************************************/
 
-void es550x_device::generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples)
+void es550x_device::generate_ulaw(es550x_voice *voice, s32 *dest)
 {
 	const u32 freqcount = voice->freqcount;
 	u64 accum = voice->accum & m_address_acc_mask;
@@ -862,8 +853,8 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffe
 				update_envelopes(voice);
 
 			// apply volumes and add
-			*lbuffer += get_sample(val1, voice->lvol);
-			*rbuffer += get_sample(val1, voice->rvol);
+			dest[0] += get_sample(val1, voice->lvol);
+			dest[1] += get_sample(val1, voice->rvol);
 
 			// check for loop end
 			check_for_end_forward(voice, accum);
@@ -892,8 +883,8 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffe
 				update_envelopes(voice);
 
 			// apply volumes and add
-			*lbuffer += get_sample(val1, voice->lvol);
-			*rbuffer += get_sample(val1, voice->rvol);
+			dest[0] += get_sample(val1, voice->lvol);
+			dest[1] += get_sample(val1, voice->rvol);
 
 			// check for loop end
 			check_for_end_reverse(voice, accum);
@@ -917,7 +908,7 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffe
 
 ***********************************************************************************************/
 
-void es550x_device::generate_pcm(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples)
+void es550x_device::generate_pcm(es550x_voice *voice, s32 *dest)
 {
 	const u32 freqcount = voice->freqcount;
 	u64 accum = voice->accum & m_address_acc_mask;
@@ -944,8 +935,8 @@ void es550x_device::generate_pcm(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer
 				update_envelopes(voice);
 
 			// apply volumes and add
-			*lbuffer += get_sample(val1, voice->lvol);
-			*rbuffer += get_sample(val1, voice->rvol);
+			dest[0] += get_sample(val1, voice->lvol);
+			dest[1] += get_sample(val1, voice->rvol);
 
 			// check for loop end
 			check_for_end_forward(voice, accum);
@@ -970,8 +961,8 @@ void es550x_device::generate_pcm(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer
 				update_envelopes(voice);
 
 			// apply volumes and add
-			*lbuffer += get_sample(val1, voice->lvol);
-			*rbuffer += get_sample(val1, voice->rvol);
+			dest[0] += get_sample(val1, voice->lvol);
+			dest[1] += get_sample(val1, voice->rvol);
 
 			// check for loop end
 			check_for_end_reverse(voice, accum);
@@ -1022,22 +1013,13 @@ inline void es550x_device::generate_irq(es550x_voice *voice, int v)
 
 ***********************************************************************************************/
 
-void es5506_device::generate_samples(s32 * const *outputs, int offset, int samples)
+void es5506_device::generate_samples(std::vector<write_stream_view> &outputs)
 {
-	// skip if nothing to do
-	if (!samples)
-		return;
-
-	// clear out the accumulators
-	for (int i = 0; i < m_channels << 1; i++)
-	{
-		memset(outputs[i] + offset, 0, sizeof(s32) * samples);
-	}
-
 	// loop while we still have samples to generate
-	while (samples)
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// loop over voices
+		s32 cursample[12] = { 0 };
 		for (int v = 0; v <= m_active_voices; v++)
 		{
 			es550x_voice *voice = &m_voice[v];
@@ -1049,40 +1031,30 @@ void es5506_device::generate_samples(s32 * const *outputs, int offset, int sampl
 			const int voice_channel = get_ca(voice->control);
 			const int channel = voice_channel % m_channels;
 			const int l = channel << 1;
-			const int r = l + 1;
-			s32 *left = outputs[l] + offset;
-			s32 *right = outputs[r] + offset;
 
 			// generate from the appropriate source
 			if (voice->control & CONTROL_CMPD)
-				generate_ulaw(voice, left, right, samples);
+				generate_ulaw(voice, &cursample[l]);
 			else
-				generate_pcm(voice, left, right, samples);
+				generate_pcm(voice, &cursample[l]);
 
 			// does this voice have it's IRQ bit raised?
 			generate_irq(voice, v);
 		}
-		offset++;
-		samples--;
+
+		constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+		for (int c = 0; c < outputs.size(); c++)
+			outputs[c].put(sampindex, stream_buffer::sample_t(cursample[c]) * sample_scale);
 	}
 }
 
-void es5505_device::generate_samples(s32 * const *outputs, int offset, int samples)
+void es5505_device::generate_samples(std::vector<write_stream_view> &outputs)
 {
-	// skip if nothing to do
-	if (!samples)
-		return;
-
-	// clear out the accumulators
-	for (int i = 0; i < m_channels << 1; i++)
-	{
-		memset(outputs[i] + offset, 0, sizeof(s32) * samples);
-	}
-
 	// loop while we still have samples to generate
-	while (samples)
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// loop over voices
+		s32 cursample[12] = { 0 };
 		for (int v = 0; v <= m_active_voices; v++)
 		{
 			es550x_voice *voice = &m_voice[v];
@@ -1100,19 +1072,18 @@ void es5505_device::generate_samples(s32 * const *outputs, int offset, int sampl
 			const int voice_channel = get_ca(voice->control);
 			const int channel = voice_channel % m_channels;
 			const int l = channel << 1;
-			const int r = l + 1;
-			s32 *left = outputs[l] + offset;
-			s32 *right = outputs[r] + offset;
 
 			// generate from the appropriate source
 			// no compressed sample support
-			generate_pcm(voice, left, right, samples);
+			generate_pcm(voice, &cursample[l]);
 
 			// does this voice have it's IRQ bit raised?
 			generate_irq(voice, v);
 		}
-		offset++;
-		samples--;
+
+		constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+		for (int c = 0; c < outputs.size(); c++)
+			outputs[c].put(sampindex, stream_buffer::sample_t(cursample[c]) * sample_scale);
 	}
 }
 
@@ -2126,7 +2097,7 @@ u16 es5505_device::read(offs_t offset)
 //  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void es550x_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void es550x_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 #if ES5506_MAKE_WAVS
 	// start the logging once we have a sample rate
@@ -2138,39 +2109,30 @@ void es550x_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 #endif
 
 	// loop until all samples are output
-	int offset = 0;
-	while (samples)
-	{
-		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-
-		generate_samples(outputs, offset, length);
+	generate_samples(outputs);
 
 #if ES5506_MAKE_WAVS
-		// log the raw data
-		if (m_wavraw)
-		{
-			// determine left/right source data
-			s32 *lsrc = m_scratch, *rsrc = m_scratch + length;
-			int channel;
-			memset(lsrc, 0, sizeof(s32) * length * 2);
-			// loop over the output channels
-			for (channel = 0; channel < m_channels; channel++)
-			{
-				s32 *l = outputs[(channel << 1)] + offset;
-				s32 *r = outputs[(channel << 1) + 1] + offset;
-				// add the current channel's samples to the WAV data
-				for (samp = 0; samp < length; samp++)
-				{
-					lsrc[samp] += l[samp];
-					rsrc[samp] += r[samp];
-				}
-			}
-			wav_add_data_32lr(m_wavraw, lsrc, rsrc, length, 4);
-		}
-#endif
+	// log the raw data
+	if (m_wavraw)
+	{
+		// determine left/right source data
 
-		// account for these samples
-		offset += length;
-		samples -= length;
+		s32 *lsrc = m_scratch, *rsrc = m_scratch + length;
+		int channel;
+		memset(lsrc, 0, sizeof(s32) * length * 2);
+		// loop over the output channels
+		for (channel = 0; channel < m_channels; channel++)
+		{
+			s32 *l = outputs[(channel << 1)] + sampindex;
+			s32 *r = outputs[(channel << 1) + 1] + sampindex;
+			// add the current channel's samples to the WAV data
+			for (samp = 0; samp < length; samp++)
+			{
+				lsrc[samp] += l[samp];
+				rsrc[samp] += r[samp];
+			}
+		}
+		wav_add_data_32lr(m_wavraw, lsrc, rsrc, length, 4);
 	}
+#endif
 }

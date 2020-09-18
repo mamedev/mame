@@ -70,12 +70,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// timer callback overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -84,9 +82,6 @@ private:
 	// internal state:
 	// sound stream
 	sound_stream *m_stream;
-
-	// per-sample timer
-	emu_timer *m_timer;
 
 	// ESP signal processor
 	required_device<es5510_device> m_esp;

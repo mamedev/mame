@@ -17,7 +17,6 @@ esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconf
 	: device_t(mconfig, ESQ_5505_5510_PUMP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_timer(nullptr)
 	, m_esp(*this, finder_base::DUMMY_TAG)
 	, m_esp_halted(true)
 	, ticks_spent_processing(0)
@@ -32,9 +31,7 @@ void esq_5505_5510_pump_device::device_start()
 {
 	logerror("Clock = %d\n", clock());
 
-	m_stream = stream_alloc_legacy(8, 2, clock());
-	m_timer = timer_alloc(0);
-	m_timer->enable(false);
+	m_stream = stream_alloc(8, 2, clock(), STREAM_SYNCHRONOUS);
 
 #if PUMP_DETECT_SILENCE
 	silent_for = 500;
@@ -51,49 +48,37 @@ void esq_5505_5510_pump_device::device_start()
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	e = make_unique_clear<int16_t[]>(0x4000);
+	e.resize(0x4000);
 	ei = 0;
 #endif
-}
-
-void esq_5505_5510_pump_device::device_stop()
-{
-	m_timer->enable(false);
-}
-
-void esq_5505_5510_pump_device::device_reset()
-{
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
-	m_timer->enable(true);
 }
 
 void esq_5505_5510_pump_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock());
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 }
 
-void esq_5505_5510_pump_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	if (samples != 1) {
-		logerror("Pump: request for %d samples\n", samples);
-	}
+	sound_assert(outputs[0].samples() == 1);
 
-	stream_sample_t *left = outputs[0], *right = outputs[1];
-	for (int i = 0; i < samples; i++)
-	{
+	auto &left = outputs[0];
+	auto &right = outputs[1];
 #define SAMPLE_SHIFT 4
+	constexpr stream_buffer::sample_t input_scale = 32768.0 / (1 << SAMPLE_SHIFT);
+	for (int i = 0; i < left.samples(); i++)
+	{
 		// anything for the 'aux' output?
-		int16_t l = inputs[0][i] >> SAMPLE_SHIFT;
-		int16_t r = inputs[1][i] >> SAMPLE_SHIFT;
+		stream_buffer::sample_t l = inputs[0].get(i) * (1.0 / (1 << SAMPLE_SHIFT));
+		stream_buffer::sample_t r = inputs[1].get(i) * (1.0 / (1 << SAMPLE_SHIFT));
 
 		// push the samples into the ESP
-		m_esp->ser_w(0, inputs[2][i] >> SAMPLE_SHIFT);
-		m_esp->ser_w(1, inputs[3][i] >> SAMPLE_SHIFT);
-		m_esp->ser_w(2, inputs[4][i] >> SAMPLE_SHIFT);
-		m_esp->ser_w(3, inputs[5][i] >> SAMPLE_SHIFT);
-		m_esp->ser_w(4, inputs[6][i] >> SAMPLE_SHIFT);
-		m_esp->ser_w(5, inputs[7][i] >> SAMPLE_SHIFT);
+		m_esp->ser_w(0, s32(inputs[2].get(i) * input_scale));
+		m_esp->ser_w(1, s32(inputs[3].get(i) * input_scale));
+		m_esp->ser_w(2, s32(inputs[4].get(i) * input_scale));
+		m_esp->ser_w(3, s32(inputs[5].get(i) * input_scale));
+		m_esp->ser_w(4, s32(inputs[6].get(i) * input_scale));
+		m_esp->ser_w(5, s32(inputs[7].get(i) * input_scale));
 
 #if PUMP_FAKE_ESP_PROCESSING
 		m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
@@ -110,32 +95,32 @@ void esq_5505_5510_pump_device::sound_stream_update_legacy(sound_stream &stream,
 #endif
 
 		// read the processed result from the ESP and add to the saved AUX data
-		int16_t ll = m_esp->ser_r(6);
-		int16_t rr = m_esp->ser_r(7);
+		stream_buffer::sample_t ll = stream_buffer::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
+		stream_buffer::sample_t rr = stream_buffer::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
 		l += ll;
 		r += rr;
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
 		// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
-		int32_t el = (inputs[2][i]) + (inputs[4][i]) + (inputs[6][i]);
-		int32_t er = (inputs[3][i]) + (inputs[5][i]) + (inputs[7][i]);
-		int32_t e_next = el + er;
+		stream_buffer::sample_t el = (inputs[2].get(i)) + (inputs[4].get(i)) + (inputs[6].get(i));
+		stream_buffer::sample_t er = (inputs[3].get(i)) + (inputs[5].get(i)) + (inputs[7].get(i));
+		stream_buffer::sample_t e_next = el + er;
 		e[(ei + 0x1d0f) % 0x4000] = e_next;
 
-		if (l != e[ei]) {
+		if (fabs(l - e[ei]) > 1e-5) {
 			util::stream_format(std::cerr, "expected (%d) but have (%d)\n", e[ei], l);
 		}
 		ei = (ei + 1) % 0x4000;
 #endif
 
 		// write the combined data to the output
-		*left++  = l;
-		*right++ = r;
+		left.put(i, l);
+		right.put(i, r);
 	}
 
 #if PUMP_DETECT_SILENCE
-	for (int i = 0; i < samples; i++) {
-		if (outputs[0][i] == 0 && outputs[1][i] == 0) {
+	for (int i = 0; i < left.samples(); i++) {
+		if (left.get(i) == 0 && right.get(i) == 0) {
 			silent_for++;
 		} else {
 			silent_for = 0;
