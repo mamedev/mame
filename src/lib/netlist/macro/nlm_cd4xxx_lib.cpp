@@ -268,6 +268,251 @@ static NETLIST_START(CD4024_DIP)
 				 /*       +--------------+     */)
 NETLIST_END()
 
+//- Identifier: CD4029_DIP
+//- Title: CD4029BM/CD4029BC Presettable Binary/Decade Up/Down Counter
+//- Pinalias: PE,Q4,J4,J1,CI,Q1,CO,VSS,BD,UD,Q2,J2,J3,Q3,CLK,VDD
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations:
+//-    Voltage-dependent timing is not implemented.
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheets/166/108968_DS.pdf
+//-    See nld_4029.cpp for tables explaining the counting order for all states
+//-
+//-         Counter Sequences:
+//-
+//-         B/D high (Binary), U/D high (Up)
+//-         +-------++----+----+----+----+----++-------+
+//-         | COUNT || Q4 | Q3 | Q2 | Q1 | CO ||  NEXT |
+//-         +=======++====+====+====+====+====++=======+
+//-         |    0  ||  0 |  0 |  0 |  0 |  1 ||     1 |
+//-         |    1  ||  0 |  0 |  0 |  1 |  1 ||     2 |
+//-         |    2  ||  0 |  0 |  1 |  0 |  1 ||     3 |
+//-         |    3  ||  0 |  0 |  1 |  1 |  1 ||     4 |
+//-         |    4  ||  0 |  1 |  0 |  0 |  1 ||     5 |
+//-         |    5  ||  0 |  1 |  0 |  1 |  1 ||     6 |
+//-         |    6  ||  0 |  1 |  1 |  0 |  1 ||     7 |
+//-         |    7  ||  0 |  1 |  1 |  1 |  1 ||     8 |
+//-         |    8  ||  1 |  0 |  0 |  0 |  1 ||     9 |
+//-         |    9  ||  1 |  0 |  0 |  1 |  1 ||     A |
+//-         |    A  ||  1 |  0 |  1 |  0 |  1 ||     B |
+//-         |    B  ||  1 |  0 |  1 |  1 |  1 ||     C |
+//-         |    C  ||  1 |  1 |  0 |  0 |  1 ||     D |
+//-         |    D  ||  1 |  1 |  0 |  1 |  1 ||     E |
+//-         |    E  ||  1 |  1 |  1 |  0 |  1 ||     F |
+//-         |    F  ||  1 |  1 |  1 |  1 |0|CI||     0 |
+//-         |    0  ||  0 |  0 |  0 |  0 |  1 ||     1 |
+//-         +-------++----+----+----+----+----++-------+
+//-
+//-         B/D high (Binary), U/D low (Down)
+//-         +-------++----+----+----+----+----++-------+
+//-         | COUNT || Q4 | Q3 | Q2 | Q1 | CO ||  NEXT |
+//-         +=======++====+====+====+====+====++=======+
+//-         |    F  ||  1 |  1 |  1 |  1 |  1 ||     E |
+//-         |    E  ||  1 |  1 |  1 |  0 |  1 ||     D |
+//-         |    D  ||  1 |  1 |  0 |  1 |  1 ||     C |
+//-         |    C  ||  1 |  1 |  0 |  0 |  1 ||     B |
+//-         |    B  ||  1 |  0 |  1 |  1 |  1 ||     A |
+//-         |    A  ||  1 |  0 |  1 |  0 |  1 ||     9 |
+//-         |    9  ||  1 |  0 |  0 |  1 |  1 ||     8 |
+//-         |    8  ||  1 |  0 |  0 |  0 |  1 ||     7 |
+//-         |    7  ||  0 |  1 |  1 |  1 |  1 ||     6 |
+//-         |    6  ||  0 |  1 |  1 |  0 |  1 ||     5 |
+//-         |    5  ||  0 |  1 |  0 |  1 |  1 ||     4 |
+//-         |    4  ||  0 |  1 |  0 |  0 |  1 ||     3 |
+//-         |    3  ||  0 |  0 |  1 |  1 |  1 ||     2 |
+//-         |    2  ||  0 |  0 |  1 |  0 |  1 ||     1 |
+//-         |    1  ||  0 |  0 |  0 |  1 |  1 ||     0 |
+//-         |    0  ||  0 |  0 |  0 |  0 |0|CI||     F |
+//-         |    F  ||  1 |  1 |  1 |  1 |  1 ||     E |
+//-         +-------++----+----+----+----+----++-------+
+//-
+//-         B/D low (Decimal), U/D high (Up)
+//-         +-------++----+----+----+----+----++-------+
+//-         | COUNT || Q4 | Q3 | Q2 | Q1 | CO ||  NEXT |
+//-         +=======++====+====+====+====+====++=======+
+//-         |    0  ||  0 |  0 |  0 |  0 |  1 ||     1 |
+//-         |    1  ||  0 |  0 |  0 |  1 |  1 ||     2 |
+//-         |    2  ||  0 |  0 |  1 |  0 |  1 ||     3 |
+//-         |    3  ||  0 |  0 |  1 |  1 |  1 ||     4 |
+//-         |    4  ||  0 |  1 |  0 |  0 |  1 ||     5 |
+//-         |    5  ||  0 |  1 |  0 |  1 |  1 ||     6 |
+//-         |    6  ||  0 |  1 |  1 |  0 |  1 ||     7 |
+//-         |    7  ||  0 |  1 |  1 |  1 |  1 ||     8 |
+//-         |    8  ||  1 |  0 |  0 |  0 |  1 ||     9 |
+//-         |    9  ||  1 |  0 |  0 |  1 |0|CI||     0 |
+//-         |    A  ||  1 |  0 |  1 |  0 |  1 ||     B |
+//-         |    B  ||  1 |  0 |  1 |  1 |0|CI||     6 |
+//-         |    C  ||  1 |  1 |  0 |  0 |  1 ||     D |
+//-         |    D  ||  1 |  1 |  0 |  1 |0|CI||     4 |
+//-         |    E  ||  1 |  1 |  1 |  0 |  1 ||     F |
+//-         |    F  ||  1 |  1 |  1 |  1 |0|CI||     2 |
+//-         |    0  ||  0 |  0 |  0 |  0 |  1 ||     1 |
+//-         +-------++----+----+----+----+----++-------+
+//-
+//-         B/D low (Decimal), U/D low (Down)
+//-         +-------++----+----+----+----+----++-------+
+//-         | COUNT || Q4 | Q3 | Q2 | Q1 | CO ||  NEXT |
+//-         +=======++====+====+====+====+====++=======+
+//-         |    F  ||  1 |  1 |  1 |  1 |  1 ||     E |
+//-         |    E  ||  1 |  1 |  1 |  0 |  1 ||     D |
+//-         |    D  ||  1 |  1 |  0 |  1 |  1 ||     C |
+//-         |    C  ||  1 |  1 |  0 |  0 |  1 ||     B |
+//-         |    B  ||  1 |  0 |  1 |  1 |  1 ||     A |
+//-         |    A  ||  1 |  0 |  1 |  0 |  1 ||     9 |
+//-         |    9  ||  1 |  0 |  0 |  1 |  1 ||     8 |
+//-         |    8  ||  1 |  0 |  0 |  0 |  1 ||     7 |
+//-         |    7  ||  0 |  1 |  1 |  1 |  1 ||     6 |
+//-         |    6  ||  0 |  1 |  1 |  0 |  1 ||     5 |
+//-         |    5  ||  0 |  1 |  0 |  1 |  1 ||     4 |
+//-         |    4  ||  0 |  1 |  0 |  0 |  1 ||     3 |
+//-         |    3  ||  0 |  0 |  1 |  1 |  1 ||     2 |
+//-         |    2  ||  0 |  0 |  1 |  0 |  1 ||     1 |
+//-         |    1  ||  0 |  0 |  0 |  1 |  1 ||     0 |
+//-         |    0  ||  0 |  0 |  0 |  0 |0|CI||     9 |
+//-         |    9  ||  1 |  0 |  0 |  1 |  1 ||     8 |
+//-         +-------++----+----+----+----+----++-------+
+//-
+//-         Note that in all cases where Carry-out is generating a non-1 signal (0 | Carry-in),
+//-         this signal is asynchronous, so if carry-in changes the carry-out value will
+//-         change immediately.
+//-
+//-         Preset/Carry in function table
+//-         +-----+-----+-----++----+----+----+----+
+//-         | PE  | CLK | CI  || Q1 | Q2 | Q3 | Q4 |
+//-         +=====+=====+=====++====+====+====+====+
+//-         |  1  |  X  |  X  || J1 | J2 | J3 | J4 |
+//-         |  0  |  X  |  1  || Q1 | Q2 | Q3 | Q4 |
+//-         |  0  | ./` |  0  ||       COUNT       |
+//-         +-----+-----+-----++----+----+----+----+
+//-
+static NETLIST_START(CD4029_DIP)
+	CD4029(A)
+
+	DIPPINS(     /*     +--------------+     */
+		   A.PE, /*  PE |1     ++    16| VDD */ A.VDD,
+		   A.Q4, /*  Q4 |2           15| CLK */ A.CLK,
+		   A.J4, /*  J4 |3           14| Q3  */ A.Q3,
+		   A.J1, /*  J1 |4    4029   13| J3  */ A.J3,
+		   A.CI, /*  CI |5           12| J2  */ A.J2,
+		   A.Q1, /*  Q1 |6           11| Q2  */ A.Q2,
+		   A.CO, /*  CO |7           10| U/D */ A.UD,
+		  A.VSS, /* VSS |8            9| B/D */ A.BD
+				 /*     +--------------+  */)
+NETLIST_END()
+
+//- Identifier: CD4030_DIP
+//- Title: CD4030M/CD4030C Quad EXCLUSIVE-OR Gate
+//- Pinalias: A1,B1,Y1,Y2,A2,B2,VSS,A3,B3,Y3,Y4,A4,B4,VDD
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations:
+//-    Voltage-dependent timing is not implemented.
+//- FunctionTable:
+//-    https://www.uni-kl.de/elektronik-lager/418055
+//-
+static NETLIST_START(CD4030_DIP)
+	   CD4030_GATE(A)
+	   CD4030_GATE(B)
+	   CD4030_GATE(C)
+	   CD4030_GATE(D)
+
+	DIPPINS(   /*     +--------------+     */
+		  A.A, /*  A1 |1     ++    14| VDD */ A.VDD,
+		  A.B, /*  B1 |2           13| B4  */ D.B,
+		  A.Q, /*  Y1 |3           12| A4  */ D.A,
+		  B.Q, /*  Y2 |4    4030   11| Y4  */ D.Q,
+		  B.A, /*  A2 |5           10| Y3  */ C.Q,
+		  B.B, /*  B2 |6            9| B3  */ C.B,
+		A.VSS, /* VSS |7            8| A3  */ C.A
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
+//- Identifier: CD4042_DIP
+//- Title: CD4042BM/CD4042BC Quad Clocked D Latch
+//- Pinalias: Q4,Q1,QQ1,D1,CLK,POL,D2,VSS,QQ2,Q2,Q3,QQ3,D3,D4,QQ4,VDD
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations:
+//-    Voltage-dependent timing is partially implemented.
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS005966.PDF
+//-
+//-         +-----+-----+----++----+-----+
+//-         | POL | CLK | Dx || Qx | QQx |
+//-         +=====+=====+====++====+=====+
+//-         |  0  |  0  |  X || Qx | /Qx |
+//-         |  0  |  1  |  D ||  D | /D  |
+//-         |  1  |  1  |  X || Qx | /Qx |
+//-         |  1  |  0  |  D ||  D | /D  |
+//-         +-----+-----+----++----+-----+
+//-         Note that since this is a level triggered transparent latch,
+//-         as long as POL ^ CLK == true, the latch is transparent, and
+//-         if D changes Q and QQ(/Q) will instantly change.
+//-
+static NETLIST_START(CD4042_DIP)
+	CD4042(A)
+
+	DIPPINS(     /*     +--------------+     */
+		   A.Q4, /*  Q4 |1     ++    16| VDD */ A.VDD,
+		   A.Q1, /*  Q1 |2           15| Q4Q */ A.Q4Q,
+		  A.Q1Q, /* Q1Q |3           14| D4  */ A.D4,
+		   A.D1, /*  D1 |4    4042   13| D3  */ A.D3,
+		  A.CLK, /* CLK |5           12| Q3Q */ A.Q3Q,
+		  A.POL, /* POL |6           11| Q3  */ A.Q3,
+		   A.D2, /*  D2 |7           10| Q2  */ A.Q2,
+		  A.VSS, /* VSS |8            9| Q2Q */ A.Q2Q
+				 /*     +--------------+        */
+	)
+NETLIST_END()
+
+//- Identifier: CD4049_DIP
+//- Title: CD4049UBM/CD4049UBC Hex Inverting Buffer
+//- Pinalias: VDD,G,A,H,B,I,C,VSS,D,J,E,K,NC,F,L,NC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations:
+//-    Voltage-dependent timing is not implemented.
+//- FunctionTable:
+//-    http://pdf.datasheetcatalog.com/datasheets/134/109125_DS.pdf
+//-
+static NETLIST_START(CD4049_DIP)
+	CD4049_GATE(A)
+	CD4049_GATE(B)
+	CD4049_GATE(C)
+	CD4049_GATE(D)
+	CD4049_GATE(E)
+	CD4049_GATE(F)
+	NC_PIN(NC)
+
+	NET_C(A.VDD, B.VDD, C.VDD, D.VDD, E.VDD, F.VDD)
+	NET_C(A.VSS, B.VSS, C.VSS, D.VSS, E.VSS, F.VSS)
+
+	//DIPPINS( /*     +--------------+     */
+	//	A.VDD, /* VCC |1     ++    16| NC  */ NC.I,
+	//	  A.G, /*G=/A |2           15| L=/F*/ F.L,
+	//	  A.A, /*   A |3           14| F   */ F.F,
+	//	  B.H, /*H=/B |4           13| NC  */ NC.I,
+	//	  B.B, /*   B |5    4049   12| K=/E*/ E.K,
+	//	  C.I, /*I=/C |6           11| E   */ E.E,
+	//	  C.C, /*   C |7           10| J=/D*/ D.J,
+	//	A.VSS, /* VSS |8            9| D   */ D.D
+	//		   /*     +--------------+     */
+	//)
+	DIPPINS(   /*     +--------------+     */
+		A.VDD, /* VCC |1     ++    16| NC  */ NC.I,
+		  A.Q, /*G=/A |2           15| L=/F*/ F.Q,
+		  A.A, /*   A |3           14| F   */ F.A,
+		  B.Q, /*H=/B |4           13| NC  */ NC.I,
+		  B.A, /*   B |5    4049   12| K=/E*/ E.Q,
+		  C.Q, /*I=/C |6           11| E   */ E.A,
+		  C.A, /*   C |7           10| J=/D*/ D.Q,
+		A.VSS, /* VSS |8            9| D   */ D.A
+			   /*     +--------------+     */
+	)
+NETLIST_END()
+
 //- Identifier: CD4053_DIP
 //- Title: CD4053BM/CD4053BC Triple 2-Channel AnalogMultiplexer/Demultiplexer
 //- Pinalias: INOUTBY,INOUTBX,INOUTCY,OUTINC,INOUTCX,INH,VEE,VSS,C,B,A,INOUTAX,INOUTAY,OUTINA,OUTINB,VDD
@@ -397,6 +642,56 @@ static NETLIST_START(CD4070_DIP)
 	)
 NETLIST_END()
 
+//- Identifier: CD4076_DIP
+//- Title: CD4076BM/CD4076BC TRI-STATE(R) Quad D Flip-Flop
+//- Pinalias: OD1,OD2,OA,OB,OC,OD,CLK,VSS,ID1,ID2,ID,IC,IB,IA,CLR,VDD
+//- Package: DIP
+//- NamingConvention: Naming conventions follow National Semiconductor datasheet
+//- Limitations:
+//-    Voltage-dependent timing is not implemented.
+//- FunctionTable:
+//-    http://www.bitsavers.org/components/national/_dataBooks/1981_Natonal_CMOS_Databook.pdf 5-186 (pdf page 567)
+//-
+//-         Function table for ID1/2 pins
+//-         +-----+-----+-----+----+-----++-----+
+//-         | ID1 | ID2 | CLR | Ix | CLK || iOx |
+//-         +=====+=====+=====+====+=====++=====+
+//-         |  X  |  X  |  0  |  X |  0  || iOx |
+//-         |  X  |  X  |  0  |  X |  1  || iOx |
+//-         |  1  |  X  |  0  |  X | 0>1 || iOx |
+//-         |  X  |  1  |  0  |  X | 0>1 || iOx |
+//-         |  0  |  0  |  0  |  0 | 0>1 ||  0  |
+//-         |  0  |  0  |  0  |  1 | 0>1 ||  1  |
+//-         |  X  |  X  |  1  |  X |  X  ||  0  |
+//-         +-----+-----+-----+----+-----++-----+
+//-         Note: iOX is an internal signal, the output of each D-latch
+//-
+//-         Function table for OD1/2 pins vs output of the internal D-latches
+//-         +-----+-----+-----++-----+
+//-         | OD1 | OD2 | iOx ||  Ox |
+//-         +=====+=====+=====++=====+
+//-         |  1  |  X  |  X  ||  Z  |
+//-         |  X  |  1  |  X  ||  Z  |
+//-         |  0  |  0  |  0  ||  0  |
+//-         |  0  |  0  |  1  ||  1  |
+//-         +-----+-----+-----++-----+
+//-
+static NETLIST_START(CD4076_DIP)
+	CD4076(A)
+
+	DIPPINS(     /*     +--------------+     */
+		  A.OD1, /* OD1 |1     ++    16| VDD */ A.VDD,
+		  A.OD2, /* OD2 |2           15| CLR */ A.CLR,
+		   A.OA, /*  OA |3           14| IA  */ A.IA,
+		   A.OB, /*  OB |4    4076   13| IB  */ A.IB,
+		   A.OC, /*  OC |5           12| IC  */ A.IC,
+		   A.OD, /*  OD |6           11| ID  */ A.ID,
+		  A.CLK, /* CLK |7           10| ID2 */ A.ID2,
+		  A.VSS, /* VSS |8            9| ID1 */ A.ID1
+				 /*     +--------------+     */
+	)
+NETLIST_END()
+
 //- Identifier: CD4316_DIP
 //- Title: 74HC/HCT4316 Quad bilateral switches
 //- Pinalias: 1Z,1Y,2Y,2Z,2S,3S,EQ,GND,VEE,3Z,3Y,4Y,4Z,4S,1S,VCC
@@ -501,6 +796,22 @@ static TRUTHTABLE_START(CD4011_GATE, 2, 1, "")
 	TT_FAMILY("CD4XXX")
 TRUTHTABLE_END()
 
+static TRUTHTABLE_START(CD4030_GATE, 2, 1, "")
+	TT_HEAD("A , B | Q ")
+	TT_LINE("0,0|0|100")
+	TT_LINE("0,1|1|100")
+	TT_LINE("1,0|1|100")
+	TT_LINE("1,1|0|100")
+	TT_FAMILY("CD4XXX")
+TRUTHTABLE_END()
+
+static TRUTHTABLE_START(CD4049_GATE, 1, 1, "")
+	TT_HEAD("A|Q ")
+	TT_LINE("0|1|45")
+	TT_LINE("1|0|45")
+	TT_FAMILY("CD4XXX")
+TRUTHTABLE_END()
+
 static TRUTHTABLE_START(CD4069_GATE, 1, 1, "")
 	TT_HEAD("A|Q ")
 	TT_LINE("0|1|55")
@@ -521,11 +832,15 @@ NETLIST_START(cd4xxx_lib)
 
 	TRUTHTABLE_ENTRY(CD4001_GATE)
 	TRUTHTABLE_ENTRY(CD4011_GATE)
+	TRUTHTABLE_ENTRY(CD4030_GATE)
+	TRUTHTABLE_ENTRY(CD4049_GATE)
 	TRUTHTABLE_ENTRY(CD4069_GATE)
 	TRUTHTABLE_ENTRY(CD4070_GATE)
 
 	LOCAL_LIB_ENTRY(CD4001_DIP)
 	LOCAL_LIB_ENTRY(CD4011_DIP)
+	LOCAL_LIB_ENTRY(CD4030_DIP)
+	LOCAL_LIB_ENTRY(CD4049_DIP)
 	LOCAL_LIB_ENTRY(CD4069_DIP)
 	LOCAL_LIB_ENTRY(CD4070_DIP)
 
@@ -536,9 +851,12 @@ NETLIST_START(cd4xxx_lib)
 	LOCAL_LIB_ENTRY(CD4022_DIP)
 	LOCAL_LIB_ENTRY(CD4020_DIP)
 	LOCAL_LIB_ENTRY(CD4024_DIP)
+	LOCAL_LIB_ENTRY(CD4029_DIP)
+	LOCAL_LIB_ENTRY(CD4042_DIP)
 	LOCAL_LIB_ENTRY(CD4053_DIP)
 	LOCAL_LIB_ENTRY(CD4066_DIP)
 	LOCAL_LIB_ENTRY(CD4016_DIP)
+	LOCAL_LIB_ENTRY(CD4076_DIP)
 	LOCAL_LIB_ENTRY(CD4316_DIP)
 	LOCAL_LIB_ENTRY(CD4538_DIP)
 
