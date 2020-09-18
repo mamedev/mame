@@ -34,12 +34,12 @@ READ_LINE_MEMBER(mdcr_device::bet)
 
 READ_LINE_MEMBER(mdcr_device::cip)
 {
-	return true;
+	return m_cassette->get_image() != nullptr;
 }
 
 READ_LINE_MEMBER(mdcr_device::wen)
 {
-	return true;
+	return m_cassette->get_image() != nullptr && m_cassette->is_writeable();
 }
 
 WRITE_LINE_MEMBER(mdcr_device::rev)
@@ -198,8 +198,14 @@ void mdcr_device::stop()
 bool mdcr_device::tape_start_or_end()
 {
 	auto pos = m_cassette->get_position();
-	return m_cassette->motor_on() &&
+	auto bet = m_cassette->motor_on() &&
 	       (pos <= 0 || pos >= m_cassette->get_length());
+
+	// Reset phase decoder at tape start/end.
+	if (bet)
+		m_phase_decoder.reset();
+
+	return bet;
 }
 
 void p2000_mdcr_devices(device_slot_interface &device)

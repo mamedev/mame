@@ -54,8 +54,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	// Only the P2000t has this device.
-    optional_device<mdcr_device> m_mdcr;
+    required_device<mdcr_device> m_mdcr;
 
 private:
 	required_ioport_array<10> m_keyboard;
