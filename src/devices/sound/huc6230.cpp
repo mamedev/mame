@@ -21,12 +21,13 @@
 constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(min, val)); }
 
 
-void huc6230_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0][i] = inputs[0][i];
-		outputs[1][i] = inputs[1][i];
+		s32 samp0 = inputs[0].get(i) * 32768.0;
+		s32 samp1 = inputs[1].get(i) * 32768.0;
 
 		for (int adpcm = 0; adpcm < 2; adpcm++)
 		{
@@ -35,9 +36,12 @@ void huc6230_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 			if (!channel->m_playing)
 				continue;
 
-			outputs[0][i] = clamp(outputs[0][i] + ((channel->m_output * channel->m_lvol) >> 3), -32768, 32767);
-			outputs[1][i] = clamp(outputs[1][i] + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
+			samp0 = clamp(samp0 + ((channel->m_output * channel->m_lvol) >> 3), -32768, 32767);
+			samp1 = clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
 		}
+
+		outputs[0].put(i, stream_buffer::sample_t(samp0) * sample_scale);
+		outputs[1].put(i, stream_buffer::sample_t(samp1) * sample_scale);
 	}
 }
 
@@ -172,7 +176,7 @@ void huc6230_device::device_start()
 
 	m_vca_cb.resolve_safe();
 
-	m_stream = stream_alloc_legacy(2, 2, clock() / 6);
+	m_stream = stream_alloc(2, 2, clock() / 6);
 	m_adpcm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(huc6230_device::adpcm_timer),this));
 
 	for (int i = 0; i < 2; i++)

@@ -142,7 +142,7 @@ cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *ta
 
 void gameboy_sound_device::device_start()
 {
-	m_channel = stream_alloc_legacy(0, 2, machine().sample_rate());
+	m_channel = stream_alloc(0, 2, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameboy_sound_device::timer_callback),this));
 	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES/128), 0, clocks_to_attotime(FRAME_CYCLES/128));
 
@@ -1214,15 +1214,16 @@ void cgb04_apu_device::apu_power_off()
 //  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void gameboy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void gameboy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outputl = outputs[0];
-	stream_sample_t *outputr = outputs[1];
-	while (samples-- > 0)
+	auto &outputl = outputs[0];
+	auto &outputr = outputs[1];
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 / 64.0);
+	for (int sampindex = 0; sampindex < outputl.samples(); sampindex++)
 	{
-		stream_sample_t sample;
-		stream_sample_t left = 0;
-		stream_sample_t right = 0;
+		s32 sample;
+		s32 left = 0;
+		s32 right = 0;
 
 		/* Mode 1 - Wave with Envelope and Sweep */
 		if (m_snd_1.on)
@@ -1269,12 +1270,8 @@ void gameboy_sound_device::sound_stream_update_legacy(sound_stream &stream, stre
 		left *= m_snd_control.vol_left;
 		right *= m_snd_control.vol_right;
 
-		/* pump up the volume */
-		left <<= 6;
-		right <<= 6;
-
 		/* Update the buffers */
-		*outputl++ = left;
-		*outputr++ = right;
+		outputl.put(sampindex, stream_buffer::sample_t(left) * sample_scale);
+		outputr.put(sampindex, stream_buffer::sample_t(right) * sample_scale);
 	}
 }
