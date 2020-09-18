@@ -44,7 +44,7 @@ void i5000snd_device::device_start()
 	m_lut_volume[0xff] = 0;
 
 	// create the stream
-	m_stream = stream_alloc_legacy(0, 2, clock() / 0x400);
+	m_stream = stream_alloc(0, 2, clock() / 0x400);
 
 	m_rom_base = (uint16_t *)device().machine().root_device().memregion(":i5000snd")->base();
 	m_rom_mask = device().machine().root_device().memregion(":i5000snd")->bytes() / 2 - 1;
@@ -114,9 +114,10 @@ bool i5000snd_device::read_sample(int ch)
 }
 
 
-void i5000snd_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void i5000snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	for (int i = 0; i < samples; i++)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 16.0);
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		int32_t mix_l = 0;
 		int32_t mix_r = 0;
@@ -157,8 +158,8 @@ void i5000snd_device::sound_stream_update_legacy(sound_stream &stream, stream_sa
 			mix_l += m_channels[ch].output_l;
 		}
 
-		outputs[0][i] = mix_r / 16;
-		outputs[1][i] = mix_l / 16;
+		outputs[0].put(i, stream_buffer::sample_t(mix_r) * sample_scale);
+		outputs[1].put(i, stream_buffer::sample_t(mix_l) * sample_scale);
 	}
 }
 
