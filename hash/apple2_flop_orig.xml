@@ -14693,4 +14693,264 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="btcrshwk">
+		<description>BattleTech: The Crescent Hawk's Inception</description>
+		<year>1989</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2020-09-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234790">
+				<rom name="battletech - the crescent hawk's inception side a.woz" size="234790" crc="309ae12f" sha1="ac4d530354cda91ae36b50f42a499556787bf5f9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241446">
+				<rom name="battletech - the crescent hawk's inception side b.woz" size="241446" crc="6a3c0596" sha1="7a017b48f9647f7cc86fb1929dfd9c5ba61b0674"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="voodoois">
+		<description>Voodoo Island</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234754">
+				<rom name="voodoo island.woz" size="234754" crc="1587edf9" sha1="cda18cb196229f36546cfd305f1ea5923ea2e6eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forbcstl">
+		<description>Forbidden Castle</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234757">
+				<rom name="forbidden castle.woz" size="234757" crc="c6283c72" sha1="f6539f74138f9dc3bde42ec73cfb778db21e7a45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amchal">
+		<description>The American Challenge: A Sailing Simulation</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="the american challenge.woz" size="234809" crc="f0bdf5e3" sha1="09c72b7a4b79a4fe59601dfc58db1db740aa8eb5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="themist">
+		<description>The Mist</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="the mist.woz" size="234766" crc="634e76c4" sha1="4df08a2efce9b077483dbe6e257fe68ee3ddf7a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bopnwrst">
+		<description>Bop 'N Wrestle</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241412">
+				<rom name="bop 'n wrestle.woz" size="241412" crc="f0d0bbd1" sha1="bb8c7aaf74f440d3c7df1c1b331bed24db526cdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsstoryb12">
+		<description>Bank Street Storybook (Version 1.2)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234779">
+				<rom name="bank street storybook v1.2 side a.woz" size="234779" crc="98e03cb9" sha1="b9d24394cd6c8a5f8f53a224234ff98cd69cf2d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234779">
+				<rom name="bank street storybook v1.2 side b.woz" size="234779" crc="29f0f0cb" sha1="60b15f34f20f2d2b235a845dd7cdb53ab03b33fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crswdm40">
+		<description>Crossword Magic (Version 4.0)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-17"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk"/>
+			<dataarea name="flop" size="121618">
+				<rom name="crossword magic v4.0.woz" size="121618" crc="9ac4acfd" sha1="7e8c1ea7a614020e0515060eb20a2d4edca21498"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Language arts puzzle disk"/>
+			<dataarea name="flop" size="234806">
+				<rom name="crossword magic v4.0 - language arts puzzle disk.woz" size="234806" crc="7df85022" sha1="b0b8096d67a82c09388b5e44ea62eca05752265f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Math puzzle disk"/>
+			<dataarea name="flop" size="234797">
+				<rom name="crossword magic v4.0 - math puzzle disk.woz" size="234797" crc="5aaea7e4" sha1="782c541d4ab8acd54c2daa530f8084052c3de378"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Reading puzzle disk"/>
+			<dataarea name="flop" size="234800">
+				<rom name="crossword magic v4.0 - reading puzzle disk.woz" size="234800" crc="943f43dc" sha1="d9bd4a7d5550c0c5196ec1abca93f4f20eb3ab6c"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Science puzzle disk"/>
+			<dataarea name="flop" size="234800">
+				<rom name="crossword magic v4.0 - science puzzle disk.woz" size="234800" crc="c07eedbe" sha1="9302c44ab35b0fd1691ae84bf4eecd642d0f53ae"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Social studies puzzle disk"/>
+			<dataarea name="flop" size="234807">
+				<rom name="crossword magic v4.0 - social studies puzzle disk.woz" size="234807" crc="fb9f623b" sha1="80e8478e1712ecca8f0446cceef5162231f8bda9"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Spelling puzzle disk"/>
+			<dataarea name="flop" size="234801">
+				<rom name="crossword magic v4.0 - spelling puzzle disk.woz" size="234801" crc="36141dac" sha1="d4047b3f775d75571a95b160b3862c65d6285428"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ridlmgic">
+		<description>Riddle Magic</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2020-09-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="234787">
+				<rom name="riddle magic side a - program.woz" size="234787" crc="f660550a" sha1="54a9832ece9ac48893390f4d7a29ad0cee4ba7ee"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Data"/>
+			<dataarea name="flop" size="234784">
+				<rom name="riddle magic side b - data.woz" size="234784" crc="a5a18fa1" sha1="97c7ac712d34e1b46b45e0a04c92c85a23bddca2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apvatlan">
+		<description>Apventure to Atlantis</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2020-09-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="apventure to atlantis.woz" size="234810" crc="7ffaa071" sha1="cc30eebf031e15bec1970965fc8f822e6c5bdcda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mumcurse">
+		<description>Mummy's Curse</description>
+		<year>1981</year>
+		<publisher>Highlands Computers</publisher>
+		<info name="release" value="2020-09-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241416">
+				<rom name="mummy's curse.woz" size="241416" crc="d78b9448" sha1="6dfc6e19addeee99a5642e5920604e80a56140bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misnthhd">
+		<description>Mission on Thunderhead</description>
+		<year>1986</year>
+		<publisher>The Avalon Hill Game Company</publisher>
+		<info name="release" value="2020-09-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235496">
+				<rom name="mission on thunderhead.woz" size="235496" crc="17b78381" sha1="fd5b85770c0fbcb5505dfd2ca88ab0469747afda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrogue">
+		<description>Space Rogue</description>
+		<year>1989</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2020-09-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Boot"/>
+			<dataarea name="flop" size="234806">
+				<rom name="space rogue side a - boot.woz" size="234806" crc="63639cb1" sha1="584e5fe82b9ee3861200e4359d68430a0f85cc9a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Data"/>
+			<dataarea name="flop" size="234806">
+				<rom name="space rogue side b - data.woz" size="234806" crc="e8f19087" sha1="c4718d7619fb453e64f47db171fa6ddd2855baf5"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
