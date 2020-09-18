@@ -56,8 +56,8 @@ void p2000t_state::p2000t_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x4fff).rom();
 	map(0x5000, 0x57ff).ram().share("videoram");
-	map(0x5800, 0x9fff).ram();
-	map(0xa000, 0xffff).noprw();
+	map(0x5800, 0xdfff).ram();
+	map(0xe000, 0xffff).bankrw("bank1");
 }
 
 void p2000m_state::p2000m_mem(address_map &map)
@@ -65,8 +65,8 @@ void p2000m_state::p2000m_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram().share("videoram");
-	map(0x6000, 0x9fff).ram();
-	map(0xa000, 0xffff).noprw();
+	map(0x6000, 0xdfff).ram();
+	map(0xe000, 0xffff).bankrw("bank1");
 }
 
 /* graphics output */
@@ -248,6 +248,9 @@ void p2000t_state::p2000t(machine_config &config)
 
 	/* the mini cassette driver */
 	MDCR(config, m_mdcr, 0);
+
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");
 }
 
 
@@ -279,6 +282,8 @@ void p2000m_state::p2000m(machine_config &config)
 
 	/* the mini cassette driver */
 	MDCR(config, m_mdcr, 0);
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");
 }
 
 
@@ -298,5 +303,5 @@ ROM_START(p2000m)
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME          FLAGS
-COMP( 1980, p2000t, 0,      0,      p2000t,  p2000t, p2000t_state, empty_init, "Philips", "Philips P2000T", 0 )
-COMP( 1980, p2000m, p2000t, 0,      p2000m,  p2000t, p2000m_state, empty_init, "Philips", "Philips P2000M", 0 )
+COMP( 1980, p2000t, 0,      0,      p2000t,  p2000t, p2000t_state, init_p2000, "Philips", "Philips P2000T", 0 )
+COMP( 1980, p2000m, p2000t, 0,      p2000m,  p2000t, p2000m_state, init_p2000, "Philips", "Philips P2000M", 0 )
