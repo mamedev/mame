@@ -34,12 +34,12 @@ READ_LINE_MEMBER(mdcr_device::bet)
 
 READ_LINE_MEMBER(mdcr_device::cip)
 {
-	return true;
+	return m_cassette->get_image() != nullptr;
 }
 
 READ_LINE_MEMBER(mdcr_device::wen)
 {
-	return true;
+	return m_cassette->get_image() != nullptr && m_cassette->is_writeable();
 }
 
 WRITE_LINE_MEMBER(mdcr_device::rev)
