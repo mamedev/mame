@@ -214,7 +214,11 @@ license:CC0
 <!-- lcd screen 2 -->
 
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="lcd2m"><rect state="0"><color red="0.69" green="0.69" blue="0.69" /></rect></element>
+
+	<element name="lcd2m" defstate="1">
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
+		<rect state="0"><color red="0.69" green="0.69" blue="0.69" /></rect>
+	</element>
 
 	<element name="lcd_cb">
 		<rect><bounds x="-2.5" y="-2.5" width="45" height="45" /><color red="0.05" green="0.55" blue="0.4" /></rect>
