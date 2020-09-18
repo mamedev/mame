@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-/* These contain a  similar game selections to the devices in unk6502_st2xxx.cpp but on updated hardware
+/* These contain a similar game selection to the devices in unk6502_st2xxx.cpp but on updated hardware
 
    The hardware appears to be an abuse of the GPL16250 SoC. The palette and sprite banks are used, but as work-ram
    rather than for their intended purpose, and the rest of the GPL16250 video hardware is either entirely bypassed
    or doesn't exist.  All video is software rendered and output directly to the LCD Controller.
+
+   If this is confirmed via a decap then this should be merged with the GPL16250 implementation.
 
    The coding of these is similar to the unk6502_st2xxx.cpp too, with all game specific function calls being loaded
    on the fly from the SPI to a tiny portion of work RAM, with graphics likewise being loaded and decompressed for
