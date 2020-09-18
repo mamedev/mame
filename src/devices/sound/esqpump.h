@@ -106,7 +106,7 @@ private:
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	std::unique_ptr<int16_t[]> e;
+	std::vector<stream_buffer::sample_t> e;
 	int ei;
 #endif
 };
