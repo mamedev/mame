@@ -10,6 +10,10 @@
    The coding of these is similar to the unk6502_st2xxx.cpp too, with all game specific function calls being loaded
    on the fly from the SPI to a tiny portion of work RAM, with graphics likewise being loaded and decompressed for
    every draw call.
+
+   pcp8718 / pcp8728 / bkid218
+   to access test mode hold up + left on startup.
+   (bkid218 cursor in test menu can't be moved in emulation, works on unit, why?)
 */ 
 
 
@@ -42,8 +46,8 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_spirom(*this, "spi"),
-		m_io_p1(*this, "IN0"),
-		m_io_p2(*this, "IN1"),
+		m_io_in0(*this, "IN0"),
+		m_io_in1(*this, "IN1"),
 		m_logger_address(0)
 	{ }
 
@@ -123,6 +127,7 @@ private:
 
 	uint16_t unk_78a1_r();
 	uint16_t m_78a1;
+	uint16_t unk_78d8_r();
 	void unk_78d8_w(uint16_t data);
 
 	enum spistate : const int
@@ -160,8 +165,8 @@ private:
 	int m_lcdaddr;
 
 	uint16_t unk_7870_r();
-	required_ioport m_io_p1;
-	required_ioport m_io_p2;
+	required_ioport m_io_in0;
+	required_ioport m_io_in1;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -223,6 +228,46 @@ uint32_t pcp8718_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 static INPUT_PORTS_START( pcp8718 )
 	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // causes lag if state is inverted, investigate
+	PORT_DIPNAME( 0x0002, 0x0002, "P0:0002" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0002, "0002" )
+	PORT_DIPNAME( 0x0004, 0x0000, "Show Vs in Test Mode" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0004, "0004" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input handler
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input handler
+	PORT_DIPNAME( 0x0020, 0x0020, "P0:0020" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0020, "0020" )
+	PORT_DIPNAME( 0x0040, 0x0040, "P0:0040" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0040, "0040" )
+	PORT_DIPNAME( 0x0080, 0x0080, "P0:0080" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0080, "0080" )
+	PORT_DIPNAME( 0x0100, 0x0100, "P0:0100" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0100, "0100" )
+	PORT_DIPNAME( 0x0200, 0x0000, "Battery Level" )
+	PORT_DIPSETTING(      0x0000, "Normal" )
+	PORT_DIPSETTING(      0x0200, "Low" )
+	PORT_DIPNAME( 0x0400, 0x0400, "P0:0400" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0400, "0400" )
+	PORT_DIPNAME( 0x0800, 0x0800, "P0:0800" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x0800, "0800" )
+	PORT_DIPNAME( 0x1000, 0x1000, "P0:1000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x1000, "1000" )
+	PORT_DIPNAME( 0x2000, 0x2000, "P0:2000" )
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x2000, "2000" )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+
+	PORT_START("IN1")
 	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0001, "0001" )
@@ -238,27 +283,13 @@ static INPUT_PORTS_START( pcp8718 )
 	PORT_DIPNAME( 0x0010, 0x0010, "P1:0010" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0010, "0010" )
-	PORT_DIPNAME( 0x0020, 0x0020, "P1:0020" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0020, "0020" )
-	PORT_DIPNAME( 0x0040, 0x0040, "P1:0040" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0040, "0040" )
-	PORT_DIPNAME( 0x0080, 0x0080, "P1:0080" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0080, "0080" )
-	PORT_DIPNAME( 0x0100, 0x0100, "P1:0100" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0100, "0100" )
-	PORT_DIPNAME( 0x0200, 0x0200, "P1:0200" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0200, "0200" )
-	PORT_DIPNAME( 0x0400, 0x0400, "P1:0400" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0400, "0400" )
-	PORT_DIPNAME( 0x0800, 0x0800, "P1:0800" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0800, "0800" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SOUND")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("ON/OFF")
 	PORT_DIPNAME( 0x1000, 0x1000, "P1:1000" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x1000, "1000" )
@@ -271,32 +302,6 @@ static INPUT_PORTS_START( pcp8718 )
 	PORT_DIPNAME( 0x8000, 0x8000, "P1:8000" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x8000, "8000" )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // causes lag if state is inverted, investigate
-	PORT_DIPNAME( 0x0002, 0x0002, "P2:0002" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0002, "0002" )
-	PORT_DIPNAME( 0x0004, 0x0000, "Show Vs in Test Mode" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x0004, "0004" )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input handler
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input handler
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SOUND")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("ON/OFF")
-	PORT_DIPNAME( 0x1000, 0x1000, "P2:1000" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x1000, "1000" )
-	PORT_DIPNAME( 0x2000, 0x2000, "P2:2000" )
-	PORT_DIPSETTING(      0x0000, "0000" )
-	PORT_DIPSETTING(      0x2000, "2000" )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 INPUT_PORTS_END
 
 uint16_t pcp8718_state::unk_7abf_r()
@@ -306,7 +311,7 @@ uint16_t pcp8718_state::unk_7abf_r()
 
 uint16_t pcp8718_state::unk_7860_r()
 {
-	uint16_t ret = (m_io_p2->read() & 0xffe7);
+	uint16_t ret = (m_io_in0->read() & 0xffe7);
 
 	if (m_bit10state)
 		ret |= 0x08;
@@ -829,7 +834,7 @@ uint16_t pcp8718_state::system_dma_params_channel0_r(offs_t offset)
 uint16_t pcp8718_state::unk_7870_r()
 {
 	logerror("%06x: unk_7870_r (IO port)\n", machine().describe_context());
-	return m_io_p2->read();
+	return m_io_in1->read();
 }
 
 void pcp8718_state::spi_control_w(uint16_t data)
@@ -841,6 +846,11 @@ uint16_t pcp8718_state::unk_78a1_r()
 {
 	// checked in interrupt, code skipped entirely if this isn't set
 	return m_78a1;
+}
+
+uint16_t pcp8718_state::unk_78d8_r()
+{
+	return 0xffff;
 }
 
 void pcp8718_state::unk_78d8_w(uint16_t data)
@@ -880,7 +890,7 @@ void pcp8718_state::map(address_map &map)
 
 	map(0x0078a1, 0x0078a1).r(FUNC(pcp8718_state::unk_78a1_r));
 
-	map(0x0078d8, 0x0078d8).w(FUNC(pcp8718_state::unk_78d8_w));
+	map(0x0078d8, 0x0078d8).rw(FUNC(pcp8718_state::unk_78d8_r), FUNC(pcp8718_state::unk_78d8_w));
 
 
 	map(0x007940, 0x007940).w(FUNC(pcp8718_state::spi_control_w));
