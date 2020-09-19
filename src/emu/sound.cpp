@@ -123,7 +123,14 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 			for (int index = 0; index < buffered_samples; index++)
 			{
 				end = prev_index(end);
-				buffer[index] = get(end);
+#if (SOUND_DEBUG)
+				// multiple resamples can occur before clearing out old NaNs so
+				// neuter them for this specific case
+				if (std::isnan(m_buffer[end]))
+					buffer[index] = 0;
+				else
+#endif
+					buffer[index] = get(end);
 			}
 		}
 	}
