@@ -115,7 +115,7 @@ void k053260_device::device_start()
 	m_sh1_cb.resolve_safe();
 	m_sh2_cb.resolve_safe();
 
-	m_stream = stream_alloc_legacy( 0, 2, clock() / CLOCKS_PER_SAMPLE );
+	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
 
 	/* register with the save state system */
 	save_item(NAME(m_portdata));
@@ -310,14 +310,15 @@ static constexpr s32 MAXOUT = 0x7fff;
 static constexpr s32 MINOUT = -0x8000;
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < samples; j++ )
+		constexpr stream_buffer::sample_t sample_scale = 1.0f / stream_buffer::sample_t(MAXOUT);
+		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
 			stream_sample_t buffer[2] = {0, 0};
 
@@ -327,14 +328,14 @@ void k053260_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 					voice.play(buffer);
 			}
 
-			outputs[0][j] = limit( buffer[0], MAXOUT, MINOUT );
-			outputs[1][j] = limit( buffer[1], MAXOUT, MINOUT );
+			outputs[0].put(j, stream_buffer::sample_t(limit( buffer[0], MAXOUT, MINOUT )) * sample_scale);
+			outputs[1].put(j, stream_buffer::sample_t(limit( buffer[1], MAXOUT, MINOUT )) * sample_scale);
 		}
 	}
 	else
 	{
-		std::fill_n(&outputs[0][0], samples, 0);
-		std::fill_n(&outputs[1][0], samples, 0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 }
 

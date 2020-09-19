@@ -23,7 +23,7 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, flags(0)
-	, ram(nullptr)
+	, ram(0x4000)
 	, reverb_pos(0)
 	, cur_ptr(0)
 	, cur_limit(0)
@@ -115,7 +115,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	};
 
 
-	int16_t *rbase = (int16_t *)ram.get();
+	int16_t *rbase = (int16_t *)&ram[0];
 
 	if(!(regs[0x22f] & 1))
 	{
@@ -321,10 +321,9 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	ram = std::make_unique<uint8_t[]>(0x4000);
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(ram.get(), 0, 0x4000);
+	memset(&ram[0], 0, 0x4000);
 
 	stream = stream_alloc(0, 2, clock() / 384);
 
@@ -335,7 +334,7 @@ void k054539_device::init_chip()
 	save_item(NAME(flags));
 
 	save_item(NAME(regs));
-	save_pointer(NAME(ram), 0x4000);
+	save_item(NAME(ram));
 	save_item(NAME(reverb_pos));
 	save_item(NAME(cur_ptr));
 	save_item(NAME(cur_limit));
@@ -553,7 +552,7 @@ void k054539_device::device_reset()
 {
 	regs[0x22c] = 0;
 	regs[0x22f] = 0;
-	memset(ram.get(), 0, 0x4000);
+	memset(&ram[0], 0, 0x4000);
 	m_timer->enable(false);
 }
 
