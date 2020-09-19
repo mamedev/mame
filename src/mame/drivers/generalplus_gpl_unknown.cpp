@@ -16,7 +16,7 @@
    pcp8718 / pcp8728 / bkid218
    to access test mode hold up + left on startup.
    (bkid218 cursor in test menu can't be moved in emulation, works on unit, why?)
-*/ 
+*/
 
 
 #include "emu.h"
@@ -178,7 +178,7 @@ private:
 	void tx_menu_cmd(uint8_t command);
 
 	int m_bit08state;
-	int	m_latchdata;
+	int m_latchdata;
 
 	int m_latchpos;
 	int m_menupos;
@@ -335,7 +335,7 @@ void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
 		if (command == 0x00)
 		{
 			m_menustate = MENU_COMMAND_00_IN;
-			m_datain = m_menupos & 0xff;;
+			m_datain = m_menupos & 0xff;
 		}
 		else if (command == 0x01)
 		{
@@ -351,15 +351,15 @@ void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
 			m_menustate = MENU_COMMAND_03_IN;
 		}
 		else if (command == 0x04)
-		{	
+		{
 			m_menustate = MENU_COMMAND_04_IN;
 		}
 		else if (command == 0x05)
-		{	
+		{
 			m_menustate = MENU_COMMAND_05_IN;
 		}
 		else if (command == 0x09)
-		{	
+		{
 			// ...
 		}
 		else if ((command) == 0x10)
@@ -368,16 +368,16 @@ void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
 			m_menupos = 0x00;
 		}
 		else if (command == 0x30)
-		{	
+		{
 			m_menupos++;
 		}
 		else if (command == 0x37)
-		{	
+		{
 			m_menupos--;
 		}
 		else if (command == 0x39)
-		{	
-			m_menupos-=4;
+		{
+			m_menupos -= 4;
 		}
 		else if (command == 0x2c)
 		{
@@ -385,7 +385,7 @@ void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
 		}
 		else
 		{
-			LOGMASKED(LOG_GPL162XX_LCDTYPE_SELECT_SIM,"tx_menu_cmd %02x (unknown)\n", command);
+			LOGMASKED(LOG_GPL162XX_LCDTYPE_SELECT_SIM, "tx_menu_cmd %02x (unknown)\n", command);
 		}
 	}
 	else if (m_menustate == MENU_COMMAND_00_IN)
@@ -398,12 +398,12 @@ void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
 	}
 	else if (m_menustate == MENU_COMMAND_02_IN)
 	{
-		m_menupos = (m_menupos & 0xff00) | ((command-0x8) & 0xff);
+		m_menupos = (m_menupos & 0xff00) | ((command - 0x8) & 0xff);
 		m_menustate = MENU_READY_FOR_COMMAND;
 	}
 	else if (m_menustate == MENU_COMMAND_03_IN)
 	{
-		m_menupos = (m_menupos & 0x00ff) | (((command-0x9) & 0xff)<<8);
+		m_menupos = (m_menupos & 0x00ff) | (((command - 0x9) & 0xff) << 8);
 		m_menustate = MENU_READY_FOR_COMMAND;
 	}
 	else if (m_menustate == MENU_COMMAND_04_IN)
@@ -430,7 +430,7 @@ void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
 		else if (command == 0x0e)
 		{
 			m_menupos -= 0x314;
-		}	
+		}
 
 		m_menustate = MENU_READY_FOR_COMMAND;
 	}
@@ -617,8 +617,8 @@ uint8_t gpl162xx_lcdtype_state::spi_process_rx()
 
 		// hack internal BIOS checksum check
 		//if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
-		//	if (dat == 0x4e)
-		//		dat = 0x5e;
+		//  if (dat == 0x4e)
+		//      dat = 0x5e;
 
 		LOGMASKED(LOG_GPL162XX_LCDTYPE,"reading SPI %02x from SPI Address %08x (adjusted word offset %08x)\n", dat, m_spiaddress, (m_spiaddress/2)+0x20000);
 		m_spiaddress++;
@@ -735,7 +735,7 @@ void gpl162xx_lcdtype_state::bankedram_7400_w(offs_t offset, uint16_t data)
 	{
 		m_bankedram_7400[offset + 0x400] = data;
 	}
-	else 
+	else
 	{
 		m_bankedram_7400[offset] = data;
 	}
@@ -747,7 +747,7 @@ uint16_t gpl162xx_lcdtype_state::bankedram_7400_r(offs_t offset)
 	{
 		return m_bankedram_7400[offset + 0x400];
 	}
-	else 
+	else
 	{
 		return m_bankedram_7400[offset];
 	}
@@ -982,8 +982,8 @@ void gpl162xx_lcdtype_state::machine_reset()
 	m_78a1 = 0;
 
 // first menu index is stored here
-//	m_spirom[0x16000] = gamenum & 0xff;
-//	m_spirom[0x16001] = (gamenum>>8) & 0xff;
+//  m_spirom[0x16000] = gamenum & 0xff;
+//  m_spirom[0x16001] = (gamenum>>8) & 0xff;
 
 	m_menupos = 0;
 }
