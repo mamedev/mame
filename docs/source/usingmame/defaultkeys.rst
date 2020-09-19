@@ -1,13 +1,19 @@
-.. _default-keys:
+Default Keyboard Controls
+=========================
+
+.. contents:: :local:
+
+
+.. _default-keys-foreword:
 
 Controls Foreword
-=================
+-----------------
 
 MAME supports a vast array of different types of machines, with a
 significantly different array of inputs across them. This means that some
 keyboard keys, mouse buttons, and joystick buttons will be used for multiple
 functions. As a result, the control charts below are separated by machine-types
-to make it easier to find what you're looking for.
+to make it easier to find what you’re looking for.
 
 All of the controls below are fully configurable in the user interface. These
 charts show the default configuration.
@@ -15,10 +21,10 @@ charts show the default configuration.
 Note that the defaults shown here are arranged by US ANSI key positioning. If
 you are using a different layout, the keys will vary.
 
-MAME Controls
-=============
+MAME User Interface Controls
+----------------------------
 
-The controls here cover MAME functions such as MAME's menus, machine pause,
+The controls here cover MAME functions such as MAME’s menus, machine pause,
 and saving/loading save states.
 
 
@@ -26,9 +32,9 @@ and saving/loading save states.
     Toggles the configuration menu.
     Switches to the next UI panel.
 **~** (tilde key)
-    Toggles the On Screen Display.
+    Toggles the On-Screen Display.
 
-    If you are running with -debug, this key sends a 'break' in emulation.
+    If you are running with -debug, this key sends a ‘break’ in emulation.
 
     When the on-screen display is visible, you can use the following
     keys to control it:
@@ -73,28 +79,22 @@ and saving/loading save states.
     UI Next Group
 **P**
     Pauses the emulated machine.
-**Shift+P**
+**Left Shift+P**
     While paused, advances to next frame. If rewind is enabled, a new rewind
     save state is also captured.
-**Shift+~**
+**Left Shift+~**
     While paused, loads the most recent rewind save state.
-**-** *(not numeric keypad)*
-    Volume Down for machines that have a volume control.
-**=** *(not numeric keypad)*
-    Volume Up for machines that have a volume control.
 **F1**
     Power the machine on for machines that have specific power button behavior.
 **F2**
     Power the machine off for machines that have specific power button behavior.
-
-    Service Mode button for machines that support that.
 **F3**
     Soft resets the machine.
-**Shift+F3**
-    Performs a "hard reset", which tears everything down and re-creates it from
+**Left Shift+F3**
+    Performs a “hard reset”, which tears everything down and re-creates it from
     scratch. This is a more thorough and complete reset than the reset you get
     from hitting F3.
-**LCtrl+F3**
+**Left Ctrl+F3**
     Toggle uneven stretch. (*SDL ONLY*)
 **F4**
     Shows the game palette, decoded graphics tiles/characters and any tilemaps.
@@ -136,20 +136,20 @@ and saving/loading save states.
     * **Enter** - switch to palette/colortable mode.
 
     Note: Not all games have decoded graphics and/or tilemaps.
-**LCtrl+F4**
+**Left Ctrl+F4**
     Toggles keeping aspect ratio.
     (*SDL MAME only*)
-**LCtrl+F5**
+**Left Ctrl+F5**
     Toggle Filter. (*SDL ONLY*)
     (*SDL MAME only*)
-**Alt+Ctrl+F5**
+**Left Alt+Left Ctrl+F5**
     Toggle HLSL Post-Processing.
     (*Windows non-SDL MAME only*)
 **F6**
-    Toggle cheat mode. (if started with "-cheat")
-**LCtrl+F6**
+    Toggle cheat mode. (if started with “-cheat”)
+**Left Ctrl+F6**
     Decrease Prescaling.
-**LCtrl+F7**
+**Left Ctrl+F7**
     Increase Prescaling.
 **F7**
     Load a save state. You will be prompted to press a key or select from the
@@ -159,7 +159,7 @@ and saving/loading save states.
     drivers. If a given driver is not known to work perfectly, you will
     receive a warning that the save state may not be valid when attempting to
     save or load.*
-**Shift+F7**
+**Left Shift+F7**
     Create a save state. Requires an additional keypress to identify the state,
     similar to the load option above. If an existing save state is present, it
     will also appear in the selection menu to allow overwriting of that save
@@ -172,9 +172,9 @@ and saving/loading save states.
     Toggle speed throttling.
 **F11**
     Toggles speed display.
-**Shift+F11**
+**Left Shift+F11**
     Toggles internal profiler display (if compiled in).
-**Alt+F11**
+**Left Alt+F11**
     Record HLSL Rendered Video.
 **F12**
     Saves a screen snapshot.
@@ -182,22 +182,22 @@ and saving/loading save states.
     Begin recording MNG video.
 **Left Control+Left Shift+F12**
     Begin recording AVI video.
-**Alt+F12**
+**Left Alt+F12**
     Take HLSL Rendered Snapshot.
 **Insert**
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
     (*Windows non-SDL MAME only*)
-**Page DN**
+**Page Down**
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
     (*Windows non-SDL MAME only*)
-**Alt+ENTER**
+**Left Alt+Enter**
     Toggles between full-screen and windowed mode.
 **Scroll Lock**/**Forward Delete** (Mac Desktop)/**fn-Delete** (Mac Laptop)
     Default mapping for the **uimodekey**.
 
-    This key toggles MAME's response to user interface keys such as the
+    This key toggles MAME’s response to user interface keys such as the
     (by default) **Tab** key being used for menus. All emulated machines
     which require emulated keyboards will start with UI controls disabled by
     default and you can only access the internal UI by first hitting this
@@ -212,38 +212,92 @@ and saving/loading save states.
 .. _default-arcade-keys:
 
 Default Arcade Machine Controls
-===============================
+-------------------------------
 
-All the controls below are fully configurable in the user interface. This list
-shows the standard keyboard configuration.
+This section covers controls that are applicable to most kinds of arcade
+machines.  Note that not all machines will have all of these controls.  All the
+controls below are fully configurable in the user interface.  This list shows
+the standard keyboard configuration.
 
-**5**
+**5** *(not numeric keypad)*
     Coin slot 1
-**6**
+**6** *(not numeric keypad)*
     Coin slot 2
-**7**
+**7** *(not numeric keypad)*
     Coin slot 3
-**8**
+**8** *(not numeric keypad)*
     Coin slot 4
-**1**
-    Player 1 start or 1 player mode
-**2**
-    Player 2 start or 2 players mode
-**3**
-    Player 3 start or 3 players mode
-**4**
-    Player 4 start or 4 players mode
 **Backspace**
     Bill 1 (For machines that have a bill receptor/note reader)
-**9**
-    Service 1 (Service buttons are typically used to give free credits or to
-    navigate the internal operator service menus)
-**0**
+**T**
+    Tilt
+
+    Usually a tilt switch or shock sensor that will end the current game, reset
+    credits and/or reset the machine if the machine is knocked excessively hard
+    or moved.  Most commonly found on pinball machines.
+**-** *(not numeric keypad)*
+    Volume Down
+
+    For machines that have an electronic volume control.
+**=** *(not numeric keypad)*
+    Volume Up
+
+    For machines that have an electronic volume control.
+**F1**
+    Memory Reset
+
+    This resets high scores, credits/winnings, statistics, and/or operator
+    settings on machines that support it.
+**F2**
+    Service Mode
+
+    This is a momentary push-button on some machines, while it is a toggle
+    switch or DIP switch on others.
+**9** *(not numeric keypad)*
+    Service 1
+
+    Service buttons are typically used to give free credits or to navigate the
+    operator service menus.
+**0** *(not numeric keypad)*
     Service 2
-**-** (not numeric keypad)
+**-** *(not numeric keypad)*
     Service 3
-**=** (not numeric keypad)
+**=** *(not numeric keypad)*
     Service 4
+
+
+.. _default-game-keys:
+
+Default Arcade Game Controls
+----------------------------
+
+This section covers controls for arcade games using common joystick/button
+control schemes.  All the controls below are fully configurable in the user
+interface.  This list shows the standard keyboard configuration.
+
+**5** *(not numeric keypad)*
+    Coin slot 1
+**6** *(not numeric keypad)*
+    Coin slot 2
+**7** *(not numeric keypad)*
+    Coin slot 3
+**8** *(not numeric keypad)*
+    Coin slot 4
+**1** *(not numeric keypad)*
+    Player 1 start or 1 player mode
+**2** *(not numeric keypad)*
+    Player 2 start or 2 players mode
+**3** *(not numeric keypad)*
+    Player 3 start or 3 players mode
+**4** *(not numeric keypad)*
+    Player 4 start or 4 players mode
+
+
+.. _default-player1-keys:
+
+Player 1 Controls
+~~~~~~~~~~~~~~~~~
+
 **Up Arrow**
     Player 1 Up
 **Down Arrow**
@@ -253,28 +307,28 @@ shows the standard keyboard configuration.
 **Right Arrow**
     Player 1 Right
 **E**
-    Up on Left Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Up on Left Stick for dual-stick machines (e.g. Robotron)
 **D**
-    Down on Left Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Down on Left Stick for dual-stick machines (e.g. Robotron)
 **S**
-    Left on Left Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Left on Left Stick for dual-stick machines (e.g. Robotron)
 **F**
-    Right on Left Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Right on Left Stick for dual-stick machines (e.g. Robotron)
 **I**
-    Up on Right Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Up on Right Stick for dual-stick machines (e.g. Robotron)
 **K**
-    Down on Right Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Down on Right Stick for dual-stick machines (e.g. Robotron)
 **J**
-    Left on Right Stick for dual-stick machines (e.g. Robotron)
+    Player 1 Left on Right Stick for dual-stick machines (e.g. Robotron)
 **L**
-    Right on Right Stick for dual-stick machines (e.g. Robotron)
-**Ctrl**/**Mouse B0**/**Gun 1 Button 0**
+    Player 1 Right on Right Stick for dual-stick machines (e.g. Robotron)
+**Left Ctrl**/**Mouse B0**/**Gun 1 Button 0**
     Player 1 Button 1
-**Alt**/**Mouse B2**/**Gun 1 Button 1**
+**Left Alt**/**Mouse B2**/**Gun 1 Button 1**
     Player 1 Button 2
 **Spacebar**/**Mouse B1**/**Joystick 1 Button 1 or B**
     Player 1 Button 3
-**Shift**
+**Left Shift**
     Player 1 Button 4
 **Z**
     Player 1 Button 5
@@ -298,42 +352,118 @@ shows the standard keyboard configuration.
     Player 1 Button 14
 **Right Shift**
     Player 1 Button 15
-**9**
-    Service
-**0**
-    Book-Keeping
+
+
+.. _default-player2-keys:
+
+Player 2 Controls
+~~~~~~~~~~~~~~~~~
+
+**R**
+    Player 2 Up
+**F**
+    Player 2 Down
+**D**
+    Player 2 Left
+**G**
+    Player 2 Right
+**A**
+    Player 2 Button 1
+**S**
+    Player 2 Button 2
+**Q**
+    Player 2 Button 3
+**W**
+    Player 2 Button 4
+**E**
+    Player 2 Button 5
+
+
+.. _default-player3-keys:
+
+Player 3 Controls
+~~~~~~~~~~~~~~~~~
+
+**I**
+    Player 3 Up
+**K**
+    Player 3 Down
+**J**
+    Player 3 Left
+**L**
+    Player 3 Right
+**Right Control**
+    Player 3 Button 1
+**Right Shift**
+    Player 3 Button 2
+**Enter** *(not numeric keypad)*
+    Player 3 Button 3
+
+
+.. _default-player4-keys:
+
+Player 4 Controls
+~~~~~~~~~~~~~~~~~
+
+**8** *(on numeric keypad)*
+    Player 4 Up
+**2** *(on numeric keypad)*
+    Player 4 Down
+**4** *(on numeric keypad)*
+    Player 4 Left
+**6** *(on numeric keypad)*
+    Player 4 Right
+**0** *(on numeric keypad)*
+    Player 4 Button 1
+**.** *(on numeric keypad)*
+    Player 4 Button 2
+**Enter** *(on numeric keypad)*
+    Player 4 Button 3
 
 
 .. _default-mahjong-hanafuda-keys:
 
 Default Mahjong and Hanafuda Keys
-=================================
+---------------------------------
 
-All the keys below are fully configurable in the user interface. This list shows
-the standard keyboard configuration.
+Most mahjong and hanafuda games use a standard control panel layout.  Some keys
+may not be present, depending on the kind of game.  For example games without a
+bonus game feature may lack the Take Score, Double Up, Big and Small keys, and
+games without gambling features may also lack the Bet key.  Some games may not
+use all keys that are present. For example many games do not use the Flip Flop
+and Last Chance keys.
+
+.. image:: images/mahjongpanel.svg
+    :width: 100%
+    :align: center
+    :alt: Standard mahjong control panel layout
+
+Due to the large number of keys, MAME only provides default input configuration
+for a single set of player controls.  For multi-player mahjong/hanafuda games,
+or mahjong/hanafuda games with multiple player positions, manual configuration
+is required. All the keys below are fully configurable in the user interface.
+This list shows the standard keyboard configuration.
 
 
-**5**
+**5** *(not numeric keypad)*
     Coin slot 1
-**6**
+**6** *(not numeric keypad)*
     Coin slot 2
-**7**
+**7** *(not numeric keypad)*
     Coin slot 3
-**8**
+**8** *(not numeric keypad)*
     Coin slot 4
-**Backspace**
-    Bill 1 (For machines that have a bill receptor/note reader)
 **Y**
     Player 1 Mahjong/Hanafuda Flip Flop
-**1**
+**1** *(not numeric keypad)*
     Player 1 start or 1 player mode
-**2**
+**2** *(not numeric keypad)*
     Player 2 start or 2 players mode
-**3**
+**3** *(not numeric keypad)*
     Player 3 start or 3 players mode
 
     Mahjong Bet
-**4**
+**4** *(not numeric keypad)*
     Player 4 start or 4 players mode
 **Right Ctrl**
     Player 1 Mahjong/Hanafuda Take Score
@@ -393,21 +523,12 @@ the standard keyboard configuration.
     Player 1 Taiwanese Mahjong P
 **Q**
     Player 1 Taiwanese Mahjong Q
-**9**
-    Service 1 (Service buttons are typically used to give free credits or to
-    navigate the internal operator service menus)
-**0**
-    Service 2
-**-** (not numeric keypad)
-    Service 3
-**=** (not numeric keypad)
-    Service 4
 
 
 .. _default-gambling-keys:
 
 Default Gambling Keys
-=====================
+---------------------
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
@@ -435,44 +556,53 @@ buttons.
     Key In
 **W**
     Key Out
-**9**
+**F1**
+    Memory Reset
+**9** *(not numeric keypad)*
     Service 1 (Service buttons are typically used to give free credits or to
     navigate the internal operator service menus)
-**0**
+**0** *(not numeric keypad)*
     Service 2
     Book-Keeping (for machines that have this functionality)
-**-** (not numeric keypad)
+**-** *(not numeric keypad)*
     Service 3
-**=** (not numeric keypad)
+**=** *(not numeric keypad)*
     Service 4
 **M**
     Bet
-**1**
+**1** *(not numeric keypad)*
     Player 1 start or 1 player mode
-**2**
+**2** *(not numeric keypad)*
     Deal
 **L**
     Stand
-**4**
+**4** *(not numeric keypad)*
     Take Score
-**3**
+
+    For games that allow gambling winnings in a double-or-nothing bonus game,
+    this takes the winnings from the main game.
+**3** *(not numeric keypad)*
     Double Up
+
+    For games that allow gambling winnings in a double-or-nothing bonus game,
+    this gambles the winnings from the main game in the bonus game.
 **D**
     Half Gamble
+
+    Used by games that allow gambling half or all of the winnings from the main
+    game in the bonus game.
 **A**
     High
 **S**
     Low
 **O**
     Door
-**0**
-    Book-Keeping
 
 
 .. _default-blackjack-keys:
 
 Default Blackjack Keys
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
@@ -480,8 +610,14 @@ the standard keyboard configuration.
 
 **1**
     Player 1 start or 1 player mode
+
+    Used to deal a new hand for games that have separate buttons to deal a new
+    hand and draw an additional card.
 **2**
-    Deal
+    Deal (hit)
+
+    Used to draw an additional card, and to deal a new hand in games that don’t
+    use separate buttons to deal a new hand and draw an additional card.
 **L**
     Stand
 
@@ -489,7 +625,7 @@ the standard keyboard configuration.
 .. _default-poker-keys:
 
 Default Poker Keys
-------------------
+~~~~~~~~~~~~~~~~~~
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
@@ -497,26 +633,34 @@ the standard keyboard configuration.
 
 **1**
     Player 1 start or 1 player mode
+
+    Used to deal a new hand for games that have separate buttons to deal a new
+    hand and draw replacement cards.
 **2**
     Deal
+
+    Used to draw replacement cards, and to deal a new hand in games that don’t
+    use separate buttons to deal a new hand and draw replacement cards.
 **Z**
-    Hold 1
+    Hold 1/discard 1
 **X**
-    Hold 2
+    Hold 2/discard 2
 **C**
-    Hold 3
+    Hold 3/discard 3
 **V**
-    Hold 4
+    Hold 4/discard 4
 **B**
-    Hold 5
+    Hold 5/discard 5
 **N**
     Cancel
+
+    Used by some games to cancel current selection for cards to hold/discard.
 
 
 .. _default-slots-keys:
 
 Default Slots Keys
-------------------
+~~~~~~~~~~~~~~~~~~
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
@@ -539,13 +683,13 @@ the standard keyboard configuration.
 .. _default-computer-keys:
 
 Default Computer Keys
-=====================
+---------------------
 
 All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 Note that controls can vary widely by computer type, so not all keys are shown
-here. See the "Input (this Machine)" section of MAME's configuration menu for
+here. See the “Input (this Machine)” section of MAME’s configuration menu for
 details for the machine you are currently using.
 
 
@@ -554,7 +698,7 @@ details for the machine you are currently using.
 **Scroll Lock**/**Forward Delete** (Mac Desktop)/**fn-Delete** (Mac Laptop)
     Default mapping for the **uimodekey**.
 
-    This key toggles MAME's response to user interface keys such as the
+    This key toggles MAME’s response to user interface keys such as the
     (by default) **Tab** key being used for menus. All emulated machines
     which require emulated keyboards will start with UI controls disabled by
     default and you can only access the internal UI by first hitting this
@@ -575,12 +719,11 @@ details for the machine you are currently using.
 .. _default-othermachine-keys:
 
 Other Machines
-==============
+--------------
 
 All the keys are fully configurable in the user interface.
 
 Note that controls can vary widely by machine type, so default keys are not
 shown here and defaults will vary considerably based on the manufacturer and
-style. See the "Input (this Machine)" section of MAME's configuration menu for
+style. See the “Input (this Machine)” section of MAME’s configuration menu for
 details for the machine you are currently using.
-

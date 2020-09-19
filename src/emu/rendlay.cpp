@@ -1365,7 +1365,11 @@ protected:
 				{
 					rgb_t const a(*src);
 					u32 const aa(a.a());
-					if (aa)
+					if (255 == aa)
+					{
+						*dst = *src;
+					}
+					else if (aa)
 					{
 						rgb_t const b(*dst);
 						u32 const ba(b.a());
