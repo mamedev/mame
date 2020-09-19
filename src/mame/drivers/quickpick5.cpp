@@ -466,5 +466,24 @@ ROM_START( quickp5 )
 
 ROM_END
 
-GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
+// Konami PWB353330
+ROM_START( goemedal )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main program
+	ROM_LOAD( "gs-257-a02.7n",  0x000000, 0x010000, CRC(e9a5f416) SHA1(b762b393bbe394339904636ff1d31d8eeb8b8d05) )
 
+	ROM_REGION( 0x80000, "k053245", 0 )   // sprites
+	ROM_LOAD32_BYTE( "gs-257-a03.3t",  0x000000, 0x020000, CRC(4aa2376b) SHA1(30e472457d10504fb805882a5eea7e548e812ff6) )
+	ROM_LOAD32_BYTE( "gs-257-a05.3u",  0x000001, 0x020000, CRC(a5b18792) SHA1(d5ee5e6a8040a2297073ad4b42b8978c9865cceb) )
+	ROM_LOAD32_BYTE( "gs-257-a04.10t", 0x000002, 0x020000, CRC(58c3ce20) SHA1(8d6df373a37770602d104325e27015611fdaaaff) )
+	ROM_LOAD32_BYTE( "gs-257-a06.10u", 0x000003, 0x020000, CRC(260f7a2f) SHA1(3922ba8bffe7c37c6895a826e0a067627d0f3ff8) )
+
+	ROM_REGION( 0x80000, "ttl", 0 ) // TTL text tilemap characters?
+	ROM_LOAD( "gs-257-a07.28t",  0x000000, 0x020000, CRC(26e3afa6) SHA1(dba5f321b523717b9dd3f1e22ef15c1301af403b) )
+
+	ROM_REGION( 0x20000, "oki", 0 )    // OKIM6295 samples
+	ROM_LOAD( "gs-257-a01.1g", 0x000000, 0x020000, CRC(8ce0e693) SHA1(fad19ba37c7987a4d2797200b96ac9c050eb5d94) )
+ROM_END
+
+
+GAME( 1995, quickp5,  0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
+GAME( 199?, goemedal, 0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Goemon Medal Game", MACHINE_NOT_WORKING)
