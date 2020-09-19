@@ -22,9 +22,6 @@ esq_5505_5510_pump_device::esq_5505_5510_pump_device(const machine_config &mconf
 	, ticks_spent_processing(0)
 	, samples_processed(0)
 {
-#if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	e = nullptr;
-#endif
 }
 
 void esq_5505_5510_pump_device::device_start()

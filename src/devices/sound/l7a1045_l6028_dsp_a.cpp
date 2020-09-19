@@ -117,7 +117,7 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = stream_alloc_legacy(0, 2, 66150); //clock() / 384);
+	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
 
 	for (int voice = 0; voice < 32; voice++)
 	{
@@ -143,15 +143,16 @@ void l7a1045_sound_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void l7a1045_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void l7a1045_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* Clear the buffers */
-	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
-	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 512.0);
 	for (int i = 0; i < 32; i++)
 	{
 		if (m_key & (1 << i))
@@ -165,7 +166,7 @@ void l7a1045_sound_device::sound_stream_update_legacy(sound_stream &stream, stre
 			uint32_t pos = vptr->pos;
 			uint32_t frac = vptr->frac;
 
-			for (int j = 0; j < samples; j++)
+			for (int j = 0; j < outputs[0].samples(); j++)
 			{
 				int32_t sample;
 				uint8_t data;
@@ -192,8 +193,8 @@ void l7a1045_sound_device::sound_stream_update_legacy(sound_stream &stream, stre
 				sample = ((int8_t)(data & 0xfc)) << (3 - (data & 3));
 				frac += step;
 
-				outputs[0][j] += ((sample * vptr->l_volume) >> 9);
-				outputs[1][j] += ((sample * vptr->r_volume) >> 9);
+				outputs[0].add(j, stream_buffer::sample_t(sample * vptr->l_volume) * sample_scale);
+				outputs[1].add(j, stream_buffer::sample_t(sample * vptr->r_volume) * sample_scale);
 			}
 
 			vptr->pos = pos;

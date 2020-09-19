@@ -34,7 +34,7 @@ void msm5232_device::device_start()
 
 	init(clock(), rate);
 
-	m_stream = stream_alloc_legacy(0, 11, rate);
+	m_stream = stream_alloc(0, 11, rate);
 
 	/* register with the save state system */
 	save_item(NAME(m_EN_out16));
@@ -725,34 +725,35 @@ void msm5232_device::set_clock(int clock)
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void msm5232_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buf1 = outputs[0];
-	stream_sample_t *buf2 = outputs[1];
-	stream_sample_t *buf3 = outputs[2];
-	stream_sample_t *buf4 = outputs[3];
-	stream_sample_t *buf5 = outputs[4];
-	stream_sample_t *buf6 = outputs[5];
-	stream_sample_t *buf7 = outputs[6];
-	stream_sample_t *buf8 = outputs[7];
-	stream_sample_t *bufsolo1 = outputs[8];
-	stream_sample_t *bufsolo2 = outputs[9];
-	stream_sample_t *bufnoise = outputs[10];
+	auto &buf1 = outputs[0];
+	auto &buf2 = outputs[1];
+	auto &buf3 = outputs[2];
+	auto &buf4 = outputs[3];
+	auto &buf5 = outputs[4];
+	auto &buf6 = outputs[5];
+	auto &buf7 = outputs[6];
+	auto &buf8 = outputs[7];
+	auto &bufsolo1 = outputs[8];
+	auto &bufsolo2 = outputs[9];
+	auto &bufnoise = outputs[10];
 	int i;
 
-	for (i=0; i<samples; i++)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	for (i=0; i<buf1.samples(); i++)
 	{
 		/* calculate all voices' envelopes */
 		EG_voices_advance();
 
 		TG_group_advance(0);   /* calculate tones group 1 */
-		buf1[i] = o2;
-		buf2[i] = o4;
-		buf3[i] = o8;
-		buf4[i] = o16;
+		buf1.put(i, stream_buffer::sample_t(o2) * sample_scale);
+		buf2.put(i, stream_buffer::sample_t(o4) * sample_scale);
+		buf3.put(i, stream_buffer::sample_t(o8) * sample_scale);
+		buf4.put(i, stream_buffer::sample_t(o16) * sample_scale);
 
 		SAVE_SINGLE_CHANNEL(0,o2)
 		SAVE_SINGLE_CHANNEL(1,o4)
@@ -760,13 +761,13 @@ void msm5232_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 		SAVE_SINGLE_CHANNEL(3,o16)
 
 		TG_group_advance(1);   /* calculate tones group 2 */
-		buf5[i] = o2;
-		buf6[i] = o4;
-		buf7[i] = o8;
-		buf8[i] = o16;
+		buf5.put(i, stream_buffer::sample_t(o2) * sample_scale);
+		buf6.put(i, stream_buffer::sample_t(o4) * sample_scale);
+		buf7.put(i, stream_buffer::sample_t(o8) * sample_scale);
+		buf8.put(i, stream_buffer::sample_t(o16) * sample_scale);
 
-		bufsolo1[i] = solo8;
-		bufsolo2[i] = solo16;
+		bufsolo1.put(i, stream_buffer::sample_t(solo8) * sample_scale);
+		bufsolo2.put(i, stream_buffer::sample_t(solo16) * sample_scale);
 
 		SAVE_SINGLE_CHANNEL(4,o2)
 		SAVE_SINGLE_CHANNEL(5,o4)
@@ -794,6 +795,6 @@ void msm5232_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 			}
 		}
 
-		bufnoise[i] = (m_noise_rng & (1<<16)) ? 32767 : 0;
+		bufnoise.put(i, (m_noise_rng & (1<<16)) ? 1.0 : 0.0);
 	}
 }
