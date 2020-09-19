@@ -4,12 +4,7 @@
 
     Curtis Electromusic Specialties CEM3394 µP-Controllable Synthesizer Voice
 
-    This driver handles CEM-3394 analog synth chip. Very crudely.
-
-    Still to do:
-        - adjust the overall volume when multiple waves are being generated
-        - filter internal sound
-        - support resonance (don't understand how it works)
+    This driver handles CEM-3394 analog synth chip.
 
 ***************************************************************************/
 
@@ -17,6 +12,18 @@
 #include "cem3394.h"
 
 #include <algorithm>
+
+
+// various filter implementations to play with; currently SVTRAP works best
+#define FILTER_TYPE_NONE   (0)
+#define FILTER_TYPE_SVTRAP (1)
+#define FILTER_TYPE_ESQ1   (2)
+
+#define FILTER_TYPE FILTER_TYPE_SVTRAP
+
+
+// logging
+#define LOG_CONTROL_CHANGES (0)
 
 
 // use 0.25 as the base volume for pulses
@@ -147,33 +154,91 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  sound_stream_update - generate sound to the mix
-//  buffer in mono
+//  filter - apply the lowpass filter at the given
+//  cutoff frequency
 //-------------------------------------------------
+
+#if (FILTER_TYPE == FILTER_TYPE_NONE)
 
 double cem3394_device::filter(double input, double cutoff)
 {
-	// clamp cutoff to useful range, 20Hz-20kHz
-	cutoff = std::max(std::min(cutoff, 20000.0), 20.0);
+	return input;
+}
+
+#elif (FILTER_TYPE == FILTER_TYPE_SVTRAP)
+
+double cem3394_device::filter(double input, double cutoff)
+{
+	// clamp cutoff to useful range, 50Hz-20kHz
+	cutoff = std::min(std::max(cutoff, 50.0), 20000.0);
+
+	// clamp resonance to below 1.0 to prevent runaway behavior; when clamping,
+	// also apply an (arbitrary) scale factor to the output since we're close
+	// to resonance and the datasheet indicates there is an amplitude correction
+	// in this case
+	double outscale = 1.0;
+	double res = m_filter_resonance;
+	if (res > 0.99)
+		res = 0.99, outscale = 0.5;
+
+	// core filter implementation
+	double g = tan(M_PI * cutoff * m_inv_sample_rate);
+	double k = 2.0 - 2.0 * res;
+	double a1 = 1.0 / (1.0 + g * (g + k));
+	double a2 = g * a1;
+	double a3 = g * a2;
+	double v3 = input - m_filter_out[1];
+	double v1 = a1 * m_filter_out[0] + a2 * v3;
+	double v2 = m_filter_out[1] + a2 * m_filter_out[0] + a3 * v3;
+	m_filter_out[0] = 2 * v1 - m_filter_out[0];
+	m_filter_out[1] = 2 * v2 - m_filter_out[1];
+
+	// lowpass output is equal to v2
+	double output = v2 * outscale;
+
+	// catch any NaNs
+	if (std::isnan(output))
+	{
+		logerror("NAN - vco: %6.0f cutoff: %6.0f res: %.5f output: %.5f\n", m_vco_step / m_inv_sample_rate, cutoff, m_filter_resonance, output);
+		output = 0;
+		m_filter_out[0] = m_filter_out[1] = 0;
+	}
+
+	// if we go out of range, scale down to 1.0 and also scale our
+	// feedback terms to help us stay in control
+	else if (fabs(output) > 1.0)
+	{
+		double scale = 1.0 / fabs(output);
+		output *= scale;
+		m_filter_out[0] *= scale;
+		m_filter_out[1] *= scale;
+	}
+	return output;
+}
+
+#elif (FILTER_TYPE == FILTER_TYPE_ESQ1)
+
+double cem3394_device::filter(double input, double cutoff)
+{
+	// clamp cutoff to useful range, 50Hz-20kHz
+	cutoff = std::min(std::max(cutoff, 50.0), 20000.0);
 
 	// clamp resonance to 0.95 to prevent infinite gain
-	double r = 4.0 * std::min(m_filter_resonance, 0.95);
+	double r = 4.0 * std::min(res, 0.95);
 
+	// core filter implementation
 	double g = 2 * M_PI * cutoff;
 	double zc = g / tan(g/2 * m_inv_sample_rate);
-
 	double gzc = zc / g;
 	double gzc2 = gzc * gzc;
 	double gzc3 = gzc2 * gzc;
 	double gzc4 = gzc3 * gzc;
 	double r1 = 1 + r;
-
 	double a0 = r1;
 	double a1 = 4 * r1;
 	double a2 = 6 * r1;
 	double a3 = 4 * r1;
 	double a4 = r1;
-
 	double b0 =      r1 + 4 * gzc + 6 * gzc2 + 4 * gzc3 + gzc4;
 	double b1 = 4 * (r1 + 2 * gzc            - 2 * gzc3 - gzc4);
 	double b2 = 6 * (r1           - 2 * gzc2            + gzc4);
@@ -184,15 +249,18 @@ double cem3394_device::filter(double input, double cutoff)
 					+  m_filter_in[0] * a1 +  m_filter_in[1] * a2 +  m_filter_in[2] * a3 +  m_filter_in[3] * a4
 					- m_filter_out[0] * b1 - m_filter_out[1] * b2 - m_filter_out[2] * b3 - m_filter_out[3] * b4) / b0;
 
-//	sound_assert(!std::isnan(output));
-//	sound_assert(output >= -1.5 && output <= 1.5);
-	if (output < -1.5 || output > 1.5 || std::isnan(output))
+	// catch NaNs
+	if (std::isnan(output))
 	{
-		if (m_filter_out[0] > -1.5 && m_filter_out[0] < 1.5)
-			printf("cutoff: %6.0f res: %.5f output: %.5f\n", cutoff, m_filter_resonance, output);
+		logerror("NAN - vco: %6.0f cutoff: %6.0f res: %.5f output: %.5f\n", m_vco_step / m_inv_sample_rate, cutoff, m_filter_resonance, output);
+		output = 0;
 	}
-	if (std::isnan(output)) output = 0;
 
+	// if output goes significantly out of range, scale it down
+	else if (fabs(output) > 10.0)
+		output = 10.0;
+
+	// update memories
 	m_filter_in[3] = m_filter_in[2];
 	m_filter_in[2] = m_filter_in[1];
 	m_filter_in[1] = m_filter_in[0];
@@ -203,12 +271,25 @@ double cem3394_device::filter(double input, double cutoff)
 	m_filter_out[1] = m_filter_out[0];
 	m_filter_out[0] = output;
 
+	// clamp to range and return
 	if (output < -1.0)
 		output = -1.0;
 	else if (output > 1.0)
 		output = 1.0;
 	return output;
 }
+
+#else
+
+#error Unknown FILTER_TYPE
+
+#endif
+
+
+//-------------------------------------------------
+//  sound_stream_update - generate sound to the mix
+//  buffer in mono
+//-------------------------------------------------
 
 void cem3394_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
@@ -370,6 +451,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 		case VCO_FREQUENCY:
 			temp = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
 			m_vco_step = temp * m_inv_sample_rate;
+			if (LOG_CONTROL_CHANGES) logerror("VCO_FREQ=%6.3fV -> freq=%f\n", voltage, temp);
 			break;
 
 		// wave select determines triangle/sawtooth enable
@@ -381,6 +463,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_wave_select |= WAVE_TRIANGLE | WAVE_SAWTOOTH;
 			else if (voltage >=  2.3 && voltage <=  3.9)
 				m_wave_select |= WAVE_SAWTOOTH;
+			if (LOG_CONTROL_CHANGES) logerror("WAVE_SEL=%6.3fV -> tri=%d saw=%d\n", voltage, (m_wave_select & WAVE_TRIANGLE) ? 1 : 0, (m_wave_select & WAVE_SAWTOOTH) ? 1 : 0);
 			break;
 
 		// pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100%
@@ -397,11 +480,13 @@ void cem3394_device::set_voltage(int input, double voltage)
 					m_pulse_width = MINIMUM_WIDTH + (MAXIMUM_WIDTH - MINIMUM_WIDTH) * m_pulse_width;
 				m_wave_select |= WAVE_PULSE;
 			}
+			if (LOG_CONTROL_CHANGES) logerror("PULSE_WI=%6.3fV -> raw=%f adj=%f\n", voltage, voltage * 0.5, m_pulse_width);
 			break;
 
 		// final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB
 		case FINAL_GAIN:
 			m_volume = compute_db_volume(voltage);
+			if (LOG_CONTROL_CHANGES) logerror("TOT_GAIN=%6.3fV -> vol=%f\n", voltage, m_volume);
 			break;
 
 		// mixer balance is a pan between the external input and the internal input
@@ -417,11 +502,13 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_mixer_internal = compute_db_volume(3.55 - 0.45 * (voltage * 0.25));
 				m_mixer_external = compute_db_volume(3.55 + voltage);
 			}
+			if (LOG_CONTROL_CHANGES) logerror(" BALANCE=%6.3fV -> int=%f ext=%f\n", voltage, m_mixer_internal, m_mixer_external);
 			break;
 
 		// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
 		case FILTER_FREQENCY:
 			m_filter_frequency = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
+			if (LOG_CONTROL_CHANGES) logerror("FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
 			break;
 
 		// modulation depth is 0.01*freq at 0V and 2.0*freq at 3.5V
@@ -432,6 +519,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_filter_modulation = 1.99;
 			else
 				m_filter_modulation = (voltage * (1.0 / 3.5)) * 1.98 + 0.01;
+			if (LOG_CONTROL_CHANGES) logerror("FLT_MODU=%6.3fV -> mod=%f\n", voltage, m_filter_modulation);
 			break;
 
 		// this is not yet implemented
@@ -442,6 +530,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 				m_filter_resonance = 1.0;
 			else
 				m_filter_resonance = voltage * (1.0 / 2.5);
+			if (LOG_CONTROL_CHANGES) logerror("FLT_RESO=%6.3fV -> mod=%f\n", voltage, m_filter_resonance);
 			break;
 	}
 }
