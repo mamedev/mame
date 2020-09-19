@@ -938,6 +938,7 @@ function cheat.startplugin()
 			if cheat.parameter.item then
 				intf.parameter.item = {}
 				for idx, item in pairs(cheat.parameter.item) do
+					intf.parameter.item[idx] = {}
 					intf.parameter.item[idx].text = cheat.parameter.item[idx].text
 					intf.parameter.item[idx].value = cheat.parameter.item[idx].value
 				end
