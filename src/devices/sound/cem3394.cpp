@@ -150,6 +150,7 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 	m_pulse_width(0),
 	m_inv_sample_rate(1.0/48000.0)
 {
+	(void)m_filter_in;
 }
 
 
