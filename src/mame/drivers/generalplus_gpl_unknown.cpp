@@ -615,11 +615,6 @@ uint8_t gpl162xx_lcdtype_state::spi_process_rx()
 	{
 		uint8_t dat = m_spirom[m_spiaddress & 0x7fffff];
 
-		// hack internal BIOS checksum check
-		//if (m_spiaddress == ((0x49d13 - 0x20000) * 2)+1)
-		//  if (dat == 0x4e)
-		//      dat = 0x5e;
-
 		LOGMASKED(LOG_GPL162XX_LCDTYPE,"reading SPI %02x from SPI Address %08x (adjusted word offset %08x)\n", dat, m_spiaddress, (m_spiaddress/2)+0x20000);
 		m_spiaddress++;
 		return dat;
