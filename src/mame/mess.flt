@@ -119,6 +119,7 @@ binbug.cpp
 bitel.cpp
 bitgraph.cpp
 bk.cpp
+blit.cpp
 blw700i.cpp
 bmjr.cpp
 bml3.cpp
