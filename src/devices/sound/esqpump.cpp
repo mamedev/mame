@@ -66,65 +66,61 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, std::v
 	auto &right = outputs[1];
 #define SAMPLE_SHIFT 4
 	constexpr stream_buffer::sample_t input_scale = 32768.0 / (1 << SAMPLE_SHIFT);
-	for (int i = 0; i < left.samples(); i++)
-	{
-		// anything for the 'aux' output?
-		stream_buffer::sample_t l = inputs[0].get(i) * (1.0 / (1 << SAMPLE_SHIFT));
-		stream_buffer::sample_t r = inputs[1].get(i) * (1.0 / (1 << SAMPLE_SHIFT));
 
-		// push the samples into the ESP
-		m_esp->ser_w(0, s32(inputs[2].get(i) * input_scale));
-		m_esp->ser_w(1, s32(inputs[3].get(i) * input_scale));
-		m_esp->ser_w(2, s32(inputs[4].get(i) * input_scale));
-		m_esp->ser_w(3, s32(inputs[5].get(i) * input_scale));
-		m_esp->ser_w(4, s32(inputs[6].get(i) * input_scale));
-		m_esp->ser_w(5, s32(inputs[7].get(i) * input_scale));
+	// anything for the 'aux' output?
+	stream_buffer::sample_t l = inputs[0].get(0) * (1.0 / (1 << SAMPLE_SHIFT));
+	stream_buffer::sample_t r = inputs[1].get(0) * (1.0 / (1 << SAMPLE_SHIFT));
+
+	// push the samples into the ESP
+	m_esp->ser_w(0, s32(inputs[2].get(0) * input_scale));
+	m_esp->ser_w(1, s32(inputs[3].get(0) * input_scale));
+	m_esp->ser_w(2, s32(inputs[4].get(0) * input_scale));
+	m_esp->ser_w(3, s32(inputs[5].get(0) * input_scale));
+	m_esp->ser_w(4, s32(inputs[6].get(0) * input_scale));
+	m_esp->ser_w(5, s32(inputs[7].get(0) * input_scale));
 
 #if PUMP_FAKE_ESP_PROCESSING
-		m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
-		m_esp->ser_w(7, m_esp->ser_r(1) + m_esp->ser_r(3) + m_esp->ser_r(5));
+	m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
+	m_esp->ser_w(7, m_esp->ser_r(1) + m_esp->ser_r(3) + m_esp->ser_r(5));
 #else
-		if (!m_esp_halted) {
-			logerror("passing one sample through ESP\n");
-			osd_ticks_t a = osd_ticks();
-			m_esp->run_once();
-			osd_ticks_t b = osd_ticks();
-			ticks_spent_processing += (b - a);
-			samples_processed++;
-		}
+	if (!m_esp_halted) {
+		logerror("passing one sample through ESP\n");
+		osd_ticks_t a = osd_ticks();
+		m_esp->run_once();
+		osd_ticks_t b = osd_ticks();
+		ticks_spent_processing += (b - a);
+		samples_processed++;
+	}
 #endif
 
-		// read the processed result from the ESP and add to the saved AUX data
-		stream_buffer::sample_t ll = stream_buffer::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
-		stream_buffer::sample_t rr = stream_buffer::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
-		l += ll;
-		r += rr;
+	// read the processed result from the ESP and add to the saved AUX data
+	stream_buffer::sample_t ll = stream_buffer::sample_t(m_esp->ser_r(6)) * (1.0 / 32768.0);
+	stream_buffer::sample_t rr = stream_buffer::sample_t(m_esp->ser_r(7)) * (1.0 / 32768.0);
+	l += ll;
+	r += rr;
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-		// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
-		stream_buffer::sample_t el = (inputs[2].get(i)) + (inputs[4].get(i)) + (inputs[6].get(i));
-		stream_buffer::sample_t er = (inputs[3].get(i)) + (inputs[5].get(i)) + (inputs[7].get(i));
-		stream_buffer::sample_t e_next = el + er;
-		e[(ei + 0x1d0f) % 0x4000] = e_next;
+	// if we're processing the fake program through the ESP, the result should just be that of adding the inputs
+	stream_buffer::sample_t el = (inputs[2].get(0)) + (inputs[4].get(0)) + (inputs[6].get(0));
+	stream_buffer::sample_t er = (inputs[3].get(0)) + (inputs[5].get(0)) + (inputs[7].get(0));
+	stream_buffer::sample_t e_next = el + er;
+	e[(ei + 0x1d0f) % 0x4000] = e_next;
 
-		if (fabs(l - e[ei]) > 1e-5) {
-			util::stream_format(std::cerr, "expected (%d) but have (%d)\n", e[ei], l);
-		}
-		ei = (ei + 1) % 0x4000;
+	if (fabs(l - e[ei]) > 1e-5) {
+		util::stream_format(std::cerr, "expected (%d) but have (%d)\n", e[ei], l);
+	}
+	ei = (ei + 1) % 0x4000;
 #endif
 
-		// write the combined data to the output
-		left.put(i, l);
-		right.put(i, r);
-	}
+	// write the combined data to the output
+	left.put(0, l);
+	right.put(0, r);
 
 #if PUMP_DETECT_SILENCE
-	for (int i = 0; i < left.samples(); i++) {
-		if (left.get(i) == 0 && right.get(i) == 0) {
-			silent_for++;
-		} else {
-			silent_for = 0;
-		}
+	if (left.get(0) == 0 && right.get(0) == 0) {
+		silent_for++;
+	} else {
+		silent_for = 0;
 	}
 	bool silence = silent_for >= 500;
 	if (was_silence != silence) {
@@ -158,9 +154,4 @@ void esq_5505_5510_pump_device::sound_stream_update(sound_stream &stream, std::v
 #endif
 	}
 #endif
-}
-
-void esq_5505_5510_pump_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) {
-	// ecery time there's a new sample period, update the stream!
-	m_stream->update();
 }
