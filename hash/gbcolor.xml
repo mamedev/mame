@@ -4,7 +4,7 @@
 license:CC0
 
 To investigate:
-  - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
+
 
 Undumped:
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
@@ -206,6 +206,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="CGB-BVPP-EUR"/>
+		<info name="submitted" value="20010215"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -447,6 +448,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="DMG-AZTP-EUR"/>
+		<info name="submitted" value="20000223"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -519,6 +521,24 @@ Unreleased (music source code exists, possibly no prototypes exist)
 				<rom name="alone in the dark - the new nightmare (usa) (en,fr,es).bin" size="4194304" crc="c145c036" sha1="a348aeac500d0d8fdaf90f5277631a026504ff44"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amfbowli">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbafpe0.339"	-->
+		<!--	Retail cartridge not yet located, might be unreleased	-->
+		<description>AMF Bowling (USA)</description>
+		<year>2000</year>
+		<publisher>Vatical Entertainment</publisher>
+		<info name="serial" value="CGB-AFPE-USA?"/>
+		<info name="submitted" value="20000727"/>
+		<info name="alt_title" value="AMF Xtreme Bowling"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbafpe0.339" size="1048576" crc="392559ee" sha1="1dd7d94f320d119682fd4df80297c8df1b28141b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1289,8 +1309,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-AUEJ-JPN"/>
+		<info name="submitted" value="19991104"/>
 		<info name="release" value="19991224"/>
-		<info name="alt_title" value="爆走戦記 メタルウォーカーGB 鋼鉄の友情"/>
+		<info name="alt_title" value="爆走戦記 メタルウォーカーＧＢ ～鋼鉄の友情～"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -1531,6 +1552,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1998</year>
 		<publisher>Tamsoft</publisher>
 		<info name="serial" value="DMG-ABEJ-JPN"/>
+		<info name="submitted" value="19981105"/>
 		<info name="release" value="19981211"/>
 		<info name="alt_title" value="バーコード対戦 バーディガン"/>
 		<part name="cart" interface="gameboy_cart">
@@ -1544,6 +1566,26 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-abej-0.u1" size="1048576" crc="ddfcf4b7" sha1="bc7847dee730ba274f3c3ccb511f1dad6b6a93c7"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barcodea" cloneof="barcode">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgabej1.f26"	-->
+		<description>Barcode Taisen Bardigun (Jpn, Rev. A)</description>
+		<year>1998</year>
+		<publisher>Tamsoft</publisher>
+		<info name="serial" value="DMG-ABEJ-JPN-1"/>
+		<info name="submitted" value="19990323"/>
+		<info name="alt_title" value="バーコード対戦 バーディガン"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgabej1.f26" size="1048576" crc="f6d291a9" sha1="21e386f60fcd3694c4a308de9e178762c5175b6c"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -2022,6 +2064,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Mattel Interactive</publisher>
 		<info name="serial" value="CGB-BALE-USA"/>
+		<info name="submitted" value="20000926"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -2164,12 +2207,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-BWAJ-JPN"/>
+		<info name="submitted" value="20000731"/>
 		<info name="release" value="20000929"/>
 		<info name="alt_title" value="牧場物語GB3 ボーイ・ミーツ・ガール"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="bokujou monogatari gb3 - boy meets girl (japan).bin" size="2097152" crc="3a18b41f" sha1="e7fceb85a78c78403711521fe5fc8f86260425d0"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bokujom3a" cloneof="harvmon3">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbwaj1.350"	-->
+		<description>Bokujou Monogatari GB3 - Boy Meets Girl (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Victor Interactive Software</publisher>
+		<info name="serial" value="CGB-BWAJ-JPN"/>
+		<info name="submitted" value="20001205"/>
+		<info name="alt_title" value="牧場物語GB3 ボーイ・ミーツ・ガール"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="cgbbwaj1.350" size="2097152" crc="75af0e84" sha1="acb2e549fb7d107d20507af88c36f40234f74958"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -2327,6 +2390,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2003</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="CGB-B2CK-KOR"/>
+		<info name="submitted" value="20030409"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-M-BFAN-10" />
 			<feature name="u1" value="U1 PRG" />
@@ -2337,6 +2401,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="bouken">
 		<!-- Notes: GBC only -->
@@ -2797,6 +2862,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="CGB-BS7J-JPN"/>
+		<info name="submitted" value="20000824"/>
 		<info name="release" value="20001006"/>
 		<info name="alt_title" value="カードキャプターさくら 〜友枝小学校大運動会〜"/>
 		<part name="cart" interface="gameboy_cart">
@@ -2827,10 +2893,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="carmgedd">
 		<!-- Notes: GBC only -->
+		<!--	USA cartridges have the European sticker underneath.	-->
 		<description>Carmageddon - Carpocalypse Now (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="CGB-AKWE-USA, CGB-AKWP-EUR"/>
+		<info name="submitted" value="CGB-AKWE-USA, CGB-AKWP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A09-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
@@ -2862,6 +2930,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="CGB-AF9X-EUU"/>
+		<info name="submitted" value="20000831"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -2884,6 +2953,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="CGB-AF9P-EUR"/>
+		<info name="submitted" value="20000831"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -2900,6 +2970,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="CGB-AF9E-USA"/>
+		<info name="submitted" value="20000404"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -2929,6 +3000,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-A3CP-EUR"/>
+		<info name="submitted" value="19991018"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -2943,6 +3015,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-A3CE-USA"/>
+		<info name="submitted" value="19991101"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -3633,6 +3706,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-A22X-EUR"/>
+		<info name="submitted" value="20000727"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -3649,6 +3723,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-A22Y-EUU"/>
+		<info name="submitted" value="20000727"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -3855,6 +3930,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="CGB-BJ2P-EUR"/>
+		<info name="submitted" value="20011127"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -3999,6 +4075,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Rage Software</publisher>
 		<info name="serial" value="CGB-BD9P-EUR"/>
+		<info name="submitted" value="20010830"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -4029,12 +4106,14 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="dendego2">
 		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbb82j0.538"	-->
 		<description>Densha de Go! 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>CyberFront</publisher>
 		<info name="serial" value="CGB-B82J-JPN"/>
+		<info name="submitted" value="20001020"/>
 		<info name="release" value="20001208"/>
-		<info name="alt_title" value="電車でGO ! 2"/>
+		<info name="alt_title" value="電車でＧＯ！ ２"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A15-10" />
 			<feature name="u1" value="U1 32M MROM 02" />
@@ -4423,6 +4502,26 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="donkey kong country (usa, europe) (en,fr,de,es,it) (sample).bin" size="4194304" crc="945c3653" sha1="6b21d4d43fe8ac234e7fb81a167f313cf044d5b6"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongcd" cloneof="dkongc">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbdye0.326"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Donkey Kong Country (USA, Not for resale)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DIS-CGB-BDYE-USA"/>
+		<info name="submitted" value="20000719"/>
+		<info name="alt_title" value="DONKEY KONG COUNTRY (DISPLAY)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="4194304">
+				<rom name="cgbbdye0.326" size="4194304" crc="080605a3" sha1="38fedd71736d258e31d3062864d28449e7c3f1c5"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4899,6 +4998,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="DMG-BDAE-USA"/>
+		<info name="submitted" value="20000623"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
@@ -5018,6 +5118,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-BQIJ-JPN"/>
+		<info name="submitted" value="20001222"/>
 		<info name="release" value="20010412"/>
 		<info name="alt_title" value="ドラゴンクエストモンスターズ2 マルタのふしぎな鍵 イルの冒険"/>
 		<part name="cart" interface="gameboy_cart">
@@ -5036,6 +5137,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-BQLJ-JPN"/>
+		<info name="submitted" value="20001208"/>
 		<info name="release" value="20010309"/>
 		<info name="alt_title" value="ドラゴンクエストモンスターズ2 マルタのふしぎな鍵 ルカの旅立ち"/>
 		<part name="cart" interface="gameboy_cart">
@@ -5048,6 +5150,26 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="dmg-bqlj-0.u1" size="4194304" crc="2c428a87" sha1="5d2daec53938805236328a0f8a614debffa34048"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dqm2ra" cloneof="dwm2c">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgbqlj1.j93"	-->
+		<description>Dragon Quest Monsters 2 - Maruta no Fushigi na Kagi - Ruka no Tabidachi (Jpn, Rev. A)</description>
+		<year>2001</year>
+		<publisher>Enix</publisher>
+		<info name="serial" value="DMG-BQLJ-JPN"/>
+		<info name="submitted" value="20001228"/>
+		<info name="release" value="20010309"/>
+		<info name="alt_title" value="ドラゴンクエストモンスターズ2 マルタのふしぎな鍵 ルカの旅立ち"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dmgbqlj1.j93" size="4194304" crc="649e8d97" sha1="217faaf8e7d60545bd07f818a3b3373843e6318d"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -5344,6 +5466,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-ADWJ-JPN"/>
+		<info name="submitted" value="20000616"/>
 		<info name="release" value="20000804"/>
 		<info name="alt_title" value="ダンジョンセイバー"/>
 		<part name="cart" interface="gameboy_cart">
@@ -5447,6 +5570,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="CGB-BETE-USA"/>
+		<info name="submitted" value="20011015"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
@@ -5634,9 +5758,10 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="emperor">
+	<software name="emperorunk" cloneof="emperor">
 		<!-- Notes: GBC only -->
-		<description>The Emperor's New Groove (Euro)</description>
+		<!-- Old dump of unknown origin -->
+		<description>The Emperor's New Groove (Euro, bad dump?)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BENP-EUR"/>
@@ -5650,12 +5775,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="emperor">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbenp0.641"	-->
+		<description>The Emperor's New Groove (Euro)</description>
+		<year>2001</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="serial" value="CGB-BENP-EUR"/>
+		<info name="submitted" value="20010123"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="cgbbenp0.641" size="2097152" crc="eb29c584" sha1="2f53318aa7f1c82df95bf3da6b29701a2c563d13"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="emperoru" cloneof="emperor">
 		<!-- Notes: GBC only -->
 		<description>The Emperor's New Groove (USA)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BENE-USA"/>
+		<info name="submitted" value="20010123"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -5805,6 +5950,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Video System</publisher>
 		<info name="serial" value="CGB-AFIP-EUR"/>
+		<info name="submitted" value="19990526"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -5837,7 +5983,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>The F.A. Premier League Stars 2001 (Euro)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="??"/>
+		<info name="serial" value="CGB-BSJP-?"/>
+		<info name="submitted" value="20010413"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -5851,7 +5998,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>F1 Championship Season 2000 (Euro)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="??"/>
+		<info name="serial" value="CGB-BFIP-?"/>
+		<info name="submitted" value="20001117"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -5860,16 +6008,34 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="f1chmp2kb" cloneof="f1chmp2k">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbfib0.579"	-->
+		<description>F1 Championship Season 2000 (Bra)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="CGB-BFIB-?"/>
+		<info name="submitted" value="20001107"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="cgbbfib0.579" size="2097152" crc="f4f5ed18" sha1="4731a7442bbff31c6d470b84938a3f148a4f1f6c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f1racing">
 		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbaeqp0.381"	-->
 		<description>F1 Racing Championship (Euro)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-AEQP-EUR"/>
+		<info name="submitted" value="20000829"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="f1 racing championship (europe) (en,fr,de,es,it).bin" size="4194304" crc="e115ddb1" sha1="e9616a53ab9474c0bb85451ff19b62bed9e7f1a4"/>
+				<rom name="cgbaeqp0.381" size="4194304" crc="93a9789f" sha1="ea844051c0b5c6f9a6a8c472f4f67ee6b9b3d8e7"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -5884,7 +6050,23 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="f1 racing championship (europe) (en,fr,de,es,it) (beta).bin" size="4194304" crc="fc537719" sha1="3c10fe93521a604f1e312253328cd977236eae07"/>
+				<rom name="f1 racing championship (europe) (en,fr,de,es,it) (beta) (february, 2000).bin" size="4194304" crc="e115ddb1" sha1="e9616a53ab9474c0bb85451ff19b62bed9e7f1a4"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1racingunk" cloneof="f1racing">
+		<!-- Notes: GBC only -->
+		<!-- Old dump of unknown origin -->
+		<description>F1 Racing Championship (Euro, bad dump?)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="4194304">
+				<rom name="f1 racing championship (europe) (en,fr,de,es,it).bin" size="4194304" crc="fc537719" sha1="3c10fe93521a604f1e312253328cd977236eae07"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6209,10 +6391,29 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="CGB-BH2E-USA"/>
+		<info name="submitted" value="20000731"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="frogger 2 (usa).bin" size="1048576" crc="6a2666aa" sha1="566e0afb3a6f25342399a3e39f3fbcacef68eb72"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger2a" cloneof="frogger2">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbh2e1.351"	-->
+		<description>Frogger 2 (USA, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Majesco</publisher>
+		<info name="serial" value="CGB-BH2E-USA"/>
+		<info name="submitted" value="20000821"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbh2e1.351" size="1048576" crc="e3227b7d" sha1="0d5028ca6fcc10df46d11cd4b56e5add1dc5e63e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6225,8 +6426,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BZOJ-JPN"/>
+		<info name="submitted" value="20020510"/>
 		<info name="release" value="20020628"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 幻のグランドライン冒険記!"/>
+		<info name="alt_title" value="From TV animation ＯＮＥ ＰＩＥＣＥ　幻のグランドライン冒険記！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A03-10" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
@@ -6249,8 +6451,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BLUJ-JPN"/>
+		<info name="submitted" value="20010615"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
+		<info name="alt_title" value="FROM TV ANIMATION　ＯＮＥ ＰＩＥＣＥ　夢のルフィ海賊団誕生！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C3203-12A2]" />
@@ -6273,8 +6476,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BLUJ-JPN"/>
+		<info name="submitted" value="20010307"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
+		<info name="alt_title" value="FROM TV ANIMATION　ＯＮＥ ＰＩＥＣＥ　夢のルフィ海賊団誕生！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -6331,12 +6535,33 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>ChinSoft</publisher>
 		<info name="serial" value="CGB-AFMJ-JPN"/>
+		<info name="submitted" value="20010622"/>
 		<info name="release" value="20010719"/>
-		<info name="alt_title" value="不思議のダンジョン 風来のシレンGB2 砂漠の魔城"/>
+		<info name="alt_title" value="不思議のダンジョン　風来のシレンＧＢ２　砂漠の魔城"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="fushigi no dungeon - fuurai no shiren gb2 - sabaku no majou (japan).bin" size="4194304" crc="2c97e90f" sha1="5264f6d0c4f12c9144de1d12fddadbadd82b3e33"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="furaish2a" cloneof="furaish2">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbfwj0.814"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Fushigi no Dungeon - Fuurai no Shiren GB2 - Sabaku no Majou (Jpn, Alt)</description>
+		<year>2001</year>
+		<publisher>ChinSoft</publisher>
+		<info name="serial" value="CGB-BFWJ-JPN?"/>
+		<info name="submitted" value="20010703"/>
+		<info name="alt_title" value="不思議のダンジョン　風来のシレンＧＢ２　砂漠の魔城"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="4194304">
+				<rom name="cgbbfwj0.814" size="4194304" crc="f3c20fbe" sha1="d9c490af97c08ac7053bbb9f7ae06d3501035127"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -6361,11 +6586,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="gakkyama">
+	<software name="gakkyamaa">
 		<description>Gakkyuu Ou Yamazaki (Jpn, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-AYMJ-JPN"/>
+		<info name="submitted" value="19990428"/>
 		<info name="release" value="19990529"/>
 		<info name="alt_title" value="学級王ヤマザキ ゲームボーイ版"/>
 		<part name="cart" interface="gameboy_cart">
@@ -6378,6 +6604,26 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-aymj-1.u1" size="1048576" crc="ef2cfd99" sha1="3a2718efa3d1cac7345fbbcddb7c3f666fc6c70c"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkyama" cloneof="gakkyamaa">
+		<!--	In lot check as "dmgaymj0.g22"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Gakkyuu Ou Yamazaki (Jpn)</description>
+		<year>1999</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="DMG-AYMJ-JPN?"/>
+		<info name="submitted" value="19990226"/>
+		<info name="release" value="19990529"/>
+		<info name="alt_title" value="学級王ヤマザキ ゲームボーイ版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgaymj0.g22" size="1048576" crc="b8147b5c" sha1="132b872391565d418ccc9d0e1c643510d778c066"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6404,12 +6650,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="CGB-BGYJ-JPN"/>
+		<info name="submitted" value="20001218"/>
 		<info name="release" value="20010209"/>
 		<info name="alt_title" value="勝負師伝説 哲也 新宿天運編"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="gambler densetsu tetsuya - shinjuku tenun hen (japan).bin" size="1048576" crc="28356950" sha1="8ba0973997bdaeecdf23c45a4fb7e18e06132dfb"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamblerta" cloneof="gamblert">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbgyj1.607"	-->
+		<description>Gambler Densetsu Tetsuya - Shinjuku Tenun Hen (Jpn, Rev. A)</description>
+		<year>2001</year>
+		<publisher>Athena</publisher>
+		<info name="serial" value="CGB-BGYJ-JPN?"/>
+		<info name="submitted" value="20010307"/>
+		<info name="alt_title" value="勝負師伝説 哲也 新宿天運編"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbgyj1.607" size="1048576" crc="91739def" sha1="b62f8e56b995874c0e1a2533df5a37f6996df12e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6857,6 +7123,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Cryo</publisher>
 		<info name="serial" value="CGB-BGFP-EUR"/>
+		<info name="submitted" value="20001026"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -6870,7 +7137,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>Gifty (Ger)</description>
 		<year>2001</year>
 		<publisher>Cryo</publisher>
-		<info name="serial" value="??"/>
+		<info name="serial" value="CGB-BGFD-?"/>
+		<info name="submitted" value="20001026"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -7073,8 +7341,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Digital Kids</publisher>
 		<info name="serial" value="CGB-AZAJ-JPN"/>
+		<info name="submitted" value="19990617"/>
 		<info name="release" value="19990716"/>
-		<info name="alt_title" value="ゴルフ王"/>
+		<info name="alt_title" value="ゴルフ王 THE KING OF GOLF"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
@@ -7983,6 +8252,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="DMG-AF4E-USA"/>
+		<info name="submitted" value="19991027"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -8031,6 +8301,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>3DO</publisher>
 		<info name="serial" value="CGB-AUHP-EUR"/>
+		<info name="submitted" value="20000727"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -8053,6 +8324,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>3DO</publisher>
 		<info name="serial" value="CGB-AUHE-USA"/>
+		<info name="submitted" value="20000508"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -8080,6 +8352,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="hexcite">
+		<!--	European cartridges have USA sticker underneath.	-->
 		<description>Hexcite (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
@@ -8398,10 +8671,27 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BHQP-EUR"/>
+		<info name="submitted" value="20000707"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="hype - the time quest (europe) (en,fr,de,es,it,nl,sv,da).bin" size="1048576" crc="24846d65" sha1="8e26e7e2e64d4bf866b67387586fc5c4a9c56855"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hypeb" cloneof="hype">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbpfe0.737"	-->
+		<description>Hype - The Time Quest (Bra)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="serial" value="CGB-BPFE-?"/>
+		<info name="submitted" value="20010411"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbpfe0.737" size="1048576" crc="cafb8035" sha1="7c7dca7c48dc478d0278c273ba37723b9e9dce5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8810,6 +9100,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>ASC Games</publisher>
 		<info name="serial" value="DMG-AJZE-USA"/>
+		<info name="submitted" value="19990930"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -8824,6 +9115,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="CGB-AJUE-USA, CGB-AJUP-EUR"/>
+		<info name="submitted" value="20000218"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -8859,6 +9151,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Vatical Entertainment</publisher>
 		<info name="serial" value="CGB-BJWP-EUR"/>
+		<info name="submitted" value="20001019"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -8903,12 +9196,13 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="jissen">
+	<software name="jissena">
 		<!-- Notes: GBC only -->
 		<description>Jissen ni Yakudatsu Tsumego (Jpn, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="CGB-BJTJ-JPN (PCPE-10004)"/>
+		<info name="submitted" value="20000711"/>
 		<info name="release" value="20000811"/>
 		<info name="alt_title" value="実戦に役立つ詰碁"/>
 		<part name="cart" interface="gameboy_cart">
@@ -8918,6 +9212,24 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
 				<rom name="cgb-bjtj-1.u1" size="262144" crc="55efa05e" sha1="5ff7f6f2a1911e97eb71a3b3788a89745cfa5d31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jissen" cloneof="jissena">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbjtj0.313"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Jissen ni Yakudatsu Tsumego (Jpn)</description>
+		<year>2000</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="CGB-BJTJ-JPN?"/>
+		<info name="submitted" value="20001004"/>
+		<info name="alt_title" value="実戦に役立つ詰碁"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="262144">
+				<rom name="cgbbjtj0.313" size="262144" crc="69c6dbef" sha1="f7ed6cdce7637a11d7fa7f5cb59b8f8ce131f9d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9292,8 +9604,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="DMG-VUTJ-JPN"/>
+		<info name="submitted" value="19990520"/>
 		<info name="release" value="19990716"/>
-		<info name="alt_title" value="川のぬし釣り4"/>
+		<info name="alt_title" value="川のぬし釣り４"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A04-01" />
 			<feature name="u1" value="U1 4M/8M MROM [M438011E-57]" />
@@ -9330,11 +9643,30 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kawaipt2">
+	<software name="kawaipt2a">
+		<!--	In lot check as "dmgbmnj1.j90"	-->
+		<description>Kawaii Pet Shop Monogatari 2 (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="DMG-BMNJ-JPN"/>
+		<info name="submitted" value="20010201"/>
+		<info name="alt_title" value="かわいいペットショップ物語2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmgbmnj1.j90" size="2097152" crc="6fce1ad0" sha1="58ea410ebbee5edc18644c0467fe9ea03d179b1c"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kawaipt2" cloneof="kawaipt2a">
 		<description>Kawaii Pet Shop Monogatari 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-BMNJ-JPN"/>
+		<info name="submitted" value="20001107"/>
 		<info name="release" value="20001222"/>
 		<info name="alt_title" value="かわいいペットショップ物語2"/>
 		<part name="cart" interface="gameboy_cart">
@@ -9971,7 +10303,26 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="laura">
 		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbldp0.420"	-->
+		<!--	Retail cartridge not yet located	-->
 		<description>Laura (Euro)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="serial" value="CGB-BLDP-EUR"/>
+		<info name="submitted" value="20000913"/>
+		<info name="alt_title" value="Laura's Happy Adventures"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbldp0.420" size="1048576" crc="a58c8282" sha1="47e5c4c7fa447efc8a0abf019e8d2cd227c5e0e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lauraunk" cloneof="laura">
+		<!-- Notes: GBC only -->
+		<!-- Old dump of unknown origin -->
+		<description>Laura (Euro, bad dump?)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BLDP-EUR"/>
@@ -10496,10 +10847,27 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BLKF-FRA"/>
+		<info name="submitted" value="20001113"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="roi lion, les - les adventures de simba (france).bin" size="1048576" crc="6467fba0" sha1="a0bef7df1ba3d75e7958763f0cec9c76428415df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingfa" cloneof="lionking">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbblkf1.573"	-->
+		<description>Le Roi Lion - Les Adventures de Simba (Fra, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="CGB-BLKF-FRA"/>
+		<info name="submitted" value="20010406"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbblkf1.573" size="1048576" crc="c7aae1b3" sha1="b8cc2f1d3a8d40c7588d5c535f28e2f80446a793"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10943,7 +11311,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kangpzl2">
+	<software name="kangpzl2a">
 		<!-- Notes: SGB enhanced, NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Jpn, Rev. A, NP)</description>
 		<year>2001</year>
@@ -10961,7 +11329,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kangpzl2a" cloneof="kangpzl2">
+	<software name="kangpzl2" cloneof="kangpzl2a">
 		<!-- Notes: SGB enhanced, NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Jpn, NP)</description>
 		<year>2001</year>
@@ -10979,7 +11347,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kangpzl3">
+	<software name="kangpzl3a">
 		<!-- Notes: SGB enhanced, NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Jpn, Rev. A, NP)</description>
 		<year>2001</year>
@@ -10997,7 +11365,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kangpzl3a" cloneof="kangpzl3">
+	<software name="kangpzl3" cloneof="kangpzl3a">
 		<!-- Notes: SGB enhanced, NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Jpn, NP)</description>
 		<year>2001</year>
@@ -11015,7 +11383,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kangpzls">
+	<software name="kangpzlsa">
 		<!-- Notes: SGB enhanced, NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Jpn, Rev. A, NP)</description>
 		<year>2001</year>
@@ -11033,7 +11401,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="kangpzlsa" cloneof="kangpzls">
+	<software name="kangpzls" cloneof="kangpzlsa">
 		<!-- Notes: SGB enhanced, NP only -->
 		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Jpn, NP)</description>
 		<year>2001</year>
@@ -11081,12 +11449,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Marvelous Entertainment</publisher>
 		<info name="serial" value="CGB-BPHJ-JPN"/>
+		<info name="submitted" value="20000616"/>
 		<info name="release" value="20000804"/>
 		<info name="alt_title" value="ラブひなポケット"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="love hina pocket (japan).bin" size="4194304" crc="1c877abd" sha1="912c09f99bdae6e7fcd62d0c6f727e5fff93db70"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lovehinaa" cloneof="lovehina">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbphj1.290"	-->
+		<description>Love Hina Pocket (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Marvelous Entertainment</publisher>
+		<info name="serial" value="CGB-BPHJ-JPN"/>
+		<info name="submitted" value="20000824"/>
+		<info name="alt_title" value="ラブひなポケット"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="4194304">
+				<rom name="cgbbphj1.290" size="4194304" crc="55dd0ba6" sha1="b29abee319ccb223e5d1a4f88982fb53e538d527"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11312,10 +11700,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="maginatn">
 		<!-- Notes: GBC only -->
-		<description>Magi Nation (USA)</description>
+		<description>Magi-Nation (USA)</description>
 		<year>2001</year>
 		<publisher>Interactive Imagination</publisher>
 		<info name="serial" value="CGB-BNNE-USA"/>
+		<info name="submitted" value="20010112"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -12639,12 +13028,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-A7YJ-JPN"/>
+		<info name="submitted" value="19991028"/>
 		<info name="release" value="19991210"/>
-		<info name="alt_title" value="みんなの将棋 初級編"/>
+		<info name="alt_title" value="みんなの将棋 ～初級編～"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="minna no shougi - shokyuu hen (japan).bin" size="1048576" crc="5cb4fc8a" sha1="777088b9a3963e55dd6f90a523a84ed58a008149"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minnashga" cloneof="minnashg">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmga7yj1.i18"	-->
+		<description>Minna no Shougi - Shokyuu Hen (Jpn, Rev. A)</description>
+		<year>1999</year>
+		<publisher>MTO</publisher>
+		<info name="serial" value="DMG-A7YJ-JPN"/>
+		<info name="submitted" value="20000811"/>
+		<info name="alt_title" value="みんなの将棋 ～初級編～"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmga7yj1.i18" size="1048576" crc="f766015a" sha1="948d2015c29342fdb6052940a5d65e771b0a81d0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -12717,10 +13126,30 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-AIMP-(NOE/UKV/FAH)"/>
+		<info name="submitted" value="19991006"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mission impossible (europe) (en,fr,de,es,it).bin" size="1048576" crc="0af32baa" sha1="5eb8dad248ff23809016a2515657089116e8df33"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missimpa" cloneof="missimp">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbaimp1.076"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Mission Impossible (Euro, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<info name="serial" value="CGB-AIMP-?"/>
+		<info name="submitted" value="19991227"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbaimp1.076" size="1048576" crc="9c51f4c7" sha1="f822bda01d881f34d1e17664465faf6a3ff64356"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -12733,6 +13162,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-AIME-USA"/>
+		<info name="submitted" value="19991227"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -12958,18 +13388,41 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="monstrvl">
+	<software name="monstrvla">
 		<!-- Notes: GBC only -->
 		<description>Monster Traveler (Jpn, Rev. A)</description>
 		<year>2002</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="CGB-BFVJ-JPN"/>
+		<info name="submitted" value="20020207"/>
 		<info name="release" value="20020308"/>
-		<info name="alt_title" value="モン★スタートラベラー"/>
+		<info name="alt_title" value="モン☆スタートラベラー"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="monster traveler (japan) (rev a).bin" size="4194304" crc="f60a376e" sha1="23842b7ad88a051b14c1676b1f561b933177f150"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstrvl" cloneof="monstrvla">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbfvj0.949"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Monster Traveler (Jpn)</description>
+		<year>2002</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="CGB-BFVJ-JPN"/>
+		<info name="submitted" value="20020122"/>
+		<info name="alt_title" value="モン☆スタートラベラー"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="4194304">
+				<rom name="cgbbfvj0.949" size="4194304" crc="5d596cf6" sha1="5195f55ad6aaa302c0a0e11c0ec6ecad4efe0e27"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -13252,18 +13705,38 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="mrdrillrj" cloneof="mrdrillr">
-		<!-- Notes: GBC only, also released by NP in 2001-06 -->
+	<software name="mrdrillrja" cloneof="mrdrillr">
+		<!-- Notes: GBC only -->
 		<description>Mr. Driller (Jpn)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="CGB-BMDJ-JPN"/>
+		<info name="submitted" value="20000510"/>
 		<info name="release" value="20000629"/>
 		<info name="alt_title" value="ミスタードリラーGB版"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mr. driller (japan).bin" size="1048576" crc="773729af" sha1="b0d725dacea717be7109bd6a81817e717641da86"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrdrillrjnp" cloneof="mrdrillr">
+		<!-- Notes: GBC only, NP only -->
+		<!--	In lot check as "cgbbv3j0.0"	-->
+		<description>Mr. Driller (Jpn, NP)</description>
+		<year>2000</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="CGB-BV3J-JPN"/>
+		<info name="release" value="200106"/>
+		<info name="alt_title" value="ミスタードリラーGB版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="524288">
+				<rom name="cgbbv3j0.0" size="524288" crc="35fd440d" sha1="fb64fa7da6a0fec3e358bb3357e66d68473ada67"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13599,8 +14072,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="CGB-B3CJ-JPN"/>
+		<info name="submitted" value="20020307"/>
 		<info name="release" value="20020405"/>
-		<info name="alt_title" value="なかよしクッキングシリーズ(5) こむぎちゃんのケーキをつくろう!"/>
+		<info name="alt_title" value="なかよしクッキングシリーズ⑤　こむぎちゃんのケーキをつくろう！"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
@@ -13616,6 +14090,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="nakapet1">
 		<description>Nakayoshi Pet Series 1 - Kawaii Hamster (Jpn)</description>
@@ -13831,15 +14306,35 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="nbazone" cloneof="nbapro99">
+	<software name="nbazonea" cloneof="nbapro99">
 		<description>NBA In the Zone (USA, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANZE-USA"/>
+		<info name="submitted" value="19990311"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nba in the zone (usa) (rev a).bin" size="1048576" crc="be949f74" sha1="f4ba926ad640d7b3e9d175fb58c90347dafcbef4"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbazone" cloneof="nbapro99">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmganze0.g29"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>NBA In the Zone (USA)</description>
+		<year>1999</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="DMG-ANZE-USA?"/>
+		<info name="submitted" value="19990303"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmganze0.g29" size="1048576" crc="f6bae9a0" sha1="7f0d5a37956ae58077656a42b26629784c203038"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13852,6 +14347,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-AJ7P-EUR"/>
+		<info name="submitted" value="19990311"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -13916,6 +14412,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANZP-EUR"/>
+		<info name="submitted" value="19990716"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -13932,6 +14429,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="CGB-AA5E-USA"/>
+		<info name="submitted" value="19991124"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -14016,6 +14514,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Microids</publisher>
 		<info name="serial" value="CGB-BAIP-EUR"/>
+		<info name="submitted" value="20011108"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -15040,6 +15539,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="CGB-A7GJ-JPN"/>
+		<info name="submitted" value="19990920"/>
 		<info name="release" value="19991015"/>
 		<info name="alt_title" value="ポケット ジーティー"/>
 		<part name="cart" interface="gameboy_cart">
@@ -15239,6 +15739,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BXTJ-JPN"/>
+		<info name="submitted" value="20001020"/>
 		<info name="release" value="20001214"/>
 		<info name="alt_title" value="ポケットモンスター クリスタルバージョン"/>
 		<part name="cart" interface="gameboy_cart">
@@ -15263,7 +15764,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>Pocket Music (Euro)</description>
 		<year>2002</year>
 		<publisher>Rage Software</publisher>
-		<info name="serial" value="??"/>
+		<info name="serial" value="CGB-BP9P-EUR?"/>
+		<info name="submitted" value="20010925"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -15348,12 +15850,51 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="CGB-BPYJ-JPN"/>
+		<info name="submitted" value="20000721"/>
 		<info name="release" value="20000922"/>
 		<info name="alt_title" value="ぽけっとぷよぷよ〜ん"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pocket puyo puyo-n (japan).bin" size="1048576" crc="870db337" sha1="a86d4a24b5da3444b1967362b13d321b5c4f7a64"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poktpuyna" cloneof="poktpuyn">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbpyj1.327"	-->
+		<description>Pocket Puyo Puyo-n (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Compile</publisher>
+		<info name="serial" value="CGB-BPYJ-JPN"/>
+		<info name="submitted" value="20010327"/>
+		<info name="alt_title" value="ぽけっとぷよぷよ〜ん"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbpyj1.327" size="1048576" crc="c884037a" sha1="3d52805f712e6d1ce22b88dfebfcac2a31743ff3"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poktpuynb" cloneof="poktpuyn">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbpyj2.327"	-->
+		<description>Pocket Puyo Puyo-n (Jpn, Rev. B)</description>
+		<year>2000</year>
+		<publisher>Compile</publisher>
+		<info name="serial" value="CGB-BPYJ-JPN"/>
+		<info name="submitted" value="20010719"/>
+		<info name="alt_title" value="ぽけっとぷよぷよ〜ん"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbpyj2.327" size="1048576" crc="573613d7" sha1="09b217161ac326da63887693281b60751ca2dfcf"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15398,6 +15939,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTE-USA, CGB-BYTP-EUR"/>
+		<info name="submitted" value="20010807, 20010726"/>
+		<info name="release" value="?, 20011102"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
@@ -15411,10 +15954,13 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="pokecrysa" cloneof="pokecrys">
 		<!-- Notes: GBC only -->
-		<description>Pokémon - Crystal Version (Euro, USA)</description>
+		<!--	European version unreleased (marked as "生産中止" in lot check)	-->
+		<description>Pokémon - Crystal Version (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTE-USA, CGB-BYTP-EUR"/>
+		<info name="submitted" value="20010524, 20010101"/>
+		<info name="release" value="20010729, unreleased"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
@@ -15432,6 +15978,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTF-FRA"/>
+		<info name="submitted" value="20010817"/>
+		<info name="release" value="20011102"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
@@ -15449,6 +15997,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTD-NOE"/>
+		<info name="submitted" value="20010726"/>
+		<info name="release" value="20011102"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
@@ -15466,6 +16016,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTI-ITA"/>
+		<info name="submitted" value="20010914"/>
+		<info name="release" value="20011102"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-KGDU-10" />
 			<feature name="u1" value="U1 PRG" />
@@ -15489,11 +16041,33 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTS-ESP"/>
+		<info name="submitted" value="20010830"/>
+		<info name="release" value="20011102"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pokemon - edicion cristal (spain).bin" size="2097152" crc="ff0a6f8a" sha1="889a06fc0bb863666865aa69def0adf97945ac2a"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokecrysaus" cloneof="pokecrys">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbytu0.834"	-->
+		<description>Pokémon - Crystal Version (Aus)</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
+		<info name="submitted" value="20010724"/>
+		<info name="release" value="20010930"/>
+		<info name="serial" value="CGB-BYTU-AUS"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="cgbbytu0.834" size="2097152" crc="bb6dd80c" sha1="a0fc810f1d4e124434f7be2c989ab5b5892ddf36"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -15833,10 +16407,29 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="pokecard">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgaxqx1.j85"	-->
+		<description>Pokémon Trading Card Game (Euro, English / Spanish / Italian, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-AXQX-EUR-1"/>
+		<info name="submitted" value="20001108"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmgaxqx1.j85" size="2097152" crc="3f1d7e58" sha1="c54b81e638b0c45d3569f9f5f0345df9e95ce975"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokecardx" cloneof="pokecard">
 		<description>Pokémon Trading Card Game (Euro, English / Spanish / Italian)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AXQX-EUR"/>
+		<info name="submitted" value="20001013"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -15847,11 +16440,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="pokecarda" cloneof="pokecard">
+	<software name="pokecarde" cloneof="pokecard">
 		<description>Pokémon Trading Card Game (Euro, English / French / German)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AXQP-NOE"/>
+		<info name="submitted" value="20001013"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A03-10" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
@@ -15862,6 +16456,24 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dmg-axqp-0.u1" size="2097152" crc="4523376e" sha1="868e7b376e39f7d65a735538d90fbe6bbc99d198"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokecardaa" cloneof="pokecard">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgaxqp1.j84"	-->
+		<description>Pokémon Trading Card Game (Euro, English / French / German, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-AXQP-NOE?"/>
+		<info name="submitted" value="20001108"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmgaxqp1.j84" size="2097152" crc="942d0b7f" sha1="dffc15f3063a4c2df84c6361406b41aec1696d3e"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16566,6 +17178,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Red Orb Entertainment</publisher>
 		<info name="serial" value="DMG-ARIE-USA, DMG-ARIP-EUR"/>
+		<info name="submitted" value="19990303, 19990525"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -16666,6 +17279,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="CGB-BPLP-EUU"/>
+		<info name="submitted" value="20000621"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -16684,7 +17298,27 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="propoolu" cloneof="propool">
 		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbple0.298"	-->
+		<!--	Retail cartridge not yet located	-->
 		<description>Pro Pool (USA)</description>
+		<year>2000?</year>
+		<publisher>Codemasters</publisher>
+		<info name="serial" value="CGB-BPLE-USA?"/>
+		<info name="submitted" value="20000621"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbple0.298" size="1048576" crc="2611fa3d" sha1="c85e514c24c82071907c6495243dae448b46c2b2"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="propooluunk" cloneof="propool">
+		<!-- Notes: GBC only -->
+		<!-- Old dump of unknown origin -->
+		<description>Pro Pool (USA, bad dump?)</description>
 		<year>2002</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="CGB-BPLE-USA"/>
@@ -16697,6 +17331,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="projs11">
 		<!-- Notes: GBC only -->
@@ -16717,6 +17352,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Event Horizon Software</publisher>
 		<info name="serial" value="DMG-AIQP-EUR"/>
+		<info name="submitted" value="20000112"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -16733,6 +17369,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-ACUJ-JPN"/>
+		<info name="submitted" value="19990311"/>
 		<info name="release" value="19990423"/>
 		<info name="alt_title" value="プチカラット"/>
 		<part name="cart" interface="gameboy_cart">
@@ -16917,6 +17554,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Event Horizon Software</publisher>
 		<info name="serial" value="CGB-AQYP-EUR"/>
+		<info name="submitted" value="20001017"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -17688,9 +18326,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 		    The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
 		<description>Robot Ponkottsu - Comic Bom Bom Special Version (Jpn)</description>
-		<year>1999?</year>
+		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-H5UJ-JPN"/>
+		<info name="submitted" value="19990618"/>
+		<info name="alt_title" value="ロボットポンコッツ ボンボンスペシャルバージョン"/>
 		<part name="cart" interface="gameboy_cart">
 			<!-- PCB documentation incomplete, based on bad pics or written docs -->
 			<feature name="pcb" value="DMG-UFDT-10" />
@@ -18013,8 +18653,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="CGB-A2QJ-JPN"/>
+		<info name="submitted" value="20000209"/>
 		<info name="release" value="20000317"/>
-		<info name="alt_title" value="RPGツクールGB"/>
+		<info name="alt_title" value="ＲＰＧ ツクール ＧＢ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -18343,6 +18984,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-ATPJ-JPN"/>
+		<info name="submitted" value="19981027"/>
 		<info name="release" value="19981127"/>
 		<info name="alt_title" value="サンリオタイムネット 過去編"/>
 		<part name="cart" interface="gameboy_cart">
@@ -18361,18 +19003,59 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="sanriotka" cloneof="sanriotk">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgatpj1.f14"	-->
+		<description>Sanrio Timenet - Kako Hen (Jpn, Rev. A)</description>
+		<year>1998</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-ATPJ-JPN"/>
+		<info name="submitted" value="19981130"/>
+		<info name="release" value="19981127"/>
+		<info name="alt_title" value="サンリオタイムネット 過去編"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgatpj1.f14" size="1048576" crc="6555b740" sha1="b3b80b4a48faec9cc71d80a6b08b12b3541b4c1b"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sanriotm">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-05 -->
 		<description>Sanrio Timenet - Mirai Hen (Jpn)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-ATFJ-JPN"/>
+		<info name="submitted" value="19981027"/>
 		<info name="release" value="19981127"/>
 		<info name="alt_title" value="サンリオタイムネット 未来編"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sanrio timenet - mirai hen (japan).bin" size="1048576" crc="efe51e17" sha1="65c4113401336784be4c53a51fe8d9b4b3d287da"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanriotma" cloneof="sanriotm">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgatfj1.f15"	-->
+		<description>Sanrio Timenet - Mirai Hen (Jpn, Rev. A)</description>
+		<year>1998</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="DMG-ATFJ-JPN"/>
+		<info name="submitted" value="19981130"/>
+		<info name="release" value="19981127"/>
+		<info name="alt_title" value="サンリオタイムネット 未来編"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgatfj1.f15" size="1048576" crc="179da7f3" sha1="5ccaf8450862dab90b45b06ab2df291d72ea6033"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -18467,7 +19150,27 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="seihai">
 		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgaeoj0.j01"	-->
+		<!--	Retail cartridge not yet located	-->
 		<description>Sei Hai Densetsu (Jpn)</description>
+		<year>2000</year>
+		<publisher>Gaps</publisher>
+		<info name="serial" value="DMG-AEOJ-JPN?"/>
+		<info name="submitted" value="20000221"/>
+		<info name="release" value="20000414"/>
+		<info name="alt_title" value="聖牌伝説"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgaeoj0.j01" size="1048576" crc="8804f856" sha1="0840846bd0a3956fc49b5c7aec598ade93e3ff77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seihaiunk" cloneof="seihai">
+		<!-- Notes: SGB enhanced -->
+		<!-- Old dump of unknown origin -->
+		<description>Sei Hai Densetsu (Jpn, bad dump?)</description>
 		<year>2000</year>
 		<publisher>Gaps</publisher>
 		<info name="serial" value="DMG-AEOJ-JPN"/>
@@ -18672,14 +19375,15 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai Pocket (Euro, USA, Rev. A)</description>
+		<description>Shanghai Pocket (Euro, Rev. A)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-AHPE-USA, DMG-AHPP-(EUR/EUU)"/>
+		<info name="serial" value="DMG-AHPP-(EUR/EUU)?"/>
+		<info name="submitted" value="19981222"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shanghai pocket (usa, europe) (rev a).bin" size="1048576" crc="d8fac36c" sha1="adbf1a18dea69e46c3dbccec03e09668912f12a7"/>
+				<rom name="shanghai pocket (europe) (rev a).bin" size="1048576" crc="d8fac36c" sha1="adbf1a18dea69e46c3dbccec03e09668912f12a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18690,7 +19394,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-ASEJ-JPN?"/>
-		<info name="release" value="19980806?"/>
+		<info name="submitted" value="19980701"/>
+		<info name="release" value="19980806"/>
 		<info name="alt_title" value="上海 ポケット"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -18700,15 +19405,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="shanghaie" cloneof="shanghai">
+		<description>Shanghai Pocket (Europe)</description>
+		<year>1998</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="DMG-AHPP-(EUR/EUU)?"/>
+		<info name="submitted" value="19981110"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shanghai pocket (europe).bin" size="1048576" crc="9401ba47" sha1="6436b152924a8612d7cd28fef09f10a81ec91ad7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shanghaiu" cloneof="shanghai">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgahpe0.f55"	-->
 		<description>Shanghai Pocket (USA)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AHPE-USA"/>
+		<info name="submitted" value="19981112"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shanghai pocket (usa).bin" size="1048576" crc="9401ba47" sha1="6436b152924a8612d7cd28fef09f10a81ec91ad7"/>
+				<rom name="shanghai pocket (usa).bin" size="1048576" crc="a5e3ece9" sha1="2058964274d8bd596bb81bc24e9cfe306411c803"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18743,12 +19465,33 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="shinmta">
+	<software name="shinmtaa">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgbhnj1.j70"	-->
+		<description>Shin Megami Tensei Devil Children - Aka no Sho (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="DMG-BHNJ-JPN"/>
+		<info name="submitted" value="20010608"/>
+		<info name="release" value="20001117"/>
+		<info name="alt_title" value="真・女神転生 デビルチルドレン 赤の書"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmgbhnj1.j70" size="2097152" crc="c1e27556" sha1="e9a3edd28503ee94db8ec4ea48832dc2ba0264d9"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shinmta" cloneof="shinmtaa">
 		<!-- Notes: SGB enhanced -->
 		<description>Shin Megami Tensei Devil Children - Aka no Sho (Jpn)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-BHNJ-JPN"/>
+		<info name="submitted" value="20000912"/>
 		<info name="release" value="20001117"/>
 		<info name="alt_title" value="真・女神転生 デビルチルドレン 赤の書"/>
 		<part name="cart" interface="gameboy_cart">
@@ -18767,12 +19510,33 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="shinmtk">
+	<software name="shinmtka">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgbhej1.j69"	-->
+		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="DMG-BHEJ-JPN"/>
+		<info name="submitted" value="20010608"/>
+		<info name="release" value="20001117"/>
+		<info name="alt_title" value="真・女神転生 デビルチルドレン 黒の書"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmgbhej1.j69" size="2097152" crc="3d4ae536" sha1="421d20bf556e28d07801d808ecfef45daf86a974"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shinmtk" cloneof="shinmtka">
 		<!-- Notes: SGB enhanced -->
 		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Jpn)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-BHEJ-JPN"/>
+		<info name="submitted" value="20000912"/>
 		<info name="release" value="20001117"/>
 		<info name="alt_title" value="真・女神転生 デビルチルドレン 黒の書"/>
 		<part name="cart" interface="gameboy_cart">
@@ -18797,6 +19561,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="CGB-BHWJ-JPN"/>
+		<info name="submitted" value="20010608"/>
 		<info name="release" value="20010727"/>
 		<info name="alt_title" value="真・女神転生 デビルチルドレン 白の書"/>
 		<part name="cart" interface="gameboy_cart">
@@ -18946,10 +19711,30 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-BRAE-USA"/>
+		<info name="submitted" value="20000921"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sewing machine operation software (usa) (en,fr,es).bin" size="1048576" crc="e42fd7c4" sha1="a05a67f2d29bf29c56c9533c172da02ee0ad26b1"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sewingose" cloneof="sewingos">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmgbraz0.k25"	-->
+		<!-- Notes: For use with Jaguar Sewing Machine (Nuotto Expansion) -->
+		<description>Sewing Machine Operation Software (Eur)</description>
+		<year>2000</year>
+		<publisher>Natsume</publisher>
+		<info name="serial" value="DMG-BRAZ-EUU"/>
+		<info name="submitted" value="20010920"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgbraz0.k25" size="1048576" crc="d8433dee" sha1="4b12589fb14932381afa8433130d684120c5e3cd"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19420,6 +20205,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-AS6P-EUR"/>
+		<info name="submitted" value="19990506"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -19434,6 +20220,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-AS6J-JPN"/>
+		<info name="submitted" value="19990615"/>
 		<info name="release" value="19990723"/>
 		<info name="alt_title" value="スパイ アンド スパイ"/>
 		<part name="cart" interface="gameboy_cart">
@@ -19450,6 +20237,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-AS6E-USA"/>
+		<info name="submitted" value="19990512"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -19548,6 +20336,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="CGB-AFZP-EUR"/>
+		<info name="submitted" value="19991101"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -19562,6 +20351,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CGB-BFZJ-JPN"/>
+		<info name="submitted" value="20010206"/>
 		<info name="release" value="20010330"/>
 		<info name="alt_title" value="ストリートファイター アルファ WARRIORS' DREAMS"/>
 		<part name="cart" interface="gameboy_cart">
@@ -19578,6 +20368,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CGB-AFZE-USA"/>
+		<info name="submitted" value="20000120"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -19802,6 +20593,25 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="smbdxja" cloneof="smbdx">
+		<!-- Notes: GBC only, NP only -->
+		<!--	In lot check as "cgbahyj1.0"	-->
+		<description>Super Mario Bros. Deluxe (Jpn, NP, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="CGB-AHYJ-JPN"/>
+		<info name="release" value="20000301"/>
+		<info name="alt_title" value="スーパーマリオブラザーズデラックス"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbahyj1.0" size="1048576" crc="f4e91f63" sha1="e61d564e1ff19eb4b7c62a6cd96214f2bca4b01d"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smbdx">
 		<!-- Notes: GBC only -->
 		<description>Super Mario Bros. Deluxe (Euro, USA, Rev. B)</description>
@@ -19971,11 +20781,30 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="survkidsj" cloneof="stranded">
 		<!-- Notes: SGB enhanced, also released by NP in 2001-02 -->
+		<!--	In lot check as "dmgavkj0.g64"	-->
 		<description>Survival Kids - Kotou no Boukensha (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AVKJ-JPN (RK189-J1)"/>
+		<info name="submitted" value="19990423"/>
 		<info name="release" value="19990617"/>
+		<info name="alt_title" value="サバイバルキッズ 孤島の冒険者"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmgavkj0.g64" size="1048576" crc="61fa675c" sha1="f80abbeaa2cf0631c1cdf812c13f13f1fea41f18"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="survkidsjunk" cloneof="stranded">
+		<!-- Notes: SGB enhanced, also released by NP in 2001-02 -->
+		<!-- Old dump of unknown origin -->
+		<description>Survival Kids - Kotou no Boukensha (Jpn, bad dump?)</description>
+		<year>1999</year>
+		<publisher>Konami</publisher>
 		<info name="alt_title" value="サバイバルキッズ 孤島の冒険者"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
@@ -19993,8 +20822,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-B2VJ-JPN (RK210-J1)"/>
+		<info name="submitted" value="20000606"/>
 		<info name="release" value="20000719"/>
-		<info name="alt_title" value="サバイバルキッズ2 脱出!双子島!"/>
+		<info name="alt_title" value="サバイバルキッズ ２ ～脱出！！双子島！～"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -20010,7 +20840,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>Suzuki Alstare Extreme Racing (Euro)</description>
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="??"/>
+		<info name="serial" value="CGB-AXRP-EUR?"/>
+		<info name="submitted" value="19991001"/>
+		<info name="release" value="20000719"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
@@ -20096,8 +20928,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="CGB-BLVJ-JPN"/>
+		<info name="submitted" value="20001117"/>
 		<info name="release" value="20001222"/>
-		<info name="alt_title" value="シルバニアファミリー2 色づく森のファンタジー"/>
+		<info name="alt_title" value="シルバニアファミリー２ ～色づく森のファンタジー～"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -20318,9 +21151,10 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="taxi2">
 		<description>Taxi 2 (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BT2F-FRA"/>
+		<info name="submitted" value="20000323"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -20506,12 +21340,32 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CGB-AT7J-JPN"/>
+		<info name="submitted" value="19991004"/>
 		<info name="release" value="19991112"/>
 		<info name="alt_title" value="テトリスアドベンチャー すすめミッキーとなかまたち"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tetris adventure - susume mickey to nakama-tachi (japan).bin" size="1048576" crc="eaf6e4f2" sha1="aa7dd2044a7e1535da67d7b9439e9771f736086a"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisada" cloneof="mtetrisc">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbat7j1.070"	-->
+		<description>Tetris Adventure - Susume Mickey to Nakama-tachi (Jpn, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="CGB-AT7J-JPN?"/>
+		<info name="submitted" value="20000623"/>
+		<info name="alt_title" value="テトリスアドベンチャー すすめミッキーとなかまたち"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbat7j1.070" size="1048576" crc="b7c0831f" sha1="a8842e85f2c6de4db40b47c9640dad59ae9d1c51"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20542,6 +21396,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-A33X-UKV"/>
+		<info name="submitted" value="20000223"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -20669,6 +21524,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Swing! Entertainment Media</publisher>
 		<info name="serial" value="CGB-BDQP-EUR"/>
+		<info name="submitted" value="20010529"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -20724,6 +21580,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>ASC Games</publisher>
 		<info name="serial" value="DMG-AFCE-USA"/>
+		<info name="submitted" value="19990917"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -20842,10 +21699,27 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
 		<info name="serial" value="CGB-BTJP-EUR"/>
+		<info name="submitted" value="20000928"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tom and jerry - mousehunt (europe) (en,fr,de,es,it).bin" size="1048576" crc="3e17d04a" sha1="6f837075d7493adcbd5b18ba1e27386b6fc31e62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjermha" cloneof="tomjermh">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbtjp1.487"	-->
+		<description>Tom and Jerry - Mousehunt (Euro, Rev. A)</description>
+		<year>2001</year>
+		<publisher>Conspiracy Entertainment</publisher>
+		<info name="serial" value="CGB-BTJP-EUR"/>
+		<info name="submitted" value="20010223"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbtjp1.487" size="1048576" crc="4b4553e0" sha1="bf5faf4c5c2aabe9636f8f5afbbf526aba59e21d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20884,6 +21758,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="CGB-BTQE-USA"/>
+		<info name="submitted" value="20001020"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -20994,6 +21869,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>TDK Mediactive</publisher>
 		<info name="serial" value="CGB-BCZE-USA"/>
+		<info name="submitted" value="20020411"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -21058,6 +21934,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BTFE-USA-1, CGB-BTFP-EUR"/>
+		<info name="submitted" value="20000201"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -21206,6 +22083,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-V33J-JPN"/>
+		<info name="submitted" value="19991028"/>
 		<info name="release" value="19991217"/>
 		<info name="alt_title" value="トップギア・ポケット2"/>
 		<part name="cart" interface="gameboy_cart">
@@ -21223,8 +22101,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<!-- Notes: GBC only -->
 		<description>Top Gear Pocket 2 (USA)</description>
 		<year>2000</year>
-		<publisher>Kemco</publisher>
+		<publisher>Vatical Entertainment</publisher>
 		<info name="serial" value="CGB-A33E-USA"/>
+		<info name="submitted" value="19991203"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -21234,6 +22113,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="tgrally">
 		<!-- Notes: GBC only -->
@@ -21256,6 +22136,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-A33P-(EUR/FRA)"/>
+		<info name="submitted" value="20000221"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -21443,12 +22324,34 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
-	<software name="tradebat">
+	<software name="tradebata">
+		<!-- Notes: SGB enhanced -->
+		<!--	Never released as physical cartridge	-->
+		<!--	Released on the 3DS Virtual Console	-->
+		<!--	In lot check as "dmgahhj1.1"	-->
+		<description>Trade &amp; Battle Card Hero (Jpn, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-AHHJ-JPN"/>
+		<info name="alt_title" value="トレード&amp;バトル カードヒーロー"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmgahhj1.1" size="2097152" crc="d98a877d" sha1="c6c1e0365166b53d25a1f84bc380948a9661df30"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tradebat" cloneof="tradebata">
 		<!-- Notes: SGB enhanced -->
 		<description>Trade &amp; Battle Card Hero (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AHHJ-JPN"/>
+		<info name="submitted" value="20000111"/>
 		<info name="release" value="20000221"/>
 		<info name="alt_title" value="トレード&amp;バトル カードヒーロー"/>
 		<part name="cart" interface="gameboy_cart">
@@ -21546,14 +22449,35 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>1999</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AF2J-JPN"/>
+		<info name="submitted" value="19990624"/>
 		<info name="release" value="19990723"/>
-		<info name="alt_title" value="昆虫博士2"/>
+		<info name="alt_title" value="昆虫博士 ２"/>
 		<part name="cart" interface="gameboy_cart">
 			<!-- PCB documentation incomplete, based on bad pics or written docs -->
 			<feature name="pcb" value="DMG-A03-01" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dmg-af2j-0.u1" size="2097152" crc="1be00a6e" sha1="ecc0b306501f1a2371a83db808bda38af8bc28ce"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="tsurisn2a" cloneof="tsurisn2">
+		<!-- Notes: SGB enhanced -->
+		<!--	In lot check as "dmga2kj1.g93"	-->
+		<!--	Retail cartridge not yet located	-->
+		<description>Tsuri Sensei 2 (Jpn, Rev. A)</description>
+		<year>1999</year>
+		<publisher>J-Wing</publisher>
+		<info name="serial" value="DMG-AF2J-JPN?"/>
+		<info name="submitted" value="19990908"/>
+		<info name="alt_title" value="昆虫博士 ２"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="dmga2kj1.g93" size="2097152" crc="d390430e" sha1="59fa1707247f12b0c48eeb2e8fec274b9231d968"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -21969,6 +22893,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>3DO</publisher>
 		<info name="serial" value="CGB-AVFP-EUR"/>
+		<info name="submitted" value="20000221"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -21983,6 +22908,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>3DO</publisher>
 		<info name="serial" value="CGB-AVFE-USA"/>
+		<info name="submitted" value="19991203"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -22056,12 +22982,30 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="vrspower">
+		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbbpbe0.340"	-->
+		<!--	Retail cartridge not yet located, might be unreleased	-->
+		<description>VR Sports Powerboat Racing (USA)</description>
+		<year>2000</year>
+		<publisher>Vatical Entertainment</publisher>
+		<info name="serial" value="CGB-BPBE-USA?"/>
+		<info name="submitted" value="20000727"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgbbpbe0.340" size="1048576" crc="cff671f1" sha1="1c77f032cdd373bfa108ea82c463f8f9f6874c71"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vslemmin" cloneof="lemmings">
 		<!-- Notes: GBC only -->
 		<description>VS Lemmings (Jpn)</description>
 		<year>2000</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="CGB-ALEJ-JPN"/>
+		<info name="submitted" value="20000225"/>
 		<info name="release" value="20000407"/>
 		<info name="alt_title" value="VSレミングス"/>
 		<part name="cart" interface="gameboy_cart">
@@ -22304,6 +23248,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>Kirat</publisher>
 		<info name="serial" value="CGB-BWNJ-JPN"/>
+		<info name="submitted" value="20020322"/>
 		<info name="release" value="20020426"/>
 		<info name="alt_title" value="わたしのレストラン"/>
 		<part name="cart" interface="gameboy_cart">
@@ -22356,6 +23301,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>TDK Mediactive</publisher>
 		<info name="serial" value="CGB-BWYD-NOE"/>
+		<info name="submitted" value="20021120"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -22938,8 +23884,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<!-- Notes: GBC only -->
 		<description>Xtreme Wheels (Euro)</description>
 		<year>2001</year>
-		<publisher>BAM! Entertainment</publisher>
+		<publisher>Spike</publisher>
 		<info name="serial" value="CGB-BXCP-EUR"/>
+		<info name="submitted" value="20000922"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -22956,6 +23903,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BXCE-USA"/>
+		<info name="submitted" value="20010307"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -22968,7 +23916,29 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="yakouchu">
 		<!-- Notes: GBC only -->
+		<!--	In lot check as "cgbaytj0.066"	-->
+		<!--	Retail cartridge not yet located	-->
 		<description>Yakouchuu GB (Jpn)</description>
+		<year>1999</year>
+		<publisher>Athena</publisher>
+		<info name="serial" value="CGB-AYTJ-JPN"/>
+		<info name="submitted" value="19990924"/>
+		<info name="release" value="19991022"/>
+		<info name="alt_title" value="夜光虫GB"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="cgbaytj0.066" size="2097152" crc="e0a06018" sha1="a7efd41d0ad17892132788bd90cdfb9df6806a78"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yakouchuunk" cloneof="yakouchu">
+		<!-- Notes: GBC only -->
+		<!-- Old dump of unknown origin -->
+		<description>Yakouchuu GB (Jpn, bad dump?)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="CGB-AYTJ-JPN"/>
@@ -22983,6 +23953,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="yarsrev">
 		<description>Yars' Revenge (Euro, USA)</description>
@@ -23030,6 +24001,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3P-EUR"/>
+		<info name="submitted" value="20020906"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
@@ -23052,6 +24024,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3F-FRA-1"/>
+		<info name="submitted" value="20020906"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -23074,6 +24047,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3D-NOE"/>
+		<info name="submitted" value="20030116"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -23096,6 +24070,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3I-ITA"/>
+		<info name="submitted" value="20030116"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -23118,6 +24093,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3S-ESP"/>
+		<info name="submitted" value="20030116"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -23140,6 +24116,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2002</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BY3E-USA"/>
+		<info name="submitted" value="20011217"/>
+		<info name="alt_title" value="Yu-Gi-Oh! Duel Monsters: Dark Duel Stories"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
@@ -23156,8 +24134,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AYCJ-JPN (RK206-J1)"/>
+		<info name="submitted" value="20000217"/>
 		<info name="release" value="20000413"/>
-		<info name="alt_title" value="遊戯王 モンスターカプセルGB"/>
+		<info name="alt_title" value="遊戯王 モンスターカプセル ＧＢ"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -26385,6 +27364,7 @@ List of unclassified roms
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="131072">
 				<rom name="action replay online bios (europe) (unl).bin" size="131072" crc="04c8c858" sha1="fa441c5e376b54b3503596fe8177b3a9ad79a9a8"/>
 			</dataarea>
@@ -26397,6 +27377,7 @@ List of unclassified roms
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="81920">
 				<rom name="gameshark online bios (usa) (unl).bin" size="81920" crc="c37d21d9" sha1="22f00e604acb827a48d4c9e109ba622f59a9d0a9"/>
 			</dataarea>
