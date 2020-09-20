@@ -14,7 +14,7 @@ license:CC0
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="disk" defstate="0"><disk><color red="0.8" green="0.8" blue="0" /></disk></element>
+	<element name="disk" defstate="0"><disk state="0"><color red="0.8" green="0.8" blue="0" /></disk></element>
 	<element name="label_left"><text string="Home"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="label_right"><text string="Visitor"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
