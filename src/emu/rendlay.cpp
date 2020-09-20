@@ -1465,33 +1465,39 @@ protected:
 	// overrides
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		// compute premultiplied colors
-		render_color const c = color(state);
-		u32 const r = c.r * c.a * 255.0f;
-		u32 const g = c.g * c.a * 255.0f;
-		u32 const b = c.b * c.a * 255.0f;
-		u32 const inva = (1.0f - c.a) * 255.0f;
-
-		// iterate over X and Y
-		for (u32 y = bounds.top(); y <= bounds.bottom(); y++)
+		render_color const c(color(state));
+		if (1.0f <= c.a)
 		{
-			for (u32 x = bounds.left(); x <= bounds.right(); x++)
+			// optimise opaque pixels
+			u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
+			s32 const width(bounds.width());
+			for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
+				std::fill_n(&dest.pix(y, bounds.left()), width, f);
+		}
+		else if (c.a)
+		{
+			// compute premultiplied colors
+			u32 const a(c.a * 255.0F);
+			u32 const r(c.r * c.a * (255.0F * 255.0F));
+			u32 const g(c.g * c.a * (255.0F * 255.0F));
+			u32 const b(c.b * c.a * (255.0F * 255.0F));
+			u32 const inva(255 - a);
+
+			// we're translucent, add in the destination pixel contribution
+			for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
 			{
-				u32 finalr = r;
-				u32 finalg = g;
-				u32 finalb = b;
-
-				// if we're translucent, add in the destination pixel contribution
-				if (inva > 0)
+				u32 *dst(&dest.pix(y, bounds.left()));
+				for (u32 x = bounds.left(); x <= bounds.right(); ++x, ++dst)
 				{
-					rgb_t dpix = dest.pix32(y, x);
-					finalr += (dpix.r() * inva) >> 8;
-					finalg += (dpix.g() * inva) >> 8;
-					finalb += (dpix.b() * inva) >> 8;
-				}
+					rgb_t const dpix(*dst);
+					u32 const finala((a * 255) + (dpix.a() * inva));
+					u32 const finalr(r + (dpix.r() * inva));
+					u32 const finalg(g + (dpix.g() * inva));
+					u32 const finalb(b + (dpix.b() * inva));
 
-				// store the target pixel, dividing the RGBA values by the overall scale factor
-				dest.pix32(y, x) = rgb_t(finalr, finalg, finalb);
+					// store the target pixel, dividing the RGBA values by the overall scale factor
+					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+				}
 			}
 		}
 	}
@@ -1514,46 +1520,51 @@ protected:
 	{
 		// compute premultiplied colors
 		render_color const c(color(state));
-		u32 const r = c.r * c.a * 255.0f;
-		u32 const g = c.g * c.a * 255.0f;
-		u32 const b = c.b * c.a * 255.0f;
-		u32 const inva = (1.0f - c.a) * 255.0f;
+		u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
+		u32 const a(c.a * 255.0F);
+		u32 const r(c.r * c.a * (255.0F * 255.0F));
+		u32 const g(c.g * c.a * (255.0F * 255.0F));
+		u32 const b(c.b * c.a * (255.0F * 255.0F));
+		u32 const inva(255 - a);
 
 		// find the center
 		float const xcenter = float(bounds.xcenter());
 		float const ycenter = float(bounds.ycenter());
-		float const xradius = float(bounds.width()) * 0.5f;
-		float const yradius = float(bounds.height()) * 0.5f;
-		float const ooyradius2 = 1.0f / (yradius * yradius);
+		float const xradius = float(bounds.width()) * 0.5F;
+		float const yradius = float(bounds.height()) * 0.5F;
+		float const ooyradius2 = 1.0F / (yradius * yradius);
 
 		// iterate over y
-		for (u32 y = bounds.top(); y <= bounds.bottom(); y++)
+		for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
 		{
-			float ycoord = ycenter - (float(y) + 0.5f);
-			float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
-
 			// compute left/right coordinates
-			s32 left = s32(xcenter - xval + 0.5f);
-			s32 right = s32(xcenter + xval + 0.5f);
+			float const ycoord = ycenter - (float(y) + 0.5F);
+			float const xval = xradius * sqrtf(1.0F - (ycoord * ycoord) * ooyradius2);
+
+			s32 const left = s32(xcenter - xval + 0.5F);
+			s32 const right = s32(xcenter + xval + 0.5F);
 
 			// draw this scanline
-			for (u32 x = left; x < right; x++)
+			if (255 <= a)
 			{
-				u32 finalr = r;
-				u32 finalg = g;
-				u32 finalb = b;
-
-				// if we're translucent, add in the destination pixel contribution
-				if (inva > 0)
+				// optimise opaque pixels
+				std::fill_n(&dest.pix(y, left), right - left, f);
+			}
+			else if (a)
+			{
+				u32 *dst(&dest.pix(y, bounds.left()));
+				for (u32 x = left; x < right; ++x, ++dst)
 				{
-					rgb_t dpix = dest.pix32(y, x);
-					finalr += (dpix.r() * inva) >> 8;
-					finalg += (dpix.g() * inva) >> 8;
-					finalb += (dpix.b() * inva) >> 8;
-				}
+					// we're translucent, add in the destination pixel contribution
+					rgb_t const dpix(*dst);
+					u32 const finala((a * 255) + (dpix.a() * inva));
+					u32 const finalr(r + (dpix.r() * inva));
+					u32 const finalg(g + (dpix.g() * inva));
+					u32 const finalb(b + (dpix.b() * inva));
 
-				// store the target pixel, dividing the RGBA values by the overall scale factor
-				dest.pix32(y, x) = rgb_t(finalr, finalg, finalb);
+					// store the target pixel, dividing the RGBA values by the overall scale factor
+					*dst = rgb_t(finala / 255, finalr / finala, finalg / finala, finalb / finala);
+				}
 			}
 		}
 	}
