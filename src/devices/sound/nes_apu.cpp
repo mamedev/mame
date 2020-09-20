@@ -134,7 +134,7 @@ void nesapu_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = stream_alloc_legacy(0, 1, rate);
+		m_stream = stream_alloc(0, 1, rate);
 }
 
 //-------------------------------------------------
@@ -725,16 +725,16 @@ void nesapu_device::write(offs_t address, u8 value)
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void nesapu_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int accum;
-	stream_sample_t *output = outputs[0];
-	memset( output, 0, samples*sizeof(*output) );
+	auto &output = outputs[0];
 
-	while (samples--)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 128.0;
+	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
 	{
 		accum = apu_square(&m_APU.squ[0]);
 		accum += apu_square(&m_APU.squ[1]);
@@ -748,6 +748,6 @@ void nesapu_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 		else if (accum < -128)
 			accum = -128;
 
-		*output++=accum<<8;
+		output.put(sampindex, stream_buffer::sample_t(accum) * sample_scale);
 	}
 }
