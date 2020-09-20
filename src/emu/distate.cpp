@@ -56,8 +56,7 @@ device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u
 		m_datasize(size),
 		m_flags(flags),
 		m_symbol(symbol),
-		m_default_format(true),
-		m_sizemask(sizemask)
+		m_default_format(true)
 {
 	assert(size == 1 || size == 2 || size == 4 || size == 8 || (flags & DSF_FLOATING_POINT) != 0);
 
@@ -79,8 +78,7 @@ device_state_entry::device_state_entry(int index, device_state_interface *dev)
 		m_datasize(0),
 		m_flags(DSF_DIVIDER | DSF_READONLY),
 		m_symbol(),
-		m_default_format(true),
-		m_sizemask(0)
+		m_default_format(true)
 {
 }
 

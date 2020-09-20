@@ -80,6 +80,7 @@ public:
 	void sailormn(machine_config &config);
 	void paceight(machine_config &config);
 	void pacslot(machine_config &config);
+	void paccarn(machine_config &config);
 	void hotdogst(machine_config &config);
 	void crusherm(machine_config &config);
 	void donpachi(machine_config &config);
@@ -340,6 +341,7 @@ private:
 	void metmqstr_sound_portmap(address_map &map);
 	void oki2_map(address_map &map);
 	void oki_map(address_map &map);
+	void paccarn_map(address_map &map);
 	void paceight_map(address_map &map);
 	void pacslot_map(address_map &map);
 	void ppsatan_map(address_map &map);

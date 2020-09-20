@@ -340,25 +340,6 @@ namespace netlist
 		pstring m_setup_func_name;
 	};
 
-	class source_token_t : public source_netlist_t
-	{
-	public:
-		source_token_t(const pstring &name, const parser_t::token_store &store)
-		: m_store(store)
-		, m_name(name)
-		{
-		}
-
-		bool parse(nlparse_t &setup, const pstring &name) override;
-
-	protected:
-		plib::istream_uptr stream(const pstring &name) override;
-
-	private:
-		parser_t::token_store m_store;
-		pstring m_name;
-	};
-
 } // namespace netlist
 
 

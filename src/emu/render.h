@@ -579,7 +579,6 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	int default_state() const { return m_defstate; }
-	int maxstate() const { return m_maxstate; }
 	render_texture *state_texture(int state);
 
 private:
@@ -603,17 +602,22 @@ private:
 		void normalize_bounds(float xoffs, float yoffs, float xscale, float yscale);
 
 		// getters
-		int state() const { return m_state; }
-		virtual int maxstate() const { return m_state; }
-		const render_bounds &bounds() const { return m_bounds; }
-		const render_color &color() const { return m_color; }
+		int statemask() const { return m_statemask; }
+		int stateval() const { return m_stateval; }
+		std::pair<int, bool> statewrap() const;
+		render_bounds overall_bounds() const;
+		render_bounds bounds(int state) const;
+		render_color color(int state) const;
 
 		// operations
 		virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) = 0;
 
 	protected:
-		// helpers
-		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align);
+		// helper
+		virtual int maxstate() const { return -1; }
+
+		// drawing helpers
+		void draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align, const render_color &color);
 		void draw_segment_horizontal_caps(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color);
 		void draw_segment_horizontal(bitmap_argb32 &dest, int minx, int maxx, int midy, int width, rgb_t color);
 		void draw_segment_vertical_caps(bitmap_argb32 &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color);
@@ -625,10 +629,27 @@ private:
 		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
 	private:
+		struct bounds_step
+		{
+			int             state;
+			render_bounds   bounds;
+			render_bounds   delta;
+		};
+		using bounds_vector = std::vector<bounds_step>;
+
+		struct color_step
+		{
+			int             state;
+			render_color    color;
+			render_color    delta;
+		};
+		using color_vector = std::vector<color_step>;
+
 		// internal state
-		int                 m_state;                    // state where this component is visible (-1 means all states)
-		render_bounds       m_bounds;                   // bounds of the element
-		render_color        m_color;                    // color of the element
+		int const           m_statemask;                // bits of state used to control visibility
+		int const           m_stateval;                 // masked state value to make component visible
+		bounds_vector       m_bounds;                   // bounds of the element
+		color_vector        m_color;                    // color of the element
 	};
 
 	// component implementations
@@ -677,8 +698,9 @@ private:
 	// internal state
 	running_machine &           m_machine;      // reference to the owning machine
 	std::vector<component::ptr> m_complist;     // list of components
-	int                         m_defstate;     // default state of this element
-	int                         m_maxstate;     // maximum state value for all components
+	int const                   m_defstate;     // default state of this element
+	int                         m_statemask;    // mask to apply to state values
+	bool                        m_foldhigh;     // whether we need to fold state values above the mask range
 	std::vector<texture>        m_elemtex;      // array of element textures used for managing the scaled bitmaps
 };
 

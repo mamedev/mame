@@ -883,6 +883,7 @@ BUSES["NSCSI"] = true
 BUSES["NUBUS"] = true
 BUSES["O2"] = true
 BUSES["ORICEXT"] = true
+BUSES["P2000"] = true
 BUSES["PASOPIA"] = true
 BUSES["PC1512"] = true
 BUSES["PCE"] = true
@@ -1064,6 +1065,7 @@ FORMATS["OPD_DSK"] = true
 FORMATS["ORAO_CAS"] = true
 FORMATS["ORIC_DSK"] = true
 FORMATS["ORIC_TAP"] = true
+FORMATS["P2000T_CAS"] = true
 FORMATS["P6001_CAS"] = true
 FORMATS["PASTI_DSK"] = true
 FORMATS["PC98FDI_DSK"] = true
@@ -2604,7 +2606,7 @@ createMESSProjects(_target, _subtarget, "informer")
 files {
 	MAME_DIR .. "src/mame/drivers/informer_207_100.cpp",
 	MAME_DIR .. "src/mame/drivers/informer_207_376.cpp",
-	MAME_DIR .. "src/mame/drivers/informer_213ae.cpp",
+	MAME_DIR .. "src/mame/drivers/informer_213.cpp",
 	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/informer_207_376_kbd.h",
 }
@@ -3225,6 +3227,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/p2000t.cpp",
 	MAME_DIR .. "src/mame/includes/p2000t.h",
 	MAME_DIR .. "src/mame/machine/p2000t.cpp",
+	MAME_DIR .. "src/mame/machine/p2000t_mdcr.cpp",
 	MAME_DIR .. "src/mame/video/p2000t.cpp",
 	MAME_DIR .. "src/mame/drivers/vg5k.cpp",
 }
@@ -3338,6 +3341,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_cm32p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d10.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_d50.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_jd800.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jv80.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx3p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_jx8p.cpp",

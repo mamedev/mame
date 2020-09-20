@@ -798,8 +798,8 @@ void gunfight_audio_device::device_add_mconfig(machine_config &config)
 	// the outputs before the power amps so that the highest output spikes
 	// of +/- 3 volts just reach the clipping limits for signed 16-bit
 	// samples.
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(32767.0 / 3.0, 0.0);
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(32767.0 / 3.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUT_L").set_mult_offset(1.0 / 3.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout1", 1, "OUT_R").set_mult_offset(1.0 / 3.0, 0.0);
 
 	// Netlist volume-potentiometer interfaces
 	NETLIST_ANALOG_INPUT(config, "sound_nl:pot_left_master_vol", "R103.DIAL");
@@ -3768,7 +3768,7 @@ void zzzap_common_audio_device::device_add_mconfig(machine_config &config)
 		// just reach the clipping limits for signed 16-bit samples.
 		// So turning the volume up much higher than the default will
 		// give clipped output.
-		NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(32767.0 / 1.25, -(32767.0 / 1.25) * 2.50);
+		NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(1.0 / 1.25, -(1.0 / 1.25) * 2.50);
 
 		// Netlist volume-potentiometer interface
 		NETLIST_ANALOG_INPUT(config, "sound_nl:pot_master_vol", "R70.DIAL");

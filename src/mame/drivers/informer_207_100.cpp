@@ -69,6 +69,7 @@ private:
 
 	void mem_map(address_map &map);
 
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
@@ -81,6 +82,10 @@ void informer_207_100_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x27ff).ram().share("ram");
 	map(0xc000, 0xffff).rom().region("maincpu", 0);
+	map(0xff00, 0xff0f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0xff20, 0xff20).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xff21, 0xff21).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xff40, 0xff41).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 }
 
 
@@ -96,8 +101,34 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
+MC6845_ON_UPDATE_ADDR_CHANGED( informer_207_100_state::crtc_addr )
+{
+//  m_video_update_address = address;
+}
+
 MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 {
+	const pen_t *pen = m_palette->pens();
+
+	for (int x = 0; x < x_count; x++)
+	{
+//		uint8_t attr = m_ram[ma + x * 2 + 0];
+		uint8_t code = m_ram[ma + x * 2 + 1];
+		uint8_t data = m_chargen[(code << 4) + ra];
+
+		if (x == cursor_x)
+			data = 0xff;
+
+		// draw 8 pixels of the character
+		bitmap.pix32(y, x * 8 + 7) = pen[BIT(data, 0)];
+		bitmap.pix32(y, x * 8 + 6) = pen[BIT(data, 1)];
+		bitmap.pix32(y, x * 8 + 5) = pen[BIT(data, 2)];
+		bitmap.pix32(y, x * 8 + 4) = pen[BIT(data, 3)];
+		bitmap.pix32(y, x * 8 + 3) = pen[BIT(data, 4)];
+		bitmap.pix32(y, x * 8 + 2) = pen[BIT(data, 5)];
+		bitmap.pix32(y, x * 8 + 1) = pen[BIT(data, 6)];
+		bitmap.pix32(y, x * 8 + 0) = pen[BIT(data, 7)];
+	}
 }
 
 static const gfx_layout char_layout =
@@ -126,6 +157,8 @@ void informer_207_100_state::machine_start()
 
 void informer_207_100_state::machine_reset()
 {
+	// start executing somewhere sane
+	m_maincpu->set_pc(0xc000);
 }
 
 
@@ -147,10 +180,7 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea_full();
-	m_screen->set_refresh_hz(60);
-//	m_screen->set_raw(19.7184_MHz_XTAL, 0, 0, 0, 0, 0, 0);
+	m_screen->set_raw(19.7184_MHz_XTAL, 832, 0, 640, 316, 0, 300);
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -161,6 +191,7 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->set_on_update_addr_change_callback(FUNC(informer_207_100_state::crtc_addr));
 	m_crtc->set_update_row_callback(FUNC(informer_207_100_state::crtc_update_row));
 }
 

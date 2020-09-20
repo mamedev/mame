@@ -352,7 +352,7 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_tokens(const parser_t::token_store &tokens, const pstring &name)
+	bool nlparse_t::parse_tokens(const plib::detail::token_store &tokens, const pstring &name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
@@ -1757,23 +1757,6 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 }
 
 plib::istream_uptr source_proc_t::stream(const pstring &name)
-{
-	plib::unused_var(name);
-	return plib::istream_uptr();
-}
-
-bool source_token_t::parse(nlparse_t &setup, const pstring &name)
-{
-	if (name == m_name)
-	{
-		auto ret = setup.parse_tokens(m_store, name);
-		return ret;
-	}
-
-	return false;
-}
-
-plib::istream_uptr source_token_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	return plib::istream_uptr();

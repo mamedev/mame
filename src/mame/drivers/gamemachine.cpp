@@ -278,7 +278,7 @@ void tgm_state::tgm(machine_config &config)
 		.set_source(NETLIST_NAME(gamemachine))
 		.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0, 10000.0 * 3.75);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0 / 32768.0, 10000.0 * 3.75 / 32768.0);
 
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p08", "P08.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "snd_nl:p09", "P09.IN", 0);

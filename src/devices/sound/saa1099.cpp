@@ -161,7 +161,7 @@ saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, d
 void saa1099_device::device_start()
 {
 	/* for each chip allocate one stream */
-	m_stream = stream_alloc(0, 2, clock()/clock_divider);
+	m_stream = stream_alloc_legacy(0, 2, clock()/clock_divider);
 
 	save_item(NAME(m_noise_params));
 	save_item(NAME(m_env_enable));
@@ -200,10 +200,10 @@ void saa1099_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void saa1099_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int j, ch;
 	/* if the channels are disabled we're done */

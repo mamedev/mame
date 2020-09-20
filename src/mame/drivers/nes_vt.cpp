@@ -141,6 +141,7 @@ public:
 
 	void nes_vt_vh2009(machine_config& config);
 	void nes_vt_vh2009_1mb(machine_config& config);
+	void nes_vt_vh2009_2mb_alt(machine_config& config);
 	void nes_vt_vh2009_4mb(machine_config& config);
 	void nes_vt_vh2009_8mb(machine_config& config);
 
@@ -182,14 +183,14 @@ public:
 	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
 };
 
-class nes_vt_waixing_alt_duetpp_state : public nes_vt_waixing_alt_state
+class nes_vt_waixing_alt_sporzpp_state : public nes_vt_waixing_alt_state
 {
 public:
-	nes_vt_waixing_alt_duetpp_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt_waixing_alt_sporzpp_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_waixing_alt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb_duetpp(machine_config& config);
+	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
 
 private:
 	uint8_t in1_r() override
@@ -200,6 +201,21 @@ private:
 	}
 };
 
+class nes_vt_wldsoctv_state : public nes_vt_state
+{
+public:
+	nes_vt_wldsoctv_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+private:
+	uint8_t in1_r() override
+	{
+		uint8_t i = machine().rand() & 0x18;
+		uint8_t ret = m_io1->read() & ~0x18;
+		return i | ret;
+	}
+};
 
 class nes_vt_timetp36_state : public nes_vt_state
 {
@@ -383,7 +399,7 @@ public:
 		m_plunger(*this, "PLUNGER")
 	{ }
 
-	void nes_vt_waixing_alt_4mb_duetpp(machine_config& config);
+	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
 
 protected:
 	virtual void machine_start() override;
@@ -888,7 +904,7 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
-void nes_vt_waixing_alt_duetpp_state::nes_vt_waixing_alt_4mb_duetpp(machine_config& config)
+void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_config& config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
@@ -1359,6 +1375,12 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_1mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_1mbyte);
 }
 
+void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_2mb_alt(machine_config& config)
+{
+	nes_vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title, but causes some games to have black palette, needs proper switching!
+}
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
 	nes_vt_vh2009(config);
@@ -1421,7 +1443,7 @@ static INPUT_PORTS_START( ablpinb )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( duetpp )
+static INPUT_PORTS_START( sporzpp )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -1741,6 +1763,11 @@ ROM_START( mc_sp69 )
 	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
 ROM_END
 
+ROM_START( vsmaxx17 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "vsmaxx17.bin", 0x00000, 0x200000, CRC(f3fccbb9) SHA1(8b70b10d28f03e72f6b35199001955033a65fd5d) )  // M6MG3D641RB
+ROM_END
+
 ROM_START( polmega )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "megamax.bin", 0x00000, 0x400000, CRC(ef3aade3) SHA1(0c130080ace000cbe43e70a805d4301e05840294) )
@@ -1751,7 +1778,7 @@ ROM_START( silv35 )
 	ROM_LOAD( "silverlit35.bin", 0x00000, 0x400000, CRC(7540e350) SHA1(a0cb456136560fa4d8a365dd44d815ec0e9fc2e7) )
 ROM_END
 
-ROM_START( duetpp )
+ROM_START( sporzpp )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "gamesporzduetpingpong.bin", 0x00000, 0x400000, CRC(96af199b) SHA1(c14ff15683545c1edf03376cebcee7ac408da733) )
 ROM_END
@@ -1759,6 +1786,21 @@ ROM_END
 ROM_START( sporzbx )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "sporzboxing.bin", 0x00000, 0x400000, CRC(8b832c0b) SHA1(8193955a81e894a01308a80d5153f2ecfe134da6) )
+ROM_END
+
+ROM_START( sporztn )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "wirelesstennis.bin", 0x00000, 0x400000, CRC(e60f5ee1) SHA1(838ba7f4e9dcd0101eaaef5be883206d8856f45c) )
+ROM_END
+
+ROM_START( wldsoctv )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "worldsoccer.bin", 0x00000, 0x400000, CRC(8c0b184b) SHA1(fe1e7e83b9a2ae50dca1e7ea3bf7d691b8407511) )
+ROM_END
+
+ROM_START( solargm )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "solargames.bin", 0x00000, 0x800000, CRC(b49f0985) SHA1(68231614b333911c25168c533f1ae9bc79c36c38) )
 ROM_END
 
 ROM_START( lpgm240 )
@@ -2145,9 +2187,13 @@ CONS( 2016, msifrog,    0,  0,  nes_vt_4mb_baddma, nes_vt_msi, nes_vt_state, emp
 CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission? (same happens on hardware?)
-CONS( 2004, duetpp,    0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-CONS( 2004, sporzbx,   0,  0,  nes_vt_waixing_alt_4mb_duetpp,        duetpp, nes_vt_waixing_alt_duetpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzpp,   0,  0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// has some longer than expected delays when sounds should play on the Boxing part, but NES hacks are all functional
+CONS( 2004, sporzbx,   0,  0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// has some longer than expected delays when sounds should play on the Tennis part, but NES hacks are all functional
+CONS( 2004, sporztn,   0,  0,  nes_vt_pal_4mb,        sporzpp, nes_vt_wldsoctv_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Tennis (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// missing PCM audio, but regular APU SFX work
+CONS( 200?, wldsoctv,  0,  0,  nes_vt_pal_4mb,        nes_vt,  nes_vt_wldsoctv_state, empty_init, "Taikee", "World Soccer TV Game 10-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
@@ -2169,6 +2215,8 @@ CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_
 
 // 060303 date code on PCB
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, solargm,   0,  0, nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Solar Games 80-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Solar Games logo is also found in the SunPlus based Millennium Arcade units
 
 // silver 'N64' type controller design
 CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
@@ -2251,7 +2299,8 @@ CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 200?, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb_alt,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_NOT_WORKING ) // from a Green unit, '17 Classic & Racing Game'
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )

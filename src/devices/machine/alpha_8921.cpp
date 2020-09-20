@@ -150,16 +150,15 @@ void alpha_8921_device::update_output()
 {
 	if ((m_old_sr != m_sr) || (m_old_even != m_even) || (m_old_h != m_h))
 	{
-		switch (m_h)
+		if (m_h)
 		{
-			case 1:
-				m_gbd = bitswap<4>(m_sr, 30, 22, 14, 6);
-				m_gad = bitswap<4>(m_sr, 31, 23, 15, 7);
-				break;
-			case 0:
-				m_gbd = bitswap<4>(m_sr, 25, 17, 9, 1);
-				m_gad = bitswap<4>(m_sr, 24, 16, 8, 0);
-				break;
+			m_gbd = bitswap<4>(m_sr, 30, 22, 14, 6);
+			m_gad = bitswap<4>(m_sr, 31, 23, 15, 7);
+		}
+		else
+		{
+			m_gbd = bitswap<4>(m_sr, 25, 17, 9, 1);
+			m_gad = bitswap<4>(m_sr, 24, 16, 8, 0);
 		}
 		if (m_even)
 			std::swap<u8>(m_gad, m_gbd);

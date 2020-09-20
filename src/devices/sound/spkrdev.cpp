@@ -102,7 +102,7 @@ void speaker_sound_device::device_start()
 	int i;
 	double x;
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 
 	m_level = 0;
 	for (i = 0; i < FILTER_LENGTH; i++)
@@ -198,11 +198,11 @@ void speaker_sound_device::device_post_load()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
 // This can be triggered by the core (based on emulated time) or via level_w().
-void speaker_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void speaker_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 	int volume = m_levels[m_level];

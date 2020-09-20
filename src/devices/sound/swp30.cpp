@@ -163,7 +163,7 @@ void swp30_device::device_add_mconfig(machine_config &config)
 
 void swp30_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 44100);
+	m_stream = stream_alloc_legacy(0, 2, 44100);
 
 	// Attenuantion for panning is 4.4 floating point.  That means 0
 	// to -96.3dB.  Since it's a nice range, we assume it's the same
@@ -761,7 +761,7 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 
 // Synthesis
 
-void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void swp30_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// Loop first on the samples and not on the channels otherwise
 	// effects will be annoying to implement.

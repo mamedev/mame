@@ -3,33 +3,36 @@
 license:CC0
 -->
 <mamelayout version="2">
-	<element name="L7" defstate="1">
+	<element name="L7">
 		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
+			<color red="0.25" green="0.25" blue="0.0" />
 		</rect>
-		<text string="START" state="1">
+		<rect>
+			<color red="1.00" green="1.00" blue="0.0" />
+		</rect>
+		<text string="START">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.25" width="1" height="0.5" />
 		</text>
 	</element>
-	<element name="BX" defstate="1">
+	<element name="BX">
 		<rect>
 			<color red="0.00" green="0.00" blue="0.0" />
 		</rect>
 	</element>
-	<element name="Dig1" defstate="1">
+	<element name="Dig1">
 		<led7seg>
-			<color red=".75" green="0.0" blue="0.0" />
+			<color red="0.75" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-		<element name="lamp3" ref="L7">
+		<element name="lamp3" ref="L7" inputtag="IN0" inputmask="0x08" >
 			<bounds x="3.093" y="3.12" width="0.5" height="0.30" />
 		</element>
-		<element name="" ref="BX">
+		<element ref="BX">
 			<bounds x="3.99" y="3.00" width="0.01" height="0.45" />
 		</element>
 		<repeat count="3">

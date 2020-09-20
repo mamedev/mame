@@ -10,11 +10,9 @@
 /// Gaussian elimination using compressed row format.
 ///
 
-#include "plib/mat_cr.h"
-
-//#include "nld_ms_direct.h"
 #include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
+#include "plib/pmatrix_cr.h"
 #include "plib/pdynlib.h"
 #include "plib/pstream.h"
 #include "plib/vector_ops.h"
@@ -31,7 +29,7 @@ namespace solver
 	{
 	public:
 
-		using mat_type = plib::pGEmatrix_cr_t<plib::pmatrix_cr_t<FT, SIZE>>;
+		using mat_type = plib::pGEmatrix_cr<plib::pmatrix_cr<FT, SIZE>>;
 		using base_type = matrix_solver_ext_t<FT, SIZE>;
 		using fptype = typename base_type::fptype;
 
@@ -119,7 +117,7 @@ namespace solver
 
 	private:
 
-		using mat_index_type = typename plib::pmatrix_cr_t<FT, SIZE>::index_type;
+		using mat_index_type = typename plib::pmatrix_cr<FT, SIZE>::index_type;
 
 		void generate_code(plib::putf8_fmt_writer &strm);
 

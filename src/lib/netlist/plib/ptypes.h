@@ -39,6 +39,30 @@
 #undef EMSCRIPTEN
 #endif
 
+// -----------------------------------------------------------------------------
+// forward definitions
+// -----------------------------------------------------------------------------
+
+namespace plib
+{
+	template <typename BASEARENA, std::size_t MINALIGN>
+	class mempool_arena;
+
+	struct aligned_arena;
+	class dynlib_base;
+
+	template<bool debug_enabled>
+	class plog_base;
+
+	struct plog_level;
+
+	namespace detail
+	{
+		class token_store;
+	} // namespace detail
+
+} // namespace plib
+
 namespace plib
 {
 	//============================================================

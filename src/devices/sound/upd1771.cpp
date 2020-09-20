@@ -255,7 +255,7 @@ void upd1771c_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 4);
+	m_channel = stream_alloc_legacy(0, 1, clock() / 4);
 
 	save_item(NAME(m_packet));
 	save_item(NAME(m_index));
@@ -476,10 +476,10 @@ TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd1771c_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
 

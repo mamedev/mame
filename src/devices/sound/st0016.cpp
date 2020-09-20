@@ -43,7 +43,7 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 
 void st0016_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 44100);
+	m_stream = stream_alloc_legacy(0, 2, 44100);
 	m_ram_read_cb.resolve_safe(0);
 
 	save_item(NAME(m_vpos));
@@ -54,10 +54,10 @@ void st0016_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void st0016_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void st0016_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int v, i, snum;
 	unsigned char *slot;

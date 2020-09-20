@@ -95,7 +95,7 @@ public:
 	{
 		m_stream->update();
 		set_rc(type, R1, R2, R3, C);
-		recalc();
+		m_last_sample_rate = 0;
 		return *this;
 	}
 
@@ -109,16 +109,17 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	void recalc();
 
 private:
 	sound_stream*  m_stream;
-	int            m_k;
-	int            m_memory;
+	stream_buffer::sample_t m_k;
+	stream_buffer::sample_t m_memory;
 	int            m_type;
+	int            m_last_sample_rate;
 	double         m_R1;
 	double         m_R2;
 	double         m_R3;

@@ -2,22 +2,22 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Informer 213 AE
-
-    VT-100 compatible terminal
+    Informer 213 (IBM 374/SNA V.22)
+	Informer 213 AE (VT-100)
 
     Hardware:
     - EF68B09EP
-	- 2x TC5564PL-15 + 1x TC5565APL
+	- 2x TC5564PL-15 [8k] (next to CG ROM)
+	- 1x TC5565APL-15 [8k] + 2x TMS4464-15NL [32k] (next to CPU)
 	- Z0853006PSC SCC
-	- ASIC
+	- ASIC (INFORMER 44223)
 	- 18.432 MHz XTAL
 
     TODO:
 	- Figure out the ASIC and how it's connected
 
     Notes:
-    - Debug tricks: "b@42=ff" after startup to show setup screen 1
+    - Debug tricks (AE): "b@42=ff" after startup to show setup screen 1
       "bp 81a1" then "b@42=ff" and "a=02" after the break to show screen 2
 
 ***************************************************************************/
@@ -33,10 +33,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class informer_213ae_state : public driver_device
+class informer_213_state : public driver_device
 {
 public:
-	informer_213ae_state(const machine_config &mconfig, device_type type, const char *tag) :
+	informer_213_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -47,7 +47,7 @@ public:
 		m_chargen(*this, "chargen")
 	{ }
 
-	void informer_213ae(machine_config &config);
+	void informer_213(machine_config &config);
 
 protected:
 	void machine_start() override;
@@ -72,10 +72,11 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-void informer_213ae_state::mem_map(address_map &map)
+void informer_213_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram().share("vram");
 	map(0x7000, 0x7fff).ram().share("aram");
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
@@ -86,7 +87,7 @@ void informer_213ae_state::mem_map(address_map &map)
 //  INPUT PORT DEFINITIONS
 //**************************************************************************
 
-static INPUT_PORTS_START( informer_213ae )
+static INPUT_PORTS_START( informer_213 )
 INPUT_PORTS_END
 
 
@@ -94,8 +95,10 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-uint32_t informer_213ae_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	offs_t chargen_base = (m_chargen.bytes() == 0x4000) ? 0x2000 : 0;
+
 	for (int y = 0; y < 26; y++)
 	{
 		for (int x = 0; x < 80; x++)
@@ -114,7 +117,7 @@ uint32_t informer_213ae_state::screen_update(screen_device &screen, bitmap_rgb32
 			// draw 9 lines
 			for (int i = 0; i < 9; i++)
 			{
-				uint8_t data = m_chargen[0x2000 | ((code << 4) + i)];
+				uint8_t data = m_chargen[chargen_base | ((code << 4) + i)];
 
 				// 6 pixels of the character
 				bitmap.pix32(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
@@ -150,11 +153,11 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-void informer_213ae_state::machine_start()
+void informer_213_state::machine_start()
 {
 }
 
-void informer_213ae_state::machine_reset()
+void informer_213_state::machine_reset()
 {
 }
 
@@ -163,10 +166,10 @@ void informer_213ae_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-void informer_213ae_state::informer_213ae(machine_config &config)
+void informer_213_state::informer_213(machine_config &config)
 {
 	MC6809(config, m_maincpu, 18.432_MHz_XTAL / 4); // unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &informer_213ae_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &informer_213_state::mem_map);
 
 	SCC8530N(config, m_scc, 0); // unknown clock
 
@@ -177,7 +180,7 @@ void informer_213ae_state::informer_213ae(machine_config &config)
 	m_screen->set_visarea_full();
 	m_screen->set_refresh_hz(60);
 //	m_screen->set_raw(18.432_MHz_XTAL, 0, 0, 0, 0, 0, 0);
-	m_screen->set_screen_update(FUNC(informer_213ae_state::screen_update));
+	m_screen->set_screen_update(FUNC(informer_213_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -188,6 +191,16 @@ void informer_213ae_state::informer_213ae(machine_config &config)
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
+
+ROM_START( in213 )
+	ROM_REGION(0x8000, "maincpu", 0)
+	// 79687-305  PTF02 SNA  V2.6 CK=24EE (checksum matches)
+	ROM_LOAD("79687-305.bin", 0x0000, 0x8000, CRC(0638c6d6) SHA1(1906f835f255d595c5743b453614ba21acb5acae))
+
+	ROM_REGION(0x2000, "chargen", 0)
+	// 79688-003  ICT 213/CG.  CK=C4E0 (checksum matches)
+	ROM_LOAD("79688-003.bin", 0x0000, 0x2000, CRC(75e0da94) SHA1(c10c71fcf980a5f868a85bc264661183fa69fa72))
+ROM_END
 
 ROM_START( in213ae )
 	ROM_REGION(0x8000, "maincpu", 0)
@@ -204,5 +217,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE         INPUT           CLASS                 INIT        COMPANY     FULLNAME          FLAGS
-COMP( 1992, in213ae, 0,       0,      informer_213ae, informer_213ae, informer_213ae_state, empty_init, "Informer", "Informer 213 AE", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE       INPUT         CLASS               INIT        COMPANY     FULLNAME           FLAGS
+COMP( 1990, in213  , 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213",    MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1992, in213ae, 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213 AE", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

@@ -2186,8 +2186,6 @@ Core Video Options
 
             mame64 mk -syncrefresh
 
-.. Tip:: **-syncrefresh** can be helpful for G-Sync or FreeSync display users.
-
 **-prescale** *<amount>*
 
     Controls the size of the screen images when they are passed off to the

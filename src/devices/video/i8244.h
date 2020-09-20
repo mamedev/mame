@@ -97,11 +97,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual void set_default_params();
 
-	//void render_scanline(int vpos);
 	int get_y_beam();
 	int get_x_beam();
 	offs_t fix_register_mirrors( offs_t offset );

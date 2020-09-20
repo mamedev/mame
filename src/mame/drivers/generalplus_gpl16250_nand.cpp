@@ -554,6 +554,14 @@ ROM_START( jak_hmhsm )
 	ROM_LOAD( "hmhsm.bin", 0x0000, 0x10800000, CRC(e63ad24c) SHA1(a7844b14af701914150aa7c06743a410f478ff7b) )
 ROM_END
 
+ROM_START( jak_camp )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "camprockguitar1_sandisk11352-256b_45da.bin", 0x0000, 0x10800000, CRC(f52a4289) SHA1(d027ae274cd4ac97924d2344df1a96456e8e7c55) )
+ROM_END
+
 
 ROM_START( jak_hsmg2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -908,6 +916,7 @@ CONS(2008, jak_hsmg2,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gp
 CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe - Two in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
 CONS(2008, jak_umdf,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Handheld Games",       "Ultimotion - Disney Fairies Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // Ultimotion Swing Zone is SPG29xx instead
+CONS(2008, jak_camp,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Camp Rock Guitar Video Game (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // There were 1 player and 2 player versions for several of the JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from

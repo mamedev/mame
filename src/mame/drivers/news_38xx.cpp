@@ -395,7 +395,8 @@ void news_38xx_state::common(machine_config &config)
 			cxd1180_device &adapter = downcast<cxd1180_device &>(*device);
 
 			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<SCSI0>));
-			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::drq_w));
+			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
+			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
 
 			//subdevice<dmac_0266_device>(":dma0")->out_eop_cb().set(adapter, FUNC(cxd1180_device::eop_w));
 			subdevice<dmac_0266_device>(":dma0")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
@@ -419,7 +420,8 @@ void news_38xx_state::common(machine_config &config)
 			cxd1180_device &adapter = downcast<cxd1180_device &>(*device);
 
 			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<SCSI1>));
-			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::drq_w));
+			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
+			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
 
 			//subdevice<dmac_0266_device>(":dma1")->out_eop_cb().set(adapter, FUNC(cxd1180_device::eop_w));
 			subdevice<dmac_0266_device>(":dma1")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));

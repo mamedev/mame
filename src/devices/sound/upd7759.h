@@ -23,11 +23,23 @@ public:
 	enum : u32 { STANDARD_CLOCK = 640'000 };
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( start_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	virtual void port_w(u8 data);
 	void set_start_delay(uint32_t data) { m_start_delay = data; };
 
 protected:
+	virtual void internal_start_w(int state) = 0;
+	virtual void internal_reset_w(int state);
+
+	enum
+	{
+		TID_PORT_WRITE,
+		TID_START_WRITE,
+		TID_RESET_WRITE,
+		TID_SLAVE_UPDATE
+	};
+
 	// chip states
 	enum
 	{
@@ -56,7 +68,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void update_adpcm(int data);
 	virtual void advance_state();
@@ -110,14 +122,10 @@ public:
 
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
-	DECLARE_WRITE_LINE_MEMBER( md_w );
-	DECLARE_WRITE_LINE_MEMBER( start_w );
+	DECLARE_WRITE_LINE_MEMBER( md_w ) { m_md = state; }
 
 protected:
-	enum
-	{
-		TIMER_SLAVE_UPDATE
-	};
+	virtual void internal_start_w(int state) override;
 
 	upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -136,9 +144,9 @@ public:
 
 	virtual void device_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER( start_w );
-
 protected:
+	virtual void internal_start_w(int state) override;
+
 	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;

@@ -16,9 +16,9 @@
 
 #include "nl_errstr.h"
 
-#include "devices/net_lib.h"
-
 #include <limits>
+
+NETLIST_EXTERNAL(base_lib)
 
 namespace netlist
 {

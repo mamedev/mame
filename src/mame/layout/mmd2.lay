@@ -8,19 +8,19 @@ Basic display of LEDs for the MMD-2
 <mamelayout version="2">
 
 	<element name="r_led">
-		<disk>
+		<disk state="0">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 
 	<element name="g_led">
-		<disk>
+		<disk state="0">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</disk>
 	</element>
 
 	<element name="o_led">
-		<disk>
+		<disk state="0">
 			<color red="1.0" green="0.50" blue="0.0" />
 		</disk>
 	</element>

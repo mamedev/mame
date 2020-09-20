@@ -72,7 +72,7 @@ device_memory_interface::space_config_vector upd7752_device::memory_space_config
 void upd7752_device::device_start()
 {
 	/* TODO: clock */
-	m_stream = stream_alloc(0, 1, clock() / 64);
+	m_stream = stream_alloc_legacy(0, 1, clock() / 64);
 
 	m_status = 0;
 }
@@ -96,10 +96,10 @@ void upd7752_device::device_stop()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void upd7752_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void upd7752_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 }
 

@@ -230,7 +230,7 @@ license:CC0
 		</repeat>
 
 		<!-- power led at A1 -->
-		<element ref="ledg" inputtag="IN.5" inputmask="0x01" inputraw="1"><bounds x="0.2" y="78.3" width="1.5" height="1.5" /></element>
+		<element ref="ledg" inputtag="IN.5" inputmask="0x01" inputraw="yes"><bounds x="0.2" y="78.3" width="1.5" height="1.5" /></element>
 
 		<!-- pieces -->
 		<repeat count="8">

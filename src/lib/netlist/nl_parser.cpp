@@ -561,4 +561,26 @@ pstring parser_t::stringify_expression(token_t &tok)
 	return ret;
 }
 
+// ----------------------------------------------------------------------------------------
+// source_token_t
+// ----------------------------------------------------------------------------------------
+
+bool source_token_t::parse(nlparse_t &setup, const pstring &name)
+{
+	if (name == m_name)
+	{
+		auto ret = setup.parse_tokens(m_store, name);
+		return ret;
+	}
+
+	return false;
+}
+
+plib::istream_uptr source_token_t::stream(const pstring &name)
+{
+	plib::unused_var(name);
+	return plib::istream_uptr();
+}
+
+
 } // namespace netlist

@@ -1470,10 +1470,10 @@ void ym2413_device::write_reg(int r, int v)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void ym2413_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2413_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	for(int i=0; i < samples ; i++ )
 	{
@@ -1511,7 +1511,7 @@ void ym2413_device::device_start()
 {
 	int rate = clock()/72;
 
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+	m_stream = stream_alloc_legacy(0,2,rate);
 
 	for (int x=0; x<TL_RES_LEN; x++)
 	{

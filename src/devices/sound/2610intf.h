@@ -40,7 +40,7 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples);
 
 	void *          m_chip;
 
@@ -75,7 +75,7 @@ public:
 	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void stream_generate(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 };
 
 

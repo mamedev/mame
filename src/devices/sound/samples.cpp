@@ -86,12 +86,11 @@ void samples_device::start(uint8_t channel, uint32_t samplenum, bool loop)
 	// update the parameters
 	sample_t &sample = m_sample[samplenum];
 	chan.source = (sample.data.size() > 0) ? &sample.data[0] : nullptr;
-	chan.source_length = sample.data.size();
-	chan.source_num = (chan.source_length > 0) ? samplenum : -1;
+	chan.source_num = (chan.source_len > 0) ? samplenum : -1;
+	chan.source_len = sample.data.size();
 	chan.pos = 0;
-	chan.frac = 0;
 	chan.basefreq = sample.frequency;
-	chan.step = (int64_t(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
+	chan.curfreq = sample.frequency;
 	chan.loop = loop;
 }
 
@@ -111,12 +110,11 @@ void samples_device::start_raw(uint8_t channel, const int16_t *sampledata, uint3
 
 	// update the parameters
 	chan.source = sampledata;
-	chan.source_length = samples;
 	chan.source_num = -1;
+	chan.source_len = samples;
 	chan.pos = 0;
-	chan.frac = 0;
 	chan.basefreq = frequency;
-	chan.step = (int64_t(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
+	chan.curfreq = frequency;
 	chan.loop = loop;
 }
 
@@ -133,7 +131,7 @@ void samples_device::set_frequency(uint8_t channel, uint32_t freq)
 	// force an update before we start
 	channel_t &chan = m_channel[channel];
 	chan.stream->update();
-	chan.step = (int64_t(freq) << FRAC_BITS) / machine().sample_rate();
+	chan.curfreq = freq;
 }
 
 
@@ -147,8 +145,7 @@ void samples_device::set_volume(uint8_t channel, float volume)
 	assert(channel < m_channels);
 
 	// force an update before we start
-	channel_t &chan = m_channel[channel];
-	chan.stream->set_output_gain(0, volume);
+	set_output_gain(channel, volume);
 }
 
 
@@ -201,11 +198,7 @@ void samples_device::stop_all()
 uint32_t samples_device::base_frequency(uint8_t channel) const
 {
 	assert(channel < m_channels);
-
-	// force an update before we start
-	const channel_t &chan = m_channel[channel];
-	chan.stream->update();
-	return chan.basefreq;
+	return m_channel[channel].basefreq;
 }
 
 
@@ -245,19 +238,17 @@ void samples_device::device_start()
 	{
 		// initialize channel
 		channel_t &chan = m_channel[channel];
-		chan.stream = stream_alloc(0, 1, machine().sample_rate());
+		chan.stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 		chan.source = nullptr;
 		chan.source_num = -1;
-		chan.step = 0;
+		chan.pos = 0;
 		chan.loop = 0;
 		chan.paused = 0;
 
 		// register with the save state system
-		save_item(NAME(chan.source_length), channel);
 		save_item(NAME(chan.source_num), channel);
+		save_item(NAME(chan.source_len), channel);
 		save_item(NAME(chan.pos), channel);
-		save_item(NAME(chan.frac), channel);
-		save_item(NAME(chan.step), channel);
 		save_item(NAME(chan.loop), channel);
 		save_item(NAME(chan.paused), channel);
 	}
@@ -296,16 +287,21 @@ void samples_device::device_post_load()
 		{
 			sample_t &sample = m_sample[chan.source_num];
 			chan.source = &sample.data[0];
-			chan.source_length = sample.data.size();
+			chan.source_len = sample.data.size();
 			if (sample.data.empty())
 				chan.source_num = -1;
 		}
 
 		// validate the position against the length in case the sample is smaller
-		if (chan.source != nullptr && chan.pos >= chan.source_length)
+		double endpos = chan.source_len;
+		if (chan.source != nullptr && chan.pos >= endpos)
 		{
 			if (chan.loop)
-				chan.pos %= chan.source_length;
+			{
+				double posfloor = floor(chan.pos);
+				chan.pos -= posfloor;
+				chan.pos += double(int32_t(posfloor) % chan.source_len);
+			}
 			else
 			{
 				chan.source = nullptr;
@@ -320,60 +316,55 @@ void samples_device::device_post_load()
 //  sound_stream_update - update a sound stream
 //-------------------------------------------------
 
-void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// find the channel with this stream
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int channel = 0; channel < m_channels; channel++)
 		if (&stream == m_channel[channel].stream)
 		{
 			channel_t &chan = m_channel[channel];
-			stream_sample_t *buffer = outputs[0];
+			auto &buffer = outputs[0];
 
 			// process if we still have a source and we're not paused
 			if (chan.source != nullptr && !chan.paused)
 			{
 				// load some info locally
-				uint32_t pos = chan.pos;
-				uint32_t frac = chan.frac;
-				uint32_t step = chan.step;
+				double step = double(chan.curfreq) / double(buffer.sample_rate());
+				double endpos = chan.source_len;
 				const int16_t *sample = chan.source;
-				uint32_t sample_length = chan.source_length;
 
-				while (samples--)
+				for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 				{
 					// do a linear interp on the sample
-					int32_t sample1 = sample[pos];
-					int32_t sample2 = sample[(pos + 1) % sample_length];
-					int32_t fracmult = frac >> (FRAC_BITS - 14);
-					*buffer++ = ((0x4000 - fracmult) * sample1 + fracmult * sample2) >> 14;
+					double pos_floor = floor(chan.pos);
+					double frac = chan.pos - pos_floor;
+					int32_t ipos = int32_t(pos_floor);
+
+					stream_buffer::sample_t sample1 = stream_buffer::sample_t(sample[ipos++]);
+					stream_buffer::sample_t sample2 = stream_buffer::sample_t(sample[(ipos + 1) % chan.source_len]);
+					buffer.put(sampindex, sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
 
 					// advance
-					frac += step;
-					pos += frac >> FRAC_BITS;
-					frac = frac & ((1 << FRAC_BITS) - 1);
+					chan.pos += step;
 
 					// handle looping/ending
-					if (pos >= sample_length)
+					if (chan.pos >= endpos)
 					{
 						if (chan.loop)
-							pos %= sample_length;
+							chan.pos -= endpos;
 						else
 						{
 							chan.source = nullptr;
 							chan.source_num = -1;
-							if (samples > 0)
-								memset(buffer, 0, samples * sizeof(*buffer));
+							buffer.fill(0, sampindex);
 							break;
 						}
 					}
 				}
-
-				// push position back out
-				chan.pos = pos;
-				chan.frac = frac;
 			}
 			else
-				memset(buffer, 0, samples * sizeof(*buffer));
+				buffer.fill(0);
 			break;
 		}
 }

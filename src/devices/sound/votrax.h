@@ -37,7 +37,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// Possible timer parameters
@@ -177,7 +177,7 @@ private:
 	void chip_update();                             // Global update called at 20KHz (main/36)
 	void filters_commit(bool force);                // Commit the currently computed interpolation values to the filters
 	void phone_commit();                            // Commit the current phone id
-	stream_sample_t analog_calc();                  // Compute one more sample
+	stream_buffer::sample_t analog_calc();                  // Compute one more sample
 };
 
 

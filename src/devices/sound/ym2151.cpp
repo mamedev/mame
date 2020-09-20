@@ -1836,16 +1836,17 @@ WRITE_LINE_MEMBER(ym2151_device::reset_w)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2151_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_reset_active)
 	{
-		std::fill(&outputs[0][0], &outputs[0][samples], 0);
-		std::fill(&outputs[1][0], &outputs[1][samples], 0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 		return;
 	}
 
-	for (int i=0; i<samples; i++)
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	for (int sampindex=0; sampindex<outputs[0].samples(); sampindex++)
 	{
 		advance_eg();
 
@@ -1871,8 +1872,8 @@ void ym2151_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			outr = 32767;
 		else if (outr < -32768)
 			outr = -32768;
-		outputs[0][i] = outl;
-		outputs[1][i] = outr;
+		outputs[0].put(sampindex, stream_buffer::sample_t(outl) * sample_scale);
+		outputs[1].put(sampindex, stream_buffer::sample_t(outr) * sample_scale);
 
 		advance();
 	}

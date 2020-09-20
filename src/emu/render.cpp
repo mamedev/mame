@@ -2511,15 +2511,13 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode)
 {
-	// if we're out of range, bail
-	if (state > element.maxstate())
-		return;
+	// limit state range to non-negative values
 	if (state < 0)
 		state = 0;
 
 	// get a pointer to the relevant texture
 	render_texture *texture = element.state_texture(state);
-	if (texture != nullptr)
+	if (texture)
 	{
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 

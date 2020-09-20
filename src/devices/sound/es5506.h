@@ -84,7 +84,7 @@ protected:
 	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	void update_irq_state();
 	void update_internal_irq_state();
@@ -111,10 +111,10 @@ protected:
 	virtual void update_envelopes(es550x_voice *voice) = 0;
 	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) = 0;
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) = 0;
-	void generate_ulaw(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples);
-	void generate_pcm(es550x_voice *voice, s32 *lbuffer, s32 *rbuffer, int samples);
+	void generate_ulaw(es550x_voice *voice, s32 *dest);
+	void generate_pcm(es550x_voice *voice, s32 *dest);
 	inline void generate_irq(es550x_voice *voice, int v);
-	virtual void generate_samples(s32 **outputs, int offset, int samples) {};
+	virtual void generate_samples(std::vector<write_stream_view> &outputs) {};
 
 	inline void update_index(es550x_voice *voice) { m_voice_index = voice->index; }
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) { return 0; }
@@ -137,12 +137,11 @@ protected:
 
 	es550x_voice  m_voice[32];            // the 32 voices
 
-	std::unique_ptr<s32[]>    m_scratch;
-
-	std::unique_ptr<s16[]>    m_ulaw_lookup;
-	std::unique_ptr<u32[]>    m_volume_lookup;
+	std::vector<s16> m_ulaw_lookup;
+	std::vector<u32> m_volume_lookup;
 
 #if ES5506_MAKE_WAVS
+	std::vector<s32> m_scratch;
 	void *      m_wavraw;                 // raw waveform
 #endif
 
@@ -190,7 +189,7 @@ protected:
 	virtual void update_envelopes(es550x_voice *voice) override;
 	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
-	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
+	virtual void generate_samples(std::vector<write_stream_view> &outputs) override;
 
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_index(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
 
@@ -244,7 +243,7 @@ protected:
 	virtual void update_envelopes(es550x_voice *voice) override;
 	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
-	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
+	virtual void generate_samples(std::vector<write_stream_view> &outputs) override;
 
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_index(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
 

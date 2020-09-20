@@ -236,7 +236,7 @@ void cassette_image_device::device_start()
 	m_state = m_default_state;
 	m_value = 0;
 
-	machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), machine().sample_rate());
+	stream_alloc_legacy(0, (m_stereo? 2:1), machine().sample_rate());
 }
 
 image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
@@ -404,7 +404,7 @@ std::string cassette_image_device::call_display()
 //  Cassette sound
 //-------------------------------------------------
 
-void cassette_image_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cassette_image_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *left_buffer = outputs[0];
 	stream_sample_t *right_buffer = nullptr;

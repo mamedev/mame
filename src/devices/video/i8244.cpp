@@ -740,16 +740,16 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void i8244_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	u8 volume = m_vdc.s.sound & 0xf;
-	int sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0x4000;
+	stream_buffer::sample_t sample_on = (m_sh_output & m_vdc.s.sound >> 7) * 0.5;
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		// clock duty cycle
 		m_sh_duty = (m_sh_duty + 1) & 0xf;
-		outputs[0][i] = (m_sh_duty < volume) ? sample_on : 0;
+		outputs[0].put(i, (m_sh_duty < volume) ? sample_on : 0.0);
 	}
 }
 

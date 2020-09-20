@@ -38,7 +38,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// Parameters for a channel
@@ -71,8 +71,8 @@ private:
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<s16[]> m_mixer_table;
-	s16 *m_mixer_lookup;
+	std::vector<stream_buffer::sample_t> m_mixer_table;
+	stream_buffer::sample_t *m_mixer_lookup;
 	std::vector<s16> m_mixer_buffer;
 
 	/* chip registers */

@@ -168,59 +168,214 @@ enum
 	pen_lightpen_pressed = pen_green
 };
 
-/* tape reader registers */
-struct tape_reader_t
+class pdp1_state;
+
+// tape reader device
+class pdp1_readtape_image_device :  public device_t,
+									public device_image_interface
 {
-	device_image_interface *fd; /* file descriptor of tape image */
+public:
+	// construction/destruction
+	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	int motor_on;   /* 1-bit reader motor on */
+	auto st_ptr() { return m_st_ptr.bind(); }
 
-	int rb;         /* 18-bit reader buffer */
-	int rcl;        /* 1-bit reader clutch */
-	int rc;         /* 2-bit reader counter */
-	int rby;        /* 1-bit reader binary mode flip-flop */
-	int rcp;        /* 1-bit reader "need a completion pulse" flip-flop */
+	void iot_rpa(int op2, int nac, int mb, int &io, int ac);
+	void iot_rpb(int op2, int nac, int mb, int &io, int ac);
+	void iot_rrb(int op2, int nac, int mb, int &io, int ac);
 
-	emu_timer *timer;   /* timer to simulate reader timing */
+protected:
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+
+	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
+
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+public:
+	TIMER_CALLBACK_MEMBER(reader_callback);
+
+	int tape_read(uint8_t *reply);
+	void begin_tape_read(int binary, int nac);
+
+	required_device<pdp1_device> m_maincpu;
+
+	devcb_write_line m_st_ptr;
+
+	int m_motor_on; // 1-bit reader motor on
+
+	int m_rb;       // 18-bit reader buffer
+	int m_rcl;      // 1-bit reader clutch
+	int m_rc;       // 2-bit reader counter
+	int m_rby;      // 1-bit reader binary mode flip-flop
+	int m_rcp;      // 1-bit reader "need a completion pulse" flip-flop
+
+	emu_timer *m_timer;     // timer to simulate reader timing
 };
 
 
 
-/* tape puncher registers */
-struct tape_puncher_t
+// tape puncher device
+class pdp1_punchtape_image_device : public device_t,
+									public device_image_interface
 {
-	device_image_interface *fd; /* file descriptor of tape image */
+public:
+	// construction/destruction
+	pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	emu_timer *timer;   /* timer to generate completion pulses */
+	auto st_ptp() { return m_st_ptp.bind(); }
+
+	void iot_ppa(int op2, int nac, int mb, int &io, int ac);
+	void iot_ppb(int op2, int nac, int mb, int &io, int ac);
+
+protected:
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+
+	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
+
+	virtual bool is_readable()  const noexcept override { return false; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
+
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+public:
+	TIMER_CALLBACK_MEMBER(puncher_callback);
+
+	void tape_write(uint8_t data);
+
+	required_device<pdp1_device> m_maincpu;
+
+	devcb_write_line m_st_ptp;
+
+	emu_timer *m_timer;     // timer to generate completion pulses
 };
 
 
 
-/* typewriter registers */
-struct typewriter_t
+// typewriter device
+class pdp1_typewriter_device :   public device_t,
+									public device_image_interface
 {
-	device_image_interface *fd; /* file descriptor of output image */
+public:
+	// construction/destruction
+	pdp1_typewriter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	int tb;         /* typewriter buffer */
+	auto st_tyo() { return m_st_tyo.bind(); }
+	auto st_tyi() { return m_st_tyi.bind(); }
 
-	emu_timer *tyo_timer;/* timer to generate completion pulses */
+	void iot_tyo(int op2, int nac, int mb, int &io, int ac);
+	void iot_tyi(int op2, int nac, int mb, int &io, int ac);
+
+protected:
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+
+	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_PRINTER; }
+
+	virtual bool is_readable()  const noexcept override { return false; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "typ"; }
+
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+public:
+	TIMER_CALLBACK_MEMBER(tyo_callback);
+
+	void linefeed();
+	void drawchar(int character);
+	void typewriter_out(uint8_t data);
+
+	void pdp1_keyboard();
+
+	required_device<pdp1_device> m_maincpu;
+	required_device<pdp1_state> m_driver_state;
+	required_ioport_array<4> m_twr;
+
+	devcb_write_line m_st_tyo;
+	devcb_write_line m_st_tyi;
+
+	int m_tb;       // typewriter buffer
+
+	emu_timer *m_tyo_timer; // timer to generate completion pulses
+
+	int m_old_typewriter_keys[4];
+	int m_color;
+	bitmap_ind16 m_bitmap;
+	int m_pos;
+	int m_case_shift;
 };
 
-/* MIT parallel drum (mostly similar to type 23) */
-struct parallel_drum_t
+// MIT parallel drum (mostly similar to type 23)
+class pdp1_cylinder_image_device :  public device_t,
+									public device_image_interface
 {
-	device_image_interface *fd; /* file descriptor of drum image */
+public:
+	// construction/destruction
+	pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	int il;         /* initial location (12-bit) */
-	int wc;         /* word counter (12-bit) */
-	int wcl;        /* word core location counter (16-bit) */
-	int rfb;        /* read field buffer (5-bit) */
-	int wfb;        /* write field buffer (5-bit) */
+	void iot_dia(int op2, int nac, int mb, int &io, int ac);
+	void iot_dba(int op2, int nac, int mb, int &io, int ac);
+	void iot_dcc(int op2, int nac, int mb, int &io, int ac);
+	void iot_dra(int op2, int nac, int mb, int &io, int ac);
 
-	int dba;
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
-	emu_timer *rotation_timer;  /* timer called each time dc is 0 */
-	emu_timer *il_timer;        /* timer called each time dc is il */
+	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_CYLINDER; }
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "drm"; }
+
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+public:
+	void set_il(int il);
+	uint32_t drum_read(int field, int position);
+	void drum_write(int field, int position, uint32_t data);
+
+	required_device<pdp1_device> m_maincpu;
+
+	int m_il;       // initial location (12-bit)
+	int m_wc;       // word counter (12-bit)
+	int m_wcl;      // word core location counter (16-bit)
+	int m_rfb;      // read field buffer (5-bit)
+	int m_wfb;      // write field buffer (5-bit)
+
+	int m_dba;
+
+	emu_timer *m_rotation_timer;// timer called each time dc is 0
+	emu_timer *m_il_timer;      // timer called each time dc is il
 };
 
 
@@ -239,6 +394,10 @@ public:
 	pdp1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_tape_reader(*this, "readt"),
+		m_tape_puncher(*this, "punch"),
+		m_typewriter(*this, "typewriter"),
+		m_parallel_drum(*this, "drum"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_crt(*this, "crt"),
@@ -248,21 +407,20 @@ public:
 		m_tstadd(*this, "TSTADD"),
 		m_twdmsb(*this, "TWDMSB"),
 		m_twdlsb(*this, "TWDLSB"),
-		m_twr(*this, "TWR.%u", 0),
 		m_cfg(*this, "CFG"),
 		m_io_lightpen(*this, "LIGHTPEN"),
 		m_lightx(*this, "LIGHTX"),
 		m_lighty(*this, "LIGHTY")
 	{ }
 
+	required_device<pdp1_device> m_maincpu;
+	required_device<pdp1_readtape_image_device> m_tape_reader;
+	required_device<pdp1_punchtape_image_device> m_tape_puncher;
+	required_device<pdp1_typewriter_device> m_typewriter;
+	required_device<pdp1_cylinder_image_device> m_parallel_drum;
 	int m_io_status;
-	tape_reader_t m_tape_reader;
-	tape_puncher_t m_tape_puncher;
-	typewriter_t m_typewriter;
 	emu_timer *m_dpy_timer;
 	lightpen_t m_lightpen;
-	parallel_drum_t m_parallel_drum;
-	required_device<pdp1_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -271,9 +429,6 @@ public:
 	uint32_t screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pdp1);
 	INTERRUPT_GEN_MEMBER(pdp1_interrupt);
-	TIMER_CALLBACK_MEMBER(reader_callback);
-	TIMER_CALLBACK_MEMBER(puncher_callback);
-	TIMER_CALLBACK_MEMBER(tyo_callback);
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	void pdp1_machine_stop();
 	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
@@ -286,39 +441,35 @@ public:
 	void pdp1_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
 	void pdp1_draw_panel_backdrop(bitmap_ind16 &bitmap);
 	void pdp1_draw_panel(bitmap_ind16 &bitmap);
-	void pdp1_typewriter_linefeed();
-	void pdp1_typewriter_drawchar(int character);
 	void pdp1_update_lightpen_state(const lightpen_t *new_state);
 	void pdp1_draw_circle(bitmap_ind16 &bitmap, int x, int y, int radius, int color_);
 	void pdp1_erase_lightpen(bitmap_ind16 &bitmap);
 	void pdp1_draw_lightpen(bitmap_ind16 &bitmap);
-	int tape_read(uint8_t *reply);
-	void begin_tape_read(int binary, int nac);
-	void tape_write(uint8_t data);
-	void typewriter_out(uint8_t data);
-	void parallel_drum_set_il(int il);
-	uint32_t drum_read(int field, int position);
-	void drum_write(int field, int position, uint32_t data);
-	void pdp1_keyboard();
 	void pdp1_lightpen();
-	int read_spacewar() { return m_spacewar->read(); }
+
+	template <int Mask> DECLARE_WRITE_LINE_MEMBER(io_status_w);
 
 	void pdp1(machine_config &config);
 	void pdp1_map(address_map &map);
 private:
+	void iot_dpy(int op2, int nac, int mb, int &io, int ac);
+
+	void iot_011(int op2, int nac, int mb, int &io, int ac);
+
+	void iot_cks(int op2, int nac, int mb, int &io, int ac);
+
+	void io_start_clear();
+
 	pdp1_reset_param_t m_reset_param;
-	int m_old_typewriter_keys[4];
 	int m_old_lightpen;
 	int m_old_control_keys;
 	int m_old_tw_keys;
 	int m_old_ta_keys;
-	int m_typewriter_color;
 	bitmap_ind16 m_panel_bitmap;
-	bitmap_ind16 m_typewriter_bitmap;
 	lightpen_t m_lightpen_state;
 	lightpen_t m_previous_lightpen_state;
-	int m_pos;
-	int m_case_shift;
+
+public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<crt_device> m_crt;
@@ -328,7 +479,6 @@ private:
 	required_ioport m_tstadd;
 	required_ioport m_twdmsb;
 	required_ioport m_twdlsb;
-	required_ioport_array<4> m_twr;
 	required_ioport m_cfg;
 	required_ioport m_io_lightpen;
 	required_ioport m_lightx;

@@ -2281,6 +2281,9 @@ uint8_t apple2gs_state::c000_r(offs_t offset)
 		case 0x31:  // DISKREG
 			return m_diskreg;
 
+		case 0x32: // VGCINTCLEAR
+			return 0;
+
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
 
@@ -2508,12 +2511,12 @@ void apple2gs_state::c000_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0x23:  // VGCINT
-			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECOND))
+			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECONDENABLE))
 			{
 				lower_irq(IRQS_SECOND);
 				m_vgcint &= ~(VGCINT_SECOND);
 			}
-			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINE))
+			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINEEN))
 			{
 				lower_irq(IRQS_SCAN);
 				m_vgcint &= ~(VGCINT_SCANLINE);
@@ -2563,14 +2566,14 @@ void apple2gs_state::c000_w(offs_t offset, uint8_t data)
 		case 0x32:  // VGCINTCLEAR
 			//printf("%02x to VGCINTCLEAR\n", data);
 			// one second
-			if ((m_vgcint & VGCINT_SECOND) && !(data & VGCINT_SECOND))
+			if (m_vgcint & VGCINT_SECOND)
 			{
 				lower_irq(IRQS_SECOND);
 				m_vgcint &= ~(VGCINT_SECOND|VGCINT_ANYVGCINT);
 			}
 
 			// scanline
-			if ((m_vgcint & VGCINT_SCANLINE) && !(data & VGCINT_SCANLINE))
+			if (m_vgcint & VGCINT_SCANLINE)
 			{
 				lower_irq(IRQS_SCAN);
 				m_vgcint &= ~(VGCINT_SCANLINE|VGCINT_ANYVGCINT);

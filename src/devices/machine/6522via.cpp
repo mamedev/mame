@@ -587,17 +587,6 @@ u8 via6522_device::read(offs_t offset)
 		{
 			LOGINT("PB INT ");
 			CLR_PB_INT();
-
-			if (m_out_cb2 && (CB2_PULSE_OUTPUT(m_pcr) || CB2_AUTO_HS(m_pcr)))
-			{
-				m_out_cb2 = 0;
-				m_cb2_handler(m_out_cb2);
-			}
-
-			if (CB2_PULSE_OUTPUT(m_pcr))
-			{
-				m_cb2_timer->adjust(clocks_to_attotime(1));
-			}
 		}
 		break;
 

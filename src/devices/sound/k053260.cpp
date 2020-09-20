@@ -313,11 +313,12 @@ static constexpr s32 MINOUT = -0x8000;
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	if (m_mode & 2)
 	{
-		for ( int j = 0; j < samples; j++ )
+		constexpr stream_buffer::sample_t sample_scale = 1.0f / stream_buffer::sample_t(MAXOUT);
+		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
 			stream_sample_t buffer[2] = {0, 0};
 
@@ -327,14 +328,14 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					voice.play(buffer);
 			}
 
-			outputs[0][j] = limit( buffer[0], MAXOUT, MINOUT );
-			outputs[1][j] = limit( buffer[1], MAXOUT, MINOUT );
+			outputs[0].put(j, stream_buffer::sample_t(limit( buffer[0], MAXOUT, MINOUT )) * sample_scale);
+			outputs[1].put(j, stream_buffer::sample_t(limit( buffer[1], MAXOUT, MINOUT )) * sample_scale);
 		}
 	}
 	else
 	{
-		std::fill_n(&outputs[0][0], samples, 0);
-		std::fill_n(&outputs[1][0], samples, 0);
+		outputs[0].fill(0);
+		outputs[1].fill(0);
 	}
 }
 
@@ -429,7 +430,7 @@ void k053260_device::KDSC_Voice::update_pan_volume()
 void k053260_device::KDSC_Voice::key_on()
 {
 	m_position = m_kadpcm ? 1 : 0; // for kadpcm low bit is nybble offset, so must start at 1 due to preincrement
-	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
+	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update_legacy
 	m_output = 0;
 	m_playing = true;
 	if (LOG) m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x:%x, loop = %s, %s\n",

@@ -13,7 +13,7 @@ copyright-holders:Robbbert
 	</element>
 
 	<element name="red_led">
-		<disk><color red="1.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><color red="1.0" green="0.0" blue="0.0" /></disk>
 	</element>
 
 	<element name="P0"><text string="BALL"><color red="1.0" green="1.0" blue="1.0" /></text></element>

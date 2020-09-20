@@ -81,7 +81,7 @@ void rf5c68_device::device_start()
 	m_sample_end_cb.resolve();
 
 	/* allocate the stream */
-	m_stream = stream_alloc(0, 2, clock() / 384);
+	m_stream = stream_alloc_legacy(0, 2, clock() / 384);
 
 	save_item(STRUCT_MEMBER(m_chan, enable));
 	save_item(STRUCT_MEMBER(m_chan, env));
@@ -116,10 +116,10 @@ device_memory_interface::space_config_vector rf5c68_device::memory_space_config(
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void rf5c68_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *left = outputs[0];
 	stream_sample_t *right = outputs[1];

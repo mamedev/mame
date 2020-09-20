@@ -160,7 +160,7 @@ void s_dsp_device::device_start()
 	space().cache(m_cache);
 	space().specific(m_data);
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock() / 64);
+	m_channel = stream_alloc_legacy(0, 2, clock() / 64);
 
 	state_register();
 }
@@ -965,8 +965,8 @@ int s_dsp_device::advance_envelope( int v )
 
 void s_dsp_device::set_volume(int volume)
 {
-	m_channel->set_output_gain(0, volume / 100.0);
-	m_channel->set_output_gain(1, volume / 100.0);
+	set_output_gain(0, volume / 100.0);
+	set_output_gain(1, volume / 100.0);
 }
 
 
@@ -1061,10 +1061,10 @@ void s_dsp_device::state_register()
 }
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void s_dsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void s_dsp_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	s16 mix[2];
 

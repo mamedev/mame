@@ -248,8 +248,6 @@ private:
 	// a single token
 	class parse_token
 	{
-		friend class simple_list<parse_token>;
-
 		// operator flags
 		enum
 		{

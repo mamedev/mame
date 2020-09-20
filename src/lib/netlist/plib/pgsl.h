@@ -25,6 +25,8 @@
 #if defined(__has_builtin) // clang and gcc 10
 	#if __has_builtin(__builtin_unreachable)
 		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	#else
+		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 	#endif
 #elif defined(__GNUC__) && !(defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ))
 	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
@@ -34,8 +36,10 @@
 	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 #endif
 
+#if 0
 #undef gsl_Expects
 #define gsl_Expects(e) do {} while (0)
+#endif
 #define gsl_Ensures(e) gsl_Expects(e)
 
 namespace plib {

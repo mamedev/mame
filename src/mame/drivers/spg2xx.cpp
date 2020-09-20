@@ -1862,6 +1862,11 @@ ROM_START( vtechtvsgr )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
 ROM_END
 
+ROM_START( jouet )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jouet.bin", 0x000000, 0x400000, CRC(da46097e) SHA1(f760f4d126a8291b7dacdea7a70691b25ad8b989) )
+ROM_END
+
 ROM_START( senspeed )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "speedracer.bin", 0x000000, 0x800000, CRC(4efbcd39) SHA1(2edffbaa9ea309ad308fa60f32d8b7a98ee313c7) )
@@ -1988,6 +1993,9 @@ CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_s
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
+
+// ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
+CONS( 200?, jouet, 0,             0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "<unknown>",                                              "10 Jeux Interactifs / Jeux Pour Filles (France)",                       MACHINE_NOT_WORKING )
 
 CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_state, empty_init,    "Senario",                                                "Speed Racer (Senario)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

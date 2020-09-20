@@ -412,10 +412,10 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, s16 *buffer, int 
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymz280b_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *lacc = outputs[0];
 	stream_sample_t *racc = outputs[1];
@@ -565,7 +565,7 @@ void ymz280b_device::device_start()
 	}
 
 	/* create the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, INTERNAL_SAMPLE_RATE);
+	m_stream = stream_alloc_legacy(0, 2, INTERNAL_SAMPLE_RATE);
 
 	/* allocate memory */
 	assert(MAX_SAMPLE_CHUNK < 0x10000);

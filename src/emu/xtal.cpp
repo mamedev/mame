@@ -336,6 +336,7 @@ const double XTAL::known_xtals[] = {
 	 25'771'500, /* 25.7715_MHz_XTAL       HP-2622A */
 	 25'920'000, /* 25.92_MHz_XTAL         ADDS Viewpoint 60 */
 	 26'000'000, /* 26_MHz_XTAL            Gaelco PCBs */
+	 26'195'000, /* 26.195_MHz_XTAL        Roland JD-800 */
 	 26'366'000, /* 26.366_MHz_XTAL        DEC VT320 */
 	 26'580'000, /* 26.58_MHz_XTAL         Wyse WY-60 80-column display clock */
 	 26'590'906, /* 26.590906_MHz_XTAL     Atari Jaguar NTSC */
@@ -353,6 +354,7 @@ const double XTAL::known_xtals[] = {
 	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 132-column display clock */
 	 27'956'000, /* 27.956_MHz_XTAL        CIT-101e 132-column display clock */
 	 28'000'000, /* 28_MHz_XTAL            - */
+	 28'224'000, /* 28.224_MHz_XTAL        Roland JD-800 */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */
 	 28'475'000, /* 28.475_MHz_XTAL        CoCo 3 PAL */

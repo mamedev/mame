@@ -1248,7 +1248,7 @@ void floppy_sound_device::device_start()
 	// If we don't have all samples, don't allocate a stream or access sample data.
 	if (m_loaded)
 	{
-		m_sound = machine().sound().stream_alloc(*this, 0, 1, clock()); // per-floppy stream
+		m_sound = stream_alloc_legacy(0, 1, clock()); // per-floppy stream
 	}
 	register_for_save_states();
 }
@@ -1369,10 +1369,10 @@ void floppy_sound_device::step(int zone)
 }
 
 //-------------------------------------------------
-//  sound_stream_update - update the sound stream
+//  sound_stream_update_legacy - update the sound stream
 //-------------------------------------------------
 
-void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void floppy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// We are using only one stream, unlike the parent class
 	// Also, there is no need for interpolation, as we only expect

@@ -45,7 +45,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 private:
 	enum SCSP_STATE { SCSP_ATTACK, SCSP_DECAY1, SCSP_DECAY2, SCSP_RELEASE };
@@ -150,8 +150,8 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
-	stream_sample_t *m_exts0;
-	stream_sample_t *m_exts1;
+	stream_sample_t const *m_exts0;
+	stream_sample_t const *m_exts1;
 
 	int m_length;
 

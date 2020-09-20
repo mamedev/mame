@@ -63,10 +63,7 @@ void sp0250_device::device_start()
 	// output PWM data at the ROMCLOCK frequency
 	int sample_rate = clock() / 2;
 	int frame_rate = sample_rate / (4 * PWM_CLOCKS);
-	if (!m_pwm_mode)
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, frame_rate);
-	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
+	m_stream = stream_alloc(0, 1, m_pwm_mode ? sample_rate : frame_rate);
 
 	// if a DRQ callback is offered, run a timer at the frame rate
 	// to ensure the DRQ gets picked up in a timely manner
@@ -255,17 +252,19 @@ int8_t sp0250_device::next()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *output = outputs[0];
+	auto &output = outputs[0];
+
 	if (!m_pwm_mode)
 	{
-		while (samples-- != 0)
-			*output++ = next() << 8;
+		constexpr stream_buffer::sample_t sample_scale = 1.0 / 128.0;
+		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
+			output.put(sampindex, stream_buffer::sample_t(next()) * sample_scale);
 	}
 	else
 	{
-		while (samples != 0)
+		for (int sampindex = 0; sampindex < output.samples(); )
 		{
 			// see where we're at in the current PWM cycle
 			if (m_pwm_index >= PWM_CLOCKS)
@@ -279,28 +278,27 @@ void sp0250_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 			// determine the value to fill and the number of samples remaining
 			// until it changes
-			stream_sample_t value;
+			stream_buffer::sample_t value;
 			int remaining;
 			if (m_pwm_index < m_pwm_count)
 			{
-				value = 32767;
+				value = 1.0;
 				remaining = m_pwm_count - m_pwm_index;
 			}
 			else
 			{
-				value = 0;
+				value = 0.0;
 				remaining = PWM_CLOCKS - m_pwm_index;
 			}
 
 			// clamp to the number of samples requested and advance the counters
-			if (remaining > samples)
-				remaining = samples;
+			if (remaining > output.samples() - sampindex)
+				remaining = output.samples() - sampindex;
 			m_pwm_index += remaining;
-			samples -= remaining;
 
 			// fill the output
 			while (remaining-- != 0)
-				*output++ = value;
+				outputs[0].put(sampindex++, value);
 		}
 	}
 }

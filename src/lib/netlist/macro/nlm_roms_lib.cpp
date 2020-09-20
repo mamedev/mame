@@ -342,6 +342,39 @@ static NETLIST_START(PROM_MK28000_DIP)
 	ALIAS(24, A.OE1)
 NETLIST_END()
 
+//- Identifier:  ROM_MCM14524_DIP
+//- Title: MCM14524 1024-BIT READ ONLY MEMORY
+//- Pinalias: CLK,EN,B0,B1,B2,B3,A2,GND,A3,A4,A5,A6,A7,A1,A0,VCC
+//- Package: DIP
+//- Param: ROM
+//-    The name of the source to load the rom content from
+//- NamingConvention: Naming conventions follow Motorola datasheet
+//- Limitations:
+//-    Voltage-dependent timing is partially implemented.
+//- FunctionTable:
+//-    http://www.bitsavers.org/components/motorola/_dataBooks/1978_Motorola_CMOS_Data_Book.pdf 7-439 (pdf page 488)
+
+static NETLIST_START(ROM_MCM14524_DIP)
+
+	ROM_MCM14524(A)
+
+	DEFPARAM(ROM, "unknown")
+	PARAM(A.ROM, "$(@.ROM)")
+
+			 /* Motorola MCM14524:      */
+	DIPPINS( /*      +-----..-----+     */
+	  A.CLK, /* /CLK |1         16| VDD */ A.VCC,
+	   A.EN, /*   CE |2         15| A0  */ A.A0,
+	   A.B0, /*   B0 |3   MCM   14| A1  */ A.A1,
+	   A.B1, /*   B1 |4  14524  13| A7  */ A.A7,
+	   A.B2, /*   B2 |5         12| A6  */ A.A6,
+	   A.B3, /*   B3 |6         11| A5  */ A.A5,
+	   A.A2, /*   A2 |7         10| A4  */ A.A4,
+	  A.GND, /*  VSS |8          9| A3  */ A.A3
+			 /*      +------------+ */
+	)
+NETLIST_END()
+
 /*  2102: 1024 x 1-bit Static RAM
  *
  *          +--------------+
@@ -402,6 +435,7 @@ NETLIST_START(roms_lib)
 	LOCAL_LIB_ENTRY(TTL_82S16_DIP)
 	LOCAL_LIB_ENTRY(PROM_82S115_DIP)
 	LOCAL_LIB_ENTRY(PROM_MK28000_DIP)
+	LOCAL_LIB_ENTRY(ROM_MCM14524_DIP)
 	LOCAL_LIB_ENTRY(RAM_2102A_DIP)
 	LOCAL_LIB_ENTRY(ROM_TMS4800_DIP)
 	NETLIST_END()
