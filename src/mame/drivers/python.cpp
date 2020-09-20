@@ -218,7 +218,7 @@ void python_state::ps2_map(address_map &map)
 	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
 }
 
-static INPUT_PORTS_START( pyson )
+static INPUT_PORTS_START( python )
 INPUT_PORTS_END
 
 void python_state::python(machine_config &config)
@@ -226,12 +226,12 @@ void python_state::python(machine_config &config)
 	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pyson_state::ps2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &python_state::ps2_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(pyson_state::screen_update));
+	screen.set_screen_update(FUNC(python_state::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
 
