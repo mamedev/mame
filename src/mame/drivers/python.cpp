@@ -6,9 +6,9 @@ Konami (Bemani) Python (2) Hardware Overview
 Konami 2002-2007
 
 Onmp314 notes:
-To do:
-- Dump other games,
-- boot PS2.
+Konami Python 2 is based on a fat PS2, but with an 
+additional I/O board and (possibly) a different BIOS. 
+The first games on this equipment appeared at the turn of 2004/2005.
 
 This system uses a standard GH-006 PS2 main board (the older Playstation 2 square type) with a
 Sony-supplied PS2 power supply which bolts onto the top of the main board. This power supply
@@ -299,3 +299,7 @@ GAME(2002, python,          0,   python,   python, python_state, empty_init, ROT
 // GAME(2003, rpmred        0,   python,   python, python_state, empty_init, ROT0, "Konami", "R.P.M. Red", MACHINE_IS_SKELETION) /* undumped, satelite */	
 GAME(2002, wswe,       python,   python,   python, python_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style (Japan?)", MACHINE_IS_SKELETON)
 GAME(2003, wswe2k3,    python,   python,   python, python_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003 (Japan?)", MACHINE_IS_SKELETON)
+	
+// Konami Python (2nd generation)
+
+// GAME(2004?, python2,          0,   python,   python, python_state, empty_init, ROT0, "Konami", "Konami Python 2 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT) /* undumped, perhaps Python 2 is based on Python BIOS */	
