@@ -1081,6 +1081,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 		for ( ; dstindex < numsamples; dstindex++)
 		{
 			// if still within the current sample, just replicate
+			srcpos += step;
 			if (srcpos <= 1.0)
 				output.put(dstindex, cursample);
 
@@ -1093,7 +1094,6 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 				cursample = rebased.get(srcindex++);
 				output.put(dstindex, stepinv * (prevsample * (step - srcpos) + srcpos * cursample));
 			}
-			srcpos += step;
 		}
 		sound_assert(srcindex <= rebased.samples());
 	}
