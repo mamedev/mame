@@ -21423,6 +21423,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- this 'prototype' set has also been found on a PAL/UK Radica Out Run 2019 Plug & Play unit (see rad_orun in megadriv_rad.cpp) -->
 	<software name="outr2019up" cloneof="outr2019">
 		<description>Out Run 2019 (USA, Prototype)</description>
 		<year>1993</year>
