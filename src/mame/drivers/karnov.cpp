@@ -343,7 +343,7 @@ void karnov_state::karnovjbl_map(address_map &map)
 {
 	karnov_map(map);
 	map(0x0c0000, 0x0c0001).portr("P1_P2").nopw();
-	map(0x0c0006, 0x0c0007).noprw();
+	map(0x0c0006, 0x0c0007).lr16(NAME([]() { return 0x56a; })).lw16(NAME([this](u16 data) { m_maincpu->set_input_line(6, HOLD_LINE); }));
 }
 
 void karnov_state::wndrplnt_map(address_map &map)
