@@ -22216,6 +22216,7 @@ rad_gen1                        // (c)2004 Radica
 rad_gen2                        // (c)2004 Radica
 rad_ssoc                        // (c)2004 Radica
 rad_sonic
+rad_orun
 
 @source:megaphx.cpp
 megaphx                         // (c) 1991 Dinamic / Inder
@@ -32251,8 +32252,11 @@ zdog
 otrail
 denv150
 techni4
-duetpp
+sporzpp
 sporzbx
+sporztn
+wldsoctv
+solargm	
 ablmini
 senwld
 zonefusn
@@ -38126,6 +38130,7 @@ senspeed
 ordentv
 wfcentro
 tiktokmm
+jouet
 
 @source:spg2xx_digimake.cpp
 rad_digi
