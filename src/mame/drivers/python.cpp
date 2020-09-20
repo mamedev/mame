@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Guru, Scott Stone
+// copyright-holders:Guru, Scott Stone, Onmp314
 /***************************************************************************
 
-Konami Pyson Hardware Overview
-Konami 2001-2005
+Konami (Bemani) Python (2) Hardware Overview
+Konami 2002-2007
+
+Onmp314 notes:
+To do:
+- Dump other games,
+- boot PS2.
 
 This system uses a standard GH-006 PS2 main board (the older Playstation 2 square type) with a
 Sony-supplied PS2 power supply which bolts onto the top of the main board. This power supply
@@ -23,16 +28,34 @@ Game Title                                             Label       Label        
 *Baseball Heroes 2005
 *Battle Climaxx!
 *Battle Climaxx! 2
+*Dance 86.4 Funky Radio Station (Bemani Python 2)
+*Dance Dance Revolution SuperNOVA (Bemani Python 2)
+*Dance Dance Revolution SuperNOVA 2 (Bemani Python 2)
+*Drum Mania V (Bemani Python 2)
+*Drum Mania V2 (Bemani Python 2)
+*Drum Mania V3 (Bemani Python 2)
+*Dancing Stage Fusion (Bemani Python 1)
 *Dog Station
 *Dog Station Deluxe
-*Hawaiian De Golf
+*Guitar Freaks V (Bemani Python 2)
+*Guitar Freaks V2 (Bemani Python 2)
+*Guitar Freaks V3 (Bemani Python 2)
 *Monster Gate Online
 *Monster Gate Online 2
 *Nice Smash!
 *Paintball Mania
 *Perfect Pool
 *Pool Pocket Fortunes
+Pop'n Music 9 (Bemani Python 1)
+*Pop'n Music 10 (Bemani Python 2 (?))
+*Pop'n Music 11 (Bemani Python 2 (?))
+*Pop'n Music 12 Iroha (Bemani Python 2 (?))
+*Pop'n Music 13 Carnival (Bemani Python 2 (?))
+*Pop'n Music 14 Fever! (Bemani Python 2 (?))
 *R.P.M. Red
+*Thrill Drive 3 (Python 2)
+*Toy's March (Bemani Python 2)
+*Toy's March 2 (Bemani Python 2)
 World Soccer Winning Eleven Arcade Game Style          C18JAA03    DIN5 dongle GCC27JA    KN00002
 World Soccer Winning Eleven Arcade Game Style 2003     C27JAA03    not used               KN00002
 ---------------------------------------------------------------------------------------------------------
@@ -43,7 +66,7 @@ Konami PCB Layout
 -----------------
 
 PWB0000106626
-KONAMI 2001
+KONAMI 2002
   |-----------------------------------------|
   |          CN5  CN7  CN2               CN3|
 |-|                                         |
@@ -157,15 +180,15 @@ Notes:
 #include "screen.h"
 
 
-class pyson_state : public driver_device
+class python_state : public driver_device
 {
 public:
-	pyson_state(const machine_config &mconfig, device_type type, const char *tag)
+	python_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	void pyson(machine_config &config);
+	void python(machine_config &config);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -180,16 +203,16 @@ private:
 };
 
 
-void pyson_state::video_start()
+void python_state::video_start()
 {
 }
 
-uint32_t pyson_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t python_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void pyson_state::ps2_map(address_map &map)
+void python_state::ps2_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
 	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
@@ -198,7 +221,7 @@ void pyson_state::ps2_map(address_map &map)
 static INPUT_PORTS_START( pyson )
 INPUT_PORTS_END
 
-void pyson_state::pyson(machine_config &config)
+void python_state::python(machine_config &config)
 {
 	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
 	m_maincpu->set_icache_size(16384);
@@ -215,12 +238,12 @@ void pyson_state::pyson(machine_config &config)
 	PALETTE(config, "palette").set_entries(65536);
 }
 
-#define PYSON_BIOS  \
+#define PYTHON_BIOS  \
 		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) )
 
-ROM_START( pyson )
+ROM_START( python )
 	ROM_REGION32_LE(0x200000, "bios", 0)
-	PYSON_BIOS
+	PYTHON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
 	DISK_REGION( "ide:0:hdd:image" )
@@ -228,7 +251,7 @@ ROM_END
 
 ROM_START( wswe )
 	ROM_REGION32_LE(0x200000, "bios", 0)
-	PYSON_BIOS
+	PYTHON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
 		ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(bd1770aa) SHA1(be217d6d7648e529953ea25caad904394919644c) )
@@ -243,7 +266,7 @@ ROM_END
 
 ROM_START( wswe2k3 )
 	ROM_REGION32_LE(0x200000, "bios", 0)
-	PYSON_BIOS
+	PYTHON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
 		ROM_LOAD( "kn00002.ic002",     0x000000, 0x800000, CRC(6f5b7309) SHA1(5e9d75497c3a3a92af41b20e41991c9c5837d50a) )
@@ -257,6 +280,22 @@ ROM_START( wswe2k3 )
 ROM_END
 
 
-GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
+// Konami Python (1st generation)
+
+GAME(2002, python,          0,   python,   python, python_state, empty_init, ROT0, "Konami", "Konami Python BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+// GAME(2005, basher05,          0,   python,   python, python_state, empty_init, ROT0, "Konami", "Baseball Heroes 2005", MACHINE_IS_SKELETION) /* undumped, satelite */
+// GAME(2004, batcm,         0,   python,   python, python_state, empty_init, ROT0, "Konami", "Battle Climaxx!", MACHINE_IS_SKELETION) /* undumped, satelite */
+// GAME(2005, batcm2,        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Battle Climaxx! 2", MACHINE_IS_SKELETION) /* undumped, satelite */
+// GAME(2005, dsfs,         0,   python,   python, python_state, empty_init, ROT0, "Konami", "Dancing Stage Fusion (Europe)", MACHINE_IS_SKELETION) /* undumped, Bemani Python 1 */
+// GAME(2002, dogst,        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Dog Station", MACHINE_IS_SKELETION) /* undumped, requires keyboard */
+// GAME(2002, dogstdx,        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Dog Station Deluxe", MACHINE_IS_SKELETION) /* undumped, requires keyboard */
+// GAME(2004, monsron,        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Monster Gate Online", MACHINE_IS_SKELETION) /* undumped, satelite */
+// GAME(2005, monsron2,        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Monster Gate Online 2", MACHINE_IS_SKELETION) /* undumped, satelite */
+// GAME(2002, nicesm,        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Nice Smash!", MACHINE_IS_SKELETION) /* undumped */
+// GAME(2005, paiblmn        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Paintball Mania", MACHINE_IS_SKELETION)	/* undumped */
+// GAME(2002, perpool        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Perfect Pool", MACHINE_IS_SKELETION) /* undumped, mechanical parts? */
+// GAME(2002, poolpf        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Pool Pocket Fortunes", MACHINE_IS_SKELETION) /* undumped */
+// GAME(2003, popn9        0,   python,   python, python_state, empty_init, ROT0, "Konami", "Pop'n Music 9", MACHINE_IS_SKELETION) /* TODO: move from viper.cpp, Bemani Python 1 */
+// GAME(2003, rpmred        0,   python,   python, python_state, empty_init, ROT0, "Konami", "R.P.M. Red", MACHINE_IS_SKELETION) /* undumped, satelite */	
+GAME(2002, wswe,       python,   python,   python, python_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style (Japan?)", MACHINE_IS_SKELETON)
+GAME(2003, wswe2k3,    python,   python,   python, python_state, empty_init, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003 (Japan?)", MACHINE_IS_SKELETON)
