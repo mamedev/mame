@@ -112,14 +112,14 @@ void bl_handhelds_menucontrol_device::handle_command()
 		// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
 		if (m_is_unsp_type_hack)
 		{
-			if (command == 0x0b)
-			{
-				m_menupos -= 0xdc;
-			}
-			else if (command == 0x0e)
-			{
-				m_menupos -= 0x314;
-			}
+			if (command == 0x0d)
+				m_menupos += 4;
+			else if (command == 0x0a)
+				m_menupos += 0;
+			// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
+			// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
+			else if (command == 0x1e)
+				m_menupos += 0x310;
 		}
 		else
 		{
@@ -134,14 +134,15 @@ void bl_handhelds_menucontrol_device::handle_command()
 		// used if you try to scroll down past the and the value becomes too large
 		if (m_is_unsp_type_hack)
 		{
-			if (command == 0x0d)
-				m_menupos += 4;
-			else if (command == 0x0a)
-				m_menupos += 0;
-			// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
-			// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
-			else if (command == 0x1e)
-				m_menupos += 0x310;
+			// actually writes 0x313 split into 2 commands, so the 2nd write to 0x05 with param then instead 0b/16 sequence of writes instead of 26/0c subtracts from the high byte?
+			if (command == 0x0b)
+			{
+				m_menupos -= 0xdc;
+			}
+			else if (command == 0x0e)
+			{
+				m_menupos -= 0x314;
+			}
 		}
 		else
 		{
