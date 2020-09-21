@@ -51,7 +51,6 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	outputs[0].fill(0);
 	outputs[1].fill(0);
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int ch = 0; ch < 6; ch++)
 	{
 		channel *chan = &m_channel[ch];
@@ -88,8 +87,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 						// based on Charles MacDonald's research
 						chan->noise_seed = (seed >> 1) | ((BIT(seed, 0) ^ BIT(seed, 1) ^ BIT(seed, 11) ^ BIT(seed, 12) ^ BIT(seed, 17)) << 17);
 					}
-					outputs[0].add(i, stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
-					outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
+					outputs[0].add_int(i, s16(vll * (data - 16)), 32768);
+					outputs[1].add_int(i, s16(vlr * (data - 16)), 32768);
 				}
 			}
 			else
@@ -98,8 +97,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				/* DDA mode */
 				for (int i = 0; i < outputs[0].samples(); i++)
 				{
-					outputs[0].add(i, stream_buffer::sample_t(s16(vll * (chan->dda - 16))) * sample_scale);
-					outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (chan->dda - 16))) * sample_scale);
+					outputs[0].add_int(i, s16(vll * (chan->dda - 16)), 32768);
+					outputs[1].add_int(i, s16(vlr * (chan->dda - 16)), 32768);
 				}
 			}
 			else
@@ -138,8 +137,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 								lfo_dstchan->tick = step;
 								lfo_dstchan->index = (lfo_dstchan->index + 1) & 0x1f;
 							}
-							outputs[0].add(i, stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
-							outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
+							outputs[0].add_int(i, s16(vll * (data - 16)), 32768);
+							outputs[1].add_int(i, s16(vlr * (data - 16)), 32768);
 						}
 					}
 				}
@@ -156,8 +155,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 							chan->tick = step;
 							chan->index = (chan->index + 1) & 0x1f;
 						}
-						outputs[0].add(i, stream_buffer::sample_t(s16(vll * (data - 16))) * sample_scale);
-						outputs[1].add(i, stream_buffer::sample_t(s16(vlr * (data - 16))) * sample_scale);
+						outputs[0].add_int(i, s16(vll * (data - 16)), 32768);
+						outputs[1].add_int(i, s16(vlr * (data - 16)), 32768);
 					}
 				}
 			}

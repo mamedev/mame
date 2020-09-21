@@ -344,7 +344,6 @@ void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, writ
 		return;
 
 	// loop while we still have samples to generate
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 2048.0;
 	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		// fetch the next sample byte
@@ -352,7 +351,7 @@ void okim6295_device::okim_voice::generate_adpcm(device_rom_interface &rom, writ
 
 		// output to the buffer, scaling by the volume
 		// signal in range -2048..2047
-		buffer.add(sampindex, m_adpcm.clock(nibble) * sample_scale * m_volume);
+		buffer.add_int(sampindex, m_adpcm.clock(nibble) * m_volume, 2048);
 
 		// next!
 		if (++m_sample >= m_count)

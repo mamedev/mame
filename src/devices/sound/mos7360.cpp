@@ -463,7 +463,6 @@ void mos7360_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	int i, v, a;
 	auto &buffer = outputs[0];
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (i = 0; i < buffer.samples(); i++)
 	{
 		v = 0;
@@ -507,7 +506,7 @@ void mos7360_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 		v = v * a;
 
-		buffer.put(i, stream_buffer::sample_t(v) * sample_scale);
+		buffer.put_int(i, v, 32768);
 	}
 }
 

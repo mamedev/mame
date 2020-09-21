@@ -23,7 +23,6 @@ constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(m
 
 void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		s32 samp0 = inputs[0].get(i) * 32768.0;
@@ -40,8 +39,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			samp1 = clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 3), -32768, 32767);
 		}
 
-		outputs[0].put(i, stream_buffer::sample_t(samp0) * sample_scale);
-		outputs[1].put(i, stream_buffer::sample_t(samp1) * sample_scale);
+		outputs[0].put_int(i, samp0, 32768);
+		outputs[1].put_int(i, samp1, 32768);
 	}
 }
 

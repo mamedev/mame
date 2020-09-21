@@ -370,7 +370,6 @@ u16 ks0164_device::uncomp_8_16(u8 value)
 
 void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 32.0);
 	for(int sample = 0; sample != outputs[0].samples(); sample++) {
 		s32 suml = 0, sumr = 0;
 		for(int voice = 0; voice < 0x20; voice++) {
@@ -416,7 +415,7 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				sumr += samp;
 			}
 		}
-		outputs[0].put(sample, stream_buffer::sample_t(suml) * sample_scale);
-		outputs[1].put(sample, stream_buffer::sample_t(sumr) * sample_scale);
+		outputs[0].put_int(sample, suml, 32768 * 32);
+		outputs[1].put_int(sample, sumr, 32768 * 32);
 	}
 }

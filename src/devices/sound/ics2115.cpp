@@ -391,7 +391,6 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 	const u16 fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3f)<< (10 - fine);
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * (1 << (5 + volume_bits)));
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
@@ -411,8 +410,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 		{
 		/*if (voice.playing())
 		{*/
-			outputs[0].add(i, stream_buffer::sample_t(sample * vleft) * sample_scale);
-			outputs[1].add(i, stream_buffer::sample_t(sample * vright) * sample_scale);
+			outputs[0].add_int(i, (sample * vleft) >> (5 + volume_bits), 32768);
+			outputs[1].add_int(i, (sample * vright) >> (5 + volume_bits), 32768);
 		}
 
 		voice.update_ramp();

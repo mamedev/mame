@@ -164,7 +164,6 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 	int i;
 	int16_t *audio_cache = (int16_t *) m_audio_cache.get();
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int sampindex = 0; sampindex < bufL.samples(); )
 	{
 		/* if no file, audio not playing, audio paused, or out of disc data,
@@ -191,8 +190,8 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 		for (i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
-			bufL.put(sampindex + i, stream_buffer::sample_t(s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ))) * sample_scale); m_audio_bptr++;
-			bufR.put(sampindex + i, stream_buffer::sample_t(s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ))) * sample_scale); m_audio_bptr++;
+			bufL.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
+			bufR.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
 		}
 
 		sampindex += samples;
