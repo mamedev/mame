@@ -37,10 +37,49 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLUS-01300, SLUS-01300CE"/>
+		<info name="release" value="20001120"/>
+		<info name="barcode" value="0 14633 12539 9, 0 14633 14251 8"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="007 racing (usa)" sha1="b0d5e1641367d45c6f187c5c6249371c95636e5a"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="007twine">
+		<!-- Original images (Redump)
+		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
+		<rom name="007 - The World Is Not Enough (USA).bin" size="726429312" crc="6e91b75f" sha1="0d6f886485318959b9a86209a91228840b61fbad"/>
+		-->
+		<description>007 - The World Is Not Enough (USA)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLUS-01272, SLUS-01272GH"/>
+		<info name="release" value="20001108"/>
+		<info name="barcode" value="0 14633 14185 6"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - the world is not enough (usa)" sha1="d79f4b8ce9db7c5dacd841e7d7ebbb306f88de70"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- boot OK -->
+	<software name="007twinep" cloneof="007twine">
+		<!-- Original images (Redump)
+		<rom name="007 - The World Is Not Enough (USA) (Beta).cue" size="108" crc="f2614b92" sha1="dd1f6569bd7b5ef77b61732d2b225b6901128c73"/>
+		<rom name="007 - The World Is Not Enough (USA) (Beta).bin" size="750278592" crc="a709d8bd" sha1="edb14c9b988cf2a6052c9f770a0190077bd7de8e"/>
+		-->
+		<description>007 - The World Is Not Enough (USA, Prototype)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLUS-00978"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - the world is not enough (usa) (beta)" sha1="385715ee6e34fa375a25582b9f3ebf03f46a1418"/>
 			</diskarea>
 		</part>
 	</software>
@@ -56,6 +95,8 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLUS-00975, SLUS-00975CE, SLUS-00975GH"/>
+		<info name="release" value="19991116"/>
+		<info name="barcode" value="0 14633 09749 8, 014633125399"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -64,19 +105,170 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007twine">
+	<software name="1xtreme">
 		<!-- Original images (Redump)
-		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
-		<rom name="007 - The World Is Not Enough (USA).bin" size="726429312" crc="6e91b75f" sha1="0d6f886485318959b9a86209a91228840b61fbad"/>
+		<rom name="1Xtreme (USA).cue" size="700" crc="fe46298f" sha1="1c435695dc2049bc6e6fd863952451cd834c50f5"/>
+		<rom name="1Xtreme (USA) (Track 1).bin" size="106148112" crc="fa91ae7d" sha1="cd5b1d751a29b7438155eed9172fc9e63aea81df"/>
+		<rom name="1Xtreme (USA) (Track 2).bin" size="60213552" crc="4531bb15" sha1="209fcd68a66f2d1523f05d3a1b9147a8454f454c"/>
+		<rom name="1Xtreme (USA) (Track 3).bin" size="66371088" crc="240ae824" sha1="a9066257cdc1e4ddb9e9d66bf0893c5f78c11344"/>
+		<rom name="1Xtreme (USA) (Track 4).bin" size="54460560" crc="12d6a5d5" sha1="901ee2af3f312e7c52825d04f0bc3f1dbe14827c"/>
+		<rom name="1Xtreme (USA) (Track 5).bin" size="67222512" crc="78e5eb51" sha1="397ab9e6bf14ddd6018e012de13d13dc9bb8f3c1"/>
+		<rom name="1Xtreme (USA) (Track 6).bin" size="63391104" crc="0be5297f" sha1="5ddf648f9ee3eb7a8b780b9383a4ecd7a1b5d2a5"/>
+		<rom name="1Xtreme (USA) (Track 7).bin" size="63035952" crc="9cee0906" sha1="b03a441e27ccfd27f72f5330f1e9e2f3cf9665d9"/>
+		<rom name="1Xtreme (USA) (Track 8).bin" size="63035952" crc="9cee0906" sha1="b03a441e27ccfd27f72f5330f1e9e2f3cf9665d9"/>
 		-->
-		<description>007 - The World Is Not Enough (USA)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLUS-01272, SLUS-01272GH"/>
+		<description>1Xtreme (USA)</description>
+		<year>1995</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94503"/>
+		<info name="release" value="19951210"/>
+		<info name="barcode" value="7 11719 45032 0"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 - the world is not enough (usa)" sha1="d79f4b8ce9db7c5dacd841e7d7ebbb306f88de70"/>
+				<disk name="1xtreme (usa)" sha1="dc9659759bbc1b7b46d7eb86718592a6bdfc96ae"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="fifa2k2w">
+		<!-- Original images (Redump)
+		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
+		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
+		-->
+		<description>2002 FIFA World Cup (USA)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLUS-01449"/>
+		<info name="release" value="20020423"/>
+		<info name="barcode" value="0 14633 14482 6"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 fifa world cup (usa) (en,es)" sha1="94ed77c9560169b79a0ea310e4c0e8f3919a0055"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="2xtreme">
+		<!-- Original images (Redump)
+		<rom name="2Xtreme (USA).cue" size="700" crc="7e95393e" sha1="ed526fe2905f428530cc001038dd72c413bbe291"/>
+		<rom name="2Xtreme (USA) (Track 1).bin" size="45715824" crc="aad124a6" sha1="3f25e5d1366e60e70a416109711e109d48c9f19b"/>
+		<rom name="2Xtreme (USA) (Track 2).bin" size="56064624" crc="6f8d371b" sha1="9b986d87e8314c72757f629f6d7201bdeb0190b0"/>
+		<rom name="2Xtreme (USA) (Track 3).bin" size="80120880" crc="162546d0" sha1="c37b8229fbabf82d1fd998b3e38f84f33bf62462"/>
+		<rom name="2Xtreme (USA) (Track 4).bin" size="76465872" crc="50225eae" sha1="ea6ed6e3d9b32cc78b2ed207165015bf5f37046a"/>
+		<rom name="2Xtreme (USA) (Track 5).bin" size="64992816" crc="11e2eb17" sha1="b79dd757b07e6540ac886b0b2f58b042ae9f8628"/>
+		<rom name="2Xtreme (USA) (Track 6).bin" size="60799200" crc="326d328e" sha1="133d61d62c239ca9efe3ff6b8d36944ef6955322"/>
+		<rom name="2Xtreme (USA) (Track 7).bin" size="76423536" crc="7b086381" sha1="793799dfa58aee0d825cfb43cd7dae59d1337c08"/>
+		<rom name="2Xtreme (USA) (Track 8).bin" size="19733280" crc="04dfaa48" sha1="9ea7615182e887372ec8e5b1c1df83696ec07d4d"/>
+		-->
+		<description>2Xtreme (USA)</description>
+		<year>1996</year>
+		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="serial" value="SCUS-94508"/>
+		<info name="release" value="19961031"/>
+		<info name="barcode" value="7 11719 45082 5"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="2xtreme (usa)" sha1="cf2eda5444f604fdfdc6e38c12c4a92a58749044"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="3dbball">
+		<!-- Original images (Redump)
+		<rom name="3D Baseball (USA).cue" size="83" crc="28127db0" sha1="c9b88e2c7bbddefe7cb7077f8209278156523ded"/>
+		<rom name="3D Baseball (USA).bin" size="451685136" crc="e44b3ce4" sha1="622248c1abc14c70ca9a00d7aea3b72451f80593"/>
+		-->
+		<description>3D Baseball (USA)</description>
+		<year>1996</year>
+		<publisher>Crystal Dynamics</publisher>
+		<info name="serial" value="SLUS-00066"/>
+		<info name="release" value="19961031"/>
+		<info name="barcode" value="0 24294 12617 8"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3d baseball (usa)" sha1="046bb57577ed7bfdd9e8a98ca1ba324d6eb5a91e"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="3dlemmin">
+		<!-- Original images (Redump)
+		<rom name="3D Lemmings (USA).cue" size="2670" crc="b394a6d2" sha1="b2b3cbba19838d9883c5042f5119a2e531e93484"/>
+		<rom name="3D Lemmings (USA) (Track 01).bin" size="192184272" crc="b7dbfea7" sha1="f713cdcb5d0e3d875031dbdc438dbbab0cdd3340"/>
+		<rom name="3D Lemmings (USA) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
+		<rom name="3D Lemmings (USA) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
+		<rom name="3D Lemmings (USA) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
+		<rom name="3D Lemmings (USA) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
+		<rom name="3D Lemmings (USA) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
+		<rom name="3D Lemmings (USA) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
+		<rom name="3D Lemmings (USA) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
+		<rom name="3D Lemmings (USA) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
+		<rom name="3D Lemmings (USA) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
+		<rom name="3D Lemmings (USA) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
+		<rom name="3D Lemmings (USA) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
+		<rom name="3D Lemmings (USA) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
+		<rom name="3D Lemmings (USA) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
+		<rom name="3D Lemmings (USA) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
+		<rom name="3D Lemmings (USA) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
+		<rom name="3D Lemmings (USA) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
+		<rom name="3D Lemmings (USA) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
+		<rom name="3D Lemmings (USA) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
+		<rom name="3D Lemmings (USA) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
+		<rom name="3D Lemmings (USA) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
+		<rom name="3D Lemmings (USA) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
+		<rom name="3D Lemmings (USA) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		<rom name="3D Lemmings (USA) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		-->
+		<description>3D Lemmings (USA)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="serial" value="SCUS-94601"/>
+		<info name="release" value="19950731"/>
+		<info name="barcode" value="7 11719 46012 1"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3d lemmings (usa)" sha1="ce0fe62049e1f2567b7e4e66f209d97713fb54d8"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="3xtreme">
+		<!-- Original images (Redump)
+		<rom name="3Xtreme (USA) (Track 1).bin" size="340649568" crc="c16782c6" sha1="4e6ced10157eda5e1881e95d1bd8363ae6b560f8"/>
+		<rom name="3Xtreme (USA) (Track 2).bin" size="26732832" crc="efb07e5e" sha1="60da792ac141a78f7fe875788d0e73b5bc1b943d"/>
+		-->
+		<description>3Xtreme (USA)</description>
+		<year>1999</year>
+		<publisher>989 Studios</publisher>
+		<info name="serial" value="SCUS-94231"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="3xtreme (usa)" sha1="dbc36461c1491be04b9b41cdb43f5aacc5b8d219"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="40winks">
+		<!-- Original images (Redump)
+		<rom name="40 Winks (USA).cue" size="80" crc="1d060c48" sha1="327eb468983d8aeebc67998a7e8a017d5c41bdd3"/>
+		<rom name="40 Winks (USA).bin" size="540854160" crc="5b53f0a5" sha1="68b0e80f3f59cb673fc5ae7c4ebb8eba4a7b6a50"/>
+		-->
+		<description>40 Winks (USA)</description>
+		<year>1999</year>
+		<publisher>GT Interactive Software</publisher>
+		<info name="serial" value="SLUS-00874"/>
+		<info name="release" value="19991114"/>
+		<info name="barcode" value="7 42725 19815 9"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="40 winks (usa)" sha1="8247541f750a4dbe16ed653a9db0e7a9a8ddfc12"/>
 			</diskarea>
 		</part>
 	</software>
@@ -210,111 +402,6 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="1xtreme">
-		<!-- Original images (Redump)
-		<rom name="1Xtreme (USA).cue" size="700" crc="fe46298f" sha1="1c435695dc2049bc6e6fd863952451cd834c50f5"/>
-		<rom name="1Xtreme (USA) (Track 1).bin" size="106148112" crc="fa91ae7d" sha1="cd5b1d751a29b7438155eed9172fc9e63aea81df"/>
-		<rom name="1Xtreme (USA) (Track 2).bin" size="60213552" crc="4531bb15" sha1="209fcd68a66f2d1523f05d3a1b9147a8454f454c"/>
-		<rom name="1Xtreme (USA) (Track 3).bin" size="66371088" crc="240ae824" sha1="a9066257cdc1e4ddb9e9d66bf0893c5f78c11344"/>
-		<rom name="1Xtreme (USA) (Track 4).bin" size="54460560" crc="12d6a5d5" sha1="901ee2af3f312e7c52825d04f0bc3f1dbe14827c"/>
-		<rom name="1Xtreme (USA) (Track 5).bin" size="67222512" crc="78e5eb51" sha1="397ab9e6bf14ddd6018e012de13d13dc9bb8f3c1"/>
-		<rom name="1Xtreme (USA) (Track 6).bin" size="63391104" crc="0be5297f" sha1="5ddf648f9ee3eb7a8b780b9383a4ecd7a1b5d2a5"/>
-		<rom name="1Xtreme (USA) (Track 7).bin" size="63035952" crc="9cee0906" sha1="b03a441e27ccfd27f72f5330f1e9e2f3cf9665d9"/>
-		<rom name="1Xtreme (USA) (Track 8).bin" size="63035952" crc="9cee0906" sha1="b03a441e27ccfd27f72f5330f1e9e2f3cf9665d9"/>
-		-->
-		<description>1Xtreme (USA)</description>
-		<year>1995</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="SCUS-94503"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="1xtreme (usa)" sha1="dc9659759bbc1b7b46d7eb86718592a6bdfc96ae"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="2xtreme">
-		<!-- Original images (Redump)
-		<rom name="2Xtreme (USA).cue" size="700" crc="7e95393e" sha1="ed526fe2905f428530cc001038dd72c413bbe291"/>
-		<rom name="2Xtreme (USA) (Track 1).bin" size="45715824" crc="aad124a6" sha1="3f25e5d1366e60e70a416109711e109d48c9f19b"/>
-		<rom name="2Xtreme (USA) (Track 2).bin" size="56064624" crc="6f8d371b" sha1="9b986d87e8314c72757f629f6d7201bdeb0190b0"/>
-		<rom name="2Xtreme (USA) (Track 3).bin" size="80120880" crc="162546d0" sha1="c37b8229fbabf82d1fd998b3e38f84f33bf62462"/>
-		<rom name="2Xtreme (USA) (Track 4).bin" size="76465872" crc="50225eae" sha1="ea6ed6e3d9b32cc78b2ed207165015bf5f37046a"/>
-		<rom name="2Xtreme (USA) (Track 5).bin" size="64992816" crc="11e2eb17" sha1="b79dd757b07e6540ac886b0b2f58b042ae9f8628"/>
-		<rom name="2Xtreme (USA) (Track 6).bin" size="60799200" crc="326d328e" sha1="133d61d62c239ca9efe3ff6b8d36944ef6955322"/>
-		<rom name="2Xtreme (USA) (Track 7).bin" size="76423536" crc="7b086381" sha1="793799dfa58aee0d825cfb43cd7dae59d1337c08"/>
-		<rom name="2Xtreme (USA) (Track 8).bin" size="19733280" crc="04dfaa48" sha1="9ea7615182e887372ec8e5b1c1df83696ec07d4d"/>
-		-->
-		<description>2Xtreme (USA)</description>
-		<year>1996</year>
-		<publisher>Sony Computer Entertainment America</publisher>
-		<info name="serial" value="SCUS-94508"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2xtreme (usa)" sha1="cf2eda5444f604fdfdc6e38c12c4a92a58749044"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="3dbball">
-		<!-- Original images (Redump)
-		<rom name="3D Baseball (USA).cue" size="83" crc="28127db0" sha1="c9b88e2c7bbddefe7cb7077f8209278156523ded"/>
-		<rom name="3D Baseball (USA).bin" size="451685136" crc="e44b3ce4" sha1="622248c1abc14c70ca9a00d7aea3b72451f80593"/>
-		-->
-		<description>3D Baseball (USA)</description>
-		<year>1996</year>
-		<publisher>Crystal Dynamics</publisher>
-		<info name="serial" value="SLUS-00066"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="3d baseball (usa)" sha1="046bb57577ed7bfdd9e8a98ca1ba324d6eb5a91e"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="3dlemmin">
-		<!-- Original images (Redump)
-		<rom name="3D Lemmings (USA).cue" size="2670" crc="b394a6d2" sha1="b2b3cbba19838d9883c5042f5119a2e531e93484"/>
-		<rom name="3D Lemmings (USA) (Track 01).bin" size="192184272" crc="b7dbfea7" sha1="f713cdcb5d0e3d875031dbdc438dbbab0cdd3340"/>
-		<rom name="3D Lemmings (USA) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
-		<rom name="3D Lemmings (USA) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
-		<rom name="3D Lemmings (USA) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
-		<rom name="3D Lemmings (USA) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
-		<rom name="3D Lemmings (USA) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
-		<rom name="3D Lemmings (USA) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
-		<rom name="3D Lemmings (USA) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
-		<rom name="3D Lemmings (USA) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
-		<rom name="3D Lemmings (USA) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
-		<rom name="3D Lemmings (USA) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
-		<rom name="3D Lemmings (USA) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
-		<rom name="3D Lemmings (USA) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
-		<rom name="3D Lemmings (USA) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
-		<rom name="3D Lemmings (USA) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
-		<rom name="3D Lemmings (USA) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
-		<rom name="3D Lemmings (USA) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
-		<rom name="3D Lemmings (USA) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
-		<rom name="3D Lemmings (USA) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
-		<rom name="3D Lemmings (USA) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
-		<rom name="3D Lemmings (USA) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
-		<rom name="3D Lemmings (USA) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
-		<rom name="3D Lemmings (USA) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
-		<rom name="3D Lemmings (USA) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
-		-->
-		<description>3D Lemmings (USA)</description>
-		<year>1997</year>
-		<publisher>Psygnosis</publisher>
-		<info name="serial" value="SCUS-94601"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="3d lemmings (usa)" sha1="ce0fe62049e1f2567b7e4e66f209d97713fb54d8"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="3stooges">
 		<!-- Original images (Redump)
 		<rom name="Three Stooges, The (USA).cue" size="1529" crc="1cbb208c" sha1="be7bb517e3ef02b9ab6cc2a604210b8d83604fa4"/>
@@ -340,40 +427,6 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="three stooges, the (usa)" sha1="ad4be5edcf0daa1a2017de2bbf13729b3e7aa4f6"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="3xtreme">
-		<!-- Original images (Redump)
-		<rom name="3Xtreme (USA) (Track 1).bin" size="340649568" crc="c16782c6" sha1="4e6ced10157eda5e1881e95d1bd8363ae6b560f8"/>
-		<rom name="3Xtreme (USA) (Track 2).bin" size="26732832" crc="efb07e5e" sha1="60da792ac141a78f7fe875788d0e73b5bc1b943d"/>
-		-->
-		<description>3Xtreme (USA)</description>
-		<year>1999</year>
-		<publisher>989 Studios</publisher>
-		<info name="serial" value="SCUS-94231"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="3xtreme (usa)" sha1="dbc36461c1491be04b9b41cdb43f5aacc5b8d219"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="40winks">
-		<!-- Original images (Redump)
-		<rom name="40 Winks (USA).cue" size="80" crc="1d060c48" sha1="327eb468983d8aeebc67998a7e8a017d5c41bdd3"/>
-		<rom name="40 Winks (USA).bin" size="540854160" crc="5b53f0a5" sha1="68b0e80f3f59cb673fc5ae7c4ebb8eba4a7b6a50"/>
-		-->
-		<description>40 Winks (USA)</description>
-		<year>1999</year>
-		<publisher>GT Interactive Software</publisher>
-		<info name="serial" value="SLUS-00874"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="40 winks (usa)" sha1="8247541f750a4dbe16ed653a9db0e7a9a8ddfc12"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9114,23 +9167,6 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fifa soccer 2002 (usa) (en,es)" sha1="51a3fa513693c6090497a690f197161f340b2845"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
-		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
-		-->
-		<description>2002 FIFA World Cup (USA)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLUS-01449"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup (usa) (en,es)" sha1="94ed77c9560169b79a0ea310e4c0e8f3919a0055"/>
 			</diskarea>
 		</part>
 	</software>
@@ -31383,6 +31419,24 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 <!-- LIGHTSPAN EDUSOFT FROM REDUMP SET -->
 <!-- WE SPLIT THEM HERE BECAUSE THEY USE A SEPARATE CODE SYSTEM -->
 
+	<!-- boot OK -->
+	<software name="16tales1">
+		<!-- Original images (Redump)
+		<rom name="16 Tales 1 (USA).cue" size="82" crc="79224c44" sha1="d887c3ed3f743b8dfe0579db1e4884ab00736f96"/>
+		<rom name="16 Tales 1 (USA).bin" size="622045200" crc="eaba661f" sha1="d57b2141d93c179a638c92cd9dd501fd3ec83c44"/>
+		-->
+		<description>16 Tales 1 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99012101"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="16 tales 1 (usa)" sha1="629a2ee55b04092a717266b1d01f675ab7b4d6ec"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="16tales2">
 		<!-- Original images (Redump)
 		<rom name="16 Tales 2 (USA).cue" size="82" crc="359166ed" sha1="b699b8ff729299c4e631aae6d57c959e0a586b52"/>
@@ -31396,6 +31450,42 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="16 tales 2 (usa)" sha1="1becd188fa8ef2781817d8b444988cabd89a53fe"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- boot OK -->
+	<software name="16tales3">
+		<!-- Original images (Redump)
+		<rom name="16 Tales 3 (USA).cue" size="82" crc="b8d082b5" sha1="e5e9c9299f81f5eac791891721cb8417f3bbc30a"/>
+		<rom name="16 Tales 3 (USA).bin" size="624190224" crc="a09e982f" sha1="10473b608a55f81d5b724d238d55c7f5cb4bdc88"/>
+		-->
+		<description>16 Tales 3 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-990123-0.1"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="16 tales 3 (usa)" sha1="b4316ad2a1abbac04d274bf8382652725e1319ef"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- boot OK -->
+	<software name="16tales4">
+		<!-- Original images (Redump)
+		<rom name="16 Tales 4 (USA).cue" size="82" crc="acf733bf" sha1="af236e2395aad00b1e27cb4cf031ea550756d526"/>
+		<rom name="16 Tales 4 (USA).bin" size="620125968" crc="c7804475" sha1="d1c40cabd2a6189f2affd993e5df2e673abbf924"/>
+		-->
+		<description>16 Tales 4 (USA)</description>
+		<year>1996</year>
+		<publisher>The Lightspan Partnership</publisher>
+		<info name="serial" value="LSP-99012401"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="16 tales 4 (usa)" sha1="d8d15e463ed9e4059ad6f67d8fe576e3e01dd75e"/>
 			</diskarea>
 		</part>
 	</software>
