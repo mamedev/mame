@@ -853,7 +853,7 @@ void gpl162xx_lcdtype_state::gpl162xx_lcdtype(machine_config &config)
 }
 
 // pcp8718 and pcp8728 both contain user data (player name?) and will need to be factory defaulted once they work
-// the ROM code is slightly dfifferent between them
+// the ROM code is slightly different between them
 
 ROM_START( pcp8718 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
