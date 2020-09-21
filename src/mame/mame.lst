@@ -930,6 +930,9 @@ virusrck                        // (c) 2001 Access GmbH
 virusrckxl                      // (c) 2002 Access GmbH
 viruscl                         // (c) 2004 Access GmbH
 
+@source:adacp150.cpp
+adacp150p                       //
+
 @source:adam.cpp
 adam                            // Coleco Adam
 
