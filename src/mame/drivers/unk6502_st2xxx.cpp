@@ -21,6 +21,8 @@
 #include "emu.h"
 
 #include "cpu/m6502/st2205u.h"
+#include "machine/bl_handhelds_menucontrol.h"
+
 #include "screen.h"
 #include "emupal.h"
 #include "speaker.h"
@@ -34,7 +36,8 @@ public:
 		m_screen(*this, "screen"),
 		m_spirom(*this, "spi"),
 		m_io_p1(*this, "IN0"),
-		m_io_p2(*this, "IN1")
+		m_io_p2(*this, "IN1"),
+		m_menucontrol(*this, "menucontrol")
 	{ }
 
 	void bbl380(machine_config& config);
@@ -55,29 +58,10 @@ private:
 	required_device<st2xxx_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	enum menustate : const int
-	{
-	   MENU_READY_FOR_COMMAND = 0,
-
-	   MENU_COMMAND_00_IN,
-	   MENU_COMMAND_02_IN,
-	   MENU_COMMAND_04_IN,
-	   MENU_COMMAND_05_IN
-	};
-
-	menustate m_menustate;
-
-	u8 m_bit10state;
-	u8 m_latchdata;
-	int m_latchpos;
-	u8 m_latchinbit;
-	u8 m_menupos;
-
-	u8 input_r();
-	u8 input2_r();
-	void tx_menu_cmd(u8 data);
 	void output_w(u8 data);
 	void output2_w(u8 data);
+
+	uint8_t m_output2val;
 
 	u8 m_displaybuffer[256*256*2];
 	int m_posx, m_posy;
@@ -107,77 +91,9 @@ private:
 	required_region_ptr<u8> m_spirom;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
+	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
 };
 
-u8 bbl380_state::input_r()
-{
-	return m_io_p1->read();
-}
-
-u8 bbl380_state::input2_r()
-{
-	u8 dat = (m_bit10state << 4) | (m_latchinbit << 3);
-	dat |= m_io_p2->read() & 0xe7;
-
-	return dat;
-}
-
-void bbl380_state::tx_menu_cmd(u8 data)
-{
-	if (m_menustate == MENU_READY_FOR_COMMAND)
-	{
-		if (data == 0x00)
-		{
-			m_menustate = MENU_COMMAND_00_IN;
-		}
-		else if (data == 0x09)
-		{
-			// ..
-		}
-		else if (data == 0x02)
-		{
-			// set
-			m_menustate = MENU_COMMAND_02_IN;
-		}
-		else if (data == 0x04)
-		{
-			// add
-			m_menustate = MENU_COMMAND_04_IN;
-		}
-		else if (data == 0x05)
-		{
-			// sub
-			m_menustate = MENU_COMMAND_05_IN;
-		}
-		else
-		{
-			logerror("sending %02x unknown command\n", data);
-		}
-	}
-	else if (m_menustate == MENU_COMMAND_00_IN)
-	{
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_02_IN)
-	{
-		m_menupos = data - 0x08;
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_04_IN)
-	{
-		m_menupos += (data - 0x09);
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_05_IN)
-	{
-		if (data != 0xf0)
-			m_menupos -= (data - 0x0b);
-		else
-			m_menupos -= (data - 0x0a); // dphh8630 when pressing 'right' on final menu page
-
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-}
 
 void bbl380_state::output_w(u8 data)
 {
@@ -186,32 +102,16 @@ void bbl380_state::output_w(u8 data)
 
 void bbl380_state::output2_w(u8 data)
 {
-	if (data & 0x40)
+	if ((data & 0x40) != (m_output2val & 0x40))
 	{
-		if (data & 0x04)
-		{
-			m_bit10state = 1;
-		}
-		else
-		{
-			m_bit10state = 0;
-			m_latchdata <<= 1;
-			m_latchdata |= ((data & 0x08) >> 3);
-			m_latchinbit = (m_menupos >> (7 - m_latchpos)) & 1;
-			m_latchpos++;
+		if (data & 0x40)
+			m_menucontrol->reset_w(1);
+	}
 
-			if (m_latchpos == 8)
-			{
-				m_latchpos = 0;
-				tx_menu_cmd(m_latchdata);
-			}
-		}
-	}
-	else
-	{
-		m_latchpos = 0;
-		m_latchdata = 0;
-	}
+	m_menucontrol->data_w((data & 0x08)>>3);
+	m_menucontrol->clock_w((data & 0x04)>>2);
+
+	m_output2val = data;
 }
 
 uint32_t bbl380_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -239,13 +139,11 @@ uint32_t bbl380_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void bbl380_state::machine_start()
 {
-	m_menupos = 0x01;
 }
 
 void bbl380_state::machine_reset()
 {
-	m_bit10state = 0;
-	m_menustate = MENU_READY_FOR_COMMAND;
+	m_output2val = 0;
 }
 
 void bbl380_state::lcdc_command_w(u8 data)
@@ -420,8 +318,8 @@ static INPUT_PORTS_START( bbl380 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input2_r
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // handled in input2_r
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, data_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, status_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -429,8 +327,8 @@ void bbl380_state::bbl380(machine_config &config)
 {
 	ST2302U(config, m_maincpu, 24000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
-	m_maincpu->in_pa_callback().set(FUNC(bbl380_state::input_r));
-	m_maincpu->in_pb_callback().set(FUNC(bbl380_state::input2_r));
+	m_maincpu->in_pa_callback().set_ioport("IN0");
+	m_maincpu->in_pb_callback().set_ioport("IN1");
 	m_maincpu->out_pa_callback().set(FUNC(bbl380_state::output_w));
 	m_maincpu->out_pb_callback().set(FUNC(bbl380_state::output2_w));
 	m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r));
@@ -442,6 +340,8 @@ void bbl380_state::bbl380(machine_config &config)
 	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160-1, 0, 128-1);
 	m_screen->set_screen_update(FUNC(bbl380_state::screen_update));
+
+	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
