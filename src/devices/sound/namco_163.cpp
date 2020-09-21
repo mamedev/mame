@@ -151,7 +151,6 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, std::vect
 	}
 
 	// Slightly noisy but closer to real hardware behavior
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 128.0;
 	for (int s = 0; s < outputs[0].samples(); s++)
 	{
 		u32 phase = (m_ram[m_reg_addr + 5] << 16) | (m_ram[m_reg_addr + 3] << 8) | m_ram[m_reg_addr + 1];
@@ -172,6 +171,6 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, std::vect
 		{
 			m_reg_addr = 0x78 - ((m_ram[0x7f] & 0x70) >> 1);
 		}
-		outputs[0].put(s, stream_buffer::sample_t(output) * sample_scale);
+		outputs[0].put_int(s, output, 128);
 	}
 }

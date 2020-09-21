@@ -55,6 +55,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "sound/mm5837.h"
 #include "audio/sente6vb.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
@@ -64,53 +65,6 @@
 #define LOG_CEM_WRITES      0
 
 DEFINE_DEVICE_TYPE(SENTE6VB, sente6vb_device, "sente6vb", "Bally Sente 6VB Audio Board")
-
-
-/*************************************
-*
-*  Trivial sound device to spew
-*  a MM5837 noise stream to CEM3394
-*  inputs
-*
-*************************************/
-
-DECLARE_DEVICE_TYPE(MM5837_NOISE_SOURCE, mm5837_noise_source)
-
-class mm5837_noise_source : public device_t, public device_sound_interface
-{
-public:
-	mm5837_noise_source(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, MM5837_NOISE_SOURCE, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_noise_state(0x1ffff)
-	{
-	}
-
-protected:
-	// device-level overrides
-	virtual void device_start() override
-	{
-		m_stream = stream_alloc(0, 1, clock());
-		save_item(NAME(m_noise_state));
-	}
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
-	{
-		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
-		{
-			outputs[0].put(sampindex, BIT(m_noise_state, 0) ? 1.0 : 0.0);
-			m_noise_state = (m_noise_state >> 1) | ((BIT(m_noise_state, 0) ^ BIT(m_noise_state, 3)) << 16);
-		}
-	}
-
-private:
-	sound_stream *m_stream;           // sound stream
-	u32 m_noise_state;                // noise state
-};
-
-DEFINE_DEVICE_TYPE(MM5837_NOISE_SOURCE, mm5837_noise_source, "mm5837noise", "MM5837")
 
 
 
@@ -172,7 +126,9 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	mm5837_noise_source &noise(MM5837_NOISE_SOURCE(config, "noise", 100000));
+	mm5837_stream_device &noise(MM5837_STREAM(config, "noise", 0));
+//	noise.set_vdd(-6.5);   // seems too low -- possible the mapping in mm5837 is wrong
+	noise.set_vdd(-8.0);
 
 	for (auto &cem_device : m_cem_device)
 	{
@@ -180,7 +136,7 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 		cem_device->set_vco_zero_freq(431.894);
 		cem_device->set_filter_zero_freq(1300.0);
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.90);
-		noise.add_route(0, *cem_device, 1.0);
+		noise.add_route(0, *cem_device, 0.5);
 	}
 }
 

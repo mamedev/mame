@@ -134,7 +134,6 @@ void iremga20_device::sound_stream_update(sound_stream &stream, std::vector<read
 	auto &outL = outputs[0];
 	auto &outR = outputs[1];
 
-	stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 4.0);
 	for (int i = 0; i < outL.samples(); i++)
 	{
 		s32 sampleout = 0;
@@ -159,9 +158,8 @@ void iremga20_device::sound_stream_update(sound_stream &stream, std::vector<read
 			}
 		}
 
-		stream_buffer::sample_t final = stream_buffer::sample_t(sampleout) * sample_scale;
-		outL.put(i, final);
-		outR.put(i, final);
+		outL.put_int(i, sampleout, 32768 * 4);
+		outR.put_int(i, sampleout, 32768 * 4);
 	}
 }
 

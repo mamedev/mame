@@ -733,7 +733,6 @@ void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	int accum;
 	auto &output = outputs[0];
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 128.0;
 	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
 	{
 		accum = apu_square(&m_APU.squ[0]);
@@ -742,12 +741,6 @@ void nesapu_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		accum += apu_noise(&m_APU.noi);
 		accum += apu_dpcm(&m_APU.dpcm);
 
-		/* 8-bit clamps */
-		if (accum > 127)
-			accum = 127;
-		else if (accum < -128)
-			accum = -128;
-
-		output.put(sampindex, stream_buffer::sample_t(accum) * sample_scale);
+		output.put_int_clamp(sampindex, accum, 128);
 	}
 }

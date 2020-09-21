@@ -2061,7 +2061,6 @@ void tms5220_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	auto &output = outputs[0];
 
 	/* loop while we still have samples to generate */
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int sampindex = 0; sampindex < output.samples(); )
 	{
 		int length = (output.samples() > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : output.samples();
@@ -2069,7 +2068,7 @@ void tms5220_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
 		for (int index = 0; index < length; index++)
-			output.put(sampindex++, sample_data[index] * sample_scale);
+			output.put_int(sampindex++, sample_data[index], 32768);
 	}
 }
 

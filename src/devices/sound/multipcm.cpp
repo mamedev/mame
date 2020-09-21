@@ -632,19 +632,6 @@ void multipcm_device::device_clock_changed()
 //  16 bits and convert to a stream_buffer::sample_t
 //-----------------------------------------------------
 
-stream_buffer::sample_t multipcm_device::convert_to_stream_sample(int32_t value)
-{
-	if (value < -32768)
-	{
-		return -1.0;
-	}
-	else if (value > 32767)
-	{
-		return 1.0;
-	}
-	return stream_buffer::sample_t(value) * (1.0 / 32768.0);
-}
-
 #if MULTIPCM_LOG_SAMPLES
 void multipcm_device::dump_sample(slot_t &slot)
 {
@@ -734,8 +721,8 @@ void multipcm_device::sound_stream_update(sound_stream &stream, std::vector<read
 			}
 		}
 
-		outputs[0].put(i, convert_to_stream_sample(smpl));
-		outputs[1].put(i, convert_to_stream_sample(smpr));
+		outputs[0].put_int_clamp(i, smpl, 32768);
+		outputs[1].put_int_clamp(i, smpr, 32768);
 	}
 }
 

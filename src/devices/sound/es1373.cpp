@@ -306,7 +306,6 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 	//uint32_t sample_size = calc_size(chan.format);
 	// Send data to sound stream
 	bool buf_row_done;
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int i=0; i<outL.samples(); i++) {
 		buf_row_done = false;
 		int16_t lsamp = 0, rsamp = 0;
@@ -374,8 +373,8 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 				chan.buf_rptr -= 0x10;
 			}
 		}
-		outL.put(i, stream_buffer::sample_t(lsamp) * sample_scale);
-		outR.put(i, stream_buffer::sample_t(rsamp) * sample_scale);
+		outL.put_int(i, lsamp, 32768);
+		outR.put_int(i, rsamp, 32768);
 	}
 }
 

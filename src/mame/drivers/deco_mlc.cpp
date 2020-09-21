@@ -913,6 +913,32 @@ ROM_START( skullfnga )
 	ROM_LOAD( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
 ROM_END
 
+ROM_START( acchi ) // DE-0444-1 + DE-0457-0
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "eaa-00-3.l10", 0x000000, 0x80000, CRC(faff1710) SHA1(b28d210b16b7a0a818ecfeb59696b093be27dc2b) )
+	ROM_LOAD32_WORD( "eaa-01-3.l11", 0x000002, 0x80000, CRC(00510371) SHA1(1beef396065c10e5f16b80a92d960abcd4838363) )
+
+	ROM_REGION( 0x1800000, "gfx1", ROMREGION_ERASE00 ) // TODO: fix ROM loading
+	ROM_LOAD16_BYTE( "faa-00-0.b1", 0x0000001, 0x200000, CRC(2cf34cd6) SHA1(4d96ca597ad84bedabf53dc17a976f0d95ab99b4) )
+	ROM_LOAD16_BYTE( "faa-02-0.b2", 0x0000000, 0x200000, CRC(bdf75bd6) SHA1(f271192a851e3750beeea6033dc43df614967de1) )
+	ROM_LOAD16_BYTE( "faa-08-0.c1", 0x0400001, 0x200000, CRC(70ba2149) SHA1(fbcf7c65021e55ed74b0333852860bfb56f05cab) )
+	ROM_LOAD16_BYTE( "faa-09-0.c2", 0x0400000, 0x200000, CRC(b616058f) SHA1(9dd8f259f08b76e177fc2a266159e4a716b5f4c6) )
+	// d1 and d2 not populated
+	ROM_LOAD16_BYTE( "faa-01-0.e1", 0x0c00001, 0x200000, CRC(a245270b) SHA1(a2279af96878fb099f8c1e67c2ecf3d0254b36a3) )
+	ROM_LOAD16_BYTE( "faa-03-0.e2", 0x0c00000, 0x200000, CRC(af457714) SHA1(dcb94ac0cc632a9d84bb896588f33b47bf87a695) )
+	ROM_LOAD16_BYTE( "faa-04-0.f1", 0x1000001, 0x200000, CRC(35280765) SHA1(9dcee2724f16fa5c371bf89a4257bbb7eb25f733) )
+	ROM_LOAD16_BYTE( "faa-06-0.f2", 0x1000000, 0x200000, CRC(5538ff81) SHA1(f68369a0ee25fe5ac3ce5f36c56ca72e46a08279) )
+	ROM_LOAD16_BYTE( "faa-05-0.h1", 0x1400001, 0x200000, CRC(1e7a7a0a) SHA1(09333289177aa102ca082f55d27c453037769b4c) )
+	ROM_LOAD16_BYTE( "faa-07-0.h2", 0x1400000, 0x200000, CRC(60028a62) SHA1(883935cb5421b344c9a83665a6bbdcff4986f1e7) )
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "eaa-02-0.l12", 0x000000, 0x80000, CRC(09baf624) SHA1(548269cead3204c6d269955f5b91937a231bd6af) )
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "faa-10-0.a5",  0x000000, 0x200000, CRC(9f280e5f) SHA1(47c3532b4142ff677f4f0b763ba142883ba3d545) )
+	ROM_LOAD( "faa-11-0.a7",  0x200000, 0x200000, CRC(3775ae66) SHA1(28208d6fee4bf638545dc6b002c900dbb7ab85b0) )
+ROM_END
+
 /***************************************************************************/
 
 void deco_mlc_state::descramble_sound(  )
@@ -978,6 +1004,13 @@ void deco_mlc_state::init_mlc()
 	descramble_sound();
 }
 
+void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
+{
+	m_irqLevel = ARM_IRQ_LINE;
+	deco156_decrypt(machine());
+}
+
+
 /***************************************************************************/
 
 GAME( 1995, avengrgs,  0,        avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
@@ -992,3 +1025,4 @@ GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      R
 GAME( 1996, hoops96,   0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, ddream95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, hoops95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, acchi,     0,        mlc,      mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // wrong GFX ROM loading / GFX decode

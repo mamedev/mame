@@ -152,7 +152,6 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, std::vector
 	outputs[0].fill(0);
 	outputs[1].fill(0);
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 512.0);
 	for (int i = 0; i < 32; i++)
 	{
 		if (m_key & (1 << i))
@@ -193,8 +192,8 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, std::vector
 				sample = ((int8_t)(data & 0xfc)) << (3 - (data & 3));
 				frac += step;
 
-				outputs[0].add(j, stream_buffer::sample_t(sample * vptr->l_volume) * sample_scale);
-				outputs[1].add(j, stream_buffer::sample_t(sample * vptr->r_volume) * sample_scale);
+				outputs[0].add_int(j, sample * vptr->l_volume, 32768 * 512);
+				outputs[1].add_int(j, sample * vptr->r_volume, 32768 * 512);
 			}
 
 			vptr->pos = pos;

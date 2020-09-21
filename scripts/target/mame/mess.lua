@@ -779,6 +779,7 @@ MACHINES["XC1700E"] = true
 MACHINES["EDLC"] = true
 MACHINES["WTL3132"] = true
 MACHINES["CXD1185"] = true
+MACHINES["BL_HANDHELDS_MENUCONTROL"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -4281,6 +4282,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/aaa.cpp",
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
+	MAME_DIR .. "src/mame/drivers/adacp150.cpp",
 	MAME_DIR .. "src/mame/drivers/aid80f.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",

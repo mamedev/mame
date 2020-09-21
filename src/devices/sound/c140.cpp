@@ -77,12 +77,6 @@ DEFINE_DEVICE_TYPE(C219, c219_device, "c219", "Namco C219")
 //  LIVE DEVICE
 //**************************************************************************
 
-static inline stream_buffer::sample_t limit(stream_buffer::sample_t in)
-{
-	return std::max(-1.0f, std::min(1.0f, in));
-}
-
-
 //-------------------------------------------------
 //  c140_device - constructor
 //-------------------------------------------------
@@ -326,15 +320,10 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	{
 		auto &dest1 = outputs[0];
 		auto &dest2 = outputs[1];
-		constexpr stream_buffer::sample_t sample_scale = 8.0 / 32768.0;
 		for (int i = 0; i < samples; i++)
 		{
-			stream_buffer::sample_t val;
-
-			val = stream_buffer::sample_t(*lmix++) * sample_scale;
-			dest1.put(i, limit(val));
-			val = stream_buffer::sample_t(*rmix++) * sample_scale;
-			dest2.put(i, limit(val));
+			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
+			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
 		}
 	}
 }
@@ -465,15 +454,10 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	{
 		auto &dest1 = outputs[0];
 		auto &dest2 = outputs[1];
-		constexpr stream_buffer::sample_t sample_scale = 8.0 / 32768.0;
 		for (int i = 0; i < samples; i++)
 		{
-			stream_buffer::sample_t val;
-
-			val = stream_buffer::sample_t(*lmix++) * sample_scale;
-			dest1.put(i, limit(val));
-			val = stream_buffer::sample_t(*rmix++) * sample_scale;
-			dest2.put(i, limit(val));
+			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
+			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
 		}
 	}
 }

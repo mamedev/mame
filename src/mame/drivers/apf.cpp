@@ -34,6 +34,16 @@ RAM switch
 - Basic will work with 8K or 16K.
 
 
+The monitor
+-----------
+From Basic, do CALL 28672 to enter the monitor - you get a * prompt. Commands:
+D nnnn  - display memory
+G nnnn  - goto an address
+M nnnn  - modify memory
+Type the command letter, then all 4 digits, no need to hit Enter.
+To exit back to Basic, do G 8894 (Basic has no prompt).
+
+
 Status of cart-based games
 --------------------------
 backgammon - works, needs offset of 0x120, bottom line is coming from 0x3E0, should be 0x380

@@ -930,6 +930,9 @@ virusrck                        // (c) 2001 Access GmbH
 virusrckxl                      // (c) 2002 Access GmbH
 viruscl                         // (c) 2004 Access GmbH
 
+@source:adacp150.cpp
+adacp150p                       //
+
 @source:adam.cpp
 adam                            // Coleco Adam
 
@@ -11960,6 +11963,7 @@ cobraa                          //
 rblaster                        // (c) 1985
 
 @source:deco_mlc.cpp
+acchi                           // ??? (c) 1996 Data East Corporation (Japan)
 avengrgs                        // MCG (c) 1995 Data East Corporation (World)
 avengrgsj                       // MCG (c) 1995 Data East Corporation (Japan)
 ddream95                        // MCE (c) 1996 Data East Corporation
@@ -14203,8 +14207,9 @@ luctoday                        // 1980 Sigma
 mandinga                        // bootleg (Artemi)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
-olmandingo                      // bootleg
 mandingac                       // bootleg (Centromatic)
+olmandingo                      // bootleg
+olmandingc                      // bootleg (Calfesa)
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -15527,6 +15532,7 @@ hulk                            //
 jokrpokr                        //
 pinpool                         //
 roldisco                        //
+sahalove                        //
 sinbad                          //
 sinbadn                         //
 solaride                        //
@@ -19863,7 +19869,6 @@ uccopsu                         // (c) 1992 Irem America (US)
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 maccclas                        // 1993 Apple Macintosh Color Classic
 macclas2                        // 1991 Apple Macintosh Classic II
-macclasc                        // 1990 Apple Macintosh Classic
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
@@ -19888,16 +19893,17 @@ macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
 macprtb                         // 1989 Apple Macintosh Portable
 macqd700                        // 1991 Apple Macintosh Quadra 700
-macse                           // 1987 Apple Macintosh SE
 macse30                         // 1989 Apple Macintosh SE/30
-macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
 
 @source:mac128.cpp
 mac128k                         // 1984 Apple Macintosh
 mac512k                         // 1985 Apple Macintosh 512k
 mac512ke                        // 1986 Apple Macintosh 512ke
+macclasc                        // 1990 Apple Macintosh Classic
 macplus                         // 1986 Apple Macintosh Plus
+macse                           // 1987 Apple Macintosh SE
+macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
@@ -32257,7 +32263,7 @@ sporzpp
 sporzbx
 sporztn
 wldsoctv
-solargm	
+solargm
 ablmini
 senwld
 zonefusn
@@ -37863,6 +37869,7 @@ ikari3k                         // A7007 'IK3'(c) 1989
 ikari3u                         // A7007 'IK3'(c) 1989
 ikari3w                         // A7007 'IK3'(c) 1989
 pow                             // A7008 'DG' (c) 1988
+powb                            // bootleg
 powj                            // A7008 'DG' (c) 1988
 searchar                        // A8007 'BH' (c) 1989
 searcharj                       // A8007 'BH' (c) 1989

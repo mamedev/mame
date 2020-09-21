@@ -43,8 +43,6 @@
 /* a position of waveform sample */
 #define WAVEFORM_POSITION(n)    (((n) >> m_f_fracbits) & 0x1f)
 
-static constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-
 DEFINE_DEVICE_TYPE(NAMCO,       namco_device,       "namco",       "Namco")
 DEFINE_DEVICE_TYPE(NAMCO_15XX,  namco_15xx_device,  "namco_15xx",  "Namco 15xx")
 DEFINE_DEVICE_TYPE(NAMCO_CUS30, namco_cus30_device, "namco_cus30", "Namco CUS30")
@@ -239,7 +237,7 @@ uint32_t namco_audio_device::namco_update_one(write_stream_view &buffer, const i
 {
 	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		buffer.add(sampindex, stream_buffer::sample_t(wave[WAVEFORM_POSITION(counter)]) * sample_scale);
+		buffer.add_int(sampindex, wave[WAVEFORM_POSITION(counter)], 32768);
 		counter += freq;
 	}
 
@@ -699,13 +697,13 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 						if (voice->noise_state)
 						{
-							lmix.add(i, stream_buffer::sample_t(l_noise_data) * sample_scale);
-							rmix.add(i, stream_buffer::sample_t(r_noise_data) * sample_scale);
+							lmix.add_int(i, l_noise_data, 32768);
+							rmix.add_int(i, r_noise_data, 32768);
 						}
 						else
 						{
-							lmix.add(i, stream_buffer::sample_t(-l_noise_data) * sample_scale);
-							rmix.add(i, stream_buffer::sample_t(-r_noise_data) * sample_scale);
+							lmix.add_int(i, -l_noise_data, 32768);
+							rmix.add_int(i, -r_noise_data, 32768);
 						}
 
 						if (hold)
@@ -799,9 +797,9 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 						int cnt;
 
 						if (voice->noise_state)
-							buffer.add(i, stream_buffer::sample_t(noise_data) * sample_scale);
+							buffer.add_int(i, noise_data, 32768);
 						else
-							buffer.add(i, stream_buffer::sample_t(-noise_data) * sample_scale);
+							buffer.add_int(i, -noise_data, 32768);
 
 						if (hold)
 						{

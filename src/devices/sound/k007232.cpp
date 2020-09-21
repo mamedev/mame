@@ -236,7 +236,6 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 	}
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int j = 0; j < outputs[0].samples(); j++)
 	{
 		s32 lsum = 0, rsum = 0;
@@ -282,7 +281,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				rsum += out * vol_b;
 			}
 		}
-		outputs[0].put(j, stream_buffer::sample_t(lsum) * sample_scale);
-		outputs[1].put(j, stream_buffer::sample_t(rsum) * sample_scale);
+		outputs[0].put_int(j, lsum, 32768);
+		outputs[1].put_int(j, rsum, 32768);
 	}
 }

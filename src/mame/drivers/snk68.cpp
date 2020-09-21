@@ -48,6 +48,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
+#include "sound/msm5205.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -155,6 +156,13 @@ void snk68_state::sound_io_map(address_map &map)
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x40, 0x40).w(FUNC(snk68_state::D7759_write_port_0_w));
 	map(0x80, 0x80).lw8(NAME([this] (u8 data) { m_upd7759->reset_w(BIT(data, 7)); } ));
+}
+
+void snk68_state::powb_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
 }
 
 /******************************************************************************/
@@ -619,6 +627,17 @@ void snk68_state::pow(machine_config &config)
 	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void snk68_state::powb(machine_config &config)
+{
+	pow(config);
+
+	m_soundcpu->set_addrmap(AS_IO, &snk68_state::powb_sound_io_map);
+
+	config.device_remove("upd");
+
+	MSM5205(config, "msm", 0).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: hook this up
+}
+
 void snk68_state::streetsm(machine_config &config)
 {
 	pow(config);
@@ -707,6 +726,58 @@ ROM_START( powj )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal20l10.a6", 0x0000, 0x00cc, CRC(c3d9e729) SHA1(f05f03eecf12b4d0793124ecd3195307be04046b) )
+ROM_END
+
+ROM_START( powb ) // main PCB + sprite ROM board
+	ROM_REGION( 0x40000, "maincpu", 0 ) // identical to pow, but smaller ROMs
+	ROM_LOAD16_BYTE( "pow36b.bin",   0x000000, 0x10000, CRC(a4de338d) SHA1(18ac22e5e99018cc794350faed4b75006737d2bc) )
+	ROM_LOAD16_BYTE( "pow35b.bin",   0x000001, 0x10000, CRC(ba405691) SHA1(a21eab60efbe8c56524518c389ab7d545c41af55) )
+	ROM_LOAD16_BYTE( "pow36a.bin",   0x020000, 0x10000, CRC(fa53460c) SHA1(f4a31e27c45ac2727cbf3e855ccc787392e17866) )
+	ROM_LOAD16_BYTE( "pow35a.bin",   0x020001, 0x10000, CRC(a67c6495) SHA1(14066d314bbe42ab12d7287724e4071869f61157) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // very similar to pow, updated to support MSM5205 instead of UPD7759
+	ROM_LOAD( "pow37.bin",   0x000000, 0x10000, CRC(0d22d25f) SHA1(0dca3e1bebe91da84b8537c0ff184241797ac8da) )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )   // characters, identical to pow
+	ROM_LOAD( "pow34.bin",  0x000000, 0x08000, CRC(df864a08) SHA1(dd996070077efbbf9d784299b6563cab258e4a8e) )
+	ROM_LOAD( "pow33.bin",  0x008000, 0x08000, CRC(9e470d53) SHA1(f7dc6ac39ade573480e87170a2781f0f72930580) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   // sprites, different format
+	ROM_LOAD16_BYTE( "pow30.bin", 0x000000, 0x10000, CRC(40b43c09) SHA1(8b12b02284032e01ff8b9410948e1da8f88f124b) )
+	ROM_LOAD16_BYTE( "pow24.bin", 0x000001, 0x10000, CRC(efbfdf59) SHA1(c02d18fb582bd4bdbf2b3ea6f2bd925e7d70a3af) )
+	ROM_LOAD16_BYTE( "pow29.bin", 0x020000, 0x10000, CRC(61909aa4) SHA1(6981bf33f7261a0d5dc412e4f4bb72b523f4af37) )
+	ROM_LOAD16_BYTE( "pow23.bin", 0x020001, 0x10000, CRC(ea9aca79) SHA1(693916685b23b10b966e6fb9e0f2846994b672c9) )
+	ROM_LOAD16_BYTE( "pow28.bin", 0x040000, 0x10000, CRC(81da0f09) SHA1(0c788abce58b581790051741aafee72ddcdabd02) )
+	ROM_LOAD16_BYTE( "pow22.bin", 0x040001, 0x10000, CRC(361f178b) SHA1(6a680e2b37e1ae825d548e90720999bd0188b151) )
+	ROM_LOAD16_BYTE( "pow27.bin", 0x060000, 0x10000, CRC(f7db186c) SHA1(cbd17ee46563dcb7ad1e2f8b2c7481102ecb91f7) )
+	ROM_LOAD16_BYTE( "pow21.bin", 0x060001, 0x10000, CRC(606fab0a) SHA1(7b60df4ee8096da6ad14d0aa197b20b7293f04a9) )
+	ROM_LOAD16_BYTE( "pow26.bin", 0x080000, 0x10000, CRC(a028dfda) SHA1(7a84a44fc062aa946f1fddbefbde0dae0d0212a3) )
+	ROM_LOAD16_BYTE( "pow20.bin", 0x080001, 0x10000, CRC(06be682c) SHA1(24abf7f3b525124a2b38aae6e1c313d1dc0ad1ff) )
+	ROM_LOAD16_BYTE( "pow31.bin", 0x0a0000, 0x10000, CRC(f25ea217) SHA1(bde91824539ea037acdd3ccdbb3387f0364888ec) )
+	ROM_LOAD16_BYTE( "pow19.bin", 0x0a0001, 0x10000, CRC(4e7b2b47) SHA1(344af976c4c82495a820437cbbdacb1027fa14c0) )
+	ROM_LOAD16_BYTE( "pow25.bin", 0x0c0000, 0x10000, CRC(a4cf97d5) SHA1(8ff0a7fe61f3ee3167601e68a54960b3e712c4b5) )
+	ROM_LOAD16_BYTE( "pow18.bin", 0x0c0001, 0x10000, CRC(b70c603d) SHA1(6434eeddf7009887889914edc63a348053a05bc0) )
+	ROM_LOAD16_BYTE( "pow32.bin", 0x0e0000, 0x10000, CRC(9ffd27ea) SHA1(d693baa289811c8b612fb45b1186a361d73d223b) )
+	ROM_LOAD16_BYTE( "pow17.bin", 0x0e0001, 0x10000, CRC(c91291ce) SHA1(1276caa972ba625f3aacbd11e5b37d66406fbe97) )
+	ROM_LOAD16_BYTE( "pow15.bin", 0x100000, 0x10000, CRC(ffe660b2) SHA1(06b93e0f0b7dd83046c428459a47239454e9d7f2) )
+	ROM_LOAD16_BYTE( "pow1.bin",  0x100001, 0x10000, CRC(4fc31abe) SHA1(2bdc3de7301ab512dbf3c3a9e4e249d258ea287f) )
+	ROM_LOAD16_BYTE( "pow14.bin", 0x120000, 0x10000, CRC(07a08711) SHA1(d43707a6e8eb6925e1f46a495590c31a1683d073) )
+	ROM_LOAD16_BYTE( "pow2.bin",  0x120001, 0x10000, CRC(0be02c0c) SHA1(7dcbc8c47982d78c887de4e8112cb17678f07213) )
+	ROM_LOAD16_BYTE( "pow13.bin", 0x140000, 0x10000, CRC(37147ef2) SHA1(2970bfbdac856a02316ebef98c4da8fe451efc7b) )
+	ROM_LOAD16_BYTE( "pow3.bin",  0x140001, 0x10000, CRC(fe4e3f95) SHA1(efe2665405dbd866de96a09bced43ff945d09ede) )
+	ROM_LOAD16_BYTE( "pow12.bin", 0x160000, 0x10000, CRC(57085ebc) SHA1(ee1c4140bd24aa8721fcdba5545001ffbfb5df44) )
+	ROM_LOAD16_BYTE( "pow4.bin",  0x160001, 0x10000, CRC(325ba653) SHA1(55e6c9d8bd61a02ef8334e9637e4be02e22750bd) )
+	ROM_LOAD16_BYTE( "pow11.bin", 0x180000, 0x10000, CRC(2c90e2c2) SHA1(cc1d555076e780cacfeb8aa0e784da08cce7e23a) )
+	ROM_LOAD16_BYTE( "pow5.bin",  0x180001, 0x10000, CRC(36d691e2) SHA1(b4c7fd340649380bb9736e325c31775eb515a642) )
+	ROM_LOAD16_BYTE( "pow10.bin", 0x1a0000, 0x10000, CRC(6ac5e036) SHA1(05ec7e82080b8ea4426b18ccf1e79fc2f2f81e8b) )
+	ROM_LOAD16_BYTE( "pow6.bin",  0x1a0001, 0x10000, CRC(e6d8123a) SHA1(23f21d0b857de6c099de5c4d139bc32475cb8b88) )
+	ROM_LOAD16_BYTE( "pow9.bin",  0x1c0000, 0x10000, CRC(5b1a1c99) SHA1(d4748cc02021bd189e635a8578ce28201000ee4f) )
+	ROM_LOAD16_BYTE( "pow7.bin",  0x1c0001, 0x10000, CRC(093fe9c6) SHA1(36090da050f66fea1d9edaf5673a156a3f43de77) )
+	ROM_LOAD16_BYTE( "pow16.bin", 0x1e0000, 0x10000, CRC(bbc4d174) SHA1(73bbee1ae76a76a5c057f8ade05399c411640aaf) )
+	ROM_LOAD16_BYTE( "pow8.bin",  0x1e0001, 0x10000, CRC(7f7c703e) SHA1(86d98d2028fef28ef629a417a1e06b7353766545) )
+
+	ROM_REGION( 0x10000, "msm", 0 ) // unique
+	ROM_LOAD( "pow38.bin",  0x000000, 0x10000, CRC(72f35d38) SHA1(072d2af2a3ffa4b46be471659fc4d9bf6e02b683) )
 ROM_END
 
 ROM_START( streetsm )
@@ -1092,19 +1163,33 @@ ROM_START( searcharj )
 	ROM_LOAD( "bh.v1",      0x000000, 0x20000, CRC(07a6114b) SHA1(224df4616b77a56f33974d3b1793473d48ad52ca) )
 ROM_END
 
+
+void snk68_state::init_powb()
+{
+	uint8_t *gfx2 = memregion("gfx2")->base();
+
+	// rearrange sprites to what the driver expects
+	for (int i = 0; i < 0x200000; i++)
+	{
+		gfx2[i] = bitswap(gfx2[i], 7, 3, 6, 2, 5, 1, 4, 0);
+	}
+}
+
+
 /******************************************************************************/
 
-GAME( 1988, pow,       0,        pow,      pow,      snk68_state,    empty_init, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, powj,      pow,      pow,      powj,     snk68_state,    empty_init, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state,    empty_init, ROT0,  "SNK", "Street Smart (US version 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm1, streetsm, searchar, streetsm, searchar_state, empty_init, ROT0,  "SNK", "Street Smart (US version 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmw, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK", "Street Smart (World version 1)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmj, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK", "Street Smart (Japan version 1)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3,    0,        searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World version 1, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3w,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World, Rotary Joystick)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searchar,  0,        searchar, searchar, searchar_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (World)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharu, searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (US)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharj, searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (Japan version 3)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, pow,       0,        pow,      pow,      snk68_state,    empty_init, ROT0,  "SNK",     "P.O.W. - Prisoners of War (US version 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, powj,      pow,      pow,      powj,     snk68_state,    empty_init, ROT0,  "SNK",     "Datsugoku - Prisoners of War (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, powb,      pow,      powb,     pow,      snk68_state,    init_powb,  ROT0,  "bootleg", "P.O.W. - Prisoners of War (bootleg of US version 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MSM5205 not hooked up
+GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state,    empty_init, ROT0,  "SNK",     "Street Smart (US version 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm1, streetsm, searchar, streetsm, searchar_state, empty_init, ROT0,  "SNK",     "Street Smart (US version 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmw, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK",     "Street Smart (World version 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmj, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK",     "Street Smart (Japan version 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3,    0,        searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (World version 1, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3w,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (World, Rotary Joystick)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (US, Rotary Joystick)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari Three (Japan, Rotary Joystick)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari Three (Korea, 8-Way Joystick)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searchar,  0,        searchar, searchar, searchar_state, empty_init, ROT90, "SNK",     "SAR - Search And Rescue (World)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharu, searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK",     "SAR - Search And Rescue (US)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharj, searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK",     "SAR - Search And Rescue (Japan version 3)",                MACHINE_SUPPORTS_SAVE )

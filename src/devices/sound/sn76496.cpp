@@ -378,7 +378,6 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<
 	int16_t out;
 	int16_t out2 = 0;
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int sampindex = 0; sampindex < lbuffer->samples(); sampindex++)
 	{
 		// clock chip once
@@ -445,9 +444,9 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<
 
 		if (m_negate) { out = -out; out2 = -out2; }
 
-		lbuffer->put(sampindex, stream_buffer::sample_t(out) * sample_scale);
+		lbuffer->put_int(sampindex, out, 32768);
 		if (m_stereo)
-			rbuffer->put(sampindex, stream_buffer::sample_t(out2) * sample_scale);
+			rbuffer->put_int(sampindex, out2, 32768);
 	}
 }
 

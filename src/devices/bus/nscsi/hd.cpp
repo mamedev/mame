@@ -119,8 +119,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command READ start=%08x blocks=%04x\n", lba, blocks);
 
-		scsi_data_in(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(hard_disk_read(harddisk, lba, block)) {
+			scsi_data_in(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_WRITE_6:
@@ -468,8 +475,15 @@ void nscsi_harddisk_device::scsi_command()
 
 		LOG("command READ EXTENDED start=%08x blocks=%04x\n",lba, blocks);
 
-		scsi_data_in(2, blocks*bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
+		if(hard_disk_read(harddisk, lba, block)) {
+			scsi_data_in(2, blocks*bytes_per_sector);
+			scsi_status_complete(SS_GOOD);
+		}
+		else
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 
 	case SC_WRITE_10:
