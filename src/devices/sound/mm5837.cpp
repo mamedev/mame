@@ -17,7 +17,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(MM5837, mm5837_device, "mm5837", "MM5837 Digital Noise Source")
-DEFINE_DEVICE_TYPE(MM5837_STREAM, mm5837_stream_device, "mm5837", "MM5837 Digital Noise Stream")
+DEFINE_DEVICE_TYPE(MM5837_STREAM, mm5837_stream_device, "mm5837_stream", "MM5837 Digital Noise Stream")
 
 
 //**************************************************************************
