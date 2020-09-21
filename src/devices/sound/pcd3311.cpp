@@ -52,6 +52,6 @@ void pcd3311_device::device_start()
 //  our sound stream
 //-------------------------------------------------
 
-void pcd3311_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void pcd3311_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 }
