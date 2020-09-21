@@ -171,7 +171,7 @@ void lmc1992_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 

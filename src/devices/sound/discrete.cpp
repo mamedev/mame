@@ -1060,7 +1060,7 @@ void discrete_device::process(int samples)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 

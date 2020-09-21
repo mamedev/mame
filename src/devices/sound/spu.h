@@ -35,7 +35,7 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_stop() override;
 
-	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	static constexpr float ms_to_rate(float ms) { return 1.0f / (ms * (float(spu_base_frequency_hz) / 1000.0f)); }
 	static constexpr float s_to_rate(float s) { return ms_to_rate(s * 1000.0f); }

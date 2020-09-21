@@ -884,7 +884,7 @@ void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
 void mos6560_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)

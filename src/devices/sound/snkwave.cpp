@@ -44,7 +44,7 @@ void snkwave_device::device_start()
 	m_sample_rate = m_external_clock >> CLOCK_SHIFT;
 
 	/* get stream channels */
-	m_stream = stream_alloc_legacy(0, 1, m_sample_rate);
+	m_stream = stream_alloc(0, 1, m_sample_rate);
 
 	/* reset all the voices */
 	m_frequency = 0;
@@ -60,26 +60,26 @@ void snkwave_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle update requests
+//  sound_stream_update - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 
-void snkwave_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void snkwave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-
-	/* zap the contents of the buffer */
-	memset(buffer, 0, samples * sizeof(*buffer));
+	auto &buffer = outputs[0];
 
 	assert(m_counter < 0x1000);
 	assert(m_frequency < 0x1000);
 
 	/* if no sound, we're done */
 	if (m_frequency == 0xfff)
+	{
+		buffer.fill(0);
 		return;
+	}
 
 	/* generate sound into buffer while updating the counter */
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int loops;
 		int16_t out = 0;
@@ -104,7 +104,7 @@ void snkwave_device::sound_stream_update_legacy(sound_stream &stream, stream_sam
 			}
 		}
 
-		*buffer++ = out;
+		buffer.put_int(sampindex, out, 32768);
 	}
 }
 

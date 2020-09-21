@@ -160,7 +160,7 @@ void s_dsp_device::device_start()
 	space().cache(m_cache);
 	space().specific(m_data);
 
-	m_channel = stream_alloc_legacy(0, 2, clock() / 64);
+	m_channel = stream_alloc(0, 2, clock() / 64);
 
 	state_register();
 }
@@ -1061,20 +1061,20 @@ void s_dsp_device::state_register()
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s_dsp_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void s_dsp_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	s16 mix[2];
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		mix[0] = mix[1] = 0;
 		dsp_update(mix);
 
 		/* Update the buffers */
-		outputs[0][i] = (stream_sample_t)mix[0];
-		outputs[1][i] = (stream_sample_t)mix[1];
+		outputs[0].put_int(i, (stream_sample_t)mix[0], 32768);
+		outputs[1].put_int(i, (stream_sample_t)mix[1], 32768);
 	}
 }

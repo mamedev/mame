@@ -354,7 +354,7 @@ void meritum_state::port_ff_w(u8 data)
 	if (!init)
 	{
 		init = 1;
-		static int16_t speaker_levels[4] = { 0, -32767, 0, 32767 };
+		static double const speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 		m_speaker->set_levels(4, speaker_levels);
 	}
 }

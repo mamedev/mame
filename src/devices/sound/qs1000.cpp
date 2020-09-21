@@ -466,7 +466,7 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy -
+//  sound_stream_update -
 //-------------------------------------------------
 void qs1000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
