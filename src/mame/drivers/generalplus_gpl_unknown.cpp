@@ -182,7 +182,7 @@ uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb
 
 		for (int x = 0; x < 320; x++)
 		{
-			// 8-bit values get pumped through a 256 word table in intenral ROM and converted to words
+			// 8-bit values get pumped through a 256 word table in internal ROM and converted to words
 			uint16_t dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
 
 			int b = ((dat >> 0) & 0x1f) << 3;

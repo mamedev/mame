@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "machine/bl_handhelds_menucontrol.h"
 
-DEFINE_DEVICE_TYPE(BL_HANDHELDS_MENUCONTROL, bl_handhelds_menucontrol_device, "BaoBaoLong", "BL Handhelds Menu Controller")
+DEFINE_DEVICE_TYPE(BL_HANDHELDS_MENUCONTROL, bl_handhelds_menucontrol_device, "blhandheldmenu", "BaoBaoLong Handhelds Menu Controller")
 
 bl_handhelds_menucontrol_device::bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BL_HANDHELDS_MENUCONTROL, tag, owner, clock),
