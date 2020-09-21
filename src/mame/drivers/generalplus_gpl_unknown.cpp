@@ -22,11 +22,11 @@
 #include "emu.h"
 
 #include "cpu/unsp/unsp.h"
+#include "machine/bl_handhelds_menucontrol.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
 
 #define LOG_GPL162XX_LCDTYPE            (1U << 1)
 #define LOG_GPL162XX_LCDTYPE_SELECT_SIM (1U << 2)
@@ -50,7 +50,8 @@ public:
 		m_screen(*this, "screen"),
 		m_spirom(*this, "spi"),
 		m_io_in0(*this, "IN0"),
-		m_io_in1(*this, "IN1")
+		m_io_in1(*this, "IN1"),
+		m_menucontrol(*this, "menucontrol")
 	{ }
 
 	void gpl162xx_lcdtype(machine_config &config);
@@ -170,33 +171,9 @@ private:
 	uint16_t io_7870_r();
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
+	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-
-
-	int m_latchinbit;
-	void tx_menu_cmd(uint8_t command);
-
-	int m_bit08state;
-	int m_latchdata;
-
-	int m_latchpos;
-	int m_menupos;
-	uint8_t m_datain;
-
-	enum menustate : const int
-	{
-	   MENU_READY_FOR_COMMAND = 0,
-
-	   MENU_COMMAND_00_IN,
-	   MENU_COMMAND_01_IN,
-	   MENU_COMMAND_02_IN,
-	   MENU_COMMAND_03_IN,
-	   MENU_COMMAND_04_IN,
-	   MENU_COMMAND_05_IN,
-	};
-
-	menustate m_menustate;
 };
 
 uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -227,12 +204,12 @@ uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb
 
 READ_LINE_MEMBER( gpl162xx_lcdtype_state::bit08state_r )
 {
-	return m_bit08state;
+	return m_menucontrol->status_r();
 }
 
 READ_LINE_MEMBER( gpl162xx_lcdtype_state::latchinbit_r )
 {
-	return m_latchinbit;
+	return m_menucontrol->data_r();
 }
 
 
@@ -326,136 +303,10 @@ uint16_t gpl162xx_lcdtype_state::io_7860_r()
 	return ret;
 }
 
-// TODO: make this a device, the unk6502_st2xxx.cpp units use the same thing
-void gpl162xx_lcdtype_state::tx_menu_cmd(uint8_t command)
-{
-	// additions and subtractions here are likely also meant to be done as high byte and low byte
-	if (m_menustate == MENU_READY_FOR_COMMAND)
-	{
-		if (command == 0x00)
-		{
-			m_menustate = MENU_COMMAND_00_IN;
-			m_datain = m_menupos & 0xff;
-		}
-		else if (command == 0x01)
-		{
-			m_menustate = MENU_COMMAND_01_IN;
-			m_datain = (m_menupos >> 8) & 0xff;
-		}
-		else if (command == 0x02)
-		{
-			m_menustate = MENU_COMMAND_02_IN;
-		}
-		else if (command == 0x03)
-		{
-			m_menustate = MENU_COMMAND_03_IN;
-		}
-		else if (command == 0x04)
-		{
-			m_menustate = MENU_COMMAND_04_IN;
-		}
-		else if (command == 0x05)
-		{
-			m_menustate = MENU_COMMAND_05_IN;
-		}
-		else if (command == 0x09)
-		{
-			// ...
-		}
-		else if ((command) == 0x10)
-		{
-			// this is followed by 0x1b, written if you try to move right off last entry
-			m_menupos = 0x00;
-		}
-		else if (command == 0x30)
-		{
-			m_menupos++;
-		}
-		else if (command == 0x37)
-		{
-			m_menupos--;
-		}
-		else if (command == 0x39)
-		{
-			m_menupos -= 4;
-		}
-		else if (command == 0x2c)
-		{
-			m_menupos = 0x01;
-		}
-		else
-		{
-			LOGMASKED(LOG_GPL162XX_LCDTYPE_SELECT_SIM, "tx_menu_cmd %02x (unknown)\n", command);
-		}
-	}
-	else if (m_menustate == MENU_COMMAND_00_IN)
-	{
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_01_IN)
-	{
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_02_IN)
-	{
-		m_menupos = (m_menupos & 0xff00) | ((command - 0x8) & 0xff);
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_03_IN)
-	{
-		m_menupos = (m_menupos & 0x00ff) | (((command - 0x9) & 0xff) << 8);
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_04_IN)
-	{
-		if (command == 0x0d)
-			m_menupos += 4;
-		else if (command == 0x0a)
-			m_menupos += 0;
-		// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
-		// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
-		else if (command == 0x1e)
-			m_menupos += 0x310;
-
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-	else if (m_menustate == MENU_COMMAND_05_IN)
-	{
-		// used if you try to scroll down past the and the value becomes too large
-		// actually writes 0x313 split into 2 commands, so the 2nd write to 0x05 with param then instead 0b/16 sequence of writes instead of 26/0c subtracts from the high byte?
-		if (command == 0x0b)
-		{
-			m_menupos -= 0xdc;
-		}
-		else if (command == 0x0e)
-		{
-			m_menupos -= 0x314;
-		}
-
-		m_menustate = MENU_READY_FOR_COMMAND;
-	}
-}
-
 void gpl162xx_lcdtype_state::io_7860_w(uint16_t data)
 {
-	if (data & 0x20)
-	{
-		m_bit08state = 1;
-	}
-	else
-	{
-		m_bit08state = 0;
-		m_latchdata <<= 1;
-		m_latchdata |= ((data & 0x10) >> 4);
-		m_latchinbit = (m_datain >> (7 - m_latchpos)) & 1;
-		m_latchpos++;
-
-		if (m_latchpos == 8)
-		{
-			m_latchpos = 0;
-			tx_menu_cmd(m_latchdata);
-		}
-	}
+	m_menucontrol->data_w((data & 0x10)>>4);
+	m_menucontrol->clock_w((data & 0x20)>>5);
 
 	m_7860 = data;
 }
@@ -469,7 +320,7 @@ void gpl162xx_lcdtype_state::unk_7863_w(uint16_t data)
 	// probably port direction (or 7862 is?)
 	if (data == 0x3cf7)
 	{
-		m_latchpos = 0;
+		m_menucontrol->reset_w(1);
 	}
 }
 
@@ -979,8 +830,6 @@ void gpl162xx_lcdtype_state::machine_reset()
 // first menu index is stored here
 //  m_spirom[0x16000] = gamenum & 0xff;
 //  m_spirom[0x16001] = (gamenum>>8) & 0xff;
-
-	m_menupos = 0;
 }
 
 WRITE_LINE_MEMBER(gpl162xx_lcdtype_state::screen_vblank)
@@ -1012,10 +861,13 @@ void gpl162xx_lcdtype_state::gpl162xx_lcdtype(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(gpl162xx_lcdtype_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
+
+	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
+
 }
 
 // pcp8718 and pcp8728 both contain user data (player name?) and will need to be factory defaulted once they work
-// the ROM code is slightly different between them
+// the ROM code is slightly dfifferent between them
 
 ROM_START( pcp8718 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
