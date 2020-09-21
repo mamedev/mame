@@ -4,10 +4,15 @@
 
 X Tom 3D
 
+Notes:
+- This game works on DOSBox,
+- the game runs on DOS (MS-DOS or PC-DOS?),
+- boots, but show "DISK BOOT FAILURE".
+
 TODO:
 - clears a work RAM snippet then jumps to that snippet ... it doesn't do
-  that if you soft reset emulation.
-- understand how to load game ROMs
+  that if you soft reset emulation,
+- understand how to load game ROMs.
 
 This game runs on PC-based hardware.
 Major components are....
@@ -449,4 +454,4 @@ ROM_START( xtom3d )
 ROM_END
 
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
