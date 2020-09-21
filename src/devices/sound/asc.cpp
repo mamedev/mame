@@ -148,7 +148,6 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 
 		case 1: // FIFO mode
 		{
-			constexpr stream_buffer::sample_t sample_scale = 64.0 / 32768.0;
 			for (i = 0; i < outL.samples(); i++)
 			{
 				int8_t smpll, smplr;
@@ -234,15 +233,14 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 						break;
 				}
 
-				outL.put(i, stream_buffer::sample_t(smpll) * sample_scale);
-				outR.put(i, stream_buffer::sample_t(smplr) * sample_scale);
+				outL.put_int(i, smpll, 32768 / 64);
+				outR.put_int(i, smplr, 32768 / 64);
 			}
 			break;
 		}
 
 		case 2: // wavetable mode
 		{
-			constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 4.0);
 			for (i = 0; i < outL.samples(); i++)
 			{
 				int32_t mixL, mixR;
@@ -269,8 +267,8 @@ void asc_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 					mixR += smpl*256;
 				}
 
-				outL.put(i, stream_buffer::sample_t(mixL) * sample_scale);
-				outR.put(i, stream_buffer::sample_t(mixR) * sample_scale);
+				outL.put_int(i, mixL, 32768 * 4);
+				outR.put_int(i, mixR, 32768 * 4);
 			}
 			break;
 		}

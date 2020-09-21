@@ -199,9 +199,8 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		}
 
 		mixp = &m_mix_buffer[0];
-		constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 8.0);
 		for (i = 0; i < outputs[chan].samples(); i++)
-			outputs[chan].put(i, stream_buffer::sample_t(*mixp++) * sample_scale);
+			outputs[chan].put_int(i, *mixp++, 32768 * 8);
 	}
 }
 

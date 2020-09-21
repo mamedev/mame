@@ -1233,7 +1233,6 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 {
 	int i;
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / stream_buffer::sample_t(32768 << SHIFT);
 	for (int s = 0; s < bufl.samples(); ++s)
 	{
 		s32 smpl = 0, smpr = 0;
@@ -1293,8 +1292,8 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 			smpr = clip16(smpr >> 3);
 		}
 
-		bufl.put(s, stream_buffer::sample_t(smpl * m_LPANTABLE[MVOL() << 0xd]) * sample_scale);
-		bufr.put(s, stream_buffer::sample_t(smpr * m_LPANTABLE[MVOL() << 0xd]) * sample_scale);
+		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
 

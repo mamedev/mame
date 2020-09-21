@@ -79,7 +79,6 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
 void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* fill all data needed */
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int j = 0; j < outputs[0].samples(); j++)
 	{
 		int output_l = 0, output_r = 0;
@@ -178,8 +177,8 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<r
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		outputs[0].put(j, stream_buffer::sample_t(output_l) * sample_scale);
-		outputs[1].put(j, stream_buffer::sample_t(output_r) * sample_scale);
+		outputs[0].put_int(j, output_l, 32768);
+		outputs[1].put_int(j, output_r, 32768);
 	}
 
 //	if (wavraw)

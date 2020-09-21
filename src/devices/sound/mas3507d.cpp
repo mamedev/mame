@@ -367,17 +367,15 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 	if(s1 > sample_count)
 		s1 = sample_count;
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	if(mp3_info.channels == 1) {
 		for(int i=0; i<s1; i++) {
-			stream_buffer::sample_t v = stream_buffer::sample_t(samples[i]) * sample_scale;
-			outputs[0].put(i+pos, v);
-			outputs[1].put(i+pos, v);
+			outputs[0].put_int(i+pos, samples[i], 32768);
+			outputs[1].put_int(i+pos, samples[i], 32768);
 		}
 	} else {
 		for(int i=0; i<s1; i++) {
-			outputs[0].put(i+pos, stream_buffer::sample_t(samples[i*2]) * sample_scale);
-			outputs[1].put(i+pos, stream_buffer::sample_t(samples[i*2+1]) * sample_scale);
+			outputs[0].put_int(i+pos, samples[i*2], 32768);
+			outputs[1].put_int(i+pos, samples[i*2+1], 32768);
 		}
 	}
 

@@ -346,6 +346,7 @@ protected:
 
 class write_stream_view : public read_stream_view
 {
+
 public:
 	// empty constructor so we can live in an array or vector
 	write_stream_view()
@@ -364,7 +365,7 @@ public:
 	{
 	}
 
-	// safely write a gain-applied sample to the buffer
+	// safely write a sample to the buffer
 	void put(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
@@ -374,7 +375,33 @@ public:
 		m_buffer->put(index, sample);
 	}
 
-	// safely add a gain-applied sample to the buffer
+	// write a sample to the buffer, clamping to +/- the clamp value
+	void put_clamp(s32 index, sample_t sample, sample_t clamp = 1.0)
+	{
+		if (sample > clamp)
+			sample = clamp;
+		if (sample < -clamp)
+			sample = -clamp;
+		put(index, sample);
+	}
+
+	// write a sample to the buffer, converting from an integer with the given maximum
+	void put_int(s32 index, s32 sample, s32 max)
+	{
+		put(index, sample_t(sample) * (1.0f / sample_t(max)));
+	}
+
+	// write a sample to the buffer, converting from an integer with the given maximum
+	void put_int_clamp(s32 index, s32 sample, s32 maxclamp)
+	{
+		if (sample > maxclamp)
+			sample = maxclamp;
+		else if (sample < -maxclamp)
+			sample = -maxclamp;
+		put_int(index, sample, maxclamp);
+	}
+
+	// safely add a sample to the buffer
 	void add(s32 index, sample_t sample)
 	{
 		sound_assert(u32(index) < samples());
@@ -382,6 +409,12 @@ public:
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
 		m_buffer->put(index, m_buffer->get(index) + sample);
+	}
+
+	// add a sample to the buffer, converting from an integer with the given maximum
+	void add_int(s32 index, s32 sample, s32 max)
+	{
+		add(index, sample_t(sample) * (1.0f / sample_t(max)));
 	}
 
 	// fill part of the view with the given value

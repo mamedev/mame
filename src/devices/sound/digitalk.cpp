@@ -548,7 +548,6 @@ void digitalker_device::sound_stream_update(sound_stream &stream, std::vector<re
 {
 	auto &sout = outputs[0];
 	int cpos = 0;
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	while(cpos != sout.samples()) {
 		if(m_zero_count == 0 && m_dac_index == 128)
 			digitalker_step();
@@ -563,10 +562,10 @@ void digitalker_device::sound_stream_update(sound_stream &stream, std::vector<re
 
 		} else if(m_dac_index != 128) {
 			while(cpos != sout.samples() && m_dac_index != 128) {
-				stream_buffer::sample_t v = stream_buffer::sample_t(m_dac[m_dac_index]) * sample_scale;
+				s32 v = m_dac[m_dac_index];
 				int pp = m_pitch_pos;
 				while(cpos != sout.samples() && pp != m_pitch) {
-					sout.put(cpos++, v);
+					sout.put_int(cpos++, v, 32768);
 					pp++;
 				}
 				if(pp == m_pitch) {

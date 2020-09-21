@@ -301,14 +301,6 @@ void k053260_device::write(offs_t offset, u8 data)
 	}
 }
 
-static inline int limit(int val, int max, int min)
-{
-	return std::max(min, std::min(max, val));
-}
-
-static constexpr s32 MAXOUT = 0x7fff;
-static constexpr s32 MINOUT = -0x8000;
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -317,7 +309,6 @@ void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_
 {
 	if (m_mode & 2)
 	{
-		constexpr stream_buffer::sample_t sample_scale = 1.0f / stream_buffer::sample_t(MAXOUT);
 		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
 			stream_sample_t buffer[2] = {0, 0};
@@ -328,8 +319,8 @@ void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					voice.play(buffer);
 			}
 
-			outputs[0].put(j, stream_buffer::sample_t(limit( buffer[0], MAXOUT, MINOUT )) * sample_scale);
-			outputs[1].put(j, stream_buffer::sample_t(limit( buffer[1], MAXOUT, MINOUT )) * sample_scale);
+			outputs[0].put_int_clamp(j, buffer[0], 32768);
+			outputs[1].put_int_clamp(j, buffer[1], 32768);
 		}
 	}
 	else

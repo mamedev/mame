@@ -160,11 +160,10 @@ void nile_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		}
 	}
 	mixp = &mix[0];
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 16.0);
 	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * sample_scale);
-		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * sample_scale);
+		outputs[0].put_int(i, *mixp++, 32768 * 16);
+		outputs[1].put_int(i, *mixp++, 32768 * 16);
 	}
 }
 

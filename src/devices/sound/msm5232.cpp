@@ -743,17 +743,16 @@ void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	auto &bufnoise = outputs[10];
 	int i;
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (i=0; i<buf1.samples(); i++)
 	{
 		/* calculate all voices' envelopes */
 		EG_voices_advance();
 
 		TG_group_advance(0);   /* calculate tones group 1 */
-		buf1.put(i, stream_buffer::sample_t(o2) * sample_scale);
-		buf2.put(i, stream_buffer::sample_t(o4) * sample_scale);
-		buf3.put(i, stream_buffer::sample_t(o8) * sample_scale);
-		buf4.put(i, stream_buffer::sample_t(o16) * sample_scale);
+		buf1.put_int(i, o2, 32768);
+		buf2.put_int(i, o4, 32768);
+		buf3.put_int(i, o8, 32768);
+		buf4.put_int(i, o16, 32768);
 
 		SAVE_SINGLE_CHANNEL(0,o2)
 		SAVE_SINGLE_CHANNEL(1,o4)
@@ -761,13 +760,13 @@ void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		SAVE_SINGLE_CHANNEL(3,o16)
 
 		TG_group_advance(1);   /* calculate tones group 2 */
-		buf5.put(i, stream_buffer::sample_t(o2) * sample_scale);
-		buf6.put(i, stream_buffer::sample_t(o4) * sample_scale);
-		buf7.put(i, stream_buffer::sample_t(o8) * sample_scale);
-		buf8.put(i, stream_buffer::sample_t(o16) * sample_scale);
+		buf5.put_int(i, o2, 32768);
+		buf6.put_int(i, o4, 32768);
+		buf7.put_int(i, o8, 32768);
+		buf8.put_int(i, o16, 32768);
 
-		bufsolo1.put(i, stream_buffer::sample_t(solo8) * sample_scale);
-		bufsolo2.put(i, stream_buffer::sample_t(solo16) * sample_scale);
+		bufsolo1.put_int(i, solo8, 32768);
+		bufsolo2.put_int(i, solo16, 32768);
 
 		SAVE_SINGLE_CHANNEL(4,o2)
 		SAVE_SINGLE_CHANNEL(5,o4)

@@ -129,7 +129,6 @@ void c352_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	auto &buffer_rl = outputs[2];
 	auto &buffer_rr = outputs[3];
 
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
 	for (int i = 0; i < buffer_fl.samples(); i++)
 	{
 		int out[4] = { 0, 0, 0, 0 };
@@ -174,10 +173,10 @@ void c352_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 			out[3] += (((v.flags & C352_FLG_PHASEFR) ? -s : s) * v.curr_vol[3]) >> 8;
 		}
 
-		buffer_fl.put(i, stream_buffer::sample_t(s16(out[0] >> 3)) * sample_scale);
-		buffer_fr.put(i, stream_buffer::sample_t(s16(out[1] >> 3)) * sample_scale);
-		buffer_rl.put(i, stream_buffer::sample_t(s16(out[2] >> 3)) * sample_scale);
-		buffer_rr.put(i, stream_buffer::sample_t(s16(out[3] >> 3)) * sample_scale);
+		buffer_fl.put_int(i, s16(out[0] >> 3), 32768);
+		buffer_fr.put_int(i, s16(out[1] >> 3), 32768);
+		buffer_rl.put_int(i, s16(out[2] >> 3), 32768);
+		buffer_rr.put_int(i, s16(out[3] >> 3), 32768);
 	}
 }
 
