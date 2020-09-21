@@ -109,6 +109,7 @@
 //#include "bus/a2bus/hostram.h"
 //#include "bus/a2bus/ramfast.h"
 #include "bus/a2bus/uthernet.h"
+#include "bus/a2bus/sider.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4580,7 +4581,9 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("hostram", A2BUS_HOSTRAM); /* Slot 7 RAM for GS Plus host protocol */
 //  device.option_add("ramfast", A2BUS_RAMFAST); /* C.V. Technologies RAMFast SCSI card */
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
-	device.option_add("uthernet", A2BUS_UTHERNET);  /* CMS Apple II SCSI Card */
+	device.option_add("uthernet", A2BUS_UTHERNET);  /* A2RetroSystems Uthernet card */
+	device.option_add("sider", A2BUS_SIDER); /* Advanced Tech Systems / First Class Peripherals Sider SASI card */
+	device.option_add("xebec", A2BUS_XEBEC); /* Xebec SASI card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
