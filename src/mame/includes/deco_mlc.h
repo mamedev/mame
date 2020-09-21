@@ -30,6 +30,7 @@ public:
 		{ }
 
 	void init_mlc();
+	void init_acchi();
 	void init_avengrgs();
 
 	void mlc(machine_config &config);
