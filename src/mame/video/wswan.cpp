@@ -9,7 +9,8 @@
 
  TODO:
    - remove the redundant parts of m_regs
-   - split the Color VDP from the Mono VDP?
+   - split the Color VDP from the Mono VDP
+	 - Add support for WSC high/low contrast (register 14, bit 1)
 
  ***************************************************************************/
 
@@ -1007,7 +1008,8 @@ void wswan_video_device::reg_w(offs_t offset, uint8_t data)
 			break;
 		case 0x14:  // LCD control
 					// Bit 0   - LCD enable
-					// Bit 1-7 - Unknown
+					// Bit 1   - WSC only, brightness low/high
+					// Bit 2-7 - Unknown
 			m_lcd_control = data;
 			break;
 		case 0x15:  // LCD icons
