@@ -8,8 +8,9 @@
 
 DEFINE_DEVICE_TYPE(BL_HANDHELDS_MENUCONTROL, bl_handhelds_menucontrol_device, "BaoBaoLong", "BL Handhelds Menu Controller")
 
-bl_handhelds_menucontrol_device::bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BL_HANDHELDS_MENUCONTROL, tag, owner, clock)
+bl_handhelds_menucontrol_device::bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BL_HANDHELDS_MENUCONTROL, tag, owner, clock),
+	m_is_unsp_type_hack(false)
 {
 }
 
@@ -23,6 +24,8 @@ READ_LINE_MEMBER(bl_handhelds_menucontrol_device::data_r)
 	return m_responsebit;
 }
 
+// is there some 'carry' related behavior on the add / remove, because sometimes calculations are off by 1 eg command 0x05 (subtract) subcommand 0xf0
+// edge cases to test - moving up and left off entry 0, moving next / previous page when on any entry on the first/last pages, moving down/right off last entry, crossing 255/256 game boundary
 void bl_handhelds_menucontrol_device::handle_command()
 {
 	uint8_t command = m_command;
@@ -106,28 +109,46 @@ void bl_handhelds_menucontrol_device::handle_command()
 	}
 	else if (m_menustate == MENU_COMMAND_04_IN)
 	{
-		if (command == 0x0d)
-			m_menupos += 4;
-		else if (command == 0x0a)
-			m_menupos += 0;
 		// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
-		// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
-		else if (command == 0x1e)
-			m_menupos += 0x310;
+		if (m_is_unsp_type_hack)
+		{
+			if (command == 0x0b)
+			{
+				m_menupos -= 0xdc;
+			}
+			else if (command == 0x0e)
+			{
+				m_menupos -= 0x314;
+			}
+		}
+		else
+		{
+			m_menupos += (command - 0x09);
+			m_menustate = MENU_READY_FOR_COMMAND;
+		}
 
 		m_menustate = MENU_READY_FOR_COMMAND;
 	}
 	else if (m_menustate == MENU_COMMAND_05_IN)
 	{
 		// used if you try to scroll down past the and the value becomes too large
-		// actually writes 0x313 split into 2 commands, so the 2nd write to 0x05 with param then instead 0b/16 sequence of writes instead of 26/0c subtracts from the high byte?
-		if (command == 0x0b)
+		if (m_is_unsp_type_hack)
 		{
-			m_menupos -= 0xdc;
+			if (command == 0x0d)
+				m_menupos += 4;
+			else if (command == 0x0a)
+				m_menupos += 0;
+			// used if you try to scroll up or left past 0 and the value becomes too large (a negative number)
+			// actually writes 0x314 split into 2 commands, so the 2nd write to 0x04 with param then instead 0b/16 sequence of writes instead of 26/0c adds to the high byte?
+			else if (command == 0x1e)
+				m_menupos += 0x310;
 		}
-		else if (command == 0x0e)
+		else
 		{
-			m_menupos -= 0x314;
+			if (command != 0xf0)
+				m_menupos -= (command - 0x0b);
+			else
+				m_menupos -= (command - 0x0a); // dphh8630 when pressing 'right' on final menu page
 		}
 
 		m_menustate = MENU_READY_FOR_COMMAND;

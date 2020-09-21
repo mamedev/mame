@@ -56,9 +56,6 @@ public:
 
 	void gpl162xx_lcdtype(machine_config &config);
 
-	DECLARE_READ_LINE_MEMBER(bit08state_r);
-	DECLARE_READ_LINE_MEMBER(latchinbit_r);
-
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -185,7 +182,7 @@ uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb
 
 		for (int x = 0; x < 320; x++)
 		{
-			// 8-bit values get pumped through a 256 word table in intenral ROM and converted to words, so it's probably raw 16-bit RGB data?
+			// 8-bit values get pumped through a 256 word table in intenral ROM and converted to words
 			uint16_t dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
 
 			int b = ((dat >> 0) & 0x1f) << 3;
@@ -201,18 +198,6 @@ uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb
 }
 
 
-
-READ_LINE_MEMBER( gpl162xx_lcdtype_state::bit08state_r )
-{
-	return m_menucontrol->status_r();
-}
-
-READ_LINE_MEMBER( gpl162xx_lcdtype_state::latchinbit_r )
-{
-	return m_menucontrol->data_r();
-}
-
-
 static INPUT_PORTS_START( gpl162xx_lcdtype )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // causes lag if state is inverted, investigate
@@ -222,8 +207,8 @@ static INPUT_PORTS_START( gpl162xx_lcdtype )
 	PORT_DIPNAME( 0x0004, 0x0000, "Show Vs in Test Mode" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0004, "0004" )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(gpl162xx_lcdtype_state, bit08state_r)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_MEMBER(gpl162xx_lcdtype_state, latchinbit_r)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, status_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, data_r)
 	PORT_DIPNAME( 0x0020, 0x0020, "P0:0020" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0020, "0020" )
@@ -863,6 +848,7 @@ void gpl162xx_lcdtype_state::gpl162xx_lcdtype(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 
 	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
+	m_menucontrol->set_is_unsp_type_hack();
 
 }
 

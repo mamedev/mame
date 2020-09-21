@@ -14,6 +14,9 @@ public:
 	// construction/destruction
 	bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// the chip is the same between systems, but there's some logic not fully understood that is causing off-by-1 errors on some calcs
+	void set_is_unsp_type_hack() { m_is_unsp_type_hack = true; }
+
 	DECLARE_READ_LINE_MEMBER(status_r);
 	DECLARE_READ_LINE_MEMBER(data_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
@@ -25,9 +28,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	// config
+	bool m_is_unsp_type_hack;
+
 	// internal state
 	int m_menupos;
-
+	
 	// command handling
 	int m_clockstate;
 	int m_datashifterpos;
