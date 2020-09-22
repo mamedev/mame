@@ -8036,7 +8036,7 @@ license:CC0
 
 	<software name="gbskjtatie">
 		<!--	In lot check as "dmgbq2j0.k33"	-->
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn, Alt)</description>
 		<year>2003</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BQ2J-JPN?" />
@@ -11112,7 +11112,7 @@ license:CC0
 	</software>
 
 	<software name="kininkoa">
-		<!--	In lot check as "dmgpgj-1.403"	-->
+		<!--	In lot check as "dmgonj-1.153"	-->
 		<description>Kinin Koumaroku Oni (Jpn, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
@@ -11121,8 +11121,8 @@ license:CC0
 		<info name="alt_title" value="鬼忍降魔録  ＯＮＩ　人々は、かれを「隠れ忍ぶ者－隠忍－」と呼んだ..." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
-			<dataarea name="rom" size="131072">
-				<rom name="dmgpgj-1.403" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd"/>
+			<dataarea name="rom" size = "131072">
+				<rom name="dmgonj-1.153.gb" size="131072" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" offset="0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -16911,7 +16911,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-agx-0.u1" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026" />
+				<rom name="pang (uk).bin" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026" />
 			</dataarea>
 		</part>
 	</software>
@@ -18370,6 +18370,22 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="popeye 2 (japan).bin" size="131072" crc="4372ed68" sha1="d59986195bd74dde865245fae9c4081a8a24efb0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeye2ja" cloneof="popeye2">
+		<!--	In lot check as "dmgpgj-1.403"	-->
+		<description>Popeye 2 (Japan, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Sigma</publisher>
+		<info name="serial" value="DMG-PGJ" />
+		<info name="release" value="19911122" />
+		<info name="alt_title" value="ポパイ2" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dmgpgj-1.403" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd"/>
 			</dataarea>
 		</part>
 	</software>
