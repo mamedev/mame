@@ -805,8 +805,7 @@ void wswan_video_device::refresh_scanline()
 	rectangle rec(0, WSWAN_X_PIXELS, m_current_line, m_current_line);
 	if (m_lcd_control)
 	{
-		/* Not sure if these background color checks and settings are correct */
-		if (m_color_mode && m_colors_16)
+		if (m_color_mode)
 			m_bitmap.fill(m_pal[m_bg_control >> 4][m_bg_control & 0x0f], rec);
 		else
 			m_bitmap.fill(m_main_palette[m_bg_control & 0x07], rec);
