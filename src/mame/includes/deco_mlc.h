@@ -37,6 +37,7 @@ public:
 	void mlc_6bpp(machine_config &config);
 	void avengrgs(machine_config &config);
 	void mlc_5bpp(machine_config &config);
+	void acchi(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -102,5 +103,6 @@ private:
 	void descramble_sound();
 
 	void avengrgs_map(address_map &map);
-	void decomlc_map(address_map &map);
+	void decomlc_146_map(address_map &map);
+	void decomlc_no146_map(address_map &map);
 };

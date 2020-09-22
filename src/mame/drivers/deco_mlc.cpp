@@ -323,7 +323,7 @@ void deco_mlc_state::avengrgs_map(address_map &map)
 	map(0x0600000, 0x0600007).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0xff000000).mirror(0xff000000);
 }
 
-void deco_mlc_state::decomlc_map(address_map &map)
+void deco_mlc_state::decomlc_no146_map(address_map &map)
 {
 	map(0x0000000, 0x00fffff).rom();
 	map(0x0100000, 0x011ffff).ram().share("mainram");
@@ -344,6 +344,12 @@ void deco_mlc_state::decomlc_map(address_map &map)
 	map(0x044001c, 0x044001f).rw(FUNC(deco_mlc_state::mlc_44001c_r), FUNC(deco_mlc_state::mlc_44001c_w));
 	map(0x0500000, 0x0500003).w(FUNC(deco_mlc_state::eeprom_w));
 	map(0x0600000, 0x0600007).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0xff000000);
+}
+
+void deco_mlc_state::decomlc_146_map(address_map &map)
+{
+	decomlc_no146_map(map);
+
 	map(0x070f000, 0x070ffff).rw(FUNC(deco_mlc_state::sh96_protection_region_0_146_r), FUNC(deco_mlc_state::sh96_protection_region_0_146_w)).umask32(0xffff0000);
 }
 
@@ -549,7 +555,7 @@ void deco_mlc_state::mlc(machine_config &config)
 {
 	/* basic machine hardware */
 	ARM(config, m_maincpu, 42000000/6); /* 42 MHz -> 7MHz clock confirmed on real board */
-	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
@@ -596,6 +602,15 @@ void deco_mlc_state::mlc_5bpp(machine_config &config)
 	// TODO: mono? ch.0 doesn't output any sound in-game
 	m_ymz->add_route(1, "lspeaker", 1.0);
 	m_ymz->add_route(0, "rspeaker", 1.0);
+}
+
+void deco_mlc_state::acchi(machine_config &config)
+{
+	mlc_6bpp(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
+
+	config.device_remove("ioprot");
 }
 
 /***************************************************************************/
@@ -1025,4 +1040,4 @@ GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      R
 GAME( 1996, hoops96,   0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, ddream95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, hoops95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, acchi,     0,        mlc,      mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // wrong GFX ROM loading / GFX decode
+GAME( 1995, acchi,     0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // wrong GFX ROM loading / GFX decode
