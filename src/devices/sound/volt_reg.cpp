@@ -27,7 +27,7 @@ voltage_regulator_device::voltage_regulator_device(const machine_config &mconfig
 
 void voltage_regulator_device::device_start()
 {
-	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_MINIMUM);
 }
 
 void voltage_regulator_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
