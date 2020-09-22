@@ -16,17 +16,16 @@
     TODO:
 	- Figure out the ASIC and how it's connected
 
-    Notes:
-    - Debug tricks (AE): "b@42=ff" after startup to show setup screen 1
-      "bp 81a1" then "b@42=ff" and "a=02" after the break to show screen 2
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/z80scc.h"
+#include "machine/informer_213_kbd.h"
+#include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -42,6 +41,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scc(*this, "scc"),
+		m_beep(*this, "beep"),
 		m_vram(*this, "vram"),
 		m_aram(*this, "aram"),
 		m_chargen(*this, "chargen")
@@ -58,6 +58,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<scc8530_device> m_scc;
+	required_device<beep_device> m_beep;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_aram;
 	required_region_ptr<uint8_t> m_chargen;
@@ -65,6 +66,22 @@ private:
 	void mem_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vblank_w(int state);
+	void vram_addr_w(offs_t offset, uint8_t data);
+	void cursor_addr_w(offs_t offset, uint8_t data);
+
+	uint8_t unk_42_r();
+	void unk_42_w(uint8_t data);
+
+	void bell_w(uint8_t data);
+
+	void kbd_int_w(int state);
+	uint8_t vector_r();
+
+	uint16_t m_vram_addr;
+	uint16_t m_cursor_addr;
+	uint8_t m_unk_42;
+	uint8_t m_vector;
 };
 
 
@@ -74,12 +91,18 @@ private:
 
 void informer_213_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
+	map(0x0000, 0x0000).rw("kbd", FUNC(informer_213_kbd_hle_device::read), FUNC(informer_213_kbd_hle_device::write));
+	map(0x0006, 0x0007).unmapr().w(FUNC(informer_213_state::vram_addr_w));
+	map(0x000f, 0x0010).unmapr().w(FUNC(informer_213_state::cursor_addr_w));
+	map(0x0042, 0x0042).rw(FUNC(informer_213_state::unk_42_r), FUNC(informer_213_state::unk_42_w));
+	map(0x0060, 0x0060).w(FUNC(informer_213_state::bell_w));
+	map(0x0100, 0x1fff).ram();
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram().share("vram");
 	map(0x7000, 0x7fff).ram().share("aram");
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
+	map(0xfff7, 0xfff7).r(FUNC(informer_213_state::vector_r));
 }
 
 
@@ -103,11 +126,11 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	{
 		for (int x = 0; x < 80; x++)
 		{
-			// screen memory starts at 0x6820
-			uint8_t code = m_vram[26 * 80 + y * 80 + x];
-//			uint8_t attr = m_aram[26 * 80 + y * 80 + x];
+			uint16_t addr = m_vram_addr + y * 80 + x;
+			uint8_t code = m_vram[addr - 0x6000];
+//			uint8_t attr = m_aram[addr - 0x6000];
 
-			// but status line is at top of vram
+			// status line is at top of vram
 			if (y > 23)
 			{
 				code = m_vram[(y - 24) * 80 + x];
@@ -118,6 +141,9 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 			for (int i = 0; i < 9; i++)
 			{
 				uint8_t data = m_chargen[chargen_base | ((code << 4) + i)];
+
+				if (addr == m_cursor_addr)
+					data ^= 0xff;
 
 				// 6 pixels of the character
 				bitmap.pix32(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
@@ -131,6 +157,31 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	}
 
 	return 0;
+}
+
+void informer_213_state::vram_addr_w(offs_t offset, uint8_t data)
+{
+	if (offset)
+		m_vram_addr = (m_vram_addr & 0xff00) | (data << 0);
+	else
+		m_vram_addr = (m_vram_addr & 0x00ff) | (data << 8);
+}
+
+void informer_213_state::cursor_addr_w(offs_t offset, uint8_t data)
+{
+	if (offset)
+		m_cursor_addr = (m_cursor_addr & 0xff00) | (data << 0);
+	else
+		m_cursor_addr = (m_cursor_addr & 0x00ff) | (data << 8);
+}
+
+void informer_213_state::vblank_w(int state)
+{
+	if (state)
+	{
+		m_vector = 0x10;
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	}
 }
 
 static const gfx_layout char_layout =
@@ -153,12 +204,55 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
+uint8_t informer_213_state::unk_42_r()
+{
+	logerror("unk_42_r\n");
+	return m_unk_42 | 4;
+}
+
+void informer_213_state::unk_42_w(uint8_t data)
+{
+	logerror("unk_42_w: %02x\n", data);
+	m_unk_42 = data;
+}
+
+void informer_213_state::bell_w(uint8_t data)
+{
+	logerror("bell_w: %02x\n", data);
+
+	// 76543---  unknown
+	// -----2--  beeper
+	// ------10  unknown
+
+	m_beep->set_state(BIT(data, 2));
+}
+
+void informer_213_state::kbd_int_w(int state)
+{
+	m_vector = 0x14;
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+}
+
+uint8_t informer_213_state::vector_r()
+{
+	uint8_t tmp = m_vector;
+	m_vector = 0x00;
+
+	return tmp;
+}
+
 void informer_213_state::machine_start()
 {
+	// register for save states
+	save_item(NAME(m_vram_addr));
+	save_item(NAME(m_cursor_addr));
+	save_item(NAME(m_unk_42));
+	save_item(NAME(m_vector));
 }
 
 void informer_213_state::machine_reset()
 {
+	m_vector = 0x00;
 }
 
 
@@ -179,12 +273,21 @@ void informer_213_state::informer_213(machine_config &config)
 	m_screen->set_size(480, 234);
 	m_screen->set_visarea_full();
 	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //	m_screen->set_raw(18.432_MHz_XTAL, 0, 0, 0, 0, 0, 0);
 	m_screen->set_screen_update(FUNC(informer_213_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(informer_213_state::vblank_w));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
+
+	// sound
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beep", 500).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
+
+	informer_213_kbd_hle_device &kbd(INFORMER_213_KBD_HLE(config, "kbd"));
+	kbd.int_handler().set(FUNC(informer_213_state::kbd_int_w));
 }
 
 
@@ -218,5 +321,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE       INPUT         CLASS               INIT        COMPANY     FULLNAME           FLAGS
-COMP( 1990, in213  , 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213",    MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
-COMP( 1992, in213ae, 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213 AE", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1990, in213  , 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1992, in213ae, 0,       0,      informer_213, informer_213, informer_213_state, empty_init, "Informer", "Informer 213 AE", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
