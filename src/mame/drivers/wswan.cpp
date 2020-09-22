@@ -12,6 +12,10 @@
 
   Based on the WStech documentation by Judge and Dox.
 
+  Usage:
+    Keep START button pressed during startup (or reset) to enter the internal
+    configuration menu.
+
   Known issues/TODOs:
   - Add support for noise sound
   - Add support for voice sound
@@ -119,11 +123,11 @@ protected:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void wswan_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 
-	void wswan_io(address_map &map);
-	void wswan_mem(address_map &map);
-	void wswan_snd(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void snd_map(address_map &map);
 
 	void register_save();
 	void handle_irqs();
@@ -139,8 +143,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	void wscolor_mem(address_map &map);
-	void wscolor_palette(palette_device &palette) const;
+	void mem_map(address_map &map);
+	void palette(palette_device &palette) const;
 	virtual u16 get_internal_eeprom_address() override;
 };
 
@@ -164,30 +168,28 @@ static const uint8_t ws_portram_init[256] =
 	0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1
 };
 
-void wswan_state::wswan_mem(address_map &map)
+void wswan_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x03fff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles
 	map(0x04000, 0x0ffff).noprw();       // nothing
-	//map(0x10000, 0xeffff)    // cart range, setup at machine_start
 	map(0xf0000, 0xfffff).r(FUNC(wswan_state::bios_r));
 }
 
 
-void wscolor_state::wscolor_mem(address_map &map)
+void wscolor_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
-	//map(0x10000, 0xeffff)    // cart range, setup at machine_start
 	map(0xf0000, 0xfffff).r(FUNC(wscolor_state::bios_r));
 }
 
 
-void wswan_state::wswan_io(address_map &map)
+void wswan_state::io_map(address_map &map)
 {
 	map(0x00, 0xff).rw(FUNC(wswan_state::port_r), FUNC(wswan_state::port_w));   // I/O ports
 }
 
 
-void wswan_state::wswan_snd(address_map &map)
+void wswan_state::snd_map(address_map &map)
 {
 	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
 }
@@ -217,7 +219,7 @@ GFXDECODE_END
 
 
 /* WonderSwan can display 16 shades of grey */
-void wswan_state::wswan_palette(palette_device &palette) const
+void wswan_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -227,7 +229,7 @@ void wswan_state::wswan_palette(palette_device &palette) const
 }
 
 
-void wscolor_state::wscolor_palette(palette_device &palette) const
+void wscolor_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4096; i++)
 	{
@@ -251,8 +253,8 @@ void wswan_state::wswan(machine_config &config)
 {
 	// Basic machine hardware
 	V30MZ(config, m_maincpu, 3.072_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wswan_state::wswan_mem);
-	m_maincpu->set_addrmap(AS_IO, &wswan_state::wswan_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wswan_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &wswan_state::io_map);
 
 	WSWAN_VIDEO(config, m_vdp, 0);
 	m_vdp->set_screen("screen");
@@ -276,13 +278,13 @@ void wswan_state::wswan(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_wswan);
-	PALETTE(config, "palette", FUNC(wswan_state::wswan_palette), 16);
+	PALETTE(config, "palette", FUNC(wswan_state::palette), 16);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	WSWAN_SND(config, m_sound, 3.072_MHz_XTAL);
-	m_sound->set_addrmap(0, &wswan_state::wswan_snd);
+	m_sound->set_addrmap(0, &wswan_state::snd_map);
 	m_sound->add_route(0, "lspeaker", 0.50);
 	m_sound->add_route(1, "rspeaker", 0.50);
 
@@ -301,13 +303,13 @@ void wscolor_state::wscolor(machine_config &config)
 {
 	wswan(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &wscolor_state::wscolor_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wscolor_state::mem_map);
 
 	m_vdp->set_vdp_type(wswan_video_device::VDP_TYPE_WSC);
 
 	auto &palette(*subdevice<palette_device>("palette"));
 	palette.set_entries(4096);
-	palette.set_init(FUNC(wscolor_state::wscolor_palette));
+	palette.set_init(FUNC(wscolor_state::palette));
 
 	// software lists
 	config.device_remove("wsc_list");
@@ -467,7 +469,7 @@ void wswan_state::machine_reset()
 u8 wswan_state::bios_r(offs_t offset)
 {
 	if (!m_bios_disabled)
-		return m_region_maincpu->base()[offset & (m_region_maincpu->bytes() -1)];
+		return m_region_maincpu->base()[offset & (m_region_maincpu->bytes() - 1)];
 	else
 		return m_cart->read_rom40(offset + 0xb0000);
 }
