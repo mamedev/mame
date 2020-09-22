@@ -337,7 +337,7 @@ void ppu2c0x_device::init_palette()
 	init_palette(false);
 }
 
-rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num)
+rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy)
 {
 	const double tint = 0.22; /* adjust to taste */
 	const double hue = 287.0;
@@ -390,6 +390,31 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num)
 	double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
 	double B = (y + Ku * u) * 255.0;
 
+	double r_mod = 0.0;
+	double g_mod = 0.0;
+	double b_mod = 0.0;
+
+	if (is_pal_or_dendy) // PAL machines swap the colour emphasis bits, this means the red/blue highlighting on rampart tally bar doesn't look as good
+	{
+		color_emphasis = bitswap<3>(color_emphasis, 2, 0, 1);
+	}
+
+	switch (color_emphasis)
+	{
+		case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+		case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+		case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+		case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+		case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+		case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+		case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+		case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+	}
+
+	R = R * r_mod;
+	G = G * g_mod;
+	B = B * b_mod;
+
 	/* Clipping, in case of saturation */
 	if (R < 0)
 		R = 0;
@@ -409,6 +434,8 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num)
 
 void ppu2c0x_device::init_palette(bool indirect)
 {
+	bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
+
 	/* This routine builds a palette using a transformation from */
 	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
 
@@ -421,31 +448,13 @@ void ppu2c0x_device::init_palette(bool indirect)
 	/* Loop through the emphasis modes (8 total) */
 	for (int color_emphasis = 0; color_emphasis < 8; color_emphasis++)
 	{
-		/*
-		double r_mod = 0.0;
-		double g_mod = 0.0;
-		double b_mod = 0.0;
-
-		switch (color_emphasis)
-		{
-		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
-		}
-		*/
-
 		/* loop through the 4 intensities */
 		for (int color_intensity = 0; color_intensity < 4; color_intensity++)
 		{
 			/* loop through the 16 colors */
 			for (int color_num = 0; color_num < 16; color_num++)
 			{
-				rgb_t col = nespal_to_RGB(color_intensity, color_num);
+				rgb_t col = nespal_to_RGB(color_intensity, color_num, color_emphasis, is_pal);
 
 				/* Round, and set the value */
 				if (indirect)
@@ -477,20 +486,6 @@ void ppu2c0x_rgb_device::init_palette()
 
 	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
-
-#if 0
-/* the charlayout we use for the chargen */
-static const gfx_layout ppu_charlayout =
-{
-	8, 8,   /* 8*8 characters */
-	0,
-	2,      /* 2 bits per pixel */
-	{ 8*8, 0 }, /* the two bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-#endif
 
 /*************************************
  *
