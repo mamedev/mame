@@ -2111,12 +2111,11 @@ struct ym2203_state
 } // anonymous namespace
 
 /* Generate samples for one of the YM2203s */
-void ym2203_update_one(void *chip, write_stream_view &buffer)
+void ym2203_update_one(void *chip, write_stream_view &buf)
 {
 	ym2203_state *F2203 = (ym2203_state *)chip;
 	FM_OPN *OPN =   &F2203->OPN;
 	int i;
-	auto &buf = buffer;
 	FM_CH   *cch[3];
 
 	cch[0]   = &F2203->CH[0];

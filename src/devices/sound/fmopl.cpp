@@ -2206,11 +2206,10 @@ void ym3812_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device
 ** '*buffer' is the output buffer pointer
 ** 'length' is the number of samples that should be generated
 */
-void ym3812_update_one(void *chip, write_stream_view &buffer)
+void ym3812_update_one(void *chip, write_stream_view &buf)
 {
 	FM_OPL      *OPL = (FM_OPL *)chip;
 	uint8_t       rhythm = OPL->rhythm&0x20;
-	auto &buf = buffer;
 	int i;
 
 	for( i=0; i < buf.samples(); i++ )
@@ -2330,11 +2329,10 @@ void ym3526_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device
 ** '*buffer' is the output buffer pointer
 ** 'length' is the number of samples that should be generated
 */
-void ym3526_update_one(void *chip, write_stream_view &buffer)
+void ym3526_update_one(void *chip, write_stream_view &buf)
 {
 	FM_OPL      *OPL = (FM_OPL *)chip;
 	uint8_t       rhythm = OPL->rhythm&0x20;
-	auto &buf = buffer;
 	int i;
 
 	for( i=0; i < buf.samples() ; i++ )
@@ -2481,13 +2479,12 @@ void y8950_set_delta_t_memory(void *chip, FM_READBYTE read_byte, FM_WRITEBYTE wr
 ** '*buffer' is the output buffer pointer
 ** 'length' is the number of samples that should be generated
 */
-void y8950_update_one(void *chip, write_stream_view &buffer)
+void y8950_update_one(void *chip, write_stream_view &buf)
 {
 	int i;
 	FM_OPL      *OPL = (FM_OPL *)chip;
 	uint8_t       rhythm  = OPL->rhythm&0x20;
 	YM_DELTAT   &DELTAT = *OPL->deltat;
-	auto &buf = buffer;
 
 	for( i=0; i < buf.samples() ; i++ )
 	{
