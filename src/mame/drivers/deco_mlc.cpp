@@ -500,6 +500,18 @@ static const gfx_layout spritelayout_6bpp =
 	16*32
 };
 
+static const gfx_layout spritelayout_acchi =
+{
+	16,16,
+	RGN_FRAC(1,5),
+	5,
+	{ RGN_FRAC(0,5), RGN_FRAC(1,5), RGN_FRAC(2,5), RGN_FRAC(3,5), RGN_FRAC(4,5) },
+	{ 15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
 static GFXDECODE_START( gfx_deco_mlc )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout_4bpp,   0, 256 )
 GFXDECODE_END
@@ -510,6 +522,10 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_6bpp )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout_6bpp,   0,  64 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_acchi )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout_acchi,   0,  64 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -606,11 +622,13 @@ void deco_mlc_state::mlc_5bpp(machine_config &config)
 
 void deco_mlc_state::acchi(machine_config &config)
 {
-	mlc_6bpp(config);
+	mlc(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
 
 	config.device_remove("ioprot");
+
+	m_gfxdecode->set_info(gfx_acchi);
 }
 
 /***************************************************************************/
@@ -933,20 +951,20 @@ ROM_START( acchi ) // DE-0444-1 + DE-0457-0
 	ROM_LOAD32_WORD( "eaa-00-3.l10", 0x000000, 0x80000, CRC(faff1710) SHA1(b28d210b16b7a0a818ecfeb59696b093be27dc2b) )
 	ROM_LOAD32_WORD( "eaa-01-3.l11", 0x000002, 0x80000, CRC(00510371) SHA1(1beef396065c10e5f16b80a92d960abcd4838363) )
 
-	ROM_REGION( 0x1800000, "gfx1", ROMREGION_ERASE00 ) // TODO: fix ROM loading
-	ROM_LOAD16_BYTE( "faa-00-0.b1", 0x0000001, 0x200000, CRC(2cf34cd6) SHA1(4d96ca597ad84bedabf53dc17a976f0d95ab99b4) )
-	ROM_LOAD16_BYTE( "faa-02-0.b2", 0x0000000, 0x200000, CRC(bdf75bd6) SHA1(f271192a851e3750beeea6033dc43df614967de1) )
-	ROM_LOAD16_BYTE( "faa-08-0.c1", 0x0400001, 0x200000, CRC(70ba2149) SHA1(fbcf7c65021e55ed74b0333852860bfb56f05cab) )
-	ROM_LOAD16_BYTE( "faa-09-0.c2", 0x0400000, 0x200000, CRC(b616058f) SHA1(9dd8f259f08b76e177fc2a266159e4a716b5f4c6) )
-	// d1 and d2 not populated
-	ROM_LOAD16_BYTE( "faa-01-0.e1", 0x0c00001, 0x200000, CRC(a245270b) SHA1(a2279af96878fb099f8c1e67c2ecf3d0254b36a3) )
+	ROM_REGION( 0x1400000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "faa-09-0.c2", 0x0000000, 0x200000, CRC(b616058f) SHA1(9dd8f259f08b76e177fc2a266159e4a716b5f4c6) )
+	ROM_LOAD16_BYTE( "faa-08-0.c1", 0x0000001, 0x200000, CRC(70ba2149) SHA1(fbcf7c65021e55ed74b0333852860bfb56f05cab) )
+	ROM_LOAD16_BYTE( "faa-07-0.h2", 0x0400000, 0x200000, CRC(60028a62) SHA1(883935cb5421b344c9a83665a6bbdcff4986f1e7) )
+	ROM_LOAD16_BYTE( "faa-05-0.h1", 0x0400001, 0x200000, CRC(1e7a7a0a) SHA1(09333289177aa102ca082f55d27c453037769b4c) )
+	ROM_LOAD16_BYTE( "faa-06-0.f2", 0x0800000, 0x200000, CRC(5538ff81) SHA1(f68369a0ee25fe5ac3ce5f36c56ca72e46a08279) )
+	ROM_LOAD16_BYTE( "faa-04-0.f1", 0x0800001, 0x200000, CRC(35280765) SHA1(9dcee2724f16fa5c371bf89a4257bbb7eb25f733) )
 	ROM_LOAD16_BYTE( "faa-03-0.e2", 0x0c00000, 0x200000, CRC(af457714) SHA1(dcb94ac0cc632a9d84bb896588f33b47bf87a695) )
-	ROM_LOAD16_BYTE( "faa-04-0.f1", 0x1000001, 0x200000, CRC(35280765) SHA1(9dcee2724f16fa5c371bf89a4257bbb7eb25f733) )
-	ROM_LOAD16_BYTE( "faa-06-0.f2", 0x1000000, 0x200000, CRC(5538ff81) SHA1(f68369a0ee25fe5ac3ce5f36c56ca72e46a08279) )
-	ROM_LOAD16_BYTE( "faa-05-0.h1", 0x1400001, 0x200000, CRC(1e7a7a0a) SHA1(09333289177aa102ca082f55d27c453037769b4c) )
-	ROM_LOAD16_BYTE( "faa-07-0.h2", 0x1400000, 0x200000, CRC(60028a62) SHA1(883935cb5421b344c9a83665a6bbdcff4986f1e7) )
+	ROM_LOAD16_BYTE( "faa-01-0.e1", 0x0c00001, 0x200000, CRC(a245270b) SHA1(a2279af96878fb099f8c1e67c2ecf3d0254b36a3) )
+	ROM_LOAD16_BYTE( "faa-02-0.b2", 0x1000000, 0x200000, CRC(bdf75bd6) SHA1(f271192a851e3750beeea6033dc43df614967de1) )
+	ROM_LOAD16_BYTE( "faa-00-0.b1", 0x1000001, 0x200000, CRC(2cf34cd6) SHA1(4d96ca597ad84bedabf53dc17a976f0d95ab99b4) )
+	// there are two unpopulated IC spaces at d1 and d2
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "eaa-02-0.l12", 0x000000, 0x80000, CRC(09baf624) SHA1(548269cead3204c6d269955f5b91937a231bd6af) )
 
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
@@ -1040,4 +1058,4 @@ GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      R
 GAME( 1996, hoops96,   0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, ddream95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, hoops95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, acchi,     0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // wrong GFX ROM loading / GFX decode
+GAME( 1995, acchi,     0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_IMPERFECT_GRAPHICS ) // wrong GFX ROM loading / GFX decode
