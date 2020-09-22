@@ -17,22 +17,14 @@
   - Add support for voice sound
   - Add support for enveloped sound
   - Perform video DMA at proper timing.
-  - Add sound DMA.
-  - Setup some reasonable values in the internal EEPROM area?
   - Add (real/proper) RTC support.
-  - Look into timing issues like in Puzzle Bobble. VBlank interrupt lasts very long
-    which causes sprites to be disabled until about 10%-40% of drawing the screen.
-    The real unit seems to display things fine, need a real unit + real cart to
-    verify.
-  - Is background color setting really ok?
-  - Get a dump of the internal BIOSes.
   - Swan Crystal can handle up to 512Mbit ROMs??????
 	- SRAM sizes should be in kbit instead of kbytes(?). This raises a few
     interesting issues:
     - mirror of smaller <64KBYTE/512kbit sram sizes
     - banking when using 1M or 2M sram sizes
-  - There is some black around the corners of the Bandai logo during boot
-
+	- The units likely came with the name "WONDERSWAN" configured in the
+	  internal EEPOM
 
 ***************************************************************************/
 
@@ -875,11 +867,21 @@ u16 wscolor_state::get_internal_eeprom_address() {
 ROM_START(wswan)
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("boot.rom", 0x0000, 0x1000, CRC(7f35f890) SHA1(4015bcacea76bb0b5bbdb13c5358f7e1abb986a1))
+
+	ROM_REGION(0x80, "nvram", 0)
+	// Need a dump from an original new unit
+	// Empty file containing just the name 'WONDERSAN'
+	ROM_LOAD("internal_eeprom.ws", 0x00, 0x80, BAD_DUMP CRC(b1dff316) SHA1(7b76c3d59c9add9501f95e8bfc34427773fcbd28))
 ROM_END
 
 ROM_START(wscolor)
 	ROM_REGION(0x2000, "maincpu", 0)
   ROM_LOAD("boot.rom", 0x0000, 0x2000, CRC(cb06d9c3) SHA1(c5ad0b8af45d762662a69f50b64161b9c8919efb))
+
+	ROM_REGION(0x800, "nvram", 0)
+	// Need a dump from an original new unit
+	// Empty file containing just the name 'WONDERSAN'
+	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(9e29725c) SHA1(a903c2cb5f4bb94b67326ff87a2d91605dceffff))
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME
