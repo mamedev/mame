@@ -414,13 +414,13 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 	}
 }
 
-void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest)
 {
 	int is4bpp = get_201x_reg(0x0) & 0x02;
 
 	if (!is4bpp)
 	{
-		ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest, color_table);
+		ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest);
 	}
 	else
 	{

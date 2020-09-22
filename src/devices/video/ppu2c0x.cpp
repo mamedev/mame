@@ -36,6 +36,8 @@
 ***************************************************************************/
 
 /* default monochromatic colortable */
+
+/* TODO FIX
 static const pen_t default_colortable_mono[] =
 {
 	0,1,2,3,
@@ -48,7 +50,7 @@ static const pen_t default_colortable_mono[] =
 	0,1,2,3,
 };
 
-/* default colortable */
+// default colortable
 static const pen_t default_colortable[] =
 {
 	0,1,2,3,
@@ -60,6 +62,7 @@ static const pen_t default_colortable[] =
 	0,25,26,27,
 	0,29,30,31,
 };
+*/
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -252,8 +255,11 @@ void ppu2c0x_device::device_start()
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
 	m_bitmap = std::make_unique<bitmap_rgb32>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	m_spriteram = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
+
+	/* TODO FIX
 	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
 	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
+	*/
 
 	m_palette_ram.resize(0x20);
 
@@ -261,14 +267,16 @@ void ppu2c0x_device::device_start()
 		m_palette_ram[i] = 0x00;
 
 	/* initialize the color tables */
+	/* TODO FIX
 	for (int i = 0; i < ARRAY_LENGTH(default_colortable_mono); i++)
 	{
-		/* monochromatic table */
+		// monochromatic table
 		m_colortable_mono[i] = default_colortable_mono[i];
 
-		/* color table */
+		// color table
 		m_colortable[i] = default_colortable[i];
 	}
+	*/
 
 	init_palette();
 
@@ -293,8 +301,12 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
 	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
+
+	/* TODO FIX
 	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
 	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
+	*/
+
 	save_item(NAME(*m_bitmap));
 }
 
@@ -456,16 +468,18 @@ void ppu2c0x_device::init_palette(bool indirect)
 			{
 				rgb_t col = nespal_to_RGB(color_intensity, color_num, color_emphasis, is_pal);
 
+				m_nespens[entry] = col;
+
 				/* Round, and set the value */
 				if (indirect)
 					set_indirect_color(entry++, col);
 				else
 					set_pen_color(entry++, col);
+
+				
 			}
 		}
 	}
-
-	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
 void ppu2c0x_rgb_device::init_palette()
@@ -480,11 +494,11 @@ void ppu2c0x_rgb_device::init_palette()
 			int G = ((color_emphasis & 2) ? 7 : m_palette_data[color_num * 3 + 1]);
 			int B = ((color_emphasis & 4) ? 7 : m_palette_data[color_num * 3 + 2]);
 
+			m_nespens[entry] = rgb_t(pal3bit(R), pal3bit(G), pal3bit(B));
+
 			set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 		}
 	}
-
-	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
 /*************************************
@@ -604,13 +618,13 @@ void ppu2c0x_device::shift_tile_plane_data(uint8_t& pix)
 	m_planebuf[1] = m_planebuf[1] << 1;
 }
 
-void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest)
 {
 	pen_t pen;
 
 	if (pix)
 	{
-		const pen_t* paldata = &color_table[4 * color];
+		const pen_t* paldata = 0;// TODO FIX &color_table[4 * color];
 		pen = this->pen(paldata[pix]);
 	}
 	else
@@ -621,7 +635,7 @@ void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uin
 	*dest = pen;
 }
 
-void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest)
 {
 	int color = (((color_byte >> color_bits) & 0x03));
 
@@ -635,7 +649,7 @@ void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color
 
 		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 		{
-			draw_tile_pixel(pix, color, back_pen, dest, color_table);
+			draw_tile_pixel(pix, color, back_pen, dest);
 
 			// priority marking
 			if (pix)
@@ -654,10 +668,11 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint8_t color_mask;
-	const pen_t* color_table;
+	uint8_t color_mask = 0xff; // TODO FIX
+	//const pen_t* color_table;
 
 	/* setup the color mask and colortable to use */
+	/* TODO FIX
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 	{
 		color_mask = 0xf0;
@@ -668,7 +683,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 		color_mask = 0xff;
 		color_table = m_colortable.get();
 	}
-
+	*/
 	/* cache the background pen */
 	pen_t back_pen = pen(m_back_color & color_mask);
 
@@ -725,7 +740,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest, color_table);
+			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest);
 
 			start_x += 8;
 
@@ -791,7 +806,7 @@ void ppu2c0x_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
 
 void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	const pen_t* paldata = &m_colortable[4 * color];
+	const pen_t* paldata = 0; // TODO FIX &m_colortable[4 * color];
 	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(paldata[pixel_data]);
 }
 
@@ -1130,29 +1145,36 @@ void ppu2c0x_device::update_scanline()
 
 void ppu2c0x_device::palette_write(offs_t offset, uint8_t data)
 {
-	int color_emphasis = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
+	//int color_emphasis = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
 
 	// palette RAM is only 6 bits wide
 	data &= 0x3f;
 
-	// transparent pens are mirrored!
 	if (offset & 0x3)
 	{
+		// regular pens, no mirroring
 		m_palette_ram[offset & 0x1f] = data;
+
+		/* TODO FIX
 		m_colortable[offset & 0x1f] = data + color_emphasis;
 		m_colortable_mono[offset & 0x1f] = (data & 0xf0) + color_emphasis;
+		*/
 	}
 	else
 	{
-		int i;
+		// transparent pens are mirrored!
+		//int i;
 		if (0 == (offset & 0xf))
 		{
 			m_back_color = data;
+
+			/* TODO FIX
 			for (i = 0; i < 32; i += 4)
 			{
 				m_colortable[i] = data + color_emphasis;
 				m_colortable_mono[i] = (data & 0xf0) + color_emphasis;
 			}
+			*/
 		}
 		m_palette_ram[offset & 0xf] = m_palette_ram[(offset & 0xf) + 0x10] = data;
 	}
@@ -1275,6 +1297,8 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 
 	case PPU_CONTROL1: /* 1 */
 		/* if color intensity has changed, change all the color tables to reflect them */
+		/* TODO FIX
+
 		if ((data & PPU_CONTROL1_COLOR_EMPHASIS) != (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS))
 		{
 			int i;
@@ -1285,6 +1309,7 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 				m_colortable[i] = oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
 			}
 		}
+		*/
 
 		//logerror("control1 write: %02x (scanline: %d)\n", data, m_scanline);
 		m_regs[PPU_CONTROL1] = data;
