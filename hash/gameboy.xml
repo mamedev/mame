@@ -5,36 +5,36 @@ license:CC0
 
   To investigate:
 	- Check for duplicates in lot check folders and cross-check with official spreadsheets, to look for additional regional releases with shared ROM contents.
-	- Was Gargoyle's Quest (Rev. A) released in the USA?
+	- Was Gargoyle's Quest (Rev. 1) released in the USA?
 
   Known dumps not yet verified against retail cartridge:
 	- The Adventures of Rocky and Bullwinkle (USA)
 	- Fastest Lap (USA)
 	- GI King! - Sanbiki no Yosouya (Japan)
 	- Hyper Lode Runner (World)
-	- The Jetsons - Robot Panic (USA, Rev. A)
+	- The Jetsons - Robot Panic (USA, Rev. 1)
 	- Jungle Strike (USA)
-	- Kaseki Sousei Reborn (Jpn, Rev. A)
+	- Kaseki Sousei Reborn (Jpn, Rev. 1)
 	- Disney's Mulan (USA)
-	- Pac-In-Time (Euro, Rev. A)
+	- Pac-In-Time (Euro, Rev. 1)
 	- Pac-Man (Japan)
 	- Pang (UK)
 	- Suzuki Aguri no F-1 Super Driving (Japan)
-	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev. A)
+	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev. 1)
 	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
 	- The Adventures of Rocky and Bullwinkle (USA)
 	- Fastest Lap (USA)
 	- GI King! - Sanbiki no Yosouya (Japan)
 	- Hyper Lode Runner (World)
-	- The Jetsons - Robot Panic (USA, Rev. A)
+	- The Jetsons - Robot Panic (USA, Rev. 1)
 	- Jungle Strike (USA)
-	- Kaseki Sousei Reborn (Jpn, Rev. A)
+	- Kaseki Sousei Reborn (Jpn, Rev. 1)
 	- Disney's Mulan (USA)
-	- Pac-In-Time (Euro, Rev. A)
+	- Pac-In-Time (Euro, Rev. 1)
 	- Pac-Man (Japan)
 	- Pang (UK)
 	- Suzuki Aguri no F-1 Super Driving (Japan)
-	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev. A)
+	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev. 1)
 	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
 
   Undumped pirate carts:
@@ -793,7 +793,7 @@ license:CC0
 
 	<software name="amoudan2a">
 		<!--	In lot check as "dmgauj-1.434"	-->
-		<description>America Oudan Ultra Quiz Part 2 (Jpn, Rev. A)</description>
+		<description>America Oudan Ultra Quiz Part 2 (Jpn, Rev. 1)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AUJ" />
@@ -6408,7 +6408,7 @@ license:CC0
 	</software>
 
 	<software name="fifa98">
-		<description>FIFA Road to the World Cup '98 (Euro, Rev. A)</description>
+		<description>FIFA Road to the World Cup '98 (Euro, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU" />
@@ -6968,7 +6968,7 @@ license:CC0
 	</software>
 
 	<software name="gwatchu" cloneof="gwatch">
-		<description>Game &amp; Watch Gallery (USA, Rev. A)</description>
+		<description>Game &amp; Watch Gallery (USA, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA" />
@@ -7337,7 +7337,7 @@ license:CC0
 		<!--	In lot check as "dmgrae-1.108"	-->
 		<!--	European release is a relabeled USA version	-->
 		<!--	Unreleased in USA?	-->
-		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev. A)</description>
+		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev. 1)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-RA-NOE-1" />
@@ -10177,7 +10177,7 @@ license:CC0
 	<software name="jetsonsa">
 		<!--	In lot check as "dmgjse-1.588"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>The Jetsons - Robot Panic (USA, Rev. A)</description>
+		<description>The Jetsons - Robot Panic (USA, Rev. 1)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-JS-USA?" />
@@ -10723,7 +10723,7 @@ license:CC0
 	<software name="kasekia">
 		<!--	In lot check as "dmgakrj1.e41"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Kaseki Sousei Reborn (Jpn, Rev. A)</description>
+		<description>Kaseki Sousei Reborn (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AKRJ-JPN?" />
@@ -11113,7 +11113,7 @@ license:CC0
 
 	<software name="kininkoa">
 		<!--	In lot check as "dmgonj-1.153"	-->
-		<description>Kinin Koumaroku Oni (Jpn, Rev. A)</description>
+		<description>Kinin Koumaroku Oni (Jpn, Rev. 1)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ONJ?" />
@@ -13530,7 +13530,7 @@ license:CC0
 
 	<software name="mickey5a" cloneof="mickeymw">
 		<!--	In lot check as "dmgi5j-1.933"	-->
-		<description>Mickey Mouse V (Jpn, Rev. A)</description>
+		<description>Mickey Mouse V (Jpn, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-I5J?" />
@@ -15512,7 +15512,7 @@ license:CC0
 
 	<software name="wh2ja" cloneof="wh2">
 		<!--	In lot check as "dmgawjj1.a40"	-->
-		<description>Nettou World Heroes 2 Jet (Jpn, Rev. A)</description>
+		<description>Nettou World Heroes 2 Jet (Jpn, Rev. 1)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AWJJ-JPN?" />
@@ -16372,7 +16372,7 @@ license:CC0
 	<software name="pacintima">
 		<!--	In lot check as "dmgaptp1.a96"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Pac-In-Time (Euro, Rev. A)</description>
+		<description>Pac-In-Time (Euro, Rev. 1)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-APTP-?" />
@@ -17878,7 +17878,7 @@ license:CC0
 	<software name="poktpuyoa">
 		<!--	In lot check as "KENSA\dmgapyj1.0"	-->
 		<!-- NP only -->
-		<description>Pocket Puyo Puyo Tsuu (Jpn, Rev. A, NP)</description>
+		<description>Pocket Puyo Puyo Tsuu (Jpn, Rev. 1, NP)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="DMG-APYJ-JPN?" />
@@ -18376,7 +18376,7 @@ license:CC0
 
 	<software name="popeye2ja" cloneof="popeye2">
 		<!--	In lot check as "dmgpgj-1.403"	-->
-		<description>Popeye 2 (Japan, Rev. A)</description>
+		<description>Popeye 2 (Japan, Rev. 1)</description>
 		<year>1991</year>
 		<publisher>Sigma</publisher>
 		<info name="serial" value="DMG-PGJ" />
@@ -18809,7 +18809,7 @@ license:CC0
 	<software name="purikuraa">
 		<!--	In lot check as "KENSA\dmgappj1.0"	-->
 		<!-- NP only -->
-		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev. A, NP)</description>
+		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev. 1, NP)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-APPJ-JPN?" />
@@ -19983,7 +19983,7 @@ license:CC0
 
 	<software name="mvpbba">
 		<!--	In lot check as "dmgvme-1.640"	-->
-		<description>Roger Clemens' MVP Baseball (USA, Rev. A)</description>
+		<description>Roger Clemens' MVP Baseball (USA, Rev. 1)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="DMG-VM-USA?" />
@@ -23626,7 +23626,7 @@ license:CC0
 	<software name="tmnt3a" cloneof="tmnt3">
 		<!--	In lot check as "dmgk8x-1.918"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev. A)</description>
+		<description>Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-K8-UKV?" />
@@ -23902,7 +23902,7 @@ license:CC0
 
 	<software name="tetris2a">
 		<!--	In lot check as "dmgehx-1.@08"	-->
-		<description>Tetris 2 (Europe, Rev. A)</description>
+		<description>Tetris 2 (Europe, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="gold" value="19961029"/>
