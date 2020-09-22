@@ -2921,7 +2921,7 @@ license:CC0
 		<year>2000</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="CGB-AKWE-USA, CGB-AKWP-EUR"/>
-		<info name="gold" value="CGB-AKWE-USA, CGB-AKWP-EUR"/>
+		<info name="gold" value="19990910"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A09-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
