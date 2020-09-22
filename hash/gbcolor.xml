@@ -28891,7 +28891,7 @@ license:CC0
 		<description>Tun Shi Tian Di - Chi Bi Zhi Zhan (China)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="吞食天地 赤壁之戰 (Devouring of Heaven and Earth: The Battle of Red Cliffs)"/>
+		<info name="alt_title" value="吞食天地 赤壁之戰"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
@@ -28906,7 +28906,7 @@ license:CC0
 		<description>Shi Mian Mai Fu - Tu Long Pian (China)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="十面埋伏 屠龍篇 (House of Flying Daggers: Dragon Slayer Chapter)"/>
+		<info name="alt_title" value="十面埋伏 屠龍篇"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -28921,7 +28921,7 @@ license:CC0
 		<description>Shi Mian Mai Fu - Tian Long Pian (China)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="十面埋伏 天龍篇 (House of Flying Daggers: Sky Dragon Chapter)"/>
+		<info name="alt_title" value="十面埋伏 天龍篇"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -28980,7 +28980,7 @@ license:CC0
 		<description>Ying Xiong Chuan Shuo (China)</description>
 		<year>20??</year>
 		<publisher>Waixing</publisher>
-		<info name="alt_title" value="英雄传说 (Legend of Heroes)"/>
+		<info name="alt_title" value="英雄传说"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_digimon" />
 			<dataarea name="rom" size="1048576">
@@ -28996,7 +28996,7 @@ license:CC0
 		<year>20??</year>
 		<publisher>GOWIN</publisher>
 		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
-		<info name="alt_title" value="石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King)"/>
+		<info name="alt_title" value="石器時代 精靈王誕生"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_yong" />
 			<dataarea name="rom" size="4194304">
