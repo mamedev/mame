@@ -1433,7 +1433,7 @@ GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init, 
 GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)", "Astro Fire",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asterion,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Olympia)",    "Asterion",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Olympia)",    "Asterion",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (newer, CB)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (older, PZ)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

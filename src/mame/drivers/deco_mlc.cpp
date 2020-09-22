@@ -1039,6 +1039,7 @@ void deco_mlc_state::init_mlc()
 
 void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 {
+	m_maincpu->set_clock_scale(2.0f);  // avoids hangs in attract mode / end of round, see init_mlc()
 	m_irqLevel = ARM_IRQ_LINE;
 	deco156_decrypt(machine());
 }
@@ -1058,4 +1059,4 @@ GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      R
 GAME( 1996, hoops96,   0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, ddream95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, hoops95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, acchi,     0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_IMPERFECT_GRAPHICS ) // wrong GFX ROM loading / GFX decode
+GAME( 1995, acchi,     0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_IMPERFECT_GRAPHICS )
