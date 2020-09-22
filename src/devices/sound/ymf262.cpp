@@ -2618,19 +2618,19 @@ void ymf262_set_update_handler(void *chip, OPL3_UPDATEHANDLER UpdateHandler, dev
 ** '**buffers' is table of 4 pointers to the buffers: CH.A, CH.B, CH.C and CH.D
 ** 'length' is the number of samples that should be generated
 */
-void ymf262_update_one(void *_chip, OPL3SAMPLE * const *buffers, int length)
+void ymf262_update_one(void *_chip, std::vector<write_stream_view> &buffers)
 {
 	int i;
 	OPL3        *chip  = (OPL3 *)_chip;
 	signed int *chanout = chip->chanout;
 	uint8_t       rhythm = chip->rhythm&0x20;
 
-	OPL3SAMPLE  *ch_a = buffers[0]; // DO2 (mixed) left output for OPL4
-	OPL3SAMPLE  *ch_b = buffers[1]; // DO2 (mixed) right output for OPL4
-	OPL3SAMPLE  *ch_c = buffers[2]; // DO0 (FM only) left output for OPL4
-	OPL3SAMPLE  *ch_d = buffers[3]; // DO0 (FM only) right output for OPL4
+	auto &ch_a = buffers[0]; // DO2 (mixed) left output for OPL4
+	auto &ch_b = buffers[1]; // DO2 (mixed) right output for OPL4
+	auto &ch_c = buffers[2]; // DO0 (FM only) left output for OPL4
+	auto &ch_d = buffers[3]; // DO0 (FM only) right output for OPL4
 
-	for( i=0; i < length ; i++ )
+	for( i=0; i < ch_a.samples() ; i++ )
 	{
 		int a,b,c,d;
 
@@ -2782,16 +2782,6 @@ void ymf262_update_one(void *_chip, OPL3SAMPLE * const *buffers, int length)
 		c += chanout[17] & chip->pan[70];
 		d += chanout[17] & chip->pan[71];
 #endif
-		a >>= FINAL_SH;
-		b >>= FINAL_SH;
-		c >>= FINAL_SH;
-		d >>= FINAL_SH;
-
-		/* limit check */
-		a = limit( a , MAXOUT, MINOUT );
-		b = limit( b , MAXOUT, MINOUT );
-		c = limit( c , MAXOUT, MINOUT );
-		d = limit( d , MAXOUT, MINOUT );
 
 		#ifdef SAVE_SAMPLE
 		if (which==0)
@@ -2801,10 +2791,10 @@ void ymf262_update_one(void *_chip, OPL3SAMPLE * const *buffers, int length)
 		#endif
 
 		/* store to sound buffer */
-		ch_a[i] = a;
-		ch_b[i] = b;
-		ch_c[i] = c;
-		ch_d[i] = d;
+		ch_a.put_int_clamp(i, a, 32768 << FINAL_SH);
+		ch_b.put_int_clamp(i, a, 32768 << FINAL_SH);
+		ch_c.put_int_clamp(i, a, 32768 << FINAL_SH);
+		ch_d.put_int_clamp(i, a, 32768 << FINAL_SH);
 
 		advance(chip);
 	}
