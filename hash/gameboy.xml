@@ -14,9 +14,9 @@ license:CC0
 	- Hyper Lode Runner (World)
 	- The Jetsons - Robot Panic (USA, Rev. 1)
 	- Jungle Strike (USA)
-	- Kaseki Sousei Reborn (Jpn, Rev. 1)
+	- Kaseki Sousei Reborn (Japan, Rev. 1)
 	- Disney's Mulan (USA)
-	- Pac-In-Time (Euro, Rev. 1)
+	- Pac-In-Time (Europe, Rev. 1)
 	- Pac-Man (Japan)
 	- Pang (UK)
 	- Suzuki Aguri no F-1 Super Driving (Japan)
@@ -28,9 +28,9 @@ license:CC0
 	- Hyper Lode Runner (World)
 	- The Jetsons - Robot Panic (USA, Rev. 1)
 	- Jungle Strike (USA)
-	- Kaseki Sousei Reborn (Jpn, Rev. 1)
+	- Kaseki Sousei Reborn (Japan, Rev. 1)
 	- Disney's Mulan (USA)
-	- Pac-In-Time (Euro, Rev. 1)
+	- Pac-In-Time (Europe, Rev. 1)
 	- Pac-Man (Japan)
 	- Pang (UK)
 	- Suzuki Aguri no F-1 Super Driving (Japan)
@@ -793,7 +793,7 @@ license:CC0
 
 	<software name="amoudan2a">
 		<!--	In lot check as "dmgauj-1.434"	-->
-		<description>America Oudan Ultra Quiz Part 2 (Jpn, Rev. 1)</description>
+		<description>America Oudan Ultra Quiz Part 2 (Japan, Rev. 1)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AUJ" />
@@ -3605,7 +3605,7 @@ license:CC0
 	</software>
 
 	<software name="centiped">
-		<description>Centipede (Euro, USA, Accolade)</description>
+		<description>Centipede (Europe, USA, Accolade)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-CZ-USA, DMG-CZ-FRG" />
@@ -4146,7 +4146,7 @@ license:CC0
 	</software>
 
 	<software name="coolhanda" cloneof="coolhand" supported="partial">
-		<description>Cool Hand (Euro, French / German)</description>
+		<description>Cool Hand (Europe, French / German)</description>
 		<year>1998</year>
 		<publisher>Take-Two Interactive</publisher>
 		<info name="serial" value="DMG-ACDX-EUR" />
@@ -6408,7 +6408,7 @@ license:CC0
 	</software>
 
 	<software name="fifa98">
-		<description>FIFA Road to the World Cup '98 (Euro, Rev. 1)</description>
+		<description>FIFA Road to the World Cup '98 (Europe, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU" />
@@ -8012,7 +8012,7 @@ license:CC0
 	</software>
 
 	<software name="gbsjousse" cloneof="gbsjous">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Jpn, Special Edition)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Joushiki no Sho (Japan, Special Edition)</description>
 		<year>2002</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BS4J-JPN" />
@@ -8036,7 +8036,7 @@ license:CC0
 
 	<software name="gbskjtatie">
 		<!--	In lot check as "dmgbq2j0.k33"	-->
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn, Alt)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, Alt)</description>
 		<year>2003</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BQ2J-JPN?" />
@@ -8053,7 +8053,7 @@ license:CC0
 	</software>
 
 	<software name="gbskjtat" cloneof="gbskjtatie">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Jpn, Special Edition)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, Special Edition)</description>
 		<year>2001</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-BK4J-JPN" />
@@ -10723,7 +10723,7 @@ license:CC0
 	<software name="kasekia">
 		<!--	In lot check as "dmgakrj1.e41"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Kaseki Sousei Reborn (Jpn, Rev. 1)</description>
+		<description>Kaseki Sousei Reborn (Japan, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AKRJ-JPN?" />
@@ -11113,7 +11113,7 @@ license:CC0
 
 	<software name="kininkoa">
 		<!--	In lot check as "dmgonj-1.153"	-->
-		<description>Kinin Koumaroku Oni (Jpn, Rev. 1)</description>
+		<description>Kinin Koumaroku Oni (Japan, Rev. 1)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ONJ?" />
@@ -12252,7 +12252,7 @@ license:CC0
 		<publisher>Data East</publisher>
 		<info name="serial" value="DMG-LCA, DMG-LC-USA, DMG-LC-UKV, DMG-128 CHN" />
 		<info name="release" value="19900511 (JPN)" />
-		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box), LOCK'N'CHASE 銀行大盗·银行大盗 (Chinese)" />
+		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Japan Box), Lock n' Chase (Western Box), LOCK'N'CHASE 銀行大盗·银行大盗 (Chinese)" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found with DMG-BBA-02 -->
 			<feature name="u1" value="U1 PRG" />
@@ -13402,7 +13402,7 @@ license:CC0
 	</software>
 
 	<software name="metroid2">
-		<!-- Also released via the Nintendo Power service in 2000-03 (Jpn) -->
+		<!-- Also released via the Nintendo Power service in 2000-03 (Japan) -->
 		<description>Metroid II - Return of Samus (World)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -13530,7 +13530,7 @@ license:CC0
 
 	<software name="mickey5a" cloneof="mickeymw">
 		<!--	In lot check as "dmgi5j-1.933"	-->
-		<description>Mickey Mouse V (Jpn, Rev. 1)</description>
+		<description>Mickey Mouse V (Japan, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-I5J?" />
@@ -14510,7 +14510,7 @@ license:CC0
 	</software>
 
 	<software name="motoxman">
-		<description>Motocross Maniacs (Euro, re-release)</description>
+		<description>Motocross Maniacs (Europe, re-release)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-MX-NOE-1" />
@@ -15512,7 +15512,7 @@ license:CC0
 
 	<software name="wh2ja" cloneof="wh2">
 		<!--	In lot check as "dmgawjj1.a40"	-->
-		<description>Nettou World Heroes 2 Jet (Jpn, Rev. 1)</description>
+		<description>Nettou World Heroes 2 Jet (Japan, Rev. 1)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AWJJ-JPN?" />
@@ -16372,7 +16372,7 @@ license:CC0
 	<software name="pacintima">
 		<!--	In lot check as "dmgaptp1.a96"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Pac-In-Time (Euro, Rev. 1)</description>
+		<description>Pac-In-Time (Europe, Rev. 1)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-APTP-?" />
@@ -17475,7 +17475,7 @@ license:CC0
 	</software>
 
 	<!--
-	Pocket Bomberman (Jpn) supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	Pocket Bomberman (Japan) supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 	-->
@@ -17878,7 +17878,7 @@ license:CC0
 	<software name="poktpuyoa">
 		<!--	In lot check as "KENSA\dmgapyj1.0"	-->
 		<!-- NP only -->
-		<description>Pocket Puyo Puyo Tsuu (Jpn, Rev. 1, NP)</description>
+		<description>Pocket Puyo Puyo Tsuu (Japan, Rev. 1, NP)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="DMG-APYJ-JPN?" />
@@ -18752,7 +18752,7 @@ license:CC0
 	</software>
 
 	<software name="probot2s" cloneof="probot2">
-		<description>Probotector 2 (Euro, Sample)</description>
+		<description>Probotector 2 (Europe, Sample)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -23506,7 +23506,7 @@ license:CC0
 	</software>
 
 	<software name="tazdevl">
-		<description>Taz-Mania (Euro, USA, Sunsoft)</description>
+		<description>Taz-Mania (Europe, USA, Sunsoft)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-ZT-USA, DMG-ZT-NOE" />
@@ -23523,7 +23523,7 @@ license:CC0
 	</software>
 
 	<software name="tazmania">
-		<description>Taz-Mania (Euro, THQ)</description>
+		<description>Taz-Mania (Europe, THQ)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ZM-UKV" />
@@ -24066,7 +24066,7 @@ license:CC0
 
 	<software name="tintinx">
 		<!--	In lot check as "dmgat6x0.c13"	-->
-		<description>Tintin in Tibet (Euro, En / Es / It / Sv)</description>
+		<description>Tintin in Tibet (Europe, En / Es / It / Sv)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-AT6X-?"/>
@@ -24081,7 +24081,7 @@ license:CC0
 	</software>
 
 	<software name="tintin" cloneof="tintinx">
-		<description>Tintin in Tibet (Euro, En / Fr / De / Nl)</description>
+		<description>Tintin in Tibet (Europe, En / Fr / De / Nl)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-AT6P-?"/>
