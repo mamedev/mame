@@ -92,6 +92,7 @@ void iop_spu_device::dma_done(int bank)
 void iop_spu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// TODO
+	outputs[0].fill(0);
 }
 
 TIMER_CALLBACK_MEMBER(iop_spu_device::autodma_done_timer_hack)

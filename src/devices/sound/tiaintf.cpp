@@ -31,7 +31,7 @@ tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t 
 
 void tia_device::device_start()
 {
-	m_channel = stream_alloc_legacy(0, 1, clock());
+	m_channel = stream_alloc(0, 1, clock());
 	m_chip = tia_sound_init(this, clock(), clock(), 16);
 	if (!m_chip)
 		throw emu_fatalerror("tia_device(%s): Error creating TIA chip", tag());
@@ -49,12 +49,12 @@ void tia_device::device_stop()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tia_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void tia_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	tia_process(m_chip, outputs[0], samples);
+	tia_process(m_chip, outputs[0]);
 }
 
 

@@ -264,7 +264,7 @@ void tia_write(void *_chip, offs_t offset, uint8_t data)
 /*                                                                           */
 /*****************************************************************************/
 
-void tia_process(void *_chip, stream_sample_t *buffer, int length)
+void tia_process(void *_chip, write_stream_view &buffer)
 {
 	struct tia *chip = (struct tia *)_chip;
 	uint8_t audc0, audc1;
@@ -286,7 +286,7 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 	div_n_cnt1 = chip->Div_n_cnt[1];
 
 	/* loop until the buffer is filled */
-	while (length > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); )
 	{
 		/* Process channel 0 */
 		if (div_n_cnt0 > 1)
@@ -482,10 +482,7 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 				chip->Samp_n_cnt += chip->Samp_n_max;
 
 				/* calculate the latest output value and place in buffer */
-				*buffer++ = outvol_0 + outvol_1;
-
-				/* and indicate one less byte to process */
-				length--;
+				buffer.put_int(sampindex++, outvol_0 + outvol_1, 32768);
 			}
 		}
 		else
@@ -496,10 +493,9 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 				 * byte contains the fractional part */
 				chip->Samp_n_cnt -= 256;
 				/* calculate the latest output value and place in buffer */
-				*buffer++ = outvol_0 + outvol_1;
-				length--;
+				buffer.put_int(sampindex++, outvol_0 + outvol_1, 32768);
 			}
-			while ((chip->Samp_n_cnt >= 256) && (length > 0));
+			while ((chip->Samp_n_cnt >= 256) && (sampindex < buffer.samples()));
 
 			/* adjust the sample counter if necessary */
 			if (chip->Samp_n_cnt < 256)

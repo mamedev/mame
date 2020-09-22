@@ -177,6 +177,7 @@ void lmc1992_device::device_start()
 
 void lmc1992_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	outputs[0].fill(0);
 }
 
 
