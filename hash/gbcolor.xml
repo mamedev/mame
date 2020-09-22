@@ -17,13 +17,13 @@ license:CC0
 	- Gakkyuu Ou Yamazaki (Jpn)
 	- Jissen ni Yakudatsu Tsumego (Jpn)
 	- Laura (Euro)
-	- Mission Impossible (Euro, Rev. A)
+	- Mission Impossible (Euro, Rev. 1)
 	- Monster Traveler (Jpn)
 	- NBA In the Zone (USA)
 	- Pro Pool (USA)
 	- Sei Hai Densetsu (Jpn)
-	- Super Mario Bros. Deluxe (USA, Rev. B)	<- Was it released?
-	- Tsuri Sensei 2 (Jpn, Rev. A)
+	- Super Mario Bros. Deluxe (USA, Rev. 2)	<- Was it released?
+	- Tsuri Sensei 2 (Jpn, Rev. 1)
 	- Turok - Rage Wars (Aus)
 	- VR Sports Powerboat Racing (USA)
 	- Yakouchuu GB (Jpn)
@@ -1595,7 +1595,7 @@ license:CC0
 
 	<software name="barcodea" cloneof="barcode">
 		<!--	In lot check as "dmgabej1.f26"	-->
-		<description>Barcode Taisen Bardigun (Jpn, Rev. A)</description>
+		<description>Barcode Taisen Bardigun (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Tamsoft</publisher>
 		<info name="serial" value="DMG-ABEJ-JPN-1"/>
@@ -2245,7 +2245,7 @@ license:CC0
 	<software name="bokujom3a" cloneof="harvmon3">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbwaj1.350"	-->
-		<description>Bokujou Monogatari GB3 - Boy Meets Girl (Jpn, Rev. A)</description>
+		<description>Bokujou Monogatari GB3 - Boy Meets Girl (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-BWAJ-JPN"/>
@@ -2820,7 +2820,7 @@ license:CC0
 	</software>
 
 	<software name="ccsakuit">
-		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Jpn, Rev. B)</description>
+		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Jpn, Rev. 2)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-AM7J-JPN"/>
@@ -2836,7 +2836,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="cardcaptor sakura - itsumo sakura-chan to issho (japan) (rev b).bin" size="524288" crc="7243e258" sha1="a53e7f8d95375aea144e870977b0966cc1fd4b94"/>
+				<rom name="cardcaptor sakura - itsumo sakura-chan to issho (japan) (rev 2).bin" size="524288" crc="7243e258" sha1="a53e7f8d95375aea144e870977b0966cc1fd4b94"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -2844,7 +2844,7 @@ license:CC0
 	</software>
 
 	<software name="ccsakuita" cloneof="ccsakuit">
-		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Jpn, Rev. A)</description>
+		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-AM7J-JPN"/>
@@ -2854,7 +2854,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="cardcaptor sakura - itsumo sakura-chan to issho (japan) (rev a).bin" size="524288" crc="43f28e22" sha1="b3926ac213b9f88f570b0587fae89e3151018d63"/>
+				<rom name="cardcaptor sakura - itsumo sakura-chan to issho (japan) (rev 1).bin" size="524288" crc="43f28e22" sha1="b3926ac213b9f88f570b0587fae89e3151018d63"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4654,7 +4654,7 @@ license:CC0
 
 	<software name="doraqzb">
 		<!-- Notes: GBC only -->
-		<description>Doraemon no Quiz Boy (Jpn, Rev. A)</description>
+		<description>Doraemon no Quiz Boy (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="CGB-BQBJ-JPN"/>
@@ -5075,7 +5075,7 @@ license:CC0
 	</software>
 
 	<software name="dqm" cloneof="dwm">
-		<description>Dragon Quest Monsters - Terry no Wonderland (Jpn, Rev. A)</description>
+		<description>Dragon Quest Monsters - Terry no Wonderland (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-ADQJ-JPN"/>
@@ -5183,7 +5183,7 @@ license:CC0
 
 	<software name="dqm2ra" cloneof="dwm2c">
 		<!--	In lot check as "dmgbqlj1.j93"	-->
-		<description>Dragon Quest Monsters 2 - Maruta no Fushigi na Kagi - Ruka no Tabidachi (Jpn, Rev. A)</description>
+		<description>Dragon Quest Monsters 2 - Maruta no Fushigi na Kagi - Ruka no Tabidachi (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-BQLJ-JPN"/>
@@ -6157,7 +6157,7 @@ license:CC0
 
 	<software name="fairykit">
 		<!-- Also released by NP in 2000-03 -->
-		<description>Fairy Kitty no Kaiun Jiten - Yousei no Kuni no Uranai Shugyou (Jpn, Rev. A)</description>
+		<description>Fairy Kitty no Kaiun Jiten - Yousei no Kuni no Uranai Shugyou (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AFUJ-JPN"/>
@@ -6167,7 +6167,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="fairy kitty no kaiun jiten - yousei no kuni no uranai shugyou (japan) (rev. a).bin" size="1048576" crc="c4d3628f" sha1="d07b600cc9af8cadc2581a6ac19aadea79313d69"/>
+				<rom name="fairy kitty no kaiun jiten - yousei no kuni no uranai shugyou (japan) (Rev. 1).bin" size="1048576" crc="c4d3628f" sha1="d07b600cc9af8cadc2581a6ac19aadea79313d69"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6372,7 +6372,7 @@ license:CC0
 	</software>
 
 	<software name="froggeru" cloneof="frogger">
-		<description>Frogger (USA, Rev. B)</description>
+		<description>Frogger (USA, Rev. 2)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AFRE-USA-3"/>
@@ -6388,14 +6388,14 @@ license:CC0
 	</software>
 
 	<software name="froggerua" cloneof="frogger">
-		<description>Frogger (USA, Rev. A)</description>
+		<description>Frogger (USA, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AFRE-USA-2"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="frogger (usa) (rev a).bin" size="1048576" crc="ba907064" sha1="db3d21977c17a505936d1e2fc3626a0b43addf16"/>
+				<rom name="frogger (usa) (rev 1).bin" size="1048576" crc="ba907064" sha1="db3d21977c17a505936d1e2fc3626a0b43addf16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6433,7 +6433,7 @@ license:CC0
 	<software name="frogger2a" cloneof="frogger2">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbh2e1.351"	-->
-		<description>Frogger 2 (USA, Rev. A)</description>
+		<description>Frogger 2 (USA, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="CGB-BH2E-USA"/>
@@ -6474,7 +6474,7 @@ license:CC0
 	</software>
 
 	<software name="onepyume">
-		<description>From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Jpn, Rev. A)</description>
+		<description>From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BLUJ-JPN"/>
@@ -6491,7 +6491,7 @@ license:CC0
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou (japan) (rev. a).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b"/>
+				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou (japan) (Rev. 1).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6616,7 +6616,7 @@ license:CC0
 	</software>
 
 	<software name="gakkyamaa">
-		<description>Gakkyuu Ou Yamazaki (Jpn, Rev. A)</description>
+		<description>Gakkyuu Ou Yamazaki (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-AYMJ-JPN"/>
@@ -6695,7 +6695,7 @@ license:CC0
 	<software name="gamblerta" cloneof="gamblert">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbgyj1.607"	-->
-		<description>Gambler Densetsu Tetsuya - Shinjuku Tenun Hen (Jpn, Rev. A)</description>
+		<description>Gambler Densetsu Tetsuya - Shinjuku Tenun Hen (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="CGB-BGYJ-JPN?"/>
@@ -7823,7 +7823,7 @@ license:CC0
 
 	<software name="hamstpa2">
 		<!-- Notes: GBC only -->
-		<description>Hamster Paradise 2 (Jpn, Rev. A)</description>
+		<description>Hamster Paradise 2 (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="CGB-BHMJ-JPN"/>
@@ -7832,7 +7832,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="hamster paradise 2 (japan) (rev a).bin" size="2097152" crc="b9e1f3b0" sha1="140100d96d165ee399f5cd18f5aec962fde714b6"/>
+				<rom name="hamster paradise 2 (japan) (rev 1).bin" size="2097152" crc="b9e1f3b0" sha1="140100d96d165ee399f5cd18f5aec962fde714b6"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9233,7 +9233,7 @@ license:CC0
 
 	<software name="jissena">
 		<!-- Notes: GBC only -->
-		<description>Jissen ni Yakudatsu Tsumego (Jpn, Rev. A)</description>
+		<description>Jissen ni Yakudatsu Tsumego (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="CGB-BJTJ-JPN (PCPE-10004)"/>
@@ -9685,7 +9685,7 @@ license:CC0
 
 	<software name="kawaipt2a">
 		<!--	In lot check as "dmgbmnj1.j90"	-->
-		<description>Kawaii Pet Shop Monogatari 2 (Jpn, Rev. A)</description>
+		<description>Kawaii Pet Shop Monogatari 2 (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-BMNJ-JPN"/>
@@ -9990,7 +9990,7 @@ license:CC0
 
 	<software name="kisekae2">
 		<!-- Notes: GBC only -->
-		<description>Kisekae Series 2 - Oshare Nikki (Jpn, Rev. A)</description>
+		<description>Kisekae Series 2 - Oshare Nikki (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-B23J-JPN"/>
@@ -9999,7 +9999,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="kisekae series 2 - oshare nikki (japan) (rev. a).bin" size="2097152" crc="e915337c" sha1="1896ec1aa7edb56774afa5d8b93e941aa1e838eb"/>
+				<rom name="kisekae series 2 - oshare nikki (japan) (Rev. 1).bin" size="2097152" crc="e915337c" sha1="1896ec1aa7edb56774afa5d8b93e941aa1e838eb"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10484,14 +10484,14 @@ license:CC0
 	</software>
 
 	<software name="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Euro, Aus, USA, Rev. B)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Euro, Aus, USA, Rev. 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLE-USA, DMG-AZLP-(EUR/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="legend of zelda, the - link's awakening dx (usa, europe) (rev b).bin" size="1048576" crc="06887a34" sha1="1c091225688d966928cc74336dbef2e07d12a47c"/>
+				<rom name="legend of zelda, the - link's awakening dx (usa, europe) (rev 2).bin" size="1048576" crc="06887a34" sha1="1c091225688d966928cc74336dbef2e07d12a47c"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -10499,14 +10499,14 @@ license:CC0
 	</software>
 
 	<software name="zeldaldxa" cloneof="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Euro, USA, Rev. A)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Euro, USA, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLE-USA, DMG-AZLP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="legend of zelda, the - link's awakening dx (usa, europe) (rev a).bin" size="1048576" crc="b38eb9de" sha1="363d184d9b1e9faa5a2facd80897b7e118446164"/>
+				<rom name="legend of zelda, the - link's awakening dx (usa, europe) (rev 1).bin" size="1048576" crc="b38eb9de" sha1="363d184d9b1e9faa5a2facd80897b7e118446164"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -10536,7 +10536,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaldxf" cloneof="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Fra, Rev. A)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Fra, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLF-FRA"/>
@@ -10578,7 +10578,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaldxg" cloneof="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Ger, Rev. A)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Ger, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLD-NOE"/>
@@ -10900,7 +10900,7 @@ license:CC0
 	<software name="lionkingfa" cloneof="lionking">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbblkf1.573"	-->
-		<description>Le Roi Lion - Les Adventures de Simba (Fra, Rev. A)</description>
+		<description>Le Roi Lion - Les Adventures de Simba (Fra, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BLKF-FRA"/>
@@ -11246,7 +11246,7 @@ license:CC0
 
 	<software name="hirapzl2">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-2-gou (Jpn, Rev. A, NP)</description>
+		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-2-gou (Jpn, Rev. 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B52J-JPN"/>
@@ -11256,7 +11256,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="loppi puzzle magazine - hirameku puzzle dai-2-gou (japan) (rev a) (np).bin" size="262144" crc="d54d5836" sha1="c88ae04f7adbec5ad40edec650198cbe58a561bd"/>
+				<rom name="loppi puzzle magazine - hirameku puzzle dai-2-gou (japan) (rev 1) (np).bin" size="262144" crc="d54d5836" sha1="c88ae04f7adbec5ad40edec650198cbe58a561bd"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -11284,7 +11284,7 @@ license:CC0
 
 	<software name="hirapzl3">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-3-gou (Jpn, Rev. A, NP)</description>
+		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-3-gou (Jpn, Rev. 1, NP)</description>
 		<year>2002</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B53J-JPN"/>
@@ -11294,7 +11294,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="loppi puzzle magazine - hirameku puzzle dai-3-gou (japan) (rev a) (np).bin" size="262144" crc="065a3bf5" sha1="42721b99b427e51f7e815c852bf53e807c52dd65"/>
+				<rom name="loppi puzzle magazine - hirameku puzzle dai-3-gou (japan) (rev 1) (np).bin" size="262144" crc="065a3bf5" sha1="42721b99b427e51f7e815c852bf53e807c52dd65"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -11322,7 +11322,7 @@ license:CC0
 
 	<software name="hirapzls">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Hirameku Puzzle Soukangou (Jpn, Rev. A, NP)</description>
+		<description>Loppi Puzzle Magazine - Hirameku Puzzle Soukangou (Jpn, Rev. 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B51J-JPN"/>
@@ -11332,7 +11332,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="loppi puzzle magazine - hirameku puzzle soukangou (japan) (rev a) (np).bin" size="262144" crc="267b5253" sha1="f977d3dd6395066bbea729ea547c7a81e1c4464d"/>
+				<rom name="loppi puzzle magazine - hirameku puzzle soukangou (japan) (rev 1) (np).bin" size="262144" crc="267b5253" sha1="f977d3dd6395066bbea729ea547c7a81e1c4464d"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -11360,7 +11360,7 @@ license:CC0
 
 	<software name="kangpzl2a">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Jpn, Rev. A, NP)</description>
+		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Jpn, Rev. 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B62J-JPN"/>
@@ -11370,7 +11370,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="loppi puzzle magazine - kangaeru puzzle dai-2-gou (japan) (rev a) (np).bin" size="262144" crc="a30ad68d" sha1="bbb3c1b9d0dcfabc177f443ea11efa6b6e3112e1"/>
+				<rom name="loppi puzzle magazine - kangaeru puzzle dai-2-gou (japan) (rev 1) (np).bin" size="262144" crc="a30ad68d" sha1="bbb3c1b9d0dcfabc177f443ea11efa6b6e3112e1"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -11398,7 +11398,7 @@ license:CC0
 
 	<software name="kangpzl3a">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Jpn, Rev. A, NP)</description>
+		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Jpn, Rev. 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B63J-JPN"/>
@@ -11408,7 +11408,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="loppi puzzle magazine - kangaeru puzzle dai-3-gou (japan) (rev a) (np).bin" size="262144" crc="9c932f0d" sha1="1d0dbac5283d6e7459afb0e4b4a194bbe79a798b"/>
+				<rom name="loppi puzzle magazine - kangaeru puzzle dai-3-gou (japan) (rev 1) (np).bin" size="262144" crc="9c932f0d" sha1="1d0dbac5283d6e7459afb0e4b4a194bbe79a798b"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -11436,7 +11436,7 @@ license:CC0
 
 	<software name="kangpzlsa">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Jpn, Rev. A, NP)</description>
+		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Jpn, Rev. 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B61J-JPN"/>
@@ -11446,7 +11446,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="loppi puzzle magazine - kangaeru puzzle soukangou (japan) (rev a) (np).bin" size="262144" crc="8019c6f5" sha1="4a9d7a35bc073399cbe852d356afa3772c5a7788"/>
+				<rom name="loppi puzzle magazine - kangaeru puzzle soukangou (japan) (rev 1) (np).bin" size="262144" crc="8019c6f5" sha1="4a9d7a35bc073399cbe852d356afa3772c5a7788"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -11518,7 +11518,7 @@ license:CC0
 	<software name="lovehinaa" cloneof="lovehina">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbphj1.290"	-->
-		<description>Love Hina Pocket (Jpn, Rev. A)</description>
+		<description>Love Hina Pocket (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Marvelous Entertainment</publisher>
 		<info name="serial" value="CGB-BPHJ-JPN"/>
@@ -11814,14 +11814,14 @@ license:CC0
 
 	<software name="mtetrisc">
 		<!-- Notes: GBC only -->
-		<description>Magical Tetris Challenge (Euro, Rev. A)</description>
+		<description>Magical Tetris Challenge (Euro, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-AXCP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="magical tetris challenge (europe) (en,fr,de,es,it,nl,sv) (rev a).bin" size="1048576" crc="c82be2f4" sha1="950b30b267b0f0b79d7e85e91b8536b096b6a1b2"/>
+				<rom name="magical tetris challenge (europe) (en,fr,de,es,it,nl,sv) (rev 1).bin" size="1048576" crc="c82be2f4" sha1="950b30b267b0f0b79d7e85e91b8536b096b6a1b2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11897,7 +11897,7 @@ license:CC0
 	</software>
 
 	<software name="majomari">
-		<description>Majokko Mari-chan no Kisekae Monogatari (Jpn, Rev. A)</description>
+		<description>Majokko Mari-chan no Kisekae Monogatari (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="DMG-A23J-JPN-1"/>
@@ -11907,7 +11907,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="majokko mari-chan no kisekae monogatari (japan) (rev. a).bin" size="2097152" crc="0d16a545" sha1="a56e2a42d4a0b21e656bc928e4451cf0623486cf"/>
+				<rom name="majokko mari-chan no kisekae monogatari (japan) (Rev. 1).bin" size="2097152" crc="0d16a545" sha1="a56e2a42d4a0b21e656bc928e4451cf0623486cf"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13099,7 +13099,7 @@ license:CC0
 
 	<software name="minnashga" cloneof="minnashg">
 		<!--	In lot check as "dmga7yj1.i18"	-->
-		<description>Minna no Shougi - Shokyuu Hen (Jpn, Rev. A)</description>
+		<description>Minna no Shougi - Shokyuu Hen (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-A7YJ-JPN"/>
@@ -13197,7 +13197,7 @@ license:CC0
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbaimp1.076"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Mission Impossible (Euro, Rev. A)</description>
+		<description>Mission Impossible (Euro, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-AIMP-?"/>
@@ -13446,7 +13446,7 @@ license:CC0
 
 	<software name="monstrvla">
 		<!-- Notes: GBC only -->
-		<description>Monster Traveler (Jpn, Rev. A)</description>
+		<description>Monster Traveler (Jpn, Rev. 1)</description>
 		<year>2002</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="CGB-BFVJ-JPN"/>
@@ -13456,7 +13456,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
-				<rom name="monster traveler (japan) (rev a).bin" size="4194304" crc="f60a376e" sha1="23842b7ad88a051b14c1676b1f561b933177f150"/>
+				<rom name="monster traveler (japan) (rev 1).bin" size="4194304" crc="f60a376e" sha1="23842b7ad88a051b14c1676b1f561b933177f150"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13485,7 +13485,7 @@ license:CC0
 
 	<software name="monstinc">
 		<!-- Notes: GBC only -->
-		<description>Monsters, Inc. (Euro, Rev. A)</description>
+		<description>Monsters, Inc. (Euro, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="CGB-B4QP-UKV"/>
@@ -14364,7 +14364,7 @@ license:CC0
 	</software>
 
 	<software name="nbazonea" cloneof="nbapro99">
-		<description>NBA In the Zone (USA, Rev. A)</description>
+		<description>NBA In the Zone (USA, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANZE-USA"/>
@@ -14372,7 +14372,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="nba in the zone (usa) (rev a).bin" size="1048576" crc="be949f74" sha1="f4ba926ad640d7b3e9d175fb58c90347dafcbef4"/>
+				<rom name="nba in the zone (usa) (rev 1).bin" size="1048576" crc="be949f74" sha1="f4ba926ad640d7b3e9d175fb58c90347dafcbef4"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -14627,7 +14627,7 @@ license:CC0
 	</software>
 
 	<software name="blitz">
-		<description>NFL Blitz (Euro, USA, Rev. A)</description>
+		<description>NFL Blitz (Euro, USA, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="DMG-ABZE-USA, DMG-ABZP-EUU"/>
@@ -15711,7 +15711,7 @@ license:CC0
 	</software>
 
 	<software name="pokegin" cloneof="pokesilv">
-		<description>Pocket Monsters Gin (Jpn, Rev. A)</description>
+		<description>Pocket Monsters Gin (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAXJ-JPN"/>
@@ -15728,7 +15728,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pocket monsters gin (japan) (rev a).bin" size="1048576" crc="0aea5383" sha1="a11d5ddc26eb826086593f82370b15d16404d33e"/>
+				<rom name="pocket monsters gin (japan) (rev 1).bin" size="1048576" crc="0aea5383" sha1="a11d5ddc26eb826086593f82370b15d16404d33e"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -15755,7 +15755,7 @@ license:CC0
 	</software>
 
 	<software name="pokekin" cloneof="pokegold">
-		<description>Pocket Monsters Kin (Jpn, Rev. A)</description>
+		<description>Pocket Monsters Kin (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAUJ-JPN"/>
@@ -15766,7 +15766,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pocket monsters kin (japan) (rev a).bin" size="1048576" crc="4ef7f2a5" sha1="a222402235d484ee8e39f3f31bae57cf13daf585"/>
+				<rom name="pocket monsters kin (japan) (rev 1).bin" size="1048576" crc="4ef7f2a5" sha1="a222402235d484ee8e39f3f31bae57cf13daf585"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -15925,7 +15925,7 @@ license:CC0
 	<software name="poktpuyna" cloneof="poktpuyn">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbpyj1.327"	-->
-		<description>Pocket Puyo Puyo-n (Jpn, Rev. A)</description>
+		<description>Pocket Puyo Puyo-n (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="CGB-BPYJ-JPN"/>
@@ -15944,7 +15944,7 @@ license:CC0
 	<software name="poktpuynb" cloneof="poktpuyn">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbpyj2.327"	-->
-		<description>Pocket Puyo Puyo-n (Jpn, Rev. B)</description>
+		<description>Pocket Puyo Puyo-n (Jpn, Rev. 2)</description>
 		<year>2000</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="CGB-BPYJ-JPN"/>
@@ -15996,7 +15996,7 @@ license:CC0
 	<software name="pokecrys">
 		<!-- Notes: GBC only -->
 		<!--	European version 0 never released (marked as "生産中止" in lot check)	-->
-		<description>Pokémon - Crystal Version (Euro, USA, Rev. A)</description>
+		<description>Pokémon - Crystal Version (Euro, USA, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTE-USA, CGB-BYTP-EUR"/>
@@ -16006,7 +16006,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<rom name="pokemon - crystal version (usa, europe) (rev a).bin" size="2097152" crc="3358e30a" sha1="f2f52230b536214ef7c9924f483392993e226cfb"/>
+				<rom name="pokemon - crystal version (usa, europe) (rev 1).bin" size="2097152" crc="3358e30a" sha1="f2f52230b536214ef7c9924f483392993e226cfb"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16469,7 +16469,7 @@ license:CC0
 
 	<software name="pokecard">
 		<!--	In lot check as "dmgaxqx1.j85"	-->
-		<description>Pokémon Trading Card Game (Euro, English / Spanish / Italian, Rev. A)</description>
+		<description>Pokémon Trading Card Game (Euro, English / Spanish / Italian, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AXQX-EUR-1"/>
@@ -16527,7 +16527,7 @@ license:CC0
 
 	<software name="pokecardaa" cloneof="pokecard">
 		<!--	In lot check as "dmgaxqp1.j84"	-->
-		<description>Pokémon Trading Card Game (Euro, English / French / German, Rev. A)</description>
+		<description>Pokémon Trading Card Game (Euro, English / French / German, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AXQP-NOE?"/>
@@ -16716,7 +16716,7 @@ license:CC0
 	</software>
 
 	<software name="powrpkp">
-		<description>Power Pro Kun Pocket (Jpn, Rev. A)</description>
+		<description>Power Pro Kun Pocket (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AVVJ-JPN (RK178-J1)"/>
@@ -16726,7 +16726,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="power pro kun pocket (japan) (rev a).bin" size="2097152" crc="894d88f2" sha1="ae145f2de0d53c19b973c71baaf3f2cca2ca395a"/>
+				<rom name="power pro kun pocket (japan) (rev 1).bin" size="2097152" crc="894d88f2" sha1="ae145f2de0d53c19b973c71baaf3f2cca2ca395a"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16920,7 +16920,7 @@ license:CC0
 
 	<software name="powrpfbmu" cloneof="powrpfbm">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev. B)</description>
+		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev. 2)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BJJE-USA-2"/>
@@ -16938,7 +16938,7 @@ license:CC0
 
 	<software name="powrpfbmua" cloneof="powrpfbm">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev. A)</description>
+		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BJJE-USA-1"/>
@@ -17042,7 +17042,7 @@ license:CC0
 
 	<software name="powrpfbhu" cloneof="powrpfbh">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Battle Him (USA, Rev. A)</description>
+		<description>The Powerpuff Girls - Battle Him (USA, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BBHE-USA-1"/>
@@ -17141,28 +17141,28 @@ license:CC0
 
 	<software name="powrpfpnu" cloneof="powrpfpn">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev. B)</description>
+		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev. 2)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BPTE-USA-2?"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="powerpuff girls, the - paint the townsville green (usa) (rev b).bin" size="2097152" crc="443367ae" sha1="ef93e793067bbb3748aac17d661c8c8b68ccee9b"/>
+				<rom name="powerpuff girls, the - paint the townsville green (usa) (rev 2).bin" size="2097152" crc="443367ae" sha1="ef93e793067bbb3748aac17d661c8c8b68ccee9b"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="powrpfpnua" cloneof="powrpfpn">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev. A)</description>
+		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BPTE-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="powerpuff girls, the - paint the townsville green (usa) (rev a).bin" size="2097152" crc="295b3646" sha1="023d4d9374e7fe9844f970dd0004c5d7eefd2d38"/>
+				<rom name="powerpuff girls, the - paint the townsville green (usa) (rev 1).bin" size="2097152" crc="295b3646" sha1="023d4d9374e7fe9844f970dd0004c5d7eefd2d38"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19072,7 +19072,7 @@ license:CC0
 
 	<software name="sanriotka" cloneof="sanriotk">
 		<!--	In lot check as "dmgatpj1.f14"	-->
-		<description>Sanrio Timenet - Kako Hen (Jpn, Rev. A)</description>
+		<description>Sanrio Timenet - Kako Hen (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-ATPJ-JPN"/>
@@ -19112,7 +19112,7 @@ license:CC0
 
 	<software name="sanriotma" cloneof="sanriotm">
 		<!--	In lot check as "dmgatfj1.f15"	-->
-		<description>Sanrio Timenet - Mirai Hen (Jpn, Rev. A)</description>
+		<description>Sanrio Timenet - Mirai Hen (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-ATFJ-JPN"/>
@@ -19332,7 +19332,7 @@ license:CC0
 	</software>
 
 	<software name="shadgate">
-		<description>Shadowgate Classic (Euro, USA, Rev. A)</description>
+		<description>Shadowgate Classic (Euro, USA, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ASWE-USA, DMG-ASWP-EUR"/>
@@ -19443,7 +19443,7 @@ license:CC0
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai Pocket (Euro, Rev. A)</description>
+		<description>Shanghai Pocket (Euro, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AHPP-(EUR/EUU)?"/>
@@ -19451,7 +19451,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shanghai pocket (europe) (rev a).bin" size="1048576" crc="d8fac36c" sha1="adbf1a18dea69e46c3dbccec03e09668912f12a7"/>
+				<rom name="shanghai pocket (europe) (rev 1).bin" size="1048576" crc="d8fac36c" sha1="adbf1a18dea69e46c3dbccec03e09668912f12a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19535,7 +19535,7 @@ license:CC0
 
 	<software name="shinmtaa">
 		<!--	In lot check as "dmgbhnj1.j70"	-->
-		<description>Shin Megami Tensei Devil Children - Aka no Sho (Jpn, Rev. A)</description>
+		<description>Shin Megami Tensei Devil Children - Aka no Sho (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-BHNJ-JPN"/>
@@ -19580,7 +19580,7 @@ license:CC0
 
 	<software name="shinmtka">
 		<!--	In lot check as "dmgbhej1.j69"	-->
-		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Jpn, Rev. A)</description>
+		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-BHEJ-JPN"/>
@@ -20304,7 +20304,7 @@ license:CC0
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "KENSA\cgbas6j1.0"	-->
 		<!--	Never released as physical cartridge	-->
-		<description>Spy vs. Spy (Japan, Rev. A, NP)</description>
+		<description>Spy vs. Spy (Japan, Rev. 1, NP)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -20682,7 +20682,7 @@ license:CC0
 	<software name="smbdxja" cloneof="smbdx">
 		<!-- Notes: GBC only, NP only -->
 		<!--	In lot check as "KENSA\cgbahyj1.0"	-->
-		<description>Super Mario Bros. Deluxe (Jpn, NP, Rev. A)</description>
+		<description>Super Mario Bros. Deluxe (Jpn, NP, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AHYJ-JPN"/>
@@ -20702,14 +20702,14 @@ license:CC0
 		<!-- Notes: GBC only -->
 		<!--	Retail cartridge of USA version not yet secured, might be unreleased	-->
 		<!--	In lot check as "cgbahyp2.013", "KENSA\cgbahye2.0"	-->
-		<description>Super Mario Bros. Deluxe (Euro, USA, Rev. B)</description>
+		<description>Super Mario Bros. Deluxe (Euro, USA, Rev. 2)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AHYE-USA, CGB-AHYP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="super mario bros. deluxe (usa, europe) (rev b).bin" size="1048576" crc="62bbae83" sha1="254f2254e9d54e2501e3e4ebe09491e03573a6a4"/>
+				<rom name="super mario bros. deluxe (usa, europe) (rev 2).bin" size="1048576" crc="62bbae83" sha1="254f2254e9d54e2501e3e4ebe09491e03573a6a4"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20718,14 +20718,14 @@ license:CC0
 
 	<software name="smbdxa" cloneof="smbdx">
 		<!-- Notes: GBC only -->
-		<description>Super Mario Bros. Deluxe (Euro, USA, Rev. A)</description>
+		<description>Super Mario Bros. Deluxe (Euro, USA, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AHYE-USA, CGB-AHYP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="super mario bros. deluxe (usa, europe) (rev a).bin" size="1048576" crc="90ab047b" sha1="07295cd60ae44183ebecb013930727e0404169d5"/>
+				<rom name="super mario bros. deluxe (usa, europe) (rev 1).bin" size="1048576" crc="90ab047b" sha1="07295cd60ae44183ebecb013930727e0404169d5"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -21446,7 +21446,7 @@ license:CC0
 	<software name="tetrisada" cloneof="mtetrisc">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbat7j1.070"	-->
-		<description>Tetris Adventure - Susume Mickey to Nakama-tachi (Jpn, Rev. A)</description>
+		<description>Tetris Adventure - Susume Mickey to Nakama-tachi (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CGB-AT7J-JPN?"/>
@@ -21802,7 +21802,7 @@ license:CC0
 	<software name="tomjermha" cloneof="tomjermh">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbtjp1.487"	-->
-		<description>Tom and Jerry - Mousehunt (Euro, Rev. A)</description>
+		<description>Tom and Jerry - Mousehunt (Euro, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
 		<info name="serial" value="CGB-BTJP-EUR"/>
@@ -21832,7 +21832,7 @@ license:CC0
 	<software name="tomjermhua" cloneof="tomjermh">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbbtqe1.541"	-->
-		<description>Tom and Jerry - Mousehunt (USA, Rev. A)</description>
+		<description>Tom and Jerry - Mousehunt (USA, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
 		<info name="serial" value="CGB-BTJE-USA?"/>
@@ -22308,7 +22308,7 @@ license:CC0
 
 	<software name="tottokh">
 		<!-- Notes: GBC only -->
-		<description>Tottoko Hamutarou - Tomodachi Daisakusen Dechu (Jpn, Rev. A)</description>
+		<description>Tottoko Hamutarou - Tomodachi Daisakusen Dechu (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-BHTJ-JPN"/>
@@ -22324,7 +22324,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
-				<rom name="tottoko hamutarou - tomodachi daisakusen dechu (japan) (rev a).bin" size="1048576" crc="d549e074" sha1="369f53d1a8bc7e6f2d1ccd101e648c2744c39fc5"/>
+				<rom name="tottoko hamutarou - tomodachi daisakusen dechu (japan) (rev 1).bin" size="1048576" crc="d549e074" sha1="369f53d1a8bc7e6f2d1ccd101e648c2744c39fc5"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -22435,7 +22435,7 @@ license:CC0
 		<!--	Never released as physical cartridge	-->
 		<!--	Released on the 3DS Virtual Console	-->
 		<!--	In lot check as "KENSA\dmgahhj1.1"	-->
-		<description>Trade &amp; Battle Card Hero (Jpn, Rev. A)</description>
+		<description>Trade &amp; Battle Card Hero (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AHHJ-JPN"/>
@@ -22574,7 +22574,7 @@ license:CC0
 	<software name="tsurisn2a" cloneof="tsurisn2">
 		<!--	In lot check as "dmga2kj1.g93"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Tsuri Sensei 2 (Jpn, Rev. A)</description>
+		<description>Tsuri Sensei 2 (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AF2J-JPN?"/>
@@ -23310,7 +23310,7 @@ license:CC0
 
 	<software name="watashik">
 		<!-- Notes: GBC only -->
-		<description>Watashi no Kitchen (Jpn, Rev. A)</description>
+		<description>Watashi no Kitchen (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Kirat</publisher>
 		<info name="serial" value="CGB-BKRJ-JPN"/>
@@ -23319,7 +23319,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="watashi no kitchen (japan) (rev a).bin" size="1048576" crc="584669e4" sha1="effd0d198bac35abee1a8a6481382a1f2b14ead3"/>
+				<rom name="watashi no kitchen (japan) (rev 1).bin" size="1048576" crc="584669e4" sha1="effd0d198bac35abee1a8a6481382a1f2b14ead3"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23537,7 +23537,7 @@ license:CC0
 
 	<software name="wizardem">
 		<!-- Notes: GBC only -->
-		<description>Wizardry Empire (Jpn, Rev. A)</description>
+		<description>Wizardry Empire (Jpn, Rev. 1)</description>
 		<year>1999</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="CGB-AEWJ-JPN"/>
@@ -23546,7 +23546,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="wizardry empire (japan) (rev a).bin" size="1048576" crc="fa82620f" sha1="f5f4e8bead0fe45075141133a530a0eb116ea78c"/>
+				<rom name="wizardry empire (japan) (rev 1).bin" size="1048576" crc="fa82620f" sha1="f5f4e8bead0fe45075141133a530a0eb116ea78c"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23860,7 +23860,7 @@ license:CC0
 
 	<software name="xmenma">
 		<!-- Notes: GBC only -->
-		<description>X-Men - Mutant Academy (Euro, USA, Rev. A)</description>
+		<description>X-Men - Mutant Academy (Euro, USA, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BXAE-USA, CGB-BXAP-NOE"/>
@@ -24426,7 +24426,7 @@ license:CC0
 
 	<software name="zeldaldxj" cloneof="zeldaldx">
 		<!-- Also released by NP in 2000-03 -->
-		<description>Zelda no Densetsu - Yume o Miru Shima DX (Jpn, Rev. B)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima DX (Jpn, Rev. 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLJ-JPN"/>
@@ -24451,7 +24451,7 @@ license:CC0
 
 	<software name="zeldaldxja" cloneof="zeldaldx">
 		<!-- Also released by NP in 2000-03 -->
-		<description>Zelda no Densetsu - Yume o Miru Shima DX (Jpn, Rev. A)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima DX (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLJ-JPN"/>
@@ -24461,7 +24461,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zelda no densetsu - yume o miru shima dx (japan) (rev a).bin" size="1048576" crc="bd8a1041" sha1="d3de302d44bdb240bcf55a5dc70f491f5456d721"/>
+				<rom name="zelda no densetsu - yume o miru shima dx (japan) (rev 1).bin" size="1048576" crc="bd8a1041" sha1="d3de302d44bdb240bcf55a5dc70f491f5456d721"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24536,7 +24536,7 @@ license:CC0
 	</software>
 
 	<software name="zoidsjas">
-		<description>Zoids - Jashin Fukkatsu! Genobreaker Hen (Jpn, Rev. A)</description>
+		<description>Zoids - Jashin Fukkatsu! Genobreaker Hen (Jpn, Rev. 1)</description>
 		<year>2000</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-BGZJ-JPN"/>
@@ -24546,7 +24546,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
-				<rom name="zoids - jashin fukkatsu genobreaker hen (japan) (rev a).bin" size="2097152" crc="96461918" sha1="bfe8cdb8a8da37d5c8d9db57e8a5eeedee24d4cc"/>
+				<rom name="zoids - jashin fukkatsu genobreaker hen (japan) (rev 1).bin" size="2097152" crc="96461918" sha1="bfe8cdb8a8da37d5c8d9db57e8a5eeedee24d4cc"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
