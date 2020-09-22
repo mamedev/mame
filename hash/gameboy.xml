@@ -3083,7 +3083,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="bugs bunny collection (japan) (rev a).bin" size="262144" crc="8244220b" sha1="9d69d72b7de0377cb0439aa301b1fb82d3ce786a" />
+				<rom name="bugs bunny collection (japan) (rev 1).bin" size="262144" crc="8244220b" sha1="9d69d72b7de0377cb0439aa301b1fb82d3ce786a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3745,7 +3745,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="chessmaster, the (usa) (rev a).bin" size="65536" crc="59ed370c" sha1="f0351faab8b912967552684d4160f5cf94540d41" />
+				<rom name="chessmaster, the (usa) (rev 1).bin" size="65536" crc="59ed370c" sha1="f0351faab8b912967552684d4160f5cf94540d41" />
 			</dataarea>
 		</part>
 	</software>
@@ -5871,7 +5871,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dx bakenou z (japan) (rev a).bin" size="131072" crc="fadfd0f6" sha1="6e2b9b21ea7d8d482be1f17722a579f720f2029d" />
+				<rom name="dx bakenou z (japan) (rev 1).bin" size="131072" crc="fadfd0f6" sha1="6e2b9b21ea7d8d482be1f17722a579f720f2029d" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6976,7 +6976,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="game &amp; watch gallery (usa) (rev a).bin" size="262144" crc="9e6cdc96" sha1="4e4da0ed89c2baaed64600f7eaca90aeeadc084e" />
+				<rom name="game &amp; watch gallery (usa) (rev 1).bin" size="262144" crc="9e6cdc96" sha1="4e4da0ed89c2baaed64600f7eaca90aeeadc084e" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8545,7 +8545,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - suuji de asobou sansuu hen (japan) (rev a).bin" size="262144" crc="74821248" sha1="b1626c1fe162a7b0292d292e8ba60a1c6823fc8d" />
+				<rom name="goukaku boy series - shikakui atama o marukusuru - suuji de asobou sansuu hen (japan) (rev 1).bin" size="262144" crc="74821248" sha1="b1626c1fe162a7b0292d292e8ba60a1c6823fc8d" />
 			</dataarea>
 		</part>
 	</software>
@@ -9255,7 +9255,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="hoshi no kirby (japan) (rev a).bin" size="262144" crc="04342c83" sha1="5fe35fab25299b6c53b40decfe2b1827b4a64d2a" />
+				<rom name="hoshi no kirby (japan) (rev 1).bin" size="262144" crc="04342c83" sha1="5fe35fab25299b6c53b40decfe2b1827b4a64d2a" />
 			</dataarea>
 		</part>
 	</software>
@@ -11606,7 +11606,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="konchuu hakase (japan) (rev a).bin" size="524288" crc="05753790" sha1="3e8e47b36a2171ad93d0e21fe5c22feff17c6d88" />
+				<rom name="konchuu hakase (japan) (rev 1).bin" size="524288" crc="05753790" sha1="3e8e47b36a2171ad93d0e21fe5c22feff17c6d88" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11921,7 +11921,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev b).bin" size="524288" crc="34d08e7b" sha1="5ab63def958728933571c3b4f6af54db14f3f8b2" />
+				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev 2).bin" size="524288" crc="34d08e7b" sha1="5ab63def958728933571c3b4f6af54db14f3f8b2" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11936,7 +11936,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev a).bin" size="524288" crc="7d1b6cd6" sha1="5259e68522225a7a830e29ea17dfddc33263ced5" />
+				<rom name="legend of zelda, the - link's awakening (usa, europe) (rev 1).bin" size="524288" crc="7d1b6cd6" sha1="5259e68522225a7a830e29ea17dfddc33263ced5" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15468,7 +15468,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="nettou toushinden (japan) (rev a).bin" size="524288" crc="d5a6b132" sha1="5fd55a5d01817c770b251dbb9a0dc73a02d8c566" />
+				<rom name="nettou toushinden (japan) (rev 1).bin" size="524288" crc="d5a6b132" sha1="5fd55a5d01817c770b251dbb9a0dc73a02d8c566" />
 			</dataarea>
 		</part>
 	</software>
@@ -18444,7 +18444,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="power mission (japan) (rev a).bin" size="131072" crc="e30ef8ab" sha1="89b2306ad9c9e296884354ec3be039b944d52d13" />
+				<rom name="power mission (japan) (rev 1).bin" size="131072" crc="e30ef8ab" sha1="89b2306ad9c9e296884354ec3be039b944d52d13" />
 			</dataarea>
 		</part>
 	</software>
@@ -18491,7 +18491,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="power pro gb (japan) (rev a).bin" size="262144" crc="71bea855" sha1="ebca3bce624d19a0fa3a92d30a5c543c12541ea4" />
+				<rom name="power pro gb (japan) (rev 1).bin" size="262144" crc="71bea855" sha1="ebca3bce624d19a0fa3a92d30a5c543c12541ea4" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -20971,7 +20971,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="shougi saikyou (japan) (rev a).bin" size="262144" crc="a074bf7e" sha1="1c5a97aa3a09362c94fdd630456e5e59ae3af5fa" />
+				<rom name="shougi saikyou (japan) (rev 1).bin" size="262144" crc="a074bf7e" sha1="1c5a97aa3a09362c94fdd630456e5e59ae3af5fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -22789,7 +22789,7 @@ license:CC0
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev a).bin" size="524288" crc="e6f886e5" sha1="96e3a314561fb394cdf51101f9178a32713c2313" />
+				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev 1).bin" size="524288" crc="e6f886e5" sha1="96e3a314561fb394cdf51101f9178a32713c2313" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -24533,7 +24533,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="toy story (usa) (rev a).bin" size="524288" crc="6f36b6ed" sha1="04227fcd3e049465f4499fefe6519322ee492a82" />
+				<rom name="toy story (usa) (rev 1).bin" size="524288" crc="6f36b6ed" sha1="04227fcd3e049465f4499fefe6519322ee492a82" />
 			</dataarea>
 		</part>
 	</software>
@@ -26470,7 +26470,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="zelda no densetsu - yume o miru shima (japan) (rev a).bin" size="524288" crc="ea20b82a" sha1="80f5d111c7e2d79d39f6c25a37b54c3196d2bd12" />
+				<rom name="zelda no densetsu - yume o miru shima (japan) (rev 1).bin" size="524288" crc="ea20b82a" sha1="80f5d111c7e2d79d39f6c25a37b54c3196d2bd12" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -27141,7 +27141,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_camera" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pocket camera (japan) (rev a).bin" size="1048576" crc="73e8ef96" sha1="912205ea22e1dd735ed4f41d247039eebf39dddc" />
+				<rom name="pocket camera (japan) (rev 1).bin" size="1048576" crc="73e8ef96" sha1="912205ea22e1dd735ed4f41d247039eebf39dddc" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
