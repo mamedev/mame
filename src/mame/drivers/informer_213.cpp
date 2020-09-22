@@ -69,6 +69,7 @@ private:
 	void vblank_w(int state);
 	void vram_addr_w(offs_t offset, uint8_t data);
 	void cursor_addr_w(offs_t offset, uint8_t data);
+	void screen_ctrl_w(uint8_t data);
 
 	uint8_t unk_42_r();
 	void unk_42_w(uint8_t data);
@@ -80,6 +81,7 @@ private:
 
 	uint16_t m_vram_addr;
 	uint16_t m_cursor_addr;
+	uint8_t m_screen_ctrl;
 	uint8_t m_unk_42;
 	uint8_t m_vector;
 };
@@ -94,6 +96,7 @@ void informer_213_state::mem_map(address_map &map)
 	map(0x0000, 0x0000).rw("kbd", FUNC(informer_213_kbd_hle_device::read), FUNC(informer_213_kbd_hle_device::write));
 	map(0x0006, 0x0007).unmapr().w(FUNC(informer_213_state::vram_addr_w));
 	map(0x000f, 0x0010).unmapr().w(FUNC(informer_213_state::cursor_addr_w));
+	map(0x0021, 0x0021).w(FUNC(informer_213_state::screen_ctrl_w));
 	map(0x0042, 0x0042).rw(FUNC(informer_213_state::unk_42_r), FUNC(informer_213_state::unk_42_w));
 	map(0x0060, 0x0060).w(FUNC(informer_213_state::bell_w));
 	map(0x0100, 0x1fff).ram();
@@ -124,18 +127,23 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	for (int y = 0; y < 26; y++)
 	{
+		uint8_t line_attr = 0;
+
 		for (int x = 0; x < 80; x++)
 		{
 			uint16_t addr = m_vram_addr + y * 80 + x;
 			uint8_t code = m_vram[addr - 0x6000];
-//			uint8_t attr = m_aram[addr - 0x6000];
+			uint8_t attr = m_aram[addr - 0x6000];
 
 			// status line is at top of vram
 			if (y > 23)
 			{
 				code = m_vram[(y - 24) * 80 + x];
-//				attr = m_aram[(y - 24) * 80 + x];
+				attr = m_aram[(y - 24) * 80 + x];
 			}
+
+			if (code == 0xc0 || code == 0xe8)
+				line_attr = attr;
 
 			// draw 9 lines
 			for (int i = 0; i < 9; i++)
@@ -143,6 +151,15 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 				uint8_t data = m_chargen[chargen_base | ((code << 4) + i)];
 
 				if (addr == m_cursor_addr)
+					data ^= 0xff;
+
+				if (line_attr == 0xb0 || line_attr == 0x90)
+					data ^= 0xff;
+
+				if (code == 0xc0 || code == 0xe8)
+					data = 0;
+
+				if (BIT(m_screen_ctrl, 5))
 					data ^= 0xff;
 
 				// 6 pixels of the character
@@ -173,6 +190,18 @@ void informer_213_state::cursor_addr_w(offs_t offset, uint8_t data)
 		m_cursor_addr = (m_cursor_addr & 0xff00) | (data << 0);
 	else
 		m_cursor_addr = (m_cursor_addr & 0x00ff) | (data << 8);
+}
+
+void informer_213_state::screen_ctrl_w(uint8_t data)
+{
+	logerror("screen_ctrl_w: %02x\n", data);
+
+	// 76------  unknown
+	// --5-----  screen reverse
+	// ---4----  cursor blink/steady
+	// ----3210  unknown
+
+	m_screen_ctrl = data;
 }
 
 void informer_213_state::vblank_w(int state)
@@ -246,6 +275,7 @@ void informer_213_state::machine_start()
 	// register for save states
 	save_item(NAME(m_vram_addr));
 	save_item(NAME(m_cursor_addr));
+	save_item(NAME(m_screen_ctrl));
 	save_item(NAME(m_unk_42));
 	save_item(NAME(m_vector));
 }
