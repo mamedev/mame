@@ -77,7 +77,6 @@ public:
 	/* routines */
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
 	virtual void init_palette_tables();
-	void init_palette_tables(bool indirect);
 
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(uint8_t &pix);

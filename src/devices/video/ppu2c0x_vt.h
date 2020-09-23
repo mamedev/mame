@@ -41,6 +41,8 @@ public:
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
 	void init_vt03_palette_tables(int palmode);
+	void init_vtxx_rgb555_palette_tables();
+	void init_vtxx_rgb444_palette_tables();
 
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(uint8_t &pix) override;
@@ -70,6 +72,8 @@ protected:
 	bool m_is_50hz;
 
 	uint32_t m_vtpens[0x1000*8];
+	uint32_t m_vtpens_rgb555[0x8000*8];
+	uint32_t m_vtpens_rgb444[0x1000*8];
 
 private:
 	devcb_read8 m_read_bg;

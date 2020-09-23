@@ -293,11 +293,6 @@ inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
  *
  *************************************/
 
-void ppu2c0x_device::init_palette_tables()
-{
-	init_palette_tables(false);
-}
-
 rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy)
 {
 	const double tint = 0.22; /* adjust to taste */
@@ -393,7 +388,7 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int colo
 	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
 }
 
-void ppu2c0x_device::init_palette_tables(bool indirect)
+void ppu2c0x_device::init_palette_tables()
 {
 	bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
 
@@ -418,13 +413,6 @@ void ppu2c0x_device::init_palette_tables(bool indirect)
 				rgb_t col = nespal_to_RGB(color_intensity, color_num, color_emphasis, is_pal);
 
 				m_nespens[entry] = (uint32_t)col;
-
-				/* Round, and set the value */
-				//if (indirect)
-				//	set_indirect_color(entry++, col);
-				//else
-				//	set_pen_color(entry++, col);
-
 				entry++;
 				
 			}

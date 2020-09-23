@@ -75,19 +75,11 @@ void ppu_vt03_device::set_new_pen(int i)
 		if (m_pal_mode == PAL_MODE_NEW_RGB)
 		{
 			
-			uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
-			uint8_t blue = (rgbval & 0x001f) << 3;
-			uint8_t green = (rgbval & 0x3e0) >> 2;
-			uint8_t red = (rgbval & 0x7C00) >> 7;
-			set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+
 		}
 		else if (m_pal_mode == PAL_MODE_NEW_RGB12)
 		{
-			uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
-			uint8_t red = (rgbval & 0x000f) << 4;
-			uint8_t green = (rgbval & 0x0f0);
-			uint8_t blue = (rgbval & 0xf00) >> 4;
-			set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+
 		}
 		else
 		{
@@ -170,6 +162,43 @@ uint8_t ppu_vt03_device::read_extended(offs_t offset)
 }
 
 
+
+void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
+{
+	int entry = 0;
+	for (int emp = 0; emp < 8; emp++)
+	{
+		for (int palval = 0; palval < 0x8000; palval++)
+		{
+		//	uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
+			uint8_t blue = (palval & 0x001f) << 3;
+			uint8_t green = (palval & 0x3e0) >> 2;
+			uint8_t red = (palval & 0x7C00) >> 7;
+
+			// TODO: apply emphasis values if they work in this mode
+			m_vtpens_rgb555[entry] = rgb_t(red, green, blue);
+			entry++;
+		}
+	}
+}
+
+void ppu_vt03_device::init_vtxx_rgb444_palette_tables()
+{
+	int entry = 0;
+	for (int emp = 0; emp < 8; emp++)
+	{
+		for (int palval = 0; palval < 0x1000; palval++)
+		{
+			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
+			uint8_t red = (palval & 0x000f) << 4;
+			uint8_t green = (palval & 0x0f0);
+			uint8_t blue = (palval & 0xf00) >> 4;
+			// TODO: apply emphasis values if they work in this mode
+			m_vtpens_rgb444[entry] = rgb_t(red, green, blue);
+			entry++;
+		}
+	}
+}
 // what cases are palmode 1 anyway?
 void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 {
@@ -251,6 +280,8 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_201x_regs));
 
 	init_vt03_palette_tables(0);
+	init_vtxx_rgb555_palette_tables();
+	init_vtxx_rgb444_palette_tables();
 }
 
 uint8_t ppu_vt03_device::get_201x_reg(int reg)
