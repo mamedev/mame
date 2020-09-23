@@ -14953,4 +14953,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="swmwre21">
+		<description>Swimware (Version 2.1)</description>
+		<year>1988</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="release" value="2020-09-21"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="swimware v2.1 side a.woz" size="234815" crc="ed0742c0" sha1="f1949d5ca927a7f0dd59f62afa2c9e851b131528"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234815">
+				<rom name="swimware v2.1 side b.woz" size="234815" crc="38316b19" sha1="c7b5c1a6132231ba67533c28b26cff32c1f8548a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
