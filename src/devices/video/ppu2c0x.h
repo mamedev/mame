@@ -84,6 +84,7 @@ public:
 	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest);
 	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t *&dest);
 	virtual void draw_background( uint8_t *line_priority );
+	virtual void draw_back_pen(uint32_t* dst, int back_pen);
 	void draw_background_pen();
 
 	virtual void read_sprite_plane_data(int address);
@@ -129,6 +130,8 @@ public:
 	void set_vram_dest(uint16_t dest);
 
 	void ppu2c0x(address_map &map);
+
+	bool in_vblanking() { return (m_scanline >= m_vblank_first_scanline - 1); }
 protected:
 	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal_map);
 

@@ -581,7 +581,7 @@ void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, 
 	}
 	else
 	{
-		usepen = back_pen;
+		usepen = m_nespens[back_pen];
 	}
 
 
@@ -622,17 +622,14 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint8_t color_mask = 0x3f;
-	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-		color_mask = 0x30;
+//	uint8_t color_mask = 0x3f;
+//	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+//		color_mask = 0x30;
 
-	uint16_t palval = m_back_color & color_mask;
-
-	// apply colour emphasis
-	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+	uint16_t palval = m_back_color;// &color_mask;
 
 	/* cache the background pen */
-	uint32_t back_pen = m_nespens[palval];
+	uint32_t back_pen = palval;
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -708,10 +705,17 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 		dest = &bitmap.pix32(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
-			*(dest++) = back_pen;
+			draw_back_pen(dest, back_pen);
+			dest++;
+
 			line_priority[i] ^= 0x02;
 		}
 	}
+}
+
+void ppu2c0x_device::draw_back_pen(uint32_t* dst, int back_pen)
+{
+	*dst = m_nespens[back_pen];
 }
 
 void ppu2c0x_device::draw_background_pen()
@@ -722,15 +726,12 @@ void ppu2c0x_device::draw_background_pen()
 	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0x30 : 0x3f;
 	uint16_t palval = m_back_color & color_mask;
 
-	// apply colour emphasis
-	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
-
 	/* cache the background pen */
-	uint32_t back_pen = m_nespens[palval];
+	uint32_t back_pen = palval;
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		bitmap.pix32(m_scanline, i) = back_pen;
+		draw_back_pen(&bitmap.pix32(m_scanline, i), back_pen);
 }
 
 void ppu2c0x_device::read_sprite_plane_data(int address)
@@ -1050,10 +1051,7 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 
 	uint16_t palval = m_back_color & color_mask;
 
-	// apply colour emphasis
-	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
-
-	back_pen = m_nespens[palval];
+	back_pen = palval;
 
 	if (m_paletteram_in_ppuspace)
 	{
@@ -1066,13 +1064,13 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 			// pen. Micro Machines makes use of this feature.
 			int pen_num = m_palette_ram[(m_videomem_addr & 0x03) ? (m_videomem_addr & 0x1f) : 0];
 
-			back_pen = m_nespens[pen_num];
+			back_pen = pen_num;
 		}
 	}
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		bitmap.pix32(m_scanline, i) = back_pen;
+		draw_back_pen(&bitmap.pix32(m_scanline, i), back_pen);
 }
 
 void ppu2c0x_device::update_visible_scanline()

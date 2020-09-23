@@ -121,6 +121,7 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type 
 
 	m_default_palette_mode = PAL_MODE_VT0x;
 	m_force_baddma = false;
+	m_use_raster_timing_hack = false;
 }
 
 nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -380,6 +381,12 @@ void nes_vt_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 		// load latched value and start counting
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
+
+		// HACK for some one line errors in various games and completely broken rasters in msifrog, TOOD: find real source of issue (bad timing of interrupt or counter changes, or latching of data?)
+		if (m_use_raster_timing_hack)
+			if (m_ppu->in_vblanking())
+				m_timer_val--;
+
 		m_timer_running = 1;
 		break;
 

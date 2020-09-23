@@ -225,17 +225,22 @@ void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 
 			float V = sin(fPhase) * C * 1.05; // 1.05 needed to get closer to EmuVT palette's color levels in phases 1-12
 			float U = cos(fPhase) * C * 1.05;
-			double R = Y + 1.1400 * V + 0.0000 * U;
-			double G = Y - 0.5807 * V - 0.3940 * U;
-			double B = Y - 0.0000 * V + 2.0290 * U;
-
-			// does this really apply to the VT palette?
-			bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
-			apply_color_emphasis_and_clamp(is_pal, color_emphasis, R, G, B);
-
+			float R = Y + 1.1400 * V + 0.0000 * U;
+			float G = Y - 0.5807 * V - 0.3940 * U;
+			float B = Y - 0.0000 * V + 2.0290 * U;
+			if (R < 0.0) R = 0.0;
+			if (R > 1.0) R = 1.0;
+			if (G < 0.0) G = 0.0;
+			if (G > 1.0) G = 1.0;
+			if (B < 0.0) B = 0.0;
+			if (B > 1.0) B = 1.0;
 			int RV = R * 255.0;
 			int GV = G * 255.0;
 			int BV = B * 255.0;
+
+			// does this really apply to the VT palette?
+			//bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
+			//apply_color_emphasis_and_clamp(is_pal, color_emphasis, R, G, B);
 
 			m_vtpens[entry] = rgb_t(RV, GV, BV);
 			entry++;
@@ -428,6 +433,12 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 }
 
 
+void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
+{
+	draw_tile_pixel_inner(back_pen, dst);
+}
+
+
 void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 {
 	if (m_201x_regs[0] & 0x80)
@@ -442,10 +453,10 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			//	palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 11);
 
 			uint32_t pix;
-			pix = m_vtpens_rgb555[palval];
+			pix = m_vtpens_rgb555[palval & 0x3ffff];
 			*dest = pix;
 		}
 		else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
@@ -458,15 +469,15 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			//	palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 8);
 
 			uint32_t pix;
-			pix = m_vtpens_rgb444[palval];
+			pix = m_vtpens_rgb444[palval & 0x7ffff];
 			*dest = pix;
 		}
 		else // VT03 mode
 		{
-			uint16_t palval;
+			uint32_t palval;
 			palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
@@ -474,10 +485,10 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			//	palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 8);
 
 			uint32_t pix;
-			pix = m_vtpens[palval];
+			pix = m_vtpens[palval  & 0x7ffff];
 			*dest = pix;
 		}
 	}
@@ -493,7 +504,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
 
 		uint32_t pix;
-		pix = m_nespens[palval];
+		pix = m_nespens[palval & 0x1ff];
 		*dest = pix;
 	}
 }
@@ -525,7 +536,7 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen,
 		}
 		else
 		{
-			pen = back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
+			pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
 		}
 
 		draw_tile_pixel_inner(pen, dest);	
