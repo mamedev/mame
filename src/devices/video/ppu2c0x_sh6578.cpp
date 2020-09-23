@@ -88,8 +88,8 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 
 void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	//uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = 0;// this->pen(palval); // TODO FIX
+	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
+	bitmap.pix32(m_scanline, sprite_xpos + pixel) = m_nespens[palval];
 }
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
@@ -136,12 +136,12 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 			if (!trans)
 			{
-				pen = 0;// this->pen(palval); TODO FIX
+				pen = m_nespens[palval];
 			}
 			else
 			{
-				//uint8_t palval = m_palette_ram[0x0] & 0x3f;
-				pen = 0;// this->pen(palval); TODO FIX
+				uint8_t palval = m_palette_ram[0x0] & 0x3f;
+				pen = m_nespens[palval];
 			}
 
 			*dest = pen;
@@ -158,25 +158,24 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	//uint8_t color_mask = 0xff;
+	uint8_t color_mask = 0xff;
 	//const pen_t* color_table;
 
 	/* setup the color mask and colortable to use */
-	/* TODO FIX
+
+	//TODO FIX
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 	{
 		color_mask = 0xf0;
-		color_table = m_colortable_mono.get();
 	}
 	else
 	{
 		color_mask = 0xff;
-		color_table = m_colortable.get();
 	}
-	*/
+	
 
 	/* cache the background pen */
-	pen_t back_pen = 0;// pen(m_back_color & color_mask); TODO FIX
+	pen_t back_pen = m_nespens[m_back_color & color_mask];
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
