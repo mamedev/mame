@@ -40,7 +40,7 @@ public:
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
-	void init_vt03_palette_tables();
+	void init_vt03_palette_tables(int palmode);
 
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(uint8_t &pix) override;

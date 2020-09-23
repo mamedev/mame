@@ -170,7 +170,8 @@ uint8_t ppu_vt03_device::read_extended(offs_t offset)
 }
 
 
-void ppu_vt03_device::init_vt03_palette_tables()
+// what cases are palmode 1 anyway?
+void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 {
 	// the 12-bit VT HSV format, Credit to NewRisingSun
 	int entry = 0;
@@ -183,7 +184,7 @@ void ppu_vt03_device::init_vt03_palette_tables()
 			int nChroma = (palval >> 8) & 0xF;
 			float phaseOffset = -11.0;
 			//bool inverted = false;
-			if ((nLuma < (nChroma + 1) >> 1 || nLuma > 15 - (nChroma >> 1)) && (m_pal_mode != PAL_MODE_NEW_VG))
+			if ((nLuma < (nChroma + 1) >> 1 || nLuma > 15 - (nChroma >> 1)) && (palmode != 1))
 			{
 				//inverted = true;
 				// Strange color number wrap-around. Is this for protection reasons, or a bug of the original hardware?
@@ -200,8 +201,7 @@ void ppu_vt03_device::init_vt03_palette_tables()
 			float fChroma = nChroma / 18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
 			float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
 
-			//if (m_pal_mode == PAL_MODE_NEW_VG)
-			if (1)
+			if (palmode == 1)
 			{
 				if (fPhase > 0 && fPhase < 13)
 				{
@@ -250,7 +250,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_201x_regs));
 
-	init_vt03_palette_tables();
+	init_vt03_palette_tables(0);
 }
 
 uint8_t ppu_vt03_device::get_201x_reg(int reg)
@@ -277,9 +277,6 @@ void ppu_vt03_device::device_reset()
 	// todo: what are the actual defaults for these?
 	for (int i = 0; i < 0x20; i++)
 		set_201x_reg(i, 0x00);
-
-	//m_201x_regs[0] = 0x86; // alt fix for ddrdismx would be to set the default palette mode here
-
 
 	m_read_bg4_bg3 = 0;
 	m_va34 = 0;
@@ -354,14 +351,27 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 	{
 		if (!is16pix)
 		{
+
 			uint8_t pen = pixel_data + (4 * color);
 
-			uint16_t penval;
-			penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-			uint32_t palval;
-			palval = m_vtpens[penval];
+			if (m_201x_regs[0] & 0x80)
+			{
 
-			bitmap.pix32(m_scanline, sprite_xpos + pixel) = palval;
+				uint16_t penval;
+				penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+				uint32_t palval;
+				palval = m_vtpens[penval];
+
+				bitmap.pix32(m_scanline, sprite_xpos + pixel) = palval;
+			}
+			else
+			{
+				uint16_t penval;
+				penval = (m_palette_ram[pen & 0x7f] & 0x3f);
+				uint32_t palval;
+				palval = m_nespens[penval];
+				bitmap.pix32(m_scanline, sprite_xpos + pixel) = palval;
+			}
 		}
 		else
 		{
@@ -372,23 +382,45 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			{
 				uint8_t pen = (pixel_data & 0x03) + (4 * color);
 
-				uint16_t penval;
-				penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-				uint32_t palval;
-				palval = m_vtpens[penval];
-
-				bitmap.pix32(m_scanline, sprite_xpos + pixel) = palval;
+				if (m_201x_regs[0] & 0x80)
+				{
+					uint16_t penval;
+					penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+					uint32_t palval;
+					palval = m_vtpens[penval];
+					bitmap.pix32(m_scanline, sprite_xpos + pixel) = palval;
+				}
+				else // old colour compatible mode
+				{
+					uint16_t penval;
+					penval = (m_palette_ram[pen & 0x7f] & 0x3f);
+					uint32_t palval;
+					palval = m_nespens[penval];
+					bitmap.pix32(m_scanline, sprite_xpos + pixel) = palval;
+				}
 			}
+
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
 				uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
 
-				uint16_t penval;
-				penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-				uint32_t palval;
-				palval = m_vtpens[penval];
+				if (m_201x_regs[0] & 0x80)
+				{
+					uint16_t penval;
+					penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+					uint32_t palval;
+					palval = m_vtpens[penval];
 
-				bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = palval;
+					bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = palval;
+				}
+				else // old colour compatible mode
+				{
+					uint16_t penval;
+					penval = (m_palette_ram[pen & 0x7f] & 0x3f);
+					uint32_t palval;
+					palval = m_nespens[penval];
+					bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = palval;
+				}
 			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
@@ -471,11 +503,22 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen,
 			pen = 0; // fixme backpen logic probably differs on vt03 due to extra colours
 		}
 
-		uint16_t penval;
-		penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-		uint32_t palval;
-		palval = m_vtpens[penval];
-		*dest = palval;
+		if (m_201x_regs[0] & 0x80)
+		{
+			uint16_t penval;
+			penval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+			uint32_t palval;
+			palval = m_vtpens[penval];
+			*dest = palval;
+		}
+		else // old colour compatible mode
+		{
+			uint16_t penval;
+			penval = (m_palette_ram[pen & 0x7f] & 0x3f);
+			uint32_t palval;
+			palval = m_nespens[penval];
+			*dest = palval;
+		}
 		
 	}
 }
