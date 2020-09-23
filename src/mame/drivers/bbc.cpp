@@ -1978,6 +1978,8 @@ void bbcm_state::bbcmc(machine_config &config)
 	m_via6522_1->readpb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_r)).mask(0xe0);
 	m_via6522_1->writepb_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::pb_w)).mask(0x1f);
 	m_via6522_1->writepb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_w)).mask(0xe0);
+	m_via6522_1->cb1_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::write_cb1));
+	m_via6522_1->cb2_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::write_cb2));
 
 	/* cartridge sockets */
 	config.device_remove("cartslot1");
