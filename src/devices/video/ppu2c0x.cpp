@@ -622,11 +622,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-//	uint8_t color_mask = 0x3f;
-//	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-//		color_mask = 0x30;
-
-	uint16_t palval = m_back_color;// &color_mask;
+	uint16_t palval = m_back_color;
 
 	/* cache the background pen */
 	uint32_t back_pen = palval;
