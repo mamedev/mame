@@ -2335,10 +2335,13 @@ CONS( 2016, fcpocket,  0,  0,  nes_vt_fp_4x16mb,   nes_vt_fp, nes_vt_hh_state, e
 
 	Things below seem on heavily enhanced hardware of unknown VT type
 
-	It's possible it is the same as some of the ones above (sy889, rminitv, dgun2573 etc.) but with more features used
-	or in some cases somehing almost entirely different that doesn't belong here
+	It's possible some of these are the same as some of the ones above (sy889, rminitv, dgun2573 etc.) but with
+	more features used.
 
-/***************************************************************************************************************/
+	In some cases these might be almost entirely different, and it is likely a number don't belong in this
+	driver at all.
+
+****************************************************************************************************************/
 
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
