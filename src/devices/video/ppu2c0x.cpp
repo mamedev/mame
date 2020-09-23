@@ -293,6 +293,48 @@ inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
  *
  *************************************/
 
+void ppu2c0x_device::apply_color_emphasis_and_clamp(bool is_pal_or_dendy, int color_emphasis, double& R, double& G, double& B)
+{
+	if (is_pal_or_dendy) // PAL machines swap the colour emphasis bits, this means the red/blue highlighting on rampart tally bar doesn't look as good
+	{
+		color_emphasis = bitswap<3>(color_emphasis, 2, 0, 1);
+	}
+
+	double r_mod = 0.0;
+	double g_mod = 0.0;
+	double b_mod = 0.0;
+
+	switch (color_emphasis)
+	{
+	case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+	case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+	case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+	case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+	case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+	case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+	case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+	case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+	}
+
+	R = R * r_mod;
+	G = G * g_mod;
+	B = B * b_mod;
+
+	/* Clipping, in case of saturation */
+	if (R < 0)
+		R = 0;
+	if (R > 255)
+		R = 255;
+	if (G < 0)
+		G = 0;
+	if (G > 255)
+		G = 255;
+	if (B < 0)
+		B = 0;
+	if (B > 255)
+		B = 255;
+}
+
 rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy)
 {
 	const double tint = 0.22; /* adjust to taste */
@@ -346,44 +388,7 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int colo
 	double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
 	double B = (y + Ku * u) * 255.0;
 
-	double r_mod = 0.0;
-	double g_mod = 0.0;
-	double b_mod = 0.0;
-
-	if (is_pal_or_dendy) // PAL machines swap the colour emphasis bits, this means the red/blue highlighting on rampart tally bar doesn't look as good
-	{
-		color_emphasis = bitswap<3>(color_emphasis, 2, 0, 1);
-	}
-
-	switch (color_emphasis)
-	{
-		case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-		case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-		case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-		case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-		case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-		case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-		case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-		case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
-	}
-
-	R = R * r_mod;
-	G = G * g_mod;
-	B = B * b_mod;
-
-	/* Clipping, in case of saturation */
-	if (R < 0)
-		R = 0;
-	if (R > 255)
-		R = 255;
-	if (G < 0)
-		G = 0;
-	if (G > 255)
-		G = 255;
-	if (B < 0)
-		B = 0;
-	if (B > 255)
-		B = 255;
+	apply_color_emphasis_and_clamp(is_pal_or_dendy, color_emphasis, R, G, B);
 
 	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
 }
@@ -563,12 +568,23 @@ void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, 
 
 	if (pix)
 	{
-		usepen = m_nespens[m_palette_ram[((4 * color) + pix) & 0x1f]];  // TODO IMPROVE
+		uint8_t pen = ((4 * color) + pix) & 0x1f;
+		uint16_t palval = m_palette_ram[pen];
+
+		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			palval &= 0x30;
+
+		// apply colour emphasis
+		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+		usepen = m_nespens[palval];
 	}
 	else
 	{
 		usepen = back_pen;
 	}
+
+
 
 	*dest = usepen;
 }
@@ -606,24 +622,17 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint8_t color_mask = 0xff; // TODO FIX
-	//const pen_t* color_table;
-
-	/* setup the color mask and colortable to use */
-	/* TODO FIX
+	uint8_t color_mask = 0x3f;
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-	{
-		color_mask = 0xf0;
-		color_table = m_colortable_mono.get();
-	}
-	else
-	{
-		color_mask = 0xff;
-		color_table = m_colortable.get();
-	}
-	*/
+		color_mask = 0x30;
+
+	uint16_t palval = m_back_color & color_mask;
+
+	// apply colour emphasis
+	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
 	/* cache the background pen */
-	uint32_t back_pen = m_nespens[m_back_color & color_mask];
+	uint32_t back_pen = m_nespens[palval];
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -710,10 +719,14 @@ void ppu2c0x_device::draw_background_pen()
 	bitmap_rgb32& bitmap = *m_bitmap;
 
 	/* setup the color mask and colortable to use */
-	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
+	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0x30 : 0x3f;
+	uint16_t palval = m_back_color & color_mask;
+
+	// apply colour emphasis
+	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
 
 	/* cache the background pen */
-	uint32_t back_pen = m_nespens[m_back_color & color_mask];
+	uint32_t back_pen = m_nespens[palval];
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
@@ -744,8 +757,15 @@ void ppu2c0x_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
 
 void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	uint8_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
-	uint32_t pix = m_nespens[palval];  // TODO IMPROVE
+	uint16_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
+
+	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+		palval &= 0x30;
+
+	// apply colour emphasis
+	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+	uint32_t pix = m_nespens[palval];
 	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pix;
 }
 
@@ -1026,9 +1046,14 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 	uint32_t back_pen;
 
 	/* setup the color mask and colortable to use */
-	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
+	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0x30 : 0x3f;
 
-	back_pen = m_nespens[m_back_color & color_mask];
+	uint16_t palval = m_back_color & color_mask;
+
+	// apply colour emphasis
+	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+	back_pen = m_nespens[palval];
 
 	if (m_paletteram_in_ppuspace)
 	{
@@ -1084,8 +1109,6 @@ void ppu2c0x_device::update_scanline()
 
 void ppu2c0x_device::palette_write(offs_t offset, uint8_t data)
 {
-	//int color_emphasis = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
-
 	// palette RAM is only 6 bits wide
 	data &= 0x3f;
 
@@ -1221,21 +1244,6 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case PPU_CONTROL1: /* 1 */
-		/* if color intensity has changed, change all the color tables to reflect them */
-		/* TODO FIX
-
-		if ((data & PPU_CONTROL1_COLOR_EMPHASIS) != (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS))
-		{
-			int i;
-			for (i = 0; i <= 0x1f; i++)
-			{
-				uint8_t oldColor = m_palette_ram[i];
-
-				m_colortable[i] = oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
-			}
-		}
-		*/
-
 		//logerror("control1 write: %02x (scanline: %d)\n", data, m_scanline);
 		m_regs[PPU_CONTROL1] = data;
 		break;

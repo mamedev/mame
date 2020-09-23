@@ -732,34 +732,6 @@ void nes_vt_ablpinb_state::in0_w(uint8_t data)
 }
 
 
-/* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
-static const gfx_layout helper_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0*64, 1*64, 2*64, 3*64 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	4*64
-};
-
-static const gfx_layout helper2_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0*8, 1*8, 2*8, 3*8 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*16, 1*16, 2*16, 3*16,4*16,5*16,5*16,6*16,7*16 },
-	4*64
-};
-
-static GFXDECODE_START( vt03_gfx_helper )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
-	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
-GFXDECODE_END
-
 void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
@@ -777,7 +749,6 @@ void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
@@ -912,8 +883,6 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_co
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
-
-	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 
@@ -924,7 +893,6 @@ void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
@@ -941,7 +909,6 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
-	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 
@@ -952,7 +919,6 @@ void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
@@ -968,8 +934,6 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
 	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
 	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
-
-	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 uint8_t nes_vt_base_state::upper_412c_r()
@@ -995,8 +959,6 @@ void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 	/* basic machine hardware */
 	NES_VT_SOC_4KRAM(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-
-	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt_state::upper_412c_r));
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt_state::upper_412d_r));
@@ -1090,7 +1052,6 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 	m_soc->force_bad_dma();
 }
 
@@ -1117,7 +1078,6 @@ void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 	nes_vt_dg(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_1mbyte);
 
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
 
@@ -1365,8 +1325,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 
 	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-
-	//m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_1mb(machine_config& config)
@@ -1379,7 +1337,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_2mb_alt(machine_config& config)
 {
 	nes_vt_vh2009(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title, but causes some games to have black palette, needs proper switching!
 }
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
@@ -1398,7 +1355,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 {
 	nes_vt_vh2009(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
 static INPUT_PORTS_START( nes_vt_fp )
@@ -2300,7 +2256,7 @@ CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_stat
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
-CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb_alt,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_NOT_WORKING ) // from a Green unit, '17 Classic & Racing Game'
+CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb_alt,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )

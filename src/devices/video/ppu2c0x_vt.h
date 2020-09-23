@@ -19,7 +19,6 @@
 enum vtxx_pal_mode {
 	PAL_MODE_VT0x,
 	PAL_MODE_NEW_RGB,
-	PAL_MODE_NEW_VG,
 	PAL_MODE_NEW_RGB12,
 };
 
@@ -92,8 +91,6 @@ private:
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
 	void set_2010_reg(uint8_t data);
-
-	void set_new_pen(int i);
 };
 
 class ppu_vt03pal_device : public ppu_vt03_device {

@@ -75,6 +75,7 @@ public:
 	auto int_callback() { return m_int_callback.bind(); }
 
 	/* routines */
+	void apply_color_emphasis_and_clamp(bool is_pal_or_dendy, int color_emphasis, double& R, double& G, double& B);
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
 	virtual void init_palette_tables();
 
@@ -209,7 +210,7 @@ protected:
 
 	uint8_t readbyte(offs_t address);
 
-	uint32_t m_nespens[0x200];
+	uint32_t m_nespens[0x40*8];
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
