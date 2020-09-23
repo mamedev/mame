@@ -639,6 +639,7 @@ static inline void OPL3_SLOT_CONNECT(OPL3 *chip, OPL3_SLOT *slot) {
 	}
 }
 
+#if 0
 static inline int limit( int val, int max, int min ) {
 	if ( val > max )
 		val = max;
@@ -647,7 +648,7 @@ static inline int limit( int val, int max, int min ) {
 
 	return val;
 }
-
+#endif
 
 /* status set and IRQ handling */
 static inline void OPL3_STATUS_SET(OPL3 *chip,int flag)

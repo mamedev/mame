@@ -1498,7 +1498,7 @@ const int8_t FM_OPL::lfo_pm_table[8*8*2] = {
 int FM_OPL::num_lock = 0;
 
 
-
+#if 0
 static inline int limit( int val, int max, int min ) {
 	if ( val > max )
 		val = max;
@@ -1507,7 +1507,7 @@ static inline int limit( int val, int max, int min ) {
 
 	return val;
 }
-
+#endif
 
 /* generic table initialize */
 int FM_OPL::init_tables()
