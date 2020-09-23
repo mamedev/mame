@@ -50,28 +50,22 @@ private:
 	u8 m_control;
 };
 
-class a2bus_sidercard_device: public a2bus_sider_device
+class a2bus_sider2card_device: public a2bus_sider_device
 {
 public:
-	a2bus_sidercard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_sider2card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-class a2bus_xebeccard_device: public a2bus_sider_device
+class a2bus_sider1card_device: public a2bus_sider_device
 {
 public:
-	a2bus_xebeccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_sider1card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	// the Xebec version of the firmware doesn't work; it appears to have some bytes corrupted.
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
-
-protected:
-	virtual void device_start() override;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(A2BUS_SIDER, a2bus_sidercard_device)
-DECLARE_DEVICE_TYPE(A2BUS_XEBEC, a2bus_xebeccard_device)
+DECLARE_DEVICE_TYPE(A2BUS_SIDER2, a2bus_sider2card_device)
+DECLARE_DEVICE_TYPE(A2BUS_SIDER1, a2bus_sider1card_device)
 
 #endif // MAME_BUS_A2BUS_SIDER_H

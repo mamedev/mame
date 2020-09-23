@@ -4503,8 +4503,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);  /* CMS Apple II SCSI Card */
 	device.option_add("uthernet", A2BUS_UTHERNET); /* A2RetroSystems Uthernet card */
-	device.option_add("sider", A2BUS_SIDER); /* First Class Peripherals / Advanced Tech Systems Sider SASI card */
-	device.option_add("xebec", A2BUS_XEBEC); /* Xebec SASI card */
+	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
+	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

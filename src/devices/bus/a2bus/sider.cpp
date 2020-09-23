@@ -4,10 +4,55 @@
 
     sider.cpp
 
-    Implementation of the First Class Peripherals / Advanced Tech Services / Xebec SASI Card
+    Implementation of the First Class Peripherals / Advanced Tech Services / Xebec Sider cards
 
-    The original card was by Xebec; the Sider's relationship with Xebec is not clear, but
-    the Sider version of the firmware is quite different (and much more compact).
+    Sider 1: based on Xebec SASI hardware, with Xebec firmware.  Requires HDD with 256 byte sectors
+    and special formatting - not compatible with standard .po/.hdv type images.
+
+    Sider 2: Same hardware, new firmware that's fully ProDOS compliant including 512 byte sectors.
+    Sectors are interleaved: the first byte is the byte that would be at 0, the second byte is the byte that would be at $100,
+    the third is the byte at $1, the fourth at $101, and so on.  So this is also not compatible with standard images.
+
+    This command-line program will convert a standard image to work with Sider 2.  First parameter is the input filename,
+    second parameter is the output filename.  No error checking is done, if the input file doesn't exist it'll probably crash.
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+
+    static char block[512];
+    static char blockout[512];
+
+    int main(int argc, char *argv[])
+    {
+      FILE *in, *out;
+
+      in = fopen(argv[1], "rb");
+      out = fopen(argv[2], "wb");
+
+      int len = 0;
+      fseek(in, 0, SEEK_END);
+      len = ftell(in);
+      fseek(in, 0, SEEK_SET);
+
+      for (int bnum = 0; bnum < (len / 512); bnum++)
+      {
+        fread(block, 512, 1, in);
+        for (int byte = 0; byte < 256; byte++)
+        {
+          blockout[byte*2] = block[byte];
+          blockout[(byte*2)+1] = block[byte+256];
+        }
+        fwrite(blockout, 512, 1, out);
+        printf("block %d\n", bnum);
+      }
+
+      fclose(out);
+      fclose(in);
+      return 0;
+    }
+
+    --------------------------------------
 
     $C0(n+8)X space:
     $0: read state / write latch
@@ -41,17 +86,17 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_SIDER, a2bus_sidercard_device, "a2sider", "First Class Peripherals Sider SASI Card")
-DEFINE_DEVICE_TYPE(A2BUS_XEBEC, a2bus_xebeccard_device, "a2xebec", "Xebec SASI Card")
+DEFINE_DEVICE_TYPE(A2BUS_SIDER2, a2bus_sider2card_device, "a2sider2", "First Class Peripherals Sider 2 SASI Card")
+DEFINE_DEVICE_TYPE(A2BUS_SIDER1, a2bus_sider1card_device, "a2sider1", "First Class Peripherals Sider 1 SASI Card")
 
 #define SASI_ROM_REGION  "sasi_rom"
 
-ROM_START( sider )
+ROM_START( sider2 )
 	ROM_REGION(0x800, SASI_ROM_REGION, 0)
 	ROM_LOAD( "atsv22_a02a9baad2262a8a49ecea843f602124.bin", 0x000000, 0x000800, CRC(97773a0b) SHA1(8d0a5d6ce3b9a236771126033c4aba6c0cc5e704) )
 ROM_END
 
-ROM_START( xebec )
+ROM_START( sider1 )
 	ROM_REGION(0x800, SASI_ROM_REGION, 0)
 	ROM_LOAD( "xebec-103684c-1986.bin", 0x000000, 0x000800, CRC(9e62e15f) SHA1(7f50b5e00cac4960204f50448a6e2d623b1a41e2) )
 ROM_END
@@ -81,14 +126,14 @@ void a2bus_sider_device::device_add_mconfig(machine_config &config)
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *a2bus_sidercard_device::device_rom_region() const
+const tiny_rom_entry *a2bus_sider2card_device::device_rom_region() const
 {
-	return ROM_NAME( sider );
+	return ROM_NAME( sider2 );
 }
 
-const tiny_rom_entry *a2bus_xebeccard_device::device_rom_region() const
+const tiny_rom_entry *a2bus_sider1card_device::device_rom_region() const
 {
-	return ROM_NAME( xebec );
+	return ROM_NAME( sider1 );
 }
 
 //**************************************************************************
@@ -106,13 +151,13 @@ a2bus_sider_device::a2bus_sider_device(const machine_config &mconfig, device_typ
 {
 }
 
-a2bus_sidercard_device::a2bus_sidercard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_sider_device(mconfig, A2BUS_SIDER, tag, owner, clock)
+a2bus_sider2card_device::a2bus_sider2card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_sider_device(mconfig, A2BUS_SIDER2, tag, owner, clock)
 {
 }
 
-a2bus_xebeccard_device::a2bus_xebeccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_sider_device(mconfig, A2BUS_XEBEC, tag, owner, clock)
+a2bus_sider1card_device::a2bus_sider1card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_sider_device(mconfig, A2BUS_SIDER1, tag, owner, clock)
 {
 }
 
@@ -130,32 +175,6 @@ void a2bus_sider_device::device_reset()
 {
 	m_latch = 0xff;
 	m_control = 0;
-}
-
-void a2bus_xebeccard_device::device_start()
-{
-	a2bus_sider_device::device_start();
-
-	m_rom[0x42] = 0x01; 	// correct boot block jump to $801
-	m_rom[0x492] = 0x01;    // correct ProDOS READ_BLOCK to read one block, not two
-	m_rom[0x497] = 0xea;    // fix various weird stuff done to the READ_BLOCK parameters
-	m_rom[0x498] = 0xea;
-	m_rom[0x499] = 0xea;
-	m_rom[0x49a] = 0xea;
-	m_rom[0x49b] = 0xea;
-	m_rom[0x49c] = 0xea;
-	m_rom[0x4b4] = 0xea;
-	m_rom[0x4b5] = 0xea;
-	m_rom[0x4b9] = 0xea;
-	m_rom[0x4ba] = 0xea;
-	m_rom[0x4bf] = 0xea;
-	m_rom[0x4c0] = 0xea;
-	m_rom[0x4c7] = 0xea;
-	m_rom[0x4c8] = 0xea;
-	m_rom[0x4c9] = 0xea;
-	m_rom[0x4ca] = 0xea;
-	m_rom[0x4cb] = 0xea;
-	m_rom[0x4cc] = 0xea;
 }
 
 /*-------------------------------------------------
