@@ -202,7 +202,7 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ppu2c0x_device::device_start()
+void ppu2c0x_device::start_nopalram()
 {
 	// bind our handler
 	m_int_callback.resolve_safe();
@@ -221,12 +221,7 @@ void ppu2c0x_device::device_start()
 	m_bitmap = std::make_unique<bitmap_rgb32>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	m_spriteram = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
 
-	m_palette_ram.resize(0x20);
-
-	for (int i = 0; i < 0x20; i++)
-		m_palette_ram[i] = 0x00;
-
-	init_palette();
+	init_palette_tables();
 
 	// register for state saving
 	save_item(NAME(m_scanline));
@@ -245,7 +240,6 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_scanlines_per_frame));
 	save_item(NAME(m_vblank_first_scanline));
 	save_item(NAME(m_regs));
-	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
 	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
@@ -256,6 +250,18 @@ void ppu2c0x_device::device_start()
 	*/
 
 	save_item(NAME(*m_bitmap));
+}
+
+void ppu2c0x_device::device_start()
+{
+	start_nopalram();
+
+	m_palette_ram.resize(0x20);
+
+	for (int i = 0; i < 0x20; i++)
+		m_palette_ram[i] = 0x00;
+
+	save_item(NAME(m_palette_ram));
 }
 
 //**************************************************************************
@@ -292,9 +298,9 @@ inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
  *
  *************************************/
 
-void ppu2c0x_device::init_palette()
+void ppu2c0x_device::init_palette_tables()
 {
-	init_palette(false);
+	init_palette_tables(false);
 }
 
 rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy)
@@ -392,7 +398,7 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int colo
 	return rgb_t(floor(R + .5), floor(G + .5), floor(B + .5));
 }
 
-void ppu2c0x_device::init_palette(bool indirect)
+void ppu2c0x_device::init_palette_tables(bool indirect)
 {
 	bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
 
@@ -431,7 +437,7 @@ void ppu2c0x_device::init_palette(bool indirect)
 	}
 }
 
-void ppu2c0x_rgb_device::init_palette()
+void ppu2c0x_rgb_device::init_palette_tables()
 {
 	/* Loop through the emphasis modes (8 total) */
 	int entry = 0;
@@ -1104,27 +1110,13 @@ void ppu2c0x_device::palette_write(offs_t offset, uint8_t data)
 	{
 		// regular pens, no mirroring
 		m_palette_ram[offset & 0x1f] = data;
-
-		/* TODO FIX
-		m_colortable[offset & 0x1f] = data + color_emphasis;
-		m_colortable_mono[offset & 0x1f] = (data & 0xf0) + color_emphasis;
-		*/
 	}
 	else
 	{
 		// transparent pens are mirrored!
-		//int i;
 		if (0 == (offset & 0xf))
 		{
 			m_back_color = data;
-
-			/* TODO FIX
-			for (i = 0; i < 32; i += 4)
-			{
-				m_colortable[i] = data + color_emphasis;
-				m_colortable_mono[i] = (data & 0xf0) + color_emphasis;
-			}
-			*/
 		}
 		m_palette_ram[offset & 0xf] = m_palette_ram[(offset & 0xf) + 0x10] = data;
 	}

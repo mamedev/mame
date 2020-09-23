@@ -51,12 +51,14 @@ void ppu_sh6578_device::ppu_internal_map(address_map& map)
 
 void ppu_sh6578_device::device_start()
 {
-	ppu2c0x_device::device_start();
+	start_nopalram();
 
 	m_palette_ram.resize(0x40);
 
 	for (int i = 0; i < 0x40; i++)
 		m_palette_ram[i] = 0x00;
+
+	save_item(NAME(m_palette_ram));
 }
 
 void ppu_sh6578_device::device_reset()

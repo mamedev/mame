@@ -76,8 +76,8 @@ public:
 
 	/* routines */
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
-	virtual void init_palette();
-	void init_palette(bool indirect);
+	virtual void init_palette_tables();
+	void init_palette_tables(bool indirect);
 
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(uint8_t &pix);
@@ -182,6 +182,8 @@ protected:
 
 	required_device<cpu_device> m_cpu;
 
+	void start_nopalram();
+
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
 	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
@@ -244,7 +246,7 @@ class ppu2c0x_rgb_device : public ppu2c0x_device {
 protected:
 	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void init_palette() override;
+	virtual void init_palette_tables() override;
 
 private:
 	required_region_ptr<uint8_t> m_palette_data;

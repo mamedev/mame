@@ -40,7 +40,7 @@ public:
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
-	virtual void init_palette() override;
+	void init_vt03_palette_tables();
 
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(uint8_t &pix) override;
@@ -68,11 +68,11 @@ protected:
 	bool m_is_pal;
 	bool m_is_50hz;
 
+	uint32_t m_vtpens[0x1000*8];
+
 private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
-
-	std::unique_ptr<uint8_t[]> m_newpal;
 
 	int m_read_bg4_bg3;
 	int m_va34;
