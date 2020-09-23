@@ -33,11 +33,12 @@ public:
 	void init_acchi();
 	void init_avengrgs();
 
-	void mlc(machine_config &config);
-	void mlc_6bpp(machine_config &config);
-	void avengrgs(machine_config &config);
-	void mlc_5bpp(machine_config &config);
 	void acchi(machine_config &config);
+	void avengrgs(machine_config &config);
+	void mlc(machine_config &config);
+	void mlc_5bpp(machine_config &config);
+	void mlc_6bpp(machine_config &config);
+	void stadhr96(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -61,11 +62,7 @@ private:
 	required_region_ptr<u8> m_gfx2;
 
 	int m_irqLevel;
-	u32 m_mlc_raster_table_1[4*256];
-	u32 m_mlc_raster_table_2[4*256];
-	u32 m_mlc_raster_table_3[4*256];
 	u32 m_vbl_i;
-	int m_lastScanline[9];
 	u32 m_colour_mask;
 	u32 m_shadow_mask;
 	u32 m_shadow_shift;

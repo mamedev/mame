@@ -92,13 +92,13 @@
     Driver TODO:
         stadhr96 - protection? issues (or 156 co-processor? or timing?)
         avengrgs - doesn't generate enough line interrupts?
-        ddream95 seems to have a dual screen mode(??)
-        skullfng - slowdowns not verified from real PCB, Random hangs sometimes
+        ddream95 - seems to have a dual screen mode(??)
+        skullfng - slowdowns not verified from real PCB, random hangs sometimes
 
     Graphic TODO:
-        blending, raster effect features isn't fully emulated, verified currently
-        Not verified : Can sprites effect 8bpp and shadowing simultaneously?
-        Not verified what palette highest bits actually doing
+        blending, raster effect features aren't fully emulated, verified currently
+        Not verified : Can sprites affect 8bpp and shadowing simultaneously?
+        Not verified what palette highest bits actually do
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
@@ -186,7 +186,7 @@ void deco_mlc_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 	else if (ACCESSING_BITS_0_7)
 	{
-		/* Master volume control (TODO: probably logaritmic) */
+		// Master volume control (TODO: probably logarithmic)
 		m_ymz->set_output_gain(0, (255.0 - data) / 255.0);
 		m_ymz->set_output_gain(1, (255.0 - data) / 255.0);
 	}
@@ -206,14 +206,14 @@ void deco_mlc_state::irq_ram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_irq_ram[offset]);
 
 	/*
-	TODO : Accurate this from real PCB
-	Word 0 : Used but Unknown
+	TODO : Verify this on real PCB
+	Word 0 : Used but unknown
 	    skullfng : 0x00000cf3
 	    hoops**  : 0xffffdfff
 	    avengrgs : 0x00000cd3
 	    stadhr96 : 0x000028f3
 
-	Word 1 : 0xc0 at shadow, 0x00 at alpha, Other bits unknown
+	Word 1 : 0xc0 at shadow, 0x00 at alpha, other bits unknown
 	    skullfng : 0x000000c0 or 0x00000000
 	    hoops**  : 0xfffffffc
 	    avengrgs : 0xffffffff
@@ -230,10 +230,10 @@ void deco_mlc_state::irq_ram_w(offs_t offset, u32 data, u32 mem_mask)
 
 	switch (offset * 4)
 	{
-	case 0x10: /* IRQ ack.  Value written doesn't matter */
+	case 0x10: // IRQ ack.  Value written doesn't matter
 		m_maincpu->set_input_line(m_irqLevel, CLEAR_LINE);
 		return;
-	case 0x14: /* Prepare scanline interrupt */
+	case 0x14: // Prepare scanline interrupt
 		if(m_irq_ram[0x14 / 4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
 			m_raster_irq_timer->adjust(attotime::never);
 		else
@@ -537,15 +537,15 @@ void deco_mlc_state::machine_reset()
 
 void deco_mlc_state::avengrgs(machine_config &config)
 {
-	/* basic machine hardware */
-	SH2(config, m_maincpu, 42000000/2); /* 21 MHz clock confirmed on real board */
+	// basic machine hardware
+	SH2(config, m_maincpu, 42000000/2); // 21 MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::avengrgs_map);
 
-	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
+	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
 
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_size(40*8, 32*8);
@@ -558,7 +558,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -569,15 +569,15 @@ void deco_mlc_state::avengrgs(machine_config &config)
 
 void deco_mlc_state::mlc(machine_config &config)
 {
-	/* basic machine hardware */
-	ARM(config, m_maincpu, 42000000/6); /* 42 MHz -> 7MHz clock confirmed on real board */
-	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
+	// basic machine hardware
+	ARM(config, m_maincpu, 42000000/6); // 42 MHz -> 7MHz clock confirmed on real board
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
 
-	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
+	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
 
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_size(40*8, 32*8);
@@ -590,10 +590,7 @@ void deco_mlc_state::mlc(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(16);
 
-	DECO146PROT(config, m_deco146, 0);
-	m_deco146->set_use_magic_read_address_xor(true);
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -620,13 +617,19 @@ void deco_mlc_state::mlc_5bpp(machine_config &config)
 	m_ymz->add_route(0, "rspeaker", 1.0);
 }
 
+void deco_mlc_state::stadhr96(machine_config &config)
+{
+	mlc_6bpp(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
+
+	DECO146PROT(config, m_deco146, 0);
+	m_deco146->set_use_magic_read_address_xor(true);
+}
+
 void deco_mlc_state::acchi(machine_config &config)
 {
 	mlc(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
-
-	config.device_remove("ioprot");
 
 	m_gfxdecode->set_info(gfx_acchi);
 }
@@ -713,8 +716,8 @@ ROM_END
 
 ROM_START( stadhr96 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD32_WORD( "sh-eaj.2a", 0x000000, 0x80000, CRC(10d1496a) SHA1(1dc151547463a38d717159b3dfce7ffd78a943ad) ) /* FRI SEP 20 14:32:35 JST 1996 */
-	ROM_LOAD32_WORD( "sh-eaj.2b", 0x000002, 0x80000, CRC(608a9144) SHA1(15e2fa99dc96e8ebd9868713ae7708cb824fc6c5) ) /*    EUROPE (DISTRIBUTED)      */
+	ROM_LOAD32_WORD( "sh-eaj.2a", 0x000000, 0x80000, CRC(10d1496a) SHA1(1dc151547463a38d717159b3dfce7ffd78a943ad) ) // FRI SEP 20 14:32:35 JST 1996
+	ROM_LOAD32_WORD( "sh-eaj.2b", 0x000002, 0x80000, CRC(608a9144) SHA1(15e2fa99dc96e8ebd9868713ae7708cb824fc6c5) ) //    EUROPE (DISTRIBUTED)
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
@@ -736,8 +739,8 @@ ROM_END
 
 ROM_START( stadhr96u )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD32_WORD( "eah00-0.2a", 0x000000, 0x80000, CRC(f45b2ca0) SHA1(442dbfea97abb98451b323986878504ac0370e85) ) /* FRI SEP 20 14:01:45 JST 1996 */
-	ROM_LOAD32_WORD( "eah01-0.2b", 0x000002, 0x80000, CRC(328a2bca) SHA1(7e398b48719e5d71b2212d5b65be667e20663589) ) /*            U.S.A.            */
+	ROM_LOAD32_WORD( "eah00-0.2a", 0x000000, 0x80000, CRC(f45b2ca0) SHA1(442dbfea97abb98451b323986878504ac0370e85) ) // FRI SEP 20 14:01:45 JST 1996
+	ROM_LOAD32_WORD( "eah01-0.2b", 0x000002, 0x80000, CRC(328a2bca) SHA1(7e398b48719e5d71b2212d5b65be667e20663589) ) //            U.S.A.
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
@@ -759,8 +762,8 @@ ROM_END
 
 ROM_START( stadhr96j )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD32_WORD( "ead00-4.2a", 0x000000, 0x80000, CRC(b0adfc39) SHA1(3094dfb7c7f8fa9d7e10d98dff8fb8aba285d710) ) /* WED SEP  5 00:00:00 JST 1996 (FINAL) */
-	ROM_LOAD32_WORD( "ead01-4.2b", 0x000002, 0x80000, CRC(0b332820) SHA1(28b757fe529250711fcb82424ba63c222a9329b9) ) /*                JAPAN                 */
+	ROM_LOAD32_WORD( "ead00-4.2a", 0x000000, 0x80000, CRC(b0adfc39) SHA1(3094dfb7c7f8fa9d7e10d98dff8fb8aba285d710) ) // WED SEP  5 00:00:00 JST 1996 (FINAL)
+	ROM_LOAD32_WORD( "ead01-4.2b", 0x000002, 0x80000, CRC(0b332820) SHA1(28b757fe529250711fcb82424ba63c222a9329b9) ) //                JAPAN
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
@@ -976,7 +979,7 @@ ROM_END
 
 void deco_mlc_state::descramble_sound(  )
 {
-	/* the same as simpl156 / heavy smash? */
+	// the same as simpl156 / heavy smash?
 	u8 *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
 	std::vector<u8> buf(length);
@@ -1047,16 +1050,16 @@ void deco_mlc_state::init_acchi() // sound ROMs don't appear to be scrambled
 
 /***************************************************************************/
 
-GAME( 1995, avengrgs,  0,        avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, avengrgsj, avengrgs, avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, stadhr96,  0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
-GAME( 1996, stadhr96u, stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
-GAME( 1996, stadhr96j, stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
-GAME( 1996, stadhr96j2,stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan?, EAE)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rom labels are EAE ^^
-GAME( 1996, skullfng,  0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Europe, Master 96.02.19 13:45 */
-GAME( 1996, skullfngj, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan 1.09)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.09, Japan, Master 96.02.08 14:39 */
-GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia 1.13)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Asia, Master 96.02.19 13:49 */
-GAME( 1996, hoops96,   0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, ddream95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, hoops95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, acchi,     0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgs,   0,        avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (US/Europe 1.0)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, avengrgsj,  avengrgs, avengrgs, mlc, deco_mlc_state, init_avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan 1.2)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, stadhr96,   0,        stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
+GAME( 1996, stadhr96u,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
+GAME( 1996, stadhr96j,  stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
+GAME( 1996, stadhr96j2, stadhr96, stadhr96, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan?, EAE)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rom labels are EAE ^^
+GAME( 1996, skullfng,   0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.13, Europe, Master 96.02.19 13:45
+GAME( 1996, skullfngj,  skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan 1.09)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.09, Japan, Master 96.02.08 14:39
+GAME( 1996, skullfnga,  skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia 1.13)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Version 1.13, Asia, Master 96.02.19 13:49
+GAME( 1996, hoops96,    0,        mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, ddream95,   hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)",            MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, hoops95,    hoops96,  mlc_5bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, acchi,      0,        acchi,    mlc, deco_mlc_state, init_acchi,    ROT0,   "Data East Corporation", "Janken Game Acchi Muite Hoi! (Japan 1.3)",   MACHINE_IMPERFECT_GRAPHICS )
