@@ -453,7 +453,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			//	palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 11);
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
 
 			uint32_t pix;
 			pix = m_vtpens_rgb555[palval & 0x3ffff];
@@ -469,10 +469,10 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			//	palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 8);
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
 
 			uint32_t pix;
-			pix = m_vtpens_rgb444[palval & 0x7ffff];
+			pix = m_vtpens_rgb444[palval & 0x7fff];
 			*dest = pix;
 		}
 		else // VT03 mode
@@ -485,10 +485,10 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			//	palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 8);
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
 
 			uint32_t pix;
-			pix = m_vtpens[palval  & 0x7ffff];
+			pix = m_vtpens[palval  & 0x7fff];
 			*dest = pix;
 		}
 	}
