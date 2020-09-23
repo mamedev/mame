@@ -244,11 +244,6 @@ void ppu2c0x_device::start_nopalram()
 	save_item(NAME(m_tilecount));
 	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
 
-	/* TODO FIX
-	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
-	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
-	*/
-
 	save_item(NAME(*m_bitmap));
 }
 
