@@ -67,8 +67,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
-	void vram_addr_w(offs_t offset, uint8_t data);
+	void vram_start_addr_w(offs_t offset, uint8_t data);
+	void vram_end_addr_w(offs_t offset, uint8_t data);
+	void vram_start_addr2_w(offs_t offset, uint8_t data);
 	void cursor_addr_w(offs_t offset, uint8_t data);
+	void cursor_start_w(uint8_t data);
+	void cursor_end_w(uint8_t data);
 	void screen_ctrl_w(uint8_t data);
 
 	uint8_t unk_42_r();
@@ -79,7 +83,11 @@ private:
 	void kbd_int_w(int state);
 	uint8_t vector_r();
 
-	uint16_t m_vram_addr;
+	uint16_t m_vram_start_addr;
+	uint16_t m_vram_end_addr;
+	uint16_t m_vram_start_addr2;
+	uint8_t m_cursor_start;
+	uint8_t m_cursor_end;
 	uint16_t m_cursor_addr;
 	uint8_t m_screen_ctrl;
 	uint8_t m_unk_42;
@@ -94,7 +102,11 @@ private:
 void informer_213_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0000).rw("kbd", FUNC(informer_213_kbd_hle_device::read), FUNC(informer_213_kbd_hle_device::write));
-	map(0x0006, 0x0007).unmapr().w(FUNC(informer_213_state::vram_addr_w));
+	map(0x0006, 0x0007).unmapr().w(FUNC(informer_213_state::vram_start_addr_w));
+	map(0x0008, 0x0009).unmapr().w(FUNC(informer_213_state::vram_end_addr_w));
+	map(0x000a, 0x000b).unmapr().w(FUNC(informer_213_state::vram_start_addr2_w));
+	map(0x000d, 0x000d).unmapr().w(FUNC(informer_213_state::cursor_start_w));
+	map(0x000e, 0x000e).unmapr().w(FUNC(informer_213_state::cursor_end_w));
 	map(0x000f, 0x0010).unmapr().w(FUNC(informer_213_state::cursor_addr_w));
 	map(0x0021, 0x0021).w(FUNC(informer_213_state::screen_ctrl_w));
 	map(0x0042, 0x0042).rw(FUNC(informer_213_state::unk_42_r), FUNC(informer_213_state::unk_42_w));
@@ -124,6 +136,9 @@ INPUT_PORTS_END
 uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t chargen_base = (m_chargen.bytes() == 0x4000) ? 0x2000 : 0;
+	
+	// line at which vram splits into two windows
+	int split = 24 - ((m_vram_start_addr2 - m_vram_start_addr) / 80);
 
 	for (int y = 0; y < 26; y++)
 	{
@@ -131,16 +146,18 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		for (int x = 0; x < 80; x++)
 		{
-			uint16_t addr = m_vram_addr + y * 80 + x;
+			uint16_t addr;
+
+			// vram is split into 3 areas: display window 1, display window 2, status bar
+			if (y >= 24)
+				addr = 0x6000 + (y - 24) * 80 + x;
+			else if (y >= split)
+				addr = m_vram_start_addr + (y - split) * 80 + x;
+			else
+				addr = m_vram_start_addr2 + y * 80 + x;
+
 			uint8_t code = m_vram[addr - 0x6000];
 			uint8_t attr = m_aram[addr - 0x6000];
-
-			// status line is at top of vram
-			if (y > 23)
-			{
-				code = m_vram[(y - 24) * 80 + x];
-				attr = m_aram[(y - 24) * 80 + x];
-			}
 
 			if (code == 0xc0 || code == 0xe8)
 				line_attr = attr;
@@ -150,17 +167,33 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 			{
 				uint8_t data = m_chargen[chargen_base | ((code << 4) + i)];
 
-				if (addr == m_cursor_addr)
+				// conceal
+				if (line_attr & 0x08 || attr & 0x08)
+					data = 0x00;
+
+				// reverse video
+				if (line_attr & 0x10 || attr & 0x10)
 					data ^= 0xff;
 
-				if (line_attr == 0xb0 || line_attr == 0x90)
-					data ^= 0xff;
+				// underline (not supported by terminal?)
+				if (line_attr & 0x20 || attr & 0x20)
+					data = data;
+
+				// blink (todo: timing)
+				if (line_attr & 0x40 || attr & 0x40)
+					data = m_screen->frame_number() & 0x20 ? 0x00 :data;
 
 				if (code == 0xc0 || code == 0xe8)
 					data = 0;
 
 				if (BIT(m_screen_ctrl, 5))
 					data ^= 0xff;
+
+				// cursor
+				if (BIT(m_cursor_start, 5) == 1 && addr == m_cursor_addr && y < 24)
+					if (i >= (m_cursor_start & 0x0f) && i < (m_cursor_end & 0x0f))
+						if (!(BIT(m_screen_ctrl, 4) == 0 && (m_screen->frame_number() & 0x20)))
+							data = 0xff;
 
 				// 6 pixels of the character
 				bitmap.pix32(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
@@ -176,12 +209,59 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-void informer_213_state::vram_addr_w(offs_t offset, uint8_t data)
+void informer_213_state::vram_start_addr_w(offs_t offset, uint8_t data)
 {
 	if (offset)
-		m_vram_addr = (m_vram_addr & 0xff00) | (data << 0);
+		m_vram_start_addr = (m_vram_start_addr & 0xff00) | (data << 0);
 	else
-		m_vram_addr = (m_vram_addr & 0x00ff) | (data << 8);
+		m_vram_start_addr = (m_vram_start_addr & 0x00ff) | (data << 8);
+
+	if (offset)
+		logerror("vram_start_addr_w: %04x\n", m_vram_start_addr);
+}
+
+void informer_213_state::vram_end_addr_w(offs_t offset, uint8_t data)
+{
+	if (offset)
+		m_vram_end_addr = (m_vram_end_addr & 0xff00) | (data << 0);
+	else
+		m_vram_end_addr = (m_vram_end_addr & 0x00ff) | (data << 8);
+
+	if (offset)
+		logerror("vram_end_addr_w: %04x\n", m_vram_end_addr);
+}
+
+void informer_213_state::vram_start_addr2_w(offs_t offset, uint8_t data)
+{
+	if (offset)
+		m_vram_start_addr2 = (m_vram_start_addr2 & 0xff00) | (data << 0);
+	else
+		m_vram_start_addr2 = (m_vram_start_addr2 & 0x00ff) | (data << 8);
+
+	if (offset)
+		logerror("vram_start_addr2_w: %04x\n", m_vram_start_addr2);
+}
+
+void informer_213_state::cursor_start_w(uint8_t data)
+{
+	logerror("cursor_start_w: %02x\n", data);
+
+	// 76------  unknown
+	// --5-----  cursor visible
+	// ---4----  unknown
+	// ----3210  cursor starting line, values seen: 0 (block/off), 6 (underline)
+
+	m_cursor_start = data;
+}
+
+void informer_213_state::cursor_end_w(uint8_t data)
+{
+	logerror("cursor_end_w: %02x\n", data);
+
+	// 7654----  unknown
+	// ----3210  cursor ending line, values seen: 9 (block), 8 (underline), 1 (off)
+
+	m_cursor_end = data;
 }
 
 void informer_213_state::cursor_addr_w(offs_t offset, uint8_t data)
@@ -190,6 +270,9 @@ void informer_213_state::cursor_addr_w(offs_t offset, uint8_t data)
 		m_cursor_addr = (m_cursor_addr & 0xff00) | (data << 0);
 	else
 		m_cursor_addr = (m_cursor_addr & 0x00ff) | (data << 8);
+
+	if (offset)
+		logerror("cursor_addr_w: %04x\n", m_cursor_addr);
 }
 
 void informer_213_state::screen_ctrl_w(uint8_t data)
@@ -273,7 +356,9 @@ uint8_t informer_213_state::vector_r()
 void informer_213_state::machine_start()
 {
 	// register for save states
-	save_item(NAME(m_vram_addr));
+	save_item(NAME(m_vram_start_addr));
+	save_item(NAME(m_vram_start_addr2));
+	save_item(NAME(m_vram_end_addr));
 	save_item(NAME(m_cursor_addr));
 	save_item(NAME(m_screen_ctrl));
 	save_item(NAME(m_unk_42));
