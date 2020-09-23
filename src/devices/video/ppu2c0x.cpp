@@ -468,7 +468,7 @@ void ppu2c0x_device::init_palette(bool indirect)
 			{
 				rgb_t col = nespal_to_RGB(color_intensity, color_num, color_emphasis, is_pal);
 
-				m_nespens[entry] = col;
+				m_nespens[entry] = (uint32_t)col;
 
 				/* Round, and set the value */
 				if (indirect)
@@ -494,7 +494,7 @@ void ppu2c0x_rgb_device::init_palette()
 			int G = ((color_emphasis & 2) ? 7 : m_palette_data[color_num * 3 + 1]);
 			int B = ((color_emphasis & 4) ? 7 : m_palette_data[color_num * 3 + 2]);
 
-			m_nespens[entry] = rgb_t(pal3bit(R), pal3bit(G), pal3bit(B));
+			m_nespens[entry] = (pal3bit(R)<<16) | (pal3bit(G)<<8) | pal3bit(B);
 
 			set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 		}
@@ -620,19 +620,18 @@ void ppu2c0x_device::shift_tile_plane_data(uint8_t& pix)
 
 void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest)
 {
-	pen_t pen;
+	pen_t usepen;
 
 	if (pix)
 	{
-		const pen_t* paldata = 0;// TODO FIX &color_table[4 * color];
-		pen = this->pen(paldata[pix]);
+		usepen = pen(m_palette_ram[((4 * color) + pix) & 0x1f]);  // TODO IMPROVE
 	}
 	else
 	{
-		pen = back_pen;
+		usepen = back_pen;
 	}
 
-	*dest = pen;
+	*dest = usepen;
 }
 
 void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest)
@@ -806,8 +805,9 @@ void ppu2c0x_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx)
 
 void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	const pen_t* paldata = 0; // TODO FIX &m_colortable[4 * color];
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(paldata[pixel_data]);
+	uint8_t palval = m_palette_ram[((4 * color) | pixel_data) & 0x1f];
+	uint32_t pix = m_nespens[palval];  // TODO IMPROVE
+	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pix;
 }
 
 void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)

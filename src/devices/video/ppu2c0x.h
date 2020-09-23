@@ -212,7 +212,7 @@ protected:
 
 	uint8_t readbyte(offs_t address);
 
-	rgb_t m_nespens[0x200];
+	uint32_t m_nespens[0x200];
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
