@@ -9667,8 +9667,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk? -->
-	<software name="lipsadv3" supported="no">
+	<software name="lipsadv3">
 		<!--
 		Origin: redump.org
 		<rom name="Lip 3 - Lipstick Adventure 3 (Japan) (Track 01).bin" size="52567200" crc="7462e0c3" sha1="48900be15c74d4099e25710dcd5e6f26123c1d7f"/>
@@ -9691,6 +9690,15 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HME-221"/>
 		<info name="release" value="199305xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<!-- 
+				This image has been reconstructed manually by creating empty files with the names that the game expects and re-initializing them with the in-game option.
+				It's enough to make the game work, but it should be replaced with an actual dump of the original disk.
+				-->
+				<rom name="lip3_userdisk.hdm" size="1261568" crc="d1ea991e" sha1="da73198e178d90871b0b8e90f5b0ee8bc2a9c5eb" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lip 3 - lipstick adventure 3 (japan)" sha1="c0507c340b55c1fa08a8080e0fc3d53d271f6a1e" />
