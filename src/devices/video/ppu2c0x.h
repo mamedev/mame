@@ -42,8 +42,7 @@
 
 class ppu2c0x_device :  public device_t,
 						public device_memory_interface,
-						public device_video_interface,
-						public device_palette_interface
+						public device_video_interface
 {
 public:
 	typedef device_delegate<void (int scanline, int vblank, int blanked)> scanline_delegate;
@@ -79,12 +78,11 @@ public:
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
 	virtual void init_palette();
 	void init_palette(bool indirect);
-	virtual uint32_t palette_entries() const override { return 4*16*8; }
 
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(uint8_t &pix);
-	virtual void draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest);
-	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t *&dest);
+	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest);
+	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t *&dest);
 	virtual void draw_background( uint8_t *line_priority );
 	void draw_background_pen();
 
@@ -205,8 +203,6 @@ protected:
 	int                         m_refresh_data;         /* refresh-related */
 	int                         m_x_fine;               /* refresh-related */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
-	//std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
-	//std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	latch_delegate              m_latch;
 
 

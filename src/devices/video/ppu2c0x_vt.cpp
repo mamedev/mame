@@ -69,14 +69,16 @@ void ppu_vt03_device::set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t re
 
 void ppu_vt03_device::set_new_pen(int i)
 {
+#if 0 // TODO FIX
 	if ((i < 0x20) && ((i & 0x3) == 0))
 	{
-		set_pen_color(i & 0x7f, rgb_t(0, 0, 0));
+		set_pen_color(i & 0x7f, rgb_t(0, 0, 0)); TODO FIX
 	}
 	else
 	{
 		if (m_pal_mode == PAL_MODE_NEW_RGB)
 		{
+			
 			uint16_t rgbval = (m_newpal[i & 0x7f] & 0xff) | ((m_newpal[(i & 0x7f) + 0x80] & 0xff) << 8);
 			uint8_t blue = (rgbval & 0x001f) << 3;
 			uint8_t green = (rgbval & 0x3e0) >> 2;
@@ -151,7 +153,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			set_pen_color(i & 0x7f, rgb_t(RV, GV, BV));
 		}
 	}
-
+#endif
 
 }
 
@@ -353,7 +355,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 	{
 		if (!is16pix)
 		{
-			bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(pixel_data + (4 * color));
+			//bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(pixel_data + (4 * color));  TODO FIX
 		}
 		else
 		{
@@ -361,9 +363,13 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			    we probably need to split them out again and draw them at xpos+8 with a
 			    cliprect - not seen used yet */
 			if ((pixel_data & 0x03) != 0)
-				bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen((pixel_data & 0x03) + (4 * color));
+			{
+				//bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen((pixel_data & 0x03) + (4 * color)); TODO FIX
+			}
 			if (((pixel_data >> 5) & 0x03) != 0)
-				bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = pen(((pixel_data >> 5) & 0x03) + (4 * color));
+			{
+				//bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = pen(((pixel_data >> 5) & 0x03) + (4 * color)); TODO FIX
+			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
 		}
@@ -414,7 +420,7 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 	}
 }
 
-void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest)
+void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
 	int is4bpp = get_201x_reg(0x0) & 0x02;
 
@@ -424,6 +430,7 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, ui
 	}
 	else
 	{
+		/* TODO FIX 
 		int basepen;
 		int pen;
 
@@ -445,6 +452,7 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, ui
 			pen = 0; // fixme backpen logic probably differs on vt03 due to extra colours
 		}
 		*dest = this->pen(pen);
+		*/
 	}
 }
 
@@ -482,7 +490,7 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 		{
 			for (int i = 0; i < 256; i++)
 			{
-				set_pen_indirect(i, i);
+				//set_pen_indirect(i, i);  TODO FIX
 			}
 		}
 	}

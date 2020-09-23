@@ -88,8 +88,8 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 
 void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = this->pen(palval);
+	//uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
+	bitmap.pix32(m_scanline, sprite_xpos + pixel) = 0;// this->pen(palval); // TODO FIX
 }
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
@@ -101,7 +101,7 @@ void ppu_sh6578_device::read_tile_plane_data(int address, int color)
 	m_extplanebuf[1] = readbyte(address + 24);
 }
 
-void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest)
+void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t*& dest)
 {
 	int color = color_byte;
 
@@ -136,12 +136,12 @@ void ppu_sh6578_device::draw_tile(uint8_t* line_priority, int color_byte, int co
 
 			if (!trans)
 			{
-				pen = this->pen(palval);
+				pen = 0;// this->pen(palval); TODO FIX
 			}
 			else
 			{
-				uint8_t palval = m_palette_ram[0x0] & 0x3f;
-				pen = this->pen(palval);
+				//uint8_t palval = m_palette_ram[0x0] & 0x3f;
+				pen = 0;// this->pen(palval); TODO FIX
 			}
 
 			*dest = pen;
@@ -158,7 +158,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
 
-	uint8_t color_mask = 0xff;
+	//uint8_t color_mask = 0xff;
 	//const pen_t* color_table;
 
 	/* setup the color mask and colortable to use */
@@ -176,7 +176,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	*/
 
 	/* cache the background pen */
-	pen_t back_pen = pen(m_back_color & color_mask);
+	pen_t back_pen = 0;// pen(m_back_color & color_mask); TODO FIX
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */

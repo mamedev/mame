@@ -30,40 +30,6 @@
 
 #include "screen.h"
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* default monochromatic colortable */
-
-/* TODO FIX
-static const pen_t default_colortable_mono[] =
-{
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-	0,1,2,3,
-};
-
-// default colortable
-static const pen_t default_colortable[] =
-{
-	0,1,2,3,
-	0,5,6,7,
-	0,9,10,11,
-	0,13,14,15,
-	0,17,18,19,
-	0,21,22,23,
-	0,25,26,27,
-	0,29,30,31,
-};
-*/
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -122,7 +88,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	device_palette_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, internal_map),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_scanline(0),  // reset the scanline count
@@ -256,27 +221,10 @@ void ppu2c0x_device::device_start()
 	m_bitmap = std::make_unique<bitmap_rgb32>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	m_spriteram = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
 
-	/* TODO FIX
-	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
-	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
-	*/
-
 	m_palette_ram.resize(0x20);
 
 	for (int i = 0; i < 0x20; i++)
 		m_palette_ram[i] = 0x00;
-
-	/* initialize the color tables */
-	/* TODO FIX
-	for (int i = 0; i < ARRAY_LENGTH(default_colortable_mono); i++)
-	{
-		// monochromatic table
-		m_colortable_mono[i] = default_colortable_mono[i];
-
-		// color table
-		m_colortable[i] = default_colortable[i];
-	}
-	*/
 
 	init_palette();
 
@@ -471,11 +419,12 @@ void ppu2c0x_device::init_palette(bool indirect)
 				m_nespens[entry] = (uint32_t)col;
 
 				/* Round, and set the value */
-				if (indirect)
-					set_indirect_color(entry++, col);
-				else
-					set_pen_color(entry++, col);
+				//if (indirect)
+				//	set_indirect_color(entry++, col);
+				//else
+				//	set_pen_color(entry++, col);
 
+				entry++;
 				
 			}
 		}
@@ -496,7 +445,8 @@ void ppu2c0x_rgb_device::init_palette()
 
 			m_nespens[entry] = (pal3bit(R)<<16) | (pal3bit(G)<<8) | pal3bit(B);
 
-			set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+			//set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+			entry++;
 		}
 	}
 }
@@ -618,13 +568,13 @@ void ppu2c0x_device::shift_tile_plane_data(uint8_t& pix)
 	m_planebuf[1] = m_planebuf[1] << 1;
 }
 
-void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest)
+void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
-	pen_t usepen;
+	uint32_t usepen;
 
 	if (pix)
 	{
-		usepen = pen(m_palette_ram[((4 * color) + pix) & 0x1f]);  // TODO IMPROVE
+		usepen = m_nespens[m_palette_ram[((4 * color) + pix) & 0x1f]];  // TODO IMPROVE
 	}
 	else
 	{
@@ -634,7 +584,7 @@ void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uin
 	*dest = usepen;
 }
 
-void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t*& dest)
+void ppu2c0x_device::draw_tile(uint8_t* line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t*& dest)
 {
 	int color = (((color_byte >> color_bits) & 0x03));
 
@@ -684,7 +634,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 	}
 	*/
 	/* cache the background pen */
-	pen_t back_pen = pen(m_back_color & color_mask);
+	uint32_t back_pen = m_nespens[m_back_color & color_mask];
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -774,7 +724,7 @@ void ppu2c0x_device::draw_background_pen()
 	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
 
 	/* cache the background pen */
-	pen_t back_pen = pen(m_back_color & color_mask);
+	uint32_t back_pen = m_nespens[m_back_color & color_mask];
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
@@ -1084,12 +1034,12 @@ void ppu2c0x_device::update_visible_enabled_scanline()
 void ppu2c0x_device::update_visible_disabled_scanline()
 {
 	bitmap_rgb32& bitmap = *m_bitmap;
-	pen_t back_pen;
+	uint32_t back_pen;
 
 	/* setup the color mask and colortable to use */
 	uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
 
-	back_pen = pen(m_back_color & color_mask);
+	back_pen = m_nespens[m_back_color & color_mask];
 
 	if (m_paletteram_in_ppuspace)
 	{
@@ -1102,7 +1052,7 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 			// pen. Micro Machines makes use of this feature.
 			int pen_num = m_palette_ram[(m_videomem_addr & 0x03) ? (m_videomem_addr & 0x1f) : 0];
 
-			back_pen = pen(pen_num);
+			back_pen = m_nespens[pen_num];
 		}
 	}
 

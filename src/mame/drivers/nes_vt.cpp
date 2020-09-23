@@ -913,7 +913,7 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_co
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 
@@ -924,7 +924,7 @@ void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
@@ -941,7 +941,7 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 
@@ -952,7 +952,7 @@ void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
@@ -969,7 +969,7 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
 	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
 
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 }
 
 uint8_t nes_vt_base_state::upper_412c_r()
@@ -996,7 +996,7 @@ void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 	NES_VT_SOC_4KRAM(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
+	// GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper); TODO FIX
 
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt_state::upper_412c_r));
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt_state::upper_412d_r));
