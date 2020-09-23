@@ -82,11 +82,11 @@ license:CC0
 	  XX   | 80-281504(GER)  | Rapunzel - Neu verföhnt
 	       | 80-281600(US)   | Chuggington - Babysitter Brewster
 	       | 80-281603(UK)   | Chuggington - Babysitter Brewster
-	       | 80-281604(GER)  | Chuggington - Bastian, der babysitter
+	       | 80-281604(GER)  | Chuggington - Bastian, der Babysitter
 	       | 80-281605(FR)   | Chuggington - Bruno fait du baby-sitting
 	       | 80-281700(US)   | The Penguins of Madagascar - The Helmet
 	       | 80-281703(UK)   | The Penguins of Madagascar - The Helmet
-		   | 80-281723(??)   | De Pinguïns van Madagascar - De Helm (Netherlands)
+	       | 80-281723(??)   | De Pinguïns van Madagascar - De Helm (Netherlands)
 	       | 80-281800(US)   | Kung Fu Panda 2
 	       | 80-281803(UK)   | Kung Fu Panda 2
 	       | 80-281900(US)   | Disney/Pixar Cars 2
@@ -112,20 +112,20 @@ license:CC0
 	       | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise
 	       | 80-282403(UK)   | Hello Kitty - Hello Kitty's Surprise
 	       | 80-282404(GER)  | Hello Kitty - Hello Kittys Überraschung!
-		   | 80-282422(SP)   | Hello Kitty - La sorpresa de Hello Kitty
+	       | 80-282422(SP)   | Hello Kitty - La sorpresa de Hello Kitty
 	       | 80-282423(??)   | Hello Kitty - Hello Kitty's Verrassing! (Netherlands)
 	       | 80-282700(US)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
 	       | 80-282703(UK)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
-	       | 80-282704(GER)  | Thomas und sein Freunde - Auf und davon Diesel ist neidisch
-		   
-		   Notes: Storio 1 carts follow an 80-28XXXX(XX) product code sequence. Spain and Netherlands releases use an 80-28XX2X(XX) sequence.
-		   EAN is calculated by using a 341776 prefix, appending the six digit product code, and adding an EAN check number at the end.
-		   EG: 341776 + 280003 + 3 (calculated check digit) = 3417762800033 - Shrek's Holiday (UK.)
-		   
-		   Two letter Netherlands and Italy suffixes have not yet been confirmed. All items have been confirmed via physical photographs, product code searches,
-		   and online shopping sites, with the exception of Winnie Puuh (Spain) which was listed in a Spanish product catalog and may have not been released.
-		   
-		   Storio 1 carts come in boxes with an orange stripe in front. Storio carts with a blue stripe in front are only compatible with Storio 2 and later systems.
+	       | 80-282704(GER)  | Thomas und seine Freunde - Auf und davon Diesel ist neidisch
+
+	       Notes: Storio 1 carts follow an 80-28XXXX(XX) product code sequence. Spain and Netherlands releases use an 80-28XX2X(XX) sequence.
+	       EAN is calculated by using a 341776 prefix, appending the six digit product code, and adding an EAN check number at the end.
+	       EG: 341776 + 280003 + 3 (calculated check digit) = 3417762800033 - Shrek's Holiday (UK.)
+
+	       Two letter Netherlands and Italy suffixes have not yet been confirmed. All items have been confirmed via physical photographs, product code searches,
+	       and online shopping sites, with the exception of Winnie Puuh (Spain) which was listed in a Spanish product catalog and may have not been released.
+
+	       Storio 1 carts come in boxes with an orange stripe in front. Storio carts with a blue stripe in front are only compatible with Storio 2 and later systems.
 
 	-->
 
