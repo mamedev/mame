@@ -49,19 +49,27 @@ namespace netlist
 		template<typename... Args>
 		void qpush(Args&&...args) noexcept
 		{
-			if (!NL_USE_QUEUE_STATS || !m_use_stats)
+#if (!NL_USE_QUEUE_STATS)
+			m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
+#else
+			if (!m_use_stats)
 				m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
 			else
 				m_queue.emplace<true>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
+#endif
 		}
 
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-			if (!NL_USE_QUEUE_STATS || !m_use_stats)
+#if (!NL_USE_QUEUE_STATS)
+			m_queue.remove<false>(elem);
+#else
+			if (!m_use_stats)
 				m_queue.remove<false>(elem);
 			else
 				m_queue.remove<true>(elem);
+#endif
 		}
 
 		// Control functions
