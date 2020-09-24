@@ -206,7 +206,7 @@ void bl_handhelds_menucontrol_device::device_start()
 	save_item(NAME(m_response));
 	save_item(NAME(m_commandbit));
 	save_item(NAME(m_command));
-	//save_item(NAME(m_menustate));
+	save_item(NAME(m_menustate));
 }
 
 void bl_handhelds_menucontrol_device::device_reset()

@@ -34,8 +34,7 @@ public:
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
-		m_prgrom(*this, "mainrom"),
-		m_previous_port0(0)
+		m_prgrom(*this, "mainrom")
 	{ }
 
 protected:
@@ -48,23 +47,24 @@ protected:
 
 	void nes_vt_map(address_map& map);
 
-
 	optional_ioport m_io0;
 	optional_ioport m_io1;
+
 	uint8_t m_latch0;
 	uint8_t m_latch1;
-
-	/* Misc */
-	uint32_t m_ahigh; // external banking bits
-	uint8_t m_4242;
-	uint8_t m_411c;
-	uint8_t m_411d;
+	uint8_t m_previous_port0;
 
 	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
 	optional_ioport m_exin1;
 	optional_ioport m_exin2;
 	optional_ioport m_exin3;
+
+	/* Misc */
+	uint32_t m_ahigh; // external banking bits
+	uint8_t m_4242;
+	uint8_t m_411c;
+	uint8_t m_411d;
 
 	required_region_ptr<uint8_t> m_prgrom;
 
@@ -76,7 +76,6 @@ protected:
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
 	void upper_412c_w(uint8_t data);
-	int m_previous_port0;
 
 private:
 	/* APU handling */
@@ -649,6 +648,23 @@ void nes_vt_ablping_state::ablping_extraio_w(uint8_t data)
 
 void nes_vt_base_state::machine_start()
 {
+	m_latch0 = 0;
+	m_latch1 = 0;
+	m_previous_port0 = 0;
+
+	m_ahigh = 0;
+	m_4242 = 0;
+	m_411c = 0;
+	m_411d = 0;
+
+	save_item(NAME(m_latch0));
+	save_item(NAME(m_latch1));
+	save_item(NAME(m_previous_port0));
+
+	save_item(NAME(m_ahigh));
+	save_item(NAME(m_4242));
+	save_item(NAME(m_411c));
+	save_item(NAME(m_411d));
 }
 
 void nes_vt_base_state::machine_reset()
