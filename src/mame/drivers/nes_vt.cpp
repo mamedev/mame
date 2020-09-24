@@ -128,8 +128,6 @@ public:
 
 protected:
 	required_device<nes_vt_soc_device> m_soc;
-
-	void vt03_8000_mapper_w(offs_t offset, uint8_t data) { m_soc->vt03_8000_mapper_w(offset, data); }
 };
 
 
@@ -444,45 +442,45 @@ void nes_vt_base_state::vtspace_w(offs_t offset, uint8_t data)
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
 void nes_vt_state::vt_external_space_map_32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 void nes_vt_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 void nes_vt_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 void nes_vt_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 void nes_vt_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 void nes_vt_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 void nes_vt_state::vt_external_space_map_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).mirror(0x1f80000).rw(FUNC(nes_vt_state::vt_rom_r), FUNC(nes_vt_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt_state::vt_rom_r));
 }
 
 // Win Lose Draw has RAM as well as ROM
 void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
+	map(0x0000000, 0x007ffff).r(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r));
 	map(0x0100000, 0x010ffff).ram();
-	map(0x0180000, 0x01fffff).rw(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r), FUNC(nes_vt_swap_op_d5_d6_state::vtspace_w));
+	map(0x0180000, 0x01fffff).r(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r));
 }
 
 // bitboy is 2 16Mbyte banks
@@ -493,7 +491,7 @@ uint8_t nes_vt_cy_state::vt_rom_banked_r(offs_t offset)
 
 void nes_vt_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_cy_state::vt_rom_banked_r), FUNC(nes_vt_cy_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_cy_state::vt_rom_banked_r));
 }
 
 // fapocket is 4 16Mbyte banks
@@ -504,7 +502,7 @@ uint8_t nes_vt_dg_state::vt_rom_banked_r(offs_t offset)
 
 void nes_vt_dg_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).rw(FUNC(nes_vt_dg_state::vt_rom_banked_r), FUNC(nes_vt_dg_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_dg_state::vt_rom_banked_r));
 }
 
 uint8_t nes_vt_hh_state::vt_rom_banked_r(offs_t offset)
@@ -514,7 +512,7 @@ uint8_t nes_vt_hh_state::vt_rom_banked_r(offs_t offset)
 
 void nes_vt_hh_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).rw(FUNC(nes_vt_hh_state::vt_rom_banked_r), FUNC(nes_vt_hh_state::vt03_8000_mapper_w));
+	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt_hh_state::vt_rom_banked_r));
 }
 
 uint8_t nes_vt_base_state::extrain_0_r()
