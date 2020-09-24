@@ -121,6 +121,7 @@ nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, device_type 
 
 	m_default_palette_mode = PAL_MODE_VT0x;
 	m_force_baddma = false;
+	m_use_raster_timing_hack = false;
 }
 
 nes_vt_soc_device::nes_vt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -380,6 +381,12 @@ void nes_vt_soc_device::scrambled_410x_w(uint16_t offset, uint8_t data)
 		// load latched value and start counting
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
+
+		// HACK for some one line errors in various games and completely broken rasters in msifrog, TOOD: find real source of issue (bad timing of interrupt or counter changes, or latching of data?)
+		if (m_use_raster_timing_hack)
+			if (m_ppu->in_vblanking())
+				m_timer_val--;
+
 		m_timer_running = 1;
 		break;
 
@@ -985,13 +992,6 @@ void nes_vt_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 		length -= 1;
 		src_addr += 1;
 	}
-	//TODO (always false)
-	//else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
-	//{
-	//  // Legacy mode for DGUN-2573 compat
-	//  m_ppu->set_vram_dest(0x3F00);
-	//  m_ppu->set_palette_mode(PAL_MODE_VT0x);
-	//}
 
 	for (int i = 0; i < length; i++)
 	{

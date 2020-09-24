@@ -105,6 +105,7 @@ public:
 	void nes_vt_1mb_baddma(machine_config& config);
 	void nes_vt_2mb_baddma(machine_config& config);
 	void nes_vt_4mb_baddma(machine_config& config);
+	void nes_vt_4mb_baddma_rasterhack(machine_config& config);
 	void nes_vt_4mb(machine_config& config);
 	void nes_vt_8mb(machine_config& config);
 	void nes_vt_16mb(machine_config& config);
@@ -169,6 +170,7 @@ public:
 	{ }
 
 	void nes_vt_waixing_512kb(machine_config& config);
+	void nes_vt_waixing_512kb_rasterhack(machine_config& config);
 	void nes_vt_waixing_2mb(machine_config& config);
 };
 
@@ -366,6 +368,7 @@ public:
 
 	void nes_vt_vg(machine_config& config);
 	void nes_vt_vg_4mb(machine_config& config);
+	void nes_vt_vg_4mb_rasterhack(machine_config& config);
 	void nes_vt_vg_8mb(machine_config& config);
 	void nes_vt_vg_16mb(machine_config& config);
 
@@ -732,34 +735,6 @@ void nes_vt_ablpinb_state::in0_w(uint8_t data)
 }
 
 
-/* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
-static const gfx_layout helper_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0*64, 1*64, 2*64, 3*64 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	4*64
-};
-
-static const gfx_layout helper2_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0*8, 1*8, 2*8, 3*8 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*16, 1*16, 2*16, 3*16,4*16,5*16,5*16,6*16,7*16 },
-	4*64
-};
-
-static GFXDECODE_START( vt03_gfx_helper )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
-	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
-GFXDECODE_END
-
 void nes_vt_base_state::configure_soc(nes_vt_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
@@ -777,7 +752,6 @@ void nes_vt_vg_1mb_majgnc_state::nes_vt_vg_1mb_majgnc(machine_config &config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_vg_1mb_majgnc_state::vt_external_space_map_1mbyte);
 }
 
@@ -818,6 +792,13 @@ void nes_vt_state::nes_vt_4mb_baddma(machine_config& config)
 {
 	nes_vt_4mb(config);
 	m_soc->force_bad_dma();
+
+}
+
+void nes_vt_state::nes_vt_4mb_baddma_rasterhack(machine_config& config)
+{
+	nes_vt_2mb_baddma(config);
+	m_soc->force_raster_timing_hack();
 }
 
 
@@ -878,6 +859,13 @@ void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
 
+void nes_vt_waixing_state::nes_vt_waixing_512kb_rasterhack(machine_config &config)
+{
+	nes_vt_waixing_512kb(config);
+	m_soc->force_raster_timing_hack();
+}
+
+
 void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 {
 	NES_VT_SOC(config, m_soc, NTSC_APU_CLOCK);
@@ -912,8 +900,6 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_co
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
-
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 
@@ -924,7 +910,6 @@ void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
 	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
@@ -941,7 +926,6 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 
@@ -952,7 +936,6 @@ void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
 	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
@@ -968,8 +951,6 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
 	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
 	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
-
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 }
 
 uint8_t nes_vt_base_state::upper_412c_r()
@@ -995,8 +976,6 @@ void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 	/* basic machine hardware */
 	NES_VT_SOC_4KRAM(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-
-	GFXDECODE(config, "gfxdecode", "soc:ppu", vt03_gfx_helper);
 
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt_state::upper_412c_r));
 	dynamic_cast<nes_vt_soc_4kram_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt_state::upper_412d_r));
@@ -1090,7 +1069,6 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	NES_VT_SOC_8KRAM_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 	m_soc->force_bad_dma();
 }
 
@@ -1106,6 +1084,13 @@ void nes_vt_hh_state::nes_vt_vg_4mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_4mbyte);
 }
 
+void nes_vt_hh_state::nes_vt_vg_4mb_rasterhack(machine_config& config)
+{
+	nes_vt_vg_4mb(config);
+	m_soc->force_raster_timing_hack();
+}
+
+
 void nes_vt_hh_state::nes_vt_vg_16mb(machine_config& config)
 {
 	nes_vt_vg(config);
@@ -1116,8 +1101,7 @@ void nes_vt_hh_state::nes_vt_vg_1mb_majkon(machine_config &config)
 {
 	nes_vt_dg(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::vt_external_space_map_1mbyte);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
+	m_soc->force_raster_timing_hack();
 }
 
 
@@ -1365,8 +1349,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
 
 	NES_VT_SOC_SCRAMBLE(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-
-	//m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_1mb(machine_config& config)
@@ -1379,7 +1361,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_2mb_alt(machine_config& config)
 {
 	nes_vt_vh2009(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG); // gives better title, but causes some games to have black palette, needs proper switching!
 }
 void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
 {
@@ -1398,7 +1379,6 @@ void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
 {
 	nes_vt_vh2009(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_VG);
 }
 
 static INPUT_PORTS_START( nes_vt_fp )
@@ -2178,7 +2158,7 @@ CONS( 2016, msisinv,    0,  0,  nes_vt_1mb_baddma, nes_vt_msi, nes_vt_state, emp
 
 // This is from the version with the same case type as the above MSI units.
 // MSI also issued a version in the original Majesco shell but with the updated case logos and boot logos in the software, the software on that revision might match this one.
-CONS( 2016, msifrog,    0,  0,  nes_vt_4mb_baddma, nes_vt_msi, nes_vt_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing issues, mode change issues
+CONS( 2016, msifrog,    0,  0,  nes_vt_4mb_baddma_rasterhack, nes_vt_msi, nes_vt_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) //  raster timing for need a hack
 
 // MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
 
@@ -2202,14 +2182,14 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, 
 
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt_vg_4mb,        nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger
+CONS( 2006, vgtablet,  0, 0,  nes_vt_vg_4mb_rasterhack,  nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing for Frogger needs a hack, controls fail in several games eg Stellar Attack, River Quest
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
-CONS( 2004, majkon,    0, 0,  nes_vt_vg_1mb_majkon, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
+CONS( 2004, majkon,    0, 0,  nes_vt_vg_1mb_majkon, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing for Frogger needs a hack, Green Beret has other serious issues
 
-CONS( 200?, majgnc,    0, 0,  nes_vt_vg_1mb_majgnc, majgnc, nes_vt_vg_1mb_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
+CONS( 200?, majgnc,    0, 0,  nes_vt_vg_1mb_majgnc, majgnc, nes_vt_vg_1mb_majgnc_state,  empty_init, "Majesco", "Golden Nugget Casino", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb_rasterhack,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
@@ -2219,7 +2199,7 @@ CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing
 CONS( 200?, solargm,   0,  0, nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Solar Games 80-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Solar Games logo is also found in the SunPlus based Millennium Arcade units
 
 // silver 'N64' type controller design
-CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS ) // the styling on the box looks like a '2' in places, a 'Z' in others.
+CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
  // needs PCM samples, Y button is not mapped (not used by any of the games? some sources indicate it's just a hardware autofire button)
 CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2227,11 +2207,9 @@ CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,  
 CONS( 200?, timetp7,   0, 0,  nes_vt_pal_2mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 7-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is VT09 based
-// it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
-// and colors overall a bit off
-CONS( 2009, cybar120,  0,  0,  nes_vt_vg_16mb, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vgpocket,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, cybar120,  0,  0,  nes_vt_vg_16mb, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, vgpocket,  0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Butterfly Catch (same game as Insect Chase in polmega) is broken
+CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
@@ -2241,75 +2219,15 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg_4mb, nes_vt, nes_vt_hh_state, empty_ini
 // emulation
 CONS( 200?, dgun2500,  0,  0,  nes_vt_dg_baddma_16mb, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
-// don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2016, dgun2593,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcycr,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-// the data order is swapped for this one, maybe other internal differences?
-CONS( 200?, lxcmcypp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, init_lxcmcypp, "Lexibook", "Lexibook Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-
-
-CONS( 200?, lxccminn,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxccplan,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-
-
-// GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-
-
-/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
-
-    (handhekd units, use standard AAA batteries)
-    Lexibook Compact Cyber Arcade - Cars
-    Lexibook Compact Cyber Arcade - Barbie
-    Lexibook Compact Cyber Arcade - Finding Dory
-    Lexibook Compact Cyber Arcade - PJ Masks
-
-    (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
-    Lexibook Console Colour - Barbie
-
-    (units for use with TV)
-    Lexibook Retro TV Game Console (300 Games) - Cars
-    Lexibook Retro TV Game Console (300 Games) - PJ Masks
-
-    (more?)
-
-    There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
-    Spiderman
-    Frozen
-    (generic)
-    it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
-
-*/
-
-// intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-
-
-
-CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
-CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb_alt,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_NOT_WORKING ) // from a Green unit, '17 Classic & Racing Game'
-CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
+CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING ) // Insect Chase is broken
+CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb_alt,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Vs. Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
+CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,      nes_vt, nes_vt_state,        empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
  // seems to use PCM for all sound, some garbage at bottom of screen, needs correct inputs (seems to respond to start, and any direction input for 'hit' - check if they're power related)
 CONS( 200?, protpp,   0,  0,  nes_vt_vh2009_1mb,      nes_vt, nes_vt_swap_op_d5_d6_state,        init_protpp, "Protocol", "Virtual Ping Pong (Protocol)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
-// same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
-CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
 // This was also often found in cart form with SunPlus / Famiclone hybrid systems to boost the game count, eg. the WiWi (ROM verified to match)
@@ -2381,23 +2299,16 @@ CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty
  // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
 CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 
-
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
 CONS( 201?, ppgc200g,   0,         0,  nes_vt_8mb, nes_vt, nes_vt_state, empty_init, "<unknown>", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
-
 
 // Probably VT09 or similar
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
 CONS( 2017, fapocket,   0,        0,  nes_vt_fa_4x16mb, nes_vt_fa, nes_vt_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
-
-CONS( 2017, otrail,     0,        0,  nes_vt_dg_1mb, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
 CONS( 2005, senwld,   0,          0,  nes_vt_senwld_512kb,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
-
-
 
 // Runs well, minor GFX issues in intro
 CONS( 2017, sy889,      0,        0,  nes_vt_hh_8mb, nes_vt, nes_vt_hh_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
@@ -2418,5 +2329,77 @@ CONS( 2015, rminitv,   0,  0,  nes_vt_fp_pal_32mb, nes_vt, nes_vt_hh_state, empt
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt_fp_4x16mb,   nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
+
+
+/****************************************************************************************************************
+
+	Things below seem on heavily enhanced hardware of unknown VT type
+
+	It's possible some of these are the same as some of the ones above (sy889, rminitv, dgun2573 etc.) but with
+	more features used.
+
+	In some cases these might be almost entirely different, and it is likely a number don't belong in this
+	driver at all.
+
+****************************************************************************************************************/
+
+// don't even get to menu. very enhanced chipset, VT368/9?
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcysp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcycr,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+// the data order is swapped for this one, maybe other internal differences?
+CONS( 200?, lxcmcypp,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, init_lxcmcypp, "Lexibook", "Lexibook Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+
+
+CONS( 200?, lxccminn,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxccplan,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
+
+
+// GB-NO13-Main-VT389-2 on PCBs
+CONS( 2016, rtvgc300,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2017, rtvgc300fz,0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init,    "Lexibook", "Lexibook Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+
+
+/* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
+
+    (handhekd units, use standard AAA batteries)
+    Lexibook Compact Cyber Arcade - Cars
+    Lexibook Compact Cyber Arcade - Barbie
+    Lexibook Compact Cyber Arcade - Finding Dory
+    Lexibook Compact Cyber Arcade - PJ Masks
+
+    (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
+    Lexibook Console Colour - Barbie
+
+    (units for use with TV)
+    Lexibook Retro TV Game Console (300 Games) - Cars
+    Lexibook Retro TV Game Console (300 Games) - PJ Masks
+
+    (more?)
+
+    There are also updated 'Compact Cyber Arcade' branded units with a large + D-pad and internal battery / USB charger for
+    Spiderman
+    Frozen
+    (generic)
+    it isn't verified if these use the same ROMs as the original Compact Cyber Arcade releases, or if the software has been updated
+
+*/
+
+// intial code isn't valid? scrambled?
+CONS( 201?, red5mam,  0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+
+CONS( 201?, denv150,   0,  0,  nes_vt_cy_bigger, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
+CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+
+CONS( 2017, otrail,     0,        0,  nes_vt_dg_1mb, nes_vt, nes_vt_dg_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, zonefusn,  0,         0,  nes_vt_fp_16mb,     nes_vt, nes_vt_hh_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )

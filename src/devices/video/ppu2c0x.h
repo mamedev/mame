@@ -42,8 +42,7 @@
 
 class ppu2c0x_device :  public device_t,
 						public device_memory_interface,
-						public device_video_interface,
-						public device_palette_interface
+						public device_video_interface
 {
 public:
 	typedef device_delegate<void (int scanline, int vblank, int blanked)> scanline_delegate;
@@ -76,16 +75,16 @@ public:
 	auto int_callback() { return m_int_callback.bind(); }
 
 	/* routines */
-	rgb_t nespal_to_RGB(int color_intensity, int color_num);
-	virtual void init_palette();
-	void init_palette(bool indirect);
-	virtual uint32_t palette_entries() const override { return 4*16*8; }
+	void apply_color_emphasis_and_clamp(bool is_pal_or_dendy, int color_emphasis, double& R, double& G, double& B);
+	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
+	virtual void init_palette_tables();
 
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(uint8_t &pix);
-	virtual void draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table);
-	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t *&dest, const pen_t *color_table);
+	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest);
+	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t *&dest);
 	virtual void draw_background( uint8_t *line_priority );
+	virtual void draw_back_pen(uint32_t* dst, int back_pen);
 	void draw_background_pen();
 
 	virtual void read_sprite_plane_data(int address);
@@ -131,6 +130,8 @@ public:
 	void set_vram_dest(uint16_t dest);
 
 	void ppu2c0x(address_map &map);
+
+	bool in_vblanking() { return (m_scanline >= m_vblank_first_scanline - 1); }
 protected:
 	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal_map);
 
@@ -184,6 +185,8 @@ protected:
 
 	required_device<cpu_device> m_cpu;
 
+	void start_nopalram();
+
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
 	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
@@ -205,12 +208,12 @@ protected:
 	int                         m_refresh_data;         /* refresh-related */
 	int                         m_x_fine;               /* refresh-related */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
-	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
-	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	latch_delegate              m_latch;
 
 
 	uint8_t readbyte(offs_t address);
+
+	uint32_t m_nespens[0x40*8];
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
@@ -246,7 +249,7 @@ class ppu2c0x_rgb_device : public ppu2c0x_device {
 protected:
 	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void init_palette() override;
+	virtual void init_palette_tables() override;
 
 private:
 	required_region_ptr<uint8_t> m_palette_data;
