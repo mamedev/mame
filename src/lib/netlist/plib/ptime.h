@@ -53,8 +53,14 @@ namespace plib
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (RES / den)) { }
 
-		template <typename O>
-		constexpr explicit ptime(const ptime<O, RES> &rhs) noexcept
+		template <typename O, typename = std::enable_if_t<ptime_le<ptime<O, RES>, ptime>::value>>
+		constexpr ptime(const ptime<O, RES> &rhs) noexcept
+		: m_time(static_cast<TYPE>(rhs.m_time))
+		{
+		}
+
+		template <typename O, typename T = std::enable_if_t<!ptime_le<ptime<O, RES>, ptime>::value, int>>
+		constexpr explicit ptime(const ptime<O, RES> &rhs, T dummy = 0) noexcept
 		: m_time(static_cast<TYPE>(rhs.m_time))
 		{
 		}
@@ -82,27 +88,18 @@ namespace plib
 			return *this;
 		}
 
-#if 1
 		template <typename O>
 		constexpr ptime operator-(const ptime<O, RES> &rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			return ptime(m_time - rhs.m_time);
 		}
-#else
-		template <typename O>
-		constexpr ptime operator-(ptime<O, RES> rhs) const noexcept
-		{
-			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
-			return (rhs -= (*this)); // causes a crash - FIXME
-		}
-#endif
+
 		template <typename O>
 		constexpr ptime operator+(ptime<O, RES> rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
-			return (rhs += *this);
-			//return ptime(m_time + rhs.m_time);
+			return ptime(m_time + rhs.m_time);
 		}
 
 		template <typename M>
@@ -137,7 +134,8 @@ namespace plib
 		template <typename O>
 		friend constexpr bool operator>(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
-			return (rhs < lhs);
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return (lhs.m_time > rhs.as_raw());
 		}
 
 		template <typename O>
@@ -155,7 +153,7 @@ namespace plib
 		template <typename O>
 		friend constexpr bool operator==(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
-			return lhs.m_time == rhs.m_time;
+			return lhs.m_time == rhs.as_raw();
 		}
 
 		template <typename O>

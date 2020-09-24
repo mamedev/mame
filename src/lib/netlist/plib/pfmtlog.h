@@ -12,6 +12,7 @@
 #include "ppmf.h"
 #include "pstring.h"
 #include "ptypes.h"
+#include "pgsl.h"
 
 #include <limits>
 #include <locale>
@@ -62,6 +63,18 @@ namespace plib {
 
 	template <typename T>
 	struct ptype_traits;
+
+	template<>
+	struct ptype_traits<compile_info::int128_type>
+	{
+		// FIXME: need native support at some time
+		static constexpr const bool is_signed = true;
+		static char32_t fmt_spec() { return 'd'; }
+		static void streamify(std::ostream &s, const compile_info::int128_type &v)
+		{
+			s << narrow_cast<long long>(v);
+		}
+	};
 
 	template<>
 	struct ptype_traits<bool> : ptype_traits_base<bool>
@@ -159,6 +172,7 @@ namespace plib {
 		static char32_t fmt_spec() { return 'f'; }
 	};
 	#endif
+
 
 	template<>
 	struct ptype_traits<char *> : ptype_traits_base<char *>

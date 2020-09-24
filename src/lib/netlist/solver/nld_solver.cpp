@@ -113,7 +113,7 @@ namespace devices
 			}
 		}
 		if (!m_queue.empty())
-			m_Q_step.net().toggle_and_push_to_queue(m_queue.top().exec_time() - now);
+			m_Q_step.net().toggle_and_push_to_queue(static_cast<netlist_time>(m_queue.top().exec_time() - now));
 	}
 
 	void NETLIB_NAME(solver) :: reschedule(solver::matrix_solver_t *solv, netlist_time ts)
