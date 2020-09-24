@@ -32,11 +32,11 @@ namespace netlist
 		logic_t(device_t &dev, const pstring &aname,
 				state_e terminal_state, nldelegate delegate);
 
-		logic_net_t & net() noexcept
+		constexpr logic_net_t & net() noexcept
 		{
 			return plib::downcast<logic_net_t &>(core_terminal_t::net());
 		}
-		const logic_net_t &  net() const noexcept
+		constexpr const logic_net_t &  net() const noexcept
 		{
 			return plib::downcast<const logic_net_t &>(core_terminal_t::net());
 		}
@@ -52,7 +52,7 @@ namespace netlist
 		logic_input_t(device_t &dev, const pstring &aname,
 				nldelegate delegate);
 
-		inline netlist_sig_t operator()() const noexcept
+		constexpr const netlist_sig_t &operator()() const noexcept
 		{
 			nl_assert(terminal_state() != STATE_INP_PASSIVE);
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
@@ -120,12 +120,12 @@ namespace netlist
 
 		void initial(netlist_sig_t val) noexcept;
 
-		inline void push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
+		void push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
 		{
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
 		}
 
-		inline void set_Q_time(const netlist_sig_t &newQ, const netlist_time_ext &at) noexcept
+		void set_Q_time(const netlist_sig_t &newQ, const netlist_time_ext &at) noexcept
 		{
 			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}

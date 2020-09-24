@@ -335,7 +335,7 @@ namespace plib
 
 	private:
 
-		static inline void givens_mult(FT c, FT s, FT & g0, FT & g1 )
+		static void givens_mult(FT c, FT s, FT & g0, FT & g1 )
 		{
 			const FT g0_last(g0);
 

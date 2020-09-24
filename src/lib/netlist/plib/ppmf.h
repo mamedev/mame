@@ -377,7 +377,7 @@ namespace plib {
 			bind<specific_member_function<O>>(object, &mftp);
 		}
 
-		inline R operator()(Targs... args) const noexcept(true)
+		R operator()(Targs... args) const noexcept(true)
 		{
 			return this->call(std::forward<Targs>(args)...);
 		}

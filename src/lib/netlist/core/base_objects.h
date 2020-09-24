@@ -241,7 +241,7 @@ namespace netlist
 			void clear_net() noexcept { m_net = nullptr; }
 			bool has_net() const noexcept { return (m_net != nullptr); }
 
-			net_t & net() const noexcept { return *m_net;}
+			constexpr net_t & net() const noexcept { return *m_net;}
 
 			bool is_logic() const noexcept;
 			bool is_logic_input() const noexcept;
@@ -270,7 +270,7 @@ namespace netlist
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
 			const nldelegate &delegate() const noexcept { return m_delegate; }
-			inline void run_delegate() noexcept { return m_delegate(); }
+			void run_delegate() const noexcept { return m_delegate(); }
 		private:
 			nldelegate m_delegate;
 			net_t * m_net;

@@ -566,7 +566,7 @@ namespace devices
 	private:
 		NETLIB_HANDLERI(input)
 		{
-			nl_fptype val = m_dis.var()(m_mt.var());
+			nl_fptype val = m_dis()(m_mt());
 			m_T.change_state([this, val]()
 			{
 				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());

@@ -84,7 +84,7 @@ namespace netlist
 			NVCC_CONSTEXPR bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
-			inline void update_devs() noexcept
+			void update_devs() noexcept
 			{
 				nl_assert(this->is_rail_net());
 
@@ -165,7 +165,7 @@ namespace netlist
 		protected:
 
 			// only used for logic nets
-			NVCC_CONSTEXPR netlist_sig_t Q() const noexcept { return m_cur_Q; }
+			NVCC_CONSTEXPR const netlist_sig_t &Q() const noexcept { return m_cur_Q; }
 
 			// only used for logic nets
 			void initial(netlist_sig_t val) noexcept
@@ -175,7 +175,7 @@ namespace netlist
 			}
 
 			// only used for logic nets
-			inline void set_Q_and_push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
+			void set_Q_and_push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
 			{
 				if (newQ != m_new_Q)
 				{
@@ -185,7 +185,7 @@ namespace netlist
 			}
 
 			// only used for logic nets
-			inline void set_Q_time(const netlist_sig_t &newQ, const netlist_time_ext &at) noexcept
+			void set_Q_time(const netlist_sig_t &newQ, const netlist_time_ext &at) noexcept
 			{
 				if (newQ != m_new_Q)
 				{

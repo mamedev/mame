@@ -74,12 +74,12 @@ namespace devices
 		}
 
 	private:
-		inline NETLIB_HANDLERI(id)
+		NETLIB_HANDLERI(id)
 		{
 			m_enable_in = (!(m_ID1() || m_ID2()));
 		}
 
-		inline NETLIB_HANDLERI(clk)
+		NETLIB_HANDLERI(clk)
 		{
 			if ((!m_clk_old) && m_CLK() && m_enable_in) // clock rising edge and input is enabled; otherwise the latch just re-latches its own value
 			{
@@ -94,7 +94,7 @@ namespace devices
 			}
 		}
 
-		inline NETLIB_HANDLERI(od)
+		NETLIB_HANDLERI(od)
 		{
 			m_enable_out = (!(m_OD1() || m_OD2()));
 			// update the pin output state

@@ -23,7 +23,7 @@
 #include <vector>
 
 //============================================================
-//  MACROS / inline netlist definitions
+//  MACROS - netlist definitions
 //============================================================
 
 #define NET_STR(x) # x
@@ -273,10 +273,6 @@ namespace netlist
 		log_type &m_log;
 		unsigned m_frontier_cnt;
 	};
-
-	// -----------------------------------------------------------------------------
-	// inline implementations
-	// -----------------------------------------------------------------------------
 
 } // namespace netlist
 

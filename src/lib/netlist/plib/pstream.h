@@ -28,7 +28,7 @@ namespace plib {
 	/// \brief wrapper around isteam read
 	///
 	template <typename S, typename T>
-	static inline S & istream_read(S &is, T * data, size_t len)
+	static S & istream_read(S &is, T * data, size_t len)
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "istream_read sizeof issue");
@@ -39,7 +39,7 @@ namespace plib {
 	/// \brief wrapper around osteam write
 	///
 	template <typename S, typename T>
-	static inline S & ostream_write(S &os, const T * data, size_t len)
+	static S & ostream_write(S &os, const T * data, size_t len)
 	{
 		using ct = typename S::char_type;
 		static_assert((sizeof(T) % sizeof(ct)) == 0, "ostream_write sizeof issue");

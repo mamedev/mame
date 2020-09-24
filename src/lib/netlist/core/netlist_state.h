@@ -76,7 +76,7 @@ namespace netlist
 		/// \return vector with pointers to devices
 
 		template<class C>
-		inline std::vector<C *> get_device_list() const
+		std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
 			for (const auto &d : m_devices)

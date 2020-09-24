@@ -41,7 +41,7 @@ namespace netlist
 			}
 
 		private:
-			inline NETLIB_HANDLERI(oe1)
+			NETLIB_HANDLERI(oe1)
 			{
 				m_enable_lo = m_OE1();
 				uint8_t o = m_enable_lo ? m_latched_rom : 0;
@@ -52,7 +52,7 @@ namespace netlist
 				}
 			}
 
-			inline NETLIB_HANDLERI(oe2)
+			NETLIB_HANDLERI(oe2)
 			{
 				m_enable_hi = m_OE2();
 				uint8_t o = m_enable_hi ? m_latched_rom : 0;
@@ -63,7 +63,7 @@ namespace netlist
 				}
 			}
 
-			inline NETLIB_HANDLERI(addr)
+			NETLIB_HANDLERI(addr)
 			{
 				if (!m_ARQ())
 				{
@@ -114,7 +114,7 @@ namespace netlist
 			}
 
 		private:
-			inline NETLIB_HANDLERI(en)
+			NETLIB_HANDLERI(en)
 			{
 				m_enabled = m_EN();
 				uint8_t o = m_enabled ? m_latched_rom : 0; // outputs are forced to 0 by enable going low; this chip does not have tri-state outputs!
@@ -124,7 +124,7 @@ namespace netlist
 				}
 			}
 
-			inline NETLIB_HANDLERI(addr)
+			NETLIB_HANDLERI(addr)
 			{
 				if (!m_CLK() && m_clk_old) // latch on falling edge
 				{
@@ -139,7 +139,7 @@ namespace netlist
 				}
 			}
 
-			inline NETLIB_HANDLERI(vdd_vss)
+			NETLIB_HANDLERI(vdd_vss)
 			{
 				auto d = m_power_pins.VCC()() - m_power_pins.GND()();
 				if (d > 0.1) // avoid unrealistic values
@@ -185,7 +185,7 @@ namespace netlist
 		private:
 
 			template <std::size_t N>
-			inline NETLIB_HANDLERI(ce)
+			NETLIB_HANDLERI(ce)
 			{
 				using cet = typename D::chip_enable_time;
 				m_enabled = (m_CEQ() == D::chip_enable_mask::value);
@@ -214,7 +214,6 @@ namespace netlist
 
 			}
 
-			inline
 			NETLIB_HANDLERI(addr)
 			{
 				if (m_enabled)

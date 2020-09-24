@@ -82,18 +82,27 @@ namespace plib
 			return *this;
 		}
 
+#if 1
 		template <typename O>
 		constexpr ptime operator-(const ptime<O, RES> &rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			return ptime(m_time - rhs.m_time);
 		}
-
+#else
 		template <typename O>
-		constexpr ptime operator+(const ptime<O, RES> &rhs) const noexcept
+		constexpr ptime operator-(ptime<O, RES> rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
-			return ptime(m_time + rhs.m_time);
+			return (rhs -= (*this)); // causes a crash - FIXME
+		}
+#endif
+		template <typename O>
+		constexpr ptime operator+(ptime<O, RES> rhs) const noexcept
+		{
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return (rhs += *this);
+			//return ptime(m_time + rhs.m_time);
 		}
 
 		template <typename M>
@@ -173,9 +182,7 @@ namespace plib
 		constexpr ptime shr(unsigned shift) const noexcept { return ptime(m_time >> shift); }
 
 		// for save states ....
-#if 0
-		constexpr internal_type *get_internaltype_ptr() noexcept { return &m_time; }
-#endif
+
 		template <typename ST>
 		void save_state(ST &&st)
 		{

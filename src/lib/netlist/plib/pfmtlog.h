@@ -40,7 +40,7 @@ namespace plib {
 	{
 		static constexpr const bool is_signed = std::numeric_limits<T>::is_signed;
 		static char32_t fmt_spec() { return 'u'; }
-		static inline void streamify(std::ostream &s, const T &v)
+		static void streamify(std::ostream &s, const T &v)
 		{
 			s << v;
 		}
@@ -53,7 +53,7 @@ namespace plib {
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
 		static char32_t fmt_spec() { return 'f'; }
-		static inline void streamify(std::ostream &s, const FLOAT128 &v)
+		static void streamify(std::ostream &s, const FLOAT128 &v)
 		{
 			s << narrow_cast<long double>(v);
 		}
@@ -176,7 +176,7 @@ namespace plib {
 	struct ptype_traits<const char16_t *> : ptype_traits_base<const char16_t *>
 	{
 		static char32_t fmt_spec() { return 's'; }
-		static inline void streamify(std::ostream &s, const char16_t *v)
+		static void streamify(std::ostream &s, const char16_t *v)
 		{
 			const putf16string su16(v);
 			s << putf8string(su16).c_str();
@@ -187,7 +187,7 @@ namespace plib {
 	struct ptype_traits<const char32_t *> : ptype_traits_base<const char32_t *>
 	{
 		static char32_t fmt_spec() { return 's'; }
-		static inline void streamify(std::ostream &s, const char32_t *v)
+		static void streamify(std::ostream &s, const char32_t *v)
 		{
 			const putf32string su32(v);
 			s << putf8string(su32).c_str();
@@ -210,7 +210,7 @@ namespace plib {
 	struct ptype_traits<putf16string> : ptype_traits_base<putf16string>
 	{
 		static char32_t fmt_spec() { return 's'; }
-		static inline void streamify(std::ostream &s, const putf16string &v)
+		static void streamify(std::ostream &s, const putf16string &v)
 		{
 			s << putf8string(v).c_str();
 		}

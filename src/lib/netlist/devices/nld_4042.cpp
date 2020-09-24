@@ -62,7 +62,7 @@ namespace devices
 		}
 
 	private:
-		inline NETLIB_HANDLERI(clk)
+		NETLIB_HANDLERI(clk)
 		{
 			if (m_POL() ^ m_CLK()) // are we in transparent mode? if so latch the data and push it.
 			{
@@ -73,7 +73,7 @@ namespace devices
 			// if not, the data inputs are ignored and just do nothing
 		}
 
-		inline NETLIB_HANDLERI(inputs)
+		NETLIB_HANDLERI(inputs)
 		{
 			if ((m_POL() ^ m_CLK())&&(m_latch != (m_D()&0xf))) // are we in transparent mode? if so latch the data and push it. only do this if the data actually changed
 			{
@@ -83,7 +83,7 @@ namespace devices
 			}
 		}
 
-		inline NETLIB_HANDLERI(vdd_vss)
+		NETLIB_HANDLERI(vdd_vss)
 		{
 			auto d = m_power_pins.VCC()() - m_power_pins.GND()();
 			if (d > 0.1) // avoid unrealistic values
