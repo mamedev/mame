@@ -30,7 +30,7 @@
 
 class okim9810_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface<24>
+						public device_rom_interface<24, 0, 0, ENDIANNESS_BIG>
 {
 public:
 	// construction/destruction
