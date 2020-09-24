@@ -20,7 +20,7 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 	ay8910_device(mconfig, YM2608, tag, owner, clock, PSG_TYPE_YM, 1, 2),
 	device_rom_interface(mconfig, *this),
 	m_internal(*this, "internal"),
-	m_opn(*this, true),
+	m_opn(*this),
 	m_adpcm_a(*this, read8sm_delegate(*this, FUNC(ym2608_device::adpcm_a_read)), 0),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(ym2608_device::adpcm_b_read)), write8sm_delegate(*this, FUNC(ym2608_device::adpcm_b_write))),
 	m_stream(nullptr),
@@ -41,7 +41,7 @@ u8 ym2608_device::read(offs_t offset)
 	switch (offset & 3)
 	{
 		case 0:	// status port, YM2203 compatible
-			result = m_opn.status() & (ymopn_engine::STATUS_TIMERA | ymopn_engine::STATUS_TIMERB | ymopn_engine::STATUS_BUSY);
+			result = m_opn.status() & (ymopna_engine::STATUS_TIMERA | ymopna_engine::STATUS_TIMERB | ymopna_engine::STATUS_BUSY);
 			break;
 
 		case 1: // data port (only SSG)

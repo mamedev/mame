@@ -24,7 +24,7 @@ ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, dev
 	m_adpcm_b_config("adpcm-b", ENDIANNESS_LITTLE, 8, 24, 0),
 	m_adpcm_a_region(*this, "adpcma"),
 	m_adpcm_b_region(*this, "adpcmb"),
-	m_opn(*this, true),
+	m_opn(*this),
 	m_adpcm_a(*this, read8sm_delegate(*this, FUNC(ym2610_device::adpcm_a_read)), 8),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(ym2610_device::adpcm_b_read)), write8sm_delegate(*this), 8),
 	m_stream(nullptr),
@@ -56,7 +56,7 @@ u8 ym2610_device::read(offs_t offset)
 	switch (offset & 3)
 	{
 		case 0:	// status port, YM2203 compatible
-			result = m_opn.status() & (ymopn_engine::STATUS_TIMERA | ymopn_engine::STATUS_TIMERB | ymopn_engine::STATUS_BUSY);
+			result = m_opn.status() & (ymopna_engine::STATUS_TIMERA | ymopna_engine::STATUS_TIMERB | ymopna_engine::STATUS_BUSY);
 			break;
 
 		case 1: // data port (only SSG)

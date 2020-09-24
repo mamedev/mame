@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(YMF276, ymf276_device, "ymf276", "YMF276 OPN2L")
 ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_opn(*this, true),
+	m_opn(*this),
 	m_stream(nullptr),
 	m_address(0),
 	m_dac_data(0),

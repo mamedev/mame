@@ -69,7 +69,7 @@ inline stream_buffer::sample_t fp_to_linear(s16 value)
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ay8910_device(mconfig, YM2203, tag, owner, clock, PSG_TYPE_YM, 3, 2),
-	m_opn(*this, false),
+	m_opn(*this),
 	m_stream(nullptr),
 	m_address(0)
 {
@@ -200,12 +200,6 @@ void ym2203_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		ay8910_device::sound_stream_update(stream, inputs, outputs);
 		return;
 	}
-
-	// force configured registers that are not relevant on the OPN
-	m_opn.write(0x22, 0x00);	// disable LFO
-	m_opn.write(0xb4, 0x80);	// pan left, disable LFO
-	m_opn.write(0xb5, 0x80);	// pan left, disable LFO
-	m_opn.write(0xb6, 0x80);	// pan left, disable LFO
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)

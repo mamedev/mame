@@ -317,7 +317,8 @@ u8 block_fnum_to_keycode(u16 block_fnum)
 //  ymopn_operator - constructor
 //-------------------------------------------------
 
-ymopn_operator::ymopn_operator(ymopn_registers regs) :
+template<class RegisterType>
+ymopn_operator<RegisterType>::ymopn_operator(RegisterType regs) :
 	m_phase(0),
 	m_env_attenuation(0x3ff),
 	m_env_state(ENV_RELEASE),
@@ -334,8 +335,11 @@ ymopn_operator::ymopn_operator(ymopn_registers regs) :
 //  save - register for save states
 //-------------------------------------------------
 
-ALLOW_SAVE_TYPE(ymopn_operator::envelope_state);
-void ymopn_operator::save(device_t &device, u8 index)
+ALLOW_SAVE_TYPE(ymopn_operator<ymopn_registers>::envelope_state);
+ALLOW_SAVE_TYPE(ymopn_operator<ymopna_registers>::envelope_state);
+
+template<class RegisterType>
+void ymopn_operator<RegisterType>::save(device_t &device, u8 index)
 {
 	// save our data
 	device.save_item(YMOPN_NAME(m_phase), index);
@@ -352,7 +356,8 @@ void ymopn_operator::save(device_t &device, u8 index)
 //  reset - reset the channel state
 //-------------------------------------------------
 
-void ymopn_operator::reset()
+template<class RegisterType>
+void ymopn_operator<RegisterType>::reset()
 {
 	// reset our data
 	m_phase = 0;
@@ -369,7 +374,8 @@ void ymopn_operator::reset()
 //  clock - master clocking function
 //-------------------------------------------------
 
-void ymopn_operator::clock(u32 env_counter, u8 lfo_counter, u8 pm_depth, u16 block_fnum)
+template<class RegisterType>
+void ymopn_operator<RegisterType>::clock(u32 env_counter, u8 lfo_counter, u8 pm_depth, u16 block_fnum)
 {
 	// clock the key state
 	u8 keycode = block_fnum_to_keycode(block_fnum);
@@ -395,7 +401,8 @@ void ymopn_operator::clock(u32 env_counter, u8 lfo_counter, u8 pm_depth, u16 blo
 //  modulation and an AM LFO offset
 //-------------------------------------------------
 
-s16 ymopn_operator::compute_volume(u16 modulation, u8 am_offset) const
+template<class RegisterType>
+s16 ymopn_operator<RegisterType>::compute_volume(u16 modulation, u8 am_offset) const
 {
 	// start with the upper 10 bits of the phase value plus modulation
 	// the low 10 bits of this result represents a full 2*PI period over
@@ -421,7 +428,8 @@ s16 ymopn_operator::compute_volume(u16 modulation, u8 am_offset) const
 //  rate value after adjusting for keycode
 //-------------------------------------------------
 
-u8 ymopn_operator::effective_rate(u8 rawrate, u8 keycode)
+template<class RegisterType>
+u8 ymopn_operator<RegisterType>::effective_rate(u8 rawrate, u8 keycode)
 {
 	if (rawrate == 0)
 		return 0;
@@ -436,7 +444,8 @@ u8 ymopn_operator::effective_rate(u8 rawrate, u8 keycode)
 //  is complete and restarts
 //-------------------------------------------------
 
-void ymopn_operator::start_attack(u8 keycode)
+template<class RegisterType>
+void ymopn_operator<RegisterType>::start_attack(u8 keycode)
 {
 	// don't change anything if already in attack state
 	if (m_env_state == ENV_ATTACK)
@@ -454,8 +463,8 @@ void ymopn_operator::start_attack(u8 keycode)
 	if (effective_rate(m_regs.attack_rate(), keycode) >= 62)
 		m_env_attenuation = 0;
 
-printf("KeyOn %X: fnum=%04X fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d ssg=%X adsr=%02X/%02X/%02X/%X sl=%X pan=%d%d am=%d pm=%d\n",
-	m_regs.opbase(),
+printf("KeyOn %d.%d: fnum=%04X fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d ssg=%X adsr=%02X/%02X/%02X/%X sl=%X pan=%d%d am=%d pm=%d\n",
+	BIT(m_regs.opbase(), 0, 2) + (BIT(m_regs.opbase(), 8) * 3), BIT(m_regs.opbase(), 3) + (BIT(m_regs.opbase(), 2) << 1),
 	m_regs.block_fnum(),
 	m_regs.feedback(),
 	m_regs.algorithm(),
@@ -481,7 +490,8 @@ printf("KeyOn %X: fnum=%04X fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d ssg=%X adsr
 //  called when a keyoff happens
 //-------------------------------------------------
 
-void ymopn_operator::start_release()
+template<class RegisterType>
+void ymopn_operator<RegisterType>::start_release()
 {
 	// don't change anything if already in release state
 	if (m_env_state == ENV_RELEASE)
@@ -499,7 +509,8 @@ void ymopn_operator::start_release()
 //  the incoming keystate
 //-------------------------------------------------
 
-void ymopn_operator::clock_keystate(u8 keystate, u8 keycode)
+template<class RegisterType>
+void ymopn_operator<RegisterType>::clock_keystate(u8 keystate, u8 keycode)
 {
 	// has the key changed?
 	if ((keystate ^ m_key_state) != 0)
@@ -522,7 +533,8 @@ void ymopn_operator::clock_keystate(u8 keystate, u8 keycode)
 //  should only be called if SSG-EG is enabled
 //-------------------------------------------------
 
-void ymopn_operator::clock_ssg_eg_state(u8 keycode)
+template<class RegisterType>
+void ymopn_operator<RegisterType>::clock_ssg_eg_state(u8 keycode)
 {
 	// work only happens once the attenuation crosses above 0x200
 	if (!BIT(m_env_attenuation, 9))
@@ -577,7 +589,8 @@ void ymopn_operator::clock_ssg_eg_state(u8 keycode)
 //  according to the given count
 //-------------------------------------------------
 
-void ymopn_operator::clock_envelope(u16 env_counter, u8 keycode)
+template<class RegisterType>
+void ymopn_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 {
 	// if in attack state, see if we hit minimum attenuation
 	if (m_env_state == ENV_ATTACK && m_env_attenuation == 0)
@@ -649,7 +662,8 @@ void ymopn_operator::clock_envelope(u16 env_counter, u8 keycode)
 //  generator
 //-------------------------------------------------
 
-void ymopn_operator::clock_phase(u8 lfo_counter, u8 pm_depth, u16 block_fnum)
+template<class RegisterType>
+void ymopn_operator<RegisterType>::clock_phase(u8 lfo_counter, u8 pm_depth, u16 block_fnum)
 {
 	// extract frequency number and adjust by LFO
 	u16 fnum = BIT(block_fnum, 0, 11) << 1;
@@ -691,7 +705,8 @@ void ymopn_operator::clock_phase(u8 lfo_counter, u8 pm_depth, u16 block_fnum)
 //  attenuation of the envelope
 //-------------------------------------------------
 
-u16 ymopn_operator::envelope_attenuation(u8 am_offset) const
+template<class RegisterType>
+u16 ymopn_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 {
 	u16 result = m_env_attenuation;
 
@@ -720,7 +735,8 @@ u16 ymopn_operator::envelope_attenuation(u8 am_offset) const
 //  ymopn_channel - constructor
 //-------------------------------------------------
 
-ymopn_channel::ymopn_channel(ymopn_registers regs) :
+template<class RegisterType>
+ymopn_channel<RegisterType>::ymopn_channel(RegisterType regs) :
 	m_feedback{ 0, 0 },
 	m_op1(regs.operator_registers(0)),
 	m_op2(regs.operator_registers(1)),
@@ -735,7 +751,8 @@ ymopn_channel::ymopn_channel(ymopn_registers regs) :
 //  save - register for save states
 //-------------------------------------------------
 
-void ymopn_channel::save(device_t &device, u8 index)
+template<class RegisterType>
+void ymopn_channel<RegisterType>::save(device_t &device, u8 index)
 {
 	// save our data
 	device.save_item(YMOPN_NAME(m_feedback), index);
@@ -752,7 +769,8 @@ void ymopn_channel::save(device_t &device, u8 index)
 //  reset - reset the channel state
 //-------------------------------------------------
 
-void ymopn_channel::reset()
+template<class RegisterType>
+void ymopn_channel<RegisterType>::reset()
 {
 	// reset our data
 	m_feedback[0] = m_feedback[1] = 0;
@@ -769,7 +787,8 @@ void ymopn_channel::reset()
 //  keyonoff - signal key on/off to our operators
 //-------------------------------------------------
 
-void ymopn_channel::keyonoff(u8 states)
+template<class RegisterType>
+void ymopn_channel<RegisterType>::keyonoff(u8 states)
 {
 	m_op1.keyonoff(BIT(states, 0));
 	m_op2.keyonoff(BIT(states, 1));
@@ -782,7 +801,8 @@ void ymopn_channel::keyonoff(u8 states)
 //  keyon_csm - signal CSM key on to our operators
 //-------------------------------------------------
 
-void ymopn_channel::keyon_csm()
+template<class RegisterType>
+void ymopn_channel<RegisterType>::keyon_csm()
 {
 	m_op1.keyon_csm();
 	m_op2.keyon_csm();
@@ -795,7 +815,8 @@ void ymopn_channel::keyon_csm()
 //  clock - master clock of all operators
 //-------------------------------------------------
 
-void ymopn_channel::clock(u32 env_counter, u8 lfo_counter, bool multi_freq)
+template<class RegisterType>
+void ymopn_channel<RegisterType>::clock(u32 env_counter, u8 lfo_counter, bool multi_freq)
 {
 	// grab common PM depth and block/fnum values
 	u16 block_fnum = m_regs.block_fnum();
@@ -833,7 +854,8 @@ void ymopn_channel::clock(u32 env_counter, u8 lfo_counter, bool multi_freq)
 //  vary between different OPN implementations
 //-------------------------------------------------
 
-void ymopn_channel::output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const
+template<class RegisterType>
+void ymopn_channel<RegisterType>::output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const
 {
 	// skip if both pans are clear; no need to do all this work for nothing
 	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
@@ -949,7 +971,8 @@ void ymopn_channel::output(u8 lfo_counter, s32 &lsum, s32 &rsum, u8 rshift, s16 
 //  ymopn_engine - constructor
 //-------------------------------------------------
 
-ymopn_engine::ymopn_engine(device_t &device, bool six_channels) :
+template<class RegisterType>
+ymopn_engine_base<RegisterType>::ymopn_engine_base(device_t &device) :
 	m_device(device),
 	m_env_counter(0),
 	m_lfo_subcounter(0),
@@ -961,14 +984,13 @@ ymopn_engine::ymopn_engine(device_t &device, bool six_channels) :
 	m_busy_end(attotime::zero),
 	m_timer{ nullptr, nullptr },
 	m_irq_handler(device),
-	m_regdata(0x100 * (six_channels ? 2 : 1)),
+	m_regdata(RegisterType::registers()),
 	m_fnum_latches{ 0 },
 	m_regs(m_regdata)
 {
 	// create the channels
-	int channels = six_channels ? 6 : 3;
-	for (int chnum = 0; chnum < channels; chnum++)
-		m_channel.push_back(std::make_unique<ymopn_channel>(m_regs.channel_registers(chnum)));
+	for (int chnum = 0; chnum < RegisterType::channels(); chnum++)
+		m_channel.push_back(std::make_unique<ymopn_channel<RegisterType>>(m_regs.channel_registers(chnum)));
 }
 
 
@@ -976,11 +998,12 @@ ymopn_engine::ymopn_engine(device_t &device, bool six_channels) :
 //  save - register for save states
 //-------------------------------------------------
 
-void ymopn_engine::save(device_t &device)
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::save(device_t &device)
 {
 	// allocate our timers
 	for (int tnum = 0; tnum < 2; tnum++)
-		m_timer[tnum] = device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymopn_engine::timer_handler), this));
+		m_timer[tnum] = device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymopn_engine_base::timer_handler), this));
 
 	// resolve the IRQ handler while we're here
 	m_irq_handler.resolve();
@@ -1007,7 +1030,8 @@ void ymopn_engine::save(device_t &device)
 //  reset - reset the overall state
 //-------------------------------------------------
 
-void ymopn_engine::reset()
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::reset()
 {
 	// reset all status bits
 	set_reset_status(0, 0xff);
@@ -1035,7 +1059,8 @@ void ymopn_engine::reset()
 //  them forward one step
 //-------------------------------------------------
 
-u32 ymopn_engine::clock(u8 chanmask)
+template<class RegisterType>
+u32 ymopn_engine_base<RegisterType>::clock(u8 chanmask)
 {
 	// increment the envelope count; low two bits are the subcount, which
 	// only counts to 3, so if it reaches 3, count one more time
@@ -1074,7 +1099,8 @@ u32 ymopn_engine::clock(u8 chanmask)
 //  channels
 //-------------------------------------------------
 
-void ymopn_engine::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const
 {
 	// sum over all the desired channels
 	for (int chnum = 0; chnum < m_channel.size(); chnum++)
@@ -1087,7 +1113,8 @@ void ymopn_engine::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanm
 //  write - handle writes to the OPN registers
 //-------------------------------------------------
 
-void ymopn_engine::write(u16 regnum, u8 data)
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::write(u16 regnum, u8 data)
 {
 	// writes in the 0xa0-af/0x1a0-af region are handled as latched pairs
 	if ((regnum & 0xf0) == 0xa0)
@@ -1144,7 +1171,8 @@ void ymopn_engine::write(u16 regnum, u8 data)
 //  status flags
 //-------------------------------------------------
 
-u8 ymopn_engine::status() const
+template<class RegisterType>
+u8 ymopn_engine_base<RegisterType>::status() const
 {
 	u8 result = m_status;
 
@@ -1160,7 +1188,8 @@ u8 ymopn_engine::status() const
 //  register
 //-------------------------------------------------
 
-void ymopn_engine::set_busy()
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::set_busy()
 {
 	// according to hardware tests, BUSY is set for 32 * prescaled clock
 	// regardless of actual data consumption
@@ -1173,7 +1202,8 @@ void ymopn_engine::set_busy()
 //  timer
 //-------------------------------------------------
 
-void ymopn_engine::update_timer(u8 tnum, u8 enable)
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::update_timer(u8 tnum, u8 enable)
 {
 	// if the timer is live, but not currently enabled, set the timer
 	if (enable && !m_timer[tnum]->enabled())
@@ -1199,7 +1229,8 @@ void ymopn_engine::update_timer(u8 tnum, u8 enable)
 //  status and possibly IRQs
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(ymopn_engine::timer_handler)
+template<class RegisterType>
+TIMER_CALLBACK_MEMBER(ymopn_engine_base<RegisterType>::timer_handler)
 {
 	// update status
 	if (param == 0 && m_regs.enable_timer_a())
@@ -1221,7 +1252,8 @@ TIMER_CALLBACK_MEMBER(ymopn_engine::timer_handler)
 //  for interrupts
 //-------------------------------------------------
 
-void ymopn_engine::check_interrupts()
+template<class RegisterType>
+void ymopn_engine_base<RegisterType>::check_interrupts()
 {
 	// update the state
 	u8 old_state = m_irq_state;
@@ -1231,3 +1263,9 @@ void ymopn_engine::check_interrupts()
 	if (old_state != m_irq_state && !m_irq_handler.isnull())
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
+
+
+// Explicit template instantiation
+template class ymopn_engine_base<ymopn_registers>;
+template class ymopn_engine_base<ymopna_registers>;
+

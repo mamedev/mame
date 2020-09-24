@@ -50,7 +50,7 @@ private:
 	std::string const m_adpcm_b_region_name; // name of ADPCM-B memory region
 	optional_memory_region m_adpcm_a_region; // ADPCM-A memory region
 	optional_memory_region m_adpcm_b_region; // ADPCM-B memory region
-	ymopn_engine m_opn;              // core OPN engine
+	ymopna_engine m_opn;             // core OPNA engine
 	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	sound_stream *m_stream;          // sound stream

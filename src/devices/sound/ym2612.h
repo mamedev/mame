@@ -39,7 +39,7 @@ protected:
 	void sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity);
 
 	// internal state
-	ymopn_engine m_opn;              // core OPN engine
+	ymopna_engine m_opn;             // core OPN engine
 	sound_stream *m_stream;          // sound stream
 	u16 m_address;                   // address register
 	u16 m_dac_data;                  // 9-bit DAC data

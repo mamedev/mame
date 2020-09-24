@@ -62,7 +62,7 @@ private:
 
 	// internal state
 	required_memory_region m_internal; // internal memory region
-	ymopn_engine m_opn;              // core OPN engine
+	ymopna_engine m_opn;             // core OPNA engine
 	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	sound_stream *m_stream;          // sound stream
