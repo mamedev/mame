@@ -10884,11 +10884,12 @@ license:CC0
 
 	<software name="lionkingf" cloneof="lionking">
 		<!-- Notes: GBC only -->
-		<description>Le Roi Lion - Les Adventures de Simba (France)</description>
+		<description>Les Roi Lion - Les Adventures de Simba (France)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BLKF-FRA"/>
 		<info name="gold" value="20001113"/>
+		<info name="alt_title" value="Le Roi Lion - La formidable aventure de Simba"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -10900,11 +10901,12 @@ license:CC0
 	<software name="lionkingfa" cloneof="lionking">
 		<!-- Notes: GBC only -->
 		<!--	In lot check as "cgbblkf1.573"	-->
-		<description>Le Roi Lion - Les Adventures de Simba (France, Rev 1)</description>
+		<description>Les Roi Lion - Les Adventures de Simba (France, Rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BLKF-FRA"/>
 		<info name="gold" value="20010406"/>
+		<info name="alt_title" value="Le Roi Lion - La formidable aventure de Simba"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
