@@ -379,7 +379,7 @@ void gottlieb_sound_r1_with_votrax_device::speech_clock_dac_w(uint8_t data)
 		logerror("clock = %02X\n", data);
 
 		// totally random guesswork; would like to get real measurements on a board
-		m_votrax->set_unscaled_clock(900000 + (data - 0xa0) * 9000);
+		m_votrax->set_unscaled_clock(950000 + (data - 0xa0) * 5500);
 		m_last_speech_clock = data;
 	}
 }
