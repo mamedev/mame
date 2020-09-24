@@ -125,7 +125,7 @@
 /// This is about 10% slower on a skylake processor for pongf.
 ///
 #ifndef NL_PREFER_INT128
-#define NL_PREFER_INT128 (1)
+#define NL_PREFER_INT128 (0)
 #endif
 
 /// \brief Support float type for matrix calculations.

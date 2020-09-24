@@ -93,7 +93,7 @@ namespace plib {
 	/// and later for debug builds use dynamic_cast.
 	///
 	template <typename D, typename B>
-	inline constexpr D downcast(B && b) noexcept
+	constexpr D downcast(B && b) noexcept
 	{
 		static_assert(std::is_pointer<D>::value || std::is_reference<D>::value, "downcast only supports pointers or reference for derived");
 		static_assert(std::is_pointer<B>::value || std::is_reference<B>::value, "downcast only supports pointers or reference for base");
@@ -101,6 +101,10 @@ namespace plib {
 	}
 
 	using pgsl::narrow_cast;
+
+	template <typename T>
+	constexpr void * void_ptr_cast(T *ptr) noexcept { return static_cast<void *>(ptr); }
+
 } // namespace plib
 
 //FIXME: This is the place to use more complete implementations
