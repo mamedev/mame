@@ -9338,6 +9338,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="fireforget2">
+		<!-- dumped via KryoFlux, some tracks show up as modified -->
+		<description>Fire &amp; Forget 2</description>
+		<year>1990</year>
+		<publisher>Titus</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fireforget2.img" size="737280" crc="24ac2704" sha1="737ca587fa78d5f1160557c99a68b0022f1f216c" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="futurwar">
 		<description>Future Wars - Adventures in Time</description>
 		<year>1990</year>
