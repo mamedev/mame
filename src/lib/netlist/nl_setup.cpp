@@ -1305,7 +1305,7 @@ void models_t::model_parse(const pstring &model_in, map_t &map)
 	if (!plib::endsWith(remainder, ")"))
 		throw nl_exception(MF_MODEL_ERROR_1(model));
 	// FIMXE: Not optimal
-	remainder = plib::left(remainder, remainder.size() - 1);
+	remainder = plib::left(remainder, remainder.length() - 1);
 
 	const auto pairs(plib::psplit(remainder,' ', true));
 	for (const pstring &pe : pairs)
@@ -1353,7 +1353,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 	pstring tmp = value_str(entity);
 
 	nl_fptype factor = nlconst::one();
-	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.size() - 1));
+	auto p = std::next(tmp.begin(), plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
 	switch (*p)
 	{
 		case 'M': factor = nlconst::magic(1e6); break; // NOLINT
@@ -1370,7 +1370,7 @@ nl_fptype models_t::model_t::value(const pstring &entity) const
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_2(m_model, entity));
 	}
 	if (factor != nlconst::one())
-		tmp = plib::left(tmp, tmp.size() - 1);
+		tmp = plib::left(tmp, tmp.length() - 1);
 	// FIXME: check for errors
 	bool err(false);
 	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);

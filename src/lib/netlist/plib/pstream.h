@@ -228,7 +228,7 @@ public:
 		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
 		const putf8string conv_utf8(text);
 		//m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str()  )));
-		ostream_write(*m_strm, conv_utf8.c_str(), string_info<putf8string>::mem_size(conv_utf8));
+		ostream_write(*m_strm, conv_utf8.c_str(), conv_utf8.size());
 	}
 
 	void write(const pstring::value_type c) const
@@ -290,7 +290,7 @@ public:
 	{
 		const auto *sm = s.c_str();
 		//const auto sl(std::char_traits<pstring::mem_t>::length(sm));
-		const auto sl(string_info<pstring>::mem_size(s));
+		const auto sl(s.size());
 		write(sl);
 		ostream_write(m_strm, sm, sl);
 	}
