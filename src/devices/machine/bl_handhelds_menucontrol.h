@@ -32,21 +32,21 @@ private:
 	bool m_is_unsp_type_hack;
 
 	// internal state
-	int m_menupos;
+	uint16_t m_menupos;
 	
 	// command handling
-	int m_clockstate;
-	int m_datashifterpos;
+	uint8_t m_clockstate;
+	uint8_t m_datashifterpos;
 
-	int m_responsebit;
+	uint8_t m_responsebit;
 	uint8_t m_response;
 
-	int m_commandbit;
+	uint8_t m_commandbit;
 	uint8_t m_command;
 
 	void handle_command();
 
-	enum menustate : const int
+	enum menustate : uint8_t
 	{
 	   MENU_READY_FOR_COMMAND = 0,
 
@@ -58,7 +58,7 @@ private:
 	   MENU_COMMAND_05_IN,
 	};
 
-	menustate m_menustate;
+	uint8_t m_menustate;
 };
 
 #endif // MAME_MACHINE_BL_HANDHELDS_MENUCONTROL_H
