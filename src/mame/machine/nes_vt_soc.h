@@ -142,7 +142,6 @@ private:
 	address_space_config        m_space_config;
 
 	int m_bankaddr[4];
-	uint16_t m_real_access_address;
 
 	devcb_write8 m_write_0_callback;
 	devcb_read8 m_read_0_callback;
