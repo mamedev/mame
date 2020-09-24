@@ -271,7 +271,7 @@ namespace plib
 	/// FIXME: limited implementation
 	///
 	template <typename T1, typename T2>
-	static
+	static inline
 	auto pow(T1 v, T2 p) noexcept -> decltype(std::pow(v, p))
 	{
 		return std::pow(v, p);

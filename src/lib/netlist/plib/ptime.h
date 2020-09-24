@@ -63,6 +63,7 @@ namespace plib
 		constexpr explicit ptime(const ptime<O, RES> &rhs, T dummy = 0) noexcept
 		: m_time(static_cast<TYPE>(rhs.m_time))
 		{
+			plib::unused_var(dummy);
 		}
 
 		template <typename O>

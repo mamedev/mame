@@ -70,7 +70,8 @@ namespace plib {
 		// FIXME: need native support at some time
 		static constexpr const bool is_signed = true;
 		static char32_t fmt_spec() { return 'd'; }
-		static void streamify(std::ostream &s, const compile_info::int128_type &v)
+		template <typename T, typename = std::enable_if_t<plib::is_arithmetic<T>::value>>
+		static void streamify(std::ostream &s, const T &v)
 		{
 			s << narrow_cast<long long>(v);
 		}
