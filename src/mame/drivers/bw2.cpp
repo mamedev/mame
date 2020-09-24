@@ -459,7 +459,6 @@ uint8_t bw2_state::ppi_pc_r()
 	data |= m_mfdbk << 5;
 
 	// write protect
-	//if (m_floppy) data |= m_floppy->wpt_r() << 7;
 	if (m_floppy) data |= ((~m_floppy->wpt_r()) & 0x01) << 7;
 
 	return data;
