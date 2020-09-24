@@ -84,7 +84,8 @@ private:
 	uint32_t output_rate;
 
 	emu_timer *m_timer;
-	std::vector<int32_t> m_mix_buffer;
+
+	int32_t m_mix_buffer[(44100/60)*2*8];
 
 	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift);
 };

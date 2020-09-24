@@ -129,14 +129,13 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 }
 void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	static int32_t mix[(44100/60)*2*8];
 	int32_t *mixp;
 	int osc, snum, i;
 	uint32_t ramptr;
 	int samples = outputs[0].samples();
 
 	assert(samples < (44100/60)*2);
-	memset(mix, 0, sizeof(mix));
+	std::fill_n(&m_mix_buffer[0], samples*output_channels, 0);
 
 	for (int chan = 0; chan < output_channels; chan++)
 	{
@@ -155,7 +154,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				int8_t data = -128;
 				int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
 				uint32_t sizemask = accmasks[pOsc->wavetblsize];
-				mixp = &mix[0] + chan;
+				mixp = &m_mix_buffer[0] + chan;
 
 				for (snum = 0; snum < samples; snum++)
 				{
@@ -197,11 +196,14 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			}
 		}
 	}
-	mixp = &mix[0];
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 8.0);
+	mixp = &m_mix_buffer[0];
 	for (int chan = 0; chan < output_channels; chan++)
+	{
 		for (i = 0; i < outputs[chan].samples(); i++)
-			outputs[chan].put(i, stream_buffer::sample_t(*mixp++) * sample_scale);
+		{
+			outputs[chan].put_int(i, *mixp++, 32768*8);
+		}
+	}
 }
 
 
