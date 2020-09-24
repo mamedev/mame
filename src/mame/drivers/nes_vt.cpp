@@ -34,7 +34,8 @@ public:
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
-		m_prgrom(*this, "mainrom")
+		m_prgrom(*this, "mainrom"),
+		m_previous_port0(0)
 	{ }
 
 protected:
@@ -75,6 +76,7 @@ protected:
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
 	void upper_412c_w(uint8_t data);
+	int m_previous_port0;
 
 private:
 	/* APU handling */
@@ -84,7 +86,6 @@ private:
 	uint8_t extrain_1_r();
 	uint8_t extrain_2_r();
 	uint8_t extrain_3_r();
-
 };
 
 class nes_vt_state : public nes_vt_base_state
@@ -291,7 +292,6 @@ class nes_vt_cy_lexibook_state : public nes_vt_cy_state
 public:
 	nes_vt_cy_lexibook_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_cy_state(mconfig, type, tag),
-		m_previous_port0(0),
 		m_latch0_bit(0),
 		m_latch1_bit(0)
 	{ }
@@ -304,7 +304,6 @@ protected:
 	virtual void in0_w(uint8_t data) override;
 
 private:
-	int m_previous_port0;
 	uint8_t m_latch0_bit;
 	uint8_t m_latch1_bit;
 };
@@ -582,11 +581,18 @@ uint8_t nes_vt_base_state::in1_r()
 void nes_vt_base_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
-	if (data & 0x01)
-		return;
 
-	m_latch0 = m_io0->read();
-	m_latch1 = m_io1->read();
+	// need to check this or some games (eg cybar120 Aero Engine) won't have working inputs as they repeatedly write a pattern of 02 / 00 here between fetches which resets the latch
+	if ((data & 0x01) != (m_previous_port0 & 0x01))
+	{
+		if (data & 0x01)
+		{
+			m_latch0 = m_io0->read();
+			m_latch1 = m_io1->read();
+		}
+	}
+
+	m_previous_port0 = data;
 }
 
 /* Lexibook I/O handlers */
@@ -2180,7 +2186,7 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, 
 
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt_vg_4mb_rasterhack,  nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing for Frogger needs a hack, controls fail in several games eg Stellar Attack, River Quest
+CONS( 2006, vgtablet,  0, 0,  nes_vt_vg_4mb_rasterhack,  nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing for Frogger needs a hack
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 CONS( 2004, majkon,    0, 0,  nes_vt_vg_1mb_majkon, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing for Frogger needs a hack, Green Beret has other serious issues
 
