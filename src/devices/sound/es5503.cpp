@@ -127,16 +127,16 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 		m_irq_func(1);
 	}
 }
-
-void es5503_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	static int32_t mix[(44100/60)*2*8];
 	int32_t *mixp;
 	int osc, snum, i;
 	uint32_t ramptr;
+	int samples = outputs[0].samples();
 
 	assert(samples < (44100/60)*2);
- 	memset(mix, 0, sizeof(mix));
+	memset(mix, 0, sizeof(mix));
 
 	for (int chan = 0; chan < output_channels; chan++)
 	{
@@ -157,7 +157,7 @@ void es5503_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 				uint32_t sizemask = accmasks[pOsc->wavetblsize];
 				mixp = &mix[0] + chan;
 
-  				for (snum = 0; snum < samples; snum++)
+				for (snum = 0; snum < samples; snum++)
 				{
 					altram = acc >> resshift;
 					ramptr = altram & sizemask;
@@ -198,9 +198,10 @@ void es5503_device::sound_stream_update_legacy(sound_stream &stream, stream_samp
 		}
 	}
 	mixp = &mix[0];
-	for (i = 0; i < samples; i++)
-		for (int chan = 0; chan < output_channels; chan++)
-			outputs[chan][i] = (*mixp++)>>3;
+	constexpr stream_buffer::sample_t sample_scale = 1.0 / (32768.0 * 8.0);
+	for (int chan = 0; chan < output_channels; chan++)
+		for (i = 0; i < outputs[chan].samples(); i++)
+			outputs[chan].put(i, stream_buffer::sample_t(*mixp++) * sample_scale);
 }
 
 
@@ -223,7 +224,7 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
 	output_rate = (clock() / 8) / (2 + oscsenabled);
-	m_stream = stream_alloc_legacy(0, output_channels, output_rate);
+	m_stream = stream_alloc(0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
