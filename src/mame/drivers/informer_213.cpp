@@ -177,7 +177,7 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 
 				// underline (not supported by terminal?)
 				if (line_attr & 0x20 || attr & 0x20)
-					data = data;
+					data = +data;
 
 				// blink (todo: timing)
 				if (line_attr & 0x40 || attr & 0x40)
