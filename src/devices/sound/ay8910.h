@@ -268,7 +268,7 @@ private:
 	inline u8 get_envelope_chan(int chan) { return is_expanded_mode() ? chan : 0; }
 
 	inline bool noise_enable(int chan) { return BIT(m_regs[AY_ENABLE], 3 + chan); }
-	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : (m_regs[AY_NOISEPER] & 0x1f) << 1; }
+	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : m_regs[AY_NOISEPER] & 0x1f; }
 	inline u8 noise_output() { return m_rng & 1; }
 
 	inline bool is_expanded_mode() { return ((m_feature & PSG_HAS_EXPANDED_MODE) && ((m_mode & 0xe) == 0xa)); }

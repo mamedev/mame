@@ -1125,8 +1125,9 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			 * channels.
 			 */
 			m_count_noise = 0;
+			m_prescale_noise ^= 1;
 
-			if (!m_prescale_noise)
+			if (!m_prescale_noise || is_expanded_mode()) // AY8930 noise generator rate is twice compares as compatibility mode
 			{
 				/* The Random Number Generator of the 8910 is a 17-bit shift */
 				/* register. The input to the shift register is bit0 XOR bit3 */
@@ -1135,9 +1136,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				// TODO : get actually algorithm for AY8930
 				m_rng ^= (((m_rng & 1) ^ ((m_rng >> 3) & 1)) << 17);
 				m_rng >>= 1;
-				m_prescale_noise = 1;
 			}
-			m_prescale_noise--;
 		}
 
 		for (int chan = 0; chan < NUM_CHANNELS; chan++)
