@@ -22,8 +22,6 @@ license:CC0
 	- Suzuki Aguri no F-1 Super Driving (Japan)
 	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)
 	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
-	- Robot Ponkottsu Taikenban
-	- From TV Animation Slam Dunk - Shueisha Limited Version
 
   Undumped pirate carts:
 	- GOWIN carts (see below the list of known games)
@@ -21801,6 +21799,7 @@ license:CC0
 	</software>
 
 	<software name="uchiiwai" cloneof="splitz">
+		<!--	Reskinned version of Splitz, based on the manga Kyoudaijingi	-->
 		<description>Uchiiwai - Kyoudaijingi no Puzzle Game (Japan)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
