@@ -76,6 +76,7 @@ williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mco
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
+		m_ym2151(*this, "ym2151"),
 		m_hc55516(*this, "cvsd"),
 		m_rombank(*this, "rombank"),
 		m_talkback(0)
@@ -185,12 +186,13 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia->writepb_handler().set(FUNC(williams_cvsd_sound_device::talkback_w));
+	m_pia->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
 	m_pia->irqa_handler().set_inputline(m_cpu, M6809_FIRQ_LINE);
 	m_pia->irqb_handler().set_inputline(m_cpu, INPUT_LINE_NMI);
 
-	ym2151_device &ym(YM2151(config, "ym2151", CVSD_FM_CLOCK));
-	ym.irq_handler().set(m_pia, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
-	ym.add_route(ALL_OUTPUTS, *this, 0.10);
+	YM2151(config, m_ym2151, CVSD_FM_CLOCK);
+	m_ym2151->irq_handler().set(m_pia, FUNC(pia6821_device::ca1_w)).invert(); // IRQ is not true state
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.10);
 
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));

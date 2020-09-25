@@ -10,12 +10,14 @@
 #define MAME_INCLUDES_S11_H
 
 #include "cpu/m6800/m6800.h"
-#include "audio/s11c_bg.h"
 #include "audio/pinsnd88.h"
+#include "audio/s11c_bg.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
 #include "machine/input_merger.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "sound/ym2151.h"
 
@@ -45,6 +47,8 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_audioirq(*this, "audioirq")
 		, m_hc55516(*this, "hc55516")
+		, m_cvsd_filter(*this, "cvsd_filter")
+		, m_cvsd_filter2(*this, "cvsd_filter2")
 		, m_dac(*this, "dac")
 		, m_pias(*this, "pias")
 		, m_pia21(*this, "pia21")
@@ -60,6 +64,7 @@ public:
 		{ }
 
 	void s11(machine_config &config);
+	void s11_only(machine_config &config);
 	void s11_bgs(machine_config &config);
 	void s11_bgm(machine_config &config);
 
@@ -113,6 +118,8 @@ protected:
 	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<input_merger_device> m_audioirq;
 	optional_device<hc55516_device> m_hc55516;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	optional_device<mc1408_device> m_dac;
 	optional_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
