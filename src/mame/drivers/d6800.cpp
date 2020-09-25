@@ -68,10 +68,7 @@ public:
 		, m_pia(*this, "pia")
 		, m_beeper(*this, "beeper")
 		, m_videoram(*this, "videoram")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
-		, m_io_x2(*this, "X2")
-		, m_io_x3(*this, "X3")
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_io_shift(*this, "SHIFT")
 		{ }
 
@@ -105,10 +102,7 @@ private:
 	required_device<pia6821_device> m_pia;
 	required_device<beep_device> m_beeper;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
-	required_ioport m_io_x2;
-	required_ioport m_io_x3;
+	required_ioport_array<4> m_io_keyboard;
 	required_ioport m_io_shift;
 };
 
@@ -227,7 +221,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 	if (m_rtc > 159)
 		m_rtc = 0;
 
-	uint8_t data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
+	uint8_t data = m_io_keyboard[0]->read() & m_io_keyboard[1]->read() & m_io_keyboard[2]->read() & m_io_keyboard[3]->read();
 	int ca1 = (data == 255) ? 0 : 1;
 	int ca2 = m_io_shift->read();
 	int cb1 = (m_rtc) ? 1 : 0;
@@ -288,27 +282,15 @@ uint8_t d6800_state::d6800_keyboard_r()
 	lines around and reads it another way. This isolates the key that was pressed.
 	*/
 
-	u8 data[4];
-
-	data[0] = m_io_x0->read() & 15;
-	data[1] = m_io_x1->read() & 15;
-	data[2] = m_io_x2->read() & 15;
-	data[3] = m_io_x3->read() & 15;
-
 	u8 y = 8;
 	for (u8 i = 0; i < 4; i++)
 	{
+		u8 data = m_io_keyboard[i]->read() & 15;
 		y <<= 1;
-		if (data[i] < 15)
-		{
+		if (data < 15)
 			for (u8 j = 0; j < 4; j++)
-			{
-				if (!BIT(data[i],j))
-				{
-					return data[i] | (0xf0 - y);
-				}
-			}
-		}
+				if (!BIT(data, j))
+					return data | (0xf0 - y);
 	}
 
 	return 0xff;
