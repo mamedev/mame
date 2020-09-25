@@ -166,6 +166,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "loopback.h"
 #include "null_modem.h"
 #include "printer.h"
+#include "rs232luaprinter.h"
 #include "pty.h"
 #include "sun_kbd.h"
 #include "swtpc8212.h"
@@ -179,6 +180,7 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("dec_loopback", DEC_RS232_LOOPBACK);
 	device.option_add("null_modem", NULL_MODEM);
 	device.option_add("printer", SERIAL_PRINTER);
+	device.option_add("luaprinter", SERIAL_LUAPRINTER);
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("pty", PSEUDO_TERMINAL);
 	device.option_add("sunkbd", SUN_KBD_ADAPTOR);

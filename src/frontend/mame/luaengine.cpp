@@ -26,6 +26,7 @@
 #include "pluginopts.h"
 #include "softlist.h"
 #include "inputdev.h"
+#include "luaprinter.h"
 
 #include <cstring>
 #include <thread>
@@ -1442,6 +1443,15 @@ void lua_engine::initialize()
 				}
 			};
 			tree(m.root_device(), table);
+			return table;
+		}));
+	machine_type.set("lp", sol::property([this](running_machine &m) {
+			sol::table table = sol().create_table();
+			int i=1;
+			for(auto p : luaprinter::luaprinterlist)
+			{
+				table[i++] = p;
+			};
 			return table;
 		}));
 	machine_type.set("screens", sol::property([this](running_machine &r) {
@@ -2984,6 +2994,72 @@ void lua_engine::initialize()
 	image_type.set("must_be_loaded", sol::property(&device_image_interface::must_be_loaded));
 	sol().registry().set_usertype("image", image_type);
 
+
+/*  luaprinter library
+ *
+ * manager:machine().lp[]
+ *
+ * clearpage()
+ * savepage()
+ * drawpixel(x,y,color)
+ * getpixel(x,y)
+ * getheadpos()
+ * setheadpos(x,y)
+ * checkbottomofpageandsave(y,ylimit,clrpage)
+ * getbuffer()
+ * getnextchar()
+ * putnextchar(char)
+ * setprintername(string)
+ * getprintername()
+ * sessiontime()
+ * simplename()
+ * tagname()
+ * pagewidth()
+ * pageheight()
+ * pagesize()
+ * getpagelimit()
+ * setpagelimit(num)
+ * setprintheadcolor(head, border)
+ * setprintheadsize(xsize, ysize, bordersize)
+ * setsnapshotdir(dir)
+ * getsnapshotdir()
+ * cleartoline(pos)
+ * cleartobottom(pos)
+ * getclearlinepos()
+ * setclearline(pos)
+ */
+
+	auto luaprinter_type = sol().registry().create_simple_usertype<luaprinter>("new", sol::no_constructor);
+	luaprinter_type.set("clearpage", &luaprinter::clearpage);
+	luaprinter_type.set("savepage", &luaprinter::savepage);
+	luaprinter_type.set("drawpixel", &luaprinter::drawpixel);
+	luaprinter_type.set("getpixel", &luaprinter::getpixel);
+	luaprinter_type.set("getheadpos", &luaprinter::getheadpos);
+	luaprinter_type.set("setheadpos", &luaprinter::setheadpos);
+	luaprinter_type.set("checkbottomofpageandsave", &luaprinter::checkbottomofpageandsave);
+	luaprinter_type.set("getbuffer", &luaprinter::getbuffer);
+	luaprinter_type.set("getnextchar", &luaprinter::getnextchar);
+	luaprinter_type.set("putnextchar", &luaprinter::putnextchar);
+	luaprinter_type.set("getprintername", &luaprinter::getprintername);
+	luaprinter_type.set("setprintername", &luaprinter::setprintername);
+	luaprinter_type.set("sessiontime", &luaprinter::sessiontime);
+	luaprinter_type.set("simplename", &luaprinter::simplename);
+	luaprinter_type.set("tagname", &luaprinter::tagname);
+	luaprinter_type.set("pagewidth", &luaprinter::pagewidth);
+	luaprinter_type.set("pageheight", &luaprinter::pageheight);
+	luaprinter_type.set("pagesize", &luaprinter::pagesize);
+	luaprinter_type.set("getpagelimit", &luaprinter::getpagelimit);
+	luaprinter_type.set("setpagelimit", &luaprinter::setpagelimit);
+	luaprinter_type.set("setprintheadsize", &luaprinter::setprintheadsize);
+	luaprinter_type.set("setprintheadcolor", &luaprinter::setprintheadcolor);
+	luaprinter_type.set("setsnapshotdir", &luaprinter::setsnapshotdir);
+	luaprinter_type.set("getsnapshotdir", &luaprinter::getsnapshotdir);
+	luaprinter_type.set("cleartoline", &luaprinter::cleartoline);
+	luaprinter_type.set("cleartobottom", &luaprinter::cleartobottom);
+	luaprinter_type.set("getclearlinepos", &luaprinter::getclearlinepos);
+	luaprinter_type.set("setclearlinepos", &luaprinter::setclearlinepos);
+	luaprinter_type.set("setclearlinebottom", &luaprinter::setclearlinebottom);
+	sol().registry().set_usertype("luaprinter", luaprinter_type);
 
 /*  mame_machine_manager library
  *
