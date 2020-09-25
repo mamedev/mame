@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.1
+  ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.2
   By R. Belmont.
 
   Copyright R. Belmont.
@@ -30,6 +30,9 @@
   2.0 (RB) - C++ conversion, more accurate oscillator IRQ timing
   2.1 (RB) - Corrected phase when looping; synthLAB, Arkanoid, and Arkanoid II no longer go out of tune
   2.1.1 (RB) - Fixed issue introduced in 2.0 where IRQs were delayed
+  2.1.2 (RB) - Fixed SoundSmith POLY.SYNTH inst where one-shot on the even oscillator and swap on the odd should loop.
+               Conversely, the intro voice in FTA Delta Demo has swap on the even and one-shot on the odd and doesn't
+               want to loop.
 */
 
 #include "emu.h"
@@ -88,7 +91,8 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 {
 	ES5503Osc *pOsc = &oscillators[onum];
 	ES5503Osc *pPartner = &oscillators[onum^1];
-	int mode = (pOsc->control>>1) & 3;
+	const int mode = (pOsc->control>>1) & 3;
+	const int partnerMode = (pPartner->control>>1) & 3;
 
 	// if 0 found in sample data or mode is not free-run, halt this oscillator
 	if ((mode != MODE_FREE) || (type != 0))
@@ -112,8 +116,9 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 		*accumulator = altram << resshift;
 	}
 
-	// if swap mode, start the partner
-	if (mode == MODE_SWAP)
+	// if we're in swap mode or we're the even oscillator and the partner is in swap mode,
+	// start the partner.
+	if ((mode == MODE_SWAP) || ((partnerMode == MODE_SWAP) && ((onum & 1)==0)))
 	{
 		pPartner->control &= ~1;    // clear the halt bit
 		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
@@ -134,7 +139,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	uint32_t ramptr;
 	int samples = outputs[0].samples();
 
-	assert(samples < (44100/60)*2);
+	assert(samples < (44100/50));
 	std::fill_n(&m_mix_buffer[0], samples*output_channels, 0);
 
 	for (int chan = 0; chan < output_channels; chan++)
@@ -237,6 +242,8 @@ void es5503_device::device_clock_changed()
 {
 	output_rate = (clock() / 8) / (2 + oscsenabled);
 	m_stream->set_sample_rate(output_rate);
+
+	m_mix_buffer.resize((output_rate/50)*8);
 
 	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
 	m_timer->adjust(update_rate, 0, update_rate);
@@ -390,12 +397,11 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xa0:  // oscillator control
-				// if a fresh key-on, reset the ccumulator
+				// if a fresh key-on, reset the accumulator
 				if ((oscillators[osc].control & 1) && (!(data&1)))
 				{
 					oscillators[osc].accumulator = 0;
 				}
-
 				oscillators[osc].control = data;
 				break;
 
@@ -428,6 +434,8 @@ void es5503_device::write(offs_t offset, u8 data)
 
 				output_rate = (clock()/8)/(2+oscsenabled);
 				m_stream->set_sample_rate(output_rate);
+
+				m_mix_buffer.resize((output_rate/50)*8);
 
 				attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
 				m_timer->adjust(update_rate, 0, update_rate);
