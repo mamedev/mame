@@ -62,7 +62,7 @@ namespace netlist
 	namespace devices
 	{
 
-	static const std::array<netlist_time, 3> out_delay { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54) };
+	static constexpr std::array<netlist_time, 3> out_delay { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54) };
 
 	NETLIB_OBJECT(7493)
 	{

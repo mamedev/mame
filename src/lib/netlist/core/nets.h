@@ -72,51 +72,76 @@ namespace netlist
 					if (!!is_queued())
 						exec().qremove(this);
 
-					const auto nst(exec().time() + delay);
-					m_next_scheduled_time = nst;
+					m_next_scheduled_time = exec().time() + delay;
 #if (AVOID_NOOP_QUEUE_PUSHES)
 					m_in_queue = (m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE
 						: (m_new_Q != m_cur_Q ? queue_status::QUEUED : queue_status::DELIVERED));
 					if (m_in_queue == queue_status::QUEUED)
-						exec().qpush(nst, this);
+						exec().qpush(m_next_scheduled_time, this);
 					else
 						update_inputs();
 #else
-					if (!m_list_active.empty())
-					{
-						m_in_queue = queue_status::QUEUED;
-						exec().qpush(nst, this);
-					}
+					m_in_queue = m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE : queue_status::QUEUED;
+					if (m_in_queue == queue_status::QUEUED)
+						exec().qpush(m_next_scheduled_time, this);
 					else
-					{
-						m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
 						update_inputs();
-					}
 #endif
 				}
 			}
-			NVCC_CONSTEXPR bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
+
+			// -----------------------------------------------------------------------------
+			// Very hot
+			// -----------------------------------------------------------------------------
 
 			template <bool KEEP_STATS>
 			void update_devs() noexcept
 			{
-				nl_assert(this->is_rail_net());
+				gsl_Expects(this->is_rail_net());
 
 				m_in_queue = queue_status::DELIVERED; // mark as taken ...
 
+				const netlist_sig_t new_Q(m_new_Q);
+				const netlist_sig_t cur_Q(m_cur_Q);
 #if (!AVOID_NOOP_QUEUE_PUSHES)
-				if (m_new_Q ^ m_cur_Q)
+				if (new_Q ^ cur_Q)
 #endif
 				{
-					process<KEEP_STATS>((m_new_Q << core_terminal_t::INP_LH_SHIFT)
-						| (m_cur_Q << core_terminal_t::INP_HL_SHIFT), m_new_Q);
+					const auto mask = (new_Q << core_terminal_t::INP_LH_SHIFT)
+						| (cur_Q << core_terminal_t::INP_HL_SHIFT);
+					m_cur_Q = new_Q;
+
+					if (!KEEP_STATS)
+					{
+						for (auto &p : m_list_active)
+						{
+							p.set_copied_input(new_Q);
+							if ((p.terminal_state() & mask) != 0)
+								p.run_delegate();
+						}
+					}
+					else
+					{
+						for (auto & p : m_list_active)
+						{
+							p.set_copied_input(new_Q);
+							auto *stats(p.device().stats());
+							stats->m_stat_call_count.inc();
+							if ((p.terminal_state() & mask))
+							{
+								auto g(stats->m_stat_total_time.guard());
+								p.run_delegate();
+							}
+						}
+					}
 				}
 			}
 
-			netlist_time_ext next_scheduled_time() const noexcept { return m_next_scheduled_time; }
+			const netlist_time_ext &next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
-			NVCC_CONSTEXPR bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
+			bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
 			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
 
 			bool has_connections() const noexcept { return !m_core_terms.empty(); }
@@ -196,7 +221,7 @@ namespace netlist
 		protected:
 
 			// only used for logic nets
-			NVCC_CONSTEXPR const netlist_sig_t &Q() const noexcept { return m_cur_Q; }
+			const netlist_sig_t &Q() const noexcept { return m_cur_Q; }
 
 			// only used for logic nets
 			void initial(netlist_sig_t val) noexcept
@@ -208,6 +233,8 @@ namespace netlist
 			// only used for logic nets
 			void set_Q_and_push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
 			{
+				gsl_Expects(delay >= netlist_time::zero());
+
 				if (newQ != m_new_Q)
 				{
 					m_new_Q = newQ;
@@ -218,6 +245,8 @@ namespace netlist
 			// only used for logic nets
 			void set_Q_time(const netlist_sig_t &newQ, const netlist_time_ext &at) noexcept
 			{
+				gsl_Expects(at >= netlist_time_ext::zero());
+
 				if (newQ != m_new_Q)
 				{
 					m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
@@ -236,45 +265,12 @@ namespace netlist
 			state_var<netlist_sig_t>     m_new_Q;
 			state_var<netlist_sig_t>     m_cur_Q;
 			state_var<queue_status>      m_in_queue;
+			plib::linkedlist_t<core_terminal_t> m_list_active;
 			state_var<netlist_time_ext>  m_next_scheduled_time;
 
 			core_terminal_t * m_railterminal;
-			plib::linkedlist_t<core_terminal_t> m_list_active;
 			std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
-			// -----------------------------------------------------------------------------
-			// Very hot
-			// -----------------------------------------------------------------------------
-
-			template <bool KEEP_STATS, typename T, typename S>
-			void process(const T &mask, const S &sig) noexcept
-			{
-				m_cur_Q = sig;
-
-				if (KEEP_STATS)
-				{
-					for (auto & p : m_list_active)
-					{
-						p.set_copied_input(sig);
-						auto *stats(p.device().stats());
-						stats->m_stat_call_count.inc();
-						if ((p.terminal_state() & mask))
-						{
-							auto g(stats->m_stat_total_time.guard());
-							p.run_delegate();
-						}
-					}
-				}
-				else
-				{
-					for (auto &p : m_list_active)
-					{
-						p.set_copied_input(sig);
-						if ((p.terminal_state() & mask) != 0)
-							p.run_delegate();
-					}
-				}
-			}
 		};
 	} // namespace detail
 
@@ -286,10 +282,10 @@ namespace netlist
 
 		void reset() noexcept override;
 
-		nl_fptype Q_Analog() const noexcept { return m_cur_Analog; }
+		const nl_fptype &Q_Analog() const noexcept { return m_cur_Analog; }
 		void set_Q_Analog(nl_fptype v) noexcept { m_cur_Analog = v; }
 		// used by solver code ...
-		nl_fptype *Q_Analog_state_ptr() noexcept { return &m_cur_Analog(); }
+		nl_fptype *Q_Analog_state_ptr() noexcept { return *m_cur_Analog; }
 
 		//FIXME: needed by current solver code
 		solver::matrix_solver_t *solver() const noexcept { return m_solver; }

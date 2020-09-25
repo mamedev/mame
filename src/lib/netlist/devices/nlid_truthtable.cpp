@@ -52,6 +52,8 @@ namespace devices
 		/* FIXME: the family should provide the names of the power-terminals! */
 		, m_power_pins(*this)
 		{
+			m_activate = activate_delegate(& NETLIB_NAME(truthtable_t) :: incdec_active, this);
+			set_hint_deactivate(true);
 			init(desc);
 		}
 
@@ -100,16 +102,18 @@ namespace devices
 		}
 #endif
 
-		void inc_active() noexcept override
+		void incdec_active(bool a) noexcept
 		{
-			process<false>();
-		}
-
-		void dec_active() noexcept override
-		{
-			for (std::size_t i = 0; i< m_NI; i++)
-				m_I[i].inactivate();
-			m_ign = (1<<m_NI)-1;
+			if (a)
+			{
+				process<false>();
+			}
+			else
+			{
+				for (std::size_t i = 0; i< m_NI; i++)
+					m_I[i].inactivate();
+				m_ign = (1<<m_NI)-1;
+			}
 		}
 
 		template<bool doOUT>
@@ -371,8 +375,6 @@ namespace devices
 	template<std::size_t m_NI, std::size_t m_NO>
 	void NETLIB_NAME(truthtable_t)<m_NI, m_NO>::init(const std::vector<pstring> &desc)
 	{
-		set_hint_deactivate(true);
-
 		pstring header = desc[0];
 
 		std::vector<pstring> io(plib::psplit(header,'|'));

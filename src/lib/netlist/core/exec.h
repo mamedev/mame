@@ -33,7 +33,7 @@ namespace netlist
 
 		// run functions
 
-		netlist_time_ext time() const noexcept { return m_time; }
+		const netlist_time_ext &time() const noexcept { return m_time; }
 
 		void process_queue(netlist_time_ext delta) noexcept;
 		void abort_current_queue_slice() noexcept

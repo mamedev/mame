@@ -79,8 +79,8 @@ namespace netlist
 
 		param_num_t(core_device_t &device, const pstring &name, T val) noexcept(false);
 
-		T operator()() const noexcept { return m_param; }
-		operator T() const noexcept { return m_param; }
+		constexpr const T &operator()() const noexcept { return m_param; }
+		constexpr operator const T& () const noexcept { return m_param; }
 
 		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
 

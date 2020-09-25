@@ -24,7 +24,6 @@ namespace plib {
 	{
 	public:
 		inline pspin_mutex() noexcept = default;
-		inline ~pspin_mutex() noexcept = default;
 		inline void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
 		inline void unlock() noexcept { m_lock.clear(std::memory_order_release); }
 	private:
@@ -37,7 +36,6 @@ namespace plib {
 	{
 	public:
 		inline pspin_mutex() noexcept = default;
-		inline ~pspin_mutex() noexcept = default;
 		static inline void lock() /*const*/ noexcept { }
 		static inline void unlock() /*const*/ noexcept { }
 	};

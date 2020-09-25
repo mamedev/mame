@@ -716,7 +716,7 @@ param_ref_t setup_t::find_param(const pstring &param_in) const
 //NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 {
-	nl_assert(out.is_logic());
+	gsl_Expects(out.is_logic());
 
 	const auto &out_cast = dynamic_cast<const logic_output_t &>(out);
 	auto iter_proxy(m_proxies.find(&out));
@@ -759,7 +759,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(const detail::core_terminal_t &o
 //NOLINTNEXTLINE(misc-no-recursion)
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
-	nl_assert(inp.is_logic());
+	gsl_Expects(inp.is_logic());
 
 	const auto &incast = dynamic_cast<const logic_input_t &>(inp);
 
@@ -1607,13 +1607,10 @@ void setup_t::prepare_to_run()
 		if (p != m_abstract.m_hints.end())
 		{
 			p->second = true; // mark as used
-			if (use_deactivate)
-				d.second->set_hint_deactivate(false);
-			else
-				d.second->set_hint_deactivate(true);
+			d.second->set_hint_deactivate(false);
 		}
 		else
-			d.second->set_hint_deactivate(true);
+			d.second->set_hint_deactivate(use_deactivate);
 	}
 
 	if (errcnt > 0)

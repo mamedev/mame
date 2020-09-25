@@ -1029,12 +1029,14 @@ namespace netlist
 				}
 
 				m_time = top->exec_time();
-				auto *const obj(top->object());
+				detail::net_t *const obj(top->object());
 				m_queue.pop();
-				if (obj != nullptr)
-					obj->template update_devs<KEEP_STATS>();
-				else
+
+				if (!!(obj == nullptr))
 					break;
+
+				obj->template update_devs<KEEP_STATS>();
+
 				if (KEEP_STATS)
 					m_perf_out_processed.inc();
 			} while (true);

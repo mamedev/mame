@@ -32,11 +32,11 @@ namespace netlist
 		logic_t(device_t &dev, const pstring &aname,
 				state_e terminal_state, nldelegate delegate);
 
-		constexpr logic_net_t & net() noexcept
+		logic_net_t & net() noexcept
 		{
 			return plib::downcast<logic_net_t &>(core_terminal_t::net());
 		}
-		constexpr const logic_net_t &  net() const noexcept
+		const logic_net_t & net() const noexcept
 		{
 			return plib::downcast<const logic_net_t &>(core_terminal_t::net());
 		}
@@ -52,9 +52,9 @@ namespace netlist
 		logic_input_t(device_t &dev, const pstring &aname,
 				nldelegate delegate);
 
-		constexpr const netlist_sig_t &operator()() const noexcept
+		const netlist_sig_t &operator()() const noexcept
 		{
-			nl_assert(terminal_state() != STATE_INP_PASSIVE);
+			gsl_Expects(terminal_state() != STATE_INP_PASSIVE);
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 			return m_Q;
 	#else
@@ -122,6 +122,8 @@ namespace netlist
 
 		void push(const netlist_sig_t &newQ, const netlist_time &delay) noexcept
 		{
+			gsl_Expects(delay >= netlist_time::zero());
+
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
 		}
 

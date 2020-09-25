@@ -61,7 +61,8 @@ namespace netlist
 		//! Assignment operator to assign value of type T.
 		constexpr state_var &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
 		//! Assignment move operator to assign value of type T.
-		constexpr state_var &operator=(T &&rhs) noexcept { std::swap(m_value, rhs); return *this; }
+		//constexpr state_var &operator=(T &&rhs) noexcept { std::swap(m_value, rhs); return *this; }
+		constexpr state_var &operator=(T &&rhs) noexcept { m_value = std::move(rhs); return *this; }
 		//! Return non-const value of state variable.
 		constexpr operator T & () noexcept { return m_value; }
 		//! Return const value of state variable.
@@ -78,6 +79,10 @@ namespace netlist
 		constexpr T * operator->() noexcept { return &m_value; }
 		//! Access state variable by const ->.
 		constexpr const T * operator->() const noexcept{ return &m_value; }
+		//! Access state variable by *.
+		constexpr T * operator *() noexcept { return &m_value; }
+		//! Access state variable by const *.
+		constexpr const T * operator *() const noexcept{ return &m_value; }
 
 	private:
 		T m_value;

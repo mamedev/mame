@@ -21,7 +21,7 @@ namespace netlist
 	// nld_base_proxy
 	// -----------------------------------------------------------------------------
 
-	static const std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
+	static constexpr std::array<std::pair<const char *, const char *>, 3> power_syms = {{ {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}}};
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 		const logic_t *inout_proxied)
