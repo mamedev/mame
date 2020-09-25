@@ -147,8 +147,8 @@ inline bool cvsd_device::is_clock_changed(bool clock_state)
 
 inline bool cvsd_device::is_active_clock_transition(bool clock_state)
 {
-	return (( m_active_clock_edge && !m_last_clock_state &&  clock_state) ||
-			(!m_active_clock_edge &&  m_last_clock_state && !clock_state));
+	return ((clock_state != m_last_clock_state) &&
+			(clock_state == m_active_clock_edge));
 }
 
 inline bool cvsd_device::current_clock_state()
@@ -332,8 +332,9 @@ void hc55516_device::process_bit(bool bit, bool clock_state)
 		/* shift the new bit into the shift register */
 		m_shiftreg = (m_shiftreg << 1) | (bit?1:0);
 
-		if ( ((m_shiftreg & m_shiftreg_mask) == 0) ||
-		((m_shiftreg & m_shiftreg_mask) == m_shiftreg_mask) )
+		/* if we got all 0's or all 1's in the last n bits... */
+		if (((m_shiftreg & m_shiftreg_mask) == 0) ||
+			((m_shiftreg & m_shiftreg_mask) == m_shiftreg_mask))
 		{
 			// coincidence is true
 			if (!frozen) m_sylfilter += (((~m_sylfilter) & m_sylmask) >> m_sylshift);

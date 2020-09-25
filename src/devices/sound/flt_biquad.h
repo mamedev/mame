@@ -1,16 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:K.Wilkins,Couriersud,Derrick Renaud,Frank Palazzolo,Jonathan Gevaryahu
-#pragma once
-
 #ifndef MAME_SOUND_FLT_BIQUAD_H
 #define MAME_SOUND_FLT_BIQUAD_H
 
 #pragma once
-
-// we need the M_SQRT2 constant
-#ifndef M_SQRT2
-#define M_SQRT2 1.41421356237309504880
-#endif
 
 // display debug info about the filters
 #undef FLT_BIQUAD_DEBUG_SETUP
@@ -123,7 +116,7 @@ public:
 		}
 
 		double const gain = -r3 / r1;
-		double fc, q = (M_SQRT2/2);
+		double fc, q = (1.41421356237309504880 / 2.0); // (M_SQRT2 / 2.0)
 		if (c1 == 0) // set C1 to 0 to run this filter in a degraded single pole mode where C1 was left off the filter entirely. Certain williams boards seem to have omitted C1, presumably by accident.
 		{
 			fc = (r1 * r3) / (2 * M_PI * ((r1 * r2) + (r1 * r3) + (r2 * r3)) * r3 * c2);
@@ -241,7 +234,7 @@ private:
 	int            m_type = HIGHPASS;
 	int            m_last_sample_rate;
 	double         m_fc = 16.0;
-	double         m_q = M_SQRT2 / 2.0;
+	double         m_q = 1.41421356237309504880 / 2.0; // M_SQRT2 / 2.0;
 	double         m_gain = 1.0;
 
 	stream_buffer::sample_t m_input = 0.0;

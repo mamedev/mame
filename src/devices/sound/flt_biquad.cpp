@@ -3,6 +3,11 @@
 #include "emu.h"
 #include "flt_biquad.h"
 
+// we need the M_SQRT2 constant
+#ifndef M_SQRT2
+#define M_SQRT2 1.41421356237309504880
+#endif
+
 // device type definition
 DEFINE_DEVICE_TYPE(FILTER_BIQUAD, filter_biquad_device, "filter_biquad", "Biquad Filter")
 
@@ -101,7 +106,7 @@ void filter_biquad_device::recalc()
 	double const MGain = fabs(m_gain); // absolute multiplicative gain
 	double const DBGain = log10(MGain) * 20.0; // gain in dB
 	double const AMGain = pow(10, fabs(DBGain) / 20.0); // multiplicative gain of absolute DB
-	double const K = tan(M_PI * m_fc / machine().sample_rate());
+	double const K = tan(M_PI * m_fc / m_stream->sample_rate());
 	double const Ksquared = K * K;
 	double const KoverQ = K / m_q;
 	double normal = 1.0 / (1.0 + KoverQ + Ksquared);
@@ -112,13 +117,13 @@ void filter_biquad_device::recalc()
 	switch (m_type)
 	{
 		case LOWPASS1P:
-			m_a1 = exp(-2.0 * M_PI * (m_fc / machine().sample_rate()));
+			m_a1 = exp(-2.0 * M_PI * (m_fc / m_stream->sample_rate()));
 			m_b0 = 1.0 - m_a1;
 			m_a1 = -m_a1;
 			m_b1 = m_b2 = m_a2 = 0.0;
 			break;
 		case HIGHPASS1P:
-			m_a1 = -exp(-2.0 * M_PI * (0.5 - m_fc / machine().sample_rate()));
+			m_a1 = -exp(-2.0 * M_PI * (0.5 - m_fc / m_stream->sample_rate()));
 			m_b0 = 1.0 + m_a1;
 			m_a1 = -m_a1;
 			m_b1 = m_b2 = m_a2 = 0.0;
@@ -215,15 +220,15 @@ void filter_biquad_device::recalc()
 			break;
 	}
 #ifdef FLT_BIQUAD_DEBUG
-	fprintf(stderr,"Calculated Parameters:\n");
-	fprintf(stderr, "Gain (dB): %f, (raw): %f\n", DBGain, MGain);
-	fprintf(stderr, "k: %f\n", K);
-	fprintf(stderr, "normal: %f\n", normal);
-	fprintf(stderr,"b0: %f\n", m_b0);
-	fprintf(stderr,"b1: %f\n", m_b1);
-	fprintf(stderr,"b2: %f\n", m_b2);
-	fprintf(stderr,"a1: %f\n", m_a1);
-	fprintf(stderr,"a2: %f\n", m_a2);
+	logerror("Calculated Parameters:\n");
+	logerror( "Gain (dB): %f, (raw): %f\n", DBGain, MGain);
+	logerror( "k: %f\n", K);
+	logerror( "normal: %f\n", normal);
+	logerror("b0: %f\n", m_b0);
+	logerror("b1: %f\n", m_b1);
+	logerror("b2: %f\n", m_b2);
+	logerror("a1: %f\n", m_a1);
+	logerror("a2: %f\n", m_a2);
 #endif
 	// peak and shelf filters do not use gain for the entire signal, only for the peak/shelf portions
 	// side note: the first order lowpass and highpass filter analogues technically don't have gain either,
@@ -236,9 +241,9 @@ void filter_biquad_device::recalc()
 		m_b1 *= m_gain;
 		m_b2 *= m_gain;
 #ifdef FLT_BIQUAD_DEBUG
-		fprintf(stderr,"b0g: %f\n", m_b0);
-		fprintf(stderr,"b1g: %f\n", m_b1);
-		fprintf(stderr,"b2g: %f\n", m_b2);
+		logerror("b0g: %f\n", m_b0);
+		logerror("b1g: %f\n", m_b1);
+		logerror("b2g: %f\n", m_b2);
 #endif
 	}
 #ifdef FLT_BIQUAD_DEBUG
