@@ -210,7 +210,7 @@ uint8_t a2bus_sider_device::read_c0nx(uint8_t offset)
 			return rv;
 
 		default:
-			printf("Read c0n%x (%s)\n", offset, machine().describe_context().c_str());
+			logerror("Read c0n%x (%s)\n", offset, machine().describe_context().c_str());
 			break;
 	}
 
@@ -260,7 +260,7 @@ void a2bus_sider_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 
 		default:
-			printf("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context().c_str());
+			logerror("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context().c_str());
 			break;
 	}
 }

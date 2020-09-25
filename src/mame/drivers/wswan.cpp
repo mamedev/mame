@@ -2,7 +2,7 @@
 // copyright-holders:Anthony Kruize,Wilbert Pol
 /***************************************************************************
 
-  wswan.c
+  wswan.cpp
 
   Driver file to handle emulation of the Bandai WonderSwan
   By:
@@ -17,15 +17,15 @@
     configuration menu.
 
   Known issues/TODOs:
-  - Add support for noise sound
-  - Add support for voice sound
-  - Add support for enveloped sound
+  - Add support for noise sound.
+  - Add support for voice sound.
+  - Add support for enveloped sound.
   - Perform video DMA at proper timing.
   - Add (real/proper) RTC support.
   - Swan Crystal can handle up to 512Mbit ROMs??????
-	- SRAM sizes should be in kbit instead of kbytes(?). This raises a few
+  - SRAM sizes should be in kbit instead of kbytes(?). This raises a few
     interesting issues:
-    - mirror of smaller <64KBYTE/512kbit sram sizes
+    - mirror of smaller <64KBYTE/512kbit SRAM sizes
     - banking when using 1M or 2M sram sizes
 	- The units likely came with the name "WONDERSWAN" configured in the
 	  internal EEPOM
@@ -46,6 +46,11 @@
 #include "speaker.h"
 
 #include "wswan.lh"
+
+#include <algorithm>
+
+
+namespace {
 
 class wswan_state : public driver_device
 {
@@ -92,9 +97,11 @@ protected:
 
 	struct sound_dma_t
 	{
-		u32  source;     // Source address
-		u16  size;       // Size
-		u8   enable;     // Enabled
+		sound_dma_t() { }
+
+		u32  source = 0; // Source address
+		u16  size = 0;   // Size
+		u8   enable = 0; // Enabled
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -456,13 +463,13 @@ void wswan_state::machine_reset()
 		m_rotate = 0;
 
 	/* Intialize ports */
-	memcpy(m_ws_portram, ws_portram_init, 256);
+	std::copy(std::begin(ws_portram_init), std::end(ws_portram_init), std::begin(m_ws_portram));
 
 	render_target *target = machine().render().first_target();
 	target->set_view(m_rotate);
 
 	/* Initialize sound DMA */
-	memset(&m_sound_dma, 0, sizeof(m_sound_dma));
+	m_sound_dma = sound_dma_t();
 }
 
 
@@ -767,12 +774,12 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			}
 			break;
 		case 0xb5:  // Read controls
-		            // Bit 0-3 - Current state of input lines (read-only)
-		            // Bit 4-6 - Select line of inputs to read
-		            // 001 - Read Y cursors
-		            // 010 - Read X cursors
-		            // 100 - Read START,A,B buttons
-		            // Bit 7   - Unknown
+			// Bit 0-3 - Current state of input lines (read-only)
+			// Bit 4-6 - Select line of inputs to read
+			// 001 - Read Y cursors
+			// 010 - Read X cursors
+			// 100 - Read START,A,B buttons
+			// Bit 7   - Unknown
 			break;
 		case 0xb6:  // Interrupt acknowledge
 			// Bit 0   - Serial transmit interrupt acknowledge
@@ -878,13 +885,16 @@ ROM_END
 
 ROM_START(wscolor)
 	ROM_REGION(0x2000, "maincpu", 0)
-  ROM_LOAD("boot.rom", 0x0000, 0x2000, CRC(cb06d9c3) SHA1(c5ad0b8af45d762662a69f50b64161b9c8919efb))
+	ROM_LOAD("boot.rom", 0x0000, 0x2000, CRC(cb06d9c3) SHA1(c5ad0b8af45d762662a69f50b64161b9c8919efb))
 
 	ROM_REGION(0x800, "nvram", 0)
 	// Need a dump from an original new unit
 	// Empty file containing just the name 'WONDERSAN'
 	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(9e29725c) SHA1(a903c2cb5f4bb94b67326ff87a2d91605dceffff))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME
 CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state,   empty_init, "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
