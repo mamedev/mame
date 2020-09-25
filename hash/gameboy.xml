@@ -11,21 +11,7 @@ license:CC0
 	- The Adventures of Rocky and Bullwinkle (USA)
 	- Fastest Lap (USA)
 	- GI King! - Sanbiki no Yosouya (Japan)
-	- Hyper Lode Runner (World)
-	- The Jetsons - Robot Panic (USA, Rev 1)
-	- Jungle Strike (USA)
-	- Kaseki Sousei Reborn (Japan, Rev 1)
-	- Disney's Mulan (USA)
-	- Pac-In-Time (Europe, Rev 1)
-	- Pac-Man (Japan)
-	- Pang (UK)
-	- Suzuki Aguri no F-1 Super Driving (Japan)
-	- Teenage Mutant Hero Turtles III - Radical Rescue (Europe, Rev 1)
-	- World Cup Striker (Europe, En / Fra / Ger)	<-	Unreleased?
-	- The Adventures of Rocky and Bullwinkle (USA)
-	- Fastest Lap (USA)
-	- GI King! - Sanbiki no Yosouya (Japan)
-	- Hyper Lode Runner (World)
+	- Hyper Lode Runner (Japan?)
 	- The Jetsons - Robot Panic (USA, Rev 1)
 	- Jungle Strike (USA)
 	- Kaseki Sousei Reborn (Japan, Rev 1)
@@ -2090,8 +2076,9 @@ license:CC0
 		<description>Beethoven (Europe)</description>
 		<year>1994</year>
 		<publisher>Hi Tech Expressions</publisher>
-		<info name="alt_title" value="Beethoven - The Ultimate Canine Caper (Box)" />
+		<info name="alt_title" value="Beethoven - The Ultimate Canine Caper! (Box)" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<dataarea name="rom" size="131072">
 				<rom name="beethoven's 2nd (europe).bin" size="131072" crc="637e54e3" sha1="a175778faca00f096f0bfdbaa844a38816bbeb0f" />
 			</dataarea>
@@ -9474,6 +9461,7 @@ license:CC0
 	</software>
 
 	<software name="hyperloda">
+		<!--	Region "A" according to filename	-->
 		<description>Hyper Lode Runner (World, Rev 1)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -9492,7 +9480,8 @@ license:CC0
 	<software name="hyperlod" cloneof="hyperloda">
 		<!--	In lot check as "dmghla-0.011"	-->
 		<!--	Retail cartridge not yet secured	-->
-		<description>Hyper Lode Runner (World)</description>
+		<!--	Region "A" according to filename	-->
+		<description>Hyper Lode Runner (Japan?)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="gold" value="19890609" />
@@ -16461,7 +16450,7 @@ license:CC0
 		<!--	In lot check as "dmgpca-0.159"	-->
 		<!--	Lot check ROM is padded with FFs to twice its size, but correct size is 512kb (64KB) according to the official release spreadsheet	-->
 		<!--	Retail cartridge not yet secured	-->
-		<!--	World version according to region code	-->
+		<!--	Region "A" according to filename	-->
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Pac-Man (Japan)</description>
 		<year>1990</year>
