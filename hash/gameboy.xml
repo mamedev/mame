@@ -11920,10 +11920,13 @@ license:CC0
 	</software>
 
 	<software name="zeldalnka" cloneof="zeldalnk">
+		<!--	In lot check as "DMGZLE-1.858"	-->
+		<!--	Region code "E" (USA)	-->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-UKV, DMG-ZL-ESP-1, DMG-ZL-CAN" />
+		<info name="gold" value="19930805" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -11935,10 +11938,13 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkb" cloneof="zeldalnk">
+		<!--	In lot check as "DMGZLE-0.858"	-->
+		<!--	Region code "E" (USA)	-->
 		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-CAN, DMG-ZL-UKV, DMG-ZL-USA" />
+		<info name="gold" value="19930602" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -11956,10 +11962,12 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkc" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Canada)</description>
+		<!--	In lot check as "DMGZCF-0.888"	-->
+		<description>The Legend of Zelda - Link's Awakening (Canada, French)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZC-CAN" />
+		<info name="gold" value="19930901" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -11977,10 +11985,12 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkf" cloneof="zeldalnk">
+		<!--	In lot check as "DMGZLF-0.872"	-->
 		<description>The Legend of Zelda - Link's Awakening (France)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-FRA" />
+		<info name="gold" value="19930805" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -11998,10 +12008,12 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkg" cloneof="zeldalnk">
+		<!--	In lot check as "DMGZLD-0.873"	-->
 		<description>The Legend of Zelda - Link's Awakening (Germany)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-NOE" />
+		<info name="gold" value="19930805" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -26457,11 +26469,12 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkj" cloneof="zeldalnk">
+		<!--	In lot check as "DMGZLJ-1.836"	-->
 		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, Rev 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZLJ, DMG-407 CHN" />
-		<info name="release" value="19930606" />
+		<info name="gold" value="19930728" />
 		<info name="alt_title" value="ゼルダの伝説 夢をみる島" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -26474,10 +26487,12 @@ license:CC0
 	</software>
 
 	<software name="zeldalnkja" cloneof="zeldalnk">
+		<!--	In lot check as "DMGZLJ-0.836"	-->
 		<description>Zelda no Densetsu - Yume o Miru Shima (Japan)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZLJ" />
+		<info name="gold" value="19930430" />
 		<info name="release" value="19930606" />
 		<info name="alt_title" value="ゼルダの伝説 夢をみる島" />
 		<part name="cart" interface="gameboy_cart">
