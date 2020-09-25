@@ -308,11 +308,11 @@ void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - audio streamer for
+//  sound_stream_update - audio streamer for
 //  laserdiscs
 //-------------------------------------------------
 
-void laserdisc_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// compute AND values based on the squelch
 	int16_t leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;
@@ -324,12 +324,12 @@ void laserdisc_device::sound_stream_update_legacy(sound_stream &stream, stream_s
 		samples_avail += m_audiobufsize;
 
 	// if no attached ld, just clear the buffers
-	stream_sample_t *dst0 = outputs[0];
-	stream_sample_t *dst1 = outputs[1];
-	if (samples_avail < samples)
+	auto &dst0 = outputs[0];
+	auto &dst1 = outputs[1];
+	if (samples_avail < outputs[0].samples())
 	{
-		memset(dst0, 0, samples * sizeof(dst0[0]));
-		memset(dst1, 0, samples * sizeof(dst1[0]));
+		dst0.fill(0);
+		dst1.fill(0);
 	}
 
 	// otherwise, stream from our buffer
@@ -340,10 +340,11 @@ void laserdisc_device::sound_stream_update_legacy(sound_stream &stream, stream_s
 		int sampout = m_audiobufout;
 
 		// copy samples, clearing behind us as we go
-		while (sampout != m_audiobufin && samples-- > 0)
+		int sampindex;
+		for (sampindex = 0; sampout != m_audiobufin && sampindex < outputs[0].samples(); sampindex++)
 		{
-			*dst0++ = buffer0[sampout] & leftand;
-			*dst1++ = buffer1[sampout] & rightand;
+			dst0.put_int(sampindex, buffer0[sampout] & leftand, 32768);
+			dst1.put_int(sampindex, buffer1[sampout] & rightand, 32768);
 			buffer0[sampout] = 0;
 			buffer1[sampout] = 0;
 			sampout++;
@@ -353,16 +354,16 @@ void laserdisc_device::sound_stream_update_legacy(sound_stream &stream, stream_s
 		m_audiobufout = sampout;
 
 		// clear out the rest of the buffer
-		if (samples > 0)
+		if (sampindex < outputs[0].samples())
 		{
 			sampout = (m_audiobufout == 0) ? m_audiobufsize - 1 : m_audiobufout - 1;
-			stream_sample_t fill0 = buffer0[sampout] & leftand;
-			stream_sample_t fill1 = buffer1[sampout] & rightand;
+			s32 fill0 = buffer0[sampout] & leftand;
+			s32 fill1 = buffer1[sampout] & rightand;
 
-			while (samples-- > 0)
+			for ( ; sampindex < outputs[0].samples(); sampindex++)
 			{
-				*dst0++ = fill0;
-				*dst1++ = fill1;
+				dst0.put_int(sampindex, fill0, 32768);
+				dst1.put_int(sampindex, fill1, 32768);
 			}
 		}
 	}
@@ -762,7 +763,7 @@ void laserdisc_device::init_audio()
 	m_audio_callback.resolve();
 
 	// allocate a stream
-	m_stream = stream_alloc_legacy(0, 2, 48000);
+	m_stream = stream_alloc(0, 2, 48000);
 
 	// allocate audio buffers
 	m_audiomaxsamples = ((uint64_t)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;

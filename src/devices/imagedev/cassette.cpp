@@ -236,7 +236,7 @@ void cassette_image_device::device_start()
 	m_state = m_default_state;
 	m_value = 0;
 
-	stream_alloc_legacy(0, (m_stereo? 2:1), machine().sample_rate());
+	stream_alloc(0, m_stereo? 2:1, machine().sample_rate());
 }
 
 image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
@@ -404,37 +404,29 @@ std::string cassette_image_device::call_display()
 //  Cassette sound
 //-------------------------------------------------
 
-void cassette_image_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void cassette_image_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *left_buffer = outputs[0];
-	stream_sample_t *right_buffer = nullptr;
-
-	if (m_stereo)
-		right_buffer = outputs[1];
-
 	cassette_state state = get_state() & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER);
 
 	if (exists() && (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)))
 	{
 		cassette_image *cassette = get_image();
 		double time_index = get_position();
-		double duration = ((double) samples) / machine().sample_rate();
+		double duration = ((double) outputs[0].samples()) / outputs[0].sample_rate();
 
-		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, left_buffer, CASSETTE_WAVEFORM_16BIT);
-		if (m_stereo)
-			cassette_get_samples(cassette, 1, time_index, duration, samples, 2, right_buffer, CASSETTE_WAVEFORM_16BIT);
+		if (m_samples.size() < outputs[0].samples())
+			m_samples.resize(outputs[0].samples());
 
-		for (int i = samples - 1; i >= 0; i--)
+		for (int ch = 0; ch < outputs.size(); ch++)
 		{
-			left_buffer[i] = ((int16_t *) left_buffer)[i];
-			if (m_stereo)
-				right_buffer[i] = ((int16_t *) right_buffer)[i];
+			cassette_get_samples(cassette, 0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], CASSETTE_WAVEFORM_16BIT);
+			for (int sampindex = 0; sampindex < outputs[ch].samples(); sampindex++)
+				outputs[ch].put_int(sampindex, m_samples[sampindex], 32768);
 		}
 	}
 	else
 	{
-		memset(left_buffer, 0, sizeof(*left_buffer) * samples);
-		if (m_stereo)
-			memset(right_buffer, 0, sizeof(*right_buffer) * samples);
+		for (int ch = 0; ch < outputs.size(); ch++)
+			outputs[ch].fill(0);
 	}
 }
