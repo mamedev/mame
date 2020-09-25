@@ -380,7 +380,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="80 track"/>
-			<dataarea name="flop" size="102400">
+			<dataarea name="flop" size="204800">
 				<rom name="Music City_80t.ssd" size="204800" crc="65621356" sha1="d1512754ef1896c64cd220761b3aa9a5bfe8865e"/>
 			</dataarea>
 		</part>
