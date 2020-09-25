@@ -439,6 +439,12 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	int tracks, heads;
 	image->get_maximal_geometry(tracks, heads);
 
+	m_mode.clear();
+	m_track.clear();
+	m_head.clear();
+	m_sector_count.clear();
+	m_ssize.clear();
+
 	while(pos < size) {
 		m_mode.push_back(img[pos++]);
 		m_track.push_back(img[pos++]);
