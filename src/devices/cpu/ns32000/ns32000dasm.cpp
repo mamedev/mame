@@ -272,7 +272,7 @@ const char *const ns32000_disassembler::Format2[] =
 };
 const char *const ns32000_disassembler::Format3[] =
 {
-	"CXPD", "Trap (UND)", "BICPSR", "Trap (UND)", "JUMP", "Trap (UND)", "BISPSR", "Trap (UND)", "Trap (UND)", "Trap (UND)", "ADJSPi", "Trap (UND)", "JSR", "Trap (UND)", "CASEi", "Trap (UND)"
+	"CXPD", "Trap (UND)", "BICPSRi", "Trap (UND)", "JUMP", "Trap (UND)", "BISPSRi", "Trap (UND)", "Trap (UND)", "Trap (UND)", "ADJSPi", "Trap (UND)", "JSR", "Trap (UND)", "CASEi", "Trap (UND)"
 };
 const char *const ns32000_disassembler::Format4[] =
 {
@@ -569,7 +569,10 @@ void ns32000_disassembler::stream_gen(std::ostream &stream, u8 gen_addr, u8 op_l
 		/* External */
 		disp1 = get_disp(pc, opcodes);
 		disp2 = get_disp(pc, opcodes);
-		util::stream_format(stream, "EXT(%d)+%d", disp1, disp2);
+		if (disp2)
+			util::stream_format(stream, "EXT(%d)+%d", disp1, disp2);
+		else
+			util::stream_format(stream, "EXT(%d)", disp1);
 		break;
 	case 0x17:
 		/* Top Of Stack */

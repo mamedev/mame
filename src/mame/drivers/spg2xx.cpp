@@ -317,6 +317,14 @@ void spg2xx_game_gssytts_state::mem_map_upperbank(address_map &map)
 	map(0x200000, 0x3fffff).bankr("upperbank");
 }
 
+
+void spg2xx_game_wfcentro_state::mem_map_wfcentro(address_map &map)
+{
+	map(0x000000, 0x37ffff).bankr("cartbank");
+	map(0x380000, 0x3fffff).ram();
+}
+
+
 static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuring out of inputs
 	PORT_START("P1")
 	PORT_DIPNAME( 0x0001, 0x0001, "P1:0001" )
@@ -629,6 +637,19 @@ static INPUT_PORTS_START( abltenni )
 	PORT_MODIFY("P3")
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( ordentv )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( fordrace )
 	PORT_INCLUDE( spg2xx )
 
@@ -659,8 +680,32 @@ static INPUT_PORTS_START( fordrace )
 	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spg2xx_game_fordrace_state, wheel_r)
 
 	PORT_START("WHEEL_REAL")
-	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")  
+	PORT_BIT(0x1fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x1fff) PORT_NAME("Wheel")
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( totspies )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// unit also has a 'select' button next to 'OK' and while test mode shows it onscreen too, it doesn't get tested, so probably isn't connected to anything?
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("OK")
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 
 CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
 {
@@ -669,7 +714,7 @@ CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel_r)
 
 CUSTOM_INPUT_MEMBER(spg2xx_game_fordrace_state::wheel2_r)
 {
-//	return 0x0800;
+//  return 0x0800;
 	uint16_t dat = ioport("WHEEL_REAL")->read();
 
 	return ((dat >> 1) ^ 0xfff) + (dat & 1);
@@ -821,6 +866,31 @@ static INPUT_PORTS_START( guitarss )
 
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( senwfit )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )  PORT_16WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_16WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )  PORT_16WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_16WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Weight Left")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Weight Right")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Up-Left")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Down-Left")
+	PORT_BIT( 0x1c00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Up-Right")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Down-Right")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jjstrip )
 	PORT_START("P1") // active LOW or HIGH?
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -954,6 +1024,48 @@ static INPUT_PORTS_START( tmntbftc )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( hotwheels )
+	// 2 pads, each pad has 4 directions and 1 button, and an internal solder pad to select type, but input reading code seems a bit more complex
+	// the unit this was dumped from was a PAL, with P1 as 'Bling' and P2 as 'Tuner' so those are the defaults used
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x0500, 0x0000, "Player 2 Controller Type" )
+	PORT_CONFSETTING(      0x0000, "Tuner" )
+	PORT_CONFSETTING(      0x0100, "Off-Road" )
+	//PORT_CONFSETTING(      0x0400, "Tuner" )
+	PORT_CONFSETTING(      0x0500, "Nothing" )
+	PORT_BIT( 0x0a00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )   
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )  
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )  
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )     
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     
+	PORT_CONFNAME( 0x0080, 0x0000, "Player 1 Controller Type" )
+	PORT_CONFSETTING(      0x0000, "Bling" )
+	PORT_CONFSETTING(      0x0080, "Rally" )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P1EXTRA")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag  (ACTIVE_HIGH = NTSC, ACTIVE_LOW = PAL)
+	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )   PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )   PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_PLAYER(2)  
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3") // never read?
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -1025,6 +1137,13 @@ void spg2xx_game_state::spg2xx(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
 }
 
+void spg2xx_game_state::spg2xx_pal(machine_config& config)
+{
+	spg2xx(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
 
 void spg2xx_game_fordrace_state::fordrace(machine_config &config)
 {
@@ -1076,9 +1195,9 @@ void spg2xx_game_senspeed_state::senspeed(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_senspeed_state::portb_w));
 
 	/*
-		ATMLH806
-		02B 1
-		A7J4565E
+	    ATMLH806
+	    02B 1
+	    A7J4565E
 	*/
 	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
 }
@@ -1395,7 +1514,7 @@ void spg2xx_game_gssytts_state::portc_w(offs_t offset, uint16_t data, uint16_t m
 
 void spg2xx_game_gssytts_state::machine_start()
 {
-	m_upperbank->configure_entries(0, 4, memregion("maincpu")->base(), 0x400000);
+	m_upperbank->configure_entries(0, memregion("maincpu")->bytes()/0x400000, memregion("maincpu")->base(), 0x400000);
 	m_upperbank->set_entry(1);
 
 	spg2xx_game_state::machine_start();
@@ -1426,6 +1545,75 @@ void spg2xx_game_gssytts_state::gssytts(machine_config &config)
 }
 
 
+void spg2xx_game_wfcentro_state::wfcentro(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_wfcentro_state::mem_map_wfcentro);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_wfcentro_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_wfcentro_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_wfcentro_state::base_portc_r));
+}
+
+
+
+void spg2xx_game_senwfit_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int bank = 0;
+
+	logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	if (mem_mask & 1)
+		if (data & 1)
+			bank |= 1;
+
+	if (mem_mask & 2)
+		if (data & 2)
+			bank |= 2;
+
+	if (mem_mask & 4)
+		if (data & 4)
+			bank |= 4;
+
+	m_upperbank->set_entry(bank);
+	m_maincpu->invalidate_cache();
+}
+
+
+void spg2xx_game_senwfit_state::init_senwfit()
+{
+	uint8_t *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	std::vector<u8> buffer(len);
+
+	for (int i = 0; i < len; i++)
+	{
+		int newaddr = bitswap<25>(i, 24,23,22,20,9,19,18,21,17,16,15,14,13,12,11,10,8,7,6,5,4,3,2,1,0);
+		buffer[i] = src[newaddr];
+	}
+	std::copy(buffer.begin(), buffer.end(), &src[0]);
+
+}
+
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
 	rad_skat(config);
@@ -1448,6 +1636,81 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_maincpu->i2c_w().set(FUNC(spg2xx_game_state::i2c_w));
 	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
+
+uint16_t spg2xx_game_ordentv_state::ordentv_portc_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = m_io_p3->read() ^ (machine().rand() & 1);
+	logerror("%s: Port C Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void spg2xx_game_ordentv_state::ordentv(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_ordentv_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_ordentv_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_ordentv_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_ordentv_state::ordentv_portc_r));
+}
+
+
+void spg2xx_game_hotwheels_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	m_porta_dat_hot = data;
+}
+
+uint16_t spg2xx_game_hotwheels_state::hotwheels_porta_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data;
+	if (m_porta_dat_hot)
+		data = m_io_p1->read();
+	else
+		data = m_io_p1_extra->read();
+
+	logerror("%s: Port A Read: %04x (%04x)\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_hotwheels_state::mem_map_2m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_hotwheels_state::hotwheels_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_hotwheels_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_hotwheels_state::base_portc_r));
+
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_hotwheels_state::porta_w));
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
+
+
+
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -1481,10 +1744,14 @@ ROM_START( abltenni )
 	ROM_LOAD16_WORD_SWAP( "ablpnpwirelesstennis.bin", 0x000000, 0x400000, CRC(66bd8ef1) SHA1(a83640d5d9e84e10d29a065a61e0d7bbec16c6e4) )
 ROM_END
 
+ROM_START( totspies )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "w321tg.u2", 0x000000, 0x400000, CRC(76152ad7) SHA1(b37ea950670eb927f3f0ab5e38d0e2a5f3ca7904) )
+ROM_END
+
 ROM_START( ablkickb )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ablkickboxing.bin", 0x000000, 0x800000,  CRC(61394c45) SHA1(291d28a39edcb32a8f5d776a5e5c05e6fd0abece) )
-	ROM_LOAD16_WORD_SWAP( "fm25q16a.bin", 0x800000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
 ROM_START( lxspidaj )
@@ -1548,7 +1815,10 @@ ROM_START( gssytts )
 	ROM_CONTINUE(0x800000, 0x800000) // 2nd 8mb
 ROM_END
 
-
+ROM_START( senwfit )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "wirelessfit.bin", 0x000000, 0x2000000, CRC(bfdc9c56) SHA1(dd0d4262720fcc3fab5b66d39df9be3419b07178) )
+ROM_END
 
 
 ROM_START( jjstrip )
@@ -1592,10 +1862,37 @@ ROM_START( vtechtvsgr )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
 ROM_END
 
+ROM_START( jouet )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jouet.bin", 0x000000, 0x400000, CRC(da46097e) SHA1(f760f4d126a8291b7dacdea7a70691b25ad8b989) )
+ROM_END
+
 ROM_START( senspeed )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "speedracer.bin", 0x000000, 0x800000, CRC(4efbcd39) SHA1(2edffbaa9ea309ad308fa60f32d8b7a98ee313c7) )
 ROM_END
+
+ROM_START( ordentv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "taikeeordenadortv.bin", 0x000000, 0x800000, CRC(ba15895a) SHA1(0a18076cbc3264c91473b8518dfb10d679321b47) )
+ROM_END
+
+ROM_START( wfcentro )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "winfuncentro.bin", 0x000000, 0x800000, CRC(fd6ad052) SHA1(78af844729bf4843dc70531349e38a8c25caf748) )
+ROM_END
+
+ROM_START( tiktokmm )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "webcamthingy.bin", 0x000000, 0x800000, CRC(54c0d4a9) SHA1(709ee607ca447baa6f7e686268df1998372fe617) )
+ROM_END
+
+
+ROM_START( hotwhl2p )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "hotwheels.bin", 0x000000, 0x400000, CRC(f3520b74) SHA1(02a53558d68cf3640a9ab09514cd6cebff8b30af) )
+ROM_END
+
 
 void spg2xx_game_state::init_crc()
 {
@@ -1645,6 +1942,13 @@ void spg2xx_game_albkickb_state::init_ablkickb()
 	decrypt_ac_ff(ROM, size);
 }
 
+void spg2xx_game_ordentv_state::init_ordentv()
+{
+	// the game will die by jumping to an infinite loop if this check fails, what is it checking?
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x4fef8] = 0xee07;
+}
+
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
@@ -1657,13 +1961,15 @@ CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,   
 CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
 // ABL TV Games
-CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "f / V-Tac Technology Co Ltd.",                           "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, ablkickb,   0,        0, ablkickb,  ablkickb,  spg2xx_game_albkickb_state, init_ablkickb, "Advance Bright Ltd / Coleco / V-Tac Technology Co Ltd.", "Kick Boxing (BJ8888, ABL TV Game)",                                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // 4 motion sensors, one for each limb
 
-CONS( 2007, lxspidaj,   0,        0, spg2xx,    lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, lxspidaj,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_state, init_ablkickb, "Lexibook",                                               "Spider-Man Super TV Air Jet (Lexibook Junior, JG6000SP)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2008, comil,      0,        0, comil,     comil,     spg2xx_game_comil_state,    empty_init,    "Character Options",                                      "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -1682,11 +1988,16 @@ CONS( 200?, guitarssa,  guitarss, 0, spg2xx,    guitarss,  spg2xx_game_state,   
 // The sequel has 'You Take The Stage' on both the box and title screen
 CONS( 2009, gssytts,    0,        0, gssytts,   guitarss,  spg2xx_game_gssytts_state,  empty_init,    "Senario",                                                "Guitar Super Star: You Take The Stage",                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
-CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_state, empty_init,    "Senario",                                                "Speed Racer (Senario)",                                                 MACHINE_NOT_WORKING )
+// ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
+CONS( 200?, jouet, 0,             0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "<unknown>",                                              "10 Jeux Interactifs / Jeux Pour Filles (France)",                       MACHINE_NOT_WORKING )
+
+CONS( 2008, senspeed,  0,         0, senspeed,  senspeed,  spg2xx_game_senspeed_state, empty_init,    "Senario",                                                "Speed Racer (Senario)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, jjstrip,    0,        0, tvsprt10,  jjstrip,   spg2xx_game_state,          empty_init,    "Shiggles Inc.",                                          "Club Jenna Presents: Jenna Jameson's Strip Poker",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -1702,6 +2013,14 @@ CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_
 CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_state,  init_swclone,  "Hasbro / Tiger Electronics",                             "Star Wars - The Clone Wars",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
-CONS( 2005, mattelcs,   0,        0, rad_skat, mattelcs,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// Both the WiWi and Fox Sports units seem to be related to the 'Virtual Interactive' (aka 'Vi') console
+// there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
+CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
+
+CONS( 200?, wfcentro,   0,        0, wfcentro,  spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "WinFun",                                                 "Centro TV de Diseno Artistico (Spain)",                                 MACHINE_NOT_WORKING )
+
+// set 2862 to 0003 (irq enable) when it stalls on boot to show something (doesn't turn on IRQs again otherwise?) needs camera emulating
+CONS( 200?, tiktokmm,   0,        0, spg2xx,    spg2xx,    spg2xx_game_wfcentro_state, empty_init,    "TikTokTech Ltd. / 3T Games / Senario",                   "Moving Music (MM-TV110)",                                 MACHINE_NOT_WORKING )

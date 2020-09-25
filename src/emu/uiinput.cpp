@@ -5,6 +5,7 @@
     uiinput.cpp
 
     Internal MAME user interface input state.
+
 ***************************************************************************/
 
 #include "emu.h"

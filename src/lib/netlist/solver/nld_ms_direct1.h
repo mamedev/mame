@@ -24,10 +24,10 @@ namespace solver
 		using float_type = FT;
 		using base_type = matrix_solver_direct_t<FT, 1>;
 
-		matrix_solver_direct1_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
-			const solver_parameters_t *params)
-			: matrix_solver_direct_t<FT, 1>(anetlist, name, nets, params, 1)
+		matrix_solver_direct1_t(devices::nld_solver &main_solver, const pstring &name,
+			const matrix_solver_t::net_list_t &nets,
+			const solver::solver_parameters_t *params)
+			: matrix_solver_direct_t<FT, 1>(main_solver, name, nets, params, 1)
 			{}
 
 		// ----------------------------------------------------------------------------------------

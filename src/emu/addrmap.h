@@ -483,7 +483,6 @@ public:
 	void global_mask(offs_t mask);
 	void unmap_value_low() { m_unmapval = 0; }
 	void unmap_value_high() { m_unmapval = ~0; }
-	void unmap_value(u8 value) { m_unmapval = value; }
 
 	// add a new entry of the given type
 	address_map_entry &operator()(offs_t start, offs_t end);

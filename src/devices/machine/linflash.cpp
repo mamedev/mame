@@ -26,14 +26,14 @@ device_memory_interface::space_config_vector linear_flash_pccard_device::memory_
 	return space_config_vector{ std::make_pair(0, &m_space_config) };
 }
 
-READ16_MEMBER( linear_flash_pccard_device::read_memory )
+uint16_t linear_flash_pccard_device::read_memory(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_space->read_word(offset * 2, mem_mask);
 	//printf( "<%08x %04x %04x\n", offset, data, mem_mask );
 	return data;
 }
 
-WRITE16_MEMBER( linear_flash_pccard_device::write_memory )
+void linear_flash_pccard_device::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf( ">%08x %04x %04x\n", offset, data, mem_mask );
 	m_space->write_word(offset * 2, data, mem_mask);

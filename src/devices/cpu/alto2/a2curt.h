@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2CURT_H_
-#define _A2CURT_H_
+#ifndef MAME_CPU_ALTO2_A2CURT_H
+#define MAME_CPU_ALTO2_A2CURT_H
 
 //! F2 functions for cursor task
 enum {
@@ -24,5 +24,5 @@ void activate_curt();                           //!< curt_activate: called by th
 void init_curt(int task = task_curt);           //!< initialize cursor task
 void exit_curt();                               //!< deinitialize cursor task
 void reset_curt();                              //!< reset cursor task
-#endif // _A2CURT_H_
+#endif // MAME_CPU_A2CURT_H
 #endif  // ALTO2_DEFINE_CONSTANTS

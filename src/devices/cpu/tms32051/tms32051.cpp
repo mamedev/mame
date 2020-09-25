@@ -444,7 +444,7 @@ void tms32051_device::execute_run()
 
 /*****************************************************************************/
 
-READ16_MEMBER( tms32051_device::cpuregs_r )
+uint16_t tms32051_device::cpuregs_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -529,7 +529,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 	return 0;
 }
 
-WRITE16_MEMBER( tms32051_device::cpuregs_w )
+void tms32051_device::cpuregs_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{

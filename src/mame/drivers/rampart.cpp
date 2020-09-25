@@ -10,12 +10,12 @@
         * Rampart (1990) [4 sets]
 
     Known bugs:
-        * P3 trackball doesn't work, maybe it needs some kind of fake input port
+        * none at this time
 
     Note:
         P3 buttons 1 and 2 are mapped twice. THIS IS NOT A BUG!
 
-    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g}
+    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g} <- what's this for?
 
 ****************************************************************************
 

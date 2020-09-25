@@ -77,7 +77,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 void ymz770_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sclock);
+	m_stream = stream_alloc(0, 2, m_sclock);
 
 	for (auto & channel : m_channels)
 	{
@@ -182,14 +182,12 @@ void ymz770_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ymz770_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *outL, *outR;
+	auto &outL = outputs[0];
+	auto &outR = outputs[1];
 
-	outL = outputs[0];
-	outR = outputs[1];
-
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outL.samples(); i++)
 	{
 		sequencer();
 
@@ -282,8 +280,8 @@ retry:
 		}
 		if (m_mute)
 			mixr = mixl = 0;
-		outL[i] = mixl;
-		outR[i] = mixr;
+		outL.put_int(i, mixl, 32768);
+		outR.put_int(i, mixr, 32768);
 	}
 }
 

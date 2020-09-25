@@ -50,16 +50,16 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE8_MEMBER(prog_if_w);
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
-	DECLARE_READ32_MEMBER(address_base_r);
-	DECLARE_WRITE32_MEMBER(address_base_w);
-	DECLARE_WRITE32_MEMBER(subsystem_id_w);
-	DECLARE_READ32_MEMBER(ide_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide_write_cs1);
-	DECLARE_READ32_MEMBER(ide2_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
+	void prog_if_w(uint8_t data);
+	uint32_t pcictrl_r(offs_t offset);
+	void pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t address_base_r(offs_t offset);
+	void address_base_w(offs_t offset, uint32_t data);
+	void subsystem_id_w(uint32_t data);
+	uint32_t ide_read_cs1(offs_t offset, uint32_t mem_mask = ~0);
+	void ide_write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide2_read_cs1(offs_t offset, uint32_t mem_mask = ~0);
+	void ide2_write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;

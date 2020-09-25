@@ -131,12 +131,12 @@ void cesblit_device::device_stop()
     READ/WRITE HANDLERS
 ***************************************************************************/
 
-READ16_MEMBER(cesblit_device::status_r)
+uint16_t cesblit_device::status_r()
 {
 	return 0x0000;  // bit 7 = blitter busy
 }
 
-WRITE16_MEMBER(cesblit_device::regs_w)
+void cesblit_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t olddata = m_regs[offset];
 	uint16_t newdata = COMBINE_DATA( &m_regs[offset] );
@@ -158,12 +158,12 @@ WRITE16_MEMBER(cesblit_device::regs_w)
 	}
 }
 
-WRITE16_MEMBER(cesblit_device::color_w)
+void cesblit_device::color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_color );
 }
 
-WRITE16_MEMBER(cesblit_device::addr_hi_w)
+void cesblit_device::addr_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_addr_hi );
 }

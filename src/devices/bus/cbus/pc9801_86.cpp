@@ -169,10 +169,10 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 void pc9801_86_device::device_start()
 {
 	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
-	m_bus->install_io(0xa460, 0xa463, read8_delegate(*this, FUNC(pc9801_86_device::id_r)), write8_delegate(*this, FUNC(pc9801_86_device::mask_w)));
-	m_bus->install_io(0xa464, 0xa46f, read8_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
-	m_bus->install_io(0xa66c, 0xa66f, read8_delegate(*this, [this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
-								   write8_delegate(*this, [this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+	m_bus->install_io(0xa460, 0xa463, read8smo_delegate(*this, FUNC(pc9801_86_device::id_r)), write8smo_delegate(*this, FUNC(pc9801_86_device::mask_w)));
+	m_bus->install_io(0xa464, 0xa46f, read8sm_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
+	m_bus->install_io(0xa66c, 0xa66f, read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+								   write8sm_delegate(*this, [this](offs_t o, u8 d){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
 
 	m_dac_timer = timer_alloc();
 	save_item(NAME(m_count));
@@ -189,7 +189,7 @@ void pc9801_86_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008f, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(*this, FUNC(pc9801_86_device::opna_r)), write8_delegate(*this, FUNC(pc9801_86_device::opna_w)));
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8sm_delegate(*this, FUNC(pc9801_86_device::opna_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::opna_w)));
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
@@ -207,7 +207,7 @@ void pc9801_86_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_86_device::opna_r)
+uint8_t pc9801_86_device::opna_r(offs_t offset)
 {
 	if((offset & 1) == 0)
 		return m_opna->read(offset >> 1);
@@ -218,7 +218,7 @@ READ8_MEMBER(pc9801_86_device::opna_r)
 	}
 }
 
-WRITE8_MEMBER(pc9801_86_device::opna_w)
+void pc9801_86_device::opna_w(offs_t offset, uint8_t data)
 {
 	if((offset & 1) == 0)
 		m_opna->write(offset >> 1,data);
@@ -226,17 +226,17 @@ WRITE8_MEMBER(pc9801_86_device::opna_w)
 		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
-READ8_MEMBER(pc9801_86_device::id_r)
+uint8_t pc9801_86_device::id_r()
 {
 	return 0x40 | m_mask;
 }
 
-WRITE8_MEMBER(pc9801_86_device::mask_w)
+void pc9801_86_device::mask_w(uint8_t data)
 {
 	m_mask = data & 1;
 }
 
-READ8_MEMBER(pc9801_86_device::pcm_r)
+uint8_t pc9801_86_device::pcm_r(offs_t offset)
 {
 	if((offset & 1) == 0)
 	{
@@ -258,7 +258,7 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_86_device::pcm_w)
+void pc9801_86_device::pcm_w(offs_t offset, uint8_t data)
 {
 	const u32 rate = (25.4_MHz_XTAL).value() / 16;
 	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
@@ -421,7 +421,7 @@ void pc9801_speakboard_device::device_start()
 {
 	pc9801_86_device::device_start();
 
-	m_bus->install_io(0x0588, 0x058f, read8_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_r)), write8_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_w)));
+	m_bus->install_io(0x0588, 0x058f, read8sm_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_r)), write8sm_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_w)));
 }
 
 void pc9801_speakboard_device::device_reset()
@@ -429,7 +429,7 @@ void pc9801_speakboard_device::device_reset()
 	pc9801_86_device::device_reset();
 }
 
-READ8_MEMBER(pc9801_speakboard_device::opna_slave_r)
+uint8_t pc9801_speakboard_device::opna_slave_r(offs_t offset)
 {
 	if((offset & 1) == 0)
 		return m_opna_slave->read(offset >> 1);
@@ -440,7 +440,7 @@ READ8_MEMBER(pc9801_speakboard_device::opna_slave_r)
 	}
 }
 
-WRITE8_MEMBER(pc9801_speakboard_device::opna_slave_w)
+void pc9801_speakboard_device::opna_slave_w(offs_t offset, uint8_t data)
 {
 	if((offset & 1) == 0)
 		m_opna_slave->write(offset >> 1,data);

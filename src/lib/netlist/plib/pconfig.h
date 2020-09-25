@@ -8,7 +8,7 @@
 /// \file pconfig.h
 ///
 
-/// \brief More accurate measurements if you processor supports RDTSCP.
+/// \brief More accurate measurements the processor supports RDTSCP.
 ///
 #ifndef PHAS_RDTSCP
 #define PHAS_RDTSCP (0)
@@ -41,7 +41,11 @@
 /// Set this to one if you want to use aligned storage optimizations.
 ///
 #ifndef PUSE_ALIGNED_OPTIMIZATIONS
+#if defined(__EMSCRIPTEN__)
 #define PUSE_ALIGNED_OPTIMIZATIONS (0)
+#else
+#define PUSE_ALIGNED_OPTIMIZATIONS (1)
+#endif
 #endif
 
 /// \brief Use aligned allocations.
@@ -63,11 +67,13 @@
 
 /// \brief Number of bytes for cache line alignment
 ///
-#define PALIGN_CACHELINE        (16)
+#define PALIGN_CACHELINE        (64)
 
 /// \brief Number of bytes for vector alignment
 ///
-#define PALIGN_VECTOROPT        (16)
+#define PALIGN_VECTOROPT        (32)
+
+#define PALIGN_MIN_SIZE         (16)
 
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)

@@ -99,7 +99,7 @@ void tp84_state::tp84_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
+void tp84_state::tp84_spriteram_w(offs_t offset, uint8_t data)
 {
 	/* the game multiplexes the sprites, so update now */
 //  m_screen->update_now();
@@ -108,7 +108,7 @@ WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
 }
 
 
-READ8_MEMBER(tp84_state::tp84_scanline_r)
+uint8_t tp84_state::tp84_scanline_r()
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();

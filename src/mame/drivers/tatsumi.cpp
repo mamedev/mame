@@ -173,43 +173,43 @@
 /***************************************************************************/
 
 
-WRITE8_MEMBER(cyclwarr_state::cyclwarr_sound_w)
+void cyclwarr_state::cyclwarr_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-READ16_MEMBER(cyclwarr_state::cyclwarr_sprite_r)
+uint16_t cyclwarr_state::cyclwarr_sprite_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(cyclwarr_state::cyclwarr_sprite_w)
+void cyclwarr_state::cyclwarr_sprite_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-WRITE16_MEMBER(cyclwarr_state::bigfight_a40000_w)
+void cyclwarr_state::bigfight_a40000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bigfight_a40000[offset]);
 }
 
 template<int Bank>
-READ16_MEMBER(cyclwarr_state::cyclwarr_videoram_r)
+uint16_t cyclwarr_state::cyclwarr_videoram_r(offs_t offset)
 {
 	return m_cyclwarr_videoram[Bank][offset];
 }
 
 template<int Bank>
-WRITE16_MEMBER(cyclwarr_state::cyclwarr_videoram_w)
+void cyclwarr_state::cyclwarr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram[Bank][offset]);
 	m_layer[(Bank<<1)|0]->mark_tile_dirty(offset);
 	m_layer[(Bank<<1)|1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(cyclwarr_state::output_w)
+void cyclwarr_state::output_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);

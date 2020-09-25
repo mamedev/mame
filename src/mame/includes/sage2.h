@@ -55,7 +55,7 @@ public:
 private:
 	void update_fdc_int();
 
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t rom_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
 	void ppi0_pc_w(uint8_t data);

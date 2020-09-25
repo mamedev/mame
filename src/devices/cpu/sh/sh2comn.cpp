@@ -480,59 +480,59 @@ void sh2_device::sh2_dmac_check(int dmach)
  */
 // TODO: identical to H8 counterpart
 
-READ8_MEMBER( sh2_device::smr_r )
+uint8_t sh2_device::smr_r()
 {
 	return m_smr;
 }
 
-WRITE8_MEMBER( sh2_device::smr_w )
+void sh2_device::smr_w(uint8_t data)
 {
 	m_smr = data;
 }
 
-READ8_MEMBER( sh2_device::brr_r )
+uint8_t sh2_device::brr_r()
 {
 	return m_brr;
 }
 
-WRITE8_MEMBER( sh2_device::brr_w )
+void sh2_device::brr_w(uint8_t data)
 {
 	m_brr = data;
 }
 
-READ8_MEMBER( sh2_device::scr_r )
+uint8_t sh2_device::scr_r()
 {
 	return m_scr;
 }
 
-WRITE8_MEMBER( sh2_device::scr_w )
+void sh2_device::scr_w(uint8_t data)
 {
 	m_scr = data;
 }
 
-READ8_MEMBER( sh2_device::tdr_r )
+uint8_t sh2_device::tdr_r()
 {
 	return m_tdr;
 }
 
-WRITE8_MEMBER( sh2_device::tdr_w )
+void sh2_device::tdr_w(uint8_t data)
 {
 	m_tdr = data;
 	// printf("%c",data & 0xff);
 }
 
-READ8_MEMBER( sh2_device::ssr_r )
+uint8_t sh2_device::ssr_r()
 {
 	// 0x84 is needed by EGWord on Saturn to make it to boot for some reason.
 	return m_ssr | 0x84;
 }
 
-WRITE8_MEMBER( sh2_device::ssr_w )
+void sh2_device::ssr_w(uint8_t data)
 {
 	m_ssr = data;
 }
 
-READ8_MEMBER( sh2_device::rdr_r )
+uint8_t sh2_device::rdr_r()
 {
 	return 0;
 }
@@ -541,12 +541,12 @@ READ8_MEMBER( sh2_device::rdr_r )
  * FRC
  */
 
-READ8_MEMBER( sh2_device::tier_r )
+uint8_t sh2_device::tier_r()
 {
 	return m_tier;
 }
 
-WRITE8_MEMBER( sh2_device::tier_w )
+void sh2_device::tier_w(uint8_t data)
 {
 	sh2_timer_resync();
 	m_tier = data;
@@ -554,7 +554,7 @@ WRITE8_MEMBER( sh2_device::tier_w )
 	sh2_recalc_irq();
 }
 
-READ8_MEMBER( sh2_device::ftcsr_r )
+uint8_t sh2_device::ftcsr_r()
 {
 	// TODO: to be tested
 	if (!m_ftcsr_read_cb.isnull())
@@ -563,7 +563,7 @@ READ8_MEMBER( sh2_device::ftcsr_r )
 	return m_ftcsr;
 }
 
-WRITE8_MEMBER( sh2_device::ftcsr_w )
+void sh2_device::ftcsr_w(uint8_t data)
 {
 	uint8_t old;
 	old = m_ftcsr;
@@ -575,13 +575,13 @@ WRITE8_MEMBER( sh2_device::ftcsr_w )
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::frc_r )
+uint16_t sh2_device::frc_r()
 {
 	sh2_timer_resync();
 	return m_frc;
 }
 
-WRITE16_MEMBER( sh2_device::frc_w )
+void sh2_device::frc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sh2_timer_resync();
 	COMBINE_DATA(&m_frc);
@@ -589,12 +589,12 @@ WRITE16_MEMBER( sh2_device::frc_w )
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::ocra_b_r )
+uint16_t sh2_device::ocra_b_r()
 {
 	return (m_tocr & 0x10) ? m_ocrb : m_ocra;
 }
 
-WRITE16_MEMBER( sh2_device::ocra_b_w )
+void sh2_device::ocra_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sh2_timer_resync();
 	if(m_tocr & 0x10)
@@ -605,12 +605,12 @@ WRITE16_MEMBER( sh2_device::ocra_b_w )
 	sh2_recalc_irq();
 }
 
-READ8_MEMBER( sh2_device::frc_tcr_r )
+uint8_t sh2_device::frc_tcr_r()
 {
 	return m_frc_tcr & 0x83;
 }
 
-WRITE8_MEMBER( sh2_device::frc_tcr_w )
+void sh2_device::frc_tcr_w(uint8_t data)
 {
 	sh2_timer_resync();
 	m_frc_tcr = data & 0x83;
@@ -618,12 +618,12 @@ WRITE8_MEMBER( sh2_device::frc_tcr_w )
 	sh2_recalc_irq();
 }
 
-READ8_MEMBER( sh2_device::tocr_r )
+uint8_t sh2_device::tocr_r()
 {
 	return (m_tocr & 0x13) | 0xe0;
 }
 
-WRITE8_MEMBER( sh2_device::tocr_w )
+void sh2_device::tocr_w(uint8_t data)
 {
 	sh2_timer_resync();
 	// TODO: output levels A/B (bits 1-0)
@@ -632,7 +632,7 @@ WRITE8_MEMBER( sh2_device::tocr_w )
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::frc_icr_r )
+uint16_t sh2_device::frc_icr_r()
 {
 	return m_frc_icr;
 }
@@ -641,26 +641,26 @@ READ16_MEMBER( sh2_device::frc_icr_r )
  * INTC
  */
 
-READ16_MEMBER( sh2_device::intc_icr_r )
+uint16_t sh2_device::intc_icr_r()
 {
 	// TODO: flip meaning based off NMI edge select bit (NMIE)
 	uint16_t nmilv = m_nmi_line_state == ASSERT_LINE ? 0 : 0x8000;
 	return (nmilv) | (m_intc_icr & 0x0101);
 }
 
-WRITE16_MEMBER( sh2_device::intc_icr_w )
+void sh2_device::intc_icr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_intc_icr);
 	m_nmie = bool(BIT(m_intc_icr, 8));
 	m_vecmd = bool(BIT(m_intc_icr, 0));
 }
 
-READ16_MEMBER( sh2_device::ipra_r )
+uint16_t sh2_device::ipra_r()
 {
 	return m_ipra & 0xfff0;
 }
 
-WRITE16_MEMBER( sh2_device::ipra_w )
+void sh2_device::ipra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ipra);
 	m_irq_level.divu = (m_ipra >> 12) & 0xf;
@@ -669,12 +669,12 @@ WRITE16_MEMBER( sh2_device::ipra_w )
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::iprb_r )
+uint16_t sh2_device::iprb_r()
 {
 	return m_iprb & 0xff00;
 }
 
-WRITE16_MEMBER( sh2_device::iprb_w )
+void sh2_device::iprb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_iprb);
 	m_irq_level.sci = (m_iprb >> 12) & 0xf;
@@ -682,36 +682,36 @@ WRITE16_MEMBER( sh2_device::iprb_w )
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::vcra_r )
+uint16_t sh2_device::vcra_r()
 {
 	return m_vcra & 0x7f7f;
 }
 
-WRITE16_MEMBER( sh2_device::vcra_w )
+void sh2_device::vcra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcra);
 	// ...
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::vcrb_r )
+uint16_t sh2_device::vcrb_r()
 {
 	return m_vcrb;
 }
 
-WRITE16_MEMBER( sh2_device::vcrb_w )
+void sh2_device::vcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrb);
 	// ...
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::vcrc_r )
+uint16_t sh2_device::vcrc_r()
 {
 	return m_vcrc & 0x7f7f;
 }
 
-WRITE16_MEMBER( sh2_device::vcrc_w )
+void sh2_device::vcrc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrc);
 	m_irq_vector.fic = (m_vcrc >> 8) & 0x7f;
@@ -719,36 +719,36 @@ WRITE16_MEMBER( sh2_device::vcrc_w )
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::vcrd_r )
+uint16_t sh2_device::vcrd_r()
 {
 	return m_vcrd & 0x7f00;
 }
 
-WRITE16_MEMBER( sh2_device::vcrd_w )
+void sh2_device::vcrd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrd);
 	m_irq_vector.fov = (m_vcrc >> 8) & 0x7f;
 	sh2_recalc_irq();
 }
 
-READ16_MEMBER( sh2_device::vcrwdt_r )
+uint16_t sh2_device::vcrwdt_r()
 {
 	return m_vcrwdt & 0x7f7f;
 }
 
-WRITE16_MEMBER( sh2_device::vcrwdt_w )
+void sh2_device::vcrwdt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrwdt);
 	// ...
 	sh2_recalc_irq();
 }
 
-READ32_MEMBER( sh2_device::vcrdiv_r )
+uint32_t sh2_device::vcrdiv_r()
 {
 	return m_vcrdiv & 0x7f;
 }
 
-WRITE32_MEMBER( sh2_device::vcrdiv_w )
+void sh2_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrdiv);
 	// TODO: unemulated, level is seemingly not documented/settable?
@@ -760,12 +760,12 @@ WRITE32_MEMBER( sh2_device::vcrdiv_w )
  * DIVU
  */
 
-READ32_MEMBER( sh2_device::dvcr_r )
+uint32_t sh2_device::dvcr_r()
 {
 	return (m_divu_ovfie == true ? 2 : 0) | (m_divu_ovf == true ? 1 : 0);
 }
 
-WRITE32_MEMBER( sh2_device::dvcr_w )
+void sh2_device::dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -781,22 +781,22 @@ WRITE32_MEMBER( sh2_device::dvcr_w )
 	}
 }
 
-READ32_MEMBER( sh2_device::dvsr_r )
+uint32_t sh2_device::dvsr_r()
 {
 	return m_dvsr;
 }
 
-WRITE32_MEMBER( sh2_device::dvsr_w )
+void sh2_device::dvsr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvsr);
 }
 
-READ32_MEMBER( sh2_device::dvdnt_r )
+uint32_t sh2_device::dvdnt_r()
 {
 	return m_dvdntl;
 }
 
-WRITE32_MEMBER( sh2_device::dvdnt_w )
+void sh2_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdntl);
 	int32_t a = m_dvdntl;
@@ -816,22 +816,22 @@ WRITE32_MEMBER( sh2_device::dvdnt_w )
 	}
 }
 
-READ32_MEMBER( sh2_device::dvdnth_r )
+uint32_t sh2_device::dvdnth_r()
 {
 	return m_dvdnth;
 }
 
-READ32_MEMBER( sh2_device::dvdntl_r )
+uint32_t sh2_device::dvdntl_r()
 {
 	return m_dvdntl;
 }
 
-WRITE32_MEMBER( sh2_device::dvdnth_w )
+void sh2_device::dvdnth_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdnth);
 }
 
-WRITE32_MEMBER( sh2_device::dvdntl_w )
+void sh2_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdntl);
 	int64_t a = m_dvdntl | ((uint64_t)(m_dvdnth) << 32);
@@ -866,18 +866,18 @@ WRITE32_MEMBER( sh2_device::dvdntl_w )
  * WTC
  */
 
-READ16_MEMBER( sh2_device::wtcnt_r )
+uint16_t sh2_device::wtcnt_r()
 {
 	sh2_wtcnt_recalc();
 	return ((m_wtcsr | 0x18) << 8) | (m_wtcnt & 0xff);
 }
 
-READ16_MEMBER( sh2_device::rstcsr_r )
+uint16_t sh2_device::rstcsr_r()
 {
 	return (m_rstcsr & 0xe0) | 0x1f;
 }
 
-WRITE16_MEMBER( sh2_device::wtcnt_w )
+void sh2_device::wtcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wtcw[0]);
 	switch (m_wtcw[0] & 0xff00)
@@ -911,7 +911,7 @@ WRITE16_MEMBER( sh2_device::wtcnt_w )
 	}
 }
 
-WRITE16_MEMBER( sh2_device::rstcsr_w )
+void sh2_device::rstcsr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wtcw[1]);
 	switch (m_wtcw[1] & 0xff00)
@@ -927,12 +927,12 @@ WRITE16_MEMBER( sh2_device::rstcsr_w )
 	}
 }
 
-READ16_MEMBER( sh2_device::fmr_sbycr_r )
+uint16_t sh2_device::fmr_sbycr_r()
 {
 	return m_sbycr;
 }
 
-WRITE16_MEMBER( sh2_device::fmr_sbycr_w )
+void sh2_device::fmr_sbycr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -952,12 +952,12 @@ WRITE16_MEMBER( sh2_device::fmr_sbycr_w )
 	}
 }
 
-READ8_MEMBER( sh2_device::ccr_r )
+uint8_t sh2_device::ccr_r()
 {
 	return m_ccr & ~0x30;
 }
 
-WRITE8_MEMBER( sh2_device::ccr_w )
+void sh2_device::ccr_w(uint8_t data)
 {
 	/*
 	    xx-- ---- Way 0/1
@@ -970,73 +970,73 @@ WRITE8_MEMBER( sh2_device::ccr_w )
 	m_ccr = data;
 }
 
-READ32_MEMBER( sh2_device::bcr1_r )
+uint32_t sh2_device::bcr1_r()
 {
 	return (m_bcr1 & ~0xe008) | (m_is_slave ? 0x8000 : 0);
 }
 
-WRITE32_MEMBER( sh2_device::bcr1_w )
+void sh2_device::bcr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bcr1);
 }
 
-READ32_MEMBER( sh2_device::bcr2_r )
+uint32_t sh2_device::bcr2_r()
 {
 	return m_bcr2;
 }
 
-WRITE32_MEMBER( sh2_device::bcr2_w )
+void sh2_device::bcr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bcr2);
 }
 
-READ32_MEMBER( sh2_device::wcr_r )
+uint32_t sh2_device::wcr_r()
 {
 	return m_wcr;
 }
 
-WRITE32_MEMBER( sh2_device::wcr_w )
+void sh2_device::wcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_wcr);
 }
 
-READ32_MEMBER( sh2_device::mcr_r )
+uint32_t sh2_device::mcr_r()
 {
 	return m_mcr & ~0x103;
 }
 
-WRITE32_MEMBER( sh2_device::mcr_w )
+void sh2_device::mcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_mcr);
 }
 
-READ32_MEMBER( sh2_device::rtcsr_r )
+uint32_t sh2_device::rtcsr_r()
 {
 	return m_rtcsr & 0xf8;
 }
 
-WRITE32_MEMBER( sh2_device::rtcsr_w )
+void sh2_device::rtcsr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_rtcsr);
 }
 
-READ32_MEMBER( sh2_device::rtcnt_r )
+uint32_t sh2_device::rtcnt_r()
 {
 	return m_rtcnt & 0xff;
 }
 
-WRITE32_MEMBER( sh2_device::rtcnt_w )
+void sh2_device::rtcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_rtcnt);
 	m_rtcnt &= 0xff;
 }
 
-READ32_MEMBER( sh2_device::rtcor_r )
+uint32_t sh2_device::rtcor_r()
 {
 	return m_rtcor & 0xff;
 }
 
-WRITE32_MEMBER( sh2_device::rtcor_w )
+void sh2_device::rtcor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_rtcor);
 	m_rtcor &= 0xff;
@@ -1171,55 +1171,55 @@ void sh2a_device::sh7032_dma_exec(int ch)
 	printf("%02x %02x %02x %1d\n",sm,dm,rs,ts);
 }
 
-READ32_MEMBER(sh2a_device::dma_sar0_r)
+uint32_t sh2a_device::dma_sar0_r()
 {
 	return m_dma[0].sar;
 }
 
-WRITE32_MEMBER(sh2a_device::dma_sar0_w)
+void sh2a_device::dma_sar0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dma[0].sar);
 }
 
-READ32_MEMBER(sh2a_device::dma_dar0_r)
+uint32_t sh2a_device::dma_dar0_r()
 {
 	return m_dma[0].dar;
 }
 
-WRITE32_MEMBER(sh2a_device::dma_dar0_w)
+void sh2a_device::dma_dar0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dma[0].dar);
 }
 
-READ16_MEMBER(sh2a_device::dma_tcr0_r)
+uint16_t sh2a_device::dma_tcr0_r()
 {
 	return m_dma[0].tcr;
 }
 
-WRITE16_MEMBER(sh2a_device::dma_tcr0_w)
+void sh2a_device::dma_tcr0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%04x\n",data);
 	COMBINE_DATA(&m_dma[0].tcr);
 }
 
-READ16_MEMBER(sh2a_device::dma_chcr0_r)
+uint16_t sh2a_device::dma_chcr0_r()
 {
 	return m_dma[0].chcr;
 }
 
-WRITE16_MEMBER(sh2a_device::dma_chcr0_w)
+void sh2a_device::dma_chcr0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%04x CHCR0\n",data);
 	COMBINE_DATA(&m_dma[0].chcr);
 	sh7032_dma_exec(0);
 }
 
-READ16_MEMBER(sh2a_device::dmaor_r)
+uint16_t sh2a_device::dmaor_r()
 {
 	return m_dmaor;
 }
 
-WRITE16_MEMBER(sh2a_device::dmaor_w)
+void sh2a_device::dmaor_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dmaor);
 	sh7032_dma_exec(0);
@@ -1228,7 +1228,7 @@ WRITE16_MEMBER(sh2a_device::dmaor_w)
 /*!
   @brief Dummy debug interface
   */
-READ16_MEMBER(sh1_device::sh7032_r)
+uint16_t sh1_device::sh7032_r(offs_t offset)
 {
 	return m_sh7032_regs[offset];
 }
@@ -1236,12 +1236,12 @@ READ16_MEMBER(sh1_device::sh7032_r)
 /*!
   @brief Dummy debug interface
  */
-WRITE16_MEMBER(sh1_device::sh7032_w)
+void sh1_device::sh7032_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sh7032_regs[offset]);
 }
 
-READ16_MEMBER(sh2a_device::sh7021_r)
+uint16_t sh2a_device::sh7021_r(offs_t offset)
 {
 	return m_sh7021_regs[offset];
 }
@@ -1249,7 +1249,7 @@ READ16_MEMBER(sh2a_device::sh7021_r)
 /*!
   @brief Dummy debug interface
  */
-WRITE16_MEMBER(sh2a_device::sh7021_w)
+void sh2a_device::sh7021_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sh7021_regs[offset]);
 }

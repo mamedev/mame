@@ -21,7 +21,7 @@ public:
 	~speaker_sound_device() {}
 
 	// configuration
-	void set_levels(int num_levels, const int16_t *levels) { m_num_levels = num_levels; m_levels = levels; }
+	void set_levels(int num_levels, const double *levels) { m_num_levels = num_levels; m_levels = levels; }
 
 	void level_w(int new_level); // can use as writeline
 
@@ -32,7 +32,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// Length of anti-aliasing filter kernel, measured in number of intermediate samples
@@ -47,9 +47,9 @@ private:
 	void update_interm_samples(const attotime &time, int volume);
 
 	// Updates the composed volume array and returns final filtered volume of next stream sample
-	double update_interm_samples_get_filtered_volume(int volume);
+	double update_interm_samples_get_filtered_volume(double volume);
 
-	void finalize_interm_sample(int volume);
+	void finalize_interm_sample(double volume);
 	void init_next_interm_sample();
 	inline double make_fraction(const attotime &a, const attotime &b, double timediv);
 	double get_filtered_volume();
@@ -80,7 +80,7 @@ private:
 	double  m_prevx, m_prevy;
 
 	int          m_num_levels;  /* optional: number of levels (if not two) */
-	const int16_t  *m_levels;     /* optional: pointer to level lookup table */
+	const double  *m_levels;     /* optional: pointer to level lookup table */
 };
 
 DECLARE_DEVICE_TYPE(SPEAKER_SOUND, speaker_sound_device)

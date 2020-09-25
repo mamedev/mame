@@ -14,7 +14,7 @@
 #include "render.h"
 
 
-const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base, uint16_t *out_pitch)
+const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int rowpixels, int height, const rgb_t *palette, void *base, uint16_t *out_pitch)
 {
 	bgfx::TextureInfo info;
 	switch (src_format)
@@ -38,7 +38,7 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 
 const bgfx::Memory* bgfx_util::mame_texture_data_to_argb32(uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 {
-	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
+	const bgfx::Memory* mem = bgfx::alloc(rowpixels * height * 4);
 	auto* dst = reinterpret_cast<uint32_t*>(mem->data);
 	auto* src16 = reinterpret_cast<uint16_t*>(base);
 	auto* src32 = reinterpret_cast<uint32_t*>(base);

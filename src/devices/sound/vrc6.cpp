@@ -45,7 +45,7 @@ vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, d
 
 void vrc6snd_device::device_start()
 {
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = stream_alloc(0, 1, clock());
 
 	m_freqctrl = m_pulsectrl[0] = m_pulsectrl[1] = 0;
 	m_pulsefrql[0] = m_pulsefrql[1] = m_pulsefrqh[0] = m_pulsefrqh[1] = 0;
@@ -93,15 +93,16 @@ void vrc6snd_device::device_reset()
 //  our sound stream
 //-------------------------------------------------
 
-void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vrc6snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	std::fill_n(&outputs[0][0], samples, 0);
-
 	// check global halt bit
 	if (m_freqctrl & 1)
+	{
+		outputs[0].fill(0);
 		return;
+	}
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		// update pulse1
 		if (m_pulsefrqh[0] & 0x80)
@@ -198,9 +199,8 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		// sum 2 4-bit pulses, 1 5-bit saw = unsigned 6 bit output
 		s16 tmp = (s16)(u8)(m_output[0] + m_output[1] + m_output[2]);
-		tmp <<= 8;
 
-		outputs[0][i] = tmp;
+		outputs[0].put_int(i, tmp, 128);
 	}
 }
 

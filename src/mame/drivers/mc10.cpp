@@ -4,7 +4,7 @@
 
     TRS-80 Radio Shack MicroColor Computer
 
-	May 2020: Added emulation for Darren Atkinson's MCX 128.
+    May 2020: Added emulation for Darren Atkinson's MCX 128.
 
 ***************************************************************************/
 

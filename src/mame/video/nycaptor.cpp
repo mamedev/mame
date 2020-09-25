@@ -126,9 +126,7 @@ void nycaptor_state::nycaptor_scrlram_w(offs_t offset, uint8_t data)
 
 void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	int i;
-
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int pr = m_spriteram[0x9f - i];
 		int offs = (pr & 0x1f) * 4;

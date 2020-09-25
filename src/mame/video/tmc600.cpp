@@ -3,12 +3,12 @@
 #include "emu.h"
 #include "includes/tmc600.h"
 
-WRITE8_MEMBER( tmc600_state::vismac_register_w )
+void tmc600_state::vismac_register_w(uint8_t data)
 {
 	m_vismac_reg_latch = data >> 4;
 }
 
-WRITE8_MEMBER( tmc600_state::vismac_data_w )
+void tmc600_state::vismac_data_w(uint8_t data)
 {
 	uint16_t ma = m_maincpu->get_memory_address();
 
@@ -36,7 +36,7 @@ uint8_t tmc600_state::get_color(uint16_t pma)
 	return color;
 }
 
-WRITE8_MEMBER( tmc600_state::page_ram_w )
+void tmc600_state::page_ram_w(offs_t offset, uint8_t data)
 {
 	m_page_ram[offset] = data;
 	m_color_ram[offset] = m_vismac_color_latch;

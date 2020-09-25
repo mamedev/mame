@@ -67,9 +67,9 @@ private:
 	// linked cabinet specific handlers
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
-	DECLARE_READ16_MEMBER(link_r);
-	DECLARE_READ16_MEMBER(link2_r);
-	DECLARE_WRITE16_MEMBER(link2_w);
+	uint16_t link_r();
+	uint16_t link2_r();
+	void link2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 //  uint8_t link_portc0_r();
 
 	// input helpers

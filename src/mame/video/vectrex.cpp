@@ -73,12 +73,12 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 *********************************************************************/
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_r)
+uint8_t vectrex_base_state::vectrex_via_r(offs_t offset)
 {
 	return m_via6522_0->read(offset);
 }
 
-WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
+void vectrex_base_state::vectrex_via_w(offs_t offset, uint8_t data)
 {
 	attotime period;
 
@@ -411,7 +411,7 @@ WRITE_LINE_MEMBER(vectrex_base_state::v_via_cb2_w)
 
 *****************************************************************/
 
-WRITE8_MEMBER(raaspec_state::raaspec_led_w)
+void raaspec_state::raaspec_led_w(uint8_t data)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
 				(data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,

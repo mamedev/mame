@@ -58,13 +58,13 @@ void shootout_state::bankswitch_w(uint8_t data)
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-READ8_MEMBER(shootout_state::sound_cpu_command_r)
+uint8_t shootout_state::sound_cpu_command_r()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read();
 }
 
-WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
+void shootout_state::sound_cpu_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -89,7 +89,7 @@ void shootout_state::flipscreen_w(uint8_t data)
     This should be an input for a BCD to 7-segment decoder (e.g. a 74LS47), but all the PCBs I've seen don't have 'onboard'
     display(s), so this was implemented as normal "coin counter" (after all, they both have the same goal: count credits ;))
 */
-WRITE8_MEMBER(shootout_state::coincounter_w)
+void shootout_state::coincounter_w(uint8_t data)
 {
 	if (data != m_ccnt_old_val)
 	{

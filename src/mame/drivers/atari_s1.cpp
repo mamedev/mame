@@ -531,7 +531,16 @@ ROM_START(midearth)
 	ROM_LOAD("608.bin", 0x7800, 0x0800, CRC(28b92faf) SHA1(8585770f4059049f1dcbc0c6ef5718b6ff1a5431))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+ROM_END
+
+ROM_START(mideartha)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("20855-01.bin", 0x7000, 0x0800, CRC(4a9d47ca) SHA1(57c4458822109c3ba2fa53ac1c1cd6e169e51b24))
+	ROM_LOAD("20856-01.bin", 0x7800, 0x0800, CRC(8f119e37) SHA1(5a4d63605865f3ceca4c09dbdcd888498c615b89))
+
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -547,8 +556,9 @@ ROM_START(spcrider)
 ROM_END
 
 
-GAME( 1976, atarians, 0, atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, time2000, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, aavenger, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1978, midearth, 0, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, spcrider, 0, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1976, atarians,  0,        atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, time2000,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, aavenger,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1978, midearth,  0,        midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, mideartha, midearth, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth (alternate)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, spcrider,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

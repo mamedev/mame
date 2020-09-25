@@ -105,13 +105,13 @@ void suprloco_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(suprloco_state::videoram_w)
+void suprloco_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(suprloco_state::scrollram_w)
+void suprloco_state::scrollram_w(offs_t offset, uint8_t data)
 {
 	int adj = flip_screen() ? -8 : 8;
 

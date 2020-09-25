@@ -52,7 +52,7 @@ enum
 };
 
 
-WRITE8_MEMBER( vicdual_state::tranqgun_audio_w )
+void vicdual_state::tranqgun_audio_w(uint8_t data)
 {
 	int bitsChanged;
 	int bitsGoneHigh;

@@ -59,15 +59,15 @@ public:
 	void init_trackfldnz();
 
 private:
-	DECLARE_WRITE8_MEMBER(questions_bank_w);
-	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
-	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
-	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
-	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
-	DECLARE_READ8_MEMBER(trackfld_speech_r);
-	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(m_SN76496_latch); };
+	void questions_bank_w(uint8_t data);
+	void trackfld_videoram_w(offs_t offset, uint8_t data);
+	void trackfld_colorram_w(offs_t offset, uint8_t data);
+	void atlantol_gfxbank_w(uint8_t data);
+	uint8_t trackfld_SN76496_r();
+	uint8_t trackfld_speech_r();
+	void trackfld_VLM5030_control_w(uint8_t data);
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; };
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); };
 
 	void hyprolyb_sound_map(address_map &map);
 	void main_map(address_map &map);

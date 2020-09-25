@@ -244,7 +244,7 @@ int mame_machine_manager::execute()
 		bool is_empty = (system == &GAME_NAME(___empty));
 		if (!is_empty)
 		{
-			validity_checker valid(m_options);
+			validity_checker valid(m_options, true);
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}

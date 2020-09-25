@@ -17,17 +17,17 @@
  *
  *************************************/
 
-void starfire_state::video_start()
+void starfire_base_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_starfire_screen);
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starfire_state::starfire_scanline_callback),this));
+	m_screen->register_screen_bitmap(m_screen_bitmap);
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starfire_base_state::scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
 	/* register for state saving */
-	save_item(NAME(m_starfire_vidctrl));
-	save_item(NAME(m_starfire_vidctrl1));
-	save_item(NAME(m_starfire_color));
-	save_item(NAME(m_starfire_colors));
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_vidctrl1));
+	save_item(NAME(m_color));
+	save_item(NAME(m_colors));
 }
 
 
@@ -37,7 +37,7 @@ void starfire_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_colorram_w)
+void starfire_base_state::colorram_w(offs_t offset, uint8_t data)
 {
 	/* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
@@ -45,19 +45,19 @@ WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
 
 		/* set RAM regardless */
-		int cl = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
+		int cl = (m_vidctrl1 & 0x80) ? m_color : (data & 0x1f);
 		int cr = (data >> 5) | ((offset & 0x100) >> 5);
-		cr |= (m_starfire_vidctrl1 & 0x80) ? (m_starfire_color & 0x10) : (data & 0x10);
+		cr |= (m_vidctrl1 & 0x80) ? (m_color & 0x10) : (data & 0x10);
 
-		m_starfire_colorram[offset & ~0x100] = cl;
-		m_starfire_colorram[offset |  0x100] = cr;
+		m_colorram[offset & ~0x100] = cl;
+		m_colorram[offset |  0x100] = cr;
 
-		m_starfire_color = cl;
+		m_color = cl;
 
 		/* don't modify the palette unless the TRANS bit is set */
-		if (m_starfire_vidctrl1 & 0x40)
+		if (m_vidctrl1 & 0x40)
 		{
-			m_starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
+			m_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
 		}
 	}
 
@@ -65,30 +65,30 @@ WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 	else
 	{
 		/* set RAM based on CDRM */
-		m_starfire_colorram[offset] = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
-		m_starfire_color = (m_starfire_vidctrl1 & 0x80) ? m_starfire_color : (data & 0x1f);
+		m_colorram[offset] = (m_vidctrl1 & 0x80) ? m_color : (data & 0x1f);
+		m_color = (m_vidctrl1 & 0x80) ? m_color : (data & 0x1f);
 	}
 }
 
-READ8_MEMBER(starfire_state::starfire_colorram_r)
+uint8_t starfire_base_state::colorram_r(offs_t offset)
 {
 	/* handle writes to the pseudo-color RAM, which also happen on reads */
 	if ((offset & 0xe0) == 0)
 	{
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
-		int cl = m_starfire_colorram[offset & ~0x100];
-		int cr = m_starfire_colorram[offset |  0x100];
+		int cl = m_colorram[offset & ~0x100];
+		int cr = m_colorram[offset |  0x100];
 
 		/* don't modify the palette unless the TRANS bit is set */
-		if (m_starfire_vidctrl1 & 0x40)
+		if (m_vidctrl1 & 0x40)
 		{
-			m_starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
+			m_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
 		}
 
 		return cl | ((cr & 0x7) << 5);
 	}
 
-	return m_starfire_colorram[offset];
+	return m_colorram[offset];
 }
 
 /*************************************
@@ -97,26 +97,26 @@ READ8_MEMBER(starfire_state::starfire_colorram_r)
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_videoram_w)
+void starfire_base_state::videoram_w(offs_t offset, uint8_t data)
 {
 	int sh, lr, dm, ds, mask, d0, dalu;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
 
 	/* PROT */
-	if (!(offset & 0xe0) && !(m_starfire_vidctrl1 & 0x20))
+	if (!(offset & 0xe0) && !(m_vidctrl1 & 0x20))
 		return;
 
 	/* selector 6A */
 	if (offset & 0x2000)
 	{
-		sh = (m_starfire_vidctrl >> 1) & 0x07;
-		lr = m_starfire_vidctrl & 0x01;
+		sh = (m_vidctrl >> 1) & 0x07;
+		lr = m_vidctrl & 0x01;
 	}
 	else
 	{
-		sh = (m_starfire_vidctrl >> 5) & 0x07;
-		lr = (m_starfire_vidctrl >> 4) & 0x01;
+		sh = (m_vidctrl >> 5) & 0x07;
+		lr = (m_vidctrl >> 4) & 0x01;
 	}
 
 	/* mirror bits 5B/5C/5D/5E */
@@ -132,18 +132,18 @@ WRITE8_MEMBER(starfire_state::starfire_videoram_w)
 	/* ROLL */
 	if ((offset & 0x1f00) == 0x1f00)
 	{
-		if (m_starfire_vidctrl1 & 0x10)
+		if (m_vidctrl1 & 0x10)
 			mask &= 0x00ff;
 		else
 			mask &= 0xff00;
 	}
 
 	/* ALU 8B/8D */
-	d0 = (m_starfire_videoram[offset1] << 8) | m_starfire_videoram[offset2];
+	d0 = (m_videoram[offset1] << 8) | m_videoram[offset2];
 	dalu = d0 & ~mask;
 	d0 &= mask;
 	ds &= mask;
-	switch (~m_starfire_vidctrl1 & 15)
+	switch (~m_vidctrl1 & 15)
 	{
 		case 0:     dalu |= ds ^ mask;              break;
 		case 1:     dalu |= (ds | d0) ^ mask;       break;
@@ -164,20 +164,20 @@ WRITE8_MEMBER(starfire_state::starfire_videoram_w)
 	}
 
 	/* final output */
-	m_starfire_videoram[offset1] = dalu >> 8;
-	m_starfire_videoram[offset2] = dalu;
+	m_videoram[offset1] = dalu >> 8;
+	m_videoram[offset2] = dalu;
 
 	/* color output */
-	if (!(offset & 0x2000) && !(m_starfire_vidctrl1 & 0x80))
+	if (!(offset & 0x2000) && !(m_vidctrl1 & 0x80))
 	{
 		if (mask & 0xff00)
-			m_starfire_colorram[offset1] = m_starfire_color;
+			m_colorram[offset1] = m_color;
 		if (mask & 0x00ff)
-			m_starfire_colorram[offset2] = m_starfire_color;
+			m_colorram[offset2] = m_color;
 	}
 }
 
-READ8_MEMBER(starfire_state::starfire_videoram_r)
+uint8_t starfire_base_state::videoram_r(offs_t offset)
 {
 	int sh, mask, d0;
 	int offset1 = offset & 0x1fff;
@@ -185,9 +185,9 @@ READ8_MEMBER(starfire_state::starfire_videoram_r)
 
 	/* selector 6A */
 	if (offset & 0x2000)
-		sh = (m_starfire_vidctrl >> 1) & 0x07;
+		sh = (m_vidctrl >> 1) & 0x07;
 	else
-		sh = (m_starfire_vidctrl >> 5) & 0x07;
+		sh = (m_vidctrl >> 5) & 0x07;
 
 	/* shifters 6D/6E */
 	mask = 0xff00 >> sh;
@@ -195,14 +195,14 @@ READ8_MEMBER(starfire_state::starfire_videoram_r)
 	/* ROLL */
 	if ((offset & 0x1f00) == 0x1f00)
 	{
-		if (m_starfire_vidctrl1 & 0x10)
+		if (m_vidctrl1 & 0x10)
 			mask &= 0x00ff;
 		else
 			mask &= 0xff00;
 	}
 
 	/* munge the results */
-	d0 = (m_starfire_videoram[offset1] & (mask >> 8)) | (m_starfire_videoram[offset2] & mask);
+	d0 = (m_videoram[offset1] & (mask >> 8)) | (m_videoram[offset2] & mask);
 	d0 = (d0 << sh) | (d0 >> (8 - sh));
 	return d0 & 0xff;
 }
@@ -215,41 +215,41 @@ READ8_MEMBER(starfire_state::starfire_videoram_r)
  *
  *************************************/
 
-void starfire_state::get_pens(pen_t *pens)
+void starfire_base_state::get_pens(pen_t *pens)
 {
 	offs_t offs;
 
 	for (offs = 0; offs < STARFIRE_NUM_PENS; offs++)
 	{
-		uint16_t color = m_starfire_colors[offs];
+		uint16_t color = m_colors[offs];
 
 		pens[offs] = rgb_t(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
 	}
 }
 
-TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
+TIMER_CALLBACK_MEMBER(starfire_base_state::scanline_callback)
 {
 	pen_t pens[STARFIRE_NUM_PENS];
 	int y = param;
 
 	get_pens(pens);
 
-	uint8_t *pix = &m_starfire_videoram[y];
-	uint8_t *col = &m_starfire_colorram[y];
+	uint8_t *pix = &m_videoram[y];
+	uint8_t *col = &m_colorram[y];
 
 	for (int x = 0; x < 256; x += 8)
 	{
 		int data = pix[0];
 		int color = col[0];
 
-		m_starfire_screen.pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
-		m_starfire_screen.pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
-		m_starfire_screen.pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
-		m_starfire_screen.pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
-		m_starfire_screen.pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
-		m_starfire_screen.pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
-		m_starfire_screen.pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
-		m_starfire_screen.pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 3) = pens[color | ((data << 1) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 4) = pens[color | ((data << 2) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 5) = pens[color | ((data << 3) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 6) = pens[color | ((data << 4) & 0x20)];
+		m_screen_bitmap.pix32(y, x + 7) = pens[color | ((data << 5) & 0x20)];
 
 		pix += 256;
 		col += 256;
@@ -260,9 +260,9 @@ TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 	m_scanline_timer->adjust(m_screen->time_until_pos(y), y);
 }
 
-uint32_t starfire_state::screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t starfire_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, m_starfire_screen, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_screen_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

@@ -11,7 +11,7 @@
 *********************************************************************
 
   Seems to be a prototype, since there are some issues.
-  You can choose motorcycle <-> car game throug a DIP switch.
+  You can choose motorcycle <-> car game through a DIP switch.
 
   Also there are four difficult modes:
 
@@ -30,9 +30,9 @@
 
 
   Duintronic, the manufacturer, is a Spanish company from Barcelona,
-  created by someone from Ampetronic, and finally adquired by one of
+  created by someone from Ampetronic, and finally acquired by one of
   the Tecfri CEOs. The only arcade game known released by them was
-  Buccaneers, running in IREM M75 Vigilante hardware.
+  Buccaneers, running on IREM M75 Vigilante hardware.
 
 
 *********************************************************************
@@ -133,10 +133,10 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#define FIRST_CLOCK		XTAL(5'000'000)
-#define SECOND_CLOCK	XTAL(20'000'000)
-#define CPU_CLOCK   	(FIRST_CLOCK)		// verified 5 MHz.
-#define SND_CLOCK		(SECOND_CLOCK / 8)	// verified 2.5 MHz.
+#define FIRST_CLOCK     XTAL(5'000'000)
+#define SECOND_CLOCK    XTAL(20'000'000)
+#define CPU_CLOCK       (FIRST_CLOCK)       // verified 5 MHz.
+#define SND_CLOCK       (SECOND_CLOCK / 8)  // verified 2.5 MHz.
 
 
 class smotor_state : public driver_device
@@ -154,6 +154,10 @@ public:
 
 	void smotor(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ym2413_device> m_ym2413;
@@ -166,14 +170,11 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(cpu_io_videoreg_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void cpu_io_videoreg_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	void smotor_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -186,7 +187,7 @@ private:
 *               Video Hardware               *
 *********************************************/
 
-WRITE8_MEMBER(smotor_state::videoram_w)
+void smotor_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
@@ -303,7 +304,7 @@ void smotor_state::smotor_palette(palette_device &palette) const
 void smotor_state::smotor_cpu_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
- 	map(0xf000, 0xf7ff).ram().w(FUNC(smotor_state::videoram_w)).share("videoram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(smotor_state::videoram_w)).share("videoram");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -331,14 +332,14 @@ void smotor_state::smotor_cpu_io(address_map &map)
 
 }
 
-WRITE8_MEMBER(smotor_state::cpu_io_videoreg_w)
+void smotor_state::cpu_io_videoreg_w(offs_t offset, uint8_t data)
 {
 	switch (offset) {
 
 		case 0x00:
 			m_videoreg[offset] = data;
 			m_ym2413->set_output_gain(ALL_OUTPUTS, BIT(data, 4) ? 1.0f : 0.0f);
-			if ((BIT(data, 0)) & (BIT(data, 2)))	// coin lock + coin a, used for init.
+			if ((BIT(data, 0)) & (BIT(data, 2)))    // coin lock + coin a, used for init.
 				break;
 			machine().bookkeeping().coin_lockout_global_w(BIT(data, 0));  // coin lock.
 			machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // coin b counter.
@@ -375,7 +376,7 @@ static INPUT_PORTS_START( smotor )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
@@ -392,7 +393,7 @@ static INPUT_PORTS_START( smotor )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
@@ -411,26 +412,26 @@ static INPUT_PORTS_START( smotor )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Difficult ) )	PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Difficult ) )    PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, "Easy (with gas cans, only trucks)" )
 	PORT_DIPSETTING(    0x04, "Normal (with gas cans, trucks and cars)" )
 	PORT_DIPSETTING(    0x02, "Medium (no gas cans, both trucks and cars)" )
 	PORT_DIPSETTING(    0x00, "Hard (no gas cans, both trucks and cars)" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Game_Time ) )	PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "1:00" )
 	PORT_DIPSETTING(    0x10, "1:20" )
 	PORT_DIPSETTING(    0x08, "1:40" )
 	PORT_DIPSETTING(    0x00, "2:00" )
-	PORT_DIPNAME( 0x20, 0x20, "Cycle / Car" )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Cycle / Car" )           PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Cycle" )
 	PORT_DIPSETTING(    0x00, "Car" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -533,4 +534,4 @@ ROM_END
 *********************************************/
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS         INIT        ROT    COMPANY       FULLNAME                  FLAGS
-GAME( 19??, smotor,  0,      smotor,  smotor,  smotor_state, empty_init, ROT0, "Duintronic", "Super Motor (prototype)", 0 )
+GAME( 19??, smotor,  0,      smotor,  smotor,  smotor_state, empty_init, ROT0, "Duintronic", "Super Motor (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -11,43 +11,68 @@
 template<typename F>
 int pstring_t<F>::compare(const pstring_t &right) const noexcept
 {
-	if (mem_t_size() == 0 && right.mem_t_size() == 0)
-		return 0;
-	if (right.mem_t_size() == 0)
-		return 1;
-	if (mem_t_size() == 0)
-		return -1;
-
+#if 0
+	return m_str.compare(right.m_str);
+#else
 	auto si = this->begin();
 	auto ri = right.begin();
-	while (si != this->end() && ri != right.end() && *si == *ri)
+	const auto se = this->end();
+	const auto re = right.end();
+
+	while (si != se && ri != re && *si == *ri)
 	{
 		++ri;
 		++si;
 	}
 
-	if (si != this->end() && ri != right.end())
+	if (si != se && ri != re)
 		return plib::narrow_cast<int>(*si) - plib::narrow_cast<int>(*ri);
-	if (this->mem_t_size() > right.mem_t_size())
+	if (si != se)
 		return 1;
-	if (this->mem_t_size() < right.mem_t_size())
+	if (ri != re)
 		return -1;
 	return 0;
+#endif
 }
 
 template<typename F>
 pstring_t<F> pstring_t<F>::substr(size_type start, size_type nlen) const
 {
 	pstring_t ret;
-	//FIXME: throw ?
-	const size_type l = length();
-	if (start < l)
+	auto ps = begin();
+	while (ps != end() && start > 0)
 	{
-		if (nlen == npos || start + nlen > l)
-			nlen = l - start;
-		auto ps = std::next(begin(), plib::narrow_cast<difference_type>(start));
-		auto pe = std::next(ps, plib::narrow_cast<difference_type>(nlen));
+		++ps;
+		--start;
+	}
+	//FIXME: throw ?
+	if (ps != end())
+	{
+		auto pe = ps;
+		while (pe != end() && nlen > 0)
+		{
+			++pe;
+			--nlen;
+		}
 		ret.m_str.assign(ps.p, pe.p);
+	}
+	return ret;
+}
+
+template<typename F>
+pstring_t<F> pstring_t<F>::substr(size_type start) const
+{
+	pstring_t ret;
+	auto ps = begin();
+	while (ps != end() && start > 0)
+	{
+		++ps;
+		--start;
+	}
+	//FIXME: throw ?
+	if (ps != end())
+	{
+		ret.m_str.assign(ps.p, end().p);
 	}
 	return ret;
 }
@@ -75,9 +100,14 @@ typename pstring_t<F>::size_type pstring_t<F>::find(const pstring_t &search, siz
 template<typename F>
 typename pstring_t<F>::size_type pstring_t<F>::find(code_t search, size_type start) const noexcept
 {
-	pstring_t ss;
-	traits_type::encode(search, ss.m_str);
-	return find(ss, start);
+	auto i = std::next(begin(), static_cast<difference_type>(start));
+	for (; i != end(); ++i)
+	{
+		if (*i == search)
+			return start;
+		++start;
+	}
+	return npos;
 }
 
 // ----------------------------------------------------------------------------------------

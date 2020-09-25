@@ -13,8 +13,6 @@
 
 #include "dfi_dsk.h"
 
-#include "emucore.h" // emu_fatalerror
-
 #include <zlib.h>
 
 #define NUMBER_OF_MULTIREADS 3
@@ -62,13 +60,19 @@ int dfi_format::identify(io_generic *io, uint32_t form_factor)
 {
 	char sign[4];
 	io_generic_read(io, sign, 0, 4);
-	if (memcmp(sign, "DFER", 4) == 0)
-		throw emu_fatalerror("Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
 	return memcmp(sign, "DFE2", 4) ? 0 : 100;
 }
 
 bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
+	char sign[4];
+	io_generic_read(io, sign, 0, 4);
+	if (memcmp(sign, "DFER", 4) == 0)
+	{
+		osd_printf_error("dfi_dsk: Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
+		return false;
+	}
+
 	uint64_t size = io_generic_size(io);
 	uint64_t pos = 4;
 	std::vector<uint8_t> data;
@@ -102,7 +106,10 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		int total_time = 0; // total sampled time per track
 		for(int i=0; i<tsize; i++) {
 			uint8_t v = data[i];
-			if (v == 0xFF) { fprintf(stderr,"DFI stream contained a 0xFF at t%d, position%d, THIS SHOULD NEVER HAPPEN! Bailing out!\n", track, i); exit(1); }
+			if (v == 0xFF) {
+				osd_printf_error("dfi_dsk: DFI stream contained a 0xFF at t%d, position%d, THIS SHOULD NEVER HAPPEN! Bailing out!\n", track, i);
+				return false;
+			}
 			if((v & 0x7f) == 0x7f)
 				total_time += 0x7f;
 			else if(v & 0x80) {
@@ -121,30 +128,30 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		if (onerev_time == 0) onerev_time = total_time;
 
 		if(!track && !head)
-			fprintf(stderr, "%02d:%d tt=%10d it=%10d\n", track, head, total_time, index_time);
+			osd_printf_verbose("dfi_dsk: %02d:%d tt=%10d it=%10d\n", track, head, total_time, index_time);
 		if(!track && !head) {
-			fprintf(stderr, "index_count: %d, onerev_time: %d\n", index_count, onerev_time);
+			osd_printf_verbose("dfi_dsk: index_count: %d, onerev_time: %d\n", index_count, onerev_time);
 			if ((onerev_time > REV25_MIN) && (onerev_time < REV25_MAX)) {
-				fprintf(stderr, "Guess: speed: 360rpm, clock 25MHz\n");
+				osd_printf_verbose("dfi_dsk: Guess: speed: 360rpm, clock 25MHz\n");
 				clock_rate = 25000000; rpm = 360;
 			} else if ((onerev_time > REV25_MIN*1.2) && (onerev_time < REV25_MAX*1.2)) {
-				fprintf(stderr, "Guess: speed: 300rpm, clock 25MHz\n");
+				osd_printf_verbose("dfi_dsk: Guess: speed: 300rpm, clock 25MHz\n");
 				clock_rate = 25000000; rpm = 300;
 			} else if ((onerev_time > REV25_MIN*2) && (onerev_time < REV25_MAX*2)) {
-				fprintf(stderr, "Guess: speed: 360rpm, clock 50MHz\n");
+				osd_printf_verbose("dfi_dsk: Guess: speed: 360rpm, clock 50MHz\n");
 				clock_rate = 50000000; rpm = 360;
 			} else if ((onerev_time > (REV25_MIN*2)*1.2) && (onerev_time < (REV25_MAX*2)*1.2)) {
-				fprintf(stderr, "Guess: speed: 300rpm, clock 50MHz\n");
+				osd_printf_verbose("dfi_dsk: Guess: speed: 300rpm, clock 50MHz\n");
 				clock_rate = 50000000; rpm = 300;
 			} else if ((onerev_time > REV25_MIN*4) && (onerev_time < REV25_MAX*4)) {
-				fprintf(stderr, "Guess: speed: 360rpm, clock 100MHz\n");
+				osd_printf_verbose("dfi_dsk: Guess: speed: 360rpm, clock 100MHz\n");
 				clock_rate = 100000000; rpm = 360;
 			} else if ((onerev_time > (REV25_MIN*4)*1.2) && (onerev_time < (REV25_MAX*4)*1.2)) {
-				fprintf(stderr, "Guess: speed: 300rpm, clock 100MHz\n");
+				osd_printf_verbose("dfi_dsk: Guess: speed: 300rpm, clock 100MHz\n");
 				clock_rate = 100000000; rpm = 300;
 			} else
-				fprintf(stderr, "WARNING: Cannot Guess Speed! Assuming 360rpm, 100Mhz clock!\n");
-			fprintf(stderr,"Actual rpm based on index: %f\n", ((double)clock_rate/(double)onerev_time)*60);
+				osd_printf_warning("dfi_dsk: WARNING: Cannot Guess Speed! Assuming 360rpm, 100Mhz clock!\n");
+			osd_printf_verbose("dfi_dsk: Actual rpm based on index: %f\n", ((double)clock_rate/(double)onerev_time)*60);
 		}
 
 		rpm += 0;   // HACK: prevent GCC 4.6+ from warning "variable set but unused"
@@ -187,7 +194,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				// cur_time and onerev_time need to be converted to something standard, so we'll stick with 300rpm at the standard 200mhz rate that mfi uses internally
 				// TODO for 4/22/2012: ACTUALLY DO THIS RESCALING STEP
 				// filter out spurious crap
-				//if (trans_time <= MIN_THRESH) fprintf(stderr, "DFI: Throwing out short transition of length %d\n", trans_time);
+				//if (trans_time <= MIN_THRESH) osd_printf_verbose("dfi_dsk: Throwing out short transition of length %d\n", trans_time);
 				// the normal case: write the transition at the appropriate time
 				if ((prev_time == 0) || ((trans_time > MIN_THRESH) && (trans_time <= MAX_THRESH))) {
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
@@ -197,7 +204,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				// the long case: we probably missed a transition, stuff an extra guessed one in there to see if it helps
 				if (trans_time > MAX_THRESH) {
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					if (((track%2)==0)&&(head==0)) fprintf(stderr,"missed transition, total time for transition is %d\n",trans_time);
+					if (((track%2)==0)&&(head==0)) osd_printf_info("dfi_dsk: missed transition, total time for transition is %d\n",trans_time);
 #ifndef FAKETRANS_ONE
 					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
 #else
@@ -208,7 +215,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					buf[tpos++] = mg | uint32_t(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
-					}
+				}
 			}
 		}
 #ifdef TRACK_HISTOGRAM

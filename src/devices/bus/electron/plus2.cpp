@@ -31,6 +31,8 @@ DEFINE_DEVICE_TYPE(ELECTRON_PLUS2, electron_plus2_device, "electron_plus2", "Slo
 
 void electron_plus2_device::device_add_mconfig(machine_config &config)
 {
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 13
 	m_rom[0]->set_device_load(FUNC(electron_plus2_device::rom1_load));
@@ -41,17 +43,19 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart[0], DERIVED_CLOCK(1, 1), electron_cart, nullptr);
-	m_cart[0]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_cart[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_cart[0]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 	ELECTRON_CARTSLOT(config, m_cart[1], DERIVED_CLOCK(1, 1), electron_cart, nullptr);
-	m_cart[1]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_cart[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_cart[1]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 
 	/* via */
 	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
-	m_via->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));
+	m_via->cb2_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb2));
+	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* user port */
 	BBC_USERPORT_SLOT(config, m_userport, bbc_userport_devices, nullptr);
@@ -60,7 +64,7 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 
 	/* pass-through */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), electron_expansion_devices, nullptr);
-	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 }
 
@@ -75,6 +79,7 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 electron_plus2_device::electron_plus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ELECTRON_PLUS2, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
+	, m_irqs(*this, "irqs")
 	, m_exp(*this, "exp")
 	, m_via(*this, "via6522")
 	, m_rom(*this, "rom%u", 1)
@@ -175,6 +180,10 @@ void electron_plus2_device::expbus_w(offs_t offset, uint8_t data)
 		case 6:
 		case 7:
 			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
+			break;
+		case 13:
+			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
+			m_cart[1]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
 			break;
 		}
 		break;

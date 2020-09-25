@@ -12,7 +12,6 @@
 #define MAME_BUS_LPCI_PCI_H
 
 #pragma once
-#include <forward_list>
 
 //**************************************************************************
 //  TYPE DEFINITIONS

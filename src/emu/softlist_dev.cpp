@@ -405,12 +405,9 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 	if (valid.already_checked(std::string("softlist/").append(m_list_name).c_str()))
 		return;
 
-	// do device validation only in case of validate command
-	if (!valid.validate_all())
-		return;
-
-	// actually do the validate
-	const_cast<software_list_device *>(this)->internal_validity_check(valid);
+	// skip in case of quick validation
+	if (!valid.quick())
+		const_cast<software_list_device *>(this)->internal_validity_check(valid);
 }
 
 

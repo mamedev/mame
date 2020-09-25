@@ -58,8 +58,8 @@ public:
 protected:
 	virtual void device_start() override;
 
-	DECLARE_READ32_MEMBER(config_register_r);
-	DECLARE_WRITE32_MEMBER(config_register_w);
+	uint32_t config_register_r();
+	void config_register_w(uint32_t data);
 
 private:
 	int ram_size;
@@ -99,9 +99,9 @@ public:
 	virtual void set_virtual_line(int line, int state) override;
 	virtual void remap() override;
 
-	DECLARE_READ32_MEMBER(acpi_r);
-	DECLARE_WRITE32_MEMBER(acpi_w);
-	DECLARE_WRITE8_MEMBER(boot_state_w);
+	uint32_t acpi_r(offs_t offset, uint32_t mem_mask = ~0);
+	void acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void boot_state_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(irq1);
 	DECLARE_WRITE_LINE_MEMBER(irq3);
@@ -129,8 +129,8 @@ private:
 	void update_smi_line();
 	void speaker_set_spkrdata(uint8_t data);
 
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	uint8_t portb_r();
+	void portb_w(uint8_t data);
 
 	devcb_write_line m_smi_callback;
 	devcb_write_line m_interrupt_output;
@@ -173,10 +173,10 @@ public:
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(smbus0_r);
-	DECLARE_WRITE32_MEMBER(smbus0_w);
-	DECLARE_READ32_MEMBER(smbus1_r);
-	DECLARE_WRITE32_MEMBER(smbus1_w);
+	uint32_t smbus0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void smbus0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t smbus1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void smbus1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;
@@ -215,8 +215,8 @@ public:
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(ohci_r);
-	DECLARE_WRITE32_MEMBER(ohci_w);
+	uint32_t ohci_r(offs_t offset);
+	void ohci_w(offs_t offset, uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -248,10 +248,10 @@ class mcpx_eth_device : public pci_device {
 public:
 	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(eth_r);
-	DECLARE_WRITE32_MEMBER(eth_w);
-	DECLARE_READ32_MEMBER(eth_io_r);
-	DECLARE_WRITE32_MEMBER(eth_io_w);
+	uint32_t eth_r();
+	void eth_w(uint32_t data);
+	uint32_t eth_io_r();
+	void eth_io_w(uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -279,8 +279,8 @@ public:
 	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 
-	DECLARE_READ32_MEMBER(apu_r);
-	DECLARE_WRITE32_MEMBER(apu_w);
+	uint32_t apu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void apu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;
@@ -324,12 +324,12 @@ class mcpx_ac97_audio_device : public pci_device {
 public:
 	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(ac97_audio_r);
-	DECLARE_WRITE32_MEMBER(ac97_audio_w);
-	DECLARE_READ32_MEMBER(ac97_audio_io0_r);
-	DECLARE_WRITE32_MEMBER(ac97_audio_io0_w);
-	DECLARE_READ32_MEMBER(ac97_audio_io1_r);
-	DECLARE_WRITE32_MEMBER(ac97_audio_io1_w);
+	uint32_t ac97_audio_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ac97_audio_io0_r();
+	void ac97_audio_io0_w(uint32_t data);
+	uint32_t ac97_audio_io1_r();
+	void ac97_audio_io1_w(uint32_t data);
 
 protected:
 	virtual void device_start() override;
@@ -371,11 +371,11 @@ public:
 
 	virtual void config_map(address_map &map) override;
 
-	DECLARE_WRITE32_MEMBER(class_rev_w);
-	DECLARE_READ8_MEMBER(pri_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(pri_write_cs1_w);
-	DECLARE_READ8_MEMBER(sec_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(sec_write_cs1_w);
+	void class_rev_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t pri_read_cs1_r();
+	void pri_write_cs1_w(uint8_t data);
+	uint8_t sec_read_cs1_r();
+	void sec_write_cs1_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -416,8 +416,8 @@ public:
 
 	void config_map(address_map& map) override;
 
-	DECLARE_READ32_MEMBER(unknown_r);
-	DECLARE_WRITE32_MEMBER(unknown_w);
+	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
+	void unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;
@@ -444,10 +444,10 @@ public:
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
-	DECLARE_READ32_MEMBER(geforce_r);
-	DECLARE_WRITE32_MEMBER(geforce_w);
-	DECLARE_READ32_MEMBER(nv2a_mirror_r);
-	DECLARE_WRITE32_MEMBER(nv2a_mirror_w);
+	uint32_t geforce_r(offs_t offset, uint32_t mem_mask = ~0);
+	void geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t nv2a_mirror_r(offs_t offset, uint32_t mem_mask = ~0);
+	void nv2a_mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

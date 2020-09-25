@@ -400,7 +400,7 @@ void superpet_device::pet_irq_w(int state)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( superpet_device::read )
+uint8_t superpet_device::read(offs_t offset)
 {
 	return m_slot->dma_bd_r(offset);
 }
@@ -410,7 +410,7 @@ READ8_MEMBER( superpet_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superpet_device::write )
+void superpet_device::write(offs_t offset, uint8_t data)
 {
 	m_slot->dma_bd_w(offset, data);
 }

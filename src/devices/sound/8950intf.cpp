@@ -59,9 +59,9 @@ void y8950_device::timer_handler(int c, const attotime &period)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void y8950_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	y8950_update_one(m_chip, outputs[0], samples);
+	y8950_update_one(m_chip, outputs[0]);
 }
 
 
@@ -87,7 +87,7 @@ void y8950_device::device_start()
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(m_chip, &y8950_device::static_read_byte, &y8950_device::static_write_byte);
 
-	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
+	m_stream = stream_alloc(0,1,rate);
 	/* port and keyboard handler */
 	y8950_set_port_handler(m_chip, &y8950_device::static_port_handler_w, &y8950_device::static_port_handler_r, this);
 	y8950_set_keyboard_handler(m_chip, &y8950_device::static_keyboard_handler_w, &y8950_device::static_keyboard_handler_r, this);

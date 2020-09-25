@@ -1729,7 +1729,7 @@ WRITE_LINE_MEMBER(newport_base_device::update_screen_size)
 	m_screen->set_visarea_full();
 }
 
-READ64_MEMBER(newport_base_device::rex3_r)
+uint64_t newport_base_device::rex3_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t ret = 0;
 	switch (offset & ~(0x800/8))
@@ -2199,11 +2199,6 @@ READ64_MEMBER(newport_base_device::rex3_r)
 	return ret;
 }
 
-uint32_t newport_base_device::do_endian_swap(uint32_t color)
-{
-	return (color >> 24) | (color << 24) | ((color >> 8) & 0x0000ff00) | ((color << 8) & 0x00ff0000);
-}
-
 uint32_t newport_base_device::get_host_color()
 {
 	static const uint32_t s_color_masks[4] = { 0xf, 0xff, 0xfff, 0xffffffff };
@@ -2259,7 +2254,7 @@ uint32_t newport_base_device::get_host_color()
 		break;
 	}
 	if (BIT(m_rex3.m_draw_mode1, 11))
-		color = do_endian_swap(color);
+		color = swapendian_int32(color);
 	return color;
 }
 
@@ -3557,7 +3552,7 @@ void newport_base_device::write_y_end(int32_t val)
 	m_rex3.m_xy_end_i = (m_rex3.m_xy_end_i & 0xffff0000) | (uint16_t)m_rex3.m_y_end_i;
 }
 
-WRITE64_MEMBER(newport_base_device::rex3_w)
+void newport_base_device::rex3_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 #if ENABLE_NEWVIEW_LOG
 	if (m_newview_log != nullptr)

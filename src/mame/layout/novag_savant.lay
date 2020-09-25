@@ -235,8 +235,8 @@ license:CC0
 		</repeat>
 
 		<!-- backlight -->
-		<element ref="nothing" blend="add" inputtag="LIGHT" inputmask="0x00" inputraw="1"><bounds x="0" y="0" width="101" height="114" /></element>
-		<element ref="cb_light" blend="multiply" inputtag="LIGHT" inputmask="0x01" inputraw="1"><bounds x="0" y="0" width="101" height="114" /></element>
+		<element ref="nothing" blend="add" inputtag="LIGHT" inputmask="0x00" inputraw="yes"><bounds x="0" y="0" width="101" height="114" /></element>
+		<element ref="cb_light" blend="multiply" inputtag="LIGHT" inputmask="0x01" inputraw="yes"><bounds x="0" y="0" width="101" height="114" /></element>
 
 		<!-- mask edges -->
 		<element ref="blackb"><bounds x="0" y="0" width="101" height="2" /></element>

@@ -42,7 +42,7 @@ Taito W Rom Board:
 -Program, Sound roms
 
 TODO:
-- program ROM is read via parallel port (for offset write, encrypted) and game port!? 
+- program ROM is read via parallel port (for offset write, encrypted) and game port!?
 - Emulation of the entire Taito Wolf main board which plugs into the PC motherboard's only PCI slot.
 - PCI comms between both boards have yet to be understood.
 

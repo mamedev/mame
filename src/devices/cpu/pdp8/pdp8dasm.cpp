@@ -11,7 +11,7 @@
 
 u32 pdp8_disassembler::opcode_alignment() const
 {
-	return 2;
+	return 1;
 }
 
 offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -164,5 +164,5 @@ offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		}
 	}
 
-	return 2 | SUPPORTED;
+	return 1 | SUPPORTED | (opcode == 4 ? STEP_OVER : 0);
 }

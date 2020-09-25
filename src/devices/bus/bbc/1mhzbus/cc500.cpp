@@ -149,13 +149,13 @@ void bbc_cc500_device::fred_w(offs_t offset, uint8_t data)
 		switch (offset & 0x18)
 		{
 		case 0x00:
-			m_palette_ram[~offset & 0x07].set_r((data << 4) | (data & 0x0f));
+			m_palette_ram[~offset & 0x07].set_r(pal4bit(data));
 			break;
 		case 0x08:
-			m_palette_ram[~offset & 0x07].set_g((data << 4) | (data & 0x0f));
+			m_palette_ram[~offset & 0x07].set_g(pal4bit(data));
 			break;
 		case 0x10:
-			m_palette_ram[~offset & 0x07].set_b((data << 4) | (data & 0x0f));
+			m_palette_ram[~offset & 0x07].set_b(pal4bit(data));
 			break;
 		}
 		m_palette->set_pen_colors(0, &m_palette_ram[0], 8);

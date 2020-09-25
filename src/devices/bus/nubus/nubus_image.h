@@ -56,20 +56,20 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ32_MEMBER(image_status_r);
-	DECLARE_WRITE32_MEMBER(image_status_w);
-	DECLARE_READ32_MEMBER(image_r);
-	DECLARE_WRITE32_MEMBER(image_w);
-	DECLARE_READ32_MEMBER(image_super_r);
-	DECLARE_WRITE32_MEMBER(image_super_w);
-	DECLARE_READ32_MEMBER(file_cmd_r);
-	DECLARE_WRITE32_MEMBER(file_cmd_w);
-	DECLARE_READ32_MEMBER(file_data_r);
-	DECLARE_WRITE32_MEMBER(file_data_w);
-	DECLARE_READ32_MEMBER(file_len_r);
-	DECLARE_WRITE32_MEMBER(file_len_w);
-	DECLARE_READ32_MEMBER(file_name_r);
-	DECLARE_WRITE32_MEMBER(file_name_w);
+	uint32_t image_status_r();
+	void image_status_w(uint32_t data);
+	uint32_t image_r();
+	void image_w(uint32_t data);
+	uint32_t image_super_r(offs_t offset, uint32_t mem_mask = ~0);
+	void image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t file_cmd_r();
+	void file_cmd_w(uint32_t data);
+	uint32_t file_data_r();
+	void file_data_w(uint32_t data);
+	uint32_t file_len_r();
+	void file_len_w(uint32_t data);
+	uint32_t file_name_r(offs_t offset);
+	void file_name_w(offs_t offset, uint32_t data);
 
 	messimg_disk_image_device *m_image;
 	nbfilectx filectx;

@@ -554,7 +554,7 @@ void beezer_state::beezer(machine_config &config)
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 
 	mm5837_device &noise(MM5837(config, "noise"));
-	noise.set_vdd_voltage(12);
+	noise.set_vdd(-12);
 	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
 	SPEAKER(config, "speaker").front_center();

@@ -586,7 +586,7 @@ ROM_START( blktigerb3 )
 	ROM_LOAD( "10.9a",  0x20000, 0x10000, CRC(fc33ccc6) SHA1(d492626a88565c2626f98ecb1d74535f1ad68e4c) )
 	ROM_LOAD( "9.8a",   0x30000, 0x10000, CRC(f449de01) SHA1(f6b40e9eb2471b89c42ab84f4214295d284db0c3) )
 
-	ROM_REGION( 0x0400, "proms", 0 )    /* PROMs (function unknown) */ // misisng in this dump
+	ROM_REGION( 0x0400, "proms", 0 )    // PROMs (function unknown), missing in this dump
 	ROM_LOAD( "bd01.8j",   0x0000, 0x0100, CRC(29b459e5) SHA1(0034734a533df3dea16b7b48e072485d7f26f850) )
 	ROM_LOAD( "bd02.9j",   0x0100, 0x0100, CRC(8b741e66) SHA1(6c1fda59936a7217b05949f5c54b1f91f4b49dbe) )
 	ROM_LOAD( "bd03.11k",  0x0200, 0x0100, CRC(27201c75) SHA1(c54d87f06bfe0b0908389c005014d97156e272c2) )

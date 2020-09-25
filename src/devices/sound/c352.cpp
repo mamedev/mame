@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, superctr
 /*
-    c352.c - Namco C352 custom PCM chip emulation
+    c352.cpp - Namco C352 custom PCM chip emulation
     v2.0
     By R. Belmont
     Rewritten and improved by superctr
@@ -122,14 +122,14 @@ void c352_device::ramp_volume(c352_voice_t &v, int ch, u8 val)
 		v.curr_vol[ch] += (vol_delta > 0) ? -1 : 1;
 }
 
-void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c352_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer_fl = outputs[0];
-	stream_sample_t *buffer_fr = outputs[1];
-	stream_sample_t *buffer_rl = outputs[2];
-	stream_sample_t *buffer_rr = outputs[3];
+	auto &buffer_fl = outputs[0];
+	auto &buffer_fr = outputs[1];
+	auto &buffer_rl = outputs[2];
+	auto &buffer_rr = outputs[3];
 
-	for (int i = 0; i < samples; i++)
+	for (int i = 0; i < buffer_fl.samples(); i++)
 	{
 		int out[4] = { 0, 0, 0, 0 };
 
@@ -173,14 +173,14 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			out[3] += (((v.flags & C352_FLG_PHASEFR) ? -s : s) * v.curr_vol[3]) >> 8;
 		}
 
-		*buffer_fl++ = (s16)(out[0] >> 3);
-		*buffer_fr++ = (s16)(out[1] >> 3);
-		*buffer_rl++ = (s16)(out[2] >> 3);
-		*buffer_rr++ = (s16)(out[3] >> 3);
+		buffer_fl.put_int(i, s16(out[0] >> 3), 32768);
+		buffer_fr.put_int(i, s16(out[1] >> 3), 32768);
+		buffer_rl.put_int(i, s16(out[2] >> 3), 32768);
+		buffer_rr.put_int(i, s16(out[3] >> 3), 32768);
 	}
 }
 
-u16 c352_device::read_reg16(offs_t offset)
+u16 c352_device::read(offs_t offset)
 {
 	m_stream->update();
 
@@ -206,7 +206,7 @@ u16 c352_device::read_reg16(offs_t offset)
 	return 0;
 }
 
-void c352_device::write_reg16(offs_t offset, u16 data, u16 mem_mask)
+void c352_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_stream->update();
 
@@ -224,7 +224,7 @@ void c352_device::write_reg16(offs_t offset, u16 data, u16 mem_mask)
 
 	if (offset < 0x100)
 	{
-		u16 newval = read_reg16(offset);
+		u16 newval = read(offset);
 		COMBINE_DATA(&newval);
 		*((u16*)&m_c352_v[offset / 8] + reg_map[offset % 8]) = newval;
 	}
@@ -358,14 +358,14 @@ void c352_device::device_clock_changed()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(m_sample_rate_base);
 	else
-		m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+		m_stream = stream_alloc(0, 4, m_sample_rate_base);
 }
 
 void c352_device::device_start()
 {
 	m_sample_rate_base = clock() / m_divider;
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+	m_stream = stream_alloc(0, 4, m_sample_rate_base);
 
 	// generate mulaw table (Output similar to namco's VC emulator)
 	int j = 0;
@@ -413,14 +413,4 @@ void c352_device::device_reset()
 	// init noise generator
 	m_random = 0x1234;
 	m_control = 0;
-}
-
-READ16_MEMBER( c352_device::read )
-{
-	return read_reg16(offset);
-}
-
-WRITE16_MEMBER( c352_device::write )
-{
-	write_reg16(offset, data, mem_mask);
 }

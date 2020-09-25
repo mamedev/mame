@@ -73,21 +73,21 @@ void vixen_state::update_interrupt()
 }
 
 
-READ8_MEMBER( vixen_state::opram_r )
+uint8_t vixen_state::opram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(0); // read videoram
 	return m_program->read_byte(offset);
 }
 
-READ8_MEMBER( vixen_state::oprom_r )
+uint8_t vixen_state::oprom_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
 
-READ8_MEMBER( vixen_state::status_r )
+uint8_t vixen_state::status_r()
 {
 	/*
 
@@ -118,7 +118,7 @@ READ8_MEMBER( vixen_state::status_r )
 	return data;
 }
 
-WRITE8_MEMBER( vixen_state::cmd_w )
+void vixen_state::cmd_w(uint8_t data)
 {
 	/*
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 	update_interrupt();
 }
 
-READ8_MEMBER( vixen_state::ieee488_r )
+uint8_t vixen_state::ieee488_r()
 {
 	/*
 
@@ -203,7 +203,7 @@ READ8_MEMBER( vixen_state::ieee488_r )
 //  port3_r - serial status read
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::port3_r )
+uint8_t vixen_state::port3_r()
 {
 	/*
 

@@ -38,8 +38,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	uint16_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint16_t data);
 
 	required_device<ins8250_device> m_uart;
 

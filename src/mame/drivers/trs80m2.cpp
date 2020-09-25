@@ -98,7 +98,7 @@ void trs80m2_state::write(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( trs80m2_state::rom_enable_w )
+void trs80m2_state::rom_enable_w(uint8_t data)
 {
 	/*
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER( trs80m2_state::rom_enable_w )
 	m_boot_rom = BIT(data, 0);
 }
 
-WRITE8_MEMBER( trs80m2_state::drvslt_w )
+void trs80m2_state::drvslt_w(uint8_t data)
 {
 	/*
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
 	m_fdc->dden_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( trs80m2_state::keyboard_r )
+uint8_t trs80m2_state::keyboard_r()
 {
 	// clear keyboard interrupt
 	if (!m_kbirq)
@@ -170,7 +170,7 @@ READ8_MEMBER( trs80m2_state::keyboard_r )
 	return m_key_data;
 }
 
-READ8_MEMBER( trs80m2_state::rtc_r )
+uint8_t trs80m2_state::rtc_r()
 {
 	// clear RTC interrupt
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -178,7 +178,7 @@ READ8_MEMBER( trs80m2_state::rtc_r )
 	return 0;
 }
 
-READ8_MEMBER( trs80m2_state::nmi_r )
+uint8_t trs80m2_state::nmi_r()
 {
 	/*
 
@@ -212,7 +212,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 	return data;
 }
 
-WRITE8_MEMBER( trs80m2_state::nmi_w )
+void trs80m2_state::nmi_w(uint8_t data)
 {
 	/*
 
@@ -252,17 +252,17 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 	m_msel = BIT(data, 7);
 }
 
-READ8_MEMBER( trs80m2_state::fdc_r )
+uint8_t trs80m2_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( trs80m2_state::fdc_w )
+void trs80m2_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER( trs80m16_state::tcl_w )
+void trs80m16_state::tcl_w(uint8_t data)
 {
 	/*
 
@@ -289,7 +289,7 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
 	m_ual = (m_ual & 0x1fe) | BIT(data, 7);
 }
 
-WRITE8_MEMBER( trs80m16_state::ual_w )
+void trs80m16_state::ual_w(uint8_t data)
 {
 	/*
 

@@ -99,7 +99,7 @@ bool geneve_memex_device::access_enabled(offs_t offset)
     Note that the incomplete decoding of the standard Geneve must be
     considered.
 */
-READ8Z_MEMBER( geneve_memex_device::readz )
+void geneve_memex_device::readz(offs_t offset, uint8_t *value)
 {
 	/* If not Genmod, add the upper two address bits 10 */
 //  if (!m_genmod) offset |= 0x100000;

@@ -49,27 +49,27 @@ void sprint2_state::video_start()
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_collision1_r)
+uint8_t sprint2_state::sprint2_collision1_r()
 {
 	return m_collision[0];
 }
-READ8_MEMBER(sprint2_state::sprint2_collision2_r)
+uint8_t sprint2_state::sprint2_collision2_r()
 {
 	return m_collision[1];
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_collision_reset1_w)
+void sprint2_state::sprint2_collision_reset1_w(uint8_t data)
 {
 	m_collision[0] = 0;
 }
-WRITE8_MEMBER(sprint2_state::sprint2_collision_reset2_w)
+void sprint2_state::sprint2_collision_reset2_w(uint8_t data)
 {
 	m_collision[1] = 0;
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_video_ram_w)
+void sprint2_state::sprint2_video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

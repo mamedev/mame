@@ -129,6 +129,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE VECTOR OPTIONS" },
 	{ OPTION_BEAM_WIDTH_MIN,                             "1.0",       OPTION_FLOAT,      "set vector beam width minimum" },
 	{ OPTION_BEAM_WIDTH_MAX,                             "1.0",       OPTION_FLOAT,      "set vector beam width maximum" },
+	{ OPTION_BEAM_DOT_SIZE,                              "1.0",       OPTION_FLOAT,      "set vector beam size for dots" },
 	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
 
@@ -137,6 +138,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     OPTION_INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ OPTION_VOLUME ";vol",                              "0",         OPTION_INTEGER,    "sound volume in decibels (-32 min, 0 max)" },
+	{ OPTION_SPEAKER_REPORT,                             "0",         OPTION_INTEGER,    "print report of speaker ouput maxima (0=none, or 1-4 for more detail)" },
 
 	// input options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE INPUT OPTIONS" },

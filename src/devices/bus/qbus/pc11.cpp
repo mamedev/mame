@@ -2,10 +2,11 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DEC PC11 paper tape reader and punch controller (punch not implemented)
+    DEC PC11 paper tape reader and punch controller (punch not implemented)
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "pc11.h"
 
 
@@ -13,7 +14,7 @@
 #define LOG_DBG     (1U <<  2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DBG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -68,8 +69,8 @@ pc11_device::pc11_device(const machine_config &mconfig, const char *tag, device_
 
 void pc11_device::device_start()
 {
-	m_bus->install_device(0177550, 0177557, read16_delegate(*this, FUNC(pc11_device::read)),
-		write16_delegate(*this, FUNC(pc11_device::write)));
+	m_bus->install_device(0177550, 0177557, read16sm_delegate(*this, FUNC(pc11_device::read)),
+		write16sm_delegate(*this, FUNC(pc11_device::write)));
 
 	// resolve callbacks
 
@@ -157,7 +158,7 @@ void pc11_device::call_unload()
 //  read - register read
 //-------------------------------------------------
 
-READ16_MEMBER(pc11_device::read)
+uint16_t pc11_device::read(offs_t offset)
 {
 	uint16_t data = 0;
 
@@ -184,7 +185,7 @@ READ16_MEMBER(pc11_device::read)
 //  write - register write
 //-------------------------------------------------
 
-WRITE16_MEMBER(pc11_device::write)
+void pc11_device::write(offs_t offset, uint16_t data)
 {
 	LOGDBG("W %06o <- %06o\n", 0177550 + (offset << 1), data);
 

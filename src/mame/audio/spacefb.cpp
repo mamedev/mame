@@ -34,7 +34,7 @@ READ_LINE_MEMBER(spacefb_state::audio_t1_r)
 }
 
 
-WRITE8_MEMBER(spacefb_state::port_1_w)
+void spacefb_state::port_1_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 

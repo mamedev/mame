@@ -308,11 +308,11 @@ void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 
 //-------------------------------------------------
-//  sound_stream_update - audio streamer for
+//  sound_stream_update_legacy - audio streamer for
 //  laserdiscs
 //-------------------------------------------------
 
-void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void laserdisc_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	// compute AND values based on the squelch
 	int16_t leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;
@@ -762,7 +762,7 @@ void laserdisc_device::init_audio()
 	m_audio_callback.resolve();
 
 	// allocate a stream
-	m_stream = stream_alloc(0, 2, 48000);
+	m_stream = stream_alloc_legacy(0, 2, 48000);
 
 	// allocate audio buffers
 	m_audiomaxsamples = ((uint64_t)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;

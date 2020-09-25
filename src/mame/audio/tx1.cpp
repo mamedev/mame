@@ -111,7 +111,7 @@ void tx1_sound_device::device_start()
 
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << TX1_FRAC) / (double)machine().sample_rate();
 
 	/* Compute the engine resistor weights */
@@ -131,23 +131,23 @@ void tx1_sound_device::device_reset()
 }
 
 /* Main CPU and Z80 synchronisation */
-WRITE16_MEMBER( tx1_sound_device::z80_busreq_w )
+void tx1_sound_device::z80_busreq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
-WRITE8_MEMBER( tx1_sound_device::z80_intreq_w )
+void tx1_sound_device::z80_intreq_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER( tx1_sound_device::z80_shared_r )
+uint16_t tx1_sound_device::z80_shared_r(offs_t offset)
 {
 	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE16_MEMBER( tx1_sound_device::z80_shared_w )
+void tx1_sound_device::z80_shared_w(offs_t offset, uint16_t data)
 {
 	m_audiocpu->space(AS_PROGRAM).write_byte(offset, data & 0xff);
 }
@@ -156,13 +156,13 @@ WRITE16_MEMBER( tx1_sound_device::z80_shared_w )
     (TODO) TS: Connected in place of dipswitch A bit 0
     Accessed on startup as some sort of acknowledgement
 */
-WRITE8_MEMBER( tx1_sound_device::ts_w )
+void tx1_sound_device::ts_w(offs_t offset, uint8_t data)
 {
 //  TS = 1;
 	m_z80_ram[offset] = data;
 }
 
-READ8_MEMBER( tx1_sound_device::ts_r )
+uint8_t tx1_sound_device::ts_r(offs_t offset)
 {
 //  TS = 1;
 	return m_z80_ram[offset];
@@ -177,13 +177,13 @@ static uint8_t bit_reverse8(uint8_t val)
 	return val;
 }
 
-READ16_MEMBER( tx1_sound_device::dipswitches_r )
+uint16_t tx1_sound_device::dipswitches_r()
 {
 	return (m_dsw->read() & 0xfffe) | m_ts;
 }
 
 // Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
-READ8_MEMBER( buggyboy_sound_device::bb_analog_r )
+uint8_t buggyboy_sound_device::bb_analog_r(offs_t offset)
 {
 	if (offset == 0)
 		return bit_reverse8(((m_accelerator->read() & 0xf) << 4) | m_steering->read());
@@ -191,7 +191,7 @@ READ8_MEMBER( buggyboy_sound_device::bb_analog_r )
 		return bit_reverse8((m_brake->read() & 0xf) << 4);
 }
 
-READ8_MEMBER( buggyboyjr_sound_device::bbjr_analog_r )
+uint8_t buggyboyjr_sound_device::bbjr_analog_r(offs_t offset)
 {
 	if (offset == 0)
 		return ((m_accelerator->read() & 0xf) << 4) | m_steering->read();
@@ -229,7 +229,7 @@ uint8_t tx1_sound_device::tx1_ppi_portb_r()
 	return m_ppi_portd->read() | m_ppi_latch_b;
 }
 
-WRITE8_MEMBER( tx1_sound_device::pit8253_w )
+void tx1_sound_device::pit8253_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER( tx1_sound_device::pit8253_w )
 	}
 }
 
-READ8_MEMBER( tx1_sound_device::pit8253_r )
+uint8_t tx1_sound_device::pit8253_r(offs_t offset)
 {
 	osd_printf_debug("PIT R: %x", offset);
 	return 0;
@@ -356,10 +356,10 @@ static inline void update_engine(int eng[4])
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tx1_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
@@ -662,7 +662,7 @@ void buggyboy_sound_device::device_start()
 		m_eng_voltages[i] = combine_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
+	m_stream = stream_alloc_legacy(0, 2, machine().sample_rate());
 	m_freq_to_step = (double)(1 << 24) / (double)machine().sample_rate();
 }
 
@@ -763,10 +763,10 @@ void buggyboy_sound_device::ym2_b_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void buggyboy_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	/* This is admittedly a bit of a hack job... */
 

@@ -31,8 +31,8 @@ public:
 	template <typename T> void set_king_tag(T &&tag) { m_huc6272.set_tag(std::forward<T>(tag)); }
 
 	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
 
 protected:
 	// device-level overrides

@@ -56,8 +56,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 
-	void bg_speech_clock_w(uint8_t data);
-	void bg_speech_digit_w(uint8_t data);
+	void bg_cvsd_clock_set_w(uint8_t data);
+	void bg_cvsd_digit_clock_clear_w(uint8_t data);
 	void rombank_w(uint8_t data);
 	uint8_t latch_r();
 	void latch_w(uint8_t data);

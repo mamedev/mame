@@ -41,8 +41,8 @@ private:
 	uint8_t iocpu_test0_r();
 
 	/* GPIB */
-	DECLARE_READ8_MEMBER(gpib_r);
-	DECLARE_WRITE8_MEMBER(gpib_w);
+	uint8_t gpib_r(offs_t offset);
+	void gpib_w(offs_t offset, uint8_t data);
 	void ieee488_dio_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(gpib_irq);

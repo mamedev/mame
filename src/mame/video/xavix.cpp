@@ -61,32 +61,32 @@ void xavix_state::video_start()
 }
 
 
-WRITE8_MEMBER(xavix_state::palram_sh_w)
+void xavix_state::palram_sh_w(offs_t offset, uint8_t data)
 {
 	m_palram_sh[offset] = data;
 	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
 }
 
-WRITE8_MEMBER(xavix_state::palram_l_w)
+void xavix_state::palram_l_w(offs_t offset, uint8_t data)
 {
 	m_palram_l[offset] = data;
 	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
 }
 
-WRITE8_MEMBER(xavix_state::bmp_palram_sh_w)
+void xavix_state::bmp_palram_sh_w(offs_t offset, uint8_t data)
 {
 	m_bmp_palram_sh[offset] = data;
 	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
-WRITE8_MEMBER(xavix_state::bmp_palram_l_w)
+void xavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
 {
 	m_bmp_palram_l[offset] = data;
 	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
 
-WRITE8_MEMBER(xavix_state::spriteram_w)
+void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x100)
 	{
@@ -898,17 +898,17 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 
-WRITE8_MEMBER(xavix_state::spritefragment_dma_params_1_w)
+void xavix_state::spritefragment_dma_params_1_w(offs_t offset, uint8_t data)
 {
 	m_spritefragment_dmaparam1[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::spritefragment_dma_params_2_w)
+void xavix_state::spritefragment_dma_params_2_w(offs_t offset, uint8_t data)
 {
 	m_spritefragment_dmaparam2[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
+void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 {
 	uint16_t len = data & 0x07;
 	uint16_t src = (m_spritefragment_dmaparam1[1] << 8) | m_spritefragment_dmaparam1[0];
@@ -938,18 +938,18 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
 			uint8_t dat = read_full_data_sp_bypass(src + i);
 			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
-			spriteram_w(space, (dst + i) & 0x7ff, dat);
+			spriteram_w((dst + i) & 0x7ff, dat);
 		}
 	}
 }
 
-READ8_MEMBER(xavix_state::spritefragment_dma_status_r)
+uint8_t xavix_state::spritefragment_dma_status_r()
 {
 	// expects bit 0x40 to clear in most cases
 	return 0x00;
 }
 
-READ8_MEMBER(xavix_state::pal_ntsc_r)
+uint8_t xavix_state::pal_ntsc_r()
 {
 	// only seen 0x10 checked in code
 	// in monster truck the tile base address gets set based on this, there are 2 copies of the test screen in rom, one for pal, one for ntsc, see 1854c
@@ -958,7 +958,7 @@ READ8_MEMBER(xavix_state::pal_ntsc_r)
 }
 
 
-WRITE8_MEMBER(xavix_state::tmap1_regs_w)
+void xavix_state::tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	   0x0 pointer to low tile bits
@@ -1004,7 +1004,7 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	COMBINE_DATA(&m_tmap1_regs[offset]);
 }
 
-WRITE8_MEMBER(xavix_state::tmap2_regs_w)
+void xavix_state::tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// same as above but for 2nd tilemap
 	if ((offset != 0x4) && (offset != 0x5))
@@ -1016,7 +1016,7 @@ WRITE8_MEMBER(xavix_state::tmap2_regs_w)
 }
 
 
-WRITE8_MEMBER(xavix_state::spriteregs_w)
+void xavix_state::spriteregs_w(uint8_t data)
 {
 	LOG("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
 	/*
@@ -1034,20 +1034,20 @@ WRITE8_MEMBER(xavix_state::spriteregs_w)
 	m_spritereg = data;
 }
 
-READ8_MEMBER(xavix_state::tmap1_regs_r)
+uint8_t xavix_state::tmap1_regs_r(offs_t offset)
 {
 	LOG("%s: tmap1_regs_r offset %02x\n", offset, machine().describe_context());
 	return m_tmap1_regs[offset];
 }
 
-READ8_MEMBER(xavix_state::tmap2_regs_r)
+uint8_t xavix_state::tmap2_regs_r(offs_t offset)
 {
 	LOG("%s: tmap2_regs_r offset %02x\n", offset, machine().describe_context());
 	return m_tmap2_regs[offset];
 }
 
 // The Text Array / Memory Emulator acts as a memory area that you can point the tilemap sources at to get a fixed pattern of data
-WRITE8_MEMBER(xavix_state::xavix_memoryemu_txarray_w)
+void xavix_state::xavix_memoryemu_txarray_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x400)
 	{
@@ -1067,7 +1067,7 @@ WRITE8_MEMBER(xavix_state::xavix_memoryemu_txarray_w)
 	}
 }
 
-READ8_MEMBER(xavix_state::xavix_memoryemu_txarray_r)
+uint8_t xavix_state::xavix_memoryemu_txarray_r(offs_t offset)
 {
 	return txarray_r(offset);
 }

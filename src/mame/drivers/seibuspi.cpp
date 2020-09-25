@@ -2010,50 +2010,50 @@ void seibuspi_state::sys386f(machine_config &config)
 
 void seibuspi_state::init_senkyu()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32smo_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_senkyua()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32smo_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_batlball()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32smo_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32smo_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1o()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32smo_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_ejanhs()
 {
 //  idle skip doesn't work properly?
-//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
+//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32smo_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32smo_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft2()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32smo_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
 
 	rdft2_text_decrypt(memregion("chars")->base());
 	rdft2_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2063,7 +2063,7 @@ void seibuspi_state::init_rdft2()
 
 void seibuspi_state::init_rfjet()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32smo_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
 
 	rfjet_text_decrypt(memregion("chars")->base());
 	rfjet_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2072,21 +2072,21 @@ void seibuspi_state::init_rfjet()
 }
 
 
-READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
+u32 seibuspi_state::senkyu_speedup_r()
 {
 	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
-READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
+u32 seibuspi_state::senkyua_speedup_r()
 {
 	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
 
-READ32_MEMBER(seibuspi_state::batlball_speedup_r)
+u32 seibuspi_state::batlball_speedup_r()
 {
 //  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
@@ -2099,7 +2099,7 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 	return m_mainram[0x0018db4/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
+u32 seibuspi_state::viprp1_speedup_r()
 {
 	/* viprp1 */
 	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
@@ -2115,7 +2115,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 	return m_mainram[0x001e2e0/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
+u32 seibuspi_state::viprp1o_speedup_r()
 {
 	/* viperp1o */
 	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
@@ -2125,7 +2125,7 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 
 #ifdef UNUSED_FUNCTION
 // causes input problems?
-READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
+u32 seibuspi_state::ejanhs_speedup_r()
 {
 // osd_printf_debug("%08x\n",m_maincpu->pc());
 	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
@@ -2133,7 +2133,7 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 }
 #endif
 
-READ32_MEMBER(seibuspi_state::rdft_speedup_r)
+u32 seibuspi_state::rdft_speedup_r()
 {
 	/* rdft */
 	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
@@ -2161,7 +2161,7 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 	return m_mainram[0x00298d0/4];
 }
 
-READ32_MEMBER(seibuspi_state::rf2_speedup_r)
+u32 seibuspi_state::rf2_speedup_r()
 {
 	/* rdft22kc */
 	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
@@ -2180,7 +2180,7 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 	return m_mainram[0x0282ac/4];
 }
 
-READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
+u32 seibuspi_state::rfjet_speedup_r()
 {
 	/* rfjet, rfjetu, rfjeta */
 	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle

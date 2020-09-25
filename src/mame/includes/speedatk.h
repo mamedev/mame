@@ -40,11 +40,11 @@ private:
 	uint8_t m_coin_settings;
 	uint8_t m_coin_impulse;
 
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_WRITE8_MEMBER(key_matrix_w);
-	DECLARE_READ8_MEMBER(key_matrix_status_r);
-	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
-	DECLARE_WRITE8_MEMBER(m6845_w);
+	uint8_t key_matrix_r();
+	void key_matrix_w(uint8_t data);
+	uint8_t key_matrix_status_r();
+	void key_matrix_status_w(uint8_t data);
+	void m6845_w(offs_t offset, uint8_t data);
 	void output_w(uint8_t data);
 
 	virtual void machine_start() override;

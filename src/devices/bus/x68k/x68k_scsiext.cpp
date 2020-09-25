@@ -72,7 +72,7 @@ void x68k_scsiext_device::device_start()
 	uint8_t *ROM = machine().root_device().memregion(subtag("scsiexrom").c_str())->base();
 	machine().root_device().membank("scsi_ext")->set_base(ROM);
 
-	m_slot->space().install_readwrite_handler(0xea0000,0xea001f, read8_delegate(*this, FUNC(x68k_scsiext_device::register_r)), write8_delegate(*this, FUNC(x68k_scsiext_device::register_w)), 0x00ff00ff);
+	m_slot->space().install_readwrite_handler(0xea0000,0xea001f, read8sm_delegate(*this, FUNC(x68k_scsiext_device::register_r)), write8sm_delegate(*this, FUNC(x68k_scsiext_device::register_w)), 0x00ff00ff);
 }
 
 void x68k_scsiext_device::device_reset()
@@ -94,12 +94,12 @@ void x68k_scsiext_device::drq_w(int state)
 	// TODO
 }
 
-READ8_MEMBER(x68k_scsiext_device::register_r)
+uint8_t x68k_scsiext_device::register_r(offs_t offset)
 {
 	return m_spc->mb89352_r(offset);
 }
 
-WRITE8_MEMBER(x68k_scsiext_device::register_w)
+void x68k_scsiext_device::register_w(offs_t offset, uint8_t data)
 {
 	m_spc->mb89352_w(offset,data);
 }

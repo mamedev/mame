@@ -102,7 +102,7 @@ void hp98032_io_card_device::device_reset()
 	m_gpio->preset_w(0);
 }
 
-READ16_MEMBER(hp98032_io_card_device::reg_r)
+uint16_t hp98032_io_card_device::reg_r(address_space &space, offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -173,7 +173,7 @@ READ16_MEMBER(hp98032_io_card_device::reg_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp98032_io_card_device::reg_w)
+void hp98032_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t data)
 {
 	LOG("wr R%u=%04x\n" , offset + 4 , data);
 

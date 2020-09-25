@@ -61,10 +61,10 @@ public:
 	void init_vixen();
 
 private:
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_READ8_MEMBER( ieee488_r );
-	DECLARE_READ8_MEMBER( port3_r );
+	uint8_t status_r();
+	void cmd_w(uint8_t data);
+	uint8_t ieee488_r();
+	uint8_t port3_r();
 	uint8_t i8155_pa_r();
 	void i8155_pb_w(uint8_t data);
 	void i8155_pc_w(uint8_t data);
@@ -78,8 +78,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
-	DECLARE_READ8_MEMBER(opram_r);
-	DECLARE_READ8_MEMBER(oprom_r);
+	uint8_t opram_r(offs_t offset);
+	uint8_t oprom_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bios_mem(address_map &map);

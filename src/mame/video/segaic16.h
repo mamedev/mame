@@ -27,9 +27,9 @@ class sega_16bit_common_base : public driver_device
 {
 public:
 	// palette helpers
-	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_WRITE16_MEMBER( hangon_paletteram_w );
-	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void hangon_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void philko_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// construction/destruction
@@ -158,14 +158,14 @@ public:
 	void tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
 	void rotate_init(int which, int type, int colorbase);
 
-	DECLARE_READ16_MEMBER( tileram_r );
-	DECLARE_READ16_MEMBER( textram_r );
-	DECLARE_WRITE16_MEMBER( tileram_w );
-	DECLARE_WRITE16_MEMBER( textram_w );
+	uint16_t tileram_r(offs_t offset);
+	uint16_t textram_r(offs_t offset);
+	void tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void textram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap);
 
-	DECLARE_READ16_MEMBER( rotate_control_r );
+	uint16_t rotate_control_r();
 
 	TILE_GET_INFO_MEMBER( tilemap_16b_tile_info );
 	TILE_GET_INFO_MEMBER( tilemap_16b_text_info );

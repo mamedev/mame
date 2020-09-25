@@ -59,9 +59,9 @@ void ym2612_device::timer_handler(int c,int count,int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ym2612_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	ym2612_update_one(m_chip, outputs, samples, m_output_bits);
+	ym2612_update_one(m_chip, outputs, m_output_bits);
 }
 
 
@@ -87,7 +87,7 @@ void ym2612_device::device_start()
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+	m_stream = stream_alloc(0,2,rate);
 
 	/**** initialize YM2612 ****/
 	m_chip = ym2612_init(this,clock(),rate,&ym2612_device::static_timer_handler,&ym2612_device::static_irq_handler);
@@ -108,7 +108,7 @@ void ym2612_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+		m_stream = stream_alloc(0,2,rate);
 }
 
 //-------------------------------------------------

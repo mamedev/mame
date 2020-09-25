@@ -28,6 +28,7 @@ public:
 
 	void mrdo(machine_config &config);
 	void mrlo(machine_config &config);
+	void mrdobl(machine_config &config);
 
 protected:
 	virtual void video_start() override;

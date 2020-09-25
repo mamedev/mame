@@ -50,7 +50,7 @@ NOTE: There is manual for Run Deep which is (c) 1988 by World Games. Is Cream Co
 ***************************************************************************/
 
 
-WRITE8_MEMBER(thedeep_state::nmi_w)
+void thedeep_state::nmi_w(uint8_t data)
 {
 	m_nmi_enable = data;
 	if (!m_nmi_enable)
@@ -69,19 +69,19 @@ void thedeep_state::machine_start()
 	save_item(NAME(m_coin_result));
 }
 
-READ8_MEMBER(thedeep_state::protection_r)
+uint8_t thedeep_state::protection_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return m_mcu_to_maincpu;
 }
 
-WRITE8_MEMBER(thedeep_state::protection_w)
+void thedeep_state::protection_w(uint8_t data)
 {
 	m_maincpu_to_mcu = data;
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(thedeep_state::e004_r)
+uint8_t thedeep_state::e004_r()
 {
 	// 7654321-  unused?
 	// -------0  coin status from mcu ready
@@ -93,7 +93,7 @@ READ8_MEMBER(thedeep_state::e004_r)
 	return data;
 }
 
-WRITE8_MEMBER(thedeep_state::e100_w)
+void thedeep_state::e100_w(uint8_t data)
 {
 	if (data != 1)
 		logerror("pc %04x: e100 = %02x\n", m_maincpu->pc(),data);

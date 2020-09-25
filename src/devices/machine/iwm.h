@@ -5,13 +5,13 @@
     Apple IWM floppy disk controller
 
 *********************************************************************/
-
-#pragma once
-
 #ifndef MAME_MACHINE_IWM_H
 #define MAME_MACHINE_IWM_H
 
+#pragma once
+
 #include "applefdintf.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

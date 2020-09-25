@@ -13,19 +13,84 @@
 #define NLTYPES_H_
 
 #include "nl_config.h"
-#include "plib/pchrono.h"
-#include "plib/pdynlib.h"
-#include "plib/pfmtlog.h"
+
 #include "plib/pmempool.h"
-#include "plib/pstate.h"
+#include "plib/ppmf.h"
 #include "plib/pstring.h"
 #include "plib/ptime.h"
-#include "plib/putil.h"
+#include "plib/ptypes.h"
 
-#include <unordered_map>
+#include <memory>
 
 namespace netlist
 {
+	// -----------------------------------------------------------------------------
+	// forward definitions
+	// -----------------------------------------------------------------------------
+
+	class logic_output_t;
+	class tristate_output_t;
+	class logic_input_t;
+	class analog_net_t;
+	class logic_net_t;
+	class setup_t;
+	class nlparse_t;
+	class netlist_t;
+	class netlist_state_t;
+	class core_device_t;
+	class device_t;
+	class netlist_state_t;
+	class param_t;
+	class logic_family_desc_t;
+	class terminal_t;
+
+	class models_t;
+
+	namespace devices
+	{
+		class nld_solver;
+		class nld_mainclock;
+		class nld_base_proxy;
+		class nld_base_d_to_a_proxy;
+		class nld_base_a_to_d_proxy;
+		class nld_netlistparams;
+	} // namespace devices
+
+	namespace solver
+	{
+		class matrix_solver_t;
+	} // namespace solver
+
+	namespace detail
+	{
+		struct abstract_t;
+		class core_terminal_t;
+		class net_t;
+		class device_object_t;
+	} // namespace detail
+
+	namespace factory
+	{
+		class list_t;
+		class element_t;
+		struct properties;
+	} // namespace factory
+
+	template <class CX>
+	class delegator_t : public CX
+	{
+	protected:
+		using base_type = delegator_t<CX>;
+		using delegated_type = CX;
+		using delegated_type::delegated_type;
+	};
+
+} // namespace netlist
+
+
+namespace netlist
+{
+
 	/// \brief Constants and const calculations for the library
 	///
 	template<typename T>
@@ -33,10 +98,10 @@ namespace netlist
 	{
 		using BC = plib::constants<T>;
 
-		static inline constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
+		static constexpr T np_VT(T n=BC::one(), T temp=BC::T0()) noexcept
 		{ return n * temp * BC::k_b() / BC::Q_e(); }
 
-		static inline constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
+		static constexpr T np_Is() noexcept { return static_cast<T>(1e-15); } // NOLINT
 
 		/// \brief constant startup gmin
 		///
@@ -44,19 +109,19 @@ namespace netlist
 		/// conductivities with a reasonable value.
 		/// During reset, the object should than make use of exec().gmin()
 		/// to use the actual gmin() value.
-		static inline constexpr T cgmin() noexcept { return BC::magic(1e-9); } // NOLINT
+		static constexpr T cgmin() noexcept { return BC::magic(1e-9); } // NOLINT
 
 		// FIXME: Some objects used 1e-15 for initial gmin. Needs to be
 		//        aligned with cgmin
-		static inline constexpr T cgminalt() noexcept { return BC::magic(1e-15); } // NOLINT
+		static constexpr T cgminalt() noexcept { return BC::magic(1e-15); } // NOLINT
 
 		/// \brief Multiplier applied to VT in np diode models to determine range for constant model
 		///
-		static inline constexpr T diode_min_cutoff_mult() noexcept { return BC::magic(-5.0); } // NOLINT
+		static constexpr T diode_min_cutoff_mult() noexcept { return BC::magic(-5.0); } // NOLINT
 
 		/// \brief Startup voltage used by np diode models
 		///
-		static inline constexpr T diode_start_voltage() noexcept { return BC::magic(0.7); } // NOLINT
+		static constexpr T diode_start_voltage() noexcept { return BC::magic(0.7); } // NOLINT
 
 	};
 
@@ -79,44 +144,31 @@ namespace netlist
 	///
 
 	using device_arena = std::conditional_t<config::use_mempool::value,
-		plib::mempool_arena<plib::aligned_arena>,
+		plib::mempool_arena<plib::aligned_arena, NL_MEMPOOL_ALIGN>,
 		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
-	/// \brief Interface definition for netlist callbacks into calling code
-	///
-	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
-	/// constructor. Netlist does processing during construction and thus needs
-	/// the object passed completely constructed.
-	///
-	class callbacks_t
-	{
-	public:
-
-		callbacks_t() = default;
-		virtual ~callbacks_t() = default;
-
-		PCOPYASSIGNMOVE(callbacks_t, default)
-
-		/// \brief logging callback.
-		///
-		virtual void vlog(const plib::plog_level &l, const pstring &ls) const noexcept = 0;
-
-		/// \brief provide library with static solver implementations.
-		///
-		/// By default no static solvers are provided since these are
-		/// determined by the specific use case. It is up to the implementor
-		/// of a callbacks_t implementation to optionally provide such a collection
-		/// of symbols.
-		///
-		virtual host_arena::unique_ptr<plib::dynlib_base> static_solver_lib() const;
-	};
-
-	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
+	using log_type =  plib::plog_base<NL_DEBUG>;
 
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
+
+	/// \brief Timestep type.
+	///
+	/// May be either FORWARD or RESTORE
+	///
+	enum class timestep_type
+	{
+		FORWARD,  ///< forward time
+		RESTORE   ///< restore state before last forward
+	};
+
+	/// \brief Delegate type for device notification.
+	///
+	using nldelegate = plib::pmfp<void>;
+	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
+	using nldelegate_dyn = plib::pmfp<void>;
 
 	namespace detail {
 
@@ -139,9 +191,9 @@ namespace netlist
 	//  MACROS
 	//============================================================
 
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
-	template <typename T> inline constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
+	template <typename T> constexpr netlist_time NLTIME_FROM_NS(T &&t) noexcept { return netlist_time::from_nsec(t); }
+	template <typename T> constexpr netlist_time NLTIME_FROM_US(T &&t) noexcept { return netlist_time::from_usec(t); }
+	template <typename T> constexpr netlist_time NLTIME_FROM_MS(T &&t) noexcept { return netlist_time::from_msec(t); }
 
 	struct desc_base
 	{
@@ -168,7 +220,7 @@ namespace netlist
 		{
 			static constexpr netlist_time value(std::size_t N)
 			{
-				return NLTIME_FROM_NS(N == 0 ? value0 : value1);
+				return N == 0 ? NLTIME_FROM_NS(value0) : NLTIME_FROM_NS(value1);
 			}
 		};
 
@@ -181,9 +233,9 @@ namespace netlist
 		{
 			static constexpr netlist_time value(std::size_t N)
 			{
-				return NLTIME_FROM_NS(N == 0 ? value0 :
-						N == 1 ? value1 :
-								 value2);
+				return N == 0 ? NLTIME_FROM_NS(value0) :
+					   N == 1 ? NLTIME_FROM_NS(value1) :
+								NLTIME_FROM_NS(value2);
 			}
 		};
 
@@ -198,6 +250,32 @@ namespace netlist
 		using desc_const_t =  std::integral_constant<const T, V>;
 	};
 
+	//============================================================
+	//  Exceptions
+	//============================================================
+
+	/// \brief Generic netlist exception.
+	///  The exception is used in all events which are considered fatal.
+
+	class nl_exception : public plib::pexception
+	{
+	public:
+		/// \brief Constructor.
+		///  Allows a descriptive text to be passed to the exception
+
+		explicit nl_exception(const pstring &text //!< text to be passed
+				)
+		: plib::pexception(text) { }
+
+		/// \brief Constructor.
+		///  Allows to use \ref plib::pfmt logic to be used in exception
+
+		template<typename... Args>
+		explicit nl_exception(const pstring &fmt //!< format to be used
+			, Args&&... args //!< arguments to be passed
+			)
+		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
+	};
 
 } // namespace netlist
 

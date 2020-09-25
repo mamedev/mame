@@ -40,32 +40,32 @@ Basic display of keyboard LEDs for the Acorn Communicator
 			<bounds left="0" right="400" top="0" bottom="300" />
 		</screen>
 
-		<bezel name="label_caps" element="label_caps">
+		<element name="label_caps" ref="label_caps">
 			<bounds x="14" y="302" width="6" height="26" />
 			<orientation rotate="270" />
-		</bezel>
+		</element>
 
-		<bezel name="capslock_led" element="green_led">
+		<element name="capslock_led" ref="green_led">
 			<bounds x="15" y="330" width="4" height="8" />
-		</bezel>
+		</element>
 
-		<bezel name="label_shift" element="label_shift">
+		<element name="label_shift" ref="label_shift">
 			<bounds x="29" y="302" width="6" height="26" />
 			<orientation rotate="270" />
-		</bezel>
+		</element>
 
-		<bezel name="shiftlock_led" element="green_led">
+		<element name="shiftlock_led" ref="green_led">
 			<bounds x="30" y="330" width="4" height="8" />
-		</bezel>
+		</element>
 
-		<bezel name="label_line" element="label_line">
+		<element name="label_line" ref="label_line">
 			<bounds x="44" y="302" width="6" height="26" />
 			<orientation rotate="270" />
-		</bezel>
+		</element>
 
-		<bezel name="line_led" element="green_led">
+		<element name="line_led" ref="green_led">
 			<bounds x="45" y="330" width="4" height="8" />
-		</bezel>
+		</element>
 	</view>
 
 </mamelayout>

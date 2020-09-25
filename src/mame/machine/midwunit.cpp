@@ -7,10 +7,6 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/m6809/m6809.h"
-#include "audio/dcs.h"
-#include "includes/midtunit.h"
 #include "includes/midwunit.h"
 
 #define LOG_UNKNOWN (1 << 0)
@@ -64,6 +60,9 @@ uint16_t midwunit_state::midwunit_cmos_r(offs_t offset)
 
 void midwunit_state::midwunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// apply I/O shuffling
+	offset = m_ioshuffle[offset % 16];
+
 	offset %= 8;
 	int oldword = m_iodata[offset];
 	int newword = oldword;
@@ -79,6 +78,7 @@ void midwunit_state::midwunit_io_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 			/* bit 5 (active low) reset security chip */
 			if (m_midway_serial_pic) m_midway_serial_pic->reset_w(newword & 0x20);
+			if (m_midway_serial_pic_emu) m_midway_serial_pic_emu->reset_w(newword & 0x20);
 			break;
 
 		case 3:
@@ -119,6 +119,7 @@ uint16_t midwunit_state::midwunit_io_r(offs_t offset)
 		{
 			int picret = 0;
 			if (m_midway_serial_pic) picret = m_midway_serial_pic->status_r();
+			if (m_midway_serial_pic_emu) picret = m_midway_serial_pic_emu->status_r();
 
 			return (picret << 12) | midwunit_sound_state_r();
 		}
@@ -160,7 +161,7 @@ void midwunit_state::machine_start()
 /********************** Mortal Kombat 3 **********************/
 
 
-void midwunit_state::umk3_palette_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void midwunit_state::umk3_palette_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    UMK3 uses a circular buffer to hold pending palette changes; the buffer holds 17 entries
@@ -181,7 +182,7 @@ void midwunit_state::umk3_palette_hack_w(address_space &space, offs_t offset, ui
 	    without significantly impacting the rest of the system.
 	*/
 	COMBINE_DATA(&m_umk3_palette[offset]);
-	space.device().execute().adjust_icount(-100);
+	m_maincpu->adjust_icount(-100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", m_umk3_palette[3], m_umk3_palette[2], m_umk3_palette[1], m_umk3_palette[0]); */
 }
 
@@ -209,14 +210,14 @@ void midwunit_state::init_mk3r10()
 void midwunit_state::init_umk3()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16s_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
 void midwunit_state::init_umk3r11()
 {
 	init_mk3_common();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16s_delegate(*this, FUNC(midwunit_state::umk3_palette_hack_w)));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
@@ -241,6 +242,7 @@ void midwunit_state::init_nbahangt()
 
 /********************** WWF Wrestlemania **********************/
 
+// note: other game's PCBs probably shuffle I/O addresses too, but only WWF game code use/require this.
 void midwunit_state::wwfmania_io_0_w(uint16_t data)
 {
 	/* start with the originals */
@@ -336,6 +338,7 @@ uint16_t midwunit_state::midwunit_security_r()
 {
 	uint16_t picret = 0;
 	if (m_midway_serial_pic) picret = m_midway_serial_pic->read();
+	if (m_midway_serial_pic_emu) picret = m_midway_serial_pic_emu->read();
 	return picret;
 }
 
@@ -345,6 +348,7 @@ void midwunit_state::midwunit_security_w(offs_t offset, uint16_t data, uint16_t 
 	if (offset == 0 && ACCESSING_BITS_0_7)
 	{
 		if (m_midway_serial_pic) m_midway_serial_pic->write(data);
+		if (m_midway_serial_pic_emu) m_midway_serial_pic_emu->write(data);
 	}
 }
 

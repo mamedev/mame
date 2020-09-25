@@ -48,14 +48,14 @@ private:
 	void porta_w(uint8_t data);
 	void portb_w(uint8_t data);
 	void portc_w(uint8_t data);
-	DECLARE_READ8_MEMBER(devsel_r);
-	DECLARE_WRITE8_MEMBER(devsel_w);
-	DECLARE_READ8_MEMBER(gate5a_r);
-	DECLARE_WRITE8_MEMBER(gate5a_w);
-	DECLARE_READ8_MEMBER(iosel_r);
-	DECLARE_WRITE8_MEMBER(iosel_w);
-	DECLARE_READ8_MEMBER(gate7a_r);
-	DECLARE_WRITE8_MEMBER(gate7a_w);
+	uint8_t devsel_r(offs_t offset);
+	void devsel_w(offs_t offset, uint8_t data);
+	uint8_t gate5a_r(offs_t offset);
+	void gate5a_w(offs_t offset, uint8_t data);
+	uint8_t iosel_r(offs_t offset);
+	void iosel_w(offs_t offset, uint8_t data);
+	uint8_t gate7a_r(offs_t offset);
+	void gate7a_w(offs_t offset, uint8_t data);
 
 	void ex800_mem(address_map &map);
 

@@ -95,8 +95,8 @@ void nubus_cb264_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_cb264", &m_vram[0]);
 
-	nubus().install_device(slotspace+0xff6000, slotspace+0xff60ff, read32_delegate(*this, FUNC(nubus_cb264_device::cb264_r)), write32_delegate(*this, FUNC(nubus_cb264_device::cb264_w)));
-	nubus().install_device(slotspace+0xff7000, slotspace+0xff70ff, read32_delegate(*this, FUNC(nubus_cb264_device::cb264_ramdac_r)), write32_delegate(*this, FUNC(nubus_cb264_device::cb264_ramdac_w)));
+	nubus().install_device(slotspace+0xff6000, slotspace+0xff60ff, read32s_delegate(*this, FUNC(nubus_cb264_device::cb264_r)), write32s_delegate(*this, FUNC(nubus_cb264_device::cb264_w)));
+	nubus().install_device(slotspace+0xff7000, slotspace+0xff70ff, read32sm_delegate(*this, FUNC(nubus_cb264_device::cb264_ramdac_r)), write32sm_delegate(*this, FUNC(nubus_cb264_device::cb264_ramdac_w)));
 }
 
 //-------------------------------------------------
@@ -221,7 +221,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264_device::cb264_w )
+void nubus_cb264_device::cb264_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -243,7 +243,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 	}
 }
 
-READ32_MEMBER( nubus_cb264_device::cb264_r )
+uint32_t nubus_cb264_device::cb264_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -263,7 +263,7 @@ READ32_MEMBER( nubus_cb264_device::cb264_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
+void nubus_cb264_device::cb264_ramdac_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{
@@ -289,7 +289,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
 	}
 }
 
-READ32_MEMBER( nubus_cb264_device::cb264_ramdac_r )
+uint32_t nubus_cb264_device::cb264_ramdac_r(offs_t offset)
 {
 	return 0;
 }

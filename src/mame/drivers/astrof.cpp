@@ -1049,6 +1049,26 @@ ROM_START( astrof3 )
 ROM_END
 
 
+ROM_START( astroff )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b.4a",        0xd000, 0x0400, CRC(18bdc2d9) SHA1(1fc93de1212f04f04acc224d91c2308758f5d5ca) )
+	ROM_LOAD( "a.4c",        0xd400, 0x0400, CRC(2344521c) SHA1(7f50890df10219b51bf4cf617e8ffb4336e19ae3) )
+	ROM_LOAD( "9.5a",        0xd800, 0x0400, CRC(9bd0e10d) SHA1(0170f56ce0c7a3827548bdd954acb2c0e4a2cb24) )
+	ROM_LOAD( "8.5c",        0xdc00, 0x0400, CRC(c00d8f28) SHA1(08abc667b2c079bee1242b30545002fa7fea8a72) )
+	ROM_LOAD( "7.4d",        0xe000, 0x0400, CRC(6cd01b9e) SHA1(597db331008a4a561bc8d9bbd42ffde9bcd565dc) )
+	ROM_LOAD( "6.4f",        0xe400, 0x0400, CRC(69cd2604) SHA1(09201ae691330e3bd788f9c714f6dcbb7e8335d0) )
+	ROM_LOAD( "5.5d",        0xe800, 0x0400, CRC(14a4118f) SHA1(d99876f405dd646a7f0e85e584f2509d9cf17372) )
+	ROM_LOAD( "4.5f",        0xec00, 0x0400, CRC(0513bc92) SHA1(dbf774e8353c966c303e02ce8196b888d235bdb2) )
+	ROM_LOAD( "3.4h",        0xf000, 0x0400, CRC(e01713bd) SHA1(e0370a070c727f8f7ff767fdd84f7aeef31c8347) )
+	ROM_LOAD( "2.4k",        0xf400, 0x0400, CRC(24ab94d5) SHA1(1e0a61d83fa67340d4b1477377ed9d65cf826f53) )
+	ROM_LOAD( "1.5h",        0xf800, 0x0400, CRC(142bbc5d) SHA1(55017fd88a19d09943cde16d583db00cf4c3218b) )
+	ROM_LOAD( "0.5k",        0xfc00, 0x0400, CRC(c63a9c80) SHA1(f51694912d823a5ae7883c603915b9c1aa0e0733) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "im5610-82s123.2f",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+
 ROM_START( abattle )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10405-b.bin",  0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
@@ -1112,6 +1132,29 @@ ROM_START( afire )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+
+ROM_START( asterion )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "asterion eprom 12.bin", 0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
+	ROM_LOAD( "asterion eprom 11.bin", 0xd400, 0x0400, CRC(8974715e) SHA1(1a4a576d51a0788dd973de5c5fde5131a940d3f0) )
+	ROM_LOAD( "asterion eprom 10.bin", 0xd800, 0x0400, CRC(354cf432) SHA1(138956ea8064eba0dcd8b2f175d4981b689a2077) )
+	ROM_LOAD( "asterion eprom 9.bin",  0xdc00, 0x0400, CRC(4cee0c8b) SHA1(98bfdda9d2d368db16d6e9090536b09d8337c0e5) )
+	ROM_LOAD( "asterion eprom 5.bin",  0xe000, 0x0400, CRC(9cb477f3) SHA1(6866264aa8d0479cee237a00e4a919e3981144a5) )
+	ROM_LOAD( "asterion eprom 7.bin",  0xe400, 0x0400, CRC(272de8f1) SHA1(e917b3b8bb96fedacd6d5cb3d1c30977818f2e85) )
+	ROM_LOAD( "asterion eprom 6.bin",  0xe800, 0x0400, CRC(ff25acaa) SHA1(5cb360c556c9b36039ae05702e6900b82fe5676b) )
+	ROM_LOAD( "asterion eprom 4.bin",  0xec00, 0x0400, CRC(6edf202d) SHA1(a4cab2f10a99e0a4b1c571168e17cbee1d18cf06) )
+	ROM_LOAD( "asterion eprom 8.bin",  0xf000, 0x0400, CRC(47dccb04) SHA1(b6b6c6685c93ac9531efb970b2e82ad68eea87ba) )
+	ROM_LOAD( "asterion eprom 2.bin",  0xf400, 0x0400, CRC(86c6ae5c) SHA1(c5d8dab0ef3168884ae6fe7099708a290daba2ba) )
+	ROM_LOAD( "asterion eprom 3.bin",  0xf800, 0x0400, CRC(b206deda) SHA1(9ab52920c06ed6beb38bc7f97ffd00e8ad46c17d) )
+	ROM_LOAD( "asterion eprom 1.bin",  0xfc00, 0x0400, CRC(99008e90) SHA1(bfa1c3a66992f432fad37203f052f820b098e05f) )
+
+	ROM_REGION( 0x0100, "proms", 0 ) // not dumped yet, using the one from abattle for now
+	ROM_LOAD( "8f-clr.bin",   0x0000, 0x0100, BAD_DUMP CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
+
+	ROM_REGION( 0x0100, "user1", 0 ) // not dumped yet, using the one from abattle for now, decryption is correct so this dump should too
+	ROM_LOAD( "2h-prot.bin",  0x0000, 0x0100, BAD_DUMP CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
 ROM_END
 
 
@@ -1386,15 +1429,17 @@ void astrof_state::init_acombat3()
 GAME( 1979, astrof,    0,        astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, astrof2,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, astrof3,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 3)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg? (Famaresa)",   "Astro Fighter (set 4)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)", "Astro Fire",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Olympia)",    "Asterion",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (newer, CB)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (older, PZ)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, acombat4,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg (Proel)",       "Astro Combat (encrypted)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, strfight,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (VGG)",         "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbtl, ROT90, "bootleg",               "Super Star Battle",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbtl, ROT90, "bootleg (SG-Florence)", "Super Star Battle",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, spfghmk2,  0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spfghmk22, spfghmk2, spfghmk2, spfghmk22, astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

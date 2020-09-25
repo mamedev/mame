@@ -92,8 +92,8 @@ void nubus_xceedmc30_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_xceedmc30_device::vram_r)), write32_delegate(*this, FUNC(nubus_xceedmc30_device::vram_w)));
-	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_r)), write32_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_w)));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_xceedmc30_device::vram_r)), write32s_delegate(*this, FUNC(nubus_xceedmc30_device::vram_w)));
+	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32s_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_r)), write32s_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
@@ -230,7 +230,7 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
+void nubus_xceedmc30_device::xceedmc30_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -304,7 +304,7 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 	}
 }
 
-READ32_MEMBER( nubus_xceedmc30_device::xceedmc30_r )
+uint32_t nubus_xceedmc30_device::xceedmc30_r(offs_t offset, uint32_t mem_mask)
 {
 //    printf("xceedmc30_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device<cpu_device>("maincpu")->pc());
 	if (offset == 0x80008)
@@ -316,12 +316,12 @@ READ32_MEMBER( nubus_xceedmc30_device::xceedmc30_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_xceedmc30_device::vram_w )
+void nubus_xceedmc30_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_xceedmc30_device::vram_r )
+uint32_t nubus_xceedmc30_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

@@ -5793,12 +5793,12 @@ void saturn_state::stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cli
 	}
 }
 
-READ32_MEMBER ( saturn_state::saturn_vdp2_vram_r )
+uint32_t saturn_state::saturn_vdp2_vram_r(offs_t offset)
 {
 	return m_vdp2_vram[offset];
 }
 
-WRITE32_MEMBER ( saturn_state::saturn_vdp2_vram_w )
+void saturn_state::saturn_vdp2_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t* gfxdata = m_vdp2.gfx_decode.get();
 
@@ -5852,7 +5852,7 @@ WRITE32_MEMBER ( saturn_state::saturn_vdp2_vram_w )
 	}
 }
 
-READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
+uint16_t saturn_state::saturn_vdp2_regs_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -5930,7 +5930,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 	return m_vdp2_regs[offset];
 }
 
-READ32_MEMBER ( saturn_state::saturn_vdp2_cram_r )
+uint32_t saturn_state::saturn_vdp2_cram_r(offs_t offset)
 {
 	offset &= (0xfff) >> (2);
 	return m_vdp2_cram[offset];
@@ -5939,7 +5939,7 @@ READ32_MEMBER ( saturn_state::saturn_vdp2_cram_r )
 
 
 
-WRITE32_MEMBER ( saturn_state::saturn_vdp2_cram_w )
+void saturn_state::saturn_vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 	uint8_t cmode0;
@@ -6045,7 +6045,7 @@ void saturn_state::refresh_palette_data( void )
 	}
 }
 
-WRITE16_MEMBER ( saturn_state::saturn_vdp2_regs_w )
+void saturn_state::saturn_vdp2_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vdp2_regs[offset]);
 

@@ -37,21 +37,17 @@ public:
 	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
 
 private:
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_READ8_MEMBER(options_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
-	DECLARE_WRITE8_MEMBER(collision_reset_w);
-	DECLARE_WRITE8_MEMBER(da_latch_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(screech_1_w);
-	DECLARE_WRITE8_MEMBER(screech_2_w);
-	DECLARE_WRITE8_MEMBER(screech_3_w);
-	DECLARE_WRITE8_MEMBER(screech_4_w);
-	DECLARE_WRITE8_MEMBER(bang_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
+	uint8_t wram_r(offs_t offset);
+	uint8_t analog_r(offs_t offset);
+	uint8_t coin_r(offs_t offset);
+	uint8_t collision_r(offs_t offset);
+	uint8_t options_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
+	void collision_reset_w(offs_t offset, uint8_t data);
+	void da_latch_w(uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void bang_w(uint8_t data);
+	void attract_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

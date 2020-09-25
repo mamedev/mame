@@ -143,7 +143,7 @@ uint8_t atetris_state::slapstic_r(address_space &space, offs_t offset)
 	if (new_bank != m_current_bank)
 	{
 		m_current_bank = new_bank;
-		memcpy(m_slapstic_base, &m_slapstic_source[m_current_bank * 0x4000], 0x4000);
+		reset_bank();
 	}
 	return result;
 }
@@ -162,6 +162,25 @@ void atetris_state::coincount_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, (data >> 4) & 1);
 }
 
+
+void atetris_bartop_state::output_w(uint8_t data)
+{
+	coincount_w(data);
+
+	/* atetrisbp: $3c00 also handles ROM bank selection */
+	/* game writes 0x4 to select bank 0, 0x5 to select bank 1 */
+	if (data & 4)
+	{
+		int new_bank = data & 1;
+
+		/* update for the new bank */
+		if (new_bank != m_current_bank)
+		{
+			m_current_bank = new_bank;
+			reset_bank();
+		}
+	}
+}
 
 
 /*************************************
@@ -228,6 +247,22 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 	map(0x4000, 0x5fff).rom();
 	map(0x6000, 0x7fff).r(FUNC(atetris_mcu_state::slapstic_r));
 	map(0x8000, 0xffff).rom();
+}
+
+
+void atetris_bartop_state::atetrisbp_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().w(FUNC(atetris_bartop_state::videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).mirror(0x0300).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x2800, 0x280f).mirror(0x03e0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x2810, 0x281f).mirror(0x03e0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x3000, 0x3000).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
+	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_bartop_state::irq_ack_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(atetris_bartop_state::output_w));
+	map(0x4000, 0xffff).rom();
 }
 
 
@@ -424,6 +459,13 @@ void atetris_mcu_state::atetrisb3(machine_config &config)
 	}
 }
 
+
+void atetris_bartop_state::atetrisbp(machine_config &config)
+{
+	atetris(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_bartop_state::atetrisbp_map);
+}
 
 
 /*************************************
@@ -708,13 +750,13 @@ void atetris_state::init_atetris()
  *
  *************************************/
 
-GAME( 1988, atetris,   0,       atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb4, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 5, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, atetrisbp, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "Atari Games", "Tetris (bartop, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetris,   0,       atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state,    init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb4, atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,        init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 5, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, atetrisbp, atetris, atetrisbp, atetris,  atetris_bartop_state, init_atetris, ROT0,   "Atari Games", "Tetris (bartop, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,        init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,        init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

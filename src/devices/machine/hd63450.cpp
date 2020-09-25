@@ -101,7 +101,7 @@ void hd63450_device::device_reset()
 	m_irq_callback(CLEAR_LINE);
 }
 
-READ16_MEMBER(hd63450_device::read)
+uint16_t hd63450_device::read(offs_t offset)
 {
 	int channel,reg;
 
@@ -150,7 +150,7 @@ READ16_MEMBER(hd63450_device::read)
 	return 0xff;
 }
 
-WRITE16_MEMBER(hd63450_device::write)
+void hd63450_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int channel,reg;
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvwpoints.c
+    dvwpoints.cpp
 
     Watchpoint debugger view.
 

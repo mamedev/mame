@@ -60,8 +60,8 @@ void dio16_98620_device::device_reset()
 	if (!m_installed_io)
 	{
 		program_space().install_readwrite_handler(0x500000, 0x50020f,
-				read16_delegate(*this, FUNC(dio16_98620_device::dma_r)),
-				write16_delegate(*this, FUNC(dio16_98620_device::dma_w)));
+				read16sm_delegate(*this, FUNC(dio16_98620_device::dma_r)),
+				write16sm_delegate(*this, FUNC(dio16_98620_device::dma_w)));
 		m_installed_io = true;
 	}
 	m_control = 0;
@@ -88,7 +88,7 @@ uint16_t dio16_98620_device::get_ctrl(const int channel)
 	return ret;
 }
 
-READ16_MEMBER(dio16_98620_device::dma_r)
+uint16_t dio16_98620_device::dma_r(offs_t offset)
 {
 
 	uint16_t ret = 0;
@@ -218,7 +218,7 @@ void dio16_98620_device::update_ctrl(const int channel, const uint16_t data, con
 
 	}
 }
-WRITE16_MEMBER(dio16_98620_device::dma_w)
+void dio16_98620_device::dma_w(offs_t offset, uint16_t data)
 {
 	LOG("dma_w: offset=%02X, data=%02X\n", offset << 1, data);
 

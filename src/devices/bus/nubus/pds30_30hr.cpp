@@ -96,8 +96,8 @@ void nubus_xceed30hr_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_xceed30hr_device::vram_r)), write32_delegate(*this, FUNC(nubus_xceed30hr_device::vram_w)));
-	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_r)), write32_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_w)));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_xceed30hr_device::vram_r)), write32s_delegate(*this, FUNC(nubus_xceed30hr_device::vram_w)));
+	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32s_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_r)), write32s_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
@@ -217,7 +217,7 @@ uint32_t nubus_xceed30hr_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
+void nubus_xceed30hr_device::xceed30hr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -287,7 +287,7 @@ WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
 	}
 }
 
-READ32_MEMBER( nubus_xceed30hr_device::xceed30hr_r )
+uint32_t nubus_xceed30hr_device::xceed30hr_r(offs_t offset, uint32_t mem_mask)
 {
 //    logerror("xceed30hr_r: @ %x, mask %08x %s\n", offset, mem_mask, machine().describe_context());
 	if (offset == 0x80008)
@@ -299,12 +299,12 @@ READ32_MEMBER( nubus_xceed30hr_device::xceed30hr_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_xceed30hr_device::vram_w )
+void nubus_xceed30hr_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_xceed30hr_device::vram_r )
+uint32_t nubus_xceed30hr_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

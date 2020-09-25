@@ -24,8 +24,7 @@ class mastboyo_state : public driver_device
 public:
 	mastboyo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_fgram(*this, "fgram"),
-		m_fgram2(*this, "fgram2"),
+		m_fgram(*this, "fgram.%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_bank1(*this, "bank1"),
@@ -42,8 +41,7 @@ protected:
 private:
 	tilemap_t *m_fg_tilemap;
 
-	required_shared_ptr<uint8_t> m_fgram;
-	required_shared_ptr<uint8_t> m_fgram2;
+	required_shared_ptr_array<uint8_t, 2> m_fgram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_memory_bank m_bank1;
@@ -53,19 +51,18 @@ private:
 	void mastboyo_map(address_map &map);
 	void mastboyo_portmap(address_map &map);
 
-	void fgram_w(offs_t offset, uint8_t data);
-	void fgram2_w(offs_t offset, uint8_t data);
+	template<uint8_t Which> void fgram_w(offs_t offset, uint8_t data);
 	void rombank_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	uint32_t screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mastboyo_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
 };
 
 
 TILE_GET_INFO_MEMBER(mastboyo_state::get_fg_tile_info)
 {
-	int code = m_fgram[tile_index];
-	int attr = m_fgram2[tile_index];
+	int code = m_fgram[0][tile_index];
+	int attr = m_fgram[1][tile_index];
 	tileinfo.set(0,
 			code,
 			attr & 0x0f,
@@ -77,25 +74,20 @@ void mastboyo_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mastboyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t mastboyo_state::screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mastboyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
+template<uint8_t Which>
 void mastboyo_state::fgram_w(offs_t offset, uint8_t data)
 {
-	m_fgram[offset] = data;
+	m_fgram[Which][offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void mastboyo_state::fgram2_w(offs_t offset, uint8_t data)
-{
-	m_fgram2[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-void mastboyo_state::mastboyo_palette(palette_device &palette) const
+void mastboyo_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -119,11 +111,11 @@ void mastboyo_state::mastboyo_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x5000, 0x53ff).ram().w(FUNC(mastboyo_state::fgram_w)).share("fgram");
-	map(0x5400, 0x57ff).ram().w(FUNC(mastboyo_state::fgram2_w)).share("fgram2");
+	map(0x5000, 0x53ff).ram().w(FUNC(mastboyo_state::fgram_w<0>)).share(m_fgram[0]);
+	map(0x5400, 0x57ff).ram().w(FUNC(mastboyo_state::fgram_w<1>)).share(m_fgram[1]);
 	map(0x6000, 0x6000).w(FUNC(mastboyo_state::rombank_w));
 //  map(0x7000, 0x7000).portr("UNK"); // possible watchdog? or IRQ ack?
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr(m_bank1);
 }
 
 void mastboyo_state::mastboyo_portmap(address_map &map)
@@ -213,12 +205,12 @@ void mastboyo_state::mastboyo(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 2*8, 256-2*8-1);
-	screen.set_screen_update(FUNC(mastboyo_state::screen_update_mastboyo));
+	screen.set_screen_update(FUNC(mastboyo_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mastboyo);
 
-	PALETTE(config, "palette", FUNC(mastboyo_state::mastboyo_palette), 256);
+	PALETTE(config, "palette", FUNC(mastboyo_state::palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -321,6 +313,30 @@ ROM_START( mastboyob )
 	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
 
-GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mastboyob, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel)", MACHINE_SUPPORTS_SAVE )
+ROM_START( mastboyoc ) // PCB marked 'MMV-1 FABRICADO POR GAELCO'
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "ic14-mb-pt-27128.bin", 0x0000, 0x4000, CRC(3a42c74d) SHA1(64791b5a48e53d07275076077f3860799992c005) ) // basically the same as mastboyoa but with different phone number
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "ic36-fij-27128.bin", 0x0000, 0x4000, CRC(bdd0f821) SHA1(63f607bccf1eded92531b2a10605d0578d371f77) ) // same as mastboyob
+
+	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic13-mb-1-27256.bin", 0x40000, 0x08000, CRC(efb4b2f9) SHA1(c68f7d83549b554d25f7404a758f48f962622a2d) ) // same as the parent
+	ROM_LOAD( "ic12-mb-2-27256.bin", 0x48000, 0x08000, CRC(f2611186) SHA1(05860fecc23014c39cb28762763e94bc91412b34) ) // same as the parent
+	ROM_LOAD( "ic11-mb-3-27256.bin", 0x50000, 0x08000, CRC(b92ffd4f) SHA1(34431d6771e58f2ec083756f07e8b2a02bdb0e5a) ) // same as the parent
+	ROM_LOAD( "ic10-mb-4-27256.bin", 0x58000, 0x08000, CRC(266e7d37) SHA1(39b5e4ff4475393126a97c8b51980bfc1b7b2627) ) // same as the parent
+	ROM_LOAD( "ic9-mb-5-27256.bin",  0x60000, 0x08000, CRC(40b07eeb) SHA1(93f62e0a2a330f7ff1041eaa7cba3ef42121b1a8) ) // same as the parent
+	ROM_LOAD( "ic8-mb-6-27256.bin",  0x68000, 0x08000, CRC(3a214efd) SHA1(752fe28a70dc01b5d4ec38c4751e609c690eed71) ) // same as the parent
+
+	ROM_REGION( 0x100, "proms", 0 ) // timing or memory mapping?
+	ROM_LOAD( "d_82s129.ic23", 0x000, 0x100, CRC(d5fd2dfd) SHA1(66e3afa9e73507db0647d125c0be992b27d08adc) )
+
+	ROM_REGION( 0x200, "palette", 0 )
+	ROM_LOAD( "h_82s129.ic39", 0x100, 0x100, CRC(8e965fc3) SHA1(b52c8e505438937c7a5d3e1393d54f0ad0425e78) )
+	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
+ROM_END
+
+GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyob, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyoc, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel, set 2)", MACHINE_SUPPORTS_SAVE )

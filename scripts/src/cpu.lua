@@ -39,13 +39,24 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/uml.h",
 		MAME_DIR .. "src/devices/cpu/x86log.cpp",
 		MAME_DIR .. "src/devices/cpu/x86log.h",
-		MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
-		MAME_DIR .. "src/devices/cpu/drcbex86.h",
-		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
-		MAME_DIR .. "src/devices/cpu/drcbex64.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
-		MAME_DIR .. "src/devices/cpu/x86emit.h",
 	}
+	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+		files {
+			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbex64.h",
+			MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbex86.h",
+		}
+	end
+
+	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
+		if string.find(_OPTIONS["gcc"], "clang") and (str_to_version(_OPTIONS["gcc_version"]) < 80000) then
+			defines {
+				"TARGET_OS_OSX=1",
+			}
+		end
+	end
 end
 
 --------------------------------------------------
@@ -590,6 +601,23 @@ end
 if (CPUS["G65816"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/g65816/g65816ds.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/g65816/g65816ds.h")
+end
+
+--------------------------------------------------
+-- Hitachi H16
+--@src/devices/cpu/h16/hd641016.h,CPUS["H16"] = true
+--------------------------------------------------
+
+if (CPUS["H16"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/h16/hd641016.cpp",
+		MAME_DIR .. "src/devices/cpu/h16/hd641016.h",
+	}
+end
+
+if (CPUS["H16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h16/h16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/h16/h16dasm.h")
 end
 
 --------------------------------------------------
@@ -1867,10 +1895,10 @@ if (CPUS["NEC"]~=null) then
 		MAME_DIR .. "src/devices/cpu/nec/nec80inst.hxx",
 		MAME_DIR .. "src/devices/cpu/nec/necmacro.h",
 		MAME_DIR .. "src/devices/cpu/nec/necmodrm.h",
-		MAME_DIR .. "src/devices/cpu/nec/necpriv.h",
+		MAME_DIR .. "src/devices/cpu/nec/necpriv.ipp",
 		MAME_DIR .. "src/devices/cpu/nec/v25instr.h",
 		MAME_DIR .. "src/devices/cpu/nec/v25instr.hxx",
-		MAME_DIR .. "src/devices/cpu/nec/v25priv.h",
+		MAME_DIR .. "src/devices/cpu/nec/v25priv.ipp",
 		MAME_DIR .. "src/devices/cpu/nec/v25.cpp",
 		MAME_DIR .. "src/devices/cpu/nec/v25.h",
 		MAME_DIR .. "src/devices/cpu/nec/v25sfr.cpp",
@@ -2570,6 +2598,13 @@ if (CPUS["TLCS900"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.h",
 	}
 end
 
@@ -2591,8 +2626,18 @@ if (CPUS["Z80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.h",
+		MAME_DIR .. "src/devices/cpu/z80/kc82.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kc82.h",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.h",
+		MAME_DIR .. "src/devices/cpu/z80/kl5c80a16.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kl5c80a16.h",
+		MAME_DIR .. "src/devices/cpu/z80/kp63.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kp63.h",
+		MAME_DIR .. "src/devices/cpu/z80/kp69.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kp69.h",
+		MAME_DIR .. "src/devices/cpu/z80/ky80.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/ky80.h",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
 	}

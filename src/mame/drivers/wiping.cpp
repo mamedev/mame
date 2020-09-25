@@ -54,7 +54,7 @@ void wiping_state::machine_start()
 }
 
 /* input ports are rotated 90 degrees */
-READ8_MEMBER(wiping_state::ports_r)
+uint8_t wiping_state::ports_r(offs_t offset)
 {
 	int i,res;
 	static const char *const portnames[] = { "P1", "P2", "IN2", "IN3", "IN4", "IN5", "SYSTEM", "DSW" };

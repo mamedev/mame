@@ -19,6 +19,9 @@ Hardware notes:
 It also appeared in Tandy's Chess Champion 2150, not as a simple rebrand, but
 with hardware differences: 3MHz R65C02, 1 64KB ROM and no EGR socket.
 
+TODO:
+- where does the IRQ come from? same problem as with stratos
+
 ***************************************************************************/
 
 #include "emu.h"

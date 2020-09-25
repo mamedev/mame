@@ -29,10 +29,10 @@ namespace solver
 
 		using float_type = FT;
 
-		matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name,
-			analog_net_t::list_t &nets,
+		matrix_solver_SOR_t(devices::nld_solver &main_solver, const pstring &name,
+			matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
+			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params, size)
 			, m_lp_fact(*this, "m_lp_fact", 0)
 			, w(size, plib::constants<FT>::zero())
 			, one_m_w(size, plib::constants<FT>::zero())

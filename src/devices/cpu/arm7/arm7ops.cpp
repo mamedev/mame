@@ -299,7 +299,7 @@ int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 void arm7_cpu_device::HandleCoProcDO(uint32_t insn)
 {
 	// This instruction simply instructs the co-processor to do something, no data is returned to ARM7 core
-	arm7_do_callback(*m_program, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
+	arm7_do_callback(0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
 }
 
 // Co-Processor Register Transfer - To/From Arm to Co-Proc
@@ -310,7 +310,7 @@ void arm7_cpu_device::HandleCoProcRT(uint32_t insn)
 	// Load (MRC) data from Co-Proc to ARM7 register
 	if (insn & 0x00100000)       // Bit 20 = Load or Store
 	{
-		uint32_t res = arm7_rt_r_callback(*m_program, insn, 0);   // RT Read handler must parse opcode & return appropriate result
+		uint32_t res = arm7_rt_r_callback(insn);   // RT Read handler must parse opcode & return appropriate result
 		if (!m_pendingUnd)
 		{
 			SetRegister((insn >> 12) & 0xf, res);
@@ -319,7 +319,7 @@ void arm7_cpu_device::HandleCoProcRT(uint32_t insn)
 	// Store (MCR) data from ARM7 to Co-Proc register
 	else
 	{
-		arm7_rt_w_callback(*m_program, insn, GetRegister((insn >> 12) & 0xf), 0);
+		arm7_rt_w_callback(insn, GetRegister((insn >> 12) & 0xf));
 	}
 }
 

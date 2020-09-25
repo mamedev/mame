@@ -68,7 +68,7 @@ ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-READ8_MEMBER(ie15_device::mem_r)
+uint8_t ie15_device::mem_r()
 {
 	uint8_t ret;
 
@@ -83,7 +83,7 @@ READ8_MEMBER(ie15_device::mem_r)
 	return ret;
 }
 
-WRITE8_MEMBER(ie15_device::mem_w)
+void ie15_device::mem_w(uint8_t data)
 {
 	if ((m_latch ^= 1) == 0)
 	{
@@ -96,7 +96,7 @@ WRITE8_MEMBER(ie15_device::mem_w)
 	}
 }
 
-WRITE8_MEMBER(ie15_device::mem_addr_inc_w)
+void ie15_device::mem_addr_inc_w(uint8_t data)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
@@ -107,7 +107,7 @@ WRITE8_MEMBER(ie15_device::mem_addr_inc_w)
 	if (m_video.enable) m_video.ptr2 = m_video.ptr1;
 }
 
-WRITE8_MEMBER(ie15_device::mem_addr_dec_w)
+void ie15_device::mem_addr_dec_w(uint8_t data)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
@@ -118,7 +118,7 @@ WRITE8_MEMBER(ie15_device::mem_addr_dec_w)
 	if (m_video.enable) m_video.ptr2 = m_video.ptr1;
 }
 
-WRITE8_MEMBER(ie15_device::mem_addr_lo_w)
+void ie15_device::mem_addr_lo_w(uint8_t data)
 {
 	uint16_t tmp = m_video.ptr1;
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(ie15_device::mem_addr_lo_w)
 	if (m_video.enable) m_video.ptr2 = tmp;
 }
 
-WRITE8_MEMBER(ie15_device::mem_addr_hi_w)
+void ie15_device::mem_addr_hi_w(uint8_t data)
 {
 	uint16_t tmp = m_video.ptr1;
 
@@ -151,7 +151,7 @@ TIMER_CALLBACK_MEMBER(ie15_device::ie15_beepoff)
 	m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER(ie15_device::beep_w)
+void ie15_device::beep_w(uint8_t data)
 {
 	uint16_t length = (m_long_beep & IE_TRUE) ? 150 : 400;
 
@@ -166,14 +166,14 @@ WRITE8_MEMBER(ie15_device::beep_w)
 /* keyboard */
 
 // active high
-READ8_MEMBER(ie15_device::kb_r)
+uint8_t ie15_device::kb_r()
 {
 	DBG_LOG(2, "keyboard", ("R %02X '%c'\n", m_kb_data, m_kb_data < 0x20 ? ' ' : m_kb_data));
 	return m_kb_data;
 }
 
 // active low
-READ8_MEMBER(ie15_device::kb_ready_r)
+uint8_t ie15_device::kb_ready_r()
 {
 	m_kb_flag &= IE_TRUE;
 	if (m_kb_flag != m_kb_flag0)
@@ -185,7 +185,7 @@ READ8_MEMBER(ie15_device::kb_ready_r)
 }
 
 // active low
-WRITE8_MEMBER(ie15_device::kb_ready_w)
+void ie15_device::kb_ready_w(uint8_t data)
 {
 	DBG_LOG(2, "keyboard", ("clear ready\n"));
 	m_kb_flag = IE_TRUE | ie15_keyboard_device::IE_KB_ACK;
@@ -193,31 +193,31 @@ WRITE8_MEMBER(ie15_device::kb_ready_w)
 
 
 // active high; active = interpret controls, inactive = display controls
-READ8_MEMBER(ie15_device::kb_s_red_r)
+uint8_t ie15_device::kb_s_red_r()
 {
 	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_RED ? IE_TRUE : 0;
 }
 
 // active high; active = setup mode
-READ8_MEMBER(ie15_device::kb_s_sdv_r)
+uint8_t ie15_device::kb_s_sdv_r()
 {
 	return m_kb_control & ie15_keyboard_device::IE_KB_SDV ? IE_TRUE : 0;
 }
 
 // active high; active = keypress detected on aux keypad
-READ8_MEMBER(ie15_device::kb_s_dk_r)
+uint8_t ie15_device::kb_s_dk_r()
 {
 	return m_kb_control & ie15_keyboard_device::IE_KB_DK ? IE_TRUE : 0;
 }
 
 // active low; active = full duplex, inactive = half duplex
-READ8_MEMBER(ie15_device::kb_s_dupl_r)
+uint8_t ie15_device::kb_s_dupl_r()
 {
 	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_DUP ? IE_TRUE : 0;
 }
 
 // active high; active = on-line, inactive = local editing
-READ8_MEMBER(ie15_device::kb_s_lin_r)
+uint8_t ie15_device::kb_s_lin_r()
 {
 	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_LIN ? IE_TRUE : 0;
 }
@@ -268,26 +268,26 @@ void ie15_device::tra_complete()
 }
 
 // active low
-READ8_MEMBER(ie15_device::serial_rx_ready_r)
+uint8_t ie15_device::serial_rx_ready_r()
 {
 	return m_serial_rx_ready;
 }
 
 // active high
-READ8_MEMBER(ie15_device::serial_tx_ready_r)
+uint8_t ie15_device::serial_tx_ready_r()
 {
 	return m_serial_tx_ready;
 }
 
 // not called unless data are ready
-READ8_MEMBER(ie15_device::serial_r)
+uint8_t ie15_device::serial_r()
 {
 	m_serial_rx_ready = IE_TRUE;
 	DBG_LOG(1,"serial",("R %02X '%c'\n", m_serial_rx_char, m_serial_rx_char < 0x20?' ':m_serial_rx_char&127));
 	return m_serial_rx_char;
 }
 
-WRITE8_MEMBER(ie15_device::serial_w)
+void ie15_device::serial_w(uint8_t data)
 {
 	DBG_LOG(1, "serial", ("W %02X '%c'\n", data, data < 0x20 ? ' ' : data & 127));
 
@@ -295,7 +295,7 @@ WRITE8_MEMBER(ie15_device::serial_w)
 	transmit_register_setup(data);
 }
 
-WRITE8_MEMBER(ie15_device::serial_speed_w)
+void ie15_device::serial_speed_w(uint8_t data)
 {
 	return;
 }
@@ -318,7 +318,7 @@ WRITE_LINE_MEMBER(ie15_device::update_serial)
 	set_rcv_rate(rxbaud);
 }
 
-READ8_MEMBER(ie15_device::flag_r)
+uint8_t ie15_device::flag_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -340,7 +340,7 @@ READ8_MEMBER(ie15_device::flag_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ie15_device::flag_w)
+void ie15_device::flag_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

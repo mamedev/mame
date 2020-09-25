@@ -359,7 +359,7 @@ private:
 	required_device<tms34020_device> m_videocpu;
 	required_device<ramdac_device> m_ramdac;
 
-	required_shared_ptr<uint16_t> m_vidram;
+	required_shared_ptr<uint32_t> m_vidram;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -422,17 +422,19 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(atronic_state::from_shiftreg)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(atronic_state::scanline_update)
 {
-	uint32_t fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
-	uint16_t* bg0_base = &m_vidram[(fulladdr & 0xffc00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
+	uint32_t fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 5;
+	uint32_t* bg0_base = &m_vidram[(fulladdr & 0x7fe00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
 	uint32_t* dst = &bitmap.pix32(scanline);
-	int coladdr = fulladdr & 0x3ff;
+	int coladdr = fulladdr & 0x1ff;
 	const pen_t *pens = m_palette->pens();
 
-	for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+	for (int x = params->heblnk; x < params->hsblnk; x += 4, coladdr++)
 	{
-		uint16_t bg0pix = bg0_base[coladdr & 0x3ff];
-		dst[x + 0] = pens[(bg0pix & 0x00ff)];
-		dst[x + 1] = pens[(bg0pix & 0xff00) >> 8];
+		uint32_t bg0pix = bg0_base[coladdr & 0x1ff];
+		dst[x + 0] = pens[(bg0pix & 0x000000ff)];
+		dst[x + 1] = pens[(bg0pix & 0x0000ff00) >> 8];
+		dst[x + 2] = pens[(bg0pix & 0x00ff0000) >> 16];
+		dst[x + 3] = pens[(bg0pix & 0xff000000) >> 24];
 	}
 }
 
@@ -440,9 +442,9 @@ void atronic_state::video_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("vidram");
 
-	map(0xa0000010, 0xa000001f).w(m_ramdac, FUNC(ramdac_device::index_w)).umask16(0x00ff);
-	map(0xa0000020, 0xa000002f).w(m_ramdac, FUNC(ramdac_device::pal_w)).umask16(0x00ff);
-	map(0xa0000030, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::mask_w)).umask16(0x00ff);
+	map(0xa0000000, 0xa000001f).w(m_ramdac, FUNC(ramdac_device::index_w)).umask32(0x00ff0000);
+	map(0xa0000020, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::pal_w)).umask32(0x000000ff);
+	map(0xa0000020, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::mask_w)).umask32(0x00ff0000);
 
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -503,7 +505,7 @@ ROM_START( atronic )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "atronic u6.bin", 0x0000, 0x020000, CRC(9742b2d8) SHA1(9f5851c78f92055730b834de18f8dc7bd9b29a37) )
 
-	ROM_REGION16_LE( 0x800000, "user1", ROMREGION_ERASE00 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASE00 ) /* TMS34020APCM-40 code (34020) */
 	ROM_REGION( 0x400000, "u18u21",ROMREGION_ERASE00 ) // sound
 	ROM_REGION( 0x400000, "pals",ROMREGION_ERASE00 ) // pal (converted from JED)
 
@@ -518,7 +520,7 @@ ROM_START( atronica )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "atronic u6 std.bin", 0x0000, 0x020000, CRC(9ef7ae79) SHA1(3ed0ea056b23cee8829421c2369ff869b370ee80) )
 
-	ROM_REGION16_LE( 0x800000, "user1", ROMREGION_ERASE00 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASE00 ) /* TMS34020APCM-40 code (34020) */
 	ROM_REGION( 0x400000, "u18u21",ROMREGION_ERASE00 ) // sound
 	ROM_REGION( 0x400000, "pals",ROMREGION_ERASE00 ) // pal (converted from JED)
 ROM_END
@@ -532,7 +534,7 @@ ROM_START( atlantca )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6.1 atla01-a-zb-std-5-xx-xx-axx", 0x0000, 0x020000, CRC(5d09a4bf) SHA1(94aea5396a968ff659ac9e2f4879262c55eba2fe) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9.8 atla01-a-e-std-5",  0x000000, 0x100000, CRC(7f8210fa) SHA1(f71faee0d606c6aa06287f6ea31f41727e2a22d9) )
 	ROM_LOAD32_BYTE( "u11.8 atla01-a-e-std-5", 0x000001, 0x100000, CRC(af648717) SHA1(8ab57dc9962ed47a8beb03dcfc686c57de326793) )
 	ROM_LOAD32_BYTE( "u13.8 atla01-a-e-std-5", 0x000002, 0x100000, CRC(6e89bf2b) SHA1(0c3346a5da6c67bf2ef38cf657860dccb03a0461) )
@@ -560,7 +562,7 @@ ROM_START( atlantcaa )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6.1 atla01-a-zb-std-5-xx-xx-axx", 0x0000, 0x020000, CRC(5d09a4bf) SHA1(94aea5396a968ff659ac9e2f4879262c55eba2fe) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(1c51f9e1) SHA1(9300c80409f28ba55b94b93a3359fac732262b27) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(b2b1f41f) SHA1(7551c7acc5c6c26b672e4a42d847ec9af79b50fe) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(515820fa) SHA1(2f5def7145b45f8cd63d5463880a548e58e2b2d3) )
@@ -589,7 +591,7 @@ ROM_START( baboshka )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(8b0ccfd2) SHA1(abdc59ebddc9e4fc3aa5b723a746de1419f7d6e7) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(1a5d8a4f) SHA1(ff8160f000ecb032831ef4320b686fdd37c19bc9) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(713e18c9) SHA1(eb14213101c3ee09601bf01000631c3a2509e876) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(dfbc8c2f) SHA1(1ae2dcd572fa5fc31be5cdb7d6de2bced06ff94e) )
@@ -614,7 +616,7 @@ ROM_START( cfblue )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6.bin", 0x0000, 0x020000, CRC(63690e7e) SHA1(9dcb3d64bae03556875185ead23d9b911773f5bd) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9.bin",  0x000000, 0x100000, CRC(d1c2ad08) SHA1(e53c7e91b2ab86e64f4ae753404aa86ae881becf) )
 	ROM_LOAD32_BYTE( "u11.bin", 0x000001, 0x100000, CRC(42872aef) SHA1(54d7cf6a9f3d5d8b2b14fa381fd7b9db974525e1) )
 	ROM_LOAD32_BYTE( "u13.bin", 0x000002, 0x100000, CRC(7da9415b) SHA1(aaa73465417dcf92838021b37cb412d52ccb4d85) )
@@ -639,7 +641,7 @@ ROM_START( cfbluea )
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(0db0531d) SHA1(391e41b2dcd38669dcc24e938e9838feee972559) )
 	ROM_LOAD( "u6low-10.bin", 0x0000, 0x020000, CRC(3cbad206) SHA1(d2a468d5bfd441b74ef85be088873d1f74d5c66e) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(37b3a499) SHA1(eb3252185596dd513d3cce95f3425241ca8513ab) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(d98b2b1d) SHA1(414d300d113e9737d63efea09b358aeb8eeed7fc) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(478bb4a5) SHA1(94304fe1477bfc66e8dcf2c2c91226754cb8c32a) )
@@ -664,7 +666,7 @@ ROM_START( cfgreen )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(3cbad206) SHA1(d2a468d5bfd441b74ef85be088873d1f74d5c66e) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(19a47a1b) SHA1(ae9ad2027fddf96062833345a5e2b9e7101b3380) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(7d805f07) SHA1(0bb27a702e45d3d660363ac75c0f52f07248d40a) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(104110dc) SHA1(9322598a94e3c71f546da3b42f137a22fc78a894) )
@@ -689,7 +691,7 @@ ROM_START( chicken )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(bac68023) SHA1(fdc5d540ceb4a2d44013dfd59b46103ec6745dea) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(1109b7d6) SHA1(c0f6f5d56ee95982688b595894a2985ef53629e7) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(5a1449f6) SHA1(3903858239223c37615f12a8db6a8e873722e34c) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(e1081c7a) SHA1(dd6390d64cda9af93093092361ca24b551d82549) )
@@ -714,7 +716,7 @@ ROM_START( aclown )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(ab86b3d4) SHA1(b0d32887674f971a3ccd482775ec3f978a2ea0c1) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(8bcbb27f) SHA1(d953268213580af11a2cc0dbd8bf1652f97f3929) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(73fb3169) SHA1(8bbe5d8b8898e2d3368506e7b66d05b8f8ac7d02) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(47580998) SHA1(37a6e409618aa3fe7d24bd3580fa93269895b059) )
@@ -740,7 +742,7 @@ ROM_START( goldglen )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(94409a39) SHA1(99af058e48147fc75a8c23e4f1a28484f3d5f625) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(01e69d2d) SHA1(a6e6974aec52931aeeb1f90d8f917ab85ebe843e) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(6c39a180) SHA1(95f91ec10961d36c86dee5ce42fc7c8ab693e271) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(e60a093f) SHA1(fa0af661f869f80e11097e101ec6100a75d1e63f) )
@@ -765,7 +767,7 @@ ROM_START( iccash )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(5e7d8a05) SHA1(255355cf594c2818d358860e616b5b578a87e974) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(db77fe46) SHA1(2502c5c165a9720e5ff1196eaa17189281c3145c) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(3a512c6c) SHA1(ba8592773d71e57b3dc6aaff7df1214a57429b10) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(75fadda8) SHA1(5a968f10e582fbe74000f3de33dc1e2d07c3fec1) )
@@ -791,7 +793,7 @@ ROM_START( shpinxii )
 	ROM_LOAD( "u6-10.bin", 0x0000, 0x020000, CRC(4d37999a) SHA1(678dc788cfe00ab2599df08941660324793d7f6c) )
 	ROM_LOAD( "sphinx ii.bin", 0x0000, 0x020000, CRC(7fae09a6) SHA1(5c26798337d3691d81f853ee447cb7119fce7b14) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-80.bin",  0x000000, 0x100000, CRC(c54e4e07) SHA1(1249494773dae044a7bb4381b084e3d2e14367d7) )
 	ROM_LOAD32_BYTE( "u11-80.bin", 0x000001, 0x100000, CRC(5c1e82ab) SHA1(f22ba1dc6799388e855d8f3064b96d568619a75b) )
 	ROM_LOAD32_BYTE( "u13-80.bin", 0x000002, 0x100000, CRC(fb49ae3e) SHA1(bf0cb5815639ebc3db3333249ab2ed81d3bdc684) )
@@ -819,7 +821,7 @@ ROM_START( beachpt )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u06_crp5bs1a.bin", 0x0000, 0x020000, CRC(0db0531d) SHA1(391e41b2dcd38669dcc24e938e9838feee972559) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u09_bep5a01d.bin", 0x000000, 0x100000, CRC(0f4614de) SHA1(2181c552e9a3669fda5e87d0c596d5534d24d4b3) )
 	ROM_LOAD32_BYTE( "u11_bep5a01d.bin", 0x000001, 0x100000, CRC(4f8c6fee) SHA1(2b75fe948bddda899969ef4a7663a52dc7b0eb81) )
 	ROM_LOAD32_BYTE( "u13_bep5a01d.bin", 0x000002, 0x100000, CRC(ca9a24e5) SHA1(67276f680f3aedf480c54c666f0db1110cd77aee) )
@@ -847,7 +849,7 @@ ROM_START( beetleup )
 	ROM_LOAD( "u06_n5b0-a-05-b.648f.bin", 0x0000, 0x020000, CRC(2d2ff35f) SHA1(97759fbad4b6b30ca8f8ea74da74cfaa433a7fa2) )
 	ROM_LOAD( "u06_n5b0-a-06-b.64 56.bin", 0x0000, 0x020000, CRC(7b4a6a97) SHA1(e3d54476730ca34a9f7214219cf991a220e15d5c) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u09_7b88.bin", 0x000000, 0x100000, CRC(8443972b) SHA1(5f2eea84ba18a83502f36eeaa52cff49a1631668) )
 	ROM_LOAD32_BYTE( "u11_1957.bin", 0x000001, 0x100000, CRC(36c7e5c5) SHA1(2bad0bb6b363af6a37f5b11c7ca8b3b674df4072) )
 	ROM_LOAD32_BYTE( "u13_b661.bin", 0x000002, 0x100000, CRC(0e74726c) SHA1(3103d801a622315877fc09d9c99290b54b266885) )
@@ -874,7 +876,7 @@ ROM_START( bigblue )
 	ROM_LOAD( "big blue bags.bin", 0x0000, 0x020000, CRC(4ec3fc1c) SHA1(7a081d370c54a6ea333957958b1341560458e845) )
 	ROM_LOAD( "bbbu01-c-za-std_-5-xx-xx-axx.1mu06.bin", 0x0000, 0x020000, CRC(09e6df0b) SHA1(85961160f95cb8d223f73483d6edad79fa37d729) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "bbbu01-a_-a-std_-5_.8gu09.bin", 0x000000, 0x100000, CRC(6f11b908) SHA1(663382bc295615afbc3a9a39c7089470b8b55926) )
 	ROM_LOAD32_BYTE( "bbbu01-a_-a-std_-5_.8gu11.bin", 0x000001, 0x100000, CRC(4cddcb5a) SHA1(e23354ab36f814b22c39564111558d4935fe8d70) )
 	ROM_LOAD32_BYTE( "bbbu01-a_-a-std_-5_.8gu13.bin", 0x000002, 0x100000, CRC(3a6dd649) SHA1(0f2b6cdf4f10ded99adc4fe0b47e4fada4aa6643) )
@@ -898,7 +900,7 @@ ROM_START( castaway )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6.1 c5bo-a-03-a", 0x0000, 0x020000, CRC(3917302a) SHA1(39b0672c36554712825a0e310522933be4b46d84) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9.8 cw5_b-03-b",  0x000000, 0x100000, CRC(c49aaf25) SHA1(5518312046208b4f912e9dee2ff24653a9976c6f) )
 	ROM_LOAD32_BYTE( "u11.8 cw5_b-03-b", 0x000001, 0x100000, CRC(24267b4b) SHA1(9103923dd1bba0b01f6020f7c357ac9b7bef4951) )
 	ROM_LOAD32_BYTE( "u13.8 cw5_b-03-b", 0x000002, 0x100000, CRC(3e606516) SHA1(5edad0a3099700bfeedff5a143591a85b3c4f582) )
@@ -922,7 +924,7 @@ ROM_START( castawaya ) // bad dump? (roms all look incorrect size to me)
 	ROM_REGION( 0x080000, "u6", 0 ) // config?
 	ROM_LOAD( "u-6 m27c801.bin", 0x0000, 0x080000, CRC(86538b30) SHA1(6b8d732b59af2cc1a6524989f8cf12a4d4dac484) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	// seem to be half size, doesn't have the TMS vectors
 	ROM_LOAD32_BYTE( "u-9 m27c801.bin",  0x000000, 0x080000, BAD_DUMP CRC(4a5efe38) SHA1(23e82eeadccdd0224858686b1d96bd5d184904cb) )
 	ROM_LOAD32_BYTE( "u-11 m27c801.bin", 0x000001, 0x080000, BAD_DUMP CRC(099e27e2) SHA1(4419ac8090ccab673e61f4f73c837971e341e7e2) )
@@ -952,7 +954,7 @@ ROM_START( dncsprt )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "dasp01-d-za-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(2d5f7976) SHA1(77de321ba2f46726a0c26aa498a4c3deb7f8c421) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "dasp01-a_-c-std_-5_.8gu09", 0x000000, 0x100000, CRC(e6941863) SHA1(c9fe08bd070c9fac7b8c9089a6ecbff581265b3a) )
 	ROM_LOAD32_BYTE( "dasp01-a_-c-std_-5_.8gu11", 0x000001, 0x100000, CRC(400b82ab) SHA1(5af6daf65e50b0c5ad27c43b0f3d4d8d24f38102) )
 	ROM_LOAD32_BYTE( "dasp01-a_-c-std_-5_.8gu13", 0x000002, 0x100000, CRC(b425a8f6) SHA1(82d8e0d8602a81c6d4cf528b73f3c84ab5dde11b) )
@@ -977,7 +979,7 @@ ROM_START( drmmake )
 	ROM_LOAD( "u6-1001", 0x0000, 0x020000, CRC(7a00ad2a) SHA1(67d90b10b4f62922c4ed94bb8a0f77e474ee385d) )
 	ROM_LOAD( "dream maker.bin", 0x0000, 0x020000, CRC(49c19eb3) SHA1(a55d4f9a0dd2b1db41fb28f475efa7e9f7c85be6) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9-801",  0x000000, 0x100000, CRC(e560eeff) SHA1(fe33927a91be7ecd2a283bb09b87f5f3d659cf09) )
 	ROM_LOAD32_BYTE( "u11-801", 0x000001, 0x100000, CRC(693cec8e) SHA1(83d33603fa11aa4341a40b2ffc4862992307dcfc) )
 	ROM_LOAD32_BYTE( "u13-801", 0x000002, 0x100000, CRC(8b78f6aa) SHA1(74804c44124b71f0f11446da342d0548130394f6) )
@@ -1004,7 +1006,7 @@ ROM_START( jumpjkpt )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "jujp01-a-za-std_-5_u06.bin", 0x0000, 0x020000, CRC(0f19b0c1) SHA1(c118215bcf502287277c34e6f389af70ab945674) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u09.bin", 0x000000, 0x100000, CRC(7d3cb293) SHA1(e9f102620f01309327678e115e206fd29dcffde6) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u11.bin", 0x000001, 0x100000, CRC(d92c0c7e) SHA1(680032b81e76c74539ff56f8c5fc7d4d16fd4793) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u13.bin", 0x000002, 0x100000, CRC(555ced70) SHA1(1ec115a2e2a1c171070775913a3eb831efc81dab) )
@@ -1030,7 +1032,7 @@ ROM_START( mushmagi )
 	ROM_REGION( 0x080000, "u6", 0 ) // config?
 	ROM_LOAD( "mb-u06.bin", 0x0000, 0x080000, CRC(10e3f3f6) SHA1(458f5be7ee01e361b4c31c099fc721521fbe3864) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "gb-u09.bin", 0x000000, 0x100000, CRC(f2d82cee) SHA1(78a15f757bbbb1f4f0a5ab889a9807d886a543a8) )
 	ROM_LOAD32_BYTE( "gb-u11.bin", 0x000001, 0x100000, CRC(3ead238a) SHA1(21956bd6b24e3281db70b6d28d97ee7bbd9ae75f) )
 	ROM_LOAD32_BYTE( "gb-u13.bin", 0x000002, 0x100000, CRC(58c191e6) SHA1(b0f86f407958de2b8e0f5e61288f8b6c7a2c0c2f) )
@@ -1056,7 +1058,7 @@ ROM_START( splmastr )
 	ROM_LOAD( "mb-u6 ebda.bin", 0x0000, 0x020000, CRC(7e73e9c7) SHA1(a8b00af9a3bf936e54391a96777ac78773b3cee0) )
 	ROM_LOAD( "speel master.bin", 0x0000, 0x020000, CRC(04168ab7) SHA1(70a387599bf6629a9a8a6ff38ed0d40e92e54504) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "gb-u9 b408.bin",  0x000000, 0x100000, CRC(e7146c72) SHA1(21b143ae93a73dd59b652a0033ceaa9116575239) )
 	ROM_LOAD32_BYTE( "gb-u11 abf6.bin", 0x000001, 0x100000, CRC(de54f849) SHA1(b628a69c8ad5f81543cd78c458dd9348226114a7) )
 	ROM_LOAD32_BYTE( "gb-u13 6526.bin", 0x000002, 0x100000, CRC(e5744b4f) SHA1(8c36b087dc4fad6cd463abea5b1e7c0bd9c30074) )
@@ -1094,7 +1096,7 @@ ROM_START( tajmah )
 	ROM_LOAD32_BYTE( "t5_d01d.u12", 0x600002, 0x080000, CRC(c2ca0b17) SHA1(cfd553f1943552620f6d324f767fd1f1957e8e25) )
 	ROM_LOAD32_BYTE( "t5_d01d.u14", 0x600003, 0x080000, CRC(0d512057) SHA1(f5f43dad25940193516d467725ecbe1989cc9003) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) - is this an alt set, or a 2nd video board? */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) - is this an alt set, or a 2nd video board? */
 	ROM_LOAD32_BYTE( "u9",  0x400000, 0x080000, CRC(157b9860) SHA1(6e04f035a945a63617e32b196fa0c1b6fd26b281) )
 	ROM_LOAD32_BYTE( "u11", 0x400001, 0x080000, CRC(6aa2cecc) SHA1(7b1d6bb81fed7413f69e926e7cefe1ee171453b4) )
 	ROM_LOAD32_BYTE( "u13", 0x400002, 0x080000, CRC(5c091b7a) SHA1(d1c758a6d155bbc7359f3f46a29bac44d96ec4b1) )
@@ -1127,7 +1129,7 @@ ROM_START( 3wishrd )
 	ROM_LOAD( "three wishes.bin", 0x0000, 0x020000, CRC(37d85da7) SHA1(64db855e06dab5ea85c669bd72f1e8ee8856607a) )
 	ROM_LOAD( "590a13a.1u6", 0x0000, 0x020000, CRC(3e674907) SHA1(ca933c416764ebf355d8e04f871f8421c9039078) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "tw5b01a.8u9", 0x000000, 0x100000, CRC(2410659a) SHA1(2bcd2539c0e3e7389c27c21e58d9199b9c7c742e) )
 	ROM_LOAD32_BYTE( "tw5b01a.u11", 0x000001, 0x100000, CRC(44ca9ce1) SHA1(b1c6d83f749202c072c6ce99c0470a31cfab8986) )
 	ROM_LOAD32_BYTE( "tw5b01a.u13", 0x000002, 0x100000, CRC(6c60097b) SHA1(f5ddb86b481b7b95d6ec151b37d662b583817813) )
@@ -1156,7 +1158,7 @@ ROM_START( atrwild )
 	ROM_LOAD( "mb-u22-d.bin", 0x000, 0x117, CRC(dc097847) SHA1(305294284d0ffd578f9115b836ef1f9e906c1599) )
 	ROM_LOAD( "mb-u32-b.bin", 0x000, 0x117, CRC(78a9310b) SHA1(deb84d96b0411b05c54fb2c998bed020a37d5005) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u8.bin",  0x600000, 0x080000, CRC(4acafd98) SHA1(d516c55ddce1470e4e19725b6d7dfd5f70ba1129) )
 	ROM_LOAD32_BYTE( "u10.bin", 0x600001, 0x080000, CRC(804800be) SHA1(5fb2a5479c2a7073c2abd40e14a162fbf783eb70) )
 	ROM_LOAD32_BYTE( "u12.bin", 0x600002, 0x080000, CRC(0845ff27) SHA1(5012569a79c9fcbee178a0cee45d25769a1cf9be) )
@@ -1177,7 +1179,7 @@ ROM_START( atricmon )
 	ROM_LOAD( "mb-u32-d.bin", 0x000, 0x2e5, CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
 	ROM_LOAD( "mb-u35-65994077_icm-s.bin", 0x000, 0x2e5, CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "gb-u9.bin",  0x000000, 0x100000, CRC(eff83f95) SHA1(743f2fb0dd84a83387919db70175aa62f5f6f858) )
 	ROM_LOAD32_BYTE( "gb-u11.bin", 0x000001, 0x100000, CRC(3fc27ae9) SHA1(896da175c11b48fb28dbb0678849b8f167cf5f6e) )
 	ROM_LOAD32_BYTE( "gb-u13.bin", 0x000002, 0x100000, CRC(6ad50f67) SHA1(b32781f06acc3e9929467d6d1212cf0dc757e5b3) )
@@ -1210,7 +1212,7 @@ ROM_START( atrbonpk )
 	ROM_LOAD( "u6-b.bin", 0x000, 0x117, CRC(2750fb0a) SHA1(3814c4755a215073425a9d6bb048315498962c76) )
 	ROM_LOAD( "u7-a.bin", 0x000, 0x117, CRC(adcb2789) SHA1(cc2ebd69abec73d66665faaec19b8706e539b34c) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "u9.bin",  0x400000, 0x080000, CRC(5b8450f1) SHA1(27fc771c3fb824cdb845237324984778fcd0a737) )
 	ROM_LOAD32_BYTE( "u11.bin", 0x400001, 0x080000, CRC(c8c52bd1) SHA1(081b8b4c46f18d030329bf519a8ed50385f7c062) )
 	ROM_LOAD32_BYTE( "u13.bin", 0x400002, 0x080000, CRC(23164a85) SHA1(e6de6aac28f1dac9ea908aaab9760b56ded1bb91) )
@@ -1231,7 +1233,7 @@ ROM_START( abigchs )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "bigc21-d-zf-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(0eb376fb) SHA1(34e1f28e71503ffb0e1e922bd3ba17bad0d37d99) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	// not valid TMS code, looks like some x86 drive image split into ROMs?
 	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu09", 0x000000, 0x100000, CRC(c87e6bb4) SHA1(387e2498625ff718fccaa7701dd595ee787b9a83) )
 	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu11", 0x100000, 0x100000, CRC(c9e9fa7f) SHA1(1698215845f21cfde0274e880d89c66fb3226f04) )
@@ -1256,7 +1258,7 @@ ROM_START( bearnec )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u6_bene21-e-zg-std_-5-xx-xx-axx_0f78.bin", 0x0000, 0x020000, CRC(d956484f) SHA1(d2d659a4350d7204666234a511ebd4dd7a021d89) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	// not valid TMS code, looks like some x86 drive image split into ROMs?
 	ROM_LOAD( "u09_a632.bin", 0x000000, 0x100000, CRC(a671b6e8) SHA1(86b97ba98fdd09575a371b5b7f7d42bf2916fe17) )
 	ROM_LOAD( "u11_947b.bin", 0x100000, 0x100000, CRC(3dc60963) SHA1(d824cd4fbe4116744727180762fbf0ffe22e6398) )
@@ -1281,7 +1283,7 @@ ROM_START( goldcity )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "goci21-e-zf-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(73ab9c41) SHA1(0888923bdaede83f264979c0757894f5cb2e0ec8) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	// not valid TMS code, looks like some x86 drive image split into ROMs?
 	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu09", 0x000000, 0x100000, CRC(72c9b584) SHA1(1345e7ea34a819fbc01b9a64e9f9c1a2de927dda) )
 	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu11", 0x100000, 0x100000, CRC(2ebe1d71) SHA1(1b540c3bb9b232f475c3fe2b56c55f473d8c09ee) )
@@ -1309,7 +1311,7 @@ ROM_START( santam )
 	ROM_REGION( 0x020000, "u6", 0 ) // config?
 	ROM_LOAD( "u06_1m_m27c1001-10f_da21h.bin", 0x0000, 0x020000, CRC(51c0a380) SHA1(861c8b4f825f4bc11dd02ac03dcc2cc7e8c65129) )
 
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	// not valid TMS code, looks like some x86 drive image split into ROMs?
 	ROM_LOAD( "gb_u09_8m_m27c801-100f1_9df6h.bin", 0x000000, 0x100000, CRC(470ccae5) SHA1(0521af7830cc59102edcc658df4d21a3d669d6db) )
 	ROM_LOAD( "gb_u11_8m_m27c801-100f1_7621h.bin", 0x100000, 0x100000, CRC(8f9a1031) SHA1(1aca654b62e73f3005e627625bea2b4198c04a99) )

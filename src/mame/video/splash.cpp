@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap1)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(splash_state::vram_w)
+void splash_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 1);

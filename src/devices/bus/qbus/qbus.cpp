@@ -26,8 +26,8 @@ void qbus_cards(device_slot_interface &device)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(QBUS, qbus_device, "qbus", "QBUS bus")
-DEFINE_DEVICE_TYPE(QBUS_SLOT, qbus_slot_device, "qbus_slot", "QBUS slot")
+DEFINE_DEVICE_TYPE(QBUS, qbus_device, "qbus", "DEC Qbus bus")
+DEFINE_DEVICE_TYPE(QBUS_SLOT, qbus_slot_device, "qbus_slot", "DEC Qbus slot")
 
 
 //**************************************************************************
@@ -57,6 +57,7 @@ qbus_slot_device::qbus_slot_device(const machine_config &mconfig, const char *ta
 	m_write_birq6(*this),
 	m_write_birq7(*this),
 	m_write_bdmr(*this),
+	m_card(nullptr),
 	m_bus(*this, DEVICE_SELF_OWNER)
 {
 }
@@ -133,7 +134,7 @@ void qbus_device::add_card(device_qbus_card_interface *card)
 	m_device_list.append(*card);
 }
 
-void qbus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
+void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 }

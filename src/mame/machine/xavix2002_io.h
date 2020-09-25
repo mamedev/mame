@@ -18,13 +18,13 @@ public:
 	auto write_1_callback() { return m_out1_cb.bind(); }
 	auto write_2_callback() { return m_out2_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(pio_dir_w);
-	DECLARE_READ8_MEMBER(pio_dir_r);
+	void pio_dir_w(offs_t offset, uint8_t data);
+	uint8_t pio_dir_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(pio_out_w);
-	DECLARE_READ8_MEMBER(pio_out_r);
+	void pio_out_w(offs_t offset, uint8_t data);
+	uint8_t pio_out_r(offs_t offset);
 
-	DECLARE_READ8_MEMBER(pio_in_r);
+	uint8_t pio_in_r(offs_t offset);
 
 protected:
 	// device-level overrides

@@ -167,53 +167,47 @@ license:CC0
 		</screen>
 
 		<!-- Button lamps -->
-		<bezel name="lamp8" element="COLLECT" inputtag="P1" inputmask="0x100">
+		<element name="lamp8" ref="COLLECT" inputtag="P1" inputmask="0x100">
 			<bounds x="0.27" y="3.02" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="lamp7" element="RESERVE" inputtag="P1" inputmask="0x80">
+		<element name="lamp7" ref="RESERVE" inputtag="P1" inputmask="0x80">
 			<bounds x="0.27" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp6" element="BET1" inputtag="P1" inputmask="0x40">
+		</element>
+		<element name="lamp6" ref="BET1" inputtag="P1" inputmask="0x40">
 			<bounds x="0.68" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
+		</element>
+		<element name="lamp5" ref="BET2" inputtag="P1" inputmask="0x20">
 			<bounds x="1.09" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
+		</element>
+		<element name="lamp4" ref="BET3" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp3" element="BET4" inputtag="P1" inputmask="0x08">
+		</element>
+		<element name="lamp3" ref="BET4" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp2" element="BET5" inputtag="P1" inputmask="0x04">
+		</element>
+		<element name="lamp2" ref="BET5" inputtag="P1" inputmask="0x04">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp0" element="GAMBLE" inputtag="P1" inputmask="0x01">
+		</element>
+		<element name="lamp0" ref="GAMBLE" inputtag="P1" inputmask="0x01">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
-		</bezel>
-		<bezel name="lamp1" element="TAKE_WIN" inputtag="P1" inputmask="0x02">
+		</element>
+		<element name="lamp1" ref="TAKE_WIN" inputtag="P1" inputmask="0x02">
 			<bounds x="3.14" y="3.43" width="0.3" height="0.3" />
-		</bezel>
+		</element>
 
 		<!-- Tower lamps -->
-		<bezel name="lamp32" element="REDLAMP">
+		<element name="lamp32" ref="REDLAMP">
 			<bounds x="3.58" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp33" element="REDLAMP">
+		</element>
+		<element name="lamp33" ref="REDLAMP">
 			<bounds x="3.58" y="3.43" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp34" element="REDLAMP">
+		</element>
+		<element name="lamp34" ref="REDLAMP">
 			<bounds x="3.68" y="3.31" width="0.10" height="0.10" />
-		</bezel>
-		<bezel name="lamp35" element="REDLAMP">
+		</element>
+		<element name="lamp35" ref="REDLAMP">
 			<bounds x="3.68" y="3.43" width="0.10" height="0.10" />
-		</bezel>
-	</view>
-
-	<view name="Screen">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
+		</element>
 	</view>
 </mamelayout>

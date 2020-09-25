@@ -58,16 +58,16 @@ protected:
 	uint8_t m_irq_mask;
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(charram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void charram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(scrollx_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(satansat_b002_w);
-	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
+	void scrollx_w(uint8_t data);
+	void scrolly_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void satansat_b002_w(uint8_t data);
+	void satansat_backcolor_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -130,7 +130,7 @@ public:
 	void pballoon(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(fantasy_flipscreen_w);
+	void fantasy_flipscreen_w(offs_t offset, uint8_t data);
 
 	void fantasy_map(address_map &map);
 	void pballoon_map(address_map &map);

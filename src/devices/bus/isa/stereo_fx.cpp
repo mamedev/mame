@@ -214,7 +214,7 @@ void stereo_fx_device::device_start()
 	ym3812_device &ym3812 = *subdevice<ym3812_device>("ym3812");
 	set_isa_device();
 
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
 	m_isa->install_device(0x0226, 0x0227, read8smo_delegate(*this, FUNC(stereo_fx_device::invalid_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::dsp_reset_w)));
 	m_isa->install_device(0x022a, 0x022b, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_data_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
 	m_isa->install_device(0x022c, 0x022d, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_wbuf_status_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::dsp_cmd_w)));

@@ -25,11 +25,11 @@ public:
 	uint16_t cop_program[0x100];              /* program "code" */
 	uint16_t cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
 
-	DECLARE_WRITE16_MEMBER( cop_pgm_data_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_addr_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_value_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_mask_w );
-	DECLARE_WRITE16_MEMBER( cop_pgm_trigger_w );
+	void cop_pgm_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_pgm_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_pgm_value_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_pgm_mask_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_pgm_trigger_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// these are used by legionna.c to find the command based on trigger value
 	// legionna/seicop implementation then looks up the command based on hardcoded sequences in the driver rather than actually using the trigger value (should be changed)
@@ -46,20 +46,20 @@ public:
 	uint16_t pal_brightness_val;
 	uint16_t pal_brightness_mode;
 
-	DECLARE_WRITE16_MEMBER( cop_dma_v1_w );
-	DECLARE_WRITE16_MEMBER( cop_dma_v2_w );
+	void cop_dma_v1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_dma_v2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( cop_dma_adr_rel_w );
-	DECLARE_WRITE16_MEMBER( cop_dma_src_w );
-	DECLARE_WRITE16_MEMBER( cop_dma_size_w );
-	DECLARE_WRITE16_MEMBER( cop_dma_dst_w );
-	DECLARE_READ16_MEMBER( cop_dma_mode_r );
-	DECLARE_WRITE16_MEMBER( cop_dma_mode_w );
+	void cop_dma_adr_rel_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_dma_size_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cop_dma_mode_r();
+	void cop_dma_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( cop_pal_brightness_val_w );
-	DECLARE_WRITE16_MEMBER( cop_pal_brightness_mode_w );
+	void cop_pal_brightness_val_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_pal_brightness_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
+	void cop_dma_trigger_w(uint16_t data);
 
 	uint8_t fade_table(int v);
 
@@ -69,10 +69,10 @@ public:
 
 	// Number Conversion
 
-	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
-	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
-	DECLARE_WRITE16_MEMBER( cop_itoa_mode_w );
-	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
+	void cop_itoa_low_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_itoa_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_itoa_mode_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cop_itoa_digits_r(offs_t offset);
 
 	uint32_t cop_itoa;
 	uint16_t cop_itoa_mode;
@@ -80,25 +80,25 @@ public:
 
 	// Main COP functionality
 
-	DECLARE_WRITE16_MEMBER( cop_scale_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_target_w );
-	DECLARE_WRITE16_MEMBER( cop_angle_step_w );
+	void cop_scale_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_angle_target_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_angle_step_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER ( cop_reg_high_r );
-	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
-	DECLARE_READ16_MEMBER ( cop_reg_low_r );
-	DECLARE_WRITE16_MEMBER( cop_reg_low_w );
+	uint16_t cop_reg_high_r(offs_t offset);
+	void cop_reg_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cop_reg_low_r(offs_t offset);
+	void cop_reg_low_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER( cop_cmd_w );
-	DECLARE_READ16_MEMBER ( cop_collision_status_r );
-	DECLARE_READ16_MEMBER (cop_collision_status_val_r);
-	DECLARE_READ16_MEMBER (cop_collision_status_stat_r);
+	void cop_cmd_w(offs_t offset, uint16_t data);
+	uint16_t cop_collision_status_r();
+	uint16_t cop_collision_status_val_r(offs_t offset);
+	uint16_t cop_collision_status_stat_r();
 
-	DECLARE_READ16_MEMBER ( cop_status_r );
-	DECLARE_READ16_MEMBER ( cop_dist_r );
-	DECLARE_READ16_MEMBER ( cop_angle_r );
+	uint16_t cop_status_r();
+	uint16_t cop_dist_r();
+	uint16_t cop_angle_r();
 
-	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
+	void cop_hitbox_baseadr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
 	uint32_t cop_regs[8];
@@ -146,50 +146,50 @@ public:
 	uint32_t cop_sort_ram_addr, cop_sort_lookup;
 	uint16_t cop_sort_param;
 
-	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_param_w);
-	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
+	void cop_sort_lookup_hi_w(uint16_t data);
+	void cop_sort_lookup_lo_w(uint16_t data);
+	void cop_sort_ram_addr_hi_w(uint16_t data);
+	void cop_sort_ram_addr_lo_w(uint16_t data);
+	void cop_sort_param_w(uint16_t data);
+	void cop_sort_dma_trig_w(uint16_t data);
 
 	// RNG (cupsoc)
 	uint16_t m_cop_rng_max_value;
-	DECLARE_READ16_MEMBER(cop_prng_r);
-	DECLARE_WRITE16_MEMBER(cop_prng_maxvalue_w);
-	DECLARE_READ16_MEMBER(cop_prng_maxvalue_r);
+	uint16_t cop_prng_r();
+	void cop_prng_maxvalue_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cop_prng_maxvalue_r();
 
 	// misc 68k (grainbow)
 	uint32_t m_cop_sprite_dma_param;
 	uint32_t m_cop_sprite_dma_src;
 
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_size_w);
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_src_hi_w);
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_src_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_inc_w);
+	void cop_sprite_dma_param_hi_w(uint16_t data);
+	void cop_sprite_dma_param_lo_w(uint16_t data);
+	void cop_sprite_dma_size_w(uint16_t data);
+	void cop_sprite_dma_src_hi_w(uint16_t data);
+	void cop_sprite_dma_src_lo_w(uint16_t data);
+	void cop_sprite_dma_inc_w(uint16_t data);
 	int m_cop_sprite_dma_size;
 
 	// misc 68k
 	uint16_t m_cop_unk_param_a,m_cop_unk_param_b;
-	DECLARE_WRITE16_MEMBER(cop_unk_param_a_w);
-	DECLARE_WRITE16_MEMBER(cop_unk_param_b_w);
+	void cop_unk_param_a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_unk_param_b_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_precmd;
-	DECLARE_WRITE16_MEMBER(cop_precmd_w);
-	DECLARE_WRITE16_MEMBER(cop_rom_addr_lo_w);
-	DECLARE_WRITE16_MEMBER(cop_rom_addr_hi_w);
+	void cop_precmd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_rom_addr_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cop_rom_addr_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y;
 	int m_sprite_dma_rel_x, m_sprite_dma_rel_y;
 	int m_sprite_dma_x_clip;
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_y_w);
-	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_x_w);
+	void cop_sprite_dma_abs_y_w(uint16_t data);
+	void cop_sprite_dma_abs_x_w(uint16_t data);
 
 	// legacy code, to be removed / refactored into above
 	int m_LEGACY_r0, m_LEGACY_r1;
-	DECLARE_WRITE16_MEMBER(LEGACY_cop_cmd_w);
+	void LEGACY_cop_cmd_w(offs_t offset, uint16_t data);
 
 	// DEBUG
 	void dump_table();

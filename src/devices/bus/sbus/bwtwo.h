@@ -29,11 +29,11 @@ protected:
 	// device_sbus_slot_interface overrides
 	virtual void install_device() override;
 
-	DECLARE_READ8_MEMBER(regs_r);
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ32_MEMBER(rom_r);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	uint8_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint8_t data);
+	uint32_t rom_r(offs_t offset);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

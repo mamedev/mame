@@ -172,19 +172,19 @@ protected:
 	template <std::size_t N> void set_port_open_drain(bool value);
 	template <std::size_t N> void set_port_mask(u8 mask);
 	template <std::size_t N> void port_input_w(uint8_t data) { m_port_input[N] = data & ~m_port_mask[N]; }
-	template <std::size_t N> DECLARE_READ8_MEMBER(port_r);
-	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_latch_w);
-	template <std::size_t N> DECLARE_WRITE8_MEMBER(port_ddr_w);
+	template <std::size_t N> u8 port_r();
+	template <std::size_t N> void port_latch_w(u8 data);
+	template <std::size_t N> void port_ddr_w(u8 data);
 	template <std::size_t N> void port_cb_w();
 
-	DECLARE_READ8_MEMBER(misc_r) { return m_mr; }
-	DECLARE_WRITE8_MEMBER(misc_w) { m_mr = data; }
+	u8 misc_r() { return m_mr; }
+	void misc_w(u8 data) { m_mr = data; }
 
 	// A/D converter
-	DECLARE_READ8_MEMBER(acr_r);
-	DECLARE_WRITE8_MEMBER(acr_w);
-	DECLARE_READ8_MEMBER(arr_r);
-	DECLARE_WRITE8_MEMBER(arr_w);
+	u8 acr_r();
+	void acr_w(u8 data);
+	u8 arr_r();
+	void arr_w(u8 data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -250,11 +250,11 @@ protected:
 
 	m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
 
-	template <offs_t B> DECLARE_READ8_MEMBER(eprom_r);
-	template <offs_t B> DECLARE_WRITE8_MEMBER(eprom_w);
+	template <offs_t B> u8 eprom_r(offs_t offset);
+	template <offs_t B> void eprom_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER(pcr_r);
-	DECLARE_WRITE8_MEMBER(pcr_w);
+	u8 pcr_r();
+	void pcr_w(u8 data);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

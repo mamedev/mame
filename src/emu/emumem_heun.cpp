@@ -23,7 +23,7 @@ template<int Width, int AddrShift, endianness_t Endian> std::string handler_entr
 }
 
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_unmapped<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)const 
+template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_unmapped<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)const
 {
 	if (inh::m_space->log_unmap() && !inh::m_space->m_manager.machine().side_effects_disabled())
 		inh::m_space->device().logerror(inh::m_space->is_octal()
@@ -74,6 +74,8 @@ template class handler_entry_read_unmapped<1,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_unmapped<1,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_unmapped<1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_read_unmapped<1, -1, ENDIANNESS_BIG>;
+template class handler_entry_read_unmapped<2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_unmapped<2,  3, ENDIANNESS_BIG>;
 template class handler_entry_read_unmapped<2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_unmapped<2,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_unmapped<2, -1, ENDIANNESS_LITTLE>;
@@ -99,6 +101,8 @@ template class handler_entry_write_unmapped<1,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_unmapped<1,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_unmapped<1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_write_unmapped<1, -1, ENDIANNESS_BIG>;
+template class handler_entry_write_unmapped<2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_write_unmapped<2,  3, ENDIANNESS_BIG>;
 template class handler_entry_write_unmapped<2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_unmapped<2,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_unmapped<2, -1, ENDIANNESS_LITTLE>;
@@ -125,6 +129,8 @@ template class handler_entry_read_nop<1,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_nop<1,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_nop<1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_read_nop<1, -1, ENDIANNESS_BIG>;
+template class handler_entry_read_nop<2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_read_nop<2,  3, ENDIANNESS_BIG>;
 template class handler_entry_read_nop<2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_read_nop<2,  0, ENDIANNESS_BIG>;
 template class handler_entry_read_nop<2, -1, ENDIANNESS_LITTLE>;
@@ -150,6 +156,8 @@ template class handler_entry_write_nop<1,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_nop<1,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_nop<1, -1, ENDIANNESS_LITTLE>;
 template class handler_entry_write_nop<1, -1, ENDIANNESS_BIG>;
+template class handler_entry_write_nop<2,  3, ENDIANNESS_LITTLE>;
+template class handler_entry_write_nop<2,  3, ENDIANNESS_BIG>;
 template class handler_entry_write_nop<2,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_nop<2,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_nop<2, -1, ENDIANNESS_LITTLE>;

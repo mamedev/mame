@@ -85,7 +85,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "cpu/tlcs900/tlcs900.h"
+#include "cpu/tlcs900/tmp95c063.h"
 #include "cpu/mn10200/mn10200.h"
 #include "cpu/tms32051/tms32051.h"
 #include "video/tc0780fpa.h"

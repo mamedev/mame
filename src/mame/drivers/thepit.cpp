@@ -182,7 +182,7 @@ void thepit_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-READ8_MEMBER(thepit_state::intrepid_colorram_mirror_r)
+uint8_t thepit_state::intrepid_colorram_mirror_r(offs_t offset)
 {
 	return m_colorram[offset];
 }
@@ -1323,7 +1323,7 @@ ROM_END
 */
 
 
-READ8_MEMBER(thepit_state::rtriv_question_r)
+uint8_t thepit_state::rtriv_question_r(offs_t offset)
 {
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)
@@ -1353,7 +1353,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 void thepit_state::init_rtriv()
 {
 	// Set-up the weirdest questions read ever done
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(*this, FUNC(thepit_state::rtriv_question_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8sm_delegate(*this, FUNC(thepit_state::rtriv_question_r)));
 
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));

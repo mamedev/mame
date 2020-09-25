@@ -222,13 +222,13 @@ VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(warpwarp_state::geebee_videoram_w)
+void warpwarp_state::geebee_videoram_w(offs_t offset, uint8_t data)
 {
 	m_geebee_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
+void warpwarp_state::warpwarp_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);

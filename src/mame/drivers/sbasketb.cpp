@@ -55,7 +55,7 @@ CPU/Video Board Parts:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
+void sbasketb_state::sbasketb_sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }

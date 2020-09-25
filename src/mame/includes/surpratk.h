@@ -47,8 +47,8 @@ private:
 	required_device<k053251_device> m_k053251;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(surpratk_videobank_w);
-	DECLARE_WRITE8_MEMBER(surpratk_5fc0_w);
+	void surpratk_videobank_w(uint8_t data);
+	void surpratk_5fc0_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_surpratk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

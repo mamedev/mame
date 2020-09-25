@@ -71,8 +71,8 @@ public:
 
 private:
 	virtual void machine_start() override;
-	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
-	DECLARE_WRITE8_MEMBER(starshp1_analog_in_w);
+	void starshp1_collision_reset_w(uint8_t data);
+	void starshp1_analog_in_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ship_explode_w);
 	DECLARE_WRITE_LINE_MEMBER(circle_mod_w);
 	DECLARE_WRITE_LINE_MEMBER(circle_kill_w);
@@ -80,13 +80,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(inverse_w);
 	DECLARE_WRITE_LINE_MEMBER(mux_w);
 	DECLARE_WRITE_LINE_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(starshp1_rng_r);
-	DECLARE_WRITE8_MEMBER(starshp1_ssadd_w);
-	DECLARE_WRITE8_MEMBER(starshp1_sspic_w);
-	DECLARE_WRITE8_MEMBER(starshp1_playfield_w);
+	uint8_t starshp1_rng_r();
+	void starshp1_ssadd_w(offs_t offset, uint8_t data);
+	void starshp1_sspic_w(uint8_t data);
+	void starshp1_playfield_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(attract_w);
 	DECLARE_WRITE_LINE_MEMBER(phasor_w);
-	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
+	void starshp1_analog_out_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	void starshp1_palette(palette_device &palette) const;

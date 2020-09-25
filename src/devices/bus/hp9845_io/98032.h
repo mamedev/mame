@@ -32,8 +32,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ16_MEMBER(reg_r) override;
-	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
+	virtual uint16_t reg_r(address_space &space, offs_t offset) override;
+	virtual void reg_w(address_space &space, offs_t offset, uint16_t data) override;
 
 private:
 	required_device<hp98032_gpio_slot_device> m_gpio;

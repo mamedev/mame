@@ -126,8 +126,8 @@ private:
 	void dsp_HOLDA_signal_w(offs_t offset, u16 data);
 	void paletteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void gradram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	DECLARE_READ16_MEMBER(stick_input_r);
-	DECLARE_READ16_MEMBER(stick2_input_r);
+	u16 stick_input_r(offs_t offset);
+	u16 stick2_input_r(offs_t offset);
 	void coin_control_w(u8 data);
 	void sound_bankswitch_w(u8 data);
 	void dsp_flags_w(offs_t offset, u16 data);

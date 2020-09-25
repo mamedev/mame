@@ -124,7 +124,7 @@ void tecmosys_state::prot_init(int which)
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&tecmosys_state::prot_reset,this));
 }
 
-READ16_MEMBER(tecmosys_state::prot_status_r)
+u16 tecmosys_state::prot_status_r(offs_t offset, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -136,13 +136,13 @@ READ16_MEMBER(tecmosys_state::prot_status_r)
 	return 0xc0; // simulation is always ready
 }
 
-WRITE16_MEMBER(tecmosys_state::prot_status_w)
+void tecmosys_state::prot_status_w(u16 data)
 {
 	// deroon clears the status in one place.
 }
 
 
-READ16_MEMBER(tecmosys_state::prot_data_r)
+u16 tecmosys_state::prot_data_r()
 {
 	// prot appears to be read-ready for two consecutive reads
 	// but returns 0xff for subsequent reads.
@@ -153,7 +153,7 @@ READ16_MEMBER(tecmosys_state::prot_data_r)
 }
 
 
-WRITE16_MEMBER(tecmosys_state::prot_data_w)
+void tecmosys_state::prot_data_w(u16 data)
 {
 	// Only LSB
 	data >>= 8;

@@ -141,7 +141,7 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 }
 
 
-WRITE8_MEMBER(qsound_device::qsound_w)
+void qsound_device::qsound_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -169,7 +169,7 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_device::qsound_r)
+u8 qsound_device::qsound_r()
 {
 	return m_dsp_ready ? 0x80 : 0x00;
 }
@@ -254,10 +254,10 @@ void qsound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void qsound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	std::fill_n(outputs[0], samples, m_samples[0]);
-	std::fill_n(outputs[1], samples, m_samples[1]);
+	outputs[0].fill(stream_buffer::sample_t(m_samples[0]) * (1.0 / 32768.0));
+	outputs[1].fill(stream_buffer::sample_t(m_samples[1]) * (1.0 / 32768.0));
 }
 
 
@@ -279,7 +279,7 @@ void qsound_device::dsp_io_map(address_map &map)
 }
 
 
-READ16_MEMBER(qsound_device::dsp_sample_r)
+u16 qsound_device::dsp_sample_r(offs_t offset)
 {
 	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));

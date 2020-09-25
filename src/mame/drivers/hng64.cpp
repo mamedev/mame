@@ -1770,9 +1770,6 @@ void hng64_state::machine_start()
 	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
 	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
-	m_comm_rom = memregion("user2")->base();
-	m_comm_ram = std::make_unique<uint8_t[]>(0x10000);
-
 	for (int i = 0; i < 0x38 / 4; i++)
 	{
 		m_videoregs[i] = 0xdeadbeef;
@@ -2195,7 +2192,7 @@ void hng64_state::hng64_shoot(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some misisng?!)
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some missing?!)
 	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
 }
 

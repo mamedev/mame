@@ -234,4 +234,5 @@ static const struct CassetteFormat vg5k_k7_format =
 
 CASSETTE_FORMATLIST_START(vg5k_cassette_formats)
 	CASSETTE_FORMAT(vg5k_k7_format)
+    CASSETTE_FORMAT(wavfile_format)
 CASSETTE_FORMATLIST_END

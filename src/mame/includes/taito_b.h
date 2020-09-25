@@ -59,16 +59,16 @@ protected:
 
 	void sound_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	template<int Player> DECLARE_READ16_MEMBER(tracky_hi_r);
-	template<int Player> DECLARE_READ16_MEMBER(tracky_lo_r);
-	template<int Player> DECLARE_READ16_MEMBER(trackx_hi_r);
-	template<int Player> DECLARE_READ16_MEMBER(trackx_lo_r);
-	DECLARE_READ16_MEMBER(eep_latch_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
-	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
+	void bankswitch_w(uint8_t data);
+	template<int Player> uint16_t tracky_hi_r();
+	template<int Player> uint16_t tracky_lo_r();
+	template<int Player> uint16_t trackx_hi_r();
+	template<int Player> uint16_t trackx_lo_r();
+	uint16_t eep_latch_r();
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t player_34_coin_ctrl_r();
+	void player_34_coin_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spacedxo_tc0220ioc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void mb87078_gain_changed(offs_t offset, uint8_t data);
 	virtual void video_start() override;
 	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -134,8 +134,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
 
 protected:
-	DECLARE_WRITE16_MEMBER(realpunc_output_w);
-	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
+	void realpunc_output_w(uint16_t data);
+	void realpunc_video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void realpunc_map(address_map &map);
 	void realpunc_hd63484_map(address_map &map);
@@ -163,8 +163,8 @@ protected:
 	virtual void video_reset() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(pixelram_w);
-	DECLARE_WRITE16_MEMBER(pixel_scroll_w);
+	void pixelram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pixel_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void hitice_map(address_map &map);
 

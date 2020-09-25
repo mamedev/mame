@@ -67,12 +67,12 @@ void sh7604_wdt_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( sh7604_wdt_device::read )
+uint8_t sh7604_wdt_device::read(address_space &space, offs_t offset)
 {
 	return space.read_byte(offset);
 }
 
-WRITE16_MEMBER( sh7604_wdt_device::write )
+void sh7604_wdt_device::write(address_space &space, offs_t offset, uint16_t data)
 {
 	uint8_t id_param = data >> 8;
 	switch(id_param)

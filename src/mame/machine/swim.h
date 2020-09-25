@@ -8,9 +8,10 @@
     early Macs
 
 *********************************************************************/
-
 #ifndef MAME_MACHINE_SWIM_H
 #define MAME_MACHINE_SWIM_H
+
+#pragma once
 
 #include "machine/applefdc.h"
 

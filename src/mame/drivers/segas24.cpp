@@ -400,7 +400,7 @@ void segas24_state::device_post_load()
 	}
 }
 
-READ16_MEMBER( segas24_state::fdc_r )
+uint16_t segas24_state::fdc_r(offs_t offset)
 {
 	if(!m_track_size)
 		return 0xffff;
@@ -435,7 +435,7 @@ READ16_MEMBER( segas24_state::fdc_r )
 	}
 }
 
-WRITE16_MEMBER( segas24_state::fdc_w )
+void segas24_state::fdc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!m_track_size)
 		return;
@@ -525,7 +525,7 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 	}
 }
 
-READ16_MEMBER( segas24_state::fdc_status_r )
+uint16_t segas24_state::fdc_status_r()
 {
 	if(!m_track_size)
 		return 0xffff;
@@ -533,7 +533,7 @@ READ16_MEMBER( segas24_state::fdc_status_r )
 	return 0x90 | (m_fdc_irq ? 2 : 0) | (m_fdc_drq ? 1 : 0) | (m_fdc_phys_track ? 0x40 : 0) | (m_fdc_index_count ? 0x20 : 0);
 }
 
-WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
+void segas24_state::fdc_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		FDC_LOG(("FDC control %02x\n", data & 0xff));
@@ -576,13 +576,13 @@ void segas24_state::hotrod_lamps_w(uint8_t data)
 	// Lamps
 }
 
-READ16_MEMBER( segas24_state::iod_r )
+uint16_t segas24_state::iod_r(offs_t offset)
 {
 	logerror("IO daughterboard read %02x %s\n", offset, machine().describe_context());
 	return 0xffff;
 }
 
-WRITE16_MEMBER( segas24_state::iod_w )
+void segas24_state::iod_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("IO daughterboard write %02x, %04x & %04x %s\n", offset, data, mem_mask, machine().describe_context());
 }
@@ -685,30 +685,30 @@ void segas24_state::reset_bank()
 	}
 }
 
-READ8_MEMBER( segas24_state::curbank_r )
+uint8_t segas24_state::curbank_r()
 {
 	return m_curbank;
 }
 
-WRITE8_MEMBER( segas24_state::curbank_w )
+void segas24_state::curbank_w(uint8_t data)
 {
 	m_curbank = data;
 	reset_bank();
 }
 
-READ8_MEMBER( segas24_state::frc_mode_r )
+uint8_t segas24_state::frc_mode_r()
 {
 	return m_frc_mode & 1;
 }
 
-WRITE8_MEMBER( segas24_state::frc_mode_w )
+void segas24_state::frc_mode_w(uint8_t data)
 {
 	/* reset frc if a write happens here */
 	m_frc_cnt_timer->reset();
 	m_frc_mode = data & 1;
 }
 
-READ8_MEMBER( segas24_state::frc_r )
+uint8_t segas24_state::frc_r()
 {
 	int32_t result = (m_frc_cnt_timer->time_elapsed() * (m_frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
 
@@ -717,7 +717,7 @@ READ8_MEMBER( segas24_state::frc_r )
 	return result;
 }
 
-WRITE8_MEMBER( segas24_state::frc_w )
+void segas24_state::frc_w(uint8_t data)
 {
 	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
 	m_maincpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
@@ -736,12 +736,12 @@ const uint8_t segas24_state::s_quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
 const uint8_t   segas24_state::s_dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 
-READ8_MEMBER( segas24_state::mlatch_r )
+uint8_t segas24_state::mlatch_r()
 {
 	return m_mlatch;
 }
 
-WRITE8_MEMBER( segas24_state::mlatch_w )
+void segas24_state::mlatch_w(uint8_t data)
 {
 	int i;
 	uint8_t mxor = 0;
@@ -876,7 +876,7 @@ void segas24_state::irq_init()
 	m_irq_vsynctime = attotime::zero;
 }
 
-WRITE16_MEMBER(segas24_state::irq_w)
+void segas24_state::irq_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0: {
@@ -925,7 +925,7 @@ WRITE16_MEMBER(segas24_state::irq_w)
 // 410 cycles/ligne
 // 410*0x200/26 = 8073
 
-READ16_MEMBER(segas24_state::irq_r)
+uint16_t segas24_state::irq_r(offs_t offset)
 {
 	switch(offset) {
 	case 2:
@@ -985,12 +985,12 @@ WRITE_LINE_MEMBER(segas24_state::irq_ym)
 
 // 315-5242
 
-READ16_MEMBER( segas24_state::paletteram_r )
+uint16_t segas24_state::paletteram_r(offs_t offset)
 {
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER( segas24_state::paletteram_w )
+void segas24_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b;
 	COMBINE_DATA (m_paletteram + offset);

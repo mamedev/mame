@@ -58,13 +58,13 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ32_MEMBER( control_r );
-	DECLARE_WRITE32_MEMBER( control_w );
-	DECLARE_READ32_MEMBER( baud_rate_div_r );
-	DECLARE_WRITE32_MEMBER( baud_rate_div_w );
-	DECLARE_READ32_MEMBER( status_r );
-	DECLARE_WRITE32_MEMBER( transmit_buffer_w );
-	DECLARE_READ32_MEMBER( receive_buffer_r );
+	uint32_t control_r();
+	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t baud_rate_div_r();
+	void baud_rate_div_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t status_r();
+	void transmit_buffer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t receive_buffer_r(offs_t offset, uint32_t mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER( break_timer_cb );
 
 	uint32_t m_ucon = 0; // control
@@ -138,24 +138,24 @@ private:
 
 	// INTC
 	uint32_t m_inten = 0;
-	DECLARE_READ32_MEMBER(inten_r);
-	DECLARE_WRITE32_MEMBER(inten_w);
+	uint32_t inten_r();
+	void inten_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(intvec_r);
-	DECLARE_WRITE32_MEMBER(intvec_w);
+	uint32_t intvec_r();
+	void intvec_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint8_t m_IntHigh = 0;
 	uint32_t m_intst = 0;
-	DECLARE_READ32_MEMBER(intst_r);
-	DECLARE_WRITE32_MEMBER(intst_w);
+	uint32_t intst_r();
+	void intst_w(uint32_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
 
 	// Timer
-	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
-	template<int Which> DECLARE_READ32_MEMBER(tmcon_r);
-	template<int Which> DECLARE_WRITE16_MEMBER(tmcnt_w);
-	template<int Which> DECLARE_READ16_MEMBER(tmcnt_r);
+	template<int Which> void tmcon_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Which> uint32_t tmcon_r();
+	template<int Which> void tmcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Which> uint16_t tmcnt_r();
 	TIMER_CALLBACK_MEMBER(Timercb);
 
 	uint32_t m_timer_control[4] = { 0, 0, 0, 0 };
@@ -164,14 +164,14 @@ private:
 	void TimerStart(int which);
 
 	// DMAC
-	template<int Which> DECLARE_READ32_MEMBER(dmac_r);
-	template<int Which> DECLARE_WRITE32_MEMBER(dmac_w);
-	template<int Which> DECLARE_READ32_MEMBER(dmatc_r);
-	template<int Which> DECLARE_WRITE32_MEMBER(dmatc_w);
-	template<int Which> DECLARE_READ32_MEMBER(dmasa_r);
-	template<int Which> DECLARE_WRITE32_MEMBER(dmasa_w);
-	template<int Which> DECLARE_READ32_MEMBER(dmada_r);
-	template<int Which> DECLARE_WRITE32_MEMBER(dmada_w);
+	template<int Which> uint32_t dmac_r();
+	template<int Which> void dmac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Which> uint32_t dmatc_r();
+	template<int Which> void dmatc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Which> uint32_t dmasa_r();
+	template<int Which> void dmasa_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Which> uint32_t dmada_r();
+	template<int Which> void dmada_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	inline int dma_setup_hold(uint8_t setting, uint8_t bitmask);
 	struct {
 		uint32_t src = 0;
@@ -181,22 +181,22 @@ private:
 	}m_dma[2];
 
 	// CRTC
-	DECLARE_READ32_MEMBER(crtc_r);
-	DECLARE_WRITE32_MEMBER(crtc_w);
+	uint32_t crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void crtc_update();
 	inline bool crt_is_interlaced();
 
 	// Misc
-	DECLARE_READ32_MEMBER( sysid_r );
-	DECLARE_READ32_MEMBER( cfgr_r );
+	uint32_t sysid_r();
+	uint32_t cfgr_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	DECLARE_READ16_MEMBER( textureram_r );
-	DECLARE_WRITE16_MEMBER( textureram_w );
-	DECLARE_READ16_MEMBER( frameram_r );
-	DECLARE_WRITE16_MEMBER( frameram_w );
+	uint16_t textureram_r(offs_t offset);
+	void textureram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t frameram_r(offs_t offset);
+	void frameram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// Hacks
 #ifdef IDLE_LOOP_SPEEDUP

@@ -385,11 +385,11 @@ void legionna_state::cupsocs_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
 	map(0x100600, 0x10067f).lrw16(
-								  NAME([this](address_space &space, offs_t offset, u16 mem_mask) {
-									  return m_crtc->read(space, offset ^ 0x20, mem_mask);
+								  NAME([this](offs_t offset) {
+									  return m_crtc->read(offset ^ 0x20);
 								  }),
-								  NAME([this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
-									  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
+								  NAME([this](offs_t offset, u16 data) {
+									  m_crtc->write(offset ^ 0x20, data);
 								  }));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x100701).portr("DSW1");

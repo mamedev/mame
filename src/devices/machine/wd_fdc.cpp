@@ -128,6 +128,8 @@ void wd_fdc_device_base::device_start()
 	enmf = false;
 	floppy = nullptr;
 	status = 0x00;
+	data = 0x00;
+	track = 0x00;
 	mr = true;
 
 	save_item(NAME(status));
@@ -172,10 +174,8 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		main_state = IDLE;
 		sub_state = IDLE;
 		cur_live.state = IDLE;
-		track = 0x00;
 		sector = 0x01;
 		status = 0x00;
-		data = 0x00;
 		cmd_buffer = track_buffer = sector_buffer = -1;
 		counter = 0;
 		status_type_1 = true;
@@ -203,10 +203,13 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
 		intrq_cond = 0;
 		live_abort();
 	} else if(state && !mr) {
-		// trigger a restore after everything else is reset too, in particular the floppy device itself
-		status |= S_BUSY;
-		sub_state = INITIAL_RESTORE;
-		t_gen->adjust(attotime::zero);
+		// WD1770/72 (supposedly) not perform RESTORE after reset
+		if (!motor_control) {
+			// trigger a restore after everything else is reset too, in particular the floppy device itself
+			status |= S_BUSY;
+			sub_state = INITIAL_RESTORE;
+			t_gen->adjust(attotime::zero);
+		}
 		mr = true;
 	}
 }
@@ -976,6 +979,22 @@ void wd_fdc_device_base::interrupt_start()
 			intrq_cb(intrq);
 	}
 
+	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
+	{
+		motor_timeout = 0;
+
+		if (head_control)
+			set_hld();
+
+		if (motor_control) {
+			status |= S_MON | S_SPIN;
+
+			mon_cb(0);
+			if (floppy && !disable_motor_control)
+				floppy->mon_w(0);
+		}
+	}
+
 	if(command & 0x03) {
 		logerror("%s: unhandled interrupt generation (%02x)\n", machine().time().to_string(), command);
 	}
@@ -1055,11 +1074,15 @@ void wd_fdc_device_base::do_generic()
 
 void wd_fdc_device_base::do_cmd_w()
 {
+	// it is actually possible to send another command even while in busy state.
+	// currently we simply accept any commands, but chip logic probably more complex (presumable it is possible change command of the same type only).
+#if 0
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
 		cmd_buffer = -1;
 		return;
 	}
+#endif
 	command = cmd_buffer;
 	cmd_buffer = -1;
 
@@ -1139,13 +1162,6 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	{
 		// checkme timings
 		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
-		if (spinup_on_interrupt)  // see note in WD1772 constructor, might be true for other FDC types as well.
-		{
-			if (head_control)
-				set_hld();
-			if (motor_control)
-				spinup();
-		}
 	}
 	else
 	{
@@ -1427,6 +1443,9 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case TRACK_DONE:
 		live_abort();
 		break;
+
+	case DUMMY:
+		return;
 
 	default:
 		logerror("%s: Index pulse on unknown sub-state %d\n", machine().time().to_string(), sub_state);
@@ -2232,8 +2251,11 @@ void wd_fdc_device_base::set_hld()
 {
 	if(head_control && !hld) {
 		hld = true;
+		int temp = sub_state;
+		sub_state = DUMMY;
 		if(!hld_cb.isnull())
 			hld_cb(hld);
+		sub_state = temp;
 	}
 }
 
@@ -2241,8 +2263,11 @@ void wd_fdc_device_base::drop_hld()
 {
 	if(head_control && hld) {
 		hld = false;
+		int temp = sub_state;
+		sub_state = DUMMY;
 		if(!hld_cb.isnull())
 			hld_cb(hld);
+		sub_state = temp;
 	}
 }
 
@@ -2935,7 +2960,7 @@ int wd2797_device::calc_sector_size(uint8_t size, uint8_t command) const
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1770, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
 	has_enmf = false;
@@ -2953,7 +2978,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	const static int wd1772_step_times[4] = { 12000, 24000, 4000, 6000 };
 
 	step_times = wd1772_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;
@@ -2979,7 +3004,7 @@ int wd1772_device::settle_time() const
 wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1773, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
-	delay_register_commit = 32;
+	delay_register_commit = 16;
 	delay_command_commit = 48;
 	disable_mfm = false;
 	has_enmf = false;

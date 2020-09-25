@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 }
 
 
-WRITE8_MEMBER(sprint4_state::video_ram_w)
+void sprint4_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_playfield->mark_tile_dirty(offset);

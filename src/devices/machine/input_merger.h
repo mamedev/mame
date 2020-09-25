@@ -27,8 +27,8 @@ public:
 
 	// input lines
 	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(in_w) { static_assert(Bit < 32, "invalid bit"); machine().scheduler().synchronize(timer_expired_delegate(FUNC(input_merger_device::update_state), this), (Bit << 1) | (state ? 1U : 0U)); }
-	template <unsigned Bit> DECLARE_WRITE8_MEMBER(in_set) { in_w<Bit>(1); }
-	template <unsigned Bit> DECLARE_WRITE8_MEMBER(in_clear) { in_w<Bit>(0); }
+	template <unsigned Bit> void in_set(u8 data) { in_w<Bit>(1); }
+	template <unsigned Bit> void in_clear(u8 data) { in_w<Bit>(0); }
 
 protected:
 	// constructor/destructor

@@ -251,7 +251,7 @@ function cheatfind.startplugin()
 		return cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd, step)
 	end
 
-	_G.cf = cheat
+	_G.emu.plugin.cheatfind = cheat
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
@@ -937,10 +937,10 @@ function cheatfind.startplugin()
 						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. pokevalue .. ")"
 					end
 					if match.mode == 1 then
-						if not _G.ce then
+						if not emu.plugin.cheat then
 							manager:machine():popmessage(_("Cheat engine not available"))
 						else
-							_G.ce.inject(cheat)
+							emu.plugin.cheat.inject(cheat)
 						end
 					elseif match.mode == 2 then
 						cheat_save = {}

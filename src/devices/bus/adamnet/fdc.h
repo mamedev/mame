@@ -54,7 +54,7 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER( data_r );
+	uint8_t data_r(offs_t offset);
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p2_r();

@@ -33,7 +33,7 @@ void ata_flash_pccard_device::device_reset()
 	m_pin_replacement = 0x002e;
 }
 
-READ16_MEMBER( ata_flash_pccard_device::read_memory )
+uint16_t ata_flash_pccard_device::read_memory(offs_t offset, uint16_t mem_mask)
 {
 	if(offset <= 7)
 	{
@@ -50,7 +50,7 @@ READ16_MEMBER( ata_flash_pccard_device::read_memory )
 	}
 }
 
-WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
+void ata_flash_pccard_device::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset <= 7)
 	{
@@ -63,7 +63,7 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
 	}
 }
 
-READ16_MEMBER( ata_flash_pccard_device::read_reg )
+uint16_t ata_flash_pccard_device::read_reg(offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -81,10 +81,10 @@ READ16_MEMBER( ata_flash_pccard_device::read_reg )
 			return m_cis[offset];
 	}
 
-	return device_pccard_interface::read_reg(space, offset, mem_mask);
+	return device_pccard_interface::read_reg(offset, mem_mask);
 }
 
-WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
+void ata_flash_pccard_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/// TODO: get offsets from CIS
 	switch (offset)
@@ -107,7 +107,7 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
 		break;
 
 	default:
-		device_pccard_interface::write_reg(space, offset, data, mem_mask);
+		device_pccard_interface::write_reg(offset, data, mem_mask);
 		break;
 	}
 }
@@ -146,7 +146,7 @@ void taito_pccard1_device::device_reset()
 	}
 }
 
-READ16_MEMBER(taito_pccard1_device::read_reg)
+uint16_t taito_pccard1_device::read_reg(offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -154,11 +154,11 @@ READ16_MEMBER(taito_pccard1_device::read_reg)
 		return m_locked != 0;
 
 	default:
-		return ata_flash_pccard_device::read_reg(space, offset, mem_mask);
+		return ata_flash_pccard_device::read_reg(offset, mem_mask);
 	}
 }
 
-WRITE16_MEMBER(taito_pccard1_device::write_reg)
+void taito_pccard1_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset >= 0x280 && offset <= 0x288)
 	{
@@ -180,7 +180,7 @@ WRITE16_MEMBER(taito_pccard1_device::write_reg)
 	}
 	else
 	{
-		ata_flash_pccard_device::write_reg(space, offset, data, mem_mask);
+		ata_flash_pccard_device::write_reg(offset, data, mem_mask);
 	}
 }
 

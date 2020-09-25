@@ -45,6 +45,7 @@ private:
 	uint8_t R2_r();
 	uint8_t R3_r();
 	void O_w(uint8_t data);
+	void P_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER( rw_sync );
 	TIMER_CALLBACK_MEMBER( write_sync );

@@ -12,92 +12,92 @@ license:CC0
 		<screen index="0">
 			<bounds x="0" y="0" width="300" height="400" />
 		</screen>
-		<backdrop name="LED01" element="lamp">
-					<bounds x="34" y="36" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED02" element="lamp">
-					<bounds x="15" y="43" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED03" element="lamp">
-					<bounds x="12" y="65" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED04" element="lamp">
-					<bounds x="50" y="73" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED05" element="lamp">
-					<bounds x="103" y="48" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED06" element="lamp">
-					<bounds x="131" y="33" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED07" element="lamp">
-					<bounds x="158" y="47" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED08" element="lamp">
-					<bounds x="222" y="102" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED09" element="lamp">
-					<bounds x="18" y="117" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED10" element="lamp">
-					<bounds x="7" y="140" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED11" element="lamp">
-					<bounds x="21" y="163" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED12" element="lamp">
-					<bounds x="126" y="132" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED13" element="lamp">
-					<bounds x="190" y="133" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED14" element="lamp">
-					<bounds x="8" y="252" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED15" element="lamp">
-					<bounds x="38" y="251" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED16" element="lamp">
-					<bounds x="67" y="229" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED17" element="lamp">
-					<bounds x="125" y="246" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED18" element="lamp">
-					<bounds x="125" y="256" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED19" element="lamp">
-					<bounds x="125" y="265" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED20" element="lamp">
-					<bounds x="125" y="275" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED21" element="lamp">
-					<bounds x="125" y="285" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED22" element="lamp">
-					<bounds x="125" y="295" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED23" element="lamp">
-					<bounds x="125" y="304" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED24" element="lamp">
-					<bounds x="125" y="314" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED25" element="lamp">
-					<bounds x="125" y="324" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED26" element="lamp">
-					<bounds x="125" y="334" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED27" element="lamp">
-					<bounds x="186" y="229" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED28" element="lamp">
-					<bounds x="197" y="288" width="7" height="7" />
-		</backdrop>
-		<backdrop name="LED29" element="lamp">
-					<bounds x="141" y="366" width="7" height="7" />
-		</backdrop>
+		<element name="LED01" ref="lamp" blend="add">
+			<bounds x="34" y="36" width="7" height="7" />
+		</element>
+		<element name="LED02" ref="lamp" blend="add">
+			<bounds x="15" y="43" width="7" height="7" />
+		</element>
+		<element name="LED03" ref="lamp" blend="add">
+			<bounds x="12" y="65" width="7" height="7" />
+		</element>
+		<element name="LED04" ref="lamp" blend="add">
+			<bounds x="50" y="73" width="7" height="7" />
+		</element>
+		<element name="LED05" ref="lamp" blend="add">
+			<bounds x="103" y="48" width="7" height="7" />
+		</element>
+		<element name="LED06" ref="lamp" blend="add">
+			<bounds x="131" y="33" width="7" height="7" />
+		</element>
+		<element name="LED07" ref="lamp" blend="add">
+			<bounds x="158" y="47" width="7" height="7" />
+		</element>
+		<element name="LED08" ref="lamp" blend="add">
+			<bounds x="222" y="102" width="7" height="7" />
+		</element>
+		<element name="LED09" ref="lamp" blend="add">
+			<bounds x="18" y="117" width="7" height="7" />
+		</element>
+		<element name="LED10" ref="lamp" blend="add">
+			<bounds x="7" y="140" width="7" height="7" />
+		</element>
+		<element name="LED11" ref="lamp" blend="add">
+			<bounds x="21" y="163" width="7" height="7" />
+		</element>
+		<element name="LED12" ref="lamp" blend="add">
+			<bounds x="126" y="132" width="7" height="7" />
+		</element>
+		<element name="LED13" ref="lamp" blend="add">
+			<bounds x="190" y="133" width="7" height="7" />
+		</element>
+		<element name="LED14" ref="lamp" blend="add">
+			<bounds x="8" y="252" width="7" height="7" />
+		</element>
+		<element name="LED15" ref="lamp" blend="add">
+			<bounds x="38" y="251" width="7" height="7" />
+		</element>
+		<element name="LED16" ref="lamp" blend="add">
+			<bounds x="67" y="229" width="7" height="7" />
+		</element>
+		<element name="LED17" ref="lamp" blend="add">
+			<bounds x="125" y="246" width="7" height="7" />
+		</element>
+		<element name="LED18" ref="lamp" blend="add">
+			<bounds x="125" y="256" width="7" height="7" />
+		</element>
+		<element name="LED19" ref="lamp" blend="add">
+			<bounds x="125" y="265" width="7" height="7" />
+		</element>
+		<element name="LED20" ref="lamp" blend="add">
+			<bounds x="125" y="275" width="7" height="7" />
+		</element>
+		<element name="LED21" ref="lamp" blend="add">
+			<bounds x="125" y="285" width="7" height="7" />
+		</element>
+		<element name="LED22" ref="lamp" blend="add">
+			<bounds x="125" y="295" width="7" height="7" />
+		</element>
+		<element name="LED23" ref="lamp" blend="add">
+			<bounds x="125" y="304" width="7" height="7" />
+		</element>
+		<element name="LED24" ref="lamp" blend="add">
+			<bounds x="125" y="314" width="7" height="7" />
+		</element>
+		<element name="LED25" ref="lamp" blend="add">
+			<bounds x="125" y="324" width="7" height="7" />
+		</element>
+		<element name="LED26" ref="lamp" blend="add">
+			<bounds x="125" y="334" width="7" height="7" />
+		</element>
+		<element name="LED27" ref="lamp" blend="add">
+			<bounds x="186" y="229" width="7" height="7" />
+		</element>
+		<element name="LED28" ref="lamp" blend="add">
+			<bounds x="197" y="288" width="7" height="7" />
+		</element>
+		<element name="LED29" ref="lamp" blend="add">
+			<bounds x="141" y="366" width="7" height="7" />
+		</element>
 	</view>
 </mamelayout>

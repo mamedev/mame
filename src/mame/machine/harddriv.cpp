@@ -37,7 +37,6 @@
 void harddriv_state::device_start()
 {
 	m_lamps.resolve();
-	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
@@ -50,7 +49,6 @@ void harddriv_state::device_start()
 void  harddriv_state::device_reset()
 {
 	/* generic reset */
-	//atarigen_state::machine_reset();
 	if (m_slapstic_device.found()) m_slapstic_device->slapstic_reset();
 
 	/* halt several of the DSPs to start */

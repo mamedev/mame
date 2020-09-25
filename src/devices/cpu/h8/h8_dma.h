@@ -45,12 +45,12 @@ class h8_dma_device : public device_t {
 public:
 	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(dmawer_r);
-	DECLARE_WRITE8_MEMBER(dmawer_w);
-	DECLARE_READ8_MEMBER(dmatcr_r);
-	DECLARE_WRITE8_MEMBER(dmatcr_w);
-	DECLARE_READ16_MEMBER(dmabcr_r);
-	DECLARE_WRITE16_MEMBER(dmabcr_w);
+	uint8_t dmawer_r();
+	void dmawer_w(uint8_t data);
+	uint8_t dmatcr_r();
+	void dmatcr_w(uint8_t data);
+	uint16_t dmabcr_r();
+	void dmabcr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	bool trigger_dma(int vector);
 	void count_last(int id);
@@ -104,30 +104,30 @@ public:
 	}
 	void set_info(const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
 
-	DECLARE_READ16_MEMBER(marah_r);
-	DECLARE_WRITE16_MEMBER(marah_w);
-	DECLARE_READ16_MEMBER(maral_r);
-	DECLARE_WRITE16_MEMBER(maral_w);
-	DECLARE_READ16_MEMBER(ioara_r);
-	DECLARE_WRITE16_MEMBER(ioara_w);
-	DECLARE_READ16_MEMBER(etcra_r);
-	DECLARE_WRITE16_MEMBER(etcra_w);
-	DECLARE_READ16_MEMBER(marbh_r);
-	DECLARE_WRITE16_MEMBER(marbh_w);
-	DECLARE_READ16_MEMBER(marbl_r);
-	DECLARE_WRITE16_MEMBER(marbl_w);
-	DECLARE_READ16_MEMBER(ioarb_r);
-	DECLARE_WRITE16_MEMBER(ioarb_w);
-	DECLARE_READ16_MEMBER(etcrb_r);
-	DECLARE_WRITE16_MEMBER(etcrb_w);
-	DECLARE_READ16_MEMBER(dmacr_r);
-	DECLARE_WRITE16_MEMBER(dmacr_w);
+	uint16_t marah_r();
+	void marah_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t maral_r();
+	void maral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioara_r();
+	void ioara_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t etcra_r();
+	void etcra_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t marbh_r();
+	void marbh_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t marbl_r();
+	void marbl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioarb_r();
+	void ioarb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t etcrb_r();
+	void etcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dmacr_r();
+	void dmacr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// H8H DMA
-	DECLARE_READ8_MEMBER(dtcra_r);
-	DECLARE_WRITE8_MEMBER(dtcra_w);
-	DECLARE_READ8_MEMBER(dtcrb_r);
-	DECLARE_WRITE8_MEMBER(dtcrb_w);
+	uint8_t dtcra_r();
+	void dtcra_w(uint8_t data);
+	uint8_t dtcrb_r();
+	void dtcrb_w(uint8_t data);
 
 	void set_id(int id);
 	void set_bcr(bool fae, bool sae, uint8_t dta, uint8_t dte, uint8_t dtie);

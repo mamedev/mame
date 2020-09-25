@@ -29,9 +29,9 @@ protected:
 	// device_sbus_slot_interface overrides
 	virtual void install_device() override;
 
-	DECLARE_READ32_MEMBER(unknown_r);
-	DECLARE_WRITE32_MEMBER(unknown_w);
-	DECLARE_READ32_MEMBER(rom_r);
+	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
+	void unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rom_r(offs_t offset);
 
 private:
 	void mem_map(address_map &map) override;

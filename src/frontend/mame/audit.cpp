@@ -515,7 +515,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 		{
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
-				if (ROM_GETLENGTH(rom) == romlength)
+				if (rom_file_size(rom) == romlength)
 				{
 					util::hash_collection hashes(ROM_GETHASHDATA(rom));
 					if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))
@@ -535,7 +535,7 @@ device_t *media_auditor::find_shared_device(device_t &device, const char *name, 
 				{
 					for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 					{
-						if (ROM_GETLENGTH(rom) == romlength)
+						if (rom_file_size(rom) == romlength)
 						{
 							util::hash_collection hashes(ROM_GETHASHDATA(rom));
 							if ((dumped && hashes == romhashes) || (!dumped && ROM_GETNAME(rom) == name))

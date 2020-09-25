@@ -17,7 +17,7 @@ void horshoes_state::horshoes_tile_cb(u32 &code)
 	code |= m_horshoes_gfxbank << 12;
 }
 
-WRITE8_MEMBER(horshoes_state::bankg_w)
+void horshoes_state::bankg_w(u8 data)
 {
 	if (m_horshoes_gfxbank != data)
 	{

@@ -312,8 +312,7 @@ public:
 	auto drq6_callback() { return m_out_drq6_cb.bind(); }
 	auto drq7_callback() { return m_out_drq7_cb.bind(); }
 
-	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
-	void install16_device(offs_t start, offs_t end, read16s_delegate rhandler, write16s_delegate whandler);
+	template<typename R, typename W> void install16_device(offs_t start, offs_t end, R rhandler, W whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;

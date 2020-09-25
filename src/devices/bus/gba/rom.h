@@ -91,10 +91,10 @@ public:
 	gba_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom) override { return m_rom[offset]; }
+	virtual uint32_t read_rom(offs_t offset) override { return m_rom[offset]; }
 
-	virtual DECLARE_READ32_MEMBER(read_gpio) override;
-	virtual DECLARE_WRITE32_MEMBER(write_gpio) override;
+	virtual uint32_t read_gpio(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_gpio(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 	virtual uint16_t gpio_dev_read(int gpio_dirs) { return 0; }
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) { }
@@ -121,8 +121,8 @@ public:
 	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	gba_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -183,8 +183,8 @@ public:
 	gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 // reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	gba_rom_flash_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -229,8 +229,8 @@ public:
 	gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -275,8 +275,8 @@ public:
 	gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	gba_rom_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -301,8 +301,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_tilt) override;
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) override;
+	virtual uint32_t read_tilt(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_tilt(offs_t offset, uint32_t data) override;
 
 protected:
 	virtual void device_start() override;
@@ -325,8 +325,8 @@ public:
 	gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
+	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
 	gba_rom_eeprom64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -372,7 +372,7 @@ public:
 	gba_rom_3dmatrix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) override;
+	virtual void write_mapper(offs_t offset, uint32_t data) override;
 
 protected:
 	// device-level overrides

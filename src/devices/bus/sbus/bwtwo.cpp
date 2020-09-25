@@ -88,28 +88,28 @@ uint32_t sbus_bwtwo_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-READ8_MEMBER(sbus_bwtwo_device::regs_r)
+uint8_t sbus_bwtwo_device::regs_r(offs_t offset)
 {
 	logerror("%s: regs_r (unimplemented): %08x\n", machine().describe_context(), 0x400000 + offset);
 	return 0;
 }
 
-WRITE8_MEMBER(sbus_bwtwo_device::regs_w)
+void sbus_bwtwo_device::regs_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: regs_w (unimplemented): %08x = %02x\n", machine().describe_context(), 0x400000 + offset, data);
 }
 
-READ32_MEMBER(sbus_bwtwo_device::rom_r)
+uint32_t sbus_bwtwo_device::rom_r(offs_t offset)
 {
 	return ((uint32_t*)m_rom->base())[offset];
 }
 
-READ8_MEMBER(sbus_bwtwo_device::vram_r)
+uint8_t sbus_bwtwo_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(sbus_bwtwo_device::vram_w)
+void sbus_bwtwo_device::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 }

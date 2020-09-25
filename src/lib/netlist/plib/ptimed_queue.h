@@ -8,10 +8,10 @@
 /// \file ptimed_queue.h
 ///
 
-#include "palloc.h"
+#include "palloc.h" // FIXME: for aligned_vector
 #include "pchrono.h"
 #include "pmulti_threading.h"
-#include "pstring.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <mutex>
@@ -89,7 +89,7 @@ namespace plib {
 		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		bool empty() const noexcept { return (m_end == &m_list[1]); }
 
-	    template<bool KEEPSTAT, typename... Args>
+		template<bool KEEPSTAT, typename... Args>
 		void emplace(Args&&... args) noexcept
 		{
 			// Lock
@@ -165,6 +165,7 @@ namespace plib {
 					return;
 				}
 			}
+			//printf("Element not found in delete %s\n", elem->name().c_str());
 		}
 
 		template <bool KEEPSTAT, class R>
@@ -217,7 +218,6 @@ namespace plib {
 		using lock_guard_type  = std::lock_guard<mutex_type>;
 
 		mutex_type               m_lock;
-		PALIGNAS_CACHELINE()
 		T *                      m_end;
 		aligned_vector<T>        m_list;
 
@@ -341,3 +341,4 @@ namespace plib {
 } // namespace plib
 
 #endif // PTIMED_QUEUE_H_
+#include <cstdlib> 

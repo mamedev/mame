@@ -47,7 +47,7 @@ Year + Game         PCB             Notes
                                 Burglar X
 ***************************************************************************/
 
-WRITE8_MEMBER(unico_state::burglarx_okibank_w)
+void unico_state::burglarx_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -79,7 +79,7 @@ void unico_state::burglarx_map(address_map &map)
                                 Zero Point
 ***************************************************************************/
 
-WRITE8_MEMBER(zeropnt_state::zeropnt_okibank_leds_w)
+void zeropnt_state::zeropnt_okibank_leds_w(uint8_t data)
 {
 	/* Banked sound samples. The 3rd quarter of the ROM
 	   contains garbage. Indeed, only banks 0&1 are used */
@@ -92,7 +92,7 @@ WRITE8_MEMBER(zeropnt_state::zeropnt_okibank_leds_w)
 }
 
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
-READ16_MEMBER(zeropnt_state::gunx_0_msb_r)
+uint16_t zeropnt_state::gunx_0_msb_r()
 {
 	int x=m_gun_axes[X0]->read();
 
@@ -103,7 +103,7 @@ READ16_MEMBER(zeropnt_state::gunx_0_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::guny_0_msb_r)
+uint16_t zeropnt_state::guny_0_msb_r()
 {
 	int y=m_gun_axes[Y0]->read();
 
@@ -112,7 +112,7 @@ READ16_MEMBER(zeropnt_state::guny_0_msb_r)
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::gunx_1_msb_r)
+uint16_t zeropnt_state::gunx_1_msb_r()
 {
 	int x=m_gun_axes[X1]->read();
 
@@ -123,7 +123,7 @@ READ16_MEMBER(zeropnt_state::gunx_1_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::guny_1_msb_r)
+uint16_t zeropnt_state::guny_1_msb_r()
 {
 	int y=m_gun_axes[Y1]->read();
 
@@ -167,24 +167,24 @@ void zeropnt_state::zeropnt_oki_map(address_map &map)
                                 Zero Point 2
 ***************************************************************************/
 
-READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_0_msb_r) { return (gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_guny_0_msb_r) { return (guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_1_msb_r) { return (gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_guny_1_msb_r) { return (guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_gunx_0_msb_r() { return (gunx_0_msb_r()-0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_guny_0_msb_r() { return (guny_0_msb_r()+0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_gunx_1_msb_r() { return (gunx_1_msb_r()-0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_guny_1_msb_r() { return (guny_1_msb_r()+0x0800) << 16; }
 
-WRITE8_MEMBER(zeropnt2_state::zeropnt2_okibank)
+void zeropnt2_state::zeropnt2_okibank(uint8_t data)
 {
 	m_okibank->set_entry((data & 3) % 4);
 }
 
-WRITE8_MEMBER(zeropnt2_state::leds_w)
+void zeropnt2_state::leds_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 	m_leds[0] = BIT(data, 7); // Start 1
 	m_leds[1] = BIT(data, 6); // Start 2
 }
 
-WRITE32_MEMBER(zeropnt2_state::eeprom_w)
+void zeropnt2_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xfe00000)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);

@@ -23,7 +23,7 @@ namespace plib
 	public:
 		using size_type = std::size_t;
 		using arena_type = A;
-		using allocator_type = typename A::template allocator_type<T>;
+		using allocator_type = typename A::template allocator_type<T, PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<allocator_type>::align_size;
 		static constexpr const size_type stride_size = align_traits<allocator_type>::stride_size;
@@ -50,6 +50,8 @@ namespace plib
 			for (std::size_t i = 0; i < N * m_stride; i++)
 				::new(&m_v[i]) T();
 		}
+
+		PCOPYASSIGNMOVE(pmatrix2d, delete)
 
 		~pmatrix2d()
 		{
@@ -138,10 +140,11 @@ namespace plib
 		using size_type = std::size_t;
 		using value_type = T;
 		using arena_type = A;
-		using allocator_type = typename A::template allocator_type<T>;
+		using allocator_type = typename A::template allocator_type<T, PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<allocator_type>::align_size;
 		static constexpr const size_type stride_size = align_traits<allocator_type>::stride_size;
+
 		pmatrix2d_vrl() noexcept
 		: m_N(0), m_M(0), m_v()
 		{
@@ -153,6 +156,9 @@ namespace plib
 			m_row.resize(N + 1, 0);
 			m_v.resize(N); //FIXME
 		}
+
+		PCOPYASSIGNMOVE(pmatrix2d_vrl, default)
+		~pmatrix2d_vrl() = default;
 
 		void resize(size_type N, size_type M)
 		{
@@ -214,7 +220,12 @@ namespace plib
 			return m_row[r] + c;
 		}
 
-		std::size_t tx() const { return m_v.size(); }
+		size_type colcount(size_type row) const noexcept
+		{
+			return m_row[row + 1] - m_row[row];
+		}
+
+		size_type tx() const { return m_v.size(); }
 	private:
 
 		size_type m_N;

@@ -115,7 +115,7 @@ void ide_pci_device::device_reset()
 	m_ide2->reset();
 }
 
-READ32_MEMBER(ide_pci_device::ide_read_cs1)
+uint32_t ide_pci_device::ide_read_cs1(offs_t offset, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	uint32_t data;
@@ -125,13 +125,13 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 	return data;
 }
 
-WRITE32_MEMBER(ide_pci_device::ide_write_cs1)
+void ide_pci_device::ide_write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	m_ide->write_cs1(1, data, mem_mask);
 }
 
-READ32_MEMBER(ide_pci_device::ide2_read_cs1)
+uint32_t ide_pci_device::ide2_read_cs1(offs_t offset, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
 	uint32_t data;
@@ -139,7 +139,7 @@ READ32_MEMBER(ide_pci_device::ide2_read_cs1)
 	return data;
 }
 
-WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
+void ide_pci_device::ide2_write_cs1(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
 	m_ide2->write_cs1(1, data, mem_mask);
@@ -161,7 +161,7 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 		logerror("%s:ide_interrupt set to %i\n", machine().describe_context(), state);
 }
 
-WRITE8_MEMBER(ide_pci_device::prog_if_w)
+void ide_pci_device::prog_if_w(uint8_t data)
 {
 	uint32_t oldVal = pclass;
 	pclass = (pclass & ~(0xff)) | (data & 0xff);
@@ -170,35 +170,35 @@ WRITE8_MEMBER(ide_pci_device::prog_if_w)
 		// Map Primary IDE Channel
 		if (pclass & 0x1) {
 			// PCI Mode
-			pci_device::address_base_w(space, 0, pci_bar[0]);
-			pci_device::address_base_w(space, 1, pci_bar[1]);
+			pci_device::address_base_w(0, pci_bar[0]);
+			pci_device::address_base_w(1, pci_bar[1]);
 		} else {
 			// Legacy Mode
-			pci_device::address_base_w(space, 0, (m_legacy_top << 20) | 0x1f0);
-			pci_device::address_base_w(space, 1, (m_legacy_top << 20) | 0x3f4);
+			pci_device::address_base_w(0, (m_legacy_top << 20) | 0x1f0);
+			pci_device::address_base_w(1, (m_legacy_top << 20) | 0x3f4);
 		}
 		// Map Primary IDE Channel
 		if (pclass & 0x4) {
 			// PCI Mode
-			pci_device::address_base_w(space, 2, pci_bar[2]);
-			pci_device::address_base_w(space, 3, pci_bar[3]);
+			pci_device::address_base_w(2, pci_bar[2]);
+			pci_device::address_base_w(3, pci_bar[3]);
 		}
 		else {
 			// Legacy Mode
-			pci_device::address_base_w(space, 2, (m_legacy_top << 20) | 0x170);
-			pci_device::address_base_w(space, 3, (m_legacy_top << 20) | 0x374);
+			pci_device::address_base_w(2, (m_legacy_top << 20) | 0x170);
+			pci_device::address_base_w(3, (m_legacy_top << 20) | 0x374);
 		}
 	}
 	if (1)
 		logerror("%s:prog_if_w pclass = %06X\n", machine().describe_context(), pclass);
 }
 
-READ32_MEMBER(ide_pci_device::pcictrl_r)
+uint32_t ide_pci_device::pcictrl_r(offs_t offset)
 {
 	return m_config_data[offset];
 }
 
-WRITE32_MEMBER(ide_pci_device::pcictrl_w)
+void ide_pci_device::pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_config_data[offset]);
 	// PCI646U2 Offset 0x50 is interrupt status
@@ -209,7 +209,7 @@ WRITE32_MEMBER(ide_pci_device::pcictrl_w)
 	}
 }
 
-READ32_MEMBER(ide_pci_device::address_base_r)
+uint32_t ide_pci_device::address_base_r(offs_t offset)
 {
 	if (bank_reg_infos[offset].bank == -1)
 		return 0;
@@ -221,7 +221,7 @@ READ32_MEMBER(ide_pci_device::address_base_r)
 
 }
 
-WRITE32_MEMBER(ide_pci_device::address_base_w)
+void ide_pci_device::address_base_w(offs_t offset, uint32_t data)
 {
 	// Save local copy of BAR
 	pci_bar[offset] = data;
@@ -229,20 +229,20 @@ WRITE32_MEMBER(ide_pci_device::address_base_w)
 	switch (offset) {
 	case 0: case 1:
 		if (pclass & 0x1)
-			pci_device::address_base_w(space, offset, data);
+			pci_device::address_base_w(offset, data);
 		break;
 	case 2: case 3:
 		if (pclass & 0x4)
-			pci_device::address_base_w(space, offset, data);
+			pci_device::address_base_w(offset, data);
 		break;
 	default:
 		// Only the first 4 bars are controlled by pif
-		pci_device::address_base_w(space, offset, data);
+		pci_device::address_base_w(offset, data);
 	}
 	logerror("Mapping bar[%i] = %08x\n", offset, data);
 }
 
-WRITE32_MEMBER(ide_pci_device::subsystem_id_w)
+void ide_pci_device::subsystem_id_w(uint32_t data)
 {
 	// Config register 0x4f enables subsystem id writing for CMD646
 	if (m_config_data[0xc / 4] & 0x01000000)

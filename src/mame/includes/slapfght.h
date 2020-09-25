@@ -94,29 +94,29 @@ private:
 	uint8_t m_gs_e;
 	uint8_t m_tigerhb_cmd;
 
-	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
+	uint8_t tigerh_mcu_status_r();
 	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(fixram_w);
-	DECLARE_WRITE8_MEMBER(fixcol_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
+	uint8_t vblank_r();
+	void sound_nmi_enable_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void fixram_w(offs_t offset, uint8_t data);
+	void fixcol_w(offs_t offset, uint8_t data);
+	void scrollx_lo_w(uint8_t data);
+	void scrollx_hi_w(uint8_t data);
+	void scrolly_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
 	void scroll_from_mcu_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(getstar_mcusim_r);
-	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
-	DECLARE_READ8_MEMBER(getstar_mcusim_status_r);
-	DECLARE_READ8_MEMBER(getstarb1_prot_r);
-	DECLARE_READ8_MEMBER(tigerhb1_prot_r);
-	DECLARE_WRITE8_MEMBER(tigerhb1_prot_w);
+	uint8_t getstar_mcusim_r();
+	void getstar_mcusim_w(uint8_t data);
+	uint8_t getstar_mcusim_status_r();
+	uint8_t getstarb1_prot_r();
+	uint8_t tigerhb1_prot_r();
+	void tigerhb1_prot_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -6,7 +6,7 @@
 #include "68340.h"
 
 
-READ32_MEMBER( m68340_cpu_device::m68340_internal_dma_r )
+uint32_t m68340_cpu_device::m68340_internal_dma_r(offs_t offset, uint32_t mem_mask)
 {
 	assert(m_m68340DMA);
 	//m68340_dma &dma = *m_m68340DMA;
@@ -16,7 +16,7 @@ READ32_MEMBER( m68340_cpu_device::m68340_internal_dma_r )
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68340_cpu_device::m68340_internal_dma_w )
+void m68340_cpu_device::m68340_internal_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	assert(m_m68340DMA);
 	//m68340_dma &dma = *m_m68340DMA;

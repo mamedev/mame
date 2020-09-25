@@ -676,6 +676,27 @@ private:
 	required_ioport m_io_p1;
 };
 
+class vt1682_lxts3_state : public vt_vt1682_state
+{
+public:
+	vt1682_lxts3_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag),
+		m_io_p1(*this, "IN0")
+	{ }
+
+	void vt1682_lxts3(machine_config& config);
+	void vt1682_unk1682(machine_config& config);
+
+	void unk1682_init();
+	void njp60in1_init();
+
+protected:
+	uint8_t uio_porta_r();
+
+private:
+	required_ioport m_io_p1;
+};
+
 class vt1682_exsport_state : public vt_vt1682_state
 {
 public:
@@ -3482,7 +3503,7 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
-		set_dma_dt_addr(dstaddr);;
+		set_dma_dt_addr(dstaddr);
 		set_dma_sr_addr(srcaddr);
 	}
 }
@@ -4301,7 +4322,7 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 			bytes_in = 2;
 		}
 
-		int xbase = x;;
+		int xbase = x;
 
 		for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
 		{
@@ -5658,6 +5679,30 @@ static INPUT_PORTS_START( 110dance )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Pad Right") PORT_16WAY
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lxts3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( njp60in1 )
+	PORT_START("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( exsprt48 )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -5678,6 +5723,21 @@ static INPUT_PORTS_START( exsprt48 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dance555 )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Pad Up") PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Pad Down") PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Pad Left") PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Pad Right") PORT_16WAY
+
+	PORT_START("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -5833,7 +5893,12 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_rightdac->add_route(0, "mono", 0.5);
 }
 
-
+uint8_t vt1682_lxts3_state::uio_porta_r()
+{
+	uint8_t ret = m_io_p1->read();
+	logerror("%s: porta_r returning: %02x (INPUTS)\n", machine().describe_context(), ret);
+	return ret;
+}
 
 uint8_t vt1682_dance_state::uio_porta_r()
 {
@@ -5894,6 +5959,48 @@ void vt1682_dance_state::vt1682_dance(machine_config& config)
 	m_uio->porta_out().set(FUNC(vt1682_dance_state::uio_porta_w));
 }
 
+void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
+{
+	vt_vt1682_ntscbase(config);
+	vt_vt1682_common(config);
+
+	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_PAL); // no opcode bitswap
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_lxts3_state::vt_vt1682_map);
+
+	m_leftdac->reset_routes();
+	m_rightdac->reset_routes();
+
+	config.device_remove(":lspeaker");
+	config.device_remove(":rspeaker");
+
+	SPEAKER(config, "mono").front_center();
+	m_leftdac->add_route(0, "mono", 0.5);
+	m_rightdac->add_route(0, "mono", 0.5);
+
+	m_uio->porta_in().set(FUNC(vt1682_lxts3_state::uio_porta_r));
+}
+
+void vt1682_lxts3_state::vt1682_unk1682(machine_config& config)
+{
+	vt_vt1682_palbase(config);
+	vt_vt1682_common(config);
+
+	M6502(config.replace(), m_maincpu, MAIN_CPU_CLOCK_PAL); // no opcode bitswap
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_lxts3_state::vt_vt1682_map);
+
+	m_leftdac->reset_routes();
+	m_rightdac->reset_routes();
+
+	config.device_remove(":lspeaker");
+	config.device_remove(":rspeaker");
+
+	SPEAKER(config, "mono").front_center();
+	m_leftdac->add_route(0, "mono", 0.5);
+	m_rightdac->add_route(0, "mono", 0.5);
+
+	m_uio->porta_in().set(FUNC(vt1682_lxts3_state::uio_porta_r));
+}
+
 
 void vt1682_wow_state::vt1682_wow(machine_config& config)
 {
@@ -5925,8 +6032,28 @@ void intec_interact_state::banked_init()
 }
 
 
+void vt1682_lxts3_state::unk1682_init()
+{
+	regular_init();
 
+	uint8_t* ROM = memregion("mainrom")->base();
+	// this jumps to a function on startup that has a bunch of jumps / accesses to the 3xxx region, which is internal ROM
+	// but bypassing it allows the unit to boot.
+	ROM[0x7ef43] = 0xea;
+	ROM[0x7ef44] = 0xea;
+	ROM[0x7ef45] = 0xea;
+}
 
+void vt1682_lxts3_state::njp60in1_init()
+{
+	regular_init();
+
+	uint8_t* ROM = memregion("mainrom")->base();
+	// first jsr in the code is for some port based security(?) check, might be SEEPROM
+	ROM[0x7ff44] = 0xea;
+	ROM[0x7ff45] = 0xea;
+	ROM[0x7ff46] = 0xea;
+}
 
 // the VT1682 can have 0x1000 bytes of internal ROM, but none of the software dumped makes use of it.
 
@@ -5943,6 +6070,16 @@ ROM_END
 ROM_START( zone7in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "zone.bin", 0x000000, 0x1000000, CRC(50726ae8) SHA1(bcedcd61728dce7b430784585be14109af542cc2) )
+ROM_END
+
+ROM_START( zone7in1p )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "zone7in1.bin", 0x000000, 0x1000000, CRC(40bbfb80) SHA1(f65a900abea13977713bbe3b5e736e6d4d106f2c) )
+ROM_END
+
+ROM_START( dance555 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "39vf6401.u3", 0x000000, 0x800000, CRC(13b1ccef) SHA1(3eb494816a1781a5e6a45bd0562b2b8326598ef7) )
 ROM_END
 
 ROM_START( miwi2_16 )
@@ -5976,15 +6113,54 @@ ROM_START( itvg48 )
 	ROM_LOAD( "48in1sports.bin", 0x00000, 0x2000000, CRC(8e490541) SHA1(aeb01b3d7229fc888b36aaa924fe6b10597a7783) )
 ROM_END
 
+ROM_START( xing48 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "xing48in1.bin", 0x00000, 0x0800000, CRC(c601a4ae) SHA1(ec1219ede01a48df6bfd01675e715f6b13d2b43e) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+ROM_END
+
+
 ROM_START( wowwg )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "msp55lv128.bin", 0x00000, 0x1000000, CRC(f607c40c) SHA1(66d3960c3b8fbab06a88cf039419c79a6c8633f0) )
 	ROM_RELOAD(0x1000000,0x1000000)
 ROM_END
 
+ROM_START( unk1682 )
+	ROM_REGION( 0x1000, "internal", 0 )
+	// this appears to use the internal ROM on startup, so mark it as missing
+	ROM_LOAD( "101in1.internal.rom", 0x00000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "vt1682_101in1.bin", 0x00000, 0x0800000, CRC(82879200) SHA1(c1977d1733f8849326286102c0755629d0406ec4) )
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+
+	// also has a 24c02N SEEPROM, no accesses noted (maybe accessed from 'internal ROM' code?)
+ROM_END
+
+ROM_START( njp60in1 )
+	ROM_REGION( 0x2000000, "mainrom", 0 ) // the 6Mbyte - 7Mbyte region of the ROM is missing, causing Extreme Power Soccer to fail
+	ROM_LOAD( "60-in-1.bin", 0x00000, 0x0800000, CRC(7b2ee951) SHA1(fc7c214704908b85676efc64a21930483d24a457) )
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+
+	// also has a 24c02n SEEPROM, seems to access it on startup (security check?)
+ROM_END
+
+
 ROM_START( 110dance )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "110songdancemat.bin", 0x00000, 0x2000000, CRC(cd668e41) SHA1(975bfe05f4cce047860b05766bc8539218f6014f) )
+ROM_END
+
+ROM_START( lxts3 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "lexibooktoystory_mx29lv640mt_00c2227e.bin", 0x00000, 0x800000, CRC(91344ae7) SHA1(597fc4a27dd1fb6e6f5fda1c4ea237c07e9dba71))
 ROM_END
 
 
@@ -5993,14 +6169,17 @@ ROM_END
 //  the internal hardware gets used at all.
 
 CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
-CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// UK version of Zone 7-in-1 has different games (Boxing / Tennis / Golf / Fishing / Table Tennis / Bowling / Football) with Fishing replacing Baseball
+CONS( 200?, zone7in1,  0,         0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Ultimate Products Ltd.", "Zone 7-in-1 Sports (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, zone7in1p, zone7in1,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Ultimate Products Ltd.", "Zone 7-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has Fishing instead of Baseball, and Ultimate Products banners in the Football game
 
-CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
-CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
+CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Macro Winners", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
+CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "Macro Winners", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // ViMax seems to be identical software to MiWi2
 
 CONS( 200?, intact89,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game - 89-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6029,15 +6208,15 @@ CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state
 // the timing code for MotorStorm differs between these sets (although fails wiht our emulation in both cases, even if the game runs fine in other collections)
 CONS( 200?, exsprt48,   0,         0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
 CONS( 200?, itvg48,     exsprt48,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "TaiKee", "Interactive TV Games 48-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
+
+// This has a different selection of games to the above, Dancing as extra under Music, Doesn't have Poker under Brain, Ball Shoot instead of 'Noshery' under Arcade
+// imported by Cathay Product Sourcing Ltd. (Ireland) no other manufacturer information on box, not sure if Xing is name of manufacturer or product
+CONS( 200?, xing48,     0,         0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "Xing", "Xing Wireless Interactive TV Game 'Wi TV Zone' 48-in-1 (Europe, PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
 /*
-There is at least one alt US version of Excite Sports Wireless Interactive TV Game - 48-in-1 also on VT1682
+The above was also released in the US as Excite Sports Wireless Interactive TV Game - 48-in-1 with an almost identical box to exsprt48 unit, but with the different games noted.
 
 It is still advertised as 48-in-1, 8 Interactive Sports Games, 8 Olympic games, 32 Arcade Games
 see https://www.youtube.com/watch?v=tHMX71daHAk
-Changes:
-Dancing as extra under Music
-Doesn't have Poker under Brain
-Ball Shoot instead of 'Noshery' under Arcade
 
 This might be a regional / store thing if some places didn't want to sell a unit with a Poker game in it?
 */
@@ -6046,6 +6225,23 @@ This might be a regional / store thing if some places didn't want to sell a unit
 // 'Riding Horse' on the other hand actually needs PAL timings, so this unit clearly was designed for PAL regions, however 'Explosion' was left broken.
 CONS( 200?, wowwg,  0,  0,  vt1682_wow, exsprt48, vt1682_wow_state, regular_init, "Wow", "Wow Wireless Gaming (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
 
+
 CONS( 200?, 110dance,  0,  0,  vt1682_dance, 110dance, vt1682_dance_state, regular_init, "<unknown>", "Retro Dance Mat (110 song Super StepMania + 9-in-1 games) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
+// songs 5-8 are repeats of songs 1-4, but probably not a bug?
+CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state, regular_init,  "Subor", "Sports and Dance Fit Games Mat D-555 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
 // NJ Pocket 60-in-1 (NJ-250) is meant to have similar games to the mini-games found in wowwg and 110dance, so almost certainly fits here
+
+// manual explicitly states it has NTSC output only (unit can be connected to a TV) and both Ranning Horse + Explosion (Bomberman) are the NTSC versions
+// has 21.477 Mhz XTAL
+CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // RNG + linescroll issues 
+
+// this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
+// Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
+// has 26.6017 Mhz (6xPAL) XTAL
+CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk1682_init, "<unknown>", "unknown VT1682-based 101-in-1 handheld (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // RNG + linescroll issues 
+
+CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // RNG + linescroll issues 
+

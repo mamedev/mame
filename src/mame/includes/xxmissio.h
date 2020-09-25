@@ -47,12 +47,12 @@ private:
 	uint8_t m_yscroll;
 	uint8_t m_flipscreen;
 
-	DECLARE_WRITE8_MEMBER(bank_sel_w);
-	DECLARE_WRITE8_MEMBER(status_m_w);
-	DECLARE_WRITE8_MEMBER(status_s_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_READ8_MEMBER(bgram_r);
+	void bank_sel_w(uint8_t data);
+	void status_m_w(uint8_t data);
+	void status_s_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
+	uint8_t bgram_r(offs_t offset);
 	void scroll_x_w(uint8_t data);
 	void scroll_y_w(uint8_t data);
 

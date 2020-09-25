@@ -58,8 +58,8 @@ protected:
 	{ }
 
 	void vectrex_psg_port_w(uint8_t data);
-	DECLARE_READ8_MEMBER(vectrex_via_r);
-	DECLARE_WRITE8_MEMBER(vectrex_via_w);
+	uint8_t vectrex_via_r(offs_t offset);
+	void vectrex_via_w(offs_t offset, uint8_t data);
 	virtual void driver_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -183,7 +183,7 @@ public:
 	void raaspec(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(raaspec_led_w);
+	void raaspec_led_w(uint8_t data);
 	uint8_t vectrex_s1_via_pb_r();
 
 	void raaspec_map(address_map &map);

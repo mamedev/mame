@@ -15,6 +15,7 @@ public:
 	void init_drgw2();
 	void init_dw2v100x();
 	void init_drgw2c();
+	void init_drgw2c101();
 	void init_drgw2j();
 	void init_drgw2hk();
 

@@ -285,7 +285,7 @@ u16 toaplan1_state::frame_done_r()
 	return m_screen->vblank();
 }
 
-WRITE16_MEMBER(toaplan1_state::tile_offsets_w)
+void toaplan1_state::tile_offsets_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset == 0)
 	{

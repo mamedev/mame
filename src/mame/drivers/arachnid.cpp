@@ -560,5 +560,5 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY     FULLNAME
-GAME( 1990, arac6000, 0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1990, arac6spa, arac6000, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1990, arac6000, 0,        arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6300 v2.7
+GAME( 1990, arac6spa, arac6000, arachnid, arachnid, arachnid_state, empty_init, ROT0,    "Arachnid", "Super Six Plus II English Mark Darts (Spanish)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // 6307 v2.8

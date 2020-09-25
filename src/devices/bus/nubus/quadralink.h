@@ -36,8 +36,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_READ32_MEMBER(dev_r);
-	DECLARE_WRITE32_MEMBER(dev_w);
+	uint32_t dev_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dev_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
 // device type definition

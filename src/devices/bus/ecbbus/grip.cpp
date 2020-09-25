@@ -217,7 +217,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( ecb_grip21_device::grip5_addr_changed )
 }
 */
 
-static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
+static const double speaker_levels[] = { -1.0, 0.0, 1.0, 0.0 };
 
 //-------------------------------------------------
 //  I8255A interface
@@ -791,7 +791,7 @@ void ecb_grip21_device::cxstb_w(uint8_t data)
 
 void grip5_state::eprom_w(uint8_t data)
 {
-	membank("eprom")->set_entry(BIT(data, 0));
+    membank("eprom")->set_entry(BIT(data, 0));
 }
 
 
@@ -801,7 +801,7 @@ void grip5_state::eprom_w(uint8_t data)
 
 void grip5_state::dpage_w(uint8_t data)
 {
-	m_dpage = BIT(data, 7);
+    m_dpage = BIT(data, 7);
 }
 */
 

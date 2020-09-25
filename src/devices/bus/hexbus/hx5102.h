@@ -55,23 +55,23 @@ private:
 	required_device<tms9995_device> m_flopcpu;
 	line_state m_ready_old;
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(mspeed_w);
 
-	DECLARE_READ8_MEMBER(fdc_read);
-	DECLARE_WRITE8_MEMBER(fdc_write);
-	DECLARE_READ8_MEMBER(ibc_read);
-	DECLARE_WRITE8_MEMBER(ibc_write);
+	uint8_t fdc_read(offs_t offset);
+	void fdc_write(offs_t offset, uint8_t data);
+	uint8_t ibc_read(offs_t offset);
+	void ibc_write(offs_t offset, uint8_t data);
 	void hexbus_out(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(hsklatch_out);
 
-	DECLARE_READ8_MEMBER(cruread);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
 
 	// Operate the floppy motors
 	bool m_motor_on;

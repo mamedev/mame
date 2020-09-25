@@ -58,32 +58,24 @@ public:
 	uint16_t      m_i8751_needs_ack;
 	uint16_t      m_i8751_coin_pending;
 	uint16_t      m_i8751_command_queue;
-	int         m_microcontroller_id;
-	int         m_coin_mask;
 	int         m_latch;
 
-	u16 mcusim_r();
-	void mcusim_w(u16 data);
-	void mcusim_ack_w(u16 data);
-	void mcusim_reset_w(u16 data);
+	u16 wndrplnt_mcu_r();
+	void wndrplnt_mcu_w(u16 data);
+	void wndrplnt_mcu_ack_w(u16 data);
+	void wndrplnt_mcu_reset_w(u16 data);
+
 	void vint_ack_w(u16 data);
 	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void playfield_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void init_wndrplnt();
-	void init_karnov();
-	void init_karnovj();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(mcusim_vbint_w);
+	DECLARE_WRITE_LINE_MEMBER(wndrplnt_mcusim_vbint_w);
 	void vbint_w(int state);
 
-	void karnov_i8751_w( int data );
-	void wndrplnt_i8751_w( int data );
-
-	void chelnov(machine_config &config);
 	void chelnovjbl(machine_config &config);
 	void karnov(machine_config &config);
 	void wndrplnt(machine_config &config);
@@ -93,7 +85,8 @@ public:
 	void chelnovjbl_mcu_map(address_map &map);
 	void chelnovjbl_mcu_io_map(address_map &map);
 	void karnov_map(address_map &map);
-	void chelnov_map(address_map &map);
+	void karnovjbl_map(address_map &map);
+	void wndrplnt_map(address_map &map);
 	void karnov_sound_map(address_map &map);
 	void karnovjbl_sound_map(address_map &map);
 
@@ -122,10 +115,4 @@ private:
 	uint16_t m_mcu_to_maincpu;
 	uint16_t m_maincpu_to_mcu;
 	bool m_coin_state;
-};
-
-enum {
-	KARNOV = 0,
-	KARNOVJ,
-	WNDRPLNT
 };

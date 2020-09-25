@@ -72,7 +72,7 @@ void spdheat_state::video_start()
  *************************************/
 
 template<int screen>
-WRITE16_MEMBER(spdheat_state::text_w)
+void spdheat_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_ram[screen][offset]);
 	m_fg_tilemap[screen]->mark_tile_dirty(offset);
@@ -285,58 +285,58 @@ void spdheat_state::sub_io_map(address_map &map)
  *
  *************************************/
 
-READ16_MEMBER(spdheat_state::sound_status_r)
+uint16_t spdheat_state::sound_status_r()
 {
 	// 1s mean not busy?
 	return m_sound_status;
 }
 
 template<int screen>
-WRITE16_MEMBER(spdheat_state::sound_w)
+void spdheat_state::sound_w(uint16_t data)
 {
 	m_sound_data[screen] = data;
 	m_sound_status &= ~(1 << screen);
 }
 
-READ8_MEMBER(spdheat_state::sub_r)
+uint8_t spdheat_state::sub_r()
 {
 	return 0; // TODO
 }
 
-WRITE8_MEMBER(spdheat_state::sub_dac_w)
+void spdheat_state::sub_dac_w(uint8_t data)
 {
 	m_dac->write(data);
 }
 
-READ8_MEMBER(spdheat_state::soundstatus_r)
+uint8_t spdheat_state::soundstatus_r()
 {
 	return m_sound_status ^ 0xf;
 }
 
 template<int screen>
-READ8_MEMBER(spdheat_state::sndcpu_sound_r)
+uint8_t spdheat_state::sndcpu_sound_r()
 {
 	m_sound_status |= 1 << screen;
 	return m_sound_data[screen];
 }
 
-READ8_MEMBER(spdheat_state::sub_status_r)
+uint8_t spdheat_state::sub_status_r()
 {
 	return m_sub_status ? 0x80 : 0;
 }
 
-READ8_MEMBER(spdheat_state::sub_snd_r)
+uint8_t spdheat_state::sub_snd_r()
 {
 	return m_sub_data;
 }
 
-WRITE8_MEMBER(spdheat_state::sub_status_w)
+void spdheat_state::sub_status_w(uint8_t data)
 {
 	m_sub_status = 0;
 }
 
 // Write command to sub CPU
-WRITE8_MEMBER(spdheat_state::sub_nmi_w)
+void spdheat_state::sub_nmi_w(uint8_t data)
 {
 	// Sub data is cleared by /NMI?
 	m_sub_data = data;

@@ -243,38 +243,38 @@ void seibu_crtc_device::seibu_crtc_vregs(address_map &map)
 	map(0x002c, 0x003b).w(FUNC(seibu_crtc_device::layer_scroll_base_w));
 }
 
-WRITE16_MEMBER(seibu_crtc_device::decrypt_key_w)
+void seibu_crtc_device::decrypt_key_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_decrypt_key_cb.isnull())
 		m_decrypt_key_cb(0, data, mem_mask);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::layer_en_w)
+void seibu_crtc_device::layer_en_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_layer_en_cb.isnull())
 		m_layer_en_cb(0,data,mem_mask);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::layer_scroll_w)
+void seibu_crtc_device::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_layer_scroll_cb.isnull())
 		m_layer_scroll_cb(offset,data,mem_mask);
 }
 
-READ16_MEMBER(seibu_crtc_device::reg_1a_r)
+uint16_t seibu_crtc_device::reg_1a_r()
 {
 	// SPI needs read/write access to this
 	return m_reg_1a;
 }
 
-WRITE16_MEMBER( seibu_crtc_device::reg_1a_w)
+void seibu_crtc_device::reg_1a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_reg_1a);
 	if (!m_reg_1a_cb.isnull())
 		m_reg_1a_cb(offset,data,mem_mask);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::layer_scroll_base_w)
+void seibu_crtc_device::layer_scroll_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_layer_scroll_base_cb.isnull())
 		m_layer_scroll_base_cb(offset,data,mem_mask);
@@ -376,23 +376,23 @@ inline void seibu_crtc_device::write_word(offs_t address, uint16_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( seibu_crtc_device::read )
+uint16_t seibu_crtc_device::read(offs_t offset)
 {
 	return read_word(offset);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::write )
+void seibu_crtc_device::write(offs_t offset, uint16_t data)
 {
 	write_word(offset,data);
 }
 
 /* Sky Smasher / Raiden DX swaps registers [0x10] with [0x20] */
-READ16_MEMBER( seibu_crtc_device::read_alt )
+uint16_t seibu_crtc_device::read_alt(offs_t offset)
 {
 	return read_word(bitswap<16>(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0));
 }
 
-WRITE16_MEMBER( seibu_crtc_device::write_alt )
+void seibu_crtc_device::write_alt(offs_t offset, uint16_t data)
 {
 	write_word(bitswap<16>(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
 }

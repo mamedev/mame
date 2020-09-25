@@ -111,7 +111,7 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
 {
 }
 
-SETADDRESS_DBIN_MEMBER( myarc_hfdc_device::setaddress_dbin )
+void myarc_hfdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for the debugger. It will mess up the
 	// setaddress/memory access pairs when the CPU enters wait states.
@@ -205,7 +205,7 @@ void myarc_hfdc_device::debug_write(offs_t offset, uint8_t data)
 
     HFDC manual, p. 44
 */
-READ8Z_MEMBER(myarc_hfdc_device::readz)
+void myarc_hfdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -371,7 +371,7 @@ void myarc_hfdc_device::write(offs_t offset, uint8_t data)
     ---
     0 on all other locations
 */
-READ8Z_MEMBER(myarc_hfdc_device::crureadz)
+void myarc_hfdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	uint8_t reply;
 	if ((offset & 0xff00)==m_cru_base)

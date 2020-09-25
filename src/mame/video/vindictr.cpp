@@ -93,7 +93,7 @@ void vindictr_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
+void vindictr_state::vindictr_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };

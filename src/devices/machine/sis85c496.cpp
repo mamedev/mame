@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( sis85c496_host_device::at_pit8254_out2_changed )
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
-READ8_MEMBER( sis85c496_host_device::at_page8_r )
+uint8_t sis85c496_host_device::at_page8_r(offs_t offset)
 {
 	uint8_t data = m_at_pages[offset % 0x10];
 
@@ -384,7 +384,7 @@ READ8_MEMBER( sis85c496_host_device::at_page8_r )
 }
 
 
-WRITE8_MEMBER( sis85c496_host_device::at_page8_w )
+void sis85c496_host_device::at_page8_w(offs_t offset, uint8_t data)
 {
 	m_at_pages[offset % 0x10] = data;
 
@@ -517,7 +517,7 @@ WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack5_w ) { pc_select_dma_channel(5
 WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
 WRITE_LINE_MEMBER( sis85c496_host_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
 
-READ8_MEMBER( sis85c496_host_device::at_portb_r )
+uint8_t sis85c496_host_device::at_portb_r()
 {
 	uint8_t data = m_at_speaker;
 	data &= ~0xd0; /* AT BIOS don't likes this being set */
@@ -533,7 +533,7 @@ READ8_MEMBER( sis85c496_host_device::at_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sis85c496_host_device::at_portb_w )
+void sis85c496_host_device::at_portb_w(uint8_t data)
 {
 	m_at_speaker = data;
 	m_pit8254->write_gate2(BIT(data, 0));
@@ -542,38 +542,38 @@ WRITE8_MEMBER( sis85c496_host_device::at_portb_w )
 	//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
 }
 
-READ8_MEMBER( sis85c496_host_device::at_dma8237_2_r )
+uint8_t sis85c496_host_device::at_dma8237_2_r(offs_t offset)
 {
 	return m_dma8237_2->read( offset / 2);
 }
 
-WRITE8_MEMBER( sis85c496_host_device::at_dma8237_2_w )
+void sis85c496_host_device::at_dma8237_2_w(offs_t offset, uint8_t data)
 {
 	m_dma8237_2->write( offset / 2, data);
 }
 
-READ8_MEMBER( sis85c496_host_device::at_keybc_r )
+uint8_t sis85c496_host_device::at_keybc_r(offs_t offset)
 {
 	switch (offset)
 	{
 	case 0: return m_keybc->data_r();
-	case 1: return at_portb_r(space, 0);
+	case 1: return at_portb_r();
 	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( sis85c496_host_device::at_keybc_w )
+void sis85c496_host_device::at_keybc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0: m_keybc->data_w(data); break;
-	case 1: at_portb_w(space, 0, data); break;
+	case 1: at_portb_w(data); break;
 	}
 }
 
 
-WRITE8_MEMBER( sis85c496_host_device::write_rtc )
+void sis85c496_host_device::write_rtc(offs_t offset, uint8_t data)
 {
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);

@@ -382,7 +382,7 @@ void c1571cr_device::via0_pb_w(uint8_t data)
 }
 
 
-READ8_MEMBER( c1571_device::via1_r )
+uint8_t c1571_device::via1_r(offs_t offset)
 {
 	uint8_t data = m_via1->read(offset);
 
@@ -392,7 +392,7 @@ READ8_MEMBER( c1571_device::via1_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1571_device::via1_w )
+void c1571_device::via1_w(offs_t offset, uint8_t data)
 {
 	m_via1->write(offset, data);
 

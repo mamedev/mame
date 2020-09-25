@@ -65,8 +65,8 @@ private:
 	uint8_t pitc_r();
 
 	// Below are duplicated declarations from src/mame/drivers/fccpu20.cpp
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
+	uint32_t bootvect_r(offs_t offset);
+	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void cpu20_mem(address_map &map);
 	void cpu_space_map(address_map &map);

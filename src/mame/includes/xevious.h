@@ -49,13 +49,13 @@ protected:
 	DECLARE_MACHINE_RESET(xevios);
 	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER( xevious_fg_videoram_w );
-	DECLARE_WRITE8_MEMBER( xevious_fg_colorram_w );
-	DECLARE_WRITE8_MEMBER( xevious_bg_videoram_w );
-	DECLARE_WRITE8_MEMBER( xevious_bg_colorram_w );
-	DECLARE_WRITE8_MEMBER( xevious_vh_latch_w );
-	DECLARE_WRITE8_MEMBER( xevious_bs_w );
-	DECLARE_READ8_MEMBER( xevious_bb_r );
+	void xevious_fg_videoram_w(offs_t offset, uint8_t data);
+	void xevious_fg_colorram_w(offs_t offset, uint8_t data);
+	void xevious_bg_videoram_w(offs_t offset, uint8_t data);
+	void xevious_bg_colorram_w(offs_t offset, uint8_t data);
+	void xevious_vh_latch_w(offs_t offset, uint8_t data);
+	void xevious_bs_w(offs_t offset, uint8_t data);
+	uint8_t xevious_bb_r(offs_t offset);
 
 	optional_device<cpu_device> m_subcpu3;
 
@@ -84,18 +84,18 @@ protected:
 	void battles_mem4(address_map &map);
 
 	// Custom I/O
-	DECLARE_READ8_MEMBER( customio0_r );
-	DECLARE_READ8_MEMBER( customio_data0_r );
-	DECLARE_READ8_MEMBER( customio3_r );
-	DECLARE_READ8_MEMBER( customio_data3_r );
-	DECLARE_READ8_MEMBER( input_port_r );
+	uint8_t customio0_r();
+	uint8_t customio_data0_r(offs_t offset);
+	uint8_t customio3_r();
+	uint8_t customio_data3_r(offs_t offset);
+	uint8_t input_port_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER( customio0_w );
-	DECLARE_WRITE8_MEMBER( customio_data0_w );
-	DECLARE_WRITE8_MEMBER( customio3_w );
-	DECLARE_WRITE8_MEMBER( customio_data3_w );
-	DECLARE_WRITE8_MEMBER( cpu4_coin_w );
-	DECLARE_WRITE8_MEMBER( noise_sound_w );
+	void customio0_w(uint8_t data);
+	void customio_data0_w(offs_t offset, uint8_t data);
+	void customio3_w(uint8_t data);
+	void customio_data3_w(offs_t offset, uint8_t data);
+	void cpu4_coin_w(uint8_t data);
+	void noise_sound_w(offs_t offset, uint8_t data);
 
 	required_device<timer_device> m_nmi_timer;
 

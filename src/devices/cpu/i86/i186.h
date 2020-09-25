@@ -91,8 +91,8 @@ private:
 	void update_dma_control(int which, int new_control);
 	void drq_callback(int which);
 	void inc_timer(int which);
-	DECLARE_READ16_MEMBER(internal_port_r);
-	DECLARE_WRITE16_MEMBER(internal_port_w);
+	uint16_t internal_port_r(offs_t offset, uint16_t mem_mask = ~0);
+	void internal_port_w(offs_t offset, uint16_t data);
 
 	struct mem_state
 	{

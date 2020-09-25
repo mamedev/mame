@@ -69,13 +69,13 @@ READ_LINE_MEMBER(stactics_state::motor_not_ready_r)
 }
 
 
-READ8_MEMBER(stactics_state::vert_pos_r)
+uint8_t stactics_state::vert_pos_r()
 {
 	return 0x70 - m_vert_pos;
 }
 
 
-READ8_MEMBER(stactics_state::horiz_pos_r)
+uint8_t stactics_state::horiz_pos_r()
 {
 	return m_horiz_pos + 0x88;
 }
@@ -311,7 +311,7 @@ void stactics_state::machine_start()
 void stactics_state::stactics(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 1933560);
+	I8080(config, m_maincpu, 15.46848_MHz_XTAL / 8); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &stactics_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(stactics_state::interrupt));
 

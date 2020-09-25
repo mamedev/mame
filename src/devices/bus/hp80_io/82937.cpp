@@ -167,12 +167,12 @@ void hp82937_io_card_device::dio_w(uint8_t data)
 	update_data_out();
 }
 
-READ8_MEMBER(hp82937_io_card_device::switch_r)
+uint8_t hp82937_io_card_device::switch_r()
 {
 	return m_sw1->read() | 0xc0;
 }
 
-WRITE8_MEMBER(hp82937_io_card_device::latch_w)
+void hp82937_io_card_device::latch_w(uint8_t data)
 {
 	LOG("latch=%02x\n" , data);
 	m_latch = data;

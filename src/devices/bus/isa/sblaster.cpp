@@ -1171,13 +1171,13 @@ void isa8_sblaster1_0_device::device_add_mconfig(machine_config &config)
 	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 3.0);
 	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 3.0);
 
-	SAA1099(config, m_saa1099_1, 7159090);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_saa1099_1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_1->add_route(0, "lspeaker", 0.5);
+	m_saa1099_1->add_route(1, "rspeaker", 0.5);
 
-	SAA1099(config, m_saa1099_2, 7159090);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_saa1099_2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
+	m_saa1099_2->add_route(0, "lspeaker", 0.5);
+	m_saa1099_2->add_route(1, "rspeaker", 0.5);
 }
 
 void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)
@@ -1256,7 +1256,7 @@ isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, 
 
 void sb8_device::device_start()
 {
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
 	m_isa->install_device(0x0226, 0x0227, read8sm_delegate(*this, FUNC(sb_device::dsp_reset_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_reset_w)));
 	m_isa->install_device(0x022a, 0x022b, read8sm_delegate(*this, FUNC(sb_device::dsp_data_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_data_w)));
 	m_isa->install_device(0x022c, 0x022d, read8sm_delegate(*this, FUNC(sb_device::dsp_wbuf_status_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_cmd_w)));
@@ -1301,7 +1301,7 @@ void isa8_sblaster1_5_device::device_start()
 void sb16_device::device_start()
 {
 	ymf262_device &ymf262 = *subdevice<ymf262_device>("ymf262");
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
 	m_isa->install_device(0x0226, 0x0227, read8sm_delegate(*this, FUNC(sb_device::dsp_reset_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_reset_w)));
 	m_isa->install_device(0x022a, 0x022b, read8sm_delegate(*this, FUNC(sb_device::dsp_data_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_data_w)));
 	m_isa->install_device(0x022c, 0x022d, read8sm_delegate(*this, FUNC(sb_device::dsp_wbuf_status_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_cmd_w)));

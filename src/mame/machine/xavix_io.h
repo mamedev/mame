@@ -15,11 +15,11 @@ public:
 	auto write_0_callback() { return m_out0_cb.bind(); }
 	auto write_1_callback() { return m_out1_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(xav_7a0x_dir_w);
-	DECLARE_WRITE8_MEMBER(xav_7a0x_dat_w);
+	void xav_7a0x_dir_w(offs_t offset, uint8_t data);
+	void xav_7a0x_dat_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(xav_7a0x_dir_r);
-	DECLARE_READ8_MEMBER(xav_7a0x_dat_r);
+	uint8_t xav_7a0x_dir_r(offs_t offset);
+	uint8_t xav_7a0x_dat_r(offs_t offset);
 
 protected:
 	// device-level overrides

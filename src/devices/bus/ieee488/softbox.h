@@ -57,7 +57,7 @@ private:
 	uint8_t ppi1_pc_r();
 	void ppi1_pc_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( dbrg_w );
+	void dbrg_w(uint8_t data);
 
 	void softbox_io(address_map &map);
 	void softbox_mem(address_map &map);

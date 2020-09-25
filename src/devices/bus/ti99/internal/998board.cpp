@@ -160,8 +160,8 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_amigo(*this, TI998_AMIGO_TAG),
 	m_oso(*this, TI998_OSO_TAG),
 	m_maincpu(*owner, "maincpu"),
-	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI998_VDP_TAG),
+	m_sound(*owner, TI998_SOUNDCHIP_TAG),
 	m_speech(*owner, TI998_SPEECHSYN_TAG),
 	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
@@ -351,7 +351,7 @@ void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 
 // =============== CRU bus access ==================
 
-READ8Z_MEMBER(mainboard8_device::crureadz)
+void mainboard8_device::crureadz(offs_t offset, uint8_t *value)
 {
 	m_ioport->crureadz(offset, value);
 }
@@ -1153,7 +1153,7 @@ vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
+void vaquerro_device::set_address(offs_t offset, int state)
 {
 	// Do the decoding
 	// state = dbin, offset = address
@@ -1602,7 +1602,7 @@ mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-SETADDRESS_DBIN_MEMBER( mofetta_device::set_address )
+void mofetta_device::set_address(offs_t offset, int state)
 {
 	if (!m_gotfirstword)
 	{
@@ -2266,7 +2266,7 @@ void amigo_device::device_reset()
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
-	m_hexbusout(*this, ":" TI_HEXBUS_TAG),
+	m_hexbusout(*this, ":" TI998_HEXBUS_TAG),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),

@@ -324,6 +324,7 @@ void ibmpc_state::ibm5150(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "cass_list").set_original("ibm5150_cass");
+	SOFTWARE_LIST(config, "hdd_list").set_original("ibm5150_hdd");
 }
 
 
@@ -366,6 +367,7 @@ void ibmpc_state::ibm5160(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "pc_hdd_list").set_original("ibm5150_hdd");
 }
 
 

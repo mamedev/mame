@@ -21,8 +21,8 @@ public:
 
 	auto irq() { return m_int_cb.bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	enum timer_ctrl_mask : uint32_t

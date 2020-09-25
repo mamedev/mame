@@ -109,7 +109,7 @@ void jmfb_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_48gc", &m_vram[0]);
 
-	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
+	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32s_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32s_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_screen = nullptr;    // can we look this up now?
@@ -248,7 +248,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-WRITE32_MEMBER( jmfb_device::mac_48gc_w )
+void jmfb_device::mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_registers[offset&0xff]);
 
@@ -343,7 +343,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 	}
 }
 
-READ32_MEMBER( jmfb_device::mac_48gc_r )
+uint32_t jmfb_device::mac_48gc_r(offs_t offset, uint32_t mem_mask)
 {
 //  printf("%s 48gc_r: @ %x, mask %08x\n", machine().describe_context().c_str(), offset, mem_mask);
 

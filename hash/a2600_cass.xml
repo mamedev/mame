@@ -4,6 +4,11 @@
 license:CC0
 
 Info from Atariage and Atarimania
+
+The scharger cartridge must be loaded before being able to load a tape. Press Play when asked.
+
+e.g. mame64 a2600 scharger -cass commumut
+
 -->
 
 <softwarelist name="a2600_cass" description="Atari 2600 cassettes">

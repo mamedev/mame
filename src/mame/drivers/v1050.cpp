@@ -326,7 +326,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::v1050_keyboard_tick)
 	scan_keyboard();
 }
 
-READ8_MEMBER( v1050_state::kb_data_r )
+uint8_t v1050_state::kb_data_r()
 {
 	m_keyavail = 0;
 
@@ -335,7 +335,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 	return m_keydata;
 }
 
-READ8_MEMBER( v1050_state::kb_status_r )
+uint8_t v1050_state::kb_status_r()
 {
 	uint8_t val = m_uart_kb->status_r();
 
@@ -344,37 +344,37 @@ READ8_MEMBER( v1050_state::kb_status_r )
 
 // Z80 Read/Write Handlers
 
-WRITE8_MEMBER( v1050_state::v1050_i8214_w )
+void v1050_state::v1050_i8214_w(uint8_t data)
 {
 	m_pic->b_w((data >> 1) & 0x07);
 	m_pic->sgs_w(BIT(data, 4));
 }
 
-READ8_MEMBER( v1050_state::vint_clr_r )
+uint8_t v1050_state::vint_clr_r()
 {
 	set_interrupt(INT_VSYNC, 0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( v1050_state::vint_clr_w )
+void v1050_state::vint_clr_w(uint8_t data)
 {
 	set_interrupt(INT_VSYNC, 0);
 }
 
-READ8_MEMBER( v1050_state::dint_clr_r )
+uint8_t v1050_state::dint_clr_r()
 {
 	set_interrupt(INT_DISPLAY, 0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( v1050_state::dint_clr_w )
+void v1050_state::dint_clr_w(uint8_t data)
 {
 	set_interrupt(INT_DISPLAY, 0);
 }
 
-WRITE8_MEMBER( v1050_state::bank_w )
+void v1050_state::bank_w(uint8_t data)
 {
 	m_bank = data;
 
@@ -383,17 +383,17 @@ WRITE8_MEMBER( v1050_state::bank_w )
 
 // SY6502A Read/Write Handlers
 
-WRITE8_MEMBER( v1050_state::dint_w )
+void v1050_state::dint_w(uint8_t data)
 {
 	set_interrupt(INT_DISPLAY, 1);
 }
 
-WRITE8_MEMBER( v1050_state::dvint_clr_w )
+void v1050_state::dvint_clr_w(uint8_t data)
 {
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( v1050_state::sasi_data_w )
+void v1050_state::sasi_data_w(uint8_t data)
 {
 	m_sasi_data = data;
 
@@ -429,7 +429,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 	m_sasibus->write_rst(0);
 }
 
-WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
+void v1050_state::sasi_ctrl_w(uint8_t data)
 {
 	/*
 

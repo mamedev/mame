@@ -390,25 +390,25 @@ void capbowl_state::bowlrama(machine_config &config)
 
 ROM_START( capbowl )
 	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "u6",  0x08000, 0x8000, CRC(14924c96) SHA1(d436c5115873c9c2bc7657acff1cf7d99c0c5d6d) )
-	ROM_LOAD( "gr0", 0x10000, 0x8000, CRC(ef53ca7a) SHA1(219dc342595bfd23c1336f3e167e40ff0c5e7994) )
-	ROM_LOAD( "gr1", 0x18000, 0x8000, CRC(27ede6ce) SHA1(14aa31cbcf089419b5b2ea8d57e82fc51895fc2e) )
-	ROM_LOAD( "gr2", 0x20000, 0x8000, CRC(e49238f4) SHA1(ac76f1a761d6b0765437fb7367442667da7bb373) )
+	ROM_LOAD( "program_rev3_u6.u6", 0x08000, 0x8000, CRC(14924c96) SHA1(d436c5115873c9c2bc7657acff1cf7d99c0c5d6d) ) /* verified on 2 PCBs, also known to be labeled as "CT.1 PROGRAM U-6" or "BOWLING CT/1 U6" */
+	ROM_LOAD( "grom0-gr0",          0x10000, 0x8000, CRC(ef53ca7a) SHA1(219dc342595bfd23c1336f3e167e40ff0c5e7994) ) /* all labels "(c)1988 IT.INC" */
+	ROM_LOAD( "grom1-gr1",          0x18000, 0x8000, CRC(27ede6ce) SHA1(14aa31cbcf089419b5b2ea8d57e82fc51895fc2e) )
+	ROM_LOAD( "grom2-gr2",          0x20000, 0x8000, CRC(e49238f4) SHA1(ac76f1a761d6b0765437fb7367442667da7bb373) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound.u30", 0x8000, 0x8000, CRC(8c9c3b8a) SHA1(f3cdf42ef19012817e6b7966845f9ede39f61b07) )
+	ROM_LOAD( "sound_v2.1_u30.u30", 0x8000, 0x8000, CRC(8c9c3b8a) SHA1(f3cdf42ef19012817e6b7966845f9ede39f61b07) ) /* labeled as "SOUND V2.1 U30" */
 ROM_END
 
 
 ROM_START( capbowl2 )
 	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "program_rev_3_u6.u6", 0x08000, 0x8000, CRC(9162934a) SHA1(7542dd68a2aa55ad4f03b23ae2313ed6a34ae145) )
-	ROM_LOAD( "gr0",                 0x10000, 0x8000, CRC(ef53ca7a) SHA1(219dc342595bfd23c1336f3e167e40ff0c5e7994) )
-	ROM_LOAD( "gr1",                 0x18000, 0x8000, CRC(27ede6ce) SHA1(14aa31cbcf089419b5b2ea8d57e82fc51895fc2e) )
-	ROM_LOAD( "gr2",                 0x20000, 0x8000, CRC(e49238f4) SHA1(ac76f1a761d6b0765437fb7367442667da7bb373) )
+	ROM_LOAD( "grom0-gr0",           0x10000, 0x8000, CRC(ef53ca7a) SHA1(219dc342595bfd23c1336f3e167e40ff0c5e7994) )
+	ROM_LOAD( "grom1-gr1",           0x18000, 0x8000, CRC(27ede6ce) SHA1(14aa31cbcf089419b5b2ea8d57e82fc51895fc2e) )
+	ROM_LOAD( "grom2-gr2",           0x20000, 0x8000, CRC(e49238f4) SHA1(ac76f1a761d6b0765437fb7367442667da7bb373) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound.u30", 0x8000, 0x8000, CRC(8c9c3b8a) SHA1(f3cdf42ef19012817e6b7966845f9ede39f61b07) )
+	ROM_LOAD( "sound_v2.1_u30.u30", 0x8000, 0x8000, CRC(8c9c3b8a) SHA1(f3cdf42ef19012817e6b7966845f9ede39f61b07) ) /* labeled as "SOUND V2.1 U30" */
 ROM_END
 
 
@@ -420,7 +420,7 @@ ROM_START( capbowl3 )
 	ROM_LOAD( "grom2-gr2.gr2", 0x20000, 0x8000, CRC(f3d2468d) SHA1(0348ee5d0000b753ad90a525048d05bfb552bee1) ) /* I.T. label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound_r2_u30.u30", 0x8000, 0x8000, CRC(43ac1658) SHA1(1fab23d649d0c565ef1a7f45b30806f9d1bb4afd) ) /* labeled as "SOUND (R-2) U30" */
+	ROM_LOAD( "sound_r-2_u30.u30", 0x8000, 0x8000, CRC(43ac1658) SHA1(1fab23d649d0c565ef1a7f45b30806f9d1bb4afd) ) /* labeled as "SOUND (R-2) U30" */
 ROM_END
 
 
@@ -438,10 +438,10 @@ ROM_END
 
 ROM_START( clbowl )
 	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "cb8_prg.u6",              0x08000, 0x8000, CRC(91e06bc4) SHA1(efa54328417f971cc482a4529d05331a3baffc1a) ) /* Capcom label */
-	ROM_LOAD( "coors_bowling_grom0.gr0", 0x10000, 0x8000, CRC(899c8f15) SHA1(dbb4a9c015b5e64c62140f0c99b87da2793ae5c1) ) /* I.T. label */
-	ROM_LOAD( "coors_bowling_grom1.gr1", 0x18000, 0x8000, CRC(0ac0dc4c) SHA1(61afa3af1f84818b940b5c6f6a8cfb58ca557551) ) /* I.T. label */
-	ROM_LOAD( "coors_bowling_grom2.gr2", 0x20000, 0x8000, CRC(251f5da5) SHA1(063001cfb68e3ec35baa24eed186214e26d55b82) ) /* I.T. label */
+	ROM_LOAD( "coors_bowling_program.u6", 0x08000, 0x8000, CRC(91e06bc4) SHA1(efa54328417f971cc482a4529d05331a3baffc1a) ) /* I.T. label, also known to be labeled as "CB8 PRG" on a genuine Capcom label */
+	ROM_LOAD( "coors_bowling_grom0.gr0",  0x10000, 0x8000, CRC(899c8f15) SHA1(dbb4a9c015b5e64c62140f0c99b87da2793ae5c1) ) /* I.T. label */
+	ROM_LOAD( "coors_bowling_grom1.gr1",  0x18000, 0x8000, CRC(0ac0dc4c) SHA1(61afa3af1f84818b940b5c6f6a8cfb58ca557551) ) /* I.T. label */
+	ROM_LOAD( "coors_bowling_grom2.gr2",  0x20000, 0x8000, CRC(251f5da5) SHA1(063001cfb68e3ec35baa24eed186214e26d55b82) ) /* I.T. label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "coors_bowling_sound.u30", 0x8000, 0x8000, CRC(1eba501e) SHA1(684bdc18cf5e01a86d8018a3e228ec34e5dec57d) )

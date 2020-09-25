@@ -92,23 +92,21 @@ void sonson_state::sonson_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(sonson_state::sonson_videoram_w)
+void sonson_state::sonson_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_colorram_w)
+void sonson_state::sonson_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_scrollx_w)
+void sonson_state::sonson_scrollx_w(uint8_t data)
 {
-	int row;
-
-	for (row = 5; row < 32; row++)
+	for (int row = 5; row < 32; row++)
 		m_bg_tilemap->set_scrollx(row, data);
 }
 

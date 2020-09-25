@@ -66,13 +66,13 @@ void sprint8_state::machine_reset()
 }
 
 
-READ8_MEMBER(sprint8_state::collision_r)
+uint8_t sprint8_state::collision_r()
 {
 	return m_collision_index;
 }
 
 
-READ8_MEMBER(sprint8_state::input_r)
+uint8_t sprint8_state::input_r(offs_t offset)
 {
 	static const char *const portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
 	uint8_t val = ioport(portnames[offset])->read();
@@ -90,7 +90,7 @@ READ8_MEMBER(sprint8_state::input_r)
 }
 
 
-WRITE8_MEMBER(sprint8_state::lockout_w)
+void sprint8_state::lockout_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(offset, !(data & 1));
 }

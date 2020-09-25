@@ -28,7 +28,7 @@ remove all the code writing the $a0000 area.)
 
 *************************************************************************/
 
-WRITE16_MEMBER(toki_state::toki_control_w)
+void toki_state::toki_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos() - 1);
 	COMBINE_DATA(&m_scrollram[offset]);
@@ -94,20 +94,19 @@ void toki_state::video_start()
 
 /*************************************/
 
-WRITE16_MEMBER(toki_state::foreground_videoram_w)
+void toki_state::foreground_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_state::background1_videoram_w)
+void toki_state::background1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background1_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_state::background2_videoram_w)
+void toki_state::background2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background2_videoram[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);

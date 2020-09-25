@@ -138,7 +138,7 @@ video_manager::video_manager(running_machine &machine)
 			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			viewnode->set_attribute("name", util::xml::normalize_string(util::string_format("s%1$u", i).c_str()));
+			viewnode->set_attribute("name", util::string_format("s%1$u", i).c_str());
 			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 			if (!screennode)
 				throw emu_fatalerror("Couldn't create XML node??");
@@ -266,7 +266,7 @@ void video_manager::frame_update(bool from_debugger)
 		screen_device *const screen = screen_device_iterator(machine().root_device()).first();
 		bool const debugger_enabled = machine().debug_flags & DEBUG_FLAG_ENABLED;
 		bool const within_instruction_hook = debugger_enabled && machine().debugger().within_instruction_hook();
-		if (screen && (machine().paused() || from_debugger || within_instruction_hook))
+		if (screen && ((machine().paused() && machine().options().update_in_pause()) || from_debugger || within_instruction_hook))
 			screen->reset_partial_updates();
 	}
 }
@@ -642,7 +642,10 @@ bool video_manager::finish_screen_updates()
 	bool has_live_screen = false;
 	for (screen_device &screen : iter)
 	{
+		if (screen.partial_scan_hpos() >= 0) // previous update ended mid-scanline
+			screen.update_now();
 		screen.update_partial(screen.visible_area().max_y);
+
 		if (machine().render().is_live(screen))
 			has_live_screen = true;
 	}
@@ -894,7 +897,7 @@ void video_manager::update_frameskip()
 		// calibrate the "adjusted speed" based on the target
 		double adjusted_speed_percent = m_speed_percent / (double) m_throttle_rate;
 
-		// if we're too fast, attempt to increase the frameskip
+		// if we're too fast, attempt to decrease the frameskip
 		double speed = m_speed * 0.001;
 		if (adjusted_speed_percent >= 0.995 * speed)
 		{

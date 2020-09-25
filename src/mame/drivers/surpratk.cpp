@@ -19,7 +19,7 @@
 #include "speaker.h"
 
 
-WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
+void surpratk_state::surpratk_videobank_w(uint8_t data)
 {
 	if (data & 0xf8)
 		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
@@ -33,7 +33,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 		m_bank0000->set_bank(BIT(data, 0));
 }
 
-WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
+void surpratk_state::surpratk_5fc0_w(uint8_t data)
 {
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);

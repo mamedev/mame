@@ -72,10 +72,10 @@ private:
 	};
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(svision_r);
-	DECLARE_WRITE8_MEMBER(svision_w);
-	DECLARE_READ8_MEMBER(tvlink_r);
-	DECLARE_WRITE8_MEMBER(tvlink_w);
+	uint8_t svision_r(offs_t offset);
+	void svision_w(offs_t offset, uint8_t data);
+	uint8_t tvlink_r(offs_t offset);
+	void tvlink_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

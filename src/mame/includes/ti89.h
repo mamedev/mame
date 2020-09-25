@@ -90,11 +90,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t keypad_r();
-	DECLARE_WRITE16_MEMBER( ti68k_io_w );
-	DECLARE_READ16_MEMBER( ti68k_io_r );
-	DECLARE_WRITE16_MEMBER( ti68k_io2_w );
-	DECLARE_READ16_MEMBER( ti68k_io2_r );
-	DECLARE_READ16_MEMBER( rom_r );
+	void ti68k_io_w(offs_t offset, uint16_t data);
+	uint16_t ti68k_io_r(offs_t offset);
+	void ti68k_io2_w(offs_t offset, uint16_t data);
+	uint16_t ti68k_io2_r(offs_t offset);
+	uint16_t rom_r(offs_t offset);
 	uint16_t reset_overlay_r(offs_t offset);
 	void ti68k_palette(palette_device &palette) const;
 

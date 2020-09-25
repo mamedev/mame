@@ -20,9 +20,9 @@ namespace plib {
 		struct sys_ticks
 		{
 			using type = typename T::rep;
-			static inline constexpr type start() noexcept { return T::now().time_since_epoch().count(); }
-			static inline constexpr type stop() noexcept { return T::now().time_since_epoch().count(); }
-			static inline constexpr type per_second() noexcept { return T::period::den / T::period::num; }
+			static constexpr type start() noexcept { return T::now().time_since_epoch().count(); }
+			static constexpr type stop() noexcept { return T::now().time_since_epoch().count(); }
+			static constexpr type per_second() noexcept { return T::period::den / T::period::num; }
 		};
 
 		using hires_ticks = sys_ticks<std::chrono::high_resolution_clock>;
@@ -217,6 +217,12 @@ namespace plib {
 					/ narrow_cast<S>(T::per_second()); }
 
 			guard_t guard() noexcept { return guard_t(*this); }
+
+			// pause must be followed by cont(inue)
+			void stop() noexcept { m_time += T::stop(); }
+			void start() noexcept { m_time -= T::start(); }
+
+
 		private:
 			type m_time;
 			ctype m_count;

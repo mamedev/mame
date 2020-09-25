@@ -20,8 +20,7 @@ k001006_device::k001006_device(const machine_config &mconfig, const char *tag, d
 	m_unknown_ram(nullptr),
 	m_addr(0),
 	m_device_sel(0),
-	m_palette(nullptr), m_gfxrom(*this, finder_base::DUMMY_TAG),
-	m_tex_layout(0)
+	m_palette(nullptr), m_gfxrom(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -37,7 +36,7 @@ void k001006_device::device_start()
 
 	m_texrom = std::make_unique<uint8_t[]>(0x800000);
 
-	preprocess_texture_data(m_texrom.get(), m_gfxrom, 0x800000, m_tex_layout);
+	preprocess_texture_data(m_texrom.get(), m_gfxrom, 0x800000);
 
 	save_pointer(NAME(m_pal_ram), 0x800*sizeof(uint16_t));
 	save_pointer(NAME(m_unknown_ram), 0x1000*sizeof(uint16_t));
@@ -150,39 +149,20 @@ uint32_t k001006_device::fetch_texel(int page, int pal_index, int u, int v)
 }
 
 
-void k001006_device::preprocess_texture_data(uint8_t *dst, uint8_t *src, int length, int layout)
+void k001006_device::preprocess_texture_data(uint8_t *dst, uint8_t *src, int length)
 {
-	static const int decode_x_gti[8] = {  0, 16, 2, 18, 4, 20, 6, 22 };
-	static const int decode_y_gti[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 104, 65, 73, 97, 105 };
+	static const int decode_x[8] = {  0, 16, 2, 18, 4, 20, 6, 22 };
+	static const int decode_y[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 104, 65, 73, 97, 105 };
 
-	static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
-	static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
-
-	int index;
-	int i, x, y;
 	uint8_t temp[0x40000];
 
-	const int *decode_x;
-	const int *decode_y;
-
-	if (layout == 1)
-	{
-		decode_x = decode_x_gti;
-		decode_y = decode_y_gti;
-	}
-	else
-	{
-		decode_x = decode_x_zr107;
-		decode_y = decode_y_zr107;
-	}
-
-	for (index=0; index < length; index += 0x40000)
+	for (int index = 0; index < length; index += 0x40000)
 	{
 		int offset = index;
 
 		memset(temp, 0, 0x40000);
 
-		for (i=0; i < 0x800; i++)
+		for (int i = 0; i < 0x800; i++)
 		{
 			int tx = ((i & 0x400) >> 5) | ((i & 0x100) >> 4) | ((i & 0x40) >> 3) | ((i & 0x10) >> 2) | ((i & 0x4) >> 1) | (i & 0x1);
 			int ty = ((i & 0x200) >> 5) | ((i & 0x80) >> 4) | ((i & 0x20) >> 3) | ((i & 0x8) >> 2) | ((i & 0x2) >> 1);
@@ -190,9 +170,9 @@ void k001006_device::preprocess_texture_data(uint8_t *dst, uint8_t *src, int len
 			tx <<= 3;
 			ty <<= 4;
 
-			for (y=0; y < 16; y++)
+			for (int y = 0; y < 16; y++)
 			{
-				for (x=0; x < 8; x++)
+				for (int x = 0; x < 8; x++)
 				{
 					uint8_t pixel = src[offset + decode_y[y] + decode_x[x]];
 

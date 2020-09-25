@@ -29,7 +29,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
@@ -135,7 +135,7 @@ private:
 
 	void write_slot(slot_t &slot, int32_t reg, uint8_t data);
 
-	int16_t clamp_to_int16(int32_t value);
+	stream_buffer::sample_t convert_to_stream_sample(int32_t value);
 
 #if MULTIPCM_LOG_SAMPLES
 	void dump_sample(slot_t &slot);

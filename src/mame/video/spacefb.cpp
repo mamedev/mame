@@ -17,7 +17,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(spacefb_state::port_0_w)
+void spacefb_state::port_0_w(uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -25,7 +25,7 @@ WRITE8_MEMBER(spacefb_state::port_0_w)
 }
 
 
-WRITE8_MEMBER(spacefb_state::port_2_w)
+void spacefb_state::port_2_w(uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());

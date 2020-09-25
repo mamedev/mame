@@ -384,7 +384,7 @@ void gdfs_state::video_start()
 
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::vblank_r)
+uint16_t ssv_state::vblank_r()
 {
 	// maybe reads scanline counter? pastelis reads this on the 'for use in Japan' screen + end credits
 	// and adjusts y position to do a polled raster effect by changing scroll values midscreen
@@ -399,7 +399,7 @@ READ16_MEMBER(ssv_state::vblank_r)
 	return ret;
 }
 
-WRITE16_MEMBER(ssv_state::scroll_w)
+void ssv_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos() - 1); // pastelis FOR USE IN JAPAN screen polls the vblank / hblank to do a raster effect
 	COMBINE_DATA(m_scroll + offset);

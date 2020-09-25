@@ -251,25 +251,25 @@ void h83002_device::device_reset()
 	syscr = 0x09;
 }
 
-READ8_MEMBER(h83002_device::syscr_r)
+uint8_t h83002_device::syscr_r()
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h83002_device::syscr_w)
+void h83002_device::syscr_w(uint8_t data)
 {
 	syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
 }
 
-READ8_MEMBER(h83002_device::rtmcsr_r)
+uint8_t h83002_device::rtmcsr_r()
 {
 	// set bit 7 -- Compare Match Flag (CMF): This status flag indicates that the RTCNT and RTCOR values have matched.
 	return rtmcsr | 0x80;
 }
 
-WRITE8_MEMBER(h83002_device::rtmcsr_w)
+void h83002_device::rtmcsr_w(uint8_t data)
 {
 	rtmcsr = data;
 	logerror("rtmcsr = %02x\n", data);

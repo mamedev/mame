@@ -12,8 +12,8 @@ public:
 	void init_sms_supergame();
 
 private:
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
+	void port08_w(uint8_t data);
+	void port18_w(uint8_t data);
 
 	void sms_supergame_io(address_map &map);
 	void sms_supergame_map(address_map &map);

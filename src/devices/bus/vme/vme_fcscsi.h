@@ -44,17 +44,17 @@ private:
 	void fdc_write_byte(uint8_t data);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ8_MEMBER (tcr_r);
-	DECLARE_WRITE8_MEMBER (tcr_w);
+	uint16_t bootvect_r(offs_t offset);
+	uint8_t tcr_r();
+	void tcr_w(uint8_t data);
 	void led_w(uint8_t data);
 
 	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER(not_implemented_r);
-	DECLARE_WRITE8_MEMBER(not_implemented_w);
+	uint8_t not_implemented_r();
+	void not_implemented_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(scsi_r);
-	DECLARE_WRITE8_MEMBER(scsi_w);
+	uint8_t scsi_r(offs_t offset);
+	void scsi_w(offs_t offset, uint8_t data);
 
 	void fcscsi1_mem(address_map &map);
 	void cpu_space_map(address_map &map);

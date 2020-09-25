@@ -114,24 +114,24 @@ private:
 	void scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// DMA
-	DECLARE_READ32_MEMBER(dma_lv0_r);
-	DECLARE_WRITE32_MEMBER(dma_lv0_w);
-	DECLARE_READ32_MEMBER(dma_lv1_r);
-	DECLARE_WRITE32_MEMBER(dma_lv1_w);
-	DECLARE_READ32_MEMBER(dma_lv2_r);
-	DECLARE_WRITE32_MEMBER(dma_lv2_w);
-	DECLARE_READ32_MEMBER(dma_status_r);
+	uint32_t dma_lv0_r(offs_t offset);
+	void dma_lv0_w(offs_t offset, uint32_t data);
+	uint32_t dma_lv1_r(offs_t offset);
+	void dma_lv1_w(offs_t offset, uint32_t data);
+	uint32_t dma_lv2_r(offs_t offset);
+	void dma_lv2_w(offs_t offset, uint32_t data);
+	uint32_t dma_status_r();
 
 	// Timers
-	DECLARE_WRITE32_MEMBER(t0_compare_w);
-	DECLARE_WRITE32_MEMBER(t1_setdata_w);
-	DECLARE_WRITE16_MEMBER(t1_mode_w);
+	void t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void t1_mode_w(uint16_t data);
 	// Interrupt
-	DECLARE_READ32_MEMBER(irq_mask_r);
-	DECLARE_READ32_MEMBER(irq_status_r);
-	DECLARE_WRITE32_MEMBER(irq_mask_w);
-	DECLARE_WRITE32_MEMBER(irq_status_w);
-	DECLARE_READ32_MEMBER(version_r);
+	uint32_t irq_mask_r();
+	uint32_t irq_status_r();
+	void irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t version_r();
 };
 
 

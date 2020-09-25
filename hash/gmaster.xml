@@ -5,9 +5,7 @@ license:CC0
 
 Undumped:
 - Bomb Disposer
-- Invader
 - S-Race
-- Tank War
 -->
 <softwarelist name="gmaster" description="Hartung Game Master cartridges">
 	<software name="bublboy" supported="no">
@@ -153,6 +151,17 @@ Undumped:
 		</part>
 	</software>
 
+	<software name="spaceinv" supported="no">
+		<description>Space Invader</description>
+		<year>1992</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="space_invader.bin" size="32768" crc="7c8318c4" sha1="abe9a6c98b06adcec1ba8e4ee1cbda26689bbb87"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swarrior" supported="no">
 		<description>Space Warrior</description>
 		<year>199?</year>
@@ -160,6 +169,17 @@ Undumped:
 		<part name="cart" interface="gmaster_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="space_warrior.bin" size="32768" crc="af61d552" sha1="7fb7731716013277c42712bfa6c5ab7cc2467349"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankwar" supported="no">
+		<description>Tank War</description>
+		<year>199?</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tank_war.bin" size="32768" crc="50ce2e30" sha1="f570dae807af62c29f3364cff53a51b51efd60fe"/>
 			</dataarea>
 		</part>
 	</software>

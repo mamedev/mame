@@ -119,8 +119,8 @@ class dummy_space_device : public device_t,
 public:
 	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	void dummy(address_map &map);
 protected:

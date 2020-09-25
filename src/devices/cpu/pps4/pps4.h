@@ -47,7 +47,7 @@ public:
 	auto dib_cb() { return m_dib_cb.bind(); }
 	auto do_cb() { return m_do_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(address_bus_r);
+	u16 address_bus_r(address_space &space);
 
 protected:
 	pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

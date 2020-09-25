@@ -95,11 +95,8 @@ void oki_adpcm_state::save()
 
 void oki_adpcm_state::restore()
 {
-	if (m_saved)
-	{
-		m_signal = m_loop_signal;
-		m_step = m_loop_step;
-	}
+	m_signal = m_loop_signal;
+	m_step = m_loop_step;
 }
 
 
@@ -215,11 +212,8 @@ void oki_adpcm2_state::save()
 
 void oki_adpcm2_state::restore()
 {
-	if (m_saved)
-	{
-		m_signal = m_loop_signal;
-		m_step = m_loop_step;
-	}
+	m_signal = m_loop_signal;
+	m_step = m_loop_step;
 }
 
 

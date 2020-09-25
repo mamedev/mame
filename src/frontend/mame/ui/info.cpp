@@ -139,13 +139,38 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 
 
 //-------------------------------------------------
+//  has_warnings - returns true if the system has
+//  issues that warrant a yellow/red message
+//-------------------------------------------------
+
+bool machine_static_info::has_warnings() const
+{
+	return (machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS)) || unemulated_features() || imperfect_features();
+}
+
+
+//-------------------------------------------------
+//  has_severe_warnings - returns true if the
+//  system has issues that warrant a red message
+//-------------------------------------------------
+
+bool machine_static_info::has_severe_warnings() const
+{
+	return
+			(machine_flags() & MACHINE_ERRORS) ||
+			(unemulated_features() & (device_t::feature::PROTECTION | device_t::feature::GRAPHICS | device_t::feature::SOUND)) ||
+			(imperfect_features() & device_t::feature::PROTECTION);
+}
+
+
+//-------------------------------------------------
 //  status_color - returns suitable colour for
 //  driver status box
 //-------------------------------------------------
 
 rgb_t machine_static_info::status_color() const
 {
-	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
+	if (has_severe_warnings())
 		return UI_RED_COLOR;
 	else if ((machine_flags() & MACHINE_WARNINGS & ~::machine_flags::REQUIRES_ARTWORK) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
@@ -161,7 +186,7 @@ rgb_t machine_static_info::status_color() const
 
 rgb_t machine_static_info::warnings_color() const
 {
-	if ((machine_flags() & MACHINE_ERRORS) || ((unemulated_features() | imperfect_features()) & device_t::feature::PROTECTION))
+	if (has_severe_warnings())
 		return UI_RED_COLOR;
 	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
@@ -292,10 +317,6 @@ std::string machine_info::warnings_string() const
 		if (foundworking)
 			buf << '\n';
 	}
-
-	// add the 'press OK' string
-	if (!buf.str().empty())
-		buf << _("\n\nPress any key to continue");
 
 	return buf.str();
 }
@@ -451,9 +472,8 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
 
 
 /*-------------------------------------------------
-  menu_game_info - handle the game information
-  menu
- -------------------------------------------------*/
+  menu_game_info - handle the game information menu
+-------------------------------------------------*/
 
 menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
@@ -477,9 +497,33 @@ void menu_game_info::handle()
 
 
 /*-------------------------------------------------
-  menu_image_info - handle the image information
-  menu
- -------------------------------------------------*/
+  menu_warn_info - handle the emulation warnings menu
+-------------------------------------------------*/
+
+menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+{
+}
+
+menu_warn_info::~menu_warn_info()
+{
+}
+
+void menu_warn_info::populate(float &customtop, float &custombottom)
+{
+	std::string tempstring = ui().machine_info().warnings_string();
+	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
+}
+
+void menu_warn_info::handle()
+{
+	// process the menu
+	process(0);
+}
+
+
+/*-------------------------------------------------
+  menu_image_info - handle the image information menu
+-------------------------------------------------*/
 
 menu_image_info::menu_image_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {

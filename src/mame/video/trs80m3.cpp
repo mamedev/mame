@@ -13,7 +13,7 @@
     d2 80/40 or 64/32 characters per line (1=80)
     d0 80/64 or 40/32 characters per line (1=32) */
 
-WRITE8_MEMBER( trs80m3_state::port_88_w )
+void trs80m3_state::port_88_w(offs_t offset, uint8_t data)
 {
 /* This is for the programming of the CRTC registers.
     However this CRTC is mask-programmed, and only the

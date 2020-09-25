@@ -36,10 +36,10 @@ public:
 	// interface
 	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
 
-	DECLARE_READ16_MEMBER( gayle_r );
-	DECLARE_WRITE16_MEMBER( gayle_w );
-	DECLARE_READ16_MEMBER( gayle_id_r );
-	DECLARE_WRITE16_MEMBER( gayle_id_w );
+	uint16_t gayle_r(offs_t offset, uint16_t mem_mask = ~0);
+	void gayle_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gayle_id_r(offs_t offset, uint16_t mem_mask = ~0);
+	void gayle_id_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// inline configuration
 	void set_id(uint8_t id) { m_gayle_id = id; }

@@ -535,7 +535,6 @@ void bq4847_device::nvram_default()
 void bq4847_device::nvram_read(emu_file &file)
 {
 	file.read(m_reg, 16);
-	// get_system_time();
 	transfer_to_access();
 
 	// Clear the saved flags

@@ -157,6 +157,8 @@ public:
 
 protected:
 	virtual void machine_start() override;
+
+	std::vector<double> m_speaker_levels;
 };
 
 void wildfire_state::machine_start()
@@ -255,10 +257,10 @@ void wildfire_state::wildfire(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	static s16 speaker_levels[0x8000];
+	m_speaker_levels.resize(0x8000);
 	for (int i = 0; i < 0x8000; i++)
-		speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, speaker_levels);
+		m_speaker_levels[i] = double(i) / 32768.0;
+	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms

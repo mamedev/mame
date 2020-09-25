@@ -18,6 +18,16 @@
  *
  * Set C=0 to disable filter
  *
+ * FLT_RC_LOWPASS_@C:
+ *
+ * signal >--R1--+----> amp
+ *               |
+ *               C
+ *               |
+ *              GND
+ *
+ * Set C=0 to disable filter
+ *
  * FLT_RC_HIGHPASS:
  *
  * signal >--C---+----> amp
@@ -53,8 +63,9 @@ public:
 	enum
 	{
 		LOWPASS      = 0,
-		HIGHPASS     = 1,
-		AC           = 2
+		LOWPASS_2C   = 2,
+		HIGHPASS     = 3,
+		AC           = 4
 	};
 
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -70,11 +81,21 @@ public:
 		return *this;
 	}
 
+	filter_rc_device &set_lowpass(double R, double C)
+	{
+		m_type = LOWPASS_2C;
+		m_R1 = R;
+		m_R2 = 0;
+		m_R3 = 0;
+		m_C = C;
+		return *this;
+	}
+
 	filter_rc_device &filter_rc_set_RC(int type, double R1, double R2, double R3, double C)
 	{
 		m_stream->update();
 		set_rc(type, R1, R2, R3, C);
-		recalc();
+		m_last_sample_rate = 0;
 		return *this;
 	}
 
@@ -88,16 +109,17 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	void recalc();
 
 private:
 	sound_stream*  m_stream;
-	int            m_k;
-	int            m_memory;
+	stream_buffer::sample_t m_k;
+	stream_buffer::sample_t m_memory;
 	int            m_type;
+	int            m_last_sample_rate;
 	double         m_R1;
 	double         m_R2;
 	double         m_R3;

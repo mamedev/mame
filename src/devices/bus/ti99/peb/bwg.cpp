@@ -141,7 +141,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 	operate_ready_line();
 }
 
-SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
+void snug_bwg_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Do not allow setaddress for debugger
 	if (machine().side_effects_disabled()) return;
@@ -221,7 +221,7 @@ void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
     Read a byte from ROM, RAM, FDC, or RTC. See setaddress_dbin for selection
     logic.
 */
-READ8Z_MEMBER(snug_bwg_device::readz)
+void snug_bwg_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -346,7 +346,7 @@ void snug_bwg_device::write(offs_t offset, uint8_t data)
     bit 6: Dip 3
     bit 7: Dip 4
 */
-READ8Z_MEMBER(snug_bwg_device::crureadz)
+void snug_bwg_device::crureadz(offs_t offset, uint8_t *value)
 {
 	uint8_t reply;
 

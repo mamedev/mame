@@ -41518,4 +41518,161 @@ license:CC0
 		</part>
 	</software>
 
+<!-- hacked dumpd of protected games using 'Sintax' protection.
+
+     These games have a protection device which locks out certain ranges (and further reads) depending on the otherwised unused
+     upper address bits.  Furthermore there is some kind of bootstrap mechanism to bypass the GBA protection.
+
+     The dumps are 'full address range' as to bypass the address lockouts, with the expected data for booting patched in.
+
+     These should be replaced with proper dumps of the flash ROM, with the lockout ranges documented and simulated
+     as things stand they have to be marked as 'bad' as they're not true archival quality dumps.
+
+     see http://hhug.me/?post=90 for details
+
+-->
+	<software name="rayman4">
+		<description>Rayman IV (Rayman - Sunshine of Trip) (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Rayman IV (Rayman - Sunshine of Trip) (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="d72c620f" sha1="0ef17374ee28f903127493bf47c14971aa6ed0b8" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rayman4r" cloneof="rayman4">
+		<description>Rayman IV (Rayman - Puteshestviye Solnechnogo Sveta) (unlicensed) (Russian) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Rayman IV (Rayman - Puteshestviye Solnechnogo Sveta) (Unl) (Rus) [YJ restored].gba" size="0x2000000" crc="8ee6b303" sha1="6a2840b0b15e23c0914a5d233183030f050a1148" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leiman4" cloneof="rayman4"> <!-- 'Rayman 4' -->
+		<description>Leiman IV - Guangming Zhi Lv (unlicensed) (Chinese) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Leiman IV - Guangming Zhi Lv (Unl) (Chi) [YJ restored].gba" size="0x2000000" crc="d05c8414" sha1="90bb6a90fe3fcf57beb0bb6b69122860c532cf26" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smariodx">
+		<description>Super Mario DX (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="E12-U8" />
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Super Mario DX (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="9255c170" sha1="2b7dce921497e10b43083040bc7a596369fc1b0e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chaojim" cloneof="smariodx">
+		<description>Chaoji Maliou DX (unlicensed) (Chinese) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Chaoji Maliou DX (Unl) (Chi) [YJ restored].gba" size="0x2000000" crc="2c7af7e8" sha1="a8968d5e324c27c8d64382815f4e3ab40dffa80c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crashad4">
+		<description>Crash Advance IV  (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Crash Advance IV (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="4b67247c" sha1="a122a0c7d2cf2cb58d12007a79f811044a9f3539" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digirs">
+		<description>Digimon - Ruby and Sapphire (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Digimon - Ruby and Sapphire (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="51ef4700" sha1="88f496a8e796d3dedb356c4aafff9ccf41ed5af4" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poksaph"> <!-- unlicensed translation -->
+		<description>Pokemon - Sapphire Version (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Pokemon - Sapphire Version (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="86a602ab" sha1="14051d159d7a1266b5bfecbfd52722fd3e0711bf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic3fs">
+		<description>Sonic 3 - Fighter Sonic (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Sonic 3 - Fighter Sonic (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="8e0a9112" sha1="b3855ceae35152b8a98c882777f040ac2aa93926" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmnturt2">
+		<description>Teenage Mutant Ninja Turtles 2 (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Teenage Mutant Ninja Turtles 2 (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="8ee6d3d5" sha1="cbcb99b4ee34d6d83c898a09083a655f7f9eecb1" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotr4">
+		<description>The Lord of the Rings IV - The Fellowship of the Ring (unlicensed) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="The Lord of the Rings IV - The Fellowship of the Ring (Unl) (Eng) [YJ restored].gba" size="0x2000000" crc="09c7c895" sha1="bf5f2ec4e7c7df834be9911d217af0d4490e3722" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultcje">
+		<description>Ultraman - Confrontation Between Justice And Evil (Ul'traman - Konfrontatsiya mezhdu spravedlivost'yu i zlom) (unlicensed) (Russian) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="Ultraman - Confrontation Between Justice And Evil (Unl) (Rus) [YJ restored].gba" size="0x2000000" crc="4683dbb5" sha1="08a9530ce82a76e1be5e408ae99bdd90c42748e9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmanam">
+		<description>X-Man - Armour of Might (X-men) (unlicensed) (Russian) (protection hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="X-Man - Armour of Might (X-men) (Unl) (Rus) [YJ restored].gba" size="0x2000000" crc="e14c9b78" sha1="a894acc460efc9b9b03a7ce55e5a860b64473e13" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

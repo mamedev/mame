@@ -46,70 +46,70 @@ Basic display of LEDs for the SITCOM85
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="34" top="60" right="341" bottom="200" />
-		</bezel>
+		</element>
 
-		<bezel name="sod_led" element="a_led">
+		<element name="sod_led" ref="a_led">
 			<bounds left="46" top="90" right="56" bottom="100" />
-		</bezel>
+		</element>
 
-		<bezel name="test_led" element="b_led">
+		<element name="test_led" ref="b_led">
 			<bounds left="46" top="160" right="56" bottom="170" />
-		</bezel>
+		</element>
 
 		<!-- DL1414 left -->
-		<bezel name="digit3" element="a_digit">
+		<element name="digit3" ref="a_digit">
 			<bounds left="65" top="70" right="90" bottom="120" />
-		</bezel>
-		<bezel name="digit2" element="a_digit">
+		</element>
+		<element name="digit2" ref="a_digit">
 			<bounds left="99" top="70" right="124" bottom="120" />
-		</bezel>
-		<bezel name="digit1" element="a_digit">
+		</element>
+		<element name="digit1" ref="a_digit">
 			<bounds left="133" top="70" right="158" bottom="120" />
-		</bezel>
-		<bezel name="digit0" element="a_digit">
+		</element>
+		<element name="digit0" ref="a_digit">
 			<bounds left="167" top="70" right="192" bottom="120" />
-		</bezel>
+		</element>
 
 		<!-- DL1414 right -->
-		<bezel name="digit7" element="a_digit">
+		<element name="digit7" ref="a_digit">
 			<bounds left="204" top="70" right="229" bottom="120" />
-		</bezel>
-		<bezel name="digit6" element="a_digit">
+		</element>
+		<element name="digit6" ref="a_digit">
 			<bounds left="238" top="70" right="263" bottom="120" />
-		</bezel>
-		<bezel name="digit5" element="a_digit">
+		</element>
+		<element name="digit5" ref="a_digit">
 			<bounds left="272" top="70" right="297" bottom="120" />
-		</bezel>
-		<bezel name="digit4" element="a_digit">
+		</element>
+		<element name="digit4" ref="a_digit">
 			<bounds left="306" top="70" right="331" bottom="120" />
-		</bezel>
+		</element>
 
 		<!-- DL1414 remote -->
-		<bezel name="digit11" element="a_digit">
+		<element name="digit11" ref="a_digit">
 			<bounds left="65" top="140" right="90" bottom="190" />
-		</bezel>
-		<bezel name="digit10" element="a_digit">
+		</element>
+		<element name="digit10" ref="a_digit">
 			<bounds left="99" top="140" right="124" bottom="190" />
-		</bezel>
-		<bezel name="digit9" element="a_digit">
+		</element>
+		<element name="digit9" ref="a_digit">
 			<bounds left="133" top="140" right="158" bottom="190" />
-		</bezel>
-		<bezel name="digit8" element="a_digit">
+		</element>
+		<element name="digit8" ref="a_digit">
 			<bounds left="167" top="140" right="192" bottom="190" />
-		</bezel>
+		</element>
 
 		<!-- meter -->
-		<bezel name="digit14" element="b_digit">
+		<element name="digit14" ref="b_digit">
 			<bounds left="238" top="140" right="263" bottom="190" />
-		</bezel>
-		<bezel name="digit13" element="b_digit">
+		</element>
+		<element name="digit13" ref="b_digit">
 			<bounds left="272" top="140" right="297" bottom="190" />
-		</bezel>
-		<bezel name="digit12" element="b_digit">
+		</element>
+		<element name="digit12" ref="b_digit">
 			<bounds left="306" top="140" right="331" bottom="190" />
-		</bezel>
+		</element>
 	</view>
 
 </mamelayout>

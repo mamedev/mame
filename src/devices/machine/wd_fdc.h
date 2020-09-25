@@ -219,6 +219,7 @@ private:
 		TRACK_DONE,
 
 		INITIAL_RESTORE,
+		DUMMY,
 
 		// Live states
 

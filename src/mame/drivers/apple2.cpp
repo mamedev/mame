@@ -1344,7 +1344,7 @@ void apple2_state::apple2_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
@@ -1408,6 +1408,7 @@ void apple2_state::apple2_common(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple2_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void apple2_state::apple2(machine_config &config)

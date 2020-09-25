@@ -829,7 +829,7 @@ void xbox_superio_device::device_start()
 	registers[0][0x26] = 0x2e; // Configuration port address byte 0
 }
 
-READ8_MEMBER(xbox_superio_device::read)
+uint8_t xbox_superio_device::read(offs_t offset)
 {
 	if (configuration_mode == false)
 		return 0;
@@ -845,7 +845,7 @@ READ8_MEMBER(xbox_superio_device::read)
 	return 0;
 }
 
-WRITE8_MEMBER(xbox_superio_device::write)
+void xbox_superio_device::write(offs_t offset, uint8_t data)
 {
 	if (configuration_mode == false)
 	{
@@ -882,14 +882,14 @@ WRITE8_MEMBER(xbox_superio_device::write)
 	}
 }
 
-READ8_MEMBER(xbox_superio_device::read_rs232)
+uint8_t xbox_superio_device::read_rs232(offs_t offset)
 {
 	if (offset == 5)
 		return 0x20;
 	return 0;
 }
 
-WRITE8_MEMBER(xbox_superio_device::write_rs232)
+void xbox_superio_device::write_rs232(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

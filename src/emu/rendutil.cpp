@@ -2,18 +2,19 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    rendutil.c
+    rendutil.cpp
 
     Core rendering utilities.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "render.h"
 #include "rendutil.h"
+
 #include "png.h"
 
 #include "jpeglib.h"
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES

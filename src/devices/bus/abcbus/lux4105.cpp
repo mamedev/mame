@@ -41,59 +41,7 @@ Notes:
 
     TODO
 
-    - command execution gets stuck in message in phase
-
-        08A88   move.l  D7,D0               D0=00000025
-        08A8A   lsl.l   #5, D0              D0=000004A0
-        08A8C   ori.l   #$7e000, D0         D0=0007E4A0
-        08A92   movea.l D0, A0              A0=0007E4A0
-        08A94   move.b  ($2,A0), D0         D0=0007E4AF
-        08A98   btst    #$2, D0
-        08A9C   beq     $8aa4
-        08AA0   bra     $8a88
-
-        [:bus2:4105:sasi:0:s1410] state=3.1 change
-        [:bus2:4105:sasi:0:s1410] state=3.0 change
-        [:bus2:4105:sasi] ctrl .....B.CI stat 0005
-        [:bus2:4105:sasi] 0=ICB
-        [:bus2:4105:sasi] ctrl .....B.CI stat 0005
-        [:bus2:4105:sasi] 0=ICB
-        [:bus2:4105:sasi] ctrl .....B.CI stat 0000
-        [:bus2:4105:sasi] 0=ICB
-        [:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
-        [:bus2:4105:sasi] 0=QICB
-        [:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
-        [:bus2:4105:sasi] 0=QICB
-        [:bus2:4105:sasi:0:s1410] state=3.4 change
-        [:bus2:4105:sasi] ctrl ...Q.B.CI stat 0000
-        [:bus2:4105:sasi] 0=QICB
-        [:] ':3f' (089A8) STAT 25: 45
-        [:bus2:4105:sasi] ctrl ..KQ.B.CI stat 0000
-        [:bus2:4105:sasi] 0=QICB
-        [:bus2:4105:sasi] 1=K
-        [:bus2:4105:sasi:0:s1410] state=3.4 change
-        [:bus2:4105:sasi] ctrl ..K..B.CI stat 0000
-        [:bus2:4105:sasi] 0=ICB
-        [:bus2:4105:sasi] 1=K
-        [:bus2:4105:sasi] ctrl .....B.CI stat 0000
-        [:bus2:4105:sasi] 0=ICB
-        [:bus2:4105:sasi:0:s1410] state=3.3 change
-        [:bus2:4105:sasi:0:s1410] state=3.0 change
-        [:bus2:4105:sasi] ctrl .....BMCI min  0000
-        [:bus2:4105:sasi] 0=MICB
-        [:bus2:4105:sasi] ctrl .....BMCI min  0000
-        [:bus2:4105:sasi] 0=MICB
-        [:bus2:4105:sasi] ctrl .....BMCI min  0000
-        [:bus2:4105:sasi] 0=MICB
-        [:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
-        [:bus2:4105:sasi] 0=QMICB
-        [:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
-        [:bus2:4105:sasi] 0=QMICB
-        [:bus2:4105:sasi:0:s1410] state=3.4 change
-        [:bus2:4105:sasi] ctrl ...Q.BMCI min  0000
-        [:bus2:4105:sasi] 0=QMICB
-        [:] ':3f' (089D4) INP 25: 00
-        [:] ':3f' (089E8) STAT 25: 05
+    - sector length error in read check after format
 
 */
 
@@ -109,7 +57,9 @@ Notes:
 //**************************************************************************
 
 #define SASIBUS_TAG     "sasi"
-
+#define DMA_O1  BIT(m_dma, 0)
+#define DMA_O2  BIT(m_dma, 1)
+#define DMA_O3  BIT(m_dma, 2)
 
 
 //**************************************************************************
@@ -133,6 +83,7 @@ void luxor_4105_device::device_add_mconfig(machine_config &config)
 			downcast<nscsi_callback_device&>(*device).cd_callback().set(*this, FUNC(luxor_4105_device::write_sasi_cd));
 			downcast<nscsi_callback_device&>(*device).bsy_callback().set(*this, FUNC(luxor_4105_device::write_sasi_bsy));
 			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(luxor_4105_device::write_sasi_req));
+			downcast<nscsi_callback_device&>(*device).msg_callback().set(*this, FUNC(luxor_4105_device::write_sasi_msg));
 			downcast<nscsi_callback_device&>(*device).io_callback().set(*this, FUNC(luxor_4105_device::write_sasi_io));
 		});
 }
@@ -164,6 +115,11 @@ INPUT_PORTS_START( luxor_4105 )
 	PORT_DIPNAME( 0x7f, 0x25, "Card Address" ) PORT_DIPLOCATION("5E:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x25, "37" )
 	PORT_DIPSETTING(    0x2d, "45" )
+
+	PORT_START("S1")
+	PORT_CONFNAME( 0x01, 0x01, "DMA Timing" )
+	PORT_CONFSETTING(    0x00, "1043/1044" ) // a. TREN connected via delay circuit to OUT latch enable
+	PORT_CONFSETTING(    0x01, "1045/1046" ) // b. TREN connected directly to OUT latch enable
 INPUT_PORTS_END
 
 
@@ -206,7 +162,11 @@ void luxor_4105_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_cs));
+	save_item(NAME(m_data_out));
 	save_item(NAME(m_dma));
+	save_item(NAME(m_req));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_pren));
 }
 
 
@@ -217,38 +177,93 @@ void luxor_4105_device::device_start()
 void luxor_4105_device::device_reset()
 {
 	m_cs = false;
-	m_dma = 0;
 
-	m_sasi->rst_w(1);
-	m_sasi->rst_w(0);
-
-	m_slot->trrq_w(1);
+	internal_reset();
 }
 
 
-void luxor_4105_device::update_trrq_int()
+void luxor_4105_device::internal_reset()
 {
-	bool cd = !m_sasi->cd_r();
-	bool req = !m_sasi->req_r();
-	int trrq = (cd & !req) ? 0 : 1;
+	write_dma_register(0);
 
-	if (BIT(m_dma, 5))
-	{
-		m_slot->irq_w(trrq ? CLEAR_LINE : ASSERT_LINE);
-	}
-	else
-	{
-		m_slot->irq_w(CLEAR_LINE);
-	}
+	m_data_out = 0;
 
-	if (BIT(m_dma, 6))
+	m_sasi->sel_w(0);
+
+	m_sasi->rst_w(1);
+	m_sasi->rst_w(0);
+}
+
+
+void luxor_4105_device::update_dma()
+{
+	// IRQ
+	bool cd = m_sasi->cd_r();
+	bool io = m_sasi->io_r();
+	bool req = m_sasi->req_r() && !m_req;
+	m_drq = (!((!cd || !io) && !(!cd && !DMA_O2))) && req;
+	bool irq = !(DMA_O3 && m_pren) || !(DMA_O1 && m_drq);
+	m_slot->irq_w(irq);
+
+	// TRRQ
+	if (DMA_O2)
 	{
+		bool trrq = !(!cd && req);
 		m_slot->trrq_w(trrq);
 	}
 	else
 	{
 		m_slot->trrq_w(1);
 	}
+}
+
+
+void luxor_4105_device::update_ack()
+{
+	m_sasi->ack_w(m_sasi->req_r() && (m_sasi->msg_r() || m_req));
+}
+
+
+void luxor_4105_device::write_dma_register(uint8_t data)
+{
+	/*
+
+	    bit     description
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5       byte interrupt enable?
+	    6       DMA/CPU mode (1=DMA, 0=CPU)?
+	    7       error interrupt enable?
+
+	*/
+
+	m_dma = BIT(data, 5) << 2 | BIT(data, 6) << 1 | BIT(data, 7);
+
+	// PREN
+	m_pren = !DMA_O2;
+	m_slot->pren_w(m_pren);
+
+	update_dma();
+}
+
+
+void luxor_4105_device::write_sasi_data(uint8_t data)
+{
+	m_data_out = data;
+
+	if (!m_sasi->io_r())
+	{
+		m_sasi->write(data);
+	}
+
+	// clock REQ FF
+	m_req = m_sasi->req_r();
+	update_ack();
+	update_dma();
 }
 
 
@@ -263,7 +278,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
 
 WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 {
-	update_trrq_int();
+	update_dma();
 }
 
 
@@ -271,10 +286,18 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_req )
 {
 	if (!state)
 	{
-		m_sasi->ack_w(0);
+		// reset REQ FF
+		m_req = 0;
 	}
 
-	update_trrq_int();
+	update_ack();
+	update_dma();
+}
+
+
+WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_msg )
+{
+	update_ack();
 }
 
 
@@ -284,6 +307,12 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_io )
 	{
 		m_sasi->write(0);
 	}
+	else
+	{
+		m_sasi->write(m_data_out);
+	}
+
+	update_dma();
 }
 
 
@@ -321,22 +350,25 @@ uint8_t luxor_4105_device::abcbus_stat()
 
 		    bit     description
 
-		    0       ?
-		    1       ?
-		    2       ?
-		    3       ?
+		    0       REQ
+		    1       C/D
+		    2       BSY
+		    3       I/O
 		    4       0
-		    5
-		    6       ? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
-		    7
+		    5       DMA !O3
+		    6       PREN
+		    7       DMA request
 
 		*/
 
-		data = m_sasi->req_r();
+		data = m_sasi->req_r() && !m_req;
 		data |= !m_sasi->cd_r() << 1;
 		data |= m_sasi->bsy_r() << 2;
 		data |= !m_sasi->io_r() << 3;
-		data |= !m_sasi->msg_r() << 6;
+
+		data |= !DMA_O3 << 5;
+		data |= !m_pren << 6;
+		data |= !m_drq << 7;
 	}
 
 	return data;
@@ -351,19 +383,19 @@ uint8_t luxor_4105_device::abcbus_inp()
 {
 	uint8_t data = 0xff;
 
-	if (m_cs)
+	if (m_sasi->bsy_r())
 	{
-		if (!m_sasi->bsy_r())
-		{
-			data = m_1e->read();
-		}
-		else
-		{
-			data = m_sasi->read();
-
-			m_sasi->ack_w(1);
-		}
+		data = m_sasi->read();
 	}
+	else
+	{
+		data = m_1e->read();
+	}
+
+	// clock REQ FF
+	m_req = m_sasi->req_r();
+	update_ack();
+	update_dma();
 
 	return data;
 }
@@ -377,9 +409,7 @@ void luxor_4105_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
-		m_sasi->write(data);
-
-		m_sasi->ack_w(1);
+		write_sasi_data(data);
 	}
 }
 
@@ -405,12 +435,7 @@ void luxor_4105_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
-		m_dma = 0;
-
-		m_sasi->sel_w(0);
-
-		m_sasi->rst_w(1);
-		m_sasi->rst_w(0);
+		internal_reset();
 	}
 }
 
@@ -423,23 +448,54 @@ void luxor_4105_device::abcbus_c4(uint8_t data)
 {
 	if (m_cs)
 	{
-		/*
+		write_dma_register(data);
+	}
+}
 
-		    bit     description
 
-		    0
-		    1
-		    2
-		    3
-		    4
-		    5       byte interrupt enable?
-		    6       DMA/CPU mode (1=DMA, 0=CPU)?
-		    7       error interrupt enable?
+//-------------------------------------------------
+//  abcbus_tren -
+//-------------------------------------------------
 
-		*/
+uint8_t luxor_4105_device::abcbus_tren()
+{
+	uint8_t data = 0xff;
 
-		m_dma = data;
+	if (m_sasi->bsy_r())
+	{
+		data = m_sasi->read();
+	}
 
-		update_trrq_int();
+	// clock REQ FF
+	m_req = m_sasi->req_r();
+	update_ack();
+	update_dma();
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  abcbus_tren -
+//-------------------------------------------------
+
+void luxor_4105_device::abcbus_tren(uint8_t data)
+{
+	write_sasi_data(data);
+}
+
+
+//-------------------------------------------------
+//  abcbus_prac -
+//-------------------------------------------------
+
+void luxor_4105_device::abcbus_prac(int state)
+{
+	if ((state && DMA_O2) && !m_slot->trrq_r())
+	{
+		// set REQ FF
+		m_req = 1;
+		update_ack();
+		update_dma();
 	}
 }

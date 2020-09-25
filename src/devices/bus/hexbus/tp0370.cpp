@@ -153,7 +153,7 @@ ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t 
 /*
     Reading from host
 */
-READ8_MEMBER( ibc_device::read )
+uint8_t ibc_device::read(offs_t offset)
 {
 	uint8_t status = 0;
 	switch (offset)
@@ -197,7 +197,7 @@ READ8_MEMBER( ibc_device::read )
 /*
     Writing from host
 */
-WRITE8_MEMBER( ibc_device::write )
+void ibc_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

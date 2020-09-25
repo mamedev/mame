@@ -601,7 +601,7 @@ WRITE_LINE_MEMBER( abc77_device::prog_w )
 //  j3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::j3_w )
+void abc77_device::j3_w(uint8_t data)
 {
 	m_j3 = data;
 }

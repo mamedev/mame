@@ -135,8 +135,7 @@
 
 void tiamc1_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	tiamc1_bankswitch_w(space, 0, 0);
+	tiamc1_bankswitch_w(0);
 }
 
 void tiamc1_state::tiamc1_control_w(uint8_t data)

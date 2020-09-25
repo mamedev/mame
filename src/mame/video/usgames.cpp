@@ -26,7 +26,7 @@ void usgames_state::video_start()
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
-WRITE8_MEMBER(usgames_state::charram_w)
+void usgames_state::charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset/8);

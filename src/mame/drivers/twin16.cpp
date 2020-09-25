@@ -69,7 +69,7 @@ int twin16_state::spriteram_process_enable()
 
 /* Read/Write Handlers */
 
-WRITE16_MEMBER(twin16_state::CPUA_register_w)
+void twin16_state::CPUA_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -102,7 +102,7 @@ WRITE16_MEMBER(twin16_state::CPUA_register_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::CPUB_register_w)
+void twin16_state::CPUB_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -123,7 +123,7 @@ WRITE16_MEMBER(twin16_state::CPUB_register_w)
 	}
 }
 
-WRITE16_MEMBER(fround_state::fround_CPU_register_w)
+void fround_state::fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -143,17 +143,17 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 	}
 }
 
-READ8_MEMBER(twin16_state::upd_busy_r)
+uint8_t twin16_state::upd_busy_r()
 {
 	return m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(twin16_state::upd_reset_w)
+void twin16_state::upd_reset_w(uint8_t data)
 {
 	m_upd7759->reset_w(data & 2);
 }
 
-WRITE8_MEMBER(twin16_state::upd_start_w)
+void twin16_state::upd_start_w(uint8_t data)
 {
 	m_upd7759->start_w(data & 1);
 }
@@ -1243,7 +1243,7 @@ void fround_state::init_fround()
 	m_is_fround = true;
 }
 
-WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
+void cuebrickj_state::nvram_bank_w(uint8_t data)
 {
 	membank("nvrambank")->set_entry(data);
 }
@@ -1255,7 +1255,7 @@ void cuebrickj_state::init_cuebrickj()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
-	space.install_write_handler( 0x0b0400, 0x0b0401, write8_delegate(*this, FUNC(cuebrickj_state::nvram_bank_w)), 0xff00);
+	space.install_write_handler( 0x0b0400, 0x0b0401, write8smo_delegate(*this, FUNC(cuebrickj_state::nvram_bank_w)), 0xff00);
 
 	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
 

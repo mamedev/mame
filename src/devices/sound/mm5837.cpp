@@ -13,21 +13,15 @@
 
 
 //**************************************************************************
-//  CONSTEXPR DEFINITIONS
-//**************************************************************************
-
-constexpr int mm5837_device::m_frequency[];
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(MM5837, mm5837_device, "mm5837", "MM5837 Digital Noise Source")
+DEFINE_DEVICE_TYPE(MM5837_STREAM, mm5837_stream_device, "mm5837_stream", "MM5837 Digital Noise Stream")
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  MM5837 DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
@@ -37,11 +31,11 @@ DEFINE_DEVICE_TYPE(MM5837, mm5837_device, "mm5837", "MM5837 Digital Noise Source
 mm5837_device::mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MM5837, tag, owner, clock),
 	m_output_cb(*this),
-	m_vdd(0),
 	m_timer(nullptr),
-	m_shift(0)
+	m_vdd(-12)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -56,8 +50,9 @@ void mm5837_device::device_start()
 	m_timer = timer_alloc(0);
 
 	// register for save states
-	save_item(NAME(m_shift));
+	save_item(NAME(m_source.m_shift));
 }
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -65,14 +60,14 @@ void mm5837_device::device_start()
 
 void mm5837_device::device_reset()
 {
-	// initialize with something
-	m_shift = 123456;
+	m_source.reset();
 
 	if (m_vdd < 16)
-		m_timer->adjust(attotime::zero, 0, attotime::from_hz(m_frequency[m_vdd]));
+		m_timer->adjust(attotime::zero, 0, attotime::from_hz(mm5837_source::frequency(m_vdd)));
 	else
 		throw emu_fatalerror("%s: Invalid voltage: %d\n", tag(), m_vdd);
 }
+
 
 //-------------------------------------------------
 //  device_timer - handle timer callbacks
@@ -80,12 +75,45 @@ void mm5837_device::device_reset()
 
 void mm5837_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int tap_14 = BIT(m_shift, 13);
-	int tap_17 = BIT(m_shift, 16);
-	int zero = (m_shift == 0) ? 1 : 0;
+	m_output_cb(m_source.clock());
+}
 
-	m_shift <<= 1;
-	m_shift |= tap_14 ^ tap_17 ^ zero;
 
-	m_output_cb(BIT(m_shift, 16));
+
+//**************************************************************************
+//  MM5837 STREAM DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  mm5837_stream_device - constructor
+//-------------------------------------------------
+
+mm5837_stream_device::mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MM5837_STREAM, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_vdd(-12)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mm5837_stream_device::device_start()
+{
+	m_stream = stream_alloc(0, 1, mm5837_source::frequency(m_vdd));
+	save_item(NAME(m_source.m_shift));
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - fill the sound buffer
+//-------------------------------------------------
+
+void mm5837_stream_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+		outputs[0].put(sampindex, m_source.clock() ? 1.0 : 0.0);
 }

@@ -11,20 +11,22 @@
 #include "flopimg.h"
 #include "imageutl.h"
 
-#include "emucore.h" // emu_fatalerror
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "pool.h"
 
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
+#include <cassert>
 #include <cctype>
 #include <climits>
-#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <stdexcept>
 
 #define TRACK_LOADED        0x01
 #define TRACK_DIRTY         0x02
+
+using util::BIT;
 
 
 struct floppy_image_legacy
@@ -1362,7 +1364,7 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 		sec++;
 		// This line prevents lock-ups of the emulator when the interleave is not appropriate
 		if (sec > total_sectors)
-			throw emu_fatalerror("Format error: interleave %d not appropriate for %d sectors per track\n", interleave, total_sectors);
+			throw std::invalid_argument(util::string_format("Format error: interleave %d not appropriate for %d sectors per track", interleave, total_sectors));
 	}
 	// use skew param
 	sec -= track_head * skew;
@@ -1699,7 +1701,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 	}
 
 	if(int(buffer.size()) != track_size)
-		throw emu_fatalerror("Wrong track size in generate_track, expected %d, got %d\n", track_size, int(buffer.size()));
+		throw std::invalid_argument(util::string_format("Wrong track size in generate_track, expected %d, got %d", track_size, buffer.size()));
 
 	fixup_crcs(buffer, crcs);
 
@@ -1781,7 +1783,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 			break;
 
 		case MG_W:
-			throw emu_fatalerror("Weak bits not yet handled, track %d head %d\n", track, head);
+			throw std::runtime_error(util::string_format("Weak bits not yet handled, track %d head %d", track, head));
 
 		case MG_0:
 		case floppy_image::MG_N:
@@ -1791,7 +1793,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 		case floppy_image::MG_A:
 		case floppy_image::MG_B:
 		default:
-			throw emu_fatalerror("Incorrect MG information in generate_track_from_levels, track %d head %d\n", track, head);
+			throw std::invalid_argument(util::string_format("Incorrect MG information in generate_track_from_levels, track %d head %d", track, head));
 		}
 	}
 
@@ -2711,7 +2713,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 	unsigned int etpos = track_data.size() + (sector_count*(6+5+2+gap_2+6+1+2) + total_size)*16;
 
 	if(etpos > cell_count)
-		throw emu_fatalerror("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
+		throw std::invalid_argument(util::string_format("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos));
 
 	if(etpos + gap_3*16*(sector_count-1) > cell_count)
 		gap_3 = (cell_count - etpos) / 16 / (sector_count-1);
@@ -2778,7 +2780,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 	int etpos = int(track_data.size()) + (sector_count*(12+3+5+2+gap_2+12+3+1+2) + total_size)*16;
 
 	if(etpos > cell_count)
-		throw emu_fatalerror("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
+		throw std::invalid_argument(util::string_format("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos));
 
 	if(etpos + gap_3*16*(sector_count-1) > cell_count)
 		gap_3 = (cell_count - etpos) / 16 / (sector_count-1);

@@ -41,15 +41,15 @@ specimx_sound_device::specimx_sound_device(const machine_config &mconfig, const 
 void specimx_sound_device::device_start()
 {
 	m_specimx_input[0] = m_specimx_input[1] = m_specimx_input[2] = 0;
-	m_mixer_channel = stream_alloc(0, 1, machine().sample_rate());
+	m_mixer_channel = stream_alloc_legacy(0, 1, machine().sample_rate());
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  sound_stream_update_legacy - handle a stream update
 //-------------------------------------------------
 
-void specimx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void specimx_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int16_t channel_0_signal;
 	int16_t channel_1_signal;

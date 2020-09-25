@@ -473,8 +473,8 @@ void hp9845_base_state::device_reset()
 
 	// Then, set r/w handlers of all installed I/O cards
 	int sc;
-	read16_delegate rhandler(*this);
-	write16_delegate whandler(*this);
+	read16m_delegate rhandler(*this);
+	write16m_delegate whandler(*this);
 	for (unsigned i = 0; 4 > i; ++i) {
 		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
 			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
@@ -2452,7 +2452,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			// process data on R4 or R6
 			if (act_trig) {
 				switch (m_gv_cmd) {
-				case 1:	// read words command
+				case 1: // read words command
 					break;
 				case 0x8:   // load X I/O address
 					m_gv_word_x_position = ~m_gv_data_w & 0x3f;     // 0..34
@@ -2494,7 +2494,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 				default:
 					logerror("unknown 98770A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w);
 				}
-				if (m_gv_cmd == 1) {	// Read words
+				if (m_gv_cmd == 1) {    // Read words
 					m_gv_fsm_state = GV_STAT_WAIT_MEM_0;
 				} else if (m_gv_cmd == 0xd) {
 					m_gv_fsm_state = GV_STAT_WAIT_DS_2;     // -> get second data word

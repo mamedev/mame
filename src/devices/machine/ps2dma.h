@@ -49,13 +49,13 @@ public:
 		SPR_IN
 	};
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_READ32_MEMBER(channel_r);
-	DECLARE_WRITE32_MEMBER(channel_w);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t channel_r(offs_t offset, uint32_t mem_mask = ~0);
+	void channel_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(disable_mask_r);
-	DECLARE_WRITE32_MEMBER(disable_mask_w);
+	uint32_t disable_mask_r(offs_t offset, uint32_t mem_mask = ~0);
+	void disable_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	virtual void device_start() override;

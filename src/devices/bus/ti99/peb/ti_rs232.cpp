@@ -238,7 +238,7 @@ void ti_pio_attached_device::call_unload()
 /*
     CRU read
 */
-READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
+void ti_rs232_pio_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -374,7 +374,7 @@ WRITE_LINE_MEMBER(ti_rs232_pio_device::led_w)
 /*
     Memory read
 */
-READ8Z_MEMBER( ti_rs232_pio_device::readz )
+void ti_rs232_pio_device::readz(offs_t offset, uint8_t *value)
 {
 	if (m_senila==ASSERT_LINE)
 	{

@@ -9518,7 +9518,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 				<rom name="musicmaestro(gtm).uef" size="9811" crc="47d92a23" sha1="bddf0f5921628a46d85e3e77a91b1a17f8d46fa7" />
 			</dataarea>
 		</part>
-	<part name="cass2" interface="bbc_cass">
+		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Music Instructions"/>
 			<dataarea name="cass" size="10762">
 				<rom name="musicmaestro-instructions(gtm).uef" size="10762" crc="288b3e9b" sha1="ab7782e69a1fb77bf9b6cf4d52ae4c4da2dc97e0" />
@@ -12791,7 +12791,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 				<rom name="soccersupremo-eurocups(qualsoft).uef" size="7793" crc="182792a9" sha1="15ad8c55cd09709f1c323b2f6f437044e8be4ec0" />
 			</dataarea>
 		</part>
-	<part name="cass3" interface="bbc_cass">
+		<part name="cass3" interface="bbc_cass">
 			<feature name="part_id" value="Data"/>
 			<dataarea name="cass" size="2857">
 				<rom name="soccersupremo-data(qualsoft).uef" size="2857" crc="afe54b24" sha1="e7c29f3a71383d721413fbcd90625cf7181d088e" />

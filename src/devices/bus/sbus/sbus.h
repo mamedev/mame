@@ -46,9 +46,6 @@ protected:
 	// configuration
 	required_device<sbus_device> m_sbus;
 	int m_slot;
-
-	DECLARE_READ32_MEMBER(timeout_r);
-	DECLARE_WRITE32_MEMBER(timeout_w);
 };
 
 DECLARE_DEVICE_TYPE(SBUS_SLOT, sbus_slot_device)
@@ -92,8 +89,8 @@ public:
 		m_space->install_device(addrstart, addrend, device, map, unitmask);
 	}
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
 	sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -117,8 +114,8 @@ private:
 	void slot2_timeout_map(address_map &map);
 	void slot3_timeout_map(address_map &map);
 
-	template <unsigned Slot> DECLARE_READ32_MEMBER(slot_timeout_r);
-	template <unsigned Slot> DECLARE_WRITE32_MEMBER(slot_timeout_w);
+	template <unsigned Slot> uint32_t slot_timeout_r();
+	template <unsigned Slot> void slot_timeout_w(uint32_t data);
 };
 
 DECLARE_DEVICE_TYPE(SBUS, sbus_device)

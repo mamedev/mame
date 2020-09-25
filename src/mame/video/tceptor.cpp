@@ -141,7 +141,7 @@ void tceptor_state::tile_mark_dirty(int offset)
 }
 
 
-WRITE8_MEMBER(tceptor_state::tceptor_tile_ram_w)
+void tceptor_state::tceptor_tile_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_tile_ram[offset] != data)
 	{
@@ -150,7 +150,7 @@ WRITE8_MEMBER(tceptor_state::tceptor_tile_ram_w)
 	}
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor_tile_attr_w)
+void tceptor_state::tceptor_tile_attr_w(offs_t offset, uint8_t data)
 {
 	if (m_tile_attr[offset] != data)
 	{
@@ -180,14 +180,14 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 	tileinfo.set(m_bg, code, color, 0);
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
+void tceptor_state::tceptor_bg_ram_w(offs_t offset, uint8_t data)
 {
 	m_bg_ram[offset] = data;
 
 	m_bg_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
+void tceptor_state::tceptor_bg_scroll_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -549,7 +549,7 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 	}
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor2_shutter_w)
+void tceptor_state::tceptor2_shutter_w(uint8_t data)
 {
 	// 3D scope shutter control
 	m_shutter = BIT(data, 0);

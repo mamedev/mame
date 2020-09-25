@@ -6,6 +6,12 @@
 
     driver by Jarek Burczynski
 
+	TODO:
+	- complete MCU simulation, several gameplay elements not properly right;
+	- sprites are probably banked differently (no way to be sure until MCU dump is available)
+	- TA7630 emulation needs filter support (characteristics depend on the frequency)
+	- TA7630 volume table is hand tuned to match the sample, but still slightly off.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -16,14 +22,6 @@
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-/*
-TO DO:
-  - sprites are probably banked differently (no way to be sure until MCU dump is available)
-  - TA7630 emulation needs filter support (characteristics depend on the frequency)
-  - TA7630 volume table is hand tuned to match the sample, but still slightly off.
-*/
 
 
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)

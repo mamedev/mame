@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    machine.c
+    machine.cpp
 
     Controls execution of the core MAME system.
 
@@ -276,7 +276,7 @@ void running_machine::start()
 		m_video->begin_recording(filename, movie_recording::format::MNG);
 
 	filename = options().avi_write();
-	if (filename[0] != 0)
+	if (filename[0] != 0 && !m_video->is_recording())
 		m_video->begin_recording(filename, movie_recording::format::AVI);
 
 	// if we're coming in with a savegame request, process it now
@@ -1339,12 +1339,12 @@ void system_time::full_time::set(struct tm &t)
 //  DUMMY ADDRESS SPACE
 //**************************************************************************
 
-READ8_MEMBER(dummy_space_device::read)
+u8 dummy_space_device::read(offs_t offset)
 {
 	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
 }
 
-WRITE8_MEMBER(dummy_space_device::write)
+void dummy_space_device::write(offs_t offset, u8 data)
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }

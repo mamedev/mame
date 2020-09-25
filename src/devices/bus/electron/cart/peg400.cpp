@@ -22,14 +22,14 @@ DEFINE_DEVICE_TYPE(ELECTRON_PEG400, electron_peg400_device, "electron_peg400", "
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( peg400 )
+//  FLOPPY_FORMATS( peg400 )
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER(electron_peg400_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 void peg400_floppies(device_slot_interface &device)
 {
@@ -85,12 +85,9 @@ uint8_t electron_peg400_device::read(offs_t offset, int infc, int infd, int romq
 
 	if (infc)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0xfc)
 		{
 		case 0xc4:
-		case 0xc5:
-		case 0xc6:
-		case 0xc7:
 			data = m_fdc->read(offset & 0x03);
 			break;
 		}
@@ -126,15 +123,12 @@ void electron_peg400_device::write(offs_t offset, uint8_t data, int infc, int in
 {
 	if (infc)
 	{
-		switch (offset & 0xff)
+		switch (offset & 0xfc)
 		{
 		case 0xc0:
 			wd1770_control_w(data);
 			break;
 		case 0xc4:
-		case 0xc5:
-		case 0xc6:
-		case 0xc7:
 			m_fdc->write(offset & 0x03, data);
 			break;
 		}

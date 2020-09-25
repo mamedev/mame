@@ -17,32 +17,32 @@ license:CC0
 
 	<view name="Default Layout">
 		<!-- Black background -->
-		<bezel element="background">
+		<element ref="background">
 			<bounds left="1" top="95" right="501" bottom="195" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds left="11" top="105" right="59" bottom="185" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds left="59" top="105" right="107" bottom="185" />
-		</bezel>
-		<bezel name="digit2" element="digit">
+		</element>
+		<element name="digit2" ref="digit">
 			<bounds left="107" top="105" right="155" bottom="185" />
-		</bezel>
-		<bezel name="digit3" element="digit">
+		</element>
+		<element name="digit3" ref="digit">
 			<bounds left="155" top="105" right="203" bottom="185" />
-		</bezel>
-		<bezel name="digit4" element="digit">
+		</element>
+		<element name="digit4" ref="digit">
 			<bounds left="299" top="105" right="347" bottom="185" />
-		</bezel>
-		<bezel name="digit5" element="digit">
+		</element>
+		<element name="digit5" ref="digit">
 			<bounds left="347" top="105" right="395" bottom="185" />
-		</bezel>
-		<bezel name="digit6" element="digit">
+		</element>
+		<element name="digit6" ref="digit">
 			<bounds left="395" top="105" right="443" bottom="185" />
-		</bezel>
-		<bezel name="digit7" element="digit">
+		</element>
+		<element name="digit7" ref="digit">
 			<bounds left="443" top="105" right="491" bottom="185" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

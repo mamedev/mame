@@ -42,14 +42,14 @@ private:
 	tilemap_t *m_fg_tilemap;
 
 	uint8_t m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(solomon_sh_command_w);
-	DECLARE_READ8_MEMBER(solomon_0xe603_r);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(solomon_videoram_w);
-	DECLARE_WRITE8_MEMBER(solomon_colorram_w);
-	DECLARE_WRITE8_MEMBER(solomon_videoram2_w);
-	DECLARE_WRITE8_MEMBER(solomon_colorram2_w);
-	DECLARE_WRITE8_MEMBER(solomon_flipscreen_w);
+	void solomon_sh_command_w(uint8_t data);
+	uint8_t solomon_0xe603_r();
+	void nmi_mask_w(uint8_t data);
+	void solomon_videoram_w(offs_t offset, uint8_t data);
+	void solomon_colorram_w(offs_t offset, uint8_t data);
+	void solomon_videoram2_w(offs_t offset, uint8_t data);
+	void solomon_colorram2_w(offs_t offset, uint8_t data);
+	void solomon_flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_solomon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

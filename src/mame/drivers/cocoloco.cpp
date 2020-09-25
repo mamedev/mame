@@ -503,7 +503,7 @@ void cocoloco_state::cocoloco(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5, 0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5 / 32768.0, 0);
 }
 
 

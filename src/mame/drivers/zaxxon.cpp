@@ -255,7 +255,7 @@
 
 #include "emu.h"
 #include "includes/zaxxon.h"
-#include "audio/segasnd.h"
+#include "audio/segausb.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

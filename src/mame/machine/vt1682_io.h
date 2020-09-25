@@ -24,14 +24,14 @@ public:
 	auto portd_in() { return m_portd_in.bind(); }
 
 
-	DECLARE_READ8_MEMBER(vt1682_210e_io_ab_r);
-	DECLARE_READ8_MEMBER(vt1682_210f_io_cd_r);
+	uint8_t vt1682_210e_io_ab_r();
+	uint8_t vt1682_210f_io_cd_r();
 
-	DECLARE_WRITE8_MEMBER(vt1682_210e_io_ab_w);
-	DECLARE_WRITE8_MEMBER(vt1682_210f_io_cd_w);
+	void vt1682_210e_io_ab_w(uint8_t data);
+	void vt1682_210f_io_cd_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(vt1682_210d_ioconfig_r);
-	DECLARE_WRITE8_MEMBER(vt1682_210d_ioconfig_w);
+	uint8_t vt1682_210d_ioconfig_r();
+	void vt1682_210d_ioconfig_w(uint8_t data);
 
 
 protected:

@@ -1656,7 +1656,7 @@ void pps4_2_device::device_reset()
 	m_DIO = 15;     // DIO clamp
 }
 
-READ16_MEMBER(pps4_device::address_bus_r)
+u16 pps4_device::address_bus_r(address_space &space)
 {
 	int id = space.spacenum();
 	if (id == AS_IO || id == AS_DATA)

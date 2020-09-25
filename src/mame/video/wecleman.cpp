@@ -153,8 +153,8 @@ void wecleman_state::sortsprite(int *idx_array, int *key_array, int size)
 }
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
-template<class _BitmapClass>
-void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite)
+template<class BitmapClass>
+void wecleman_state::do_blit_zoom32(BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -241,7 +241,7 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	{
 		uint8_t *row_base = sprite.pen_data + (src_f0y>>PRECISION_Y) * sprite.line_offset;
 		src_fpx = src_f0x;
-		typename _BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
+		typename BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
 
 		if (bitmap.format() == BITMAP_FORMAT_RGB32) // Wec Le Mans
 		{
@@ -313,8 +313,8 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	}
 }
 
-template<class _BitmapClass>
-void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+void wecleman_state::sprite_draw(BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -406,7 +406,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_txt_tile_info)
 	tileinfo.set(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
-WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
+void wecleman_state::wecleman_txtram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_data = m_txtram[offset];
 	uint16_t new_data = COMBINE_DATA(&m_txtram[offset]);
@@ -472,7 +472,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_fg_tile_info)
 ------------------------------------------------------------------------*/
 
 /* Pages that compose both the background and the foreground */
-WRITE16_MEMBER(wecleman_state::wecleman_pageram_w)
+void wecleman_state::wecleman_pageram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pageram[offset]);
 
@@ -810,7 +810,7 @@ void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 
 // new video and palette code
 // TODO: remove me.
-WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
+void wecleman_state::wecleman_videostatus_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_videostatus);
 
@@ -830,7 +830,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
 	}
 }
 
-WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
+void wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword, r, g, b;
 
@@ -845,7 +845,7 @@ WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
 	m_palette->set_pen_color(offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
-WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
+void wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 

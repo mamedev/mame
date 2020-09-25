@@ -31,6 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
+		, m_bank1(*this, "bank1")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		//, m_floppy1(*this, "fdc:1")
@@ -54,12 +55,12 @@ private:
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	bool m_rom_in_map;
 	bool m_dma_dir;
 	u16 m_dma_adr;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
+	required_memory_bank    m_bank1;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	//required_device<floppy_connector> m_floppy1;
@@ -67,8 +68,8 @@ private:
 
 void dps1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("mainram").lr8(NAME([this] (offs_t offset) { if(m_rom_in_map) return m_rom[offset]; else return m_ram[offset]; }));
-	map(0x0400, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x03ff).bankr("bank1");
 }
 
 void dps1_state::io_map(address_map &map)
@@ -113,7 +114,7 @@ void dps1_state::portb4_w(u8 data)
 // enable eprom
 void dps1_state::portb6_w(u8 data)
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 }
 
 // set A16-23
@@ -136,7 +137,7 @@ void dps1_state::portbc_w(u8 data)
 // disable eprom
 void dps1_state::portbe_w(u8 data)
 {
-	m_rom_in_map = false;
+	m_bank1->set_entry(0);
 }
 
 // read 8 front-panel switches
@@ -173,14 +174,15 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 
 void dps1_state::machine_start()
 {
-	save_item(NAME(m_rom_in_map));
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
 	save_item(NAME(m_dma_dir));
 	save_item(NAME(m_dma_adr));
 }
 
 void dps1_state::machine_reset()
 {
-	m_rom_in_map = true;
+	m_bank1->set_entry(1);
 	// set fdc for 8 inch floppies
 	m_fdc->set_rate(500000);
 	// turn on the motor

@@ -158,6 +158,7 @@ void n64_periphs::device_reset()
 	vi_vburst = 0;
 	vi_xscale = 0;
 	vi_yscale = 0;
+	field = 0;
 
 	ai_timer->adjust(attotime::never);
 	memset(ai_fifo, 0, sizeof(ai_fifo));
@@ -1652,7 +1653,7 @@ uint32_t n64_periphs::ri_reg_r(offs_t offset, uint32_t mem_mask)
 		time recommended for letting the SI devices settle after startup.
 		This allows the initialization routines for the SI to see that a
 		proper amount of time has passed since system startup. */
-		m_vr4300->burn_cycles(93750000/2);
+		m_vr4300->adjust_icount(-93750000/2);
 	}
 
 	if(offset > 0x1c/4)

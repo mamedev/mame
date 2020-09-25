@@ -44,11 +44,8 @@
 void eprom_state::video_int_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-}
-
-void eprom_state::video_int_ack_extra_w(uint16_t data)
-{
-	m_extra->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+	if (m_extra.found())
+		m_extra->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 void eprom_state::machine_start()
@@ -198,7 +195,7 @@ void eprom_state::extra_map(address_map &map)
 	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
-	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_extra_w));
+	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
 	map(0x360011, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_base_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_base_device::main_command_w));

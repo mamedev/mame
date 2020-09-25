@@ -117,7 +117,7 @@ uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 	return 0;
 }
 
-READ8_MEMBER(speedatk_state::key_matrix_r)
+uint8_t speedatk_state::key_matrix_r()
 {
 	if(m_coin_impulse > 0)
 	{
@@ -151,13 +151,13 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	return iox_key_matrix_calc((m_mux_data == 2) ? 0 : 2);
 }
 
-WRITE8_MEMBER(speedatk_state::key_matrix_w)
+void speedatk_state::key_matrix_w(uint8_t data)
 {
 	m_mux_data = data;
 }
 
 /* Key matrix status,used for coin settings and I don't know what else... */
-READ8_MEMBER(speedatk_state::key_matrix_status_r)
+uint8_t speedatk_state::key_matrix_status_r()
 {
 	/* bit 0: busy flag,active low */
 	return (m_km_status & 0xfe) | 1;
@@ -174,7 +174,7 @@ My guess is that the other commands configs the key matrix, it probably needs so
 8x coinage setting command
 a1
 */
-WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
+void speedatk_state::key_matrix_status_w(uint8_t data)
 {
 	m_km_status = data;
 	if((m_km_status & 0xf0) == 0x80) //coinage setting command

@@ -103,23 +103,23 @@ void xerox820ii_state::bankswitch(int bank)
 	}
 }
 
-READ8_MEMBER( xerox820_state::fdc_r )
+uint8_t xerox820_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( xerox820_state::fdc_w )
+void xerox820_state::fdc_w(offs_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER( xerox820_state::scroll_w )
+void xerox820_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll = (offset >> 8) & 0x1f;
 }
 
 #ifdef UNUSED_CODE
-WRITE8_MEMBER( xerox820_state::x120_system_w )
+void xerox820_state::x120_system_w(uint8_t data)
 {
 	/*
 
@@ -138,27 +138,27 @@ WRITE8_MEMBER( xerox820_state::x120_system_w )
 }
 #endif
 
-WRITE8_MEMBER( xerox820ii_state::bell_w )
+void xerox820ii_state::bell_w(offs_t offset, uint8_t data)
 {
 	m_speaker->level_w(offset);
 }
 
-WRITE8_MEMBER( xerox820ii_state::slden_w )
+void xerox820ii_state::slden_w(offs_t offset, uint8_t data)
 {
 	m_fdc->dden_w(offset);
 }
 
-WRITE8_MEMBER( xerox820ii_state::chrom_w )
+void xerox820ii_state::chrom_w(offs_t offset, uint8_t data)
 {
 	m_chrom = offset;
 }
 
-WRITE8_MEMBER( xerox820ii_state::lowlite_w )
+void xerox820ii_state::lowlite_w(uint8_t data)
 {
 	m_lowlite = data;
 }
 
-WRITE8_MEMBER( xerox820ii_state::sync_w )
+void xerox820ii_state::sync_w(offs_t offset, uint8_t data)
 {
 	if (offset)
 	{

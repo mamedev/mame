@@ -17,13 +17,13 @@
  for writes to Video Ram
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::fg0_videoram_w)
+void wwfsstar_state::fg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg0_videoram[offset]);
 	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(wwfsstar_state::bg0_videoram_w)
+void wwfsstar_state::bg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg0_videoram[offset]);
 	m_bg0_tilemap->mark_tile_dirty(offset/2);

@@ -233,11 +233,13 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
 	m_console.register_command("saveo",     CMDFLAG_NONE, AS_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2));
+	m_console.register_command("saver",     CMDFLAG_NONE, 0, 4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1, _2));
 
 	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
 	m_console.register_command("loado",     CMDFLAG_NONE, AS_OPCODES, 2, 4, std::bind(&debugger_commands::execute_load, this, _1, _2));
+	m_console.register_command("loadr",     CMDFLAG_NONE, 0, 4, 4, std::bind(&debugger_commands::execute_loadregion, this, _1, _2));
 
 	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
 	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2));
@@ -269,6 +271,11 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("findi",     CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
 	m_console.register_command("fo",        CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
 	m_console.register_command("findo",     CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2));
+
+	m_console.register_command("fill",      CMDFLAG_KEEP_QUOTES, AS_PROGRAM, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
+	m_console.register_command("filld",     CMDFLAG_KEEP_QUOTES, AS_DATA, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
+	m_console.register_command("filli",     CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
+	m_console.register_command("fillo",     CMDFLAG_KEEP_QUOTES, AS_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_fill, this, _1, _2));
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1, _2));
 
@@ -525,6 +532,25 @@ bool debugger_commands::validate_cpu_space_parameter(const char *param, int spac
 		return false;
 	}
 	result = &cpu->memory().space(spacenum);
+	return true;
+}
+
+
+/*-------------------------------------------------
+    validate_memory_region_parameter - validates
+    a parameter as a memory region name and
+    retrieves the given memory region
+-------------------------------------------------*/
+
+bool debugger_commands::validate_memory_region_parameter(const std::string &param, memory_region *&result)
+{
+	auto &regions = m_machine.memory().regions();
+	auto iter = regions.find(param);
+	if(iter == regions.end()) {
+		m_console.printf("No matching memory region found for '%s'\n", param);
+		return false;
+	}
+	result = iter->second.get();
 	return true;
 }
 
@@ -1949,6 +1975,45 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 
 
 /*-------------------------------------------------
+    execute_saveregion - execute the save command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_saveregion(int ref, const std::vector<std::string> &params)
+{
+	u64 offset, length;
+	memory_region *region;
+
+	/* validate parameters */
+	if (!validate_number_parameter(params[1], offset))
+		return;
+	if (!validate_number_parameter(params[2], length))
+		return;
+	if (!validate_memory_region_parameter(params[3], region))
+		return;
+
+	if (offset >= region->bytes())
+	{
+		m_console.printf("Invalid offset\n");
+		return;
+	}
+	if ((length <= 0) || ((length + offset) >= region->bytes()))
+		length = region->bytes() - offset;
+
+	/* open the file */
+	FILE *f = fopen(params[0].c_str(), "wb");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		return;
+	}
+	fwrite(region->base() + offset, 1, length, f);
+
+	fclose(f);
+	m_console.printf("Data saved successfully\n");
+}
+
+
+/*-------------------------------------------------
     execute_load - execute the load command
 -------------------------------------------------*/
 
@@ -2057,6 +2122,54 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 
 
 /*-------------------------------------------------
+    execute_loadregion - execute the load command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_loadregion(int ref, const std::vector<std::string> &params)
+{
+	u64 offset, length;
+	memory_region *region;
+
+	/* validate parameters */
+	if (!validate_number_parameter(params[1], offset))
+		return;
+	if (!validate_number_parameter(params[2], length))
+		return;
+	if (!validate_memory_region_parameter(params[3], region))
+		return;
+
+	if (offset >= region->bytes())
+	{
+		m_console.printf("Invalid offset\n");
+		return;
+	}
+	if ((length <= 0) || ((length + offset) >= region->bytes()))
+		length = region->bytes() - offset;
+
+	/* open the file */
+	FILE *f = fopen(params[0].c_str(), "rb");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0].c_str());
+		return;
+	}
+
+	fseek(f, 0L, SEEK_END);
+	u64 size = ftell(f);
+	rewind(f);
+
+	// check file size
+	if (length >= size)
+		length = size;
+
+	fread(region->base() + offset, 1, length, f);
+
+	fclose(f);
+	m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, offset + length - 1);
+}
+
+
+/*-------------------------------------------------
     execute_dump - execute the dump command
 -------------------------------------------------*/
 
@@ -2088,7 +2201,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		return;
 
 	int shift = space->addr_shift();
-	u64 granularity = shift > 0 ? 2 : 1 << -shift;
+	u64 granularity = shift >= 0 ? 1 : 1 << -shift;
 
 	/* further validation */
 	if (width == 0)
@@ -2796,6 +2909,113 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 	/* print something if not found */
 	if (found == 0)
 		m_console.printf("Not found\n");
+}
+
+
+//-------------------------------------------------
+//  execute_fill - execute the fill command
+//-------------------------------------------------
+
+void debugger_commands::execute_fill(int ref, const std::vector<std::string> &params)
+{
+	u64 offset, length;
+	address_space *space;
+
+	// validate parameters
+	if (!validate_number_parameter(params[0], offset))
+		return;
+	if (!validate_number_parameter(params[1], length))
+		return;
+	if (!validate_cpu_space_parameter(nullptr, ref, space))
+		return;
+
+	// further validation
+	offset = space->address_to_byte(offset & space->addrmask());
+	int cur_data_size = space->addr_shift() > 0 ? 2 : 1 << -space->addr_shift();
+	if (cur_data_size == 0)
+		cur_data_size = 1;
+
+	// parse the data parameters
+	u64 fill_data[256];
+	u8 fill_data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		const char *pdata = params[i].c_str();
+		size_t pdatalen = strlen(pdata) - 1;
+
+		// check for a string
+		if (pdata[0] == '"' && pdata[pdatalen] == '"')
+		{
+			for (int j = 1; j < pdatalen; j++)
+			{
+				fill_data[data_count] = pdata[j];
+				fill_data_size[data_count++] = 1;
+			}
+		}
+
+		// otherwise, validate as a number
+		else
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			fill_data_size[data_count] = cur_data_size;
+			if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 1; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 2; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 4; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 8; pdata += 2; }
+
+			// validate as a number
+			if (!validate_number_parameter(pdata, fill_data[data_count++]))
+				return;
+		}
+	}
+	if (data_count == 0)
+		return;
+
+	// now fill memory
+	device_memory_interface &memory = space->device().memory();
+	auto dis = space->device().machine().disable_side_effects();
+	u64 count = space->address_to_byte(length);
+	while (count != 0)
+	{
+		// write the entire string
+		for (int j = 0; j < data_count; j++)
+		{
+			offs_t address = space->byte_to_address(offset) & space->logaddrmask();
+			if (!memory.translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, address))
+			{
+				m_console.printf("Fill aborted due to page fault at %0*X\n", space->logaddrchars(), space->byte_to_address(offset) & space->logaddrmask());
+				length = 0;
+				break;
+			}
+			switch (fill_data_size[j])
+			{
+			case 1:
+				space->write_byte(address, fill_data[j]);
+				break;
+
+			case 2:
+				space->write_word_unaligned(address, fill_data[j]);
+				break;
+
+			case 4:
+				space->write_dword_unaligned(address, fill_data[j]);
+				break;
+
+			case 8:
+				space->read_qword_unaligned(address, fill_data[j]);
+				break;
+			}
+			offset += fill_data_size[j];
+			if (count <= fill_data_size[j])
+			{
+				count = 0;
+				break;
+			}
+			else
+				count -= fill_data_size[j];
+		}
+	}
 }
 
 

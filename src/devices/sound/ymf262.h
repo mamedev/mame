@@ -33,7 +33,7 @@ void ymf262_reset_chip(void *chip);
 int  ymf262_write(void *chip, int a, int v);
 unsigned char ymf262_read(void *chip, int a);
 int  ymf262_timer_over(void *chip, int c);
-void ymf262_update_one(void *chip, OPL3SAMPLE **buffers, int length);
+void ymf262_update_one(void *chip, std::vector<write_stream_view> &buffers);
 
 void ymf262_set_timer_handler(void *chip, OPL3_TIMERHANDLER TimerHandler, device_t *device);
 void ymf262_set_irq_handler(void *chip, OPL3_IRQHANDLER IRQHandler, device_t *device);

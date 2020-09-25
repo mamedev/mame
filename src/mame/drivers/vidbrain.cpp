@@ -63,7 +63,7 @@
 //  keyboard_w - keyboard column write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::keyboard_w )
+void vidbrain_state::keyboard_w(uint8_t data)
 {
 	/*
 
@@ -90,7 +90,7 @@ WRITE8_MEMBER( vidbrain_state::keyboard_w )
 //  keyboard_r - keyboard row read
 //-------------------------------------------------
 
-READ8_MEMBER( vidbrain_state::keyboard_r )
+uint8_t vidbrain_state::keyboard_r()
 {
 	/*
 
@@ -124,7 +124,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 //  sound_w - sound clock write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::sound_w )
+void vidbrain_state::sound_w(uint8_t data)
 {
 	/*
 

@@ -35,7 +35,7 @@ uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 /******************************************************************************/
 
-WRITE16_MEMBER(stadhero_state::pf1_data_w)
+void stadhero_state::pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);

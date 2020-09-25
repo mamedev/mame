@@ -27,8 +27,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	DECLARE_READ16_MEMBER(dma_r);
-	DECLARE_WRITE16_MEMBER(dma_w);
+	uint16_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 

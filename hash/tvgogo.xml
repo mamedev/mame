@@ -9,12 +9,12 @@ Dumped | Dumped | Name       |Notes
 _(EU)__|__(US)__|____________|_____________________________________
   Y*   |   Y    | 4 in 1     |No controller
   Y    |   Y    | Whac-A-Mole|Hammer-shaped IR motion controller
+  Y    |   Y    | Basketball |Ball-shaped motion controller
   Y    |        | Tennis     |Racquet-shaped IR motion controller
-       |        | Paintball  |Gun controller
-       |        | Skateboard |Skateboard-shaped motion controller
-  -    |        | Basketball |Ball-shaped motion controller
        |   Y    | Dodgeball  |Motion controller
        |   Y    | Baseball   |Baseball Bat shaped motion controller
+       |        | Paintball  |Gun controller
+       |        | Skateboard |Skateboard-shaped motion controller
 
 
     The US carts do not appear to have a language selection screen
@@ -101,6 +101,28 @@ _(EU)__|__(US)__|____________|_____________________________________
 		<part name="cart" interface="tvgogo_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="tvgogododgeball_m5m29gt320_001c0020.bin" size="0x400000" crc="785f4305" sha1="0c96d6330acd2771adb4dbdcb6b9ccaa73ffc513"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketbal" supported="no">
+		<description>Basketball (EU)</description>
+		<year>2005</year>
+		<publisher>Toyquest</publisher>
+		<part name="cart" interface="tvgogo_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="gogotv_basketball.bin" size="0x400000" crc="4d5d54f5" sha1="b22717f7003783658f84369221bdf6c2a9e6361d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketbalu" cloneof="basketbal" supported="no">
+		<description>Basketball (US)</description>
+		<year>2005</year>
+		<publisher>Toyquest</publisher>
+		<part name="cart" interface="tvgogo_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="gogobasketball_m5m29gt320_001c0020.bin" size="0x400000" crc="dfdec0c6" sha1="7b3cc68f54b43e839beac8ed0806a005919f61b1"/>
 			</dataarea>
 		</part>
 	</software>

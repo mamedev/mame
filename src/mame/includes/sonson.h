@@ -43,9 +43,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_WRITE8_MEMBER(sonson_videoram_w);
-	DECLARE_WRITE8_MEMBER(sonson_colorram_w);
-	DECLARE_WRITE8_MEMBER(sonson_scrollx_w);
+	void sonson_videoram_w(offs_t offset, uint8_t data);
+	void sonson_colorram_w(offs_t offset, uint8_t data);
+	void sonson_scrollx_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

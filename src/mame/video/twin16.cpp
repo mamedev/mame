@@ -38,25 +38,25 @@ enum
 };
 
 
-WRITE16_MEMBER(twin16_state::fixram_w)
+void twin16_state::fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fixram[offset]);
 	m_fixed_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram0_w)
+void twin16_state::videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[0][offset]);
 	m_scroll_tmap[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram1_w)
+void twin16_state::videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[1][offset]);
 	m_scroll_tmap[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::zipram_w)
+void twin16_state::zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_zipram[offset];
 	COMBINE_DATA(&m_zipram[offset]);
@@ -69,7 +69,7 @@ void twin16_state::twin16_postload()
 	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fround_state::gfx_bank_w)
+void fround_state::gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int changed = 0;
 
@@ -96,7 +96,7 @@ WRITE16_MEMBER(fround_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::video_register_w)
+void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -189,7 +189,7 @@ WRITE16_MEMBER(twin16_state::video_register_w)
  *   3  | ------------xxxx | color
  */
 
-READ16_MEMBER(twin16_state::sprite_status_r)
+uint16_t twin16_state::sprite_status_r()
 {
 	// bit 0: busy, other bits: dunno
 	return m_sprite_busy;

@@ -38,40 +38,40 @@ license:CC0
 		<screen index="0">
 			<bounds left="0" right="400" top="0" bottom="300" />
 		</screen>
-		<bezel element="static_black">
+		<element ref="static_black">
 			<bounds left="0" right="400" top="300" bottom="330" />
-		</bezel>
-		<bezel element="static_orange">
+		</element>
+		<element ref="static_orange">
 			<bounds left="0" right="400" top="302" bottom="330" />
-		</bezel>
-		<bezel element="static_blue">
+		</element>
+		<element ref="static_blue">
 			<bounds left="0" right="400" top="304" bottom="330" />
-		</bezel>
+		</element>
 
-		<bezel element="text1">
+		<element ref="text1">
 			<bounds x="5" y="307" width="50" height="10" />
-		</bezel>
-		<bezel element="text2">
+		</element>
+		<element ref="text2">
 			<bounds x="10" y="317" width="40" height="10" />
-		</bezel>
-		<bezel element="static_black">
+		</element>
+		<element ref="static_black">
 			<bounds x="60" y="307" width="14" height="20" />
-		</bezel>
-		<bezel name="digit0" element="digit">
+		</element>
+		<element name="digit0" ref="digit">
 			<bounds x="61" y="308" width="12" height="18" />
-		</bezel>
+		</element>
 
-		<bezel element="text1">
+		<element ref="text1">
 			<bounds x="345" y="307" width="50" height="10" />
-		</bezel>
-		<bezel element="text2">
+		</element>
+		<element ref="text2">
 			<bounds x="350" y="317" width="40" height="10" />
-		</bezel>
-		<bezel element="static_black">
+		</element>
+		<element ref="static_black">
 			<bounds x="326" y="307" width="14" height="20" />
-		</bezel>
-		<bezel name="digit1" element="digit">
+		</element>
+		<element name="digit1" ref="digit">
 			<bounds x="327" y="308" width="12" height="18" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

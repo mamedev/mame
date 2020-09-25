@@ -60,13 +60,13 @@ WRITE_LINE_MEMBER(starwars_state::boost_interleave_hack)
 }
 
 
-READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
+uint8_t starwars_state::starwars_main_ready_flag_r()
 {
 	return m_riot->porta_in_get() & 0xc0;    /* only upper two flag bits mapped */
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
+void starwars_state::starwars_soundrst_w(uint8_t data)
 {
 	m_soundlatch->acknowledge_w();
 	m_mainlatch->acknowledge_w();

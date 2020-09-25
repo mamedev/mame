@@ -202,45 +202,7 @@ void karnov_state::mcubl_p1_w(uint8_t data)
 
 // mcu simulation below
 
-/* Emulation of the protected microcontroller - for coins & general protection */
-void karnov_state::karnov_i8751_w( int data )
-{
-	/* Pending coin operations may cause protection commands to be queued */
-	if (m_i8751_needs_ack)
-	{
-		m_i8751_command_queue = data;
-		return;
-	}
-
-	m_i8751_return = 0;
-
-	if (data == 0x100 && m_microcontroller_id == KARNOV) /* USA version */
-		m_i8751_return = 0x56b;
-
-	if (data == 0x100 && m_microcontroller_id == KARNOVJ)    /* Japan version */
-		m_i8751_return = 0x56a;
-
-	if ((data & 0xf00) == 0x300)
-		m_i8751_return = (data & 0xff) * 0x12; /* Player sprite mapping */
-
-	/* I'm not sure the ones marked ^ appear in the right order */
-	if (data == 0x400) m_i8751_return = 0x4000; /* Get The Map... */
-	if (data == 0x402) m_i8751_return = 0x40a6; /* Ancient Ruins */
-	if (data == 0x403) m_i8751_return = 0x4054; /* Forest... */
-	if (data == 0x404) m_i8751_return = 0x40de; /* ^Rocky hills */
-	if (data == 0x405) m_i8751_return = 0x4182; /* Sea */
-	if (data == 0x406) m_i8751_return = 0x41ca; /* Town */
-	if (data == 0x407) m_i8751_return = 0x421e; /* Desert */
-	if (data == 0x401) m_i8751_return = 0x4138; /* ^Whistling wind */
-	if (data == 0x408) m_i8751_return = 0x4276; /* ^Heavy Gates */
-
-//  if (!m_i8751_return && data != 0x300) logerror("%s - Unknown Write %02x intel\n", machine().describe_context(), data);
-
-	m_maincpu->set_input_line(6, HOLD_LINE); /* Signal main cpu task is complete */
-	m_i8751_needs_ack = 1;
-}
-
-void karnov_state::wndrplnt_i8751_w( int data )
+void karnov_state::wndrplnt_mcu_w( uint16_t data )
 {
 	/* The last command hasn't been ACK'd (probably a conflict with coin command) */
 	if (m_i8751_needs_ack)
@@ -305,7 +267,7 @@ void karnov_state::wndrplnt_i8751_w( int data )
  *
  *************************************/
 
-void karnov_state::mcusim_ack_w(u16 data)
+void karnov_state::wndrplnt_mcu_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 
@@ -322,7 +284,7 @@ void karnov_state::mcusim_ack_w(u16 data)
 		{
 			/* Pending control command - just write it back as SECREQ */
 			m_i8751_needs_ack = 0;
-			mcusim_w(m_i8751_command_queue);
+			wndrplnt_mcu_w(m_i8751_command_queue);
 			m_i8751_command_queue = 0;
 		}
 		else
@@ -332,20 +294,12 @@ void karnov_state::mcusim_ack_w(u16 data)
 	}
 }
 
-u16 karnov_state::mcusim_r()
+u16 karnov_state::wndrplnt_mcu_r()
 {
 	return m_i8751_return;
 }
 
-void karnov_state::mcusim_w(u16 data)
-{
-	if (m_microcontroller_id == KARNOV || m_microcontroller_id == KARNOVJ)
-		karnov_i8751_w(data);
-	if (m_microcontroller_id == WNDRPLNT)
-		wndrplnt_i8751_w(data);
-}
-
-void karnov_state::mcusim_reset_w(u16 data)
+void karnov_state::wndrplnt_mcu_reset_w(u16 data)
 {
 	logerror("Reset i8751\n");
 	m_i8751_needs_ack = 0;
@@ -376,23 +330,28 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x0a1000, 0x0a17ff).w(FUNC(karnov_state::playfield_w)).share("pf_data");
 	map(0x0a1800, 0x0a1fff).lw16([this](offs_t offset, u16 data, u16 mem_mask)
 							{ playfield_w(((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5), data, mem_mask); }, "pf_col_w");
-	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::mcusim_ack_w));
+	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::mcu_ack_w));
 	map(0x0c0002, 0x0c0003).portr("SYSTEM");
 	map(0x0c0003, 0x0c0003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0c0004, 0x0c0005).portr("DSW").w(m_spriteram, FUNC(buffered_spriteram16_device::write));
-	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcusim_r), FUNC(karnov_state::mcusim_w));
+	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcu_r), FUNC(karnov_state::mcu_w));
 	map(0x0c0008, 0x0c000b).writeonly().share("scroll");
-	map(0x0c000c, 0x0c000d).w(FUNC(karnov_state::mcusim_reset_w));
-	map(0x0c000e, 0x0c000f).w(FUNC(karnov_state::vint_ack_w));
+	map(0x0c000e, 0x0c000f).nopr().w(FUNC(karnov_state::vint_ack_w));
 }
 
-void karnov_state::chelnov_map(address_map &map)
+void karnov_state::karnovjbl_map(address_map &map)
 {
 	karnov_map(map);
-	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::mcu_ack_w));
-	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::mcu_r), FUNC(karnov_state::mcu_w));
-	map(0x0c000c, 0x0c000d).unmaprw();
-	map(0x0c000e, 0x0c000f).nopr();
+	map(0x0c0000, 0x0c0001).portr("P1_P2").nopw();
+	map(0x0c0006, 0x0c0007).lr16(NAME([]() { return 0x56a; })).lw16(NAME([this](u16 data) { m_maincpu->set_input_line(6, HOLD_LINE); }));
+}
+
+void karnov_state::wndrplnt_map(address_map &map)
+{
+	karnov_map(map);
+	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::wndrplnt_mcu_ack_w));
+	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::wndrplnt_mcu_r), FUNC(karnov_state::wndrplnt_mcu_w));
+	map(0x0c000c, 0x0c000d).w(FUNC(karnov_state::wndrplnt_mcu_reset_w));
 }
 
 void karnov_state::base_sound_map(address_map &map)
@@ -457,10 +416,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( karnov )
 	PORT_INCLUDE( common )
 
-	PORT_START("COIN")  /* Dummy input for i8751 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_START("COIN")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:1,2")
@@ -505,6 +465,15 @@ static INPUT_PORTS_START( karnov )
 	PORT_DIPSETTING(      0x0000, "Fast" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( karnovjbl )
+	PORT_INCLUDE(karnov)
+
+	PORT_MODIFY("COIN")
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
+INPUT_PORTS_END
 
 /* verified from M68000 code */
 static INPUT_PORTS_START( wndrplnt )
@@ -690,7 +659,7 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(karnov_state::mcusim_vbint_w)
+WRITE_LINE_MEMBER(karnov_state::wndrplnt_mcusim_vbint_w)
 {
 	if (!state)
 		return;
@@ -698,10 +667,10 @@ WRITE_LINE_MEMBER(karnov_state::mcusim_vbint_w)
 	uint8_t port = ioport("COIN")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (port == m_coin_mask)
+	if (port == 0)
 		m_latch = 1;
 
-	if (port != m_coin_mask && m_latch)
+	if (port != 0 && m_latch)
 	{
 		if (m_i8751_needs_ack)
 		{
@@ -766,11 +735,24 @@ void karnov_state::machine_reset()
 void karnov_state::karnov(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);    /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);     /* Accurate */
+	// needs a tight sync with the mcu
+	config.set_perfect_quantum(m_maincpu);
+
+	M6502(config, m_audiocpu, 12_MHz_XTAL/8);     /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
+
+	I8751(config, m_mcu, 8_MHz_XTAL);
+	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
+	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
+	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
+	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
+	m_mcu->port_out_cb<2>().set(FUNC(karnov_state::mcu_p2_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
+
+	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(karnov_state::mcu_coin_irq));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -782,7 +764,7 @@ void karnov_state::karnov(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(karnov_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(karnov_state::mcusim_vbint_w));
+	m_screen->screen_vblank().set(FUNC(karnov_state::vbint_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
@@ -799,10 +781,10 @@ void karnov_state::karnov(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -810,56 +792,46 @@ void karnov_state::karnov(machine_config &config)
 void karnov_state::karnovjbl(machine_config &config)
 {
 	karnov(config);
+
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
 	Bottom board next to the ribbon cable is 12.000 MHz*/
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnovjbl_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnovjbl_sound_map);
+
+	// different MCU
+	config.device_remove("mcu");
+	config.device_remove("coin");
 
 	ym3812_device &ym2(YM3812(config.replace(), "ym2", 3000000));
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void karnov_state::chelnov(machine_config &config)
-{
-	karnov(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnov_map);
-
-	I8751(config, m_mcu, 8_MHz_XTAL); // unknown clock
-	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
-	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
-	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
-	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
-	m_mcu->port_out_cb<2>().set(FUNC(karnov_state::mcu_p2_w));
-	m_mcu->port_in_cb<3>().set_ioport("COIN");
-
-	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(karnov_state::mcu_coin_irq));
-
-	m_screen->screen_vblank().set(FUNC(karnov_state::vbint_w));
-}
-
 void karnov_state::chelnovjbl(machine_config &config)
 {
 	karnov(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnov_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	I8031(config, m_mcu, 8_MHz_XTAL); // unknown clock
+	config.device_remove("mcu");
+	config.device_remove("coin");
+
+	I8031(config, m_mcu, 8_MHz_XTAL); // info below states 8MHz for MCU
 	m_mcu->set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
 	m_mcu->set_addrmap(AS_IO, &karnov_state::chelnovjbl_mcu_io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(karnov_state::mcubl_p1_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
-
-	m_screen->screen_vblank().set(FUNC(karnov_state::vbint_w));
 }
 
 void karnov_state::wndrplnt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);   /* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::wndrplnt_map);
 
-	M6502(config, m_audiocpu, 1500000);    /* Accurate */
+	M6502(config, m_audiocpu, 12_MHz_XTAL/8);    /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
@@ -872,7 +844,7 @@ void karnov_state::wndrplnt(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(karnov_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(karnov_state::mcusim_vbint_w));
+	screen.screen_vblank().set(FUNC(karnov_state::wndrplnt_mcusim_vbint_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
@@ -889,10 +861,10 @@ void karnov_state::wndrplnt(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL/8)); // 1.5 MHz
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL/4)); // 3 MHz
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -904,7 +876,7 @@ void karnov_state::wndrplnt(machine_config &config)
  *
  *************************************/
 
-ROM_START( karnov )
+ROM_START( karnov ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-6.j15", 0x00000, 0x10000, CRC(4c60837f) SHA1(6886e6ee1d1563c3011b8fea79e7435f983a3ee0) )
 	ROM_LOAD16_BYTE( "dn11-6.j20", 0x00001, 0x10000, CRC(cd4abb99) SHA1(b4482175f5d90941ad3aec6c2269a50f57a465ed) )
@@ -916,8 +888,8 @@ ROM_START( karnov )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dn-e.k14", 0x0000, 0x1000, NO_DUMP ) /* DN-E or DN-6? */
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 MCU (Note: Dump taken from a Rev 5 board)
+	ROM_LOAD( "dn-5.k14", 0x0000, 0x1000, CRC(d056de4e) SHA1(621587ed949ff46e5ccb0d0603612655a38b69a3) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-.c5", 0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
@@ -930,20 +902,20 @@ ROM_START( karnov )
 
 	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-.f8",   0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
-	ROM_LOAD( "dn14-5.f9",  0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
-	ROM_LOAD( "dn13-.f13",  0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "dn15-5.f15", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
-	ROM_LOAD( "dn16-",      0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "dn17-5",     0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
-	ROM_LOAD( "dn18-",      0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "dn19-5",     0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
+	ROM_LOAD( "dn14-5.f11", 0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
+	ROM_LOAD( "dn13-.f9",   0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "dn15-5.f12", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
+	ROM_LOAD( "dn16-.f13",  0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "dn17-5.f15", 0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
+	ROM_LOAD( "dn18-.f16",  0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "dn19-5.f18", 0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
 	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( karnova )
+ROM_START( karnova ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) ) /* also known to be labeled DN08-5E */
 	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) ) /* also known to be labeled DN11-5E */
@@ -955,8 +927,8 @@ ROM_START( karnova )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dn-5.k14", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 MCU
+	ROM_LOAD( "dn-5.k14", 0x0000, 0x1000, CRC(d056de4e) SHA1(621587ed949ff46e5ccb0d0603612655a38b69a3) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-.c5", 0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
@@ -969,20 +941,20 @@ ROM_START( karnova )
 
 	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-.f8",   0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
-	ROM_LOAD( "dn14-5.f9",  0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
-	ROM_LOAD( "dn13-.f13",  0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "dn15-5.f15", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
-	ROM_LOAD( "dn16-",      0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "dn17-5",     0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
-	ROM_LOAD( "dn18-",      0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "dn19-5",     0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
+	ROM_LOAD( "dn14-5.f11", 0x10000, 0x08000, CRC(ac9e6732) SHA1(6f61344eb8a13349471145dee252a01aadb8cdf0) )
+	ROM_LOAD( "dn13-.f9",   0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "dn15-5.f12", 0x28000, 0x08000, CRC(8933fcb8) SHA1(0dbda4b032ed3776d7633264f39e6f00ace7a238) )
+	ROM_LOAD( "dn16-.f13",  0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "dn17-5.f15", 0x40000, 0x08000, CRC(b70ae950) SHA1(1ec833bdad12710ea846ef48dddbe2e1ae6b8ce1) )
+	ROM_LOAD( "dn18-.f16",  0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "dn19-5.f18", 0x58000, 0x08000, CRC(8fd4fa40) SHA1(1870fb0c5c64fbc53a10115f0f3c7624cf2465db) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
 	ROM_LOAD( "dn-20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( karnovj )
+ROM_START( karnovj ) /* DE-0248-3 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "kar8.j15",  0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
 	ROM_LOAD16_BYTE( "kar11.j20", 0x00001, 0x10000, CRC(417c936d) SHA1(d31f9291f18c3d5e3c4430768396e1ac10fd9ea3) )
@@ -994,8 +966,8 @@ ROM_START( karnovj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "kar5.f3", 0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "karnovj_i8751.k14", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 MCU (BAD_DUMP because it was created from the US version)
+	ROM_LOAD( "karnovj_i8751.k14", 0x0000, 0x1000, BAD_DUMP CRC(5a8c4d28) SHA1(58cc912d91e569503d5a20fa3180fbdca595e39f) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-.c5",        0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
@@ -1008,13 +980,13 @@ ROM_START( karnovj )
 
 	ROM_REGION( 0x60000, "gfx3", 0 )
 	ROM_LOAD( "dn12-.f8",  0x00000, 0x10000, CRC(9806772c) SHA1(01f17fa033262a3e64e0675cc4e20b3c3f4b254d) )  /* Sprites - 2 sets of 4, interleaved here */
-	ROM_LOAD( "kar14.f9",  0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
-	ROM_LOAD( "dn13-.f13", 0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
-	ROM_LOAD( "kar15.f15", 0x28000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
-	ROM_LOAD( "dn16-",     0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
-	ROM_LOAD( "kar17",     0x40000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
-	ROM_LOAD( "dn18-",     0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
-	ROM_LOAD( "kar19",     0x58000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
+	ROM_LOAD( "kar14.f11", 0x10000, 0x08000, CRC(c6b39595) SHA1(3bc2d0a613cc1b5d255cccc3b26e21ea1c23e75b) )
+	ROM_LOAD( "dn13-.f9",  0x18000, 0x10000, CRC(a03308f9) SHA1(1d450725a5c488332c83d8f64a73a750ce7fe4c7) )
+	ROM_LOAD( "kar15.f12", 0x28000, 0x08000, CRC(2f72cac0) SHA1(a71e61eea77ecd3240c5217ae84e7aa3ef21288a) )
+	ROM_LOAD( "dn16-.f13", 0x30000, 0x10000, CRC(55e63a11) SHA1(3ef0468fa02ac5382007428122216917ad5eaa0e) )
+	ROM_LOAD( "kar17.f15", 0x40000, 0x08000, CRC(7851c70f) SHA1(47b7a64dd8230e95cd7ae7f661c7586c7598c356) )
+	ROM_LOAD( "dn18-.f16", 0x48000, 0x10000, CRC(2ad53213) SHA1(f22696920bf3d74fb0e28e2d7cb31be5e183c6b4) )
+	ROM_LOAD( "kar19.f18", 0x58000, 0x08000, CRC(7bc174bb) SHA1(d8bc320169fc3a9cdd3f271ea523fb0486abae2c) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "dn-21.k8", 0x0000, 0x0400, CRC(aab0bb93) SHA1(545707fbb1007fca1fe297c5fce61e485e7084fc) ) /* MB7132E BPROM */
@@ -1105,7 +1077,7 @@ ROM_START( wndrplnt )
 	ROM_LOAD( "ea-20.l6",      0x0400, 0x0400, CRC(619f9d1e) SHA1(17fe49b6c9ce17be4a03e3400229e3ef4998a46f) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( chelnov )
+ROM_START( chelnov ) /* DE-0248-1 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-e.j16",   0x00000, 0x10000, CRC(8275cc3a) SHA1(961166226b68744eef15fed6a306010757b83556) )
 	ROM_LOAD16_BYTE( "ee11-e.j19",   0x00001, 0x10000, CRC(889e40a0) SHA1(e927f32d9bc448a331fb7b3478b2d07154f5013b) )
@@ -1140,7 +1112,7 @@ ROM_START( chelnov )
 	ROM_LOAD( "ee-16.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( chelnovu )
+ROM_START( chelnovu ) /* DE-0248-1 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-a.j15",   0x00000, 0x10000, CRC(2f2fb37b) SHA1(f89b424099097a95cf184d20a15b876c5b639552) )
 	ROM_LOAD16_BYTE( "ee11-a.j20",   0x00001, 0x10000, CRC(f306d05f) SHA1(e523ffd17fb0104fe28eac288b6ebf7fc0ea2908) )
@@ -1175,9 +1147,9 @@ ROM_START( chelnovu )
 	ROM_LOAD( "ee-16.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) ) /* MB7122E BPROM */
 ROM_END
 
-ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
+ROM_START( chelnovj ) /* DE-0248-1 main board, DE-259-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "ee08-1.j15",  0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )
+	ROM_LOAD16_BYTE( "ee08-1.j15",  0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )/* at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
 	ROM_LOAD16_BYTE( "ee11-1.j20",  0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) )
 	ROM_LOAD16_BYTE( "ee07.j14",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
 	ROM_LOAD16_BYTE( "ee10.j18",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) )
@@ -1241,7 +1213,8 @@ ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
 	ROM_LOAD( "5.bin",    0x38000, 0x08000, CRC(99cee6cd) SHA1(b2cd0a1aef04fd63ad27ac8a61d17a6bb4c8b600) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) /* Sprites */
-	ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad (1st half is 99.996948% match)
+//  ROM_LOAD( "17.bin",       0x00000, 0x10000, CRC(47c857f8) SHA1(59f50365cee266c0e4075c989dc7fde50e43667a) ) // probably bad, 1 byte difference: byte 0x55CC == 0x30 vs 0xF0 in ee12-.f8
+	ROM_LOAD( "ee12-.f8",     0x00000, 0x10000, CRC(9b1c53a5) SHA1(b0fdc89dc7fd0931fa4bca3bbc20fc88f637ec74) )
 	ROM_LOAD( "ee13-.f9",     0x10000, 0x10000, CRC(72b8ae3e) SHA1(535dfd70e6d13296342d96917a57d46bdb28a59e) )
 	ROM_LOAD( "ee14-.f13",    0x20000, 0x10000, CRC(d8f4bbde) SHA1(1f2d336dd97c9cc39e124c18cae634afb0ef3316) )
 	ROM_LOAD( "ee15-.f15",    0x30000, 0x10000, CRC(81e3e68b) SHA1(1059c70b8bfe09c212a19767cfe23efa22afc196) )
@@ -1260,7 +1233,6 @@ Other ic: Philips MAB8031AH MCU
 OSC: 20 mhz, 12 mhz,8 mhz (for mcu)
 
 */
-
 
 // same pcb as above?
 // this is a further hacked set of the above, with the copyright messages removed etc. (black screens for several seconds instead)
@@ -1306,42 +1278,17 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-void karnov_state::init_karnov()
-{
-	m_microcontroller_id = KARNOV;
-	m_coin_mask = 0x07;
-}
-
-void karnov_state::init_karnovj()
-{
-	m_microcontroller_id = KARNOVJ;
-	m_coin_mask = 0x07;
-}
-
-void karnov_state::init_wndrplnt()
-{
-	m_microcontroller_id = WNDRPLNT;
-	m_coin_mask = 0x00;
-}
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1987, karnov,      0,       karnov,     karnov,     karnov_state, init_karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnova,     karnov,  karnov,     karnov,     karnov_state, init_karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovj,     karnov,  karnov,     karnov,     karnov_state, init_karnovj,  ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnov,     karnov_state, init_karnovj,  ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt,   karnov_state, init_wndrplnt, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnov,     0,       chelnov,    chelnov,    karnov_state, empty_init,    ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovu,    chelnov, chelnov,    chelnovu,   karnov_state, empty_init,    ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovj,    chelnov, chelnov,    chelnovj,   karnov_state, empty_init,    ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init,    ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init,    ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnov,      0,       karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnova,     karnov,  karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovj,     karnov,  karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnovjbl,  karnov_state, empty_init, ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt,   karnov_state, empty_init, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnov,     0,       karnov,     chelnov,    karnov_state, empty_init, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu,   karnov_state, empty_init, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj,   karnov_state, empty_init, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE )

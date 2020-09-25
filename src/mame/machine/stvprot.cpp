@@ -28,7 +28,7 @@
 *
 *************************************/
 
-READ32_MEMBER( stv_state::common_prot_r )
+uint32_t stv_state::common_prot_r(offs_t offset)
 {
 	uint32_t *ROM = (uint32_t *)machine().root_device().memregion("abus")->base();
 
@@ -60,7 +60,7 @@ uint16_t stv_state::crypt_read_callback(uint32_t addr)
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
-WRITE32_MEMBER ( stv_state::common_prot_w )
+void stv_state::common_prot_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_a_bus[offset]);
 
@@ -84,7 +84,8 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 
 void stv_state::install_common_protection()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(*this, FUNC(stv_state::common_prot_r)), write32_delegate(*this, FUNC(stv_state::common_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4fffff0, 0x4ffffff, read32sm_delegate(*this, FUNC(stv_state::common_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4fffff0, 0x4ffffff, write32s_delegate(*this, FUNC(stv_state::common_prot_w)));
 }
 
 void stv_state::stv_register_protection_savestates()

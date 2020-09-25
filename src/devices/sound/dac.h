@@ -45,9 +45,10 @@ public:
 };
 
 template <unsigned bits>
-constexpr stream_sample_t dac_multiply(const double vref, const stream_sample_t code)
+constexpr stream_buffer::sample_t dac_multiply(const double vref, const s32 code)
 {
-	return (bits > 1) ? ((vref * code) / (1 << (bits))) : (vref * code);
+	constexpr stream_buffer::sample_t scale = 1.0 / stream_buffer::sample_t((bits > 1) ? (1 << (bits)) : 1);
+	return vref * scale * stream_buffer::sample_t(code);
 }
 
 template <unsigned bits>
@@ -62,12 +63,12 @@ protected:
 	}
 
 	sound_stream * m_stream;
-	stream_sample_t m_code;
+	s32 m_code;
 	const double m_gain;
 
-	inline void setCode(stream_sample_t code)
+	inline void setCode(s32 code)
 	{
-		code &= ~(~std::make_unsigned_t<stream_sample_t>(0) << bits);
+		code &= ~(~u32(0) << bits);
 		if (m_code != code)
 		{
 			m_stream->update();
@@ -75,7 +76,7 @@ protected:
 		}
 	}
 
-	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) = 0;
 };
 
 template <unsigned bits>
@@ -84,14 +85,14 @@ class dac_code_binary : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		for (int samp = 0; samp < samples; samp++)
+		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
-			double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-			double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-			stream_sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code);
-			outputs[0][samp] = vout;
+			double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
+			double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
+			stream_buffer::sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code);
+			outputs[0].put(samp, vout);
 		}
 	}
 };
@@ -102,24 +103,24 @@ class dac_code_ones_complement : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
-			for (int samp = 0; samp < samples; samp++)
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-				stream_sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ ~(~0U << bits));
-				outputs[0][samp] = vout;
+				double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
+				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ ~(~0U << bits));
+				outputs[0].put(samp, vout);
 			}
 		}
 		else
 		{
-			for (int samp = 0; samp < samples; samp++)
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-				stream_sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
-				outputs[0][samp] = vout;
+				double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
+				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
+				outputs[0].put(samp, vout);
 			}
 		}
 	}
@@ -131,14 +132,14 @@ class dac_code_twos_complement : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		for (int samp = 0; samp < samples; samp++)
+		for (int samp = 0; samp < outputs[0].samples(); samp++)
 		{
-			double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-			double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-			stream_sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code ^ (1 << (bits - 1)));
-			outputs[0][samp] = vout;
+			double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
+			double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
+			stream_buffer::sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code ^ (1 << (bits - 1)));
+			outputs[0].put(samp, vout);
 		}
 	}
 };
@@ -149,24 +150,24 @@ class dac_code_sign_magntitude : protected dac_code<bits>
 protected:
 	using dac_code<bits>::dac_code;
 
-	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
+	virtual void sound_stream_update_tag(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
 		if (this->m_code & (1 << (bits - 1)))
 		{
-			for (int samp = 0; samp < samples; samp++)
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-				stream_sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ (1 << (bits - 1)));
-				outputs[0][samp] = vout;
+				double const vref_neg = inputs[DAC_VREF_NEG_INPUT].get(samp) * this->m_gain;
+				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ (1 << (bits - 1)));
+				outputs[0].put(samp, vout);
 			}
 		}
 		else
 		{
-			for (int samp = 0; samp < samples; samp++)
+			for (int samp = 0; samp < outputs[0].samples(); samp++)
 			{
-				double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-				stream_sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
-				outputs[0][samp] = vout;
+				double const vref_pos = inputs[DAC_VREF_POS_INPUT].get(samp) * this->m_gain;
+				stream_buffer::sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
+				outputs[0].put(samp, vout);
 			}
 		}
 	}
@@ -193,9 +194,9 @@ protected:
 		save_item(NAME(this->m_code));
 	}
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		_dac_code::sound_stream_update_tag(stream, inputs, outputs, samples);
+		_dac_code::sound_stream_update_tag(stream, inputs, outputs);
 	}
 };
 
@@ -285,6 +286,7 @@ DAC_GENERATOR(MP1210, mp1210_device, dac_word_interface, dac_code_twos_complemen
 DAC_GENERATOR(PCM54HP, pcm54hp_device, dac_word_interface, dac_code_binary<16>, dac_gain_r2r, "PCM54HP", "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_interface, dac_code_twos_complement<16>, dac_gain_r2r, "UDA1341TS", "uda1341ts") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E, zn425e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN425E", "zn425e")
+DAC_GENERATOR(ZN426E, zn426e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN426E-8", "zn426e")
 DAC_GENERATOR(ZN428E, zn428e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN428E-8", "zn428e")
 DAC_GENERATOR(ZN429E, zn429e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN429E-8", "zn429e")
 

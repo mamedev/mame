@@ -2,9 +2,10 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    output.c
+    output.cpp
 
     General purpose output routines.
+
 ***************************************************************************/
 
 #include "emu.h"

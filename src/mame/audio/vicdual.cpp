@@ -137,7 +137,7 @@ MACHINE_START_MEMBER(vicdual_state,frogs_audio)
 }
 
 
-WRITE8_MEMBER( vicdual_state::frogs_audio_w )
+void vicdual_state::frogs_audio_w(uint8_t data)
 {
 	static int last_croak = 0;
 	static int last_buzzz = 0;
@@ -451,7 +451,7 @@ void vicdual_state::headon_audio(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-WRITE8_MEMBER( vicdual_state::headon_audio_w )
+void vicdual_state::headon_audio_w(uint8_t data)
 {
 	if (m_discrete == nullptr)
 		return;
@@ -465,7 +465,7 @@ WRITE8_MEMBER( vicdual_state::headon_audio_w )
 
 }
 
-WRITE8_MEMBER( vicdual_state::invho2_audio_w )
+void vicdual_state::invho2_audio_w(uint8_t data)
 {
 	if (m_discrete == nullptr)
 		return;
@@ -599,7 +599,7 @@ void vicdual_state::brdrline_audio(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
-WRITE8_MEMBER( vicdual_state::brdrline_audio_w )
+void vicdual_state::brdrline_audio_w(uint8_t data)
 {
 	uint8_t res = data ^ 0xff;
 
@@ -623,7 +623,7 @@ WRITE8_MEMBER( vicdual_state::brdrline_audio_w )
 	//printf("%02x\n",res);
 }
 
-WRITE8_MEMBER( vicdual_state::brdrline_audio_aux_w )
+void vicdual_state::brdrline_audio_aux_w(uint8_t data)
 {
 	if(data & 0xfc) // coin, unknown which is the trigger
 		m_samples->start(1, 1);

@@ -27,15 +27,15 @@
 DEFINE_DEVICE_TYPE(ARCA5, arcompact_device, "arc_a5", "Argonaut ARCtangent A5")
 
 
-READ32_MEMBER( arcompact_device::arcompact_auxreg002_LPSTART_r) { return m_LP_START&0xfffffffe; }
-WRITE32_MEMBER(arcompact_device::arcompact_auxreg002_LPSTART_w) { m_LP_START = data&0xfffffffe; }
-READ32_MEMBER( arcompact_device::arcompact_auxreg003_LPEND_r) { return m_LP_END&0xfffffffe; }
-WRITE32_MEMBER(arcompact_device::arcompact_auxreg003_LPEND_w) { m_LP_END = data&0xfffffffe; }
+uint32_t arcompact_device::arcompact_auxreg002_LPSTART_r() { return m_LP_START&0xfffffffe; }
+void arcompact_device::arcompact_auxreg002_LPSTART_w(uint32_t data) { m_LP_START = data&0xfffffffe; }
+uint32_t arcompact_device::arcompact_auxreg003_LPEND_r() { return m_LP_END&0xfffffffe; }
+void arcompact_device::arcompact_auxreg003_LPEND_w(uint32_t data) { m_LP_END = data&0xfffffffe; }
 
-READ32_MEMBER( arcompact_device::arcompact_auxreg00a_STATUS32_r) { return 0xffffdead; /*m_status32;*/ }
+uint32_t arcompact_device::arcompact_auxreg00a_STATUS32_r() { return 0xffffdead; /*m_status32;*/ }
 
-READ32_MEMBER( arcompact_device::arcompact_auxreg025_INTVECTORBASE_r) { return m_INTVECTORBASE&0xfffffc00; }
-WRITE32_MEMBER(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w) { m_INTVECTORBASE = data&0xfffffc00; }
+uint32_t arcompact_device::arcompact_auxreg025_INTVECTORBASE_r() { return m_INTVECTORBASE&0xfffffc00; }
+void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(uint32_t data) { m_INTVECTORBASE = data&0xfffffc00; }
 
 
 

@@ -55,12 +55,12 @@ private:
 	uint8_t m_math_param;
 	uint8_t m_scroll_y;
 
-	DECLARE_READ8_MEMBER(i8751_r);
-	DECLARE_WRITE8_MEMBER(i8751_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(scroll_y_r);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	uint8_t i8751_r();
+	void i8751_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t scroll_y_r();
+	void scroll_y_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

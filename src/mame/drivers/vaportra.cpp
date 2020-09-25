@@ -29,14 +29,14 @@
 
 /******************************************************************************/
 
-READ8_MEMBER(vaportra_state::irq6_ack_r)
+uint8_t vaportra_state::irq6_ack_r()
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return (0);
 }
 
-WRITE8_MEMBER(vaportra_state::irq6_ack_w)
+void vaportra_state::irq6_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 }

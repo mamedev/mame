@@ -39,8 +39,8 @@ protected:
 	required_device<wd2010_device> m_hdc;
 
 private:
-	DECLARE_READ16_MEMBER(hyperdrive_r);
-	DECLARE_WRITE16_MEMBER(hyperdrive_w);
+	uint16_t hyperdrive_r(offs_t offset);
+	void hyperdrive_w(offs_t offset, uint16_t data);
 
 	uint8_t hdd_r(offs_t offset);
 	void hdd_w(offs_t offset, uint8_t data);

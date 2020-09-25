@@ -55,8 +55,8 @@ private:
 	void riot1_pa_w(uint8_t data);
 	uint8_t riot1_pb_r();
 	void riot1_pb_w(uint8_t data);
-	DECLARE_READ8_MEMBER( fk5_r );
-	DECLARE_WRITE8_MEMBER( fk5_w );
+	uint8_t fk5_r();
+	void fk5_w(uint8_t data);
 
 	void c8280_fdc_mem(address_map &map);
 	void c8280_main_mem(address_map &map);

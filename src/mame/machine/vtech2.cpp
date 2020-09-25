@@ -27,6 +27,8 @@ static const uint8_t laser_fdc_wrprot[2] = {0x80, 0x80};
 
 void vtech2_state::init_laser()
 {
+	init_waitstates();
+
 	uint8_t *gfx = memregion("gfx2")->base();
 	int i;
 
@@ -68,12 +70,67 @@ void vtech2_state::machine_reset()
 	m_language = m_io_keyboard[5]->read() & 0x30;
 }
 
+void vtech2_state::machine_start()
+{
+	save_item(NAME(m_laser_frame_message));
+	save_item(NAME(m_laser_frame_time));
+	save_item(NAME(m_laser_latch));
+	save_item(NAME(m_laser_track_x2));
+	save_item(NAME(m_laser_fdc_status));
+	save_item(NAME(m_laser_fdc_data));
+	save_item(NAME(m_laser_data));
+	save_item(NAME(m_laser_fdc_edge));
+	save_item(NAME(m_laser_fdc_bits));
+	save_item(NAME(m_laser_drive));
+	save_item(NAME(m_laser_fdc_start));
+	save_item(NAME(m_laser_fdc_write));
+	save_item(NAME(m_laser_fdc_offs));
+	save_item(NAME(m_laser_fdc_latch));
+	save_item(NAME(m_level_old));
+	save_item(NAME(m_cassette_bit));
+	save_item(NAME(m_laser_bg_mode));
+	save_item(NAME(m_laser_two_color));
+	save_item(NAME(m_language));
+	save_item(NAME(m_cart_size));
+}
 
-READ8_MEMBER( vtech2_state::cart_r )
+uint8_t vtech2_state::cart_r(offs_t offset)
 {
 	if (offset >= m_cart_size)
 		return 0xff;
 	return m_cart->read_rom(offset);
+}
+
+// The ULA inserts one waitstate for every read and write in each space (MT 07094, MT 07141)
+void vtech2_state::init_waitstates()
+{
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	address_space &io = m_maincpu->space(AS_IO);
+
+	mem.install_read_tap(0x0000, 0xffff, "mem_wait_r", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-1);
+		return data;
+	});
+	mem.install_write_tap(0x0000, 0xffff, "mem_wait_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-1);
+		return data;
+	});
+	io.install_read_tap(0x00, 0xff, "io_wait_r", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-1);
+		return data;
+	});
+	io.install_write_tap(0x00, 0xff, "io_wait_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-1);
+		return data;
+	});
 }
 
 
@@ -89,16 +146,13 @@ READ8_MEMBER( vtech2_state::cart_r )
  * 1    column 1
  * 0    column 0
  ************************************************/
-READ8_MEMBER( vtech2_state::mmio_r )
+uint8_t vtech2_state::mmio_r(offs_t offset)
 {
 	u8 data = 0x7f;
 
 	offset = ~offset & 0x7ff;
 	if (BIT(offset, 10))
-	{
-		offset = (offset >> 8) & 3;
-		data &= m_io_keyboard[offset + 8]->read();     // ROW A-D
-	}
+		data &= m_io_keyboard[BIT(offset,8,2) + 8]->read();     // ROW A-D
 	else
 	for (u8 i = 0; i < 8; i++)
 		if (BIT(offset, i))
@@ -121,7 +175,7 @@ READ8_MEMBER( vtech2_state::mmio_r )
  * 1    cassette out (LSB)
  * 0    speaker A
  ************************************************/
-WRITE8_MEMBER( vtech2_state::mmio_w )
+void vtech2_state::mmio_w(uint8_t data)
 {
 	m_speaker->level_w(data & 1);
 	m_laser_latch = data;
@@ -165,7 +219,7 @@ void vtech2_state::laser_put_track()
 #define PHI2(n) (((n)>>2)&1)
 #define PHI3(n) (((n)>>3)&1)
 
-READ8_MEMBER(vtech2_state::laser_fdc_r)
+uint8_t vtech2_state::laser_fdc_r(offs_t offset)
 {
 	int data = 0xff;
 	switch( offset )
@@ -209,7 +263,7 @@ READ8_MEMBER(vtech2_state::laser_fdc_r)
 	return data;
 }
 
-WRITE8_MEMBER(vtech2_state::laser_fdc_w)
+void vtech2_state::laser_fdc_w(offs_t offset, uint8_t data)
 {
 	int drive;
 

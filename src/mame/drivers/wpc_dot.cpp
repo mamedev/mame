@@ -193,12 +193,12 @@ void wpc_dot_state::init_wpc_dot()
 	save_pointer(m_dmdram,"DMD RAM",0x2000);
 }
 
-READ8_MEMBER(wpc_dot_state::ram_r)
+uint8_t wpc_dot_state::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(wpc_dot_state::ram_w)
+void wpc_dot_state::ram_w(offs_t offset, uint8_t data)
 {
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;

@@ -210,7 +210,7 @@ WRITE_LINE_MEMBER(trackfld_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(trackfld_state::questions_bank_w)
+void trackfld_state::questions_bank_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER(trackfld_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(trackfld_state::trackfld_speech_r)
+uint8_t trackfld_state::trackfld_speech_r()
 {
 	if (m_vlm->bsy())
 		return 1;
@@ -267,7 +267,7 @@ READ8_MEMBER(trackfld_state::trackfld_speech_r)
 		return 0;
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
+void trackfld_state::trackfld_VLM5030_control_w(uint8_t data)
 {
 	/* bit 0 is latch direction */
 	m_vlm->st((data >> 1) & 1);
@@ -387,9 +387,9 @@ void trackfld_state::wizzquiz_map(address_map &map)
 }
 
 
-READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
+uint8_t trackfld_state::trackfld_SN76496_r()
 {
-	konami_SN76496_w(space, 0, 0);
+	konami_SN76496_w(0);
 	return 0xff; // ?
 }
 
@@ -1657,7 +1657,7 @@ void trackfld_state::init_atlantol()
 
 	downcast<konami1_device &>(*m_maincpu).set_encryption_boundary(0x6000);
 
-	space.install_write_handler(0x0800, 0x0800, write8_delegate(*this, FUNC(trackfld_state::atlantol_gfxbank_w)));
+	space.install_write_handler(0x0800, 0x0800, write8smo_delegate(*this, FUNC(trackfld_state::atlantol_gfxbank_w)));
 	space.nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */

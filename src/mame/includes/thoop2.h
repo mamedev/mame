@@ -29,15 +29,15 @@ public:
 	void thoop2(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	void oki_bankswitch_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_READ8_MEMBER(shareram_r);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void shareram_w(offs_t offset, uint8_t data);
+	uint8_t shareram_r(offs_t offset);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

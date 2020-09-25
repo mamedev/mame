@@ -121,13 +121,13 @@ protected:
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	template<class _BitmapClass>
-	u32 screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
+	template<class BitmapClass>
+	u32 screen_update_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	template<class _BitmapClass>
-	void fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
+	template<class BitmapClass>
+	void fill_bitmap(BitmapClass &bitmap, const rectangle &cliprect);
 
 	void gtmr_oki1_map(address_map &map);
 	void gtmr_oki2_map(address_map &map);

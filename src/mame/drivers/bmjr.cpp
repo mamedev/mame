@@ -6,10 +6,10 @@
 
     preliminary driver by Angelo Salese
 
+    To enter the monitor: MON
+    To quit: E
+
     TODO:
-    - for whatever reason, BASIC won't work if you try to use it directly,
-      it does if you enter into MON first then exit (with E)
-    - tape hook-up doesn't work yet (shouldn't be hard to fix)
     - Break key is unemulated (tied with the NMI)
 
 ****************************************************************************/
@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
@@ -33,8 +34,12 @@ public:
 		, m_beep(*this, "beeper")
 		, m_p_wram(*this, "wram")
 		, m_p_chargen(*this, "chargen")
+		, m_io_keyboard(*this, "KEY%d", 0U)
 	{ }
 
+	void bmjr(machine_config &config);
+
+private:
 	u8 key_r();
 	void key_w(u8 data);
 	u8 ff_r();
@@ -44,15 +49,14 @@ public:
 	u8 tape_stop_r();
 	u8 tape_start_r();
 	void xor_display_w(u8 data);
-	void init_bmjr();
-	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void bmjr(machine_config &config);
-	void bmjr_mem(address_map &map);
-private:
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mem_map(address_map &map);
 	bool m_tape_switch;
 	u8 m_xor_display;
 	u8 m_key_mux;
+	u16 m_casscnt;
+	bool m_cassold, m_cassbit;
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -60,11 +64,12 @@ private:
 	required_device<beep_device> m_beep;
 	required_shared_ptr<u8> m_p_wram;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<16> m_io_keyboard;
 };
 
 
 
-u32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 y,ra,chr,gfx,fg=4;
 	u16 sy=0,ma=0x100,x;
@@ -100,9 +105,7 @@ u32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, 
 
 u8 bmjr_state::key_r()
 {
-	char kbdrow[6];
-	sprintf(kbdrow,"KEY%X", m_key_mux);
-	return (ioport(kbdrow)->read() & 15) | (ioport("KEYMOD")->read() << 4);
+	return m_io_keyboard[m_key_mux]->read() | ioport("KEYMOD")->read();
 }
 
 void bmjr_state::key_w(u8 data)
@@ -124,11 +127,31 @@ u8 bmjr_state::unk_r()
 	return 0x30;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( bmjr_state::kansas_r )
+{
+	/* cassette - turn pulses into a bit */
+	bool cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	m_casscnt++;
+
+	if (cass_ws != m_cassold)
+	{
+		m_cassold = cass_ws;
+		m_cassbit = (m_casscnt < 12) ? 1 : 0;
+		m_casscnt = 0;
+	}
+	else
+	if (m_casscnt > 32)
+	{
+		m_casscnt = 32;
+		m_cassbit = 0;
+	}
+}
+
 u8 bmjr_state::tape_r()
 {
 	//m_cass->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 
-	return ((m_cass->input()) > 0.03) ? 0xff : 0x00;
+	return m_cassbit ? 0xff : 0x00;
 }
 
 void bmjr_state::tape_w(u8 data)
@@ -164,7 +187,7 @@ void bmjr_state::xor_display_w(u8 data)
 	m_xor_display = data;
 }
 
-void bmjr_state::bmjr_mem(address_map &map)
+void bmjr_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	//0x0100, 0x03ff basic vram
@@ -195,93 +218,80 @@ static INPUT_PORTS_START( bmjr )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY1")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("2 \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY2")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY3")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY4")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY5")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY6")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("7 \'") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY7")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY8")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
 	PORT_START("KEY9")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
-	PORT_START("KEYA")
+	PORT_START("KEY10")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_UNUSED )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(": *") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("@ Up") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('@')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("- =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
-	PORT_START("KEYB")
+	PORT_START("KEY11")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("[ Down") PORT_CODE(KEYCODE_OPENBRACE) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('[')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("^ Right") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('^')
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
-	PORT_START("KEYC")
+	PORT_START("KEY12")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_UNUSED)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("\xC2\xA5 / Left") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
-	PORT_START("KEYD")
+	PORT_START("KEY13")
 	PORT_DIPNAME( 0x01, 0x01, "D" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -294,20 +304,18 @@ static INPUT_PORTS_START( bmjr )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEYE")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("KEY14")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEYF")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("KEY15")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYMOD") /* Note: you should press Normal to return from a Kana state and vice-versa */
-	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(DEF_STR( Normal )) PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Kana Shift") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL)
-	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(DEF_STR( Normal )) PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Kana Shift") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL)
 INPUT_PORTS_END
 
 static const gfx_layout bmjr_charlayout =
@@ -327,22 +335,30 @@ GFXDECODE_END
 
 void bmjr_state::machine_start()
 {
-	m_beep->set_state(0);
+	save_item(NAME(m_tape_switch));
+	save_item(NAME(m_xor_display));
+	save_item(NAME(m_key_mux));
+	save_item(NAME(m_casscnt));
+	save_item(NAME(m_cassold));
+	save_item(NAME(m_cassbit));
 }
 
 void bmjr_state::machine_reset()
 {
+	m_beep->set_state(0);
 	m_tape_switch = 0;
+	m_xor_display = 0;
+	m_key_mux = 0;
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 void bmjr_state::bmjr(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(4'000'000)/4); //unknown clock / divider
-	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::bmjr_mem);
+	// 750khz gets the cassette sound close to a normal kansas city 300 baud
+	M6800(config, m_maincpu, 750'000); //XTAL(4'000'000)/4); //unknown clock / divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::mem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
-
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -350,7 +366,7 @@ void bmjr_state::bmjr(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 192);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(bmjr_state::screen_update_bmjr));
+	screen.set_screen_update(FUNC(bmjr_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::BRG_3BIT);
@@ -363,6 +379,7 @@ void bmjr_state::bmjr(machine_config &config)
 	/* Devices */
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(bmjr_state::kansas_r), attotime::from_hz(40000));
 }
 
 /* ROM definition */
@@ -377,9 +394,7 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-void bmjr_state::init_bmjr()
-{
-}
+
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME           FLAGS */
-COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, init_bmjr, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, empty_init, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -15,15 +15,15 @@ class wpc_s_state : public driver_device
 {
 public:
 	wpc_s_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			maincpu(*this, "maincpu"),
-			dcs(*this, "dcs"),
-			rombank(*this, "rombank"),
-			mainram(*this, "mainram"),
-			nvram(*this, "nvram"),
-			pic(*this, "pic"),
-			lamp(*this, "lamp"),
-			out(*this, "out")
+		: driver_device(mconfig, type, tag)
+		, maincpu(*this, "maincpu")
+		, dcs(*this, "dcs")
+		, rombank(*this, "rombank")
+		, mainram(*this, "mainram")
+		, nvram(*this, "nvram")
+		, pic(*this, "pic")
+		, lamp(*this, "lamp")
+		, out(*this, "out")
 	{ }
 
 	void wpc_s(machine_config &config);

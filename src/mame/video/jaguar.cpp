@@ -4,11 +4,11 @@
 
     Atari Jaguar hardware
 
-	TODO (list of exceptions):
-	jaguar_state::generic_blitter()
-	- atarikrt, bretth, brutalsp, nbajamte, spacewar, spacewarp, tempst2k
-	jaguar_state::blitter_09800009_000020_000020()
-	- ruinerp
+    TODO (list of exceptions):
+    jaguar_state::generic_blitter()
+    - atarikrt, bretth, brutalsp, nbajamte, spacewar, spacewarp, tempst2k
+    jaguar_state::blitter_09800009_000020_000020()
+    - ruinerp
 
 ****************************************************************************
 
@@ -282,11 +282,11 @@ inline void jaguar_state::verify_host_cpu_irq()
 	else
 	{
 		// cojag r3000 uses irq 4
-		// cojag 68020 uses irq 6		
+		// cojag 68020 uses irq 6
 		if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
 			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 		else
-			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);	
+			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 	}
 }
 
@@ -647,7 +647,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_cpu_irq_state &= ~(m_gpu_regs[INT1] >> 8);
 				verify_host_cpu_irq();
 				break;
-			
+
 			// TODO: INT2 bus mechanism
 
 			case VMODE:

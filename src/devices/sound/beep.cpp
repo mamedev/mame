@@ -49,7 +49,7 @@ void beep_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, BEEP_RATE);
 	m_enable = 0;
-	m_signal = 0x07fff;
+	m_signal = 1.0;
 
 	// register for savestates
 	save_item(NAME(m_enable));
@@ -63,9 +63,9 @@ void beep_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void beep_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 	int16_t signal = m_signal;
 	int clock = 0, rate = BEEP_RATE / 2;
 
@@ -78,14 +78,14 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	/* if we're not enabled, just fill with 0 */
 	if ( !m_enable || clock == 0 )
 	{
-		memset( buffer, 0, samples * sizeof(*buffer) );
+		buffer.fill(0);
 		return;
 	}
 
 	/* fill in the sample */
-	while( samples-- > 0 )
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		*buffer++ = signal;
+		buffer.put(sampindex, signal);
 		incr -= clock;
 		while( incr < 0 )
 		{
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(beep_device::set_state)
 
 	/* restart wave from beginning */
 	m_incr = 0;
-	m_signal = 0x07fff;
+	m_signal = 1.0;
 }
 
 
@@ -131,6 +131,6 @@ void beep_device::set_clock(uint32_t frequency)
 
 	m_stream->update();
 	m_frequency = frequency;
-	m_signal = 0x07fff;
+	m_signal = 1.0;
 	m_incr = 0;
 }

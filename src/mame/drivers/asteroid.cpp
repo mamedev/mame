@@ -323,9 +323,9 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    // IN0
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    // IN1
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   // DSW1
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
 	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -334,7 +334,7 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("dvg:vectorram").region("maincpu", 0x4000);
-	map(0x5000, 0x57ff).rom();                     /* vector rom */
+	map(0x5000, 0x57ff).rom();                     // Vector ROM
 	map(0x6800, 0x7fff).rom();
 }
 
@@ -345,9 +345,9 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
-	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    // IN0
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    // IN1
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   // DSW1
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x2c40, 0x2c7f).r(FUNC(asteroid_state::earom_read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
@@ -358,7 +358,7 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("dvg:vectorram").region("maincpu", 0x4000);
-	map(0x4800, 0x57ff).rom();                     /* vector rom */
+	map(0x4800, 0x57ff).rom();                     // Vector ROM
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -368,8 +368,8 @@ void asteroid_state::llander_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).ram().mirror(0x1f00);
 	map(0x2000, 0x2000).portr("IN0");
-	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    // IN1
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   // DSW1
 	map(0x2c00, 0x2c00).portr("THRUST");
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
 	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
@@ -377,7 +377,7 @@ void asteroid_state::llander_map(address_map &map)
 	map(0x3c00, 0x3c00).w(FUNC(asteroid_state::llander_sounds_w));
 	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::llander_snd_reset_w));
 	map(0x4000, 0x47ff).ram().share("dvg:vectorram").region("maincpu", 0x4000);
-	map(0x4800, 0x5fff).rom();                     /* vector rom */
+	map(0x4800, 0x5fff).rom();                     // Vector ROM
 	map(0x5800, 0x5800).nopw(); // INC access?
 	map(0x6000, 0x7fff).rom();
 }
@@ -398,11 +398,11 @@ READ_LINE_MEMBER(asteroid_state::clock_r)
 static INPUT_PORTS_START( asteroid )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
+	// Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(asteroid_state, clock_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("dvg", dvg_device, done_r)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       /* hyperspace */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    /* fire */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       // Hyperspace
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    // Fire
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
@@ -413,9 +413,9 @@ static INPUT_PORTS_START( asteroid )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)        /* thrust */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)/* right */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  /* left */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)        // Thrust
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)// Right
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  // Left
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:1,2")
@@ -426,7 +426,7 @@ static INPUT_PORTS_START( asteroid )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING (   0x04, "3" )
 	PORT_DIPSETTING (   0x00, "4" )
-	PORT_DIPNAME( 0x08, 0x00, "Center Mech" )       PORT_DIPLOCATION("SW:4") /* Left/Center for 3-door mech */
+	PORT_DIPNAME( 0x08, 0x00, "Center Mech" )       PORT_DIPLOCATION("SW:4") // Left/Center for 3-door mech
 	PORT_DIPSETTING (   0x00, "X 1" )
 	PORT_DIPSETTING (   0x08, "X 2" )
 	PORT_DIPNAME( 0x30, 0x00, "Right Mech" )        PORT_DIPLOCATION("SW:5,6")
@@ -451,31 +451,31 @@ static INPUT_PORTS_START( asteroidb )
 	PORT_INCLUDE( asteroid )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* resets */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* resets */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Resets
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Resets
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Bit 7 is VG_HALT */
+	// Bit 7 is VG_HALT
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("dvg", dvg_device, done_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)            /* thrust */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)            // Thrust
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)        /* fire */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)        // Fire
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW:6" )
 
-	PORT_START("HS") /* hyperspace */
+	PORT_START("HS") // Hyperspace
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)            /* hyperspace */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)            // Hyperspace
 INPUT_PORTS_END
 
 
@@ -495,12 +495,12 @@ static INPUT_PORTS_START( asterock )
 	PORT_INCLUDE( asteroid )
 
 	PORT_MODIFY("IN0")
-	/* Bit 0 is VG_HALT and Bit 2 is the 3 KHz source */
+	// Bit 0 is VG_HALT and Bit 2 is the 3 KHz source
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("dvg", dvg_device, done_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(asteroid_state, clock_r)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)        /* hyperspace */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)     /* fire */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)        // Hyperspace
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)     // Fire
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -536,25 +536,25 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( astdelux )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* According to schematics */
-	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // According to schematics
+	// Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(asteroid_state, clock_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("dvg", dvg_device, done_r)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       /* hyperspace */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    /* fire */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       // Hyperspace
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    // Fire
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) /* Coin Left */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) /* Coin Center */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) /* Coin Right */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // Coin Left
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // Coin Center
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) // Coin Right
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)        /* thrust */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)/* right */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  /* left */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_LALT) PORT_CODE(JOYCODE_BUTTON2)        // Thrust
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)// Right
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)  // Left
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("R5:1,2")
@@ -564,7 +564,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (   0x03, DEF_STR( Spanish ) )
 	/*  Default lives is 2,3,4,5. Values incremented by 1 if Bonus Life set to None or Coinage set to 2C_1C.
 	    Incremented by 2 if both are set at the same time. PORT_CONDITION() can only test for 1 switch at a time. */
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("R5:3,4") /* Default is 2 or 3 depending on manual version */
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("R5:3,4") // Default is 2 or 3 depending on manual version
 	PORT_DIPSETTING (   0x00, "2-4" )
 	PORT_DIPSETTING (   0x04, "3-5" )
 	PORT_DIPSETTING (   0x08, "4-6" )
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPNAME( 0x10, 0x00, "Minimum Plays" )         PORT_DIPLOCATION("R5:5")
 	PORT_DIPSETTING (   0x00, "1" )
 	PORT_DIPSETTING (   0x10, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" for pre Revision 03 versions */
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") // Listed as "Unused" for pre Revision 03 versions
 	PORT_DIPSETTING (   0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("R5:7,8")
@@ -592,7 +592,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (   0x04, "X 5" )
 	PORT_DIPSETTING (   0x08, "X 4" )
 	PORT_DIPSETTING (   0x0c, "X 1" )
-	PORT_DIPNAME( 0x10, 0x10, "Center Coin" )           PORT_DIPLOCATION("L8:5") /* "Left Coin" in a 2-mech door */
+	PORT_DIPNAME( 0x10, 0x10, "Center Coin" )           PORT_DIPLOCATION("L8:5") // "Left Coin" in a 2-mech door
 	PORT_DIPSETTING (   0x00, "X 2" )
 	PORT_DIPSETTING (   0x10, "X 1" )
 	PORT_DIPNAME( 0xe0, 0xe0, "Bonus Coins" )           PORT_DIPLOCATION("L8:6,7,8")
@@ -602,7 +602,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (   0xc0, "1 Coin Each 2 Coins" )
 	PORT_DIPSETTING (   0xe0, DEF_STR( None ) )
 
-	/* The manual includes a 3rd DIP controlling the number & configuration of coin counters, defined as: */
+	// The manual includes a 3rd DIP controlling the number & configuration of coin counters, defined as:
 #if 0
 	PORT_START("DSW3")                                  // 4-Toggle switch located on game PCB at M12
 	PORT_DIPNAME( 0x03, 0x00, "Coin Counters" )             PORT_DIPLOCATION("M12:1,2")
@@ -625,11 +625,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( llander )
 	PORT_START("IN0")
-	/* Bit 0 is VG_HALT */
+	// Bit 0 is VG_HALT
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("dvg", dvg_device, done_r)
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
-	/* Of the rest, Bit 6 is the 3KHz source. 3,4 and 5 are unknown */
+	// Of the rest, Bit 6 is the 3KHz source. 3,4 and 5 are unknown
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(asteroid_state, clock_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
@@ -641,11 +641,11 @@ static INPUT_PORTS_START( llander )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )  PORT_NAME("Select Game")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Abort")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)    /* right */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)      /* left */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)    // Right
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)      // Left
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Right Coin" )            PORT_DIPLOCATION("P8:1,2") /* "Left Coin Mech always registers X 1" */
+	PORT_DIPNAME( 0x03, 0x00, "Right Coin" )            PORT_DIPLOCATION("P8:1,2") // "Left Coin Mech always registers X 1"
 	PORT_DIPSETTING (   0x00, "X 1" )
 	PORT_DIPSETTING (   0x01, "X 4" )
 	PORT_DIPSETTING (   0x02, "X 5" )
@@ -683,10 +683,10 @@ static INPUT_PORTS_START( llander1 )
 	PORT_INCLUDE( llander )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("P8:5") /* "Left Coin Mech always registers X 1" */
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("P8:5") // "Left Coin Mech always registers X 1"
 	PORT_DIPSETTING (   0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING (   0x10, DEF_STR( Free_Play ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "P8:6" )         /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "P8:6" )         // Listed as "Unused"
 	PORT_DIPNAME( 0xc0, 0x80, "Fuel units" )            PORT_DIPLOCATION("P8:7,8")
 	PORT_DIPSETTING (   0x00, "450" )
 	PORT_DIPSETTING (   0x40, "600" )
@@ -734,7 +734,7 @@ INPUT_PORTS_END
 
 void asteroid_state::asteroid_base(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M6502(config, m_maincpu, MASTER_CLOCK/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::asteroid_map);
 	m_maincpu->set_periodic_int(FUNC(asteroid_state::asteroid_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
@@ -753,7 +753,7 @@ void asteroid_state::asteroid_base(machine_config &config)
 	outlatch.bit_handler<4>().set(FUNC(asteroid_state::coin_counter_center_w)); // COIN CNTRC
 	outlatch.bit_handler<5>().set(FUNC(asteroid_state::coin_counter_right_w)); // COIN CNTRR
 
-	/* video hardware */
+	// Video hardware
 	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
 	screen.set_refresh_hz(CLOCK_3KHZ/12/4);
@@ -769,7 +769,7 @@ void asteroid_state::asteroid(machine_config &config)
 {
 	asteroid_base(config);
 
-	/* sound hardware */
+	// Sound hardware
 	asteroid_sound(config);
 }
 
@@ -777,7 +777,7 @@ void asteroid_state::asterock(machine_config &config)
 {
 	asteroid(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	m_maincpu->set_periodic_int(FUNC(asteroid_state::asterock_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
 }
 
@@ -785,12 +785,12 @@ void asteroid_state::astdelux(machine_config &config)
 {
 	asteroid_base(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::astdelux_map);
 
 	ER2055(config, m_earom);
 
-	/* sound hardware */
+	// Sound hardware
 	astdelux_sound(config);
 
 	pokey_device &pokey(POKEY(config, "pokey", MASTER_CLOCK/8));
@@ -816,7 +816,7 @@ void asteroid_state::llander(machine_config &config)
 {
 	asteroid_base(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::llander_map);
 	m_maincpu->set_periodic_int(FUNC(asteroid_state::llander_interrupt), attotime::from_hz(MASTER_CLOCK/4096/12));
 
@@ -833,7 +833,7 @@ void asteroid_state::llander(machine_config &config)
 	outlatch.bit_handler<4>().set_output("lamp0"); // START/SELECT LEDs
 	outlatch.bit_handler<5>().set_nop();
 
-	/* sound hardware */
+	// Sound hardware
 	llander_sound(config);
 }
 
@@ -850,10 +850,10 @@ ROM_START( asteroid )
 	ROM_LOAD( "035145-04e.ef2", 0x6800, 0x0800, CRC(b503eaf7) SHA1(5369dcfe01c0b9e48b15a96a0de8d23ee8ef9145) )
 	ROM_LOAD( "035144-04e.h2",  0x7000, 0x0800, CRC(25233192) SHA1(51b2865fa897cdaa84ac6500c4b4833a80827019) )
 	ROM_LOAD( "035143-02.j2",   0x7800, 0x0800, CRC(312caa02) SHA1(1ce2eac1ab90b972e3f1fc3d250908f26328d6cb) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "035127-02.np3",  0x5000, 0x0800, CRC(8b71fd9e) SHA1(8cd5005e531eafa361d6b7e9eed159d164776c70) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -863,10 +863,10 @@ ROM_START( asteroid2 )
 	ROM_LOAD( "035145-02.ef2",  0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
 	ROM_LOAD( "035144-02.h2",   0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
 	ROM_LOAD( "035143-02.j2",   0x7800, 0x0800, CRC(312caa02) SHA1(1ce2eac1ab90b972e3f1fc3d250908f26328d6cb) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "035127-02.np3",  0x5000, 0x0800, CRC(8b71fd9e) SHA1(8cd5005e531eafa361d6b7e9eed159d164776c70) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -876,10 +876,10 @@ ROM_START( asteroid1 )
 	ROM_LOAD( "035145-01.ef2",  0x6800, 0x0800, CRC(e9bfda64) SHA1(291dc567ebb31b35df83d9fb87f4080f251ff9c8) )
 	ROM_LOAD( "035144-01.h2",   0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
 	ROM_LOAD( "035143-01.j2",   0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "035127-01.np3",  0x5000, 0x0800, CRC(99699366) SHA1(9b2828fc1cef7727f65fa65e1e11e309b7c98792) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -889,10 +889,10 @@ ROM_START( asteroidb )
 	ROM_LOAD( "035145ll.de1",  0x6800, 0x0800, CRC(605fc0f2) SHA1(8d897a3b75bd1f2537470f0a34a97a8c0853ee08) )
 	ROM_LOAD( "035144ll.c1",   0x7000, 0x0800, CRC(e106de77) SHA1(003e99d095bd4df6fae243ea1dd5b12f3eb974f1) )
 	ROM_LOAD( "035143ll.b1",   0x7800, 0x0800, CRC(6b1d8594) SHA1(ff3cd93f1bc5734bface285e442125b395602d7d) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "035127-02.np3",  0x5000, 0x0800, CRC(8b71fd9e) SHA1(8cd5005e531eafa361d6b7e9eed159d164776c70) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -906,10 +906,10 @@ ROM_START( spcrocks )
 	ROM_LOAD( "1.bin", 0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
 	ROM_LOAD( "2.bin", 0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
 	ROM_LOAD( "3.bin", 0x7800, 0x0800, CRC(b912754d) SHA1(d4ada3e162ff454a48468f6309947276df0c5331) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "e.bin",  0x5000, 0x0800, CRC(148ef465) SHA1(4b1158112364bc55b8aab4127949f9238c36b238) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) ) // still undumped.
 ROM_END
@@ -919,10 +919,10 @@ ROM_START( aerolitos )
 	ROM_LOAD( "2516_1e.bin", 0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
 	ROM_LOAD( "2516_1d.bin", 0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
 	ROM_LOAD( "2516_1c.bin", 0x7800, 0x0800, CRC(b912754d) SHA1(d4ada3e162ff454a48468f6309947276df0c5331) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "2716_3n.bin", 0x5000, 0x0800, CRC(32e69e66) SHA1(a4cce36bc781443b430003280ef4185a4a04de96) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -935,11 +935,11 @@ ROM_START( asterock )
 	ROM_LOAD( "10505.5",       0x7400, 0x0400, CRC(d2ce7672) SHA1(b6012e09b2439a614a55bcf23be0692c42830e21) )
 	ROM_LOAD( "10505.6",       0x7800, 0x0400, CRC(74103c87) SHA1(e568b5ac573a6d0474cf672b3c62abfbd3320799) )
 	ROM_LOAD( "10505.7",       0x7c00, 0x0400, CRC(75a39768) SHA1(bf22998fd692fb01964d8894e421435c55d746a0) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "10505.0",       0x5000, 0x0400, CRC(6bd2053f) SHA1(790f2858f44bbb1854e2d9d549e29f4815c4665b) )
 	ROM_LOAD( "10505.1",       0x5400, 0x0400, CRC(231ce201) SHA1(710f4c19864d725ba1c9ea447a97e84001a679f7) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -952,11 +952,11 @@ ROM_START( asterockv )
 	ROM_LOAD( "10505.5",       0x7400, 0x0400, CRC(d2ce7672) SHA1(b6012e09b2439a614a55bcf23be0692c42830e21) )
 	ROM_LOAD( "10505.6",       0x7800, 0x0400, CRC(74103c87) SHA1(e568b5ac573a6d0474cf672b3c62abfbd3320799) )
 	ROM_LOAD( "10505.7",       0x7c00, 0x0400, CRC(75a39768) SHA1(bf22998fd692fb01964d8894e421435c55d746a0) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "videotronas.0", 0x5000, 0x0400, CRC(d1ac90b5) SHA1(7209027d2099c75c6336605ae80491ffc5673674) ) // only this rom differs from Sidam's Asterock
 	ROM_LOAD( "10505.1",       0x5400, 0x0400, CRC(231ce201) SHA1(710f4c19864d725ba1c9ea447a97e84001a679f7) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -969,11 +969,11 @@ ROM_START( meteorite )
 	ROM_LOAD( "5",       0x7400, 0x0400, CRC(d2ce7672) SHA1(b6012e09b2439a614a55bcf23be0692c42830e21) )
 	ROM_LOAD( "6",       0x7800, 0x0400, CRC(379072ed) SHA1(1ea788f58490f6d0aa6fda1374e33aa25fa343c6) )
 	ROM_LOAD( "7",       0x7c00, 0x0400, CRC(75a39768) SHA1(bf22998fd692fb01964d8894e421435c55d746a0) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "0",       0x5000, 0x0400, CRC(7a3ff3ac) SHA1(11dc452d2804bbaa7cee4dff85a2ab02e6f2c3a9) )
 	ROM_LOAD( "1",       0x5400, 0x0400, CRC(d62b2887) SHA1(8832953c7166d2f0ed1067c43ebf369db4a4aa70) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "meteorites_bprom.bin",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -983,10 +983,10 @@ ROM_START( meteorts )
 	ROM_LOAD( "m0_c1.bin",    0x6800, 0x0800, CRC(dff88688) SHA1(7f4148a580fb6f605499c99e7dde7068eca1651a) )
 	ROM_LOAD( "m1_f1.bin",    0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
 	ROM_LOAD( "m2_j1.bin",    0x7800, 0x0800, CRC(64bd0408) SHA1(141d053cb4cce3fece98293136928b527d3ade0f) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "mv_np3.bin",   0x5000, 0x0800, CRC(11d1c4ae) SHA1(433c2c05b92094bbe102c356d7f1a907db13da67) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",    0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -999,13 +999,31 @@ ROM_START( meteorho )
 	ROM_LOAD( "d.bin",    0x7400, 0x0400, CRC(9f169db9) SHA1(b6a4a8ea9d48c6b1faebf104faae7c67b2b060b5) )
 	ROM_LOAD( "c.bin",    0x7800, 0x0400, CRC(bd99556a) SHA1(8c712b205125c0c2a45dbb4fa9e5e5302c5bbd1b) )
 	ROM_LOAD( "e.bin",    0x7c00, 0x0400, CRC(10fdfe9a) SHA1(9db4b3ab904e66d3622ec98e13ef6baf5d4f7099) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "a.bin",    0x5000, 0x0400, CRC(d7822110) SHA1(bf6c5e622fdc16c39a1d8f23fc029abaa1e99b19) )
 	ROM_LOAD( "b.bin",    0x5400, 0x0400, CRC(d62b2887) SHA1(8832953c7166d2f0ed1067c43ebf369db4a4aa70) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0100, CRC(9e237193) SHA1(f663e12d5db0fa50ea49d03591475ae0a7168bc0) )
+ROM_END
+
+// The PCB was found inside a "Kasteroides" cab (a Spanish Asteriods bootleg from "Sede 3")
+ROM_START( meteorbl )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2as.12", 0x6800, 0x0400, CRC(cdf720c6) SHA1(85fe748096478e28a06bd98ff3aad73ab21b22a4) )
+	ROM_LOAD( "3as.13", 0x6c00, 0x0400, CRC(ee58bdf0) SHA1(80094cb5dafd327aff6658ede33106f0493a809d) )
+	ROM_LOAD( "4as.14", 0x7000, 0x0400, CRC(8d3e421e) SHA1(5f5719ab84d4755e69bef205d313b455bc59c413) )
+	ROM_LOAD( "5as.15", 0x7400, 0x0400, CRC(d2ce7672) SHA1(b6012e09b2439a614a55bcf23be0692c42830e21) )
+	ROM_LOAD( "6as.16", 0x7800, 0x0400, CRC(74103c87) SHA1(e568b5ac573a6d0474cf672b3c62abfbd3320799) )
+	ROM_LOAD( "7as.17", 0x7c00, 0x0400, CRC(75a39768) SHA1(bf22998fd692fb01964d8894e421435c55d746a0) )
+	// Vector ROM
+	ROM_LOAD( "0as.10", 0x5000, 0x0400, CRC(dc10767a) SHA1(579951ced16d4c538eaddbc58474f9d8bf4906f3) )
+	ROM_LOAD( "1as.11", 0x5400, 0x0400, CRC(231ce201) SHA1(710f4c19864d725ba1c9ea447a97e84001a679f7) )
+
+	// DVG PROM
+	ROM_REGION( 0x100, "dvg:prom", 0 )
+	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) ) // Not dumped on this set
 ROM_END
 
 ROM_START( hyperspc )
@@ -1013,10 +1031,10 @@ ROM_START( hyperspc )
 	ROM_LOAD( "035145-01.bin",   0x6800, 0x0800, CRC(e9bfda64) SHA1(291dc567ebb31b35df83d9fb87f4080f251ff9c8) )
 	ROM_LOAD( "035144-01.bin",   0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
 	ROM_LOAD( "035143-01.bin",   0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "035127-01.bin",   0x5000, 0x0800, CRC(7dec48bd) SHA1(8bc926a763ff80b101b2e1c24d45615c3daf67d5) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -1027,11 +1045,11 @@ ROM_START( astdelux )
 	ROM_LOAD( "036431-02.ef1", 0x6800, 0x0800, CRC(d4004aae) SHA1(aa2099b8fc62a79879efeea70ea1e9ed77e3e6f0) )
 	ROM_LOAD( "036432-02.fh1", 0x7000, 0x0800, CRC(6d720c41) SHA1(198218cd2f43f8b83e4463b1f3a8aa49da5015e4) )
 	ROM_LOAD( "036433-03.j1",  0x7800, 0x0800, CRC(0dcc0be6) SHA1(bf10ffb0c4870e777d6b509cbede35db8bb6b0b8) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "036800-02.r2",  0x4800, 0x0800, CRC(bb8cabe1) SHA1(cebaa1b91b96e8b80f2b2c17c6fd31fa9f156386) )
 	ROM_LOAD( "036799-01.np2", 0x5000, 0x0800, CRC(7d511572) SHA1(1956a12bccb5d3a84ce0c1cc10c6ad7f64e30b40) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 
@@ -1044,11 +1062,11 @@ ROM_START( astdelux2 )
 	ROM_LOAD( "036431-01.ef1", 0x6800, 0x0800, CRC(157a8516) SHA1(9041d8c2369d004f198681e02b59a923fa8f70c9) )
 	ROM_LOAD( "036432-01.fh1", 0x7000, 0x0800, CRC(fdea913c) SHA1(ded0138a20d80317d67add5bb2a64e6274e0e409) )
 	ROM_LOAD( "036433-02.j1",  0x7800, 0x0800, CRC(d8db74e3) SHA1(52b64e867df98d14742eb1817b59931bb7f941d9) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "036800-01.r2",  0x4800, 0x0800, CRC(3b597407) SHA1(344fea2e5d84acce365d76daed61e96b9b6b37cc) )
 	ROM_LOAD( "036799-01.np2", 0x5000, 0x0800, CRC(7d511572) SHA1(1956a12bccb5d3a84ce0c1cc10c6ad7f64e30b40) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 
@@ -1099,11 +1117,11 @@ ROM_START( astdelux1 )
 	ROM_LOAD( "036431-01.ef1", 0x6800, 0x0800, CRC(157a8516) SHA1(9041d8c2369d004f198681e02b59a923fa8f70c9) )
 	ROM_LOAD( "036432-01.fh1", 0x7000, 0x0800, CRC(fdea913c) SHA1(ded0138a20d80317d67add5bb2a64e6274e0e409) )
 	ROM_LOAD( "036433-01.j1",  0x7800, 0x0800, CRC(ef09bac7) SHA1(6a4b37dbfe4e6badc4e81036b1430da2e9cb8ca4) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "036800-01.r2",  0x4800, 0x0800, CRC(3b597407) SHA1(344fea2e5d84acce365d76daed61e96b9b6b37cc) )
 	ROM_LOAD( "036799-01.np2", 0x5000, 0x0800, CRC(7d511572) SHA1(1956a12bccb5d3a84ce0c1cc10c6ad7f64e30b40) )
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 
@@ -1116,12 +1134,12 @@ ROM_START( llander )
 	ROM_LOAD( "034571-02.de1", 0x6800, 0x0800, CRC(77da4b2f) SHA1(4be6cef5af38734d580cbfb7e4070fe7981ddfd6) )
 	ROM_LOAD( "034570-01.c1",  0x7000, 0x0800, CRC(2724e591) SHA1(ecf4430a0040c227c896aa2cd81ee03960b4d641) )
 	ROM_LOAD( "034569-02.b1",  0x7800, 0x0800, CRC(72837a4e) SHA1(9b21ba5e1518079c326ca6e15b9993e6c4483caa) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(ebb744f2) SHA1(e685b094c1261a351e4e82dfb487462163f136a4) ) /* built from original Atari source code */
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(ebb744f2) SHA1(e685b094c1261a351e4e82dfb487462163f136a4) ) // Built from original Atari source code
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -1132,12 +1150,12 @@ ROM_START( llander1 )
 	ROM_LOAD( "034571-01.de1", 0x6800, 0x0800, CRC(493e24b7) SHA1(125a2c335338ccabababef12fd7096ef4b605a31) )
 	ROM_LOAD( "034570-01.c1",  0x7000, 0x0800, CRC(2724e591) SHA1(ecf4430a0040c227c896aa2cd81ee03960b4d641) )
 	ROM_LOAD( "034569-01.b1",  0x7800, 0x0800, CRC(b11a7d01) SHA1(8f2935dbe04ee68815d69ea9e71853b5a145d7c3) )
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(ebb744f2) SHA1(e685b094c1261a351e4e82dfb487462163f136a4) ) /* built from original Atari source code */
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(ebb744f2) SHA1(e685b094c1261a351e4e82dfb487462163f136a4) ) // Built from original Atari source code
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
@@ -1148,12 +1166,12 @@ ROM_START( llandert )
 	ROM_LOAD( "llprom1.c1",    0x7000, 0x0800, CRC(761a5b45) SHA1(dde08ef856caed4b017bfbb8e3f3260747c0a1e5) )
 	ROM_LOAD( "llprom2.b1",    0x7800, 0x0800, CRC(9ec62656) SHA1(2247fd187d0aa7305d7326722c99578ad20718fa) )
 
-	/* Vector ROM */
+	// Vector ROM
 	ROM_LOAD( "llvrom0.r3",    0x4800, 0x0800, CRC(c307b42a) SHA1(6872c7671f4ab314962892b3cf93cc9d6c380ee2) ) // unused
 	ROM_LOAD( "llvrom1.np3",   0x5000, 0x0800, CRC(ace6b2be) SHA1(afdf4e6fc4be23197977e67c04b9baf9597756a0) ) // unused
 	ROM_LOAD( "llvrom2.m3",    0x5800, 0x0800, CRC(56c38219) SHA1(714878c0b24c9657c972a2ba25e790a4d3b81d64) ) // unused, filled with garbage? (it is not the language rom)
 
-	/* DVG PROM */
+	// DVG PROM
 	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) ) // taken from parent
 ROM_END
@@ -1184,23 +1202,24 @@ void asteroid_state::init_asterock()
  *
  *************************************/
 
-GAME( 1979, asteroid,  0,        asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids (rev 4)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroid2, asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids (rev 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroid1, asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids (rev 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroidb, asteroid, asteroid, asteroidb, asteroid_state, init_asteroidb, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spcrocks,  asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "Atari (J.Estevez license)", "Space Rocks (Spanish clone of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
-GAME( 1980, aerolitos, asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
-GAME( 1979, asterock,  asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asterockv, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorite, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Proel)",       "Meteorite (Proel bootleg of Asteroids)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorts,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (VGG)",         "Meteorites (VGG bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorho,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hyperspc,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid,  0,        asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",                     "Asteroids (rev 4)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid2, asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",                     "Asteroids (rev 2)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid1, asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",                     "Asteroids (rev 1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroidb, asteroid, asteroid, asteroidb, asteroid_state, init_asteroidb, ROT0, "bootleg",                   "Asteroids (bootleg on Lunar Lander hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spcrocks,  asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "Atari (J.Estevez license)", "Space Rocks (Spanish clone of Asteroids)",     MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
+GAME( 1980, aerolitos, asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "bootleg (Rodmar Elec.)",    "Aerolitos (Spanish bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
+GAME( 1979, asterock,  asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Sidam)",           "Asterock (Sidam bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asterockv, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Videotron)",       "Asterock (Videotron bootleg of Asteroids)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorite, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Proel)",           "Meteorite (Proel bootleg of Asteroids)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorts,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (VGG)",             "Meteorites (VGG bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorho,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Hoei)",            "Meteor (Hoei bootleg of Asteroids)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorbl,  asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg",                   "Meteor (bootleg of Asteroids)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hyperspc,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Rumiano)",         "Hyperspace (bootleg of Asteroids)",            MACHINE_SUPPORTS_SAVE )
 
 GAMEL(1980, astdelux,  0,        astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
 GAMEL(1980, astdelux2, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
 GAMEL(1980, astdelux1, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
 
-GAME( 1979, llander,   0,        llander,  llander,   asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, llander1,  llander,  llander,  llander1,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, llandert,  llander,  llander,  llandert,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (screen test)", MACHINE_SUPPORTS_SAVE ) // no copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)
+GAME( 1979, llander,   0,        llander,  llander,   asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1979, llander1,  llander,  llander,  llander1,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1979, llandert,  llander,  llander,  llandert,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (screen test)", MACHINE_SUPPORTS_SAVE ) // No copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)

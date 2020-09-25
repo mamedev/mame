@@ -52,10 +52,10 @@ private:
 	uint8_t m_addr_latch;
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_READ8_MEMBER(cpu_mem_r);
-	DECLARE_WRITE8_MEMBER(cpu_mem_w);
-	DECLARE_READ8_MEMBER(cpu_io_r);
-	DECLARE_WRITE8_MEMBER(cpu_io_w);
+	uint8_t cpu_mem_r(offs_t offset);
+	void cpu_mem_w(offs_t offset, uint8_t data);
+	uint8_t cpu_io_r(offs_t offset);
+	void cpu_io_w(offs_t offset, uint8_t data);
 	void cpu_mem_map(address_map &map);
 	void cpu_io_map(address_map &map);
 	void z80_m1_w(uint8_t data);

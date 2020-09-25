@@ -13,7 +13,7 @@
 #define m68307BUS_MBSR (0x07)
 #define m68307BUS_MBDR (0x09)
 
-READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
+uint8_t m68307_cpu_device::m68307_internal_mbus_r(offs_t offset)
 {
 	assert(m_m68307MBUS);
 	m68307_mbus &mbus = *m_m68307MBUS;
@@ -55,7 +55,7 @@ READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( m68307_cpu_device::m68307_internal_mbus_w )
+void m68307_cpu_device::m68307_internal_mbus_w(offs_t offset, uint8_t data)
 {
 	assert(m_m68307MBUS);
 	m68307_mbus &mbus = *m_m68307MBUS;

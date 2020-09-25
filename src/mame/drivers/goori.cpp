@@ -54,12 +54,14 @@ ROMS:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "emupal.h"
-#include "screen.h"
-#include "tilemap.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
 
 class goori_state : public driver_device
 {
@@ -177,9 +179,9 @@ void goori_state::goori_30000e_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	if (mem_mask & 0x00ff)
 	{
-		m_eeprom->di_write((data & 0x0004) >> 2);
-		m_eeprom->cs_write((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->clk_write((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->di_write(BIT(data, 2));
+		m_eeprom->cs_write(BIT(data, 0));
+		m_eeprom->clk_write(BIT(data, 1));
 	}
 }
 

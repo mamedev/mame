@@ -42,7 +42,7 @@ void arm_aic_device::regs_map(address_map &map)
 	map(0x148, 0x14b).r(FUNC(arm_aic_device::aic_ffsr_r));        // AIC_FFSR    Fast Forcing Status Register
 }
 
-READ32_MEMBER(arm_aic_device::irq_vector_r)
+uint32_t arm_aic_device::irq_vector_r()
 {
 	uint32_t mask = m_irqs_enabled & m_irqs_pending & ~m_fast_irqs;
 	m_current_irq_vector = m_spurious_vector;
@@ -78,7 +78,7 @@ READ32_MEMBER(arm_aic_device::irq_vector_r)
 	return m_current_irq_vector;
 }
 
-READ32_MEMBER(arm_aic_device::firq_vector_r)
+uint32_t arm_aic_device::firq_vector_r()
 {
 	m_current_firq_vector = (m_irqs_enabled & m_irqs_pending & m_fast_irqs) ? m_aic_svr[0] : m_spurious_vector;
 	return m_current_firq_vector;

@@ -67,17 +67,17 @@ private:
 	uint32_t m_vcount_191;
 	uint32_t m_latch_374;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(c804_w);
-	DECLARE_WRITE8_MEMBER(gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(star_scrollx_w);
-	DECLARE_WRITE8_MEMBER(star_scrolly_w);
+	void bankswitch_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void c804_w(uint8_t data);
+	void gfxctrl_w(uint8_t data);
+	void star_scrollx_w(uint8_t data);
+	void star_scrolly_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(turtship_ports_r);
+	uint8_t turtship_ports_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
+	void whizz_bankswitch_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

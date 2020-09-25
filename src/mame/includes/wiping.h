@@ -38,7 +38,7 @@ private:
 	uint8_t m_main_irq_mask;
 	uint8_t m_sound_irq_mask;
 
-	DECLARE_READ8_MEMBER(ports_r);
+	uint8_t ports_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(main_irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);

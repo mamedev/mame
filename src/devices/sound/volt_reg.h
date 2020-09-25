@@ -17,7 +17,7 @@
 class voltage_regulator_device : public device_t, public device_sound_interface
 {
 public:
-	voltage_regulator_device &set_output(double analogue_dc) { m_output = (analogue_dc * 0x7fff) / 5.0f; return *this; }
+	voltage_regulator_device &set_output(double analogue_dc) { m_output = analogue_dc / 5.0f; return *this; }
 
 	voltage_regulator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -28,11 +28,11 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	sound_stream* m_stream;
-	stream_sample_t m_output;
+	stream_buffer::sample_t m_output;
 };
 
 DECLARE_DEVICE_TYPE(VOLTAGE_REGULATOR, voltage_regulator_device)

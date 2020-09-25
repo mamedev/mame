@@ -38,11 +38,11 @@ public:
 
 	void init_wc90b();
 
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(txvideoram_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void txvideoram_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void sound_command_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void sound_cpu(address_map &map);
@@ -85,11 +85,11 @@ private:
 	int m_msm5205next;
 	int m_toggle;
 
-	DECLARE_WRITE8_MEMBER(bankswitch1_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(adpcm_control_w);
-	DECLARE_READ8_MEMBER(master_irq_ack_r);
-	DECLARE_WRITE8_MEMBER(slave_irq_ack_w);
+	void bankswitch1_w(uint8_t data);
+	void adpcm_data_w(uint8_t data);
+	void adpcm_control_w(uint8_t data);
+	uint8_t master_irq_ack_r();
+	void slave_irq_ack_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -112,7 +112,7 @@ protected:
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority ) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(master_irq_ack_w);
+	void master_irq_ack_w(uint8_t data);
 	required_shared_ptr<uint8_t> m_bgscroll;
 
 	void map1(address_map &map);

@@ -30,7 +30,7 @@ void shisen_state::shisen_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(shisen_state::coin_w)
+void shisen_state::coin_w(uint8_t data)
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 

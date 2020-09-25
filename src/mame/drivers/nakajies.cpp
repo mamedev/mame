@@ -455,7 +455,7 @@ uint8_t nakajies_state::irq_clear_r()
 }
 
 
-void nakajies_state::irq_clear_w(uint8_t data) 
+void nakajies_state::irq_clear_w(uint8_t data)
 {
 	m_irq_active &= ~data;
 	nakajies_update_irqs();
@@ -468,7 +468,7 @@ uint8_t nakajies_state::irq_enable_r()
 }
 
 
-void nakajies_state::irq_enable_w(uint8_t data) 
+void nakajies_state::irq_enable_w(uint8_t data)
 {
 	m_irq_enabled = data;
 	nakajies_update_irqs();
@@ -486,13 +486,13 @@ uint8_t nakajies_state::unk_a0_r()
 	return 0xf7;
 }
 
-void nakajies_state::lcd_memory_start_w(uint8_t data) 
+void nakajies_state::lcd_memory_start_w(uint8_t data)
 {
 	m_lcd_memory_start = data;
 }
 
 
-void nakajies_state::banking_w(offs_t offset, uint8_t data) 
+void nakajies_state::banking_w(offs_t offset, uint8_t data)
 {
 	m_bank[offset] = data;
 	update_banks();

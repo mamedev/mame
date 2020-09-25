@@ -34,14 +34,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram2_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void sound_nmi_mask_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void colorram2_w(offs_t offset, uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void scroll_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 

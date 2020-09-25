@@ -366,7 +366,7 @@ namespace sol {
 				++uniqueness;
 
 				const char* gcmetakey = &usertype_traits<T>::gc_table()[0];
-				stack::push<user<usertype_detail::simple_map>>(L, metatable_key, uniquegcmetakey, &usertype_traits<T>::metatable()[0], 
+				stack::push_specific<user<usertype_detail::simple_map>>(L, metatable_key, uniquegcmetakey, &usertype_traits<T>::metatable()[0], 
 					umx.indexbaseclasspropogation, umx.newindexbaseclasspropogation, 
 					std::move(umx.varmap), std::move(umx.registrations)
 				);

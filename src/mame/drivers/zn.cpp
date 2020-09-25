@@ -1133,7 +1133,7 @@ uint16_t primrag2_state::vt83c461_16_r(offs_t offset, uint16_t mem_mask)
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		return m_vt83c461->read_config( ( offset / 2 ) & 3 ) >> shift;
+		return m_vt83c461->config_r( ( offset / 2 ) & 3 ) >> shift;
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
@@ -1156,7 +1156,7 @@ void primrag2_state::vt83c461_16_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
 	{
-		m_vt83c461->write_config( ( offset / 2 ) & 3, data << shift );
+		m_vt83c461->config_w( ( offset / 2 ) & 3, data << shift );
 	}
 	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
 	{
@@ -2563,34 +2563,6 @@ static INPUT_PORTS_START( nbajamex )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( zn4w )
-	PORT_INCLUDE( zn )
-
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
-
-	PORT_MODIFY("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(3)
-
-	PORT_MODIFY("P4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(4)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( zn6b )
 	PORT_INCLUDE( zn )
 
@@ -2608,6 +2580,40 @@ static INPUT_PORTS_START( zn6b )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tgm )
+	PORT_INCLUDE( zn6b )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+
+	/* Tetris: The Grand Master uses 6-button kick harness for debug inputs */
+	PORT_START("DEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Debug Inputs" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+
+	PORT_MODIFY("P4")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jdredd )
@@ -3998,6 +4004,23 @@ ROM_START( doapp )
 	ROM_LOAD( "mg05", 0x000000, 0x000008, CRC(5748a4ca) SHA1(c88d73f6a646a9ddefdfd84cba70d591759c069f) )
 ROM_END
 
+ROM_START( doappk )
+	TPS_BIOS
+
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "doapp_u0119.119", 0x0000001, 0x100000, CRC(9084704e) SHA1(616b3e65a32768767209ae77c48ad34d11b31754) )
+	ROM_LOAD16_BYTE( "doapp_u0120.120", 0x0000000, 0x100000, CRC(720a6983) SHA1(d38783110440ffa00036b86f97bff5edb6a5673f) )
+	ROM_LOAD( "doapp-0.216",         0x0400000, 0x400000, CRC(acc6c539) SHA1(a744567a3d75634098b1749103307981be9acbdd) )
+	ROM_LOAD( "doapp-1.217",         0x0800000, 0x400000, CRC(14b961c4) SHA1(3fae1fcb4665ba8bad391881b26c2d087718d42f) )
+	ROM_LOAD( "doapp-2.218",         0x0c00000, 0x400000, CRC(134f698f) SHA1(6422972cf5d30a0f09f0c20f042691d5969207b4) )
+	ROM_LOAD( "doapp-3.219",         0x1000000, 0x400000, CRC(1c6540f3) SHA1(8631fde93a1da6325d7b31c7edf12c964f0ac4fc) )
+	ROM_LOAD( "doapp-4.220",         0x1400000, 0x400000, CRC(f83bacf7) SHA1(5bd66da993f0db966581dde80dd7e5b377754412) )
+	ROM_LOAD( "doapp-5.221",         0x1800000, 0x400000, CRC(e11e8b71) SHA1(b1d1b9532b5f074ce216a603436d5674d136865d) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "mg05", 0x000000, 0x000008, CRC(5748a4ca) SHA1(c88d73f6a646a9ddefdfd84cba70d591759c069f) )
+ROM_END
+
 ROM_START( tondemo )
 	TPS_BIOS
 
@@ -5080,7 +5103,7 @@ ROM_START( nbajamex )
 	ROM_LOAD16_BYTE( "nba6o.u5",    0x1a00001, 0x200000, CRC(b1dfb42e) SHA1(fb9627e228bf2a744842eb44afbca4a6232cadb2) )
 	ROM_LOAD16_BYTE( "nba6e.u19",   0x1a00000, 0x200000, CRC(6f17d8c1) SHA1(22cf263efb64cf62030e02b641c485debe75944d) )
 
-	ROM_REGION16_LE( 0x800000, "rax", 0 )
+	ROM_REGION( 0x800000, "rax", 0 )
 	ROM_LOAD( "360snda1.u52", 0x000000, 0x080000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
 	ROM_LOAD( "sound0.u48",   0x400000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
 	ROM_LOAD( "sound1.u49",   0x600000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
@@ -5117,7 +5140,7 @@ ROM_START( nbajamexa )
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
 
-	ROM_REGION16_LE( 0x800000, "rax", 0 )
+	ROM_REGION( 0x800000, "rax", 0 )
 	ROM_LOAD( "360snda1.u52", 0x000000, 0x080000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
 	ROM_LOAD( "sound0.u48",   0x400000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
 	ROM_LOAD( "sound1.u49",   0x600000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
@@ -5227,7 +5250,7 @@ GAME( 1998, sfex2j,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, R
 GAME( 1998, plsmaswd,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (USA 980316)",         MACHINE_IMPERFECT_SOUND )
 GAME( 1998, plsmaswda, plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (Asia 980316)",        MACHINE_IMPERFECT_SOUND )
 GAME( 1998, stargld2,  plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)",   MACHINE_IMPERFECT_SOUND )
-GAME( 1998, tgmj,      coh3002c, coh3002c,    zn4w,     zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
+GAME( 1998, tgmj,      coh3002c, coh3002c,    tgm,      zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Euro 980914)",                              MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (USA 980914)",                               MACHINE_IMPERFECT_SOUND )
 GAME( 1998, kikaioh,   techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_IMPERFECT_SOUND )
@@ -5258,6 +5281,7 @@ GAME( 1997, glpracr2,  coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_in
 GAME( 1997, glpracr2j, glpracr2, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Gallop Racer 2 (Japan)",             MACHINE_IMPERFECT_SOUND )
 GAME( 1997, glpracr2l, glpracr2, coh1002ml,   zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Gallop Racer 2 Link HW (Japan)",     MACHINE_IMPERFECT_SOUND )
 GAME( 1998, doapp,     coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Dead Or Alive ++ (Japan)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1998, doappk,    doapp,    coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Dead Or Alive ++ (Korea)",           MACHINE_IMPERFECT_SOUND )
 GAME( 1998, cbaj,      coh1002m, cbaj,        zn,       cbaj_state,     empty_init, ROT0, "UEP Systems",            "Cool Boarders Arcade Jam",           MACHINE_IMPERFECT_SOUND )
 GAME( 1998, shngmtkb,  coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Sunsoft / Activision",   "Shanghai Matekibuyuu",               MACHINE_IMPERFECT_SOUND )
 GAME( 1999, tondemo,   coh1002m, coh1002m,    zn,       tecmo_zn_state, empty_init, ROT0, "Tecmo",                  "Tondemo Crisis (Japan)",             MACHINE_IMPERFECT_SOUND )

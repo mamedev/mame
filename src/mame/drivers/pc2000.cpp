@@ -16,6 +16,11 @@
 
 Other known international versions:
 - Genio 2000 (Spanish version of Genius Leader 4000 Quadro)
+- Genius 4000 (French version of Genius Leader 4000 Quadro)
+- Genius 5000 (French version of Genius Leader 5000)
+- Genius 6000 (French version of Genius Leader 6000 SL)
+- Genius 6500 Duo (alternate French version of Genius Leader 6000 SL)
+- Genius Notebook (French version of Genius Leader 3000 S)
 - PreComputer Power Pad (English version of Genius Leader 4000 Quadro)
 - PreComputer Power Pad Plus (English version of Genius Leader 5000)
 - Talking Whiz-Kid Einstein (English version of Genius Leader Power Notebook)

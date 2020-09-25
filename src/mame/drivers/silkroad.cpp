@@ -132,21 +132,21 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 */
 
-WRITE8_MEMBER(silkroad_state::okibank_w)
+void silkroad_state::okibank_w(uint8_t data)
 {
 	int bank = (data & 0x3);
 	if(bank < 3)
 		m_okibank->set_entry(bank);
 }
 
-WRITE8_MEMBER(silkroad_state::coin_w)
+void silkroad_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x1);
 	machine().bookkeeping().coin_counter_w(1, data & 0x8);
 }
 
 template<int Layer>
-WRITE32_MEMBER(silkroad_state::vram_w)
+void silkroad_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);

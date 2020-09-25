@@ -28,12 +28,12 @@ $208 strikes count
 #include "speaker.h"
 
 
-WRITE8_MEMBER(tryout_state::nmi_ack_w)
+void tryout_state::nmi_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
-WRITE8_MEMBER(tryout_state::sound_w)
+void tryout_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -41,7 +41,7 @@ WRITE8_MEMBER(tryout_state::sound_w)
 
 /*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
   stays on this state.*/
-WRITE8_MEMBER(tryout_state::sound_irq_ack_w)
+void tryout_state::sound_irq_ack_w(uint8_t data)
 {
 //  m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
@@ -51,7 +51,7 @@ void tryout_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-WRITE8_MEMBER(tryout_state::bankswitch_w)
+void tryout_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }

@@ -61,10 +61,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(tape_control_w);
 
-	DECLARE_READ8_MEMBER(cmos_r);
-	DECLARE_READ8_MEMBER(input_port_4_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_READ8_MEMBER(da_latch_r);
+	uint8_t cmos_r(offs_t offset);
+	uint8_t input_port_4_r();
+	uint8_t misc_r(offs_t offset);
+	uint8_t da_latch_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;

@@ -546,12 +546,12 @@ void kaneko16_sprite_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 void kaneko16_sprite_device::copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap) { copybitmap_common(bitmap, cliprect, priority_bitmap); }
 void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap) { copybitmap_common(bitmap, cliprect, priority_bitmap); }
 
-template<class _BitmapClass>
-void kaneko16_sprite_device::copybitmap_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
+template<class BitmapClass>
+void kaneko16_sprite_device::copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	const pen_t *pal = gfx(0)->palette().pens();
 
-	typename _BitmapClass::pixel_t *dstbitmap;
+	typename BitmapClass::pixel_t *dstbitmap;
 	int rgb;
 	if (sizeof(*dstbitmap) == 2) rgb = 0;
 	else rgb = 1;

@@ -64,9 +64,9 @@ public:
 	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(offs_t offset) override;
+	virtual uint16_t read_a13(offs_t offset) override;
+	virtual void write_a13(offs_t offset, uint16_t data) override;
 
 protected:
 	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

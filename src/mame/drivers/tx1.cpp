@@ -61,12 +61,12 @@
  *
  *************************************/
 
-WRITE16_MEMBER(tx1_state::resume_math_w)
+void tx1_state::resume_math_w(uint16_t data)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(tx1_state::halt_math_w)
+void tx1_state::halt_math_w(uint16_t data)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }

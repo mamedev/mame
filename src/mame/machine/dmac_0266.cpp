@@ -12,9 +12,7 @@
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/news68k/dev/si.c
  *
  * TODO:
- *  - tczero vs interrupt status
- *  - verify if eop output exists
- *  - verify map count/width
+ *  - find the real solution to the short transfer issue
  */
 
 #include "emu.h"
@@ -31,7 +29,6 @@ DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 DMA Cont
 dmac_0266_device::dmac_0266_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DMAC_0266, tag, owner, clock)
 	, m_bus(*this, finder_base::DUMMY_TAG, -1, 32)
-	, m_int(*this)
 	, m_dma_r(*this)
 	, m_dma_w(*this)
 {
@@ -49,8 +46,6 @@ void dmac_0266_device::map(address_map &map)
 
 void dmac_0266_device::device_start()
 {
-	m_int.resolve_safe();
-
 	m_dma_r.resolve_safe(0);
 	m_dma_w.resolve_safe();
 
@@ -61,13 +56,11 @@ void dmac_0266_device::device_start()
 	save_item(NAME(m_offset));
 	save_item(NAME(m_map));
 
-	save_item(NAME(m_int_state));
-	save_item(NAME(m_drq_state));
+	save_item(NAME(m_req_state));
 
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac_0266_device::dma_check), this));
 
-	m_int_state = false;
-	m_drq_state = false;
+	m_req_state = false;
 }
 
 void dmac_0266_device::device_reset()
@@ -90,31 +83,20 @@ void dmac_0266_device::soft_reset()
 	m_dma_check->enable(false);
 }
 
-void dmac_0266_device::irq_w(int state)
+void dmac_0266_device::eop_w(int state)
 {
 	if (state)
 		m_status |= INTERRUPT;
 	else
 		m_status &= ~INTERRUPT;
-
-	set_int(state);
 }
 
-void dmac_0266_device::drq_w(int state)
+void dmac_0266_device::req_w(int state)
 {
-	m_drq_state = bool(state);
+	m_req_state = bool(state);
 
-	if (m_drq_state)
+	if (m_req_state)
 		m_dma_check->adjust(attotime::zero);
-}
-
-void dmac_0266_device::set_int(bool int_state)
-{
-	if (int_state != m_int_state)
-	{
-		m_int_state = int_state;
-		m_int(int_state);
-	}
 }
 
 void dmac_0266_device::control_w(u32 data)
@@ -144,8 +126,8 @@ void dmac_0266_device::control_w(u32 data)
 
 void dmac_0266_device::dma_check(void *ptr, s32 param)
 {
-	// check drq active
-	if (!m_drq_state)
+	// check req active
+	if (!m_req_state)
 		return;
 
 	// check enabled
@@ -154,7 +136,22 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 
 	// check transfer count
 	if (!m_tcount)
+	{
+		/*
+		 * HACK: NEWS-OS tries to write a block to disk but sets the transfer
+		 * count to less than the block length, causing a hang while the
+		 * adapter waits for more data that the DMAC is not ready to supply.
+		 * It's not clear how the real hardware works - for now this hack
+		 * continues to read and discard data from the device, or write
+		 * arbitrary zero bytes to it until it deasserts the request line.
+		 */
+		if (m_control & DIRECTION)
+			m_dma_r();
+		else
+			m_dma_w(0);
+
 		return;
+	}
 
 	u32 const address = (m_map[m_tag & 0x7f] << 12) | (m_offset & 0xfff);
 
@@ -195,7 +192,8 @@ void dmac_0266_device::dma_check(void *ptr, s32 param)
 	if (!m_tcount)
 	{
 		LOG("transfer complete\n");
-		m_control &= ~ENABLE;
+		// HACK: per hack above, don't disable when reaching terminal count
+		//m_control &= ~ENABLE;
 		m_status |= TCZERO;
 	}
 	else

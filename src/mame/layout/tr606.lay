@@ -17,7 +17,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="0" right="100" top="0" bottom="100" />
 
-		<bezel name="0.0" element="led"><bounds x="1" y="1" width="1" height="1" /></bezel>
+		<element name="0.0" ref="led"><bounds x="1" y="1" width="1" height="1" /></element>
 
 	</view>
 </mamelayout>

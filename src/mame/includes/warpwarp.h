@@ -82,22 +82,21 @@ private:
 	tilemap_t *m_bg_tilemap;
 
 	// warpwarp and bombbee
-	DECLARE_READ8_MEMBER(warpwarp_sw_r);
-	DECLARE_WRITE8_MEMBER(warpwarp_out0_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_out3_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_videoram_w);
-	DECLARE_READ8_MEMBER(warpwarp_dsw1_r);
-	DECLARE_READ8_MEMBER(warpwarp_vol_r);
+	uint8_t warpwarp_sw_r(offs_t offset);
+	void warpwarp_out0_w(offs_t offset, uint8_t data);
+	void warpwarp_videoram_w(offs_t offset, uint8_t data);
+	uint8_t warpwarp_dsw1_r(offs_t offset);
+	uint8_t warpwarp_vol_r();
 
 	//geebee and navarone
-	DECLARE_READ8_MEMBER(geebee_in_r);
-	DECLARE_WRITE8_MEMBER(geebee_out6_w);
+	uint8_t geebee_in_r(offs_t offset);
+	void geebee_out6_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(counter_w);
 	DECLARE_WRITE_LINE_MEMBER(lock_out_w);
 	DECLARE_WRITE_LINE_MEMBER(geebee_bgw_w);
 	DECLARE_WRITE_LINE_MEMBER(ball_on_w);
 	DECLARE_WRITE_LINE_MEMBER(inv_w);
-	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
+	void geebee_videoram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(kaitei);

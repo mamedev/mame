@@ -20,8 +20,8 @@ public:
 	void set_transparent_pen(pen_t pen) { m_tmap->set_transparent_pen(pen); }
 	void draw(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority);
 
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(vram_r);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vram_r(offs_t offset);
 
 protected:
 	virtual void device_start() override;

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="bbc_hdd" description="Acorn BBC Micro hard disks">
+
+	<software name="cf_v103">
+		<description>Master 128 ADFS Hard Drive Image V1.03</description>
+		<year>2009</year>
+		<publisher>RetroClinic</publisher>
+		<sharedfeat name="compatibility" value="M" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="bbc_cf1gb_v103" sha1="380b817645fcbea317973db59f10db5120e8ac44" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cf_v105">
+		<description>Master 128 ADFS Hard Drive Image V1.05</description>
+		<year>2009</year>
+		<publisher>RetroClinic</publisher>
+		<sharedfeat name="compatibility" value="M" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="bbc_cf1gb_v105" sha1="9980aee632803ae4986b7ef56e2020a09ddde2b6" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cf_b106e">
+		<description>Model B ADFS Hard Drive Image B1.06e</description>
+		<year>2009</year>
+		<publisher>RetroClinic</publisher>
+		<sharedfeat name="compatibility" value="B" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="bbc_cf1gb_b106en" sha1="f7cb1132c78a1c742661a0bf6366dc7e8139fe96" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cf_t107">
+		<description>Model B ADFS Hard Drive Image T1.07</description>
+		<year>2009</year>
+		<publisher>RetroClinic</publisher>
+		<sharedfeat name="compatibility" value="B" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="bbc_cf1gb_t107" sha1="b6daa6b1973e762ed61b153845a8dfb26d7b0271" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cf_b131r">
+		<description>Model B ADFS Hard Drive Image B1.31 (Retro Software)</description>
+		<year>2010</year>
+		<publisher>RetroClinic</publisher>
+		<sharedfeat name="compatibility" value="B" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="bbc_cf_b131r" sha1="b921e3d5d5d359af7be6626fd928754ecf19a7ff" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cf_b142">
+		<description>Model B ADFS Hard Drive Image B1.42</description>
+		<year>2010</year>
+		<publisher>RetroClinic</publisher>
+		<sharedfeat name="compatibility" value="B" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="bbc_cf_b142" sha1="1f155b6bf1730c070314adf7387baf891476a668" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

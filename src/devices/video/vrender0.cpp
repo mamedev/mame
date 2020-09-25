@@ -50,27 +50,27 @@ void vr0video_device::regs_map(address_map &map)
 	map(0x00a6, 0x00a7).rw(FUNC(vr0video_device::flip_count_r), FUNC(vr0video_device::flip_count_w));
 }
 
-READ16_MEMBER(vr0video_device::cmd_queue_front_r)
+uint16_t vr0video_device::cmd_queue_front_r()
 {
 	return m_queue_front & 0x7ff;
 }
 
-WRITE16_MEMBER(vr0video_device::cmd_queue_front_w)
+void vr0video_device::cmd_queue_front_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_queue_front);
 }
 
-READ16_MEMBER(vr0video_device::cmd_queue_rear_r)
+uint16_t vr0video_device::cmd_queue_rear_r()
 {
 	return m_queue_rear & 0x7ff;
 }
 
-READ16_MEMBER(vr0video_device::render_control_r)
+uint16_t vr0video_device::render_control_r()
 {
 	return (m_draw_select<<7) | (m_render_reset<<3) | (m_render_start<<2) | (m_dither_mode);
 }
 
-WRITE16_MEMBER(vr0video_device::render_control_w)
+void vr0video_device::render_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -86,28 +86,28 @@ WRITE16_MEMBER(vr0video_device::render_control_w)
 	}
 }
 
-READ16_MEMBER(vr0video_device::display_bank_r)
+uint16_t vr0video_device::display_bank_r()
 {
 	return m_display_bank;
 }
 
-READ16_MEMBER(vr0video_device::bank1_select_r)
+uint16_t vr0video_device::bank1_select_r()
 {
 	return (m_bank1_select)<<15;
 }
 
-WRITE16_MEMBER(vr0video_device::bank1_select_w)
+void vr0video_device::bank1_select_w(uint16_t data)
 {
 	m_bank1_select = BIT(data,15);
 }
 
-READ16_MEMBER(vr0video_device::flip_count_r)
+uint16_t vr0video_device::flip_count_r()
 {
 	m_idleskip_cb(m_flip_count != 0);
 	return m_flip_count;
 }
 
-WRITE16_MEMBER(vr0video_device::flip_count_w)
+void vr0video_device::flip_count_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

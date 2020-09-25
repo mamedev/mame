@@ -103,7 +103,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(stadhero_state::int_ack_w)
+void stadhero_state::int_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }

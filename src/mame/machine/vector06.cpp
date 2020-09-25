@@ -14,23 +14,19 @@
 #include "screen.h"
 
 
-uint8_t vector06_state::vector06_8255_portb_r()
+uint8_t vector06_state::ppi1_portb_r()
 {
 	uint8_t key = 0xff;
-	if (BIT(m_keyboard_mask, 0)) key &= m_line[0]->read();
-	if (BIT(m_keyboard_mask, 1)) key &= m_line[1]->read();
-	if (BIT(m_keyboard_mask, 2)) key &= m_line[2]->read();
-	if (BIT(m_keyboard_mask, 3)) key &= m_line[3]->read();
-	if (BIT(m_keyboard_mask, 4)) key &= m_line[4]->read();
-	if (BIT(m_keyboard_mask, 5)) key &= m_line[5]->read();
-	if (BIT(m_keyboard_mask, 6)) key &= m_line[6]->read();
-	if (BIT(m_keyboard_mask, 7)) key &= m_line[7]->read();
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(m_keyboard_mask, i))
+			key &= m_io_keyboard[i]->read();
+
 	return key;
 }
 
-uint8_t vector06_state::vector06_8255_portc_r()
+uint8_t vector06_state::ppi1_portc_r()
 {
-	uint8_t ret = m_line[8]->read();
+	uint8_t ret = m_io_keyboard[8]->read();
 
 	if (m_cassette->input() > 0)
 		ret |= 0x10;
@@ -38,28 +34,24 @@ uint8_t vector06_state::vector06_8255_portc_r()
 	return ret;
 }
 
-void vector06_state::vector06_8255_porta_w(uint8_t data)
+void vector06_state::ppi1_porta_w(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-void vector06_state::vector06_set_video_mode(int width)
-{
-	rectangle visarea(0, width+64-1, 0, 256+64-1);
-	m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period().attoseconds());
-}
-
-void vector06_state::vector06_8255_portb_w(uint8_t data)
+void vector06_state::ppi1_portb_w(uint8_t data)
 {
 	m_color_index = data & 0x0f;
-	if ((data & 0x10) != m_video_mode)
+	if (BIT(data, 4) != m_video_mode)
 	{
-		m_video_mode = data & 0x10;
-		vector06_set_video_mode((m_video_mode==0x10) ? 512 : 256);
+		m_video_mode = BIT(data, 4);
+		u16 width = m_video_mode ? 512 : 256;
+		rectangle visarea(0, width+64-1, 0, 256+64-1);
+		m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period().attoseconds());
 	}
 }
 
-WRITE8_MEMBER( vector06_state::vector06_color_set )
+void vector06_state::color_set(uint8_t data)
 {
 	uint8_t r = (data & 7) << 5;
 	uint8_t g = ((data >> 3) & 7) << 5;
@@ -68,7 +60,7 @@ WRITE8_MEMBER( vector06_state::vector06_color_set )
 }
 
 
-uint8_t vector06_state::vector06_romdisk_portb_r()
+uint8_t vector06_state::ppi2_portb_r()
 {
 	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
@@ -77,46 +69,42 @@ uint8_t vector06_state::vector06_romdisk_portb_r()
 		return m_ay->data_r();
 }
 
-void vector06_state::vector06_romdisk_portb_w(uint8_t data)
+void vector06_state::ppi2_portb_w(uint8_t data)
 {
 	m_aylatch = data;
 }
 
-void vector06_state::vector06_romdisk_porta_w(uint8_t data)
+void vector06_state::ppi2_porta_w(uint8_t data)
 {
 	m_romdisk_lsb = data;
 }
 
-void vector06_state::vector06_romdisk_portc_w (uint8_t data)
+void vector06_state::ppi2_portc_w (uint8_t data)
 {
 	if (data & 4)
 		m_ay->address_data_w((data >> 1) & 1, m_aylatch);
 	m_romdisk_msb = data;
 }
 
-INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
-{
-	device.execute().set_input_line(0, HOLD_LINE);
-}
-
-IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
+IRQ_CALLBACK_MEMBER(vector06_state::irq_callback)
 {
 	// Interrupt is RST 7
 	return 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
+INPUT_CHANGED_MEMBER(vector06_state::f11_button)
 {
-	uint8_t val = m_reset->read();
-
-	if (BIT(val, 0))
+	if (newval)
 	{
 		m_romen = true;
 		update_mem();
 		m_maincpu->reset();
 	}
+}
 
-	if (BIT(val, 1))
+INPUT_CHANGED_MEMBER(vector06_state::f12_button)
+{
+	if (newval)
 	{
 		m_romen = false;
 		update_mem();
@@ -124,7 +112,7 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 	}
 }
 
-WRITE8_MEMBER( vector06_state::vector06_disc_w )
+void vector06_state::disc_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -146,26 +134,28 @@ WRITE8_MEMBER( vector06_state::vector06_disc_w )
 
 void vector06_state::update_mem()
 {
-	if ((m_rambank & 0x10) && m_stack_state) {
-		int sentry = ((m_rambank >> 2) & 3) + 1;
+	if (BIT(m_rambank, 4) && m_stack_state)
+	{
+		u8 sentry = ((m_rambank >> 2) & 3) + 1;
 		m_bank1->set_entry(sentry);
 		m_bank3->set_entry(sentry);
-		m_bank2->set_base(m_ram->pointer() + sentry * 0x10000);
+		m_bank2->set_entry(sentry + 1u);
 	}
-	else {
+	else
+	{
 		m_bank1->set_entry(0);
-		int ventry = 0;
-		if (m_rambank & 0x20)
+		u8 ventry = 0;
+		if (BIT(m_rambank, 5))
 			ventry = (m_rambank & 3) + 1;
 		m_bank3->set_entry(ventry);
 		if (m_romen)
-			m_bank2->set_base(m_region_maincpu->base() + 0x10000);
+			m_bank2->set_entry(0);
 		else
-			m_bank2->set_base(m_ram->pointer());
+			m_bank2->set_entry(1);
 	}
 }
 
-WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
+void vector06_state::ramdisk_w(uint8_t data)
 {
 	const uint8_t oldbank = m_rambank;
 	m_rambank = data;
@@ -173,11 +163,11 @@ WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 		update_mem();
 }
 
-void vector06_state::vector06_status_callback(uint8_t data)
+void vector06_state::status_callback(uint8_t data)
 {
 	const bool oldstate = m_stack_state;
 	m_stack_state = bool(data & i8080_cpu_device::STATUS_STACK);
-	if (oldstate != m_stack_state && (m_rambank & 0x10))
+	if ((oldstate != m_stack_state) && BIT(m_rambank, 4))
 		update_mem();
 }
 
@@ -188,8 +178,23 @@ WRITE_LINE_MEMBER(vector06_state::speaker_w)
 
 void vector06_state::machine_start()
 {
-	m_reset_check_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vector06_state::reset_check_callback), this));
-	m_reset_check_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
+	u8 *r = m_ram->pointer();
+
+	m_bank1->configure_entries(0, 5, r, 0x10000);
+	m_bank2->configure_entry(0, m_rom);
+	m_bank2->configure_entries(1, 5, r, 0x10000);
+	m_bank3->configure_entries(0, 5, r + 0xa000, 0x10000);
+
+	save_item(NAME(m_keyboard_mask));
+	save_item(NAME(m_color_index));
+	save_item(NAME(m_romdisk_msb));
+	save_item(NAME(m_romdisk_lsb));
+	save_item(NAME(m_vblank_state));
+	save_item(NAME(m_rambank));
+	save_item(NAME(m_aylatch));
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_stack_state));
+	save_item(NAME(m_romen));
 }
 
 void vector06_state::machine_reset()
@@ -198,13 +203,12 @@ void vector06_state::machine_reset()
 	m_rambank = 0;
 	m_romen = true;
 
-	m_bank1->configure_entries(0, 5, m_ram->pointer(), 0x10000);
-	for (int i = 0; i < 5; i++)
-		m_bank3->configure_entry(i, m_ram->pointer() + 0x10000 * i + 0xa000);
-
 	update_mem();
 
 	m_keyboard_mask = 0;
 	m_color_index = 0;
 	m_video_mode = 0;
+	m_bank1->set_entry(0);
+	m_bank2->set_entry(0);
+	m_bank3->set_entry(0);
 }

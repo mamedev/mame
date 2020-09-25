@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/harddriv.h"
-#include "machine/atarigen.h"
 
 #include "cpu/tms32010/tms32010.h"
 #include "sound/volt_reg.h"

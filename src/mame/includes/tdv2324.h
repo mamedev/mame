@@ -75,9 +75,9 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( tdv2324_main_io_30 );
-	DECLARE_READ8_MEMBER( tdv2324_main_io_e6 );
-	DECLARE_WRITE8_MEMBER( tdv2324_main_io_e2 );
+	uint8_t tdv2324_main_io_30();
+	uint8_t tdv2324_main_io_e6();
+	void tdv2324_main_io_e2(uint8_t data);
 
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;

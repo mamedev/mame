@@ -716,7 +716,7 @@ void ti85_state::ti83pse(machine_config &config)
 	m_membank[3]->set_map(&ti85_state::ti83pse_banked_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
-	FUJITSU_29F160T(config.replace(), m_flash, 0);
+	FUJITSU_29F160TE(config.replace(), m_flash, 0);
 }
 
 void ti85_state::ti84p(machine_config &config)

@@ -422,10 +422,10 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
     by the Mame core.
 */
 
-template<class _BitmapClass>
+template<class BitmapClass>
 void deco16ic_device::custom_tilemap_draw(
 	screen_device &screen,
-	_BitmapClass &bitmap,
+	BitmapClass &bitmap,
 	const rectangle &cliprect,
 	tilemap_t *tilemap0_8x8,
 	tilemap_t *tilemap0_16x16,
@@ -443,7 +443,7 @@ void deco16ic_device::custom_tilemap_draw(
 	u8 pmask
 	)
 {
-	typename _BitmapClass::pixel_t *dest;
+	typename BitmapClass::pixel_t *dest;
 	int rgb;
 	if (sizeof(*dest) == 2) rgb = 0;
 	else rgb = 1;
@@ -953,8 +953,8 @@ void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 
 /*****************************************************************************************/
 
-template<class _BitmapClass>
-void deco16ic_device::tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
+template<class BitmapClass>
+void deco16ic_device::tilemap_1_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
 	if (m_use_custom_pf1)
 	{
@@ -976,8 +976,8 @@ void deco16ic_device::tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap
 { tilemap_1_draw_common(screen, bitmap, cliprect, flags, priority, pmask); }
 
 
-template<class _BitmapClass>
-void deco16ic_device::tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
+template<class BitmapClass>
+void deco16ic_device::tilemap_2_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask)
 {
 	if (m_use_custom_pf2)
 	{

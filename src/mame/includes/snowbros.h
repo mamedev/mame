@@ -69,23 +69,23 @@ private:
 	uint8_t m_semicom_prot_offset;
 	uint16_t m_yutnori_prot_val;
 
-	DECLARE_WRITE8_MEMBER(snowbros_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
-	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
-	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
+	void snowbros_flipscreen_w(uint8_t data);
+	void bootleg_flipscreen_w(uint8_t data);
+	void snowbros_irq4_ack_w(uint16_t data);
+	void snowbros_irq3_ack_w(uint16_t data);
+	void snowbros_irq2_ack_w(uint16_t data);
 	void prot_p0_w(uint8_t data);
 	void prot_p1_w(uint8_t data);
 	void prot_p2_w(uint8_t data);
-	DECLARE_READ16_MEMBER(sb3_sound_r);
-	DECLARE_READ16_MEMBER(_4in1_02_read);
-	DECLARE_READ16_MEMBER(_3in1_read);
-	DECLARE_READ16_MEMBER(cookbib3_read);
-	DECLARE_WRITE8_MEMBER(twinadv_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(sb3_sound_w);
-	DECLARE_READ16_MEMBER(toto_read);
-	DECLARE_WRITE16_MEMBER(yutnori_prot_w);
-	DECLARE_READ16_MEMBER(yutnori_prot_r);
+	uint16_t sb3_sound_r();
+	uint16_t _4in1_02_read();
+	uint16_t _3in1_read();
+	uint16_t cookbib3_read();
+	void twinadv_oki_bank_w(uint8_t data);
+	void sb3_sound_w(uint16_t data);
+	uint16_t toto_read(offs_t offset, uint16_t mem_mask = ~0);
+	void yutnori_prot_w(uint16_t data);
+	uint16_t yutnori_prot_r();
 
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);

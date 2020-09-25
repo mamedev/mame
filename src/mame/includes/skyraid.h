@@ -26,15 +26,15 @@ public:
 	void skyraid(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(skyraid_port_0_r);
-	DECLARE_WRITE8_MEMBER(skyraid_range_w);
-	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
-	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
+	uint8_t skyraid_port_0_r();
+	void skyraid_range_w(uint8_t data);
+	void skyraid_offset_w(uint8_t data);
+	void skyraid_scroll_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void skyraid_palette(palette_device &palette) const;
 	uint32_t screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(skyraid_sound_w);
+	void skyraid_sound_w(uint8_t data);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_terrain(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

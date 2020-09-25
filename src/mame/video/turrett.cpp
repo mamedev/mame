@@ -190,7 +190,7 @@ void turrett_state::update_video_addr(void)
 }
 
 
-READ32_MEMBER( turrett_state::video_r )
+uint32_t turrett_state::video_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
@@ -208,7 +208,7 @@ READ32_MEMBER( turrett_state::video_r )
 }
 
 
-WRITE32_MEMBER( turrett_state::video_w )
+void turrett_state::video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER( turrett_state::dma_complete )
 }
 
 
-WRITE32_MEMBER( turrett_state::dma_w )
+void turrett_state::dma_w(offs_t offset, uint32_t data)
 {
 	int bank = ((offset & 2) >> 1) ^ 1;
 

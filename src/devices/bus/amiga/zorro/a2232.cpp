@@ -157,14 +157,14 @@ void a2232_device::device_reset_after_children()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER( a2232_device::int2_w )
+void a2232_device::int2_w(uint8_t data)
 {
 	LOG("%s: int2_w %04x\n", shortname(), data);
 
 	m_slot->int2_w(1);
 }
 
-WRITE8_MEMBER( a2232_device::irq_ack8_w )
+void a2232_device::irq_ack8_w(uint8_t data)
 {
 	LOG("%s: irq_ack_w %04x\n", shortname(), data);
 
@@ -185,24 +185,24 @@ void a2232_device::autoconfig_base_address(offs_t address)
 	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	m_slot->space().install_readwrite_handler(address, address + 0x3fff,
-			read16_delegate(*this, FUNC(a2232_device::shared_ram_r)),
-			write16_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
+			read16s_delegate(*this, FUNC(a2232_device::shared_ram_r)),
+			write16s_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
-			read16_delegate(*this, FUNC(a2232_device::irq_ack_r)),
-			write16_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
+			read16smo_delegate(*this, FUNC(a2232_device::irq_ack_r)),
+			write16smo_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
-			read16_delegate(*this, FUNC(a2232_device::reset_low_r)),
-			write16_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
+			read16smo_delegate(*this, FUNC(a2232_device::reset_low_r)),
+			write16smo_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
-			read16_delegate(*this, FUNC(a2232_device::irq_r)),
-			write16_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
+			read16smo_delegate(*this, FUNC(a2232_device::irq_r)),
+			write16smo_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
-			read16_delegate(*this, FUNC(a2232_device::reset_high_r)),
-			write16_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
+			read16s_delegate(*this, FUNC(a2232_device::reset_high_r)),
+			write16s_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 //  ZORRO
 //**************************************************************************
 
-READ16_MEMBER( a2232_device::shared_ram_r )
+uint16_t a2232_device::shared_ram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -259,7 +259,7 @@ READ16_MEMBER( a2232_device::shared_ram_r )
 	return data;
 }
 
-WRITE16_MEMBER( a2232_device::shared_ram_w )
+void a2232_device::shared_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_DATA, "%s: shared_ram_w(%04x) %04x [mask = %04x]\n", shortname(), offset << 1, data, mem_mask);
 
@@ -270,31 +270,31 @@ WRITE16_MEMBER( a2232_device::shared_ram_w )
 		m_shared_ram[offset << 1] = (data & 0xff00) >> 8;
 }
 
-READ16_MEMBER( a2232_device::irq_ack_r )
+uint16_t a2232_device::irq_ack_r()
 {
 	m_slot->int2_w(0);
 
 	return 0xffff;
 }
 
-WRITE16_MEMBER( a2232_device::irq_ack_w )
+void a2232_device::irq_ack_w(uint16_t data)
 {
 	m_slot->int2_w(0);
 }
 
-READ16_MEMBER( a2232_device::reset_low_r )
+uint16_t a2232_device::reset_low_r()
 {
 	m_iocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	return 0xffff;
 }
 
-WRITE16_MEMBER( a2232_device::reset_low_w )
+void a2232_device::reset_low_w(uint16_t data)
 {
 	m_iocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-READ16_MEMBER( a2232_device::irq_r )
+uint16_t a2232_device::irq_r()
 {
 	if (!machine().side_effects_disabled())
 		m_ioirq->in_w<8>(ASSERT_LINE);
@@ -302,12 +302,12 @@ READ16_MEMBER( a2232_device::irq_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( a2232_device::irq_w )
+void a2232_device::irq_w(uint16_t data)
 {
 	m_ioirq->in_w<8>(ASSERT_LINE);
 }
 
-READ16_MEMBER( a2232_device::reset_high_r )
+uint16_t a2232_device::reset_high_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -318,7 +318,7 @@ READ16_MEMBER( a2232_device::reset_high_r )
 	return data;
 }
 
-WRITE16_MEMBER( a2232_device::reset_high_w )
+void a2232_device::reset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("%s: reset_high_w %04x [mask = %04x]\n", shortname(), data, mem_mask);
 
@@ -331,13 +331,13 @@ WRITE16_MEMBER( a2232_device::reset_high_w )
 //**************************************************************************
 
 template<int N>
-READ8_MEMBER( a2232_device::acia_r )
+uint8_t a2232_device::acia_r(offs_t offset)
 {
 	return m_acia[N]->read(offset >> 1);
 }
 
 template<int N>
-WRITE8_MEMBER( a2232_device::acia_w )
+void a2232_device::acia_w(offs_t offset, uint8_t data)
 {
 	m_acia[N]->write(offset >> 1, data);
 }
@@ -347,12 +347,12 @@ WRITE8_MEMBER( a2232_device::acia_w )
 //  CIA
 //**************************************************************************
 
-READ8_MEMBER( a2232_device::cia_r )
+uint8_t a2232_device::cia_r(offs_t offset)
 {
 	return m_cia->read(offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::cia_w )
+void a2232_device::cia_w(offs_t offset, uint8_t data)
 {
 	m_cia->write(offset >> 1, data);
 }

@@ -76,7 +76,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 	check_irq();
 }
 
-READ8_MEMBER(svision_state::svision_r)
+uint8_t svision_state::svision_r(offs_t offset)
 {
 	int data = m_reg[offset];
 	switch (offset)
@@ -130,7 +130,7 @@ READ8_MEMBER(svision_state::svision_r)
 	return data;
 }
 
-WRITE8_MEMBER(svision_state::svision_w)
+void svision_state::svision_w(offs_t offset, uint8_t data)
 {
 	m_reg[offset] = data;
 
@@ -180,7 +180,7 @@ WRITE8_MEMBER(svision_state::svision_w)
 	}
 }
 
-READ8_MEMBER(svision_state::tvlink_r)
+uint8_t svision_state::tvlink_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -188,16 +188,16 @@ READ8_MEMBER(svision_state::tvlink_r)
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				/* strange effects when modifying palette */
-				return svision_r(space, offset);
+				return svision_r(offset);
 			}
 			else
 			{
-				return svision_r(space, offset);
+				return svision_r(offset);
 			}
 	}
 }
 
-WRITE8_MEMBER(svision_state::tvlink_w)
+void svision_state::tvlink_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -222,7 +222,7 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 			}
 			break;
 		default:
-			svision_w(space, offset,data);
+			svision_w(offset,data);
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				if (offset == 0x803 && data == 0x07)

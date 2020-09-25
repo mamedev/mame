@@ -92,8 +92,8 @@ void nubus_vikbw_device::device_start()
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, "bank_vikbw", &m_vram[0]);
 	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, "bank_vikbw2", &m_vram[0]);
 
-	nubus().install_device(slotspace, slotspace+3, read32_delegate(*this, FUNC(nubus_vikbw_device::viking_enable_r)), write32_delegate(*this, FUNC(nubus_vikbw_device::viking_disable_w)));
-	nubus().install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_r)), write32_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_w)));
+	nubus().install_device(slotspace, slotspace+3, read32smo_delegate(*this, FUNC(nubus_vikbw_device::viking_enable_r)), write32smo_delegate(*this, FUNC(nubus_vikbw_device::viking_disable_w)));
+	nubus().install_device(slotspace+0x80000, slotspace+0x80000+3, read32smo_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_r)), write32smo_delegate(*this, FUNC(nubus_vikbw_device::viking_ack_w)));
 }
 
 //-------------------------------------------------
@@ -147,22 +147,22 @@ uint32_t nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_vikbw_device::viking_ack_w )
+void nubus_vikbw_device::viking_ack_w(uint32_t data)
 {
 	lower_slot_irq();
 }
 
-READ32_MEMBER( nubus_vikbw_device::viking_ack_r )
+uint32_t nubus_vikbw_device::viking_ack_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_vikbw_device::viking_disable_w )
+void nubus_vikbw_device::viking_disable_w(uint32_t data)
 {
 	m_vbl_disable = 1;
 }
 
-READ32_MEMBER( nubus_vikbw_device::viking_enable_r )
+uint32_t nubus_vikbw_device::viking_enable_r()
 {
 	m_vbl_disable = 0;
 	return 0;

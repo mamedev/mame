@@ -30,8 +30,8 @@ public:
 	auto int_dma_done_cb() { return m_int_dma_done_cb.bind(); }
 	auto eisa_present() { return m_eisa_present.bind(); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void set_cpu_buserr(uint32_t address, uint64_t mem_mask);
 	uint32_t get_mem_config(int channel) const { return m_mem_config[channel]; }

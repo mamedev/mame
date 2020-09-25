@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    driver.c
+    driver.cpp
 
     Core driver device base class.
 

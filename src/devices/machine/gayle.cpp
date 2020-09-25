@@ -80,13 +80,13 @@ void gayle_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ16_MEMBER( gayle_device::gayle_r )
+uint16_t gayle_device::gayle_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 	offset <<= 1;
 
 	// swap
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
+	mem_mask = swapendian_int16(mem_mask);
 
 	if (BIT(offset, 15))
 	{
@@ -113,18 +113,18 @@ READ16_MEMBER( gayle_device::gayle_r )
 		logerror("gayle_r(%06x): %04x & %04x\n", offset, data, mem_mask);
 
 	// swap data
-	data = (data << 8) | (data >> 8);
+	data = swapendian_int16(data);
 
 	return data;
 }
 
-WRITE16_MEMBER( gayle_device::gayle_w )
+void gayle_device::gayle_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset <<= 1;
 
 	// swap
-	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
-	data = ((data << 8) | (data >> 8)) & mem_mask;
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data) & mem_mask;
 
 	if (VERBOSE)
 		logerror("gayle_w(%06x): %04x & %04x\n", offset, data, mem_mask);
@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
 		m_int2_w(BIT(m_gayle_reg[GAYLE_CS], 7));
 }
 
-READ16_MEMBER( gayle_device::gayle_id_r )
+uint16_t gayle_device::gayle_id_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -195,7 +195,7 @@ READ16_MEMBER( gayle_device::gayle_id_r )
 	return data;
 }
 
-WRITE16_MEMBER( gayle_device::gayle_id_w )
+void gayle_device::gayle_id_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("gayle_id_w(%06x): %04x & %04x (id=%02x)\n", offset, data, mem_mask, m_gayle_id);

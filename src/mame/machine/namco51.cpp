@@ -137,6 +137,11 @@ void namco_51xx_device::O_w(uint8_t data)
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
+void namco_51xx_device::P_w(uint8_t data)
+{
+	m_out(data);
+}
+
 /***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
@@ -189,6 +194,7 @@ void namco_51xx_device::device_add_mconfig(machine_config &config)
 	m_cpu->read_r<2>().set(FUNC(namco_51xx_device::R2_r));
 	m_cpu->read_r<3>().set(FUNC(namco_51xx_device::R3_r));
 	m_cpu->write_o().set(FUNC(namco_51xx_device::O_w));
+	m_cpu->write_p().set(FUNC(namco_51xx_device::P_w));
 }
 
 //-------------------------------------------------

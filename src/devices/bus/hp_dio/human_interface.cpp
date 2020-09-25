@@ -119,8 +119,8 @@ void human_interface_device::device_start()
 			write8sm_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_w)), 0x00ff00ff);
 
 	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
-			read8_delegate(*this, FUNC(human_interface_device::gpib_r)),
-			write8_delegate(*this, FUNC(human_interface_device::gpib_w)), 0x00ff00ff);
+			read8sm_delegate(*this, FUNC(human_interface_device::gpib_r)),
+			write8sm_delegate(*this, FUNC(human_interface_device::gpib_w)), 0x00ff00ff);
 
 	save_item(NAME(m_hil_read));
 	save_item(NAME(m_kbd_nmi));
@@ -192,7 +192,7 @@ void human_interface_device::ieee488_dio_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(human_interface_device::gpib_w)
+void human_interface_device::gpib_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x08) {
 		m_tms9914->write(offset & 0x07, data);
@@ -230,7 +230,7 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 	LOG("gpib_w: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
 }
 
-READ8_MEMBER(human_interface_device::gpib_r)
+uint8_t human_interface_device::gpib_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 

@@ -15,72 +15,72 @@ license:CC0
 		</screen>
 
 
-		<bezel name="digit0" element="digit">
+		<element name="digit0" ref="digit">
 			<bounds x="1.4" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit1" element="digit">
+		<element name="digit1" ref="digit">
 			<bounds x="1.6" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit2" element="digit">
+		<element name="digit2" ref="digit">
 			<bounds x="1.8" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit3" element="digit">
+		<element name="digit3" ref="digit">
 			<bounds x="2.0" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit4" element="digit">
+		<element name="digit4" ref="digit">
 			<bounds x="2.2" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit5" element="digit">
+		<element name="digit5" ref="digit">
 			<bounds x="2.4" y="-1.5" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
 
-		<bezel name="digit6" element="digit">
+		<element name="digit6" ref="digit">
 			<bounds x="1.9" y="-1.2" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
 
-		<bezel name="digit8" element="digit">
+		<element name="digit8" ref="digit">
 			<bounds x="1.4" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit9" element="digit">
+		<element name="digit9" ref="digit">
 			<bounds x="1.6" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit10" element="digit">
+		<element name="digit10" ref="digit">
 			<bounds x="1.8" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit11" element="digit">
+		<element name="digit11" ref="digit">
 			<bounds x="2.0" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit12" element="digit">
+		<element name="digit12" ref="digit">
 			<bounds x="2.2" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit13" element="digit">
+		<element name="digit13" ref="digit">
 			<bounds x="2.4" y="-0.9" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
 
-		<bezel name="digit7" element="digit">
+		<element name="digit7" ref="digit">
 			<bounds x="1.9" y="-0.6" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
 
-		<bezel name="digit14" element="digit">
+		<element name="digit14" ref="digit">
 			<bounds x="1.7" y="-0.3" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 
-		<bezel name="digit15" element="digit">
+		<element name="digit15" ref="digit">
 			<bounds x="1.9" y="-0.3" width="0.2" height="0.3" />
-		</bezel>
+		</element>
 	</view>
 </mamelayout>

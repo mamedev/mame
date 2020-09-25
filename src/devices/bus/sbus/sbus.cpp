@@ -103,12 +103,12 @@ void sbus_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_space = &space(0);
-	m_space->install_readwrite_handler(0x00000000, 0x01ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<0>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<0>)));
-	m_space->install_readwrite_handler(0x02000000, 0x03ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<1>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<1>)));
-	m_space->install_readwrite_handler(0x04000000, 0x05ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<2>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<2>)));
+	m_space->install_readwrite_handler(0x00000000, 0x01ffffff, read32smo_delegate(*this, FUNC(sbus_device::slot_timeout_r<0>)), write32smo_delegate(*this, FUNC(sbus_device::slot_timeout_w<0>)));
+	m_space->install_readwrite_handler(0x02000000, 0x03ffffff, read32smo_delegate(*this, FUNC(sbus_device::slot_timeout_r<1>)), write32smo_delegate(*this, FUNC(sbus_device::slot_timeout_w<1>)));
+	m_space->install_readwrite_handler(0x04000000, 0x05ffffff, read32smo_delegate(*this, FUNC(sbus_device::slot_timeout_r<2>)), write32smo_delegate(*this, FUNC(sbus_device::slot_timeout_w<2>)));
 }
 
-template <unsigned Slot> READ32_MEMBER(sbus_device::slot_timeout_r)
+template <unsigned Slot> uint32_t sbus_device::slot_timeout_r()
 {
 	m_maincpu->set_mae();
 	m_buserr(0, 0x20);
@@ -116,19 +116,19 @@ template <unsigned Slot> READ32_MEMBER(sbus_device::slot_timeout_r)
 	return 0;
 }
 
-template <unsigned Slot> WRITE32_MEMBER(sbus_device::slot_timeout_w)
+template <unsigned Slot> void sbus_device::slot_timeout_w(uint32_t data)
 {
 	m_maincpu->set_mae();
 	m_buserr(0, 0x8020);
 	m_buserr(1, 0xffa00000 + (Slot << 21));
 }
 
-READ32_MEMBER(sbus_device::read)
+uint32_t sbus_device::read(offs_t offset, uint32_t mem_mask)
 {
 	return m_space->read_dword(offset << 2, mem_mask);
 }
 
-WRITE32_MEMBER(sbus_device::write)
+void sbus_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_space->write_dword(offset << 2, data, mem_mask);
 }

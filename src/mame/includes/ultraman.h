@@ -43,8 +43,8 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<input_merger_device> m_soundnmi;
 
-	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
-	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
+	void sound_nmi_enable_w(uint8_t data);
+	void ultraman_gfxctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

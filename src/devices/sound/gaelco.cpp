@@ -76,10 +76,10 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	/* fill all data needed */
-	for (int j = 0; j < samples; j++)
+	for (int j = 0; j < outputs[0].samples(); j++)
 	{
 		int output_l = 0, output_r = 0;
 
@@ -177,19 +177,19 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		outputs[0][j] = output_l;
-		outputs[1][j] = output_r;
+		outputs[0].put_int(j, output_l, 32768);
+		outputs[1].put_int(j, output_r, 32768);
 	}
 
-	if (wavraw)
-		wav_add_data_32lr(wavraw, outputs[0], outputs[1], samples, 0);
+//	if (wavraw)
+//		wav_add_data_buffer(wavraw, outputs[0], outputs[1]);
 }
 
 /*============================================================================
                         CG-1V/GAE1 Read Handler
   ============================================================================*/
 
-READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
+uint16_t gaelco_gae1_device::gaelcosnd_r(offs_t offset)
 {
 	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", machine().describe_context(), offset));
 
@@ -203,7 +203,7 @@ READ16_MEMBER( gaelco_gae1_device::gaelcosnd_r )
                         CG-1V/GAE1 Write Handler
   ============================================================================*/
 
-WRITE16_MEMBER( gaelco_gae1_device::gaelcosnd_w )
+void gaelco_gae1_device::gaelcosnd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sound_channel *channel = &m_channel[offset >> 3];
 

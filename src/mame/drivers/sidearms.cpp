@@ -66,14 +66,14 @@ void sidearms_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
-WRITE8_MEMBER(sidearms_state::bankswitch_w)
+void sidearms_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
 
 // Turtle Ship input ports are rotated 90 degrees
-READ8_MEMBER(sidearms_state::turtship_ports_r)
+uint8_t sidearms_state::turtship_ports_r(offs_t offset)
 {
 	int res = 0;
 	for (int i = 0; i < 5;i++)
@@ -138,7 +138,7 @@ void sidearms_state::sidearms_sound_map(address_map &map)
 
 /* Whizz */
 
-WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
+void sidearms_state::whizz_bankswitch_w(uint8_t data)
 {
 	int bank = 0;
 	switch (data & 0xC0)

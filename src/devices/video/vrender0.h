@@ -22,8 +22,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	auto idleskip_cb() { return m_idleskip_cb.bind(); }
 
-	DECLARE_READ16_MEMBER(flip_count_r);
-	DECLARE_WRITE16_MEMBER(flip_count_w);
+	uint16_t flip_count_r();
+	void flip_count_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -69,21 +69,21 @@ private:
 	uint16_t *m_packetram;
 	uint16_t *m_frameram;
 
-	DECLARE_READ16_MEMBER( cmd_queue_front_r );
-	DECLARE_WRITE16_MEMBER( cmd_queue_front_w );
+	uint16_t cmd_queue_front_r();
+	void cmd_queue_front_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( cmd_queue_rear_r );
+	uint16_t cmd_queue_rear_r();
 	uint16_t m_queue_rear, m_queue_front;
 
-	DECLARE_READ16_MEMBER( bank1_select_r );
-	DECLARE_WRITE16_MEMBER( bank1_select_w );
+	uint16_t bank1_select_r();
+	void bank1_select_w(uint16_t data);
 	bool m_bank1_select;        //!< Select framebuffer bank1 address
 
-	DECLARE_READ16_MEMBER( display_bank_r );
+	uint16_t display_bank_r();
 	uint8_t m_display_bank;     //!< Current display bank
 
-	DECLARE_READ16_MEMBER( render_control_r );
-	DECLARE_WRITE16_MEMBER( render_control_w );
+	uint16_t render_control_r();
+	void render_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	bool m_draw_select;         //!< If true, device draws to Front buffer instead of Back
 	bool m_render_reset;        //!< Reset pipeline FIFO
 	bool m_render_start;        //!< Enable pipeline processing

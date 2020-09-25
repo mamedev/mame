@@ -14,6 +14,8 @@ I believe all the Cassette images here are original, so some require the manuals
       To start/stop the tape you must use the MAME menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 
 This list was compiled from the archive at http://www.stairwaytohell.com/. Additional titles will be added as they are made available at http://stardot.org.uk/ forum.
+
+Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, regardless of which system they were primarily designed for.
 -->
 
 <softwarelist name="electron_cass" description="Acorn Electron cassettes">

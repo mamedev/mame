@@ -90,7 +90,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 
 private:
 	sound_stream *m_stream;
@@ -108,11 +108,11 @@ milton_filter_device::milton_filter_device(const machine_config &mconfig, const 
 
 void milton_filter_device::device_start()
 {
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	m_stream = stream_alloc_legacy(1, 1, machine().sample_rate());
 	m_led_out.resolve();
 }
 
-void milton_filter_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void milton_filter_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	int level = 0;
 

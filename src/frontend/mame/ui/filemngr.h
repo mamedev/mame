@@ -7,13 +7,16 @@
     MESS's clunky built-in file manager
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_FILEMNGR_H
 #define MAME_FRONTEND_UI_FILEMNGR_H
 
+#pragma once
+
+#include "ui/menu.h"
+
+
 namespace ui {
+
 class menu_file_manager : public menu
 {
 public:

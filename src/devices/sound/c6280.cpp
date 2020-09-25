@@ -42,14 +42,14 @@
 
 #include <algorithm>
 
-void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	const u8 lmal = (m_balance >> 4) & 0x0f;
 	const u8 rmal = (m_balance >> 0) & 0x0f;
 
 	/* Clear buffer */
-	std::fill_n(&outputs[0][0], samples, 0);
-	std::fill_n(&outputs[1][0], samples, 0);
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
 	for (int ch = 0; ch < 6; ch++)
 	{
@@ -76,7 +76,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			{
 				/* Noise mode */
 				const u32 step = (chan->noise_control & 0x1f) ^ 0x1f;
-				for (int i = 0; i < samples; i += 1)
+				for (int i = 0; i < outputs[0].samples(); i += 1)
 				{
 					s16 data = BIT(chan->noise_seed, 0) ? 0x1f : 0;
 					chan->noise_counter--;
@@ -87,18 +87,18 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 						// based on Charles MacDonald's research
 						chan->noise_seed = (seed >> 1) | ((BIT(seed, 0) ^ BIT(seed, 1) ^ BIT(seed, 11) ^ BIT(seed, 12) ^ BIT(seed, 17)) << 17);
 					}
-					outputs[0][i] += (s16)(vll * (data - 16));
-					outputs[1][i] += (s16)(vlr * (data - 16));
+					outputs[0].add_int(i, s16(vll * (data - 16)), 32768);
+					outputs[1].add_int(i, s16(vlr * (data - 16)), 32768);
 				}
 			}
 			else
 			if (chan->control & 0x40)
 			{
 				/* DDA mode */
-				for (int i = 0; i < samples; i++)
+				for (int i = 0; i < outputs[0].samples(); i++)
 				{
-					outputs[0][i] += (s16)(vll * (chan->dda - 16));
-					outputs[1][i] += (s16)(vlr * (chan->dda - 16));
+					outputs[0].add_int(i, s16(vll * (chan->dda - 16)), 32768);
+					outputs[1].add_int(i, s16(vlr * (chan->dda - 16)), 32768);
 				}
 			}
 			else
@@ -111,7 +111,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 						channel *lfo_srcchan = &m_channel[1];
 						channel *lfo_dstchan = &m_channel[0];
 						const u16 lfo_step = lfo_srcchan->frequency ? lfo_srcchan->frequency : 0x1000;
-						for (int i = 0; i < samples; i += 1)
+						for (int i = 0; i < outputs[0].samples(); i += 1)
 						{
 							s32 step = lfo_dstchan->frequency ? lfo_dstchan->frequency : 0x1000;
 							if (m_lfo_control & 0x80) // reset LFO
@@ -137,8 +137,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 								lfo_dstchan->tick = step;
 								lfo_dstchan->index = (lfo_dstchan->index + 1) & 0x1f;
 							}
-							outputs[0][i] += (s16)(vll * (data - 16));
-							outputs[1][i] += (s16)(vlr * (data - 16));
+							outputs[0].add_int(i, s16(vll * (data - 16)), 32768);
+							outputs[1].add_int(i, s16(vlr * (data - 16)), 32768);
 						}
 					}
 				}
@@ -146,7 +146,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 				{
 					/* Waveform mode */
 					const u32 step = chan->frequency ? chan->frequency : 0x1000;
-					for (int i = 0; i < samples; i += 1)
+					for (int i = 0; i < outputs[0].samples(); i += 1)
 					{
 						const s16 data = chan->waveform[chan->index];
 						chan->tick--;
@@ -155,8 +155,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 							chan->tick = step;
 							chan->index = (chan->index + 1) & 0x1f;
 						}
-						outputs[0][i] += (s16)(vll * (data - 16));
-						outputs[1][i] += (s16)(vlr * (data - 16));
+						outputs[0].add_int(i, s16(vll * (data - 16)), 32768);
+						outputs[1].add_int(i, s16(vlr * (data - 16)), 32768);
 					}
 				}
 			}
@@ -319,7 +319,7 @@ void c6280_device::device_start()
 	m_lfo_control = 0;
 	memset(m_channel, 0, sizeof(channel) * 8);
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = stream_alloc(0, 2, clock());
 
 	/* Make volume table */
 	/* PSG has 48dB volume range spread over 32 steps */

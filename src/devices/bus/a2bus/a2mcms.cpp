@@ -206,7 +206,7 @@ mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_
 void mcms_device::device_start()
 {
 	m_write_irq.resolve();
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 31250);
+	m_stream = stream_alloc_legacy(0, 2, 31250);
 	m_timer = timer_alloc(0, nullptr);
 	m_clrtimer = timer_alloc(1, nullptr);
 	m_enabled = false;
@@ -252,7 +252,7 @@ void mcms_device::device_timer(emu_timer &timer, device_timer_id tid, int param,
 	}
 }
 
-void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mcms_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int i, v;

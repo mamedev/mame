@@ -172,8 +172,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// internal peripheral device handlers
-	DECLARE_READ32_MEMBER(primary_bus_control_r) { return m_primary_bus_control; }
-	DECLARE_WRITE32_MEMBER(primary_bus_control_w);
+	uint32_t primary_bus_control_r() { return m_primary_bus_control; }
+	void primary_bus_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// memory helpers
 	uint32_t ROPCODE(offs_t pc);

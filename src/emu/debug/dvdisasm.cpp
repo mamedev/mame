@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Olivier Galibert
 /*********************************************************************
 
-    dvdisasm.c
+    dvdisasm.cpp
 
     Disassembly debugger view.
 

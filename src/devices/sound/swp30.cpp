@@ -761,12 +761,12 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 
 // Synthesis
 
-void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// Loop first on the samples and not on the channels otherwise
 	// effects will be annoying to implement.
 
-	for(int sample = 0; sample < samples; sample++) {
+	for(int sample = 0; sample < outputs[0].samples(); sample++) {
 		// Accumulate on 64 bits, shift/clamp at the end
 		s64 acc_left = 0, acc_right = 0;
 
@@ -871,17 +871,9 @@ void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		// Global EQ is missing (it's done in the MEG)
 
 		acc_left >>= (16+6);
-		if(acc_left < -0x8000)
-			acc_left = -0x8000;
-		else if(acc_left > 0x7fff)
-			acc_left = 0x7fff;
-		outputs[0][sample] = acc_left;
+		outputs[0].put_int_clamp(sample, acc_left, 32768);
 
 		acc_right >>= (16+6);
-		if(acc_right < -0x8000)
-			acc_right = -0x8000;
-		else if(acc_right > 0x7fff)
-			acc_right = 0x7fff;
-		outputs[1][sample] = acc_right;
+		outputs[1].put_int_clamp(sample, acc_right, 32768);
 	}
 }

@@ -95,9 +95,9 @@ void nubus_m2video_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_m2video_device::vram_r)), write32_delegate(*this, FUNC(nubus_m2video_device::vram_w)));
-	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(*this, FUNC(nubus_m2video_device::vram_r)), write32_delegate(*this, FUNC(nubus_m2video_device::vram_w)));
-	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(*this, FUNC(nubus_m2video_device::m2video_r)), write32_delegate(*this, FUNC(nubus_m2video_device::m2video_w)));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_m2video_device::vram_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::vram_w)));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_m2video_device::vram_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::vram_w)));
+	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32s_delegate(*this, FUNC(nubus_m2video_device::m2video_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::m2video_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
@@ -217,7 +217,7 @@ uint32_t nubus_m2video_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_m2video_device::m2video_w )
+void nubus_m2video_device::m2video_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	switch (offset)
@@ -279,7 +279,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 	}
 }
 
-READ32_MEMBER( nubus_m2video_device::m2video_r )
+uint32_t nubus_m2video_device::m2video_r(offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0x50000/4)    // bit 0 is VBL status
 	{
@@ -294,13 +294,13 @@ READ32_MEMBER( nubus_m2video_device::m2video_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_m2video_device::vram_w )
+void nubus_m2video_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_m2video_device::vram_r )
+uint32_t nubus_m2video_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

@@ -113,7 +113,7 @@ DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "Hitachi SH-2A")
     SH2 internal map
 -------------------------------------------------*/
 
-READ32_MEMBER(sh2_device::sh2_internal_a5)
+uint32_t sh2_device::sh2_internal_a5()
 {
 	return 0xa5a5a5a5;
 }

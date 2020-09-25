@@ -66,20 +66,20 @@ void srumbler_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(srumbler_state::foreground_w)
+void srumbler_state::foreground_w(offs_t offset, uint8_t data)
 {
 	m_foregroundram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(srumbler_state::background_w)
+void srumbler_state::background_w(offs_t offset, uint8_t data)
 {
 	m_backgroundram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
-WRITE8_MEMBER(srumbler_state::_4009_w)
+void srumbler_state::_4009_w(uint8_t data)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);
@@ -92,7 +92,7 @@ WRITE8_MEMBER(srumbler_state::_4009_w)
 }
 
 
-WRITE8_MEMBER(srumbler_state::scroll_w)
+void srumbler_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll[offset] = data;
 

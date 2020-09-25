@@ -109,13 +109,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(clridx_w);
-	// Floppy drive interface
-
-	DECLARE_READ8_MEMBER(fdc_read);
-	DECLARE_WRITE8_MEMBER(fdc_write);
+	void cmd_w(uint8_t data);
+	uint8_t status_r();
+	void clridx_w(uint8_t data);
 
 	void cpu_map(address_map &map);
 

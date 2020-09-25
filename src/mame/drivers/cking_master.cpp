@@ -4,6 +4,7 @@
 /******************************************************************************
 
 Chess King Master (yes, it's plainly named "Master")
+According to the manual, the chess engine is Cyrus (by Richard Lang).
 
 Hardware notes:
 - Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
@@ -80,13 +81,12 @@ private:
 	u8 input_r();
 	void control_w(u8 data);
 
-	u16 m_inp_mux;
+	u16 m_inp_mux = 0;
 };
 
 void master_state::machine_start()
 {
-	// zerofill, register for savestates
-	m_inp_mux = 0;
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 }
 
@@ -225,14 +225,14 @@ void master_state::master(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	const attotime irq_period = attotime::from_hz(429); // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
+	const attotime irq_period = attotime::from_hz(418); // 555 timer (22nF, 150K, 1K5), measured 418Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(master_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(22870)); // active for 22.87us
 	TIMER(config, "irq_off").configure_periodic(FUNC(master_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 2);
@@ -254,7 +254,7 @@ void master_state::master(machine_config &config)
 
 ROM_START( ckmaster )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("ckmaster.ic2", 0x0000, 0x2000, CRC(59cbec9e) SHA1(2e0629e65778da62bed857406b91a334698d2fe8) ) // D2764C, no label
+	ROM_LOAD("d2764c-3.ic2", 0x0000, 0x2000, CRC(59cbec9e) SHA1(2e0629e65778da62bed857406b91a334698d2fe8) ) // no custom label
 ROM_END
 
 } // anonymous namespace

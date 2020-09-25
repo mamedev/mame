@@ -15,7 +15,7 @@
 #define m68307TIMER_WCR (0x6)
 #define m68307TIMER_XXX (0x7)
 
-READ16_MEMBER( m68307_cpu_device::m68307_internal_timer_r )
+uint16_t m68307_cpu_device::m68307_internal_timer_r(offs_t offset, uint16_t mem_mask)
 {
 	assert(m_m68307TIMER);
 	m68307_timer &timer = *m_m68307TIMER;
@@ -36,7 +36,7 @@ READ16_MEMBER( m68307_cpu_device::m68307_internal_timer_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( m68307_cpu_device::m68307_internal_timer_w )
+void m68307_cpu_device::m68307_internal_timer_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(m_m68307TIMER);
 	m68307_timer &timer = *m_m68307TIMER;

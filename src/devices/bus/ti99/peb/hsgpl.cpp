@@ -183,7 +183,7 @@ snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mco
 /*
    Read hsgpl CRU interface. None here.
 */
-READ8Z_MEMBER(snug_high_speed_gpl_device::crureadz)
+void snug_high_speed_gpl_device::crureadz(offs_t offset, uint8_t *value)
 {
 	return;
 }
@@ -268,7 +268,7 @@ void snug_high_speed_gpl_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Memory read
 */
-READ8Z_MEMBER(snug_high_speed_gpl_device::readz)
+void snug_high_speed_gpl_device::readz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0x7e000)==0x74000)
 	{

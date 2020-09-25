@@ -216,7 +216,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_sound_interface callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	inline bool is_ntsc();
 	inline uint8_t read_page_ram_byte(offs_t address);
@@ -264,7 +264,7 @@ private:
 	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	int16_t m_signal;                 // current signal
+	stream_buffer::sample_t m_signal; // current signal
 	int m_incr;                     // initial wave state
 	int m_toneoff;                  // tone off
 	int m_wnoff;                    // white noise off

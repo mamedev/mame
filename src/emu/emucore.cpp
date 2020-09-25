@@ -2,10 +2,11 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
-    emucore.c
+    emucore.cpp
 
     Simple core functions that are defined in emucore.h and which may
     need to be accessed by other MAME-related tools.
+
 ****************************************************************************/
 
 #include "emu.h"

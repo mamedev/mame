@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
 //  sound_data_r - read data from the sound latch
 //-------------------------------------------------
 
-READ8_MEMBER( segahang_state::sound_data_r )
+uint8_t segahang_state::sound_data_r()
 {
 	// assert ACK
 	m_i8255_1->pc6_w(CLEAR_LINE);

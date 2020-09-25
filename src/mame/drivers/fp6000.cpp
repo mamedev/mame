@@ -480,7 +480,7 @@ void fp6000_state::fp6000(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(16);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx);	
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 
 	// audio hardware
 	SPEAKER(config, "mono").front_center();

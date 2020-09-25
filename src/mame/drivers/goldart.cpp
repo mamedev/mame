@@ -117,7 +117,7 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 
 			count++;
 
-			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);;
+			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);
 			dstptr_bitmap[(x*2)+1] = (data&0x0f) | ((data2 & 0x0f)<<4);
 		}
 	}

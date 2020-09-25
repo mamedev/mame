@@ -36,8 +36,10 @@
 
 #include "emuopts.h"
 #include "drcbec.h"
+#ifdef NATIVE_DRC
 #include "drcbex86.h"
 #include "drcbex64.h"
+#endif
 
 #include <fstream>
 

@@ -98,7 +98,7 @@ WRITE_LINE_MEMBER(stactics_state::palette_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::scroll_ram_w)
+void stactics_state::scroll_ram_w(offs_t offset, uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -132,7 +132,7 @@ READ_LINE_MEMBER(stactics_state::frame_count_d3_r)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::speed_latch_w)
+void stactics_state::speed_latch_w(uint8_t data)
 {
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -157,13 +157,13 @@ WRITE8_MEMBER(stactics_state::speed_latch_w)
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_trigger_w)
+void stactics_state::shot_trigger_w(uint8_t data)
 {
 	m_shot_standby = 0;
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
+void stactics_state::shot_flag_clear_w(uint8_t data)
 {
 	m_shot_arrive = 0;
 }
@@ -430,10 +430,7 @@ void stactics_state::stactics_video(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_raw(15.46848_MHz_XTAL / 3, 328, 0, 256, 262, 0, 232);
 	screen.set_screen_update(FUNC(stactics_state::screen_update));
 	screen.set_palette("palette");
 

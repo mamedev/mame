@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(thedeep_state::textram_w)
+void thedeep_state::textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset / 2);

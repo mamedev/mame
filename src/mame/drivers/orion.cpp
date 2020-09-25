@@ -2,10 +2,19 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Orion driver by Miodrag Milanovic
+Orion driver by Miodrag Milanovic
 
-        22/04/2008 Orion Pro added
-        02/04/2008 Preliminary driver.
+2008-04-02 Preliminary driver.
+2008-04-22 Orion Pro added
+
+Orionide and orionidm produce ERROR at start, not sure why. The others
+appear to function well, as long as you use the romdisk software item.
+You can load tapes with the CH4 program which is found on the romdisk.
+
+Orionpro has its own menu. If you choose Orion Pro, you need to have the
+cpm370 disk in the drive. If you choose Orion 128, you need the romdisk.
+
+It's unknown how to create a tape.
 
 ****************************************************************************/
 
@@ -13,9 +22,7 @@
 #include "emu.h"
 #include "includes/orion.h"
 
-#include "imagedev/cassette.h"
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 #include "formats/smx_dsk.h"
@@ -25,7 +32,7 @@
 /* Address maps */
 
 /* Orion 128 */
-void orion_state::orion128_mem(address_map &map)
+void orion_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xefff).bankrw("bank1");
 	map(0xf000, 0xf3ff).bankrw("bank2");
@@ -39,7 +46,7 @@ void orion_state::orion128_mem(address_map &map)
 }
 
 /* Orion Z80 Card II */
-void orion_state::orion128_io(address_map &map)
+void orion_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -48,7 +55,7 @@ void orion_state::orion128_io(address_map &map)
 	map(0xfa, 0xfa).w(FUNC(orion_state::orion128_video_page_w));
 }
 
-void orion_state::orionz80_mem(address_map &map)
+void orion_z80_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).bankrw("bank1");
@@ -59,12 +66,12 @@ void orion_state::orionz80_mem(address_map &map)
 }
 
 /* Orion Pro */
-void orion_state::orionz80_io(address_map &map)
+void orion_z80_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(orion_state::orionz80_io_r), FUNC(orion_state::orionz80_io_w));
+	map(0x0000, 0xffff).rw(FUNC(orion_z80_state::orionz80_io_r), FUNC(orion_z80_state::orionz80_io_w));
 }
 
-void orion_state::orionpro_mem(address_map &map)
+void orion_pro_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).bankrw("bank1");
@@ -77,9 +84,9 @@ void orion_state::orionpro_mem(address_map &map)
 	map(0xf800, 0xffff).bankrw("bank8");
 }
 
-void orion_state::orionpro_io(address_map &map)
+void orion_pro_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(orion_state::orionpro_io_r), FUNC(orion_state::orionpro_io_w));
+	map(0x0000, 0xffff).rw(FUNC(orion_pro_state::orionpro_io_r), FUNC(orion_pro_state::orionpro_io_w));
 }
 
 FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
@@ -90,19 +97,19 @@ FLOPPY_FORMATS_END
 void orion_state::orion128(machine_config &config)
 {
 	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &orion_state::orion128_mem);
-	m_maincpu->set_addrmap(AS_IO, &orion_state::orion128_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orion_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &orion_state::io_map);
 
-	auto &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.in_pa_callback().set(FUNC(orion_state::orion_romdisk_porta_r));
-	ppi1.out_pb_callback().set(FUNC(orion_state::orion_romdisk_portb_w));
-	ppi1.out_pc_callback().set(FUNC(orion_state::orion_romdisk_portc_w));
+	I8255A(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(orion_state::orion_romdisk_porta_r));
+	m_ppi1->out_pb_callback().set(FUNC(orion_state::orion_romdisk_portb_w));
+	m_ppi1->out_pc_callback().set(FUNC(orion_state::orion_romdisk_portc_w));
 
-	auto &ppi2(I8255A(config, "ppi8255_2"));
-	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	ppi2.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
-	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255A(config, m_ppi2);
+	m_ppi2->out_pa_callback().set(FUNC(orion_state::radio86_8255_porta_w2));
+	m_ppi2->in_pb_callback().set(FUNC(orion_state::radio86_8255_portb_r2));
+	m_ppi2->in_pc_callback().set(FUNC(orion_state::radio86_8255_portc_r2));
+	m_ppi2->out_pc_callback().set(FUNC(orion_state::radio86_8255_portc_w2));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -117,11 +124,11 @@ void orion_state::orion128(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	auto &cassette(CASSETTE(config, "cassette"));
-	cassette.set_formats(rko_cassette_formats);
-	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
-	cassette.set_interface("orion_cass");
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rko_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("orion_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("orion_cass");
 
@@ -148,31 +155,31 @@ void orion_state::orion128(machine_config &config)
 void orion_state::orion128ms(machine_config &config)
 {
 	orion128(config);
-	auto &ppi2(I8255A(config.replace(), "ppi8255_2"));
-	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	ppi2.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
-	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255A(config.replace(), m_ppi2);
+	m_ppi2->out_pa_callback().set(FUNC(orion_state::radio86_8255_porta_w2));
+	m_ppi2->in_pb_callback().set(FUNC(orion_state::radio86_8255_portb_r2));
+	m_ppi2->in_pc_callback().set(FUNC(orion_state::rk7007_8255_portc_r));
+	m_ppi2->out_pc_callback().set(FUNC(orion_state::radio86_8255_portc_w2));
 }
 
 
 void orion_z80_state::orionz80(machine_config &config)
 {
 	Z80(config, m_maincpu, 2500000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &orion_z80_state::orionz80_mem);
-	m_maincpu->set_addrmap(AS_IO, &orion_z80_state::orionz80_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orion_z80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &orion_z80_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(orion_z80_state::orionz80_interrupt));
 
-	auto &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.in_pa_callback().set(FUNC(orion_z80_state::orion_romdisk_porta_r));
-	ppi1.out_pb_callback().set(FUNC(orion_z80_state::orion_romdisk_portb_w));
-	ppi1.out_pc_callback().set(FUNC(orion_z80_state::orion_romdisk_portc_w));
+	I8255A(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(orion_z80_state::orion_romdisk_porta_r));
+	m_ppi1->out_pb_callback().set(FUNC(orion_z80_state::orion_romdisk_portb_w));
+	m_ppi1->out_pc_callback().set(FUNC(orion_z80_state::orion_romdisk_portc_w));
 
-	auto &ppi2(I8255A(config, "ppi8255_2"));
-	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	ppi2.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
-	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255A(config, m_ppi2);
+	m_ppi2->out_pa_callback().set(FUNC(orion_z80_state::radio86_8255_porta_w2));
+	m_ppi2->in_pb_callback().set(FUNC(orion_z80_state::radio86_8255_portb_r2));
+	m_ppi2->in_pc_callback().set(FUNC(orion_z80_state::radio86_8255_portc_r2));
+	m_ppi2->out_pc_callback().set(FUNC(orion_z80_state::radio86_8255_portc_w2));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -193,11 +200,11 @@ void orion_z80_state::orionz80(machine_config &config)
 	auto &ay8912(AY8912(config, "ay8912", 1773400));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	auto &cassette(CASSETTE(config, "cassette"));
-	cassette.set_formats(rko_cassette_formats);
-	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
-	cassette.set_interface("orion_cass");
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rko_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("orion_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("orion_cass");
 
@@ -225,29 +232,29 @@ void orion_z80_state::orionz80ms(machine_config &config)
 {
 	orionz80(config);
 
-	auto &ppi2(I8255A(config.replace(), "ppi8255_2"));
-	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	ppi2.in_pc_callback().set(FUNC(radio86_state::rk7007_8255_portc_r));
-	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255A(config.replace(), m_ppi2);
+	m_ppi2->out_pa_callback().set(FUNC(orion_z80_state::radio86_8255_porta_w2));
+	m_ppi2->in_pb_callback().set(FUNC(orion_z80_state::radio86_8255_portb_r2));
+	m_ppi2->in_pc_callback().set(FUNC(orion_z80_state::rk7007_8255_portc_r));
+	m_ppi2->out_pc_callback().set(FUNC(orion_z80_state::radio86_8255_portc_w2));
 }
 
 void orion_pro_state::orionpro(machine_config &config)
 {
 	Z80(config, m_maincpu, 5000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &orion_pro_state::orionpro_mem);
-	m_maincpu->set_addrmap(AS_IO, &orion_pro_state::orionpro_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orion_pro_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &orion_pro_state::io_map);
 
-	auto &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.in_pa_callback().set(FUNC(orion_pro_state::orion_romdisk_porta_r));
-	ppi1.out_pb_callback().set(FUNC(orion_pro_state::orion_romdisk_portb_w));
-	ppi1.out_pc_callback().set(FUNC(orion_pro_state::orion_romdisk_portc_w));
+	I8255A(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(orion_pro_state::orion_romdisk_porta_r));
+	m_ppi1->out_pb_callback().set(FUNC(orion_pro_state::orion_romdisk_portb_w));
+	m_ppi1->out_pc_callback().set(FUNC(orion_pro_state::orion_romdisk_portc_w));
 
-	auto &ppi2(I8255A(config, "ppi8255_2"));
-	ppi2.out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
-	ppi2.in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
-	ppi2.in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
-	ppi2.out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
+	I8255A(config, m_ppi2);
+	m_ppi2->out_pa_callback().set(FUNC(orion_pro_state::radio86_8255_porta_w2));
+	m_ppi2->in_pb_callback().set(FUNC(orion_pro_state::radio86_8255_portb_r2));
+	m_ppi2->in_pc_callback().set(FUNC(orion_pro_state::radio86_8255_portc_r2));
+	m_ppi2->out_pc_callback().set(FUNC(orion_pro_state::radio86_8255_portc_w2));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -265,11 +272,11 @@ void orion_pro_state::orionpro(machine_config &config)
 	auto &ay8912(AY8912(config, "ay8912", 1773400));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	auto &cassette(CASSETTE(config, "cassette"));
-	cassette.set_formats(rko_cassette_formats);
-	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
-	cassette.set_interface("orion_cass");
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rko_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("orion_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("orion_cass");
 
@@ -361,10 +368,10 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT    CLASS            INIT        COMPANY      FULLNAME                                  FLAGS
-COMP( 1990, orion128, 0,        0,      orion128,   radio86, orion_state,     empty_init, "<unknown>", "Orion 128",                              0 )
-COMP( 1990, orionms,  orion128, 0,      orion128ms, ms7007,  orion_state,     empty_init, "<unknown>", "Orion 128 (MS7007)",                     0 )
-COMP( 1990, orionz80, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II",                0 )
-COMP( 1990, orionide, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE",          0 )
-COMP( 1990, orionzms, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       0 )
-COMP( 1990, orionidm, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", 0 )
-COMP( 1994, orionpro, orion128, 0,      orionpro,   radio86, orion_pro_state, empty_init, "<unknown>", "Orion Pro",                              0 )
+COMP( 1990, orion128, 0,        0,      orion128,   radio86, orion_state,     empty_init, "<unknown>", "Orion 128",                              MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionms,  orion128, 0,      orion128ms, ms7007,  orion_state,     empty_init, "<unknown>", "Orion 128 (MS7007)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionz80, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II",                MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionide, orion128, 0,      orionz80,   radio86, orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE",          MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionzms, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1990, orionidm, orion128, 0,      orionz80ms, ms7007,  orion_z80_state, empty_init, "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", MACHINE_SUPPORTS_SAVE )
+COMP( 1994, orionpro, orion128, 0,      orionpro,   radio86, orion_pro_state, empty_init, "<unknown>", "Orion Pro",                              MACHINE_SUPPORTS_SAVE )

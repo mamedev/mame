@@ -186,45 +186,45 @@ void h83337_device::device_reset()
 	syscr = 0x09;
 }
 
-READ8_MEMBER(h83337_device::syscr_r)
+uint8_t h83337_device::syscr_r()
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h83337_device::syscr_w)
+void h83337_device::syscr_w(uint8_t data)
 {
 	syscr = data;
 	logerror("syscr = %02x\n", data);
 }
 
-READ8_MEMBER(h83337_device::wscr_r)
+uint8_t h83337_device::wscr_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h83337_device::wscr_w)
+void h83337_device::wscr_w(uint8_t data)
 {
 	logerror("wscr = %02x\n", data);
 }
 
-READ8_MEMBER(h83337_device::stcr_r)
+uint8_t h83337_device::stcr_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h83337_device::stcr_w)
+void h83337_device::stcr_w(uint8_t data)
 {
 	logerror("stcr = %02x\n", data);
 	timer8_0->set_extra_clock_bit(data & 0x01);
 	timer8_1->set_extra_clock_bit(data & 0x02);
 }
 
-READ8_MEMBER(h83337_device::mdcr_r)
+uint8_t h83337_device::mdcr_r()
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h83337_device::mdcr_w)
+void h83337_device::mdcr_w(uint8_t data)
 {
 	logerror("mdcr = %02x\n", data);
 }
