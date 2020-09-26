@@ -59,15 +59,12 @@ std::string luaprinter::tagname() {
 
 std::string luaprinter::simplename() {
 	device_t * dev;
-	device_t * lastdev;
 	dev = m_lp_mydevice;
 	std::string s(dev->owner()->shortname());
 	while (dev){
 		s=std::string(dev->shortname())+std::string(" ")+s;
-		lastdev = dev;
 		dev=dev->owner();
 	}
-	lastdev=lastdev; // complains about non use
 	return s;
 }
 
@@ -79,7 +76,6 @@ device_t* luaprinter::getrootdev(){
 		lastdev = dev;
 		dev=dev->owner();
 	}
-	lastdev=lastdev; // complains about non use
 	return lastdev;
 }
 
