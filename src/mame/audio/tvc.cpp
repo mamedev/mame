@@ -31,7 +31,7 @@ void tvc_sound_device::device_start()
 	// resolve callbacks
 	m_write_sndint.resolve_safe();
 
-	m_stream = stream_alloc_legacy(0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 	m_sndint_timer = timer_alloc(TIMER_SNDINT);
 }
 
@@ -58,19 +58,19 @@ void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-void tvc_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void tvc_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int rate = machine().sample_rate() / 2;
-	stream_sample_t *output = outputs[0];
+	auto &output = outputs[0];
+	int rate = output.sample_rate() / 2;
 	if (m_enabled && m_freq)
 	{
-		while( samples-- > 0 )
+		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
 		{
-			*output++ = m_signal * (m_volume * 0x0800);
+			output.put_int(sampindex, m_signal * m_volume, 32768 / 0x0800);
 			m_incr -= m_freq;
 			while(m_incr < 0)
 			{
@@ -82,7 +82,7 @@ void tvc_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_s
 	else
 	{
 		// fill output with 0 if the sound is disabled
-		memset(output, 0, samples * sizeof(stream_sample_t));
+		output.fill(0);
 	}
 }
 

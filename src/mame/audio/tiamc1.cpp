@@ -77,7 +77,7 @@ void tiamc1_sound_device::device_start()
 	timer8253_reset(&m_timer0);
 	timer8253_reset(&m_timer1);
 
-	m_channel = stream_alloc_legacy(0, 1, clock() / CLOCK_DIVIDER);
+	m_channel = stream_alloc(0, 1, clock() / CLOCK_DIVIDER);
 
 	m_timer1_divider = 0;
 
@@ -104,14 +104,14 @@ void tiamc1_sound_device::device_start()
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tiamc1_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void tiamc1_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int count, o0, o1, o2, len, orval = 0;
 
-	len = samples * CLOCK_DIVIDER;
+	len = outputs[0].samples() * CLOCK_DIVIDER;
 
 	for (count = 0; count < len; count++)
 	{
@@ -140,7 +140,7 @@ void tiamc1_sound_device::sound_stream_update_legacy(sound_stream &stream, strea
 
 		if ((count + 1) % CLOCK_DIVIDER == 0)
 		{
-			outputs[0][count / CLOCK_DIVIDER] = orval ? 0x2828 : 0;
+			outputs[0].put(count / CLOCK_DIVIDER, orval ? 0.3 : 0.0);
 			orval = 0;
 		}
 	}
