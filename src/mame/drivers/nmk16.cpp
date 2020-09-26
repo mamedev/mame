@@ -4909,7 +4909,6 @@ void nmk16_state::tdragon3h(machine_config &config)
 	// It's been verified that by removing them and putting the YM2203 in its place, the game can make use of it.
 
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tdragon3h_sound_io_map);
-	m_audiocpu->set_vblank_int("screen", FUNC(nmk16_state::irq0_line_assert));
 
 	config.device_remove("ymsnd");
 	config.device_remove("oki1");
