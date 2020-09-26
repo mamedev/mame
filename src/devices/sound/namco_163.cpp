@@ -11,13 +11,14 @@
 #include "emu.h"
 #include "namco_163.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(NAMCO_163, namco_163_sound_device, "namco_163_sound", "Namco 163 (Sound)")
 
 namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NAMCO_163, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_ram(0x80)
 	, m_reg_addr(0x78)
 	, m_addr(0)
 	, m_inc(false)
@@ -33,6 +34,8 @@ namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, co
 
 void namco_163_sound_device::device_start()
 {
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
+
 	m_stream = stream_alloc(0, 1, clock() / 15);
 
 	save_item(NAME(m_ram));

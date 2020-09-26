@@ -88,7 +88,7 @@ private:
 	int flags;
 
 	unsigned char regs[0x230];
-	std::vector<uint8_t> ram;
+	std::unique_ptr<uint8_t []> ram;
 	int reverb_pos;
 
 	int32_t cur_ptr;

@@ -36,7 +36,7 @@ private:
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::vector<stream_buffer::sample_t> m_mixer_table;
+	std::unique_ptr<stream_buffer::sample_t []> m_mixer_table;
 	stream_buffer::sample_t *m_mixer_lookup;
 	std::vector<short> m_mixer_buffer;
 

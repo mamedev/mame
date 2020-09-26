@@ -23,7 +23,6 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, flags(0)
-	, ram(0x4000)
 	, reverb_pos(0)
 	, cur_ptr(0)
 	, cur_limit(0)
@@ -320,6 +319,8 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
+	ram = std::make_unique<uint8_t []>(0x4000);
+
 	reverb_pos = 0;
 	cur_ptr = 0;
 	memset(&ram[0], 0, 0x4000);
@@ -333,7 +334,7 @@ void k054539_device::init_chip()
 	save_item(NAME(flags));
 
 	save_item(NAME(regs));
-	save_item(NAME(ram));
+	save_pointer(NAME(ram), 0x4000);
 	save_item(NAME(reverb_pos));
 	save_item(NAME(cur_ptr));
 	save_item(NAME(cur_limit));

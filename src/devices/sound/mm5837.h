@@ -128,22 +128,22 @@ public:
 	static u32 frequency(double vdd)
 	{
 		// Vdd should be negative -6.2..-15V
-        if (vdd > -6.2 || vdd < -15)
-            throw emu_fatalerror("mm5837 frequency should be -6.2V .. -15V");
+		if (vdd > -6.2 || vdd < -15)
+			throw emu_fatalerror("mm5837 frequency should be -6.2V .. -15V");
 
-        // curve fitting done in excel from this table:
-        // { 0, 0, 0, 0, 0, 0, 1, 2267, 8731, 16382, 23531, 32564, 38347, 40010, 37800, 33173 }
-        double result = 191.98*vdd*vdd*vdd + 5448.4*vdd*vdd + 43388*vdd + 105347;
+		// curve fitting done in excel from this table:
+		// { 0, 0, 0, 0, 0, 0, 1, 2267, 8731, 16382, 23531, 32564, 38347, 40010, 37800, 33173 }
+		double result = 191.98*vdd*vdd*vdd + 5448.4*vdd*vdd + 43388*vdd + 105347;
 
-        // datasheet claims frequency range 24-56kHz at Vdd=-14V, but also lists
-        // maximum cycle times as ranging from 1.1-2.4s; since the 17-bit shift
-        // register cycles after 131072 clocks, we would expect the actual cycle
-        // times to be 2.34-5.46s at the 24-56kHz frequency range, so I'm presuming
-        // that it ticks 2x per "clock", effectively running at 2x the frequency
-        result *= 2;
+		// datasheet claims frequency range 24-56kHz at Vdd=-14V, but also lists
+		// maximum cycle times as ranging from 1.1-2.4s; since the 17-bit shift
+		// register cycles after 131072 clocks, we would expect the actual cycle
+		// times to be 2.34-5.46s at the 24-56kHz frequency range, so I'm presuming
+		// that it ticks 2x per "clock", effectively running at 2x the frequency
+		result *= 2;
 
-        // make sure the result isn't TOO crazy
-        result = std::max(result, 100.0);
+		// make sure the result isn't TOO crazy
+		result = std::max(result, 100.0);
 		return u32(result);
 	}
 
@@ -171,10 +171,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-    // internal state
+	// internal state
 	devcb_write_line m_output_cb;     // output callback
-    emu_timer *m_timer;               // output timer
-    double m_vdd;                     // configured voltage
+	emu_timer *m_timer;               // output timer
+	double m_vdd;                     // configured voltage
 	mm5837_source m_source;           // noise source
 };
 
@@ -199,8 +199,8 @@ protected:
 
 private:
 	sound_stream *m_stream;           // sound stream
-    double m_vdd;                     // configured voltage
-    mm5837_source m_source;           // noise source
+	double m_vdd;                     // configured voltage
+	mm5837_source m_source;           // noise source
 };
 
 

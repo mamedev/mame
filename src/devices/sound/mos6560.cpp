@@ -620,20 +620,17 @@ void mos6560_device::soundport_w( int offset, int data )
 
 void mos6560_device::sound_start()
 {
-	int i;
-
 	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise.resize(m_noisesize);
+	m_noise = std::make_unique<int8_t []>(m_noisesize);
 	{
 		int noiseshift = 0x7ffff8;
-		char data;
 
-		for (i = 0; i < m_noisesize; i++)
+		for (int i = 0; i < m_noisesize; i++)
 		{
-			data = 0;
+			char data = 0;
 			if (noiseshift & 0x400000)
 				data |= 0x80;
 			if (noiseshift & 0x100000)
@@ -661,11 +658,11 @@ void mos6560_device::sound_start()
 
 	if (m_tonesize > 0)
 	{
-		m_tone.resize(m_tonesize);
+		m_tone = std::make_unique<int16_t []>(m_tonesize);
 
-		for (i = 0; i < m_tonesize; i++)
+		for (int i = 0; i < m_tonesize; i++)
 		{
-			m_tone[i] = (int16_t)(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
+			m_tone[i] = int16_t(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
 		}
 	}
 }

@@ -171,17 +171,16 @@ void k005289_device::sound_stream_update(sound_stream &stream, std::vector<read_
 void k005289_device::make_mixer_table(int voices)
 {
 	int count = voices * 128;
-	int i;
 	int gain = 16;
 
 	/* allocate memory */
-	m_mixer_table.resize(256 * voices);
+	m_mixer_table = std::make_unique<stream_buffer::sample_t []>(256 * voices);
 
 	/* find the middle of the table */
 	m_mixer_lookup = &m_mixer_table[128 * voices];
 
 	/* fill in the table - 16 bit case */
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		int val = i * gain * 16 / voices;
 		if (val > 32767) val = 32767;

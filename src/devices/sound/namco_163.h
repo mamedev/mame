@@ -24,7 +24,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// global sound parameters
-	std::vector<u8>       m_ram;
+	u8                    m_ram[0x80];
 	u8                    m_reg_addr;
 	u8                    m_addr;
 	bool                  m_inc;

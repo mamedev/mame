@@ -176,8 +176,8 @@ protected:
 	m_noisesamples;   /* count of samples to give out per tone */
 
 	sound_stream *m_channel;
-	std::vector<int16_t> m_tone;
-	std::vector<int8_t> m_noise;
+	std::unique_ptr<int16_t []> m_tone;
+	std::unique_ptr<int8_t []> m_noise;
 
 	emu_timer *m_line_timer;
 };
