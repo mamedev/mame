@@ -205,5 +205,5 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 	/* mix it down */
 	mix = &m_mixer_buffer[0];
 	for (i = 0; i < buffer.samples(); i++)
-		buffer.put_int(i, *mix++, 256 * MAX_VOICES);
+		buffer.put_int(i, *mix++, 128 * MAX_VOICES);
 }
