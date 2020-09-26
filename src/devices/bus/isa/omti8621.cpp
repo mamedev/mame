@@ -1342,8 +1342,11 @@ void omti8621_device::fd_moten_w(uint8_t data)
 
 void omti8621_device::fd_rate_w(uint8_t data)
 {
-	// Bit 1 = FD_MINI (TODO)
-	// Bit 0 = FD_RATE (TODO)
+	// Bit 1 = FD_MINI (connects to pin 3 of FDC9239)
+	// Bit 0 = FD_RATE (inverted output connects to pin 4 of 74F163)
+	u32 fdc_clk = (48_MHz_XTAL / (BIT(data, 0) ? 5 : 3) / (BIT(data, 1) ? 4 : 2)).value();
+	m_fdc->set_unscaled_clock(fdc_clk);
+	m_fdc->set_rate(fdc_clk / 16);
 }
 
 void omti8621_device::fd_extra_w(uint8_t data)
