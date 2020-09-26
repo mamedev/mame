@@ -380,7 +380,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="agrosoar" cloneof="wereback">
+	<software name="agrosoar" cloneof="babytrex">
 		<description>Agro Soar (Australia)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -1339,7 +1339,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="babytrex" cloneof="wereback">
+	<software name="babytrex">
 		<description>Baby T-Rex (Europe)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -1467,7 +1467,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bamse" cloneof="wereback">
+	<software name="bamse" cloneof="babytrex">
 		<description>Bamse (Sweden)</description>
 		<year>1993</year>
 		<publisher>Laser Beam Entertainment</publisher>
@@ -6113,6 +6113,7 @@ license:CC0
 	</software>
 
 	<software name="f1polepo" supported="partial">
+		<!--	Region code "E" (USA)	-->
 		<description>F1 Pole Position (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
@@ -11905,10 +11906,13 @@ license:CC0
 	</software>
 
 	<software name="zeldalnk">
+		<!--	In lot check as "DMGZLE-2.858"	-->
+		<!--	Region code "E" (USA)	-->
 		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev 2)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-USA-1, DMG-ZL-EUR" />
+		<info name="gold" value="19941031" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -21602,7 +21606,7 @@ license:CC0
 
 	<software name="spaceinvj" cloneof="spaceinv">
 		<!--	The 1994 release is technically an improved localization of this, since it shares its "SP" code	-->
-		<!-- Notes: Also release by NP in 2000-03 -->
+		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Space Invaders (Japan)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
@@ -22048,6 +22052,7 @@ license:CC0
 	</software>
 
 	<software name="stng">
+		<!--	Region code "E" (USA)	-->
 		<description>Star Trek - The Next Generation (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Absolute Entertainment</publisher>
@@ -25531,7 +25536,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wereback">
+	<software name="wereback" cloneof="babytrex">
 		<description>We're Back! - A Dinosaur's Story (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -26113,7 +26118,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xj" cloneof="xu">
+	<software name="xj">
 		<description>X (Japan)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -26135,9 +26140,10 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xu">
-		<description>X (USA, prototype)</description>
-		<year>1992</year>
+	<software name="lunchasep" cloneof="xj">
+		<!--	Very early prototype with different gameplay	-->
+		<description>Lunar Chase (USA, prototype)</description>
+		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -26667,6 +26673,10 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+<!--
+	List of pirate cartridges
+-->
 
 <!-- Sachen multi-carts -->
 
