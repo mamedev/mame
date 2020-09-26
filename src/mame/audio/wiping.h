@@ -48,10 +48,7 @@ private:
 	sound_stream *m_stream;
 
 	/* mixer tables and internal buffers */
-	std::vector<int16_t> m_mixer_table;
-	int16_t *m_mixer_lookup;
 	std::vector<short> m_mixer_buffer;
-	std::vector<short> m_mixer_buffer_2;
 
 	uint8_t m_soundregs[0x4000];
 

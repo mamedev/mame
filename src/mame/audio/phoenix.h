@@ -46,7 +46,7 @@ private:
 	struct n_state      m_noise_state;
 	uint8_t               m_sound_latch_a;
 	sound_stream *      m_channel;
-	std::vector<uint32_t> m_poly18;
+	std::unique_ptr<uint32_t[]> m_poly18;
 	required_device<discrete_device> m_discrete;
 	required_device<tms36xx_device> m_tms;
 

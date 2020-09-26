@@ -72,7 +72,7 @@ void phoenix_sound_device::device_start()
 	memset(&m_c25_state, 0, sizeof(m_c25_state));
 	memset(&m_noise_state, 0, sizeof(m_noise_state));
 
-	m_poly18.resize(1ul << (18-5));
+	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )

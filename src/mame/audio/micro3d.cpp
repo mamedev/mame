@@ -68,9 +68,9 @@ void micro3d_sound_device::lp_filter::init(double fsval)
 	proto_coef[1].b1 = 1.847759;
 	proto_coef[1].b2 = 1.0;
 
-	coef.resize(4 * 2 + 1);
+	std::fill(std::begin(coef), std::end(coef), 0);
 	fs = fsval;
-	history.resize(2 * 2);
+	std::fill(std::begin(history), std::end(history), 0);
 }
 
 static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)

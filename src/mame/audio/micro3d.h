@@ -45,8 +45,8 @@ private:
 		void init(double fs);
 		void recompute(double k, double q, double fc);
 
-		std::vector<float> history;
-		std::vector<float> coef;
+		float history[2 * 2];
+		float coef[4 * 2 + 1];
 		double fs;
 		biquad proto_coef[2];
 	};

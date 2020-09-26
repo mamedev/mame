@@ -23,8 +23,7 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	m_sound_rom(nullptr),
 	m_num_voices(0),
 	m_sound_enable(0),
-	m_stream(nullptr),
-	m_mixer_lookup(nullptr)
+	m_stream(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
 	memset(m_soundregs, 0, sizeof(uint8_t)*0x4000);
@@ -44,9 +43,6 @@ void wiping_sound_device::device_start()
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer.resize(clock()/2);
-
-	/* build the mixer table */
-	make_mixer_table(8, defgain);
 
 	/* extract globals from the interface */
 	m_num_voices = 8;
@@ -78,26 +74,6 @@ void wiping_sound_device::device_start()
 		save_item(NAME(m_channel_list[i].oneshotplaying), i);
 	}
 }
-
-/* build a table to divide by the number of voices; gain is specified as gain*16 */
-void wiping_sound_device::make_mixer_table(int voices, int gain)
-{
-	/* allocate memory */
-	m_mixer_table.resize(256 * voices);
-
-	/* find the middle of the table */
-	m_mixer_lookup = &m_mixer_table[128 * voices];
-
-	/* fill in the table - 16 bit case */
-	for (int i = 0; i < voices * 128; i++)
-	{
-		int val = i * gain * 16 / voices;
-		if (val > 32767) val = 32767;
-		m_mixer_lookup[ i] = val;
-		m_mixer_lookup[-i] = -val;
-	}
-}
-
 
 /********************************************************************************/
 
@@ -229,5 +205,5 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 	/* mix it down */
 	mix = &m_mixer_buffer[0];
 	for (i = 0; i < buffer.samples(); i++)
-		buffer.put_int(i, m_mixer_lookup[*mix++], 32768);
+		buffer.put_int(i, *mix++, 256 * MAX_VOICES);
 }
