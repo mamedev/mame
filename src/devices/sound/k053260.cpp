@@ -311,7 +311,7 @@ void k053260_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	{
 		for ( int j = 0; j < outputs[0].samples(); j++ )
 		{
-			stream_sample_t buffer[2] = {0, 0};
+			s32 buffer[2] = {0, 0};
 
 			for (auto & voice : m_voice)
 			{
@@ -435,7 +435,7 @@ void k053260_device::KDSC_Voice::key_off()
 	m_playing = false;
 }
 
-void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
+void k053260_device::KDSC_Voice::play(s32 *outputs)
 {
 	m_counter += CLOCKS_PER_SAMPLE;
 

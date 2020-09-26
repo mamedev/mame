@@ -314,15 +314,15 @@ void exidy_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 	}
 }
 
-stream_sample_t exidy_sound_device::generate_music_sample()
+s32 exidy_sound_device::generate_music_sample()
 {
 	return 0;
 }
 
-stream_sample_t exidy_sh8253_sound_device::generate_music_sample()
+s32 exidy_sh8253_sound_device::generate_music_sample()
 {
 	sh8253_timer_channel *c;
-	stream_sample_t sample = 0;
+	s32 sample = 0;
 
 	/* music channel 0 */
 	c = &m_sh8253_timer[0];

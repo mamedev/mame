@@ -169,7 +169,7 @@ int wswan_sound_device::fetch_sample(int channel, int offset)
 
 void wswan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t sample, left, right;
+	s32 sample, left, right;
 
 	auto &outputl = outputs[0];
 	auto &outputr = outputs[1];

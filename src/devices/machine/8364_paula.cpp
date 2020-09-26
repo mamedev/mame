@@ -215,7 +215,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 			audio_channel *chan = &m_channel[channum];
 			int volume = (nextvol == -1) ? chan->vol : nextvol;
 			int period = (nextper == -1) ? chan->per : nextper;
-			stream_sample_t sample;
+			s32 sample;
 			int i;
 
 			// normalize the volume value

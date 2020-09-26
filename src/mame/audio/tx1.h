@@ -104,9 +104,9 @@ protected:
 	uint8_t m_ppi_latch_b = 0;
 	uint32_t m_ts = 0;
 
-	stream_sample_t m_pit0 = 0;
-	stream_sample_t m_pit1 = 0;
-	stream_sample_t m_pit2 = 0;
+	s32 m_pit0 = 0;
+	s32 m_pit1 = 0;
+	s32 m_pit2 = 0;
 
 	double m_weights0[4] = { 0, 0, 0, 0 };
 	double m_weights1[3] = { 0, 0, 0 };

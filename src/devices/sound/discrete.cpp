@@ -1026,7 +1026,7 @@ void discrete_sound_device::device_reset()
 //  discrete_device_process - process a number of
 //  samples.
 //
-//  input / output buffers are stream_sample_t
+//  input / output buffers are s32
 //  to not to have to convert the buffers.
 //  a "discrete cpu" device will pass nullptr here
 //-------------------------------------------------

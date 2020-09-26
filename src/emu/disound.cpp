@@ -66,14 +66,9 @@ device_sound_interface &device_sound_interface::add_route(u32 output, device_t &
 
 
 //-------------------------------------------------
-//  stream_alloc_legacy - allocate a stream implicitly
+//  stream_alloc - allocate a stream implicitly
 //  associated with this device
 //-------------------------------------------------
-
-sound_stream *device_sound_interface::stream_alloc_legacy(int inputs, int outputs, int sample_rate)
-{
-	return device().machine().sound().stream_alloc_legacy(*this, inputs, outputs, sample_rate, stream_update_legacy_delegate(&device_sound_interface::sound_stream_update_legacy, this));
-}
 
 sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate)
 {
@@ -378,17 +373,6 @@ void device_sound_interface::interface_pre_reset()
 	for (auto &stream : device().machine().sound().streams())
 		if (&stream->device() == &device())
 			stream->update();
-}
-
-
-//-------------------------------------------------
-//  sound_stream_update_legacy - implementation
-//  that should be overridden by legacy devices
-//-------------------------------------------------
-
-void device_sound_interface::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
-{
-	throw emu_fatalerror("sound_stream_update_legacy called but not overridden by owning class");
 }
 
 
