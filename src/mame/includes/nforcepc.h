@@ -24,7 +24,7 @@ public:
 	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, const char *bios_device_tag)
 		: crush11_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x10de01a4, 0x01, 0x10430c11);
+		set_ids_host(0x10de01a4, 0xb2, 0);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		biosrom.set_tag(bios_device_tag);
 	}
@@ -36,6 +36,7 @@ public:
 	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
 	void bios_map(address_map &map);
+	void aperture_map(address_map &map) {}
 
 protected:
 	virtual void device_start() override;
@@ -66,7 +67,7 @@ DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
 
 class crush11_memory_device : public pci_device {
 public:
-	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int ram_size);
+	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id, int ram_size);
 	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_ram_size(int ram_size);

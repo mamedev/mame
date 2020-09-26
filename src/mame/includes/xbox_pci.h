@@ -169,6 +169,7 @@ public:
 
 class mcpx_smbus_device : public pci_device {
 public:
+	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
@@ -181,6 +182,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void config_map(address_map &map) override;
 
 private:
 	devcb_write_line m_interrupt_handler;
@@ -199,6 +202,8 @@ private:
 	void smbus_io2(address_map &map);
 	uint32_t smbus_read(int bus, offs_t offset, uint32_t mem_mask);
 	void smbus_write(int bus, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint8_t minimum_grant_r() { return 3; }
+	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
@@ -209,6 +214,7 @@ DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
 class usb_function_device;
 class mcpx_ohci_device : public pci_device {
 public:
+	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
 	void plug_usb_device(int port, device_usb_ohci_function_interface *function);
@@ -224,6 +230,8 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual void config_map(address_map &map) override;
+
 private:
 	ohci_usb_controller *ohci_usb;
 	devcb_write_line m_interrupt_handler;
@@ -236,6 +244,8 @@ private:
 		int port;
 	} connecteds[4];
 	int connecteds_count;
+	uint8_t minimum_grant_r() { return 3; }
+	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
@@ -271,9 +281,10 @@ DECLARE_DEVICE_TYPE(MCPX_ETH, mcpx_eth_device)
 class mcpx_apu_device : public pci_device {
 public:
 	template <typename T>
-	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id, T &&cpu_tag)
 		: mcpx_apu_device(mconfig, tag, owner, clock)
 	{
+		set_ids(0x10de01b0, 0xc2, 0x040100, subsystem_id);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -286,6 +297,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void config_map(address_map &map) override;
 
 private:
 	required_device<device_memory_interface> cpu;
@@ -312,6 +325,8 @@ private:
 		address_space *space;
 	} apust;
 	void apu_mmio(address_map &map);
+	uint8_t minimum_grant_r() { return 1; }
+	uint8_t maximum_latency_r() { return 0xc; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
@@ -322,6 +337,7 @@ DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
 
 class mcpx_ac97_audio_device : public pci_device {
 public:
+	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t ac97_audio_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -335,6 +351,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void config_map(address_map &map) override;
+
 private:
 	struct ac97_state {
 		uint32_t mixer_regs[0x84 / 4];
@@ -343,6 +361,8 @@ private:
 	void ac97_mmio(address_map &map);
 	void ac97_io0(address_map &map);
 	void ac97_io1(address_map &map);
+	uint8_t minimum_grant_r() { return 2; }
+	uint8_t maximum_latency_r() { return 5; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device)
@@ -364,12 +384,11 @@ DECLARE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device)
 
 class mcpx_ide_device : public pci_device {
 public:
+	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto pri_interrupt_handler() { return m_pri_interrupt_handler.bind(); }
 	auto sec_interrupt_handler() { return m_sec_interrupt_handler.bind(); }
-
-	virtual void config_map(address_map &map) override;
 
 	void class_rev_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t pri_read_cs1_r();
@@ -384,6 +403,8 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
+	virtual void config_map(address_map &map) override;
+
 private:
 	required_device<bus_master_ide_controller_device> m_pri;
 	required_device<bus_master_ide_controller_device> m_sec;
@@ -396,6 +417,8 @@ private:
 	void ide_io(address_map &map);
 	DECLARE_WRITE_LINE_MEMBER(ide_pri_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_sec_interrupt);
+	uint8_t minimum_grant_r() { return 3; }
+	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)
