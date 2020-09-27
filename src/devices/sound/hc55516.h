@@ -18,30 +18,34 @@ public:
 
 	// common things across all the CVSD chips:
 	// Clock pull, really only relevant of something manually polls the clock (and clock is specified) for some reason, which is a very bad design pattern
-	// this function WILL ASSERT if it is called and the clock hz is NOT specified!
+	// this function WILL ASSERT if it is called and the clock hz is NOT specified! TODO: remove this
 	READ_LINE_MEMBER( clock_r );
-	// A clock state change callback, because where we're going we don't need sanity
-	auto clock_state_cb() { return m_clock_state_push_cb.bind(); }
 
 	// Clock push
 	// this function WILL ASSERT if it is called and the clock hz IS specified!
 	WRITE_LINE_MEMBER( mclock_w );
 
-	// Digital in pull callback function, for use if a clock is specified and we need to pull in the digital pin state, otherwise unused
-	auto digin_cb() { return m_digin_pull_cb.bind(); }
 	// Digital in push to the pin, as a pseudo 'buffer'
 	WRITE_LINE_MEMBER( digin_w );
-
-	// Audio In pin, an analog value (int16_t -32768 - 32767, or a float?) of the audio waveform being pushed to the chip
-	void audio_in_w(int16_t data); // TODO: handle encoding
 
 	// DEC/ENC decode/encode select push
 	WRITE_LINE_MEMBER( dec_encq_w ); //TODO: handle encoding
 
-	// Digital out push callback function
-	auto digout_cb() { return m_digout_push_cb.bind(); }
 	// Digital out pull
 	READ_LINE_MEMBER( digout_r );
+
+	// callback versions of above functions
+	// A clock state change callback, because where we're going we don't need sanity and/or proper synchronization. TODO: remove this.
+	auto clock_state_cb() { return m_clock_state_push_cb.bind(); }
+
+	// Digital in pull callback function, for use if a clock is specified and we need to pull in the digital pin state, otherwise unused
+	//auto digin_cb() { return m_digin_pull_cb.bind(); } // TODO: this is not hooked up yet.
+
+	// Digital out push callback function.
+	//auto digout_cb() { return m_digout_push_cb.bind(); } // TODO: this is not hooked up yet.
+
+	// Audio In pin, an analog value of the audio waveform being pushed to the chip
+	//void audio_in_w(stream_buffer::sample_t data); // TODO: this is not hooked up yet, and this should really be an input stream from a separate DAC device, not a value push.
 
 	// common overridable functions
 
@@ -64,8 +68,6 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-	void start_common(uint8_t shiftreg_mask, bool active_clock_hi);
 
 	// callbacks
 	devcb_write_line m_clock_state_push_cb; ///TODO: get rid of this, if you use it you should feel bad

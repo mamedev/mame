@@ -50,14 +50,13 @@ cvsd_device::cvsd_device(const machine_config &mconfig, device_type type, const 
 	, m_samples_generated(0)
 {
 }
-//-------------------------------------------------
-//  start_common - common init and savestate reg for everything shared
-//-------------------------------------------------
-void cvsd_device::start_common(uint8_t shiftreg_mask, bool active_clock_edge)
-{
-	m_shiftreg_mask = shiftreg_mask;
-	m_active_clock_edge = active_clock_edge;
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cvsd_device::device_start()
+{
 	/* create the stream */
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE);
 
@@ -69,15 +68,6 @@ void cvsd_device::start_common(uint8_t shiftreg_mask, bool active_clock_edge)
 	save_item(NAME(m_curr_sample));
 	save_item(NAME(m_next_sample));
 	save_item(NAME(m_samples_generated));
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cvsd_device::device_start()
-{
-	//stub, don't even bother registering for savestates, this should NEVER be called
 }
 
 //-------------------------------------------------
@@ -117,10 +107,10 @@ WRITE_LINE_MEMBER( cvsd_device::digin_w )
 }
 
 // the following encode related functions don't do anything yet, don't call them.
-void cvsd_device::audio_in_w(int16_t data)
+/*void cvsd_device::audio_in_w(int16_t data)
 {
 	assert(0);
-}
+}*/
 
 WRITE_LINE_MEMBER( cvsd_device::dec_encq_w )
 {
@@ -262,7 +252,7 @@ hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, 
 
 void hc55516_device::device_start()
 {
-	start_common(0x07, RISING);
+	cvsd_device::device_start();
 	save_item(NAME(m_sylmask));
 	save_item(NAME(m_sylshift));
 	save_item(NAME(m_syladd));
@@ -277,6 +267,8 @@ void hc55516_device::device_start()
 	m_fzq_pull_cb.resolve();
 
 	/* variant-specific parameters */
+	m_shiftreg_mask = 0x07;
+	m_active_clock_edge = RISING;
 	m_sylmask = 0xfc0;
 	m_sylshift = 6;
 	m_syladd = 0xfc1;
@@ -454,7 +446,7 @@ hc55532_device::hc55532_device(const machine_config &mconfig, const char *tag, d
 
 void hc55532_device::device_start()
 {
-	start_common(0x07, RISING);
+	cvsd_device::device_start();
 	save_item(NAME(m_sylmask));
 	save_item(NAME(m_sylshift));
 	save_item(NAME(m_syladd));
@@ -468,6 +460,8 @@ void hc55532_device::device_start()
 	m_fzq_pull_cb.resolve();
 
 	/* variant-specific parameters */
+	m_shiftreg_mask = 0x07;
+	m_active_clock_edge = RISING;
 	m_sylmask = 0xf80;
 	m_sylshift = 7;
 	m_syladd = 0xfe1;
@@ -521,14 +515,21 @@ mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, co
 
 void mc3417_device::device_start()
 {
+	cvsd_device::device_start();
+	save_item(NAME(m_sylfilter_d));
+	save_item(NAME(m_intfilter_d));
+	save_item(NAME(m_charge));
+	save_item(NAME(m_decay));
+	save_item(NAME(m_leak));
+
 	/* compute the fixed charge, decay, and leak time constants */
 	m_charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0));
 	m_decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0));
 	m_leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
-	start_common(0x07, FALLING);
-	save_item(NAME(m_sylfilter_d));
-	save_item(NAME(m_intfilter_d));
+	/* variant-specific parameters */
+	m_shiftreg_mask = 0x07;
+	m_active_clock_edge = FALLING;
 }
 
 void mc3417_device::process_bit(bool bit, bool clock_state)
@@ -641,14 +642,21 @@ mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, dev
 
 void mc3418_device::device_start()
 {
+	cvsd_device::device_start();
+	save_item(NAME(m_sylfilter_d));
+	save_item(NAME(m_intfilter_d));
+	save_item(NAME(m_charge));
+	save_item(NAME(m_decay));
+	save_item(NAME(m_leak));
+
 	/* compute the fixed charge, decay, and leak time constants */
 	m_charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0));
 	m_decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0));
 	m_leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
-	start_common(0x0f, FALLING);
-	save_item(NAME(m_sylfilter_d));
-	save_item(NAME(m_intfilter_d));
+	/* variant-specific parameters */
+	m_shiftreg_mask = 0x0f;
+	m_active_clock_edge = FALLING;
 }
 
 /*
