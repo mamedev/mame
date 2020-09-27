@@ -196,7 +196,7 @@ void a2bus_computereyes2_device::write_c0nx(uint8_t offset, uint8_t data)
 				m_x = m_y = 0;
 				std::fill_n(m_a2_bitmap, 280*193, 0);
 
-				m_bitmap = &m_picture->get_bitmap();
+				m_bitmap = m_picture->get_bitmap();
 				if (m_bitmap)
 				{
 					// convert arbitrary sized ARGB32 image to a 188x193 image with 256 levels of grayscale
