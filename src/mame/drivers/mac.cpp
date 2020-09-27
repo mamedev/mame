@@ -1568,6 +1568,11 @@ void mac_state::macqd700(machine_config &config)
 
 	add_via2(config);
 
+	MACADB(config, m_macadb, C15M);
+	m_macadb->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_macadb->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_macadb->adb_irq_callback().set(FUNC(mac_state::adb_irq_w));
+
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
 	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
