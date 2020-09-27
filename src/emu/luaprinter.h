@@ -67,8 +67,8 @@ public:
     void setclearlinebottom() { setclearlinepos(m_lp_bitmap->height()); }
     int getdistfrombottom() { return m_lp_distfrombottom; }
 
-    void drawpixel(int x, int y, int pixelval) { m_lp_bitmap->pix32(y,x) = pixelval; m_lp_pagedirty = 1; };
-    int getpixel(int x, int y) { return m_lp_bitmap->pix32(y,x); };
+    void drawpixel(int x, int y, int pixelval);
+    int getpixel(int x, int y);
 
     void setheadpos(int x, int y) { m_lp_xpos=x;m_lp_ypos=y; };
     std::tuple<int,int>getheadpos() { return std::make_tuple(m_lp_xpos,m_lp_ypos); };

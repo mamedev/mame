@@ -27,14 +27,27 @@ int device_luaprinter_interface::getnextchar() {
 	}
 }
 
-void device_luaprinter_interface::putnextchar(int c) {
+void device_luaprinter_interface::putnextchar(int c)
+{
 	m_lp_printerbuffer.at(m_lp_head++) = c;
 	m_lp_head %= BUFFERSIZE;
 }
 
-std::string device_luaprinter_interface::fixchar(std::string in, char from, char to) {
-    std::string final;
-    for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
+void device_luaprinter_interface::drawpixel(int x, int y, int pixelval)
+{
+	m_lp_bitmap->pix32(y,x) = pixelval;
+	m_lp_pagedirty = 1;
+};
+
+int device_luaprinter_interface::getpixel(int x, int y)
+{
+	return m_lp_bitmap->pix32(y,x);
+};
+
+std::string device_luaprinter_interface::fixchar(std::string in, char from, char to)
+{
+	std::string final;
+	for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
     {
         if((*it) != from)
         {
