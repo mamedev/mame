@@ -3,6 +3,39 @@
 <!--
 license:CC0
 -->
+<!--
+Some titles might exist with other revisions:
+- Chocobo no Fushigi na Dungeon for WonderSwan - Rev 0
+- Chou Aniki - Otoko no Tamafuda - Rev 0, 1, 2, 3
+- Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou - Rev 0, 1, 2
+- Clock Tower for WonderSwan - Rev 0
+- Densha de Go! - Rev 0
+- Digital Monster - Ver. WonderSwan - Rev 0
+- Fire Pro Wrestling for WonderSwan - Rev 0, 1, 2, 3, 4
+- Goraku Ou Tango! - Rev 0, 1
+- Hunter X Hunter - Ishi o Tsugu Mono - Rev 0
+- Keitai Gyogun Tanchiki - WonderSwan Handy Sonar - Rev 0
+- Kiss Yori... - Seaside Serenade - Rev 0, 1
+- Kyousouba Ikusei Simulation - Keiba - Rev 0
+- Langrisser Millennium WS - The Last Century - Rev 0
+- Mahjong Touryuumon - Rev 0, 2
+- Mingle Magnet - Rev 0
+- Nihon Pro Mahjong Renmei Kounin Tetsuman - Rev 0, 1
+- MobileWonderGate - Rev 0
+- Nice On - Rev 0
+- Pro Mahjong Kiwame for WonderSwan - Rev 0
+- Robot Works (Asia) - Rev 0
+- SD Gundam - Emotional Jam - Rev 0, 1
+- Shin Nihon Pro Wrestling Toukon Retsuden - Rev 0
+- Sotsugyou for WonderSwan - Rev 0
+- Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen - Rev 0, 1, 2, 3
+- Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen - Rev 0, 1
+- Tanjou Debut for WonderSwan - Rev 0
+- Trump Collection - Bottom-Up Teki Trump Seikatsu - Rev 0
+- Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi - Rev 0
+- Uzumaki - Denshi Kaiki Hen - Rev 0, 1, 2, 3
+- Vaitz Blade - Rev 0
+-->
 
 <softwarelist name="wswan" description="Bandai Wonderswan cartridges">
 	<software name="anchorz">
@@ -142,7 +175,24 @@ license:CC0
 	</software>
 
 	<software name="chocodng">
-		<description>Chocobo no Fushigi na Dungeon for WonderSwan</description>
+		<description>Chocobo no Fushigi na Dungeon for WonderSwan (Rev 3)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN002"/>
+		<info name="release" value="19990304"/>
+		<info name="alt_title" value="チョコボの不思議なダンジョン for ワンダースワン"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-ban002.bin" size="2097152" crc="aa53971d" sha1="f7a65e95a8e97f35ec2419897ad96af1e1d49676" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chocodnga" cloneof="chocodng">
+		<description>Chocobo no Fushigi na Dungeon for WonderSwan (Rev 2)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN002"/>
@@ -158,8 +208,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="chocodngb" cloneof="chocodng">
+		<description>Chocobo no Fushigi na Dungeon for WonderSwan (Rev 1)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN002"/>
+		<info name="release" value="19990304"/>
+		<info name="alt_title" value="チョコボの不思議なダンジョン for ワンダースワン"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-ban002.bin" size="2097152" crc="a607a350" sha1="a8c4f423429a8683cfebd05370ea122613349033" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="choaniki">
-		<description>Chou Aniki - Otoko no Tamafuda</description>
+		<description>Chou Aniki - Otoko no Tamafuda (Rev 4)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN023"/>
@@ -176,7 +243,7 @@ license:CC0
 	</software>
 
 	<software name="youfumak"> <!-- needs initialized SRAM? -->
-		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou</description>
+		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou (Rev 3)</description>
 		<year>1999</year>
 		<publisher>Kobunsha</publisher>
 		<info name="serial" value="SWJ-KBS002"/>
@@ -194,7 +261,7 @@ license:CC0
 
 	<!-- graphics bugs in main sprites during the game -->
 	<software name="clocktow" supported="partial">
-		<description>Clock Tower for WonderSwan</description>
+		<description>Clock Tower for WonderSwan (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGT002"/>
@@ -226,7 +293,7 @@ license:CC0
 	</software>
 
 	<software name="dendego">
-		<description>Densha de Go!</description>
+		<description>Densha de Go! (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SWJ-TAT001"/>
@@ -241,7 +308,7 @@ license:CC0
 	</software>
 
 	<software name="digi2tag">
-		<description>Digimon Adventure 02 - Tag Tamers</description>
+		<description>Digimon Adventure 02 - Tag Tamers (Rev 1)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN032"/>
@@ -257,8 +324,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="digi2taga" cloneof="digi2tag">
+		<description>Digimon Adventure 02 - Tag Tamers (Rev 0)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN032"/>
+		<info name="release" value="20000803"/>
+		<info name="alt_title" value="デジモンアドベンチャー02 タッグテイマーズ"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-ban032.bin" size="2097152" crc="56ce1bc5" sha1="521754084afc6321ae329421b9d2ab0f0cac8c70" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="digianod">
-		<description>Digimon Adventure - Anode Tamer</description>
+		<description>Digimon Adventure - Anode Tamer (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN01C"/>
@@ -268,6 +352,23 @@ license:CC0
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-ban01c.bin" size="2097152" crc="6e9dd148" sha1="9db54826c2887dea07aac774bd15e092596e37af" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digianoda" cloneof="digianod">
+		<description>Digimon Adventure - Anode Tamer (Rev 0)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN01C"/>
+		<info name="release" value="19991216"/>
+		<info name="alt_title" value="デジモンアドベンチャー アノードテイマー"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-ban01c.bin" size="2097152" crc="fc6946f0" sha1="c49bd00c95bca49a183d59f85e81815efb1a2fb9" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -292,7 +393,7 @@ license:CC0
 	</software>
 
 	<software name="digimon">
-		<description>Digital Monster - Ver. WonderSwan</description>
+		<description>Digital Monster - Ver. WonderSwan (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN005"/>
@@ -463,7 +564,7 @@ license:CC0
 	</software>
 
 	<software name="fireprow">
-		<description>Fire Pro Wrestling for WonderSwan</description>
+		<description>Fire Pro Wrestling for WonderSwan (Rev 5)</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGT007"/>
@@ -527,7 +628,7 @@ license:CC0
 	</software>
 
 	<software name="gorakuta">
-		<description>Goraku Ou Tango!</description>
+		<description>Goraku Ou Tango! (Rev 2)</description>
 		<year>1999</year>
 		<publisher>Moebius</publisher>
 		<info name="serial" value="SWJ-PAW001"/>
@@ -597,7 +698,22 @@ license:CC0
 	</software>
 
 	<software name="handsonr">
-		<description>Keitai Gyogun Tanchiki - WonderSwan Handy Sonar</description>
+		<description>Keitai Gyogun Tanchiki - WonderSwan Handy Sonar (Rev 2)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN00F"/>
+		<info name="release" value="19990513"/>
+		<info name="alt_title" value="携帯魚群探知機 ワンダースワン ハンディーソナー"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_rom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="swj-ban00f.bin" size="1048576" crc="d4188811" sha1="a1691ef96097c409b56c77f1d4c731fbfb3f386b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="handsonra" cloneof="handsonr">
+		<description>Keitai Gyogun Tanchiki - WonderSwan Handy Sonar (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN00F"/>
@@ -612,7 +728,24 @@ license:CC0
 	</software>
 
 	<software name="harobots">
-		<description>Harobots</description>
+		<description>Harobots (Rev 1)</description>
+		<year>1999</year>
+		<publisher>Sunrise Interactive</publisher>
+		<info name="serial" value="SWJ-SRV001"/>
+		<info name="release" value="19991007"/>
+		<info name="alt_title" value="ハロボッツ"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-srv001.bin" size="2097152" crc="f75ce82c" sha1="ecbaf210f92c75a55df9dff4777ea364596ae0c9" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harobotsa" cloneof="harobots">
+		<description>Harobots (Rev 0)</description>
 		<year>1999</year>
 		<publisher>Sunrise Interactive</publisher>
 		<info name="serial" value="SWJ-SRV001"/>
@@ -629,7 +762,7 @@ license:CC0
 	</software>
 
 	<software name="hxhishi">
-		<description>Hunter X Hunter - Ishi o Tsugu Mono</description>
+		<description>Hunter X Hunter - Ishi o Tsugu Mono (Rev 2)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN02A"/>
@@ -639,6 +772,23 @@ license:CC0
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-ban02a.bin" size="4194304" crc="70aa800e" sha1="57b4278fc5812f52413ca65f45225922d4f2ec3d" offset="000000" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hxhishia" cloneof="hxhishi">
+		<description>Hunter X Hunter - Ishi o Tsugu Mono (Rev 1)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN02A"/>
+		<info name="release" value="20000601"/>
+		<info name="alt_title" value="ハンター×ハンター 意志を継ぐ者"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_eeprom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="swj-ban02a.bin" size="4194304" crc="bd6fc68a" sha1="43d985b31848e1ae58d07231da80ee7aa8d3f686" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
 			</dataarea>
@@ -698,7 +848,7 @@ license:CC0
 	</software>
 
 	<software name="kissyori">
-		<description>Kiss Yori... - Seaside Serenade</description>
+		<description>Kiss Yori... - Seaside Serenade (Rev 2)</description>
 		<year>1999</year>
 		<publisher>Kid</publisher>
 		<info name="serial" value="SWJ-KDX001"/>
@@ -749,7 +899,7 @@ license:CC0
 	</software>
 
 	<software name="kyousoub">
-		<description>Kyousouba Ikusei Simulation - Keiba</description>
+		<description>Kyousouba Ikusei Simulation - Keiba (Rev 1)</description>
 		<year>1999</year>
 		<publisher>BEC</publisher>
 		<info name="serial" value="SWJ-BEC001"/>
@@ -766,7 +916,7 @@ license:CC0
 	</software>
 
 	<software name="langriss">
-		<description>Langrisser Millennium WS - The Last Century</description>
+		<description>Langrisser Millennium WS - The Last Century (Rev 1)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN024"/>
@@ -850,7 +1000,7 @@ license:CC0
 	</software>
 
 	<software name="mahjongt">
-		<description>Mahjong Touryuumon</description>
+		<description>Mahjong Touryuumon (Rev 3)</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
 		<info name="serial" value="SWJ-SUM001"/>
@@ -860,6 +1010,23 @@ license:CC0
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-sum001.bin" size="1048576" crc="e7e7fd4c" sha1="281079b22cb213ee4dda5c304b5b5be028130929" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjongta" cloneof="mahjongt">
+		<description>Mahjong Touryuumon (Rev 1)</description>
+		<year>1999</year>
+		<publisher>Sammy</publisher>
+		<info name="serial" value="SWJ-SUM001"/>
+		<info name="release" value="19990311"/>
+		<info name="alt_title" value="麻雀 登龍門"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="1048576">
+				<rom name="swj-sum001.bin" size="1048576" crc="c2ed122e" sha1="748ca335d39515a6650352449972684be749052a" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -952,7 +1119,7 @@ license:CC0
 	</software>
 
 	<software name="mingmagn">
-		<description>Mingle Magnet</description>
+		<description>Mingle Magnet (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Hal Corporation</publisher>
 		<info name="serial" value="SWJ-HAL002"/>
@@ -968,7 +1135,7 @@ license:CC0
 	</software>
 
 	<software name="mjkiwame">
-		<description>Pro Mahjong Kiwame for WonderSwan</description>
+		<description>Pro Mahjong Kiwame for WonderSwan (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="SWJ-ATN001"/>
@@ -985,7 +1152,7 @@ license:CC0
 	</software>
 
 	<software name="mjtetsu">
-		<description>Nihon Pro Mahjong Renmei Kounin Tetsuman</description>
+		<description>Nihon Pro Mahjong Renmei Kounin Tetsuman (Rev 2)</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGT001"/>
@@ -1002,7 +1169,7 @@ license:CC0
 	</software>
 
 	<software name="mobilewg">
-		<description>MobileWonderGate</description>
+		<description>MobileWonderGate (Rev 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1084,7 +1251,7 @@ license:CC0
 	</software>
 
 	<software name="niceon">
-		<description>Nice On</description>
+		<description>Nice On (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
 		<info name="serial" value="SWJ-SUM002"/>
@@ -1255,7 +1422,7 @@ license:CC0
 	</software>
 
 	<software name="srobot2b">
-		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen</description>
+		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen (Rev 4)</description>
 		<year>2000</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPR006"/>
@@ -1272,7 +1439,7 @@ license:CC0
 	</software>
 
 	<software name="srobot2c">
-		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen</description>
+		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen (Rev 2)</description>
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPR007"/>
@@ -1289,7 +1456,7 @@ license:CC0
 	</software>
 
 	<software name="srobotc">
-		<description>Super Robot Taisen Compact</description>
+		<description>Super Robot Taisen Compact (Rev 2)</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPR001"/>
@@ -1299,6 +1466,40 @@ license:CC0
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-bpr001.bin" size="2097152" crc="7021d54f" sha1="e93d58ab5819992e54223f5d1c4d5aeb6983d6a3" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srobotca" cloneof="srobotc">
+		<description>Super Robot Taisen Compact (Rev 1)</description>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="SWJ-BPR001"/>
+		<info name="release" value="19990428"/>
+		<info name="alt_title" value="スーパーロボット大戦 コンパクト"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-bpr001.bin" size="2097152" crc="7572e478" sha1="c4a21084bff1f2a63784fe7d11e046f305ad310a" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srobotcb" cloneof="srobotc">
+		<description>Super Robot Taisen Compact (Rev 0)</description>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="SWJ-BPR001"/>
+		<info name="release" value="19990428"/>
+		<info name="alt_title" value="スーパーロボット大戦 コンパクト"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-bpr001.bin" size="2097152" crc="8a8c5aa8" sha1="a957111681951eb6a971a6b4f75bca7f89b29628" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -1334,7 +1535,7 @@ license:CC0
 	The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
 	-->
 	<software name="robworks1" cloneof="robworks">
-		<description>Robot Works (Asia)</description>
+		<description>Robot Works (Asia) (Rev 1)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN033"/> <!-- Same ROM as cart SWJ-BAN034 (labeled "Ver.1.5") -->
@@ -1403,7 +1604,7 @@ license:CC0
 	</software>
 
 	<software name="sdgundem">
-		<description>SD Gundam - Emotional Jam</description>
+		<description>SD Gundam - Emotional Jam (Rev 3)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN006"/>
@@ -1413,6 +1614,23 @@ license:CC0
 			<feature name="slot" value="ws_sram" />
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-ban006.bin" size="2097152" crc="ae83f873" sha1="ae54a1f8916a2d37a1e0c82c5a9b5d8fe0eeae51" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdgundema" cloneof="sdgundem">
+		<description>SD Gundam - Emotional Jam (Rev 2)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BAN006"/>
+		<info name="release" value="19990527"/>
+		<info name="alt_title" value="SDガンダム エモーショナルジャム"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="2097152">
+				<rom name="swj-ban006.bin" size="2097152" crc="adfc3048" sha1="b3b4cf8e996c2a1fb149074725dc4b07922b3133" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="0x8000">
 			</dataarea>
@@ -1506,7 +1724,7 @@ license:CC0
 	</software>
 
 	<software name="sprowres">
-		<description>Shin Nihon Pro Wrestling Toukon Retsuden</description>
+		<description>Shin Nihon Pro Wrestling Toukon Retsuden (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="SWJ-TMY001"/>
@@ -1588,7 +1806,7 @@ license:CC0
 	</software>
 
 	<software name="sotsugyo">
-		<description>Sotsugyou for WonderSwan</description>
+		<description>Sotsugyou for WonderSwan (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="SWJ-BVL002"/>
@@ -1666,7 +1884,7 @@ license:CC0
 	</software-->
 
 	<software name="tanjodeb">
-		<description>Tanjou Debut for WonderSwan</description>
+		<description>Tanjou Debut for WonderSwan (Rev 1)</description>
 		<year>2000</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="SWJ-BVL003"/>
@@ -1788,7 +2006,7 @@ license:CC0
 	</software>
 
 	<software name="trumpcl2">
-		<description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi</description>
+		<description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi (Rev 1)</description>
 		<year>2000</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="SWJ-BTM002"/>
@@ -1815,7 +2033,7 @@ license:CC0
 	</software-->
 
 	<software name="trumpcol">
-		<description>Trump Collection - Bottom-Up Teki Trump Seikatsu</description>
+		<description>Trump Collection - Bottom-Up Teki Trump Seikatsu (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="SWJ-BTM001"/>
@@ -1862,7 +2080,7 @@ license:CC0
 	</software>
 
 	<software name="uzumaki">
-		<description>Uzumaki - Denshi Kaiki Hen</description>
+		<description>Uzumaki - Denshi Kaiki Hen (Rev 4)</description>
 		<year>2000</year>
 		<publisher>Omage Micott, Inc.</publisher>
 		<info name="serial" value="SWJ-OMM001"/>
@@ -1880,7 +2098,7 @@ license:CC0
 	</software>
 
 	<software name="vaitzbla">
-		<description>Vaitz Blade</description>
+		<description>Vaitz Blade (Rev 1)</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN00C"/>
