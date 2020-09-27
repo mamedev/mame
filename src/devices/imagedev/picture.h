@@ -41,7 +41,7 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "png"; }
 
-	bitmap_argb32 &get_bitmap() { return *m_picture; }
+	bitmap_argb32 *get_bitmap() { return m_picture; }
 
 protected:
 	// device-level overrides
