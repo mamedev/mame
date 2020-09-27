@@ -284,11 +284,69 @@ void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, uint16_t freq )
 	ch->period = 2048 - freq;
 }
 
+u8 wswan_sound_device::port_r(offs_t offset)
+{
+	m_channel->update();
+	switch (offset) {
+		case 0x80:
+			return m_audio1.freq & 0xff;
+		case 0x81:
+			return m_audio1.freq >> 8;
+		case 0x82:
+			return m_audio2.freq & 0xff;
+		case 0x83:
+			return m_audio2.freq >> 8;
+		case 0x84:
+			return m_audio3.freq & 0xff;
+		case 0x85:
+			return m_audio3.freq >> 8;
+		case 0x86:
+			return m_audio4.freq & 0xff;
+		case 0x87:
+			return m_audio4.freq >> 8;
+		case 0x88:
+			return (m_audio1.vol_left << 4) | m_audio1.vol_right;
+		case 0x89:
+			return (m_audio2.vol_left << 4) | m_audio2.vol_right;
+		case 0x8a:
+			return (m_audio3.vol_left << 4) | m_audio3.vol_right;
+		case 0x8b:
+			return (m_audio4.vol_left << 4) | m_audio4.vol_right;
+		case 0x8c:
+			return m_sweep_step;
+		case 0x8d:
+			return (m_sweep_time / 8192) - 1;
+		case 0x8e:
+			return m_noise_type | (m_noise_reset ? 0x08 : 0x00) | (m_noise_enable ? 0x10 : 0x00);
+		case 0x8f:
+			return m_sample_address >> 6;
+		case 0x90:
+			return (m_audio1.on ? 0x01 : 0x00) |
+				(m_audio2.on ? 0x02 : 0x00) |
+				(m_audio3.on ? 0x04 : 0x00) |
+				(m_audio4.on ? 0x08 : 0x00) |
+				(m_audio2_voice ? 0x20 : 0x00) |
+				(m_audio3_sweep ? 0x40 : 0x00) |
+				(m_audio4_noise ? 0x80 : 0x00);
+		case 0x91:
+			return (m_mono ? 0x01 : 0x00) | (m_output_volume << 1) |
+				(m_external_stereo ? 0x08 : 0x00) |
+				(m_external_speaker ? 0x00 : 0x00);	// TODO 0x80 is set when external speaker is connected
+		case 0x92:
+			return m_noise_shift & 0xff;
+		case 0x93:
+			return m_noise_shift >> 8;
+		case 0x94:
+			return m_master_volume;
+	}
+	return 0;
+}
+
 void wswan_sound_device::port_w(offs_t offset, uint8_t data)
 {
 	m_channel->update();
 
-	switch( offset )
+	switch (offset)
 	{
 		case 0x80:              /* Audio 1 freq (lo) */
 			wswan_ch_set_freq(&m_audio1, (m_audio1.freq & 0xff00) | data);
@@ -323,66 +381,66 @@ void wswan_sound_device::port_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0x88:              /* Audio 1 volume */
-			m_audio1.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio1.vol_right = data & 0x0F;
+			m_audio1.vol_left = (data & 0xf0) >> 4;
+			m_audio1.vol_right = data & 0x0f;
 			break;
 
 		case 0x89:              /* Audio 2 volume */
-			m_audio2.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio2.vol_right = data & 0x0F;
+			m_audio2.vol_left = (data & 0xf0) >> 4;
+			m_audio2.vol_right = data & 0x0f;
 			break;
 
-		case 0x8A:              /* Audio 3 volume */
-			m_audio3.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio3.vol_right = data & 0x0F;
+		case 0x8a:              /* Audio 3 volume */
+			m_audio3.vol_left = (data & 0xf0) >> 4;
+			m_audio3.vol_right = data & 0x0f;
 			break;
 
-		case 0x8B:              /* Audio 4 volume */
-			m_audio4.vol_left = ( data & 0xF0 ) >> 4;
-			m_audio4.vol_right = data & 0x0F;
+		case 0x8b:              /* Audio 4 volume */
+			m_audio4.vol_left = (data & 0xf0) >> 4;
+			m_audio4.vol_right = data & 0x0f;
 			break;
 
-		case 0x8C:              /* Sweep step */
+		case 0x8c:              /* Sweep step */
 			m_sweep_step = (int8_t)data;
 			break;
 
-		case 0x8D:              /* Sweep time */
+		case 0x8d:              /* Sweep time */
 			m_sweep_time = 8192 * (data + 1);
 			break;
 
-		case 0x8E:              /* Noise control */
+		case 0x8e:              /* Noise control */
 			m_noise_type = data & 0x07;
-			m_noise_reset = ( data & 0x08 ) >> 3;
-			m_noise_enable = ( data & 0x10 ) >> 4;
+			m_noise_reset = (data & 0x08) >> 3;
+			m_noise_enable = (data & 0x10) >> 4;
 			break;
 
-		case 0x8F:              /* Sample location */
+		case 0x8f:              /* Sample location */
 			m_sample_address = data << 6;
 			break;
 
 		case 0x90:              /* Audio control */
 			m_audio1.on = data & 0x01;
-			m_audio2.on = ( data & 0x02 ) >> 1;
-			m_audio3.on = ( data & 0x04 ) >> 2;
-			m_audio4.on = ( data & 0x08 ) >> 3;
-			m_audio2_voice = ( data & 0x20 ) >> 5;
-			m_audio3_sweep = ( data & 0x40 ) >> 6;
-			m_audio4_noise = ( data & 0x80 ) >> 7;
+			m_audio2.on = (data & 0x02) >> 1;
+			m_audio3.on = (data & 0x04) >> 2;
+			m_audio4.on = (data & 0x08) >> 3;
+			m_audio2_voice = (data & 0x20) >> 5;
+			m_audio3_sweep = (data & 0x40) >> 6;
+			m_audio4_noise = (data & 0x80) >> 7;
 			break;
 
 		case 0x91:              /* Audio output */
 			m_mono = data & 0x01;
-			m_output_volume = ( data & 0x06 ) >> 1;
-			m_external_stereo = ( data & 0x08 ) >> 3;
+			m_output_volume = (data & 0x06) >> 1;
+			m_external_stereo = (data & 0x08) >> 3;
 			m_external_speaker = 1;
 			break;
 
 		case 0x92:              /* Noise counter shift register (lo) */
-			m_noise_shift = ( m_noise_shift & 0xFF00 ) | data;
+			m_noise_shift = (m_noise_shift & 0xff00) | data;
 			break;
 
 		case 0x93:              /* Noise counter shift register (hi) */
-			m_noise_shift = ( ( data & 0x7f ) << 8 ) | ( m_noise_shift & 0x00FF );
+			m_noise_shift = ((data & 0x7f) << 8) | (m_noise_shift & 0x00ff);
 			break;
 
 		case 0x94:              /* Master volume */

@@ -99,7 +99,7 @@ void ws_rom_device::device_reset()
 	m_base30 = ((0xff & m_bank_mask) << 16) & (m_rom_size - 1);
 	m_base40 = (((0xf0 & m_bank_mask) | 4) << 16) & (m_rom_size - 1);
 
-	memset(m_io_regs, 0, sizeof(m_io_regs));
+	memset(m_io_regs, 0xff, sizeof(m_io_regs));
 
 	// Initialize RTC
 	m_rtc_index = 0;
@@ -261,8 +261,7 @@ void ws_rom_device::write_io(offs_t offset, uint8_t data)
 		case 0x00:
 			// Bit 0-3 - ROM bank base register for segments 3-15
 			// Bit 4-7 - Unknown
-			data = ((data & 0x0f) << 4) | 4;
-			m_base40 = ((data & m_bank_mask) << 16) & (m_rom_size - 1);
+			m_base40 = (((((data & 0x0f) << 4) | 4) & m_bank_mask) << 16) & (m_rom_size - 1);
 			break;
 		case 0x02: // ROM bank for segment 2 (0x20000 - 0x2ffff)
 			m_base20 = ((data & m_bank_mask) << 16) & (m_rom_size - 1);

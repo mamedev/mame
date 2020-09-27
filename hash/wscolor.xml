@@ -653,7 +653,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hanjuher" supported="no">   <!-- it freezes -->
+	<!-- hangs after story scroll when starting a new game -->
+	<software name="hanjuher" supported="no">
 		<!-- WSC only -->
 		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!!</description>
 		<year>2002</year>

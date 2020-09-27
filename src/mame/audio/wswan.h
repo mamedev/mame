@@ -27,6 +27,7 @@ public:
 	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void port_w(offs_t offset, uint8_t data);
+	u8 port_r(offs_t offset);
 
 protected:
 	struct CHAN

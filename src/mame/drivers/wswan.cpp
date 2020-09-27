@@ -95,6 +95,9 @@ protected:
 
 	enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
 
+	// timer IDs
+	static const device_timer_id TIMER_PORTC0 = 0;
+
 	struct sound_dma_t
 	{
 		sound_dma_t() { }
@@ -115,6 +118,8 @@ protected:
 	sound_dma_t m_sound_dma;
 	u8 m_bios_disabled;
 	u8 m_rotate;
+	u8 m_delayed_portC0_data;
+	emu_timer *m_portC0_timer;
 
 	required_memory_region m_region_maincpu;
 	required_ioport m_cursx;
@@ -130,6 +135,7 @@ protected:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void palette(palette_device &palette) const;
 
 	void io_map(address_map &map);
@@ -329,35 +335,35 @@ void wswan_state::handle_irqs()
 {
 	if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_HBLTMR); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_HBLTMR); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBL)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBL); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBL); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBLTMR); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBLTMR); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_LCMP)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_LCMP); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_LCMP); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_SRX)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_SRX); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_SRX); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_RTC)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_RTC); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_RTC); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_KEY)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_KEY); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_KEY); // V30MZ
 	}
 	else if (m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_STX)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_STX); // V30MZ
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_ws_portram[0xb0] + WSWAN_INT_STX); // V30MZ
 	}
 	else
 	{
@@ -406,6 +412,7 @@ void wswan_state::register_save()
 	save_item(NAME(m_internal_eeprom));
 	save_item(NAME(m_bios_disabled));
 	save_item(NAME(m_rotate));
+	save_item(NAME(m_delayed_portC0_data));
 
 	save_item(NAME(m_sound_dma.source));
 	save_item(NAME(m_sound_dma.size));
@@ -419,6 +426,8 @@ void wswan_state::register_save()
 void wswan_state::common_start()
 {
 	register_save();
+
+	m_portC0_timer = timer_alloc(TIMER_PORTC0);
 
 	if (m_cart->exists())
 	{
@@ -491,6 +500,8 @@ u8 wswan_state::port_r(offs_t offset)
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
 		return m_vdp->reg_r(offset);
+	if (offset >= 0x80 && offset <= 0x9f)
+		return m_sound->port_r(offset);
 
 	switch (offset)
 	{
@@ -520,7 +531,7 @@ u8 wswan_state::port_r(offs_t offset)
 			// Bit 1 - Determine mono/color
 			// Bit 2 - Unknown, used to determine color/crystal
 			// Bit 3 - Unknown
-			// Bit 7 - Checked during start up, expects bit 7 set
+			// Bit 7 - Checked during start up, expects bit 7 set (part of cart unlock sequence?)
 			value = value & ~ 0x02;
 			if (m_system_type == TYPE_WSC)
 				value |= 2;
@@ -585,8 +596,7 @@ u8 wswan_state::port_r(offs_t offset)
 		case 0xcd:
 		case 0xce:
 		case 0xcf:
-			value = m_cart->read_io(offset & 0x0f);
-			break;
+			return m_cart->read_io(offset & 0x0f);
 	}
 
 	return value;
@@ -711,7 +721,7 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			// Bit 4   - Unknown
 			// Bit 5   - Audio 2 voice mode enable
 			// Bit 6   - Audio 3 sweep mode enable
-			//  Bit 7   - Audio 4 noise mode enable
+			// Bit 7   - Audio 4 noise mode enable
 		case 0x91:  // Audio output
 			// Bit 0   - Mono select
 			// Bit 1-2 - Output volume
@@ -831,6 +841,20 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			}
 			break;
 		case 0xc0:  // ROM bank $40000-$fffff
+			// Some kind of pipeline/delay support (needed by wonderswan Meitantei
+			// Conan - Nishi no Meitantei Saidai no Kiki!)
+			//   mov al,0Eh
+			//   out C0h, al
+			//   br 2000:0h
+			// This delay should not be done on the cartridge. The cartcidge connector
+			// only has a 384KHz CLK signal which would be too slow.
+			//
+			// It is unknown if this is done in hardware by logic external to the
+			// v30mz cpu core in the SoC or whether it's supported by some pipelining
+			// inside the v30mz cpu core.
+			m_delayed_portC0_data = data;
+			m_portC0_timer->adjust(attotime::from_ticks(10, 3072000));
+			break;
 		case 0xc1:  // SRAM bank
 		case 0xc2:  // ROM bank $20000-$2ffff
 		case 0xc3:  // ROM bank $30000-$3ffff
@@ -855,6 +879,17 @@ void wswan_state::port_w(offs_t offset, u8 data)
 
 	// Update the port value
 	m_ws_portram[offset] = data;
+}
+
+
+void wswan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_PORTC0:
+			m_cart->write_io(0xc0 & 0x0f, m_delayed_portC0_data);
+			break;
+	}
 }
 
 
@@ -889,9 +924,11 @@ ROM_START(wscolor)
 
 	ROM_REGION(0x800, "nvram", 0)
 	// Need a dump from an original new unit
-	// Empty file containing just the name 'WONDERSAN'
+	// Empty file containing just the name 'WONDERSANCOLOR' (TODO, from Youtube videos)
 	ROM_LOAD("internal_eeprom.wsc", 0x000, 0x800, BAD_DUMP CRC(9e29725c) SHA1(a903c2cb5f4bb94b67326ff87a2d91605dceffff))
 ROM_END
+
+// SwanCrystal has the name 'SWANCRYSTAL' (from Youtube videos)
 
 } // anonymous namespace
 
