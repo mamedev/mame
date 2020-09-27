@@ -870,7 +870,7 @@ Type 2
       SYSTEM12 COH716 PCB 8661962301 (8661972301)
       (manufactured by Namco, probably in 2001, under license from Sony)
       Component layout is identical to COH-700 PCB with some updated components. Generally
-      it has 2X the amount of video RAM and 4X the amount of program RAM that the COH-700 PCB has.
+      it has 4X the amount of program RAM that the COH-700 PCB has.
       KM4132G271Q replaced with OKI 54V25632A 128k x 32-bit x 2 Banks SGRAM (x2, QFP100)
       KM416V1204 replaced with Samsung Electronics K4E6416120D 4M x16 EDO DRAM (x2, TSOP44)
       Updated Sony CXD8561CQ GPU (QFP208)
