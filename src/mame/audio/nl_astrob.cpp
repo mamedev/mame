@@ -96,7 +96,7 @@ NETLIST_START(astrob)
 	PARAM(Solver.Solver_54.DYNAMIC_MIN_TIMESTEP, 4e-6)  // gets rid of NR loops failure
 #else
 #if !(ENABLE_SONAR_ALT)
-	PARAM(Solver.Solver_42.DYNAMIC_MIN_TIMESTEP, 6e-6)  // gets rid of NR loops failure
+	PARAM(Solver.Solver_41.DYNAMIC_MIN_TIMESTEP, 6e-6)  // gets rid of NR loops failure
 #endif
 #endif
 #else
@@ -479,7 +479,7 @@ NETLIST_START(astrob)
 	Q_2N4403(Q1)
 	Q_2N4403(Q2)
 	Q_2N4403(Q3)
-	Q_2N4093(Q4)
+	//Q_2N4093(Q4)  // avoid singular matrix being created
 	Q_2N4093(Q5)
 	Q_2N4093(Q6)
 	Q_2N4403(Q7)
@@ -691,13 +691,31 @@ NETLIST_START(astrob)
 	NET_C(C40.2, R93.1, U2.9)
 	NET_C(U2.10, GND)
 
+	NET_C(R5.1, R40.1, R114.1, Q3.B, R95.1, R66.1)
+
 #if (ENABLE_SONAR_ALT)
+	// The oscillators need a small offset voltage to start oscillating.
+	// Without frontiers I assume the offset voltage is created due to the
+	// slight differences in resistor values in the four (now connected)
+	// oscillators.
+
+	ANALOG_INPUT(I_VOFF, 0.1)
+	RES(RDUM1, RES_M(1))
+	RES(RDUM2, RES_M(1))
+	RES(RDUM3, RES_M(1))
+	RES(RDUM4, RES_M(1))
+	NET_C(R5.2, RDUM1.1)
+	NET_C(R40.2, RDUM2.1)
+	NET_C(R95.2, RDUM3.1)
+	NET_C(R66.2, RDUM4.1)
+
+	NET_C(RDUM1.2, RDUM2.2, RDUM3.2, RDUM4.2, I_VOFF)
+
 	OPTIMIZE_FRONTIER(R5.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R40.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R95.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R66.2, RES_K(68), 192)
 #endif
-	NET_C(R5.1, R40.1, R114.1, Q3.B, R95.1, R66.1)
 #endif
 
 	NET_C(R114.2, GND)
@@ -1183,6 +1201,7 @@ NETLIST_START(astrob)
 	//
 	// Unconnected outputs
 	//
+	NET_C(GND, U7.7, U7.14) // avoid singular matrices
 
 #if (ENABLE_FRONTIERS)
 #define RXX 192
