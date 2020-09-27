@@ -14,7 +14,7 @@
 class serial_luaprinter_device : public device_t,
 	public device_serial_interface,
 	public device_rs232_port_interface,
-	public luaprinter
+	public device_luaprinter_interface
 {
 public:
 	serial_luaprinter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

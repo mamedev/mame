@@ -1445,13 +1445,14 @@ void lua_engine::initialize()
 			tree(m.root_device(), table);
 			return table;
 		}));
-	machine_type.set("lp", sol::property([this](running_machine &m) {
+	machine_type.set("lp", sol::property([this](running_machine &r) {
 			sol::table table = sol().create_table();
-			int i=1;
-			for(auto p : luaprinter::luaprinterlist)
+			int i = 1;
+			for (device_luaprinter_interface &lp : device_luaprinter_iterator(r.root_device()))
 			{
-				table[i++] = p;
-			};
+				table[i++]=&lp;
+				table[lp.m_lp_mydevice->tag()] = &lp;  // both integer and tag indexes
+			}
 			return table;
 		}));
 	machine_type.set("screens", sol::property([this](running_machine &r) {
@@ -3028,38 +3029,37 @@ void lua_engine::initialize()
  * getclearlinepos()
  * setclearline(pos)
  */
-
-	auto luaprinter_type = sol().registry().create_simple_usertype<luaprinter>("new", sol::no_constructor);
-	luaprinter_type.set("clearpage", &luaprinter::clearpage);
-	luaprinter_type.set("savepage", &luaprinter::savepage);
-	luaprinter_type.set("drawpixel", &luaprinter::drawpixel);
-	luaprinter_type.set("getpixel", &luaprinter::getpixel);
-	luaprinter_type.set("getheadpos", &luaprinter::getheadpos);
-	luaprinter_type.set("setheadpos", &luaprinter::setheadpos);
-	luaprinter_type.set("checkbottomofpageandsave", &luaprinter::checkbottomofpageandsave);
-	luaprinter_type.set("getbuffer", &luaprinter::getbuffer);
-	luaprinter_type.set("getnextchar", &luaprinter::getnextchar);
-	luaprinter_type.set("putnextchar", &luaprinter::putnextchar);
-	luaprinter_type.set("getprintername", &luaprinter::getprintername);
-	luaprinter_type.set("setprintername", &luaprinter::setprintername);
-	luaprinter_type.set("sessiontime", &luaprinter::sessiontime);
-	luaprinter_type.set("simplename", &luaprinter::simplename);
-	luaprinter_type.set("tagname", &luaprinter::tagname);
-	luaprinter_type.set("pagewidth", &luaprinter::pagewidth);
-	luaprinter_type.set("pageheight", &luaprinter::pageheight);
-	luaprinter_type.set("pagesize", &luaprinter::pagesize);
-	luaprinter_type.set("getpagelimit", &luaprinter::getpagelimit);
-	luaprinter_type.set("setpagelimit", &luaprinter::setpagelimit);
-	luaprinter_type.set("setprintheadsize", &luaprinter::setprintheadsize);
-	luaprinter_type.set("setprintheadcolor", &luaprinter::setprintheadcolor);
-	luaprinter_type.set("setsnapshotdir", &luaprinter::setsnapshotdir);
-	luaprinter_type.set("getsnapshotdir", &luaprinter::getsnapshotdir);
-	luaprinter_type.set("cleartoline", &luaprinter::cleartoline);
-	luaprinter_type.set("cleartobottom", &luaprinter::cleartobottom);
-	luaprinter_type.set("getclearlinepos", &luaprinter::getclearlinepos);
-	luaprinter_type.set("setclearlinepos", &luaprinter::setclearlinepos);
-	luaprinter_type.set("setclearlinebottom", &luaprinter::setclearlinebottom);
-	sol().registry().set_usertype("luaprinter", luaprinter_type);
+	auto device_luaprinter_interface_type = sol().registry().create_simple_usertype<device_luaprinter_interface>("new", sol::no_constructor);
+	device_luaprinter_interface_type.set("clearpage", &device_luaprinter_interface::clearpage);
+	device_luaprinter_interface_type.set("savepage", &device_luaprinter_interface::savepage);
+	device_luaprinter_interface_type.set("drawpixel", &device_luaprinter_interface::drawpixel);
+	device_luaprinter_interface_type.set("getpixel", &device_luaprinter_interface::getpixel);
+	device_luaprinter_interface_type.set("getheadpos", &device_luaprinter_interface::getheadpos);
+	device_luaprinter_interface_type.set("setheadpos", &device_luaprinter_interface::setheadpos);
+	device_luaprinter_interface_type.set("checkbottomofpageandsave", &device_luaprinter_interface::checkbottomofpageandsave);
+	device_luaprinter_interface_type.set("getbuffer", &device_luaprinter_interface::getbuffer);
+	device_luaprinter_interface_type.set("getnextchar", &device_luaprinter_interface::getnextchar);
+	device_luaprinter_interface_type.set("putnextchar", &device_luaprinter_interface::putnextchar);
+	device_luaprinter_interface_type.set("getprintername", &device_luaprinter_interface::getprintername);
+	device_luaprinter_interface_type.set("setprintername", &device_luaprinter_interface::setprintername);
+	device_luaprinter_interface_type.set("sessiontime", &device_luaprinter_interface::sessiontime);
+	device_luaprinter_interface_type.set("simplename", &device_luaprinter_interface::simplename);
+	device_luaprinter_interface_type.set("tagname", &device_luaprinter_interface::tagname);
+	device_luaprinter_interface_type.set("pagewidth", &device_luaprinter_interface::pagewidth);
+	device_luaprinter_interface_type.set("pageheight", &device_luaprinter_interface::pageheight);
+	device_luaprinter_interface_type.set("pagesize", &device_luaprinter_interface::pagesize);
+	device_luaprinter_interface_type.set("getpagelimit", &device_luaprinter_interface::getpagelimit);
+	device_luaprinter_interface_type.set("setpagelimit", &device_luaprinter_interface::setpagelimit);
+	device_luaprinter_interface_type.set("setprintheadsize", &device_luaprinter_interface::setprintheadsize);
+	device_luaprinter_interface_type.set("setprintheadcolor", &device_luaprinter_interface::setprintheadcolor);
+	device_luaprinter_interface_type.set("setsnapshotdir", &device_luaprinter_interface::setsnapshotdir);
+	device_luaprinter_interface_type.set("getsnapshotdir", &device_luaprinter_interface::getsnapshotdir);
+	device_luaprinter_interface_type.set("cleartoline", &device_luaprinter_interface::cleartoline);
+	device_luaprinter_interface_type.set("cleartobottom", &device_luaprinter_interface::cleartobottom);
+	device_luaprinter_interface_type.set("getclearlinepos", &device_luaprinter_interface::getclearlinepos);
+	device_luaprinter_interface_type.set("setclearlinepos", &device_luaprinter_interface::setclearlinepos);
+	device_luaprinter_interface_type.set("setclearlinebottom", &device_luaprinter_interface::setclearlinebottom);
+	sol().registry().set_usertype("device_luaprinter_interface", device_luaprinter_interface_type);
 
 /*  mame_machine_manager library
  *

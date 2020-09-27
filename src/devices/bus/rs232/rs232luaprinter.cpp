@@ -7,7 +7,7 @@ serial_luaprinter_device::serial_luaprinter_device(const machine_config &mconfig
 	device_t(mconfig, SERIAL_LUAPRINTER, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
-	luaprinter(*this, "serial_luaprinter"),
+	device_luaprinter_interface(mconfig, *this),
 	m_printer(*this, "printer"),
 	m_screen(*this, "screen"),
 	m_rs232_rxbaud(*this, "RS232_RXBAUD"),
@@ -28,7 +28,7 @@ void serial_luaprinter_device::device_add_mconfig(machine_config &config)
     screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
     screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
     screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_SCREEN_HEIGHT-1);
-    screen.set_screen_update(FUNC(luaprinter::lp_screen_update));
+    screen.set_screen_update(FUNC(device_luaprinter_interface::lp_screen_update));
 }
 
 static INPUT_PORTS_START(serial_luaprinter)

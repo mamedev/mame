@@ -22,8 +22,8 @@ DEFINE_DEVICE_TYPE(CENTRONICS_LUAPRINTER, centronics_luaprinter_device, "centron
 
 centronics_luaprinter_device::centronics_luaprinter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CENTRONICS_LUAPRINTER, tag, owner, clock),
-	device_centronics_peripheral_interface( mconfig, *this ),
-	luaprinter(*this, "cenluaprinter"),
+	device_centronics_peripheral_interface(mconfig, *this),
+	device_luaprinter_interface(mconfig, *this),
 	m_strobe(0),
 	m_data(0),
 	m_busy(0),
@@ -46,7 +46,7 @@ void centronics_luaprinter_device::device_add_mconfig(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(PAPER_WIDTH, PAPER_SCREEN_HEIGHT);
 	screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_SCREEN_HEIGHT-1);
-	screen.set_screen_update(FUNC(luaprinter::lp_screen_update));
+	screen.set_screen_update(FUNC(device_luaprinter_interface::lp_screen_update));
 
 }
 

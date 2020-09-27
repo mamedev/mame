@@ -12,7 +12,7 @@
 // ====================== centronics_luaprinter_device
 
 class centronics_luaprinter_device : public device_t,
-	public device_centronics_peripheral_interface, public luaprinter
+	public device_centronics_peripheral_interface, public device_luaprinter_interface
 {
 public:
 	// construction/destruction

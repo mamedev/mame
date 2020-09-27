@@ -11,13 +11,14 @@
 #include "luaprinter.h"
 #include "screen.h"
 
-luaprinter::luaprinter(device_t& thisdevice, std::string dummyname) {
-	m_lp_mydevice = &thisdevice;
+device_luaprinter_interface::device_luaprinter_interface(const machine_config &mconfig, device_t &device) : device_interface(device, "luaprinter")
+{
+	m_lp_mydevice = &device;
 	time(&m_lp_session_time);
 	initprintername();
 };
 
-int luaprinter::getnextchar() {
+int device_luaprinter_interface::getnextchar() {
 	if (m_lp_head==m_lp_tail) return -1;
 	else {
 		int retval = m_lp_printerbuffer.at(m_lp_tail++);
@@ -26,12 +27,12 @@ int luaprinter::getnextchar() {
 	}
 }
 
-void luaprinter::putnextchar(int c) {
+void device_luaprinter_interface::putnextchar(int c) {
 	m_lp_printerbuffer.at(m_lp_head++) = c;
 	m_lp_head %= BUFFERSIZE;
 }
 
-std::string luaprinter::fixchar(std::string in, char from, char to) {
+std::string device_luaprinter_interface::fixchar(std::string in, char from, char to) {
     std::string final;
     for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
     {
@@ -44,9 +45,9 @@ std::string luaprinter::fixchar(std::string in, char from, char to) {
     return final;
 }
 
-std::string luaprinter::fixcolons(std::string in) { return fixchar(in, ':', '-'); }
+std::string device_luaprinter_interface::fixcolons(std::string in) { return fixchar(in, ':', '-'); }
 
-std::string luaprinter::sessiontime() {
+std::string device_luaprinter_interface::sessiontime() {
 	struct tm *info;
 	char buffer[80];
 	info = localtime( &m_lp_session_time );
@@ -54,11 +55,11 @@ std::string luaprinter::sessiontime() {
 	return std::string(buffer);
 }
 
-std::string luaprinter::tagname() {
+std::string device_luaprinter_interface::tagname() {
 	return fixcolons(std::string(getrootdev()->shortname())+std::string(m_lp_mydevice->tag()));
 }
 
-std::string luaprinter::simplename() {
+std::string device_luaprinter_interface::simplename() {
 	device_t * dev;
 	dev = m_lp_mydevice;
 	std::string s(dev->owner()->shortname());
@@ -69,7 +70,7 @@ std::string luaprinter::simplename() {
 	return s;
 }
 
-device_t* luaprinter::getrootdev(){
+device_t* device_luaprinter_interface::getrootdev(){
 	device_t* dev;
 	device_t* lastdev = NULL;
 	dev = m_lp_mydevice;
@@ -80,7 +81,7 @@ device_t* luaprinter::getrootdev(){
 	return lastdev;
 }
 
-void luaprinter::drawprinthead(bitmap_rgb32 &bitmap, int x, int y) {
+void device_luaprinter_interface::drawprinthead(bitmap_rgb32 &bitmap, int x, int y) {
 	int bordx = m_lp_printheadbordersize;
 	int bordy = m_lp_printheadbordersize;
 	int offy = 9 + bordy;
@@ -90,7 +91,7 @@ void luaprinter::drawprinthead(bitmap_rgb32 &bitmap, int x, int y) {
 	bitmap.plot_box(x-sizex/2,       y+offy,       sizex,         sizey,         m_lp_printheadcolor);
 }
 
-uint32_t luaprinter::lp_screen_update (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) {
+uint32_t device_luaprinter_interface::lp_screen_update (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) {
 	int scrolly=bitmap.height() - m_lp_distfrombottom - m_lp_ypos;
 	copyscrollbitmap(bitmap, *m_lp_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 	drawprinthead(bitmap, m_lp_xpos, bitmap.height()-m_lp_distfrombottom);
@@ -99,7 +100,7 @@ uint32_t luaprinter::lp_screen_update (screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-bool luaprinter::checkbottomofpageandsave(int y, int ybottom, bool clrpage) {
+bool device_luaprinter_interface::checkbottomofpageandsave(int y, int ybottom, bool clrpage) {
 	if ( y >= ybottom ) {
 		if ((m_lp_pagelimit == 0) || (m_lp_pagecount < m_lp_pagelimit))
 			savepage();
@@ -115,7 +116,7 @@ bool luaprinter::checkbottomofpageandsave(int y, int ybottom, bool clrpage) {
 	else return false;
 }
 
-void luaprinter::savepage(){
+void device_luaprinter_interface::savepage(){
 	if (!m_lp_bitmap) return;
 	emu_file file(m_lp_snapshotdir + std::string("/") +
 				std::string(getrootdev()->shortname() ) + std::string("/"),
@@ -130,5 +131,3 @@ void luaprinter::savepage(){
         }
 }
 
-std::vector<luaprinter *> luaprinter::luaprinterlist;
-time_t luaprinter::m_lp_session_time;
