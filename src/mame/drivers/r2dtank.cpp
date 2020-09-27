@@ -279,8 +279,6 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		uint8_t data, fore_color;
-
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x1f00) |
 						((ra << 5) & 0x00e0) |
@@ -289,31 +287,31 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 		if (m_flipscreen)
 			offs = offs ^ 0x1fff;
 
-		data = m_videoram[offs];
-		fore_color = (m_colorram[offs] >> 5) & 0x07;
+		uint8_t data = m_videoram[offs];
+		uint8_t fore_color = (m_colorram[offs] >> 5) & 0x07;
 
 		for (int i = 0; i < 8; i++)
 		{
-			uint8_t bit, color;
+			uint8_t bit;
 
 			if (m_flipscreen)
 			{
 				bit = data & 0x01;
-				data = data >> 1;
+				data >>= 1;
 			}
 			else
 			{
 				bit = data & 0x80;
-				data = data << 1;
+				data <<= 1;
 			}
 
-			color = bit ? fore_color : 0;
-			bitmap.pix32(y, x) = m_palette->pen_color(color);
+			uint8_t const color = bit ? fore_color : 0;
+			bitmap.pix(y, x) = m_palette->pen_color(color);
 
-			x = x + 1;
+			x++;
 		}
 
-		ma = ma + 1;
+		ma++;
 	}
 }
 

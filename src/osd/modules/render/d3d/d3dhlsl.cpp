@@ -115,7 +115,7 @@ public:
 		for (int y = 0; y < m_height; y++)
 		{
 			auto *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
-			uint32_t *dst = &m_frame.pix32(y);
+			uint32_t *dst = &m_frame.pix(y);
 
 			for (int x = 0; x < m_width; x++)
 			{
@@ -343,7 +343,7 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	for (int y = 0; y < height; y++)
 	{
 		auto *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
-		uint32_t *dst = &snapshot.pix32(y);
+		uint32_t *dst = &snapshot.pix(y);
 
 		for (int x = 0; x < width; x++)
 		{

@@ -249,7 +249,7 @@ uint32_t mt32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		for(int y=0; y<8; y++) {
 			uint8_t v = data[c*8+y];
 			for(int x=0; x<5; x++)
-				bitmap.pix16(y == 7 ? 8 : y, c*6+x) = v & (0x10 >> x) ? 1 : 0;
+				bitmap.pix(y == 7 ? 8 : y, c*6+x) = v & (0x10 >> x) ? 1 : 0;
 		}
 	return 0;
 }

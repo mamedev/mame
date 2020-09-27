@@ -50,12 +50,11 @@ void dai_state::dai_palette(palette_device &palette) const
 uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i, j, k, l;
 
-	uint8_t* char_rom = memregion("chargen")->base();
+	uint8_t const *const char_rom = memregion("chargen")->base();
 
-	uint16_t dai_video_memory_start = 0xbfff;
-	uint16_t dai_scan_lines = 604;    /* scan lines of PAL tv */
+	uint16_t const dai_video_memory_start = 0xbfff;
+	uint16_t const dai_scan_lines = 604;    /* scan lines of PAL tv */
 
 	uint16_t current_scan_line = 0;
 	uint16_t current_video_memory_address = dai_video_memory_start;
@@ -85,11 +84,7 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	                   01 - four colour characters
 	                   10 - sixteen colour graphics
 	                   11 - sixteen colour characters */
-	uint8_t unit_mode;
-
 	uint8_t current_data_1, current_data_2;
-
-	uint8_t current_colour;
 
 	while (current_scan_line < dai_scan_lines)
 	{
@@ -98,7 +93,7 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		line_repeat_count = mode & 0x0f;
 		horizontal_resolution = (mode & 0x30) >> 4;
 		display_mode = (mode & 0xc0) >> 6;
-		unit_mode = (colour & 0x40) >> 6;
+		uint8_t const unit_mode = (colour & 0x40) >> 6;
 
 		if (colour & 0x80)
 			m_4_colours_palette[(colour & 0x30) >> 4] = colour & 0x0f;
@@ -115,32 +110,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
 
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
@@ -154,32 +149,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
@@ -193,31 +188,31 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
@@ -231,31 +226,31 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_1>>(7-k)) & 0x01)<<1) | ((current_data_2>>(7-k)) & 0x01)];
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
@@ -275,33 +270,33 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					current_data_1 = space.read_byte(current_video_memory_address);
 					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address);
 						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
@@ -316,33 +311,33 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					current_data_1 = space.read_byte(current_video_memory_address);
 					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address);
 						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
@@ -357,32 +352,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					current_data_1 = space.read_byte(current_video_memory_address);
 					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address);
 						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
@@ -396,32 +391,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					current_data_1 = space.read_byte(current_video_memory_address);
 					current_data_2 = space.read_byte(current_video_memory_address-1);
 					current_video_memory_address-=2;
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address);
 						current_data_2 = space.read_byte(current_video_memory_address-1);
 						current_video_memory_address-=2;
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = m_4_colours_palette[(((current_data_2 >> k)&0x01)<<1) | ((char_rom[current_data_1*16+j]>>k) & 0x01)];
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
@@ -440,32 +435,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
 
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
@@ -479,32 +474,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
@@ -518,31 +513,31 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
@@ -556,31 +551,31 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = ((current_data_1>>(7-k)) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
@@ -598,32 +593,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<11; i++)
+					for (int i=0; i<11; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<12; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<12; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*12+l) = current_colour;
 							}
 						}
 					}
@@ -637,32 +632,32 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
 					current_video_memory_address-=2;
 					break;
 				case 1:
-					for (i=0; i<22; i++)
+					for (int i=0; i<22; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<6; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<6; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*6+l) = current_colour;
 							}
 						}
 					}
@@ -676,31 +671,31 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<44; i++)
+					for (int i=0; i<44; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<3; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<3; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*3+l) = current_colour;
 							}
 						}
 					}
@@ -713,31 +708,31 @@ uint32_t dai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				case 0:
 					current_data_1 = space.read_byte(current_video_memory_address--);
 					current_data_2 = space.read_byte(current_video_memory_address--);
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}
 					break;
 				case 1:
-					for (i=0; i<66; i++)
+					for (int i=0; i<66; i++)
 					{
 						current_data_1 = space.read_byte(current_video_memory_address--);
 						current_data_2 = space.read_byte(current_video_memory_address--);
-						for (j=0; j<=line_repeat_count; j++)
+						for (int j=0; j<=line_repeat_count; j++)
 						{
-							for (k=0; k<8; k++)
+							for (int k=0; k<8; k++)
 							{
-								current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
-								for (l=0; l<2; l++)
-									bitmap.pix16(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
+								uint8_t const current_colour = ((char_rom[current_data_1*16+j]>>k) & 0x01) ? (current_data_2>>4)&0x0f : current_data_2&0x0f;
+								for (int l=0; l<2; l++)
+									bitmap.pix(current_scan_line/2 + j, (i*8+k)*2+l) = current_colour;
 							}
 						}
 					}

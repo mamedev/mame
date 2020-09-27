@@ -303,7 +303,7 @@ uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	for (int y = 0; y < 240; y++)
 		for (int x = 0; x < 320; x++)
-			bitmap.pix32(y, x) = BIT(m_ram[0xd800 + (y * (320 / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x) = BIT(m_ram[0xd800 + (y * (320 / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
 
 	return 0;
 }

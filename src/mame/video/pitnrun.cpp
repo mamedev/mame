@@ -104,7 +104,7 @@ void pitnrun_state::spotlights()
 				int datapix = ROM[128*16*i + x + y*16];
 				for(int b=0; b<8; b++)
 				{
-					m_tmp_bitmap[i]->pix16(y, x*8 + (7 - b)) = (datapix & 1);
+					m_tmp_bitmap[i]->pix(y, x*8 + (7 - b)) = (datapix & 1);
 					datapix>>=1;
 				}
 			}

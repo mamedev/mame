@@ -488,10 +488,10 @@ offs_t ams40041_device::get_char_rom_offset()
 MC6845_UPDATE_ROW( ams40041_device::draw_alpha )
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix(y + vbp, hbp);
 
 	if (get_display_mode(m_vdu_mode) == ALPHA_40)
-		p = &bitmap.pix32(y + vbp, hbp);
+		p = &bitmap.pix(y + vbp, hbp);
 
 	if (y > 199) return;
 
@@ -558,7 +558,7 @@ MC6845_UPDATE_ROW( ams40041_device::draw_graphics_1 )
 {
 	if (y > 199) return;
 
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix(y + vbp, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -578,7 +578,7 @@ MC6845_UPDATE_ROW( ams40041_device::draw_graphics_2 )
 {
 	if (y > 199) return;
 
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix(y + vbp, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{

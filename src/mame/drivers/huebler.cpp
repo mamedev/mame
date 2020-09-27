@@ -231,26 +231,25 @@ INPUT_PORTS_END
 
 uint32_t amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y, sx, x, line;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
-	for (y = 0; y < 240; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		line = y % 10;
+		int const line = y % 10;
 
-		for (sx = 0; sx < 64; sx++)
+		for (int sx = 0; sx < 64; sx++)
 		{
-			uint16_t videoram_addr = ((y / 10) * 64) + sx;
-			uint8_t videoram_data = m_video_ram[videoram_addr & 0x7ff];
+			uint16_t const videoram_addr = ((y / 10) * 64) + sx;
+			uint8_t const videoram_data = m_video_ram[videoram_addr & 0x7ff];
 
-			uint16_t charrom_addr = ((videoram_data & 0x7f) << 3) | line;
+			uint16_t const charrom_addr = ((videoram_data & 0x7f) << 3) | line;
 			uint8_t data = m_char_rom->base()[charrom_addr & 0x3ff];
 
-			for (x = 0; x < 6; x++)
+			for (int x = 0; x < 6; x++)
 			{
-				int color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
+				int const color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
 
-				bitmap.pix32(y, (sx * 6) + x) = pen[color];
+				bitmap.pix(y, (sx * 6) + x) = pen[color];
 
 				data <<= 1;
 			}

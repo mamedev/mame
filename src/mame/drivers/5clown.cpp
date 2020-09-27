@@ -553,7 +553,7 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
     x--- ----   Extra color for 7's.
 */
 
-	uint32_t *pix = &bitmap.pix32(y);
+	uint32_t *pix = &bitmap.pix(y);
 	ra &= 0x07;
 
 	for (int x = 0; x < x_count; x++)

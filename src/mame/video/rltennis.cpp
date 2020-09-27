@@ -154,10 +154,6 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		int x_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_X_DIR)?1:-1;
 		int y_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_Y_DIR)?1:-1;
 
-		int x,y;
-
-		int idx_x,idx_y;
-
 		int blit_w=src_x1-src_x0;
 		int blit_h=src_y1-src_y0;
 
@@ -193,9 +189,9 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			force_blit=true;
 		}
 
-		for( x=dst_x0, idx_x=0 ; idx_x<=blit_w1; x+=x_dst_step, idx_x++ )
+		for( int x=dst_x0, idx_x=0 ; idx_x<=blit_w1; x+=x_dst_step, idx_x++ )
 		{
-			for( y=dst_y0, idx_y=0 ; idx_y<=blit_h1;y+=y_dst_step, idx_y++)
+			for( int y=dst_y0, idx_y=0 ; idx_y<=blit_h1;y+=y_dst_step, idx_y++)
 			{
 				int xx=src_x0+(x_src_step*idx_x);
 				int yy=src_y0+(y_src_step*idx_y);
@@ -213,7 +209,7 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )
 				{
-					m_tmp_bitmap[layer]->pix16(y  , screen_x ) = pix;
+					m_tmp_bitmap[layer]->pix(y  , screen_x ) = pix;
 				}
 			}
 		}

@@ -574,29 +574,28 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint8_t data, int color)
 {
-	int i;
-	pen_t fg = m_palette->pen(color);
+	pen_t const fg = m_palette->pen(color);
 
 	data <<= 2;
 
-	for (i = 0; i < CH_WIDTH; i++)
+	for (int i = 0; i < CH_WIDTH; i++)
 	{
 		if (data & 0x80)
 		{
-			bitmap.pix32(y, x) = fg;
+			bitmap.pix(y, x) = fg;
 
 			if (!m_fresvert)
 			{
-				bitmap.pix32(y + 1, x) = fg;
+				bitmap.pix(y + 1, x) = fg;
 			}
 
 			if (!m_freshorz)
 			{
-				bitmap.pix32(y, x + 1) = fg;
+				bitmap.pix(y, x + 1) = fg;
 
 				if (!m_fresvert)
 				{
-					bitmap.pix32(y + 1, x + 1) = fg;
+					bitmap.pix(y + 1, x + 1) = fg;
 				}
 			}
 		}

@@ -278,10 +278,10 @@ uint32_t ppking_state::screen_update_ppking(screen_device &screen, bitmap_ind16 
 			int x = sx;
 			int y = (sy + m_fg_scrolly) & 0x1ff;
 
-			uint16_t *dest = &bitmap.pix16(sy, sx);
+			uint16_t *dest = &bitmap.pix(sy, sx);
 			while( x <= cliprect.max_x )
 			{
-				if( flagsbitmap.pix8(y, x)&TILEMAP_PIXEL_LAYER0 )
+				if( flagsbitmap.pix(y, x)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest += 512;
 				}

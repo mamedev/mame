@@ -196,12 +196,12 @@ uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &
 							data = 0xff;
 
 				// 6 pixels of the character
-				bitmap.pix32(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix32(y * 9 + i, x * 6 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 9 + i, x * 6 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}

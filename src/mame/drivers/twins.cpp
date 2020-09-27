@@ -238,7 +238,7 @@ void twins_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int count = (y * 320) + cliprect.left();
 		for(int x = cliprect.left(); x <= cliprect.right(); x++)
-			bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count++)];
+			bitmap.pix(y, x) = videoram[BYTE_XOR_LE(count++)];
 	}
 }
 
@@ -260,7 +260,7 @@ void spider_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			u8 pixel = videoram[BYTE_XOR_LE(count++)];
 			if (pixel)
-				bitmap.pix16(y, x) = pixel;
+				bitmap.pix(y, x) = pixel;
 		}
 	}
 }

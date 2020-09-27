@@ -159,18 +159,18 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 				{
 					if (!OVERLAY_CURSOR_BLINK || m_blink)
 					{
-						bitmap.pix32(y, (sx * 8) + x) = pen[7];
+						bitmap.pix(y, (sx * 8) + x) = pen[7];
 					}
 				}
 				else
 				{
 					if (!BIT(data, x) || (OVERLAY_BLK && OVERLAY_CHARACTER_BLINK && !m_blink))
 					{
-						if (OVERLAY_VB) bitmap.pix32(y, (sx * 8) + x) = pen[bg];
+						if (OVERLAY_VB) bitmap.pix(y, (sx * 8) + x) = pen[bg];
 					}
 					else
 					{
-						if (OVERLAY_VF) bitmap.pix32(y, (sx * 8) + x) = pen[fg];
+						if (OVERLAY_VF) bitmap.pix(y, (sx * 8) + x) = pen[fg];
 					}
 				}
 			}

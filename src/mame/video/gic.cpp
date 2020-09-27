@@ -147,7 +147,7 @@ void gic_device::draw_char_left(int startx, int starty, uint8_t code, bitmap_ind
 		uint8_t curry= starty+y;
 		for(uint8_t x=0x20;x!=0;x=x/2){
 			if (current&x)
-				m_bitmap.pix16(curry,startx+nextx) = GIC_WHITE;
+				m_bitmap.pix(curry,startx+nextx) = GIC_WHITE;
 			nextx++;
 		}
 	}
@@ -161,15 +161,15 @@ void gic_device::draw_char_right(int startx, int starty, uint8_t code, bitmap_in
 		uint8_t nextx=0;
 		uint8_t curry= starty+y;
 
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 		nextx++;
 		for(uint8_t x=0x20;x!=0;x=x/2){
-			m_bitmap.pix16(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
+			m_bitmap.pix(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
 			nextx++;
 		}
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 		nextx++;
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 	}
 }
 

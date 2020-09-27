@@ -384,13 +384,13 @@ uint32_t husky_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	I'm drawing each character as 6x12 to form an overall screen of 192x48.
 	*/
 
-	uint8_t data;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int y = 0; y < 48; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
+			uint8_t data;
 			switch (y % 12)
 			{
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6:
@@ -399,24 +399,24 @@ uint32_t husky_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				for (int b = 0; b < 5; b++)
 				{
-					bitmap.pix32(y, (x * 6) + b) = BIT(data, 0) ? pen[1] : pen[2];
+					bitmap.pix(y, (x * 6) + b) = BIT(data, 0) ? pen[1] : pen[2];
 					data >>= 1;
 				}
-				bitmap.pix32(y, (x * 6) + 5) = pen[0];
+				bitmap.pix(y, (x * 6) + 5) = pen[0];
 				break;
 			case 8:
 				/* cursor */
 				for (int b = 0; b < 5; b++)
 				{
-					bitmap.pix32(y, (x * 6) + b) = (!m_curinh && m_cursor == (y / 12) * 32 + x) ? pen[1] : pen[2];
+					bitmap.pix(y, (x * 6) + b) = (!m_curinh && m_cursor == (y / 12) * 32 + x) ? pen[1] : pen[2];
 				}
-				bitmap.pix32(y, (x * 6) + 5) = pen[0];
+				bitmap.pix(y, (x * 6) + 5) = pen[0];
 				break;
 			default:
 				/* blank */
 				for (int b = 0; b < 6; b++)
 				{
-					bitmap.pix32(y, (x * 6) + b) = pen[0];
+					bitmap.pix(y, (x * 6) + b) = pen[0];
 				}
 				break;
 			}

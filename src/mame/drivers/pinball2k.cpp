@@ -165,19 +165,17 @@ void pinball2k_state::video_start()
 
 void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
-	int i,j;
-	const uint8_t *dp;
 	int index = 0;
-	const pen_t *pens = m_palette->pens();
+	pen_t const *const pens = m_palette->pens();
 
-	dp = gfx->get_data(ch);
+	uint8_t const *const dp = gfx->get_data(ch);
 
-	for (j=y; j < y+8; j++)
+	for (int j=y; j < y+8; j++)
 	{
-		uint32_t *p = &bitmap.pix32(j);
-		for (i=x; i < x+8; i++)
+		uint32_t *const p = &bitmap.pix(j);
+		for (int i=x; i < x+8; i++)
 		{
-			uint8_t pen = dp[index++];
+			uint8_t const pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
@@ -191,7 +189,6 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
 	int width, height;
 	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
@@ -218,14 +215,14 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		uint8_t *framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		uint8_t *pal = m_pal;
+		uint8_t const *const framebuf = (uint8_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint8_t const *const pal = m_pal;
 
-		for (j=0; j < m_frame_height; j++)
+		for (int j=0; j < m_frame_height; j++)
 		{
-			uint32_t *p = &bitmap.pix32(j);
-			uint8_t *si = &framebuf[j * line_delta];
-			for (i=0; i < m_frame_width; i++)
+			uint32_t *const p = &bitmap.pix(j);
+			uint8_t const *si = &framebuf[j * line_delta];
+			for (int i=0; i < m_frame_width; i++)
 			{
 				int c = *si++;
 				int r = pal[(c*3)+0] << 2;
@@ -238,16 +235,16 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 	}
 	else            // 16-bit
 	{
-		uint16_t *framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		uint16_t const *const framebuf = (uint16_t*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
 		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
 					uint16_t c = *si++;
 					int r = ((c >> 11) & 0x1f) << 3;
@@ -261,11 +258,11 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 		// RGB 5-5-5 mode
 		else
 		{
-			for (j=0; j < m_frame_height; j++)
+			for (int j=0; j < m_frame_height; j++)
 			{
-				uint32_t *p = &bitmap.pix32(j);
-				uint16_t *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < m_frame_width; i++)
+				uint32_t *const p = &bitmap.pix(j);
+				uint16_t const *si = &framebuf[j * (line_delta/2)];
+				for (int i=0; i < m_frame_width; i++)
 				{
 					uint16_t c = *si++;
 					int r = ((c >> 10) & 0x1f) << 3;
@@ -281,14 +278,13 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 
 void pinball2k_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *cga = m_cga_ram;
+	uint32_t const *const cga = m_cga_ram;
 	int index = 0;
 
-	for (j=0; j < 25; j++)
+	for (int j=0; j < 25; j++)
 	{
-		for (i=0; i < 80; i+=2)
+		for (int i=0; i < 80; i+=2)
 		{
 			int att0 = (cga[index] >> 8) & 0xff;
 			int ch0 = (cga[index] >> 0) & 0xff;

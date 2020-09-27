@@ -159,7 +159,7 @@ void niyanpai_state::vramflip(int vram)
 void niyanpai_state::update_pixel(int vram, int x, int y)
 {
 	uint16_t color = m_videoram[vram][(y * m_screen->width()) + x];
-	m_tmpbitmap[vram].pix16(y, x) = color;
+	m_tmpbitmap[vram].pix(y, x) = color;
 }
 
 void niyanpai_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

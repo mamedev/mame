@@ -584,21 +584,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 
 uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=56,ma=0,x;
-
-	for (y = 0; y < 24; y++)
+	uint16_t sy=56, ma=0;
+	for (uint8_t y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++, 40);
+			uint16_t *p = &bitmap.pix(sy++, 40);
 
-			for (x = ma; x < ma+32; x++)
+			for (uint16_t x = ma; x < ma+32; x++)
 			{
-				chr = m_video_ram[x];
+				uint8_t const chr = m_video_ram[x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = m_char_ram[((chr&0x7f)<<3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
+				uint8_t const gfx = m_char_ram[((chr&0x7f)<<3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 7);

@@ -107,9 +107,9 @@ uint32_t pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			for (int b=0; b<8; b++)
 			{
 				if(b<4)
-					bitmap.pix16(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
+					bitmap.pix(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
 				else
-					bitmap.pix16(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
+					bitmap.pix(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
 			}
 		}
 

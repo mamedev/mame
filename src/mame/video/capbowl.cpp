@@ -140,8 +140,8 @@ uint32_t capbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	/* now regenerate the bitmap */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t const *src = &m_tms34061->vram(y);
-		uint32_t *dest = &bitmap.pix32(y);
+		uint8_t const *const src = &m_tms34061->vram(y);
+		uint32_t *dest = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{

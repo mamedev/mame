@@ -174,7 +174,7 @@ uint32_t lft_craft_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	const pen_t *pens = m_palette->pens();
 	for(int y = 0; y < LINES_PER_FRAME; y++)
 	{
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *dst = &bitmap.pix(y);
 		uint8_t *src = &m_pixels[y * LINE_CYCLES];
 		for(int x = 0; x < LINE_CYCLES; x++)
 		{

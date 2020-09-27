@@ -4295,11 +4295,11 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 		else
 			currentaddress = startaddress + ((tilesize_high - 1) - tileline) * linebytes;
 
-		uint8_t* pri2ptr = &m_pal2_priority_bitmap.pix8(y);
-		uint8_t* pri1ptr = &m_pal1_priority_bitmap.pix8(y);
+		uint8_t *const pri2ptr = &m_pal2_priority_bitmap.pix(y);
+		uint8_t *const pri1ptr = &m_pal1_priority_bitmap.pix(y);
 
-		uint8_t* pix2ptr = &m_pal2_pix_bitmap.pix8(y);
-		uint8_t* pix1ptr = &m_pal1_pix_bitmap.pix8(y);
+		uint8_t *const pix2ptr = &m_pal2_pix_bitmap.pix(y);
+		uint8_t *const pix1ptr = &m_pal1_pix_bitmap.pix(y);
 
 
 		int shift_amount, mask, bytes_in;
@@ -5042,12 +5042,12 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const pen_t* paldata = m_palette->pens();
-		uint8_t* pri2ptr = &m_pal2_priority_bitmap.pix8(y);
-		uint8_t* pri1ptr = &m_pal1_priority_bitmap.pix8(y);
-		uint8_t* pix2ptr = &m_pal2_pix_bitmap.pix8(y);
-		uint8_t* pix1ptr = &m_pal1_pix_bitmap.pix8(y);
-		uint32_t* dstptr = &bitmap.pix32(y);
+		pen_t const *const paldata = m_palette->pens();
+		uint8_t const *const pri2ptr = &m_pal2_priority_bitmap.pix(y);
+		uint8_t const *const pri1ptr = &m_pal1_priority_bitmap.pix(y);
+		uint8_t const *const pix2ptr = &m_pal2_pix_bitmap.pix(y);
+		uint8_t const *const pix1ptr = &m_pal1_pix_bitmap.pix(y);
+		uint32_t *const dstptr = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

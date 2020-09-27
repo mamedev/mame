@@ -166,24 +166,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
 
 uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-	pen_t pens[2];
-	pens[0] = rgb_t::black();
-	pens[1] = rgb_t::white();
-	uint8_t i,x,y,data;
+	pen_t const pens[2] = { rgb_t::black(), rgb_t::white() };
 
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		x = offs << 3;
-		y = offs >> 5;
-		data = m_videoram[offs];
+		uint8_t x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (uint8_t i = 0; i < 8; i++)
 		{
 			if (m_flipscreen)
-				bitmap.pix32(255-y, 247-(x|i)) = pens[data & 1];
+				bitmap.pix(255-y, 247-(x|i)) = pens[data & 1];
 			else
-				bitmap.pix32(y, x|i) = pens[data & 1];
+				bitmap.pix(y, x|i) = pens[data & 1];
 
 			data >>= 1;
 		}

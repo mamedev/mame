@@ -159,8 +159,7 @@ uint32_t gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bit
 		// only support RGB still image layer for now
 		if (m_vidregs[0x80/2] & 4)
 		{
-			int x, y;
-			uint16_t *vram = (uint16_t *)&m_ram[0x2100000/4];
+			uint16_t const *const vram = (uint16_t *)&m_ram[0x2100000/4];
 
 /*          printf("RGB still image 1 enabled, bpp %d, size is %d %d %d %d\n",
                 (m_vidregs[(0xda/2)]>>9)&3,
@@ -170,13 +169,13 @@ uint32_t gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bit
                 m_vidregs[(0xe8/2)]);*/
 
 
-			for (y = 0; y < 240; y++)
+			for (int y = 0; y < 240; y++)
 			{
-				uint32_t *scanline = &bitmap.pix32(y);
+				uint32_t *scanline = &bitmap.pix(y);
 
-				for (x = 0; x < 320; x++)
+				for (int x = 0; x < 320; x++)
 				{
-					uint16_t pixel = vram[(320*y)+x];
+					uint16_t const pixel = vram[(320*y)+x];
 
 					*scanline++ = rgb_t(0xff, (pixel>>11)<<3, ((pixel>>5)&0x3f)<<2, (pixel&0x1f)<<3);
 				}

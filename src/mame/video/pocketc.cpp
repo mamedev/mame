@@ -44,5 +44,5 @@ void pocketc_state::pocketc_draw_special(bitmap_ind16 &bitmap, int x, int y, con
 	for (int i = 0; i < 5; i++, y++)
 		for (int j = 0; fig[i][j]; j++)
 			if (fig[i][j] != ' ')
-				bitmap.pix16(y, x + j) = color;
+				bitmap.pix(y, x + j) = color;
 }

@@ -606,7 +606,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 	int current_row = 0;
 	for (int y = sy; y <= ey; y++, sourcey += dy)
 	{
-		u16 *dest = &bitmap.pix16(y, sx);
+		u16 *dest = &bitmap.pix(y, sx);
 		int  sourcex = dx / 2, rle_end = 0;
 
 		// loop until we hit the row we're on
@@ -665,7 +665,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 		// clipped case
 		else
 		{
-			const u16 *end = &bitmap.pix16(y, ex);
+			const u16 *end = &bitmap.pix(y, ex);
 			int to_be_skipped = pixels_to_skip;
 
 			// decode the pixels
@@ -785,7 +785,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 	int current_row = 0;
 	for (int y = sy; y <= ey; y++, sourcey += dy)
 	{
-		u16 *dest = &bitmap.pix16(y, ex);
+		u16 *dest = &bitmap.pix(y, ex);
 		int sourcex = dx / 2, rle_end = 0;
 
 		// loop until we hit the row we're on
@@ -844,7 +844,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 		// clipped case
 		else
 		{
-			const u16 *start = &bitmap.pix16(y, sx);
+			const u16 *start = &bitmap.pix(y, sx);
 			int to_be_skipped = pixels_to_skip;
 
 			// decode the pixels
@@ -989,19 +989,19 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 
 			for (int ty = sy; ty <= ey; ty++)
 			{
-				bitmap.pix16(ty, sx) = machine().rand() & 0xff;
-				bitmap.pix16(ty, ex) = machine().rand() & 0xff;
+				bitmap.pix(ty, sx) = machine().rand() & 0xff;
+				bitmap.pix(ty, ex) = machine().rand() & 0xff;
 			}
 			for (int tx = sx; tx <= ex; tx++)
 			{
-				bitmap.pix16(sy, tx) = machine().rand() & 0xff;
-				bitmap.pix16(ey, tx) = machine().rand() & 0xff;
+				bitmap.pix(sy, tx) = machine().rand() & 0xff;
+				bitmap.pix(ey, tx) = machine().rand() & 0xff;
 			}
 		} while (0);
-		fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
-			code, color, hflip,
-			x, -scaled_xoffs, (scale * info.width) >> 12,
-			y, -scaled_yoffs, (scale * info.height) >> 12, scale);
+		osd_printf_info("   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
+				code, color, hflip,
+				x, -scaled_xoffs, (scale * info.width) >> 12,
+				y, -scaled_yoffs, (scale * info.height) >> 12, scale);
 	}
 }
 

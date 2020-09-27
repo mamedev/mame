@@ -259,24 +259,23 @@ void cdc721_state::cdc721_palette(palette_device &palette) const
 
 uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,attr,pen;
-	uint16_t sy=0,x;
+	uint16_t sy=0;
 	m_flashcnt++;
 
-	for (y = 0; y < 30; y++)
+	for (uint8_t y = 0; y < 30; y++)
 	{
 		uint16_t ma = m_videoram[y * 2] | m_videoram[y * 2 + 1] << 8;
 
-		for (ra = 0; ra < 15; ra++)
+		for (uint8_t ra = 0; ra < 15; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 160; x+=2)
+			for (uint16_t x = 0; x < 160; x+=2)
 			{
-				pen = 1;
-				chr = m_videoram[(x + ma) & 0x1fff];
-				attr = m_videoram[(x + ma + 1) & 0x1fff];
-				gfx = m_rom_chargen[chr | (ra << 8) ];
+				uint8_t pen = 1;
+				uint8_t chr = m_videoram[(x + ma) & 0x1fff];
+				uint8_t attr = m_videoram[(x + ma + 1) & 0x1fff];
+				uint8_t gfx = m_rom_chargen[chr | (ra << 8) ];
 				if (BIT(attr, 0))  // blank
 					pen = 0;
 				if (BIT(attr, 1) && (ra == 14)) // underline

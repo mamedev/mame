@@ -329,7 +329,6 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	uint16_t *atable = &i82716.dram[VREG(ATBA)];
 	uint16_t *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
 
-	int sl, sx;
 	int slmask = 0xffff;     // TODO: Save if using scanline callbacks
 	int xbound = (VREG(DWBA) & 0x3f8) | 7;
 
@@ -344,13 +343,12 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	}
 
 	/* For every scanline... */
-	for (sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
+	for (int sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
 	{
-		int obj;
 		uint16_t aflags = atable[sl];
 		uint16_t slmask_old = slmask;
 
-		uint16_t *bmp_ptr = &bitmap.pix16(sl);
+		uint16_t *bmp_ptr = &bitmap.pix(sl);
 
 		slmask = 0xffff ^ (slmask ^ aflags);
 
@@ -359,7 +357,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 		memset(i82716.line_buf.get(), 0x22, 512);
 
 		/* Parse the list of 16 objects */
-		for (obj = 0; obj < 16; ++obj)
+		for (int obj = 0; obj < 16; ++obj)
 		{
 			int offs = obj * 4;
 
@@ -367,7 +365,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 			if ( !BIT(slmask, obj) )
 			{
 				uint32_t  objbase, trans, width;
-				int32_t   x, xpos;
+				int32_t   xpos;
 				uint16_t  w0, w1, w2;
 				uint16_t  *objptr;
 				uint8_t *bmpptr; // ?
@@ -419,7 +417,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 				bmpptr = (uint8_t*)objptr;
 
 				// 4bpp
-				for (x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
+				for (int x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
 				{
 					if (x >= 0)
 					{
@@ -441,7 +439,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 		}
 
 		// Write it out
-		for (sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
+		for (int sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
 		{
 			uint8_t pix = i82716.line_buf[sx / 2];
 

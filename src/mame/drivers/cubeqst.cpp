@@ -130,8 +130,6 @@ void cubeqst_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 /* TODO: This is a simplified version of what actually happens */
 uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
-
 	/*
 	 * Clear the display with palette RAM entry 0xff
 	 * This will be either transparent or an actual colour
@@ -141,13 +139,11 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 	bitmap.fill(m_colormap[255], cliprect);
 
 	/* TODO: Add 1 for linebuffering? */
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		int i;
 		int num_entries = m_linecpu->cubeqcpu_get_ptr_ram_val(y);
-		uint32_t *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
-		uint32_t *dest = &bitmap.pix32(y);
-		uint32_t pen;
+		uint32_t const *const stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
+		uint32_t *const dest = &bitmap.pix(y);
 
 		/* Zap the depth buffer */
 		memset(m_depth_buffer.get(), 0xff, 512);
@@ -155,11 +151,10 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 		/* Process all the spans on this scanline */
 		if (y < 256)
 		{
-			for (i = 0; i < num_entries; i += 2)
+			for (int i = 0; i < num_entries; i += 2)
 			{
 				int color = 0, depth = 0;
 				int h1 = 0, h2 = 0;
-				int x;
 
 				int entry1 = stk_ram[(y << 7) | ((i + 0) & 0x7f)];
 				int entry2 = stk_ram[(y << 7) | ((i + 1) & 0x7f)];
@@ -187,8 +182,8 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 				}
 
 				/* Draw the span, testing for depth */
-				pen = m_colormap[m_generic_paletteram_16[color]];
-				for (x = h1; x <= h2; ++x)
+				uint32_t pen = m_colormap[m_generic_paletteram_16[color]];
+				for (int x = h1; x <= h2; ++x)
 				{
 					if (!(m_depth_buffer[x] < depth))
 					{

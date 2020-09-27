@@ -308,7 +308,7 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 
 				int col = m_trom->get_rgb() ^ ((x_pos == cursor_x) ? 7 : 0);
 
-				bitmap.pix32(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
+				bitmap.pix(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
 			}
 		}
 	}
@@ -324,7 +324,7 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 
 				col ^= ((cursor_x != -1 && x_pos >= cursor_x && x_pos < (cursor_x + m_cursor_size)) ? 7 : 0);
 
-				bitmap.pix32(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
+				bitmap.pix(y, (x_pos*m_pixels_per_byte) + pixelno) = de ? palette[col] : rgb_t::black();
 				data = (data << 1) | 1;
 			}
 		}

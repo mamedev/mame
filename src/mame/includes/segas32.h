@@ -145,7 +145,7 @@ protected:
 	uint8_t update_tilemaps(screen_device &screen, const rectangle &cliprect);
 	void sprite_erase_buffer();
 	void sprite_swap_buffers();
-	int draw_one_sprite(uint16_t *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
+	int draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
 	void sprite_render_list();
 	inline uint8_t compute_color_offsets(int which, int layerbit, int layerflag);
 	inline uint16_t compute_sprite_blend(uint8_t encoding);

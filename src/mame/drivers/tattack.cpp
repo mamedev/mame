@@ -144,13 +144,11 @@ void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &clip
 
 void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t ram_offs;
 	const uint16_t ram_base = 0x40+(m_ram[0x33] & 0x10);
 	const int x_base = -8;
-	int xi,yi;
 
 	// draw brick pattern
-	for(ram_offs=ram_base;ram_offs<ram_base+0xe;ram_offs++)
+	for(uint16_t ram_offs=ram_base;ram_offs<ram_base+0xe;ram_offs++)
 	{
 		uint8_t cur_column = m_ram[ram_offs];
 
@@ -174,15 +172,15 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 
 			if(draw_block == true)
 			{
-				for(xi=0;xi<3;xi++)
+				for(int xi=0;xi<3;xi++)
 				{
-					for(yi=0;yi<15;yi++)
+					for(int yi=0;yi<15;yi++)
 					{
 						int resx = bit*4+xi+160+x_base;
 						int resy = (ram_offs & 0xf)*16+yi+16;
 
 						if(cliprect.contains(resx,resy))
-							bitmap.pix16(resy, resx) = m_bricks_color_bank == true ? red_pen : (bit & 4 ? yellow_pen : green_pen);
+							bitmap.pix(resy, resx) = m_bricks_color_bank == true ? red_pen : (bit & 4 ? yellow_pen : green_pen);
 					}
 				}
 			}
@@ -192,25 +190,25 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 	// draw paddle
 	if(m_bottom_edge_enable == false)
 	{
-		for(xi=0;xi<4;xi++)
-			for(yi=0;yi<m_paddle_ysize;yi++)
+		for(int xi=0;xi<4;xi++)
+			for(int yi=0;yi<m_paddle_ysize;yi++)
 			{
 				int resx =(paddle_xpos+xi);
 				int resy = m_paddle_reg+yi;
 
 				if(cliprect.contains(resx,resy))
-					bitmap.pix16(resy, resx) = white_pen;
+					bitmap.pix(resy, resx) = white_pen;
 			}
 	}
 	// draw ball
-	for(xi=0;xi<3;xi++)
-		for(yi=0;yi<3;yi++)
+	for(int xi=0;xi<3;xi++)
+		for(int yi=0;yi<3;yi++)
 		{
 			int resx = m_ball_regs[0]+xi-2+x_base;
 			int resy = m_ball_regs[1]+yi;
 
 			if(cliprect.contains(resx,resy))
-				bitmap.pix16(resy, resx) = (white_pen);
+				bitmap.pix(resy, resx) = (white_pen);
 		}
 }
 

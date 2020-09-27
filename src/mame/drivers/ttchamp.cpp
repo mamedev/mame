@@ -186,45 +186,43 @@ void ttchamp_state::video_start()
 uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	logerror("update\n");
-	int y,x,count;
+	int count;
 
 	static const int xxx=320,yyy=204;
 
 	bitmap.fill(m_palette->black_pen());
-	uint8_t *videoramfg;
-	uint8_t* videorambg;
+	uint8_t const *const videoramfg = (uint8_t*)m_videoram2;
+	uint8_t const *const videorambg = (uint8_t*)m_videoram0;
 
 	count=0;
-	videorambg = (uint8_t*)m_videoram0;
-	videoramfg = (uint8_t*)m_videoram2;
 
-	for (y=0;y<yyy;y++)
+	for (int y=0;y<yyy;y++)
 	{
-		for(x=0;x<xxx;x++)
+		for(int x=0;x<xxx;x++)
 		{
-			bitmap.pix16(y, x) = videorambg[BYTE_XOR_LE(count)]+0x300;
+			bitmap.pix(y, x) = videorambg[BYTE_XOR_LE(count)]+0x300;
 			count++;
 		}
 	}
 
-	/*
+#if 0
 	count=0;
 	videoram = (uint8_t*)m_videoram1;
-	for (y=0;y<yyy;y++)
+	for (int y=0;y<yyy;y++)
 	{
-	    for(x=0;x<xxx;x++)
-	    {
-	        uint8_t pix = videoram[BYTE_XOR_LE(count)];
-	        if (pix) bitmap.pix16(y, x) = pix+0x200;
-	        count++;
-	    }
+		for (int x=0;x<xxx;x++)
+		{
+			uint8_t pix = videoram[BYTE_XOR_LE(count)];
+			if (pix) bitmap.pix(y, x) = pix+0x200;
+			count++;
+		}
 	}
-	*/
+#endif
 
 	count=0;
-	for (y=0;y<yyy;y++)
+	for (int y=0;y<yyy;y++)
 	{
-		for(x=0;x<xxx;x++)
+		for(int x=0;x<xxx;x++)
 		{
 			uint8_t pix = videoramfg[BYTE_XOR_LE(count)];
 			if (pix)
@@ -239,16 +237,16 @@ uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (pix == 0x01) // blend mode 1
 				{
 					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
-					bitmap.pix16(y, x) = pix + 0x200;
+					bitmap.pix(y, x) = pix + 0x200;
 				}
 				else if (pix == 0x02) // blend mode 2
 				{
 					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
-					bitmap.pix16(y, x) = pix + 0x100;
+					bitmap.pix(y, x) = pix + 0x100;
 				}
 				else
 				{
-					bitmap.pix16(y, x) = pix + 0x000;
+					bitmap.pix(y, x) = pix + 0x000;
 				}
 			}
 			count++;

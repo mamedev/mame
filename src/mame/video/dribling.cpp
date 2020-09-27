@@ -62,7 +62,7 @@ uint32_t dribling_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// loop over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		// loop over columns
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)

@@ -131,7 +131,6 @@ void cdp1862_device::dma_w(uint8_t data)
 	int rd = 1, bd = 1, gd = 1;
 	int sx = screen().hpos() + 4;
 	int y = screen().vpos();
-	int x;
 
 	if (!m_con)
 	{
@@ -140,7 +139,7 @@ void cdp1862_device::dma_w(uint8_t data)
 		gd = m_read_gd();
 	}
 
-	for (x = 0; x < 8; x++)
+	for (int x = 0; x < 8; x++)
 	{
 		int color = CDP1862_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8;
 
@@ -149,7 +148,7 @@ void cdp1862_device::dma_w(uint8_t data)
 			color = (gd << 2) | (bd << 1) | rd;
 		}
 
-		m_bitmap.pix32(y, sx + x) = m_palette[color];
+		m_bitmap.pix(y, sx + x) = m_palette[color];
 
 		data <<= 1;
 	}

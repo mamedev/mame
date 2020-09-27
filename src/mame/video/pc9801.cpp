@@ -41,43 +41,40 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int xi;
-	int res_x,res_y;
-	uint8_t pen;
-	uint8_t colors16_mode;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
+	uint8_t colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
 		uint8_t *ext_gvram = (uint8_t *)m_ext_gvram.target();
-		for(xi=0;xi<16;xi++)
+		for(int xi=0;xi<16;xi++)
 		{
-			res_x = x + xi;
-			res_y = y;
+			int res_x = x + xi;
+			int res_y = y;
 
-			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
+			uint8_t pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
 
-			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
+			bitmap.pix(res_y, res_x) = palette[pen + 0x20];
 		}
 	}
 	else
 	{
-		for(xi=0;xi<16;xi++)
+		for(int xi=0;xi<16;xi++)
 		{
-			res_x = x + xi;
-			res_y = y;
+			int res_x = x + xi;
+			int res_y = y;
 
+			uint8_t pen;
 			pen = ((m_video_ram_2[((address & 0x7fff) + (0x08000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 1 : 0;
 			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x10000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 2 : 0;
 			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 4 : 0;
 			if(m_ex_video_ff[ANALOG_16_MODE])
 				pen|= ((m_video_ram_2[((address & 0x7fff) + (0) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 8 : 0;
-			bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
+			bitmap.pix(res_y, res_x) = palette[pen + colors16_mode];
 		}
 	}
 }
@@ -90,40 +87,24 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int xi,yi;
-	int x;
-	uint8_t char_size;
-//  uint8_t interlace_on;
-	uint16_t tile;
-	uint8_t kanji_lr;
-	uint8_t kanji_sel;
-	uint8_t x_step;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  interlace_on = m_video_ff[INTERLACE_REG];
-	char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
-	tile = 0;
+//  uint8_t interlace_on = m_video_ff[INTERLACE_REG];
+	uint8_t char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
 
-	for(x=0;x<pitch;x+=x_step)
+	uint8_t x_step;
+	for(int x=0;x<pitch;x+=x_step)
 	{
-		uint8_t tile_data,secret,reverse,u_line,v_line,blink;
-		uint8_t color;
-		uint8_t attr;
-		int pen;
-		uint32_t tile_addr;
-		uint8_t knj_tile;
-		uint8_t gfx_mode;
+		uint32_t tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
 
-		tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
+		uint8_t kanji_sel = 0;
+		uint8_t kanji_lr = 0;
 
-		kanji_sel = 0;
-		kanji_lr = 0;
-
-		tile = m_video_ram_1[tile_addr & 0xfff] & 0xff;
-		knj_tile = m_video_ram_1[tile_addr & 0xfff] >> 8;
+		uint16_t tile = m_video_ram_1[tile_addr & 0xfff] & 0xff;
+		uint8_t knj_tile = m_video_ram_1[tile_addr & 0xfff] >> 8;
 		if(knj_tile)
 		{
 			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
@@ -150,36 +131,33 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 		{
 			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
 			   assume that all attributes are recalculated on different strips */
-			attr = (m_video_ram_1[((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
+			uint8_t attr = (m_video_ram_1[((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
 
-			secret = (attr & 1) ^ 1;
-			blink = attr & 2;
-			reverse = attr & 4;
-			u_line = attr & 8;
-			v_line = (m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
-			gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
-			color = (attr & 0xe0) >> 5;
+			uint8_t secret = (attr & 1) ^ 1;
+			uint8_t blink = attr & 2;
+			uint8_t reverse = attr & 4;
+			uint8_t u_line = attr & 8;
+			uint8_t v_line = (m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
+			uint8_t gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
+			uint8_t color = (attr & 0xe0) >> 5;
 
-			for(yi=0;yi<lr;yi++)
+			for(int yi=0;yi<lr;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					int res_x,res_y;
-
-					res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
-					res_y = y+yi - (m_txt_scroll_reg[3] % 20);
+					int res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
+					int res_y = y+yi - (m_txt_scroll_reg[3] % 20);
 
 					if(!m_screen->visible_area().contains(res_x, res_y))
 						continue;
 
-					tile_data = 0;
+					uint8_t tile_data = 0;
 
 					if(!secret)
 					{
 						/* TODO: priority */
 						if(gfx_mode)
 						{
-							int gfx_bit;
 							tile_data = 0;
 
 							/*
@@ -193,6 +171,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 							    33337777
 							*/
 
+							int gfx_bit;
 							gfx_bit = (xi & 4);
 							gfx_bit+= (yi & (2 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
 							gfx_bit+= (yi & (4 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
@@ -216,13 +195,14 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					if(blink && m_screen->frame_number() & 0x10)
 						tile_data = 0;
 
+					int pen;
 					if(yi >= char_size)
 						pen = -1;
 					else
 						pen = (tile_data >> (7-xi) & 1) ? color : -1;
 
 					if(pen != -1)
-						bitmap.pix32(res_y, res_x) = palette[pen];
+						bitmap.pix(res_y, res_x) = palette[pen];
 
 					if(m_video_ff[WIDTH40_REG])
 					{
@@ -230,7 +210,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 							continue;
 
 						if(pen != -1)
-							bitmap.pix32(res_y, res_x+1) = palette[pen];
+							bitmap.pix(res_y, res_x+1) = palette[pen];
 					}
 				}
 			}

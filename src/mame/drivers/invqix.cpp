@@ -174,8 +174,6 @@ void invqix_state::video_start()
 
 uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	// this means freeze or blank or something
 	if (m_vctl == 0x100)
 	{
@@ -184,45 +182,39 @@ uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if (m_vctl == 0x0000)
 	{
-		for(y=0;y<256;y++)
+		for(int y=0;y<256;y++)
 		{
-			for(x=0;x<256;x++)
+			for(int x=0;x<256;x++)
 			{
-				uint8_t r,g,b;
-				int pen_data;
-
-				pen_data = (m_vram[(x+y*256)]);
-				b = (pen_data & 0x001f);
-				g = (pen_data & 0x03e0) >> 5;
-				r = (pen_data & 0x7c00) >> 10;
+				int pen_data = (m_vram[(x+y*256)]);
+				uint8_t b = (pen_data & 0x001f);
+				uint8_t g = (pen_data & 0x03e0) >> 5;
+				uint8_t r = (pen_data & 0x7c00) >> 10;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 3) | (g & 0x7);
 				b = (b << 3) | (b & 0x7);
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+					bitmap.pix(y, x) = r << 16 | g << 8 | b;
 			}
 		}
 	}
 	else if (m_vctl == 0x0001)  // flip
 	{
-		for(y=0;y<256;y++)
+		for(int y=0;y<256;y++)
 		{
-			for(x=0;x<256;x++)
+			for(int x=0;x<256;x++)
 			{
-				uint8_t r,g,b;
-				int pen_data;
-
-				pen_data = (m_vram[(256-x)+((256-y)*256)]);
-				b = (pen_data & 0x001f);
-				g = (pen_data & 0x03e0) >> 5;
-				r = (pen_data & 0x7c00) >> 10;
+				int pen_data = (m_vram[(256-x)+((256-y)*256)]);
+				uint8_t b = (pen_data & 0x001f);
+				uint8_t g = (pen_data & 0x03e0) >> 5;
+				uint8_t r = (pen_data & 0x7c00) >> 10;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 3) | (g & 0x7);
 				b = (b << 3) | (b & 0x7);
 
 				if(cliprect.contains(x, y))
-					bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+					bitmap.pix(y, x) = r << 16 | g << 8 | b;
 			}
 		}
 	}

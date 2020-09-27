@@ -465,7 +465,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 	if ( y < 240 )
 	{
 		uint16_t row_addr = ( y / 10 ) * 128;
-		uint16_t *p = &m_bitmap.pix16(y);
+		uint16_t *const p = &m_bitmap.pix(y);
 		uint8_t char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )

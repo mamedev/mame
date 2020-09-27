@@ -295,10 +295,10 @@ void namcona1_state::pdraw_tile(
 	{ /* skip if inner loop doesn't draw anything */
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * gfx->rowbytes();
-			const u8 *mask_addr = mask_base + y_index * mask->rowbytes();
-			u16 *dest = &dest_bmp.pix16(y);
-			u8 *pri = &screen.priority().pix8(y);
+			u8 const *const source = source_base + y_index * gfx->rowbytes();
+			u8 const *const mask_addr = mask_base + y_index * mask->rowbytes();
+			u16 *const dest = &dest_bmp.pix(y);
+			u8 *const pri = &screen.priority().pix(y);
 
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
@@ -506,8 +506,8 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 					//const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 					const pen_t *paldata = &m_palette->pen(0);
 
-					draw_pixel_line(cliprect, &bitmap.pix16(line),
-								&screen.priority().pix8(line),
+					draw_pixel_line(cliprect, &bitmap.pix(line),
+								&screen.priority().pix(line),
 								m_videoram + ydata + 25,
 								paldata);
 				}

@@ -364,7 +364,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 		if (!is16pix)
 		{
 			uint8_t pen = pixel_data + (4 * color);
-			draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));
+			draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 		}
 		else
 		{
@@ -374,13 +374,13 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			if ((pixel_data & 0x03) != 0)
 			{
 				uint8_t pen = (pixel_data & 0x03) + (4 * color);
-				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));
+				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 			}
 
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
 				uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
-				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel + 8));
+				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
 			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);

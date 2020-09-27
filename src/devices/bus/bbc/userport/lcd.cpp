@@ -87,7 +87,7 @@ HD44780_PIXEL_UPDATE(bbc_lcd_device::lcd_pixel_update)
 		}
 
 		if (line < 4)
-			bitmap.pix16(line * (8 + 1) + y, pos * 6 + x) = state ? 1 : 2;
+			bitmap.pix(line * (8 + 1) + y, pos * 6 + x) = state ? 1 : 2;
 	}
 }
 

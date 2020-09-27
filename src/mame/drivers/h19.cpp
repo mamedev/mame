@@ -475,8 +475,9 @@ MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
 	if (!de)
 		return;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
 
 	for (uint16_t x = 0; x < x_count; x++)
 	{
@@ -491,7 +492,7 @@ MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 		}
 
 		/* get pattern of pixels for that character scanline */
-		uint8_t gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+		uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];

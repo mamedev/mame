@@ -272,7 +272,7 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 	count = 0;
 	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *const dest = &bitmap.pix16(y);
+		uint16_t *const dest = &bitmap.pix(y);
 		for (int x = 0; x < 256; x++)
 		{
 			uint16_t dat = (m_bg_rgb555_pixram[count] & 0xfffe)>>1;
@@ -285,7 +285,7 @@ uint32_t galspanic_ms_state::screen_update_backgrounds(screen_device &screen, bi
 	count = 0;
 	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *const dest = &bitmap.pix16(y);
+		uint16_t *const dest = &bitmap.pix(y);
 		for (int x = 0; x < 256; x++)
 		{
 			uint16_t const dat = m_fg_ind8_pixram[count] & 0x7ff;

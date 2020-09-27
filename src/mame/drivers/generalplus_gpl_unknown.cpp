@@ -178,7 +178,7 @@ uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
-		uint32_t* dst = &bitmap.pix32(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = 0; x < 320; x++)
 		{

@@ -232,7 +232,7 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		{
 			const int line = ((z / (BIT(rowattr, 8) ? 2 : 1)) + (rowattr & 0x00f)) & 15;
 			const bool last_line = z++ == rowlines - 1;
-			draw_line(&bitmap.pix32(y++), cliprect.left(), cliprect.right(), line, last_line, rowaddr, rowattr, scrattr);
+			draw_line(&bitmap.pix(y++), cliprect.left(), cliprect.right(), line, last_line, rowaddr, rowattr, scrattr);
 			if (last_line)
 				break;
 		}

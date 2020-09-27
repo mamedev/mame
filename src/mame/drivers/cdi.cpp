@@ -402,7 +402,7 @@ void cdi_state::draw_lcd(int y)
 	if (y >= 22 || !m_slave_hle.found())
 		return;
 
-	uint32_t *scanline = &m_lcdbitmap.pix32(y);
+	uint32_t *scanline = &m_lcdbitmap.pix(y);
 
 	for (int lcd = 0; lcd < 8; lcd++)
 	{

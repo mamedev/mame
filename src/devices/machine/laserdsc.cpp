@@ -712,10 +712,10 @@ void laserdisc_device::init_video()
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);
 
 		// make a copy of the bitmap that clips out the VBI and horizontal blanking areas
-		frame.m_visbitmap.wrap(&frame.m_bitmap.pix16(44, frame.m_bitmap.width() * 8 / 720),
-								frame.m_bitmap.width() - 2 * frame.m_bitmap.width() * 8 / 720,
-								frame.m_bitmap.height() - 44,
-								frame.m_bitmap.rowpixels());
+		frame.m_visbitmap.wrap(&frame.m_bitmap.pix(
+					44, frame.m_bitmap.width() * 8 / 720),
+					frame.m_bitmap.width() - 2 * frame.m_bitmap.width() * 8 / 720, frame.m_bitmap.height() - 44,
+					frame.m_bitmap.rowpixels());
 		frame.m_visbitmap.set_palette(m_videopalette);
 	}
 
@@ -789,7 +789,7 @@ void laserdisc_device::fillbitmap_yuy16(bitmap_yuy16 &bitmap, uint8_t yval, uint
 	// write 32 bits of color (2 pixels at a time)
 	for (int y = 0; y < bitmap.height(); y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix(y);
 		for (int x = 0; x < bitmap.width() / 2; x++)
 		{
 			*dest++ = color0;
@@ -918,7 +918,8 @@ void laserdisc_device::read_track_data()
 	frame->m_lastfield = m_curtrack * 2 + m_fieldnum;
 
 	// set the video target information
-	m_avhuff_config.video.wrap(&frame->m_bitmap.pix16(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
+	m_avhuff_video.wrap(&frame->m_bitmap.pix(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
+	m_avhuff_config.video = &m_avhuff_video;
 
 	// set the audio target information
 	if (m_audiobufin + m_audiomaxsamples <= m_audiobufsize)
@@ -995,13 +996,13 @@ void laserdisc_device::process_track_data()
 
 	// remove the video if we had an error
 	if (m_readresult != CHDERR_NONE)
-		m_avhuff_config.video.reset();
+		m_avhuff_video.reset();
 
 	// count the field as read if we are successful
-	if (m_avhuff_config.video.valid())
+	if (m_avhuff_video.valid())
 	{
 		m_frame[m_videoindex].m_numfields++;
-		player_overlay(m_avhuff_config.video);
+		player_overlay(m_avhuff_video);
 	}
 
 	// pass the audio to the callback

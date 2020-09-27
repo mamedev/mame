@@ -302,19 +302,17 @@ uint32_t dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bit
 	if (m_sl_enable)
 	{
 		/* apply shadow */
-		int x, y;
-
 		bitmap_ind16 &sl_bitmap = m_sl_tilemap->pixmap();
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				uint16_t src_pixel = m_main_bitmap.pix16(y, x);
+				uint16_t src_pixel = m_main_bitmap.pix(y, x);
 
-				if (sl_bitmap.pix16(y, x) == 0xff)
+				if (sl_bitmap.pix(y, x) == 0xff)
 					src_pixel += m_palette->entries();
 
-				bitmap.pix16(y, x) = src_pixel;
+				bitmap.pix(y, x) = src_pixel;
 			}
 	}
 	else

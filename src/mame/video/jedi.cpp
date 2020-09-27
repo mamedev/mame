@@ -124,7 +124,7 @@ void jedi_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		for(int x = cliprect.left(); x <= cliprect.right(); x++)
-			bitmap.pix32(y, x) = m_palette->pen(bitmap.pix32(y, x));
+			bitmap.pix(y, x) = m_palette->pen(bitmap.pix(y, x));
 }
 
 
@@ -223,8 +223,8 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 			   the next pixel just uses the current value directly. After we done with a pixel
 			   save it for later in the line buffer RAM */
 			const u8 bg_tempcol = prom1[(bg_last_col << 4) | bg_col];
-			bitmap.pix32(y, x + 0) = tx_col1 | prom2[(background_line_buffer[x + 0] << 4) | bg_tempcol];
-			bitmap.pix32(y, x + 1) = tx_col2 | prom2[(background_line_buffer[x + 1] << 4) | bg_col];
+			bitmap.pix(y, x + 0) = tx_col1 | prom2[(background_line_buffer[x + 0] << 4) | bg_tempcol];
+			bitmap.pix(y, x + 1) = tx_col2 | prom2[(background_line_buffer[x + 1] << 4) | bg_col];
 			background_line_buffer[x + 0] = bg_tempcol;
 			background_line_buffer[x + 1] = bg_col;
 
@@ -296,7 +296,7 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					x = x & 0x1ff;
 
 					if (col)
-						bitmap.pix32(y, x) = (bitmap.pix32(y, x) & 0x30f) | col;
+						bitmap.pix(y, x) = (bitmap.pix(y, x) & 0x30f) | col;
 
 					/* next pixel */
 					if (flip_x)

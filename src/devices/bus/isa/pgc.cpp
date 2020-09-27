@@ -401,14 +401,11 @@ uint8_t isa8_pgc_device::init_r()
 
 uint32_t isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *p;
-	uint8_t *v;
-
 	for (int y = 0; y < PGC_DISP_VERT; y++)
 	{
 		// XXX address translation happens in hardware
-		v = &m_vram[y * 1024];
-		p = &bitmap.pix16(y + PGC_VERT_START, PGC_HORZ_START);
+		uint8_t const *v = &m_vram[y * 1024];
+		uint16_t *p = &bitmap.pix(y + PGC_VERT_START, PGC_HORZ_START);
 
 		for (int x = 0; x < PGC_DISP_HORZ; x++)
 		{

@@ -858,16 +858,16 @@ INPUT_PORTS_END
 
 uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
-	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
-	bitmap_ind8 &vdp2_y1 = m_vdp2->get_y1_bitmap();
+	bitmap_rgb32 const &vdp1_bitmap = m_vdp1->get_bitmap();
+	bitmap_rgb32 const &vdp2_bitmap = m_vdp2->get_bitmap();
+	bitmap_ind8 const &vdp2_y1 = m_vdp2->get_y1_bitmap();
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
-		uint32_t *dest_ptr = &bitmap.pix32(y);
-		uint32_t *vdp1_ptr = &vdp1_bitmap.pix32(y);
-		uint32_t *vdp2_ptr = &vdp2_bitmap.pix32(y);
-		uint8_t *y1_ptr = &vdp2_y1.pix8(y);
+		uint32_t *const dest_ptr = &bitmap.pix(y);
+		uint32_t const *const vdp1_ptr = &vdp1_bitmap.pix(y);
+		uint32_t const *const vdp2_ptr = &vdp2_bitmap.pix(y);
+		uint8_t const *const y1_ptr = &vdp2_y1.pix(y);
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{

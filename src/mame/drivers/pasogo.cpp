@@ -503,23 +503,22 @@ INPUT_CHANGED_MEMBER(pasogo_state::contrast)
 
 uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *vram = (uint8_t *)m_vram.target();
-	int x, y;
-	for (y=0; y<240; y++)
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
+	for (int y=0; y<240; y++)
 	{
-		for (x=0; x<(320/8); x++)
+		for (int x=0; x<(320/8); x++)
 		{
-			int a = (y & 3) * 0x2000;
-			uint8_t d1 = vram[a + (y >> 2) * 80 + x];
-			uint16_t *line = &bitmap.pix16(y, x << 3);
-			*line++ = ((d1 >> 7) & 1);
-			*line++ = ((d1 >> 6) & 1);
-			*line++ = ((d1 >> 5) & 1);
-			*line++ = ((d1 >> 4) & 1);
-			*line++ = ((d1 >> 3) & 1);
-			*line++ = ((d1 >> 2) & 1);
-			*line++ = ((d1 >> 1) & 1);
-			*line++ = ((d1 >> 0) & 1);
+			int const a = (y & 3) * 0x2000;
+			uint8_t const d1 = vram[a + (y >> 2) * 80 + x];
+			uint16_t *line = &bitmap.pix(y, x << 3);
+			*line++ = BIT(d1, 7);
+			*line++ = BIT(d1, 6);
+			*line++ = BIT(d1, 5);
+			*line++ = BIT(d1, 4);
+			*line++ = BIT(d1, 3);
+			*line++ = BIT(d1, 2);
+			*line++ = BIT(d1, 1);
+			*line++ = BIT(d1, 0);
 		}
 	}
 	return 0;

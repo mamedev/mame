@@ -302,13 +302,12 @@ INPUT_PORTS_END
 
 MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
-	int column, bit;
+	pen_t const *const pen = m_palette->pens();
 
-	for (column = 0; column < x_count; column++)
+	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
-		uint16_t addr = code << 4 | (ra & 0x0f);
+		uint8_t const code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
+		uint16_t const addr = code << 4 | (ra & 0x0f);
 		uint8_t data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
 
 		if (column == cursor_x)
@@ -316,12 +315,12 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 			data = 0xff;
 		}
 
-		for (bit = 0; bit < 8; bit++)
+		for (int bit = 0; bit < 8; bit++)
 		{
-			int x = (column * 8) + bit;
-			int color = BIT(data, 7) && de;
+			int const x = (column * 8) + bit;
+			int const color = BIT(data, 7) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = pen[color];
+			bitmap.pix(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}

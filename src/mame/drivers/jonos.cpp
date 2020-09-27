@@ -124,23 +124,23 @@ void jonos_state::machine_reset()
 uint32_t jonos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
-	u8 y,ra,chr,gfx,inv;
-	u16 sy=0,x;
+	u16 sy=0;
 	u16 ma = (m_p_videoram[0x7da] + (m_p_videoram[0x7db] << 8)) & 0x7ff;
 
-	for (y = 0; y < 24; y++)
+	for (u8 y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 12; ra++)
+		for (u8 ra = 0; ra < 12; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 			u16 cpos = y << 8;
 
-			for (x = ma; x < ma + 80; x++)
+			for (u16 x = ma; x < ma + 80; x++)
 			{
-				chr = m_p_videoram[x];
-				inv = (BIT(chr, 7) ^ ((cpos == m_curs_pos) && BIT(m_framecnt, 5))) ? 0xff : 0;
+				u8 chr = m_p_videoram[x];
+				u8 inv = (BIT(chr, 7) ^ ((cpos == m_curs_pos) && BIT(m_framecnt, 5))) ? 0xff : 0;
 				chr &= 0x7f;
 
+				u8 gfx;
 				if (ra < 8)
 					gfx = m_p_chargen[(chr<<3) | ra ] ^ inv;
 				else

@@ -72,23 +72,23 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  
 {
 	if(width && height)
 	{
-		bitmap.pix16(y*2+0, x*2+0) = m_palette->pen(pen);
-		bitmap.pix16(y*2+0, x*2+1) = m_palette->pen(pen);
-		bitmap.pix16(y*2+1, x*2+0) = m_palette->pen(pen);
-		bitmap.pix16(y*2+1, x*2+1) = m_palette->pen(pen);
+		bitmap.pix(y*2+0, x*2+0) = m_palette->pen(pen);
+		bitmap.pix(y*2+0, x*2+1) = m_palette->pen(pen);
+		bitmap.pix(y*2+1, x*2+0) = m_palette->pen(pen);
+		bitmap.pix(y*2+1, x*2+1) = m_palette->pen(pen);
 	}
 	else if(width)
 	{
-		bitmap.pix16(y, x*2+0) = m_palette->pen(pen);
-		bitmap.pix16(y, x*2+1) = m_palette->pen(pen);
+		bitmap.pix(y, x*2+0) = m_palette->pen(pen);
+		bitmap.pix(y, x*2+1) = m_palette->pen(pen);
 	}
 	else if(height)
 	{
-		bitmap.pix16(y*2+0, x) = m_palette->pen(pen);
-		bitmap.pix16(y*2+1, x) = m_palette->pen(pen);
+		bitmap.pix(y*2+0, x) = m_palette->pen(pen);
+		bitmap.pix(y*2+1, x) = m_palette->pen(pen);
 	}
 	else
-		bitmap.pix16(y, x) = m_palette->pen(pen);
+		bitmap.pix(y, x) = m_palette->pen(pen);
 }
 
 void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr)

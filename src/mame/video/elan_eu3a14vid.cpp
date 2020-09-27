@@ -252,8 +252,8 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 			// RAM tile layer has no scrolling? (or we've never seen it used / enabled)
 		}
 
-		uint16_t* dst = &bitmap.pix16(ypos + y);
-		uint8_t* pridst = &m_prioritybitmap.pix8(ypos + y);
+		uint16_t *const dst = &bitmap.pix(ypos + y);
+		uint8_t *const pridst = &m_prioritybitmap.pix(ypos + y);
 
 		for (int x = 0; x < xstride; x++)
 		{
@@ -692,8 +692,8 @@ void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_ind16
 
 	if (ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 	{
-		uint16_t* dst = &bitmap.pix16(ypos);
-		uint8_t* pridst = &m_prioritybitmap.pix8(ypos);
+		uint16_t *const dst = &bitmap.pix(ypos);
+		uint8_t *const pridst = &m_prioritybitmap.pix(ypos);
 
 		int count = 0;
 		for (int x = 0; x < 8/bppdiv;x++)

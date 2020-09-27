@@ -499,22 +499,18 @@ void corona_state::video_start()
 
 uint32_t corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 256; x++)
-			bitmap.pix16(y, x) = m_videobuf[y * 512 + x];
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 256; x++)
+			bitmap.pix(y, x) = m_videobuf[y * 512 + x];
 
 	return 0;
 }
 
 uint32_t corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 256; x++)
-			bitmap.pix16(255 - y, x) = m_videobuf[y * 512 + x];
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 256; x++)
+			bitmap.pix(255 - y, x) = m_videobuf[y * 512 + x];
 
 	return 0;
 }

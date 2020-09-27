@@ -141,14 +141,13 @@ uint32_t kangaroo_state::screen_update_kangaroo(screen_device &screen, bitmap_rg
 	uint8_t enab = (m_video_control[9] & 0x04);
 	uint8_t pria = (~m_video_control[9] & 0x02);
 	uint8_t prib = (~m_video_control[9] & 0x01);
-	int x, y;
 
 	/* iterate over pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dest = &bitmap.pix32(y);
+		uint32_t *const dest = &bitmap.pix(y);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			uint8_t effxa = scrollx + ((x / 2) ^ xora);
 			uint8_t effya = scrolly + (y ^ xora);

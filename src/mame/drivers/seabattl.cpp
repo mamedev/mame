@@ -160,14 +160,12 @@ void seabattl_state::seabattl_colorram_w(offs_t offset, uint8_t data)
 
 uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y, offset;
-
 	// wave
 	if ( m_waveenable )
 	{
-		for ( y = 0; y < 32; y++ )
+		for ( int y = 0; y < 32; y++ )
 		{
-			for ( x = 0; x < 32; x++ )
+			for ( int x = 0; x < 32; x++ )
 			{
 				m_gfxdecode->gfx(2)->opaque(bitmap,cliprect, (y & 0x0f) + (((x & 0x0f) + ((screen.frame_number() & 0xe0) >> 4)) << 4), 0, 0, 0, x*8, y*8 );
 			}
@@ -183,7 +181,7 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 	m_bg_tilemap->draw(screen, m_collision_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	// sprites (m.obj)
-	for ( offset = 0; offset < 256; offset++ )
+	for ( int offset = 0; offset < 256; offset++ )
 	{
 		// bits 0-3: sprite num
 		// bits 4-7: x coordinate
@@ -200,15 +198,15 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 	bitmap_ind16 const &s2636_0_bitmap = m_s2636->update(cliprect);
 
 	// collisions
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			// bit 0: m.obj - pvi-bkg
 			// bit 1: pvi-bkg - scr.sm.obj
 			// bit 2: m.obj - scr.sm.obj
 			bool obj = (bitmap.pix(y,x) > 0) && (bitmap.pix(y,x) < 8);
-			bool pvi = S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix16(y, x));
+			bool pvi = S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix(y, x));
 			bool scr = (m_collision_bg.pix(y,x) & 1) != 0;
 
 			if (obj && pvi)
@@ -223,14 +221,14 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 	}
 
 	// s2636 layer
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int pixel = s2636_0_bitmap.pix16(y, x);
+			int pixel = s2636_0_bitmap.pix(y, x);
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+				bitmap.pix(y, x) = S2636_PIXEL_COLOR(pixel);
 			}
 		}
 	}

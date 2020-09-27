@@ -818,7 +818,7 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 	// The 6845 cursor signal is not used at all.
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u32 const vidbase = (m_video_latch & 15) << 14 | (ra & 7) << 12;
-	u32 *p = &bitmap.pix32(y + vbp, hbp);
+	u32 *p = &bitmap.pix(y + vbp, hbp);
 
 	for (u16 x = 0; x < x_count; x++)
 	{

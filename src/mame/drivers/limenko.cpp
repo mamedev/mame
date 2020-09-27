@@ -375,9 +375,9 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * width;
-			u16 *dest = &dest_bmp.pix16(y);
-			u8 *pri = &m_sprites_bitmap_pri.pix8(y);
+			u8 const *const source = source_base + y_index * width;
+			u16 *const dest = &dest_bmp.pix(y);
+			u8 *const pri = &m_sprites_bitmap_pri.pix(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
@@ -452,10 +452,10 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *source = &sprites_bitmap.pix16(y);
-		u16 *dest = &bitmap.pix16(y);
-		u8 *dest_pri = &priority_bitmap.pix8(y);
-		u8 *source_pri = &m_sprites_bitmap_pri.pix8(y);
+		u16 const *const source = &sprites_bitmap.pix(y);
+		u16 *const dest = &bitmap.pix(y);
+		u8 const *const dest_pri = &priority_bitmap.pix(y);
+		u8 const *const source_pri = &m_sprites_bitmap_pri.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

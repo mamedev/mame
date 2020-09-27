@@ -276,7 +276,7 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 	{
 		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
 			for (uint16_t x = ma; x < ma + m_width; x++)
 			{

@@ -437,9 +437,8 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format 
 			int32_t line = 0;
 			for(line = 0; line < 8; line++)
 			{
-				uint32_t *d = &bitmap.pix32(y + line);
-				int32_t bit = 0;
-				for(bit = 0; bit < 8; bit++)
+				uint32_t *const d = &bitmap.pix(y + line);
+				for(uint32_t bit = 0; bit < 8; bit++)
 				{
 					if(char_glyphs[cur][line] & (1 << (7 - bit)))
 					{

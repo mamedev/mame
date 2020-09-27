@@ -122,29 +122,24 @@ void lw700i_state::video_start()
 
 uint32_t lw700i_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
 	static const uint32_t palette[2] = { 0xffffff, 0 };
-	uint8_t *pVRAM = (uint8_t *)m_mainram.target();
+	uint8_t const *const pVRAM = (uint8_t *)m_mainram.target() + 0x3e200;
 
-	pVRAM += 0x3e200;
-
-	for (y = 0; y < 128; y++)
+	for (int y = 0; y < 128; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 480/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 480/8; x++)
 		{
-			pixels = pVRAM[(y * (480/8)) + (BYTE_XOR_BE(x))];
+			uint8_t const pixels = pVRAM[(y * (480/8)) + (BYTE_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			*scanline++ = palette[BIT(pixels, 7)];
+			*scanline++ = palette[BIT(pixels, 6)];
+			*scanline++ = palette[BIT(pixels, 5)];
+			*scanline++ = palette[BIT(pixels, 4)];
+			*scanline++ = palette[BIT(pixels, 3)];
+			*scanline++ = palette[BIT(pixels, 2)];
+			*scanline++ = palette[BIT(pixels, 1)];
+			*scanline++ = palette[BIT(pixels, 0)];
 		}
 	}
 

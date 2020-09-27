@@ -111,7 +111,7 @@ I8275_DRAW_CHARACTER_MEMBER(wy100_state::draw_character)
 	const rgb_t fg = rgb_t::white();
 	const rgb_t bg = rgb_t::black();
 	for (int i = 0; i < 10; i++)
-		bitmap.pix32(y, x + i) = BIT(dots, i < 1 || i > 8 ? 7 : 8 - i) ? fg : bg;
+		bitmap.pix(y, x + i) = BIT(dots, i < 1 || i > 8 ? 7 : 8 - i) ? fg : bg;
 }
 
 WRITE_LINE_MEMBER(wy100_state::txd_w)

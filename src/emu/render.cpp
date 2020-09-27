@@ -483,7 +483,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 
 		// finally fill out the new info
 		primlist.add_reference(scaled->bitmap);
-		texinfo.base = &scaled->bitmap->pix32(0);
+		texinfo.base = &scaled->bitmap->pix(0);
 		texinfo.rowpixels = scaled->bitmap->rowpixels();
 		texinfo.width = dwidth;
 		texinfo.height = dheight;
@@ -718,8 +718,8 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 	// simply replicate the source bitmap over the target
 	for (int y = 0; y < dest.height(); y++)
 	{
-		u32 *src = &source.pix32(y % source.height());
-		u32 *dst = &dest.pix32(y);
+		u32 const *const src = &source.pix(y % source.height());
+		u32 *dst = &dest.pix(y);
 		int sx = 0;
 
 		// loop over columns

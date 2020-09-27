@@ -589,7 +589,7 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				if (!m_pixel_update_cb.isnull())
 					m_pixel_update_cb(bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
 				else if (cliprect.contains(seg, com))
-					bitmap.pix16(com, seg) = pixel;
+					bitmap.pix(com, seg) = pixel;
 			}
 		}
 	}

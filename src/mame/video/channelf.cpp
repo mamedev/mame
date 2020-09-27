@@ -52,18 +52,16 @@ int channelf_state::recalc_palette_offset(int reg1, int reg2)
 
 uint32_t channelf_state::screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,col;
-	uint16_t ma=0,x;
-	int palette_offset;
+	uint16_t ma=0;
 
-	for(y = 0; y < 64; y++ )
+	for (uint8_t y = 0; y < 64; y++ )
 	{
-		uint16_t *p = &bitmap.pix16(y);
-		palette_offset = recalc_palette_offset(m_p_videoram[y*128+125]&3, m_p_videoram[y*128+126]&3);
+		uint16_t *p = &bitmap.pix(y);
+		int const palette_offset = recalc_palette_offset(m_p_videoram[y*128+125]&3, m_p_videoram[y*128+126]&3);
 
-		for (x = ma; x < ma + 128; x++)
+		for (uint16_t x = ma; x < ma + 128; x++)
 		{
-			col = palette_offset+(m_p_videoram[x|(y<<7)]&3);
+			uint8_t const col = palette_offset+(m_p_videoram[x|(y<<7)]&3);
 			*p++ = colormap[col];
 		}
 		ma+=128;

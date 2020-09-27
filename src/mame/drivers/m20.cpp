@@ -130,16 +130,15 @@ private:
 
 MC6845_UPDATE_ROW( m20_state::update_row )
 {
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i, j;
+	uint32_t *p = &bitmap.pix(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ((ma | (ra << 1)) << 4) + i;
 		uint16_t data = m_p_videoram[ offset ];
 
-		for ( j = 15; j >= 0; j-- )
+		for ( int j = 15; j >= 0; j-- )
 		{
 			*p = palette[( data & 1 << j ) ? 1 : 0];
 			p++;

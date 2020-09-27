@@ -158,7 +158,7 @@ u32 teleray10_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	{
 		for (unsigned scan = 0; scan < 12; scan++)
 		{
-			u32 *px = &bitmap.pix32(y * 12 + scan);
+			u32 *px = &bitmap.pix(y * 12 + scan);
 			for (unsigned x = 0; x < 80; x++)
 			{
 				u8 ch = m_displayram[offset + x];

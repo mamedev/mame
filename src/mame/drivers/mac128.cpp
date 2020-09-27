@@ -938,23 +938,17 @@ void mac128_state::mac_driver_init(mac128model_t model)
 
 uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t video_base;
-	const uint16_t *video_ram;
-	uint16_t word;
-	uint16_t *line;
-	int y, x, b;
+	uint32_t const video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	uint16_t const *video_ram = (const uint16_t *) (m_ram_ptr + video_base);
 
-	video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const uint16_t *) (m_ram_ptr + video_base);
-
-	for (y = 0; y < MAC_V_VIS; y++)
+	for (int y = 0; y < MAC_V_VIS; y++)
 	{
-		line = &bitmap.pix16(y);
+		uint16_t *const line = &bitmap.pix(y);
 
-		for (x = 0; x < MAC_H_VIS; x += 16)
+		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			word = *(video_ram++);
-			for (b = 0; b < 16; b++)
+			uint16_t const word = *(video_ram++);
+			for (int b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
 			}

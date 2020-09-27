@@ -91,7 +91,7 @@ void model1_state::view_t::project_point_direct(point_t *p) const
 
 void model1_state::draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	uint32_t *base = &bitmap.pix32(y);
+	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
 		base[x1] = color;
@@ -101,7 +101,7 @@ void model1_state::draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int c
 
 void model1_state::draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color)
 {
-	uint32_t *base = &bitmap.pix32(y);
+	uint32_t *const base = &bitmap.pix(y);
 	while(x1 <= x2)
 	{
 		if((x1^y) & 1)
@@ -407,7 +407,7 @@ void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, i
 	{
 		if (x >= view->x1 && x <= view->x2 && y >= view->y1 && y <= view->y2)
 		{
-			bitmap.pix32(y, x) = color;
+			bitmap.pix(y, x) = color;
 		}
 		x += s1x;
 		y += s1y;
@@ -421,7 +421,7 @@ void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, i
 	}
 	if (x >= view->x1 && x <= view->x2 && y >= view->y1 && y <= view->y2)
 	{
-		bitmap.pix16(y, x) = color;
+		bitmap.pix(y, x) = color;
 	}
 }
 #endif

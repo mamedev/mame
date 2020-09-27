@@ -31,25 +31,21 @@ void dassault_state::video_start()
 
 void dassault_state::mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha)
 {
-	int y, x;
-	const pen_t *paldata = &m_palette->pen(0);
+	pen_t const *const paldata = &m_palette->pen(0);
 
-	uint16_t* srcline;
-	uint32_t* dstline;
-
-	for (y=cliprect.top();y<=cliprect.bottom();y++)
+	for (int y=cliprect.top(); y<=cliprect.bottom(); y++)
 	{
-		srcline=&sprite_bitmap->pix16(y,0);
-		dstline=&bitmap.pix32(y,0);
+		uint16_t const *const srcline = &sprite_bitmap->pix(y, 0);
+		uint32_t *const dstline = &bitmap.pix(y, 0);
 
-		for (x=cliprect.left();x<=cliprect.right();x++)
+		for (int x=cliprect.left(); x<=cliprect.right(); x++)
 		{
 			uint16_t pix = srcline[x];
 
 			if ((pix & primask) != pri)
 				continue;
 
-			if (pix&0xf)
+			if (pix & 0xf)
 			{
 				uint16_t pen = pix&0x1ff;
 				if (pix & 0x800) pen += 0x200;

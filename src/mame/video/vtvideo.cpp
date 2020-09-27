@@ -595,18 +595,18 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 			// Double, 'double_height + double_width', then normal.
 			if (double_width)
 			{
-				bitmap.pix16(y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
-				bitmap.pix16(y_preset, DOUBLE_x_preset + (b << 1)) = bit;
+				bitmap.pix(y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
+				bitmap.pix(y_preset, DOUBLE_x_preset + (b << 1)) = bit;
 
 				if (double_height)
 				{
-					bitmap.pix16(1 + y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
-					bitmap.pix16(1 + y_preset, DOUBLE_x_preset + (b << 1)) = bit;
+					bitmap.pix(1 + y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
+					bitmap.pix(1 + y_preset, DOUBLE_x_preset + (b << 1)) = bit;
 				}
 			}
 			else
 			{
-				bitmap.pix16(y_preset, x_preset + b) = bit;
+				bitmap.pix(y_preset, x_preset + b) = bit;
 			}
 		} // for (8 bit)
 
@@ -614,21 +614,21 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 		if (double_width)
 		{
 			// double chars: 18 or 20 bits
-			bitmap.pix16(y_preset, DOUBLE_x_preset + 16) = bit;
-			bitmap.pix16(y_preset, DOUBLE_x_preset + 17) = bit;
+			bitmap.pix(y_preset, DOUBLE_x_preset + 16) = bit;
+			bitmap.pix(y_preset, DOUBLE_x_preset + 17) = bit;
 
 			if (m_columns == 80)
 			{
-				bitmap.pix16(y_preset, DOUBLE_x_preset + 18) = bit;
-				bitmap.pix16(y_preset, DOUBLE_x_preset + 19) = bit;
+				bitmap.pix(y_preset, DOUBLE_x_preset + 18) = bit;
+				bitmap.pix(y_preset, DOUBLE_x_preset + 19) = bit;
 			}
 		}
 		else
 		{   // normal chars: 9 or 10 bits
-			bitmap.pix16(y_preset, x_preset + 8) = bit;
+			bitmap.pix(y_preset, x_preset + 8) = bit;
 
 			if (m_columns == 80)
-				bitmap.pix16(y_preset, x_preset + 9) = bit;
+				bitmap.pix(y_preset, x_preset + 9) = bit;
 		}
 
 		/* The DEC terminals use a single ROM bitmap font and
@@ -652,27 +652,27 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 		{
 			if (double_width)
 			{
-				if (bitmap.pix16(y_preset, DOUBLE_x_preset + b) == fg_intensity)
+				if (bitmap.pix(y_preset, DOUBLE_x_preset + b) == fg_intensity)
 				{
 					prev_bit = fg_intensity;
 				}
 				else
 				{
 					if (prev_bit == fg_intensity)
-						bitmap.pix16(y_preset, DOUBLE_x_preset + b) = fg_intensity;
+						bitmap.pix(y_preset, DOUBLE_x_preset + b) = fg_intensity;
 					prev_bit = back_intensity;
 				}
 			}
 			else
 			{
-				if (bitmap.pix16(y_preset, x_preset + b) == fg_intensity)
+				if (bitmap.pix(y_preset, x_preset + b) == fg_intensity)
 				{
 					prev_bit = fg_intensity;
 				}
 				else
 				{
 					if (prev_bit == fg_intensity)
-						bitmap.pix16(y_preset, x_preset + b) = fg_intensity;
+						bitmap.pix(y_preset, x_preset + b) = fg_intensity;
 					prev_bit = back_intensity;
 				}
 			}

@@ -17,6 +17,8 @@
 
 #include "coreutil.h"
 
+#include <algorithm>
+
 
 #define S3C44B0_INTCON    (0x00 / 4) // Interrupt Control
 #define S3C44B0_INTPND    (0x04 / 4) // Interrupt Request Status
@@ -696,8 +698,8 @@ uint32_t s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			for (int y = 0; y < screen.height(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix32(y);
-				uint8_t *vram = m_lcd.bitmap.get() + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
+				uint32_t *scanline = &bitmap.pix(y);
+				uint8_t const *vram = m_lcd.bitmap.get() + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
 				for (int x = 0; x < screen.width(); x++)
 				{
 					*scanline++ = rgb_t(vram[0], vram[1], vram[2]);
@@ -710,8 +712,7 @@ uint32_t s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		for (int y = 0; y < screen.height(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix32(y);
-			memset(scanline, 0, screen.width() * 4);
+			std::fill_n(&bitmap.pix(y), screen.width(), 0);
 		}
 	}
 	return 0;

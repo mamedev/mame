@@ -296,28 +296,23 @@ MC6845_BEGIN_UPDATE( merit_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 {
-	uint8_t *gfx[2];
+	uint8_t const *const gfx[2] = { memregion("gfx1")->base(), memregion("gfx2")->base() };
 	uint16_t x = 0;
-	int rlen;
 
-	gfx[0] = memregion("gfx1")->base();
-	gfx[1] = memregion("gfx2")->base();
-	rlen = memregion("gfx2")->bytes();
+	int const rlen = memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		int i;
 		int attr = m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
 		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
-		uint8_t   *data;
 
 		addr &= (rlen-1);
-		data = gfx[region];
+		uint8_t const *const data = gfx[region];
 
-		for (i = 7; i>=0; i--)
+		for (int i = 7; i>=0; i--)
 		{
 			int col = colour;
 
@@ -331,7 +326,7 @@ MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 				col |= 0x03;
 
 			col = m_ram_palette[col & 0x3ff];
-			bitmap.pix32(y, x) = m_pens[col ? col & (NUM_PENS-1) : (m_lscnblk ? 8 : 0)];
+			bitmap.pix(y, x) = m_pens[col ? col & (NUM_PENS-1) : (m_lscnblk ? 8 : 0)];
 
 			x++;
 		}

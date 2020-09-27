@@ -269,11 +269,10 @@ uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rg
 	m_last_hpos = 0;
 	m_last_vpos = 0;
 
-	uint32_t pixindex = 0;
 	for (int y = 0; y < SCREEN_VTOTAL; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
-		pixindex = y * SCREEN_HTOTAL;
+		uint32_t *scanline = &bitmap.pix(y);
+		uint32_t pixindex = y * SCREEN_HTOTAL;
 		for (int x = 0; x < SCREEN_HTOTAL; x++)
 			//*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 0.5) * 0x010101);
 			*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);

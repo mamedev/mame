@@ -422,7 +422,7 @@ PCD8544_SCREEN_UPDATE(noki3310_state::pcd8544_screen_update)
 			for (int y = 0; y < 8; y++)
 			{
 				int p = BIT(gfx, y);
-				bitmap.pix16(r*8 + y, x) = p ^ inv;
+				bitmap.pix(r*8 + y, x) = p ^ inv;
 			}
 		}
 }

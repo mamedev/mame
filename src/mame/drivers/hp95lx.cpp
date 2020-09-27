@@ -188,20 +188,16 @@ void hp95lx_state::hp95lx_palette(palette_device &palette) const
 
 uint32_t hp95lx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, offset;
-	uint16_t gfx, *p;
-	uint8_t chr, attr;
-
 	if (m_graphics_mode)
 	{
-		for (y = 0; y < 128; y++)
+		for (int y = 0; y < 128; y++)
 		{
-			p = &bitmap.pix16(y);
-			offset = y * (240 / 8);
+			uint16_t *p = &bitmap.pix(y);
+			int const offset = y * (240 / 8);
 
-			for (x = offset; x < offset + (240 / 8); x++)
+			for (int x = offset; x < offset + (240 / 8); x++)
 			{
-				gfx = m_p_videoram[x];
+				uint16_t const gfx = m_p_videoram[x];
 
 				for (int i = 7; i >= 0; i--)
 				{
@@ -215,17 +211,17 @@ uint32_t hp95lx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		bool blink((m_screen->frame_number() % 10) > 4);
 
 		// screen memory is normal MDA 80x25, but only a scrollable 40x16 window is displayed
-		for (y = 0; y < 128; y++)
+		for (int y = 0; y < 128; y++)
 		{
-			p = &bitmap.pix16(y);
-			offset = (y / 8) * 160 + m_window_start_addr;
+			uint16_t *p = &bitmap.pix(y);
+			int const offset = (y / 8) * 160 + m_window_start_addr;
 
-			for (x = offset; x < offset + 80; x += 2)
+			for (int x = offset; x < offset + 80; x += 2)
 			{
-				chr = m_p_videoram[x];
-				attr = m_p_videoram[x + 1];
+				uint8_t const chr = m_p_videoram[x];
+				uint8_t const attr = m_p_videoram[x + 1];
 
-				gfx = m_p_chargen[(chr)*8 + (y % 8)];
+				uint16_t gfx = m_p_chargen[(chr)*8 + (y % 8)];
 
 				if ((x >> 1) == m_cursor_addr && blink && (y % 8) >= m_cursor_start_ras)
 				{

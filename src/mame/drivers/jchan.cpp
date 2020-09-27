@@ -323,10 +323,10 @@ u32 jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	// TODO : verify sprite-tile priorities from real hardware, Check what 15 bit of palette actually working
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16* src1 = &m_sprite_bitmap[0]->pix16(y);
-		const u16* src2 = &m_sprite_bitmap[1]->pix16(y);
-		u8 *tilepri = &tile_primap->pix8(y);
-		u16* dst =  &bitmap.pix16(y);
+		u16 const *const src1 = &m_sprite_bitmap[0]->pix(y);
+		u16 const *const src2 = &m_sprite_bitmap[1]->pix(y);
+		u8 *const tilepri = &tile_primap->pix(y);
+		u16 *const dst =  &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

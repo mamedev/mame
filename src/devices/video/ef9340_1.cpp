@@ -357,7 +357,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			{
 				// Service row is disabled
 				for (int i = 0; i < 40 * 8; i++)
-					m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + i) = 8;
+					m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 8;
 				return;
 			}
 		}
@@ -466,7 +466,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 			for (int i = 0; i < 8; i++)
 			{
 				uint16_t d = blank ? 0 : (char_data & 1) ? fg : bg;
-				m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + x*8 + i) = d | 8;
+				m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + x*8 + i) = d | 8;
 				char_data >>= 1;
 			}
 
@@ -480,7 +480,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 	else
 	{
 		for (int i = 0; i < 40 * 8; i++)
-			m_tmp_bitmap.pix16(m_offset_y + vpos, m_offset_x + i) = 0;
+			m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 0;
 	}
 
 	// determine next h parity
@@ -499,7 +499,7 @@ uint32_t ef9340_1_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	// note: palette d3 is transparency (datasheet calls it "I"), this handler masks it off
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix16(y, x) = m_tmp_bitmap.pix16(y, x) & 7;
+			bitmap.pix(y, x) = m_tmp_bitmap.pix(y, x) & 7;
 
 	return 0;
 }

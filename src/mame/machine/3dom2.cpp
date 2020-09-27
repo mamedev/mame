@@ -1336,9 +1336,9 @@ uint32_t m2_vdu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				for (uint32_t ys = vdouble ? 2 : 1; ys > 0; --ys)
 				{
 					if (hdouble)
-						draw_scanline_double(&bitmap.pix32(v, 0), srclower, srcupper);
+						draw_scanline_double(&bitmap.pix(v, 0), srclower, srcupper);
 					else
-						draw_scanline(&bitmap.pix32(v, 0), srclower, srcupper);
+						draw_scanline(&bitmap.pix(v, 0), srclower, srcupper);
 
 					++v;
 				}
@@ -1352,7 +1352,7 @@ uint32_t m2_vdu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			// Blank this block of lines if DMA is disabled
 			while (lines--)
 			{
-				uint32_t *dst = &bitmap.pix32(v, cliprect.min_x);
+				uint32_t *dst = &bitmap.pix(v, cliprect.min_x);
 
 				for (uint32_t x = cliprect.min_x; x <= cliprect.max_x; ++x)
 					*dst++ = rgb_t::black();

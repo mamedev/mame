@@ -1563,24 +1563,22 @@ uint32_t apollo_graphics_15i::screen_update(screen_device &screen, bitmap_rgb32 
 
 void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *source_ptr = m_image_memory.get();
-	int x, y;
-	uint16_t data, mask;
-	uint16_t inverse = (m_cr1 & CR1_INV) ? 0xffff : 0;
+	uint16_t const *source_ptr = m_image_memory.get();
+	uint16_t const inverse = (m_cr1 & CR1_INV) ? 0xffff : 0;
 
 	MLOG1(("screen_update1: size=%0x rowpixels=%d", m_image_memory_size, bitmap.rowpixels()));
 
 	if ((m_cr1 & CR1_DISP_EN) == 0)
 	{
 		// display is disabled
-		for (y = 0; y < m_height; y++)
+		for (int y = 0; y < m_height; y++)
 		{
 			int dest = 0;
-			for (x = 0; x < m_width; x += 16)
+			for (int x = 0; x < m_width; x += 16)
 			{
-				for (mask = 0x8000; mask; mask >>= 1)
+				for (uint16_t mask = 0x8000; mask; mask >>= 1)
 				{
-					bitmap.pix32(y, dest++) = 0;
+					bitmap.pix(y, dest++) = 0;
 				}
 			}
 			source_ptr += (m_buffer_width - m_width) / 16;
@@ -1588,23 +1586,24 @@ void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &
 	}
 	else if (m_n_planes == 4)
 	{
-		for (y = 0; y < m_height; y++)
+		for (int y = 0; y < m_height; y++)
 		{
 			int dest = 0;
-			for (x = 0; x < m_width; x += 16)
+			for (int x = 0; x < m_width; x += 16)
 			{
 				uint16_t data0 = source_ptr[0];
 				uint16_t data1 = source_ptr[m_image_plane_size];
 				uint16_t data2 = source_ptr[m_image_plane_size * 2];
 				uint16_t data3 = source_ptr[m_image_plane_size * 3];
 				source_ptr++;
-				for (mask = 0x8000; mask; mask >>= 1)
+				for (uint16_t mask = 0x8000; mask; mask >>= 1)
 				{
+					uint16_t data;
 					data = (data0 & mask) ? 1 : 0;
 					data |= (data1 & mask) ? 2 : 0;
 					data |= (data2 & mask) ? 4 : 0;
 					data |= (data3 & mask) ? 8 : 0;
-					bitmap.pix32(y, dest++) = m_color_lookup_table[data];
+					bitmap.pix(y, dest++) = m_color_lookup_table[data];
 				}
 			}
 			source_ptr += (m_buffer_width - m_width) / 16;
@@ -1612,10 +1611,10 @@ void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &
 	}
 	else if (m_n_planes == 8)
 	{
-		for (y = 0; y < m_height; y++)
+		for (int y = 0; y < m_height; y++)
 		{
 			int dest = 0;
-			for (x = 0; x < m_width; x += 16)
+			for (int x = 0; x < m_width; x += 16)
 			{
 				uint16_t data0 = source_ptr[0];
 				uint16_t data1 = source_ptr[m_image_plane_size];
@@ -1626,8 +1625,9 @@ void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &
 				uint16_t data6 = source_ptr[m_image_plane_size * 6];
 				uint16_t data7 = source_ptr[m_image_plane_size * 7];
 				source_ptr++;
-				for (mask = 0x8000; mask; mask >>= 1)
+				for (uint16_t mask = 0x8000; mask; mask >>= 1)
 				{
+					uint16_t data;
 					data = (data0 & mask) ? 1 : 0;
 					data |= (data1 & mask) ? 2 : 0;
 					data |= (data2 & mask) ? 4 : 0;
@@ -1636,7 +1636,7 @@ void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &
 					data |= (data5 & mask) ? 0x20 : 0;
 					data |= (data6 & mask) ? 0x40 : 0;
 					data |= (data7 & mask) ? 0x80 : 0;
-					bitmap.pix32(y, dest++) = m_bt458->get_rgb(data);
+					bitmap.pix(y, dest++) = m_bt458->get_rgb(data);
 				}
 			}
 			source_ptr += (m_buffer_width - m_width) / 16;
@@ -1644,15 +1644,15 @@ void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &
 	}
 	else // m_n_planes == 1
 	{
-		for (y = 0; y < m_height; y++)
+		for (int y = 0; y < m_height; y++)
 		{
 			int dest = 0;
-			for (x = 0; x < m_width; x += 16)
+			for (int x = 0; x < m_width; x += 16)
 			{
-				data = *source_ptr++ ^ inverse;
-				for (mask = 0x8000; mask; mask >>= 1)
+				uint16_t const data = *source_ptr++ ^ inverse;
+				for (uint16_t mask = 0x8000; mask; mask >>= 1)
 				{
-					bitmap.pix32(y, dest++) = data & mask ? 0 : 0x00ffffff;
+					bitmap.pix(y, dest++) = data & mask ? 0 : 0x00ffffff;
 				}
 			}
 			source_ptr += (m_buffer_width - m_width) / 16;

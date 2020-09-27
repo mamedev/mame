@@ -1095,7 +1095,6 @@ uint32_t victory_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	int bgcollmask = (m_video_control & 4) ? 4 : 7;
 	int count = 0;
-	int x, y;
 
 	/* copy the palette from palette RAM */
 	set_palette();
@@ -1105,15 +1104,15 @@ uint32_t victory_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	update_background();
 
 	/* blend the bitmaps and do collision detection */
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *scanline = &bitmap.pix16(y);
+		uint16_t *scanline = &bitmap.pix(y);
 		uint8_t sy = m_scrolly + y;
 		uint8_t *fg = &m_fgbitmap[y * 256];
 		uint8_t *bg = &m_bgbitmap[sy * 256];
 
 		/* do the blending */
-		for (x = 0; x < 256; x++)
+		for (int x = 0; x < 256; x++)
 		{
 			int fpix = *fg++;
 			int bpix = bg[(x + m_scrollx) & 255];

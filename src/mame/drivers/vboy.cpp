@@ -227,7 +227,7 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 				{
 					uint8_t const col = (pal >> (dat * 2)) & 3;
 
-					bitmap.pix16((res_y), (res_x)) = m_palette->pen(col);
+					bitmap.pix((res_y), (res_x)) = m_palette->pen(col);
 				}
 			}
 		}
@@ -288,9 +288,8 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
 {
 //  g_profiler.start(PROFILER_USER2);
-	int x,y;
 
-	for(y=0;y<=h;y++)
+	for(int y=0;y<=h;y++)
 	{
 		int32_t y1 = (y+gy);
 
@@ -299,7 +298,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 
 		int src_y = y+my;
 
-		for(x=0;x<=w;x++)
+		for(int x=0;x<=w;x++)
 		{
 			int32_t x1 = (x+gx);
 
@@ -336,7 +335,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 			}
 
 			if(pix != -1)
-				bitmap.pix16(y1, x1) = m_palette->pen(pix & 3);
+				bitmap.pix(y1, x1) = m_palette->pen(pix & 3);
 		}
 	}
 //  g_profiler.stop();
@@ -346,9 +345,8 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
 {
 //  g_profiler.start(PROFILER_USER3);
-	int x,y;
 
-	for(y=0;y<=h;y++)
+	for(int y=0;y<=h;y++)
 	{
 		float h_skw = (int16_t)READ_BGMAP(param_base + (y*8+0)) / 8.0;
 		float prlx = (int16_t)READ_BGMAP(param_base + (y*8+1)) / 8.0;
@@ -358,7 +356,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		h_skw += right ? -prlx : prlx;
 
-		for(x=0;x<=w;x++)
+		for(int x=0;x<=w;x++)
 		{
 			int32_t src_x,src_y;
 			int16_t y1 = (y+gy);
@@ -381,7 +379,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			if(pix != -1)
 				if (cliprect.contains(x1, y1))
-					bitmap.pix16(y1, x1) = m_palette->pen(pix & 3);
+					bitmap.pix(y1, x1) = m_palette->pen(pix & 3);
 		}
 	}
 //  g_profiler.stop();
@@ -421,7 +419,6 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 	uint16_t param_base = READ_WORLD(num+9) & 0xfff0;
 	uint16_t ovr_char = READ_BGMAP(READ_WORLD(num+10));
 	uint8_t bg_map_num = def & 0x0f;
-	int i;
 
 	if(end)
 		return 1;
@@ -458,21 +455,19 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 	}
 	else if (mode==3) // OBJ Mode
 	{
-		int start_offs, end_offs;
-
 		if(cur_spt == -1)
 		{
 			popmessage("Cur spt used with -1 pointer!");
 			return 0;
 		}
 
-		start_offs = m_vip_regs.SPT[cur_spt];
+		int start_offs = m_vip_regs.SPT[cur_spt];
 
-		end_offs = 0x3ff;
+		int end_offs = 0x3ff;
 		if(cur_spt != 0)
 			end_offs = m_vip_regs.SPT[cur_spt-1];
 
-		i = start_offs;
+		int i = start_offs;
 		do
 		{
 			uint16_t start_ndx = i * 4;
@@ -489,12 +484,12 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 			if(right && jron)
 				put_obj(bitmap, cliprect, (jx+jp) & 0x1ff, jy, val & 0x3fff, m_vip_regs.JPLT[(val>>14) & 3]);
 
-			i --;
+			i--;
 			i &= 0x3ff;
 		}while(i != end_offs);
 
 		if((lon && !right) || (ron && right))
-			cur_spt --;
+			cur_spt--;
 	}
 
 	return 0;
@@ -514,21 +509,15 @@ uint32_t vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16
 
 	if(0)
 	{
-		int x,y;
-
-		for(y=0;y<224;y++)
+		for(int y=0;y<224;y++)
 		{
-			for(x=0;x<384;x++)
+			for(int x=0;x<384;x++)
 			{
-				uint8_t pen;
-				uint8_t pix;
-				int yi;
+				uint8_t pen = m_l_frame_1[(x*0x40)+(y >> 2)];
+				int yi = ((y & 0x3)*2);
+				uint8_t pix = (pen >> yi) & 3;
 
-				pen = m_l_frame_1[(x*0x40)+(y >> 2)];
-				yi = ((y & 0x3)*2);
-				pix = (pen >> yi) & 3;
-
-				bitmap.pix16(y, x) = m_palette->pen(pix & 3);
+				bitmap.pix(y, x) = m_palette->pen(pix & 3);
 			}
 		}
 	}

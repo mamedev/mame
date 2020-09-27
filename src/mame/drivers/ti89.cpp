@@ -498,19 +498,18 @@ void ti68k_state::machine_reset()
 uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* preliminary implementation, doesn't use the contrast value */
-	uint8_t width = screen.width();
-	uint8_t height = screen.height();
-	uint8_t x, y, b;
+	uint8_t const width = screen.width();
+	uint8_t const height = screen.height();
 
 	if (!m_lcd_on || !m_lcd_base)
 		bitmap.fill(0);
 	else
-		for (y = 0; y < height; y++)
-			for (x = 0; x < width / 8; x++)
+		for (uint8_t y = 0; y < height; y++)
+			for (uint8_t x = 0; x < width / 8; x++)
 			{
 				uint8_t s_byte= m_maincpu->space(AS_PROGRAM).read_byte(m_lcd_base + y * (width/8) + x);
-				for (b = 0; b<8; b++)
-					bitmap.pix16(y, x * 8 + (7 - b)) = BIT(s_byte, b);
+				for (uint8_t b = 0; b<8; b++)
+					bitmap.pix(y, x * 8 + (7 - b)) = BIT(s_byte, b);
 			}
 
 	return 0;

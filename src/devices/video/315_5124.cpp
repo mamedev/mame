@@ -1723,8 +1723,8 @@ void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, in
 
 void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line)
 {
-	u32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-	u8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+	u32 *const p_bitmap = &m_tmpbitmap.pix(pixel_plot_y + line, pixel_offset_x);
+	u8  *const p_y1 = &m_y1_bitmap.pix(pixel_plot_y + line, pixel_offset_x);
 	int x = 0;
 
 	if (m_vdp_mode == 4 && BIT(m_reg[0x00], 5))
@@ -1755,8 +1755,8 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 	}
 	else
 	{
-		u32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-		u8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+		u32 *const p_bitmap = &m_tmpbitmap.pix(pixel_plot_y + line, pixel_offset_x);
+		u8  *const p_y1 = &m_y1_bitmap.pix(pixel_plot_y + line, pixel_offset_x);
 		int x = 0;
 
 		/* border on left side of the GG active screen */

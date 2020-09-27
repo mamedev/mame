@@ -91,7 +91,7 @@ void ppu_sh6578_device::scanline_increment_fine_ycounter()
 void ppu_sh6578_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
 	uint8_t palval = m_palette_ram[(pixel_data | color << 2)] & 0x3f;
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = m_nespens[palval];
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = m_nespens[palval];
 }
 
 void ppu_sh6578_device::read_tile_plane_data(int address, int color)
@@ -193,7 +193,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 
 	/* set up dest */
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	uint32_t* dest = &bitmap.pix32(m_scanline, start_x);
+	uint32_t* dest = &bitmap.pix(m_scanline, start_x);
 
 	m_tilecount = 0;
 
@@ -246,7 +246,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap.pix32(m_scanline);
+		dest = &bitmap.pix(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;

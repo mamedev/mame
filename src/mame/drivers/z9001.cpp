@@ -175,23 +175,22 @@ void z9001_state::machine_start()
 
 uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,col,fg,bg;
-	uint16_t sy=0,ma=0,x;
+	uint16_t sy=0,ma=0;
 	m_framecnt++;
 
-	for(y = 0; y < 24; y++ )
+	for (uint8_t y = 0; y < 24; y++ )
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 40; x++)
+			for (uint16_t x = ma; x < ma + 40; x++)
 			{
-				chr = m_p_videoram[x]; // get char in videoram
-				gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
-				col = m_p_colorram[x];
-				fg = col>>4;
-				bg = col&15;
+				uint8_t chr = m_p_videoram[x]; // get char in videoram
+				uint8_t gfx = m_p_chargen[(chr<<3) | ra]; // get dot pattern in chargen
+				uint8_t col = m_p_colorram[x];
+				uint8_t fg = col>>4;
+				uint8_t bg = col&15;
 
 				/* Check for flashing - swap bg & fg */
 				if ((BIT(col, 7)) && (m_framecnt & 0x10))

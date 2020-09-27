@@ -291,12 +291,12 @@ WRITE_LINE_MEMBER(bking_state::screen_vblank_bking)
 		m_bg_tilemap->set_scrolly(0, 0);
 
 		// check for collision
-		const uint8_t* colmask = memregion("user1")->base() + 8 * m_hit;
+		uint8_t const *const colmask = memregion("user1")->base() + 8 * m_hit;
 
 		for (int y = rect.min_y; y <= rect.max_y; y++)
 		{
-			const uint16_t* p0 = &m_colmap_bg.pix16(y);
-			const uint16_t* p1 = &m_colmap_ball.pix16(y);
+			uint16_t const *const p0 = &m_colmap_bg.pix(y);
+			uint16_t const *const p1 = &m_colmap_ball.pix(y);
 
 			for (int x = rect.min_x; x <= rect.max_x; x++)
 			{

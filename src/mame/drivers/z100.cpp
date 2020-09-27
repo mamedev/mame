@@ -309,7 +309,7 @@ void z100_state::memory_ctrl_w(uint8_t data)
 
 MC6845_UPDATE_ROW(z100_state::update_row)
 {
-	uint32_t *const pix = &bitmap.pix32(y);
+	uint32_t *const pix = &bitmap.pix(y);
 	const uint16_t amask = m_vram_config->read() ? 0xfff : 0x7ff;
 
 	for (int x = 0; x < x_count; x++)

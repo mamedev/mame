@@ -417,7 +417,7 @@ uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					int color = BIT(gfx, 7 - b);
 
-					bitmap.pix32((y * 10) + ra, (x * 8) + b) = pen[color];
+					bitmap.pix((y * 10) + ra, (x * 8) + b) = pen[color];
 				}
 			}
 		}

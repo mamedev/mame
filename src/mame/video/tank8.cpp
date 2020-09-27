@@ -195,8 +195,6 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 	// on falling edge
 	if (!state)
 	{
-		int x;
-		int y;
 		const rectangle &visarea = m_screen->visible_area();
 
 		m_tilemap->draw(*m_screen, m_helper1, visarea, 0, 0);
@@ -207,21 +205,19 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 		draw_sprites(m_helper2, visarea);
 		draw_bullets(m_helper3, visarea);
 
-		for (y = visarea.top(); y <= visarea.bottom(); y++)
+		for (int y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			int _state = 0;
 
-			const uint16_t* p1 = &m_helper1.pix16(y);
-			const uint16_t* p2 = &m_helper2.pix16(y);
-			const uint16_t* p3 = &m_helper3.pix16(y);
+			uint16_t const *const p1 = &m_helper1.pix(y);
+			uint16_t const *const p2 = &m_helper2.pix(y);
+			uint16_t const *const p3 = &m_helper3.pix(y);
 
 			if ((m_screen->frame_number() ^ y) & 1)
 				continue; /* video display is interlaced */
 
-			for (x = visarea.left(); x <= visarea.right(); x++)
+			for (int x = visarea.left(); x <= visarea.right(); x++)
 			{
-				uint8_t index;
-
 				/* neither wall nor mine */
 				if ((p1[x] != 0x11) && (p1[x] != 0x13))
 				{
@@ -246,6 +242,7 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 				if (_state)
 					continue;
 
+				uint8_t index;
 				if (p3[x] != 8)
 				{
 					index = ((p3[x] & ~0x01) >> 1) | 0x18;

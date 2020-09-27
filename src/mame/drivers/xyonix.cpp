@@ -197,10 +197,10 @@ MC6845_UPDATE_ROW( xyonix_state::crtc_update_row )
 		uint16_t data = m_gfx->base()[0x8000 | tile] << 8 | m_gfx->base()[tile];
 
 		// draw 4 pixels
-		bitmap.pix32(y, i * 4 + 0) = pen[(attr & 0xf0) | bitswap<4>(data, 4, 0, 12, 8)];
-		bitmap.pix32(y, i * 4 + 1) = pen[(attr & 0xf0) | bitswap<4>(data, 5, 1, 13, 9)];
-		bitmap.pix32(y, i * 4 + 2) = pen[(attr & 0xf0) | bitswap<4>(data, 6, 2, 14, 10)];
-		bitmap.pix32(y, i * 4 + 3) = pen[(attr & 0xf0) | bitswap<4>(data, 7, 3, 15, 11)];
+		bitmap.pix(y, i * 4 + 0) = pen[(attr & 0xf0) | bitswap<4>(data, 4, 0, 12, 8)];
+		bitmap.pix(y, i * 4 + 1) = pen[(attr & 0xf0) | bitswap<4>(data, 5, 1, 13, 9)];
+		bitmap.pix(y, i * 4 + 2) = pen[(attr & 0xf0) | bitswap<4>(data, 6, 2, 14, 10)];
+		bitmap.pix(y, i * 4 + 3) = pen[(attr & 0xf0) | bitswap<4>(data, 7, 3, 15, 11)];
 	}
 }
 #endif

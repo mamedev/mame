@@ -775,7 +775,7 @@ void jaguar_state::scanline_update(int param)
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
 	{
-		uint32_t *dest = &m_screen_bitmap.pix32(vc >> 1);
+		uint32_t *dest = &m_screen_bitmap.pix(vc >> 1);
 		int maxx = visarea.right();
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
 		uint16_t x,scanline[760];

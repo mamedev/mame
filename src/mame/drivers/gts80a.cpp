@@ -430,10 +430,10 @@ uint32_t caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind1
 		{
 			uint8_t pix = m_vram[count];
 
-			bitmap.pix16(y, x+0) = (pix >> 6)&0x3;
-			bitmap.pix16(y, x+1) = (pix >> 4)&0x3;
-			bitmap.pix16(y, x+2) = (pix >> 2)&0x3;
-			bitmap.pix16(y, x+3) = (pix >> 0)&0x3;
+			bitmap.pix(y, x+0) = (pix >> 6)&0x3;
+			bitmap.pix(y, x+1) = (pix >> 4)&0x3;
+			bitmap.pix(y, x+2) = (pix >> 2)&0x3;
+			bitmap.pix(y, x+3) = (pix >> 0)&0x3;
 
 			count++;
 		}

@@ -243,13 +243,12 @@ void k1ge_device::draw_sprite_plane( uint16_t *p, uint16_t priority, int line, i
 
 void k1ge_device::draw( int line )
 {
-	uint16_t *p = &m_bitmap->pix16(line);
+	uint16_t *const p = &m_bitmap->pix(line);
 	uint16_t oowcol = m_vram[0x012] & 0x07;
-	int i;
 
 	if ( line < m_wba_v || line >= m_wba_v + m_wsi_v )
 	{
-		for( i = 0; i < 160; i++ )
+		for( int i = 0; i < 160; i++ )
 		{
 			p[i] = oowcol;
 		}
@@ -258,7 +257,7 @@ void k1ge_device::draw( int line )
 	{
 		uint16_t col = ( ( m_vram[0x118] & 0xc0 ) == 0x80 ) ? m_vram[0x118] & 0x07 : 0;
 
-		for ( i = 0; i < 160; i++ )
+		for ( int i = 0; i < 160; i++ )
 			p[i] = col;
 
 		if ( m_vram[0x030] & 0x80 )
@@ -296,12 +295,12 @@ void k1ge_device::draw( int line )
 			draw_sprite_plane( p, 3, line, m_vram[0x020], m_vram[0x021] );
 		}
 
-		for( i = 0; i < m_wba_h; i++ )
+		for( int i = 0; i < m_wba_h; i++ )
 		{
 			p[i] = oowcol;
 		}
 
-		for( i = m_wba_h + m_wsi_h; i < 160; i++ )
+		for( int i = m_wba_h + m_wsi_h; i < 160; i++ )
 		{
 			p[i] = oowcol;
 		}
@@ -605,17 +604,16 @@ void k2ge_device::k1ge_draw_sprite_plane( uint16_t *p, uint16_t priority, int li
 
 void k2ge_device::draw( int line )
 {
-	uint16_t *p = &m_bitmap->pix16(line);
+	uint16_t *const p = &m_bitmap->pix(line);
 	uint16_t col = 0;
 	uint16_t oowcol;
-	int i;
 
 	oowcol = ( m_vram[0x012] & 0x07 ) * 2;
 	oowcol = m_vram[0x3f0 + oowcol ] | ( m_vram[0x3f1 + oowcol ] << 8 );
 
 	if ( line < m_wba_v || line >= m_wba_v + m_wsi_v )
 	{
-		for( i = 0; i < 160; i++ )
+		for( int i = 0; i < 160; i++ )
 		{
 			p[i] = oowcol;
 		}
@@ -630,7 +628,7 @@ void k2ge_device::draw( int line )
 		col = m_vram[0x3e0 + col ] | ( m_vram[0x3e1 + col ] << 8 );
 
 		/* Set the bacground color */
-		for ( i = 0; i < 160; i++ )
+		for ( int i = 0; i < 160; i++ )
 		{
 			p[i] = col;
 		}
@@ -712,12 +710,12 @@ void k2ge_device::draw( int line )
 			}
 		}
 
-		for ( i = 0; i < m_wba_h; i++ )
+		for ( int i = 0; i < m_wba_h; i++ )
 		{
 			p[i] = oowcol;
 		}
 
-		for ( i = m_wba_h + m_wsi_h; i < 160; i++ )
+		for ( int i = m_wba_h + m_wsi_h; i < 160; i++ )
 		{
 			p[i] = oowcol;
 		}

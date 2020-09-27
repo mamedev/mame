@@ -155,7 +155,7 @@ inline void suprloco_state::draw_pixel(bitmap_ind16 &bitmap,const rectangle &cli
 	}
 
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = color;
+		bitmap.pix(y, x) = color;
 }
 
 

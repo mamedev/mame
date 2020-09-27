@@ -267,7 +267,7 @@ I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
 		gfx ^= 0xff;
 
 	for(u8 i=0;i<7;i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 6-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 6-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 static constexpr rgb_t argo_pens[3] =

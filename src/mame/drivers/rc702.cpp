@@ -281,13 +281,13 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 		gfx ^= 0xff;
 
 	// Highlight not used
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 1) ? 1 : 0];
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 2) ? 1 : 0];
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 3) ? 1 : 0];
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 4) ? 1 : 0];
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 5) ? 1 : 0];
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 6) ? 1 : 0];
-	bitmap.pix32(y, x++) = palette[BIT(gfx, 7) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 1) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 2) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 3) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 4) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 5) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 6) ? 1 : 0];
+	bitmap.pix(y, x++) = palette[BIT(gfx, 7) ? 1 : 0];
 }
 
 // Baud rate generator. All inputs are 0.614MHz.

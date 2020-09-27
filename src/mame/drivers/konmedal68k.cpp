@@ -152,8 +152,8 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 	}
 	else
 	{
-		uint16_t *dst_ptr = &bitmap.pix16(cliprect.min_y);
-		int dst_pitch = bitmap.rowpixels();
+		uint16_t *dst_ptr = &bitmap.pix(cliprect.min_y);
+		int const dst_pitch = bitmap.rowpixels();
 
 		if ((mode & 0x01) == 0) // vertical gradient fill
 		{
@@ -173,7 +173,7 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 		{
 			pen_idx += cliprect.min_x;
 			dst_ptr += cliprect.min_x;
-			for(int y = cliprect.min_y; y<= cliprect.max_y; y++)
+			for (int y = cliprect.min_y; y<= cliprect.max_y; y++)
 			{
 				for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				{

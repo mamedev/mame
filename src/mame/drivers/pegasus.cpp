@@ -314,20 +314,19 @@ static const u8 mcm6571a_shift[] =
 
 u32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 y,ra,chr,gfx,inv;
-	u16 sy=0,ma=0,x;
+	u16 sy=0,ma=0;
 	bool pcg_mode = BIT(m_control_bits, 1);
 
-	for(y = 0; y < 16; y++ )
+	for(u8 y = 0; y < 16; y++ )
 	{
-		for(ra = 0; ra < 16; ra++ )
+		for(u8 ra = 0; ra < 16; ra++ )
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for(x = ma; x < ma + 32; x++ )
+			for(u16 x = ma; x < ma + 32; x++ )
 			{
-				inv = 0xff;
-				chr = m_vram[x];
+				u8 inv = 0xff;
+				u8 chr = m_vram[x];
 
 				if (BIT(chr, 7))
 				{
@@ -335,12 +334,12 @@ u32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					chr &= 0x7f;
 				}
 
+				u8 gfx;
 				if (pcg_mode)
 				{
 					gfx = m_pcg[(chr << 4) | ra] ^ inv;
 				}
-				else
-				if (mcm6571a_shift[chr])
+				else if (mcm6571a_shift[chr])
 				{
 					if (ra < 3)
 						gfx = inv;

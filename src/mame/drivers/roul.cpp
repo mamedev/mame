@@ -255,10 +255,9 @@ void roul_state::video_start()
 
 uint32_t roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i,j;
-	for (i = 0; i < 256; i++)
-		for (j = 0; j < 256; j++)
-			bitmap.pix16(j, i) = m_videobuf[j * 256 + 255 - i];
+	for (int i = 0; i < 256; i++)
+		for (int j = 0; j < 256; j++)
+			bitmap.pix(j, i) = m_videobuf[j * 256 + 255 - i];
 	return 0;
 }
 

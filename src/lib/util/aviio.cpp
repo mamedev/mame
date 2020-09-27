@@ -999,7 +999,7 @@ avi_file::error avi_stream::rgb32_compress_to_rgb(const bitmap_rgb32 &bitmap, st
 	/* compressed video */
 	for (y = 0; y < height; y++)
 	{
-		const std::uint32_t *source = &bitmap.pix32(y);
+		const std::uint32_t *source = &bitmap.pix(y);
 		std::uint8_t *dest = data + (m_height - 1 - y) * m_width * 3;
 
 		for (x = 0; x < width && dest < dataend; x++)
@@ -1062,7 +1062,7 @@ avi_file::error avi_stream::yuv_decompress_to_yuy16(const std::uint8_t *data, st
 	for (y = 0; y < m_height; y++)
 	{
 		const std::uint16_t *source = reinterpret_cast<const std::uint16_t *>(data) + y * m_width;
-		std::uint16_t *dest = &bitmap.pix16(y);
+		std::uint16_t *dest = &bitmap.pix(y);
 
 		/* switch off the compression */
 		switch (m_format)
@@ -1113,7 +1113,7 @@ avi_file::error avi_stream::yuy16_compress_to_yuy(const bitmap_yuy16 &bitmap, st
 	/* compressed video */
 	for (y = 0; y < m_height; y++)
 	{
-		const std::uint16_t *source = &bitmap.pix16(y);
+		const std::uint16_t *source = &bitmap.pix(y);
 		std::uint16_t *dest = reinterpret_cast<std::uint16_t *>(data) + y * m_width;
 
 		/* switch off the compression */
@@ -1298,7 +1298,7 @@ avi_file::error avi_stream::huffyuv_decompress_to_yuy16(const std::uint8_t *data
 	/* compressed video */
 	for (y = 0; y < m_height; y++)
 	{
-		std::uint16_t *dest = &bitmap.pix16(y);
+		std::uint16_t *dest = &bitmap.pix(y);
 
 		/* handle the first four bytes independently */
 		x = 0;
@@ -1386,8 +1386,8 @@ avi_file::error avi_stream::huffyuv_decompress_to_yuy16(const std::uint8_t *data
 	lastprevy = lastprevcb = lastprevcr = 0;
 	for (y = 0; y < m_height; y++)
 	{
-		std::uint16_t *prevrow = &bitmap.pix16(y - prevlines);
-		std::uint16_t *dest = &bitmap.pix16(y);
+		std::uint16_t *prevrow = &bitmap.pix(y - prevlines);
+		std::uint16_t *dest = &bitmap.pix(y);
 
 		/* handle the first four bytes independently */
 		x = 0;
@@ -1500,7 +1500,7 @@ avi_file::error avi_stream::uncompressed_rgb24_to_argb32(const std::uint8_t *dat
 	/* uncompressed video */
 	for (int y = 0; y < m_height; y++)
 	{
-		std::uint32_t *dest = &bitmap.pix32(y);
+		std::uint32_t *dest = &bitmap.pix(y);
 
 		/* loop over pixels */
 		for (int x = 0; x < m_width; x++)
@@ -1530,7 +1530,7 @@ avi_file::error avi_stream::uncompressed_yuv420p_to_argb32(const std::uint8_t *d
 	/* uncompressed video */
 	for (int y = 0; y < m_height; y++)
 	{
-		std::uint32_t *dest = &bitmap.pix32(y);
+		std::uint32_t *dest = &bitmap.pix(y);
 
 		/* loop over pixels */
 		for (int x = 0; x < m_width; x++)

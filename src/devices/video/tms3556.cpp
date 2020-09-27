@@ -573,12 +573,12 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 
 //  if (m_control_regs[4] & 0x??)
 //  {   // interlaced mode
-//      ln = &bmp->pix16(line, m_field);
+//      ln = &bmp->pix(line, m_field);
 //  }
 //  else
 	{   /* non-interlaced mode */
-		ln = &bmp.pix16(line);
-		ln2 = &bmp.pix16(line, 1);
+		ln = &bmp.pix(line);
+		ln2 = &bmp.pix(line, 1);
 		double_lines = 1;
 	}
 

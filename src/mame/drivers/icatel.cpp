@@ -228,12 +228,12 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
-		bitmap.pix16(y, pos*6 + x) = state;
+		bitmap.pix(y, pos*6 + x) = state;
 	}
 
 	if ( pos >= 64 && pos < 80 && line==0 )
 	{
-		bitmap.pix16(y+9,(pos-64)*6 + x) = state;
+		bitmap.pix(y+9,(pos-64)*6 + x) = state;
 	}
 }
 

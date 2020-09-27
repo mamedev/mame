@@ -324,24 +324,21 @@ void apple1_state::poll_keyboard()
 void apple1_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
 	int fg = 1, bg = 0;
-	int charcode = (code & 0x1f) | (((code ^ 0x40) & 0x40) >> 1);
+	int const charcode = (code & 0x1f) | (((code ^ 0x40) & 0x40) >> 1);
 
 	/* look up the character data */
-	chardata = &textgfx_data[(charcode * 8)];
+	uint8_t const *const chardata = &textgfx_data[(charcode * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (6-x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}

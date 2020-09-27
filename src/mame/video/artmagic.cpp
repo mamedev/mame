@@ -334,13 +334,12 @@ void artmagic_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 {
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
-	uint16_t *vram = address_to_vram(&offset);
-	uint32_t *dest = &bitmap.pix32(scanline);
-	const pen_t *pens = m_tlc34076->pens();
+	uint16_t const *vram = address_to_vram(&offset);
+	uint32_t *const dest = &bitmap.pix(scanline);
+	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;
-	int x;
 
 	vram += offset;
-	for (x = params->heblnk; x < params->hsblnk; x++)
+	for (int x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = pens[vram[coladdr++ & 0x1ff] & 0xff];
 }

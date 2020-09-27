@@ -54,7 +54,7 @@ u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	for (int y = 0; y < 1024; y++)
 		for (int x = 0; x < 1024; x++)
-			bitmap.pix32(y, x) = BIT(m_vram[y * (1024 / 16) + x / 16], 15 - (x % 16)) ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x) = BIT(m_vram[y * (1024 / 16) + x / 16], 15 - (x % 16)) ? rgb_t::white() : rgb_t::black();
 
 	return 0;
 }

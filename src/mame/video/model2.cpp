@@ -948,15 +948,14 @@ void model2_state::draw_framebuffer( bitmap_rgb32 &bitmap, const rectangle &clip
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int r,g,b;
 			int offset = (x + xoffs) + (y + yoffs)*512;
-			b = (fbvram[offset] >> 0) & 0x1f;
-			r = (fbvram[offset] >> 5) & 0x1f;
-			g = (fbvram[offset] >> 10) & 0x1f;
+			int b = (fbvram[offset] >> 0) & 0x1f;
+			int r = (fbvram[offset] >> 5) & 0x1f;
+			int g = (fbvram[offset] >> 10) & 0x1f;
 			r = pal5bit(r);
 			g = pal5bit(g);
 			b = pal5bit(b);
-			bitmap.pix32(y, x) = r << 16 | g << 8 | b;
+			bitmap.pix(y, x) = r << 16 | g << 8 | b;
 		}
 	}
 }

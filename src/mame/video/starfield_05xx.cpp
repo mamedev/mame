@@ -642,7 +642,7 @@ void starfield_05xx_device::draw_starfield(bitmap_ind16 &bitmap, const rectangle
 							color |= (m_lfsr<<2)&0x20;
 							color = (~color)&0x3F;
 
-							bitmap.pix16(y, dx) = STARS_COLOR_BASE + color;
+							bitmap.pix(y, dx) = STARS_COLOR_BASE + color;
 						}
 					}
 				}

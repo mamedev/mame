@@ -69,7 +69,7 @@ E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 
 	int y = com, x = seg2x[seg];
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = state;
+		bitmap.pix(y, x) = state;
 
 	// 2 rows of indicators:
 	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine

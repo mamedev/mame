@@ -42,7 +42,7 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 		return;
 
 	/* adjust the source base */
-	const u32 *sbase = &source.pix32(0);
+	const u32 *sbase = &source.pix(0);
 
 	/* determine the steppings */
 	u32 swidth = source.width();
@@ -599,11 +599,11 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 
 		if (s == 1)
 			for (int i = 0; i < w; ++i)
-				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
+				bitmap.pix(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
 
 		else if (s == 3)
 			for (int i = 0; i < w; ++i)
-				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+				bitmap.pix(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
 		else
 		{
 			osd_printf_error("Cannot read JPEG data from %s file.\n", fname);
@@ -726,7 +726,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, ++src)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					u8 const alpha(rgb_t(png.palette[*src * 3], png.palette[*src * 3 + 1], png.palette[*src * 3 + 2]).brightness());
 					accumalpha &= alpha;
@@ -741,7 +741,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, ++src)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					accumalpha &= *src;
 					dest = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
@@ -755,7 +755,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, src += 2)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					accumalpha &= *src;
 					dest = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
@@ -769,7 +769,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, src += 3)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					u8 const alpha(rgb_t(src[0], src[1], src[2]).brightness());
 					accumalpha &= alpha;
@@ -784,7 +784,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info &png)
 			{
 				for (u32 x = 0; width > x; ++x, src += 4)
 				{
-					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix32(y_trans(y), x_trans(x)) : bitmap.pix32(y, x));
+					bitmap_argb32::pixel_t &dest(png.interlace_method ? bitmap.pix(y_trans(y), x_trans(x)) : bitmap.pix(y, x));
 					rgb_t const pixel(dest);
 					u8 const alpha(rgb_t(src[0], src[1], src[2]).brightness());
 					accumalpha &= alpha;

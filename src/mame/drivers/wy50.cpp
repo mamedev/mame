@@ -158,11 +158,11 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 	const rgb_t fg = BIT(m_cur_attr, 0) || (prot && !m_rev_prot) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 	for (int i = 0; i < 9; i++)
 	{
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
 	if (!m_is_132)
-		bitmap.pix32(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? fg : rgb_t::black();
 }
 
 WRITE_LINE_MEMBER(wy50_state::mbc_attr_clock_w)

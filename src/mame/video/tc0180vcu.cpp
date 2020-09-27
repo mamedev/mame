@@ -285,7 +285,7 @@ uint16_t tc0180vcu_device::framebuffer_word_r(offs_t offset)
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
 
-	return (m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
+	return (m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 1);
 }
 
 void tc0180vcu_device::framebuffer_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -294,9 +294,9 @@ void tc0180vcu_device::framebuffer_word_w(offs_t offset, uint16_t data, uint16_t
 	int sx = 2 * (offset & 0xff);
 
 	if (ACCESSING_BITS_8_15)
-		m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) = data >> 8;
+		m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 0) = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1) = data & 0xff;
+		m_framebuffer[sy >> 8]->pix(sy & 0xff, sx + 1) = data & 0xff;
 }
 
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
@@ -521,7 +521,6 @@ void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	rectangle myclip = cliprect;
-	int x, y;
 
 g_profiler.start(PROFILER_USER1);
 
@@ -538,14 +537,12 @@ g_profiler.start(PROFILER_USER1);
 		if (m_video_control & 0x10)   /*flip screen*/
 		{
 			/*popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
-			for (y = myclip.min_y; y <= myclip.max_y; y++)
+			for (int y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
-				uint16_t *dst;
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.max_x);
 
-				dst = &bitmap.pix16(bitmap.height()-1-y, myclip.max_x);
-
-				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.min_x; x <= myclip.max_x; x++)
 				{
 					uint16_t c = *src++;
 
@@ -558,12 +555,12 @@ g_profiler.start(PROFILER_USER1);
 		}
 		else
 		{
-			for (y = myclip.min_y; y <= myclip.max_y; y++)
+			for (int y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
-				uint16_t *dst = &bitmap.pix16(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix(y, myclip.min_x);
 
-				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.min_x; x <= myclip.max_x; x++)
 				{
 					uint16_t c = *src++;
 
@@ -580,14 +577,12 @@ g_profiler.start(PROFILER_USER1);
 		if (m_video_control & 0x10)   /*flip screen*/
 		{
 			/*popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
-			for (y = myclip.min_y ;y <= myclip.max_y; y++)
+			for (int y = myclip.min_y ;y <= myclip.max_y; y++)
 			{
-				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
-				uint16_t *dst;
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.max_x);
 
-				dst = &bitmap.pix16(bitmap.height()-1-y, myclip.max_x);
-
-				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.min_x; x <= myclip.max_x; x++)
 				{
 					uint16_t c = *src++;
 
@@ -600,12 +595,12 @@ g_profiler.start(PROFILER_USER1);
 		}
 		else
 		{
-			for (y = myclip.min_y; y <= myclip.max_y; y++)
+			for (int y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
-				uint16_t *dst = &bitmap.pix16(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page]->pix(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix(y, myclip.min_x);
 
-				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.min_x; x <= myclip.max_x; x++)
 				{
 					uint16_t c = *src++;
 

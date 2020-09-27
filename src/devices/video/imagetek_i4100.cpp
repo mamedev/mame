@@ -923,8 +923,8 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &
 				for (int y = sy; y < ey; y++)
 				{
 					const u8 *source = source_base + (y_index >> 16) * width;
-					u32 *dest = &bitmap.pix32(y);
-					u8 *pri = &priority_bitmap.pix8(y);
+					u32 *dest = &bitmap.pix(y);
+					u8 *pri = &priority_bitmap.pix(y);
 					int x_index = x_index_base;
 					for (int x = sx; x < ex; x++)
 					{
@@ -1200,8 +1200,8 @@ void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bi
 		int const srctilerow = srcline >> tileshift;
 		srcline &= tilemask;
 
-		u32 *dst = &bitmap.pix32(y);
-		u8 *priority_baseaddr = &priority_bitmap.pix8(y);
+		u32 *dst = &bitmap.pix(y);
+		u8 *priority_baseaddr = &priority_bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

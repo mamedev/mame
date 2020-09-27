@@ -357,9 +357,9 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 			{
 				for (int y = sy; y < ey; y++)
 				{
-					const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-					u16 *dest = &dest_bmp.pix16(y);
-					u8 *pri = &priority_bitmap.pix8(y);
+					u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+					u16 *const dest = &dest_bmp.pix(y);
+					u8 *const pri = &priority_bitmap.pix(y);
 
 					int x_index = x_index_base;
 					for (int x = sx; x < ex; x++)
@@ -419,9 +419,9 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 			{
 				for (int y = sy; y < ey; y++)
 				{
-					const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-					u16 *dest = &dest_bmp.pix16(y);
-					u8 *pri = &priority_bitmap.pix8(y);
+					u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+					u16 *const dest = &dest_bmp.pix(y);
+					u8 *const pri = &priority_bitmap.pix(y);
 
 					int x_index = x_index_base;
 					for (int x = sx; x < ex; x++)

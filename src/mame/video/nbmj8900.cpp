@@ -188,13 +188,13 @@ void nbmj8900_state::vramflip(int vram)
 void nbmj8900_state::update_pixel0(int x, int y)
 {
 	uint8_t color = m_videoram0[(y * m_screen_width) + x];
-	m_tmpbitmap0.pix16(y, x) = m_palette->pen(color);
+	m_tmpbitmap0.pix(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::update_pixel1(int x, int y)
 {
 	uint8_t color = m_videoram1[(y * m_screen_width) + x];
-	m_tmpbitmap1.pix16(y, x) = m_palette->pen(color);
+	m_tmpbitmap1.pix(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

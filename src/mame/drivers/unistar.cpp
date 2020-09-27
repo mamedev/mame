@@ -136,7 +136,7 @@ void unistar_state::unistar_palette(palette_device &palette) const
 I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 {
 	// This code just a guess, so that we can see something
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = m_chargen[(linecount & 15) | (charcode << 4)];
 
 	if (vsp)
@@ -149,7 +149,7 @@ I8275_DRAW_CHARACTER_MEMBER(unistar_state::draw_character)
 		gfx ^= 0xff;
 
 	for(u8 i=0;i<8;i++)
-		bitmap.pix32(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
+		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }
 
 /* F4 Character Displayer */

@@ -216,20 +216,19 @@ void jr100_state::machine_reset()
 
 uint32_t jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool attr;
-	u8 y,ra,gfx,chr;
-	u16 x,sy=0,ma=0;
+	u16 sy=0,ma=0;
 
-	for (y = 0; y < 24; y++)
+	for (u8 y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (u8 ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
-			for (x = ma; x < ma + 32; x++)
+			uint16_t *p = &bitmap.pix(sy++);
+			for (u16 x = ma; x < ma + 32; x++)
 			{
-				chr = m_vram[x];
-				attr = BIT(chr, 7);
+				u8 chr = m_vram[x];
+				bool const attr = BIT(chr, 7);
 				chr &= 0x7f;
+				u8 gfx;
 				// ATTR is inverted for normal char or use PCG in case of CMODE1
 				if (m_use_pcg && attr && (chr < 32))
 					gfx = m_pcg[(chr<<3) | ra];

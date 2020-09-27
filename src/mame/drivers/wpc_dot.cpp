@@ -249,22 +249,21 @@ WRITE_LINE_MEMBER(wpc_dot_state::wpc_firq_w)
 
 uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,bit;
 	uint32_t offset = (m_wpc->get_visible_page() * 0x200);
-	uint32_t col;
 
-	for(y=0;y<32;y++)  // scanline
+	for(uint8_t y=0;y<32;y++)  // scanline
 	{
-		for(x=0;x<128;x+=8)  // column
+		for(uint8_t x=0;x<128;x+=8)  // column
 		{
-			for(bit=0;bit<8;bit++)  // bits
+			for(uint8_t bit=0;bit<8;bit++)  // bits
 			{
 				assert(offset >= 0 && offset < ARRAY_LENGTH(m_dmdram));
+				uint32_t col;
 				if(m_dmdram[offset] & (1<<bit))
 					col = rgb_t(0xff,0xaa,0x00);
 				else
 					col = rgb_t(0x00,0x00,0x00);
-				bitmap.pix32(y,x+bit) = col;
+				bitmap.pix(y,x+bit) = col;
 			}
 			offset++;
 		}

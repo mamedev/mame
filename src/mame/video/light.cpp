@@ -132,10 +132,10 @@ void light_video_device::device_reset()
 
 uint32_t light_video_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	const uint8_t *src = &m_framebuffer[0];
+	rgb_t const *const pens = m_palette->palette()->entry_list_raw();
+	uint8_t const *src = &m_framebuffer[0];
 	for (uint32_t y = 0; y < y_res; y++) {
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *dst = &bitmap.pix(y);
 		for (uint32_t x = 0; x < x_res; x++) {
 			*dst++ = pens[*src++];
 		}

@@ -450,7 +450,7 @@ u32 leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	/* for each scanline in the visible region */
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u16 *const dst = &bitmap.pix16(y);
+		u16 *const dst = &bitmap.pix(y);
 		u8 const *const fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */

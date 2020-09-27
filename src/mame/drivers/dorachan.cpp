@@ -74,8 +74,6 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
 {
 	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		uint8_t fore_color;
-
 		uint8_t x = offs >> 8 << 3;
 		uint8_t y = offs & 0xff;
 
@@ -84,6 +82,7 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
 
 		uint8_t data = m_videoram[offs];
 
+		uint8_t fore_color;
 		if (m_flip_screen)
 			fore_color = (m_colors[color_address] >> 3) & 0x07;
 		else
@@ -92,7 +91,7 @@ uint32_t dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rg
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t color = BIT(data, i) ? fore_color : 0;
-			bitmap.pix32(y, x++) = m_palette->pen_color(color);
+			bitmap.pix(y, x++) = m_palette->pen_color(color);
 		}
 	}
 

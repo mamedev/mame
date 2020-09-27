@@ -340,22 +340,19 @@ void alphatro_state::portf0_w(uint8_t data)
 
 MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 {
-	const rgb_t *pens = m_palette->palette()->entry_list_raw();
+	rgb_t const *const pens = m_palette->palette()->entry_list_raw();
 	bool palette = BIT(m_config->read(), 5);
 	if (y==0) m_flashcnt++;
-	bool inv;
-	u8 chr,gfx,attr,bg,fg;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x);
-		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
-		attr = m_p_videoram[mem | 0x800];
-		bg = (palette) ? 8 : attr & 7; // amber or RGB
-		fg = (palette) ? 0 : (attr & 0x38) >> 3;
+		bool inv = (x == cursor_x);
+		u16 mem = (ma + x) & 0x7ff;
+		u8 chr = m_p_videoram[mem];
+		u8 attr = m_p_videoram[mem | 0x800];
+		u8 bg = (palette) ? 8 : attr & 7; // amber or RGB
+		u8 fg = (palette) ? 0 : (attr & 0x38) >> 3;
 
 		if (BIT(attr, 7)) // reverse video
 		{
@@ -369,7 +366,7 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 		}
 
 		/* get pattern of pixels for that character scanline */
-		gfx = m_p_chargen[(chr<<4) | ra];
+		u8 gfx = m_p_chargen[(chr<<4) | ra];
 
 		if (inv)
 		{

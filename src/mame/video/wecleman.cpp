@@ -542,29 +542,21 @@ void wecleman_state::wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &c
 	};
 
 
-	const uint8_t *src_ptr;
-	const pen_t *pal_ptr, *rgb_ptr;
-
-	int scrollx, sy, sx;
-	int mdy, tdy, i;
-
-	rgb_ptr = m_palette->pens();
+	pen_t const *const rgb_ptr = m_palette->pens();
 
 	if (priority == 0x02)
 	{
 		// draw sky; each scanline is assumed to be dword aligned
-		for (sy=cliprect.min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
+		for (int sy=cliprect.min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
 		{
-			uint32_t *dst = &bitmap.pix32(sy+BMP_PAD, BMP_PAD);
-			uint32_t pix;
-			uint16_t road;
+			uint32_t *const dst = &bitmap.pix(sy+BMP_PAD, BMP_PAD);
 
-			road = m_roadram[sy];
+			uint16_t road = m_roadram[sy];
 			if ((road>>8) != 0x02) continue;
 
-			pix = rgb_ptr[(m_roadram[sy+(YSIZE*2)] & 0xf) + 0x7f0];
+			uint32_t pix = rgb_ptr[(m_roadram[sy+(YSIZE*2)] & 0xf) + 0x7f0];
 
-			for (sx = 0; sx < DST_WIDTH; sx++)
+			for (int sx = 0; sx < DST_WIDTH; sx++)
 				dst[sx] = pix;
 		}
 	}
@@ -573,23 +565,21 @@ void wecleman_state::wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &c
 		// draw road
 		pen_t road_rgb[48];
 
-		for (i=0; i<48; i++)
+		for (int i=0; i<48; i++)
 		{
 			int color = road_color[i];
 			road_rgb[i] = color ? rgb_ptr[color] : 0xffffffff;
 		}
 
-		for (sy=cliprect.min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
+		for (int sy=cliprect.min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
 		{
-			uint32_t *dst = &bitmap.pix32(sy+BMP_PAD, BMP_PAD);
-			uint32_t pix;
-			uint16_t road;
+			uint32_t *const dst = &bitmap.pix(sy+BMP_PAD, BMP_PAD);
 
-			road = m_roadram[sy];
+			uint16_t road = m_roadram[sy];
 			if ((road>>8) != 0x04) continue;
 			road &= YMASK;
 
-			src_ptr = m_gfxdecode->gfx(1)->get_data((road << 3));
+			uint8_t const *const src_ptr = m_gfxdecode->gfx(1)->get_data((road << 3));
 			m_gfxdecode->gfx(1)->get_data((road << 3) + 1);
 			m_gfxdecode->gfx(1)->get_data((road << 3) + 2);
 			m_gfxdecode->gfx(1)->get_data((road << 3) + 3);
@@ -597,20 +587,20 @@ void wecleman_state::wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &c
 			m_gfxdecode->gfx(1)->get_data((road << 3) + 5);
 			m_gfxdecode->gfx(1)->get_data((road << 3) + 6);
 			m_gfxdecode->gfx(1)->get_data((road << 3) + 7);
-			mdy = ((road * MIDCURB_DY) >> 8) * bitmap.rowpixels();
-			tdy = ((road * TOPCURB_DY) >> 8) * bitmap.rowpixels();
+			int mdy = ((road * MIDCURB_DY) >> 8) * bitmap.rowpixels();
+			int tdy = ((road * TOPCURB_DY) >> 8) * bitmap.rowpixels();
 
-			scrollx = m_roadram[sy+YSIZE] + (0x18 - 0xe00);
+			int scrollx = m_roadram[sy+YSIZE] + (0x18 - 0xe00);
 
-			pal_ptr = road_rgb + ((m_roadram[sy+(YSIZE*2)]<<3) & 8);
+			pen_t const *const pal_ptr = road_rgb + ((m_roadram[sy+(YSIZE*2)]<<3) & 8);
 
-			for (sx = 0; sx < DST_WIDTH; sx++, scrollx++)
+			for (int sx = 0; sx < DST_WIDTH; sx++, scrollx++)
 			{
 				if (scrollx >= 0 && scrollx < XSIZE)
 				{
 					pen_t temp;
 
-					pix = src_ptr[scrollx];
+					uint32_t pix = src_ptr[scrollx];
 					dst[sx] = pal_ptr[pix];
 
 					temp = pal_ptr[pix + 16];
@@ -643,45 +633,35 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 					int tmw_l2, int tmh_l2,     // tilemap width and height in log(2)
 					int alpha, int pal_offset ) // alpha(0-3f), # of color codes to shift
 {
-	const uint8_t *src_ptr;
-	uint16_t *tmap_ptr;
-	uint32_t *dst_base, *dst_ptr;
-	const pen_t *pal_base, *pal_ptr;
-
-	int tilew, tileh;
-	int tmskipx, tmskipy, tmscanx, tmmaskx, tmmasky;
-	int dx, dy;
-	int i, j, tx, ty;
-
 	if (alpha > 0x1f) return;
 
-	tilew = gfx->width();
-	tileh = gfx->height();
+	int const tilew = gfx->width();
+	int const tileh = gfx->height();
 
-	tmmaskx = (1<<tmw_l2) - 1;
-	tmmasky = (1<<tmh_l2) - 1;
+	int const tmmaskx = (1<<tmw_l2) - 1;
+	int const tmmasky = (1<<tmh_l2) - 1;
 
 	scrollx &= ((tilew<<tmw_l2) - 1);
 	scrolly &= ((tileh<<tmh_l2) - 1);
 
-	tmskipx = scrollx / tilew;
-	dx = -(scrollx & (tilew-1));
-	tmskipy = scrolly / tileh;
-	dy = -(scrolly & (tileh-1));
+	int tmskipx = scrollx / tilew;
+	int const dx = -(scrollx & (tilew-1));
+	int tmskipy = scrolly / tileh;
+	int const dy = -(scrolly & (tileh-1));
 
-	dst_base = &bitmap.pix32(y0+dy, x0+dx);
+	uint32_t *dst_base = &bitmap.pix(y0+dy, x0+dx);
 
-	pal_base = m_palette->pens() + pal_offset * gfx->granularity();
+	pen_t const *const pal_base = m_palette->pens() + pal_offset * gfx->granularity();
 
 	alpha <<= 6;
 
 	dst_base += 8;
-	for (i = 0; i < ycount; i++)
+	for (int i = 0; i < ycount; i++)
 	{
-		tmap_ptr = tm_base + ((tmskipy++ & tmmasky)<<tmw_l2);
-		tmscanx = tmskipx;
+		uint16_t const *const tmap_ptr = tm_base + ((tmskipy++ & tmmasky)<<tmw_l2);
+		int tmscanx = tmskipx;
 
-		for (j = 0; j < xcount; j++)
+		for (int j = 0; j < xcount; j++)
 		{
 			uint16_t tiledata = tmap_ptr[tmscanx++ & tmmaskx];
 
@@ -691,29 +671,28 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 			// Wec Le Mans specific: decodes tile color in EAX
 			uint16_t tile_color = ((tiledata >> 5) & 0x78) + (tiledata >> 12);
 
-			src_ptr = gfx->get_data(tile_index);
-			pal_ptr = pal_base + tile_color * gfx->granularity();
-			dst_ptr = dst_base + j * tilew;
+			uint8_t const *src_ptr = gfx->get_data(tile_index);
+			pen_t const *const pal_ptr = pal_base + tile_color * gfx->granularity();
+			uint32_t *dst_ptr = dst_base + j * tilew;
 
 			/* alpha case */
 			if (alpha > 0)
 			{
-				for (ty = 0; ty < tileh; ty++)
+				for (int ty = 0; ty < tileh; ty++)
 				{
-					for (tx = 0; tx < tilew; tx++)
+					for (int tx = 0; tx < tilew; tx++)
 					{
 						uint8_t srcpix = *src_ptr++;
 						pen_t srcrgb = pal_ptr[srcpix];
 						uint32_t dstrgb = dst_ptr[tx];
-						int sr, sg, sb, dr, dg, db;
 
-						sr = (srcrgb >> 3) & 0x1f;
-						sg = (srcrgb >> 11) & 0x1f;
-						sb = (srcrgb >> 19) & 0x1f;
+						int sr = (srcrgb >> 3) & 0x1f;
+						int sg = (srcrgb >> 11) & 0x1f;
+						int sb = (srcrgb >> 19) & 0x1f;
 
-						dr = (dstrgb >> 3) & 0x1f;
-						dg = (dstrgb >> 11) & 0x1f;
-						db = (dstrgb >> 19) & 0x1f;
+						int dr = (dstrgb >> 3) & 0x1f;
+						int dg = (dstrgb >> 11) & 0x1f;
+						int db = (dstrgb >> 19) & 0x1f;
 
 						dr = (m_t32x32pm[dr - sr + alpha] >> 5) + dr;
 						dg = (m_t32x32pm[dg - sg + alpha] >> 5) + dg;
@@ -728,9 +707,9 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 			/* non-alpha case */
 			else
 			{
-				for (ty = 0; ty < tileh; ty++)
+				for (int ty = 0; ty < tileh; ty++)
 				{
-					for (tx = 0; tx < tilew; tx++)
+					for (int tx = 0; tx < tilew; tx++)
 						dst_ptr[tx] = pal_ptr[*src_ptr++];
 					dst_ptr += bitmap.rowpixels();
 				}

@@ -1251,7 +1251,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	if (m_screen_disabled) /* screen is forced blank */
 		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
-			bitmap.pix32(0, x) = rgb_t::black();
+			bitmap.pix(0, x) = rgb_t::black();
 	else
 	{
 		uint8_t window_above[256];
@@ -1323,8 +1323,8 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				const int g = (c & 0x3e0) >> 5;
 				const int b = (c & 0x7c00) >> 10;
 
-				bitmap.pix32(0, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
-				bitmap.pix32(0, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix(0, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix(0, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 			else if (!blurring)
 			{
@@ -1337,8 +1337,8 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				const int b0 = (c0 & 0x7c00) >> 10;
 				const int b1 = (c1 & 0x7c00) >> 10;
 
-				bitmap.pix32(0, x * 2 + 0) = rgb_t(pal5bit(r0), pal5bit(g0), pal5bit(b0));
-				bitmap.pix32(0, x * 2 + 1) = rgb_t(pal5bit(r1), pal5bit(g1), pal5bit(b1));
+				bitmap.pix(0, x * 2 + 0) = rgb_t(pal5bit(r0), pal5bit(g0), pal5bit(b0));
+				bitmap.pix(0, x * 2 + 1) = rgb_t(pal5bit(r1), pal5bit(g1), pal5bit(b1));
 			}
 			else
 			{
@@ -1348,7 +1348,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				const int r0 = (c0 & 0x1f);
 				const int g0 = (c0 & 0x3e0) >> 5;
 				const int b0 = (c0 & 0x7c00) >> 10;
-				bitmap.pix32(0, x * 2 + 0) = rgb_t(pal5bit(r0), pal5bit(g0), pal5bit(b0));
+				bitmap.pix(0, x * 2 + 0) = rgb_t(pal5bit(r0), pal5bit(g0), pal5bit(b0));
 
 				prev = curr;
 				curr = luma[pixel(x, above, below, window_above, window_below)];
@@ -1357,7 +1357,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				const int r1 = (c1 & 0x1f);
 				const int g1 = (c1 & 0x3e0) >> 5;
 				const int b1 = (c1 & 0x7c00) >> 10;
-				bitmap.pix32(0, x * 2 + 1) = rgb_t(pal5bit(r1), pal5bit(g1), pal5bit(b1));
+				bitmap.pix(0, x * 2 + 1) = rgb_t(pal5bit(r1), pal5bit(g1), pal5bit(b1));
 
 				prev = curr;
 			}

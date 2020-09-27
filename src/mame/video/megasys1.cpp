@@ -334,17 +334,17 @@ void megasys1_state::monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask)
 void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
-	u16 colorbase = decodegfx->colorbase();
+	u16 const colorbase = decodegfx->colorbase();
 
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		u16* srcline = &m_sprite_buffer_bitmap.pix16(y);
-		u16* dstline = &bitmap.pix16(y);
-		u8 *prio = &screen.priority().pix8(y);
+		u16 const *const srcline = &m_sprite_buffer_bitmap.pix(y);
+		u16 *const dstline = &bitmap.pix(y);
+		u8 const *const prio = &screen.priority().pix(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			u16 pixel = srcline[x];
+			u16 const pixel = srcline[x];
 
 			if ((pixel & 0xf) != 0xf)
 			{
@@ -366,11 +366,11 @@ void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_i
 {
 	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
-		u16* srcline = &m_sprite_buffer_bitmap.pix16(y);
+		u16 *const srcline = &m_sprite_buffer_bitmap.pix(y);
 
 		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
-			u16 pixel = srcline[x];
+			u16 const pixel = srcline[x];
 			srcline[x] = pixel & 0x7fff; // wipe our 'drawn here' marker otherwise trails will always have priority over new sprites, which is incorrect.
 
 			// guess, very unclear from the video refernece we have, used when removing p47 trails
@@ -397,9 +397,9 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 	for (s32 y = 0; y < 16; y++, sy++, sx-=16)
 	{
-	//  u16 *dest = &bitmap.pix16(sy)+ sx;
-	//  u8 *prio = &screen.priority().pix8(sy) + sx;
-		u16* dest = &m_sprite_buffer_bitmap.pix16(sy)+ sx;
+	//  u16 *const dest = &bitmap.pix(sy)+ sx;
+	//  u8 *const prio = &screen.priority().pix(sy) + sx;
+		u16 *const dest = &m_sprite_buffer_bitmap.pix(sy)+ sx;
 
 		for (s32 x = 0; x < 16; x++, sx++)
 		{

@@ -108,7 +108,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( informer_207_100_state::crtc_addr )
 
 MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int x = 0; x < x_count; x++)
 	{
@@ -120,14 +120,14 @@ MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 			data = 0xff;
 
 		// draw 8 pixels of the character
-		bitmap.pix32(y, x * 8 + 7) = pen[BIT(data, 0)];
-		bitmap.pix32(y, x * 8 + 6) = pen[BIT(data, 1)];
-		bitmap.pix32(y, x * 8 + 5) = pen[BIT(data, 2)];
-		bitmap.pix32(y, x * 8 + 4) = pen[BIT(data, 3)];
-		bitmap.pix32(y, x * 8 + 3) = pen[BIT(data, 4)];
-		bitmap.pix32(y, x * 8 + 2) = pen[BIT(data, 5)];
-		bitmap.pix32(y, x * 8 + 1) = pen[BIT(data, 6)];
-		bitmap.pix32(y, x * 8 + 0) = pen[BIT(data, 7)];
+		bitmap.pix(y, x * 8 + 7) = pen[BIT(data, 0)];
+		bitmap.pix(y, x * 8 + 6) = pen[BIT(data, 1)];
+		bitmap.pix(y, x * 8 + 5) = pen[BIT(data, 2)];
+		bitmap.pix(y, x * 8 + 4) = pen[BIT(data, 3)];
+		bitmap.pix(y, x * 8 + 3) = pen[BIT(data, 4)];
+		bitmap.pix(y, x * 8 + 2) = pen[BIT(data, 5)];
+		bitmap.pix(y, x * 8 + 1) = pen[BIT(data, 6)];
+		bitmap.pix(y, x * 8 + 0) = pen[BIT(data, 7)];
 	}
 }
 

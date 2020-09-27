@@ -339,7 +339,7 @@ void mb88303_device::update_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipre
 					const uint32_t color = BIT(gfx[row], bit) ? 0xffffffff : 0;
 					if (!show_background() && !color)
 						continue;
-					bitmap.pix32(bitmap_y + row + m_vert_display_pos, bitmap_x + (6 - bit) + m_horiz_display_pos) = color;
+					bitmap.pix(bitmap_y + row + m_vert_display_pos, bitmap_x + (6 - bit) + m_horiz_display_pos) = color;
 				}
 			}
 		}

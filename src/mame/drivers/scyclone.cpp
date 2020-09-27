@@ -234,9 +234,9 @@ uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bit
 
 
 					if (y == star && star != 0 && noclipped)
-						bitmap.pix32(ypos, x) = paldata[7];
+						bitmap.pix(ypos, x) = paldata[7];
 					else
-						bitmap.pix32(ypos, x) = paldata[0];
+						bitmap.pix(ypos, x) = paldata[0];
 				}
 			}
 		}
@@ -273,13 +273,13 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 
 				uint8_t pal = get_bitmap_pixel(realx, realy);
 
-				if (pal) bitmap.pix32(y, (x*8)+i) = paldata[pal];
+				if (pal) bitmap.pix(y, (x*8)+i) = paldata[pal];
 
 				uint8_t pal2 = get_sprite_pixel(realx, realy);
 
 				if (pal2 & 0x3)
 				{
-					bitmap.pix32(y, (x*8)+i) = paldata[8+pal2];
+					bitmap.pix(y, (x*8)+i) = paldata[8+pal2];
 					if (pal == 0x7) m_hascollided = 1;
 				}
 			}

@@ -247,7 +247,7 @@ void s2636_device::render_next_line()
 
 	// pre-clear the line for convenience
 	rectangle const &vis_area = screen().visible_area();
-	uint16_t *const   row = &m_bitmap.pix16(m_screen_line);
+	uint16_t *const   row = &m_bitmap.pix(m_screen_line);
 	m_bitmap.plot_box(0, m_screen_line, m_bitmap.width(), 1, 0);
 
 	if ((vis_area.min_y > m_screen_line) || (vis_area.max_y < m_screen_line))

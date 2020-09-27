@@ -40,11 +40,7 @@ void fgoal_state::video_start()
 
 uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t* VRAM = m_video_ram;
-
-	int x;
-	int y;
-	int n;
+	uint8_t const *VRAM = m_video_ram;
 
 	/* draw color overlay foreground and background */
 
@@ -83,31 +79,31 @@ uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	/* the ball has a fixed color */
 
-	for (y = m_ypos; y < m_ypos + 8; y++)
+	for (int y = m_ypos; y < m_ypos + 8; y++)
 	{
-		for (x = m_xpos; x < m_xpos + 8; x++)
+		for (int x = m_xpos; x < m_xpos + 8; x++)
 		{
 			if (y < 256 && x < 256)
 			{
-				m_fgbitmap.pix16(y, x) = 128 + 16;
+				m_fgbitmap.pix(y, x) = 128 + 16;
 			}
 		}
 	}
 
 	/* draw bitmap layer */
 
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t* p = &bitmap.pix16(y);
+		uint16_t *const p = &bitmap.pix(y);
 
-		const uint16_t* FG = &m_fgbitmap.pix16(y);
-		const uint16_t* BG = &m_bgbitmap.pix16(y);
+		uint16_t const *const FG = &m_fgbitmap.pix(y);
+		uint16_t const *const BG = &m_bgbitmap.pix(y);
 
-		for (x = 0; x < 256; x += 8)
+		for (int x = 0; x < 256; x += 8)
 		{
 			uint8_t v = *VRAM++;
 
-			for (n = 0; n < 8; n++)
+			for (int n = 0; n < 8; n++)
 			{
 				if (v & (1 << n))
 				{

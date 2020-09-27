@@ -404,17 +404,15 @@ void fk1_state::machine_reset()
 
 uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t code;
-	int y, x, b;
-	uint8_t *ram = m_ram->pointer();
+	uint8_t const *const ram = m_ram->pointer();
 
-	for (x = 0; x < 64; x++)
+	for (int x = 0; x < 64; x++)
 	{
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			code = ram[x * 0x100 + ((y + m_video_rol) & 0xff) + 0x8000];
-			for (b = 0; b < 8; b++)
-				bitmap.pix16(y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
+			uint8_t code = ram[x * 0x100 + ((y + m_video_rol) & 0xff) + 0x8000];
+			for (int b = 0; b < 8; b++)
+				bitmap.pix(y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
 		}
 	}
 	return 0;

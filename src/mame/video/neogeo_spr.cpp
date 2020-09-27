@@ -181,7 +181,7 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 	uint8_t* gfx_base = m_fixed_layer_source ? m_region_fixed : m_region_fixedbios->base();
 	uint32_t addr_mask = ( m_fixed_layer_source ? m_region_fixed_size : m_region_fixedbios->bytes() ) - 1;
 	uint16_t *video_data = &m_videoram_drawsource[0x7000 | (scanline >> 3)];
-	uint32_t *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
+	uint32_t *pixel_addr = &bitmap.pix(scanline, NEOGEO_HBEND);
 
 	int garouoffsets[32];
 	int banked = m_fixed_layer_source && (addr_mask > 0x1ffff);
@@ -414,7 +414,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			/* draw the line - no wrap-around */
 			if (x <= 0x01f0)
 			{
-				uint32_t *pixel_addr = &bitmap.pix32(scanline, x + NEOGEO_HBEND);
+				uint32_t *pixel_addr = &bitmap.pix(scanline, x + NEOGEO_HBEND);
 
 				for (int i = 0; i < 0x10; i++)
 				{
@@ -436,7 +436,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			else
 			{
 				int x_save = x;
-				uint32_t *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
+				uint32_t *pixel_addr = &bitmap.pix(scanline, NEOGEO_HBEND);
 
 				for (int i = 0; i < 0x10; i++)
 				{

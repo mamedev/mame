@@ -191,15 +191,13 @@ void pasopia7_state::draw_cg4_line(bitmap_rgb32 &bitmap,int y,int yi,int width,i
 	{
 		for(int xi=0;xi<8;xi++)
 		{
-			int pen_b,pen_r,pen_g,color;
+			int pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
+			int pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
+			int pen_g = 0;//(m_vram[count+yi+0x8000]>>(7-xi)) & 1;
 
-			pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
-			pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
-			pen_g = 0;//(m_vram[count+yi+0x8000]>>(7-xi)) & 1;
+			int color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-			color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
-
-			bitmap.pix32(y, x+xi) = m_palette->pen(color);
+			bitmap.pix(y, x+xi) = m_palette->pen(color);
 		}
 		count+=8;
 	}
@@ -217,7 +215,7 @@ void pasopia7_state::draw_tv_line(bitmap_rgb32 &bitmap,int y,int yi,int width,in
 		{
 			int pen = ((m_font_rom[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-			bitmap.pix32(y, x*8+xi) = m_palette->pen(pen);
+			bitmap.pix(y, x*8+xi) = m_palette->pen(pen);
 		}
 
 		// draw cursor
@@ -225,7 +223,7 @@ void pasopia7_state::draw_tv_line(bitmap_rgb32 &bitmap,int y,int yi,int width,in
 		{
 			for(int xc=0;xc<8;xc++)
 			{
-				bitmap.pix32(y, x*8+xc) = m_palette->pen(7);
+				bitmap.pix(y, x*8+xc) = m_palette->pen(7);
 			}
 		}
 		count+=8;
@@ -243,15 +241,13 @@ void pasopia7_state::draw_mixed_line(bitmap_rgb32 &bitmap,int y,int yi,int width
 		{
 			for(int xi=0;xi<8;xi++)
 			{
-				int pen,pen_b,pen_r,pen_g;
+				int pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
+				int pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
+				int pen_g = (m_vram[count+yi+0x8000]>>(7-xi)) & 1;
 
-				pen_b = (m_vram[count+yi+0x0000]>>(7-xi)) & 1;
-				pen_r = (m_vram[count+yi+0x4000]>>(7-xi)) & 1;
-				pen_g = (m_vram[count+yi+0x8000]>>(7-xi)) & 1;
+				int pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-				pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
-
-				bitmap.pix32(y, x*8+xi) = m_palette->pen(pen);
+				bitmap.pix(y, x*8+xi) = m_palette->pen(pen);
 			}
 		}
 		else
@@ -262,7 +258,7 @@ void pasopia7_state::draw_mixed_line(bitmap_rgb32 &bitmap,int y,int yi,int width
 			{
 				int pen = ((m_font_rom[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-				bitmap.pix32(y, x*8+xi) = m_palette->pen(pen);
+				bitmap.pix(y, x*8+xi) = m_palette->pen(pen);
 			}
 		}
 
@@ -271,7 +267,7 @@ void pasopia7_state::draw_mixed_line(bitmap_rgb32 &bitmap,int y,int yi,int width
 		{
 			for(int xc=0;xc<8;xc++)
 			{
-				bitmap.pix32(y, x*8+xc) = m_palette->pen(7);
+				bitmap.pix(y, x*8+xc) = m_palette->pen(7);
 			}
 		}
 

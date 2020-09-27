@@ -490,8 +490,7 @@ void zorba_state::pia1_portb_w(uint8_t data)
 
 I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	uint8_t gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
@@ -505,8 +504,8 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 	if (lten)
 		gfx = 0xff;
 
-	for(i=0;i<8;i++)
-		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
+	for (int i = 0; i < 8; i++)
+		bitmap.pix(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];
 }
 
 

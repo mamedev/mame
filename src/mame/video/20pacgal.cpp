@@ -82,7 +82,7 @@ void _20pacgal_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &clipr
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix32(y, x) = pen[bitmap.pix32(y, x)];
+			bitmap.pix(y, x) = pen[bitmap.pix(y, x)];
 }
 
 
@@ -139,7 +139,7 @@ void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 					/* pen bits A0-A3 */
 					if (col)
-						bitmap.pix32(y, x) = (bitmap.pix32(y, x) & 0xff0) | col;
+						bitmap.pix(y, x) = (bitmap.pix(y, x) & 0xff0) | col;
 				}
 
 				/* next pixel */
@@ -278,7 +278,7 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 						/* pen bits A4-A11 */
 						if ( col != 0 )
-							bitmap.pix32(y, x) = (color_base | col) << 4;
+							bitmap.pix(y, x) = (color_base | col) << 4;
 
 						/* next pixel */
 						if (flip)
@@ -398,7 +398,7 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			if (((lfsr & 0xffc0) == star_seta) || ((lfsr & 0xffc0) == star_setb))
 			{
 				if (y >= cliprect.min_y && y <= cliprect.max_y)
-					bitmap.pix32(y, x) = NUM_PENS + (lfsr & 0x3f);
+					bitmap.pix(y, x) = NUM_PENS + (lfsr & 0x3f);
 				cnt++;
 			}
 		}

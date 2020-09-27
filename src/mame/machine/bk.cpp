@@ -151,15 +151,15 @@ void bk_state::floppy_data_w(uint16_t data)
 
 u32 bk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u16 nOfs = (m_scroll - 728) % 256;
+	u16 const nOfs = (m_scroll - 728) % 256;
 
 	for (u16 y = 0; y < 256; y++)
 	{
 		for (u16 x = 0; x < 32; x++)
 		{
-			u16 code = m_vram[((y+nOfs) %256)*32 + x];
+			u16 const code = m_vram[((y+nOfs) %256)*32 + x];
 			for (u8 b = 0; b < 16; b++)
-				bitmap.pix16(y, x*16 + b) =  BIT(code, b);
+				bitmap.pix(y, x*16 + b) =  BIT(code, b);
 		}
 	}
 	return 0;

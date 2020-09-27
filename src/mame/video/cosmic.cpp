@@ -227,9 +227,9 @@ void cosmic_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect 
 			if (data & 0x80)
 			{
 				if (flip_screen())
-					bitmap.pix16(255-y, 255-x) = pen;
+					bitmap.pix(255-y, 255-x) = pen;
 				else
-					bitmap.pix16(y, x) = pen;
+					bitmap.pix(y, x) = pen;
 			}
 
 			x++;
@@ -308,7 +308,7 @@ void cosmic_state::cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &
 				/* RGB order is reversed -- bit 7=R, 6=G, 5=B */
 				int col = (map >> 7) | ((map >> 5) & 0x02) | ((map >> 3) & 0x04);
 
-				bitmap.pix16(y, x) = col;
+				bitmap.pix(y, x) = col;
 			}
 
 			x++;
@@ -323,23 +323,20 @@ void cosmic_state::cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &
 
 void cosmic_state::devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t y;
-	uint8_t *horz_PROM = memregion("user2")->base();
-	uint8_t *vert_PROM = memregion("user3")->base();
+	uint8_t const *const horz_PROM = memregion("user2")->base();
+	uint8_t const *const vert_PROM = memregion("user3")->base();
 	offs_t horz_addr = 0;
 
 	uint8_t count = 0;
 	uint8_t horz_data = 0;
 	uint8_t vert_data;
 
-	for (y = 32; y < 224; y++)
+	for (int y = 32; y < 224; y++)
 	{
 		uint8_t x = 0;
 
 		while (1)
 		{
-			int x1;
-
 			/* for the vertical lines, each bit indicates
 			   if there should be a line at the x position */
 			vert_data = vert_PROM[x >> 3];
@@ -356,15 +353,15 @@ void cosmic_state::devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cli
 			if (count == 0)
 				horz_data = horz_PROM[horz_addr++];
 
-			for (x1 = 0; x1 < 8; x1++)
+			for (int x1 = 0; x1 < 8; x1++)
 			{
 				if (!(vert_data & horz_data & 0x80))    /* NAND gate */
 				{
 					/* blue */
 					if (flip_screen())
-						bitmap.pix16(255-y, 255-x) = 4;
+						bitmap.pix(255-y, 255-x) = 4;
 					else
-						bitmap.pix16(y, x) = 4;
+						bitmap.pix(y, x) = 4;
 				}
 
 				horz_data = (horz_data << 1) | 0x01;
@@ -481,9 +478,9 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 			if (color != 0)
 			{
 				if (flip_screen())
-					bitmap.pix16(255-y, 255-x) = color;
+					bitmap.pix(255-y, 255-x) = color;
 				else
-					bitmap.pix16(y, x) = color;
+					bitmap.pix(y, x) = color;
 			}
 
 			x++;

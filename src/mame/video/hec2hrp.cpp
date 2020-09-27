@@ -45,7 +45,7 @@ void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int
 	int ma = 0;
 	for (int y = 0; y <= ymax; y++)
 	{
-		uint16_t *pix = &bitmap.pix16(sy++);
+		uint16_t *pix = &bitmap.pix(sy++);
 		for (int x = ma; x < ma + yram; x++)
 		{
 			uint8_t gfx = *(page + x);
@@ -71,7 +71,7 @@ void hec2hrp_state::hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, in
 	int ma = 0;
 	for (int y = 0; y <= ymax; y++)
 	{
-		uint16_t *pix = &bitmap.pix16(sy++);
+		uint16_t *pix = &bitmap.pix(sy++);
 		for (int x = ma; x < ma + yram; x++)
 		{
 			uint8_t gfx = *(page + x);

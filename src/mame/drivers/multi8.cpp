@@ -115,14 +115,13 @@ void multi8_state::video_start()
 
 MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t i,chr,gfx=0,color,pen,attr;
-	uint16_t mem = y*80,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u16 mem = y*80;
+	u32 *p = &bitmap.pix(y);
 
-	for(x = 0; x < x_count; x++)
+	for(u16 x = 0; x < x_count; x++)
 	{
-		for(i = 0; i < 8; i++)
+		for(u8 i = 0; i < 8; i++)
 		{
 			u8 pen_b = BIT(m_p_vram[mem | 0x0000], 7-i);
 			u8 pen_r = BIT(m_p_vram[mem | 0x4000], 7-i);
@@ -143,18 +142,18 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 		mem++;
 	}
 
-	u8 x_width = BIT(m_display_reg, 6) ? 80 : 40;
-	u8 x_step = BIT(m_display_reg, 6) ? 1 : 2;
+	const u8 x_width = BIT(m_display_reg, 6) ? 80 : 40;
+	const u8 x_step = BIT(m_display_reg, 6) ? 1 : 2;
 	mem = 0xc000 + ma;
-	p = &bitmap.pix32(y);
+	p = &bitmap.pix(y);
 
-	for(x = 0; x < x_width; x++)
+	for(u16 x = 0; x < x_width; x++)
 	{
-		chr = m_p_vram[mem];
-		attr = m_p_vram[mem | 0x800];
-		color = (BIT(m_display_reg, 7)) ? 7 : (attr & 0x07);
+		const u8 chr = m_p_vram[mem];
+		const u8 attr = m_p_vram[mem | 0x800];
+		const u8 color = (BIT(m_display_reg, 7)) ? 7 : (attr & 0x07);
 
-		gfx = BIT(attr, 5);
+		u8 gfx = BIT(attr, 5);
 
 		if (cursor_x >= 0)
 			gfx ^= (x == (cursor_x / x_step));
@@ -165,9 +164,9 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 		if (ra < 8)
 			gfx ^= m_p_chargen[(chr << 3) | ra];
 
-		for(i = 0; i < 8; i++)
+		for(u8 i = 0; i < 8; i++)
 		{
-			pen = BIT(gfx, 7-i) ? color : 0;
+			u8 pen = BIT(gfx, 7-i) ? color : 0;
 
 			if (x_step == 1)
 			{

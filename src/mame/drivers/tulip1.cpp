@@ -118,7 +118,7 @@ GFXDECODE_END
 
 MC6845_UPDATE_ROW( tulip1_state::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -127,7 +127,7 @@ MC6845_UPDATE_ROW( tulip1_state::crtc_update_row )
 
 		// draw 8 pixels of the character
 		for (int x = 0; x < 8; x++)
-			bitmap.pix32(y, x + i*8) = pen[BIT(data, 7 - x)];
+			bitmap.pix(y, x + i*8) = pen[BIT(data, 7 - x)];
 	}
 }
 

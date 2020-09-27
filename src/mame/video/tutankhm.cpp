@@ -48,7 +48,7 @@ uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, b
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x / GALAXIAN_XSCALE; x <= cliprect.max_x / GALAXIAN_XSCALE; x++)
 		{
@@ -75,9 +75,9 @@ uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, b
 			if (m_stars_enabled && enab && (shifted & 0x02) == 0 && (star & 0x80) != 0
 				&& x > 63)
 			{
-				bitmap.pix32(y, GALAXIAN_XSCALE*x + 0) = m_star_color[star & 0x3f];
-				bitmap.pix32(y, GALAXIAN_XSCALE*x + 1) = m_star_color[star & 0x3f];
-				bitmap.pix32(y, GALAXIAN_XSCALE*x + 2) = m_star_color[star & 0x3f];
+				bitmap.pix(y, GALAXIAN_XSCALE*x + 0) = m_star_color[star & 0x3f];
+				bitmap.pix(y, GALAXIAN_XSCALE*x + 1) = m_star_color[star & 0x3f];
+				bitmap.pix(y, GALAXIAN_XSCALE*x + 2) = m_star_color[star & 0x3f];
 			}
 
 			else if (shifted)
@@ -101,7 +101,7 @@ uint32_t tutankhm_state::screen_update_tutankhm_scramble(screen_device &screen, 
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dst = &bitmap.pix32(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x / GALAXIAN_XSCALE; x <= cliprect.max_x / GALAXIAN_XSCALE; x++)
 		{
@@ -392,7 +392,7 @@ void tutankhm_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 		if (star_offs >= STAR_RNG_PERIOD)
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0)
-			bitmap.pix32(y, GALAXIAN_XSCALE*x + 0) = m_star_color[star & 0x3f];
+			bitmap.pix(y, GALAXIAN_XSCALE*x + 0) = m_star_color[star & 0x3f];
 
 		/* second RNG clock: two pixels */
 		star = m_stars[star_offs++];
@@ -400,8 +400,8 @@ void tutankhm_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0)
 		{
-			bitmap.pix32(y, GALAXIAN_XSCALE*x + 1) = m_star_color[star & 0x3f];
-			bitmap.pix32(y, GALAXIAN_XSCALE*x + 2) = m_star_color[star & 0x3f];
+			bitmap.pix(y, GALAXIAN_XSCALE*x + 1) = m_star_color[star & 0x3f];
+			bitmap.pix(y, GALAXIAN_XSCALE*x + 2) = m_star_color[star & 0x3f];
 		}
 	}
 }

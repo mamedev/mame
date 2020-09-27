@@ -356,7 +356,7 @@ I82730_UPDATE_ROW( rc759_state::txt_update_row )
 		width = 15 - width;
 
 		for (int p = 0; p < width; p++)
-			bitmap.pix32(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white() : rgb_t::black();
 	}
 }
 

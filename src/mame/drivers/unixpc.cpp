@@ -309,7 +309,7 @@ uint32_t unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	for (int y = 0; y < 348; y++)
 		for (int x = 0; x < 720/16; x++)
 			for (int b = 0; b < 16; b++)
-				bitmap.pix16(y, x * 16 + b) = BIT(m_videoram[y * (720/16) + x], b);
+				bitmap.pix(y, x * 16 + b) = BIT(m_videoram[y * (720/16) + x], b);
 
 	return 0;
 }

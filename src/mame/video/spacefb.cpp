@@ -146,7 +146,6 @@ void spacefb_state::get_starfield_pens(pen_t *pens)
 
 void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
 	pen_t pens[NUM_STARFIELD_PENS];
 
 	get_starfield_pens(pens);
@@ -154,21 +153,17 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 	/* the shift register is always shifting -- do the portion in the top VBLANK */
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
-		int i;
-
 		/* one cycle delay introduced by IC10 D flip-flop at the end of the VBLANK */
 		int clock_count = (SPACEFB_HBSTART - SPACEFB_HBEND) * SPACEFB_VBEND - 1;
 
-		for (i = 0; i < clock_count; i++)
+		for (int i = 0; i < clock_count; i++)
 			shift_star_generator();
 	}
 
 	/* visible region of the screen */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int x;
-
-		for (x = SPACEFB_HBEND; x < SPACEFB_HBSTART; x++)
+		for (int x = SPACEFB_HBEND; x < SPACEFB_HBSTART; x++)
 		{
 			if (m_object_present_map[(y * bitmap.width()) + x] == 0)
 			{
@@ -177,9 +172,9 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 					((m_star_shift_reg & 0x1c0ff) == 0x0c0d7) ||
 					((m_star_shift_reg & 0x1c0ff) == 0x0c0bb) ||
 					((m_star_shift_reg & 0x1c0ff) == 0x0c0db))
-					bitmap.pix32(y, x) = pens[(m_star_shift_reg >> 8) & 0x3f];
+					bitmap.pix(y, x) = pens[(m_star_shift_reg >> 8) & 0x3f];
 				else
-					bitmap.pix32(y, x) = pens[0];
+					bitmap.pix(y, x) = pens[0];
 			}
 
 			shift_star_generator();
@@ -254,20 +249,17 @@ void spacefb_state::get_sprite_pens(pen_t *pens)
 
 void spacefb_state::draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip)
 {
-	uint8_t sy;
-
-	uint8_t *gfx = memregion("gfx2")->base();
+	uint8_t const *const gfx = memregion("gfx2")->base();
 
 	uint8_t code = m_videoram[offs + 0x0200] & 0x3f;
 	uint8_t y = ~m_videoram[offs + 0x0100] - 2;
 
-	for (sy = 0; sy < 4; sy++)
+	for (uint8_t sy = 0; sy < 4; sy++)
 	{
-		uint8_t sx, dy;
-
 		uint8_t data = gfx[(code << 2) | sy];
 		uint8_t x = m_videoram[offs + 0x0000];
 
+		uint8_t dy;
 		if (flip)
 			dy = ~y;
 		else
@@ -275,53 +267,49 @@ void spacefb_state::draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, co
 
 		if ((dy > cliprect.min_y) && (dy < cliprect.max_y))
 		{
-			for (sx = 0; sx < 4; sx++)
+			for (uint8_t sx = 0; sx < 4; sx++)
 			{
 				if (data & 0x01)
 				{
 					uint16_t dx;
-
 					if (flip)
 						dx = (255 - x) * 2;
 					else
 						dx = x * 2;
 
-					bitmap.pix32(dy, dx + 0) = pen;
-					bitmap.pix32(dy, dx + 1) = pen;
+					bitmap.pix(dy, dx + 0) = pen;
+					bitmap.pix(dy, dx + 1) = pen;
 
 					m_object_present_map[(dy * bitmap.width()) + dx + 0] = 1;
 					m_object_present_map[(dy * bitmap.width()) + dx + 1] = 1;
 				}
 
-				x = x + 1;
-				data = data >> 1;
+				x++;
+				data >>= 1;
 			}
 		}
 
-		y = y + 1;
+		y++;
 	}
 }
 
 
 void spacefb_state::draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip)
 {
-	uint8_t sy;
-
-	uint8_t *gfx = memregion("gfx1")->base();
+	uint8_t const *const gfx = memregion("gfx1")->base();
 
 	uint8_t code = ~m_videoram[offs + 0x0200];
 	uint8_t color_base = (~m_videoram[offs + 0x0300] & 0x0f) << 2;
 	uint8_t y = ~m_videoram[offs + 0x0100] - 2;
 
-	for (sy = 0; sy < 8; sy++)
+	for (uint8_t sy = 0; sy < 8; sy++)
 	{
-		uint8_t sx, dy;
-
 		uint8_t data1 = gfx[0x0000 | (code << 3) | (sy ^ 0x07)];
 		uint8_t data2 = gfx[0x0800 | (code << 3) | (sy ^ 0x07)];
 
 		uint8_t x = m_videoram[offs + 0x0000] - 3;
 
+		uint8_t dy;
 		if (flip)
 			dy = ~y;
 		else
@@ -329,33 +317,30 @@ void spacefb_state::draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, 
 
 		if ((dy > cliprect.min_y) && (dy < cliprect.max_y))
 		{
-			for (sx = 0; sx < 8; sx++)
+			for (uint8_t sx = 0; sx < 8; sx++)
 			{
 				uint16_t dx;
-				uint8_t data;
-				pen_t pen;
-
 				if (flip)
 					dx = (255 - x) * 2;
 				else
 					dx = x * 2;
 
-				data = ((data1 << 1) & 0x02) | (data2 & 0x01);
-				pen = pens[color_base | data];
+				uint8_t data = ((data1 << 1) & 0x02) | (data2 & 0x01);
+				pen_t pen = pens[color_base | data];
 
-				bitmap.pix32(dy, dx + 0) = pen;
-				bitmap.pix32(dy, dx + 1) = pen;
+				bitmap.pix(dy, dx + 0) = pen;
+				bitmap.pix(dy, dx + 1) = pen;
 
 				m_object_present_map[(dy * bitmap.width()) + dx + 0] = (data != 0);
 				m_object_present_map[(dy * bitmap.width()) + dx + 1] = (data != 0);
 
-				x = x + 1;
-				data1 = data1 >> 1;
-				data2 = data2 >> 1;
+				x++;
+				data1 >>= 1;
+				data2 >>= 1;
 			}
 		}
 
-		y = y + 1;
+		y++;
 	}
 }
 

@@ -831,7 +831,7 @@ void spg_renderer_device::update_palette_lookup()
 
 void spg_renderer_device::apply_saturation_and_fade(bitmap_rgb32& bitmap, const rectangle& cliprect, int scanline)
 {
-	uint32_t* src = &bitmap.pix32(scanline, cliprect.min_x);
+	uint32_t* src = &bitmap.pix(scanline, cliprect.min_x);
 
 	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 	{

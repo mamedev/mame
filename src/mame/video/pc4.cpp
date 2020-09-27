@@ -30,12 +30,12 @@ uint32_t pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						if (m_ddram[char_pos] <= 0x10)
 						{
 							//draw CGRAM characters
-							bitmap.pix16(l*9 + y, i*6 + x) = BIT(m_cgram[(m_ddram[char_pos]&0x07)*8+y], 4-x);
+							bitmap.pix(l*9 + y, i*6 + x) = BIT(m_cgram[(m_ddram[char_pos]&0x07)*8+y], 4-x);
 						}
 						else
 						{
 							//draw CGROM characters
-							bitmap.pix16(l*9 + y, i*6 + x) = BIT(m_region_charset->base()[m_ddram[char_pos]*8+y], 4-x);
+							bitmap.pix(l*9 + y, i*6 + x) = BIT(m_region_charset->base()[m_ddram[char_pos]*8+y], 4-x);
 
 						}
 
@@ -45,12 +45,12 @@ uint32_t pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					//draw the cursor
 					if (m_cursor_on)
 						for (int x=0; x<5; x++)
-							bitmap.pix16(l*9 + 7, i * 6 + x) = 1;
+							bitmap.pix(l*9 + 7, i * 6 + x) = 1;
 
 					if (!m_blink && m_blink_on)
 						for (int y=0; y<7; y++)
 							for (int x=0; x<5; x++)
-								bitmap.pix16(l*9 + y, i * 6 + x) = 1;
+								bitmap.pix(l*9 + y, i * 6 + x) = 1;
 				}
 			}
 

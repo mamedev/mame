@@ -254,49 +254,47 @@ void ccastles_state::ccastles_bitmode_addr_w(offs_t offset, uint8_t data)
 
 uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteaddr = &m_spriteram[m_outlatch[1]->q7_r() * 0x100];   /* BUF1/BUF2 */
-	int flip = m_outlatch[1]->q4_r() ? 0xff : 0x00;    /* PLAYER2 */
-	pen_t black = m_palette->black_pen();
-	int x, y, offs;
+	uint8_t const *const spriteaddr = &m_spriteram[m_outlatch[1]->q7_r() * 0x100];   /* BUF1/BUF2 */
+	int const flip = m_outlatch[1]->q4_r() ? 0xff : 0x00;    /* PLAYER2 */
+	pen_t const black = m_palette->black_pen();
 
 	/* draw the sprites */
 	m_spritebitmap.fill(0x0f, cliprect);
-	for (offs = 0; offs < 320/2; offs += 4)
+	for (int offs = 0; offs < 320/2; offs += 4)
 	{
-		int x = spriteaddr[offs + 3];
-		int y = 256 - 16 - spriteaddr[offs + 1];
-		int which = spriteaddr[offs];
-		int color = spriteaddr[offs + 2] >> 7;
+		int const x = spriteaddr[offs + 3];
+		int const y = 256 - 16 - spriteaddr[offs + 1];
+		int const which = spriteaddr[offs];
+		int const color = spriteaddr[offs + 2] >> 7;
 
 		m_gfxdecode->gfx(0)->transpen(m_spritebitmap,cliprect, which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t *const dst = &bitmap.pix(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (m_syncprom[y] & 1)
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				dst[x] = black;
 		}
 
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			uint16_t *mosrc = &m_spritebitmap.pix16(y);
-			int effy = (((y - m_vblank_end) + (flip ? 0 : m_vscroll)) ^ flip) & 0xff;
-			uint8_t *src;
+			uint16_t const *const mosrc = &m_spritebitmap.pix(y);
 
 			/* the "POTATO" chip does some magic here; this is just a guess */
+			int effy = (((y - m_vblank_end) + (flip ? 0 : m_vscroll)) ^ flip) & 0xff;
 			if (effy < 24)
 				effy = 24;
-			src = &m_videoram[effy * 128];
+			uint8_t const *const src = &m_videoram[effy * 128];
 
 			/* loop over X */
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)
@@ -305,12 +303,11 @@ uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_in
 				/* otherwise, process normally */
 				else
 				{
-					int effx = (m_hscroll + (x ^ flip)) & 255;
+					int const effx = (m_hscroll + (x ^ flip)) & 255;
 
 					/* low 4 bits = left pixel, high 4 bits = right pixel */
 					uint8_t pix = (src[effx / 2] >> ((effx & 1) * 4)) & 0x0f;
-					uint8_t mopix = mosrc[x];
-					uint8_t prindex, prvalue;
+					uint8_t const mopix = mosrc[x];
 
 					/* Inputs to the priority PROM:
 
@@ -323,11 +320,12 @@ uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_in
 					    Bit 1 = MPI
 					    Bit 0 = BIT3
 					*/
+					uint8_t prindex;
 					prindex = 0x40;
 					prindex |= (mopix & 7) << 2;
 					prindex |= (mopix & 8) >> 2;
 					prindex |= (pix & 8) >> 3;
-					prvalue = m_priprom[prindex];
+					uint8_t const prvalue = m_priprom[prindex];
 
 					/* Bit 1 of prvalue selects the low 4 bits of the final pixel */
 					if (prvalue & 2)

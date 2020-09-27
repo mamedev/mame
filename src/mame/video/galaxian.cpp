@@ -905,7 +905,7 @@ void galaxian_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 		if (star_offs >= STAR_RNG_PERIOD)
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
-			bitmap.pix32(y, m_x_scale*x + 0) = m_star_color[star & 0x3f];
+			bitmap.pix(y, m_x_scale*x + 0) = m_star_color[star & 0x3f];
 
 		/* second RNG clock: two pixels */
 		star = m_stars[star_offs++];
@@ -913,8 +913,8 @@ void galaxian_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
 		{
-			bitmap.pix32(y, m_x_scale*x + 1) = m_star_color[star & 0x3f];
-			bitmap.pix32(y, m_x_scale*x + 2) = m_star_color[star & 0x3f];
+			bitmap.pix(y, m_x_scale*x + 1) = m_star_color[star & 0x3f];
+			bitmap.pix(y, m_x_scale*x + 2) = m_star_color[star & 0x3f];
 		}
 	}
 }
@@ -1150,15 +1150,15 @@ inline void galaxian_state::galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rect
 		x *= m_x_scale;
 		x += m_h0_start;
 		if (x >= cliprect.min_x && x <= cliprect.max_x)
-			bitmap.pix32(y, x) = color;
+			bitmap.pix(y, x) = color;
 
 		x++;
 		if (x >= cliprect.min_x && x <= cliprect.max_x)
-			bitmap.pix32(y, x) = color;
+			bitmap.pix(y, x) = color;
 
 		x++;
 		if (x >= cliprect.min_x && x <= cliprect.max_x)
-			bitmap.pix32(y, x) = color;
+			bitmap.pix(y, x) = color;
 	}
 }
 

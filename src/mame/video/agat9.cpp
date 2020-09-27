@@ -294,33 +294,29 @@ void agat9video_device::do_io(int offset)
 void agat9video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 8; x++)
+		for (int x = 0; x < 8; x++)
 		{
-			color = (chardata[y] & (1 << (7 - x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (7 - x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
 }
 
-int color_1_p[4] =
+static constexpr int color_1_p[4] =
 {
 	0, 4, 0, 5
 };
 
-int color_2_p[4][2] =
+static constexpr int color_2_p[4][2] =
 {
 	{ 0, 7 },
 	{ 7, 0 },
@@ -392,26 +388,22 @@ void agat9video_device::text_update_hires(screen_device &screen, bitmap_ind16 &b
 
 void agat9video_device::graph_update_mono_lores(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
 	int fg = 7, bg = 0;
 
 	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
 	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 32; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 32; col++)
 		{
-			address = m_start_address + col + (row * 0x20);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + (row * 0x20);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				v = (gfx & 0x80) >> 7;
+				uint8_t v = (gfx & 0x80) >> 7;
 				v = color_2_p[palette_index][v];
 				gfx <<= 1;
 				*(p++) = v ? fg : bg;
@@ -423,26 +415,22 @@ void agat9video_device::graph_update_mono_lores(screen_device &screen, bitmap_in
 
 void agat9video_device::graph_update_mono_hires(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
 	int fg = 7, bg = 0;
 
 	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
 	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 64; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 64; col++)
 		{
-			address = m_start_address + col + ((row / 2) * 0x40) + 0x2000 * (row & 1);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + ((row / 2) * 0x40) + 0x2000 * (row & 1);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				v = (gfx & 0x80) >> 7;
+				uint8_t v = (gfx & 0x80) >> 7;
 				v = color_2_p[palette_index][v];
 				gfx <<= 1;
 				*(p++) = v ? fg : bg;
@@ -451,7 +439,7 @@ void agat9video_device::graph_update_mono_hires(screen_device &screen, bitmap_in
 	}
 }
 
-int color_4_p[4][4] =
+static constexpr int color_4_p[4][4] =
 {
 	{ 0, 1, 2, 4 },
 	{ 7, 1, 2, 4 },
@@ -461,25 +449,20 @@ int color_4_p[4][4] =
 
 void agat9video_device::graph_update_color_hires(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
-
 	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
 	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 0x40; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 0x40; col++)
 		{
-			address = m_start_address + col + ((row / 2) * 0x40) + 0x2000 * (row & 1);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + ((row / 2) * 0x40) + 0x2000 * (row & 1);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 4; b++)
+			for (int b = 0; b < 4; b++)
 			{
-				v = (gfx & 0xc0) >> 6;
+				uint8_t v = (gfx & 0xc0) >> 6;
 				v = color_4_p[palette_index][v];
 				gfx <<= 2;
 				*(p++) = v;
@@ -491,25 +474,20 @@ void agat9video_device::graph_update_color_hires(screen_device &screen, bitmap_i
 
 void agat9video_device::graph_update_color_lores(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b;
-	uint32_t address;
-	uint16_t *p;
-	uint8_t gfx, v;
-
 	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
 	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		p = &bitmap.pix16(row);
-		for (col = 0; col < 0x40; col++)
+		uint16_t *p = &bitmap.pix(row);
+		for (int col = 0; col < 0x40; col++)
 		{
-			address = m_start_address + col + ((row / 2) * 0x40);
-			gfx = m_ram_dev->read(address);
+			uint32_t const address = m_start_address + col + ((row / 2) * 0x40);
+			uint8_t gfx = m_ram_dev->read(address);
 
-			for (b = 0; b < 2; b++)
+			for (int b = 0; b < 2; b++)
 			{
-				v = (gfx & 0xf0) >> 4;
+				uint8_t v = (gfx & 0xf0) >> 4;
 				gfx <<= 4;
 				*(p++) = v;
 				*(p++) = v;
@@ -525,34 +503,29 @@ void agat9video_device::graph_update_color_lores(screen_device &screen, bitmap_i
 void agat9video_device::plot_text_character_apple(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
 	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
-	int x, y, i;
-	const uint8_t *chardata;
-	uint16_t color;
-
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
 		code &= 0x3f;
 
 		if (m_flash)
 		{
-			i = fg;
-			fg = bg;
-			bg = i;
+			using std::swap;
+			swap(fg, bg);
 		}
 	}
 
 	/* look up the character data */
-	chardata = &textgfx_data[(code * 8)];
+	uint8_t const *const chardata = &textgfx_data[(code * 8)];
 
-	for (y = 0; y < 8; y++)
+	for (int y = 0; y < 8; y++)
 	{
-		for (x = 0; x < 7; x++)
+		for (int x = 0; x < 7; x++)
 		{
-			color = (chardata[y] & (1 << (6 - x))) ? fg : bg;
+			uint16_t const color = (chardata[y] & (1 << (6 - x))) ? fg : bg;
 
-			for (i = 0; i < xscale; i++)
+			for (int i = 0; i < xscale; i++)
 			{
-				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -560,25 +533,20 @@ void agat9video_device::plot_text_character_apple(bitmap_ind16 &bitmap, int xpos
 
 void agat9video_device::text_update_apple(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col;
-	uint32_t start_address;
-	uint32_t address;
-	int fg, bg;
+	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
 
-	start_address = m_page2 ? 0x800 : 0x400;
-
-	fg = color_2_p[palette_index][1];
-	bg = color_2_p[palette_index][0];
+	int const fg = color_2_p[palette_index][1];
+	int const bg = color_2_p[palette_index][0];
 
 	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
 	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
-	for (row = beginrow; row <= endrow; row += 8)
+	for (int row = beginrow; row <= endrow; row += 8)
 	{
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
 			/* calculate address */
-			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+			uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
 			plot_text_character_apple(bitmap, col * 7, row, 1, m_ram_dev->read(address),
 					m_char_ptr, m_char_size, fg, bg);
 		}
@@ -587,13 +555,7 @@ void agat9video_device::text_update_apple(screen_device &screen, bitmap_ind16 &b
 
 void agat9video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int row, col, b, va;
-	int offset;
 	uint8_t vram_row[42];
-	uint16_t v;
-	uint16_t *p;
-	uint32_t w;
-	uint16_t *artifact_map_ptr;
 	int begincol = 0, endcol = 40;
 
 	/* sanity checks */
@@ -614,20 +576,20 @@ void agat9video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	if (endcol < begincol)
 		return;
 
-	va = m_page2 ? 0x4000 : 0x2000;
+	int const va = m_page2 ? 0x4000 : 0x2000;
 
 	vram_row[0] = 0;
 	vram_row[41] = 0;
 
-	for (row = beginrow; row <= endrow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (col = begincol; col < endcol; col++)
+		for (int col = begincol; col < endcol; col++)
 		{
-			offset = ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			int const offset = ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col)) | ((row & 7) << 10);
 			vram_row[1 + col] = m_ram_dev->read(va + offset);
 		}
 
-		p = &bitmap.pix16(row);
+		uint16_t *p = &bitmap.pix(row);
 
 		/*
 		 * p. 50 of technical manual:
@@ -638,17 +600,17 @@ void agat9video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		 * 4. odd pixels can be 'black', 'green' (2) or 'red' (1)
 		 * 5. bit 7 affects color of pixels in this byte.  zero = 'blue' or 'red', one = 'purple' or 'green'.
 		 */
-		for (col = 0; col < 40; col++)
+		for (int col = 0; col < 40; col++)
 		{
-			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint32_t const w =  (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+							|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+							|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-			artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16];
+			uint16_t const *const artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16];
 
-			for (b = 0; b < 7; b++)
+			for (int b = 0; b < 7; b++)
 			{
-				v = artifact_map_ptr[((w >> (b + 7 - 1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+				uint16_t const v = artifact_map_ptr[((w >> (b + 7 - 1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
 				*(p++) = v;
 			}
 		}

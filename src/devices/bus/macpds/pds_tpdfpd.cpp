@@ -154,27 +154,23 @@ void macpds_sedisplay_device::device_timer(emu_timer &timer, device_timer_id tid
 
 uint32_t macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels, *vram;
+	uint8_t const *const vram = m_vram.get();
 
-	vram = m_vram.get();
-
-	for (y = 0; y < 870; y++)
+	for (int y = 0; y < 870; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 640/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 640/8; x++)
 		{
-			pixels = vram[(y * (1024/8)) + (x^1)];
+			uint8_t const pixels = vram[(y * (1024/8)) + (x^1)];
 
-			*scanline++ = m_palette[((pixels>>7)&0x1)^1];
-			*scanline++ = m_palette[((pixels>>6)&0x1)^1];
-			*scanline++ = m_palette[((pixels>>5)&0x1)^1];
-			*scanline++ = m_palette[((pixels>>4)&0x1)^1];
-			*scanline++ = m_palette[((pixels>>3)&0x1)^1];
-			*scanline++ = m_palette[((pixels>>2)&0x1)^1];
-			*scanline++ = m_palette[((pixels>>1)&0x1)^1];
-			*scanline++ = m_palette[(pixels&1)^1];
+			*scanline++ = m_palette[BIT(~pixels, 7)];
+			*scanline++ = m_palette[BIT(~pixels, 6)];
+			*scanline++ = m_palette[BIT(~pixels, 5)];
+			*scanline++ = m_palette[BIT(~pixels, 4)];
+			*scanline++ = m_palette[BIT(~pixels, 3)];
+			*scanline++ = m_palette[BIT(~pixels, 2)];
+			*scanline++ = m_palette[BIT(~pixels, 1)];
+			*scanline++ = m_palette[BIT(~pixels, 0)];
 		}
 	}
 

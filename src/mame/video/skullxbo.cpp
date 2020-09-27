@@ -243,8 +243,8 @@ uint32_t skullxbo_state::screen_update_skullxbo(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -275,11 +275,11 @@ uint32_t skullxbo_state::screen_update_skullxbo(screen_device &screen, bitmap_in
 					        +!CRAMD*LBMISC*(LBPIX!=0)
 
 					*/
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-					int mopix = mo[x] & 0x1f;
-					int pfcolor = (pf[x] >> 4) & 0x0f;
-					int pfpix = pf[x] & 0x0f;
-					int o17 = ((pf[x] & 0xc8) == 0xc8);
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopix = mo[x] & 0x1f;
+					int const pfcolor = (pf[x] >> 4) & 0x0f;
+					int const pfpix = pf[x] & 0x0f;
+					int const o17 = ((pf[x] & 0xc8) == 0xc8);
 
 					/* implement the equations */
 					if ((mopriority == 0 && !o17 && mopix >= 2) ||

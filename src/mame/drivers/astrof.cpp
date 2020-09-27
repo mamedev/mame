@@ -356,14 +356,9 @@ void astrof_state::tomahawk_video_control_2_w(uint8_t data)
 
 void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens )
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		uint8_t data;
-		int i;
-
-		uint8_t color = m_colorram[offs >> 1];
+		uint8_t const color = m_colorram[offs >> 1];
 
 		pen_t back_pen = pens[(color & (num_pens-1)) | 0x00];
 		pen_t fore_pen = pens[(color & (num_pens-1)) | 0x01];
@@ -377,22 +372,23 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 		if ((y <= cliprect.top()) || (y >= cliprect.bottom()))
 			continue;
 
+		uint8_t data;
 		if (m_screen_off)
 			data = 0;
 		else
 			data = m_videoram[offs];
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
+			pen_t const pen = (data & 0x01) ? fore_pen : back_pen;
 
 			if (m_flipscreen)
-				bitmap.pix32(y, 255 - x) = pen;
+				bitmap.pix(y, 255 - x) = pen;
 			else
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 
-			x = x + 1;
-			data = data >> 1;
+			x++;
+			data >>= 1;
 		}
 	}
 }

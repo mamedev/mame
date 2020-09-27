@@ -275,7 +275,7 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for(int b=0; b<4; b++)
 			{
-				bitmap.pix16(y, x*2 + b) = (data>>12) & 0x0f;
+				bitmap.pix(y, x*2 + b) = (data>>12) & 0x0f;
 				data <<= 4;
 			}
 		}
@@ -292,7 +292,7 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 				// I assume color 0 is transparent
 				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*4 + b, m_mouse_gfx_posy + y))
-					bitmap.pix16(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
+					bitmap.pix(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
 				data <<= 2;
 			}
 		}

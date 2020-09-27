@@ -180,7 +180,7 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 			{
 				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
 
-				bitmap.pix32(vbp + y, hbp + x++) = pen[color];
+				bitmap.pix(vbp + y, hbp + x++) = pen[color];
 
 				data <<= 1;
 			}

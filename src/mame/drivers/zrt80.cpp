@@ -224,18 +224,16 @@ void zrt80_state::machine_reset()
 
 MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
-	uint8_t polarity = ioport("DIPSW1")->read() & 4 ? 0xff : 0;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t const polarity = ioport("DIPSW1")->read() & 4 ? 0xff : 0;
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		inv = polarity;
+		uint8_t inv = polarity;
 		if (x == cursor_x) inv ^= 0xff;
-		mem = (ma + x) & 0x1fff;
-		chr = m_p_videoram[mem];
+		uint16_t const mem = (ma + x) & 0x1fff;
+		uint8_t chr = m_p_videoram[mem];
 
 		if (BIT(chr, 7))
 		{
@@ -243,7 +241,7 @@ MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 			chr &= 0x7f;
 		}
 
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+		uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7)];

@@ -508,7 +508,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 									if (cliprect.contains(px, scanline))
 									{
 										m_collision_map[ px ] |= 0x20;
-										bitmap.pix16( scanline, px ) = color;
+										bitmap.pix( scanline, px ) = color;
 									}
 								}
 							}
@@ -535,7 +535,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 									if (cliprect.contains(px, scanline))
 									{
 										m_collision_map[ px ] |= 0x20;
-										bitmap.pix16( scanline, px ) = color;
+										bitmap.pix( scanline, px ) = color;
 									}
 								}
 							}
@@ -562,7 +562,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 									if (cliprect.contains(px, scanline))
 									{
 										m_collision_map[ px ] |= 0x10;
-										bitmap.pix16( scanline, px ) = color;
+										bitmap.pix( scanline, px ) = color;
 									}
 								}
 							}
@@ -619,7 +619,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 											m_collision_status |= colx;
 
 										m_collision_map[ px ] |= 0x80;
-										bitmap.pix16( scanline, px ) = color;
+										bitmap.pix( scanline, px ) = color;
 									}
 								}
 							}
@@ -667,7 +667,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 										m_collision_status |= colx;
 
 									m_collision_map[ px ] |= 0x80;
-									bitmap.pix16( scanline, px ) = color;
+									bitmap.pix( scanline, px ) = color;
 								}
 							}
 						}
@@ -726,7 +726,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 										m_collision_status |= m_collision_map[ px ];
 
 									m_collision_map[ px ] |= mask;
-									bitmap.pix16( scanline, px ) = color;
+									bitmap.pix( scanline, px ) = color;
 								}
 							}
 						}

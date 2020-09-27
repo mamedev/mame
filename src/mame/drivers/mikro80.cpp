@@ -184,7 +184,7 @@ u32 mikro80_state::screen_update_mikro80(screen_device &screen, bitmap_ind16 &bi
 	{
 		for (u8 ra = 0; ra < 8; ra++)
 		{
-			u16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
 			for (u16 x = ma; x < ma + 64; x++)
 			{

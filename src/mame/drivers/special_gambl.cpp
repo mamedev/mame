@@ -201,9 +201,9 @@ u32 dinaris_state::screen_update_dice(screen_device &screen, bitmap_ind16 &bitma
 			u8 const color1 = m_vram[0x4000 + (y & 0xfe) + x * 256];
 			u8 const color2 = m_vram[0x4000 + (y | 0x01) + x * 256];
 			for (int b = 7; b >= 4; b--)
-				bitmap.pix16(y, x * 8 + (7 - b)) = BIT(code, b) ? (color1 & 0xf) : (color1 >> 4);
+				bitmap.pix(y, x * 8 + (7 - b)) = BIT(code, b) ? (color1 & 0xf) : (color1 >> 4);
 			for (int b = 3; b >= 0; b--)
-				bitmap.pix16(y, x * 8 + (7 - b)) = BIT(code, b) ? (color2 & 0xf) : (color2 >> 4);
+				bitmap.pix(y, x * 8 + (7 - b)) = BIT(code, b) ? (color2 & 0xf) : (color2 >> 4);
 		}
 	}
 	return 0;

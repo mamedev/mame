@@ -164,40 +164,35 @@ void pc100_state::video_start()
 
 uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	int count;
-	int xi;
-	int dot;
-	int pen[4],pen_i;
+	int count = (m_crtc.vstart + 0x20) * 0x40;
 
-	count = ((m_crtc.vstart + 0x20) * 0x40);
-
-	for(y=0;y<512;y++)
+	for(int y=0;y<512;y++)
 	{
 		count &= 0xffff;
 
-		for(x=0;x<1024/16;x++)
+		for(int x=0;x<1024/16;x++)
 		{
-			for(xi=0;xi<16;xi++)
+			for(int xi=0;xi<16;xi++)
 			{
 				if(m_crtc.cmd != 0xffff)
 				{
-					for(pen_i=0;pen_i<4;pen_i++)
+					int pen[4];
+					for(int pen_i=0;pen_i<4;pen_i++)
 						pen[pen_i] = (m_vram[count+pen_i*0x10000] >> xi) & 1;
 
-					dot = 0;
-					for(pen_i=0;pen_i<4;pen_i++)
+					int dot = 0;
+					for(int pen_i=0;pen_i<4;pen_i++)
 						dot |= pen[pen_i]<<pen_i;
 
 					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
+						bitmap.pix(y, x*16+xi) = m_palette->pen(dot);
 				}
 				else
 				{
-					dot = (m_vram[count] >> xi) & 1;
+					int dot = (m_vram[count] >> xi) & 1;
 
 					if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-						bitmap.pix16(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
+						bitmap.pix(y, x*16+xi) = m_palette->pen(dot ? 15 : 0);
 				}
 			}
 

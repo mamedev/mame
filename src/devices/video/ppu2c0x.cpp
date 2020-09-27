@@ -641,7 +641,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 
 	/* set up dest */
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	uint32_t* dest = &bitmap.pix32(m_scanline, start_x);
+	uint32_t* dest = &bitmap.pix(m_scanline, start_x);
 
 	m_tilecount = 0;
 
@@ -698,7 +698,7 @@ void ppu2c0x_device::draw_background(uint8_t* line_priority)
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap.pix32(m_scanline);
+		dest = &bitmap.pix(m_scanline);
 		for (int i = 0; i < 8; i++)
 		{
 			draw_back_pen(dest, back_pen);
@@ -727,7 +727,7 @@ void ppu2c0x_device::draw_background_pen()
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		draw_back_pen(&bitmap.pix32(m_scanline, i), back_pen);
+		draw_back_pen(&bitmap.pix(m_scanline, i), back_pen);
 }
 
 void ppu2c0x_device::read_sprite_plane_data(int address)
@@ -763,7 +763,7 @@ void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, ui
 	palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
 
 	uint32_t pix = m_nespens[palval];
-	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pix;
+	bitmap.pix(m_scanline, sprite_xpos + pixel) = pix;
 }
 
 void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
@@ -1066,7 +1066,7 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 
 	// Fill this scanline with the background pen.
 	for (int i = 0; i < bitmap.width(); i++)
-		draw_back_pen(&bitmap.pix32(m_scanline, i), back_pen);
+		draw_back_pen(&bitmap.pix(m_scanline, i), back_pen);
 }
 
 void ppu2c0x_device::update_visible_scanline()

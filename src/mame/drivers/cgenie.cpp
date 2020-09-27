@@ -344,10 +344,10 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 		{
 			const rgb_t map[] = { m_background_color, m_palette[8], m_palette[6], m_palette[5] };
 
-			bitmap.pix32(y + vbp, column * 4 + hbp + 0) = map[code >> 6 & 0x03];
-			bitmap.pix32(y + vbp, column * 4 + hbp + 1) = map[code >> 4 & 0x03];
-			bitmap.pix32(y + vbp, column * 4 + hbp + 2) = map[code >> 2 & 0x03];
-			bitmap.pix32(y + vbp, column * 4 + hbp + 3) = map[code >> 0 & 0x03];
+			bitmap.pix(y + vbp, column * 4 + hbp + 0) = map[code >> 6 & 0x03];
+			bitmap.pix(y + vbp, column * 4 + hbp + 1) = map[code >> 4 & 0x03];
+			bitmap.pix(y + vbp, column * 4 + hbp + 2) = map[code >> 2 & 0x03];
+			bitmap.pix(y + vbp, column * 4 + hbp + 3) = map[code >> 0 & 0x03];
 		}
 		else
 		{
@@ -367,7 +367,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 
 			// 8 pixel chars
 			for (int p = 0; p < 8; p++)
-				bitmap.pix32(y + vbp, column * 8 + hbp + p) = BIT(gfx, 7 - p) ? m_palette[color] : m_background_color;
+				bitmap.pix(y + vbp, column * 8 + hbp + p) = BIT(gfx, 7 - p) ? m_palette[color] : m_background_color;
 		}
 	}
 }

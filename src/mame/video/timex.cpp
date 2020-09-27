@@ -22,7 +22,7 @@
 
 inline void timex_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (uint16_t)color;
+	bitmap.pix(y, x) = (uint16_t)color;
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */

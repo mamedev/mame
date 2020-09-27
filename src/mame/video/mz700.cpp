@@ -17,18 +17,18 @@
 
 uint32_t mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,gfx,col,bg=0,fg=0,oldcol=0x7e;
-	uint16_t sy=0,ma=0,x,chr;
+	uint8_t bg=0,fg=0,oldcol=0x7e;
+	uint16_t sy=0,ma=0;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 40; x++)
+			for (uint16_t x = ma; x < ma + 40; x++)
 			{
-				col = m_colorram[x];
+				uint8_t col = m_colorram[x];
 				if (col != oldcol)
 				{
 					oldcol = col;
@@ -36,8 +36,8 @@ uint32_t mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitm
 					bg = col & 7;
 					fg = (col >> 3) & 7;
 				}
-				chr = m_videoram[x] | (BIT(col, 7)<<8);
-				gfx = m_p_chargen[(chr<<3) | ra ];
+				uint16_t chr = m_videoram[x] | (BIT(col, 7)<<8);
+				uint8_t gfx = m_p_chargen[(chr<<3) | ra ];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 0) ? fg : bg;
@@ -72,20 +72,18 @@ uint32_t mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitm
 		}
 		else
 		{
-			int x, y;
-
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
-				for (y = 0; y < 200; y++)
+				for (int y = 0; y < 200; y++)
 				{
-					bitmap.pix16(y, x * 8 + 0) = BIT(m_videoram[x * 8 + y], 0) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 1) = BIT(m_videoram[x * 8 + y], 1) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 2) = BIT(m_videoram[x * 8 + y], 2) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 3) = BIT(m_videoram[x * 8 + y], 3) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 4) = BIT(m_videoram[x * 8 + y], 4) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 5) = BIT(m_videoram[x * 8 + y], 5) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 6) = BIT(m_videoram[x * 8 + y], 6) ? 7 : 0;
-					bitmap.pix16(y, x * 8 + 7) = BIT(m_videoram[x * 8 + y], 7) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 0) = BIT(m_videoram[x * 8 + y], 0) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 1) = BIT(m_videoram[x * 8 + y], 1) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 2) = BIT(m_videoram[x * 8 + y], 2) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 3) = BIT(m_videoram[x * 8 + y], 3) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 4) = BIT(m_videoram[x * 8 + y], 4) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 5) = BIT(m_videoram[x * 8 + y], 5) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 6) = BIT(m_videoram[x * 8 + y], 6) ? 7 : 0;
+					bitmap.pix(y, x * 8 + 7) = BIT(m_videoram[x * 8 + y], 7) ? 7 : 0;
 				}
 			}
 		}

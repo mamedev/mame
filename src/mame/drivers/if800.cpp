@@ -43,18 +43,15 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int xi,gfx;
-	uint8_t pen;
+	int gfx = m_video_ram[address >> 1];
 
-	gfx = m_video_ram[address >> 1];
-
-	for(xi=0;xi<16;xi++)
+	for(int xi=0;xi<16;xi++)
 	{
-		pen = ((gfx >> xi) & 1) ? 1 : 0;
+		uint8_t pen = BIT(gfx, xi);
 
-		bitmap.pix32(y, x + xi) = palette[pen];
+		bitmap.pix(y, x + xi) = palette[pen];
 	}
 }
 

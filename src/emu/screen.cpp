@@ -1730,9 +1730,9 @@ void screen_device::create_composited_bitmap()
 		{
 			for (int y = 0; y < dstheight; y++)
 			{
-				bitmap_ind16 &srcbitmap = *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y];
-				u16 *dst = &curbitmap.as_ind16().pix16(y);
-				const u16 *src = &srcbitmap.pix16(0);
+				const bitmap_ind16 &srcbitmap = *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y];
+				u16 *dst = &curbitmap.as_ind16().pix(y);
+				const u16 *src = &srcbitmap.pix(0);
 				const int dx = (m_scan_widths[y] << 15) / dstwidth;
 				for (int x = 0; x < m_scan_widths[y]; x += dx)
 				{
@@ -1746,9 +1746,9 @@ void screen_device::create_composited_bitmap()
 		{
 			for (int y = 0; y < dstheight; y++)
 			{
-				bitmap_rgb32 &srcbitmap = *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y];
-				u32 *dst = &curbitmap.as_rgb32().pix32(y);
-				const u32 *src = &srcbitmap.pix32(0);
+				const bitmap_rgb32 &srcbitmap = *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y];
+				u32 *dst = &curbitmap.as_rgb32().pix(y);
+				const u32 *src = &srcbitmap.pix(0);
 				const int dx = (m_scan_widths[y] << 15) / dstwidth;
 				for (int x = 0; x < dstwidth << 15; x += dx)
 				{
@@ -1837,10 +1837,10 @@ void screen_device::update_burnin()
 			// iterate over rows in the destination
 			for (int y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
-				bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
-				u64 *dst = &m_burnin.pix64(y);
-				const u16 *src = &srcbitmap.pix16(per_scanline ? 0 : (srcy >> 16));
-				const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+				const bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
+				u64 *const dst = &m_burnin.pix(y);
+				u16 const *const src = &srcbitmap.pix(per_scanline ? 0 : (srcy >> 16));
+				rgb_t const *const palette = m_palette->palette()->entry_list_adjusted();
 				for (int x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = palette[src[srcx >> 16]];
@@ -1855,9 +1855,9 @@ void screen_device::update_burnin()
 			// iterate over rows in the destination
 			for (int y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
-				bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
-				u64 *dst = &m_burnin.pix64(y);
-				const u32 *src = &srcbitmap.pix32(per_scanline ? 0 : (srcy >> 16));
+				const bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
+				u64 *const dst = &m_burnin.pix(y);
+				u32 const *const src = &srcbitmap.pix(per_scanline ? 0 : (srcy >> 16));
 				for (int x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = src[srcx >> 16];
@@ -1900,7 +1900,7 @@ void screen_device::finalize_burnin()
 	u64 maxval = 0;
 	for (int y = 0; y < srcheight; y++)
 	{
-		u64 *src = &m_burnin.pix64(y);
+		u64 const *const src = &m_burnin.pix(y);
 		for (int x = 0; x < srcwidth; x++)
 		{
 			minval = std::min(minval, src[x]);
@@ -1914,8 +1914,8 @@ void screen_device::finalize_burnin()
 	// now normalize and convert to RGB
 	for (int y = 0, srcy = 0; y < dstheight; y++, srcy += ystep)
 	{
-		u64 *src = &m_burnin.pix64(srcy >> 16);
-		u32 *dst = &finalmap.pix32(y);
+		u64 const *const src = &m_burnin.pix(srcy >> 16);
+		u32 *const dst = &finalmap.pix(y);
 		for (int x = 0, srcx = 0; x < dstwidth; x++, srcx += xstep)
 		{
 			int brightness = u64(maxval - src[srcx >> 16]) * 255 / (maxval - minval);

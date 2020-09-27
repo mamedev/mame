@@ -268,7 +268,7 @@ uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// apply external LUM setting
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix16(y, x) |= lum;
+			bitmap.pix(y, x) |= lum;
 
 	return 0;
 }
@@ -288,8 +288,8 @@ uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
-			uint16_t d = bitmap.pix16(y, x) & 7;
-			uint16_t e = ef934x_bitmap->pix16(y, x);
+			uint16_t d = bitmap.pix(y, x) & 7;
+			uint16_t e = ef934x_bitmap->pix(y, x);
 
 			// i8244 decoder enable is masked with cartridge pin B
 			bool en = (e & 8) || !m_cart->b_read();
@@ -302,12 +302,12 @@ uint32_t videopacp_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 			if (en && BIT(m_mix_i8244, d))
 			{
 				// Use i8245 input
-				bitmap.pix16(y, x) |= lum;
+				bitmap.pix(y, x) |= lum;
 			}
 			else
 			{
 				// Use EF934x input
-				bitmap.pix16(y, x) = e | (i2 ? 8 : 0);
+				bitmap.pix(y, x) = e | (i2 ? 8 : 0);
 			}
 		}
 	}

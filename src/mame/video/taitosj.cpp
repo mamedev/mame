@@ -269,7 +269,7 @@ inline gfx_element * taitosj_state::get_sprite_gfx_element(uint8_t which)
 
 int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1,int sx2, int sy2, int which2)
 {
-	int x, y, minx, miny, maxx = 16, maxy = 16;
+	int minx, miny, maxx = 16, maxy = 16;
 
 	offs_t offs1 = which1 * 4;
 	offs_t offs2 = which2 * 4;
@@ -318,10 +318,10 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1,i
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x02,
 			sx2, sy2, 0);
 
-	for (y = miny; y < maxy; y++)
-		for (x = minx; x < maxx; x++)
-			if ((m_sprite_sprite_collbitmap1.pix16(y, x) != TRANSPARENT_PEN) &&
-				(m_sprite_sprite_collbitmap2.pix16(y, x) != TRANSPARENT_PEN))
+	for (int y = miny; y < maxy; y++)
+		for (int x = minx; x < maxx; x++)
+			if ((m_sprite_sprite_collbitmap1.pix(y, x) != TRANSPARENT_PEN) &&
+				(m_sprite_sprite_collbitmap2.pix(y, x) != TRANSPARENT_PEN))
 				return 1;  /* collided */
 
 	return 0;
@@ -439,7 +439,6 @@ void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_ar
 
 int taitosj_state::check_sprite_layer_bitpattern(int which, rectangle *sprite_areas)
 {
-	int y, x;
 	offs_t offs = which * 4;
 	int result = 0;  /* no collisions */
 
@@ -463,17 +462,17 @@ int taitosj_state::check_sprite_layer_bitpattern(int which, rectangle *sprite_ar
 			flip_x, flip_y,
 			0,0,0);
 
-	for (y = miny; y < maxy; y++)
-		for (x = minx; x < maxx; x++)
-			if (m_sprite_layer_collbitmap1.pix16(y - miny, x - minx) != TRANSPARENT_PEN) /* is there anything to check for ? */
+	for (int y = miny; y < maxy; y++)
+		for (int x = minx; x < maxx; x++)
+			if (m_sprite_layer_collbitmap1.pix(y - miny, x - minx) != TRANSPARENT_PEN) /* is there anything to check for ? */
 			{
-				if (check_layer_1 && (m_sprite_layer_collbitmap2[0].pix16(y, x) != TRANSPARENT_PEN))
+				if (check_layer_1 && (m_sprite_layer_collbitmap2[0].pix(y, x) != TRANSPARENT_PEN))
 					result |= 0x01;  /* collided with layer 1 */
 
-				if (check_layer_2 && (m_sprite_layer_collbitmap2[1].pix16(y, x) != TRANSPARENT_PEN))
+				if (check_layer_2 && (m_sprite_layer_collbitmap2[1].pix(y, x) != TRANSPARENT_PEN))
 					result |= 0x02;  /* collided with layer 2 */
 
-				if (check_layer_3 && (m_sprite_layer_collbitmap2[2].pix16(y, x) != TRANSPARENT_PEN))
+				if (check_layer_3 && (m_sprite_layer_collbitmap2[2].pix(y, x) != TRANSPARENT_PEN))
 					result |= 0x04;  /* collided with layer 3 */
 			}
 
@@ -485,10 +484,8 @@ void taitosj_state::check_sprite_layer_collision(int *sprites_on, rectangle *spr
 {
 	if (SPRITES_ON)
 	{
-		int which;
-
 		/* check each sprite */
-		for (which = 0; which < 0x20; which++)
+		for (int which = 0; which < 0x20; which++)
 		{
 			if ((which >= 0x10) && (which <= 0x17)) continue;   /* no sprites here */
 
