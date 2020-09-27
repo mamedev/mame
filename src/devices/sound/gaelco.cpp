@@ -181,8 +181,8 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<r
 		outputs[1].put_int(j, output_r, 32768);
 	}
 
-//	if (wavraw)
-//		wav_add_data_buffer(wavraw, outputs[0], outputs[1]);
+//  if (wavraw)
+//      wav_add_data_buffer(wavraw, outputs[0], outputs[1]);
 }
 
 /*============================================================================

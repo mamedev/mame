@@ -219,12 +219,12 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 	//  mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
 	//if (mem.read_word(0x3510f) == 0x4845)
-	//	mem.write_word(0x3510f, 0x4840);    // camp rock force service mode
+	//  mem.write_word(0x3510f, 0x4840);    // camp rock force service mode
 
 	if (mem.read_word(0x4abe7) == 0x4840)
 		mem.write_word(0x4abe7, 0x4841);    // camp rock IRQ? wait hack
 
-	 
+
 
 	// clear params after operation
 	m_dma_params[0][channel] = m_dma_params[0][channel] & 0x00f7;

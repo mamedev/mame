@@ -440,7 +440,7 @@ void abc1600_mac_device::task_w(offs_t offset, uint8_t data)
 
 	m_task = data ^ 0xff;
 
-	if (LOG) logerror("%s TASK %05x:%02x (TASK %u BOOTE %u MAGIC %u)\n", machine().describe_context(), offset, data, 
+	if (LOG) logerror("%s TASK %05x:%02x (TASK %u BOOTE %u MAGIC %u)\n", machine().describe_context(), offset, data,
 		get_current_task(offset), BOOTE, MAGIC);
 }
 
@@ -498,7 +498,7 @@ void abc1600_mac_device::segment_w(offs_t offset, uint8_t data)
 
 	m_segment_ram[sega] = data & 0x7f;
 
-	if (LOG) logerror("%s %05x:%02x TASK %u SEGMENT %u MEM %05x-%05x\n", machine().describe_context(), offset, data, 
+	if (LOG) logerror("%s %05x:%02x TASK %u SEGMENT %u MEM %05x-%05x\n", machine().describe_context(), offset, data,
 		get_current_task(offset), sega & 0x1f, (sega & 0x1f) * 0x8000, ((sega & 0x1f) * 0x8000) + 0x7fff);
 }
 
@@ -604,8 +604,8 @@ void abc1600_mac_device::page_w(offs_t offset, uint8_t data)
 		m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
 	}
 
-	if (LOG) logerror("%s %05x:%02x TASK %u SEGMENT %u PAGE %u MEM %05x-%05x %06x\n", machine().describe_context(), offset, data, 
-		get_current_task(offset), sega & 0x1f, ((offset >> 11) & 0x0f), ((sega & 0x1f) * 0x8000) + ((offset >> 11) & 0x0f) * 0x800, 
+	if (LOG) logerror("%s %05x:%02x TASK %u SEGMENT %u PAGE %u MEM %05x-%05x %06x\n", machine().describe_context(), offset, data,
+		get_current_task(offset), sega & 0x1f, ((offset >> 11) & 0x0f), ((sega & 0x1f) * 0x8000) + ((offset >> 11) & 0x0f) * 0x800,
 		((sega & 0x1f) * 0x8000) + (((offset >> 11) & 0x0f) * 0x800) + 0x7ff, (m_page_ram[pga] & 0x3ff) << 11);
 }
 

@@ -8,47 +8,47 @@
 
 ****************************************************************************
 
-	In MAME, sound is represented as a graph of sound "streams". Each
-	stream has a fixed number of inputs and outputs, and is responsible
-	for producing sound on demand.
+    In MAME, sound is represented as a graph of sound "streams". Each
+    stream has a fixed number of inputs and outputs, and is responsible
+    for producing sound on demand.
 
-	The graph is driven from the outputs, which are speaker devices.
-	These devices are updated on a regular basis (~50 times per second),
-	and when an update occurs, the graph is walked from the speaker
-	through each input, until all connected streams are up to date.
+    The graph is driven from the outputs, which are speaker devices.
+    These devices are updated on a regular basis (~50 times per second),
+    and when an update occurs, the graph is walked from the speaker
+    through each input, until all connected streams are up to date.
 
-	Individual streams can also be updated manually. This is important
-	for sound chips and CPU-driven devices, who should force any
-	affected streams to update prior to making changes.
+    Individual streams can also be updated manually. This is important
+    for sound chips and CPU-driven devices, who should force any
+    affected streams to update prior to making changes.
 
-	Sound streams are *not* part of the device execution model. This is
-	very important to understand. If the process of producing the ouput
-	stream affects state that might be consumed by an executing device
-	(e.g., a CPU), then care must be taken to ensure that the stream is
-	updated frequently enough
+    Sound streams are *not* part of the device execution model. This is
+    very important to understand. If the process of producing the ouput
+    stream affects state that might be consumed by an executing device
+    (e.g., a CPU), then care must be taken to ensure that the stream is
+    updated frequently enough
 
-	The model for timing sound samples is very important and explained
-	here. Each stream source has a clock (aka sample rate). Each clock
-	edge represents a sample that is held for the duration of one clock
-	period. This model has interesting effects:
+    The model for timing sound samples is very important and explained
+    here. Each stream source has a clock (aka sample rate). Each clock
+    edge represents a sample that is held for the duration of one clock
+    period. This model has interesting effects:
 
-	For example, if you have a 10Hz clock, and call stream.update() at
-	t=0.91, it will compute 10 samples (for clock edges 0.0, 0.1, 0.2,
-	..., 0.7, 0.8, and 0.9). And then if you ask the stream what its
-	current end time is (via stream.sample_time()), it will say t=1.0,
-	which is in the future, because it knows it will hold that last
-	sample until 1.0s.
+    For example, if you have a 10Hz clock, and call stream.update() at
+    t=0.91, it will compute 10 samples (for clock edges 0.0, 0.1, 0.2,
+    ..., 0.7, 0.8, and 0.9). And then if you ask the stream what its
+    current end time is (via stream.sample_time()), it will say t=1.0,
+    which is in the future, because it knows it will hold that last
+    sample until 1.0s.
 
-	Sound generation callbacks are presented with a std::vector of inputs
-	and outputs. The vectors contain objects of read_stream_view and
-	write_stream_view respectively, which wrap access to a circular buffer
-	of samples. Sound generation callbacks are expected to fill all the
-	samples described by the outputs' write_stream_view objects. At the
-	moment, all outputs have the same sample rate, so the number of samples
-	that need to be generated will be consistent across all outputs.
+    Sound generation callbacks are presented with a std::vector of inputs
+    and outputs. The vectors contain objects of read_stream_view and
+    write_stream_view respectively, which wrap access to a circular buffer
+    of samples. Sound generation callbacks are expected to fill all the
+    samples described by the outputs' write_stream_view objects. At the
+    moment, all outputs have the same sample rate, so the number of samples
+    that need to be generated will be consistent across all outputs.
 
-	By default, the inputs will have been resampled to match the output
-	sample rate, unless otherwise specified.
+    By default, the inputs will have been resampled to match the output
+    sample rate, unless otherwise specified.
 
 ***************************************************************************/
 
@@ -81,7 +81,11 @@ constexpr u32 SAMPLE_RATE_MINIMUM = 50;
 //**************************************************************************
 
 // turn this on to enable aggressive assertions and other checks
+#ifdef MAME_DEBUG
 #define SOUND_DEBUG (1)
+#else
+#define SOUND_DEBUG (0)
+#endif
 
 // if SOUND_DEBUG is on, make assertions fire regardless of MAME_DEBUG
 #if (SOUND_DEBUG)

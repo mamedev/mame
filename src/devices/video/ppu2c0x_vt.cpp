@@ -146,7 +146,7 @@ void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
 	{
 		for (int palval = 0; palval < 0x8000; palval++)
 		{
-		//	uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
+		//  uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
 			uint8_t blue = (palval & 0x001f) << 3;
 			uint8_t green = (palval & 0x3e0) >> 2;
 			uint8_t red = (palval & 0x7C00) >> 7;
@@ -364,7 +364,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 		if (!is16pix)
 		{
 			uint8_t pen = pixel_data + (4 * color);
-			draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));	
+			draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));
 		}
 		else
 		{
@@ -374,13 +374,13 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			if ((pixel_data & 0x03) != 0)
 			{
 				uint8_t pen = (pixel_data & 0x03) + (4 * color);
-				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));	
+				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel));
 			}
 
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
 				uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
-				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel + 8));	
+				draw_tile_pixel_inner(pen, &bitmap.pix32(m_scanline, sprite_xpos + pixel + 8));
 			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
@@ -450,7 +450,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
 			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//	palval &= 0x30;
+			//  palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
 			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
@@ -466,7 +466,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
 			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//	palval &= 0x30;
+			//  palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
 			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
@@ -482,7 +482,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 
 			// does grayscale mode exist here? (we haven't calculated any colours for it)
 			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//	palval &= 0x30;
+			//  palval &= 0x30;
 
 			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
 			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
@@ -539,7 +539,7 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen,
 			pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
 		}
 
-		draw_tile_pixel_inner(pen, dest);	
+		draw_tile_pixel_inner(pen, dest);
 	}
 }
 

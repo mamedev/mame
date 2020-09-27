@@ -7,46 +7,46 @@
 *
 ******************************************************************************/
 /*
-	The HC-110 and HC-120 both consist of 3 boards:
-	1. An 'embedded system' 6800 board with	two output latches, one input
-	   latch, and two 'resume/reset' latches which	pull the 6800 is out of
-	   reset on a rising edge, as a form of power saving. (pcb 1816?)
-	2. A keyboard handler pcb; this is different on the HC-110 (where it is
-	   made by a 3rd party company for the 128-key input) and the HC-120
-	   (where it was made by votrax/phonic mirror, pcb 1817?)
-	3. The voice synthesizer pcb 1818c, encased in epoxy. It is a discrete
-	   synthesizer roughly equivalent to an SC-01 or VSK, it has external
-	   pins to allow control of speech pitch and rate in addition to the
-	   typical 2 inflection pins.
+    The HC-110 and HC-120 both consist of 3 boards:
+    1. An 'embedded system' 6800 board with two output latches, one input
+       latch, and two 'resume/reset' latches which  pull the 6800 is out of
+       reset on a rising edge, as a form of power saving. (pcb 1816?)
+    2. A keyboard handler pcb; this is different on the HC-110 (where it is
+       made by a 3rd party company for the 128-key input) and the HC-120
+       (where it was made by votrax/phonic mirror, pcb 1817?)
+    3. The voice synthesizer pcb 1818c, encased in epoxy. It is a discrete
+       synthesizer roughly equivalent to an SC-01 or VSK, it has external
+       pins to allow control of speech pitch and rate in addition to the
+       typical 2 inflection pins.
 
-	Notes: Electronic Arrays, Inc. who made the EA8316 CMOS mask ROMs was
-	bought out by NEC in 1978.
+    Notes: Electronic Arrays, Inc. who made the EA8316 CMOS mask ROMs was
+    bought out by NEC in 1978.
 
-	TODO: 1818c discrete speech synth device
+    TODO: 1818c discrete speech synth device
 
-	The 1818C SYNTHESIZER BOARD is mentioned as one of two speech
-	synthesizers described in US Patent 4,130,730 in figures 3, 4a and 4b
-	(the Votrax VSK/VSL is the other device, described in figures 1, 2a,
-	and 2b)
-	The 1818C uses three Motorola MCM14524 256x4 CMOS MASK ROMs to hold
-	the	phoneme parameters.
-	(This is mentioned in 4,130,730 column 11 line 31.)
+    The 1818C SYNTHESIZER BOARD is mentioned as one of two speech
+    synthesizers described in US Patent 4,130,730 in figures 3, 4a and 4b
+    (the Votrax VSK/VSL is the other device, described in figures 1, 2a,
+    and 2b)
+    The 1818C uses three Motorola MCM14524 256x4 CMOS MASK ROMs to hold
+    the phoneme parameters.
+    (This is mentioned in 4,130,730 column 11 line 31.)
 
-	Motorola MCM14524:
-				+---..---+
-		/CLK -> |  1  16 | -- VDD (up to 18v)
-		  CE -> |  2  15 | <- A0
-		  B0 <- |  3  14 | <- A1
-		  B1 <- |  4  13 | <- A7
-		  B2 <- |  5  12 | <- A6
-		  B3 <- |  6  11 | <- A5
-		  A2 -> |  7  10 | <- A4
-	 (0v)VSS -- |  8   9 | <- A3
-				+--------+
-	see http://bitsavers.org/components/motorola/_dataBooks/1978_Motorola_CMOS_Data_Book.pdf
-	page 488
+    Motorola MCM14524:
+                +---..---+
+        /CLK -> |  1  16 | -- VDD (up to 18v)
+          CE -> |  2  15 | <- A0
+          B0 <- |  3  14 | <- A1
+          B1 <- |  4  13 | <- A7
+          B2 <- |  5  12 | <- A6
+          B3 <- |  6  11 | <- A5
+          A2 -> |  7  10 | <- A4
+     (0v)VSS -- |  8   9 | <- A3
+                +--------+
+    see http://bitsavers.org/components/motorola/_dataBooks/1978_Motorola_CMOS_Data_Book.pdf
+    page 488
 
-	TODO: make the two latcha/b flops combine together using input_merger
+    TODO: make the two latcha/b flops combine together using input_merger
 */
 
 /* Core includes */

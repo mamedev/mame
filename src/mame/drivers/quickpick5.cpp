@@ -488,7 +488,7 @@ static INPUT_PORTS_START( quickpick5 )
 INPUT_PORTS_END
 
 // Control panel buttons layout:
-// Payout 1 2 1-2 1-3 1-4  
+// Payout 1 2 1-2 1-3 1-4
 //        3 4 2-3 2-4 3-4 Start
 static INPUT_PORTS_START( waijockey )
 	PORT_START("IN1")

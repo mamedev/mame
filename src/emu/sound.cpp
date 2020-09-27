@@ -393,7 +393,7 @@ void sound_stream_output::init(sound_stream &stream, u32 index, char const *tag)
 
 #if (LOG_OUTPUT_WAV)
 	std::string filename = stream.device().machine().basename();
-	filename +=	stream.device().tag();
+	filename += stream.device().tag();
 	for (int index = 0; index < filename.size(); index++)
 		if (filename[index] == ':')
 			filename[index] = '_';

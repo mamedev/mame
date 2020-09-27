@@ -8,15 +8,15 @@
 
     Hardware:
     - HD68B09EP
-	- 3x HM6116LP-4 (+ 3 empty sockets), 2x TC5517BPL-20
+    - 3x HM6116LP-4 (+ 3 empty sockets), 2x TC5517BPL-20
     - R6545-1AP CRTC
-	- MC2681P DUART
+    - MC2681P DUART
     - MC68B50P ACIA
     - M58321 RTC
-	- 19.7184 MHz XTAL, 3.6864 MHz XTAL
+    - 19.7184 MHz XTAL, 3.6864 MHz XTAL
 
     TODO:
-	- Redump ROM 207_100_2.bin
+    - Redump ROM 207_100_2.bin
 
 ***************************************************************************/
 
@@ -112,7 +112,7 @@ MC6845_UPDATE_ROW( informer_207_100_state::crtc_update_row )
 
 	for (int x = 0; x < x_count; x++)
 	{
-//		uint8_t attr = m_ram[ma + x * 2 + 0];
+//      uint8_t attr = m_ram[ma + x * 2 + 0];
 		uint8_t code = m_ram[ma + x * 2 + 1];
 		uint8_t data = m_chargen[(code << 4) + ra];
 

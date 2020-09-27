@@ -6,11 +6,11 @@
 
     driver by Jarek Burczynski
 
-	TODO:
-	- complete MCU simulation, several gameplay elements not properly right;
-	- sprites are probably banked differently (no way to be sure until MCU dump is available)
-	- TA7630 emulation needs filter support (characteristics depend on the frequency)
-	- TA7630 volume table is hand tuned to match the sample, but still slightly off.
+    TODO:
+    - complete MCU simulation, several gameplay elements not properly right;
+    - sprites are probably banked differently (no way to be sure until MCU dump is available)
+    - TA7630 emulation needs filter support (characteristics depend on the frequency)
+    - TA7630 volume table is hand tuned to match the sample, but still slightly off.
 
 ****************************************************************************/
 

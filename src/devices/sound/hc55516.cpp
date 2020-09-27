@@ -188,10 +188,10 @@ void hc55516_device::process_digit()
 
 	m_next_sample = temp;
 	/* compress the sample range to fit better in a 16-bit word */
-/*	if (temp < 0)
-		m_next_sample = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
-	else
-		m_next_sample = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));*/
+/*  if (temp < 0)
+        m_next_sample = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
+    else
+        m_next_sample = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));*/
 }
 
 void hc55516_device::clock_w(int state)

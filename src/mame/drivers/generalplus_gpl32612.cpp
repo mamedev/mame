@@ -62,7 +62,7 @@ private:
 	uint32_t unk_d000003c_r(offs_t offset, uint32_t mem_mask);
 	uint32_t unk_d0800018_r(offs_t offset, uint32_t mem_mask);
 	uint32_t unk_d0900140_r(offs_t offset, uint32_t mem_mask);
-	uint32_t unk_d0900153_r(offs_t offset, uint32_t mem_mask);	
+	uint32_t unk_d0900153_r(offs_t offset, uint32_t mem_mask);
 };
 
 uint32_t generalplus_gpl32612_game_state::unk_d000003c_r(offs_t offset, uint32_t mem_mask)
@@ -90,7 +90,7 @@ void generalplus_gpl32612_game_state::arm_map(address_map &map)
 	map(0x00000000, 0x03ffffff).ram();
 
 	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gpl32612_game_state::unk_d000003c_r));
-	
+
 	map(0xd0800018, 0xd080001b).r(FUNC(generalplus_gpl32612_game_state::unk_d0800018_r));
 
 	map(0xd0900140, 0xd0900143).r(FUNC(generalplus_gpl32612_game_state::unk_d0900140_r));

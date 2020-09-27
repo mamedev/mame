@@ -597,16 +597,16 @@ static const u8 airduelm72_crc[CRC_LEN] =     { 0x54,0x81,0xe6,0x8a, 0xc9,0x12,0
 // Actual MCU is dumped, information for Air Duel (Japan, M72 hardware) for reference:
 static const u8 airduelm72_code[CODE_LEN] =
 {
-	0x68,0x00,0xd0,             // push 0d000h
-	0x1f,                       // pop ds
-	// the game checks for
-	// "This game can only be played in Japan..." message in the video text buffer
-	// the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
-	0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
-	0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
+    0x68,0x00,0xd0,             // push 0d000h
+    0x1f,                       // pop ds
+    // the game checks for
+    // "This game can only be played in Japan..." message in the video text buffer
+    // the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
+    0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
+    0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
 };
 static const u8 airduelm72j_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
-												0x00,0x00 };
+                                                0x00,0x00 };
 */
 
 /* Daiku no Gensan */

@@ -2345,7 +2345,7 @@ Stargate ROM labels are in this format:
 +--------------------+
 
 Solid Yellow (Black print) 3002-1  through 3002-12 - ROM type A, 2532
-Solid Yellow (Green print) 3002-13 through 3002-24 - ROM type B, 2732 
+Solid Yellow (Green print) 3002-13 through 3002-24 - ROM type B, 2732
 
              |    Black print    |    Green print
  Part Number |  ROM#     Number  |  ROM#     Number

@@ -174,7 +174,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 	{
 		color_mask = 0xff;
 	}
-	
+
 
 	/* cache the background pen */
 	pen_t back_pen = m_nespens[m_back_color & color_mask];

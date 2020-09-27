@@ -34,20 +34,20 @@
 
     TODO:
 
-	- sas/format/format in abcenix tries to access the SASI card using a memory location mapped for task 0, when the process is run as task 1
+    - sas/format/format in abcenix tries to access the SASI card using a memory location mapped for task 0, when the process is run as task 1
 
-		[:mac] ':3f' (0009E) ff800:4f TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
-		[:mac] ':3f' (0009E) ff801:ff TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
-		[:mac] ':3f' (0009E) ff000:4f TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
-		[:mac] ':3f' (0009E) ff001:fe TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
-		[:mac] ':3f' (0009E) fe800:4f TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
-		[:mac] ':3f' (0009E) fe801:fd TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
-		[:mac] ':3f' (0009E) fe000:4f TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
-		[:mac] ':3f' (0009E) fe001:fc TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
+        [:mac] ':3f' (0009E) ff800:4f TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
+        [:mac] ':3f' (0009E) ff801:ff TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
+        [:mac] ':3f' (0009E) ff000:4f TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
+        [:mac] ':3f' (0009E) ff001:fe TASK 0 SEGMENT 15 PAGE 14 MEM 7f000-7f7ff 1ff000
+        [:mac] ':3f' (0009E) fe800:4f TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
+        [:mac] ':3f' (0009E) fe801:fd TASK 0 SEGMENT 15 PAGE 13 MEM 7e800-7efff 1fe800
+        [:mac] ':3f' (0009E) fe000:4f TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
+        [:mac] ':3f' (0009E) fe001:fc TASK 0 SEGMENT 15 PAGE 12 MEM 7e000-7e7ff 1fe000
 
-		[:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0 TASK 1 FC 1)
-		should be
-		[:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1 TASK 0 FC 5)
+        [:mac] ':3f' (08A98) MAC 7e4a2:0004a2 (SEGA 02f SEGD 09 PGA 09c PGD 8000 NONX 1 WP 0 TASK 1 FC 1)
+        should be
+        [:mac] ':3f' (089A8) MAC 7e4a2:1fe4a2 (SEGA 00f SEGD 0f PGA 0fc PGD 43fc NONX 0 WP 1 TASK 0 FC 5)
 
     - short/long reset (RSTBUT)
     - CIO

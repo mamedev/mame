@@ -22,7 +22,7 @@
 // ======================> informer_213_kbd_hle_device
 
 class informer_213_kbd_hle_device : public device_t,
-                                    protected device_matrix_keyboard_interface<9>
+									protected device_matrix_keyboard_interface<9>
 {
 public:
 	// construction/destruction

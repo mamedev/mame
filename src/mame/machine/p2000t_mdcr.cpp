@@ -87,7 +87,7 @@ void mdcr_device::device_add_mconfig(machine_config &config)
 {
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED |
-	                              CASSETTE_SPEAKER_MUTED);
+								  CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("p2000_cass");
 	m_cassette->set_formats(p2000t_cassette_formats);
 }
@@ -199,7 +199,7 @@ bool mdcr_device::tape_start_or_end()
 {
 	auto pos = m_cassette->get_position();
 	auto bet = m_cassette->motor_on() &&
-	       (pos <= 0 || pos >= m_cassette->get_length());
+		   (pos <= 0 || pos >= m_cassette->get_length());
 
 	// Reset phase decoder at tape start/end.
 	if (bet)
@@ -239,7 +239,7 @@ bool mdcr_device::phase_decoder::signal(bool state, double delay)
 	if (state == m_last_signal)
 	{
 		if (m_needs_sync == 0 && m_current_clock > m_clock_period &&
-		    !within_tolerance(m_current_clock, m_clock_period))
+			!within_tolerance(m_current_clock, m_clock_period))
 		{
 			// We might be at the last bit in a sequence, meaning we
 			// are only getting the reference signal for a while.

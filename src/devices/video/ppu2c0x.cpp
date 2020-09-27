@@ -419,7 +419,7 @@ void ppu2c0x_device::init_palette_tables()
 
 				m_nespens[entry] = (uint32_t)col;
 				entry++;
-				
+
 			}
 		}
 	}

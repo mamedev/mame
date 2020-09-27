@@ -288,7 +288,7 @@ namespace plib
 			}
 			else
 				//rho_delta = accuracy * plib::sqrt(vec_mult2<FT>(n, rhs))
-				//		+ 1e-4 * std::sqrt(n);
+				//      + 1e-4 * std::sqrt(n);
 				rho_delta = accuracy * plib::sqrt(narrow_cast<FT>(n));
 
 			//
@@ -399,7 +399,7 @@ namespace plib
 				}
 
 				//for (std::size_t i = 0; i <= k; i++)
-				//	vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
+				//  vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
 				return true;
 			}
 			return false;

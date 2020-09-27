@@ -340,7 +340,7 @@ ROM_START(photoply98sp)
 	ROM_REGION(0x20000, "bios", 0) // Motherboard BIOS
 	ROM_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT27C010, Funworld sticker: Sept 1998
 
-	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip, Funworld sticker: Sept 1998 
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) // Multifunction board with a ESS AudioDrive chip, Funworld sticker: Sept 1998
 	ROM_LOAD("enhanced_bios_centos.bin", 0x000000, 0x8000, CRC(ee8ad003) SHA1(4814385117599a98da02155785d1e3fce4e485bd) ) // Centos CI-8000/PP2000 ROM BIOS Version 1.06, 27C256B
 
 	ROM_REGION(0x8000, "video_bios", 0 )

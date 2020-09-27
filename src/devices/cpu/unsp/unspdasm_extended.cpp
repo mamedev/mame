@@ -147,7 +147,7 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 			uint8_t rb =   (ximm & 0x000f) >> 0;
 			uint8_t size = (ximm & 0x7000) >> 12;
 			uint8_t rx   = (ximm & 0x0e00) >> 9;
-			
+
 			if (size == 0) size = 8;
 
 			int start = (rx + 1)&7;

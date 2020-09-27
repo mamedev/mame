@@ -3,18 +3,18 @@
 /***************************************************************************
 
     Informer 213 (IBM 374/SNA V.22)
-	Informer 213 AE (VT-100)
+    Informer 213 AE (VT-100)
 
     Hardware:
     - EF68B09EP
-	- 2x TC5564PL-15 [8k] (next to CG ROM)
-	- 1x TC5565APL-15 [8k] + 2x TMS4464-15NL [32k] (next to CPU)
-	- Z0853006PSC SCC
-	- ASIC (INFORMER 44223)
-	- 18.432 MHz XTAL
+    - 2x TC5564PL-15 [8k] (next to CG ROM)
+    - 1x TC5565APL-15 [8k] + 2x TMS4464-15NL [32k] (next to CPU)
+    - Z0853006PSC SCC
+    - ASIC (INFORMER 44223)
+    - 18.432 MHz XTAL
 
     TODO:
-	- Figure out the ASIC and how it's connected
+    - Figure out the ASIC and how it's connected
 
 ***************************************************************************/
 
@@ -136,7 +136,7 @@ INPUT_PORTS_END
 uint32_t informer_213_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t chargen_base = (m_chargen.bytes() == 0x4000) ? 0x2000 : 0;
-	
+
 	// line at which vram splits into two windows
 	int split = 24 - ((m_vram_start_addr2 - m_vram_start_addr) / 80);
 
@@ -389,7 +389,7 @@ void informer_213_state::informer_213(machine_config &config)
 	m_screen->set_visarea_full();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-//	m_screen->set_raw(18.432_MHz_XTAL, 0, 0, 0, 0, 0, 0);
+//  m_screen->set_raw(18.432_MHz_XTAL, 0, 0, 0, 0, 0, 0);
 	m_screen->set_screen_update(FUNC(informer_213_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(informer_213_state::vblank_w));
 

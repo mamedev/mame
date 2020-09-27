@@ -21,7 +21,7 @@
 // no action will be taken. This is academically cleaner, but slower than
 // allowing this to happen and filter it during during "process".
 
-#define AVOID_NOOP_QUEUE_PUSHES	(0)
+#define AVOID_NOOP_QUEUE_PUSHES (0)
 
 namespace netlist
 {
@@ -160,7 +160,7 @@ namespace netlist
 					if (m_in_queue == queue_status::DELAYED_DUE_TO_INACTIVE)
 					{
 #if (AVOID_NOOP_QUEUE_PUSHES)
-						if (m_next_scheduled_time > exec().time() 
+						if (m_next_scheduled_time > exec().time()
 							&& (m_cur_Q != m_new_Q))
 #else
 						if (m_next_scheduled_time > exec().time())

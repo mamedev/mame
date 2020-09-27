@@ -138,7 +138,7 @@ protected:
 	// internal state
 	u8 m_outputs;                           // number of outputs
 	std::vector<u8> m_outputmap;            // map of inputs to outputs
-	std::vector<bool> m_output_clear;		// flag for tracking cleared buffers
+	std::vector<bool> m_output_clear;       // flag for tracking cleared buffers
 	sound_stream *m_mixer_stream;           // mixing stream
 };
 

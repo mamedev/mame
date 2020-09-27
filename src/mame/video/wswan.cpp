@@ -10,7 +10,7 @@
  TODO:
    - remove the redundant parts of m_regs
    - split the Color VDP from the Mono VDP
-	 - Add support for WSC high/low contrast (register 14, bit 1)
+     - Add support for WSC high/low contrast (register 14, bit 1)
 
  ***************************************************************************/
 

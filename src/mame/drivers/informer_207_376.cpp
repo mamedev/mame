@@ -8,17 +8,17 @@
 
     Hardware:
     - M6809
-	- 8253 PIT
+    - 8253 PIT
     - Z80SCC 8530
     - 2x 6850 ACIA (up to 4)
     - 2x X2212P NOVRAM
 
     TODO:
-	- Dump keyboard controller and emulate it (currently HLE'd)
-	- Problably needs improvements to at least the Z80SCC to
-	  properly support synchrous modes
+    - Dump keyboard controller and emulate it (currently HLE'd)
+    - Problably needs improvements to at least the Z80SCC to
+      properly support synchrous modes
     - Figure out the unknown bits at 0x8400
-	- Verify clock speeds
+    - Verify clock speeds
 
     Notes:
     - Thanks to charcole and his zmachine3270 project at

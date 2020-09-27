@@ -27,8 +27,8 @@
     interesting issues:
     - mirror of smaller <64KBYTE/512kbit SRAM sizes
     - banking when using 1M or 2M sram sizes
-	- The units likely came with the name "WONDERSWAN" configured in the
-	  internal EEPOM
+    - The units likely came with the name "WONDERSWAN" configured in the
+      internal EEPOM
 
 ***************************************************************************/
 
@@ -90,8 +90,8 @@ protected:
 	static const u8 WSWAN_INT_VBL    = 6;
 	static const u8 WSWAN_INT_HBLTMR = 7;
 
-	static const u32 INTERNAL_EEPROM_SIZE = 1024;	// 16kbit on WSC
-	static const u32 INTERNAL_EEPROM_SIZE_WS = 64;	// 1kbit on WS
+	static const u32 INTERNAL_EEPROM_SIZE = 1024;   // 16kbit on WSC
+	static const u32 INTERNAL_EEPROM_SIZE_WS = 64;  // 1kbit on WS
 
 	enum enum_system { TYPE_WSWAN=0, TYPE_WSC };
 
@@ -727,7 +727,7 @@ void wswan_state::port_w(offs_t offset, u8 data)
 			// Bit 4-7 - Unknown
 			m_sound->port_w(offset, data);
 			break;
-		case 0x9E:	// WSC volume setting (0, 1, 2, 3)
+		case 0x9E:  // WSC volume setting (0, 1, 2, 3)
 			break;
 		case 0xa0:  // Hardware type/system control
 			// Bit 0   - Enable cartridge slot and/or disable bios

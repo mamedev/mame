@@ -41,13 +41,13 @@
           when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
           a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
 
-	TODO:
-		- SE and Classic to own driver
-		- Portable and PowerBook 100 to own driver
-		- Remaining PowerBooks to own driver
-		- Quadra 700 to own driver
-		- V8 and friends to own driver
-		- LC3 / LC520 / IIvx / IIvi to own driver
+    TODO:
+        - SE and Classic to own driver
+        - Portable and PowerBook 100 to own driver
+        - Remaining PowerBooks to own driver
+        - Quadra 700 to own driver
+        - V8 and friends to own driver
+        - LC3 / LC520 / IIvx / IIvi to own driver
 
 ****************************************************************************/
 

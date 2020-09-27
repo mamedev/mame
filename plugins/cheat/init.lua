@@ -944,7 +944,7 @@ function cheat.startplugin()
 				end
 			end
 		end
-		return intf 
+		return intf
 	end
 
 	function ce.list()

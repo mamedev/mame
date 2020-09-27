@@ -22,8 +22,8 @@
 // ======================> informer_207_376_kbd_hle_device
 
 class informer_207_376_kbd_hle_device : public device_t,
-                                        public device_buffered_serial_interface<16>,
-                                        protected device_matrix_keyboard_interface<8>
+										public device_buffered_serial_interface<16>,
+										protected device_matrix_keyboard_interface<8>
 {
 public:
 	// construction/destruction

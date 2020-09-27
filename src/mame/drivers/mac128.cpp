@@ -6,8 +6,8 @@
     Original-style Macintosh family emulation
 
     The cutoff here is Macs with 128k-style video and audio.
-	We also include the SE and Classic, which are basically cost-reduced Mac Pluses with ADB
-	instead of the original keyboard/mouse hardware.
+    We also include the SE and Classic, which are basically cost-reduced Mac Pluses with ADB
+    instead of the original keyboard/mouse hardware.
 
     Nate Woods, Raphael Nabet, R. Belmont
 
@@ -379,7 +379,7 @@ void mac128_state::field_interrupts()
 		take_interrupt = 1;
 	}
 
-//	printf("field_interrupts: take %d\n", take_interrupt);
+//  printf("field_interrupts: take %d\n", take_interrupt);
 
 	if (m_last_taken_interrupt > -1)
 	{
@@ -757,7 +757,7 @@ uint8_t mac128_state::mac_via_in_b()
 
 	val |= m_rtc->data_r();
 
-//	printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
 	return val;
 }

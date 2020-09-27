@@ -489,7 +489,7 @@ void votrax_sc01_device::chip_update()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 
-	//	logerror("%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
+	//  logerror("%s tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", machine().time().to_string(), m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 3, m_pitch & 7, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
 }
 
 void votrax_sc01_device::filters_commit(bool force)

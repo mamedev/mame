@@ -32,7 +32,7 @@ project "netlist"
 	}
 
 	includedirs {
-	--	MAME_DIR .. "src/lib",
+	--  MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/netlist",
 	}
 

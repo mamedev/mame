@@ -2353,13 +2353,13 @@ CONS( 2016, fcpocket,  0,  0,  nes_vt_fp_4x16mb,   nes_vt_fp, nes_vt_hh_state, e
 
 /****************************************************************************************************************
 
-	Things below seem on heavily enhanced hardware of unknown VT type
+    Things below seem on heavily enhanced hardware of unknown VT type
 
-	It's possible some of these are the same as some of the ones above (sy889, rminitv, dgun2573 etc.) but with
-	more features used.
+    It's possible some of these are the same as some of the ones above (sy889, rminitv, dgun2573 etc.) but with
+    more features used.
 
-	In some cases these might be almost entirely different, and it is likely a number don't belong in this
-	driver at all.
+    In some cases these might be almost entirely different, and it is likely a number don't belong in this
+    driver at all.
 
 ****************************************************************************************************************/
 

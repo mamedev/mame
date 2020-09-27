@@ -195,7 +195,7 @@ static INPUT_PORTS_START( macadb )
 INPUT_PORTS_END
 
 macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-        : device_t(mconfig, MACADB, tag, owner, clock),
+		: device_t(mconfig, MACADB, tag, owner, clock),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
@@ -212,7 +212,7 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 
 ioport_constructor macadb_device::device_input_ports() const
 {
-    return INPUT_PORTS_NAME(macadb);
+	return INPUT_PORTS_NAME(macadb);
 }
 
 void macadb_device::device_start()
@@ -796,12 +796,12 @@ TIMER_CALLBACK_MEMBER(macadb_device::mac_adb_tick)
 				set_adb_line(CLEAR_LINE);
 				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
-                    //printf("1 ");
+					//printf("1 ");
 					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
 				}
 				else
 				{
-                    //printf("0 ");
+					//printf("0 ");
 					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
 				}
 				m_adb_linestate++;
@@ -1499,14 +1499,14 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 	int dtime = (int)(machine().time().as_ticks(adb_timebase) - m_last_adb_time);
 	m_last_adb_time = machine().time().as_ticks(adb_timebase);
 
-    /*if (m_adb_linestate <= 12)
-    {
-        printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
-    }
-    else
-    {
-        printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
-    }*/
+	/*if (m_adb_linestate <= 12)
+	{
+	    printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
+	}
+	else
+	{
+	    printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
+	}*/
 
 	if ((m_adb_direction) && (m_adb_linestate == LST_TSTOP))
 	{

@@ -127,7 +127,7 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	mm5837_stream_device &noise(MM5837_STREAM(config, "noise", 0));
-//	noise.set_vdd(-6.5);   // seems too low -- possible the mapping in mm5837 is wrong
+//  noise.set_vdd(-6.5);   // seems too low -- possible the mapping in mm5837 is wrong
 	noise.set_vdd(-8.0);
 
 	for (auto &cem_device : m_cem_device)

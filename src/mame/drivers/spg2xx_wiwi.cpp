@@ -6,10 +6,10 @@
 
    The WiWi could also run NES games; SunPlus hardware was in the cartridge, it was a 'fake' system.
 
-	---
+    ---
 
-	some of these are just checking a external timer on a port, I think this is one of the SPG features
-	so might need making more generic.
+    some of these are just checking a external timer on a port, I think this is one of the SPG features
+    so might need making more generic.
 */
 
 
@@ -90,9 +90,9 @@ public:
 
 protected:
 
-//	virtual uint16_t portb_r();
+//  virtual uint16_t portb_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-//	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+//  virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 
@@ -212,10 +212,10 @@ void spg2xx_game_ddmsup_state::ddmsup(machine_config &config)
 {
 	spg2xx(config);
 
-//	m_maincpu->portb_in().set(FUNC(spg2xx_game_ddmsup_state::portb_r));
+//  m_maincpu->portb_in().set(FUNC(spg2xx_game_ddmsup_state::portb_r));
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_ddmsup_state::porta_r));
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_ddmsup_state::porta_w));
-//	m_maincpu->portb_out().set(FUNC(spg2xx_game_ddmsup_state::portb_w));
+//  m_maincpu->portb_out().set(FUNC(spg2xx_game_ddmsup_state::portb_w));
 }
 
 

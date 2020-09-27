@@ -1082,7 +1082,7 @@ ROM_START( knightsb3 )
 	  ==                         |
 	    |   1            5    6  |
 	    |________________________|
-		
+
 	#1   palce20v8h     secured, bruteforce ok
 	#2   palce16v8h     secured, bruteforce ok
 	#3   palce16v8h     secured, registered

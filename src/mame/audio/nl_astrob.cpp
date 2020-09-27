@@ -61,26 +61,26 @@
 
 // Define some random factors (5%)
 
-#define FRND1	1.023
-#define FRND2	1.017
-#define FRND3	1.005
-#define FRND4	1.014
-#define FRND5	1.049
-#define FRND6	1.044
-#define FRND7	1.016
-#define FRND8	1.037
-#define FRND9	1.030
-#define FRND10	1.001
-#define FRND11	1.034
-#define FRND12	1.043
-#define FRND13	1.011
-#define FRND14	1.016
-#define FRND15	1.011
-#define FRND16	1.006
-#define FRND17	1.009
-#define FRND18	1.007
-#define FRND19	1.035
-#define FRND20	1.004
+#define FRND1   1.023
+#define FRND2   1.017
+#define FRND3   1.005
+#define FRND4   1.014
+#define FRND5   1.049
+#define FRND6   1.044
+#define FRND7   1.016
+#define FRND8   1.037
+#define FRND9   1.030
+#define FRND10  1.001
+#define FRND11  1.034
+#define FRND12  1.043
+#define FRND13  1.011
+#define FRND14  1.016
+#define FRND15  1.011
+#define FRND16  1.006
+#define FRND17  1.009
+#define FRND18  1.007
+#define FRND19  1.035
+#define FRND20  1.004
 
 //
 // Main netlist

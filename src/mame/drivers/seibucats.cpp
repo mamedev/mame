@@ -12,7 +12,7 @@
     - mahjong keyboard inputs (and JAMMA adapter for some games);
     - emulate YMF721-S or at least do something about MIDI sound;
     - verify interrupt table;
-	- verify coin inputs;
+    - verify coin inputs;
     - Any other port lingering in the 0x400-0x7ff area?
 
 ===========================================================================================================================
@@ -38,14 +38,14 @@
     ROM:
     - Program ROMs: MX27C40000C-12 or MBM27C4001-12Z or TMS27C040-10 x4 (U011, U015-U017 = "PRG0-PRG3" on ROM board)
     - Sprite ROMs: MX29F8100MC-12 or "MX29F1610" x4 (U0231-U0234 = "OBJ1-OBJ4" on ROM board).
-      Only three ROMs appear to be populated on any game. 
-	  This means sprites should be 6bpp, even though they could potentially have been 8bpp.
+      Only three ROMs appear to be populated on any game.
+      This means sprites should be 6bpp, even though they could potentially have been 8bpp.
 
     EEPROM/NVRAM:
     - ST93C46AF Serial EEPROM (U0512; towards left center of board)
     - Toshiba TC55257DFL-70L (U0144 on ROM board) with Maxell CR2032 battery (BT011 on ROM board).
-      The ROM board type used by Marumie Network lacks NVRAM and RTC; 
-	  their locations are not populated on Pakkun Ball TV.
+      The ROM board type used by Marumie Network lacks NVRAM and RTC;
+      their locations are not populated on Pakkun Ball TV.
 
     RTC:
     - JRC 6355E/NJU6355 Real Time Clock (U0513, above YMF721)
@@ -54,8 +54,8 @@
     Serial ports:
     - NEC uPD71051GB USART x2 (U1133, U1134; lined up with DB9 ports)
     - MAXZ32 Serial Line Driver x2 (U1138, U1141; between USARTs and DB9 ports)
-    - Two DB9 ports, one marked "DVD" and the other "Touch Panel." 
-	The latter also uses a separate 2-pin Molex power connector (CN114).
+    - Two DB9 ports, one marked "DVD" and the other "Touch Panel."
+    The latter also uses a separate 2-pin Molex power connector (CN114).
 
     Sound and linear miscellany:
     - Yamaha YMF721-S General MIDI OPL4-ML2 (U0274; to right of USARTs)

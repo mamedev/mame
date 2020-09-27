@@ -33,7 +33,7 @@ private:
 
 	// internal state
 	uint16_t m_menupos;
-	
+
 	// command handling
 	uint8_t m_clockstate;
 	uint8_t m_datashifterpos;

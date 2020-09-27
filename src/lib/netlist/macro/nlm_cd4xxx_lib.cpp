@@ -490,15 +490,15 @@ static NETLIST_START(CD4049_DIP)
 	NET_C(A.VSS, B.VSS, C.VSS, D.VSS, E.VSS, F.VSS)
 
 	//DIPPINS( /*     +--------------+     */
-	//	A.VDD, /* VCC |1     ++    16| NC  */ NC.I,
-	//	  A.G, /*G=/A |2           15| L=/F*/ F.L,
-	//	  A.A, /*   A |3           14| F   */ F.F,
-	//	  B.H, /*H=/B |4           13| NC  */ NC.I,
-	//	  B.B, /*   B |5    4049   12| K=/E*/ E.K,
-	//	  C.I, /*I=/C |6           11| E   */ E.E,
-	//	  C.C, /*   C |7           10| J=/D*/ D.J,
-	//	A.VSS, /* VSS |8            9| D   */ D.D
-	//		   /*     +--------------+     */
+	//  A.VDD, /* VCC |1     ++    16| NC  */ NC.I,
+	//    A.G, /*G=/A |2           15| L=/F*/ F.L,
+	//    A.A, /*   A |3           14| F   */ F.F,
+	//    B.H, /*H=/B |4           13| NC  */ NC.I,
+	//    B.B, /*   B |5    4049   12| K=/E*/ E.K,
+	//    C.I, /*I=/C |6           11| E   */ E.E,
+	//    C.C, /*   C |7           10| J=/D*/ D.J,
+	//  A.VSS, /* VSS |8            9| D   */ D.D
+	//         /*     +--------------+     */
 	//)
 	DIPPINS(   /*     +--------------+     */
 		A.VDD, /* VCC |1     ++    16| NC  */ NC.I,

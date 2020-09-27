@@ -113,14 +113,14 @@ void egret_device::send_port(uint8_t offset, uint8_t data)
 			{
 				m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
 				/*
-                if (data & 0x80)
-                {
-                    printf("EG ADB: 1->0 time %d\n", m_adb_dtime);
-                }
-                else
-                {
-                    printf("EG ADB: 0->1 time %d\n", m_adb_dtime);
-                }
+				if (data & 0x80)
+				{
+				    printf("EG ADB: 1->0 time %d\n", m_adb_dtime);
+				}
+				else
+				{
+				    printf("EG ADB: 0->1 time %d\n", m_adb_dtime);
+				}
 				*/
 				// allow the linechange handler to override us
 				adb_in = (data & 0x80) ? true : false;

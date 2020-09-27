@@ -153,7 +153,7 @@ struct P2000T_Header
 std::ostream &operator<<(std::ostream &os, P2000T_Header const &hdr)
 {
 	return os << "File: " << std::string(hdr.file_name, 8) << '.'
-	          << std::string(hdr.ext, 3) << "  " << hdr.file_length;
+			  << std::string(hdr.ext, 3) << "  " << hdr.file_length;
 }
 
 static cassette_image::error p2000t_cas_identify(cassette_image *cass, struct CassetteOptions *opts)
@@ -189,27 +189,27 @@ void update_chksum(uint16_t *de, bool bit)
 }
 
 /*
-	A transition on a clock boundary from low to high is a 1.
-	A transition on a clock boundary from high to low is a 0
-	An intermediate transition halfway between the clock boundary
-	can occur when there are consecutive 0s or 1s. See the example
-	below where the clock is marked by a |
+    A transition on a clock boundary from low to high is a 1.
+    A transition on a clock boundary from high to low is a 0
+    An intermediate transition halfway between the clock boundary
+    can occur when there are consecutive 0s or 1s. See the example
+    below where the clock is marked by a |
 
 
-			1    0    1    1    0    0
-	RDA:  _|----|____|--__|----|__--|__--
-	RDC:  _|-___|-___|-___|-___|-___|-___
-			^                     ^
-			|-- clock signal      |-- intermediate transition.
+            1    0    1    1    0    0
+    RDA:  _|----|____|--__|----|__--|__--
+    RDC:  _|-___|-___|-___|-___|-___|-___
+            ^                     ^
+            |-- clock signal      |-- intermediate transition.
 
-	This signal can be written by a simple algorithm where the first bit
-	is always false (transition to low, half clock).  Now only one bit is needed
-	to determine what the next partial clock should look like.
+    This signal can be written by a simple algorithm where the first bit
+    is always false (transition to low, half clock).  Now only one bit is needed
+    to determine what the next partial clock should look like.
 
-	This works because we are always guaranteed that a block starts with 0xAA,
-	and hence will ALWAYS find a signal like this on tape: _-- (low, high, high)
-	after a gap. This is guaranteed when the tape is moving forward as well as
-	backwards.
+    This works because we are always guaranteed that a block starts with 0xAA,
+    and hence will ALWAYS find a signal like this on tape: _-- (low, high, high)
+    after a gap. This is guaranteed when the tape is moving forward as well as
+    backwards.
 */
 cassette_image::error p2000t_put_bit(cassette_image *cass, double *time_index, bool bit)
 {
@@ -263,17 +263,17 @@ static cassette_image::error p2000t_cas_load(cassette_image *cassette)
 	constexpr int CAS_BLOCK   = 1280;
 
 	/*
-		The cas format is pretty simple. it consists of a sequence of blocks,
-		where a block consists of the following:
+	    The cas format is pretty simple. it consists of a sequence of blocks,
+	    where a block consists of the following:
 
-		[0-256]   P2000 memory address 0x6000 - 0x6100
-		....   Nonsense (keyboard status etc.)
-		0x30   P200T_Header
-		0x50
-		...    Nonsense..
-		[0-1024] Data block
+	    [0-256]   P2000 memory address 0x6000 - 0x6100
+	    ....   Nonsense (keyboard status etc.)
+	    0x30   P200T_Header
+	    0x50
+	    ...    Nonsense..
+	    [0-1024] Data block
 
-		This means that one block gets stored in 1280 bytes.
+	    This means that one block gets stored in 1280 bytes.
 	*/
 	if (image_size % CAS_BLOCK != 0)
 	{

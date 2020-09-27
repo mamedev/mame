@@ -47,8 +47,8 @@
 #define LOG_SIZE_CARD       (1 << 14)
 #define LOG_FILTER_CARD     (1 << 15)
 #define LOG_KEYBC           (1 << 16)
-#define LOG_TDS				(1 << 17)
-#define LOG_TABLET			(1 << 18)
+#define LOG_TDS             (1 << 17)
+#define LOG_TABLET          (1 << 18)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
 							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
 
