@@ -107,7 +107,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ccsakura" supported="partial"> <!-- freezes if you don't press Start immediately -->
+	<software name="ccsakura">
 		<description>Cardcaptor Sakura - Sakura to Fushigi na Clow Card</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -192,7 +192,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="clocktow" supported="no"> <!-- freezes short after starting a game -->
+	<!-- graphics bugs in main sprites during the game -->
+	<software name="clocktow" supported="partial">
 		<description>Clock Tower for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
@@ -899,7 +900,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mconannm" supported="no"> <!-- freezes -->
+	<software name="mconannm">
 		<description>Meitantei Conan - Nishi no Meitantei Saidai no Kiki!</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
@@ -1236,7 +1237,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="srobot2a" supported="no"> <!-- freezes -->
+	<software name="srobot2a">
 		<description>Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen</description>
 		<year>2000</year>
 		<publisher>Banpresto</publisher>
@@ -1253,7 +1254,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="srobot2b" supported="no"> <!-- freezes -->
+	<software name="srobot2b">
 		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen</description>
 		<year>2000</year>
 		<publisher>Banpresto</publisher>
@@ -1270,7 +1271,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="srobot2c" supported="no"> <!-- freezes -->
+	<software name="srobot2c">
 		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen</description>
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
@@ -1287,7 +1288,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="srobotc" supported="no"> <!-- freezes -->
+	<software name="srobotc">
 		<description>Super Robot Taisen Compact</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
