@@ -9,6 +9,7 @@
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "nl_setup.h"
+#include "nl_errstr.h"
 #include "plib/penum.h"
 #include "plib/pstonum.h"
 #include "plib/pstrutil.h"
@@ -1192,6 +1193,7 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(name_da));
 		}
 	}
+
 	log().verbose("checking tristate consistency  ...");
 	for (auto & i : m_terminals)
 	{

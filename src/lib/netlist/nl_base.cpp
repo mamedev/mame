@@ -106,7 +106,6 @@ namespace netlist
 	netlist_state_t::netlist_state_t(const pstring &name,
 		plib::plog_delegate logger)
 	: m_log(logger)
-	, m_extended_validation(false)
 	, m_dummy_version(1)
 	{
 		m_setup = plib::make_unique<setup_t, host_arena>(*this);

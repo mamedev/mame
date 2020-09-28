@@ -82,7 +82,6 @@ public:
 		opt_type(*this,     "y", "type",        0,           std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
 
 		opt_grp6(*this,     "Options for validate command",  "These options are only used by the validate command."),
-		opt_extended_validation(*this, "", "extended",       "Identify issues with power terminals."),
 
 		opt_grp7(*this,     "Options for header command",    "These options are only used by the header command."),
 		opt_tabwidth(*this, "", "tab-width", 4,              "Tab width for output."),
@@ -153,7 +152,6 @@ private:
 	plib::option_str_limit<unsigned> opt_type;
 
 	plib::option_group  opt_grp6;
-	plib::option_bool   opt_extended_validation;
 	plib::option_group  opt_grp7;
 	plib::option_num<unsigned> opt_tabwidth;
 	plib::option_num<unsigned> opt_linewidth;
@@ -547,8 +545,6 @@ void tool_app_t::validate()
 
 	m_errors = 0;
 	m_warnings = 0;
-
-	nt.set_extended_validation(opt_extended_validation());
 
 	try
 	{
