@@ -52,7 +52,7 @@ void warpwarp_sound_device::device_start()
 
 	m_clock_16h = clock() / 3 / 2 / 16;
 	m_clock_1v = clock() / 3 / 2 / 384;
-	m_channel = stream_alloc_legacy(0, 1, m_clock_16h);
+	m_channel = stream_alloc(0, 1, m_clock_16h);
 
 	m_sound_volume_timer = timer_alloc(TIMER_SOUND_VOLUME_DECAY);
 	m_music_volume_timer = timer_alloc(TIMER_MUSIC_VOLUME_DECAY);
@@ -169,16 +169,16 @@ void warpwarp_sound_device::music2_w(u8 data)
 }
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void warpwarp_sound_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
-	{
-	stream_sample_t *buffer = outputs[0];
+void warpwarp_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	auto &buffer = outputs[0];
 
-	while (samples--)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
-		*buffer++ = (m_sound_signal + m_music_signal) / 2;
+		buffer.put_int(sampindex, m_sound_signal + m_music_signal, 32768 * 2);
 
 		/*
 		 * The music signal is selected at a rate of 2H (1.536MHz) from the

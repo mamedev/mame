@@ -36,7 +36,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	//virtual void sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples) override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides

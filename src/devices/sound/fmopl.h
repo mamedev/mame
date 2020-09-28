@@ -16,7 +16,7 @@
 /* select output bits size of output : 8 or 16 */
 #define OPL_SAMPLE_BITS 16
 
-typedef stream_sample_t OPLSAMPLE;
+typedef s32 OPLSAMPLE;
 /*
 #if (OPL_SAMPLE_BITS==16)
 typedef int16_t OPLSAMPLE;

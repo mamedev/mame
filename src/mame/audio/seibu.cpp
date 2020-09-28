@@ -385,7 +385,7 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 void seibu_adpcm_device::device_start()
 {
 	m_playing = 0;
-	m_stream = stream_alloc_legacy(0, 1, clock());
+	m_stream = stream_alloc(0, 1, clock());
 	m_adpcm.reset();
 
 	save_item(NAME(m_current));
@@ -443,14 +443,15 @@ void seibu_adpcm_device::ctl_w(u8 data)
 
 
 //-------------------------------------------------
-//  sound_stream_update_legacy - handle a stream update
+//  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void seibu_adpcm_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
+void seibu_adpcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *dest = outputs[0];
+	auto &dest = outputs[0];
 
-	while (m_playing && samples > 0)
+	int sampindex;
+	for (sampindex = 0; m_playing && sampindex < dest.samples(); sampindex++)
 	{
 		int val = (m_base[m_current] >> m_nibble) & 15;
 
@@ -462,12 +463,7 @@ void seibu_adpcm_device::sound_stream_update_legacy(sound_stream &stream, stream
 				m_playing = 0;
 		}
 
-		*dest++ = m_adpcm.clock(val) << 4;
-		samples--;
+		dest.put_int(sampindex, m_adpcm.clock(val), 32768 >> 4);
 	}
-	while (samples > 0)
-	{
-		*dest++ = 0;
-		samples--;
-	}
+	dest.fill(0, sampindex);
 }
