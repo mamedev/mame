@@ -103,8 +103,8 @@ protected:
 
 	int get_y_beam();
 	int get_x_beam();
-	offs_t fix_register_mirrors( offs_t offset );
-	bool invalid_register( offs_t offset, bool rw );
+	offs_t fix_register_mirrors(offs_t offset);
+	bool invalid_register(offs_t offset, bool rw);
 
 	/* timers */
 	static constexpr device_timer_id TIMER_VBLANK_START = 0;

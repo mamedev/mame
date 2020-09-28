@@ -45,7 +45,7 @@ ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag,
 
 
 ROM_START( ef9340_1 )
-	ROM_REGION( 0xA00, "ef9340_1", 0 )
+	ROM_REGION( 0xa00, "ef9340_1", 0 )
 	ROM_LOAD( "charset_ef9340_1.rom", 0x0000, 0x0a00, BAD_DUMP CRC(8de85988) SHA1(f8e3892234da6626eb4302e171179ada5a51fca8) ) // taken from datasheet
 ROM_END
 
@@ -65,10 +65,10 @@ void ef9340_1_device::device_start()
 	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust( screen().time_until_pos(0, 0), 0, screen().scan_period() );
+	m_line_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	m_blink_timer = timer_alloc(TIMER_BLINK);
-	m_blink_timer->adjust( screen().time_until_pos(0, 0), 0, screen().frame_period() );
+	m_blink_timer->adjust(screen().time_until_pos(0, 0), 0, screen().frame_period());
 
 	// zerofill
 	m_ef9341.TA = 0;
@@ -108,7 +108,7 @@ void ef9340_1_device::device_start()
 
 void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch ( id )
+	switch (id)
 	{
 		case TIMER_LINE:
 			ef9340_scanline(screen().vpos());
@@ -130,25 +130,25 @@ void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 u16 ef9340_1_device::ef9340_get_c_addr(u8 x, u8 y)
 {
-	if ( ( y & 0x18 ) == 0x18 )
+	if ((y & 0x18) == 0x18)
 	{
-		return 0x318 | ( ( x & 0x38 ) << 2 ) | ( x & 0x07 );
+		return 0x318 | ((x & 0x38) << 2) | (x & 0x07);
 	}
-	if ( x & 0x20 )
+	if (x & 0x20)
 	{
-		return 0x300 | ( ( y & 0x07 ) << 5 ) | ( y & 0x18 ) | ( x & 0x07 );
+		return 0x300 | ((y & 0x07) << 5) | (y & 0x18) | (x & 0x07);
 	}
-	return ( y & 0x1f ) << 5 | ( x & 0x1f );
+	return (y & 0x1f) << 5 | (x & 0x1f);
 }
 
 
 void ef9340_1_device::ef9340_inc_c()
 {
 	m_ef9340.X++;
-	if ( m_ef9340.X == 40 || m_ef9340.X == 48 || m_ef9340.X == 56 || m_ef9340.X == 64 )
+	if (m_ef9340.X == 40 || m_ef9340.X == 48 || m_ef9340.X == 56 || m_ef9340.X == 64)
 	{
-		m_ef9340.Y = ( m_ef9340.Y + 1 ) & 0x1f;
-		if ( m_ef9340.Y == 24 )
+		m_ef9340.Y = (m_ef9340.Y + 1) & 0x1f;
+		if (m_ef9340.Y == 24)
 		{
 			m_ef9340.Y = 0;
 		}
@@ -157,27 +157,27 @@ void ef9340_1_device::ef9340_inc_c()
 }
 
 
-void ef9340_1_device::ef9341_write( u8 command, u8 b, u8 data )
+void ef9340_1_device::ef9341_write(u8 command, u8 b, u8 data)
 {
-	LOG("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
+	LOG("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data);
 
-	if ( command )
+	if (command)
 	{
-		if ( b )
+		if (b)
 		{
 			m_ef9341.TB = data;
 			m_ef9341.busy = true;
-			switch( m_ef9341.TB & 0xE0 )
+			switch (m_ef9341.TB & 0xe0)
 			{
 			case 0x00:  /* Begin row */
 				m_ef9340.X = 0;
-				m_ef9340.Y = m_ef9341.TA & 0x1F;
+				m_ef9340.Y = m_ef9341.TA & 0x1f;
 				break;
 			case 0x20:  /* Load Y */
-				m_ef9340.Y = m_ef9341.TA & 0x1F;
+				m_ef9340.Y = m_ef9341.TA & 0x1f;
 				break;
 			case 0x40:  /* Load X */
-				m_ef9340.X = m_ef9341.TA & 0x3F;
+				m_ef9340.X = m_ef9341.TA & 0x3f;
 				break;
 			case 0x60:  /* INC C */
 				ef9340_inc_c();
@@ -185,13 +185,13 @@ void ef9340_1_device::ef9341_write( u8 command, u8 b, u8 data )
 			case 0x80:  /* Load M */
 				m_ef9340.M = m_ef9341.TA;
 				break;
-			case 0xA0:  /* Load R */
+			case 0xa0:  /* Load R */
 				m_ef9340.R = m_ef9341.TA;
 				break;
-			case 0xC0:  /* Load Y0 */
-				m_ef9340.Y0 = m_ef9341.TA & 0x3F;
+			case 0xc0:  /* Load Y0 */
+				m_ef9340.Y0 = m_ef9341.TA & 0x3f;
 				break;
-			case 0xE0:  /* Not interpreted */
+			case 0xe0:  /* Not interpreted */
 				break;
 			}
 			m_ef9341.busy = false;
@@ -203,13 +203,13 @@ void ef9340_1_device::ef9341_write( u8 command, u8 b, u8 data )
 	}
 	else
 	{
-		if ( b )
+		if (b)
 		{
-			u16 addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+			u16 addr = ef9340_get_c_addr(m_ef9340.X, m_ef9340.Y) & 0x3ff;
 
 			m_ef9341.TB = data;
 			m_ef9341.busy = true;
-			switch ( m_ef9340.M & 0xE0 )
+			switch (m_ef9340.M & 0xe0)
 			{
 				case 0x00:  /* Write */
 					m_ram_a[addr] = m_ef9341.TA;
@@ -232,7 +232,7 @@ void ef9340_1_device::ef9341_write( u8 command, u8 b, u8 data )
 							m_write_exram(a << 12 | b << 4 | slice, m_ef9341.TA);
 
 						// Increment slice number
-						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
+						m_ef9340.M = (m_ef9340.M & 0xf0) | ((slice + 1) % 10);
 					}
 					break;
 
@@ -249,15 +249,15 @@ void ef9340_1_device::ef9341_write( u8 command, u8 b, u8 data )
 }
 
 
-u8 ef9340_1_device::ef9341_read( u8 command, u8 b )
+u8 ef9340_1_device::ef9341_read(u8 command, u8 b)
 {
-	u8   data;
+	u8 data;
 
-	LOG("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
+	LOG("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A");
 
-	if ( command )
+	if (command)
 	{
-		if ( b )
+		if (b)
 		{
 			data = 0;
 		}
@@ -268,13 +268,13 @@ u8 ef9340_1_device::ef9341_read( u8 command, u8 b )
 	}
 	else
 	{
-		if ( b )
+		if (b)
 		{
-			u16 addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+			u16 addr = ef9340_get_c_addr(m_ef9340.X, m_ef9340.Y) & 0x3ff;
 
 			data = m_ef9341.TB;
 			m_ef9341.busy = true;
-			switch ( m_ef9340.M & 0xE0 )
+			switch (m_ef9340.M & 0xe0)
 			{
 				case 0x20:  /* Read */
 					m_ef9341.TA = m_ram_a[addr];
@@ -287,7 +287,7 @@ u8 ef9340_1_device::ef9341_read( u8 command, u8 b )
 					m_ef9341.TB = m_ram_b[addr];
 					break;
 
-				case 0xA0:  /* Read slice */
+				case 0xa0:  /* Read slice */
 					{
 						u8 a = m_ram_a[addr];
 						u8 b = m_ram_b[addr];
@@ -302,7 +302,7 @@ u8 ef9340_1_device::ef9341_read( u8 command, u8 b )
 							m_ef9341.TA = m_charset[(((a & 0x80) | (b & 0x7f)) * 10) + slice];
 
 						// Increment slice number
-						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
+						m_ef9340.M = (m_ef9340.M & 0xf0) | ((slice + 1) % 10);
 					}
 					break;
 
@@ -344,7 +344,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		bool blank = false;
 		bool w_parity = false;
 
-		if ( vpos < 10 )
+		if (vpos < 10)
 		{
 			// Service row
 			if (m_ef9340.R & 0x08)

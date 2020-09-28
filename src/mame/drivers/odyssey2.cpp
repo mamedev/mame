@@ -420,9 +420,9 @@ u8 vpp_state::io_vpp(offs_t offset, u8 data)
 	{
 		// A2 to R/W pin
 		if (offset & 4)
-			data &= m_ef934x->ef9341_read( offset & 0x02, offset & 0x01 );
+			data &= m_ef934x->ef9341_read(offset & 0x02, offset & 0x01);
 		else
-			m_ef934x->ef9341_write( offset & 0x02, offset & 0x01, data );
+			m_ef934x->ef9341_write(offset & 0x02, offset & 0x01, data);
 	}
 
 	return data;

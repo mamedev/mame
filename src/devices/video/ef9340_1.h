@@ -34,8 +34,8 @@ public:
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ef9341_write( u8 command, u8 b, u8 data );
-	u8 ef9341_read( u8 command, u8 b );
+	void ef9341_write(u8 command, u8 b, u8 data);
+	u8 ef9341_read(u8 command, u8 b);
 
 protected:
 	// device-level overrides
