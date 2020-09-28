@@ -83,7 +83,7 @@ static const u32 size_mask[] = { 0x000000ffU, 0x0000ffffU, 0x00000000U, 0xffffff
 
 #define SP ((m_psr & PSR_S) ? m_sp1 : m_sp0)
 
-ns32000_device::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int databits, int addrbits)
+template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int databits, int addrbits)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_interrupt_config("interrupt", ENDIANNESS_LITTLE, databits, addrbits, 0)
@@ -106,7 +106,7 @@ ns32032_device::ns32032_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void ns32000_device::device_start()
+template <int Width> void ns32000_device<Width>::device_start()
 {
 	set_icountptr(m_icount);
 
@@ -152,7 +152,7 @@ void ns32000_device::device_start()
 	//  state_add(8 + i, util::string_format("F%d", i).c_str(), m_f[i]);
 }
 
-void ns32000_device::device_reset()
+template <int Width> void ns32000_device<Width>::device_reset()
 {
 	for (std::pair<int, address_space_config const *> s : memory_space_config())
 		space(has_configured_map(s.first) ? s.first : 0).cache(m_bus[s.first]);
@@ -166,7 +166,7 @@ void ns32000_device::device_reset()
 	m_wait = false;
 }
 
-void ns32000_device::state_string_export(device_state_entry const &entry, std::string &str) const
+template <int Width> void ns32000_device<Width>::state_string_export(device_state_entry const &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -186,7 +186,7 @@ void ns32000_device::state_string_export(device_state_entry const &entry, std::s
 	}
 }
 
-s32 ns32000_device::displacement(unsigned &bytes)
+template <int Width> s32 ns32000_device<Width>::displacement(unsigned &bytes)
 {
 	s32 disp = space(0).read_byte(m_pc + bytes);
 	if (BIT(disp, 7))
@@ -214,7 +214,7 @@ s32 ns32000_device::displacement(unsigned &bytes)
 	return disp;
 }
 
-void ns32000_device::decode(addr_mode *mode, unsigned imm_size, unsigned &bytes)
+template <int Width> void ns32000_device<Width>::decode(addr_mode *mode, unsigned imm_size, unsigned &bytes)
 {
 	bool scaled[] = { false, false };
 
@@ -325,7 +325,7 @@ void ns32000_device::decode(addr_mode *mode, unsigned imm_size, unsigned &bytes)
 	}
 }
 
-u32 ns32000_device::ea(addr_mode const mode)
+template <int Width> u32 ns32000_device<Width>::ea(addr_mode const mode)
 {
 	u32 base;
 
@@ -352,7 +352,7 @@ u32 ns32000_device::ea(addr_mode const mode)
 	return base + mode.disp;
 }
 
-u64 ns32000_device::gen_read(addr_mode mode, unsigned size)
+template <int Width> u64 ns32000_device<Width>::gen_read(addr_mode mode, unsigned size)
 {
 	u64 data = 0;
 
@@ -396,7 +396,7 @@ u64 ns32000_device::gen_read(addr_mode mode, unsigned size)
 	return data;
 }
 
-s64 ns32000_device::gen_read_sx(addr_mode mode, unsigned size)
+template <int Width> s64 ns32000_device<Width>::gen_read_sx(addr_mode mode, unsigned size)
 {
 	u64 data = gen_read(mode, size);
 
@@ -411,7 +411,7 @@ s64 ns32000_device::gen_read_sx(addr_mode mode, unsigned size)
 	return data;
 }
 
-void ns32000_device::gen_write(addr_mode mode, unsigned size, u64 data)
+template <int Width> void ns32000_device<Width>::gen_write(addr_mode mode, unsigned size, u64 data)
 {
 	switch (mode.type)
 	{
@@ -450,7 +450,7 @@ void ns32000_device::gen_write(addr_mode mode, unsigned size, u64 data)
 	}
 }
 
-bool ns32000_device::condition(unsigned const cc)
+template <int Width> bool ns32000_device<Width>::condition(unsigned const cc)
 {
 	switch (cc & 15)
 	{
@@ -492,7 +492,7 @@ bool ns32000_device::condition(unsigned const cc)
 	return false;
 }
 
-void ns32000_device::flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction)
+template <int Width> void ns32000_device<Width>::flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction)
 {
 	unsigned const sign_bit = (size + 1) * 8 - 1;
 
@@ -508,7 +508,7 @@ void ns32000_device::flags(u32 const src1, u32 const src2, u32 const dest, unsig
 		m_psr |= PSR_F;
 }
 
-void ns32000_device::interrupt(unsigned const vector, u32 const return_address, bool const trap)
+template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector, u32 const return_address, bool const trap)
 {
 	// clear trace pending flag
 	if (vector == TRC)
@@ -543,7 +543,7 @@ void ns32000_device::interrupt(unsigned const vector, u32 const return_address, 
 	// TODO: flush queue
 }
 
-void ns32000_device::execute_run()
+template <int Width> void ns32000_device<Width>::execute_run()
 {
 	while (m_icount > 0)
 	{
@@ -866,16 +866,16 @@ void ns32000_device::execute_run()
 					m_psr &= ~(PSR_N | PSR_Z | PSR_L);
 
 					if ((size == SIZE_D && s32(src1) > s32(src2))
-						|| ((size == SIZE_W && s16(src1) > s16(src2))
-							|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+					|| ((size == SIZE_W && s16(src1) > s16(src2))
+					|| ((size == SIZE_B && s8(src1) > s8(src2)))))
 						m_psr |= PSR_N;
 
 					if (src1 == src2)
 						m_psr |= PSR_Z;
 
 					if ((size == SIZE_D && u32(src1) > u32(src2))
-						|| ((size == SIZE_W && u16(src1) > u16(src2))
-							|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+					|| ((size == SIZE_W && u16(src1) > u16(src2))
+					|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 						m_psr |= PSR_L;
 				}
 				m_pc += bytes;
@@ -1160,16 +1160,16 @@ void ns32000_device::execute_run()
 					m_psr &= ~(PSR_N | PSR_Z | PSR_L);
 
 					if ((size == SIZE_D && s32(src1) > s32(src2))
-						|| ((size == SIZE_W && s16(src1) > s16(src2))
-							|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+					|| ((size == SIZE_W && s16(src1) > s16(src2))
+					|| ((size == SIZE_B && s8(src1) > s8(src2)))))
 						m_psr |= PSR_N;
 
 					if (src1 == src2)
 						m_psr |= PSR_Z;
 
 					if ((size == SIZE_D && u32(src1) > u32(src2))
-						|| ((size == SIZE_W && u16(src1) > u16(src2))
-							|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+					|| ((size == SIZE_W && u16(src1) > u16(src2))
+					|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 						m_psr |= PSR_L;
 				}
 				m_pc += bytes;
@@ -1420,13 +1420,13 @@ void ns32000_device::execute_run()
 							m_psr &= ~PSR_Z;
 
 							if ((size == SIZE_D && s32(src1) > s32(src2))
-								|| ((size == SIZE_W && s16(src1) > s16(src2))
-									|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+							|| ((size == SIZE_W && s16(src1) > s16(src2))
+							|| ((size == SIZE_B && s8(src1) > s8(src2)))))
 								m_psr |= PSR_N;
 
 							if ((size == SIZE_D && u32(src1) > u32(src2))
-								|| ((size == SIZE_W && u16(src1) > u16(src2))
-									|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+							|| ((size == SIZE_W && u16(src1) > u16(src2))
+							|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 								m_psr |= PSR_L;
 
 							break;
@@ -2249,6 +2249,18 @@ void ns32000_device::execute_run()
 			break;
 		case 0x1e: // format 14
 			// TODO: mmu
+			{
+				u16 const opword = space(0).read_word_unaligned(m_pc + bytes);
+				bytes += 2;
+
+				addr_mode mode[] = { addr_mode((opword >> 11) & 31), addr_mode(0x13) };
+
+				//unsigned const quick = (opword >> 7) & 15;
+				unsigned const size = opword & 3;
+
+				decode(mode, size, bytes);
+			}
+			m_pc += bytes;
 			break;
 		case 0x16: // format 15.0
 		case 0x36: // format 15.1
@@ -2279,7 +2291,7 @@ void ns32000_device::execute_run()
 	}
 }
 
-void ns32000_device::execute_set_input(int inputnum, int state)
+template <int Width> void ns32000_device<Width>::execute_set_input(int inputnum, int state)
 {
 	if (state)
 		m_wait = false;
@@ -2298,7 +2310,7 @@ void ns32000_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-device_memory_interface::space_config_vector ns32000_device::memory_space_config() const
+template <int Width> device_memory_interface::space_config_vector ns32000_device<Width>::memory_space_config() const
 {
 	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_program_config),
@@ -2312,12 +2324,12 @@ device_memory_interface::space_config_vector ns32000_device::memory_space_config
 	};
 }
 
-bool ns32000_device::memory_translate(int spacenum, int intention, offs_t &address)
+template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	return true;
 }
 
-std::unique_ptr<util::disasm_interface> ns32000_device::create_disassembler()
+template <int Width> std::unique_ptr<util::disasm_interface> ns32000_device<Width>::create_disassembler()
 {
 	return std::make_unique<ns32000_disassembler>();
 }

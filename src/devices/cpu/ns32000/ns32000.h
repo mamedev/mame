@@ -6,6 +6,7 @@
 
 #pragma once
 
+template <int Width>
 class ns32000_device : public cpu_device
 {
 public:
@@ -87,7 +88,7 @@ private:
 	// emulation state
 	int m_icount;
 
-	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::cache m_bus[16];
+	typename memory_access<24, Width, 0, ENDIANNESS_LITTLE>::cache m_bus[16];
 
 	u32 m_pc;      // program counter
 	u32 m_sb;      // static base
@@ -107,19 +108,19 @@ private:
 	bool m_wait;
 };
 
-class ns32008_device : public ns32000_device
+class ns32008_device : public ns32000_device<0>
 {
 public:
 	ns32008_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
-class ns32016_device : public ns32000_device
+class ns32016_device : public ns32000_device<1>
 {
 public:
 	ns32016_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
-class ns32032_device : public ns32000_device
+class ns32032_device : public ns32000_device<2>
 {
 public:
 	ns32032_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
