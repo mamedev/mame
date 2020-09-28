@@ -823,6 +823,7 @@ BUSES["ZORRO"] = true
 -- specify used file formats
 --------------------------------------------------
 
+FORMATS["APOLLO_DSK"] = true
 FORMATS["GUAB_DSK"] = true
 FORMATS["AMI_DSK"] = true
 FORMATS["SC3000_BIT"] = true
