@@ -336,7 +336,7 @@ uint16_t mac128_state::ram_r(offs_t offset)
 {
 	if (m_overlay)
 	{
-		return m_rom_ptr[offset];
+		return m_rom_ptr[offset & 0x7ffff];
 	}
 
 	return m_ram_ptr[offset & m_ram_mask];
