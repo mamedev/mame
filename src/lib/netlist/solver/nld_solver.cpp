@@ -3,6 +3,7 @@
 
 
 #include "nl_factory.h"
+#include "nl_errstr.h"
 #include "core/setup.h"
 #include "nl_setup.h" // FIXME: only needed for splitter code
 #include "nld_matrix_solver.h"
@@ -380,9 +381,55 @@ namespace devices
 		net_splitter splitter;
 
 		splitter.run(state());
+		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
+
+		int num_errors = 0;
+
+		log().verbose("checking net consistency  ...");
+		for (const auto &grp : splitter.groups)
+		{
+			int railterms = 0;
+			pstring nets_in_grp;
+			for (const auto &n : grp)
+			{
+				nets_in_grp += (n->name() + " ");
+				if (!n->is_analog())
+				{
+					state().log().error(ME_SOLVER_CONSISTENCY_NOT_ANALOG_NET(n->name()));
+					num_errors++;
+				}
+				if (n->is_rail_net())
+				{
+					state().log().error(ME_SOLVER_CONSISTENCY_RAIL_NET(n->name()));
+					num_errors++;
+				}
+				for (const auto &t : n->core_terms())
+				{
+					if (!t->has_net())
+					{
+						state().log().error(ME_SOLVER_TERMINAL_NO_NET(t->name()));
+						num_errors++;
+					}
+					else
+					{
+						auto *otherterm = dynamic_cast<terminal_t *>(t);
+						if (otherterm != nullptr)
+							if (state().setup().get_connected_terminal(*otherterm)->net().is_rail_net())
+								railterms++;
+					}
+				}
+			}
+			if (railterms == 0)
+			{
+				state().log().error(ME_SOLVER_NO_RAIL_TERMINAL(nets_in_grp));
+				num_errors++;
+			}
+		}
+		if (num_errors > 0)
+			throw nl_exception(MF_SOLVER_CONSISTENCY_ERRORS(num_errors));
+
 
 		// setup the solvers
-		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 		for (auto & grp : splitter.groups)
 		{
 			solver_ptr ms;

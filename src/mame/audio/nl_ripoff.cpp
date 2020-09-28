@@ -239,9 +239,15 @@ NETLIST_START(ripoff)
 	Q_2N3906(Q5)            // PNP
 //  Q_2N6292(Q6)            // PNP -- part of final amp (not emulated)
 //  Q_2N6107(Q7)            // PNP -- part of final amp (not emulated)
+#if !(HLE_LASER_VCO)
 	Q_2N3904(Q8)            // NPN
+#endif
+#if !(HLE_TORPEDO_VCO)
 	Q_2N3904(Q9)            // NPN
+#endif
+#if !(HLE_BACKGROUND_VCOS)
 	Q_2N3904(Q10)           // NPN
+#endif
 
 	AMI_S2688(IC1)          // Noise generator
 
