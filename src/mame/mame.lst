@@ -10134,6 +10134,9 @@ millpac                         // Valadon
 multiped                        // hack
 warlords                        // 037153-037159    (c) 1980
 
+@source:ceres.cpp
+ceres1                          // Eidgenössische Technische Hochschule Zürich Ceres-1
+
 @source:cesclass.cpp
 ccclass                         //
 hrclass                         //

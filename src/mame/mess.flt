@@ -155,6 +155,7 @@ cd100.cpp
 cd2650.cpp
 cdc721.cpp
 cdsys5.cpp
+ceres.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
