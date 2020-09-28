@@ -488,6 +488,13 @@ NETLIST_START(astrob)
 	Q_2N4403(Q10)
 
 	TL084_DIP(U1)           // Op. Amp.
+	NET_C(U1.4, I_V12)
+	NET_C(U1.11, I_VM12)
+
+	TL084_DIP(U2)           // Op. Amp.
+	NET_C(U2.4, I_V12)
+	NET_C(U2.11, I_VM12)
+
 #if (ENABLE_SONAR_ALT)
 	// Oscillators are of order 1kHz. No need to to have UGF in MHz range
 	PARAM(U1.A.MODEL, "TL084(TYPE=3 UGF=10k)")
@@ -499,12 +506,6 @@ NETLIST_START(astrob)
 	PARAM(U2.C.MODEL, "TL084(TYPE=3 UGF=10k)")
 	PARAM(U2.D.MODEL, "TL084(TYPE=3 UGF=10k)")
 #endif
-	NET_C(U1.4, I_V12)
-	NET_C(U1.11, I_VM12)
-
-	TL084_DIP(U2)           // Op. Amp.
-	NET_C(U2.4, I_V12)
-	NET_C(U2.11, I_VM12)
 
 	CD4017_DIP(U3)          // Decade Counter/Divider
 	NET_C(U3.8, GND)
@@ -675,7 +676,7 @@ NETLIST_START(astrob)
 
 	NET_C(U2.3, GND)
 	NET_C(U2.2, D6.A, R65.1)
-	NET_C(U2.14, D6.K, R62.1)
+	NET_C(U2.1, D6.K, R62.1)
 	NET_C(R62.2, R63.2, C24.1, C25.1)
 	NET_C(R63.1, GND)
 	NET_C(R65.2, R64.2, U2.7, C25.2, R66.2)
@@ -708,8 +709,7 @@ NETLIST_START(astrob)
 	NET_C(R40.2, RDUM2.1)
 	NET_C(R95.2, RDUM3.1)
 	NET_C(R66.2, RDUM4.1)
-
-	NET_C(RDUM1.2, RDUM2.2, RDUM3.2, RDUM4.2, I_VOFF)
+	NET_C(I_VOFF, RDUM1.2, RDUM2.2, RDUM3.2, RDUM4.2)
 
 	OPTIMIZE_FRONTIER(R5.2, RES_K(68), 192)
 	OPTIMIZE_FRONTIER(R40.2, RES_K(68), 192)
