@@ -10,21 +10,30 @@
 #include "emu.h"
 #include "luaprinter.h"
 #include "screen.h"
+#include "png.h"
+#include "emuopts.h"
 
-device_luaprinter_interface::device_luaprinter_interface(const machine_config &mconfig, device_t &device) : device_interface(device, "luaprinter")
+device_luaprinter_interface::device_luaprinter_interface(const machine_config &mconfig, device_t &device):
+device_interface(device, "luaprinter")
 {
-	m_lp_mydevice = &device;
 	time(&m_lp_session_time);
 	initprintername();
 };
 
-int device_luaprinter_interface::getnextchar() {
+int device_luaprinter_interface::getnextchar()
+{
 	if (m_lp_head==m_lp_tail) return -1;
 	else {
 		int retval = m_lp_printerbuffer.at(m_lp_tail++);
 		m_lp_tail %= BUFFERSIZE;
 		return retval;
 	}
+}
+
+void device_luaprinter_interface::initluaprinter(bitmap_rgb32 &mybitmap)
+{
+	lp_register_bitmap(mybitmap);
+	setsnapshotdir(std::string(device().machine().options().snapshot_directory()));
 }
 
 void device_luaprinter_interface::putnextchar(int c)
@@ -44,23 +53,43 @@ int device_luaprinter_interface::getpixel(int x, int y)
 	return m_lp_bitmap->pix32(y,x);
 };
 
+
+void device_luaprinter_interface::clearpage()
+{
+	m_lp_bitmap->fill(m_lp_papercolor); cleartoline(0); m_lp_pagedirty = 0;
+};
+
+void device_luaprinter_interface::cleartoline(int line)
+{
+	if (line >= m_lp_clearlinepos)
+	{
+		m_lp_bitmap->plot_box(0, m_lp_clearlinepos, m_lp_bitmap->width(), line-m_lp_clearlinepos, m_lp_papercolor);
+	}
+		m_lp_clearlinepos=line;
+}
+
+
 std::string device_luaprinter_interface::fixchar(std::string in, char from, char to)
 {
 	std::string final;
 	for(std::string::const_iterator it = in.begin(); it != in.end(); ++it)
-    {
-        if((*it) != from)
-        {
-            final += *it;
-        }
-        else final += to;
-    }
-    return final;
+	{
+		if((*it) != from)
+		{
+			final += *it;
+		}
+		else final += to;
+	}
+	return final;
 }
 
-std::string device_luaprinter_interface::fixcolons(std::string in) { return fixchar(in, ':', '-'); }
+std::string device_luaprinter_interface::fixcolons(std::string in)
+{
+	return fixchar(in, ':', '-');
+}
 
-std::string device_luaprinter_interface::sessiontime() {
+std::string device_luaprinter_interface::sessiontime()
+{
 	struct tm *info;
 	char buffer[80];
 	info = localtime( &m_lp_session_time );
@@ -68,13 +97,15 @@ std::string device_luaprinter_interface::sessiontime() {
 	return std::string(buffer);
 }
 
-std::string device_luaprinter_interface::tagname() {
-	return fixcolons(std::string(getrootdev()->shortname())+std::string(m_lp_mydevice->tag()));
+std::string device_luaprinter_interface::tagname()
+{
+	return fixcolons(std::string(getrootdev()->shortname())+std::string(device().tag()));
 }
 
-std::string device_luaprinter_interface::simplename() {
+std::string device_luaprinter_interface::simplename()
+{
 	device_t * dev;
-	dev = m_lp_mydevice;
+	dev = &device();
 	std::string s(dev->owner()->shortname());
 	while (dev){
 		s=std::string(dev->shortname())+std::string(" ")+s;
@@ -83,10 +114,11 @@ std::string device_luaprinter_interface::simplename() {
 	return s;
 }
 
-device_t* device_luaprinter_interface::getrootdev(){
+device_t* device_luaprinter_interface::getrootdev()
+{
 	device_t* dev;
 	device_t* lastdev = NULL;
-	dev = m_lp_mydevice;
+	dev = &device();
 	while (dev){
 		lastdev = dev;
 		dev=dev->owner();
@@ -94,7 +126,21 @@ device_t* device_luaprinter_interface::getrootdev(){
 	return lastdev;
 }
 
-void device_luaprinter_interface::drawprinthead(bitmap_rgb32 &bitmap, int x, int y) {
+void device_luaprinter_interface::setprintheadcolor(int headcolor, int bordcolor)
+{
+	m_lp_printheadcolor = headcolor;
+	m_lp_printheadbordercolor = bordcolor;
+}
+
+void device_luaprinter_interface::setprintheadsize(int xsize, int ysize, int bordersize)
+{
+	m_lp_printheadxsize = xsize;
+	m_lp_printheadysize = ysize;
+	m_lp_printheadbordersize = bordersize;
+}
+
+void device_luaprinter_interface::drawprinthead(bitmap_rgb32 &bitmap, int x, int y)
+{
 	int bordx = m_lp_printheadbordersize;
 	int bordy = m_lp_printheadbordersize;
 	int offy = 9 + bordy;
@@ -104,7 +150,8 @@ void device_luaprinter_interface::drawprinthead(bitmap_rgb32 &bitmap, int x, int
 	bitmap.plot_box(x-sizex/2,       y+offy,       sizex,         sizey,         m_lp_printheadcolor);
 }
 
-uint32_t device_luaprinter_interface::lp_screen_update (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) {
+uint32_t device_luaprinter_interface::lp_screen_update (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	int scrolly=bitmap.height() - m_lp_distfrombottom - m_lp_ypos;
 	copyscrollbitmap(bitmap, *m_lp_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 	drawprinthead(bitmap, m_lp_xpos, bitmap.height()-m_lp_distfrombottom);
@@ -113,13 +160,16 @@ uint32_t device_luaprinter_interface::lp_screen_update (screen_device &screen, b
 	return 0;
 }
 
-bool device_luaprinter_interface::checkbottomofpageandsave(int y, int ybottom, bool clrpage) {
-	if ( y >= ybottom ) {
+bool device_luaprinter_interface::checkbottomofpageandsave(int y, int ybottom, bool clrpage)
+{
+	if (y >= ybottom)
+	{
 		if ((m_lp_pagelimit == 0) || (m_lp_pagecount < m_lp_pagelimit))
 			savepage();
 		else //  page limit to stop runaway generation of pages
 			printf("Page %d exceeded page limit: %d\n", m_lp_pagecount, m_lp_pagelimit);
-		if (clrpage) {
+		if (clrpage)
+		{
 			// clearpage();
 			cleartoline(0);
 			cleartobottom();  // if you want to manage page clearing yourself, do cleartoline(0) to reset the clearline to the top
@@ -129,18 +179,19 @@ bool device_luaprinter_interface::checkbottomofpageandsave(int y, int ybottom, b
 	else return false;
 }
 
-void device_luaprinter_interface::savepage(){
+void device_luaprinter_interface::savepage()
+{
 	if (!m_lp_bitmap) return;
 	emu_file file(m_lp_snapshotdir + std::string("/") +
-				std::string(getrootdev()->shortname() ) + std::string("/"),
-				OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-    auto const filerr = file.open(std::string(getprintername())+" Page "+std::to_string(m_lp_pagecount++)+".PNG");
+			std::string(getrootdev()->shortname() ) + std::string("/"),
+			OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	auto const filerr = file.open(std::string(getprintername())+" Page "+std::to_string(m_lp_pagecount++)+".PNG");
 
-    if (filerr == osd_file::error::NONE)
-        {
-			cleartobottom();  // clear to the end of the page
-			static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
-			png_write_bitmap(file, nullptr, (bitmap_t &) (* m_lp_bitmap), 2, png_palette);
-        }
+	if (filerr == osd_file::error::NONE)
+	{
+		cleartobottom();  // clear to the end of the page
+		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
+		png_write_bitmap(file, nullptr, (bitmap_t &) (* m_lp_bitmap), 2, png_palette);
+	}
 }
 

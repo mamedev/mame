@@ -1451,7 +1451,7 @@ void lua_engine::initialize()
 			for (device_luaprinter_interface &lp : device_luaprinter_iterator(r.root_device()))
 			{
 				table[i++]=&lp;
-				table[lp.m_lp_mydevice->tag()] = &lp;  // both integer and tag indexes
+				table[lp.device().tag()] = &lp;  // both integer and tag indexes
 			}
 			return table;
 		}));
