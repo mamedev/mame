@@ -82,8 +82,8 @@ WRITE_LINE_MEMBER(apple2_compeyes_device::an0_w)
 
 	std::fill_n(m_a2_bitmap, 280*192, 0);
 
-	m_bitmap = m_picture->get_bitmap();
-	if (m_bitmap)
+	m_bitmap = &m_picture->get_bitmap();
+	if (m_bitmap->valid())
 	{
 		// convert arbitrary sized ARGB32 image to a 280x192 image with 256 levels of grayscale
 		double stepx = (double)m_bitmap->width() / 280.0;

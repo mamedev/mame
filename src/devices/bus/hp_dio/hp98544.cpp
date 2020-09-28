@@ -178,10 +178,7 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 	int startx, starty, endx, endy;
 	m_topcat->get_cursor_pos(startx, starty, endx, endy);
-
-	for (int y = starty; y <= endy; y++) {
-		std::fill_n(&bitmap.pix(y, startx), endx - startx + 1, rgb_t(255,255,255));
-	}
+	bitmap.fill(rgb_t(255, 255, 255), rectangle(startx, endx, starty, endy));
 
 	return 0;
 }
