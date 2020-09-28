@@ -142,9 +142,9 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<o2_cart_slot_device> m_cart;
 
-	uint8_t m_ram[0x80];
-	uint8_t m_p1 = 0xff;
-	uint8_t m_p2 = 0xff;
+	u8 m_ram[0x80];
+	u8 m_p1 = 0xff;
+	u8 m_p2 = 0xff;
 
 	DECLARE_READ_LINE_MEMBER(t1_read);
 
@@ -156,15 +156,15 @@ protected:
 	required_ioport_array<8> m_keyboard;
 	required_ioport_array<2> m_joysticks;
 
-	virtual uint8_t io_read(offs_t offset);
-	virtual void io_write(offs_t offset, uint8_t data);
-	uint8_t bus_read();
-	void p1_write(uint8_t data);
-	uint8_t p2_read();
-	void p2_write(uint8_t data);
+	virtual u8 io_read(offs_t offset);
+	virtual void io_write(offs_t offset, u8 data);
+	u8 bus_read();
+	void p1_write(u8 data);
+	u8 p2_read();
+	void p2_write(u8 data);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 class vpp_state : public odyssey2_state
@@ -183,26 +183,26 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual uint8_t io_read(offs_t offset) override;
-	virtual void io_write(offs_t offset, uint8_t data) override;
+	virtual u8 io_read(offs_t offset) override;
+	virtual void io_write(offs_t offset, u8 data) override;
 
 private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef934x;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void p2_write(uint8_t data);
-	uint8_t io_vpp(offs_t offset, uint8_t data);
-	template<int P> void i8243_port_w(uint8_t data);
+	void p2_write(u8 data);
+	u8 io_vpp(offs_t offset, u8 data);
+	template<int P> void i8243_port_w(u8 data);
 
 	inline offs_t ef934x_extram_address(offs_t offset);
-	uint8_t ef934x_extram_r(offs_t offset);
-	void ef934x_extram_w(offs_t offset, uint8_t data);
+	u8 ef934x_extram_r(offs_t offset);
+	void ef934x_extram_w(offs_t offset, u8 data);
 
-	uint8_t m_mix_i8244 = 0xff;
-	uint8_t m_mix_ef934x = 0xff;
-	uint8_t m_ef934x_extram[0x800];
+	u8 m_mix_i8244 = 0xff;
+	u8 m_mix_ef934x = 0xff;
+	u8 m_ef934x_extram[0x800];
 };
 
 void odyssey2_state::machine_start()
@@ -259,7 +259,7 @@ void odyssey2_state::odyssey2_palette(palette_device &palette) const
 }
 
 
-uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_i8244->screen_update(screen, bitmap, cliprect);
 
@@ -273,7 +273,7 @@ uint32_t odyssey2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-uint32_t vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 lum = ~m_p1 >> 4 & 0x08;
 	bitmap_ind16 *ef934x_bitmap = m_ef934x->get_bitmap();
@@ -288,8 +288,8 @@ uint32_t vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
-			uint16_t d = bitmap.pix(y, x) & 7;
-			uint16_t e = ef934x_bitmap->pix(y, x);
+			u16 d = bitmap.pix(y, x) & 7;
+			u16 e = ef934x_bitmap->pix(y, x);
 
 			// i8244 decoder enable is masked with cartridge pin B
 			bool en = (e & 8) || !m_cart->b_read();
@@ -321,7 +321,7 @@ uint32_t vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
     I/O
 ******************************************************************************/
 
-uint8_t odyssey2_state::io_read(offs_t offset)
+u8 odyssey2_state::io_read(offs_t offset)
 {
 	u8 data = m_cart->io_read(offset);
 	if (!(m_p1 & 0x10) && ~offset & 0x80)
@@ -333,7 +333,7 @@ uint8_t odyssey2_state::io_read(offs_t offset)
 	return data;
 }
 
-void odyssey2_state::io_write(offs_t offset, uint8_t data)
+void odyssey2_state::io_write(offs_t offset, u8 data)
 {
 	if (!(m_p1 & 0x40))
 	{
@@ -349,7 +349,7 @@ void odyssey2_state::io_write(offs_t offset, uint8_t data)
 
 // 8048 ports
 
-void odyssey2_state::p1_write(uint8_t data)
+void odyssey2_state::p1_write(u8 data)
 {
 	// LUM changed
 	if ((m_p1 ^ data) & 0x80)
@@ -359,7 +359,7 @@ void odyssey2_state::p1_write(uint8_t data)
 	m_cart->write_p1(m_p1 & 0x13);
 }
 
-uint8_t odyssey2_state::p2_read()
+u8 odyssey2_state::p2_read()
 {
 	u8 data = 0xff;
 
@@ -374,13 +374,13 @@ uint8_t odyssey2_state::p2_read()
 	return data;
 }
 
-void odyssey2_state::p2_write(uint8_t data)
+void odyssey2_state::p2_write(u8 data)
 {
 	m_p2 = data;
 	m_cart->write_p2(m_p2 & 0x0f);
 }
 
-uint8_t odyssey2_state::bus_read()
+u8 odyssey2_state::bus_read()
 {
 	u8 data = 0xff;
 
@@ -402,19 +402,19 @@ READ_LINE_MEMBER(odyssey2_state::t1_read)
 
 // G7400-specific
 
-uint8_t vpp_state::io_read(offs_t offset)
+u8 vpp_state::io_read(offs_t offset)
 {
 	u8 data = odyssey2_state::io_read(offset);
 	return io_vpp(offset, data);
 }
 
-void vpp_state::io_write(offs_t offset, uint8_t data)
+void vpp_state::io_write(offs_t offset, u8 data)
 {
 	odyssey2_state::io_write(offset, data);
 	io_vpp(offset, data);
 }
 
-uint8_t vpp_state::io_vpp(offs_t offset, uint8_t data)
+u8 vpp_state::io_vpp(offs_t offset, u8 data)
 {
 	if (!(m_p1 & 0x20))
 	{
@@ -428,14 +428,14 @@ uint8_t vpp_state::io_vpp(offs_t offset, uint8_t data)
 	return data;
 }
 
-void vpp_state::p2_write(uint8_t data)
+void vpp_state::p2_write(u8 data)
 {
 	odyssey2_state::p2_write(data);
 	m_i8243->p2_w(m_p2 & 0x0f);
 }
 
 template<int P>
-void vpp_state::i8243_port_w(uint8_t data)
+void vpp_state::i8243_port_w(u8 data)
 {
 	// P4,P5: color mix I8244 side (IC674)
 	// P6,P7: color mix EF9340 side (IC678)
@@ -468,12 +468,12 @@ offs_t vpp_state::ef934x_extram_address(offs_t offset)
 		return address | (offset << 4 & 0x60) | (latch << 2 & 0x180);
 }
 
-uint8_t vpp_state::ef934x_extram_r(offs_t offset)
+u8 vpp_state::ef934x_extram_r(offs_t offset)
 {
 	return m_ef934x_extram[ef934x_extram_address(offset)];
 }
 
-void vpp_state::ef934x_extram_w(offs_t offset, uint8_t data)
+void vpp_state::ef934x_extram_w(offs_t offset, u8 data)
 {
 	m_ef934x_extram[ef934x_extram_address(offset)] = data;
 }

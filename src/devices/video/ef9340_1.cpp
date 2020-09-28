@@ -34,7 +34,7 @@ TODO:
 DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341")
 
 
-ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, EF9340_1, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_charset(*this, "ef9340_1")
@@ -128,7 +128,7 @@ void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-uint16_t ef9340_1_device::ef9340_get_c_addr(uint8_t x, uint8_t y)
+u16 ef9340_1_device::ef9340_get_c_addr(u8 x, u8 y)
 {
 	if ( ( y & 0x18 ) == 0x18 )
 	{
@@ -157,7 +157,7 @@ void ef9340_1_device::ef9340_inc_c()
 }
 
 
-void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
+void ef9340_1_device::ef9341_write( u8 command, u8 b, u8 data )
 {
 	LOG("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
@@ -205,7 +205,7 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 	{
 		if ( b )
 		{
-			uint16_t addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+			u16 addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
 
 			m_ef9341.TB = data;
 			m_ef9341.busy = true;
@@ -224,9 +224,9 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 
 				case 0x80:  /* Write slice */
 					{
-						uint8_t a = m_ram_a[addr];
-						uint8_t b = m_ram_b[addr];
-						uint8_t slice = m_ef9340.M & 0x0f;
+						u8 a = m_ram_a[addr];
+						u8 b = m_ram_b[addr];
+						u8 slice = m_ef9340.M & 0x0f;
 
 						if (b >= 0xa0)
 							m_write_exram(a << 12 | b << 4 | slice, m_ef9341.TA);
@@ -249,9 +249,9 @@ void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 }
 
 
-uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
+u8 ef9340_1_device::ef9341_read( u8 command, u8 b )
 {
-	uint8_t   data;
+	u8   data;
 
 	LOG("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
 
@@ -270,7 +270,7 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 	{
 		if ( b )
 		{
-			uint16_t addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+			u16 addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
 
 			data = m_ef9341.TB;
 			m_ef9341.busy = true;
@@ -289,16 +289,16 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 
 				case 0xA0:  /* Read slice */
 					{
-						uint8_t a = m_ram_a[addr];
-						uint8_t b = m_ram_b[addr];
-						uint8_t slice = m_ef9340.M & 0x0f;
+						u8 a = m_ram_a[addr];
+						u8 b = m_ram_b[addr];
+						u8 slice = m_ef9340.M & 0x0f;
 
 						m_ef9341.TA = 0xff;
 						m_ef9341.TB = 0xff;
 
 						if (b >= 0xa0)
 							m_ef9341.TA = m_read_exram(a << 12 | b << 4 | slice);
-						else if (slice < 10)
+						else if (b < 0x80 && slice < 10)
 							m_ef9341.TA = m_charset[(((a & 0x80) | (b & 0x7f)) * 10) + slice];
 
 						// Increment slice number
@@ -337,9 +337,9 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 	if (m_ef9340.R & 0x01 && vpos < max_vpos)
 	{
 		int y_row = 0;
-		uint16_t char_data = 0x00;
-		uint8_t fg = 0;
-		uint8_t bg = 0;
+		u16 char_data = 0x00;
+		u8 fg = 0;
+		u8 bg = 0;
 		bool underline = false;
 		bool blank = false;
 		bool w_parity = false;
@@ -369,9 +369,9 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 		for (int x = 0; x < 40; x++)
 		{
 			int s = slice;
-			uint16_t addr = ef9340_get_c_addr(x, y_row);
-			uint8_t a = m_ram_a[addr];
-			uint8_t b = m_ram_b[addr];
+			u16 addr = ef9340_get_c_addr(x, y_row);
+			u8 a = m_ram_a[addr];
+			u8 b = m_ram_b[addr];
 			bool blink = m_ef9340.R & 0x80 && m_ef9340.blink;
 			bool cursor = m_ef9340.R & 0x10 && x == m_ef9340.X && y_row == m_ef9340.Y;
 			bool invert = cursor && !blink;
@@ -464,7 +464,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 
 			for (int i = 0; i < 8; i++)
 			{
-				uint16_t d = blank ? 0 : (char_data & 1) ? fg : bg;
+				u16 d = blank ? 0 : (char_data & 1) ? fg : bg;
 				m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + x*8 + i) = d | 8;
 				char_data >>= 1;
 			}
@@ -493,7 +493,7 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 }
 
 
-uint32_t ef9340_1_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ef9340_1_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// note: palette d3 is transparency (datasheet calls it "I"), this handler masks it off
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)

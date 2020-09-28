@@ -24,13 +24,13 @@ DEFINE_DEVICE_TYPE(I8245, i8245_device, "i8245", "Intel 8245")
 //  i8244_device - constructor
 //-------------------------------------------------
 
-i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: i8244_device(mconfig, I8244, tag, owner, clock)
 {
 }
 
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -40,7 +40,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: i8244_device(mconfig, I8245, tag, owner, clock)
 {
 }
@@ -280,9 +280,9 @@ bool i8244_device::invalid_register( offs_t offset, bool rw )
 }
 
 
-uint8_t i8244_device::read(offs_t offset)
+u8 i8244_device::read(offs_t offset)
 {
-	uint8_t data;
+	u8 data;
 
 	offset = fix_register_mirrors(offset);
 
@@ -337,7 +337,7 @@ uint8_t i8244_device::read(offs_t offset)
 }
 
 
-void i8244_device::write(offs_t offset, uint8_t data)
+void i8244_device::write(offs_t offset, u8 data)
 {
 	offset = fix_register_mirrors(offset);
 
@@ -470,7 +470,7 @@ void i8244_device::write_cx(int x, bool cx)
 }
 
 
-uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Draw background color */
 	bitmap.fill(bitswap<3>(m_vdc.s.color,3,4,5), cliprect);
@@ -483,7 +483,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		/* Display grid if enabled */
 		if ( m_vdc.s.control & 0x08 )
 		{
-			uint16_t color = bitswap<4>(m_vdc.s.color,6,0,1,2);
+			u16 color = bitswap<4>(m_vdc.s.color,6,0,1,2);
 			int x_grid_offset = 13;
 			int y_grid_offset = 24;
 			int width = 16;
@@ -590,11 +590,11 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 					for ( int j = 0; j < ARRAY_LENGTH( m_vdc.s.quad[0].single ); j++, x += 16 )
 					{
-						uint16_t color = 8 + ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 );
+						u16 color = 8 + ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 );
 						int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-						uint8_t chr = m_charset[ offset & 0x1FF ];
+						u8 chr = m_charset[ offset & 0x1FF ];
 
-						for ( uint8_t m = 0x80; m > 0; m >>= 1, x += 2 )
+						for ( u8 m = 0x80; m > 0; m >>= 1, x += 2 )
 						{
 							if ( chr & m )
 							{
@@ -637,12 +637,12 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 				if ( y <= scanline && scanline < y + height * 2 )
 				{
-					uint16_t color = 8 + ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 );
+					u16 color = 8 + ( ( m_vdc.s.foreground[i].color >> 1 ) & 0x07 );
 					int offset = ( m_vdc.s.foreground[i].ptr | ( ( m_vdc.s.foreground[i].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
-					uint8_t chr = m_charset[ offset & 0x1FF ];
+					u8 chr = m_charset[ offset & 0x1FF ];
 					int x = (m_vdc.s.foreground[i].x + 5) * 2;
 
-					for ( uint8_t m = 0x80; m > 0; m >>= 1, x += 2 )
+					for ( u8 m = 0x80; m > 0; m >>= 1, x += 2 )
 					{
 						if ( chr & m )
 						{
@@ -685,8 +685,8 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 				if ( y <= scanline && scanline < y + height * zoom_px )
 				{
-					uint16_t color = 8 + ( ( m_vdc.s.sprites[i].color >> 3 ) & 0x07 );
-					uint8_t chr = m_vdc.s.shape[i][ ( ( scanline - y ) / zoom_px ) ];
+					u16 color = 8 + ( ( m_vdc.s.sprites[i].color >> 3 ) & 0x07 );
+					u8 chr = m_vdc.s.shape[i][ ( ( scanline - y ) / zoom_px ) ];
 					int x = (m_vdc.s.sprites[i].x + 5) * 2;
 					int x_shift = 0;
 
@@ -707,7 +707,7 @@ uint32_t i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 					x += x_shift * (zoom_px / 2);
 
-					for ( uint8_t m = 0x01; m > 0; m <<= 1, x += zoom_px )
+					for ( u8 m = 0x01; m > 0; m <<= 1, x += zoom_px )
 					{
 						if ( chr & m )
 						{
