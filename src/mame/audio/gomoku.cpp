@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "audio/gomoku.h"
 
-constexpr int DEFGAIN = 48;
-
 
 // device type definition
 DEFINE_DEVICE_TYPE(GOMOKU_SOUND, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe Renju Custom Sound")
