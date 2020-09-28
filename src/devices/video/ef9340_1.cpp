@@ -16,7 +16,6 @@ This is implemented with a callback. The datasheet explains how to hook up
 TODO:
 - busy state (right now it is immediate)
 - internal display timing (on g7400, most of it is done externally)
-- read slice from internal ROM
 - window boxing
 - Y zoom
 
@@ -299,8 +298,8 @@ uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 
 						if (b >= 0xa0)
 							m_ef9341.TA = m_read_exram(a << 12 | b << 4 | slice);
-						else
-							logerror("ef9341 read slice from internal\n");
+						else if (slice < 10)
+							m_ef9341.TA = m_charset[(((a & 0x80) | (b & 0x7f)) * 10) + slice];
 
 						// Increment slice number
 						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
