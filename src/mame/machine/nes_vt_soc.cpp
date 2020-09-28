@@ -1235,14 +1235,7 @@ void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	/* this should actually be a custom *almost* doubled up APU, however requires more thought
-	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
-	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
-	   2nd.  Probably need to split the APU into interface and sound gen logic.
-
-	   for now we're adding a standard APU, but this is incorrect
-	*/
-	NES_APU(config, m_apu, NTSC_APU_CLOCK);
+	NES_APU_VT(config, m_apu, NTSC_APU_CLOCK);
 	m_apu->irq().set(FUNC(nes_vt_soc_device::apu_irq));
 	m_apu->mem_read().set(FUNC(nes_vt_soc_device::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
