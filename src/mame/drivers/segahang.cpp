@@ -1196,6 +1196,19 @@ ROM_START( hangonvf )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "1.9d", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+
+	ROM_REGION( 0x1400, "plds", 0 )
+	ROM_LOAD( "a_pal16r4a.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "b_pls153an.bin", 0x0200, 0x00eb, NO_DUMP )
+	ROM_LOAD( "c_pal16r6a.bin", 0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "d_pal16r6a.bin", 0x0600, 0x0104, NO_DUMP )
+	ROM_LOAD( "e_pal16r6a.bin", 0x0800, 0x0104, NO_DUMP )
+	ROM_LOAD( "f_pls153n.bin",  0x0a00, 0x00eb, NO_DUMP )
+	ROM_LOAD( "g_pal16l8a.bin", 0x0c00, 0x0104, NO_DUMP )
+	// no PLD marked 'H'
+	ROM_LOAD( "i_pls153n.bin",  0x0e00, 0x00eb, NO_DUMP )
+	ROM_LOAD( "j_pal16l8a.bin", 0x1000, 0x0104, NO_DUMP )
+	ROM_LOAD( "k_pal16r4a.bin", 0x1200, 0x0104, NO_DUMP )
 ROM_END
 
 
