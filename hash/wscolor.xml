@@ -3,7 +3,19 @@
 <!--
 license:CC0
 -->
-
+<!--
+Some titles might exist with other revisions:
+- Battle Spirit - Digimon Frontier - Rev 0
+- Digital Monster Card Game - Ver. WonderSwan Color - Rev 1
+- Digimon Tamers - Brave Tamer - Rev 0
+- Dokodemo Hamster 3 - Odekake Saffron - Rev 0, 1
+- Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de - Rev 0, 1
+- Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! - Rev 0
+- Kurupara! - Rev 0
+- Super Robot Taisen Compact 3 - Rev 0, 1, 2, 3, 4
+- Rockman EXE - N1 Battle - Rev 0
+- Sorobang - Rev 0
+-->
 <softwarelist name="wscolor" description="Bandai Wonderswan Color cartridges">
 	<software name="anotherh">
 		<!-- WSC -->
@@ -62,7 +74,7 @@ license:CC0
 
 	<software name="battlesp">
 		<!-- WSC only -->
-		<description>Battle Spirit - Digimon Frontier</description>
+		<description>Battle Spirit - Digimon Frontier (Rev 1)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC31"/>
@@ -152,7 +164,25 @@ license:CC0
 
 	<software name="digi2d1">
 		<!-- WSC -->
-		<description>Digimon Adventure 02 - D1 Tamers</description>
+		<description>Digimon Adventure 02 - D1 Tamers (Rev 1)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC03"/>
+		<info name="release" value="20001209"/>
+		<info name="alt_title" value="デジモンアドベンチャー02 ディーワンテイマーズ"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="swj-banc03.bin" size="4194304" crc="62f4e4b4" sha1="6fbb07bfefac7832436ec56e4d95678428b0f7ba" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digi2d1a" cloneof="digi2d1">
+		<!-- WSC -->
+		<description>Digimon Adventure 02 - D1 Tamers (Rev 0)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC03"/>
@@ -186,7 +216,26 @@ license:CC0
 
 	<software name="digicard">
 		<!-- WSC only -->
-		<description>Digital Monster Card Game - Ver. WonderSwan Color</description>
+		<description>Digital Monster Card Game - Ver. WonderSwan Color (Rev 2)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC22"/>
+		<info name="release" value="20020316"/>
+		<info name="alt_title" value="デジタルモンスター カードゲーム バージョン ワンダースワンカラー"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_eeprom" />
+			<feature name="rotated" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="swj-banc22.bin" size="4194304" crc="1e760c41" sha1="e31bfa54cbf539a9d28090b372d8e669a93c3e28" offset="000000" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digicarda" cloneof="digicard">
+		<!-- WSC only -->
+		<description>Digital Monster Card Game - Ver. WonderSwan Color (Rev 0)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC22"/>
@@ -205,7 +254,25 @@ license:CC0
 
 	<software name="digimdp">
 		<!-- WSC only -->
-		<description>Digital Monster - D-Project</description>
+		<description>Digital Monster - D-Project (Rev 1)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC2E"/>
+		<info name="release" value="20020803"/>
+		<info name="alt_title" value="デジタルモンスター ディープロジェクト"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="swj-banc2e.bin" size="4194304" crc="bd83b82d" sha1="7dab09df13e65aa778e3bc9100efffb10b93b8a9" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digimdpa" cloneof="digimdp">
+		<!-- WSC only -->
+		<description>Digital Monster - D-Project (Rev 0)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC2E"/>
@@ -260,7 +327,7 @@ license:CC0
 
 	<software name="digitbt">
 		<!-- WSC only -->
-		<description>Digimon Tamers - Brave Tamer</description>
+		<description>Digimon Tamers - Brave Tamer (Rev 1)</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC1D"/>
@@ -287,6 +354,24 @@ license:CC0
 		<part name="cart" interface="wswan_cart">
 			<feature name="slot" value="ws_eeprom" />
 			<dataarea name="rom" size="4194304">
+				<rom name="swj-banc14.bin" size="4194304" crc="84a46949" sha1="6c5a2dc7e231ebd278fe22bb7f01b1a7cc3785d6" offset="000000" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digitmeda" cloneof="digitmed">
+		<!-- WSC -->
+		<description>Digimon Tamers - Digimon Medley (alt)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC14"/>
+		<info name="release" value="20010712"/>
+		<info name="alt_title" value="デジモンテイマーズ デジモンメドレー"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_eeprom" />
+			<dataarea name="rom" size="4194304">
 				<rom name="swj-banc14.bin" size="4194304" crc="fa92418d" sha1="8638737e5a35c6be05a888dc81e504e0d80fd756" offset="000000" />
 			</dataarea>
 			<dataarea name="eeprom" size="0x800">
@@ -296,7 +381,7 @@ license:CC0
 
 	<software name="dokodem3">
 		<!-- WSC -->
-		<description>Dokodemo Hamster 3 - Odekake Saffron</description>
+		<description>Dokodemo Hamster 3 - Odekake Saffron (Rev 2)</description>
 		<year>2000</year>
 		<publisher>BEC</publisher>
 		<info name="serial" value="SWJ-BECC01"/>
@@ -474,7 +559,7 @@ license:CC0
 
 	<software name="gmsayuki">
 		<!-- WSC only -->
-		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de</description>
+		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de (Rev 2)</description>
 		<year>2001</year>
 		<publisher>Movic ~ Soeishinsha</publisher>
 		<info name="serial" value="SWJ-SESC01"/>
@@ -656,7 +741,7 @@ license:CC0
 	<!-- hangs after story scroll when starting a new game -->
 	<software name="hanjuher" supported="no">
 		<!-- WSC only -->
-		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!!</description>
+		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! (Rev 1)</description>
 		<year>2002</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SWJ-SQRC06"/>
@@ -692,7 +777,25 @@ license:CC0
 
 	<software name="hxhgrisl">
 		<!-- WSC only, Rated "Everyone" -->
-		<description>Hunter X Hunter - Greed Island</description>
+		<description>Hunter X Hunter - Greed Island (Rev 1)</description>
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC39"/>
+		<info name="release" value="20030424"/>
+		<info name="alt_title" value="ハンター×ハンター グリードアイランド"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="swj-banc39.bin" size="8388608" crc="130af567" sha1="e26410d4eee4cc8cec5e2e369604aedf26d69d0c" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hxhgrisla" cloneof="hxhgrisl">
+		<!-- WSC only, Rated "Everyone" -->
+		<description>Hunter X Hunter - Greed Island (Rev 0)</description>
 		<year>2003</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC39"/>
@@ -873,7 +976,7 @@ license:CC0
 
 	<software name="kurupara">
 		<!-- WSC only -->
-		<description>Kurupara!</description>
+		<description>Kurupara! (Rev 1)</description>
 		<year>2001</year>
 		<publisher>Tom Create</publisher>
 		<info name="serial" value="SWJ-TMCC01"/>
@@ -1074,7 +1177,25 @@ license:CC0
 
 	<software name="oneptwar">
 		<!-- WSC only -->
-		<description>From TV Animation One Piece - Treasure Wars</description>
+		<description>From TV Animation One Piece - Treasure Wars (Rev 1)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SWJ-BANC1E"/>
+		<info name="release" value="20020103"/>
+		<info name="alt_title" value="フロムテレビアニメーション ワンピース トレジャーウォーズ"/>
+		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="ws_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="swj-banc1e.bin" size="4194304" crc="3df3e34c" sha1="55088795164170c24b243a1b572506f123064c0f" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oneptwara" cloneof="oneptwar">
+		<!-- WSC only -->
+		<description>From TV Animation One Piece - Treasure Wars (Rev 0)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC1E"/>
@@ -1165,7 +1286,7 @@ license:CC0
 
 	<software name="srobotc3a" cloneof="srobotc3">
 		<!-- WSC only, Rated "Everyone" -->
-		<description>Super Robot Taisen Compact 3 (v1.5)</description>
+		<description>Super Robot Taisen Compact 3 (Rev 5)</description>
 		<year>2003</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPRC09"/>
@@ -1183,7 +1304,7 @@ license:CC0
 
 	<software name="srobotc3">
 		<!-- WSC only, Rated "Everyone" -->
-		<description>Super Robot Taisen Compact 3 (v1.6)</description>
+		<description>Super Robot Taisen Compact 3 (Rev 6)</description>
 		<year>2003</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPRC09"/>
@@ -1199,7 +1320,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="srobotwc" supported="no">   <!-- it freezes -->
+	<software name="srobotwc">
 		<!-- WSC only -->
 		<description>Super Robot Taisen Compact for WonderSwan Color</description>
 		<year>2001</year>
@@ -1237,7 +1358,7 @@ license:CC0
 
 	<software name="rockmnxn">
 		<!-- WSC only, Rated "Everyone" -->
-		<description>Rockman EXE - N1 Battle</description>
+		<description>Rockman EXE - N1 Battle (Rev 1)</description>
 		<year>2003</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SWJ-CPCC01"/>
@@ -1399,7 +1520,7 @@ license:CC0
 
 	<software name="shamking">
 		<!-- WSC only -->
-		<description>Shaman King - Asu e no Ishi (v1.1)</description>
+		<description>Shaman King - Asu e no Ishi (Rev 1)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC2D"/>
@@ -1417,7 +1538,7 @@ license:CC0
 
 	<software name="shamking1" cloneof="shamking">
 		<!-- WSC only -->
-		<description>Shaman King - Asu e no Ishi</description>
+		<description>Shaman King - Asu e no Ishi (Rev 0)</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC2D"/>
@@ -1435,7 +1556,7 @@ license:CC0
 
 	<software name="sorobang" supported="partial">
 		<!-- WSC -->
-		<description>Sorobang</description>
+		<description>Sorobang (Rev 1)</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGTC09"/>
