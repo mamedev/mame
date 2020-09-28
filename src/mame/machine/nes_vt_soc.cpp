@@ -1214,7 +1214,7 @@ void nes_vt_soc_device::do_pal_timings_and_ppu_replacement(machine_config& confi
 
 void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, NTSC_APU_CLOCK);
+	N2A03_BASE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms N2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_device::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1238,7 +1238,10 @@ void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 	/* this should actually be a custom *almost* doubled up APU, however requires more thought
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
 	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
-	   2nd.  Probably need to split the APU into interface and sound gen logic. */
+	   2nd.  Probably need to split the APU into interface and sound gen logic.
+
+	   for now we're adding a standard APU, but this is incorrect
+	*/
 	NES_APU(config, m_apu, NTSC_APU_CLOCK);
 	m_apu->irq().set(FUNC(nes_vt_soc_device::apu_irq));
 	m_apu->mem_read().set(FUNC(nes_vt_soc_device::apu_read_mem));
@@ -1260,7 +1263,7 @@ void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt_soc_device::device_add_mconfig(config);
 
-	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	N2A03_BASE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms N2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_scramble_device::nes_vt_map);
 }
 
@@ -1461,7 +1464,7 @@ void nes_vt_soc_4kram_fp_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt_soc_device::device_add_mconfig(config);
 
-	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	M6502_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK); // are these later chips N2A03 core, or 6502 core derived?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_4kram_fp_device::nes_vt_fp_map);
 }
 
