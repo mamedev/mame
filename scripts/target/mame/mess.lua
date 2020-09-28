@@ -1168,6 +1168,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"cccp",
 		"cce",
 		"ccs",
+		"ceres",
 		"chessking",
 		"chromatics",
 		"chrysler",
@@ -2015,6 +2016,11 @@ files {
 createMESSProjects(_target, _subtarget, "ccs")
 files {
 	MAME_DIR .. "src/mame/drivers/ccs2810.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "ceres")
+files {
+	MAME_DIR .. "src/mame/drivers/ceres.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "chessking")
