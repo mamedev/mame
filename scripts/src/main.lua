@@ -165,8 +165,6 @@ end
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/bgfx@artwork/bgfx"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/popeye.zip@artwork/popeye.zip"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "roms@roms"
 
 			if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 				emccopts = emccopts
