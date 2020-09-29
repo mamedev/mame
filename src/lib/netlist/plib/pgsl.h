@@ -116,6 +116,11 @@ namespace plib {
 
 	using pgsl::narrow_cast;
 
+	/// \brief cast to void *
+	///
+	/// The purpose here is to help identifiy casts to void in the code.
+	/// These case usuallyindicate some wizard assumptioms which should be easily
+	/// be easy to identify.
 	template <typename T>
 	constexpr void * void_ptr_cast(T *ptr) noexcept { return static_cast<void *>(ptr); }
 
