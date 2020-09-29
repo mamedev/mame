@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ymopn.h"
+#include "ymfm.h"
 
 //
 // This emulator is written from the ground-up based on analysis and deduction

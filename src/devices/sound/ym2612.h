@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ymopn.h"
+#include "ymfm.h"
 
 
 // ======================> ym2612_device

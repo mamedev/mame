@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ymopn.h"
+#include "ymfm.h"
 #include "ymadpcm.h"
 #include "ay8910.h"
 
