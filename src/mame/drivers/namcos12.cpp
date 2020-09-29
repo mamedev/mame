@@ -870,8 +870,8 @@ Type 2
       SYSTEM12 COH716 PCB 8661962301 (8661972301)
       (manufactured by Namco, probably in 2001, under license from Sony)
       Component layout is identical to COH-700 PCB with some updated components. Generally
-      it has 2X the amount of video RAM and 4X the amount of program RAM that the COH-700 PCB has.
-      KM4132G271Q replaced with OKI 54V25632A 256k x 32-bit x 2 Banks SGRAM (x2, QFP100)
+      it has 4X the amount of program RAM that the COH-700 PCB has.
+      KM4132G271Q replaced with OKI 54V25632A 128k x 32-bit x 2 Banks SGRAM (x2, QFP100)
       KM416V1204 replaced with Samsung Electronics K4E6416120D 4M x16 EDO DRAM (x2, TSOP44)
       Updated Sony CXD8561CQ GPU (QFP208)
       Updated Sony CXD8606BQ R3000A-based CPU (QFP208)
@@ -1761,11 +1761,11 @@ void namcos12_state::coh700(machine_config &config)
 	/* basic machine hardware */
 	CXD8661R(config, m_maincpu, XTAL(100'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::namcos12_map);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M"); // 2 KM416V1204s
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
 	/* video hardware */
-	CXD8654Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8654Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 KM4132G271Qs
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 }
@@ -1777,11 +1777,11 @@ void namcos12_state::coh716(machine_config &config)
 	/* basic machine hardware */
 	CXD8606BQ(config, m_maincpu, XTAL(100'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::namcos12_map);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M");
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M"); // 2 K4E6416120Ds
 	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
 	/* video hardware */
-	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x400000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632As
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
 }
