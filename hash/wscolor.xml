@@ -1813,8 +1813,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20000718"/>
 		<info name="alt_title" value="ワンダーウィッチ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="wwitch" />
+			<feature name="rtc" value="yes" />
+			<!-- 512KB Flash rom -->
+			<!-- The last, 8th,  64KB page is protected and contains the main rom -->
+			<!-- The 7th page contains the Freya OS and fonts -->
+			<!-- The remaining 384KB is available for storing code -->
 			<dataarea name="rom" size="524288">
 				<rom name="wonderwitch [freyaos 1.2.0].bin" size="524288" crc="8e5e9633" sha1="d9dd280972ec45e56de98f3d425533dd49713caf" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x40000">
 			</dataarea>
 		</part>
 	</software>
@@ -1827,8 +1835,16 @@ Some titles might exist with other revisions:
 		<info name="release" value="20000718"/>
 		<info name="alt_title" value="ワンダーウィッチ"/>
 		<part name="cart" interface="wswan_cart">
+			<feature name="slot" value="wwitch" />
+			<feature name="rtc" value="yes" />
+			<!-- 512KB Flash rom -->
+			<!-- The last, 8th,  64KB page is protected and contains the main rom -->
+			<!-- The 7th page contains the Freya OS and fonts -->
+			<!-- The remaining 384KB is available for storing code -->
 			<dataarea name="rom" size="524288">
 				<rom name="wonderwitch [freyaos 1.1.5].bin" size="524288" crc="45ba7287" sha1="905cca29fd6188b2c6237b1fb71e89d7b6a1f842" offset="000000" />
+			</dataarea>
+			<dataarea name="sram" size="0x40000">
 			</dataarea>
 		</part>
 	</software>

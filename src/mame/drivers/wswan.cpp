@@ -22,13 +22,13 @@
   - Add support for enveloped sound.
   - Perform video DMA at proper timing.
   - Add (real/proper) RTC support.
-  - Swan Crystal can handle up to 512Mbit ROMs??????
   - SRAM sizes should be in kbit instead of kbytes(?). This raises a few
     interesting issues:
     - mirror of smaller <64KBYTE/512kbit SRAM sizes
     - banking when using 1M or 2M sram sizes
-    - The units likely came with the name "WONDERSWAN" configured in the
-      internal EEPOM
+  - Fix wonderwitch
+    - Wonderwitch does not finish initializing it's filesystem.
+    - Make the flash rom changes save.
 
 ***************************************************************************/
 
@@ -259,6 +259,7 @@ static void wswan_cart(device_slot_interface &device)
 	device.option_add_internal("ws_rom",     WS_ROM_STD);
 	device.option_add_internal("ws_sram",    WS_ROM_SRAM);
 	device.option_add_internal("ws_eeprom",  WS_ROM_EEPROM);
+	device.option_add_internal("wwitch",     WS_ROM_WWITCH);
 }
 
 
@@ -437,7 +438,7 @@ void wswan_state::common_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000, 0xeffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_rom40)));
 
 		// SRAM
-		if (m_cart->get_type() == WS_SRAM)
+		if (m_cart->get_type() == WS_SRAM || m_cart->get_type() == WWITCH)
 		{
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x10000, 0x1ffff, read8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::read_ram)));
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0x10000, 0x1ffff, write8sm_delegate(*m_cart, FUNC(ws_cart_slot_device::write_ram)));
