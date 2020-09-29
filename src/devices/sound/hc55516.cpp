@@ -34,7 +34,7 @@
 //#####################################
 //                 COMMON
 //#####################################
-cvsd_device::cvsd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cvsd_device_base::cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_clock_state_push_cb(*this)
@@ -55,7 +55,7 @@ cvsd_device::cvsd_device(const machine_config &mconfig, device_type type, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void cvsd_device::device_start()
+void cvsd_device_base::device_start()
 {
 	/* create the stream */
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE);
@@ -74,7 +74,7 @@ void cvsd_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void cvsd_device::device_reset()
+void cvsd_device_base::device_reset()
 {
 	m_last_clock_state = 0;
 }
@@ -82,13 +82,13 @@ void cvsd_device::device_reset()
 //-------------------------------------------------
 //  device_clock_changed - device-specific samplerate change
 //-------------------------------------------------
-/*void cvsd_device::device_clock_changed()
+/*void cvsd_device_base::device_clock_changed()
 {
 	// do nothing.
 	//m_stream->set_sample_rate(clock());
 }*/
 
-READ_LINE_MEMBER( cvsd_device::clock_r )
+READ_LINE_MEMBER( cvsd_device_base::clock_r )
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())
@@ -96,52 +96,52 @@ READ_LINE_MEMBER( cvsd_device::clock_r )
 	return clock_state_r();
 }
 
-WRITE_LINE_MEMBER( cvsd_device::mclock_w )
+WRITE_LINE_MEMBER( cvsd_device_base::mclock_w )
 {
 	clock_w(state);
 }
 
-WRITE_LINE_MEMBER( cvsd_device::digin_w )
+WRITE_LINE_MEMBER( cvsd_device_base::digin_w )
 {
 	digit_w(state);
 }
 
 // the following encode related functions don't do anything yet, don't call them.
-/*void cvsd_device::audio_in_w(int16_t data)
+/*void cvsd_device_base::audio_in_w(int16_t data)
 {
 	assert(0);
 }*/
 
-WRITE_LINE_MEMBER( cvsd_device::dec_encq_w )
+WRITE_LINE_MEMBER( cvsd_device_base::dec_encq_w )
 {
 	assert(0);
 }
 
-READ_LINE_MEMBER( cvsd_device::digout_r )
+READ_LINE_MEMBER( cvsd_device_base::digout_r )
 {
 	return 0;
 }
 
 // default and stub implementations
 
-inline bool cvsd_device::is_external_oscillator()
+inline bool cvsd_device_base::is_external_oscillator()
 {
 	return clock() != 0;
 }
 
-inline bool cvsd_device::is_clock_changed(bool clock_state)
+inline bool cvsd_device_base::is_clock_changed(bool clock_state)
 {
 	return ((!m_last_clock_state && clock_state) ||
 			(m_last_clock_state && !clock_state));
 }
 
-inline bool cvsd_device::is_active_clock_transition(bool clock_state)
+inline bool cvsd_device_base::is_active_clock_transition(bool clock_state)
 {
 	return ((clock_state != m_last_clock_state) &&
 			(clock_state == m_active_clock_edge));
 }
 
-inline bool cvsd_device::current_clock_state()
+inline bool cvsd_device_base::current_clock_state()
 {
 	// keep track of the clock state given its previous state and the number of samples produced
 	// i.e. if we generated m_samples_generated samples, at a sample rate of SAMPLE_RATE, then are we on a positive or negative level of a squarewave at clock() hz? SAMPLE_RATE may not be an integer multiple of clock()
@@ -151,13 +151,13 @@ inline bool cvsd_device::current_clock_state()
 	return (((uint64_t)m_samples_generated * clock() * 2 / SAMPLE_RATE) & 0x01)?true:false;
 }
 
-void cvsd_device::digit_w(int digit)
+void cvsd_device_base::digit_w(int digit)
 {
 	m_stream->update();
 	m_buffered_bit = digit ? true : false;
 }
 
-void cvsd_device::clock_w(int state)
+void cvsd_device_base::clock_w(int state)
 {
 	/* update the output buffer first */
 	m_stream->update();
@@ -178,7 +178,7 @@ void cvsd_device::clock_w(int state)
 	m_last_clock_state = clock_state;
 }
 
-int cvsd_device::clock_state_r()
+int cvsd_device_base::clock_state_r()
 {
 	/* only makes sense for setups with an external oscillator */
 	assert(is_external_oscillator());
@@ -188,7 +188,7 @@ int cvsd_device::clock_state_r()
 	return current_clock_state();
 }
 
-void cvsd_device::process_bit(bool bit, bool clock_state)
+void cvsd_device_base::process_bit(bool bit, bool clock_state)
 {
 	// stub
 }
@@ -197,7 +197,7 @@ void cvsd_device::process_bit(bool bit, bool clock_state)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void cvsd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void cvsd_device_base::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// Stub, just return silence
 	auto &buffer = outputs[0];
@@ -216,7 +216,7 @@ void cvsd_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 DEFINE_DEVICE_TYPE(HC55516, hc55516_device, "hc55516", "HC-55516")
 
 hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device(mconfig, HC55516, tag, owner, clock)
+	: cvsd_device_base(mconfig, HC55516, tag, owner, clock)
 	, m_agc_push_cb(*this)
 	, m_fzq_pull_cb(*this)
 	, m_sylmask(0xfc0)
@@ -232,7 +232,7 @@ hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, d
 
 // overridable type for hc55532 etc
 hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device(mconfig, type, tag, owner, clock)
+	: cvsd_device_base(mconfig, type, tag, owner, clock)
 	, m_agc_push_cb(*this)
 	, m_fzq_pull_cb(*this)
 	, m_sylmask(0xf80)
@@ -252,7 +252,7 @@ hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, 
 
 void hc55516_device::device_start()
 {
-	cvsd_device::device_start();
+	cvsd_device_base::device_start();
 	save_item(NAME(m_sylmask));
 	save_item(NAME(m_sylshift));
 	save_item(NAME(m_syladd));
@@ -446,7 +446,7 @@ hc55532_device::hc55532_device(const machine_config &mconfig, const char *tag, d
 
 void hc55532_device::device_start()
 {
-	cvsd_device::device_start();
+	cvsd_device_base::device_start();
 	save_item(NAME(m_sylmask));
 	save_item(NAME(m_sylshift));
 	save_item(NAME(m_syladd));
@@ -489,7 +489,7 @@ void hc55532_device::device_reset()
 DEFINE_DEVICE_TYPE(MC3417, mc3417_device, "mc3417", "MC3417")
 
 mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device(mconfig, MC3417, tag, owner, clock)
+	: cvsd_device_base(mconfig, MC3417, tag, owner, clock)
 	, m_sylfilter_d(0.0)
 	, m_intfilter_d(0.0)
 	, m_charge(0.0)
@@ -500,7 +500,7 @@ mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, dev
 
 // overridable type for mc3418 etc
 mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cvsd_device(mconfig, type, tag, owner, clock)
+	: cvsd_device_base(mconfig, type, tag, owner, clock)
 	, m_sylfilter_d(0.0)
 	, m_intfilter_d(0.0)
 	, m_charge(0.0)
@@ -515,7 +515,7 @@ mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, co
 
 void mc3417_device::device_start()
 {
-	cvsd_device::device_start();
+	cvsd_device_base::device_start();
 	save_item(NAME(m_sylfilter_d));
 	save_item(NAME(m_intfilter_d));
 	save_item(NAME(m_charge));
@@ -642,7 +642,7 @@ mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, dev
 
 void mc3418_device::device_start()
 {
-	cvsd_device::device_start();
+	cvsd_device_base::device_start();
 	save_item(NAME(m_sylfilter_d));
 	save_item(NAME(m_intfilter_d));
 	save_item(NAME(m_charge));
@@ -662,11 +662,11 @@ void mc3418_device::device_start()
 /*
 void mc3417_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	cvsd_device::sound_stream_update_legacy(stream, inputs, outputs, samples);
+	cvsd_device_base::sound_stream_update_legacy(stream, inputs, outputs, samples);
 }
 
 void mc3418_device::sound_stream_update_legacy(sound_stream &stream, stream_sample_t const * const *inputs, stream_sample_t * const *outputs, int samples)
 {
-	cvsd_device::sound_stream_update_legacy(stream, inputs, outputs, samples);
+	cvsd_device_base::sound_stream_update_legacy(stream, inputs, outputs, samples);
 }
 */

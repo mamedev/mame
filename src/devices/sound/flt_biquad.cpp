@@ -20,6 +20,7 @@ DEFINE_DEVICE_TYPE(FILTER_BIQUAD, filter_biquad_device, "filter_biquad", "Biquad
 //  filter_biquad_device - constructor
 //-------------------------------------------------
 
+// initialize with some sane defaults for a highpass filter with a cutoff at 16hz, same as flt_rc's 'ac' mode.
 filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FILTER_BIQUAD, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
@@ -246,9 +247,6 @@ void filter_biquad_device::recalc()
 		logerror("b2g: %f\n", m_b2);
 #endif
 	}
-#ifdef FLT_BIQUAD_DEBUG
-	fflush(stderr);
-#endif
 }
 
 /* Step the filter */

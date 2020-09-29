@@ -86,7 +86,7 @@ public:
 		double const fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
 		double const q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c1) + (r2 * c1) + ((r2 * c2) * (1.0 - gain)));
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-		fprintf(stderr,"filter_biquad_device::opamp_sk_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain); fflush(stderr);
+		logerror("filter_biquad_device::opamp_sk_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
 		return setup(LOWPASS, fc, q, gain);
 	}
@@ -121,7 +121,7 @@ public:
 		{
 			fc = (r1 * r3) / (2 * M_PI * ((r1 * r2) + (r1 * r3) + (r2 * r3)) * r3 * c2);
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-			fprintf(stderr,"filter_biquad_device::opamp_mfb_lowpass_setup() in degraded mode yields: fc = %f, Q = %f(ignored), gain = %f\n", fc, q, gain); fflush(stderr);
+			logerror("filter_biquad_device::opamp_mfb_lowpass_setup() in degraded mode yields: fc = %f, Q = %f(ignored), gain = %f\n", fc, q, gain);
 #endif
 			return setup(LOWPASS1P, fc, q, gain);
 		}
@@ -130,7 +130,7 @@ public:
 			fc = 1.0 / (2 * M_PI * sqrt(r2 * r3 * c1 * c2));
 			q = sqrt(r2 * r3 * c1 * c2) / ((r3 * c2) + (r2 * c2) + ((r2 * c2) * -gain));
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-			fprintf(stderr,"filter_biquad_device::opamp_mfb_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain); fflush(stderr);
+			logerror("filter_biquad_device::opamp_mfb_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
 			return setup(LOWPASS, fc, q, gain);
 		}
@@ -178,7 +178,7 @@ public:
 		double const q = sqrt(r3 / r_in * c1 * c2) / (c1 + c2);
 		gain *= -r3 / r_in * c2 / (c1 + c2);
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-		fprintf(stderr,"filter_biquad_device::opamp_mfb_bandpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain); fflush(stderr);
+		logerror("filter_biquad_device::opamp_mfb_bandpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
 		return setup(BANDPASS, fc, q, gain);
 	}
@@ -212,7 +212,7 @@ public:
 		double const fc = 1.0 / (2 * M_PI * sqrt(c2 * c3 * r1 * r2));
 		double const q = sqrt(c2 * c3 * r1 * r2) / ((c2 * r1) + (c3 * r1) + ((c3 * r1) * -gain));
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-		fprintf(stderr,"filter_biquad_device::opamp_mfb_highpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain); fflush(stderr);
+		logerror("filter_biquad_device::opamp_mfb_highpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
 		return setup(HIGHPASS, fc, q, gain);
 	}
@@ -228,20 +228,18 @@ private:
 	void recalc();
 	void step();
 
-// some sane defaults for a highpass filter with a cutoff at 16hz, same as flt_rc's 'ac' mode.
-private:
 	sound_stream*  m_stream;
-	int            m_type = HIGHPASS;
+	int            m_type;
 	int            m_last_sample_rate;
-	double         m_fc = 16.0;
-	double         m_q = 1.41421356237309504880 / 2.0; // M_SQRT2 / 2.0;
-	double         m_gain = 1.0;
+	double         m_fc;
+	double         m_q;
+	double         m_gain;
 
-	stream_buffer::sample_t m_input = 0.0;
-	double m_w0 = 0.0, m_w1 = 0.0, m_w2 = 0.0;  /* w[k], w[k-1], w[k-2], current and previous intermediate values */
-	stream_buffer::sample_t m_output = 0.0;
-	double m_a1 = 0.0, m_a2 = 0.0;              /* digital filter coefficients, denominator */
-	double m_b0 = 1.0, m_b1 = 0.0, m_b2 = 0.0;  /* digital filter coefficients, numerator */
+	stream_buffer::sample_t m_input;
+	double m_w0, m_w1, m_w2; /* w[k], w[k-1], w[k-2], current and previous intermediate values */
+	stream_buffer::sample_t m_output;
+	double m_a1, m_a2; /* digital filter coefficients, denominator */
+	double m_b0, m_b1, m_b2;  /* digital filter coefficients, numerator */
 };
 
 DECLARE_DEVICE_TYPE(FILTER_BIQUAD, filter_biquad_device)
