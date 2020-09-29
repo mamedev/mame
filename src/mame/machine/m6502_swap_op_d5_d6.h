@@ -24,9 +24,6 @@ protected:
 	class mi_decrypt : public mi_default {
 	public:
 
-		bool m_scramble_en = false;
-		bool m_next_scramble = false;
-
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
 
@@ -48,16 +45,13 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
-class n2a03_base_swap_op_d5_d6 : public n2a03_base_device {
+class n2a03_core_swap_op_d5_d6 : public n2a03_core_device {
 public:
-	n2a03_base_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	class mi_decrypt : public mi_default {
 	public:
-
-		bool m_scramble_en = false;
-		bool m_next_scramble = false;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
@@ -82,6 +76,6 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(M6502_SWAP_OP_D5_D6, m6502_swap_op_d5_d6)
-DECLARE_DEVICE_TYPE(N2A03_BASE_SWAP_OP_D5_D6, n2a03_base_swap_op_d5_d6)
+DECLARE_DEVICE_TYPE(N2A03_CORE_SWAP_OP_D5_D6, n2a03_core_swap_op_d5_d6)
 
 #endif // MAME_M6502_SWAP_OP_D5_D6_H

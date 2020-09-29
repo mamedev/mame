@@ -15,10 +15,9 @@
 #include "m6502.h"
 #include "sound/nes_apu.h"
 
-class n2a03_base_device : public m6502_device {
+class n2a03_core_device : public m6502_device {
 public:
-	n2a03_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	n2a03_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	n2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -26,6 +25,8 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
+	n2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// n2a03 opcodes - same as 6502 with D disabled
@@ -40,7 +41,7 @@ protected:
 private:
 };
 
-class n2a03_device : public n2a03_base_device, public device_mixer_interface {
+class n2a03_device : public n2a03_core_device, public device_mixer_interface {
 public:
 	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -80,7 +81,7 @@ enum {
 	N2A03_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-DECLARE_DEVICE_TYPE(N2A03_BASE, n2a03_base_device)
+DECLARE_DEVICE_TYPE(N2A03_CORE, n2a03_core_device)
 DECLARE_DEVICE_TYPE(N2A03, n2a03_device)
 
 #endif // MAME_CPU_M6502_N2A03_H

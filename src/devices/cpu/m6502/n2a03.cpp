@@ -12,7 +12,7 @@
 #include "n2a03.h"
 #include "n2a03d.h"
 
-DEFINE_DEVICE_TYPE(N2A03_BASE, n2a03_base_device, "n2a03_base", "Ricoh N2A03 core") // needed for some VT systems with XOP instead of standard APU
+DEFINE_DEVICE_TYPE(N2A03_CORE, n2a03_core_device, "n2a03_core", "Ricoh N2A03 core") // needed for some VT systems with XOP instead of standard APU
 DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "Ricoh N2A03")
 
 uint8_t n2a03_device::psg1_4014_r()
@@ -52,20 +52,20 @@ void n2a03_device::n2a03_map(address_map &map)
 
 
 
-n2a03_base_device::n2a03_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+n2a03_core_device::n2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: m6502_device(mconfig, type, tag, owner, clock)
 {
 }
 
-n2a03_base_device::n2a03_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: n2a03_base_device(mconfig, N2A03_BASE, tag, owner, clock)
+n2a03_core_device::n2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: n2a03_core_device(mconfig, N2A03_CORE, tag, owner, clock)
 {
 }
 
 
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: n2a03_base_device(mconfig, N2A03, tag, owner, clock)
+	: n2a03_core_device(mconfig, N2A03, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 1)
 	, m_apu(*this, "nesapu")
 {
@@ -74,7 +74,7 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 
 
 
-std::unique_ptr<util::disasm_interface> n2a03_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> n2a03_core_device::create_disassembler()
 {
 	return std::make_unique<n2a03_disassembler>();
 }

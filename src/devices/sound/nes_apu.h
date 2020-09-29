@@ -44,7 +44,6 @@ class nesapu_device : public device_t,
 {
 public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	auto irq() { return m_irq_handler.bind(); }
@@ -57,6 +56,8 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
+	nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 

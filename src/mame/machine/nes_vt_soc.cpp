@@ -1214,7 +1214,7 @@ void nes_vt_soc_device::do_pal_timings_and_ppu_replacement(machine_config& confi
 
 void nes_vt_soc_device::device_add_mconfig(machine_config &config)
 {
-	N2A03_BASE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms N2A03 core type, not 6502
+	N2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms N2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_device::nes_vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1256,7 +1256,7 @@ void nes_vt_soc_scramble_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt_soc_device::device_add_mconfig(config);
 
-	N2A03_BASE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms N2A03 core type, not 6502
+	N2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms N2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_soc_scramble_device::nes_vt_map);
 }
 

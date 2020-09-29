@@ -18,7 +18,7 @@
 #include "m6502_swap_op_d5_d6.h"
 
 DEFINE_DEVICE_TYPE(M6502_SWAP_OP_D5_D6, m6502_swap_op_d5_d6, "m6502_swap_op_d5_d6", "M6502 swapped D5/D6")
-DEFINE_DEVICE_TYPE(N2A03_BASE_SWAP_OP_D5_D6, n2a03_base_swap_op_d5_d6, "n2a03_base_swap_op_d5_d6", "N2A03 core with swapped D5/D6")
+DEFINE_DEVICE_TYPE(N2A03_CORE_SWAP_OP_D5_D6, n2a03_core_swap_op_d5_d6, "n2a03_core_swap_op_d5_d6", "N2A03 core with swapped D5/D6")
 
 m6502_swap_op_d5_d6::m6502_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6502_SWAP_OP_D5_D6, tag, owner, clock)
@@ -73,28 +73,28 @@ u8 m6502_swap_op_d5_d6::disassembler::decrypt8(u8 value, offs_t pc, bool opcode)
 
 
 
-n2a03_base_swap_op_d5_d6::n2a03_base_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	n2a03_base_device(mconfig, N2A03_BASE_SWAP_OP_D5_D6, tag, owner, clock)
+n2a03_core_swap_op_d5_d6::n2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	n2a03_core_device(mconfig, N2A03_CORE_SWAP_OP_D5_D6, tag, owner, clock)
 {
 }
 
-void n2a03_base_swap_op_d5_d6::device_start()
+void n2a03_core_swap_op_d5_d6::device_start()
 {
 	mintf = std::make_unique<mi_decrypt>();
 	init();
 }
 
-void n2a03_base_swap_op_d5_d6::device_reset()
+void n2a03_core_swap_op_d5_d6::device_reset()
 {
-	n2a03_base_device::device_reset();
+	n2a03_core_device::device_reset();
 }
 
-uint8_t n2a03_base_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
+uint8_t n2a03_core_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 {
 	return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0);
 }
 
-uint8_t n2a03_base_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
+uint8_t n2a03_core_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 {
 	uint8_t res = cprogram.read_byte(adr);
 
@@ -103,21 +103,21 @@ uint8_t n2a03_base_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 	return res;
 }
 
-std::unique_ptr<util::disasm_interface> n2a03_base_swap_op_d5_d6::create_disassembler()
+std::unique_ptr<util::disasm_interface> n2a03_core_swap_op_d5_d6::create_disassembler()
 {
 	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
 }
 
-n2a03_base_swap_op_d5_d6::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
+n2a03_core_swap_op_d5_d6::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
 {
 }
 
-u32 n2a03_base_swap_op_d5_d6::disassembler::interface_flags() const
+u32 n2a03_core_swap_op_d5_d6::disassembler::interface_flags() const
 {
 	return SPLIT_DECRYPTION;
 }
 
-u8 n2a03_base_swap_op_d5_d6::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+u8 n2a03_core_swap_op_d5_d6::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
 	return opcode ? mintf->descramble(value) : value;
 }
