@@ -83,8 +83,8 @@ void nesapu_device::create_syncs(unsigned long sps)
 
 DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 
-nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NES_APU, tag, owner, clock)
+nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
@@ -106,6 +106,11 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	{
 		elem = 0;
 	}
+}
+
+nesapu_device::nesapu_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: nesapu_device(mconfig, NES_APU, tag, owner, clock)
+{
 }
 
 void nesapu_device::device_reset()
