@@ -500,8 +500,8 @@ ROM_END
 
 GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dobouchn, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, konslot,  0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Unknown Konami slot medal game (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, konslot2, 0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Unknown Konami slot medal game (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, konslot,  0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, konslot2, 0, slot,     kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami slot medal game (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
