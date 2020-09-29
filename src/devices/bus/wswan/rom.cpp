@@ -24,9 +24,10 @@ enum
 DEFINE_DEVICE_TYPE(WS_ROM_STD,    ws_rom_device,        "ws_rom",    "Wonderswan Standard Carts")
 DEFINE_DEVICE_TYPE(WS_ROM_SRAM,   ws_rom_sram_device,   "ws_sram",   "Wonderswan Carts w/SRAM")
 DEFINE_DEVICE_TYPE(WS_ROM_EEPROM, ws_rom_eeprom_device, "ws_eeprom", "Wonderswan Carts w/EEPROM")
+DEFINE_DEVICE_TYPE(WS_ROM_WWITCH, ws_wwitch_device,     "ws_wwitch", "WonderWitch")
 
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_ws_cart_interface(mconfig, *this),
 	m_base20(0),
@@ -45,24 +46,34 @@ ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ws_rom_device(mconfig, WS_ROM_STD, tag, owner, clock)
 {
 }
 
-ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ws_rom_device(mconfig, WS_ROM_SRAM, tag, owner, clock),
 	m_nvram_base(0)
 {
 }
 
+ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	ws_rom_device(mconfig, type, tag, owner, clock),
+	m_nvram_base(0)
+{
+}
 
-ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ws_rom_device(mconfig, WS_ROM_EEPROM, tag, owner, clock),
 	m_eeprom_mode(0), m_eeprom_address(0), m_eeprom_command(0), m_eeprom_start(0), m_eeprom_write_enabled(0)
 {
 }
 
+
+ws_wwitch_device::ws_wwitch_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	ws_rom_sram_device(mconfig, WS_ROM_WWITCH, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -135,6 +146,30 @@ void ws_rom_eeprom_device::device_start()
 	save_item(NAME(m_eeprom_write_enabled));
 }
 
+void ws_wwitch_device::device_start()
+{
+	save_item(NAME(m_flash_seq));
+	save_item(NAME(m_flash_command));
+	save_item(NAME(m_write_flash));
+	save_item(NAME(m_writing_flash));
+	save_item(NAME(m_write_resetting));
+	save_item(NAME(m_flash_mode));
+	save_item(NAME(m_flash_status));
+	ws_rom_sram_device::device_start();
+}
+
+void ws_wwitch_device::device_reset()
+{
+	m_flash_seq = 0;
+	m_flash_command = 0;
+	m_write_flash = false;
+	m_writing_flash = false;
+	m_write_resetting = false;
+	m_flash_mode = READ_MODE;
+	m_flash_status = 0;
+	ws_rom_sram_device::device_reset();
+}
+
 void ws_rom_eeprom_device::device_reset()
 {
 	m_eeprom_address = 0;
@@ -205,28 +240,28 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
  mapper specific handlers
  -------------------------------------------------*/
 
-uint8_t ws_rom_device::read_rom20(offs_t offset)
+u8 ws_rom_device::read_rom20(offs_t offset)
 {
 	return m_rom[offset + m_base20];
 }
 
 
-uint8_t ws_rom_device::read_rom30(offs_t offset)
+u8 ws_rom_device::read_rom30(offs_t offset)
 {
 	return m_rom[offset + m_base30];
 }
 
 
-uint8_t ws_rom_device::read_rom40(offs_t offset)
+u8 ws_rom_device::read_rom40(offs_t offset)
 {
 	// we still need to mask in some cases, e.g. when game is 512K
 	return m_rom[(offset + m_base40) & (m_rom_size - 1)];
 }
 
 
-uint8_t ws_rom_device::read_io(offs_t offset)
+u8 ws_rom_device::read_io(offs_t offset)
 {
-	uint8_t value = m_io_regs[offset];
+	u8 value = m_io_regs[offset];
 
 	switch (offset)
 	{
@@ -254,7 +289,7 @@ uint8_t ws_rom_device::read_io(offs_t offset)
 	return value;
 }
 
-void ws_rom_device::write_io(offs_t offset, uint8_t data)
+void ws_rom_device::write_io(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -343,17 +378,17 @@ void ws_rom_device::write_io(offs_t offset, uint8_t data)
 	m_io_regs[offset] = data;
 }
 
-uint8_t ws_rom_sram_device::read_ram(offs_t offset)
+u8 ws_rom_sram_device::read_ram(offs_t offset)
 {
 	return m_nvram[m_nvram_base + offset];
 }
 
-void ws_rom_sram_device::write_ram(offs_t offset, uint8_t data)
+void ws_rom_sram_device::write_ram(offs_t offset, u8 data)
 {
 	m_nvram[m_nvram_base + offset] = data;
 }
 
-void ws_rom_sram_device::write_io(offs_t offset, uint8_t data)
+void ws_rom_sram_device::write_io(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -366,9 +401,9 @@ void ws_rom_sram_device::write_io(offs_t offset, uint8_t data)
 }
 
 
-uint8_t ws_rom_eeprom_device::read_io(offs_t offset)
+u8 ws_rom_eeprom_device::read_io(offs_t offset)
 {
-	uint8_t value = m_io_regs[offset];
+	u8 value = m_io_regs[offset];
 
 	switch (offset)
 	{
@@ -387,7 +422,7 @@ uint8_t ws_rom_eeprom_device::read_io(offs_t offset)
 	return value;
 }
 
-void ws_rom_eeprom_device::write_io(offs_t offset, uint8_t data)
+void ws_rom_eeprom_device::write_io(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -534,4 +569,139 @@ void ws_rom_eeprom_device::write_io(offs_t offset, uint8_t data)
 	}
 
 	m_io_regs[offset] = data;
+}
+
+
+u8 ws_wwitch_device::read_ram(offs_t offset)
+{
+	if (m_flash_mode == COMMAND_MODE)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if (m_writing_flash)
+			{
+				m_flash_status ^= 0x40;
+				m_flash_count++;
+				if (m_flash_count > 4) {
+					m_writing_flash = false;
+					m_flash_mode = READ_MODE;
+				}
+			}
+			// After initiating an erase block command the wwitch expects to see bit 7 set
+			if (m_flash_command == 0x30)
+			{
+				m_flash_status |= 0x80;
+			}
+		}
+		return m_flash_status;
+	}
+	if (m_io_regs[0x01] >= 8 && m_io_regs[0x01] < 16)
+	{
+		return m_rom[((m_io_regs[0x01] * 0x10000) | offset)  & (m_rom_size - 1)];
+	}
+	if (m_io_regs[0x01] < 8)
+	{
+		return ws_rom_sram_device::read_ram(offset);
+	}
+	else
+	{
+		return 0xff;
+	}
+}
+
+
+void ws_wwitch_device::write_ram(offs_t offset, u8 data)
+{
+	if (m_flash_seq == 0 && offset == 0xaaa && data == 0xaa)
+	{
+		m_flash_seq = 1;
+	}
+	else if (m_flash_seq == 1 && offset == 0x555 && data == 0x55)
+	{
+		m_flash_seq = 2;
+	}
+	else if (m_flash_seq == 2 && offset == 0xaaa)
+	{
+		switch (data)
+		{
+		case 0x10:  // Chip erase
+			if (m_flash_command == 0x80)
+			{
+				// TODO
+			}
+			break;
+		case 0x20:  // Unlock bypass
+			m_flash_command = data;
+			m_flash_mode = COMMAND_MODE;
+			break;
+		case 0x30:  // (Erase) block
+			// TODO: Any write to a block address triggers the block erase
+			if (m_flash_command == 0x80)
+			{
+				if ((m_io_regs[0x01] & 0x07) < 7)
+				{
+						u32 block_base = (m_io_regs[0x01] & 0x07) << 16;
+						for (u32 address = 0; address < 0x10000; address++)
+						{
+							m_rom[(block_base | address) & (m_rom_size - 1)] = 0xff;
+						}
+				}
+
+				m_flash_command = data;
+				m_flash_mode = COMMAND_MODE;
+			}
+			break;
+		case 0x80:	// Erase (chip or block)
+			m_flash_command = data;
+			break;
+		default:    // Unknown command
+			m_flash_command = 0;
+		}
+		m_flash_seq = 0;
+	}
+	else if (m_io_regs[0x01] >= 8 && m_io_regs[0x01] < 15)
+	{
+		if (m_write_flash)
+		{
+				// perform write
+				m_rom[((m_io_regs[0x01] * 0x10000) | offset) & (m_rom_size - 1)] &= data;
+				m_flash_status = (m_flash_status & 0x7f) | ((data ^ 0x80) & 0x80);
+				m_writing_flash = true;
+				m_flash_count = 0;
+				m_write_flash = false;
+		}
+		else if (m_flash_command == 0x20)
+		{
+			switch (data)
+			{
+			case 0x00:
+				if (m_write_resetting)
+				{
+					m_write_flash = false;
+					m_write_resetting = false;
+					m_flash_mode = READ_MODE;
+				}
+				break;
+			case 0xF0:
+				m_write_flash = false;
+				m_write_resetting = false;
+				m_flash_mode = READ_MODE;
+				break;
+			case 0x90:
+				m_write_resetting = true;
+				break;
+			case 0xA0:
+				if (m_flash_command == 0x20)
+				{
+					m_write_flash = true;
+					m_flash_mode = COMMAND_MODE;
+				}
+				break;
+			}
+		}
+	}
+	else if (m_io_regs[0x01] < 8)
+	{
+		ws_rom_sram_device::write_ram(offset, data);
+	}
 }

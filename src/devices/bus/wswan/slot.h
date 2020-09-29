@@ -79,7 +79,8 @@ enum
 {
 	WS_STD = 0,
 	WS_SRAM,
-	WS_EEPROM
+	WS_EEPROM,
+	WWITCH
 };
 
 
@@ -92,16 +93,16 @@ public:
 	virtual ~device_ws_cart_interface();
 
 	// reading and writing
-	virtual uint8_t read_rom20(offs_t offset) { return 0xff; }
-	virtual uint8_t read_rom30(offs_t offset) { return 0xff; }
-	virtual uint8_t read_rom40(offs_t offset) { return 0xff; }
-	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual u8 read_rom20(offs_t offset) { return 0xff; }
+	virtual u8 read_rom30(offs_t offset) { return 0xff; }
+	virtual u8 read_rom40(offs_t offset) { return 0xff; }
+	virtual u8 read_ram(offs_t offset) { return 0xff; }
 	virtual void write_ram(offs_t offset, uint8_t data) {}
-	virtual uint8_t read_io(offs_t offset) { return 0xff; }
-	virtual void write_io(offs_t offset, uint8_t data) { }
+	virtual u8 read_io(offs_t offset) { return 0xff; }
+	virtual void write_io(offs_t offset, u8 data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
-	void nvram_alloc(uint32_t size);
+	void rom_alloc(u32 size, const char *tag);
+	void nvram_alloc(u32 size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_nvram_base() { return &m_nvram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
@@ -116,9 +117,9 @@ protected:
 	device_ws_cart_interface(const machine_config &mconfig, device_t &device);
 
 	// internal state
-	uint8_t *m_rom;
-	uint32_t m_rom_size;
-	std::vector<uint8_t> m_nvram;
+	u8 *m_rom;
+	u32 m_rom_size;
+	std::vector<u8> m_nvram;
 	int m_bank_mask;
 
 	bool m_has_rtc, m_is_rotated;
@@ -134,7 +135,7 @@ class ws_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: ws_cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -142,7 +143,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~ws_cart_slot_device();
 
 	// image-level overrides
@@ -163,19 +164,19 @@ public:
 
 	int get_type() { return m_type; }
 	int get_is_rotated() { return m_cart->get_is_rotated(); }
-	int get_cart_type(const uint8_t *ROM, uint32_t len, uint32_t &nvram_len) const;
-	void internal_header_logging(uint8_t *ROM, uint32_t offs, uint32_t len);
+	int get_cart_type(const uint8_t *ROM, u32 len, u32 &nvram_len) const;
+	void internal_header_logging(uint8_t *ROM, u32 offs, u32 len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	// reading and writing
-	virtual uint8_t read_rom20(offs_t offset);
-	virtual uint8_t read_rom30(offs_t offset);
-	virtual uint8_t read_rom40(offs_t offset);
-	virtual uint8_t read_ram(offs_t offset);
-	virtual void write_ram(offs_t offset, uint8_t data);
-	virtual uint8_t read_io(offs_t offset);
-	virtual void write_io(offs_t offset, uint8_t data);
+	virtual u8 read_rom20(offs_t offset);
+	virtual u8 read_rom30(offs_t offset);
+	virtual u8 read_rom40(offs_t offset);
+	virtual u8 read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, u8 data);
+	virtual u8 read_io(offs_t offset);
+	virtual void write_io(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
