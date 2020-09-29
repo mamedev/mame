@@ -138,6 +138,7 @@ void a2_video_device::device_reset()
 	m_monohgr = false;
 	m_newvideo = 0x01;
 	m_rgbmode = 3;  // default to color DHGR
+	m_monochrome = 0; // TODO: never set, but if left uninitialized could cause the emulation to start in monochrome by accident. Default to color for now
 }
 
 WRITE_LINE_MEMBER(a2_video_device::txt_w)
