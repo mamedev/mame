@@ -1733,7 +1733,7 @@ plib::istream_uptr source_file_t::stream(const pstring &name)
 
 plib::istream_uptr source_pattern_t::stream(const pstring &name)
 {
-	pstring filename = plib::pfmt(m_pattern)(name);
+	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{

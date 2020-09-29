@@ -87,9 +87,6 @@
     <ClCompile Include="..\devices\nld_7483.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_82S115.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_4013.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -127,9 +124,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74153.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_82S16.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74123.cpp">
@@ -187,9 +181,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_74174.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_2102A.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_4316.cpp">
@@ -291,9 +282,6 @@
     <ClCompile Include="..\generated\nlm_modules_lib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\macro\modules\nlmod_RTEST.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_4042.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -303,10 +291,22 @@
     <ClCompile Include="..\devices\nld_4029.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\macro\modules\nlmod_ICL8038_DIP.cpp">
+    <ClCompile Include="..\devices\nld_2102a.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\macro\modules\nlmod_NE556_DIP.cpp">
+    <ClCompile Include="..\devices\nld_82s16.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_82s115.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_icl8038_dip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_ne556_dip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\macro\modules\nlmod_rtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

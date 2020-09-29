@@ -304,8 +304,9 @@ namespace netlist
 	{
 	public:
 
-		explicit source_pattern_t(const pstring &pat)
+		explicit source_pattern_t(const pstring &pat, bool force_lowercase)
 		: m_pattern(pat)
+		, m_force_lowercase(force_lowercase)
 		{
 		}
 
@@ -314,6 +315,7 @@ namespace netlist
 
 	private:
 		pstring m_pattern;
+		bool m_force_lowercase;
 	};
 
 	class source_mem_t : public source_netlist_t
