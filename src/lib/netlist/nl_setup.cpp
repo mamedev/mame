@@ -552,10 +552,10 @@ void setup_t::register_term(detail::core_terminal_t &term)
 	}
 }
 
-void setup_t::register_term(terminal_t &term, terminal_t &other_term)
+void setup_t::register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms)
 {
 	this->register_term(term);
-	m_connected_terminals.insert({&term, &other_term});
+	m_connected_terminals.insert({&term, {other_term, splitter_terms[0], splitter_terms[1], nullptr}});
 }
 
 void setup_t::register_param_t(param_t &param)

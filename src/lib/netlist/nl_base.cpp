@@ -703,13 +703,21 @@ namespace netlist
 	// terminal_t
 	// ----------------------------------------------------------------------------------------
 
-	terminal_t::terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate)
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, nldelegate delegate)
+	: terminal_t(dev, aname, otherterm, { nullptr, nullptr }, delegate)
+	{
+	}
+
+	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
+		terminal_t *otherterm, const std::array<terminal_t *, 2> &splitterterms,
+		nldelegate delegate)
 	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
 	{
-		state().setup().register_term(*this, *otherterm);
+		state().setup().register_term(*this, otherterm, splitterterms);
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)

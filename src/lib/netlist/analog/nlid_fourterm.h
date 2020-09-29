@@ -39,16 +39,20 @@ namespace analog {
 		NETLIB_CONSTRUCTOR_EX(VCCS, nl_fptype ri = nlconst::magic(1e9))
 		, m_G(*this, "G", nlconst::one())
 		, m_RI(*this, "RI", ri)
-		, m_OP(*this, "OP", &m_IP, NETLIB_DELEGATE(termhandler))
-		, m_ON(*this, "ON", &m_IP, NETLIB_DELEGATE(termhandler))
-		, m_IP(*this, "IP", &m_IN, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
-		, m_IN(*this, "IN", &m_IP, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
+		, m_OP(*this, "OP", &m_IP, {&m_ON, &m_IN}, NETLIB_DELEGATE(termhandler))
+		, m_ON(*this, "ON", &m_IP, {&m_OP, &m_IN}, NETLIB_DELEGATE(termhandler))
+		, m_IP(*this, "IP", &m_IN, {&m_OP, &m_ON}, NETLIB_DELEGATE(termhandler))
+		, m_IN(*this, "IN", &m_IP, {&m_OP, &m_ON}, NETLIB_DELEGATE(termhandler))
 		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(termhandler))
 		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(termhandler))
+		//, m_IPx(*this, "_IPx", &m_OP, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
+		//, m_INx(*this, "_INx", &m_ON, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
 		, m_gfac(nlconst::one())
 		{
 			connect(m_OP, m_OP1);
 			connect(m_ON, m_ON1);
+			//connect(m_IP, m_IPx);
+			//connect(m_IN, m_INx);
 		}
 
 		NETLIB_RESETI();
@@ -81,6 +85,9 @@ namespace analog {
 
 		terminal_t m_OP1;
 		terminal_t m_ON1;
+
+		//terminal_t m_IPx;
+		//terminal_t m_INx;
 
 	private:
 		nl_fptype m_gfac;

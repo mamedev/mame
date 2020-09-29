@@ -1201,7 +1201,6 @@ NETLIST_START(astrob)
 	//
 	// Unconnected outputs
 	//
-	NET_C(GND, U7.7, U7.14) // avoid singular matrices
 
 #if (ENABLE_FRONTIERS)
 #define RXX 192

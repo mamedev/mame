@@ -361,10 +361,14 @@ namespace devices
 					{
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
-						analog_net_t &connected_net = netlist.setup().get_connected_terminal(pt)->net();
-						netlist.log().verbose("  Connected net {}", connected_net.name());
-						if (!check_if_processed_and_join(connected_net))
-							process_net(netlist, connected_net);
+						auto connected_terminals = netlist.setup().get_connected_terminals(pt);
+						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
+						{
+							analog_net_t &connected_net = (*ct)->net();
+							netlist.log().verbose("  Connected net {}", connected_net.name());
+							if (!check_if_processed_and_join(connected_net))
+								process_net(netlist, connected_net);
+						}
 					}
 				}
 			}
