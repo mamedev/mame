@@ -156,7 +156,7 @@ void ym2203_device::device_start()
 	m_stream = stream_alloc(0, 1, clock() / (4 * 3 * 6));
 
 	// save our data
-	save_item(YMOPN_NAME(m_address));
+	save_item(YMFM_NAME(m_address));
 
 	// save the OPN engine
 	m_opn.save(*this);

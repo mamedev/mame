@@ -188,9 +188,9 @@ void ym2610_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
 
 	// save our data
-	save_item(YMOPN_NAME(m_address));
-	save_item(YMOPN_NAME(m_eos_status));
-	save_item(YMOPN_NAME(m_flag_mask));
+	save_item(YMFM_NAME(m_address));
+	save_item(YMFM_NAME(m_eos_status));
+	save_item(YMFM_NAME(m_flag_mask));
 
 	// save the the engines
 	m_opn.save(*this);

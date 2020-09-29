@@ -7,6 +7,7 @@
 #pragma once
 
 #include "ymopn.h"
+#include "ay8910.h"
 
 
 // ======================> ym2203_device

@@ -182,9 +182,9 @@ void ym2608_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
 
 	// save our data
-	save_item(YMOPN_NAME(m_address));
-	save_item(YMOPN_NAME(m_irq_enable));
-	save_item(YMOPN_NAME(m_flag_control));
+	save_item(YMFM_NAME(m_address));
+	save_item(YMFM_NAME(m_irq_enable));
+	save_item(YMFM_NAME(m_flag_control));
 
 	// save the the engines
 	m_opn.save(*this);

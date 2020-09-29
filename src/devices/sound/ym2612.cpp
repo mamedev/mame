@@ -136,10 +136,10 @@ void ym2612_device::device_start()
 	device_clock_changed();
 
 	// save our data
-	save_item(YMOPN_NAME(m_address));
-	save_item(YMOPN_NAME(m_dac_data));
-	save_item(YMOPN_NAME(m_dac_enable));
-	save_item(YMOPN_NAME(m_channel));
+	save_item(YMFM_NAME(m_address));
+	save_item(YMFM_NAME(m_dac_data));
+	save_item(YMFM_NAME(m_dac_enable));
+	save_item(YMFM_NAME(m_channel));
 
 	// save the the engines
 	m_opn.save(*this);

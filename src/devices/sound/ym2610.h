@@ -8,6 +8,7 @@
 
 #include "ymopn.h"
 #include "ymadpcm.h"
+#include "ay8910.h"
 
 
 // ======================> ym2610_device
