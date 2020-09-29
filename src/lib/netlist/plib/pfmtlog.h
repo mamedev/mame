@@ -9,10 +9,10 @@
 #define PFMTLOG_H_
 
 #include "penum.h"
+#include "pgsl.h"
 #include "ppmf.h"
 #include "pstring.h"
 #include "ptypes.h"
-#include "pgsl.h"
 
 #include <limits>
 #include <locale>

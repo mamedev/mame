@@ -8,8 +8,8 @@
 #ifndef NL_PARSER_H_
 #define NL_PARSER_H_
 
-#include "nltypes.h" // for setup_t
 #include "core/setup.h"
+#include "nltypes.h" // for setup_t
 #include "plib/ptokenizer.h"
 
 #include <unordered_map>

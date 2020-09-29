@@ -136,7 +136,6 @@ namespace plib {
 	#endif
 	}
 
-
 	fpsignalenabler::~fpsignalenabler()
 	{
 	#if HAS_FEENABLE_EXCEPT

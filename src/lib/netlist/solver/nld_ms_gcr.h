@@ -12,8 +12,8 @@
 
 #include "nld_matrix_solver_ext.h"
 #include "nld_solver.h"
-#include "plib/pmatrix_cr.h"
 #include "plib/pdynlib.h"
+#include "plib/pmatrix_cr.h"
 #include "plib/pstream.h"
 #include "plib/vector_ops.h"
 

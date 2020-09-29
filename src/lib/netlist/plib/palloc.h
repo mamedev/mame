@@ -256,7 +256,10 @@ namespace plib {
 
 		~arena_allocator() noexcept = default;
 
-		PCOPYASSIGNMOVE(arena_allocator, default)
+		arena_allocator(const arena_allocator &) = default;
+		arena_allocator &operator=(const arena_allocator &) = default;
+		arena_allocator(arena_allocator &&) noexcept = default;
+		arena_allocator &operator=(arena_allocator &&) noexcept = default;
 
 		explicit arena_allocator(arena_type & a) noexcept : m_a(a)
 		{
