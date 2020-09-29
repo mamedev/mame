@@ -473,7 +473,7 @@ uint8_t nes_vt_soc_device::spr_r(offs_t offset)
 
 uint8_t nes_vt_soc_device::chr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
+	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
 		return m_chrram[offset];
 	}
@@ -489,10 +489,17 @@ uint8_t nes_vt_soc_device::chr_r(offs_t offset)
 
 void nes_vt_soc_device::chr_w(offs_t offset, uint8_t data)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
+	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
 		logerror("vram write %04x %02x\n", offset, data);
 		m_chrram[offset] = data;
+	}
+	else
+	{
+		int realaddr = calculate_real_video_address(offset, 1, 0);
+
+		address_space& spc = this->space(AS_PROGRAM);
+		return spc.write_byte(realaddr, data);
 	}
 }
 
@@ -775,7 +782,7 @@ void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 	offset &= 0x7fff;
 
 	uint16_t addr = offset+0x8000;
-	if ((m_411d & 0x01) && (m_411d & 0x03))
+	if ((m_411d & 0x01) && (m_411d & 0x03)) // this condition is nonsense, maybe should be ((m_411d & 0x03) == 0x03) check it!  (newer VT only, not VT03/09, split)
 	{
 		//CNROM compat
 		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
@@ -787,13 +794,13 @@ void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 		m_ppu->set_201x_reg(0x5, data * 8 + 7);
 
 	}
-	else if (m_411d & 0x01)
+	else if (m_411d & 0x01) // (newer VT only, not VT03/09, split)
 	{
 		//MMC1 compat, TODO
 		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
 
 	}
-	else if (m_411d & 0x02)
+	else if (m_411d & 0x02) // (newer VT only, not VT03/09, split)
 	{
 		//UNROM compat
 		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
@@ -802,7 +809,7 @@ void nes_vt_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
 		update_banks();
 	}
-	else
+	else // standard mode (VT03/09)
 	{
 		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
 
