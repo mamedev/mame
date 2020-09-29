@@ -3319,3 +3319,13 @@ if (CPUS["UPD177X"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.h")
 end
+
+--------------------------------------------------
+-- Sanyo LC58 - Disassembler only
+--@src/devices/cpu/lc58/lc58.h,CPUS["LC58"] = true
+--------------------------------------------------
+
+if (CPUS["LC58"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.h")
+end
