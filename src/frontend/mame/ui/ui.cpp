@@ -1487,7 +1487,7 @@ std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
 
 std::unique_ptr<slider_state> mame_ui_manager::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	auto state = make_unique_clear<slider_state>();
+	auto state = std::make_unique<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;

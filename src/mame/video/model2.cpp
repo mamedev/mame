@@ -157,7 +157,7 @@ static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex
 	dst->pz = (p1.x * p2.y) - (p1.y * p2.x);
 }
 
-static inline void apply_focus( geo_state *geo, poly_vertex *p0)
+static inline void apply_focus( model2_state::geo_state *geo, poly_vertex *p0)
 {
 	p0->x *= geo->focus.x;
 	p0->y *= geo->focus.y;
@@ -201,7 +201,7 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *v
 	poly_vertex *cur, *out;
 	float   curdot, nextdot, scale;
 	int32_t   i, curin, nextin, nextvert, outcount;
-	plane clip_plane;
+	model2_state::plane clip_plane;
 
 	clip_plane.normal.x = 0.0f;
 	clip_plane.normal.y = 0.0f;
@@ -285,7 +285,7 @@ inline bool model2_state::check_culling( raster_state *raster, u32 attr, float m
 
 void model2_state::raster_init( memory_region *texture_rom )
 {
-	m_raster = make_unique_clear<raster_state>();
+	m_raster = std::make_unique<raster_state>();
 
 	m_raster->texture_rom = (u16 *)texture_rom->base();
 	m_raster->texture_rom_mask = (texture_rom->bytes() / 2) - 1;
@@ -1159,7 +1159,7 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 
 void model2_state::geo_init(memory_region *polygon_rom)
 {
-	m_geo = make_unique_clear<geo_state>();
+	m_geo = std::make_unique<geo_state>();
 	m_geo->state = this;
 
 	m_geo->raster = m_raster.get();

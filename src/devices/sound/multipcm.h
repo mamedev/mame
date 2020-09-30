@@ -37,17 +37,17 @@ protected:
 private:
 	struct sample_t
 	{
-		uint32_t m_start;
-		uint32_t m_loop;
-		uint32_t m_end;
-		uint8_t m_attack_reg;
-		uint8_t m_decay1_reg;
-		uint8_t m_decay2_reg;
-		uint8_t m_decay_level;
-		uint8_t m_release_reg;
-		uint8_t m_key_rate_scale;
-		uint8_t m_lfo_vibrato_reg;
-		uint8_t m_lfo_amplitude_reg;
+		uint32_t m_start = 0;
+		uint32_t m_loop = 0;
+		uint32_t m_end = 0;
+		uint8_t m_attack_reg = 0;
+		uint8_t m_decay1_reg = 0;
+		uint8_t m_decay2_reg = 0;
+		uint8_t m_decay_level = 0;
+		uint8_t m_release_reg = 0;
+		uint8_t m_key_rate_scale = 0;
+		uint8_t m_lfo_vibrato_reg = 0;
+		uint8_t m_lfo_amplitude_reg = 0;
 	};
 
 	enum class state_t : u8
@@ -60,38 +60,38 @@ private:
 
 	struct envelope_gen_t
 	{
-		int32_t m_volume;
-		state_t m_state;
-		int32_t step;
+		int32_t m_volume = 0;
+		state_t m_state = state_t::ATTACK;
+		int32_t step = 0;
 		//step vals
-		int32_t m_attack_rate;     // Attack
-		int32_t m_decay1_rate;    // Decay1
-		int32_t m_decay2_rate;    // Decay2
-		int32_t m_release_rate;     // Release
-		int32_t m_decay_level;     // Decay level
+		int32_t m_attack_rate = 0;  // Attack
+		int32_t m_decay1_rate = 0;  // Decay1
+		int32_t m_decay2_rate = 0;  // Decay2
+		int32_t m_release_rate = 0; // Release
+		int32_t m_decay_level = 0;  // Decay level
 	};
 
 	struct lfo_t
 	{
-		uint16_t m_phase;
-		uint32_t m_phase_step;
-		int32_t *m_table;
-		int32_t *m_scale;
+		uint16_t m_phase = 0;
+		uint32_t m_phase_step = 0;
+		int32_t *m_table = nullptr;
+		int32_t *m_scale = nullptr;
 	};
 
 	struct slot_t
 	{
-		uint8_t m_regs[8];
-		bool m_playing;
+		uint8_t m_regs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		bool m_playing = false;
 		sample_t m_sample;
-		uint32_t m_base;
-		uint32_t m_offset;
-		uint32_t m_step;
-		uint32_t m_pan;
-		uint32_t m_total_level;
-		uint32_t m_dest_total_level;
-		int32_t m_total_level_step;
-		int32_t m_prev_sample;
+		uint32_t m_base = 0;
+		uint32_t m_offset = 0;
+		uint32_t m_step = 0;
+		uint32_t m_pan = 0;
+		uint32_t m_total_level = 0;
+		uint32_t m_dest_total_level = 0;
+		int32_t m_total_level_step = 0;
+		int32_t m_prev_sample = 0;
 		envelope_gen_t m_envelope_gen;
 		lfo_t m_pitch_lfo; // Pitch lfo
 		lfo_t m_amplitude_lfo; // AM lfo

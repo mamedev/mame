@@ -39,7 +39,7 @@ void namcos21_dsp_c67_device::device_start()
 
 	m_yield_hack_cb.resolve_safe();
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
-	m_mpDspState = make_unique_clear<dsp_state>();
+	m_mpDspState = std::make_unique<dsp_state>();
 
 	save_item(NAME(m_dspram16));
 }

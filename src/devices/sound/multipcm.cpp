@@ -575,7 +575,7 @@ void multipcm_device::device_start()
 	save_item(NAME(m_address));
 
 	// Slots
-	m_slots = make_unique_clear<slot_t []>(28);
+	m_slots = std::make_unique<slot_t []>(28);
 
 	save_pointer(STRUCT_MEMBER(m_slots, m_regs), 28);
 	save_pointer(STRUCT_MEMBER(m_slots, m_playing), 28);

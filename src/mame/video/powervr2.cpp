@@ -3976,7 +3976,7 @@ void powervr2_device::device_start()
 {
 	irq_cb.resolve_safe();
 
-	grab = make_unique_clear<receiveddata[]>(NUM_BUFFERS);
+	grab = std::make_unique<receiveddata[]>(NUM_BUFFERS);
 
 	pvr_build_parameterconfig();
 

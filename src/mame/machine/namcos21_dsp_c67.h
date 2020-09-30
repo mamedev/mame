@@ -8,13 +8,16 @@
 #include "machine/namco_c67.h"
 #include "video/namcos21_3d.h"
 
-#define PTRAM_SIZE 0x20000
+#include <algorithm>
+
 
 #define ENABLE_LOGGING      0
 
 class namcos21_dsp_c67_device : public device_t
 {
 public:
+	static constexpr unsigned PTRAM_SIZE = 0x20000;
+
 	enum
 	{   /* Namco System21 */
 		NAMCOS21_AIRCOMBAT = 0x4000,
@@ -51,20 +54,27 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	#define DSP_BUF_MAX (4096*12)
+	static constexpr unsigned DSP_BUF_MAX = 4096*12;
 	struct dsp_state
 	{
-		unsigned masterSourceAddr;
+		dsp_state()
+		{
+			std::fill(std::begin(slaveInputBuffer), std::end(slaveInputBuffer), 0);
+			std::fill(std::begin(slaveOutputBuffer), std::end(slaveOutputBuffer), 0);
+			std::fill(std::begin(masterDirectDrawBuffer), std::end(masterDirectDrawBuffer), 0);
+		}
+
+		unsigned masterSourceAddr = 0;
 		uint16_t slaveInputBuffer[DSP_BUF_MAX];
-		unsigned slaveBytesAvailable;
-		unsigned slaveBytesAdvertised;
-		unsigned slaveInputStart;
+		unsigned slaveBytesAvailable = 0;
+		unsigned slaveBytesAdvertised = 0;
+		unsigned slaveInputStart = 0;
 		uint16_t slaveOutputBuffer[DSP_BUF_MAX];
-		unsigned slaveOutputSize;
+		unsigned slaveOutputSize = 0;
 		uint16_t masterDirectDrawBuffer[256];
-		unsigned masterDirectDrawSize;
-		int masterFinished;
-		int slaveActive;
+		unsigned masterDirectDrawSize = 0;
+		int masterFinished = 0;
+		int slaveActive = 0;
 	};
 
 	required_device<namcos21_3d_device> m_renderer;

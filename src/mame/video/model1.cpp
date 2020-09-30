@@ -1573,9 +1573,9 @@ void model1_state::video_start()
 
 	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
-	m_pointdb = make_unique_clear<model1_state::point_t[]>(1000000*2);
-	m_quaddb  = make_unique_clear<model1_state::quad_t[]>(1000000);
-	m_quadind = make_unique_clear<model1_state::quad_t *[]>(1000000);
+	m_pointdb = std::make_unique<point_t[]>(1000000*2);
+	m_quaddb  = std::make_unique<quad_t[]>(1000000);
+	m_quadind = make_unique_clear<quad_t *[]>(1000000);
 
 	m_pointpt = &m_pointdb[0];
 	m_quadpt = &m_quaddb[0];

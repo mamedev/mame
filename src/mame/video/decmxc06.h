@@ -28,11 +28,11 @@ protected:
 private:
 	struct sprite_t
 	{
-		int height;
-		u32 code[8], colour;
-		int x[8], y[8];
-		bool flipx, flipy;
-		u32 pri_mask;
+		int height = 0;
+		u32 code[8] = { 0, 0, 0, 0, 0, 0, 0, 0 }, colour = 0;
+		int x[8] = { 0, 0, 0, 0, 0, 0, 0, 0 }, y[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		bool flipx = false, flipy = false;
+		u32 pri_mask = 0;
 	};
 	colpri_cb_delegate m_colpri_cb;
 	bool m_flip_screen;

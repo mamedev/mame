@@ -44,9 +44,6 @@
 #include <iostream>
 
 
-/* for_each collides with c++ standard libraries - include it here */
-#define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
-
 // device type definition
 DEFINE_DEVICE_TYPE(DISCRETE, discrete_sound_device, "discrete", "Discrete Sound")
 
@@ -124,7 +121,7 @@ public:
 	node_step_list_t        step_list;
 
 	/* list of source nodes */
-	vector_t<input_buffer> source_list;      /* discrete_source_node */
+	std::vector<input_buffer> source_list;      /* discrete_source_node */
 
 	int                     task_group;
 
@@ -144,7 +141,7 @@ protected:
 	void check(discrete_task *dest_task);
 	void prepare_for_queue(int samples);
 
-	vector_t<output_buffer>      m_buffers;
+	std::vector<output_buffer>      m_buffers;
 	discrete_device &                   m_device;
 
 private:
@@ -183,27 +180,25 @@ private:
 
 inline void discrete_task::step_nodes(void)
 {
-	for_each(input_buffer *, sn, &source_list)
+	for (input_buffer &sn : source_list)
 	{
-		sn->buffer = *sn->ptr++;
+		sn.buffer = *sn.ptr++;
 	}
 
 	if (EXPECTED(!m_device.profiling()))
 	{
-		for_each(discrete_step_interface **, entry, &step_list)
+		for (discrete_step_interface *entry : step_list)
 		{
 			/* Now step the node */
-			(*entry)->step();
+			entry->step();
 		}
 	}
 	else
 	{
 		osd_ticks_t last = get_profile_ticks();
 
-		for_each(discrete_step_interface **, entry, &step_list)
+		for (discrete_step_interface *node : step_list)
 		{
-			discrete_step_interface *node = *entry;
-
 			node->run_time -= last;
 			node->step();
 			last = get_profile_ticks();
@@ -212,8 +207,8 @@ inline void discrete_task::step_nodes(void)
 	}
 
 	/* buffer the outputs */
-	for_each(output_buffer *, outbuf, &m_buffers)
-		*(outbuf->ptr++) = *outbuf->source;
+	for (output_buffer &outbuf : m_buffers)
+		*outbuf.ptr++ = *outbuf.source;
 }
 
 void *discrete_task::task_callback(void *param, int threadid)
@@ -221,14 +216,14 @@ void *discrete_task::task_callback(void *param, int threadid)
 	task_list_t *list = (task_list_t *) param;
 	do
 	{
-		for_each(discrete_task **, task, list)
+		for (discrete_task *task : *list)
 		{
 			/* try to lock */
-			if ((*task)->lock_threadid(threadid))
+			if (task->lock_threadid(threadid))
 			{
-				if (!(*task)->process())
+				if (!task->process())
 					return nullptr;
-				(*task)->unlock();
+				task->unlock();
 			}
 		}
 	} while (1);
@@ -241,11 +236,9 @@ bool discrete_task::process(void)
 	int samples = std::min(int(m_samples), MAX_SAMPLES_PER_TASK_SLICE);
 
 	/* check dependencies */
-	for_each(input_buffer *, sn, &source_list)
+	for (input_buffer &sn : source_list)
 	{
-		int avail;
-
-		avail = sn->linked_outbuf->ptr - sn->ptr;
+		int avail = sn.linked_outbuf->ptr - sn.ptr;
 		if (avail < 0)
 			throw emu_fatalerror("discrete_task::process: available samples are negative");
 		if (avail < samples)
@@ -273,13 +266,13 @@ void discrete_task::prepare_for_queue(int samples)
 {
 	m_samples = samples;
 	/* set up task buffers */
-	for_each(output_buffer *, ob, &m_buffers)
-		ob->ptr = ob->node_buf;
+	for (output_buffer &ob : m_buffers)
+		ob.ptr = ob.node_buf;
 
 	/* initialize sources */
-	for_each(input_buffer *, sn, &source_list)
+	for (input_buffer &sn : source_list)
 	{
-		sn->ptr = sn->linked_outbuf->node_buf;
+		sn.ptr = sn.linked_outbuf->node_buf;
 	}
 }
 
@@ -290,13 +283,13 @@ void discrete_task::check(discrete_task *dest_task)
 	/* Determine, which nodes in the task are referenced by nodes in dest_task
 	 * and add them to the list of nodes to be buffered for further processing
 	 */
-	for_each(discrete_step_interface **, node_entry, &step_list)
+	for (discrete_step_interface *node_entry : step_list)
 	{
-		discrete_base_node *task_node = (*node_entry)->self;
+		discrete_base_node *task_node = node_entry->self;
 
-		for_each(discrete_step_interface **, step_entry, &dest_task->step_list)
+		for (discrete_step_interface *step_entry : dest_task->step_list)
 		{
-			discrete_base_node *dest_node = (*step_entry)->self;
+			discrete_base_node *dest_node = step_entry->self;
 
 			/* loop over all active inputs */
 			for (inputnum = 0; inputnum < dest_node->active_inputs(); inputnum++)
@@ -311,7 +304,7 @@ void discrete_task::check(discrete_task *dest_task)
 						int i, found = -1;
 						output_buffer *pbuf = nullptr;
 
-						for (i = 0; i < m_buffers.count(); i++)
+						for (i = 0; i < m_buffers.size(); i++)
 //                          if (m_buffers[i].node->block_node() == inputnode_num)
 							if (m_buffers[i].node_num == inputnode_num)
 							{
@@ -330,8 +323,8 @@ void discrete_task::check(discrete_task *dest_task)
 							buf.source = dest_node->m_input[inputnum];
 							buf.node_num = inputnode_num;
 							//buf.node = device->discrete_find_node(inputnode);
-							m_buffers.count();
-							pbuf = m_buffers.add(buf);
+							m_buffers.push_back(buf);
+							pbuf = &m_buffers.back();
 						}
 						m_device.discrete_log("dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode_num), NODE_CHILD_NODE_NUM(inputnode_num), this, task_group, dest_node->index(), dest_task->task_group);
 
@@ -342,10 +335,10 @@ void discrete_task::check(discrete_task *dest_task)
 						source.linked_outbuf = pbuf;
 						source.buffer = 0.0; /* please compiler */
 						source.ptr = nullptr;
-						dest_task->source_list.add(source);
+						dest_task->source_list.push_back(source);
 
 						/* point the input to a buffered location */
-						dest_node->m_input[inputnum] = &dest_task->source_list[dest_task->source_list.count()-1].buffer; // was copied!   &source.buffer;
+						dest_node->m_input[inputnum] = &dest_task->source_list.back().buffer; // was copied!   &source.buffer;
 
 					}
 				}
@@ -520,7 +513,7 @@ void discrete_device::discrete_build_list(const discrete_block *intf, sound_bloc
 			if (intf[node_count].type == DSS_NULL)
 				fatalerror("discrete_build_list: DISCRETE_REPLACE at end of node_list\n");
 
-			for (int i=0; i < block_list.count(); i++)
+			for (int i=0; i < block_list.size(); i++)
 			{
 				const discrete_block *block = block_list[i];
 
@@ -540,9 +533,9 @@ void discrete_device::discrete_build_list(const discrete_block *intf, sound_bloc
 		}
 		else if (intf[node_count].type == DSO_DELETE)
 		{
-			vector_t<int> deletethem;
+			std::vector<int> deletethem;
 
-			for (int i=0; i<block_list.count(); i++)
+			for (int i=0; i<block_list.size(); i++)
 			{
 				const discrete_block *block = block_list[i];
 
@@ -550,16 +543,16 @@ void discrete_device::discrete_build_list(const discrete_block *intf, sound_bloc
 						(block->node <= intf[node_count].input_node[1]))
 				{
 					discrete_log("discrete_build_list() - DISCRETE_DELETE deleted NODE_%02d", NODE_INDEX(block->node) );
-					deletethem.add(i);
+					deletethem.push_back(i);
 				}
 			}
-			for_each (int *, i, &deletethem)
-				block_list.remove(*i);
+			for (int i : deletethem)
+				block_list.erase(block_list.begin() + i); // FIXME: how is this supposed to work if there's more than one item to remove?  indices are shifted back on each removal
 		}
 		else
 		{
 			discrete_log("discrete_build_list() - adding node %d\n", node_count);
-			block_list.add(&intf[node_count]);
+			block_list.push_back(&intf[node_count]);
 		}
 
 		node_count++;
@@ -575,7 +568,7 @@ void discrete_device::discrete_sanity_check(const sound_block_list_t &block_list
 	int node_count = 0;
 
 	discrete_log("discrete_start() - Doing node list sanity check");
-	for (int i=0; i < block_list.count(); i++)
+	for (int i=0; i < block_list.size(); i++)
 	{
 		const discrete_block *block = block_list[i];
 
@@ -622,10 +615,10 @@ static uint64_t list_run_time(const node_list_t &list)
 {
 	uint64_t total = 0;
 
-	for_each(discrete_base_node **, node, &list)
+	for (discrete_base_node *node : list)
 	{
 		discrete_step_interface *step;
-		if ((*node)->interface(step))
+		if (node->interface(step))
 			total += step->run_time;
 	}
 	return total;
@@ -635,9 +628,9 @@ static uint64_t step_list_run_time(const node_step_list_t &list)
 {
 	uint64_t total = 0;
 
-	for_each(discrete_step_interface **, node, &list)
+	for (discrete_step_interface *node : list)
 	{
-		total += (*node)->run_time;
+		total += node->run_time;
 	}
 	return total;
 }
@@ -651,28 +644,28 @@ void discrete_device::display_profiling(void)
 
 	/* calculate total time */
 	total = list_run_time(m_node_list);
-	count = m_node_list.count();
+	count = m_node_list.size();
 	/* print statistics */
-	util::stream_format(std::cout, "Total Samples  : %16d\n", m_total_samples);
+	osd_printf_info("Total Samples  : %16d\n", m_total_samples);
 	tresh = total / count;
-	util::stream_format(std::cout, "Threshold (mean): %16d\n", tresh / m_total_samples );
-	for_each(discrete_base_node **, node, &m_node_list)
+	osd_printf_info("Threshold (mean): %16d\n", tresh / m_total_samples);
+	for (discrete_base_node *node : m_node_list)
 	{
 		discrete_step_interface *step;
-		if ((*node)->interface(step))
+		if (node->interface(step))
 			if (step->run_time > tresh)
-				util::stream_format(std::cout, "%3d: %20s %8.2f %10.2f\n", (*node)->index(), (*node)->module_name(), double(step->run_time) / double(total) * 100.0, double(step->run_time) / double(m_total_samples));
+				osd_printf_info("%3d: %20s %8.2f %10.2f\n", node->index(), node->module_name(), double(step->run_time) / double(total) * 100.0, double(step->run_time) / double(m_total_samples));
 	}
 
 	/* Task information */
-	for_each(discrete_task **, task, &task_list)
+	for (discrete_task *task : task_list)
 	{
-		tt =  step_list_run_time((*task)->step_list);
+		tt =  step_list_run_time(task->step_list);
 
-		util::stream_format(std::cout, "Task(%d): %8.2f %15.2f\n", (*task)->task_group, tt / double(total) * 100.0, tt / double(m_total_samples));
+		osd_printf_info("Task(%d): %8.2f %15.2f\n", task->task_group, tt / double(total) * 100.0, tt / double(m_total_samples));
 	}
 
-	util::stream_format(std::cout, "Average samples/double->update: %8.2f\n", double(m_total_samples) / double(m_total_stream_updates));
+	osd_printf_info("Average samples/double->update: %8.2f\n", double(m_total_samples) / double(m_total_stream_updates));
 }
 
 
@@ -692,7 +685,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 	/* check whether we have tasks ... */
 	if (USE_DISCRETE_TASKS)
 	{
-		for (int i = 0; i < block_list.count(); i++)
+		for (int i = 0; i < block_list.size(); i++)
 		{
 			if (block_list[i]->type == DSO_TASK_START)
 				has_tasks = 1;
@@ -705,11 +698,11 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		 * No need to create a node since there are no dependencies.
 		 */
 		task = auto_alloc_clear(machine(), <discrete_task>(*this));
-		task_list.add(task);
+		task_list.push_back(task);
 	}
 
 	/* loop over all nodes */
-	for (int i = 0; i < block_list.count(); i++)
+	for (int i = 0; i < block_list.size(); i++)
 	{
 		const discrete_block *block = block_list[i];
 
@@ -743,8 +736,8 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 						task->task_group = block->initial[0];
 						if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 							fatalerror("discrete_dso_task: illegal task_group %d\n", task->task_group);
-						//util::stream_format(std::cout, "task group %d\n", task->task_group);
-						task_list.add(task);
+						//logerror("task group %d\n", task->task_group);
+						task_list.push_back(task);
 					}
 					break;
 
@@ -770,7 +763,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		}
 
 		/* add to node list */
-		m_node_list.add(node);
+		m_node_list.push_back(node);
 
 		/* our running order just follows the order specified */
 		/* does the node step ? */
@@ -781,7 +774,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 			if (task == nullptr)
 				fatalerror("init_nodes() - found node outside of task: %s\n", node->module_name() );
 			else
-				task->step_list.add(step);
+				task->step_list.push_back(step);
 		}
 
 		if (USE_DISCRETE_TASKS &&  block->type == DSO_TASK_END)
@@ -810,11 +803,11 @@ int discrete_device::same_module_index(const discrete_base_node &node)
 {
 	int index = 0;
 
-	for_each(discrete_base_node **, n, &m_node_list)
+	for (discrete_base_node *n : m_node_list)
 	{
-		if (*n == &node)
+		if (n == &node)
 			return index;
-		if ((*n)->module_type() == node.module_type())
+		if (n->module_type() == node.module_type())
 			index++;
 	}
 	return -1;
@@ -903,27 +896,27 @@ void discrete_device::device_start()
 	init_nodes(block_list);
 
 	/* now go back and find pointers to all input nodes */
-	for_each(discrete_base_node **, node, &m_node_list)
+	for (discrete_base_node *node : m_node_list)
 	{
-		(*node)->resolve_input_nodes();
+		node->resolve_input_nodes();
 	}
 
 	/* allocate a queue */
 	m_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* Process nodes which have a start func */
-	for_each(discrete_base_node **, node, &m_node_list)
+	for (discrete_base_node *node : m_node_list)
 	{
-		(*node)->start();
+		node->start();
 	}
 
 	/* Now set up tasks */
-	for_each(discrete_task **, task, &task_list)
+	for (discrete_task *task : task_list)
 	{
-		for_each(discrete_task **, dest_task, &task_list)
+		for (discrete_task *dest_task : task_list)
 		{
-			if ((*task)->task_group > (*dest_task)->task_group)
-				(*dest_task)->check((*task));
+			if (task->task_group > dest_task->task_group)
+				dest_task->check(task);
 		}
 	}
 }
@@ -942,9 +935,9 @@ void discrete_device::device_stop()
 
 	/* Process nodes which have a stop func */
 
-	for_each(discrete_base_node **, node, &m_node_list)
+	for (discrete_base_node *node : m_node_list)
 	{
-		(*node)->stop();
+		node->stop();
 	}
 
 	if (DISCRETE_DEBUGLOG)
@@ -969,31 +962,31 @@ void discrete_sound_device::device_start()
 	discrete_device::device_start();
 
 	/* look for input stream nodes */
-	for_each(discrete_base_node **, node, &m_node_list)
+	for (discrete_base_node *node : m_node_list)
 	{
 		/* if we are an stream input node, track that */
-		discrete_dss_input_stream_node *input_stream = dynamic_cast<discrete_dss_input_stream_node *>(*node);
+		discrete_dss_input_stream_node *input_stream = dynamic_cast<discrete_dss_input_stream_node *>(node);
 		if (input_stream != nullptr)
 		{
-			m_input_stream_list.add(input_stream);
+			m_input_stream_list.push_back(input_stream);
 		}
 		/* if this is an output interface, add it the output list */
 		discrete_sound_output_interface *out;
-		if ((*node)->interface(out))
-			m_output_list.add(out);
+		if (node->interface(out))
+			m_output_list.push_back(out);
 	}
 
 	/* if no outputs, give an error */
-	if (m_output_list.count() == 0)
+	if (m_output_list.empty())
 		fatalerror("init_nodes() - Couldn't find an output node\n");
 
 	/* initialize the stream(s) */
-	m_stream = stream_alloc(m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
+	m_stream = stream_alloc(m_input_stream_list.size(), m_output_list.size(), m_sample_rate);
 
 	/* Finalize stream_input_nodes */
-	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)
+	for (discrete_dss_input_stream_node *node : m_input_stream_list)
 	{
-		(*node)->stream_start();
+		node->stream_start();
 	}
 
 
@@ -1008,12 +1001,12 @@ void discrete_device::device_reset()
 	update_to_current_time();
 
 	/* loop over all nodes */
-	for_each (discrete_base_node **, node, &m_node_list)
+	for (discrete_base_node *node : m_node_list)
 	{
 		/* Fimxe : node_level */
-		(*node)->m_output[0] = 0;
+		node->m_output[0] = 0;
 
-		(*node)->reset();
+		node->reset();
 	}
 }
 
@@ -1037,17 +1030,18 @@ void discrete_device::process(int samples)
 		return;
 
 	/* Setup tasks */
-	for_each(discrete_task **, task, &task_list)
+	for (discrete_task *task : task_list)
 	{
 		/* unlock the thread */
-		(*task)->unlock();
+		task->unlock();
 
-		(*task)->prepare_for_queue(samples);
+		task->prepare_for_queue(samples);
 	}
 
-	for_each(discrete_task **, task, &task_list)
+	for (discrete_task *task : task_list)
 	{
 		/* Fire a work item for each task */
+		(void)task;
 		osd_work_item_queue(m_queue, discrete_task::task_callback, (void *) &task_list, WORK_ITEM_FLAG_AUTO_RELEASE);
 	}
 	osd_work_queue_wait(m_queue, osd_ticks_per_second()*10);
@@ -1069,17 +1063,17 @@ void discrete_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 	int outputnum = 0;
 
 	/* Setup any output streams */
-	for_each(discrete_sound_output_interface **, node, &m_output_list)
+	for (discrete_sound_output_interface *node : m_output_list)
 	{
-		(*node)->set_output_ptr(outputs[outputnum]);
+		node->set_output_ptr(outputs[outputnum]);
 		outputnum++;
 	}
 
 	/* Setup any input streams */
-	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)
+	for (discrete_dss_input_stream_node *node : m_input_stream_list)
 	{
-		(*node)->m_inview = &inputs[(*node)->m_stream_in_number];
-		(*node)->m_inview_sample = 0;
+		node->m_inview = &inputs[node->m_stream_in_number];
+		node->m_inview_sample = 0;
 	}
 
 	/* just process it */

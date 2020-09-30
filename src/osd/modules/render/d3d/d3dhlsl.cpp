@@ -1976,7 +1976,7 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 
 std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	auto state = make_unique_clear<slider_state>();
+	auto state = std::make_unique<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;
